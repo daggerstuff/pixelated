@@ -1,5 +1,9 @@
 name: Bias Detection Engine CI/CD
 
+concurrency:
+  group: bias-detection-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   id-token: write
@@ -24,6 +28,7 @@ on:
     - src/components/admin/bias-detection/**
     - src/pages/api/bias-detection/**
     - tests/**/*bias-detection*
+  workflow_dispatch:
 
 env:
   NODE_VERSION: 24.8.0
@@ -263,15 +268,8 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Ensure `uv` shim is available
-      run: |
-        if ! command -v uv >/dev/null 2>&1; then
-          echo "uv not found - installing via pip"
-          python -m pip install --upgrade pip
-          python -m pip install uv
-        else
-          echo "uv already installed"
-        fi
+    - name: Setup uv
+      uses: ./.github/actions/setup-uv
 
     - name: Cache pip dependencies
       uses: actions/cache@v4.2.3
@@ -391,15 +389,8 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Ensure `uv` shim is available
-      run: |
-        if ! command -v uv >/dev/null 2>&1; then
-          echo "uv not found - installing via pip"
-          python -m pip install --upgrade pip
-          python -m pip install uv
-        else
-          echo "uv already installed"
-        fi
+    - name: Setup uv
+      uses: ./.github/actions/setup-uv
 
     - name: Install Python ML dependencies
       run: |

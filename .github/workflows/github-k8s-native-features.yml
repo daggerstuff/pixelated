@@ -1,5 +1,9 @@
 name: GitHub-Native Kubernetes Features
 
+concurrency:
+  group: github-k8s-native-features-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   id-token: write
@@ -30,6 +34,7 @@ jobs:
   deployment-status:
     name: GitHub-Native Deployment Status
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.feature_type == 'deployment-status'
     steps:
       - name: Checkout code
@@ -37,14 +42,9 @@ jobs:
 
       - name: Load GCP environment
         run: |
-          if [[ -f ".env" ]]; then
-            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GCP_PROJECT_ID" ]]; then echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_CLUSTER_NAME" ]]; then echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_ZONE" ]]; then echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GCP_PROJECT_ID, GKE_CLUSTER_NAME, GKE_ZONE are set via secrets in auth step
+          echo "Using GitHub Secrets for GCP configuration"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -78,6 +78,9 @@ jobs:
               required_contexts: [],
               payload: { cluster, namespace, strategy: 'rolling', github_native_features: true }
             });
+            if (!res.data || !res.data.id) {
+              throw new Error('GitHub API returned invalid deployment response');
+            }
             console.log('✅ GitHub-native deployment created:', res.data.id);
             return res.data.id;
 
@@ -89,6 +92,11 @@ jobs:
             const deploymentId = '${{ steps.create_deployment.outputs.result }}';
             if (!deploymentId) {
               console.warn('No deployment_id available from previous step; skipping createDeploymentStatus');
+              return;
+            }
+            
+            if (isNaN(Number(deploymentId))) {
+              throw new Error(`Invalid deployment_id: ${deploymentId}`);
             } else {
               await github.rest.repos.createDeploymentStatus({
                 owner: context.repo.owner,
@@ -111,10 +119,9 @@ jobs:
 
       - name: Load environment
         run: |
-          if [[ -f ".env" ]]; then
-            GKE_ENVIRONMENT_URL=$(grep "^GKE_ENVIRONMENT_URL=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GKE_ENVIRONMENT_URL" ]]; then echo "GKE_ENVIRONMENT_URL=${GKE_ENVIRONMENT_URL}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GKE_ENVIRONMENT_URL is set via secrets in script step
+          echo "Using GitHub Secrets for GKE environment URL"
 
       - name: Create PR deployment preview
         uses: actions/github-script@v7
@@ -151,7 +158,7 @@ jobs:
             if (context.issue && context.issue.number) {
               await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment });
             } else {
-              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title: '🚀 PR Preview Environment Ready (automated)', body: comment, labels: ['preview', 'automation'] });
+              console.warn('No PR/issue context detected; skipping comment creation to avoid spam');
             }
 
   issue-automation:
@@ -161,12 +168,9 @@ jobs:
     steps:
       - name: Load environment
         run: |
-          if [[ -f ".env" ]]; then
-            GKE_NAMESPACE=$(grep "^GKE_NAMESPACE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "pixelated")
-            GKE_DEPLOYMENT_NAME=$(grep "^GKE_DEPLOYMENT_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "pixelated")
-            if [[ -n "$GKE_NAMESPACE" ]]; then echo "GKE_NAMESPACE=${GKE_NAMESPACE}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_DEPLOYMENT_NAME" ]]; then echo "GKE_DEPLOYMENT_NAME=${GKE_DEPLOYMENT_NAME}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GKE_NAMESPACE and GKE_DEPLOYMENT_NAME are set via secrets in script step
+          echo "Using GitHub Secrets for GKE namespace and deployment name"
 
       - name: Create K8s incident issue with GitHub-native features
         uses: actions/github-script@v7

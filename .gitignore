@@ -194,3 +194,8 @@ gitlab-runner-values.yaml
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
+gcp-service-account-key.json
+cluster-backup-20251019-204340
+cluster-backup-20251019-203844
+.ruff_cache
+.serena

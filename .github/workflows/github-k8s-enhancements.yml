@@ -1,5 +1,9 @@
 name: GitHub-Native Kubernetes Enhancements
 
+concurrency:
+  group: github-k8s-enhancements-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   id-token: write
@@ -32,6 +36,7 @@ jobs:
   github-native-monitoring:
     name: GitHub-Native K8s Monitoring
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'github-native-monitoring'
     steps:
       - name: Checkout code
@@ -39,14 +44,9 @@ jobs:
 
       - name: Load GCP environment
         run: |
-          if [[ -f ".env" ]]; then
-            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GCP_PROJECT_ID" ]]; then echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_CLUSTER_NAME" ]]; then echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_ZONE" ]]; then echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GCP_PROJECT_ID, GKE_CLUSTER_NAME, GKE_ZONE are set via secrets in auth step
+          echo "Using GitHub Secrets for GCP configuration"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -118,15 +118,15 @@ jobs:
           echo "🔍 Generating GitHub-native Kubernetes insights..."
 
           # Resource utilization analysis
-          CPU_USAGE=$(kubectl top nodes --no-headers | awk '{sum+=$3} END {print sum/NR}' | sed 's/%//')
-          MEM_USAGE=$(kubectl top nodes --no-headers | awk '{sum+=$5} END {print sum/NR}' | sed 's/%//')
-
+          CPU_USAGE=$(kubectl top nodes --no-headers 2>/dev/null | awk '{sum+=$3} END {print sum/NR}' | sed 's/%//' || echo "0")
+          MEM_USAGE=$(kubectl top nodes --no-headers 2>/dev/null | awk '{sum+=$5} END {print sum/NR}' | sed 's/%//' || echo "0")
+          
           # Cost optimization recommendations
-          if (( $(echo "$CPU_USAGE < 30" | bc -l) )); then
+          if command -v bc &> /dev/null && (( $(echo "$CPU_USAGE < 30" | bc -l) )); then
             echo "💡 Recommendation: Consider scaling down - CPU usage is ${CPU_USAGE}%"
           fi
-
-          if (( $(echo "$MEM_USAGE > 80" | bc -l) )); then
+          
+          if command -v bc &> /dev/null && (( $(echo "$MEM_USAGE > 80" | bc -l) )); then
             echo "⚠️ Alert: High memory usage at ${MEM_USAGE}% - consider scaling up"
           fi
 
@@ -134,6 +134,7 @@ jobs:
   pr-integration:
     name: PR-Kubernetes Integration
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'pr-integration'
     steps:
       - name: Checkout PR code
@@ -141,11 +142,9 @@ jobs:
 
       - name: Load environment
         run: |
-          if [[ -f ".env" ]]; then
-            # Load minimal env for PR preview
-            GKE_ENVIRONMENT_URL=$(grep "^GKE_ENVIRONMENT_URL=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GKE_ENVIRONMENT_URL" ]]; then echo "GKE_ENVIRONMENT_URL=${GKE_ENVIRONMENT_URL}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GKE_ENVIRONMENT_URL is set via secrets in script step
+          echo "Using GitHub Secrets for GKE environment URL"
 
       - name: Create PR preview environment
         uses: actions/github-script@v7
@@ -195,6 +194,7 @@ jobs:
   issue-automation:
     name: Issue-Kubernetes Automation
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'issue-automation'
     steps:
       - name: Create K8s-related issue templates
@@ -246,6 +246,7 @@ jobs:
   deployment-visualization:
     name: GitHub-Native Deployment Visualization
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'deployment-visualization'
     steps:
       - name: Create deployment timeline
@@ -285,6 +286,7 @@ jobs:
   github-cli-integration:
     name: GitHub CLI Kubernetes Integration
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'github-cli-integration'
     steps:
       - name: Demonstrate GitHub CLI K8s capabilities
@@ -313,6 +315,7 @@ jobs:
   advanced-rollback:
     name: Advanced GitHub-Native Rollback
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'advanced-rollback'
     steps:
       - name: Create sophisticated rollback workflow
@@ -351,14 +354,14 @@ jobs:
   cost-optimization:
     name: GitHub-Native Cost Optimization
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event.inputs.enhancement_type == 'cost-optimization'
     steps:
       - name: Load GCP environment
         run: |
-          if [[ -f ".env" ]]; then
-            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GCP_PROJECT_ID" ]]; then echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV; fi
-          fi
+          # No .env parsing needed - use GitHub Secrets directly
+          # GCP_PROJECT_ID is set via secrets in auth step
+          echo "Using GitHub Secrets for GCP configuration"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2

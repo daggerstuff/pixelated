@@ -5,11 +5,11 @@ permissions:
   actions: read
   checks: read
   pull-requests: read
-  security-events: write
+  # security-events: write - Not needed as we only create issues, not security events
   issues: write
 on:
   schedule:
-  - cron: 0 0 * * *
+  - cron: "0 0 * * *"
 
   workflow_run:
     workflows: [ Deploy to Staging, Deploy to Production ]

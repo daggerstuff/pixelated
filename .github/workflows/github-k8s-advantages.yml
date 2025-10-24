@@ -1,5 +1,9 @@
 name: GitHub-Native Kubernetes Advantages Demo
 
+concurrency:
+  group: github-k8s-advantages-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   id-token: write
@@ -30,21 +34,21 @@ jobs:
   deployment-api:
     name: GitHub Deployment API vs GitLab
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.demo_type == 'deployment-api'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Load GCP environment
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GKE_CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
+          GKE_ZONE: ${{ secrets.GKE_ZONE }}
         run: |
-          if [[ -f ".env" ]]; then
-            GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            if [[ -n "$GCP_PROJECT_ID" ]]; then echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_CLUSTER_NAME" ]]; then echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV; fi
-            if [[ -n "$GKE_ZONE" ]]; then echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV; fi
-          fi
+          echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
+          echo "GKE_CLUSTER_NAME=${GKE_CLUSTER_NAME}" >> $GITHUB_ENV
+          echo "GKE_ZONE=${GKE_ZONE}" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -82,6 +86,10 @@ jobs:
               }
             });
             
+            if (!deployment.data || !deployment.data.id) {
+              throw new Error('Failed to create GitHub deployment: invalid response');
+            }
+            
             console.log('✅ GitHub-native deployment created:', deployment.data.id);
             console.log('🎯 GitHub advantages over GitLab:');
             console.log('- Native GitHub deployment API integration');
@@ -115,6 +123,7 @@ jobs:
   pr-integration:
     name: PR-Kubernetes Integration Demo
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.demo_type == 'pr-integration'
     steps:
       - name: Checkout code
@@ -149,6 +158,7 @@ jobs:
   marketplace-ecosystem:
     name: GitHub Marketplace vs GitLab Built-ins
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.demo_type == 'marketplace-ecosystem'
     steps:
       - name: Demonstrate marketplace advantages
@@ -182,6 +192,7 @@ jobs:
   cli-superiority:
     name: GitHub CLI vs GitLab CLI Comparison
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.demo_type == 'cli-superiority'
     steps:
       - name: Demonstrate GitHub CLI advantages
@@ -210,6 +221,7 @@ jobs:
   security-advanced:
     name: Advanced GitHub-Native Security
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.inputs.demo_type == 'security-advanced'
     steps:
       - name: Demonstrate advanced security features
@@ -240,6 +252,7 @@ jobs:
   summary:
     name: GitHub vs GitLab K8s Integration Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: always()
     steps:
       - name: Generate comprehensive comparison
