@@ -1,0 +1,95 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  post: CollectionEntry<'blog'>
+  currentTag?: string
+}
+
+const { post, currentTag } = Astro.props
+
+// Calculate reading time with better accuracy
+const getReadingTime = (text: string): number => {
+  const wordsPerMinute = 200
+  const words = text.trim().split(/\s+/).length
+  return Math.max(1, Math.ceil(words / wordsPerMinute))
+}
+
+// Format date consistently
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+// Validate post data
+const hasValidData = post.data && post.data.title && post.data.description
+const readingTime = getReadingTime(post.body)
+const formattedDate = formatDate(post.data.pubDate)
+---
+
+{hasValidData && (
+  <article class="group" itemscope itemtype="https://schema.org/BlogPosting">
+    <div class="flex flex-col sm:flex-row gap-4">
+      <aside class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+        <time datetime={post.data.pubDate.toISOString()} itemprop="datePublished">
+          {formattedDate}
+        </time>
+        <span class="hidden sm:block mt-1" aria-label={`Reading time: ${readingTime} minutes`}>
+          {readingTime} min read
+        </span>
+      </aside>
+
+      <main class="flex-1">
+        <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors" itemprop="headline">
+          <a href={`/blog/${post.slug}`} class="block" itemprop="url">
+            {post.data.title}
+          </a>
+        </h3>
+
+        <p class="text-slate-300 mb-3 leading-relaxed" itemprop="description">
+          {post.data.description}
+        </p>
+
+        {post.data.tags && post.data.tags.length > 0 && (
+          <nav class="flex flex-wrap gap-2 mb-3" aria-label="Post tags">
+            {post.data.tags.map((postTag: string) => (
+              <a
+                href={`/blog/tags/${postTag}`}
+                class={`text-xs transition-colors px-2 py-1 rounded ${
+                  postTag === currentTag
+                    ? 'bg-green-900/30 text-green-400 font-medium'
+                    : 'text-slate-400 hover:text-green-300 hover:bg-slate-800/50'
+                }`}
+                aria-current={postTag === currentTag ? 'page' : undefined}
+              >
+                #{postTag}
+              </a>
+            ))}
+          </nav>
+        )}
+
+        <a
+          href={`/blog/${post.slug}`}
+          class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+          aria-label={`Read more about ${post.data.title}`}
+        >
+          Read article
+          <span class="ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </main>
+    </div>
+  </article>
+)}
+
+{!hasValidData && (
+  <article class="p-4 bg-red-900/10 border border-red-900/30 rounded-lg">
+    <p class="text-red-400 text-sm">
+      Error: Invalid post data for "{post.slug}"
+    </p>
+  </article>
+)}

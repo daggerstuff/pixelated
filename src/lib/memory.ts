@@ -32,7 +32,7 @@ export interface UpdateMemoryOptions {
   metadata?: Record<string, unknown>
 }
 
-import { cipherClient } from './cipher/cipherClient'
+
 
 export class MemoryService {
   private memories: Memory[] = []
@@ -52,25 +52,7 @@ export class MemoryService {
     }
     this.memories.push(memory)
 
-    // Cipher agent registration and context sync (non-blocking, logs errors)
-    try {
-      await cipherClient.registerAgent({
-        agentId: options.userId,
-        agentType: 'user',
-        metadata: options.metadata || {},
-      })
-    } catch (err) {
-      // Log but do not block memory creation
-      console.error('[Cipher] Agent registration failed:', err)
-    }
-    try {
-      await cipherClient.syncContext({
-        agentId: options.userId,
-        context: memory,
-      })
-    } catch (err) {
-      console.error('[Cipher] Context sync failed:', err)
-    }
+
 
     return memory
   }
@@ -96,15 +78,7 @@ export class MemoryService {
       updatedAt: new Date(),
     }
 
-    // Cipher context sync (non-blocking, logs errors)
-    try {
-      await cipherClient.syncContext({
-        agentId: userId,
-        context: this.memories[memoryIndex],
-      })
-    } catch (err) {
-      console.error('[Cipher] Context sync failed:', err)
-    }
+
 
     return this.memories[memoryIndex]
   }
