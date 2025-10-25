@@ -1,0 +1,43 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Set up Google Cloud credentials
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+
+      - name: Verify Google Cloud authentication
+        run: |
+          gcloud config set project pixelated-463209-e5
+          gcloud auth list
+          gcloud projects describe pixelated-463209-e5
+
+      - name: Skip deployment (no cluster yet)
+        run: echo "No GKE cluster configured. Deployment skipped."
