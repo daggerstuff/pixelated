@@ -8,10 +8,11 @@ os.environ.setdefault("ENV", "test")
 os.environ.setdefault("PYTEST", "1")
 
 # Import after env setup
-from src.lib.ai.bias_detection.python_service.bias_detection_service import (
-    BiasDetectionConfig,
-    BiasDetectionService,
-)
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'lib', 'ai', 'bias-detection', 'python-service'))
+from bias_detection_service import BiasDetectionService
+from bias_detection.config import BiasDetectionConfig
 
 
 @pytest.mark.asyncio

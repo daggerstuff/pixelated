@@ -68,6 +68,8 @@ dependencies = [
   "python-socketio>=5.14.0",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
+  "nbqa>=1.9.1",
+  "neo4j~=5.28.0",
 ]
 
 [project.optional-dependencies]
