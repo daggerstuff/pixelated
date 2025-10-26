@@ -40,6 +40,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    css: {
+      modules: {
+        classNameStrategy: 'non-scoped',
+      },
+    },
     include: [
       'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
@@ -110,5 +115,9 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    cssCodeSplit: true,
+  },
+  css: {
+    devSourcemap: true,
   },
 })

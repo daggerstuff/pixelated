@@ -1,0 +1,143 @@
+# Docker Compose for Foundation Model Training Development
+services:
+  training-service:
+    build:
+      context: .
+      dockerfile: docker/training-service/Dockerfile
+      target: production
+    container_name: pixelated-training
+    restart: unless-stopped
+    
+    # GPU Configuration
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
+    # Environment Variables
+    environment:
+      - NODE_ENV=development
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - WANDB_MODE=offline
+      - HF_HOME=/app/cache/huggingface
+      - TRANSFORMERS_CACHE=/app/cache/transformers
+    
+    # Volumes
+    volumes:
+      - ./data/training:/app/data:ro
+      - ./models:/app/models
+      - ./checkpoints:/app/checkpoints
+      - training_cache:/app/cache
+      - /dev/shm:/dev/shm:rw  # Shared memory for faster data loading
+    
+    # Ports
+    ports:
+      - "8003:8003"
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+    
+    # Dependencies
+    depends_on:
+      - redis
+      - db
+    
+    # Networks
+    networks:
+      - training-net
+      - web
+
+  # Enhanced Redis for training cache
+  redis:
+    image: redis:7-alpine
+    container_name: pixelated-redis-training
+    restart: unless-stopped
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_training_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - training-net
+
+  # Enhanced PostgreSQL for training metadata
+  db:
+    image: postgres:15-alpine
+    container_name: pixelated-db-training
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pixelated_training}
+      POSTGRES_USER: ${POSTGRES_USER:-training_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-training_password}
+    volumes:
+      - postgres_training_data:/var/lib/postgresql/data
+      - ./db/training-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - training-net
+
+  # Monitoring stack for training
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pixelated-prometheus-training
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    volumes:
+      - ./monitoring/prometheus/training.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_training_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - training-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pixelated-grafana-training
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_training_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards/training:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    networks:
+      - training-net
+
+# Networks
+networks:
+  training-net:
+    driver: bridge
+  web:
+    external: true
+
+# Volumes
+volumes:
+  training_cache:
+    driver: local
+  redis_training_data:
+    driver: local
+  postgres_training_data:
+    driver: local
+  prometheus_training_data:
+    driver: local
+  grafana_training_data:
+    driver: local

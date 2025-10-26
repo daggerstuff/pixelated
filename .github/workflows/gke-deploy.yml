@@ -613,13 +613,16 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           create_credentials_file: true
           export_environment_variables: true
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Get GKE credentials
         run: |
@@ -712,10 +715,11 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           create_credentials_file: true
           export_environment_variables: true
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

@@ -1,0 +1,132 @@
+---
+# Pod Security Standards for HIPAA Compliance
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo
+  namespace: pixelated-training
+  annotations:
+    # Pod Security Standards
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+spec:
+  # Security Context - Restricted Profile
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    seccompProfile:
+      type: RuntimeDefault
+    supplementalGroups: [1001]
+    
+  containers:
+  - name: example
+    image: nginx:alpine
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      capabilities:
+        drop:
+        - ALL
+      seccompProfile:
+        type: RuntimeDefault
+
+---
+# Network Policy for Training Services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: training-service-netpol
+  namespace: pixelated-training
+spec:
+  podSelector:
+    matchLabels:
+      app: training-service
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  # Ingress Rules
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: pixelated-prod
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8003
+
+  # Egress Rules
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  
+  # Allow HTTPS for Lightning.ai, HuggingFace, WandB
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  
+  # Allow communication with databases
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: pixelated-prod
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+
+---
+# Service Account with minimal RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: training-service-sa
+  namespace: pixelated-training
+  labels:
+    app: training-service
+automountServiceAccountToken: false
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: training-service-role
+  namespace: pixelated-training
+rules:
+- apiGroups: [""]
+  resources: ["pods", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: training-service-binding
+  namespace: pixelated-training
+subjects:
+- kind: ServiceAccount
+  name: training-service-sa
+  namespace: pixelated-training
+roleRef:
+  kind: Role
+  name: training-service-role
+  apiGroup: rbac.authorization.k8s.io

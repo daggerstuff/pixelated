@@ -8,7 +8,11 @@ vi.mock('../EmotionDetector', () => ({
     ({
       onAnalysisComplete,
     }: {
-      onAnalysisComplete: (result: boolean) => void
+      onAnalysisComplete: (result: {
+        valence: number
+        energy: number
+        dominance: number
+      }) => void
     }) => {
       // Simulate analysis completion after a delay
       setTimeout(() => {

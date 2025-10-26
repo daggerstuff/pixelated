@@ -1,0 +1,151 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: training-service
+  namespace: pixelated-training
+  labels:
+    app: training-service
+    component: ml-training
+    environment: production
+spec:
+  replicas: 1  # Training typically runs single instance
+  strategy:
+    type: Recreate  # Don't run multiple training instances simultaneously
+  selector:
+    matchLabels:
+      app: training-service
+  template:
+    metadata:
+      labels:
+        app: training-service
+        component: ml-training
+        environment: production
+    spec:
+      # Security Context - HIPAA Compliance
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+        supplementalGroups: [1001]
+
+      # Node Selection for GPU nodes
+      nodeSelector:
+        accelerator: nvidia-tesla-h100
+        node-type: gpu
+
+      # Tolerations for GPU nodes
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+
+      # Affinity for GPU scheduling
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: accelerator
+                operator: In
+                values: ["nvidia-tesla-h100", "nvidia-a100"]
+
+      containers:
+      - name: training-service
+        image: ghcr.io/pixelated/training-service:latest
+        imagePullPolicy: IfNotPresent
+        
+        # Resource Requirements for H100 Training
+        resources:
+          requests:
+            cpu: "4"
+            memory: "16Gi"
+            nvidia.com/gpu: 1
+          limits:
+            cpu: "16"
+            memory: "64Gi"
+            nvidia.com/gpu: 1
+
+        # Environment Variables
+        env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"
+        - name: PYTORCH_CUDA_ALLOC_CONF
+          value: "max_split_size_mb:512"
+        - name: LIGHTNING_CLOUD_PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name: training-secrets
+              key: lightning-project-id
+        - name: WANDB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: training-secrets
+              key: wandb-api-key
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: training-secrets
+              key: huggingface-token
+
+        # Volume Mounts
+        volumeMounts:
+        - name: training-data
+          mountPath: /app/data
+          readOnly: true
+        - name: model-output
+          mountPath: /app/models
+        - name: checkpoints
+          mountPath: /app/checkpoints
+        - name: shared-memory
+          mountPath: /dev/shm
+
+        # Health Checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8003
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 30
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8003
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 15
+          failureThreshold: 5
+
+        # Ports
+        ports:
+        - containerPort: 8003
+          protocol: TCP
+          name: http
+
+      # Volumes
+      volumes:
+      - name: training-data
+        persistentVolumeClaim:
+          claimName: training-data-pvc
+      - name: model-output
+        persistentVolumeClaim:
+          claimName: model-output-pvc
+      - name: checkpoints
+        persistentVolumeClaim:
+          claimName: checkpoints-pvc
+      - name: shared-memory
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+
+      # Service Account for RBAC
+      serviceAccountName: training-service-sa
+
+      # Restart Policy
+      restartPolicy: Always

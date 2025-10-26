@@ -43,7 +43,7 @@ export function calculateWordCount(content: string): number {
  * @returns Formatted date string
  */
 export function formatBlogDate(date: Date): string {
-  if (!date || !(date instanceof Date)) return ''
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) return ''
   
   return date.toLocaleDateString('en-US', {
     year: 'numeric',

@@ -15,14 +15,14 @@ describe('Blog utilities', () => {
 
     it('should handle very long content', () => {
       const content = 'word '.repeat(1000)
-      expect(calculateReadingTime(content, 200)).toBe(3)
+      expect(calculateReadingTime(content, 200)).toBe(5)
     })
   })
 
   describe('calculateWordCount', () => {
     it('should count words correctly', () => {
       const content = 'This has exactly five words in it right now'
-      expect(calculateWordCount(content)).toBe(5)
+      expect(calculateWordCount(content)).toBe(9)
     })
 
     it('should handle empty content', () => {
@@ -32,7 +32,7 @@ describe('Blog utilities', () => {
 
   describe('formatBlogDate', () => {
     it('should format date correctly', () => {
-      const date = new Date('2024-01-15')
+      const date = new Date('2024-01-15T12:00:00Z')
       expect(formatBlogDate(date)).toBe('January 15, 2024')
     })
 

@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pixelated-training
+  labels:
+    name: pixelated-training
+    environment: production
+    component: ml-training
+    security.istio.io/tls-mode: istio
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "gpu=true"

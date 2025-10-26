@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 /**
  * Integration Tests for Bias Detection API Endpoints
  *
@@ -405,7 +406,7 @@ describe('Bias Detection API Integration Tests', () => {
 
     it('should handle rate limiting correctly', async () => {
       const requestBody = { session: testSession }
-      const requests = []
+      const requests: Promise<Response>[] = []
 
       // Make multiple rapid requests to trigger rate limiting
       for (let i = 0; i < 65; i++) {
