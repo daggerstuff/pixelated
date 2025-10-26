@@ -124,6 +124,10 @@ export default defineConfig({
       org: 'pixelated-empathy-dq',
       project: 'pixel-astro',
     }),
+    sentryVitePlugin({
+      org: 'pixelated-empathy-dq',
+      project: 'pixel-astro',
+    }),
   ],
   base:
     process.env.NODE_ENV === 'production'

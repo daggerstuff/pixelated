@@ -1,183 +1,114 @@
-# GCP Workload Identity Federation Setup Guide
+# GCP Workload Identity Setup for GitHub Actions
 
 ## Overview
 
-This guide explains how to set up Workload Identity Federation for GitHub Actions to authenticate with Google Cloud Platform (GCP) without using service account keys.
+This document describes the correct configuration for using Google Cloud Workload Identity Federation with GitHub Actions to authenticate to GCP services without using long-lived service account keys.
 
-## What Changed
+## Why Use Workload Identity?
 
-We migrated from the deprecated `credentials_json` authentication method to the modern **Workload Identity Federation** approach. This change:
+Workload Identity Federation allows GitHub Actions to impersonate a GCP service account using short-lived OIDC tokens issued by GitHub. This is more secure than using static service account keys because:
 
-- **Eliminates the need for service account key JSON files** - No more managing sensitive key files
-- **Improves security** - Uses short-lived tokens instead of long-lived keys
-- **Simplifies secret management** - No need to rotate service account keys
-- **Follows Google Cloud best practices** - Recommended authentication method
+- No long-lived credentials are stored in GitHub Secrets
+- Tokens are short-lived and automatically rotated
+- Access is tied to the GitHub workflow context
+- Follows the principle of least privilege
 
-## Authentication Flow
+## Prerequisites
 
-```mermaid
-graph TD
-    A[GitHub Actions Workflow] -->|Request Token| B[GitHub OIDC Provider]
-    B -->|OIDC Token| C[Workload Identity Federation]
-    C -->|Exchange| D[Short-lived GCP Access Token]
-    D -->|Authenticate| E[GCP Services]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style E fill:#9f9,stroke:#333,stroke-width:2px
-```
+- A Google Cloud project with the necessary APIs enabled:
+  - Cloud Resource Manager API
+  - Identity and Access Management (IAM) API
+- A GCP service account with the required permissions for your workflows
+- GitHub repository with Actions enabled
 
-## Setup Instructions
+## Step-by-Step Configuration
 
-### 1. Create Workload Identity Pool
+### 1. Create a Workload Identity Pool
 
-```bash
-# Create a workload identity pool
-gcloud iam workload-identity-pools create github-pool \
-    --location="global" \
-    --display-name="GitHub Actions Pool"
+In the Google Cloud Console, navigate to **IAM & Admin > Workload Identity Federation** and create a new pool:
 
-# Get the pool ID (save this for later)
-gcloud iam workload-identity-pools describe github-pool \
-    --location="global" \
-    --format="value(name)"
-```
+- **Pool ID**: `github-pool`
+- **Description**: `GitHub Actions Workload Identity Pool`
 
-### 2. Create Workload Identity Provider
+### 2. Create a Workload Identity Provider
 
-```bash
-# Create OIDC provider for GitHub
-gcloud iam workload-identity-pools providers create-oidc github-provider \
-    --location="global" \
-    --workload-identity-pool="github-pool" \
-    --display-name="GitHub Actions Provider" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
-    --issuer-uri="https://token.actions.githubusercontent.com"
-```
+Within the pool, create a new provider:
 
-### 3. Create Service Account
+- **Provider ID**: `github-provider`
+- **Provider type**: `OpenID Connect (OIDC)`
+- **Issuer**: `https://token.actions.githubusercontent.com`
+- **Allowed audience**: `https://github.com/pixelatedempathy/pixelated`
+
+### 3. Configure Service Account Binding
+
+Bind the Workload Identity Provider to a GCP service account:
 
 ```bash
-# Create a service account for GitHub Actions
-gcloud iam service-accounts create github-actions-sa \
-    --display-name="GitHub Actions Service Account"
-
-# Grant necessary permissions to the service account
-gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-    --member="serviceAccount:github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
-    --role="roles/container.developer"
-
-# Add more roles as needed for your specific use case
-gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-    --member="serviceAccount:github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
-    --role="roles/logging.viewer"
+gcloud iam service-accounts add-iam-policy-binding \
+  action@pixelatedempathy.com \
+  --role=roles/iam.workloadIdentityUser \
+  --member="principalSet://iam.googleapis.com/projects/751556915102/locations/global/workloadIdentityPools/github-pool/attribute.repository_owner/pixelatedempathy"
 ```
 
-### 4. Grant Workload Identity Access
+### 4. Set GitHub Secrets
 
-```bash
-# Allow the GitHub repository to impersonate the service account
-gcloud iam service-accounts add-iam-policy-binding github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com \
-    --role="roles/iam.workloadIdentityUser" \
-    --member="principalSet://iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/attribute.repository/${GITHUB_REPOSITORY}"
-```
+In your GitHub repository, go to **Settings > Secrets and variables > Actions** and add the following secrets:
 
-### 5. Configure GitHub Secrets
+- **GCP_WORKLOAD_IDENTITY_PROVIDER**: `projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
+- **GCP_SERVICE_ACCOUNT_EMAIL**: `action@pixelatedempathy.com`
 
-Add these secrets to your GitHub repository:
+> **Important**: Do NOT use `GCP_SERVICE_ACCOUNT_KEY` with Workload Identity. This legacy method is incompatible and should be removed from `.env` files.
 
-- `GCP_WORKLOAD_IDENTITY_PROVIDER`: The full provider name in format:
-  ```
-  projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-  ```
+### 5. Configure GitHub Actions Workflow
 
-- `GCP_SERVICE_ACCOUNT_EMAIL`: The service account email:
-  ```
-  action@pixelatedempathy.com
-  ```
-
-## Required GitHub Repository Permissions
-
-Ensure your workflow has the necessary permissions:
+In your workflow YAML file (e.g., `.github/workflows/gke-monitoring.yml`), use the `google-github-actions/auth@v2` action:
 
 ```yaml
-permissions:
-  contents: read
-  id-token: write  # Required for OIDC token generation
-  issues: write    # For creating GitHub issues on alerts
+- name: Authenticate to Google Cloud
+  uses: google-github-actions/auth@v2
+  with:
+    workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+    service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+    universe: googleapis.com
+    cleanup_credentials: true
+    access_token_lifetime: 3600s
+    access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+    id_token_include_email: false
 ```
-
-## Environment Variables
-
-The workflow uses these environment variables that should be configured as GitHub secrets:
-
-- `GCP_PROJECT_ID`: Your GCP project ID
-- `GKE_CLUSTER_NAME`: Your GKE cluster name
-- `GKE_ZONE`: Your GKE cluster zone
-- `GKE_NAMESPACE`: Your Kubernetes namespace
-- `GKE_SERVICE_NAME`: Your Kubernetes service name
-- `GKE_ENVIRONMENT_URL`: Your application URL (optional)
-- `SLACK_WEBHOOK_URL`: Slack webhook for notifications (optional)
 
 ## Verification
 
-To verify the setup is working:
+To verify the configuration is working:
 
-1. **Test authentication**: Run the workflow manually from GitHub Actions
-2. **Check logs**: Verify successful GCP authentication in workflow logs
-3. **Monitor resources**: Confirm the workflow can access GKE cluster resources
+1. Trigger the workflow manually
+2. Check the logs for the "Authenticate to Google Cloud" step
+3. Look for successful token generation and credential creation
+4. Confirm subsequent `gcloud` and `kubectl` commands execute without authentication errors
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Permission denied errors**:
-   - Verify service account has required IAM roles
-   - Check Workload Identity Federation configuration
-   - Ensure repository name matches in the principal binding
+- **"invalid_target" error**: The `workload_identity_provider` value is incorrect. Verify it matches the full resource name format: `projects/{PROJECT_NUMBER}/locations/global/workloadIdentityPools/{POOL_ID}/providers/{PROVIDER_ID}`
+- **"Permission denied" error**: The service account lacks the `roles/iam.workloadIdentityUser` role on the Workload Identity Provider
+- **"Service account not found"**: The `service_account` email is incorrect or the service account doesn't exist
 
-2. **OIDC token issues**:
-   - Confirm `id-token: write` permission is set
-   - Verify GitHub repository settings allow OIDC tokens
+### Debugging Steps
 
-3. **Provider configuration errors**:
-   - Check the provider resource name format
-   - Ensure the provider exists in the correct location
+1. Verify the Workload Identity Provider exists in the Google Cloud Console
+2. Confirm the service account email is correct and exists
+3. Check the IAM policy binding on the service account
+4. Ensure the GitHub repository owner matches the policy binding
 
-### Debug Steps
+## Best Practices
 
-```bash
-# Check workload identity pool status
-gcloud iam workload-identity-pools describe github-pool --location="global"
+- Use separate service accounts for different workflows (e.g., one for deployment, one for monitoring)
+- Limit service account permissions to the minimum required
+- Regularly review and rotate service accounts
+- Remove any legacy `GCP_SERVICE_ACCOUNT_KEY` entries from `.env` files
+- Use the `cleanup_credentials: true` option to automatically clean up temporary credentials
 
-# List service account permissions
-gcloud iam service-accounts get-iam-policy github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com
-
-# Test impersonation (from local machine with appropriate credentials)
-gcloud iam service-accounts sign-jwt \
-    --iam-account=github-actions-sa@${GCP_PROJECT_ID}.iam.gserviceaccount.com \
-    --payload='{"sub":"test"}' \
-    /dev/stdout
-```
-
-## Security Benefits
-
-1. **No long-lived credentials**: Tokens are short-lived and automatically rotated
-2. **Granular access control**: Fine-grained permissions per repository/workflow
-3. **Audit trail**: All authentication events are logged in GCP
-4. **No secret rotation**: Eliminates the need to manage and rotate service account keys
-
-## Migration from Service Account Keys
-
-If you're migrating from service account key JSON files:
-
-1. Set up Workload Identity Federation as described above
-2. Update your workflows to use the new authentication method
-3. Remove old `GCP_SERVICE_ACCOUNT_KEY` secrets
-4. Delete unused service account keys from GCP
-5. Update any documentation referencing the old method
-
-## Additional Resources
+## References
 
 - [Google Cloud Workload Identity Federation Documentation](https://cloud.google.com/iam/docs/workload-identity-federation)
-- [GitHub Actions OIDC Documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
-- [Google Cloud GitHub Action](https://github.com/google-github-actions/auth)
+- [google-github-actions/auth GitHub Repository](https://github.com/google-github-actions/auth)
