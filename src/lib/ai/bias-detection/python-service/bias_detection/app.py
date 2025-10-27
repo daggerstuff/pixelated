@@ -359,9 +359,9 @@ def create_app() -> FastAPI:
     @app.get("/api/bias-analysis/user/{user_id}")
     async def get_user_analyses(
         user_id: str,
+        response: Response,
         limit: int = 100,
-        offset: int = 0,
-        response: Response
+        offset: int = 0
     ):
         """Get analyses for a user"""
         request_id = response.headers.get("X-Request-ID")
@@ -398,8 +398,8 @@ def create_app() -> FastAPI:
     
     @app.get("/api/analytics/summary")
     async def get_analytics_summary(
-        days: int = 30,
-        response: Response
+        response: Response,
+        days: int = 30
     ):
         """Get analytics summary"""
         request_id = response.headers.get("X-Request-ID")

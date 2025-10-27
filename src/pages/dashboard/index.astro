@@ -186,7 +186,7 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
             </p>
             <div class="text-center">
               <a
-                href="/analytics"
+                href="/components/analytics-dashboard"
                 class="text-sm text-primary hover:text-primary/90 font-medium"
               >
                 View Analytics →
@@ -196,9 +196,130 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
         </Card>
       </div>
 
+      <!-- New Component Features Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+          <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">scatter_plot</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-sm">3D Emotions</h4>
+                <p class="text-xs text-muted-foreground">Interactive emotion mapping</p>
+              </div>
+            </div>
+            <a 
+              href="/components/emotion-visualization" 
+              class="text-xs text-purple-600 hover:text-purple-700 font-medium"
+            >
+              Explore →
+            </a>
+          </div>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+          <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">assignment</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-sm">Treatment Plans</h4>
+                <p class="text-xs text-muted-foreground">Goal tracking & milestones</p>
+              </div>
+            </div>
+            <a 
+              href="/components/treatment-plans" 
+              class="text-xs text-green-600 hover:text-green-700 font-medium"
+            >
+              Manage →
+            </a>
+          </div>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+          <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">security</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-sm">Privacy Demo</h4>
+                <p class="text-xs text-muted-foreground">FHE encryption showcase</p>
+              </div>
+            </div>
+            <a 
+              href="/components/security-demo" 
+              class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Demo →
+            </a>
+          </div>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
+          <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">view_carousel</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-sm">UI Components</h4>
+                <p class="text-xs text-muted-foreground">Interactive carousels</p>
+              </div>
+            </div>
+            <a 
+              href="/components/ui-showcase" 
+              class="text-xs text-orange-600 hover:text-orange-700 font-medium"
+            >
+              View →
+            </a>
+          </div>
+        </Card>
+      </div>
+
+      <!-- Enhanced Dashboard Promotion -->
+      <Card class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800">
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-xl">auto_awesome</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-blue-900 dark:text-blue-100">Enhanced Dashboard Available</h3>
+                <p class="text-blue-700 dark:text-blue-200 text-sm">
+                  Experience our new enterprise-grade dashboard with 3D visualizations, real-time analytics, and advanced treatment planning.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <a 
+                href="/dashboard/enhanced" 
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+              >
+                <span>Try Enhanced Dashboard</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       <!-- Analytics Charts -->
       <Card>
         <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold">Analytics Overview</h3>
+            <a 
+              href="/components/analytics-dashboard" 
+              class="text-sm text-primary hover:text-primary/90 font-medium flex items-center gap-1"
+            >
+              <span>View Detailed Analytics</span>
+              <span class="material-symbols-outlined text-sm">open_in_new</span>
+            </a>
+          </div>
           <div class="min-h-[220px] animate-pulse rounded-md bg-white/5 border border-white/10" aria-hidden="true"></div>
           <AnalyticsCharts client:visible />
         </div>

@@ -1,0 +1,380 @@
+---
+export const prerender = false
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import EnhancedChartComponent from '@/components/analytics/EnhancedChartComponent.tsx'
+import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmotionChart.tsx'
+import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
+import Particle from '@/components/three/Particle.tsx'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+
+const clientId = user?.id || 'demo-patient'
+const sessionId = Astro.url.searchParams.get('sessionId')
+---
+
+<DashboardLayout
+  title="My Therapy Dashboard | Pixelated Empathy"
+  description="Your personal therapy dashboard with progress tracking and interactive tools"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <!-- Welcome Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold tracking-tight mb-3">
+        Welcome to Your Therapy Space
+        {user?.name && <span class="text-primary">, {user.name.split(' ')[0]}</span>}
+      </h1>
+      <p class="text-xl text-muted-foreground mb-6">
+        Track your progress, explore emotions, and engage with your healing journey
+      </p>
+      
+      <!-- Progress Summary -->
+      <div class="inline-flex items-center gap-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 px-8 py-4 rounded-full border border-blue-200 dark:border-blue-800">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600">85%</div>
+          <div class="text-sm text-muted-foreground">Overall Progress</div>
+        </div>
+        <div class="w-px h-8 bg-border"></div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600">12</div>
+          <div class="text-sm text-muted-foreground">Sessions Complete</div>
+        </div>
+        <div class="w-px h-8 bg-border"></div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600">4.8</div>
+          <div class="text-sm text-muted-foreground">Wellness Score</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journey Overview Carousel -->
+    <Card>
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-primary">timeline</span>
+          Your Therapy Journey
+        </h2>
+        <SwiperCarousel 
+          client:load
+          effect="coverflow"
+          autoplay={{delay: 6000, disableOnInteraction: false}}
+          navigation={true}
+          pagination={{clickable: true, dynamicBullets: true}}
+          loop={true}
+          slidesPerView={3}
+          spaceBetween={20}
+          centeredSlides={true}
+          height="320px"
+          className="rounded-lg"
+          breakpoints={{
+            320: { slidesPerView: 1, spaceBetween: 10 },
+            640: { slidesPerView: 2, spaceBetween: 15 },
+            1024: { slidesPerView: 3, spaceBetween: 20 },
+          }}
+          items={[
+            {
+              id: 'journey-1',
+              title: 'Starting Your Journey',
+              description: 'Initial assessment and goal setting',
+              content: (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg">
+                  <div className="text-5xl mb-4">🌱</div>
+                  <h3 className="text-xl font-bold mb-2">First Steps</h3>
+                  <p className="text-center text-sm opacity-90">Beginning your path to wellness and growth</p>
+                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Completed</div>
+                </div>
+              ),
+            },
+            {
+              id: 'journey-2',
+              title: 'Building Skills',
+              description: 'Learning coping strategies and techniques',
+              content: (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg">
+                  <div className="text-5xl mb-4">🛠️</div>
+                  <h3 className="text-xl font-bold mb-2">Skill Building</h3>
+                  <p className="text-center text-sm opacity-90">Developing tools for emotional regulation</p>
+                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">In Progress</div>
+                </div>
+              ),
+            },
+            {
+              id: 'journey-3',
+              title: 'Emotional Awareness',
+              description: 'Understanding and processing emotions',
+              content: (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg">
+                  <div className="text-5xl mb-4">🎭</div>
+                  <h3 className="text-xl font-bold mb-2">Emotional Growth</h3>
+                  <p className="text-center text-sm opacity-90">Exploring and understanding your emotions</p>
+                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Active</div>
+                </div>
+              ),
+            },
+            {
+              id: 'journey-4',
+              title: 'Relationship Building',
+              description: 'Strengthening connections with others',
+              content: (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg">
+                  <div className="text-5xl mb-4">🤝</div>
+                  <h3 className="text-xl font-bold mb-2">Connections</h3>
+                  <p className="text-center text-sm opacity-90">Building healthy relationships and support</p>
+                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div>
+                </div>
+              ),
+            },
+            {
+              id: 'journey-5',
+              title: 'Maintaining Wellness',
+              description: 'Sustaining progress and continued growth',
+              content: (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-6 rounded-lg">
+                  <div className="text-5xl mb-4">🌟</div>
+                  <h3 className="text-xl font-bold mb-2">Wellness</h3>
+                  <p className="text-center text-sm opacity-90">Maintaining growth and preventing relapse</p>
+                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Future</div>
+                </div>
+              ),
+            },
+          ]}
+        />
+      </div>
+    </Card>
+
+    <!-- Interactive Emotion Exploration -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <Card>
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-purple-600">psychology</span>
+            Emotion Exploration Space
+          </h3>
+          <p class="text-muted-foreground text-sm mb-4">
+            Interact with particles that respond to different emotions. 
+            Move your mouse to see how emotions can flow and change.
+          </p>
+          <Particle 
+            client:load
+            particleCount={40}
+            emotion="neutral"
+            interactive={true}
+            autoAnimate={true}
+            enableMouse={true}
+            showTrails={false}
+            className="h-80"
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600">3d_rotation</span>
+            Your Emotion Journey
+          </h3>
+          <p class="text-muted-foreground text-sm mb-4">
+            Explore your emotional landscape in 3D space. Each point represents 
+            your emotional state during different therapy sessions.
+          </p>
+          <MultidimensionalEmotionChart 
+            client:load
+            showTrails={true}
+            showAxes={true}
+            className="h-80"
+          />
+        </div>
+      </Card>
+    </div>
+
+    <!-- Progress Tracking -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card>
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-green-600">trending_up</span>
+            Your Progress Over Time
+          </h3>
+          <p class="text-muted-foreground text-sm mb-4">
+            Track your improvement across different areas of your therapy.
+          </p>
+          <EnhancedChartComponent 
+            client:load
+            type="line"
+            title="Monthly Progress Tracking"
+            data={{
+              category: 'progress',
+              timeRange: 90,
+              clientId: clientId,
+              sessionId: sessionId,
+              dataPoints: 15,
+              useBackendData: true,
+              autoRefresh: true,
+              refreshInterval: 60000
+            }}
+            className="h-64"
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-orange-600">mood</span>
+            Emotional Patterns
+          </h3>
+          <p class="text-muted-foreground text-sm mb-4">
+            Understand the distribution of your emotional states.
+          </p>
+          <EnhancedChartComponent 
+            client:load
+            type="pie"
+            title="Emotion Distribution (Last 30 Days)"
+            data={{
+              category: 'emotions',
+              timeRange: 30,
+              clientId: clientId,
+              useBackendData: true
+            }}
+            className="h-64"
+          />
+        </div>
+      </Card>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+        <div class="p-6 text-center">
+          <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">chat</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Continue Therapy</h3>
+          <p class="text-sm text-muted-foreground mb-4">
+            Start a new session with your AI therapy assistant
+          </p>
+          <a 
+            href="/therapy-chat" 
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <span>Start Session</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+      </Card>
+
+      <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+        <div class="p-6 text-center">
+          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">assignment</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Review Goals</h3>
+          <p class="text-sm text-muted-foreground mb-4">
+            Check your treatment plan and update your goals
+          </p>
+          <a 
+            href="/components/treatment-plans" 
+            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <span>View Goals</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+      </Card>
+
+      <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+        <div class="p-6 text-center">
+          <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">insights</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Explore Tools</h3>
+          <p class="text-sm text-muted-foreground mb-4">
+            Discover advanced visualization and analysis tools
+          </p>
+          <a 
+            href="/dashboard/enhanced" 
+            class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <span>Explore</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+      </Card>
+    </div>
+
+    <!-- Today's Insights -->
+    <Card class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
+      <div class="p-6">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-indigo-600">lightbulb</span>
+          Today's Insights
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-green-600 text-sm">trending_up</span>
+              </div>
+              <h4 class="font-medium">Progress Milestone</h4>
+            </div>
+            <p class="text-sm text-muted-foreground">
+              You've completed 85% of your anxiety management goals. Great work on consistency!
+            </p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-blue-600 text-sm">schedule</span>
+              </div>
+              <h4 class="font-medium">Session Reminder</h4>
+            </div>
+            <p class="text-sm text-muted-foreground">
+              Your next therapy session is scheduled for tomorrow at 2:00 PM.
+            </p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-purple-600 text-sm">psychology</span>
+              </div>
+              <h4 class="font-medium">Mood Pattern</h4>
+            </div>
+            <p class="text-sm text-muted-foreground">
+              Your mood has been consistently positive this week. Keep up the great work!
+            </p>
+          </div>
+        </div>
+      </div>
+    </Card>
+
+    <!-- Navigation Footer -->
+    <div class="flex items-center justify-between pt-6 border-t border-border">
+      <div class="flex items-center gap-4 text-sm text-muted-foreground">
+        <span>Patient Dashboard</span>
+        <span>•</span>
+        <span>Live Data: <span class="font-medium text-green-600">Connected</span></span>
+        <span>•</span>
+        <span>Privacy: <span class="font-medium text-blue-600">Maximum</span></span>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <a 
+          href="/dashboard" 
+          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          Standard Dashboard
+        </a>
+        <a 
+          href="/components" 
+          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Explore Components
+        </a>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

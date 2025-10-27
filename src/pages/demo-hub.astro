@@ -5,6 +5,66 @@ import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 
 const demos = [
   {
+    title: 'Enterprise Components Hub',
+    description:
+      'Comprehensive showcase of all 8 enterprise-grade components for therapy platforms.',
+    status: 'NEW',
+    difficulty: 'LOW',
+    href: '/components',
+    icon: '🏗️',
+    stats: { components: '8', status: 'integrated' },
+  },
+  {
+    title: 'Analytics Dashboard',
+    description:
+      'Advanced charting and data visualization tools with Chart.js integration.',
+    status: 'NEW',
+    difficulty: 'MEDIUM',
+    href: '/components/analytics-dashboard',
+    icon: '📊',
+    stats: { charts: '4+', responsive: 'yes' },
+  },
+  {
+    title: '3D Emotion Visualization',
+    description:
+      'Immersive 3D emotion mapping using Valence-Arousal-Dominance model with Three.js.',
+    status: 'NEW',
+    difficulty: 'HIGH',
+    href: '/components/emotion-visualization',
+    icon: '🎭',
+    stats: { dimensions: '3D', interactive: 'yes' },
+  },
+  {
+    title: 'Treatment Plan Manager',
+    description:
+      'Comprehensive clinical workflow management with goal tracking and milestones.',
+    status: 'NEW',
+    difficulty: 'MEDIUM',
+    href: '/components/treatment-plans',
+    icon: '🎯',
+    stats: { goals: 'unlimited', categories: '5' },
+  },
+  {
+    title: 'FHE Privacy Demo',
+    description:
+      'Fully Homomorphic Encryption demonstration for privacy-preserving therapy data analysis.',
+    status: 'NEW',
+    difficulty: 'HIGH',
+    href: '/components/security-demo',
+    icon: '🔒',
+    stats: { privacy: '100%', compliant: 'HIPAA' },
+  },
+  {
+    title: 'UI Component Showcase',
+    description:
+      'Modern carousel and interface elements with multiple effects and accessibility features.',
+    status: 'NEW',
+    difficulty: 'LOW',
+    href: '/components/ui-showcase',
+    icon: '🎨',
+    stats: { effects: '5+', mobile: 'optimized' },
+  },
+  {
     title: 'Bias Detection Engine',
     description:
       'Interactive, client-side demo showcasing multi-layer cultural bias analysis.',
@@ -25,32 +85,13 @@ const demos = [
     stats: { modules: '3', latency: '<500ms' },
   },
   {
-    title: 'FHE (Encrypted Analysis)',
-    description:
-      'Explore Fully Homomorphic Encryption capabilities in an interactive demo.',
-    status: 'ACTIVE',
-    difficulty: 'MEDIUM',
-    href: '/demo/fhe',
-    icon: '�',
-    stats: { privacy: '100%', mode: 'client' },
-  },
-  {
-    title: 'Emotion Visualization',
-    description: 'Visual demo of emotion metrics and dimensional analysis.',
-    status: 'ACTIVE',
-    difficulty: 'LOW',
-    href: '/demo/emotion-visualization',
-    icon: '📈',
-    stats: { dims: 'x/y', charts: 'multiple' },
-  },
-  {
     title: 'Mental Health Chat',
     description:
       'Production-grade chat with MentalLLaMA analysis (falls back to demo mode locally).',
     status: 'ACTIVE',
     difficulty: 'MEDIUM',
     href: '/mental-health-demo',
-    icon: '�',
+    icon: '💬',
     stats: { analysis: 'real-time', crisis: 'on' },
   },
   {
