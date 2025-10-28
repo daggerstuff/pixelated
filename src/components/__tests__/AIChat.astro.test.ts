@@ -1,4 +1,5 @@
 import { cleanup } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import AIChat from '../AIChat.astro'
 
 // Define interface for component props

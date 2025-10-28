@@ -1,6 +1,7 @@
 // Custom session input form for bias detection analysis
 
 import React, { useState, useEffect } from 'react'
+import { RealTimeBiasIndicator } from './RealTimeBiasIndicator'
 import type {
   SessionData,
   Demographics,
@@ -240,31 +241,47 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         </div>
       </div>
 
-      {/* Content */}
-      <div>
-        <label
-          htmlFor="therapeutic-content"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Therapeutic Content <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="therapeutic-content"
-          value={formData.content}
-          onChange={(e) => handleInputChange('content', e.target.value)}
-          disabled={disabled}
-          rows={6}
-          placeholder="Enter the therapeutic conversation content to analyze for bias patterns..."
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-            errors['content'] ? 'border-red-300' : 'border-gray-300'
-          }`}
+      {/* Content with Real-time Bias Analysis */}
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="therapeutic-content"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Therapeutic Content <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            id="therapeutic-content"
+            value={formData.content}
+            onChange={(e) => handleInputChange('content', e.target.value)}
+            disabled={disabled}
+            rows={6}
+            placeholder="Enter the therapeutic conversation content to analyze for bias patterns..."
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors ${
+              errors['content'] ? 'border-red-300' : 'border-gray-300'
+            }`}
+          />
+          {errors['content'] && (
+            <p className="mt-1 text-sm text-red-600">{errors['content']}</p>
+          )}
+          <div className="flex justify-between items-center mt-1">
+            <p className="text-sm text-gray-500">
+              {formData.content.length}/1000 characters
+            </p>
+            {formData.content.length >= 10 && (
+              <div className="flex items-center space-x-1 text-xs text-blue-600">
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                <span>Live analysis active</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Real-time Bias Indicator */}
+        <RealTimeBiasIndicator
+          content={formData.content}
+          demographics={formData.demographics}
         />
-        {errors['content'] && (
-          <p className="mt-1 text-sm text-red-600">{errors['content']}</p>
-        )}
-        <p className="mt-1 text-sm text-gray-500">
-          {formData.content.length}/1000 characters
-        </p>
       </div>
 
       {/* Example Content Suggestions */}
