@@ -416,18 +416,18 @@ jobs:
           echo "🔍 Verifying workload identity configuration..."
           echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
           echo "Workload Identity Provider: projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          echo "Service Account: action@pixelatedempathy.com"
+          echo "Service Account: github-actions-sa@pixelated-463209-e5.iam.gserviceaccount.com"
       - name: Verify Workload Identity Configuration
         run: |
           echo "🔍 Verifying workload identity configuration..."
           echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
           echo "Workload Identity Provider: projects/${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          echo "Service Account: action@pixelatedempathy.com"
+          echo "Service Account: github-actions-sa@pixelated-463209-e5.iam.gserviceaccount.com"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'github-actions-sa@pixelated-463209-e5.iam.gserviceaccount.com' }}
           create_credentials_file: true
           export_environment_variables: true
 

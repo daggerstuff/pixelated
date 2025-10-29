@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay, EffectFade, EffectCoverflow, Keyboard, Mousewheel, A11y } from 'swiper/modules'
 import type { Swiper as SwiperType } from 'swiper'
@@ -12,11 +12,14 @@ import 'swiper/css/effect-coverflow'
 
 interface CarouselItem {
   id: string
-  content: React.ReactNode
+  content?: React.ReactNode
   title?: string
   description?: string
   image?: string
   link?: string
+  icon?: string
+  gradient?: string
+  subtitle?: string
 }
 
 interface SwiperCarouselProps {
@@ -34,7 +37,7 @@ interface SwiperCarouselProps {
   mousewheel?: boolean
   className?: string
   height?: string
-  breakpoints?: Record<number, any>
+  breakpoints?: Record<number, unknown>
   onSlideChange?: (swiper: SwiperType) => void
   onSwiper?: (swiper: SwiperType) => void
 }
@@ -62,8 +65,8 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
   const [isReady, setIsReady] = useState(false)
   const swiperRef = useRef<SwiperType>()
 
-  // Default demo content
-  const defaultItems: CarouselItem[] = [
+  // Default demo content - memoized to prevent recreation
+  const defaultItems: CarouselItem[] = useMemo(() => [
     {
       id: '1',
       title: 'Therapeutic Journey',
@@ -124,7 +127,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         </div>
       ),
     },
-  ]
+  ], [])
 
   // Default responsive breakpoints
   const defaultBreakpoints = {
@@ -145,7 +148,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
   useEffect(() => {
     setCarouselItems(items || defaultItems)
     setIsReady(true)
-  }, [items])
+  }, [items, defaultItems])
 
   const modules = [
     Navigation,
@@ -219,29 +222,37 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
       <Swiper {...swiperProps} className="w-full h-full">
         {carouselItems.map((item) => (
           <SwiperSlide key={item.id} className="flex items-center justify-center">
-            {typeof item.content === 'string' ? (
-              <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-                {item.image && (
-                  <img 
-                    src={item.image} 
-                    alt={item.title || 'Carousel item'} 
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                )}
-                {item.title && <h3 className="text-xl font-bold mb-2">{item.title}</h3>}
-                {item.description && <p className="text-gray-600 mb-4">{item.description}</p>}
-                <div className="text-lg">{item.content}</div>
-                {item.link && (
-                  <a 
-                    href={item.link} 
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                  >
-                    Learn More
-                  </a>
-                )}
-              </div>
+            {item.content ? (
+              typeof item.content === 'string' ? (
+                <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+                  {item.image && (
+                    <img 
+                      src={item.image} 
+                      alt={item.title || 'Carousel item'} 
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                  )}
+                  {item.title && <h3 className="text-xl font-bold mb-2">{item.title}</h3>}
+                  {item.description && <p className="text-gray-600 mb-4">{item.description}</p>}
+                  <div className="text-lg">{item.content}</div>
+                  {item.link && (
+                    <a 
+                      href={item.link} 
+                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Learn More
+                    </a>
+                  )}
+                </div>
+              ) : (
+                item.content
+              )
             ) : (
-              item.content
+              <div className={`flex flex-col items-center justify-center h-full bg-gradient-to-br ${item.gradient || 'from-gray-500 to-gray-600'} text-white p-6 rounded-lg`}>
+                {item.icon && <div className="text-5xl mb-4">{item.icon}</div>}
+                {item.title && <h3 className="text-xl font-bold mb-2">{item.title}</h3>}
+                {item.subtitle && <p className="text-center text-sm opacity-90">{item.subtitle}</p>}
+              </div>
             )}
           </SwiperSlide>
         ))}

@@ -21,7 +21,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
         <p class="text-gray-600 dark:text-gray-400 mb-6">
           Showcase platform features with smooth sliding transitions and responsive design.
         </p>
-        <SwiperCarousel 
+        <SwiperCarousel
           client:load
           effect="slide"
           autoplay={{delay: 4000, disableOnInteraction: false}}
@@ -31,7 +31,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
           slidesPerView={1}
           spaceBetween={30}
           height="400px"
-          className="mb-4"
+          class="mb-4"
         />
       </div>
 
@@ -41,7 +41,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
         <p class="text-gray-600 dark:text-gray-400 mb-6">
           Interactive 3D coverflow effect for displaying therapy milestones and progress.
         </p>
-        <SwiperCarousel 
+        <SwiperCarousel
           client:load
           effect="coverflow"
           autoplay={false}
@@ -52,67 +52,37 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
           spaceBetween={20}
           centeredSlides={true}
           height="350px"
-          className="mb-4"
+          class="mb-4"
           items={[
             {
               id: 'journey-1',
               title: 'Initial Assessment',
               description: 'Comprehensive evaluation and goal setting',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">📋</div>
-                  <h3 className="text-xl font-bold mb-2">Assessment</h3>
-                  <p className="text-center text-sm opacity-90">Understanding your unique needs and challenges</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">📋</div><h3 class="text-xl font-bold mb-2">Assessment</h3><p class="text-center text-sm opacity-90">Understanding your unique needs and challenges</p></div>',
             },
             {
               id: 'journey-2',
               title: 'Treatment Planning',
               description: 'Collaborative goal setting and strategy development',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🎯</div>
-                  <h3 className="text-xl font-bold mb-2">Planning</h3>
-                  <p className="text-center text-sm opacity-90">Creating personalized treatment strategies</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🎯</div><h3 class="text-xl font-bold mb-2">Planning</h3><p class="text-center text-sm opacity-90">Creating personalized treatment strategies</p></div>',
             },
             {
               id: 'journey-3',
               title: 'Active Therapy',
               description: 'Regular sessions and skill building',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">💬</div>
-                  <h3 className="text-xl font-bold mb-2">Therapy</h3>
-                  <p className="text-center text-sm opacity-90">Building skills and processing experiences</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">💬</div><h3 class="text-xl font-bold mb-2">Therapy</h3><p class="text-center text-sm opacity-90">Building skills and processing experiences</p></div>',
             },
             {
               id: 'journey-4',
               title: 'Progress Monitoring',
               description: 'Tracking improvements and adjusting approach',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-yellow-500 to-orange-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">📈</div>
-                  <h3 className="text-xl font-bold mb-2">Progress</h3>
-                  <p className="text-center text-sm opacity-90">Measuring growth and celebrating victories</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-yellow-500 to-orange-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">📈</div><h3 class="text-xl font-bold mb-2">Progress</h3><p class="text-center text-sm opacity-90">Measuring growth and celebrating victories</p></div>',
             },
             {
               id: 'journey-5',
               title: 'Maintenance & Growth',
               description: 'Sustaining progress and continued development',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-red-500 to-pink-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🌱</div>
-                  <h3 className="text-xl font-bold mb-2">Growth</h3>
-                  <p className="text-center text-sm opacity-90">Maintaining wellness and continued growth</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-red-500 to-pink-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🌱</div><h3 class="text-xl font-bold mb-2">Growth</h3><p class="text-center text-sm opacity-90">Maintaining wellness and continued growth</p></div>',
             },
           ]}
         />
@@ -124,7 +94,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
         <p class="text-gray-600 dark:text-gray-400 mb-6">
           Smooth fade transitions for displaying patient success stories and testimonials.
         </p>
-        <SwiperCarousel 
+        <SwiperCarousel
           client:load
           effect="fade"
           autoplay={{delay: 5000}}
@@ -133,46 +103,19 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
           loop={true}
           slidesPerView={1}
           height="300px"
-          className="mb-4"
+          class="mb-4"
           items={[
             {
               id: 'testimonial-1',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-950 p-8 rounded-lg">
-                  <div className="text-4xl mb-4">💙</div>
-                  <blockquote className="text-lg italic text-center mb-4">
-                    "The platform helped me understand my emotions better and gave me practical tools to manage anxiety."
-                  </blockquote>
-                  <p className="font-semibold">- Sarah M.</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Anxiety & Depression Recovery</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-950 p-8 rounded-lg"><div class="text-4xl mb-4">💙</div><blockquote class="text-lg italic text-center mb-4">"The platform helped me understand my emotions better and gave me practical tools to manage anxiety."</blockquote><p class="font-semibold">- Sarah M.</p><p class="text-sm text-gray-600 dark:text-gray-400">Anxiety & Depression Recovery</p></div>',
             },
             {
               id: 'testimonial-2',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-950 p-8 rounded-lg">
-                  <div className="text-4xl mb-4">🌟</div>
-                  <blockquote className="text-lg italic text-center mb-4">
-                    "The visualization tools made it easier to track my progress and stay motivated throughout treatment."
-                  </blockquote>
-                  <p className="font-semibold">- Michael R.</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">PTSD Treatment</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-950 p-8 rounded-lg"><div class="text-4xl mb-4">🌟</div><blockquote class="text-lg italic text-center mb-4">"The visualization tools made it easier to track my progress and stay motivated throughout treatment."</blockquote><p class="font-semibold">- Michael R.</p><p class="text-sm text-gray-600 dark:text-gray-400">PTSD Treatment</p></div>',
             },
             {
               id: 'testimonial-3',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950 dark:to-pink-950 p-8 rounded-lg">
-                  <div className="text-4xl mb-4">🎯</div>
-                  <blockquote className="text-lg italic text-center mb-4">
-                    "Having clear treatment goals and being able to see my progress helped me stay engaged in therapy."
-                  </blockquote>
-                  <p className="font-semibold">- Jessica L.</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Behavioral Change Program</p>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950 dark:to-pink-950 p-8 rounded-lg"><div class="text-4xl mb-4">🎯</div><blockquote class="text-lg italic text-center mb-4">"Having clear treatment goals and being able to see my progress helped me stay engaged in therapy."</blockquote><p class="font-semibold">- Jessica L.</p><p class="text-sm text-gray-600 dark:text-gray-400">Behavioral Change Program</p></div>',
             },
           ]}
         />

@@ -8,11 +8,10 @@ import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmo
 import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
 import Particle from '@/components/three/Particle.tsx'
 
-// @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
 
 const clientId = user?.id || 'demo-patient'
-const sessionId = Astro.url.searchParams.get('sessionId')
+const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 ---
 
 <DashboardLayout
@@ -78,66 +77,31 @@ const sessionId = Astro.url.searchParams.get('sessionId')
               id: 'journey-1',
               title: 'Starting Your Journey',
               description: 'Initial assessment and goal setting',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🌱</div>
-                  <h3 className="text-xl font-bold mb-2">First Steps</h3>
-                  <p className="text-center text-sm opacity-90">Beginning your path to wellness and growth</p>
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Completed</div>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🌱</div><h3 class="text-xl font-bold mb-2">First Steps</h3><p class="text-center text-sm opacity-90">Beginning your path to wellness and growth</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Completed</div></div>',
             },
             {
               id: 'journey-2',
               title: 'Building Skills',
               description: 'Learning coping strategies and techniques',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🛠️</div>
-                  <h3 className="text-xl font-bold mb-2">Skill Building</h3>
-                  <p className="text-center text-sm opacity-90">Developing tools for emotional regulation</p>
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">In Progress</div>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🛠️</div><h3 class="text-xl font-bold mb-2">Skill Building</h3><p class="text-center text-sm opacity-90">Developing tools for emotional regulation</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">In Progress</div></div>',
             },
             {
               id: 'journey-3',
               title: 'Emotional Awareness',
               description: 'Understanding and processing emotions',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🎭</div>
-                  <h3 className="text-xl font-bold mb-2">Emotional Growth</h3>
-                  <p className="text-center text-sm opacity-90">Exploring and understanding your emotions</p>
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Active</div>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🎭</div><h3 class="text-xl font-bold mb-2">Emotional Growth</h3><p class="text-center text-sm opacity-90">Exploring and understanding your emotions</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Active</div></div>',
             },
             {
               id: 'journey-4',
               title: 'Relationship Building',
               description: 'Strengthening connections with others',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🤝</div>
-                  <h3 className="text-xl font-bold mb-2">Connections</h3>
-                  <p className="text-center text-sm opacity-90">Building healthy relationships and support</p>
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🤝</div><h3 class="text-xl font-bold mb-2">Connections</h3><p class="text-center text-sm opacity-90">Building healthy relationships and support</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div></div>',
             },
             {
               id: 'journey-5',
               title: 'Maintaining Wellness',
               description: 'Sustaining progress and continued growth',
-              content: (
-                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-6 rounded-lg">
-                  <div className="text-5xl mb-4">🌟</div>
-                  <h3 className="text-xl font-bold mb-2">Wellness</h3>
-                  <p className="text-center text-sm opacity-90">Maintaining growth and preventing relapse</p>
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Future</div>
-                </div>
-              ),
+              content: '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🌟</div><h3 class="text-xl font-bold mb-2">Wellness</h3><p class="text-center text-sm opacity-90">Maintaining growth and preventing relapse</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Future</div></div>',
             },
           ]}
         />
