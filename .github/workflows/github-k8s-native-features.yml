@@ -28,7 +28,7 @@ on:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.19.0"
+  PNPM_VERSION: "10.20.0"
 
 jobs:
   deployment-status:

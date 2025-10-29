@@ -14,7 +14,7 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ARG PNPM_VERSION=10.19.0
+ARG PNPM_VERSION=10.20.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
 WORKDIR /app
