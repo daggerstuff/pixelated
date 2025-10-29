@@ -1,0 +1,40 @@
+{
+  "enabled": true,
+  "name": "Security Vulnerability Scanner",
+  "description": "Automatically reviews changed files for potential security issues including API keys, tokens, credentials, private keys, encryption keys, certificates, authentication tokens, session IDs, passwords, secrets in configuration files, IP addresses with sensitive data, hardcoded internal URLs, and database connection credentials. Provides specific risk analysis and secure alternatives for each finding.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.js",
+      "**/*.ts",
+      "**/*.jsx",
+      "**/*.tsx",
+      "**/*.py",
+      "**/*.java",
+      "**/*.go",
+      "**/*.rb",
+      "**/*.php",
+      "**/*.env",
+      "**/*.env.*",
+      "**/*.config.js",
+      "**/*.config.ts",
+      "**/*.json",
+      "**/*.yaml",
+      "**/*.yml",
+      "**/*.xml",
+      "**/*.properties",
+      "**/*.conf",
+      "**/*.ini",
+      "**/*.sh",
+      "**/*.bash",
+      "**/*.sql",
+      "**/*.tf",
+      "**/*.tfvars"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the changed files for security vulnerabilities. Scan for:\n\n1. **API Keys & Tokens**: Look for patterns like API_KEY, APIKEY, api-key, access_token, auth_token\n2. **Private Keys**: Search for BEGIN PRIVATE KEY, BEGIN RSA PRIVATE KEY, .pem files, .key files\n3. **Encryption Keys**: Find AES keys, encryption secrets, cipher keys\n4. **Certificates**: Identify certificate files, BEGIN CERTIFICATE patterns\n5. **Authentication Tokens**: JWT tokens, bearer tokens, OAuth tokens, session tokens\n6. **Passwords**: password=, pwd=, passwd=, PASSWORD, hardcoded password strings\n7. **Database Credentials**: Connection strings with usernames/passwords, DB_PASSWORD, DATABASE_URL with credentials\n8. **Internal URLs**: Hardcoded internal IP addresses, localhost URLs with credentials, internal domain names\n9. **Cloud Provider Credentials**: AWS keys (AKIA*), GCP service account keys, Azure connection strings\n10. **Generic Secrets**: SECRET_KEY, secret=, client_secret, app_secret\n\nFor each security issue found:\n- **Highlight the specific line and security risk** with severity level (Critical/High/Medium/Low)\n- **Explain why it's dangerous** (e.g., \"Exposed AWS key can lead to unauthorized resource access and billing\")\n- **Suggest secure alternatives**:\n  - Use environment variables\n  - Use secret management services (AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager)\n  - Use encrypted configuration files\n  - Implement proper .gitignore patterns\n- **Recommend best practices**:\n  - Never commit secrets to version control\n  - Rotate compromised credentials immediately\n  - Use secret scanning tools in CI/CD\n  - Implement least privilege access\n  - Use short-lived credentials where possible\n  - Enable audit logging for secret access\n\nProvide actionable remediation steps for each finding."
+  }
+}

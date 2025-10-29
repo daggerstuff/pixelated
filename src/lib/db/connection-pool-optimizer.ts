@@ -7,7 +7,7 @@ import { Pool, PoolClient, PoolConfig } from 'pg'
 import { EventEmitter } from 'events'
 import { getLogger } from '@/lib/logging'
 
-const logger = getLogger('connection-pool')
+const logger = getLogger('connection-pool') as any
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -161,8 +161,8 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.info('Connection pool initialized', {
         min: this.config.min,
         max: this.config.max,
-        host: this.config.host,
-        database: this.config.database,
+        host: this.config.host || 'localhost',
+        database: this.config.database || 'pixelated',
       })
     } catch (error) {
       logger.error('Failed to initialize connection pool', { error })

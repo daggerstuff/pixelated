@@ -64,6 +64,7 @@ class IndexingStrategy {
         tables: ['patients'],
         suggestedIndexes: [
           {
+            table: 'therapy_sessions',
             columns: ['therapist_id', 'status'],
             type: 'btree',
             unique: false,
@@ -80,11 +81,13 @@ class IndexingStrategy {
         tables: ['sessions'],
         suggestedIndexes: [
           {
+            table: 'therapy_sessions',
             columns: ['patient_id', 'created_at'],
             type: 'btree',
             unique: false,
           },
           {
+            table: 'sessions',
             columns: ['created_at'],
             type: 'btree',
             unique: false,
@@ -101,11 +104,13 @@ class IndexingStrategy {
         tables: ['session_data'],
         suggestedIndexes: [
           {
+            table: 'session_messages',
             columns: ['session_id', 'timestamp'],
             type: 'btree',
             unique: false,
           },
           {
+            table: 'session_data',
             columns: ['session_id'],
             type: 'btree',
             unique: false,
@@ -122,6 +127,7 @@ class IndexingStrategy {
         tables: ['patients'],
         suggestedIndexes: [
           {
+            table: 'session_data',
             columns: ['search_vector'],
             type: 'gin',
             unique: false,
@@ -138,6 +144,7 @@ class IndexingStrategy {
         tables: ['audit_logs'],
         suggestedIndexes: [
           {
+            table: 'patients',
             columns: ['user_id', 'created_at'],
             type: 'btree',
             unique: false,
@@ -154,6 +161,7 @@ class IndexingStrategy {
         tables: ['sessions'],
         suggestedIndexes: [
           {
+            table: 'therapists',
             columns: ['therapist_id', 'created_at'],
             type: 'btree',
             unique: false,
