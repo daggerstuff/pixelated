@@ -1,4 +1,0 @@
-[submodule "ai"]
-	path = ai
-	url = git@github.com:pixelatedempathy/ai.git
-	ignore = all
