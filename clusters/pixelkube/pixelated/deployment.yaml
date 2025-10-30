@@ -90,19 +90,3 @@ spec:
         secret:
           defaultMode: 420
           secretName: pixelated-secrets
-  availableReplicas: 3
-  conditions:
-  - lastTransitionTime: "2025-10-29T23:04:22Z"
-    lastUpdateTime: "2025-10-29T23:05:32Z"
-    message: ReplicaSet "pixelated-6f76c75b5d" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    type: Progressing
-  - lastTransitionTime: "2025-10-29T23:26:30Z"
-    lastUpdateTime: "2025-10-29T23:26:30Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    type: Available
-  observedGeneration: 1
-  readyReplicas: 3
-  replicas: 3
-  updatedReplicas: 3

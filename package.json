@@ -141,7 +141,6 @@
     "@aws-sdk/client-s3": "^3.908.0",
     "@aws-sdk/lib-dynamodb": "^3.908.0",
     "@azure/storage-blob": "^12.28.0",
-    "@chroma-core/default-embed": "^0.1.8",
     "@eslint/js": "^9.37.0",
     "@google-cloud/storage": "^7.17.2",
     "@iconify-json/lucide": "^1.2.69",

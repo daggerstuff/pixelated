@@ -29,35 +29,18 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN addgroup -g 1001 -S astro && \
     adduser -S astro -u 1001 -G astro
 
-FROM base AS deps
+FROM base AS build
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
 
-# Create production package.json using a separate script to avoid parsing issues
-COPY scripts/create-prod-package.js ./
-RUN node create-prod-package.js
-
-# Install only production dependencies
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm config set store-dir /pnpm/store && \
-    mv package.prod.json package.json && \
-    ONNXRUNTIME_DISABLE_GPU=1 pnpm install --no-frozen-lockfile --prod
-
-FROM base AS build
-
-# Copy full dependencies for build
-COPY package.json pnpm-lock.yaml* ./
+# Install all dependencies (including dev for build)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm config set store-dir /pnpm/store && \
     pnpm install --frozen-lockfile
 
 # Copy source files
-COPY src ./src
-COPY public ./public
-COPY astro.config.mjs ./
-COPY tsconfig.json ./
-COPY uno.config.ts ./
+COPY . .
 
 # Build the application
 RUN pnpm build
@@ -71,10 +54,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 USER astro
 
 # Copy production dependencies
-COPY --from=deps --chown=astro:astro /app/node_modules ./node_modules
-COPY --from=deps --chown=astro:astro /app/package.json ./
-
-# Copy built application
+COPY --from=build --chown=astro:astro /app/node_modules ./node_modules
+COPY --from=build --chown=astro:astro /app/package.json ./
 COPY --from=build --chown=astro:astro /app/dist ./dist
 
 # Create minimal start script
