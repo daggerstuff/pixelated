@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: nginx:latest
+        image: ghcr.io/pixelatedempathy/pixelated:latest
         ports:
         - containerPort: 80
         resources:
