@@ -6,9 +6,10 @@ metadata:
   namespace: pixelated
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
-  ingressClassName: "nginx"
+  # ingressClassName: "traefik"  # Let Traefik auto-discover
   tls:
     - hosts:
         - pixelatedempathy.com
