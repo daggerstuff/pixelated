@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"pixelated-app"},"name":"pixelated-service","namespace":"pixelated"},"spec":{"ports":[{"name":"http","port":80,"protocol":"TCP","targetPort":4321}],"selector":{"app":"pixelated-app"},"type":"LoadBalancer"}}
+    kubernetes.civo.com/cluster-id: 2688ebbc-5001-42c2-ada6-95aaf60a0828
+    kubernetes.civo.com/firewall-id: b46278f6-242f-42ce-8210-9a60b83123aa
+    kubernetes.civo.com/loadbalancer-algorithm: round_robin
+    kubernetes.civo.com/loadbalancer-id: ce6435ef-2171-4b05-847c-a625bf27a5d1
+    kubernetes.civo.com/loadbalancer-name: pixelated-empathy-civo-pixelated-pixelated-service
+    kubernetes.civo.com/max-concurrent-requests: "10000"
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: pixelated-app
+  name: pixelated-service
+  namespace: pixelated
+spec:
+  allocateLoadBalancerNodePorts: true
+  - 10.43.138.176
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    nodePort: 30691
+    port: 80
+    protocol: TCP
+    targetPort: 4321
+  selector:
+    app: pixelated-app
+  sessionAffinity: None
+  type: LoadBalancer
+  loadBalancer:
+    ingress:
+    - hostname: ce6435ef-2171-4b05-847c-a625bf27a5d1.lb.civo.com
+      ip: 212.2.241.65
+      ipMode: VIP
