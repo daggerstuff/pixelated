@@ -1,0 +1,299 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: migration-scripts
+  namespace: pixelated-empathy-data
+data:
+  migrate_conversations.py: |
+    #!/usr/bin/env python3
+    """
+    Kubernetes Data Migration Job
+    Migrates conversation data to Azure PostgreSQL.
+    """
+    
+    import os
+    import sys
+    import json
+    import logging
+    import psycopg2
+    from pathlib import Path
+    import requests
+    import tarfile
+    import gzip
+    
+    # Configure logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+    
+    # Database configuration from environment
+    DB_CONFIG = {
+        "host": os.getenv("POSTGRES_HOST", "postgres-service"),
+        "port": os.getenv("POSTGRES_PORT", "5432"),
+        "user": os.getenv("POSTGRES_USER", "postgres"),
+        "password": os.getenv("POSTGRES_PASSWORD"),
+        "database": os.getenv("POSTGRES_DB", "pixelated_empathy")
+    }
+    
+    def download_backup_data():
+        """Download backup data from Azure Storage or local backup."""
+        backup_url = os.getenv("BACKUP_URL")
+        if not backup_url:
+            logger.info("No backup URL provided, assuming data is mounted")
+            return True
+        
+        try:
+            logger.info(f"Downloading backup from: {backup_url}")
+            response = requests.get(backup_url, stream=True)
+            response.raise_for_status()
+            
+            backup_path = Path("/tmp/backup.tar.gz")
+            with open(backup_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            
+            # Extract backup
+            with tarfile.open(backup_path, 'r:gz') as tar:
+                tar.extractall("/tmp/data")
+            
+            logger.info("Backup downloaded and extracted successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to download backup: {e}")
+            return False
+    
+    def migrate_jsonl_file(file_path: Path) -> int:
+        """Migrate a JSONL conversation file."""
+        try:
+            conn = psycopg2.connect(**DB_CONFIG)
+            cursor = conn.cursor()
+            
+            migrated_count = 0
+            
+            with open(file_path, 'r') as f:
+                for line_num, line in enumerate(f):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    try:
+                        conv_data = json.loads(line)
+                        
+                        # Generate conversation ID
+                        conv_id = f"{file_path.stem}_{line_num}"
+                        
+                        # Get metadata
+                        metadata = conv_data.get('metadata', {})
+                        source = metadata.get('source_dataset', file_path.stem)
+                        tier = metadata.get('tier', 1)
+                        category = metadata.get('category', 'therapeutic')
+                        quality_score = metadata.get('quality_score', 0.0)
+                        
+                        # Insert conversation
+                        cursor.execute("""
+                            INSERT INTO conversations (id, source, tier, category, quality_score)
+                            VALUES (%s, %s, %s, %s, %s)
+                            ON CONFLICT (id) DO NOTHING
+                        """, (conv_id, source, f"TIER_{tier}", category, quality_score))
+                        
+                        # Get conversation messages
+                        messages = conv_data.get('conversation', [])
+                        
+                        for i, msg in enumerate(messages):
+                            msg_id = f"{conv_id}_msg_{i}"
+                            role = msg.get('role', 'user')
+                            content = msg.get('content', '')
+                            
+                            cursor.execute("""
+                                INSERT INTO messages (id, conversation_id, role, content, word_count)
+                                VALUES (%s, %s, %s, %s, %s)
+                                ON CONFLICT (id) DO NOTHING
+                            """, (msg_id, conv_id, role, content, len(content.split())))
+                        
+                        migrated_count += 1
+                        
+                        if migrated_count % 1000 == 0:
+                            conn.commit()
+                            logger.info(f"Migrated {migrated_count} conversations from {file_path.name}")
+                            
+                    except json.JSONDecodeError as e:
+                        logger.warning(f"Invalid JSON on line {line_num} in {file_path}: {e}")
+                        continue
+                    except Exception as e:
+                        logger.warning(f"Error processing line {line_num} in {file_path}: {e}")
+                        continue
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            logger.info(f"✅ Migrated {migrated_count} conversations from {file_path}")
+            return migrated_count
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to migrate {file_path}: {e}")
+            return 0
+    
+    def find_conversation_files() -> list:
+        """Find conversation files to migrate."""
+        data_paths = [
+            Path("/data/processed"),
+            Path("/tmp/data/processed"),
+            Path("/backup/processed")
+        ]
+        
+        jsonl_files = []
+        for data_path in data_paths:
+            if data_path.exists():
+                jsonl_files.extend(data_path.rglob("*conversations.jsonl"))
+                jsonl_files.extend(data_path.rglob("*.jsonl"))
+        
+        return jsonl_files
+    
+    def main():
+        """Main migration function."""
+        logger.info("🚀 STARTING AZURE KUBERNETES DATA MIGRATION")
+        
+        # Download backup data if needed
+        if not download_backup_data():
+            logger.error("Failed to download backup data")
+            return False
+        
+        # Wait for database to be ready
+        max_retries = 30
+        for attempt in range(max_retries):
+            try:
+                conn = psycopg2.connect(**DB_CONFIG)
+                conn.close()
+                logger.info("✅ Database connection successful")
+                break
+            except Exception as e:
+                logger.info(f"Waiting for database... (attempt {attempt + 1}/{max_retries})")
+                if attempt == max_retries - 1:
+                    logger.error(f"Failed to connect to database after {max_retries} attempts: {e}")
+                    return False
+                import time
+                time.sleep(10)
+        
+        # Find conversation files
+        jsonl_files = find_conversation_files()
+        
+        if not jsonl_files:
+            logger.warning("No conversation files found for migration")
+            return False
+        
+        logger.info(f"Found {len(jsonl_files)} conversation files to migrate")
+        
+        # Migrate files
+        total_migrated = 0
+        for file_path in jsonl_files:
+            logger.info(f"📁 Processing: {file_path}")
+            migrated = migrate_jsonl_file(file_path)
+            total_migrated += migrated
+        
+        # Final verification
+        try:
+            conn = psycopg2.connect(**DB_CONFIG)
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT COUNT(*) FROM conversations")
+            conv_count = cursor.fetchone()[0]
+            
+            cursor.execute("SELECT COUNT(*) FROM messages")
+            msg_count = cursor.fetchone()[0]
+            
+            cursor.execute("SELECT source, COUNT(*) FROM conversations GROUP BY source ORDER BY COUNT(*) DESC")
+            sources = cursor.fetchall()
+            
+            logger.info(f"\n📊 MIGRATION COMPLETED!")
+            logger.info(f"Total conversations: {conv_count}")
+            logger.info(f"Total messages: {msg_count}")
+            logger.info(f"Average messages per conversation: {msg_count/conv_count if conv_count > 0 else 0:.1f}")
+            
+            logger.info(f"\n📈 CONVERSATIONS BY SOURCE:")
+            for source, count in sources[:10]:  # Top 10 sources
+                logger.info(f"  - {source}: {count}")
+            
+            cursor.close()
+            conn.close()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Migration verification failed: {e}")
+            return False
+    
+    if __name__ == "__main__":
+        success = main()
+        sys.exit(0 if success else 1)
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-migration
+  namespace: pixelated-empathy-data
+  labels:
+    app: data-migration
+    component: migration
+spec:
+  template:
+    metadata:
+      labels:
+        app: data-migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: migration
+        image: python:3.11-slim
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Installing dependencies..."
+          pip install psycopg2-binary requests
+          
+          echo "Running migration script..."
+          python /scripts/migrate_conversations.py
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_DB
+        - name: BACKUP_URL
+          value: ""  # Set this to your Azure Storage backup URL if needed
+        volumeMounts:
+        - name: migration-scripts
+          mountPath: /scripts
+        - name: data-volume
+          mountPath: /data
+          readOnly: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      volumes:
+      - name: migration-scripts
+        configMap:
+          name: migration-scripts
+          defaultMode: 0755
+      - name: data-volume
+        emptyDir: {}  # Replace with actual data volume or Azure File Share

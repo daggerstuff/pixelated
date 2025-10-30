@@ -1,0 +1,158 @@
+{
+  "release_name": "pixelated_ai_v20250803_054129_q50_t2_f3",
+  "deployment_config": {
+    "min_quality_threshold": 0.5,
+    "include_tiers": [
+      "priority_1",
+      "professional"
+    ],
+    "processing_status": "processed",
+    "train_ratio": 0.6,
+    "validation_ratio": 0.2,
+    "test_ratio": 0.2,
+    "random_seed": 42,
+    "stratify_by": [
+      "tier",
+      "quality_range"
+    ],
+    "export_formats": [
+      "jsonl",
+      "csv",
+      "huggingface"
+    ],
+    "include_metadata": true,
+    "include_quality_metrics": true,
+    "include_tags": true,
+    "validate_exports": true,
+    "output_base_dir": "/home/vivi/pixelated/ai/production_deployment/releases",
+    "release_name": null
+  },
+  "deployment_timestamp": "2025-08-03T09:41:53.928974+00:00",
+  "total_conversations": 19472,
+  "split_statistics": {
+    "total_conversations": 137855,
+    "train_count": 82709,
+    "validation_count": 27568,
+    "test_count": 27578,
+    "quality_distribution": {
+      "train": {
+        "high": 0.14038375509315795,
+        "medium": 0.8596162449068421
+      },
+      "validation": {
+        "high": 0.14038015089959374,
+        "medium": 0.8596198491004062
+      },
+      "test": {
+        "high": 0.1404017695264341,
+        "medium": 0.8595982304735659
+      }
+    },
+    "tier_distribution": {
+      "train": {
+        "priority_1": 735,
+        "professional": 10946,
+        "priority_2": 192,
+        "priority_3": 154,
+        "cot_reasoning": 38735,
+        "research": 31947
+      },
+      "validation": {
+        "priority_1": 245,
+        "professional": 3648,
+        "priority_2": 64,
+        "priority_3": 51,
+        "cot_reasoning": 12911,
+        "research": 10649
+      },
+      "test": {
+        "priority_1": 247,
+        "professional": 3651,
+        "priority_2": 64,
+        "priority_3": 53,
+        "cot_reasoning": 12913,
+        "research": 10650
+      }
+    },
+    "source_distribution": {
+      "train": {
+        "priority_1": 734,
+        "test_dataset": 1,
+        "professional_soulchat": 2967,
+        "professional_psychology": 5977,
+        "professional_neuro": 2001,
+        "test_search": 1,
+        "priority_2": 192,
+        "priority_3": 154,
+        "cot_reasoning": 38735,
+        "additional_specialized": 31947
+      },
+      "validation": {
+        "priority_1": 245,
+        "professional_psychology": 1943,
+        "professional_neuro": 724,
+        "professional_soulchat": 981,
+        "priority_2": 64,
+        "priority_3": 51,
+        "cot_reasoning": 12911,
+        "additional_specialized": 10649
+      },
+      "test": {
+        "priority_1": 246,
+        "test_search": 1,
+        "professional_psychology": 1926,
+        "professional_soulchat": 1052,
+        "professional_neuro": 673,
+        "priority_2": 64,
+        "priority_3": 53,
+        "cot_reasoning": 12913,
+        "additional_specialized": 10650
+      }
+    },
+    "split_timestamp": "2025-08-03T09:41:35.364322+00:00"
+  },
+  "export_results_summary": {
+    "train": {
+      "jsonl": {
+        "total_conversations": 11681,
+        "validation_passed": true
+      },
+      "csv": {
+        "total_conversations": 11681,
+        "validation_passed": true
+      },
+      "huggingface": {
+        "total_conversations": 11681,
+        "validation_passed": true
+      }
+    },
+    "validation": {
+      "jsonl": {
+        "total_conversations": 3893,
+        "validation_passed": true
+      },
+      "csv": {
+        "total_conversations": 3893,
+        "validation_passed": true
+      },
+      "huggingface": {
+        "total_conversations": 3893,
+        "validation_passed": true
+      }
+    },
+    "test": {
+      "jsonl": {
+        "total_conversations": 3898,
+        "validation_passed": true
+      },
+      "csv": {
+        "total_conversations": 3898,
+        "validation_passed": true
+      },
+      "huggingface": {
+        "total_conversations": 3898,
+        "validation_passed": true
+      }
+    }
+  }
+}

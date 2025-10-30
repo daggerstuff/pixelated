@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pixelated-app
+    version: v1.0.0
+  name: pixelated
+  namespace: pixelated
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pixelated-app
+  template:
+    metadata:
+      labels:
+        app: pixelated-app
+        version: v1.0.0
+    spec:
+      containers:
+      - name: pixelated
+        image: registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6
+        ports:
+        - containerPort: 4321
+          name: http
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: HOST
+          value: 0.0.0.0
+        - name: PORT
+          value: "4321"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4321
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 4321
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: secrets-volume
+          mountPath: /app/secrets
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: pixelated-config
+      - name: secrets-volume
+        secret:
+          secretName: pixelated-secrets

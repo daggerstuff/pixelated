@@ -1,0 +1,190 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-api
+  namespace: {{.Release.Namespace}}
+  labels:
+    helm.sh/chart: {{.Chart.Name}}-{{.Chart.Version|replace "+" "_"}}
+    app.kubernetes.io/name: {{.Chart.Name}}
+    app.kubernetes.io/instance: {{.Release.Name}}
+    app.kubernetes.io/managed-by: {{.Release.Service}}
+    app.kubernetes.io/component: api
+spec:
+  {{- if not .Values.autoscaling.enabled}}
+  replicas: {{.Values.replicaCount|default 1}}
+  {{- end}}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{.Chart.Name}}
+      app.kubernetes.io/instance: {{.Release.Name}}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      {{- with .Values.podAnnotations}}
+      annotations:
+        {{toYaml .|nindent 8}}
+      {{- end}}
+      labels:
+        app.kubernetes.io/name: {{.Chart.Name}}
+        app.kubernetes.io/instance: {{.Release.Name}}
+        app.kubernetes.io/component: api
+    spec:
+      {{- with .Values.imagePullSecrets}}
+      imagePullSecrets:
+        {{toYaml .|nindent 8}}
+      {{- end}}
+      securityContext:
+        {{ toYaml .Values.podSecurityContext | default dict | nindent 8}}
+      containers:
+        - name: api
+          securityContext:
+            {{ toYaml .Values.securityContext | default dict | nindent 12}}
+          {{ $imageRepo := required "A value for image.repository is required" .Values.image.repository -}}
+          {{ $imageTag := .Values.image.tag | default .Chart.AppVersion -}}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: {{.Values.image.pullPolicy|default "IfNotPresent"}}
+          command:
+            - "uv"
+            - "run"
+            - "python"
+            - "-m"
+            - "inference.pixel_voice_inference"
+          args:
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - {{.Values.service.port|default 80|quote}}
+          ports:
+            - name: http
+              containerPort: {{.Values.service.port|default 80}}
+              protocol: TCP
+          {{ $dbName := .Values.postgresql.auth.database | default "postgres" -}}
+          {{ $dbUser := .Values.postgresql.auth.username | default "postgres" -}}
+          env:
+            - name: ENV
+              value: {{.Release.Namespace|quote}}
+            - name: DB_HOST
+              value: {{.Release.Name}}-postgresql
+            - name: DB_PORT
+              value: {{.Values.postgresql.port|default 5432|quote}}
+            - name: DB_NAME
+              value: {{ $dbName | quote }}
+            - name: DB_USER
+              value: {{ $dbUser | quote }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: postgres-password
+            - name: REDIS_HOST
+              value: {{.Release.Name}}-redis
+            - name: REDIS_PORT
+              value: {{.Values.redis.port|default 6379|quote}}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{ toYaml .Values.resources | default dict | nindent 12}}
+      {{- with .Values.nodeSelector}}
+      nodeSelector:
+        {{toYaml .|nindent 8}}
+      {{- end}}
+      {{- with .Values.affinity}}
+      affinity:
+        {{toYaml .|nindent 8}}
+      {{- end}}
+      {{- with .Values.tolerations}}
+      tolerations:
+        {{toYaml .|nindent 8}}
+      {{- end}}
+---
+{{- if .Values.worker.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-pipeline-worker
+  namespace: {{.Release.Namespace}}
+  labels:
+    helm.sh/chart: {{.Chart.Name}}-{{.Chart.Version|replace "+" "_"}}
+    app.kubernetes.io/name: {{.Chart.Name}}
+    app.kubernetes.io/instance: {{.Release.Name}}
+    app.kubernetes.io/managed-by: {{.Release.Service}}
+    app.kubernetes.io/component: pipeline-worker
+spec:
+  replicas: {{.Values.worker.replicaCount|default 1}}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{.Chart.Name}}
+      app.kubernetes.io/instance: {{.Release.Name}}
+      app.kubernetes.io/component: pipeline-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{.Chart.Name}}
+        app.kubernetes.io/instance: {{.Release.Name}}
+        app.kubernetes.io/component: pipeline-worker
+    spec:
+      containers:
+        - name: pipeline-worker
+          {{ $imageRepo := required "A value for worker.image.repository is required" .Values.worker.image.repository -}}
+          {{ $imageTag := .Values.worker.image.tag | default .Chart.AppVersion -}}
+          {{ $pullPolicy := .Values.worker.image.pullPolicy | default "IfNotPresent" -}}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: {{ $pullPolicy }}
+          command:
+            - "uv"
+            - "run"
+            - "python"
+            - "-m"
+            - "pipelines.process_datasets"
+          args:
+            - "--worker"
+          livenessProbe:
+            exec:
+              command:
+                - "true"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - "true"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          {{ $dbName := .Values.postgresql.auth.database | default "postgres" -}}
+          {{ $dbUser := .Values.postgresql.auth.username | default "postgres" -}}
+          env:
+            - name: ENV
+              value: {{.Release.Namespace|quote}}
+            - name: DB_HOST
+              value: {{.Release.Name}}-postgresql
+            - name: DB_PORT
+              value: {{.Values.postgresql.port|default 5432|quote}}
+            - name: DB_NAME
+              value: {{ $dbName | quote }}
+            - name: DB_USER
+              value: {{ $dbUser | quote }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: postgres-password
+            - name: REDIS_HOST
+              value: {{.Release.Name}}-redis
+            - name: REDIS_PORT
+              value: {{.Values.redis.port|default 6379|quote}}
+          resources:
+            {{ toYaml .Values.worker.resources | default dict | nindent 12}}
+---
+{{- end}}

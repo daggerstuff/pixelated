@@ -1,0 +1,33 @@
+{
+  "prometheus": {
+    "enabled": true,
+    "port": 9090,
+    "scrape_interval": "15s",
+    "metrics_path": "/metrics"
+  },
+  "grafana": {
+    "enabled": true,
+    "port": 3000,
+    "admin_user": "admin",
+    "admin_password": "d1-GnOJS6zsqHWnvOS_Q_g"
+  },
+  "alerts": {
+    "enabled": true,
+    "webhook_url": "https://hooks.slack.com/services/emergency",
+    "severity_levels": [
+      "critical",
+      "warning",
+      "info"
+    ]
+  },
+  "health_checks": {
+    "enabled": true,
+    "interval": 30,
+    "timeout": 10,
+    "endpoints": [
+      "/health",
+      "/ready",
+      "/metrics"
+    ]
+  }
+}

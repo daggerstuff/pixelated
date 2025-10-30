@@ -1,0 +1,331 @@
+# Production Scaling Configuration for Pixelated Empathy AI
+
+# Global scaling settings
+global:
+  enabled: true
+  monitoring_interval: 30  # seconds
+  metrics_retention: 7     # days
+  default_cooldown: 300    # seconds
+
+# Horizontal scaling configuration
+horizontal_scaling:
+  enabled: true
+  
+  # Auto-scaling rules
+  rules:
+    - name: "cpu_scaling"
+      metric: "system.cpu_usage"
+      scale_up_threshold: 70.0
+      scale_down_threshold: 30.0
+      scale_up_adjustment: 2
+      scale_down_adjustment: 1
+      cooldown_period: 300
+      min_instances: 3
+      max_instances: 20
+      
+    - name: "memory_scaling"
+      metric: "system.memory_usage"
+      scale_up_threshold: 80.0
+      scale_down_threshold: 40.0
+      scale_up_adjustment: 1
+      scale_down_adjustment: 1
+      cooldown_period: 300
+      min_instances: 3
+      max_instances: 20
+      
+    - name: "request_rate_scaling"
+      metric: "app.request_rate"
+      scale_up_threshold: 100.0
+      scale_down_threshold: 20.0
+      scale_up_adjustment: 3
+      scale_down_adjustment: 1
+      cooldown_period: 180
+      min_instances: 3
+      max_instances: 50
+      
+    - name: "response_time_scaling"
+      metric: "app.response_time"
+      scale_up_threshold: 1000.0  # 1 second
+      scale_down_threshold: 200.0  # 200ms
+      scale_up_adjustment: 2
+      scale_down_adjustment: 1
+      cooldown_period: 240
+      min_instances: 3
+      max_instances: 30
+      
+    - name: "queue_depth_scaling"
+      metric: "app.queue_depth"
+      scale_up_threshold: 50.0
+      scale_down_threshold: 5.0
+      scale_up_adjustment: 4
+      scale_down_adjustment: 1
+      cooldown_period: 120
+      min_instances: 3
+      max_instances: 40
+
+# Vertical scaling configuration
+vertical_scaling:
+  enabled: true
+  
+  # Resource adjustment rules
+  cpu_scaling:
+    enabled: true
+    min_cpu: "100m"
+    max_cpu: "4000m"
+    scale_up_threshold: 80.0
+    scale_down_threshold: 20.0
+    adjustment_step: "500m"
+    
+  memory_scaling:
+    enabled: true
+    min_memory: "256Mi"
+    max_memory: "8Gi"
+    scale_up_threshold: 85.0
+    scale_down_threshold: 30.0
+    adjustment_step: "512Mi"
+
+# Load balancing configuration
+load_balancing:
+  enabled: true
+  
+  # Load balancing algorithms
+  algorithms:
+    primary: "least_connections"
+    fallback: "round_robin"
+    
+  # Health checking
+  health_checks:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 5    # seconds
+    path: "/health"
+    healthy_threshold: 2
+    unhealthy_threshold: 3
+    
+  # Session affinity
+  session_affinity:
+    enabled: false
+    method: "ip_hash"
+    timeout: 3600  # seconds
+    
+  # Connection limits
+  connection_limits:
+    max_connections_per_backend: 1000
+    max_total_connections: 10000
+    connection_timeout: 30
+
+# Metrics collection configuration
+metrics:
+  collection_interval: 30  # seconds
+  retention_period: 168    # hours (7 days)
+  
+  # System metrics
+  system_metrics:
+    - name: "cpu_usage"
+      enabled: true
+      aggregation: "average"
+      
+    - name: "memory_usage"
+      enabled: true
+      aggregation: "average"
+      
+    - name: "disk_usage"
+      enabled: true
+      aggregation: "max"
+      
+    - name: "network_io"
+      enabled: true
+      aggregation: "rate"
+  
+  # Application metrics
+  application_metrics:
+    - name: "request_rate"
+      enabled: true
+      aggregation: "sum"
+      
+    - name: "response_time"
+      enabled: true
+      aggregation: "p95"
+      
+    - name: "error_rate"
+      enabled: true
+      aggregation: "rate"
+      
+    - name: "active_connections"
+      enabled: true
+      aggregation: "sum"
+      
+    - name: "queue_depth"
+      enabled: true
+      aggregation: "max"
+  
+  # AI-specific metrics
+  ai_metrics:
+    - name: "inference_latency"
+      enabled: true
+      aggregation: "p95"
+      
+    - name: "inference_throughput"
+      enabled: true
+      aggregation: "rate"
+      
+    - name: "model_memory_usage"
+      enabled: true
+      aggregation: "max"
+      
+    - name: "gpu_utilization"
+      enabled: true
+      aggregation: "average"
+
+# Alerting configuration
+alerting:
+  enabled: true
+  
+  # Alert channels
+  channels:
+    email:
+      enabled: true
+      recipients: ["devops@pixelated-empathy.ai"]
+      
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      channel: "#scaling-alerts"
+      
+    pagerduty:
+      enabled: false
+      service_key: "${PAGERDUTY_SERVICE_KEY}"
+  
+  # Alert rules
+  rules:
+    - name: "scaling_failure"
+      condition: "scaling_event.success == false"
+      severity: "critical"
+      message: "Scaling operation failed"
+      
+    - name: "max_instances_reached"
+      condition: "current_instances >= max_instances"
+      severity: "warning"
+      message: "Maximum instance limit reached"
+      
+    - name: "frequent_scaling"
+      condition: "scaling_events_per_hour > 10"
+      severity: "warning"
+      message: "Frequent scaling events detected"
+      
+    - name: "no_healthy_instances"
+      condition: "healthy_instances == 0"
+      severity: "critical"
+      message: "No healthy instances available"
+
+# Performance optimization
+performance:
+  # Predictive scaling
+  predictive_scaling:
+    enabled: true
+    prediction_window: 300  # seconds
+    confidence_threshold: 0.8
+    
+  # Preemptive scaling
+  preemptive_scaling:
+    enabled: true
+    trigger_threshold: 0.9  # Scale when 90% of threshold is reached
+    
+  # Batch scaling
+  batch_scaling:
+    enabled: true
+    batch_size: 3
+    batch_interval: 60  # seconds
+    
+  # Resource optimization
+  resource_optimization:
+    enabled: true
+    optimization_interval: 3600  # seconds
+    target_utilization: 70.0
+
+# Integration settings
+integrations:
+  # Kubernetes
+  kubernetes:
+    enabled: true
+    namespace: "pixelated-prod"
+    hpa_enabled: true
+    vpa_enabled: true
+    pdb_enabled: true
+    
+  # Prometheus
+  prometheus:
+    enabled: true
+    endpoint: "http://prometheus:9090"
+    scrape_interval: 30
+    
+  # Grafana
+  grafana:
+    enabled: true
+    endpoint: "http://grafana:3000"
+    dashboard_id: "scaling-dashboard"
+    
+  # KEDA
+  keda:
+    enabled: true
+    polling_interval: 30
+    cooldown_period: 300
+
+# Security settings
+security:
+  # Access control
+  access_control:
+    enabled: true
+    allowed_users: ["admin", "devops"]
+    allowed_roles: ["scaling-operator"]
+    
+  # Audit logging
+  audit_logging:
+    enabled: true
+    log_level: "INFO"
+    log_file: "/var/log/scaling-audit.log"
+    
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    max_scaling_operations_per_hour: 20
+    max_scaling_operations_per_day: 100
+
+# Disaster recovery
+disaster_recovery:
+  # Multi-region scaling
+  multi_region:
+    enabled: false
+    regions: ["us-west-2", "us-east-1"]
+    failover_threshold: 0.5
+    
+  # Backup scaling configuration
+  backup:
+    enabled: true
+    backup_interval: 3600  # seconds
+    retention_period: 30   # days
+    
+  # Emergency procedures
+  emergency:
+    max_emergency_instances: 100
+    emergency_scaling_enabled: true
+    emergency_contact: "emergency@pixelated-empathy.ai"
+
+# Testing and validation
+testing:
+  # Load testing
+  load_testing:
+    enabled: true
+    test_schedule: "0 2 * * 0"  # Weekly on Sunday at 2 AM
+    test_duration: 3600         # seconds
+    
+  # Chaos engineering
+  chaos_engineering:
+    enabled: false
+    failure_injection_rate: 0.01
+    
+  # Scaling simulation
+  scaling_simulation:
+    enabled: true
+    simulation_schedule: "0 1 * * 1"  # Weekly on Monday at 1 AM
+    scenarios: ["high_load", "memory_pressure", "network_congestion"]

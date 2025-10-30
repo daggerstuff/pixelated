@@ -1,0 +1,39 @@
+{
+  "levels": {
+    "L1": {
+      "type": "memory",
+      "max_size": "256MB",
+      "ttl": 300,
+      "strategy": "LRU"
+    },
+    "L2": {
+      "type": "redis",
+      "host": "localhost",
+      "port": 6379,
+      "max_size": "1GB",
+      "ttl": 3600,
+      "strategy": "LFU"
+    }
+  },
+  "patterns": {
+    "user_sessions": {
+      "level": "L1",
+      "ttl": 1800
+    },
+    "api_responses": {
+      "level": "L2",
+      "ttl": 300
+    },
+    "database_queries": {
+      "level": "L2",
+      "ttl": 600
+    }
+  },
+  "warming": {
+    "enabled": true,
+    "strategies": [
+      "popular_content",
+      "recent_queries"
+    ]
+  }
+}

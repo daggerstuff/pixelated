@@ -1,0 +1,58 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pixelated-empathy.fullname" . }}-api
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: api
+spec:
+  type: {{ .Values.api.service.type }}
+  ports:
+    - port: {{ .Values.api.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "pixelated-empathy.selectorLabels" . | nindent 4 }}
+    component: api
+---
+{{- end }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pixelated-empathy.fullname" . }}-postgresql
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: postgresql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    {{- include "pixelated-empathy.selectorLabels" . | nindent 4 }}
+    component: postgresql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pixelated-empathy.fullname" . }}-redis
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    {{- include "pixelated-empathy.selectorLabels" . | nindent 4 }}
+    component: redis

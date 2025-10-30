@@ -105,11 +105,13 @@ export function LoginForm({
       password?: string
     } = {}
 
+    // Always validate email
     const emailError = validateEmail(email)
     if (emailError) {
       newErrors.email = emailError
     }
 
+    // Always validate password in login mode
     if (mode === 'login') {
       const passwordError = validatePassword(password)
       if (passwordError) {
@@ -124,7 +126,10 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) {
+    // Always validate form to show errors
+    const isValid = validateForm()
+    
+    if (!isValid) {
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',

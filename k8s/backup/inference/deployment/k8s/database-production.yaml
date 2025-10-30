@@ -1,0 +1,229 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pixelated-empathy-data
+  labels:
+    name: pixelated-empathy-data
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secrets
+  namespace: pixelated-empathy-data
+type: Opaque
+data:
+  # Base64 encoded values - update these with your actual secrets
+  POSTGRES_PASSWORD: cGl4ZWxhdGVkX2VtcGF0aHlfcHJvZF9wYXNzd29yZA== # pixelated_empathy_prod_password
+  POSTGRES_USER: cG9zdGdyZXM= # postgres
+  POSTGRES_DB: cGl4ZWxhdGVkX2VtcGF0aHk= # pixelated_empathy
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: pixelated-empathy-data
+data:
+  POSTGRES_DB: "pixelated_empathy"
+  POSTGRES_USER: "postgres"
+  PGDATA: "/var/lib/postgresql/data/pgdata"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-storage
+  namespace: pixelated-empathy-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: pixelated-empathy-data
+  labels:
+    app: postgres
+    component: database
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGDATA
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-storage
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: pixelated-empathy-data
+  labels:
+    app: postgres
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: postgres
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init
+  namespace: pixelated-empathy-data
+  labels:
+    app: postgres-init
+    component: database-init
+spec:
+  template:
+    metadata:
+      labels:
+        app: postgres-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: postgres-init
+        image: postgres:15
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Waiting for PostgreSQL to be ready..."
+          until pg_isready -h postgres-service -p 5432 -U postgres; do
+            echo "PostgreSQL is not ready yet. Waiting..."
+            sleep 2
+          done
+          
+          echo "PostgreSQL is ready. Creating extensions..."
+          PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres-service -U postgres -d pixelated_empathy -c "
+            CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";
+            CREATE EXTENSION IF NOT EXISTS \"pg_trgm\";
+            CREATE EXTENSION IF NOT EXISTS \"btree_gin\";
+          "
+          
+          echo "Creating conversation tables..."
+          PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres-service -U postgres -d pixelated_empathy -c "
+            CREATE TABLE IF NOT EXISTS conversations (
+                id VARCHAR PRIMARY KEY,
+                started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                category VARCHAR,
+                tier VARCHAR,
+                source VARCHAR,
+                conversation_count INTEGER DEFAULT 1,
+                total_messages INTEGER DEFAULT 0,
+                avg_message_length FLOAT DEFAULT 0.0,
+                quality_score FLOAT DEFAULT 0.0
+            );
+            
+            CREATE TABLE IF NOT EXISTS messages (
+                id VARCHAR PRIMARY KEY,
+                conversation_id VARCHAR REFERENCES conversations(id),
+                role VARCHAR NOT NULL,
+                content TEXT NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                word_count INTEGER DEFAULT 0,
+                sentiment_score FLOAT DEFAULT 0.0
+            );
+            
+            CREATE INDEX IF NOT EXISTS idx_conversations_source ON conversations(source);
+            CREATE INDEX IF NOT EXISTS idx_conversations_tier ON conversations(tier);
+            CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
+            CREATE INDEX IF NOT EXISTS idx_messages_role ON messages(role);
+          "
+          
+          echo "Database initialization completed successfully!"
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
