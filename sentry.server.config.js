@@ -58,7 +58,8 @@ Sentry.init({
     },
   },
 })
-!(function () {
+// Sentry debug ID assignment for better error tracking
+;(function () {
   try {
     const e =
       'undefined' != typeof window
