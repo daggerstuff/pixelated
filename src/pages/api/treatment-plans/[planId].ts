@@ -1,4 +1,4 @@
-// import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute, APIContext } from 'astro'
 import { z } from 'zod'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type { TreatmentPlan } from '@/types/treatment'
@@ -12,20 +12,20 @@ const updateTreatmentObjectiveSchema = z
   .object({
     id: z.string().uuid().optional(),
     description: z.string().min(1).optional(),
-    targetDate: z.string().datetime().optional().nullable(),
+    targetDate: z.string().optional().nullable(),
     status: z
       .enum(['Not Started', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])
       .optional(),
     interventions: z.array(z.string().min(1)).min(1).optional(),
     progressNotes: z.string().optional().nullable(),
   })
-  .passthrough()
+
 
 const updateTreatmentGoalSchema = z
   .object({
     id: z.string().uuid().optional(),
     description: z.string().min(1).optional(),
-    targetDate: z.string().datetime().optional().nullable(),
+    targetDate: z.string().optional().nullable(),
     status: z
       .enum([
         'Not Started',
@@ -37,13 +37,12 @@ const updateTreatmentGoalSchema = z
       .optional(),
     objectives: z.array(updateTreatmentObjectiveSchema).optional(),
   })
-  .passthrough()
 
 const updateTreatmentPlanClientSchema = z.object({
   title: z.string().min(1).optional(),
   diagnosis: z.string().optional().nullable(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional().nullable(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional().nullable(),
   status: z
     .enum(['Draft', 'Active', 'Completed', 'Discontinued', 'Archived'])
     .optional(),
@@ -74,16 +73,16 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
     // For now, return a mock plan to prevent build errors
     const plan: TreatmentPlan = {
       id: planId,
-      client_id: user.id,
-      therapist_id: user.id,
+      clientId: user.id,
+      therapistId: user.id,
       title: 'Mock Treatment Plan',
       diagnosis: null,
-      start_date: new Date().toISOString(),
-      end_date: null,
+      startDate: new Date().toISOString(),
+      endDate: null,
       status: 'Draft',
-      general_notes: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      generalNotes: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       goals: [],
     }
 
@@ -129,7 +128,7 @@ export const PUT: APIRoute = async ({
       return new Response(
         JSON.stringify({
           error: 'Invalid request data',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         }),
         { status: 400 },
       )
@@ -143,17 +142,17 @@ export const PUT: APIRoute = async ({
     // For now, return success to prevent build errors
     const updatedPlan: TreatmentPlan = {
       id: planId,
-      client_id: user.id,
-      therapist_id: user.id,
+      clientId: user.id,
+      therapistId: user.id,
       title: updates.title || 'Updated Treatment Plan',
       diagnosis: updates.diagnosis || null,
-      start_date: updates.startDate || new Date().toISOString(),
-      end_date: updates.endDate || null,
+      startDate: updates.startDate || new Date().toISOString(),
+      endDate: updates.endDate || null,
       status: updates.status || 'Draft',
-      general_notes: updates.generalNotes || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      goals: updates.goals || [],
+      generalNotes: updates.generalNotes || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      goals: updates.goals as any || [],
     }
 
     return new Response(JSON.stringify(updatedPlan), { status: 200 })
