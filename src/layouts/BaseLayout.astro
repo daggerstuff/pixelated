@@ -6,6 +6,7 @@ import type { BgType } from '@/types'
 // Import brutalist dark theme
 import '@/styles/brutalist-dark.css'
 import '@/styles/mobile-layout-fixes.css'
+import '@/styles/pixelated-theme.css'
 
 export interface Props {
   title: string
@@ -84,7 +85,7 @@ const { title, description, bgType, ogImage } = Astro.props
       src="https://js.sentry-cdn.com/ef4ca2c0d2530a95efb0ef55c168b661.min.js"
       crossorigin="anonymous"></script>
   </head>
-  <body class="brutalist-body">
+  <body class="brutalist-body theme-page">
     {bgType && <Background type={bgType} />}
     <div class="min-h-screen flex flex-col">
       <Header />

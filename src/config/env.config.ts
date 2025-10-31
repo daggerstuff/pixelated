@@ -311,18 +311,13 @@ export const config = {
 
   email: {
     from: (): string | undefined => env().EMAIL_FROM,
-    resendApiKey: (): string | undefined =>
-      env().RESEND_API_KEY ||
-      ((() => {
-        try {
-          const sm = getSecretsManager()
-          return sm.hasSecret('RESEND_API_KEY')
-            ? sm.getSecret('RESEND_API_KEY')
-            : undefined
-        } catch {
-          return undefined
-        }
-      })()),
+    resendApiKey: (): string | undefined => {
+      if (env().RESEND_API_KEY) return env().RESEND_API_KEY
+      const sm = getSecretsManager()
+      return sm.hasSecret('RESEND_API_KEY')
+        ? sm.getSecret('RESEND_API_KEY')
+        : undefined
+    },
   },
 
   security: {

@@ -1,0 +1,37 @@
+---
+interface Props {
+  eyebrow?: string
+  title: string
+  lede?: string
+  actions?: Array<{ label: string; href: string; variant?: 'primary' | 'secondary' }>
+}
+
+const { eyebrow = '', title, lede = '', actions = [] } = Astro.props
+---
+
+<header class="text-center max-w-3xl mx-auto">
+  {eyebrow && <div class="eyebrow mb-3">{eyebrow}</div>}
+  <h1 class="brutalist-heading display text-3xl md:text-5xl leading-tight">{title}</h1>
+  {lede && <p class="lede mt-6">{lede}</p>}
+  {actions.length > 0 && (
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+      {actions.map((a) => (
+        <a
+          href={a.href}
+          class={`brutalist-button ${
+            a.variant === 'secondary'
+              ? 'brutalist-button--secondary'
+              : 'brutalist-button--primary'
+          } px-8 py-4 font-semibold`}
+        >
+          {a.label}
+        </a>
+      ))}
+    </div>
+  )}
+  <div class="divider my-12"></div>
+  <slot />
+
+</header>
+
+

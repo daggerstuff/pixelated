@@ -7,7 +7,7 @@ services:
       target: production
     container_name: pixelated-training
     restart: unless-stopped
-    
+
     # GPU Configuration
     deploy:
       resources:
@@ -16,7 +16,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    
+
     # Environment Variables
     environment:
       - NODE_ENV=development
@@ -25,7 +25,7 @@ services:
       - WANDB_MODE=offline
       - HF_HOME=/app/cache/huggingface
       - TRANSFORMERS_CACHE=/app/cache/transformers
-    
+
     # Volumes
     volumes:
       - ./data/training:/app/data:ro
@@ -33,11 +33,11 @@ services:
       - ./checkpoints:/app/checkpoints
       - training_cache:/app/cache
       - /dev/shm:/dev/shm:rw  # Shared memory for faster data loading
-    
+
     # Ports
     ports:
       - "8003:8003"
-    
+
     # Health Check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
@@ -45,12 +45,12 @@ services:
       timeout: 30s
       retries: 3
       start_period: 120s
-    
+
     # Dependencies
     depends_on:
       - redis
       - db
-    
+
     # Networks
     networks:
       - training-net
@@ -111,7 +111,7 @@ services:
     container_name: pixelated-grafana-training
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_training_data:/var/lib/grafana

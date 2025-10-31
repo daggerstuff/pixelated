@@ -1,22 +1,22 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PageHeader from '@/components/ui/PageHeader.astro'
+import Surface from '@/components/ui/Surface.astro'
 ---
 
 <BaseLayout title="About Us - Pixelated Empathy">
   <section class="brutalist-section pt-20 md:pt-24 pb-16">
     <div class="brutalist-container">
-      <div class="text-center max-w-3xl mx-auto">
-        <h1 class="brutalist-heading text-3xl md:text-5xl leading-tight">
-          About Pixelated Empathy
-        </h1>
-        <p class="text-lg md:text-xl text-gray-300 mt-6">
-          We build safe AI simulation for therapists to practice the hardest sessions
-          before they happen in real life.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="About"
+        title="About Pixelated Empathy"
+        lede="We build safe AI simulation for therapists to practice the hardest sessions before they happen in real life."
+      />
+
+      <div class="divider my-12"></div>
 
       <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-        <div>
+        <Surface class="p-6">
           <h2 class="text-2xl md:text-3xl font-semibold text-white">
             What we built
           </h2>
@@ -26,8 +26,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
             and post‑session coaching. Practice escalations safely. Build measurable
             competence. Reduce risk.
           </p>
-        </div>
-        <div>
+        </Surface>
+        <Surface class="p-6">
           <h2 class="text-2xl md:text-3xl font-semibold text-white">
             Why it matters
           </h2>
@@ -36,10 +36,12 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
             We give universities, clinics, and practitioners a way to train for the
             edge‑cases that actually break sessions—without putting patients at risk.
           </p>
-        </div>
+        </Surface>
       </div>
 
-      <div class="mt-16 border-t border-gray-800 pt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="divider my-12"></div>
+
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <div class="brutalist-caption mb-2 text-teal-400">Founded</div>
           <p class="text-white font-medium">2025</p>

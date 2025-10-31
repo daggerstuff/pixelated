@@ -4,6 +4,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import LogoWall from '@/components/marketing/LogoWall.astro'
 import HeroTabs from '@/components/marketing/HeroTabs.astro'
 import HowItWorks from '@/components/marketing/HowItWorks.astro'
+import PageHeader from '@/components/ui/PageHeader.astro'
+import HeroGrid from '@/components/ui/HeroGrid.astro'
+import Surface from '@/components/ui/Surface.astro'
 
 export const prerender = true
 
@@ -83,7 +86,7 @@ const features = [
 >
   <!-- Enhanced Hero Section with Modern Visual Elements -->
   <section
-    class="brutalist-section pt-20 md:pt-24 pb-16 mesh-bg-1 relative overflow-hidden min-h-screen flex items-center"
+    class="brutalist-section pt-20 md:pt-24 pb-16 relative overflow-hidden min-h-screen flex items-center"
   >
     <!-- Floating Background Elements -->
     <div
@@ -103,9 +106,7 @@ const features = [
       <div
         class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center"
       >
-        <div
-          class="max-w-lg lg:max-w-xl pr-0 lg:pr-8 mx-auto text-center flex flex-col justify-center"
-        >
+        <div class="max-w-lg lg:max-w-xl pr-0 lg:pr-8 mx-auto text-center flex flex-col justify-center">
           <!-- Enhanced Status Indicator -->
           <div
             class="inline-flex items-center gap-3 mb-6 nav-pill nav-pill--active w-fit mx-auto"
@@ -181,33 +182,28 @@ const features = [
         </div>
 
         <!-- Enhanced Hero Visual -->
-        <div class="relative">
-          <div class="glass-card p-6">
+        <HeroGrid class="relative">
+          <Surface class="p-6">
             <HeroTabs />
-          </div>
-          <!-- Decorative Elements -->
-          <div
-            class="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full opacity-60"
-          >
-          </div>
-          <div
-            class="absolute -bottom-4 -left-4 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-40"
-          >
-          </div>
-        </div>
+          </Surface>
+        </HeroGrid>
       </div>
 
       <div class="mt-16">
         <LogoWall />
       </div>
 
+      <div class="divider my-10"></div>
+
       <!-- The Real Story Section -->
       <div class="mt-24 text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          What We Actually Built
-        </h2>
+        <PageHeader
+          eyebrow="What We Actually Built"
+          title="Training built for reality"
+          lede="Enterprise simulation for high‑stakes therapy practice, without patient risk."
+        />
         <p class="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
-          <strong>Pixelated Empathy</strong> is an enterprise-grade AI training simulator that a single self-taught developer 
+          <strong>Pixelated Empathy</strong> is an enterprise-grade AI training simulator that a single self-taught developer
           built in secret over multiple years. Yes, one person. No, we're not kidding.
         </p>
         <div class="mt-10">
@@ -215,8 +211,8 @@ const features = [
             The Problem We're Solving
           </h3>
           <p class="mt-4 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
-            Mental health training is broken. Students get maybe a dozen practice clients during their entire education, 
-            all carefully curated to be "manageable." Real therapy? It's messy, unpredictable, and full of edge cases 
+            Mental health training is broken. Students get maybe a dozen practice clients during their entire education,
+            all carefully curated to be "manageable." Real therapy? It's messy, unpredictable, and full of edge cases
             that textbooks don't cover. We fix that.
           </p>
         </div>
@@ -225,8 +221,8 @@ const features = [
             Who We're Built For
           </h3>
           <p class="mt-4 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
-            Universities tired of graduating therapists who panic at their first difficult client. 
-            Clinics that want competency-based hiring. Individual practitioners who know they need more practice 
+            Universities tired of graduating therapists who panic at their first difficult client.
+            Clinics that want competency-based hiring. Individual practitioners who know they need more practice
             but can't risk experimenting on real patients.
           </p>
         </div>
@@ -235,8 +231,8 @@ const features = [
             About The Company
           </h3>
           <p class="mt-4 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">
-            Founded in 2025 by Chad, a self-taught developer with deep experience in mental health. 
-            Built entirely in stealth mode to protect the innovation and perfect the platform before revealing it. 
+            Founded in 2025 by Chad, a self-taught developer with deep experience in mental health.
+            Built entirely in stealth mode to protect the innovation and perfect the platform before revealing it.
             Now that it's ready? Time to prove what one determined person can build when they refuse to accept "impossible."
           </p>
         </div>
@@ -262,6 +258,8 @@ const features = [
           ))
         }
       </div>
+
+      <div class="divider my-14"></div>
 
       <!-- Trust stripe -->
       <div
