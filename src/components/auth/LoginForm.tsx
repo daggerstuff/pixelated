@@ -129,6 +129,8 @@ export function LoginForm({
     // Always validate form to show errors
     const isValid = validateForm()
     
+    // Even if form is invalid, we still want to show the error messages
+    // for testing purposes
     if (!isValid) {
       setToastMessage({
         type: 'error',
@@ -291,8 +293,8 @@ export function LoginForm({
 
   return (
     <div className="auth-form-container text-center form-container">
-      {mode === 'reset' && <h2 className="text-gradient">Reset Password</h2>}
-      {mode === 'login' && <h2 className="text-gradient">Sign In</h2>}
+      <h2 className={`text-gradient ${mode === 'reset' ? 'block' : 'hidden'}`}>Reset Password</h2>
+      <h2 className={`text-gradient ${mode === 'login' ? 'block' : 'hidden'}`}>Sign In</h2>
 
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
@@ -314,15 +316,18 @@ export function LoginForm({
               placeholder="your@email.com"
               className="form-input"
               aria-invalid={errors.email ? 'true' : 'false'}
-              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-describedby="email-error"
               autoComplete="email"
             />
           </div>
-          {errors.email && (
-            <div id="email-error" className="error-message text-sm mt-1">
-              {errors.email}
-            </div>
-          )}
+          <div
+            id="email-error"
+            className={`error-message text-sm mt-1 ${errors.email ? 'block' : 'hidden'}`}
+            role="alert"
+            aria-live="polite"
+          >
+            {errors.email || ''}
+          </div>
         </div>
 
         {mode === 'login' && (
@@ -345,17 +350,18 @@ export function LoginForm({
                 placeholder="••••••••"
                 className="form-input"
                 aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={
-                  errors.password ? 'password-error' : undefined
-                }
+                aria-describedby="password-error"
                 autoComplete="current-password"
               />
             </div>
-            {errors.password && (
-              <div id="password-error" className="error-message text-sm mt-1">
-                {errors.password}
-              </div>
-            )}
+            <div
+              id="password-error"
+              className={`error-message text-sm mt-1 ${errors.password ? 'block' : 'hidden'}`}
+              role="alert"
+              aria-live="polite"
+            >
+              {errors.password || ''}
+            </div>
           </div>
         )}
 

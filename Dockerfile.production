@@ -58,6 +58,7 @@ COPY public ./public
 COPY astro.config.mjs ./
 COPY tsconfig.json ./
 COPY uno.config.ts ./
+COPY astro ./astro
 
 # Build the application
 RUN pnpm build
@@ -67,6 +68,8 @@ FROM base AS runtime
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:4321/health || exit 1
+
+RUN chown astro:astro /app
 
 USER astro
 

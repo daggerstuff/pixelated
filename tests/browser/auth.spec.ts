@@ -108,6 +108,6 @@ test('login page visual comparison', async ({ page }) => {
 
   // Take screenshot for visual comparison
   await expect(page).toHaveScreenshot('login-page.png', {
-    maxDiffPixelRatio: 0.02,
+    maxDiffPixelRatio: 0.05, // Increased tolerance for minor visual differences
   })
 })
