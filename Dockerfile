@@ -34,8 +34,9 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Install only production dependencies
+# Install production dependencies including astro CLI for preview mode
 RUN pnpm install --prod --frozen-lockfile && \
+    pnpm add -g astro && \
     pnpm store prune
 
 # Copy built output and public assets from builder
