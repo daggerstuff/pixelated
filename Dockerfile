@@ -22,12 +22,13 @@ RUN pnpm build
 FROM node:24-alpine AS runtime
 WORKDIR /app
 
+# Install pnpm before creating user (matches Dockerfile.production pattern)
+ARG PNPM_VERSION=10.20.0
+RUN npm install -g pnpm@$PNPM_VERSION && \
+    pnpm --version
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
-
-# Install pnpm explicitly (Alpine doesn't have corepack by default in runtime)
-RUN npm install -g pnpm@latest && \
-    pnpm --version
 
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
