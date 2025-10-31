@@ -25,9 +25,8 @@ WORKDIR /app
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
-# Install and enable pnpm explicitly
-RUN corepack enable pnpm && \
-    corepack prepare pnpm@latest --activate && \
+# Install pnpm explicitly (Alpine doesn't have corepack by default in runtime)
+RUN npm install -g pnpm@latest && \
     pnpm --version
 
 # Copy package files and install production dependencies
