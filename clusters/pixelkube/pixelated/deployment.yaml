@@ -19,6 +19,19 @@ spec:
       containers:
       - name: pixelated
         image: pixelatedempathy/pixelated-empathy:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
+        command:
+        - npm
+        - run
+        - start
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: HOST
+          value: 0.0.0.0
+        - name: PORT
+          value: "4321"
+        - name: WEBSITES_PORT
+          value: "4321"
         ports:
         - containerPort: 4321
         resources:

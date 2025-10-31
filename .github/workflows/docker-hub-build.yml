@@ -22,9 +22,21 @@ jobs:
       id: buildts
       run: echo "BUILD_TS=$(date +%s)" >> $GITHUB_ENV
 
+    - name: Check Docker Hub credentials
+      id: check_creds
+      run: |
+        if [ -n "${{ secrets.DOCKERHUB_USERNAME }}" ] && [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+          echo "has_creds=true" >> $GITHUB_OUTPUT
+        elif [ -n "${{ secrets.DOCKER_USER }}" ] && [ -n "${{ secrets.DOCKER_PAT }}" ]; then
+          echo "has_creds=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_creds=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Login to Docker Hub
-      if: ${{ (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') || (secrets.DOCKER_USER != '' && secrets.DOCKER_PAT != '') }}
+      if: steps.check_creds.outputs.has_creds == 'true'
       id: docker_login
+      continue-on-error: true
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USER }}

@@ -25,7 +25,7 @@ spec:
               service:
                 name: pixelated-service
                 port:
-                  number: 4321
+                  number: 80
     - host: www.pixelatedempathy.com
       http:
         paths:
@@ -35,4 +35,4 @@ spec:
               service:
                 name: pixelated-service
                 port:
-                  number: 4321
+                  number: 80
