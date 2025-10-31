@@ -35,6 +35,7 @@ spec:
       containers:
       - name: pixelated
         image: pixelatedempathy/pixelated-empathy:latest
+        command: ["node", "./dist/server/entry.mjs"]
         ports:
         - containerPort: 4321
           name: http

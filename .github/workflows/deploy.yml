@@ -290,7 +290,8 @@ jobs:
             pnpm build
 
             print_status "Building Docker container..."
-            docker build -t pixelated-empathy:latest .
+            docker build -t pixelatedempathy/pixelated-empathy:latest .
+            docker push pixelatedempathy/pixelated-empathy:latest
 
             print_status "Project setup complete"
           EOF
@@ -337,7 +338,7 @@ jobs:
               -e ASTRO_TELEMETRY_DISABLED=1 \\
               -e PUBLIC_URL="\$PUBLIC_URL" \\
               -e CORS_ORIGINS="\$CORS_ORIGINS" \\
-              pixelated-empathy:latest
+              pixelatedempathy/pixelated-empathy:latest
 
             # Wait for container to start
             sleep 15
