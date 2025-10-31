@@ -20,7 +20,7 @@ spec:
       - name: pixelated
         image: pixelatedempathy/pixelated-empathy:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
         command:
-        - npm
+        - pnpm
         - run
         - start
         env:

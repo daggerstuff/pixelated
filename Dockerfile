@@ -25,13 +25,17 @@ WORKDIR /app
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
+# Install and enable pnpm explicitly
+RUN corepack enable pnpm && \
+    corepack prepare pnpm@latest --activate && \
+    pnpm --version
+
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Enable pnpm and install only production dependencies
-RUN corepack enable pnpm && \
-    pnpm install --prod --frozen-lockfile && \
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile && \
     pnpm store prune
 
 # Copy built output and public assets from builder
