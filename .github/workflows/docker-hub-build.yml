@@ -29,6 +29,7 @@ jobs:
         tags: |
           pixelatedempathy/pixelated-empathy:latest
           pixelatedempathy/pixelated-empathy:${{ github.sha }}
+          pixelatedempathy/pixelated-empathy:build-${{ github.run_number }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |

@@ -128,7 +128,7 @@ export function LoginForm({
 
     // Always validate form to show errors
     const isValid = validateForm()
-    
+
     // Even if form is invalid, we still want to show the error messages
     // for testing purposes
     if (!isValid) {
@@ -296,7 +296,7 @@ export function LoginForm({
       <h2 className={`text-gradient ${mode === 'reset' ? 'block' : 'hidden'}`}>Reset Password</h2>
       <h2 className={`text-gradient ${mode === 'login' ? 'block' : 'hidden'}`}>Sign In</h2>
 
-      <form onSubmit={handleSubmit} className="auth-form">
+      <form noValidate onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label htmlFor="email" className="form-label">
             Email
@@ -414,6 +414,7 @@ export function LoginForm({
       <div className="auth-links">
         {mode === 'login' && showResetPassword && (
           <button
+            type="button"
             onClick={() => setMode('reset')}
             className="text-gray-400 text-sm hover:text-gray-300 underline"
           >
@@ -423,6 +424,7 @@ export function LoginForm({
 
         {mode === 'reset' && (
           <button
+            type="button"
             onClick={() => setMode('login')}
             className="text-gray-400 text-sm hover:text-gray-300 underline"
           >
