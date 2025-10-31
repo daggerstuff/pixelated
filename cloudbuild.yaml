@@ -7,7 +7,7 @@ steps:
     args:
       - 'build'
       - '-f'
-      - 'Dockerfile.cloudbuild'
+      - 'Dockerfile.production'
       - '-t'
       - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
       - '--build-arg'
