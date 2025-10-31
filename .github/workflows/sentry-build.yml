@@ -169,6 +169,39 @@ jobs:
           }
           EOF
 
+      - name: Login to Docker Hub (optional)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && ((secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') || (secrets.DOCKER_USER != '' && secrets.DOCKER_PAT != '')) }}
+        id: dockerhub_login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_PAT }}
+          logout: true
+
+      - name: Push Docker images to Docker Hub (optional)
+        if: ${{ steps.dockerhub_login.outcome == 'success' }}
+        run: |
+          echo "📤 Pushing Docker images to Docker Hub..."
+
+          DOCKERHUB_SHA=pixelatedempathy/pixelated-empathy:${{ github.sha }}
+          DOCKERHUB_BRANCH=pixelatedempathy/pixelated-empathy:${{ github.ref_name }}-${{ github.sha }}
+          DOCKERHUB_LATEST=pixelatedempathy/pixelated-empathy:latest
+
+          # Retag GHCR-built image to Docker Hub tags
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_SHA
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_BRANCH
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_LATEST
+
+          # Push with individual error handling
+          echo "📦 Pushing $DOCKERHUB_SHA..."
+          if docker push $DOCKERHUB_SHA; then echo "✅ Pushed $DOCKERHUB_SHA"; else echo "❌ Failed to push $DOCKERHUB_SHA"; exit 1; fi
+
+          echo "📦 Pushing $DOCKERHUB_BRANCH..."
+          if docker push $DOCKERHUB_BRANCH; then echo "✅ Pushed $DOCKERHUB_BRANCH"; else echo "❌ Failed to push $DOCKERHUB_BRANCH"; exit 1; fi
+
+          echo "📦 Pushing $DOCKERHUB_LATEST..."
+          if docker push $DOCKERHUB_LATEST; then echo "✅ Pushed $DOCKERHUB_LATEST"; else echo "❌ Failed to push $DOCKERHUB_LATEST"; exit 1; fi
+
       - name: Create deployment notification
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
