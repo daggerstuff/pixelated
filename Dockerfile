@@ -22,7 +22,7 @@ RUN pnpm build
 FROM node:24-alpine AS runtime
 WORKDIR /app
 
-# Install pnpm before creating user (matches Dockerfile.production pattern)
+# Install pnpm before creating user (install as root, then switch to non-root)
 ARG PNPM_VERSION=10.20.0
 RUN npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version

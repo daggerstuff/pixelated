@@ -36,9 +36,6 @@ This project provides multiple Dockerfile options for different build environmen
     -t pixelated-empathy .
   ```
 
-### `Dockerfile.production` (If exists)
-- **Use Case**: Production-specific optimizations
-- Check the file for specific use cases and features
 
 ## Cloud Build Configuration
 

@@ -25,7 +25,7 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Submit empty form to trigger validation
   await page.click('button[type="submit"]')
-  
+
   // Wait for React to process the form submission and update state
   await page.waitForTimeout(500)
 

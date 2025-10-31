@@ -14,7 +14,7 @@ All legacy deployment paths (Terraform, Helm charts, standalone `k8s/` manifests
 2) Flux syncs from `master` and applies `./clusters/pixelkube/pixelated`.
 
 ### Build image
-Build using the root `Dockerfile` (or `Dockerfile.production`):
+Build using the root `Dockerfile`:
 ```bash
 docker build -t pixelatedempathy/pixelated-empathy:latest .
 ```
