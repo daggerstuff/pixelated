@@ -295,8 +295,8 @@ export function LoginForm({
 
   const renderMainForm = () => (
     <div className="auth-form-container text-center form-container">
-      <h2 className={`text-gradient ${mode === 'reset' ? 'block' : 'hidden'}`}>Reset Password</h2>
-      <h2 className={`text-gradient ${mode === 'login' ? 'block' : 'hidden'}`}>Sign In</h2>
+      {mode === 'reset' && <h2 className="text-gradient">Reset Password</h2>}
+      {mode === 'login' && <h2 className="text-gradient">Sign In</h2>}
 
       <form noValidate onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
@@ -313,7 +313,6 @@ export function LoginForm({
               onChange={handleEmailChange}
               onFocus={() => setFocusedInput('email')}
               onBlur={handleEmailBlur}
-              required
               disabled={isLoading}
               placeholder="your@email.com"
               className="form-input"
@@ -367,7 +366,6 @@ export function LoginForm({
           onChange={handlePasswordChange}
           onFocus={() => setFocusedInput('password')}
           onBlur={handlePasswordBlur}
-          required
           disabled={isLoading}
           placeholder="••••••••"
           className="form-input"
