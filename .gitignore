@@ -80,6 +80,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.cursor/
 
 parts/
 sdist/

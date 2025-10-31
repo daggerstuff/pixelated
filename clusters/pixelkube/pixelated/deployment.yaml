@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: pixelatedempathy/pixelated:latest
+        image: pixelatedempathy/pixelated-empathy:latest
         ports:
         - containerPort: 4321
         resources:

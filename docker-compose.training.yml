@@ -111,7 +111,7 @@ services:
     container_name: pixelated-grafana-training
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_training_data:/var/lib/grafana

@@ -54,6 +54,7 @@ type EmailQueueItem = z.infer<typeof EmailQueueItemSchema>
 
 export class EmailService {
   private resend: Resend
+  private isEnabled = false
   private queueKey = 'email:queue'
   private processingKey = 'email:processing'
   private maxAttempts = 3
@@ -64,10 +65,16 @@ export class EmailService {
   constructor() {
     const apiKey = env.email.resendApiKey()
     if (!apiKey) {
-      throw new Error(
-        'RESEND_API_KEY is not configured in environment variables',
+      // Do not throw; run in disabled mode so upstream APIs don't 500
+      this.isEnabled = false
+      // @ts-expect-error - initialized later only when enabled
+      this.resend = undefined
+      logger.warn(
+        'Email service is disabled: missing RESEND_API_KEY. Emails will be skipped.',
       )
+      return
     }
+    this.isEnabled = true
     this.resend = new Resend(apiKey)
   }
 
@@ -77,6 +84,17 @@ export class EmailService {
   async queueEmail(data: EmailData): Promise<string> {
     // Validate email data
     EmailDataSchema.parse(data)
+
+    // If service is disabled, do not queue. Return a synthetic id and log.
+    if (!this.isEnabled) {
+      const id = crypto.randomUUID()
+      logger.info('Email skipped (service disabled)', {
+        id,
+        to: data.to,
+        templateAlias: data.templateAlias,
+      })
+      return id
+    }
 
     // Create queue item
     const queueItem: EmailQueueItem = {
@@ -103,6 +121,10 @@ export class EmailService {
    * Process the email queue
    */
   async processQueue(): Promise<void> {
+    if (!this.isEnabled) {
+      // Nothing to process in disabled mode
+      return
+    }
     while (true) {
       // Move item from queue to processing
       const item = await redis.rpoplpush(this.queueKey, this.processingKey)

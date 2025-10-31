@@ -9,10 +9,11 @@ LABEL org.opencontainers.image.description="Pixelated Empathy - Production"
 ARG PNPM_VERSION=10.20.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
-# Install only essential system dependencies
+# Install only essential system dependencies including tini for Cloud Run
 RUN apk add --no-cache \
     curl \
     ca-certificates \
+    tini \
     && rm -rf /var/cache/apk/*
 
 WORKDIR /app
@@ -80,10 +81,10 @@ COPY --from=deps --chown=astro:astro /app/package.json ./
 # Copy built application
 COPY --from=build --chown=astro:astro /app/dist ./dist
 
-# Create minimal start script
-RUN echo '#!/bin/sh\nnode ./dist/server/entry.mjs' > start.sh && \
+# Create minimal start script using tini for proper process management
+RUN echo '#!/bin/sh\nexec /sbin/tini -- node ./dist/server/entry.mjs' > start.sh && \
     chmod +x start.sh
 
 EXPOSE 4321
 
-CMD ["./start.sh"]
+CMD ["/sbin/tini", "--", "node", "./dist/server/entry.mjs"]

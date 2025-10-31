@@ -1,104 +1,67 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-
-const team = [
-  {
-    name: 'Chad',
-    role: 'Founder & CEO',
-    imageUrl:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    bio: 'Self-taught developer who spent 15+ years mastering Python, TypeScript, and Rust while working in mental health. Got tired of watching brilliant therapists graduate unprepared for the chaos of real practice. So he built an enterprise-grade AI platform in secret. Alone. Because apparently that\'s how you do impossible things.',
-    expertise: 'Software Engineering, Mental Health Technology, AI Development'
-  }
-]
 ---
 
 <BaseLayout title="About Us - Pixelated Empathy">
-  <div class="bg-gray-900 py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl lg:mx-0">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          What We Actually Built
-        </h2>
-        <p class="mt-6 text-lg leading-8 text-gray-300">
-          <strong>Pixelated Empathy</strong> is an enterprise-grade AI training simulator that one self-taught developer 
-          built entirely in secret. While other "startups" were raising millions and hiring teams, we were quietly building 
-          the most sophisticated therapy training platform that exists. Now it's ready. Now we're talking.
+  <section class="brutalist-section pt-20 md:pt-24 pb-16">
+    <div class="brutalist-container">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="brutalist-heading text-3xl md:text-5xl leading-tight">
+          About Pixelated Empathy
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 mt-6">
+          We build safe AI simulation for therapists to practice the hardest sessions
+          before they happen in real life.
         </p>
-        <div class="mt-10">
-          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            The Problem We're Solving
-          </h3>
-          <p class="mt-4 text-lg leading-8 text-gray-300">
-            Mental health training is fundamentally broken. Students practice on maybe a dozen carefully selected, 
-            "manageable" cases during their entire education. Then they graduate and meet their first client with 
-            severe trauma, cultural complexity, or active suicidality. And panic. We built the thing that should 
-            have existed decades ago: unlimited practice with the hardest cases, completely safely.
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-semibold text-white">
+            What we built
+          </h2>
+          <p class="mt-4 text-gray-300 leading-relaxed">
+            An enterprise‑grade training simulator that lets programs run unlimited
+            high‑stakes role‑plays with adversarial AI clients, real‑time bias cues,
+            and post‑session coaching. Practice escalations safely. Build measurable
+            competence. Reduce risk.
           </p>
         </div>
-        <div class="mt-10">
-          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Who This Is For
-          </h3>
-          <p class="mt-4 text-lg leading-8 text-gray-300">
-            Universities that are tired of graduating therapists who freeze up at their first difficult case. 
-            Clinics that want competency-based hiring instead of hoping for the best. Individual practitioners 
-            who know they need more practice but can't risk experimenting on real humans. Anyone who believes 
-            mental health professionals deserve better training than "good luck, figure it out."
-          </p>
-        </div>
-        <div class="mt-10">
-          <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            About The Company
-          </h3>
-          <p class="mt-4 text-lg leading-8 text-gray-300">
-            <strong>Pixelated Empathy</strong> was founded in 2025 by Chad, a self-taught developer with deep experience in both software engineering and mental health. 
-            The entire platform was built in stealth mode over multiple years to protect the innovation and perfect the technology before revealing it to the world. 
-            We're not your typical "move fast and break things" startup. We moved deliberately and built something that actually works.
-          </p>
-          <p class="mt-4 text-lg leading-8 text-gray-300">
-            <strong>Current Stage:</strong> The platform is built, tested, and ready for deployment. We're now emerging from stealth mode to begin partnerships 
-            with forward-thinking institutions who understand that mental health training needs a revolution, not an evolution.
-          </p>
-          <p class="mt-4 text-lg leading-8 text-gray-300">
-            <strong>Why Now:</strong> Because we're finally confident enough in what we've built to put it in front of the people who matter most: 
-            the educators, clinicians, and students who will use it to become better therapists. 
-            Time to prove that one determined person can build enterprise-grade AI when they refuse to accept "impossible."
+        <div>
+          <h2 class="text-2xl md:text-3xl font-semibold text-white">
+            Why it matters
+          </h2>
+          <p class="mt-4 text-gray-300 leading-relaxed">
+            Students see a handful of curated cases. Real practice isn’t curated.
+            We give universities, clinics, and practitioners a way to train for the
+            edge‑cases that actually break sessions—without putting patients at risk.
           </p>
         </div>
       </div>
-      <div class="mx-auto mt-16 max-w-2xl lg:mx-0 lg:max-w-none">
-        <h3 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-          The Team (Yes, It's Just One Person)
-        </h3>
-        <ul
-          role="list"
-          class="mt-6 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {
-            team.map((person) => (
-              <li>
-                <div class="flex items-center gap-x-6">
-                  <img
-                    class="h-16 w-16 rounded-full"
-                    src={person.imageUrl}
-                    alt={person.name}
-                  />
-                  <div>
-                    <h4 class="text-base font-semibold leading-7 tracking-tight text-white">
-                      {person.name}
-                    </h4>
-                    <p class="text-sm font-semibold leading-6 text-indigo-400">
-                      {person.role}
-                    </p>
-                  </div>
-                </div>
-                <p class="mt-4 text-sm leading-6 text-gray-400">{person.bio}</p>
-              </li>
-            ))
-          }
-        </ul>
+
+      <div class="mt-16 border-t border-gray-800 pt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="brutalist-caption mb-2 text-teal-400">Founded</div>
+          <p class="text-white font-medium">2025</p>
+          <p class="text-gray-400 text-sm mt-1">Built deliberately, production‑ready</p>
+        </div>
+        <div>
+          <div class="brutalist-caption mb-2 text-teal-400">Approach</div>
+          <p class="text-white font-medium">Privacy‑first, zero‑retention</p>
+          <p class="text-gray-400 text-sm mt-1">Security and auditability by design</p>
+        </div>
+        <div>
+          <div class="brutalist-caption mb-2 text-teal-400">Who we serve</div>
+          <p class="text-white font-medium">Universities, clinics, practitioners</p>
+          <p class="text-gray-400 text-sm mt-1">Competency you can measure</p>
+        </div>
+      </div>
+
+      <div class="mt-16 text-center">
+        <a href="/contact" class="brutalist-button brutalist-button--primary px-8 py-4 font-semibold">
+          Partner with us
+        </a>
       </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>

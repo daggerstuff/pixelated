@@ -216,7 +216,7 @@ export async function isSuspiciousIP(
     return false
   }
 
-  // KAN-15: Add external threat intelligence checks
+  // External threat intelligence checks
   if (threatIntelligenceService) {
     try {
       const threatResult = await threatIntelligenceService.queryIntelligence({

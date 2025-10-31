@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getSecretsManager } from '@/lib/security/secrets-manager'
 
 /**
  * Environment variable schema with validation
@@ -310,7 +311,18 @@ export const config = {
 
   email: {
     from: (): string | undefined => env().EMAIL_FROM,
-    resendApiKey: (): string | undefined => env().RESEND_API_KEY,
+    resendApiKey: (): string | undefined =>
+      env().RESEND_API_KEY ||
+      ((() => {
+        try {
+          const sm = getSecretsManager()
+          return sm.hasSecret('RESEND_API_KEY')
+            ? sm.getSecret('RESEND_API_KEY')
+            : undefined
+        } catch {
+          return undefined
+        }
+      })()),
   },
 
   security: {
