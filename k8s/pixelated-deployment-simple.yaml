@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated-app
+  namespace: pixelated
+  labels:
+    app: pixelated-app
+    version: v1.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pixelated-app
+  template:
+    metadata:
+      labels:
+        app: pixelated-app
+        version: v1.0.0
+    spec:
+      containers:
+      - name: pixelated
+        # Using a simple web server that should work
+        image: caddy:latest
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
+        # Simple command to start Caddy with a basic page
+        command: ["caddy"]
+        args: ["file-server", "--listen", ":80"]
