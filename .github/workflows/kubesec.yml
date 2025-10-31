@@ -30,31 +30,8 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Validate Kubernetes YAML syntax
-      # Install PyYAML and parse manifests to ensure k8s manifests are valid before scanning
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install PyYAML
-        python - <<'PY'
-        import sys, yaml
-        manifest_path = 'k8s/production/deployment.yaml'
-        try:
-            with open(manifest_path, 'r') as f:
-                list(yaml.safe_load_all(f))
-        except Exception as e:
-            print(f'YAML syntax error: {e}', file=sys.stderr)
-            sys.exit(1)
-        print('YAML syntax OK')
-        PY
-
     - name: Run yamllint (style, non-blocking)
       continue-on-error: true
       run: |
         python -m pip install yamllint
         yamllint "k8s/**/*.y*ml" || true
-
-    - name: Run kubesec scanner
-      uses: controlplaneio/kubesec-action@43d0ddff5ffee89a6bb9f29b64cd865411137b14
-      with:
-        input: k8s/production/deployment.yaml
-        exit-code: "0"

@@ -3,6 +3,9 @@ name: Build and Push to Docker Hub
 on:
   push:
     branches: [master]
+    tags:
+      - 'v*'
+      - 'release-*'
   workflow_dispatch:
 
 jobs:
