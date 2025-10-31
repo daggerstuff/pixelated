@@ -4,7 +4,7 @@
 This guide documents the complete migration from GitLab Container Registry to Google Container Registry (GCR) for the Pixelated Empathy application.
 
 ## Current State
-- **Previous Registry**: `registry.gitlab.com/pixeldeck/pixelated`
+- **Previous Registry**: `docker.io/pixelatedempathy/pixelated-empathy`
 - **New Registry**: `gcr.io/pixelated-463209-e5/pixelated-empathy`
 - **Migration Status**: ✅ Complete
 
@@ -218,7 +218,7 @@ kubectl rollout status deployment/pixelated --namespace=pixelated
 ```bash
 # Revert to GitLab registry
 kubectl set image deployment/pixelated \
-    pixelated=registry.gitlab.com/pixeldeck/pixelated@sha256:1691c565a3f08071ff8a0ad27af889ec4964d23fc035b2f30d2ae8ce9ec8b0e6 \
+    pixelated=docker.io/pixelatedempathy/pixelated-empathy:build-<timestamp> \
     --namespace=pixelated
 
 # Update image pull secret

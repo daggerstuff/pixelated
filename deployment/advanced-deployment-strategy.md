@@ -210,14 +210,14 @@ get_active_slot() {
             return
         fi
     fi
-    
+
     if docker ps --format "table {{.Names}}" | grep -q "pixelated-green"; then
         if [[ "$(docker inspect --format='{{.State.Health.Status}}' pixelated-green 2>/dev/null)" == "healthy" ]]; then
             echo "green"
             return
         fi
     fi
-    
+
     echo "none"
 }
 
@@ -235,15 +235,15 @@ get_inactive_slot() {
 health_check() {
     local slot="$1"
     local port
-    
+
     if [[ "$slot" == "blue" ]]; then
         port="4321"
     else
         port="4322"
     fi
-    
+
     local url="http://localhost:${port}${HEALTH_ENDPOINT}"
-    
+
     for i in $(seq 1 $HEALTH_CHECK_RETRIES); do
         if curl -sf "$url" >/dev/null 2>&1; then
             local response
@@ -253,11 +253,11 @@ health_check() {
                 return 0
             fi
         fi
-        
+
         log_info "Health check failed for $slot slot (attempt $i/$HEALTH_CHECK_RETRIES)"
         sleep 10
     done
-    
+
     log_error "Health check failed for $slot slot after $HEALTH_CHECK_RETRIES attempts"
     return 1
 }
@@ -266,16 +266,16 @@ health_check() {
 deploy_to_slot() {
     local slot="$1"
     local image="$2"
-    
+
     log_info "Deploying to $slot slot with image: $image"
-    
+
     # Stop existing container
     if docker ps -q -f name="pixelated-$slot" | grep -q .; then
         log_info "Stopping existing $slot container"
         docker stop "pixelated-$slot" || true
         docker rm "pixelated-$slot" || true
     fi
-    
+
     # Start new container
     local port
     if [[ "$slot" == "blue" ]]; then
@@ -283,7 +283,7 @@ deploy_to_slot() {
     else
         port="4322"
     fi
-    
+
     log_info "Starting new $slot container on port $port"
     docker run -d \
         --name "pixelated-$slot" \
@@ -310,14 +310,14 @@ deploy_to_slot() {
         --health-retries=3 \
         --health-start-period=30s \
         "$image"
-    
+
     # Wait for container to be healthy
     log_info "Waiting for $slot container to be healthy..."
     local timeout=$DEPLOYMENT_TIMEOUT
     while [[ $timeout -gt 0 ]]; do
         local status
         status=$(docker inspect --format='{{.State.Health.Status}}' "pixelated-$slot" 2>/dev/null || echo "starting")
-        
+
         if [[ "$status" == "healthy" ]]; then
             log_success "$slot container is healthy"
             return 0
@@ -326,12 +326,12 @@ deploy_to_slot() {
             docker logs "pixelated-$slot"
             return 1
         fi
-        
+
         log_info "$slot container status: $status (${timeout}s remaining)"
         sleep 5
         timeout=$((timeout - 5))
     done
-    
+
     log_error "$slot container failed to become healthy within ${DEPLOYMENT_TIMEOUT}s"
     return 1
 }
@@ -340,12 +340,12 @@ deploy_to_slot() {
 switch_traffic() {
     local new_slot="$1"
     local old_slot="$2"
-    
+
     log_info "Switching traffic from $old_slot to $new_slot"
-    
+
     # Update load balancer configuration
     # This would typically involve updating Traefik rules or similar
-    
+
     # For now, we'll use port mapping approach
     if [[ "$new_slot" == "blue" ]]; then
         # Map port 80 to blue (4321)
@@ -366,7 +366,7 @@ switch_traffic() {
             -e VIRTUAL_PORT=4322 \
             nginx:alpine
     fi
-    
+
     log_success "Traffic switched to $new_slot slot"
 }
 
@@ -374,17 +374,17 @@ switch_traffic() {
 rollback() {
     local current_slot
     current_slot=$(get_active_slot)
-    
+
     if [[ "$current_slot" == "none" ]]; then
         log_error "No active slot found for rollback"
         return 1
     fi
-    
+
     local previous_slot
     previous_slot=$(get_inactive_slot "$current_slot")
-    
+
     log_warning "Rolling back from $current_slot to $previous_slot"
-    
+
     if docker ps -q -f name="pixelated-$previous_slot" | grep -q .; then
         switch_traffic "$previous_slot" "$current_slot"
         log_success "Rollback completed"
@@ -397,15 +397,15 @@ rollback() {
 # Main deployment function
 deploy() {
     local image="$1"
-    
+
     log_info "Starting blue-green deployment"
     log_info "Target image: $image"
-    
+
     # Get current active slot
     local active_slot
     active_slot=$(get_active_slot)
     log_info "Current active slot: $active_slot"
-    
+
     # Determine target slot
     local target_slot
     if [[ "$active_slot" == "none" ]]; then
@@ -413,25 +413,25 @@ deploy() {
     else
         target_slot=$(get_inactive_slot "$active_slot")
     fi
-    
+
     log_info "Target slot: $target_slot"
-    
+
     # Deploy to target slot
     if deploy_to_slot "$target_slot" "$image"; then
         log_success "Deployment to $target_slot slot successful"
-        
+
         # Perform additional health checks
         if health_check "$target_slot"; then
             # Switch traffic
             if [[ "$active_slot" != "none" ]]; then
                 switch_traffic "$target_slot" "$active_slot"
-                
+
                 # Keep old slot running for quick rollback
                 log_info "Keeping $active_slot slot running for potential rollback"
             else
                 switch_traffic "$target_slot" "none"
             fi
-            
+
             log_success "Blue-green deployment completed successfully"
         else
             log_error "Health checks failed, deployment aborted"
@@ -448,17 +448,17 @@ deploy() {
 # Cleanup old containers
 cleanup() {
     log_info "Cleaning up old containers and images"
-    
+
     # Remove stopped containers
     docker container prune -f
-    
+
     # Remove old images (keep last 3)
     docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
         grep "$PROJECT_NAME" | \
         tail -n +4 | \
         awk '{print $1}' | \
         xargs -r docker rmi || true
-    
+
     log_success "Cleanup completed"
 }
 
@@ -536,7 +536,7 @@ spec:
         fsGroup: 1001
       containers:
       - name: pixelated
-        image: registry.gitlab.com/gemcity/pixelated:latest
+        image: docker.io/pixelatedempathy/pixelated-empathy:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 4321

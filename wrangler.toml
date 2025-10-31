@@ -20,6 +20,9 @@ format = "modules"
 dir = "dist"
 main = "./server/entry.mjs"
 
+[assets]
+directory = "dist/client"
+
 # Node.js compatibility
 node_compat = true
 

@@ -184,7 +184,7 @@ kubectl get secret gitlab-registry -n pixelated -o yaml
 
 # Recreate registry secret
 kubectl create secret docker-registry gitlab-registry \
-  --docker-server=registry.gitlab.com \
+  --docker-server=docker.io \
   --docker-username=$CI_REGISTRY_USER \
   --docker-password=$CI_REGISTRY_PASSWORD \
   --namespace=pixelated

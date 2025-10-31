@@ -20,7 +20,7 @@ spec:
     pattern: ^build-(?P<ts>\d+)$
     extract: $ts
   policy:
-    alphabetical:
+    numerical:
       order: asc
 ---
 apiVersion: automation.toolkit.fluxcd.io/v1beta2
