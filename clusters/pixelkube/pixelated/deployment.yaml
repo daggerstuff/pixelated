@@ -18,9 +18,9 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: nginx:alpine
+        image: pixelatedempathy/pixelated:latest
         ports:
-        - containerPort: 80
+        - containerPort: 4321
         resources:
           requests:
             memory: "128Mi"
