@@ -19,10 +19,6 @@ spec:
       containers:
       - name: pixelated
         image: pixelatedempathy/pixelated-empathy:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
-        command:
-        - pnpm
-        - run
-        - start
         env:
         - name: NODE_ENV
           value: production
