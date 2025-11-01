@@ -109,6 +109,8 @@ jobs:
 
       - name: Push Docker images
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "📤 Pushing Docker images..."
 
@@ -118,7 +120,7 @@ jobs:
             echo "✅ Already authenticated with GHCR"
           else
             echo "⚠️ Not authenticated with GHCR, attempting login..."
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             if [ $? -eq 0 ]; then
               echo "✅ Successfully logged in to GHCR"
             else
