@@ -260,6 +260,7 @@
     "braces": "^3.0.3",
     "cheerio": "^1.1.2",
     "class-variance-authority": "^0.7.1",
+    "claude-flow": "^2.7.26",
     "concurrently": "^9.2.1",
     "constructs": "^10.4.2",
     "cross-env": "^10.1.0",
