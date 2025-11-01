@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { execSync } from 'child_process'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, statSync } from 'fs'
 
 /**
  * Memory optimization tests for GitLab CI/CD pipeline
@@ -70,12 +69,14 @@ describe('Memory Optimization Tests', () => {
     it('should exist and be executable', () => {
       expect(existsSync(memoryScriptPath)).toBe(true)
 
-      // Check if script has proper permissions
+      // Check if script has proper permissions using safe file system API
       try {
-        const stats = execSync(`ls -la ${memoryScriptPath}`, { encoding: 'utf-8' })
-        expect(stats).toContain('rwxr-xr-x') // Should be executable
+        const stats = statSync(memoryScriptPath)
+        // Check if file is executable (mode & 0o111 checks all executable bits)
+        const isExecutable = (stats.mode & 0o111) !== 0
+        expect(isExecutable).toBe(true)
       } catch (_error) {
-        // If ls command fails, check if file exists at least
+        // If stat fails, at least verify file exists
         expect(existsSync(memoryScriptPath)).toBe(true)
       }
     })
