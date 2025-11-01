@@ -5,16 +5,16 @@ metadata:
   name: pixelated
   namespace: pixelated
   labels:
-    app: pixelated
+    app: pixelated-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
-      app: pixelated
+      app: pixelated-app
   template:
     metadata:
       labels:
-        app: pixelated
+        app: pixelated-app
     spec:
       containers:
       - name: pixelated
@@ -27,8 +27,26 @@ spec:
           value: 0.0.0.0
         - name: PORT
           value: "4321"
-        - name: WEBSITES_PORT
-          value: "4321"
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry-dsn
+        - name: PUBLIC_SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: public-sentry-dsn
+        - name: SENTRY_RELEASE
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry-release
+        - name: SENTRY_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry-auth-token
         ports:
         - containerPort: 4321
           name: http
