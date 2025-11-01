@@ -8,3 +8,4 @@ resources:
 - receiver-ingress.yaml
 - traefik/helmrepository.yaml
 - traefik/helmrelease.yaml
+- gitrepository.yaml
