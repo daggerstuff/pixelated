@@ -42,8 +42,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Get database connections (not used directly in this handler but kept for lifecycle/connection management)
-    const _mongoClient = mongoClient
-    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter
     const { EventEmitter } = await import('events')
@@ -134,8 +132,6 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     // Get database connections (not used directly in this handler but kept for lifecycle/connection management)
-    const _mongoClient = mongoClient
-    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter
     const { EventEmitter } = await import('events')

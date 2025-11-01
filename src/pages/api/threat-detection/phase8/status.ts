@@ -7,7 +7,7 @@ import { authenticateRequest } from '../../../../lib/auth/index'
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request as any)
     if (!authResult.success) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -16,8 +16,6 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Get database connections (unused here — prefix with '_' to satisfy linter)
-    const _mongoClient = mongoClient
-    const _redisClient = redis
 
     // Create mock orchestrator and rate limiter for status check
     const { EventEmitter } = await import('events')
@@ -42,9 +40,9 @@ export const GET: APIRoute = async ({ request }) => {
     // Get status from all services
     const [monitoringStatus, huntingStatus, intelligenceStatus] =
       await Promise.all([
-        threatDetectionSystem.monitoringService.getStatus(),
-        threatDetectionSystem.huntingService.getStatus(),
-        threatDetectionSystem.intelligenceService.getStatus(),
+        threatDetectionSystem.monitoring.getStatus(),
+        threatDetectionSystem.hunting.getStatus(),
+        threatDetectionSystem.intelligence.getStatus(),
       ])
 
     const status = {
