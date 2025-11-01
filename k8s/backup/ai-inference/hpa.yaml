@@ -1,0 +1,124 @@
+---
+# Horizontal Pod Autoscaler for AI Inference
+# Auto-scales based on CPU, memory, and custom metrics
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-inference-hpa
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-inference
+  
+  minReplicas: 3
+  maxReplicas: 20
+  
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  
+  # Memory-based scaling
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+  
+  # GPU utilization (if available)
+  - type: Pods
+    pods:
+      metric:
+        name: gpu_utilization
+      target:
+        type: AverageValue
+        averageValue: "70"
+  
+  # Request rate scaling
+  - type: Pods
+    pods:
+      metric:
+        name: inference_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "50"  # Scale up if avg RPS > 50 per pod
+  
+  # Response time scaling (critical for <2s requirement)
+  - type: Pods
+    pods:
+      metric:
+        name: inference_response_time_p95
+      target:
+        type: AverageValue
+        averageValue: "1500"  # Scale up if p95 > 1.5s
+  
+  # Queue depth scaling
+  - type: Pods
+    pods:
+      metric:
+        name: inference_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "10"  # Scale up if queue > 10 requests
+  
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # 5 minutes
+      policies:
+      - type: Percent
+        value: 25  # Scale down max 25% at a time
+        periodSeconds: 60
+      - type: Pods
+        value: 1  # Scale down max 1 pod at a time
+        periodSeconds: 60
+      selectPolicy: Min
+    
+    scaleUp:
+      stabilizationWindowSeconds: 30  # 30 seconds
+      policies:
+      - type: Percent
+        value: 100  # Can double capacity quickly
+        periodSeconds: 30
+      - type: Pods
+        value: 4  # Can add up to 4 pods at once
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+# Vertical Pod Autoscaler (optional, for resource optimization)
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: ai-inference-vpa
+  namespace: pixelated-prod
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-inference
+  updatePolicy:
+    updateMode: "Off"  # Recommendation only, don't auto-update
+  resourcePolicy:
+    containerPolicies:
+    - containerName: ai-inference
+      minAllowed:
+        cpu: 1000m
+        memory: 4Gi
+      maxAllowed:
+        cpu: 8000m
+        memory: 32Gi
+      controlledResources:
+      - cpu
+      - memory

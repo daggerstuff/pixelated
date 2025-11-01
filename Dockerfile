@@ -22,6 +22,11 @@ RUN pnpm build
 FROM node:24-alpine AS runtime
 WORKDIR /app
 
+# Install pnpm before creating user (install as root, then switch to non-root)
+ARG PNPM_VERSION=10.20.0
+RUN npm install -g pnpm@$PNPM_VERSION && \
+    pnpm --version
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 
@@ -29,9 +34,9 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Enable pnpm and install only production dependencies
-RUN corepack enable pnpm && \
-    pnpm install --prod --frozen-lockfile && \
+# Install production dependencies including astro CLI for preview mode
+RUN pnpm install --prod --frozen-lockfile && \
+    pnpm add -g astro && \
     pnpm store prune
 
 # Copy built output and public assets from builder

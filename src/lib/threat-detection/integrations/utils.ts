@@ -12,6 +12,7 @@ import type {
   ThreatResponse,
   ResponseAction,
 } from '../response-orchestration'
+import { ExternalThreatIntelligenceService } from './external-threat-intelligence'
 
 const logger = createBuildSafeLogger('threat-detection-utils')
 
@@ -192,7 +193,10 @@ export function calculateThreatScore(threatData: ThreatData): number {
 /**
  * Check if IP address is suspicious
  */
-export function isSuspiciousIP(ip: string): boolean {
+export async function isSuspiciousIP(
+  ip: string,
+  threatIntelligenceService?: ExternalThreatIntelligenceService,
+): Promise<boolean> {
   // Private IP ranges
   const privateRanges = [
     /^10\./,
@@ -212,9 +216,102 @@ export function isSuspiciousIP(ip: string): boolean {
     return false
   }
 
-  // TODO [KAN-15]: Add external threat intelligence checks here
-  // For now, consider non-private IPs as potentially suspicious
+  // External threat intelligence checks
+  if (threatIntelligenceService) {
+    try {
+      const threatResult = await threatIntelligenceService.queryIntelligence({
+        iocType: 'ip',
+        iocValue: ip,
+      })
+
+      // If we found threat intelligence for this IP, it's suspicious
+      if (threatResult.intelligence.length > 0) {
+        logger.info(`IP ${ip} found in threat intelligence`, {
+          sources: threatResult.sources,
+          threatCount: threatResult.intelligence.length,
+        })
+        return true
+      }
+
+      // Log cache hit/miss for monitoring
+      logger.debug(`Threat intelligence query for IP ${ip}`, {
+        cacheHit: threatResult.cacheHit,
+        sources: threatResult.sources,
+      })
+    } catch (error) {
+      // Log error but don't fail the check - fallback to basic heuristics
+      logger.warn(`Failed to query threat intelligence for IP ${ip}`, {
+        error: String(error),
+      })
+    }
+  }
+
+  // Fallback: consider non-private IPs as potentially suspicious
+  // This maintains the original behavior when threat intelligence is unavailable
   return true
+}
+
+/**
+ * Check if IP address is suspicious (synchronous version for backward compatibility)
+ * @deprecated Use isSuspiciousIP with threat intelligence service for better accuracy
+ */
+export function isSuspiciousIPSync(ip: string): boolean {
+  // Private IP ranges
+  const privateRanges = [
+    /^10\./,
+    /^192\.168\./,
+    /^172\.(1[6-9]|2[0-9]|3[01])\./,
+    /^127\./,
+    /^169\.254\./,
+  ]
+
+  // Check if IP is in private range
+  if (privateRanges.some((range) => range.test(ip))) {
+    return false // Private IPs are not suspicious
+  }
+
+  // Check for localhost
+  if (ip === '127.0.0.1' || ip === '::1') {
+    return false
+  }
+
+  // Fallback: consider non-private IPs as potentially suspicious
+  return true
+}
+
+/**
+ * Check if IP address is suspicious with enhanced threat intelligence
+ * This is a convenience function that initializes the threat intelligence service if needed
+ */
+export async function checkSuspiciousIPWithIntelligence(
+  ip: string,
+  config?: {
+    mongoUrl?: string
+    redisUrl?: string
+    enabled?: boolean
+  },
+): Promise<boolean> {
+  if (!config?.enabled) {
+    return isSuspiciousIPSync(ip)
+  }
+
+  try {
+    const threatService = new ExternalThreatIntelligenceService({
+      mongoUrl: config.mongoUrl || process.env.MONGODB_URL || 'mongodb://localhost:27017',
+      redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
+      enabled: true,
+    })
+
+    await threatService.initialize()
+    const result = await isSuspiciousIP(ip, threatService)
+    await threatService.shutdown()
+    return result
+  } catch (error) {
+    logger.warn('Failed to use threat intelligence service, falling back to basic check', {
+      error: String(error),
+    })
+    return isSuspiciousIPSync(ip)
+  }
 }
 
 /**

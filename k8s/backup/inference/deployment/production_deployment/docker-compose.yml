@@ -1,0 +1,220 @@
+version: '3.8'
+
+services:
+  # Main application
+  pixelated-empathy-ai:
+    build:
+      context: ..
+      dockerfile: production_deployment/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
+        VERSION: ${VERSION:-latest}
+        VCS_REF: ${VCS_REF:-$(git rev-parse --short HEAD)}
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://postgres:password@pgbouncer:6432/pixelated_db
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=INFO
+    depends_on:
+      - pgbouncer
+      - redis
+    volumes:
+      - ../logs:/app/logs
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: production_deployment/Dockerfile
+    command: celery -A pixelated_ai.tasks worker -l INFO
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@pgbouncer:6432/pixelated_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - pgbouncer
+    volumes:
+      - ../logs:/app/logs
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # Celery Beat (Scheduler)
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: production_deployment/Dockerfile
+    command: celery -A pixelated_ai.tasks beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@pgbouncer:6432/pixelated_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - pgbouncer
+    volumes:
+      - ../logs:/app/logs
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=pixelated_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgBouncer connection pooler
+  pgbouncer:
+    image: prouse/pgbouncer:latest
+    ports:
+      - "6432:6432"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+      - pgbouncer_logs:/var/log/pgbouncer
+    depends_on:
+      - postgres
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - pixelated-empathy-ai
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  # Log aggregation with ELK stack
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.8.0
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elasticsearch
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - pixelated-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+  pgbouncer_logs:
+
+networks:
+  pixelated-network:
+    driver: bridge

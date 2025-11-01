@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kaniko-build-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kaniko-build-pixelated
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+        - "--dockerfile=Dockerfile.production"
+        - "--context=dir://workspace"
+        - "--destination=pixelated-empathy:latest"
+        - "--tarPath=/workspace/pixelated-empathy.tar"
+        - "--no-push"
+        - "--single-snapshot"
+        volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+        - name: docker-config
+          mountPath: /kaniko/.docker
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      initContainers:
+      - name: copy-source
+        image: alpine/git:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Clone the repository
+            git clone https://github.com/your-username/pixelated-empathy.git /workspace
+            
+            # Or copy from current directory if available
+            # cp -r /source/* /workspace/
+            
+            echo "Source code copied to workspace"
+        volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: kaniko-build-pvc
+      - name: docker-config
+        configMap:
+          name: docker-config
+      restartPolicy: Never
+  backoffLimit: 3

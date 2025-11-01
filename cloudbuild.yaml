@@ -1,55 +1,67 @@
 # Google Cloud Build configuration for Pixelated Empathy
-# Uses Dockerfile.cloudbuild (no BuildKit required) for maximum compatibility
-
-options:
-  # Use more powerful machine for faster builds
-  machineType: 'E2_HIGHCPU_8' # 8 vCPU, 8GB RAM for faster builds
-  logging: CLOUD_LOGGING_ONLY
+# Optimized for Cloud Run deployment with proper process management
 
 steps:
-# Build Docker image using standard docker build (no BuildKit required)
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'Build'
-  args:
-  - 'build'
-  - '--file=Dockerfile.cloudbuild'
-  - '--build-arg=NODE_VERSION=24'
-  - '--build-arg=SENTRY_RELEASE=${_SENTRY_RELEASE}'
-  - '--build-arg=PUBLIC_SENTRY_DSN=${_PUBLIC_SENTRY_DSN}'
-  - '--build-arg=SENTRY_DSN=$$SENTRY_DSN'
-  - '--build-arg=SENTRY_AUTH_TOKEN=$$SENTRY_AUTH_TOKEN'
-  - '--build-arg=BETTER_AUTH_SECRET=$$BETTER_AUTH_SECRET'
-  - '--tag=gcr.io/$PROJECT_ID/pixelated-empathy:$SHORT_SHA'
-  - '--tag=gcr.io/$PROJECT_ID/pixelated-empathy:latest'
-  - '.'
-  secretEnv:
-  - 'SENTRY_DSN'
-  - 'SENTRY_AUTH_TOKEN'
-  - 'BETTER_AUTH_SECRET'
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
+      - '--build-arg'
+      - 'NODE_VERSION=24'
+      - '.'
+    timeout: 1200s
 
-# Secret references from Google Secret Manager
-availableSecrets:
-  secretManager:
-  - versionName: projects/$PROJECT_ID/secrets/sentry-dsn/versions/latest
-    env: 'SENTRY_DSN'
-  - versionName: projects/$PROJECT_ID/secrets/sentry-auth-token/versions/latest
-    env: 'SENTRY_AUTH_TOKEN'
-  - versionName: projects/$PROJECT_ID/secrets/better-auth-secret/versions/latest
-    env: 'BETTER_AUTH_SECRET'
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
 
-# Substitutions for non-sensitive build arguments
-substitutions:
-  _SENTRY_RELEASE: ''
-  _PUBLIC_SENTRY_DSN: ''
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pixelated'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '3'
+      - '--min-instances'
+      - '0'
+      - '--port'
+      - '4321'
+      - '--timeout'
+      - '300s'
+      - '--concurrency'
+      - '80'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=4321'
+      - '--set-secrets'
+      - 'DB_PASSWORD=db-password:latest,REDIS_PASSWORD=redis-password:latest,JWT_SECRET=jwt-secret:latest'
+    timeout: 600s
 
-# Timeout and image configuration
-timeout: '1800s' # 30 minutes
-images:
-- 'gcr.io/$PROJECT_ID/pixelated-empathy:$SHORT_SHA'
-- 'gcr.io/$PROJECT_ID/pixelated-empathy:latest'
+# Use the Cloud Run service account
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/cloud-run@$PROJECT_ID.iam.gserviceaccount.com'
 
-# Tags for build identification
-tags:
-- 'pixelated-empathy'
-- 'production'
-- 'astro'
+# Use the default network
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_MEDIUM'
+
+# Trigger on push to main branch
+trigger:
+  branchName: main

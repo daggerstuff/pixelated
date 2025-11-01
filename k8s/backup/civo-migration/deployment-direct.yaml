@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated-empathy-app
+  namespace: default
+  labels:
+    app: pixelated-empathy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pixelated-empathy
+  template:
+    metadata:
+      labels:
+        app: pixelated-empathy
+    spec:
+      containers:
+      - name: pixelated-empathy
+        image: node:24-alpine
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Install pnpm
+            npm install -g pnpm@10.20.0
+            
+            # Clone the repository
+            git clone https://github.com/your-username/pixelated-empathy.git /app
+            cd /app
+            
+            # Install dependencies
+            pnpm install --no-frozen-lockfile
+            
+            # Build the application
+            pnpm build
+            
+            # Start the application
+            pnpm start
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      restartPolicy: Always

@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.production
+      dockerfile: Dockerfile
     container_name: pixelated-app
     restart: unless-stopped
     ports:

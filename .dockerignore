@@ -184,6 +184,7 @@ clusters/
 scripts/
 !scripts/setup-dev.sh
 !scripts/build-*.sh
+!scripts/create-prod-package.js
 
 # Tools and utilities
 tools/
@@ -237,6 +238,7 @@ playwright.config*.ts
 browserstack.config.ts
 tsconfig*.json
 !tsconfig.json
+!uno.config.ts
 
 # Keep only essential files for build
 !package.json

@@ -1,196 +1,86 @@
-# Terraform Variables for Pixelated Empathy Infrastructure
+# Oracle Cloud Infrastructure Variables
+# ====================================
 
-variable "project_name" {
-  description = "Name of the project"
+variable "compartment_id" {
   type        = string
-  default     = "pixelated-empathy"
+  description = "The compartment to create the resources in"
+  default     = "ocid1.tenancy.oc1..aaaaaaaaf7kzx4gvgyjxft6hacpx6d2xigbylolx2gwizor3dpxyaj24j2wa"
 }
 
-variable "environment" {
-  description = "Environment name"
+variable "region" {
   type        = string
-  default     = "production"
+  description = "The region to provision the resources in"
+  default     = "us-ashburn-1"
 }
 
-variable "aws_region" {
-  description = "AWS region"
+variable "ssh_public_key" {
   type        = string
-  default     = "us-east-1"
+  description = "The SSH public key to use for connecting to the worker nodes"
+  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPDhYx8CTkZV+OiR/mq8Bylr2S9505TprhOwKtCc2UGO"
 }
 
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+variable "bastion_allowed_ips" {
+  type        = list(string)
+  description = "List of IP prefixes allowed to connect via bastion"
+  default     = ["174.207.224.155/32", "2600:1009:b14a:a216:fd95:7eff:e504:3f54/128"]
+}
+
+variable "ad_list" {
+  type        = list(any)
+  description = "List of length 2 with the names of availability regions to use"
+  default     = ["BJqI:US-ASHBURN-1-AD-1", "BJqI:US-ASHBURN-1-AD-2"]
+}
+
+variable "git_token" {
+  description = "Git PAT"
+  sensitive   = true
+  default     = null # Must be provided via TF_VAR_git_token environment variable
+}
+
+variable "git_url" {
+  description = "Git repository URL"
+  default     = "https://github.com/pixelatedempathy/pixelated"
+  type        = string
+  nullable    = false
+}
+
+variable "instance_shape" {
+  description = "The shape of the compute instance"
+  type        = string
+  default     = "VM.Standard.E2.1.Micro"
+}
+
+variable "vcn_cidr" {
+  description = "CIDR block for the VCN"
   type        = string
   default     = "10.0.0.0/16"
 }
 
-variable "availability_zones" {
-  description = "Availability zones"
-  type        = list(string)
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
-}
-
-variable "private_subnets" {
-  description = "Private subnet CIDR blocks"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-}
-
-variable "public_subnets" {
-  description = "Public subnet CIDR blocks"
-  type        = list(string)
-  default     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-}
-
-variable "kubernetes_version" {
-  description = "Kubernetes version"
+variable "subnet_cidr" {
+  description = "CIDR block for the public subnet"
   type        = string
-  default     = "1.28"
+  default     = "10.0.1.0/24"
 }
-
-variable "node_group_min_size" {
-  description = "Minimum number of nodes in the node group"
-  type        = number
-  default     = 1
-}
-
-variable "node_group_max_size" {
-  description = "Maximum number of nodes in the node group"
-  type        = number
-  default     = 10
-}
-
-variable "node_group_desired_size" {
-  description = "Desired number of nodes in the node group"
-  type        = number
-  default     = 3
-}
-
-variable "node_instance_types" {
-  description = "Instance types for the node group"
-  type        = list(string)
-  default     = ["t3.medium"]
-}
-
-variable "postgres_version" {
-  description = "PostgreSQL version"
+variable "flux_registry" {
+  description = "Container registry for Flux images"
   type        = string
-  default     = "15.4"
+  default     = "ghcr.io/fluxcd"
 }
 
-variable "db_instance_class" {
-  description = "RDS instance class"
+variable "flux_version" {
+  description = "Version of Flux to install"
   type        = string
-  default     = "db.t3.micro"
+  default     = "v2.1.0"
 }
 
-variable "db_allocated_storage" {
-  description = "Allocated storage for RDS instance"
-  type        = number
-  default     = 20
-}
-
-variable "db_max_allocated_storage" {
-  description = "Maximum allocated storage for RDS instance"
-  type        = number
-  default     = 100
-}
-
-variable "db_name" {
-  description = "Database name"
+variable "git_path" {
+  description = "Path within the Git repository for Flux manifests"
   type        = string
-  default     = "pixelated_empathy"
+  default     = "./clusters/production" # Adjust to your repo structure
 }
 
-variable "db_username" {
-  description = "Database username"
+variable "git_ref" {
+  description = "Git branch or tag reference for Flux to track"
   type        = string
-  default     = "pixelated_user"
-}
-
-variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_backup_retention_period" {
-  description = "Database backup retention period"
-  type        = number
-  default     = 7
-}
-
-variable "db_backup_window" {
-  description = "Database backup window"
-  type        = string
-  default     = "03:00-04:00"
-}
-
-variable "db_maintenance_window" {
-  description = "Database maintenance window"
-  type        = string
-  default     = "sun:04:00-sun:05:00"
-}
-
-variable "redis_node_type" {
-  description = "Redis node type"
-  type        = string
-  default     = "cache.t3.micro"
-}
-
-variable "redis_num_cache_nodes" {
-  description = "Number of cache nodes"
-  type        = number
-  default     = 2
-}
-
-variable "common_tags" {
-  description = "Common tags to apply to all resources"
-  type        = map(string)
-  default = {
-    Project     = "pixelated-empathy"
-    Environment = "production"
-    ManagedBy   = "terraform"
-  }
-}
-
-variable "s3_kms_key_id" {
-  description = "KMS key ID for S3 bucket encryption"
-  type        = string
-}
-
-variable "s3_replication_dest_arn" {
-  description = "ARN of the destination S3 bucket for replication"
-  type        = string
-}
-
-variable "s3_replication_role_arn" {
-  description = "ARN of the IAM role for S3 replication"
-  type        = string
-}
-
-variable "s3_replication_kms_key_id" {
-  description = "KMS key ID for S3 replication encryption"
-  type        = string
-}
-
-variable "s3_logging_bucket" {
-  description = "S3 bucket for access logging"
-  type        = string
-}
-
-variable "rds_performance_insights_kms_key_id" {
-  description = "KMS key ID for RDS Performance Insights"
-  type        = string
-}
-
-variable "redis_kms_key_id" {
-  description = "KMS key ID for Redis encryption"
-  type        = string
-}
-
-variable "redis_auth_token" {
-  description = "Redis authentication token"
-  type        = string
-  sensitive   = true
+  default     = "master"
 }

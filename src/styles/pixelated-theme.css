@@ -18,13 +18,33 @@
 
   /* Background Colors */
   --theme-bg-primary: #050505;
-  --theme-bg-secondary: rgba(16, 185, 129, 0.1); /* green-500/10 */
-  --theme-bg-card: rgba(16, 185, 129, 0.05); /* green-500/5 */
+  --theme-bg-secondary: rgba(16, 185, 129, 0.08); /* restrained tint */
+  --theme-bg-card: #0b0b0b; /* neutral surface */
+  --theme-bg-elevated: #0f0f0f; /* slightly lifted */
 
   /* Border Colors */
-  --theme-border-primary: rgba(16, 185, 129, 0.3); /* green-500/30 */
-  --theme-border-secondary: rgba(16, 185, 129, 0.4); /* green-500/40 */
-  --theme-border-hover: rgba(16, 185, 129, 0.6); /* green-500/60 */
+  --theme-border-primary: rgba(255, 255, 255, 0.06);
+  --theme-border-secondary: rgba(255, 255, 255, 0.12);
+  --theme-border-hover: rgba(20, 184, 166, 0.35);
+
+  /* Enterprise spacings and radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Subtle shadows (avoid glow) */
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* Organic Particles Animation */
@@ -261,6 +281,31 @@
   background-color: var(--theme-bg-card);
 }
 
+/* Enterprise surfaces */
+.surface {
+  background: var(--theme-bg-card);
+  border: 1px solid var(--theme-border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.surface--elevated {
+  background: var(--theme-bg-elevated);
+  border: 1px solid var(--theme-border-secondary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
 /* Theme-specific Border Colors */
 .theme-border-primary {
   border-color: var(--theme-border-primary);
@@ -332,12 +377,33 @@
 .theme-card {
   background-color: var(--theme-bg-card);
   border: 1px solid var(--theme-border-primary);
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+  box-shadow: var(--shadow-1);
 }
 
 .theme-card:hover {
   border-color: var(--theme-border-hover);
   background-color: rgba(16, 185, 129, 0.08);
+}
+
+/* Enterprise typography refinements */
+.eyebrow {
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.display {
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  color: #c7d2d9;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }

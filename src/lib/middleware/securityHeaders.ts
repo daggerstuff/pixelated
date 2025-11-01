@@ -27,7 +27,7 @@ export const securityHeaders = async (
     "connect-src 'self' https://*.sentry.io",
   ]
 
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV === 'development') {
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'",
@@ -45,7 +45,7 @@ export const securityHeaders = async (
   response.headers.set('X-Frame-Options', 'SAMEORIGIN')
 
   // Only set HSTS header in production to avoid issues during local development
-  if (import.meta.env.PROD) {
+  if (process.env.NODE_ENV === 'production') {
     response.headers.set(
       'Strict-Transport-Security',
       'max-age=31536000; includeSubDomains',

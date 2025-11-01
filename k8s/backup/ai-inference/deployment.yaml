@@ -1,0 +1,293 @@
+---
+# AI Inference Deployment
+# Optimized for <2s response time with GPU support
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-inference
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime deployments
+  
+  selector:
+    matchLabels:
+      app: pixelated
+      component: ai-inference
+  
+  template:
+    metadata:
+      labels:
+        app: pixelated
+        component: ai-inference
+        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    
+    spec:
+      # Security Context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      
+      # Node Affinity for GPU nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                - gpu-inference
+                - high-performance
+        
+        # Pod Anti-Affinity for high availability
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                  - ai-inference
+              topologyKey: kubernetes.io/hostname
+      
+      # Topology Spread for zone distribution
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            component: ai-inference
+      
+      containers:
+      - name: ai-inference
+        image: pixelated/ai-inference:latest
+        imagePullPolicy: Always
+        
+        # Resource Limits (GPU-enabled)
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 8Gi
+            nvidia.com/gpu: 1
+          limits:
+            cpu: 4000m
+            memory: 16Gi
+            nvidia.com/gpu: 1
+        
+        # Health Checks (optimized for AI inference)
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 60  # Allow time for model loading
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        
+        # Startup Probe (for slow model loading)
+        startupProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30  # Allow up to 5 minutes for startup
+        
+        # Environment Variables
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: PORT
+          value: "8000"
+        - name: METRICS_PORT
+          value: "9090"
+        
+        # Model Configuration
+        - name: MODEL_PATH
+          value: "/models/therapeutic_moe_model"
+        - name: MODEL_CACHE_DIR
+          value: "/cache/models"
+        - name: MAX_BATCH_SIZE
+          value: "8"
+        - name: MAX_SEQUENCE_LENGTH
+          value: "2048"
+        
+        # Performance Optimization
+        - name: INFERENCE_TIMEOUT
+          value: "2000"  # 2 seconds
+        - name: ENABLE_CACHING
+          value: "true"
+        - name: CACHE_TTL
+          value: "3600"
+        - name: NUM_WORKERS
+          value: "4"
+        
+        # Database Configuration
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: postgres-host
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: postgres-db
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: postgres-password
+        
+        # Redis Configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ai-inference-config
+              key: redis-host
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: redis-password
+        
+        # MongoDB Configuration
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: ai-inference-secrets
+              key: mongodb-uri
+        
+        # Bias Detection
+        - name: BIAS_DETECTION_ENABLED
+          value: "true"
+        - name: BIAS_THRESHOLD
+          value: "0.7"
+        
+        # Progress Tracking
+        - name: PROGRESS_TRACKING_ENABLED
+          value: "true"
+        - name: PROGRESS_DB_PATH
+          value: "/data/therapeutic_progress.db"
+        
+        # Monitoring
+        - name: ENABLE_METRICS
+          value: "true"
+        - name: LOG_LEVEL
+          value: "INFO"
+        
+        # Ports
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models
+          readOnly: true
+        - name: cache-volume
+          mountPath: /cache
+        - name: data-volume
+          mountPath: /data
+        - name: tmp-volume
+          mountPath: /tmp
+      
+      # Volumes
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: ai-model-pvc
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 10Gi
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: ai-data-pvc
+      - name: tmp-volume
+        emptyDir:
+          sizeLimit: 5Gi
+      
+      # Service Account
+      serviceAccountName: ai-inference-service-account
+      
+      # Image Pull Secrets
+      imagePullSecrets:
+      - name: pixelated-registry-secret
+      
+      # DNS Configuration
+      dnsPolicy: ClusterFirst
+      
+      # Termination Grace Period (allow time for graceful shutdown)
+      terminationGracePeriodSeconds: 60
+
+---
+# Persistent Volume Claim for Model Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-model-pvc
+  namespace: pixelated-prod
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+
+---
+# Persistent Volume Claim for Data Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-data-pvc
+  namespace: pixelated-prod
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: fast-ssd

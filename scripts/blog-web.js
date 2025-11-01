@@ -320,115 +320,144 @@ function generatePostForm() {
   `
 }
 
-// Handle HTTP requests
-const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`)
+// Handle status/report actions
+function handleStatusAction(action) {
+  const result = runBlogCommand(action)
+  
+  if (result.success) {
+    return {
+      content: `
+        <div class="card">
+          <h2>${action.charAt(0).toUpperCase() + action.slice(1)} Results</h2>
+          <pre class="content">${result.output}</pre>
+        </div>
+      `,
+      message: null
+    }
+  } else {
+    const response = {
+      content: '',
+      message: {
+        type: 'error',
+        text: `Error: ${result.error}`,
+      }
+    }
+    
+    if (result.output) {
+      response.content = `
+        <div class="card">
+          <h2>Error Output</h2>
+          <pre class="content">${result.output}</pre>
+        </div>
+      `
+    }
+    
+    return response
+  }
+}
+
+// Handle post generation
+function handleGenerateAction(url) {
+  const title = url.searchParams.get('title')
+  let series = url.searchParams.get('series')
+  const newSeries = url.searchParams.get('newSeries')
+
+  if (!title) {
+    return {
+      content: generatePostForm(),
+      message: {
+        type: 'error',
+        text: 'Post title is required',
+      }
+    }
+  }
+
+  // If "new" is selected and newSeries is provided, use that
+  if (series === 'new' && newSeries) {
+    series = newSeries
+  }
+
+  const seriesArg = series ? `"${series}"` : '""'
+  const generateResult = runBlogCommand(`generate ${seriesArg} "${title}"`)
+
+  if (generateResult.success) {
+    return {
+      content: `
+        <div class="card">
+          <h2>Post Created</h2>
+          <pre class="content">${generateResult.output}</pre>
+        </div>
+      `,
+      message: {
+        type: 'success',
+        text: 'Post created successfully!',
+      }
+    }
+  } else {
+    return {
+      content: `
+        <div class="card">
+          <h2>Error Output</h2>
+          <pre class="content">${generateResult.output || 'No output available'}</pre>
+        </div>
+      `,
+      message: {
+        type: 'error',
+        text: `Failed to create post: ${generateResult.error}`,
+      }
+    }
+  }
+}
+
+// Route request to appropriate handler
+function handleRequest(url) {
   const action = url.searchParams.get('action')
+  
+  if (!action) {
+    return {
+      content: `
+        <div class="card">
+          <h2>Welcome to Blog Management</h2>
+          <p>Select an action from the buttons above to manage your blog content.</p>
+        </div>
+      `,
+      message: null
+    }
+  }
 
-  let content = ''
-  let message = ''
+  switch (action) {
+    case 'status':
+    case 'series':
+    case 'upcoming':
+    case 'overdue':
+    case 'report':
+      return handleStatusAction(action)
 
-  if (action) {
-    switch (action) {
-      case 'status':
-      case 'series':
-      case 'upcoming':
-      case 'overdue':
-      case 'report':
-        const result = runBlogCommand(action)
+    case 'generate_form':
+      return {
+        content: generatePostForm(),
+        message: null
+      }
 
-        if (result.success) {
-          content = `
-          <div class="card">
-            <h2>${action.charAt(0).toUpperCase() + action.slice(1)} Results</h2>
-            <pre class="content">${result.output}</pre>
-          </div>
-          `
-        } else {
-          message = {
-            type: 'error',
-            text: `Error: ${result.error}`,
-          }
+    case 'generate':
+      return handleGenerateAction(url)
 
-          if (result.output) {
-            content = `
-            <div class="card">
-              <h2>Error Output</h2>
-              <pre class="content">${result.output}</pre>
-            </div>
-            `
-          }
-        }
-        break
-
-      case 'generate_form':
-        content = generatePostForm()
-        break
-
-      case 'generate':
-        const title = url.searchParams.get('title')
-        let series = url.searchParams.get('series')
-        const newSeries = url.searchParams.get('newSeries')
-
-        if (!title) {
-          message = {
-            type: 'error',
-            text: 'Post title is required',
-          }
-          content = generatePostForm()
-        } else {
-          // If "new" is selected and newSeries is provided, use that
-          if (series === 'new' && newSeries) {
-            series = newSeries
-          }
-
-          const seriesArg = series ? `"${series}"` : '""'
-          const generateResult = runBlogCommand(
-            `generate ${seriesArg} "${title}"`,
-          )
-
-          if (generateResult.success) {
-            message = {
-              type: 'success',
-              text: 'Post created successfully!',
-            }
-            content = `
-            <div class="card">
-              <h2>Post Created</h2>
-              <pre class="content">${generateResult.output}</pre>
-            </div>
-            `
-          } else {
-            message = {
-              type: 'error',
-              text: `Failed to create post: ${generateResult.error}`,
-            }
-            content = `
-            <div class="card">
-              <h2>Error Output</h2>
-              <pre class="content">${generateResult.output || 'No output available'}</pre>
-            </div>
-            `
-          }
-        }
-        break
-
-      default:
-        message = {
+    default:
+      return {
+        content: '',
+        message: {
           type: 'error',
           text: `Unknown action: ${action}`,
         }
-    }
-  } else {
-    // Default page with welcome message
-    content = `
-    <div class="card">
-      <h2>Welcome to Blog Management</h2>
-      <p>Select an action from the buttons above to manage your blog content.</p>
-    </div>
-    `
+      }
   }
+}
 
+// Handle HTTP requests
+const server = http.createServer((req, res) => {
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const { content, message } = handleRequest(url)
+  
   res.writeHead(200, { 'Content-Type': 'text/html' })
   res.end(generateHTML(content, message))
 })

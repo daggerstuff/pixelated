@@ -5,12 +5,27 @@ on:
     - cron: "0 12 * * *"
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
+  actions: read
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.19.0
+  PNPM_VERSION: 10.20.0
   NODE_ENV: production
+  DEFAULT_BASE_URL: "https://pixelatedempathy.com"
+  HEALTH_CHECK_TIMEOUT_PROD: 30
+  HEALTH_CHECK_TIMEOUT_STAGING: 20
+  HEALTH_CHECK_TIMEOUT_PREVIEW: 15
+  HEALTH_CHECK_RETRIES_PROD: 3
+  HEALTH_CHECK_RETRIES_STAGING: 2
+  HEALTH_CHECK_RETRIES_PREVIEW: 1
+  HEALTH_CHECK_RETRY_DELAY_PROD: 10
+  HEALTH_CHECK_RETRY_DELAY_STAGING: 5
+  HEALTH_CHECK_RETRY_DELAY_PREVIEW: 3
+  HEALTH_CHECK_CONNECT_TIMEOUT_PROD: 15
+  HEALTH_CHECK_CONNECT_TIMEOUT_STAGING: 10
+  HEALTH_CHECK_CONNECT_TIMEOUT_PREVIEW: 8
 
 jobs:
   health-check-production:
@@ -20,12 +35,12 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -53,7 +68,9 @@ jobs:
 
       - name: Resolve APP_URL (Production)
         id: resolve-app-url-prod
+        shell: bash
         run: |
+          set -euo pipefail
           BASE_URL="${{ vars.APP_URL }}"
           if [ -z "$BASE_URL" ]; then
             BASE_URL="${{ secrets.APP_URL }}"
@@ -67,7 +84,9 @@ jobs:
 
       - name: Run health checks
         id: health-check
+        shell: bash
         run: |
+          set -euo pipefail
           echo "🏥 Running PRODUCTION health checks against $BASE_URL"
           echo "ℹ️  Production failures will trigger alerts and notifications"
 
@@ -75,17 +94,18 @@ jobs:
           check_endpoint() {
             local url="$1"
             local endpoint_name="$2"
-            local max_retries=3
-            local timeout=30
-            local retry_delay=10
+            local max_retries="$3"
+            local timeout="$4"
+            local retry_delay="$5"
+            local connect_timeout="$6"
 
-            for attempt in $(seq 1 $max_retries); do
+            for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
               # Use curl with explicit timeout and connection timeout
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 15 \
-                --max-time $timeout \
+                --connect-timeout "$connect_timeout" \
+                --max-time "$timeout" \
                 --retry 0 \
                 "$url" 2>/dev/null || echo "000")
 
@@ -100,43 +120,37 @@ jobs:
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
-              if [[ $attempt -lt $max_retries ]]; then
+              if [[ $attempt -lt "$max_retries" ]]; then
                 echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
+                sleep "$retry_delay"
               fi
             done
 
             return 1
           }
 
-          # Function to perform robust HTTP check with retries
-          MAX_RETRIES=3
-          check_endpoint() {
-            local url="$1"
-            local endpoint_name="$2"
-            local max_retries="$MAX_RETRIES"
-            local timeout=30
-            local retry_delay=10
-            # …existing retry loop using $max_retries…
-          }
-
           # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
-            MAIN_STATUS="passing"
+          if check_endpoint "$BASE_URL" "Main Site" \
+            "${{ env.HEALTH_CHECK_RETRIES_PROD }}" \
+            "${{ env.HEALTH_CHECK_TIMEOUT_PROD }}" \
+            "${{ env.HEALTH_CHECK_RETRY_DELAY_PROD }}" \
+            "${{ env.HEALTH_CHECK_CONNECT_TIMEOUT_PROD }}"; then
+            echo "status=passing" >> $GITHUB_OUTPUT
           else
-            echo "::error::PRODUCTION site is down or returning errors after ${MAX_RETRIES} attempts"
+            echo "::error::PRODUCTION site is down or returning errors after ${{ env.HEALTH_CHECK_RETRIES_PROD }} attempts"
             echo "status=failing" >> $GITHUB_OUTPUT
             exit 1
           fi
-          # API health check with retries (non-blocking)
       - name: Create temporary config
         if: steps.health-check.outputs.status == 'passing'
+        shell: bash
         run: |
-          cat > temp-playwright.config.js << 'EOF'
+          set -euo pipefail
+          cat > temp-playwright.config.js << EOF
           module.exports = {
             testDir: './tests/monitoring',
             use: {
-              baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
+              baseURL: process.env.BASE_URL || '${{ env.DEFAULT_BASE_URL }}',
             },
             projects: [
               {
@@ -154,35 +168,31 @@ jobs:
       - name: Run Playwright tests
         id: run-tests
         if: steps.health-check.outputs.status == 'passing'
+        shell: bash
         run: |
+          set -euo pipefail
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against PRODUCTION: $BASE_URL"
 
           # Run tests and propagate failure
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js
+          TEST_EXIT=0
+          if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+            pnpm exec playwright test --config=temp-playwright.config.js; then
+            TEST_EXIT=$?
+          fi
 
-          TEST_EXIT=$?
-          if [ $TEST_EXIT -eq 0 ]; then
+          if [ "$TEST_EXIT" -eq 0 ]; then
             echo "✅ PRODUCTION monitoring tests completed"
             echo "status=success" >> $GITHUB_OUTPUT
           else
             echo "::error::Playwright tests failed with exit code $TEST_EXIT"
             echo "status=failure" >> $GITHUB_OUTPUT
-            exit $TEST_EXIT
+            exit "$TEST_EXIT"
           fi
-          echo "Running Playwright tests against PRODUCTION: $BASE_URL"
-
-          # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
-
-          echo "✅ PRODUCTION monitoring tests completed"
-          echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload test results
         if: always() && steps.health-check.outputs.status == 'passing'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-production
           path: playwright-report/
@@ -200,9 +210,10 @@ jobs:
 
       - name: Notify failure
         if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@v1.25.0
+        uses: slackapi/slack-github-action@v2.1.1
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
           payload: |
             {
@@ -232,12 +243,12 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -264,13 +275,15 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Resolve APP_URL (Staging)
         id: resolve-app-url-staging
+        shell: bash
         run: |
+          set -euo pipefail
           BASE_URL="${{ vars.APP_URL }}"
           if [ -z "$BASE_URL" ]; then
             BASE_URL="${{ secrets.APP_URL }}"
           fi
           if [ -z "$BASE_URL" ]; then
-            BASE_URL="https://pixelatedempathy.com"
+            BASE_URL="${{ env.DEFAULT_BASE_URL }}"
             echo "::notice::APP_URL not set for Staging; defaulting to $BASE_URL"
           fi
           echo "Using BASE_URL: $BASE_URL"
@@ -278,7 +291,9 @@ jobs:
 
       - name: Run health checks
         id: health-check
+        shell: bash
         run: |
+          set -euo pipefail
           echo "🏥 Running STAGING health checks against $BASE_URL"
           echo "ℹ️  Staging failures will warn but not trigger critical alerts"
 
@@ -286,17 +301,18 @@ jobs:
           check_endpoint() {
             local url="$1"
             local endpoint_name="$2"
-            local max_retries=2  # Fewer retries for staging
-            local timeout=20     # Shorter timeout for staging
-            local retry_delay=5  # Shorter delay for staging
+            local max_retries="$3"
+            local timeout="$4"
+            local retry_delay="$5"
+            local connect_timeout="$6"
 
-            for attempt in $(seq 1 $max_retries); do
+            for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
               # Use curl with explicit timeout and connection timeout
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 10 \
-                --max-time $timeout \
+                --connect-timeout "$connect_timeout" \
+                --max-time "$timeout" \
                 --retry 0 \
                 "$url" 2>/dev/null || echo "000")
 
@@ -311,9 +327,9 @@ jobs:
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
-              if [[ $attempt -lt $max_retries ]]; then
+              if [[ $attempt -lt "$max_retries" ]]; then
                 echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
+                sleep "$retry_delay"
               fi
             done
 
@@ -321,7 +337,12 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
+          MAIN_STATUS=""
+          if check_endpoint "$BASE_URL" "Main Site" \
+            "${{ env.HEALTH_CHECK_RETRIES_STAGING }}" \
+            "${{ env.HEALTH_CHECK_TIMEOUT_STAGING }}" \
+            "${{ env.HEALTH_CHECK_RETRY_DELAY_STAGING }}" \
+            "${{ env.HEALTH_CHECK_CONNECT_TIMEOUT_STAGING }}"; then
             MAIN_STATUS="passing"
             echo "status=passing" >> $GITHUB_OUTPUT
           else
@@ -332,11 +353,14 @@ jobs:
           fi
 
           # API health check with retries (non-blocking)
-          if check_endpoint "$BASE_URL/api/health" "API Health"; then
-            API_STATUS="passing"
+          if check_endpoint "$BASE_URL/api/health" "API Health" \
+            "${{ env.HEALTH_CHECK_RETRIES_STAGING }}" \
+            "${{ env.HEALTH_CHECK_TIMEOUT_STAGING }}" \
+            "${{ env.HEALTH_CHECK_RETRY_DELAY_STAGING }}" \
+            "${{ env.HEALTH_CHECK_CONNECT_TIMEOUT_STAGING }}"; then
+            echo "✅ API health check passed"
           else
             echo "::warning::API health endpoint is not responding after retries"
-            API_STATUS="failing"
           fi
 
           if [[ "$MAIN_STATUS" == "warning" ]]; then
@@ -347,12 +371,14 @@ jobs:
 
       - name: Create temporary config
         if: steps.health-check.outputs.status == 'passing'
+        shell: bash
         run: |
-          cat > temp-playwright.config.js << 'EOF'
+          set -euo pipefail
+          cat > temp-playwright.config.js << EOF
           module.exports = {
             testDir: './tests/monitoring',
             use: {
-              baseURL: process.env.BASE_URL || 'https://pixelatedempathy.com',
+              baseURL: process.env.BASE_URL || '${{ env.DEFAULT_BASE_URL }}',
             },
             projects: [
               {
@@ -371,20 +397,25 @@ jobs:
       - name: Run Playwright tests
         id: run-tests
         if: steps.health-check.outputs.status == 'passing'
+        shell: bash
         run: |
+          set -euo pipefail
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against STAGING: $BASE_URL"
 
           # Run tests and store exit code to determine if any tests failed
-          NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
+          TEST_EXIT=0
+          if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
+            pnpm exec playwright test --config=temp-playwright.config.js; then
+            TEST_EXIT=$?
+          fi
 
           echo "✅ STAGING monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-staging
           path: playwright-report/
@@ -398,12 +429,12 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -431,13 +462,15 @@ jobs:
 
       - name: Resolve APP_URL (Preview)
         id: resolve-app-url-preview
+        shell: bash
         run: |
+          set -euo pipefail
           BASE_URL="${{ vars.APP_URL }}"
           if [ -z "$BASE_URL" ]; then
             BASE_URL="${{ secrets.APP_URL }}"
           fi
           if [ -z "$BASE_URL" ]; then
-            BASE_URL="https://pixelatedempathy.com"
+            BASE_URL="${{ env.DEFAULT_BASE_URL }}"
             echo "::notice::APP_URL not set for Preview; defaulting to $BASE_URL"
           fi
           echo "Using BASE_URL: $BASE_URL"
@@ -445,7 +478,9 @@ jobs:
 
       - name: Run health checks
         id: health-check
+        shell: bash
         run: |
+          set -euo pipefail
           echo "🏥 Running PREVIEW health checks against $BASE_URL"
           echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
           echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
@@ -454,17 +489,18 @@ jobs:
           check_endpoint() {
             local url="$1"
             local endpoint_name="$2"
-            local max_retries=1  # Single retry for preview
-            local timeout=15     # Short timeout for preview
-            local retry_delay=3  # Very short delay for preview
+            local max_retries="$3"
+            local timeout="$4"
+            local retry_delay="$5"
+            local connect_timeout="$6"
 
-            for attempt in $(seq 1 $max_retries); do
+            for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
               # Use curl with explicit timeout and connection timeout
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-                --connect-timeout 8 \
-                --max-time $timeout \
+                --connect-timeout "$connect_timeout" \
+                --max-time "$timeout" \
                 --retry 0 \
                 "$url" 2>/dev/null || echo "000")
 
@@ -479,9 +515,9 @@ jobs:
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
-              if [[ $attempt -lt $max_retries ]]; then
+              if [[ $attempt -lt "$max_retries" ]]; then
                 echo "⏳ Waiting ${retry_delay}s before retry..."
-                sleep $retry_delay
+                sleep "$retry_delay"
               fi
             done
 
@@ -489,7 +525,12 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site"; then
+          MAIN_STATUS=""
+          if check_endpoint "$BASE_URL" "Main Site" \
+            "${{ env.HEALTH_CHECK_RETRIES_PREVIEW }}" \
+            "${{ env.HEALTH_CHECK_TIMEOUT_PREVIEW }}" \
+            "${{ env.HEALTH_CHECK_RETRY_DELAY_PREVIEW }}" \
+            "${{ env.HEALTH_CHECK_CONNECT_TIMEOUT_PREVIEW }}"; then
             MAIN_STATUS="passing"
             echo "status=passing" >> $GITHUB_OUTPUT
           else
@@ -502,12 +543,14 @@ jobs:
 
       - name: Create temporary config
         if: steps.health-check.outputs.status == 'passing'
+        shell: bash
         run: |
-          cat > temp-playwright.config.js << 'EOF'
+          set -euo pipefail
+          cat > temp-playwright.config.js << EOF
           module.exports = {
             testDir: './tests/monitoring',
             use: {
-              baseURL: process.env.BASE_URL,
+              baseURL: process.env.BASE_URL || '${{ env.DEFAULT_BASE_URL }}',
             },
             projects: [
               {
@@ -519,7 +562,7 @@ jobs:
             ],
             reporter: ['html', 'list'],
             timeout: 60000,
-            retries: 2, // More retries for preview builds
+            retries: 2,
           };
           EOF
 
@@ -527,6 +570,7 @@ jobs:
         id: run-tests
         if: steps.health-check.outputs.status == 'passing'
         continue-on-error: true
+        shell: bash
         run: |
           # Ensure this step never fails the job even if tests fail
           set +e
@@ -545,7 +589,7 @@ jobs:
           cat playwright-output.log
 
           # Set simple success/failure indicator
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
+          if [ "$TEST_EXIT_CODE" -eq 0 ]; then
             echo "status=success" >> $GITHUB_OUTPUT
             echo "✅ All PREVIEW tests passed successfully!"
           else
@@ -558,7 +602,7 @@ jobs:
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-preview
           path: playwright-report/
@@ -575,11 +619,13 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Resolve APP_URL (Performance)
         id: resolve-perf
+        shell: bash
         run: |
+          set -euo pipefail
           BASE_URL_INITIAL="${{ env.BASE_URL }}"
           if [ -z "$BASE_URL_INITIAL" ]; then
             BASE_URL_INITIAL="${{ secrets.APP_URL }}"
@@ -594,15 +640,26 @@ jobs:
           fi
 
       - name: Probe Lighthouse URLs (wait for healthy)
+        id: probe-urls
+        if: steps.resolve-perf.outputs.skip_lhci == 'false'
+        shell: bash
+        env:
+          MAX_PROBE_ATTEMPTS: 15
+          PROBE_SLEEP_SECONDS: 5
         run: |
+          set -euo pipefail
+          # Initialize arrays
+          CANDIDATES=("$BASE_URL")
+          OK_URLS=()
+
           for u in "${CANDIDATES[@]}"; do
             ATTEMPTS=0
             code=000
-            until [ "$code" = "200" ] || [ $ATTEMPTS -ge 15 ]; do
-              code=$(curl -s -o /dev/null -w "%{http_code}" "$u")
+            until [ "$code" = "200" ] || [ "$ATTEMPTS" -ge "$MAX_PROBE_ATTEMPTS" ]; do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "$u" || echo "000")
               if [ "$code" != "200" ]; then
-                echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/15"
-                sleep 5
+                echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/$MAX_PROBE_ATTEMPTS"
+                sleep "$PROBE_SLEEP_SECONDS"
               fi
               ATTEMPTS=$((ATTEMPTS+1))
             done
@@ -626,22 +683,12 @@ jobs:
             } >> "$GITHUB_OUTPUT"
           fi
 
-          if [ ${#OK_URLS[@]} -eq 0 ]; then
-            echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."
-            echo "skip_lhci_urls=true" >> $GITHUB_OUTPUT
-          else
-            {
-              echo "skip_lhci_urls=false"
-              echo "urls<<EOF"
-              printf "%s\n" "${OK_URLS[@]}"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Prepare Lighthouse auth headers (optional)
         id: prep-lh-headers
         if: steps.resolve-perf.outputs.skip_lhci == 'false'
+        shell: bash
         run: |
+          set -euo pipefail
           if [ -n "${{ secrets.LH_AUTH_COOKIE }}" ]; then
             # Provide extraHeaders to Lighthouse via environment override
             # Expect cookie like: "session=abc; other=value"
@@ -657,7 +704,9 @@ jobs:
       - name: Add protected URLs (optional)
         id: add-protected
         if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
+        shell: bash
         run: |
+          set -euo pipefail
           {
             echo "extra_urls<<EOF"
             echo "${BASE_URL}/dashboard?perf=1"
@@ -667,10 +716,10 @@ jobs:
       - name: Run Lighthouse CI
         id: lhci
         uses: treosh/lighthouse-ci-action@v12
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
+        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
         with:
           urls: |
-            ${{ steps.build-urls.outputs.urls }}
+            ${{ steps.probe-urls.outputs.urls }}
             ${{ steps.add-protected.outputs.extra_urls }}
           configPath: ./.github/lighthouse-config.json
           budgetPath: ./.github/lighthouse-budget.json
@@ -678,7 +727,7 @@ jobs:
           temporaryPublicStorage: true
 
       - name: Check for critical performance issues
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
+        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
         run: echo "Analyzing performance metrics for PRODUCTION..."
 
       - name: Set Slack enabled output (performance)
@@ -691,14 +740,15 @@ jobs:
           fi
 
       - name: Skip notice
-        if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.build-urls.outputs.skip_lhci_urls == 'true'
+        if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.probe-urls.outputs.skip_lhci_urls == 'true'
         run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
 
       - name: Notify performance issues
         if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@v1.25.0
+        uses: slackapi/slack-github-action@v2.1.1
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
           payload: |
             {

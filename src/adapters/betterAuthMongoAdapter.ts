@@ -4,8 +4,8 @@
  * Delegates runtime calls to the server-side `mongoAuthService` exported
  * from `src/services/mongoAuth.service.ts`.
  */
-import type { User as MongoUser } from '@/services/mongodb.types'
-import { mongoAuthService } from '@/services/mongoAuth.service'
+import type { User as MongoUser } from '../services/mongodb.types'
+import { mongoAuthService } from '../services/mongoAuth.service'
 
 export interface AuthInfo {
   userId: string

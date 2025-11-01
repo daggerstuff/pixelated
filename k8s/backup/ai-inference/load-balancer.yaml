@@ -1,0 +1,264 @@
+---
+# AI Inference Service Load Balancer Configuration
+# Optimized for <2s response time and high availability
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-inference-lb
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+  annotations:
+    # Load Balancer Type (AWS NLB for low latency)
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    
+    # Cross-zone load balancing for high availability
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    
+    # SSL/TLS Configuration
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/ai-inference-cert"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+    
+    # Health Check Configuration (optimized for AI inference)
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/api/v1/health"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "8000"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "HTTP"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "10"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout: "5"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "2"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "2"
+    
+    # Connection Settings (optimized for long-running inference)
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "300"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "60"
+    
+    # Access Logs
+    service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: "pixelated-ai-lb-logs"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "ai-inference"
+    
+    # Performance Optimization
+    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+    
+    # Monitoring
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    prometheus.io/path: "/metrics"
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: pixelated
+    component: ai-inference
+    environment: production
+  
+  # Session Affinity for consistent routing (important for stateful inference)
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600  # 1 hour session stickiness
+  
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  
+  # IP Whitelist (configure for security)
+  loadBalancerSourceRanges:
+  - "0.0.0.0/0"  # Update with specific IP ranges in production
+
+---
+# Headless Service for direct pod access (for internal services)
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-inference-headless
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+spec:
+  clusterIP: None
+  selector:
+    app: pixelated
+    component: ai-inference
+    environment: production
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+
+---
+# Internal Service for cluster-internal communication
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-inference-internal
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app: pixelated
+    component: ai-inference
+    environment: production
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+
+---
+# Service Monitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ai-inference-monitor
+  namespace: pixelated-prod
+  labels:
+    app: pixelated
+    component: ai-inference
+    environment: production
+spec:
+  selector:
+    matchLabels:
+      app: pixelated
+      component: ai-inference
+  endpoints:
+  - port: metrics
+    interval: 15s
+    path: /metrics
+    scheme: http
+
+---
+# Network Policy for AI Inference Service
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ai-inference-network-policy
+  namespace: pixelated-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: pixelated
+      component: ai-inference
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Allow from load balancer
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8000
+  
+  # Allow from web application
+  - from:
+    - podSelector:
+        matchLabels:
+          app: pixelated
+          component: web
+    ports:
+    - protocol: TCP
+      port: 8000
+  
+  # Allow from monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+  
+  egress:
+  # Allow to database
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow to Redis
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  
+  # Allow to MongoDB
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mongodb
+    ports:
+    - protocol: TCP
+      port: 27017
+  
+  # Allow DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+  
+  # Allow external API calls (for model inference)
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443
+
+---
+# Pod Disruption Budget for High Availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ai-inference-pdb
+  namespace: pixelated-prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: pixelated
+      component: ai-inference
+      environment: production

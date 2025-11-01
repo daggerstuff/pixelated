@@ -29,7 +29,7 @@ jobs:
         python3 -m pip install --no-cache-dir uv || true
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.28.0
+      uses: aquasecurity/trivy-action@0.33.1
       continue-on-error: true
       with:
         scan-type: 'fs'
@@ -75,21 +75,21 @@ jobs:
 
     - name: Upload Trivy diagnostic artifact
       if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       continue-on-error: true
       with:
         name: trivy-diagnostic
         path: trivy-missing.txt
 
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
         sarif_file: 'trivy-results.sarif'
 
     - name: Upload Trivy SARIF as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
@@ -97,7 +97,7 @@ jobs:
         path: trivy-results.sarif
 
     - name: Upload Checkov scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
@@ -111,14 +111,14 @@ jobs:
 
     - name: Upload Checkov diagnostic artifact
       if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       continue-on-error: true
       with:
         name: checkov-diagnostic
         path: checkov-missing.txt
 
     - name: Upload Checkov SARIF as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
@@ -133,7 +133,7 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: '24'
 
@@ -150,7 +150,7 @@ jobs:
       run: pnpm audit --json > audit-results.json || true
 
     - name: Upload audit results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: security-audit-results
         path: audit-results.json

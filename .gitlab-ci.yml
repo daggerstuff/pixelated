@@ -19,10 +19,10 @@ variables:
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
 
-  # Container registry
-  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  CONTAINER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
-  CONTAINER_IMAGE_CACHE: $CI_REGISTRY_IMAGE:cache
+  # Container registry - switched to GCR
+  CONTAINER_IMAGE: gcr.io/$GCP_PROJECT_ID/pixelated-empathy:$CI_COMMIT_SHA
+  CONTAINER_IMAGE_LATEST: gcr.io/$GCP_PROJECT_ID/pixelated-empathy:latest
+  CONTAINER_IMAGE_CACHE: gcr.io/$GCP_PROJECT_ID/pixelated-empathy:cache
 
   # Resource limits - optimized for memory-intensive builds
   KUBERNETES_CPU_REQUEST: "2"
@@ -255,7 +255,9 @@ build:
       # Disable LFS smudge to speed up clones
       git config --global lfs.skipSmudge 1
       echo "✅ Git configuration optimized for Kubernetes"
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - echo "🔐 Authenticating with Google Container Registry..."
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
+    - cat /tmp/gcp-key.json | docker login -u _json_key --password-stdin https://gcr.io
     # Install Docker Buildx for BuildKit support
     - |
       if ! docker buildx version >/dev/null 2>&1; then
@@ -391,7 +393,9 @@ security:
     matrix:
       - SCANNER: [trivy, container-security, sast]
   before_script:
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - echo "🔐 Authenticating with Google Container Registry..."
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
+    - cat /tmp/gcp-key.json | docker login -u _json_key --password-stdin https://gcr.io
   script:
     - echo "🔒 Running $SCANNER security scan..."
     - |
@@ -799,7 +803,9 @@ cleanup:
     # Optimize cleanup operations
     DOCKER_BUILDKIT: 1
   before_script:
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - echo "🔐 Authenticating with Google Container Registry..."
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
+    - cat /tmp/gcp-key.json | docker login -u _json_key --password-stdin https://gcr.io
     # Optimize Docker daemon for faster cleanup
     - |
       echo "🔧 Optimizing Docker daemon for cleanup operations..."

@@ -6,7 +6,8 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('crypto-example')
-import { createCryptoSystem, ScheduledKeyRotation } from './index'
+import { createCryptoSystem } from './index'
+import { ScheduledKeyRotation } from './scheduledRotation'
 import { KeyStorage } from './keyStorage'
 
 /**
@@ -16,18 +17,17 @@ async function basicEncryptionExample() {
   // Create a crypto system
   const crypto = createCryptoSystem({
     namespace: 'example',
-    useSecureStorage: true,
     keyRotationDays: 90,
   })
 
   // Encrypt some data
   const sensitiveData = 'This is sensitive patient information'
-  const encrypted = await crypto.encrypt(sensitiveData)
+  const encrypted = await crypto.encrypt(sensitiveData, 'patient-data')
 
   logger.info('Data encrypted successfully', { encrypted })
 
   // Decrypt the data
-  const decrypted = await crypto.decrypt(encrypted)
+  const decrypted = await crypto.decrypt(encrypted, 'patient-data')
 
   logger.info('Data decrypted successfully', { decrypted })
 
@@ -44,7 +44,8 @@ async function manualKeyRotationExample() {
   // Create a key storage instance
   const keyStorage = new KeyStorage({
     namespace: 'example',
-    useSecureStorage: true,
+    region: 'us-east-1',
+    useKms: false,
   })
 
   // Generate a key
@@ -75,7 +76,6 @@ function scheduledKeyRotationExample() {
   // Create a scheduled rotation service
   const scheduler = new ScheduledKeyRotation({
     namespace: 'example',
-    useSecureStorage: true,
     checkIntervalMs: 5 * 60 * 1000, // Check every 5 minutes
     onRotation: (oldKeyId, newKeyId) => {
       logger.info('Key rotation completed', { oldKeyId, newKeyId })
@@ -103,13 +103,12 @@ async function reencryptionExample() {
   // Create a crypto system
   const crypto = createCryptoSystem({
     namespace: 'example',
-    useSecureStorage: true,
     keyRotationDays: 90,
   })
 
   // Encrypt some data
   const sensitiveData = 'This is sensitive patient information'
-  const encrypted = await crypto.encrypt(sensitiveData)
+  const encrypted = await crypto.encrypt(sensitiveData, 'patient-data')
 
   logger.info('Original data encrypted', { encrypted })
 
@@ -119,7 +118,8 @@ async function reencryptionExample() {
   // Simulate key rotation
   const keyStorage = new KeyStorage({
     namespace: 'example',
-    useSecureStorage: true,
+    region: 'us-east-1',
+    useKms: false,
   })
   const rotatedKey = await keyStorage.rotateKey(keyId)
 
@@ -129,13 +129,13 @@ async function reencryptionExample() {
     })
 
     // Re-encrypt the data with the new key
-    const decrypted = await crypto.decrypt(encrypted)
-    const reencrypted = await crypto.encrypt(decrypted)
+    const decrypted = await crypto.decrypt(encrypted, 'patient-data')
+    const reencrypted = await crypto.encrypt(decrypted, 'patient-data')
 
     logger.info('Data re-encrypted with new key', { reencrypted })
 
     // Verify the re-encryption worked correctly
-    const redecrypted = await crypto.decrypt(reencrypted)
+    const redecrypted = await crypto.decrypt(reencrypted, 'patient-data')
     logger.info('Re-encryption verification', {
       success: redecrypted === sensitiveData,
     })

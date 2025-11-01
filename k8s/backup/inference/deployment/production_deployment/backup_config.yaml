@@ -1,0 +1,183 @@
+# Production Backup Configuration for Pixelated Empathy AI
+
+# Database backup settings
+database:
+  host: ${DB_HOST:-localhost}
+  port: ${DB_PORT:-5432}
+  database: ${DB_NAME:-pixelated_db}
+  username: ${DB_USER:-postgres}
+  password: ${DB_PASSWORD}
+  backup_path: /backups/database
+  retention_days: 30
+  compression: true
+  encryption: false
+
+# File system backup settings
+filesystem:
+  backup_path: /backups/files
+  retention_days: 14
+  compression: true
+  encryption: false
+  
+  # Directories to backup
+  directories:
+    - name: application_logs
+      source: /app/logs
+      schedule: daily
+      backup_type: full
+      
+    - name: user_data
+      source: /app/data
+      schedule: daily
+      backup_type: incremental
+      
+    - name: configuration
+      source: /app/config
+      schedule: weekly
+      backup_type: full
+      
+    - name: ai_models
+      source: /app/models
+      schedule: weekly
+      backup_type: full
+
+# Cloud storage settings
+cloud_storage:
+  # AWS S3 configuration
+  s3:
+    enabled: true
+    bucket: ${S3_BACKUP_BUCKET:-pixelated-empathy-ai-backups}
+    region: ${AWS_REGION:-us-west-2}
+    access_key: ${AWS_ACCESS_KEY_ID}
+    secret_key: ${AWS_SECRET_ACCESS_KEY}
+    storage_class: STANDARD_IA
+    encryption: AES256
+    
+  # Google Cloud Storage configuration
+  gcs:
+    enabled: false
+    bucket: ${GCS_BACKUP_BUCKET}
+    project_id: ${GCP_PROJECT_ID}
+    credentials_file: ${GCP_CREDENTIALS_FILE}
+    storage_class: NEARLINE
+    
+  # Azure Blob Storage configuration
+  azure:
+    enabled: false
+    account_name: ${AZURE_ACCOUNT_NAME}
+    account_key: ${AZURE_ACCOUNT_KEY}
+    container: ${AZURE_CONTAINER:-backups}
+    tier: Cool
+
+# Backup schedules
+schedules:
+  database_full:
+    type: database
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    backup_type: full
+    
+  database_incremental:
+    type: database
+    schedule: "0 */6 * * *"  # Every 6 hours
+    backup_type: incremental
+    
+  files_daily:
+    type: filesystem
+    schedule: "0 3 * * *"  # Daily at 3 AM
+    backup_type: full
+    
+  files_hourly:
+    type: filesystem
+    schedule: "0 * * * *"  # Every hour
+    backup_type: incremental
+
+# Monitoring and alerting
+monitoring:
+  enabled: true
+  
+  # Health checks
+  health_checks:
+    backup_age_threshold: 25  # Hours
+    backup_size_threshold: 100  # MB minimum
+    
+  # Alert settings
+  alerts:
+    email:
+      enabled: true
+      smtp_host: ${SMTP_HOST}
+      smtp_port: ${SMTP_PORT:-587}
+      username: ${SMTP_USERNAME}
+      password: ${SMTP_PASSWORD}
+      from_address: ${BACKUP_ALERT_FROM:-backups@pixelated-empathy.ai}
+      to_addresses:
+        - ${BACKUP_ALERT_TO:-admin@pixelated-empathy.ai}
+    
+    slack:
+      enabled: false
+      webhook_url: ${SLACK_WEBHOOK_URL}
+      channel: "#alerts"
+    
+    webhook:
+      enabled: false
+      url: ${BACKUP_WEBHOOK_URL}
+      headers:
+        Authorization: "Bearer ${BACKUP_WEBHOOK_TOKEN}"
+
+# Retention policies
+retention:
+  # Database backups
+  database:
+    daily: 30    # Keep daily backups for 30 days
+    weekly: 12   # Keep weekly backups for 12 weeks
+    monthly: 12  # Keep monthly backups for 12 months
+    yearly: 5    # Keep yearly backups for 5 years
+    
+  # File backups
+  files:
+    daily: 14    # Keep daily backups for 14 days
+    weekly: 8    # Keep weekly backups for 8 weeks
+    monthly: 6   # Keep monthly backups for 6 months
+    yearly: 3    # Keep yearly backups for 3 years
+
+# Recovery settings
+recovery:
+  # Point-in-time recovery settings
+  point_in_time:
+    enabled: true
+    wal_archive_path: /backups/wal
+    recovery_target_time: latest
+    
+  # Disaster recovery settings
+  disaster_recovery:
+    enabled: true
+    secondary_region: us-east-1
+    replication_lag_threshold: 300  # seconds
+    
+  # Testing settings
+  testing:
+    enabled: true
+    test_schedule: "0 4 * * 0"  # Weekly on Sunday at 4 AM
+    test_database: pixelated_test_restore
+    notification_on_failure: true
+
+# Security settings
+security:
+  # Encryption settings
+  encryption:
+    enabled: true
+    algorithm: AES-256-GCM
+    key_rotation_days: 90
+    
+  # Access control
+  access_control:
+    backup_user: backup_service
+    restore_user: restore_service
+    admin_users:
+      - admin
+      - devops
+      
+  # Audit logging
+  audit:
+    enabled: true
+    log_file: /var/log/backup_audit.log
+    log_level: INFO

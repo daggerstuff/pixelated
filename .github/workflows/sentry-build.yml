@@ -17,15 +17,15 @@ jobs:
       NODE_OPTIONS: "--max-old-space-size=4096"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.19.0
+          version: 10.20.0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
 
@@ -109,42 +109,25 @@ jobs:
 
       - name: Push Docker images
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "📤 Pushing Docker images..."
-          
-          # Explicitly login to GHCR using GITHUB_TOKEN to ensure authentication
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          
-          # Verify authentication
+
+          # Verify authentication status before pushing
           echo "🔍 Verifying Docker authentication with GHCR..."
-          docker info | grep -i "registry"
-          
-          # Push images with individual error handling
-          echo "📦 Pushing $IMAGE_TAG_SHA..."
-          if docker push $IMAGE_TAG_SHA; then
-            echo "✅ Successfully pushed $IMAGE_TAG_SHA"
+          if docker info | grep -q "ghcr.io"; then
+            echo "✅ Already authenticated with GHCR"
           else
-            echo "❌ Failed to push $IMAGE_TAG_SHA"
-            exit 1
+            echo "⚠️ Not authenticated with GHCR, attempting login..."
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            if [ $? -eq 0 ]; then
+              echo "✅ Successfully logged in to GHCR"
+            else
+              echo "❌ Failed to authenticate with GHCR"
+              exit 1
+            fi
           fi
-
-          echo "📦 Pushing $IMAGE_TAG_BRANCH..."
-          if docker push $IMAGE_TAG_BRANCH; then
-            echo "✅ Successfully pushed $IMAGE_TAG_BRANCH"
-          else
-            echo "❌ Failed to push $IMAGE_TAG_BRANCH"
-            exit 1
-          fi
-
-          echo "📦 Pushing $IMAGE_TAG_LATEST..."
-          if docker push $IMAGE_TAG_LATEST; then
-            echo "✅ Successfully pushed $IMAGE_TAG_LATEST"
-          else
-            echo "❌ Failed to push $IMAGE_TAG_LATEST"
-            exit 1
-          fi
-
-          echo "🎉 All Docker images pushed successfully!"
 
           # Push images with individual error handling
           echo "📦 Pushing $IMAGE_TAG_SHA..."
@@ -187,6 +170,39 @@ jobs:
             "sentry_release": "${{ github.sha }}"
           }
           EOF
+
+      - name: Login to Docker Hub (optional)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && ((secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') || (secrets.DOCKER_USER != '' && secrets.DOCKER_PAT != '')) }}
+        id: dockerhub_login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_PAT }}
+          logout: true
+
+      - name: Push Docker images to Docker Hub (optional)
+        if: ${{ steps.dockerhub_login.outcome == 'success' }}
+        run: |
+          echo "📤 Pushing Docker images to Docker Hub..."
+
+          DOCKERHUB_SHA=pixelatedempathy/pixelated-empathy:${{ github.sha }}
+          DOCKERHUB_BRANCH=pixelatedempathy/pixelated-empathy:${{ github.ref_name }}-${{ github.sha }}
+          DOCKERHUB_LATEST=pixelatedempathy/pixelated-empathy:latest
+
+          # Retag GHCR-built image to Docker Hub tags
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_SHA
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_BRANCH
+          docker tag $IMAGE_TAG_SHA $DOCKERHUB_LATEST
+
+          # Push with individual error handling
+          echo "📦 Pushing $DOCKERHUB_SHA..."
+          if docker push $DOCKERHUB_SHA; then echo "✅ Pushed $DOCKERHUB_SHA"; else echo "❌ Failed to push $DOCKERHUB_SHA"; exit 1; fi
+
+          echo "📦 Pushing $DOCKERHUB_BRANCH..."
+          if docker push $DOCKERHUB_BRANCH; then echo "✅ Pushed $DOCKERHUB_BRANCH"; else echo "❌ Failed to push $DOCKERHUB_BRANCH"; exit 1; fi
+
+          echo "📦 Pushing $DOCKERHUB_LATEST..."
+          if docker push $DOCKERHUB_LATEST; then echo "✅ Pushed $DOCKERHUB_LATEST"; else echo "❌ Failed to push $DOCKERHUB_LATEST"; exit 1; fi
 
       - name: Create deployment notification
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}

@@ -29,7 +29,8 @@ export class ScheduledKeyRotation {
   constructor(options: ScheduledRotationOptions = {}) {
     this.keyStorage = new KeyStorage({
       namespace: options.namespace || 'app',
-      useSecureStorage: options.useSecureStorage || false,
+      region: 'us-east-1',
+      useKms: false,
     })
 
     // Default check interval: 1 hour

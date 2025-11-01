@@ -62,7 +62,7 @@ export class RedisCache {
 
   async disconnect(): Promise<void> {
     if (this.connected) {
-      await this.client.disconnect()
+      await this.client.quit()
       this.connected = false
     }
   }
@@ -89,7 +89,7 @@ export class RedisCache {
     }
   }
 
-  async set(key: string, value: any, ttl?: number): Promise<void> {
+  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     try {
       if (!this.connected) {
         await this.connect()
@@ -183,7 +183,7 @@ export class RedisCache {
   async getStats(): Promise<{
     connected: boolean
     keys: number
-    memory: any
+    memory: Record<string, string> | null
   }> {
     try {
       if (!this.connected) {
@@ -208,9 +208,9 @@ export class RedisCache {
     }
   }
 
-  private parseRedisInfo(info: string): any {
+  private parseRedisInfo(info: string): Record<string, string> {
     const lines = info.split('\n')
-    const result: any = {}
+    const result: Record<string, string> = {}
 
     lines.forEach((line) => {
       if (line.includes(':')) {
@@ -229,12 +229,12 @@ export class RedisCache {
   }
 
   // Analytics-specific caching methods
-  async getAnalyticsData(key: string, days: number): Promise<any> {
+  async getAnalyticsData<T>(key: string, days: number): Promise<T | null> {
     const cacheKey = `analytics:${key}:${days}`
-    return this.get(cacheKey)
+    return this.get<T>(cacheKey)
   }
 
-  async setAnalyticsData(key: string, days: number, data: any): Promise<void> {
+  async setAnalyticsData<T>(key: string, days: number, data: T): Promise<void> {
     const cacheKey = `analytics:${key}:${days}`
     // Analytics data can be cached for 15 minutes
     await this.set(cacheKey, data, 900)
@@ -245,11 +245,11 @@ export class RedisCache {
   }
 
   // Dashboard-specific caching
-  async getDashboardSummary(): Promise<any> {
-    return this.get('dashboard:summary')
+  async getDashboardSummary<T>(): Promise<T | null> {
+    return this.get<T>('dashboard:summary')
   }
 
-  async setDashboardSummary(data: any): Promise<void> {
+  async setDashboardSummary<T>(data: T): Promise<void> {
     // Dashboard summary cached for 5 minutes
     await this.set('dashboard:summary', data, 300)
   }

@@ -222,7 +222,7 @@ if (typeof window === 'undefined') {
       return jwt.verify(token, this.JWT_SECRET) as AuthTokenPayload
     }
   }
-  mongoAuthService = new MongoAuthServiceImpl()
+  mongoAuthService = new (MongoAuthServiceImpl as any)()
 }
 
 if (typeof window !== 'undefined') {

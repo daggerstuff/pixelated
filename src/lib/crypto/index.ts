@@ -135,7 +135,8 @@ class RedisStorageProvider implements StorageProvider {
 
   async get(key: string): Promise<string | null> {
     await this.ensureConnection()
-    return this.client.get(key)
+    const result = await this.client.get(key)
+    return typeof result === 'string' ? result : null
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
@@ -327,8 +328,7 @@ export function decrypt(data: string, key: string): string {
       error: error instanceof Error ? String(error) : String(error),
     })
     throw new Error(
-      `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
-      { cause: error },
+      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
     )
   }
 }

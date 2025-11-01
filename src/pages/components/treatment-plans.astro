@@ -1,0 +1,200 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.tsx'
+---
+
+<BaseLayout title="Treatment Plan Management - Pixelated Empathy" description="Comprehensive treatment plan management system for therapists and patients">
+  <section class="container mx-auto py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Treatment Plan Management</h1>
+      
+      <div class="prose dark:prose-invert max-w-none mb-8 text-center">
+        <p class="text-xl">
+          Comprehensive treatment planning system with goal tracking, milestone management, 
+          and progress monitoring for effective therapy outcomes.
+        </p>
+      </div>
+
+      <!-- Main Treatment Plan Interface -->
+      <div class="mb-8">
+        <TreatmentPlanManager 
+          client:load
+          class="w-full"
+          readOnly={false}
+        />
+      </div>
+
+      <!-- Features Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div class="text-3xl mb-4 text-center">🎯</div>
+          <h3 class="text-xl font-semibold mb-3 text-center">Goal Management</h3>
+          <ul class="space-y-2 text-sm">
+            <li>• SMART goal setting and tracking</li>
+            <li>• Priority-based organization</li>
+            <li>• Category-based classification</li>
+            <li>• Progress percentage tracking</li>
+            <li>• Target date management</li>
+          </ul>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div class="text-3xl mb-4 text-center">📋</div>
+          <h3 class="text-xl font-semibold mb-3 text-center">Milestone Tracking</h3>
+          <ul class="space-y-2 text-sm">
+            <li>• Detailed milestone breakdown</li>
+            <li>• Completion date tracking</li>
+            <li>• Notes and observations</li>
+            <li>• Progress calculation</li>
+            <li>• Visual progress indicators</li>
+          </ul>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div class="text-3xl mb-4 text-center">📊</div>
+          <h3 class="text-xl font-semibold mb-3 text-center">Progress Analytics</h3>
+          <ul class="space-y-2 text-sm">
+            <li>• Visual progress charts</li>
+            <li>• Overall completion metrics</li>
+            <li>• Timeline visualization</li>
+            <li>• Performance insights</li>
+            <li>• Trend analysis</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Clinical Categories -->
+      <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-center">Treatment Categories</h2>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div class="text-3xl mb-2">🎯</div>
+            <h4 class="font-semibold">Behavioral</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Behavior modification and habit formation goals
+            </p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div class="text-3xl mb-2">🧠</div>
+            <h4 class="font-semibold">Cognitive</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Thought pattern restructuring and cognitive therapy
+            </p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div class="text-3xl mb-2">❤️</div>
+            <h4 class="font-semibold">Emotional</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Emotional regulation and awareness development
+            </p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div class="text-3xl mb-2">👥</div>
+            <h4 class="font-semibold">Social</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Relationship building and social skills enhancement
+            </p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div class="text-3xl mb-2">💪</div>
+            <h4 class="font-semibold">Physical</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Physical wellness and health-related objectives
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow Integration -->
+      <div class="bg-green-50 dark:bg-green-950 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4">Clinical Workflow Integration</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-green-800 dark:text-green-200">For Therapists</h3>
+            <ul class="space-y-2 text-sm">
+              <li>✓ Comprehensive patient assessment tools</li>
+              <li>✓ Evidence-based treatment planning</li>
+              <li>✓ Progress monitoring and reporting</li>
+              <li>✓ Collaborative care coordination</li>
+              <li>✓ Outcome measurement tracking</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-green-800 dark:text-green-200">For Patients</h3>
+            <ul class="space-y-2 text-sm">
+              <li>✓ Clear goal visibility and understanding</li>
+              <li>✓ Self-monitoring and progress tracking</li>
+              <li>✓ Milestone celebration and motivation</li>
+              <li>✓ Treatment engagement enhancement</li>
+              <li>✓ Shared decision-making participation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Features -->
+      <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-center">Technical Capabilities</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="text-center">
+            <div class="text-2xl mb-2">🔒</div>
+            <h4 class="font-semibold">HIPAA Compliant</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Secure patient data handling
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl mb-2">📱</div>
+            <h4 class="font-semibold">Mobile Ready</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Responsive design for all devices
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl mb-2">🔄</div>
+            <h4 class="font-semibold">Real-time Sync</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Instant updates across platforms
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl mb-2">📊</div>
+            <h4 class="font-semibold">Analytics Ready</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Integrated reporting and insights
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call to Action -->
+      <div class="text-center">
+        <h2 class="text-2xl font-bold mb-4">Ready to Transform Your Practice?</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          Start using our comprehensive treatment planning system to improve patient outcomes, 
+          streamline workflows, and enhance the therapeutic relationship.
+        </p>
+        <div class="flex justify-center space-x-4">
+          <a 
+            href="/dashboard/patients" 
+            class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Start Planning
+          </a>
+          <a 
+            href="/demo-hub" 
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View Demo
+          </a>
+          <a 
+            href="/components" 
+            class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            All Components
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

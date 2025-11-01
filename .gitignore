@@ -80,6 +80,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.cursor/
 
 parts/
 sdist/
@@ -265,6 +266,7 @@ verbose/coverage/
 *.aac
 
 ai/
+.clinerules/
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
 .roo/rules/byterover-rules.md
@@ -272,4 +274,13 @@ ai/
 .cursor/rules/byterover-rules.mdc
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md
+.augment/rules/byterover-rules.mdterraform/.terraform/
+terraform/.terraform.lock.hcl
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfplan
+terraform/plan.tfplan
