@@ -174,8 +174,11 @@ export class FileSystemStorageProvider implements StorageProvider {
             continue
           }
 
-          const fullPath = path.join(dirPath, entry.name)
-          const relPath = path.join(relativePath, entry.name)
+          // Use securePathJoin to prevent path traversal
+          const fullPath = securePathJoin(dirPath, entry.name)
+          const relPath = relativePath
+            ? securePathJoin(relativePath, entry.name)
+            : entry.name
 
           if (entry.isDirectory()) {
             await scanDir(fullPath, relPath)
@@ -368,8 +371,11 @@ export class MockCloudStorageProvider implements StorageProvider {
             continue
           }
 
-          const entryPath = path.join(dirPath, entry.name)
-          const keyPath = path.join(relativePath, entry.name)
+          // Use securePathJoin to prevent path traversal
+          const entryPath = securePathJoin(dirPath, entry.name)
+          const keyPath = relativePath
+            ? securePathJoin(relativePath, entry.name)
+            : entry.name
 
           if (entry.isDirectory()) {
             await scanDir(entryPath, keyPath)
@@ -728,7 +734,8 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')
     }
@@ -947,7 +954,8 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')
     }
@@ -1200,7 +1208,8 @@ export class AzureBlobStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\x00-\x1f]/
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')
     }

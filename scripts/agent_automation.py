@@ -44,7 +44,7 @@ class TaskMasterInterface:
         if not task_id or not isinstance(task_id, str):
             return False
         # Only allow alphanumeric, hyphens, and underscores
-        return bool(re.match(r'^[a-zA-Z0-9_-]+
+        return bool(re.match(r'^[a-zA-Z0-9_-]+$', task_id))
         def _validate_status(self, status: str) -> bool:
         """Validate status to prevent command injection"""
         return status in self.VALID_STATUSES
@@ -66,7 +66,7 @@ class TaskMasterInterface:
         """Get the next available task"""
         try:
             result = subprocess.run(
-                self.base_cmd + ["next"], capture_output=True, text=True, timeout=30, check=False
+                self.base_cmd + ["next"], capture_output=True, text=True, timeout=30, check=False, shell=False
             )
 
             if result.returncode == 0:
@@ -90,6 +90,7 @@ class TaskMasterInterface:
                 text=True,
                 timeout=30,
                 check=False,
+                shell=False,
             )
 
             if result.returncode == 0:
@@ -119,6 +120,7 @@ class TaskMasterInterface:
                 text=True,
                 timeout=30,
                 check=False,
+                shell=False,
             )
 
             return result.returncode == 0
@@ -345,7 +347,7 @@ def main():
         """Get the next available task"""
         try:
             result = subprocess.run(
-                self.base_cmd + ["next"], capture_output=True, text=True, timeout=30, check=False
+                self.base_cmd + ["next"], capture_output=True, text=True, timeout=30, check=False, shell=False
             )
 
             if result.returncode == 0:
@@ -369,6 +371,7 @@ def main():
                 text=True,
                 timeout=30,
                 check=False,
+                shell=False,
             )
 
             if result.returncode == 0:
@@ -398,6 +401,7 @@ def main():
                 text=True,
                 timeout=30,
                 check=False,
+                shell=False,
             )
 
             return result.returncode == 0

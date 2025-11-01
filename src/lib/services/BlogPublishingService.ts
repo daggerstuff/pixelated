@@ -3,6 +3,7 @@ import * as cron from 'node-cron'
 import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { securePathJoin } from '../utils/index'
 
 const logger = createBuildSafeLogger('blog-publishing')
 
@@ -229,7 +230,8 @@ export class BlogPublishingService {
           continue
         }
 
-        const fullPath = path.join(dirPath, entry.name)
+        // Use securePathJoin to prevent path traversal
+        const fullPath = securePathJoin(dirPath, entry.name)
 
         if (entry.isDirectory()) {
           await this.walkDirectory(fullPath)
