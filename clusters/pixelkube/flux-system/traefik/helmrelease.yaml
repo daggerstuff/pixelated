@@ -16,9 +16,11 @@ spec:
   values:
     ports:
       web:
+        port: 80
         service:
           type: LoadBalancer
       websecure:
+        port: 443
         service:
           type: LoadBalancer
     serviceAccount:
@@ -34,11 +36,6 @@ spec:
         enabled: true
       kubernetesIngress:
         enabled: true
-    ports:
-      web:
-        port: 80
-      websecure:
-        port: 443
     additionalArguments:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
