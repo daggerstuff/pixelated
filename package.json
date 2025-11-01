@@ -222,7 +222,8 @@
     "wrangler": "^4.45.3",
     "ws": "^8.18.3",
     "zod": "^4.1.12",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.8",
+    "class-variance-authority": "^0.7.1"
   },
   "devDependencies": {
     "@astrojs/markdoc": "^0.15.8",
@@ -259,7 +260,6 @@
     "axe-core": "^4.11.0",
     "braces": "^3.0.3",
     "cheerio": "^1.1.2",
-    "class-variance-authority": "^0.7.1",
     "claude-flow": "^2.7.26",
     "concurrently": "^9.2.1",
     "constructs": "^10.4.2",
