@@ -19,7 +19,7 @@ spec:
   imageRepositoryRef:
     name: pixelated-empathy
   filterTags:
-    pattern: ^(latest|build-(?P<ts>\d+))$
+    pattern: ^build-(?P<ts>\d+)$
     extract: $ts
   policy:
     numerical:
