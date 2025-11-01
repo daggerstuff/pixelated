@@ -293,7 +293,7 @@ build:
       # Enhanced pnpm install with git fetch retry wrapper
       corepack enable pnpm
       pnpm config set store-dir $PNPM_CACHE_FOLDER
-      
+
       # Retry pnpm install with exponential backoff
       for i in {1..3}; do
         echo "🔄 Install attempt $i of 3..."
@@ -303,12 +303,12 @@ build:
         else
           echo "⚠️ Install attempt $i failed, checking git status..."
           git status || echo "Git status check completed"
-          
+
           if [ $i -lt 3 ]; then
             DELAY=$((5 * i))
             echo "⏳ Retrying in $DELAY seconds..."
             sleep $DELAY
-            
+
             # Try to clean up any partial state
             echo "🧹 Cleaning up partial installation state..."
             rm -rf node_modules/.pnpm || true
@@ -429,7 +429,7 @@ security:
           # Container security configuration check
           docker pull $CONTAINER_IMAGE
           echo "🔍 Checking container security configuration..."
-          
+
           # Check user configuration
           USER_ID=$(docker inspect $CONTAINER_IMAGE --format='{{.Config.User}}' 2>/dev/null || echo "")
           if [ -z "$USER_ID" ] || [ "$USER_ID" = "root" ] || [ "$USER_ID" = "0" ]; then
@@ -444,7 +444,7 @@ security:
           else
             echo "✅ Container configured with non-root user: $USER_ID"
           fi
-          
+
           # Check exposed ports
           EXPOSED_PORTS=$(docker inspect $CONTAINER_IMAGE --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
           echo "ℹ️ Exposed ports: ${EXPOSED_PORTS:-none}"
@@ -629,7 +629,7 @@ deploy-gke:
       fi
 
       echo "✅ GKE deployment completed successfully"
-      echo "🌐 Application URL: ${GKE_ENVIRONMENT_URL:-http://35.243.226.27}"
+      echo "🌐 Application URL: ${GKE_ENVIRONMENT_URL}"
       echo "📊 Deployment strategy: $DEPLOYMENT_STRATEGY"
 
       # Store deployment metadata
@@ -699,14 +699,14 @@ rollback-gke:
       # Rollback to previous revision
       if kubectl rollout undo deployment/$GKE_DEPLOYMENT_NAME; then
         echo "✅ Rollback initiated"
-        
+
         # Wait for rollback to complete
         kubectl rollout status deployment/$GKE_DEPLOYMENT_NAME --timeout=300s
-        
+
         # Verify rollback
         kubectl get deployment $GKE_DEPLOYMENT_NAME
         kubectl get pods -l app=pixelated
-        
+
         echo "✅ GKE rollback completed successfully"
       else
         echo "❌ Rollback failed"
@@ -848,10 +848,10 @@ cleanup:
           grep $CI_REGISTRY_IMAGE | \
           head -20 | \
           sort -k2 -r)
-        
+
         IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
         echo "📊 Found $IMAGE_COUNT images for $CI_REGISTRY_IMAGE"
-        
+
         if [ $IMAGE_COUNT -gt $KEEP_IMAGES ]; then
           # Remove images beyond the keep threshold - process in smaller batches
           IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +$((KEEP_IMAGES + 1)) | awk '{print $1}')

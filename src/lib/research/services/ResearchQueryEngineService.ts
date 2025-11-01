@@ -1,9 +1,9 @@
 /**
  * Research Query Engine Service
- * 
+ *
  * Provides natural language to SQL translation, query result anonymization,
  * and performance optimization for large healthcare datasets.
- * 
+ *
  * Security: All queries go through approval workflow for sensitive data
  * Performance: Optimized for sub-5 second response times
  */
@@ -15,7 +15,7 @@ export interface ResearchQuery {
   id: string
   naturalLanguageQuery: string
   translatedSQL: string
-  parameters: Record<string, any>
+  parameters: any[]
   requiredPermissions: string[]
   estimatedExecutionTime: number
   dataClassification: 'public' | 'internal' | 'confidential' | 'restricted'
@@ -108,16 +108,16 @@ export class ResearchQueryEngineService {
 
       // Parse natural language using NLP techniques
       const parsedIntent = await this.parseQueryIntent(naturalLanguageQuery)
-      
+
       // Translate to SQL with safety checks
-      const translatedSQL = await this.generateSQLFromIntent(parsedIntent, researchContext)
-      
+      const { sql: translatedSQL, params: sqlParams } = await this.generateSQLFromIntent(parsedIntent, researchContext)
+
       // Estimate execution complexity and time
       const estimatedExecutionTime = await this.estimateQueryExecutionTime(translatedSQL)
-      
+
       // Determine required permissions based on data access
       const requiredPermissions = await this.analyzeRequiredPermissions(translatedSQL, researchContext.dataScope)
-      
+
       // Classify data sensitivity
       const dataClassification = await this.classifyDataSensitivity(translatedSQL, researchContext.dataScope)
 
@@ -125,7 +125,7 @@ export class ResearchQueryEngineService {
         id: queryId,
         naturalLanguageQuery,
         translatedSQL,
-        parameters: parsedIntent.parameters,
+        parameters: sqlParams,
         requiredPermissions,
         estimatedExecutionTime,
         dataClassification,
@@ -164,7 +164,7 @@ export class ResearchQueryEngineService {
       // Find query in user's history
       const userHistory = this.queryHistory.get(userId) || []
       const query = userHistory.find(q => q.id === queryId)
-      
+
       if (!query) {
         throw new Error('Query not found or access denied')
       }
@@ -199,16 +199,16 @@ export class ResearchQueryEngineService {
 
       // Execute SQL query (simulated - would connect to actual database)
       const rawResults = await this.executeSQLQuery(query.translatedSQL, query.parameters)
-      
+
       // Anonymize results based on level
       const anonymizedResults = await this.anonymizeQueryResults(rawResults, anonymizationLevel, userId)
-      
+
       const endTime = performance.now()
       const executionTime = (endTime - startTime) / 1000
 
       // Calculate privacy metrics
       const privacyMetrics = await this.calculatePrivacyMetrics(anonymizedResults, anonymizationLevel)
-      
+
       // Determine compliance status
       const complianceStatus = await this.assessComplianceStatus(query, anonymizedResults)
 
@@ -273,10 +273,10 @@ export class ResearchQueryEngineService {
     }
 
     this.pendingApprovals.set(query.id, approvalRequest)
-    
+
     // Notify reviewers (simulated)
     console.log(`Query approval requested for ${query.id}`, approvalRequest)
-    
+
     return approvalRequest
   }
 
@@ -294,11 +294,11 @@ export class ResearchQueryEngineService {
     optimizationSuggestions: string[]
   }> {
     const userHistory = this.queryHistory.get(userId) || []
-    
+
     const totalQueries = userHistory.length
     const approvedQueries = userHistory.filter(q => q.approvalStatus === 'approved')
     const successRate = totalQueries > 0 ? approvedQueries.length / totalQueries : 0
-    
+
     // Analyze most used data types from query history
     const dataTypeFrequency = new Map<string, number>()
     userHistory.forEach(query => {
@@ -306,7 +306,7 @@ export class ResearchQueryEngineService {
         dataTypeFrequency.set(permission, (dataTypeFrequency.get(permission) || 0) + 1)
       })
     })
-    
+
     const mostUsedDataTypes = Array.from(dataTypeFrequency.entries())
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
@@ -336,10 +336,10 @@ export class ResearchQueryEngineService {
   }> {
     // Simplified NLP parsing - in production would use advanced NLP models
     const query = naturalLanguageQuery.toLowerCase()
-    
+
     let intent = 'unknown'
     let confidence = 0.5
-    
+
     if (query.includes('correlation') || query.includes('relationship')) {
       intent = 'correlation_analysis'
       confidence = 0.8
@@ -371,13 +371,15 @@ export class ResearchQueryEngineService {
   private async generateSQLFromIntent(
     parsedIntent: any,
     researchContext: any
-  ): Promise<string> {
+  ): Promise<{ sql: string; params: any[] }> {
     // Simplified SQL generation - in production would use sophisticated query builders
     const { intent, entities } = parsedIntent
-    
+
     let baseQuery = 'SELECT '
     let fields = ['session_id', 'anonymized_user_id', 'session_date', 'emotional_metrics']
     let conditions = []
+    let params: any[] = []
+    let paramIndex = 1
 
     // Add fields based on intent
     if (intent === 'correlation_analysis') {
@@ -386,34 +388,38 @@ export class ResearchQueryEngineService {
       fields.push('session_sequence', 'progress_metrics')
     }
 
-    // Add conditions based on entities
+    // Add conditions based on entities using parameterized queries
     entities.forEach(entity => {
       if (entity.type === 'condition') {
-        conditions.push(`primary_condition = '${entity.value}'`)
+        conditions.push(`primary_condition = $${paramIndex}`)
+        params.push(entity.value)
+        paramIndex++
       }
     })
 
-    // Add time range if specified
+    // Add time range if specified using parameterized queries
     if (researchContext.timeRange) {
-      conditions.push(`session_date BETWEEN '${researchContext.timeRange.start}' AND '${researchContext.timeRange.end}'`)
+      conditions.push(`session_date BETWEEN $${paramIndex} AND $${paramIndex + 1}`)
+      params.push(researchContext.timeRange.start, researchContext.timeRange.end)
+      paramIndex += 2
     }
 
     baseQuery += fields.join(', ')
     baseQuery += ' FROM anonymized_research_data'
-    
+
     if (conditions.length > 0) {
       baseQuery += ' WHERE ' + conditions.join(' AND ')
     }
 
     baseQuery += ' LIMIT 1000' // Safety limit
 
-    return baseQuery
+    return { sql: baseQuery, params }
   }
 
-  private async executeSQLQuery(sql: string, parameters: Record<string, any>): Promise<any[]> {
+  private async executeSQLQuery(sql: string, parameters: any[]): Promise<any[]> {
     // Simulated database execution
     await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))
-    
+
     // Return mock data for demonstration
     return Array.from({ length: Math.floor(Math.random() * 100) + 10 }, (_, i) => ({
       id: `record_${i}`,
@@ -455,7 +461,7 @@ export class ResearchQueryEngineService {
     }
 
     const anonymizedRecords: AnonymizedRecord[] = []
-    
+
     for (const record of rawResults) {
       const result = await anonymizationPipelineService.anonymizeSessionData(
         record,
@@ -477,13 +483,13 @@ export class ResearchQueryEngineService {
     privacyBudgetUsed: number
   }> {
     // Calculate based on anonymization level and data
-    const kAnonymityLevel = anonymizationLevel === 'maximum' ? 10 : 
+    const kAnonymityLevel = anonymizationLevel === 'maximum' ? 10 :
                            anonymizationLevel === 'enhanced' ? 5 : 3
-    
-    const informationLoss = anonymizedResults.reduce((avg, record) => 
+
+    const informationLoss = anonymizedResults.reduce((avg, record) =>
       avg + record.qualityMetrics.informationLoss, 0) / anonymizedResults.length
-    
-    const privacyBudgetUsed = anonymizedResults.reduce((avg, record) => 
+
+    const privacyBudgetUsed = anonymizedResults.reduce((avg, record) =>
       avg + record.qualityMetrics.privacyBudgetUsed, 0) / anonymizedResults.length
 
     return {
@@ -500,12 +506,12 @@ export class ResearchQueryEngineService {
 
   private async analyzeRequiredPermissions(sql: string, dataScope: string[]): Promise<string[]> {
     const permissions = []
-    
+
     if (sql.includes('emotional_metrics')) permissions.push('emotional_data_access')
     if (sql.includes('session_')) permissions.push('session_data_access')
     if (sql.includes('user_')) permissions.push('user_data_access')
     if (sql.includes('outcome')) permissions.push('outcome_data_access')
-    
+
     return permissions
   }
 
@@ -536,15 +542,15 @@ export class ResearchQueryEngineService {
 
   private generateQueryWarnings(query: ResearchQuery, results: AnonymizedRecord[]): string[] {
     const warnings = []
-    
+
     if (results.length === 0) {
       warnings.push('No results found for query. Consider broadening search criteria.')
     }
-    
+
     if (query.estimatedExecutionTime > 10) {
       warnings.push('Query may take longer than expected to execute.')
     }
-    
+
     const avgInformationLoss = results.reduce((avg, r) => avg + r.qualityMetrics.informationLoss, 0) / results.length
     if (avgInformationLoss > 0.5) {
       warnings.push('High information loss due to anonymization. Results may be less precise.')
@@ -555,15 +561,15 @@ export class ResearchQueryEngineService {
 
   private generateOptimizationSuggestions(history: ResearchQuery[], metrics: QueryPerformanceMetrics): string[] {
     const suggestions = []
-    
+
     if (metrics.averageExecutionTime > 5) {
       suggestions.push('Consider adding more specific filters to reduce query execution time')
     }
-    
+
     if (metrics.cacheHitRate < 0.5) {
       suggestions.push('Similar queries detected. Consider reusing previous results when appropriate')
     }
-    
+
     const complexQueries = history.filter(q => q.estimatedExecutionTime > 10)
     if (complexQueries.length > 0) {
       suggestions.push('Break down complex queries into smaller, more focused analyses')
@@ -574,10 +580,10 @@ export class ResearchQueryEngineService {
 
   private updatePerformanceMetrics(executionTime: number, cacheHit: boolean): void {
     // Update running averages
-    this.performanceMetrics.averageExecutionTime = 
+    this.performanceMetrics.averageExecutionTime =
       (this.performanceMetrics.averageExecutionTime * 0.9) + (executionTime * 0.1)
-    
-    this.performanceMetrics.cacheHitRate = 
+
+    this.performanceMetrics.cacheHitRate =
       (this.performanceMetrics.cacheHitRate * 0.95) + (cacheHit ? 0.05 : 0)
   }
 
