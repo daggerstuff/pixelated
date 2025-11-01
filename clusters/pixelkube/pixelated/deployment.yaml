@@ -19,6 +19,7 @@ spec:
       containers:
       - name: pixelated
         image: pixelatedempathy/pixelated-empathy:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
+        imagePullPolicy: Always
         env:
         - name: NODE_ENV
           value: production
@@ -30,10 +31,27 @@ spec:
           value: "4321"
         ports:
         - containerPort: 4321
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "512Mi"
+            cpu: "200m"
           limits:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "1Gi"
+            cpu: "1000m"
