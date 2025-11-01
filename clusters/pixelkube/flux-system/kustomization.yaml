@@ -6,3 +6,5 @@ resources:
 - image-automation.yaml
 - receiver.yaml
 - receiver-ingress.yaml
+- traefik/helmrepository.yaml
+- traefik/helmrelease.yaml
