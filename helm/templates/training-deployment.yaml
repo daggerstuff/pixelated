@@ -1,0 +1,98 @@
+{{- if .Values.training.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pixelated-empathy.fullname" . }}-training
+  namespace: {{ .Values.training.namespace | default "pixelated-training" }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: training
+spec:
+  replicas: {{ .Values.training.replicaCount | default 1 }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "pixelated-empathy.selectorLabels" . | nindent 6 }}
+      component: training
+  template:
+    metadata:
+      labels:
+        {{- include "pixelated-empathy.selectorLabels" . | nindent 8 }}
+        component: training
+    spec:
+      {{- with .Values.training.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      {{- with .Values.training.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      {{- with .Values.training.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      securityContext:
+        {{- toYaml .Values.training.podSecurityContext | nindent 8 }}
+      
+      serviceAccountName: {{ include "pixelated-empathy.fullname" . }}-training
+      
+      containers:
+      - name: training
+        image: "{{ .Values.training.image.repository }}:{{ .Values.training.image.tag }}"
+        imagePullPolicy: {{ .Values.training.image.pullPolicy }}
+        
+        securityContext:
+          {{- toYaml .Values.training.securityContext | nindent 10 }}
+        
+        resources:
+          {{- toYaml .Values.training.resources | nindent 10 }}
+        
+        env:
+        {{- range .Values.training.env }}
+        - name: {{ .name }}
+          {{- if .value }}
+          value: {{ .value | quote }}
+          {{- else if .valueFrom }}
+          valueFrom:
+            {{- toYaml .valueFrom | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        
+        ports:
+        - containerPort: {{ .Values.training.service.targetPort | default 8003 }}
+          protocol: TCP
+          name: http
+        
+        livenessProbe:
+          {{- toYaml .Values.training.livenessProbe | nindent 10 }}
+        
+        readinessProbe:
+          {{- toYaml .Values.training.readinessProbe | nindent 10 }}
+        
+        volumeMounts:
+        {{- range .Values.training.volumeMounts }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          {{- if .readOnly }}
+          readOnly: {{ .readOnly }}
+          {{- end }}
+        {{- end }}
+      
+      volumes:
+      {{- range .Values.training.volumes }}
+      - name: {{ .name }}
+        {{- if .persistentVolumeClaim }}
+        persistentVolumeClaim:
+          claimName: {{ .persistentVolumeClaim.claimName }}
+        {{- else if .emptyDir }}
+        emptyDir:
+          {{- toYaml .emptyDir | nindent 10 }}
+        {{- end }}
+      {{- end }}
+{{- end }}

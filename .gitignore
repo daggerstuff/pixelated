@@ -266,7 +266,10 @@ verbose/coverage/
 *.aac
 
 ai/
+<<<<<<< HEAD
 .clinerules/
+=======
+>>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
 .roo/rules/byterover-rules.md
@@ -274,6 +277,7 @@ ai/
 .cursor/rules/byterover-rules.mdc
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
+<<<<<<< HEAD
 .augment/rules/byterover-rules.mdterraform/.terraform/
 terraform/.terraform.lock.hcl
 
@@ -284,3 +288,6 @@ terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/*.tfplan
 terraform/plan.tfplan
+=======
+.augment/rules/byterover-rules.md
+>>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0

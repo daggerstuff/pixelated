@@ -2,7 +2,11 @@ import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
+<<<<<<< HEAD
 import type { APIContext, MiddlewareNext } from 'astro';
+=======
+import type { APIContext, MiddlewareNext } from 'astro'
+>>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
 
 // Simple route matcher for protected API routes
 const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
@@ -21,7 +25,7 @@ function isProtectedRoute(request: Request) {
  * Auth middleware that uses the project's session system.
  * If a request targets a protected route and there's no session, redirect to sign-in.
  */
-const projectAuthMiddleware = async (context: any, next: any) => {
+const projectAuthMiddleware = async (context: APIContext, next: MiddlewareNext) => {
   const { request } = context
 
   // Allow non-protected routes through quickly
