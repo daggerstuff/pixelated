@@ -5,7 +5,7 @@ metadata:
   name: pixelated-service
   namespace: pixelated
   labels:
-    app: pixelated
+    app: pixelated-app
 spec:
   selector:
     app: pixelated-app
