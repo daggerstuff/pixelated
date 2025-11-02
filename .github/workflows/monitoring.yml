@@ -37,7 +37,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -77,6 +77,10 @@ jobs:
           fi
           if [ -z "$BASE_URL" ]; then
             echo "::error::APP_URL is not set. Define repository/environment variable 'APP_URL' or secret 'APP_URL' for Production."
+            echo "::notice::To configure monitoring:"
+            echo "::notice::  1. Go to Settings > Secrets and variables > Actions"
+            echo "::notice::  2. Add 'APP_URL' variable or secret pointing to your production site"
+            echo "::notice::  3. Example: https://yourdomain.com or https://pixelatedempathy.com"
             exit 1
           fi
           echo "Using BASE_URL: $BASE_URL"
@@ -89,6 +93,7 @@ jobs:
           set -euo pipefail
           echo "🏥 Running PRODUCTION health checks against $BASE_URL"
           echo "ℹ️  Production failures will trigger alerts and notifications"
+          echo "ℹ️  Ensure your production site is deployed and accessible before monitoring"
 
           # Function to perform robust HTTP check with retries
           check_endpoint() {
@@ -116,6 +121,10 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "522" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
+                echo "   ℹ️  This typically means the origin server is not reachable or is down."
+                echo "   ℹ️  Check if the site is actually deployed and DNS is configured correctly."
               else
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
@@ -137,7 +146,14 @@ jobs:
             "${{ env.HEALTH_CHECK_CONNECT_TIMEOUT_PROD }}"; then
             echo "status=passing" >> $GITHUB_OUTPUT
           else
+            echo ""
             echo "::error::PRODUCTION site is down or returning errors after ${{ env.HEALTH_CHECK_RETRIES_PROD }} attempts"
+            echo "::error::URL tested: $BASE_URL"
+            echo "::error::If you see HTTP 522, check if:"
+            echo "::error::  1. The site is actually deployed to a server"
+            echo "::error::  2. DNS is correctly configured to point to your server"
+            echo "::error::  3. Cloudflare settings match your hosting provider"
+            echo ""
             echo "status=failing" >> $GITHUB_OUTPUT
             exit 1
           fi
@@ -160,11 +176,16 @@ jobs:
                 },
               },
             ],
-            reporter: ['html', 'list'],
+            reporter: [
+              ['html', { outputFolder: 'playwright-report' }],
+              ['list'],
+            ],
             timeout: 60000,
             retries: 1,
           };
           EOF
+          # Ensure playwright-report directory exists
+          mkdir -p playwright-report
       - name: Run Playwright tests
         id: run-tests
         if: steps.health-check.outputs.status == 'passing'
@@ -174,12 +195,18 @@ jobs:
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against PRODUCTION: $BASE_URL"
 
+          # Ensure playwright-report directory exists before running tests
+          mkdir -p playwright-report
+
           # Run tests and propagate failure
           TEST_EXIT=0
           if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
             pnpm exec playwright test --config=temp-playwright.config.js; then
             TEST_EXIT=$?
           fi
+
+          # Ensure directory exists even if tests fail (for artifact upload)
+          mkdir -p playwright-report
 
           if [ "$TEST_EXIT" -eq 0 ]; then
             echo "✅ PRODUCTION monitoring tests completed"
@@ -196,7 +223,7 @@ jobs:
         with:
           name: playwright-test-results-production
           path: playwright-report/
-          if-no-files-found: warn
+          if-no-files-found: ignore
           retention-days: 30
 
       - name: Set Slack enabled output (production)
@@ -245,7 +272,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -323,6 +350,10 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "522" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
+                echo "   ℹ️  This typically means the origin server is not reachable or is down."
+                echo "   ℹ️  Check if the site is actually deployed and DNS is configured correctly."
               else
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
@@ -388,11 +419,16 @@ jobs:
                 },
               },
             ],
-            reporter: ['html', 'list'],
+            reporter: [
+              ['html', { outputFolder: 'playwright-report' }],
+              ['list'],
+            ],
             timeout: 60000,
             retries: 1,
           };
           EOF
+          # Ensure playwright-report directory exists
+          mkdir -p playwright-report
 
       - name: Run Playwright tests
         id: run-tests
@@ -403,12 +439,18 @@ jobs:
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against STAGING: $BASE_URL"
 
+          # Ensure playwright-report directory exists before running tests
+          mkdir -p playwright-report
+
           # Run tests and store exit code to determine if any tests failed
           TEST_EXIT=0
           if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
             pnpm exec playwright test --config=temp-playwright.config.js; then
             TEST_EXIT=$?
           fi
+
+          # Ensure directory exists even if tests fail (for artifact upload)
+          mkdir -p playwright-report
 
           echo "✅ STAGING monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
@@ -419,7 +461,7 @@ jobs:
         with:
           name: playwright-test-results-staging
           path: playwright-report/
-          if-no-files-found: warn
+          if-no-files-found: ignore
           retention-days: 30
 
   health-check-preview:
@@ -431,7 +473,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -511,6 +553,10 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "522" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
+                echo "   ℹ️  This typically means the origin server is not reachable or is down."
+                echo "   ℹ️  Check if the site is actually deployed and DNS is configured correctly."
               else
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
               fi
@@ -559,11 +605,16 @@ jobs:
                 },
               },
             ],
-            reporter: ['html', 'list'],
+            reporter: [
+              ['html', { outputFolder: 'playwright-report' }],
+              ['list'],
+            ],
             timeout: 60000,
             retries: 2,
           };
           EOF
+          # Ensure playwright-report directory exists
+          mkdir -p playwright-report
 
       - name: Run Playwright tests
         id: run-tests
@@ -577,6 +628,9 @@ jobs:
           echo "Running Playwright tests against PREVIEW: $BASE_URL"
           echo "Note: Preview test failures are informational and do not indicate production issues"
 
+          # Ensure playwright-report directory exists before running tests
+          mkdir -p playwright-report
+
           # Run tests and store exit code to determine if any tests failed
           TEST_EXIT_CODE=0
           if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
@@ -586,6 +640,9 @@ jobs:
 
           # Display the output regardless of exit code
           cat playwright-output.log
+
+          # Ensure directory exists even if tests fail (for artifact upload)
+          mkdir -p playwright-report
 
           # Set simple success/failure indicator
           if [ "$TEST_EXIT_CODE" -eq 0 ]; then
@@ -605,7 +662,7 @@ jobs:
         with:
           name: playwright-test-results-preview
           path: playwright-report/
-          if-no-files-found: warn
+          if-no-files-found: ignore
           retention-days: 7
 
   check-performance:
@@ -619,6 +676,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          fetch-depth: 1
 
       - name: Resolve APP_URL (Performance)
         id: resolve-perf

@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
+    libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
 RUN corepack enable pnpm
 
@@ -30,11 +31,14 @@ WORKDIR /app
 
 # Install pnpm before creating user (install as root, then switch to non-root)
 ARG PNPM_VERSION=10.20.0
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
+RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -m nextjs
 
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
