@@ -1,4 +1,4 @@
-pick upname: Bias Detection Engine CI/CD
+name: Bias Detection Engine CI/CD
 
 concurrency:
   group: bias-detection-${{ github.ref }}
