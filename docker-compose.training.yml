@@ -7,11 +7,6 @@ services:
       target: production
     container_name: pixelated-training
     restart: unless-stopped
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # GPU Configuration
     deploy:
       resources:
@@ -20,11 +15,6 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # Environment Variables
     environment:
       - NODE_ENV=development
@@ -33,11 +23,6 @@ services:
       - WANDB_MODE=offline
       - HF_HOME=/app/cache/huggingface
       - TRANSFORMERS_CACHE=/app/cache/transformers
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # Volumes
     volumes:
       - ./data/training:/app/data:ro
@@ -45,19 +30,9 @@ services:
       - ./checkpoints:/app/checkpoints
       - training_cache:/app/cache
       - /dev/shm:/dev/shm:rw  # Shared memory for faster data loading
-<<<<<<< HEAD
-
     # Ports
     ports:
       - "8003:8003"
-
-=======
-    
-    # Ports
-    ports:
-      - "8003:8003"
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # Health Check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
@@ -65,20 +40,10 @@ services:
       timeout: 30s
       retries: 3
       start_period: 120s
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # Dependencies
     depends_on:
       - redis
       - db
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
     # Networks
     networks:
       - training-net
@@ -139,11 +104,7 @@ services:
     container_name: pixelated-grafana-training
     restart: unless-stopped
     environment:
-<<<<<<< HEAD
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
-=======
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_training_data:/var/lib/grafana
@@ -172,8 +133,4 @@ volumes:
   prometheus_training_data:
     driver: local
   grafana_training_data:
-<<<<<<< HEAD
     driver: local
-=======
-    driver: local
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0

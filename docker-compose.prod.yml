@@ -83,8 +83,4 @@ volumes:
   postgres_prod_data:
     driver: local
   redis_prod_data:
-<<<<<<< HEAD
     driver: local
-=======
-    driver: local
->>>>>>> master

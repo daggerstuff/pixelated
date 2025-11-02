@@ -269,17 +269,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Determine image tag
+        id: image_tag
+        run: |
+          # Try to use the first tag from build step, or fallback to SHA-based tag
+          if [ -n "${{ needs.build.outputs.image-tag }}" ]; then
+            IMAGE_TAG="${{ needs.build.outputs.image-tag }}"
+          else
+            # Fallback: construct tag from registry, image name, and SHA
+            IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          fi
+          echo "image_ref=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "🔍 Using image: ${IMAGE_TAG}"
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          image-ref: ${{ steps.image_tag.outputs.image_ref }}
           format: "sarif"
           output: "trivy-results.sarif"
 
+      - name: Check for Trivy SARIF file
+        id: trivy_sarif
+        run: |
+          if [ -s trivy-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Trivy SARIF file found"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Trivy SARIF file not found or empty"
+          fi
+
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         continue-on-error: true
         with:
           sarif_file: "trivy-results.sarif"
@@ -287,11 +311,12 @@ jobs:
       - name: Container security check
         run: |
           echo "🔍 Checking container security configuration..."
+          IMAGE_REF="${{ steps.image_tag.outputs.image_ref }}"
           # Check user configuration
-          USER_ID=$(docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --format='{{.Config.User}}' 2>/dev/null || echo "")
+          USER_ID=$(docker inspect "$IMAGE_REF" --format='{{.Config.User}}' 2>/dev/null || echo "")
           if [ -z "$USER_ID" ] || [ "$USER_ID" = "root" ] || [ "$USER_ID" = "0" ]; then
             echo "⚠️ Container may run as root - checking runtime behavior"
-            RUNTIME_USER=$(timeout 30 docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} whoami 2>/dev/null || echo "unknown")
+            RUNTIME_USER=$(timeout 30 docker run --rm "$IMAGE_REF" whoami 2>/dev/null || echo "unknown")
             if [ "$RUNTIME_USER" = "root" ]; then
               echo "❌ Container runs as root - security risk"
               exit 1
@@ -303,7 +328,7 @@ jobs:
           fi
 
           # Check exposed ports
-          EXPOSED_PORTS=$(docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
+          EXPOSED_PORTS=$(docker inspect "$IMAGE_REF" --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
           echo "ℹ️ Exposed ports: ${EXPOSED_PORTS:-none}"
           echo "✅ Security checks completed"
 
@@ -428,19 +453,52 @@ jobs:
       - name: Verify Workload Identity Configuration
         run: |
           echo "🔍 Verifying workload identity configuration..."
+
+          # Check required secrets are set
+          if [ -z "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ]; then
+            echo "❌ Error: GCP_WORKLOAD_IDENTITY_PROVIDER secret is not set"
+            echo "📚 See docs/gcp-authentication-setup.md for setup instructions"
+            echo "💡 Format: projects/[PROJECT_NUMBER]/locations/global/workloadIdentityPools/[POOL_NAME]/providers/[PROVIDER_NAME]"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" ]; then
+            echo "❌ Error: GCP_SERVICE_ACCOUNT_EMAIL secret is not set"
+            echo "📚 See docs/gcp-authentication-setup.md for setup instructions"
+            exit 1
+          fi
+
+          if [ -z "${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}" ]; then
+            echo "❌ Error: GCP_PROJECT_ID is not set"
+            echo "📚 See docs/gcp-authentication-setup.md for setup instructions"
+            exit 1
+          fi
+
+          echo "✅ Required secrets are configured"
           echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
-          echo "Workload Identity Provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}"
-          echo "Service Account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}"
+          echo "Workload Identity Provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
+          echo "Service Account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}"
+          echo ""
+          echo "⚠️  If authentication fails with 'invalid_target', check:"
+          echo "   1. The workload identity pool exists: gcloud iam workload-identity-pools list"
+          echo "   2. The provider exists: gcloud iam workload-identity-pools providers list"
+          echo "   3. Use PROJECT_NUMBER (not PROJECT_ID) in the provider path"
+          echo "   4. The pool/provider is ACTIVE (not DISABLED or DELETED)"
+          echo "📚 Full troubleshooting: docs/workload-identity-troubleshooting.md"
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           create_credentials_file: true
           export_environment_variables: true
           project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
           universe: googleapis.com
           cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -628,9 +686,12 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           create_credentials_file: true
           export_environment_variables: true
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
           universe: googleapis.com
           cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -732,9 +793,12 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           create_credentials_file: true
           export_environment_variables: true
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
           universe: googleapis.com
           cleanup_credentials: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          id_token_include_email: false
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

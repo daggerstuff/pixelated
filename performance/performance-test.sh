@@ -7,10 +7,12 @@ set -e
 echo "🚀 Starting performance testing..."
 
 # Configuration
-TARGET_URL="${TARGET_URL:-https://pixelated-empathy.com}"
+TARGET_URL="${TARGET_URL:-https://pixelatedempathy.com}"
 PERFORMANCE_BUDGET_FILE="${PERFORMANCE_BUDGET_FILE:-/home/vivi/pixelated/performance/performance-budget.json}"
 RESULTS_DIR="/tmp/performance-results-$(date +%Y%m%d_%H%M%S)"
+export RESULTS_DIR
 
+# Create the results directory if it doesn't exist
 mkdir -p "$RESULTS_DIR"
 
 # Lighthouse performance testing
@@ -18,10 +20,10 @@ run_lighthouse_tests() {
     echo "Running Lighthouse performance tests..."
     
     # Desktop performance test
-    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-desktop.json"         --preset=perf         --chrome-flags="--headless --no-sandbox"
+    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-desktop.json"         --preset=perf         --disable-network-throttling         --disable-cpu-throttling         --chrome-flags="--headless --no-sandbox --disable-gpu --no-sandbox --disable-dev-shm-usage"
 
     # Mobile performance test
-    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-mobile.json"         --preset=perf         --form-factor=mobile         --chrome-flags="--headless --no-sandbox"
+    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-mobile.json"         --preset=perf         --form-factor=mobile         --disable-network-throttling         --disable-cpu-throttling         --chrome-flags="--headless --no-sandbox --disable-gpu --no-sandbox --disable-dev-shm-usage"
     
     echo "✅ Lighthouse tests completed"
 }
@@ -42,7 +44,7 @@ run_webpagetest() {
 run_load_tests() {
     echo "Running load tests with Artillery..."
     
-    cat > "$RESULTS_DIR/artillery-config.yml" << 'EOF'
+    cat > "$RESULTS_DIR/artillery-config.yml" << EOF
 config:
   target: '${TARGET_URL}'
   phases:
@@ -52,7 +54,7 @@ config:
       arrivalRate: 50
     - duration: 60
       arrivalRate: 100
-  processor: "./processor.js"
+  processor: "$RESULTS_DIR/processor.js"
 
 scenarios:
   - name: "Homepage load test"
@@ -63,7 +65,7 @@ scenarios:
       - think: 2
       - get:
           url: "/api/health"
-  
+
   - name: "API load test"
     weight: 60
     flow:
