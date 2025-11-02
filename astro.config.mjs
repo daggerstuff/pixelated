@@ -57,7 +57,8 @@ export default defineConfig({
           '@react-three/drei',
           'mongodb',
           'recharts',
-          'chart.js'
+          'chart.js',
+          'class-variance-authority'
 
         ],
         onwarn(warning, warn) {
@@ -126,7 +127,8 @@ export default defineConfig({
         '@react-three/drei',
         'mongodb',
         'recharts',
-        'chart.js'
+        'chart.js',
+        'class-variance-authority'
 
       ],
     },
@@ -156,7 +158,8 @@ export default defineConfig({
         '@react-three/drei',
         'mongodb',
         'recharts',
-        'chart.js'
+        'chart.js',
+        'class-variance-authority'
 
       ],
     },
