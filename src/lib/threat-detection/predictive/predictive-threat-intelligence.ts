@@ -215,7 +215,7 @@ export class AdvancedPredictiveThreatIntelligence
 
   async predictThreatTrends(
     historicalData: ThreatData[],
-    _timeframe: TimeWindow,
+    timeframe: TimeWindow,
   ): Promise<ThreatForecast> {
     try {
       // Validate input data
@@ -344,7 +344,7 @@ export class AdvancedPredictiveThreatIntelligence
 
   async modelThreatPropagation(
     initialThreat: Threat,
-    _network: NetworkGraph,
+    network: NetworkGraph,
   ): Promise<PropagationModel> {
     try {
       // Validate inputs
@@ -368,7 +368,7 @@ export class AdvancedPredictiveThreatIntelligence
         )
 
       // Simulate propagation
-      const simulation = await this.simulateThreatPropagation(
+      const simulation = await this.propagationModeler.simulatePropagation(
         propagationGraph,
         propagationProbabilities,
         initialThreat,
@@ -973,6 +973,49 @@ export class AdvancedPredictiveThreatIntelligence
     await collection.insertOne(forecast)
   }
 
+  private async generateContainmentStrategies(
+    _simulation: PropagationSimulation,
+    _affectedNodes: NetworkNode[],
+  ): Promise<ContainmentStrategy[]> {
+    return []
+  }
+
+  private async calculateTimeToPropagation(
+    _simulation: PropagationSimulation,
+  ): Promise<number> {
+    return 0
+  }
+
+  private async generateNovelThreatRecommendations(
+    _significantNovelThreats: NovelThreat[],
+  ): Promise<NovelThreat[]> {
+    return []
+  }
+
+  private async extractThreatFeatures(_data: ThreatData[]): Promise<any> {
+    return {}
+  }
+
+  private async analyzeTrends(
+    _timeSeries: ThreatTimeSeries[],
+    _predictions: PredictedThreat[],
+  ): Promise<any> {
+    return {}
+  }
+
+  private async evaluateModelPerformance(
+    _models: ForecastingModel[],
+    _timeSeries: ThreatTimeSeries[],
+  ): Promise<any> {
+    return {}
+  }
+
+  private async identifyAffectedNodes(
+    _simulation: PropagationSimulation,
+  ): Promise<NetworkNode[]> {
+    return []
+  }
+
   async shutdown(): Promise<void> {
     await this.redis.quit()
     await this.mongoClient.close()
@@ -981,6 +1024,18 @@ export class AdvancedPredictiveThreatIntelligence
 }
 
 // Supporting interfaces and types
+interface ModelRegistry {
+  // TODO: Add methods if needed
+}
+
+class ThreatModelRegistry implements ModelRegistry {
+  constructor(_mongoClient: MongoClient) {}
+}
+interface PropagationSimulation {
+  simulationId: string
+  results: any[]
+}
+
 interface TimeWindow {
   start: Date
   end: Date
@@ -1284,6 +1339,29 @@ abstract class RiskAssessor {
   ): Promise<RiskAssessment>
 }
 
+class SeasonalAnalyzer implements SeasonalAnalyzer {
+  async decompose(
+    _timeSeries: ThreatTimeSeries[],
+  ): Promise<SeasonalComponents> {
+    return {}
+  }
+
+  async identifyPatterns(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern[]> {
+    return []
+  }
+}
+
+class RiskAssessor implements RiskAssessor {
+  async assessRisk(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<RiskAssessment> {
+    return {} as RiskAssessment
+  }
+}
+
 // Concrete implementations
 class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
   private model: tf.Sequential | null = null
@@ -1552,5 +1630,3 @@ class ProbabilisticRiskAssessor extends RiskAssessor {
     }
   }
 }
-
-export { AdvancedPredictiveThreatIntelligence }

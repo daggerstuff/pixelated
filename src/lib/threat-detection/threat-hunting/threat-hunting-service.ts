@@ -113,7 +113,7 @@ export interface InvestigationStepResult {
 export interface InvestigationFinding {
   findingId: string
   stepId: string
-  type: 'evidence' | 'indicator' | 'anomaly' | 'conclusion'
+  type: 'evidence' | 'indicator' | 'anomaly' | 'conclusion' | 'iocs'
   title: string
   description: string
   data: Record<string, unknown>
@@ -123,17 +123,48 @@ export interface InvestigationFinding {
 }
 
 export class ThreatHuntingService extends EventEmitter {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private config: ThreatHuntingConfig
+  redis: Redis
+  mongoClient: MongoClient
+  public config: ThreatHuntingConfig
+  orchestrator: any
+  aiService: any
+  behavioralService: any
+  predictiveService: any
+  investigations: any
+  huntQueries: any
   private huntingModel: tf.Sequential | null = null
   private huntingInterval: NodeJS.Timeout | null = null
   private activeInvestigations: Map<string, Investigation> = new Map()
 
-  constructor(config: ThreatHuntingConfig) {
+  constructor(
+    redis: Redis,
+    orchestrator: any,
+    aiService: any,
+    behavioralService: any,
+    predictiveService: any,
+    config?: ThreatHuntingConfig,
+  ) {
     super()
-    this.config = config
-    this.initializeServices()
+    this.redis = redis
+    this.orchestrator = orchestrator
+    this.aiService = aiService
+    this.behavioralService = behavioralService
+    this.predictiveService = predictiveService
+    this.config =
+      config ||
+      ({
+        enabled: true,
+        maxInvestigations: 100,
+        maxHuntQueries: 50,
+        timelineRetention: 86400000, // 24 hours
+        enableAIAnalysis: true,
+        enableRealTimeHunting: true,
+        autoArchiveCompleted: true,
+        reportFormats: ['pdf', 'json', 'csv'],
+        maxResultsPerQuery: 1000,
+      } as any)
+    this.investigations = new Map()
+    this.huntQueries = new Map()
   }
 
   private async initializeServices(): Promise<void> {
@@ -251,7 +282,6 @@ export class ThreatHuntingService extends EventEmitter {
           if (result.investigationTriggered && rule.autoInvestigate) {
             await this.startInvestigation({
               huntId: result.huntId,
-              ruleId: rule.ruleId,
               priority: rule.investigationPriority,
             })
           }
@@ -339,7 +369,7 @@ export class ThreatHuntingService extends EventEmitter {
   /**
    * Execute hunt query against data sources
    */
-  private async executeHuntQuery(
+  public async executeHuntQuery(
     query: Record<string, unknown>,
   ): Promise<HuntFinding[]> {
     const findings: HuntFinding[] = []
@@ -612,7 +642,7 @@ export class ThreatHuntingService extends EventEmitter {
     try {
       const result = await tf.tidy(async () => {
         const inputTensor = tf.tensor2d([features])
-        const prediction = (await this.huntingModel.predict(
+        const prediction = (await this.huntingModel!.predict(
           inputTensor,
         )) as tf.Tensor
         const data = await prediction.data()
@@ -844,7 +874,7 @@ export class ThreatHuntingService extends EventEmitter {
           }
         } catch (error) {
           step.status = 'failed'
-          step.error = error.message
+          step.error = (error as any).message
           logger.error(`Investigation step failed: ${step.name}`, {
             error,
             investigationId,
@@ -1218,7 +1248,7 @@ export class ThreatHuntingService extends EventEmitter {
   /**
    * Update investigation in database
    */
-  private async updateInvestigation(
+  public async updateInvestigation(
     investigation: Investigation,
   ): Promise<void> {
     try {
@@ -1269,7 +1299,7 @@ export class ThreatHuntingService extends EventEmitter {
         .limit(limit)
         .toArray()
 
-      return investigations as Investigation[]
+      return investigations as unknown as Investigation[]
     } catch (error) {
       logger.error('Failed to get recent investigations:', { error })
       return []
@@ -1346,7 +1376,7 @@ export class ThreatHuntingService extends EventEmitter {
         huntsWithFindings,
         investigationsTriggered: investigations,
         criticalFindings,
-        recentHunts: recentHunts as HuntResult[],
+        recentHunts: recentHunts as unknown as HuntResult[],
       }
     } catch (error) {
       logger.error('Failed to get hunting statistics:', { error })
@@ -1428,14 +1458,195 @@ export class ThreatHuntingService extends EventEmitter {
       throw error
     }
   }
-}
 
-export type {
-  ThreatHuntingConfig,
-  HuntingRule,
-  InvestigationTemplate,
-  HuntResult,
-  HuntFinding,
-  Investigation,
-  InvestigationFinding,
+  public async createInvestigation(
+    investigationData: any,
+  ): Promise<any | { errors: string[] }> {
+    if (!investigationData.title || !investigationData.priority) {
+      return { errors: ['Invalid investigation data'] }
+    }
+    const investigationId = `inv_${await this.redis.incr('investigation:id')}`
+    const investigation = {
+      id: investigationId,
+      ...investigationData,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    }
+    await this.redis.set(
+      `investigation:${investigationId}`,
+      JSON.stringify(investigation),
+    )
+    return investigation
+  }
+
+  public async closeInvestigation(
+    investigationId: string,
+    resolutionData: any,
+  ): Promise<any> {
+    const investigation = await this.getInvestigation(investigationId)
+    if (!investigation) {
+      return null
+    }
+    const updatedInvestigation = {
+      ...investigation,
+      ...resolutionData,
+      status: 'resolved',
+      resolvedAt: new Date().toISOString(),
+    }
+    await this.redis.set(
+      `investigation:${investigationId}`,
+      JSON.stringify(updatedInvestigation),
+    )
+    return updatedInvestigation
+  }
+
+  public async getActiveInvestigations(): Promise<any[]> {
+    const keys = await this.redis.keys('investigation:inv_*')
+    const investigations = await this.redis.mget(keys)
+    return investigations
+      .map((inv) => JSON.parse(inv))
+      .filter((inv) => inv.status === 'active')
+  }
+
+  public async getInvestigationsByPriority(priority: string): Promise<any[]> {
+    const keys = await this.redis.keys('investigation:inv_*')
+    const investigations = await this.redis.mget(keys)
+    return investigations
+      .map((inv) => JSON.parse(inv))
+      .filter((inv) => inv.priority === priority)
+  }
+
+  public async createHuntQuery(queryData: any): Promise<any> {
+    const huntId = `hunt_${await this.redis.incr('hunt:id')}`
+    const huntQuery = {
+      id: huntId,
+      ...queryData,
+      status: 'active',
+    }
+    await this.redis.set(`hunt:${huntId}`, JSON.stringify(huntQuery))
+    return huntQuery
+  }
+
+  public async saveHuntTemplate(templateData: any): Promise<any> {
+    const templateId = `template_${await this.redis.incr('template:id')}`
+    const template = {
+      id: templateId,
+      ...templateData,
+    }
+    await this.redis.set(`hunt:template:${templateId}`, JSON.stringify(template))
+    return template
+  }
+
+  public async loadHuntTemplates(): Promise<any[]> {
+    const keys = await this.redis.keys('hunt:template:*')
+    const templates = await this.redis.mget(keys)
+    return templates.map((t) => JSON.parse(t))
+  }
+
+  public async scheduleHunt(queryId: string, scheduleData: any): Promise<any> {
+    const huntQuery = await this.redis.get(`hunt:${queryId}`)
+    if (!huntQuery) {
+      return null
+    }
+    const updatedQuery = {
+      ...JSON.parse(huntQuery),
+      schedule: scheduleData,
+    }
+    await this.redis.set(`hunt:${queryId}`, JSON.stringify(updatedQuery))
+    return scheduleData
+  }
+
+  public async createTimeline(
+    investigationId: string,
+    timelineData: any,
+  ): Promise<any> {
+    const timelineId = `timeline_${await this.redis.incr('timeline:id')}`
+    const timeline = {
+      id: timelineId,
+      investigationId,
+      ...timelineData,
+      events: [],
+    }
+    await this.redis.set(`timeline:${timelineId}`, JSON.stringify(timeline))
+    return timeline
+  }
+
+  public async addTimelineEvent(timelineId: string, eventData: any): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    timeline.events.push(eventData)
+    await this.redis.set(`timeline:${timelineId}`, JSON.stringify(timeline))
+    return timeline
+  }
+
+  public async analyzeTimeline(timelineId: string): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    return this.aiService.analyzePattern(timeline.events)
+  }
+
+  public async exportTimeline(timelineId: string, format: string): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    return {
+      format,
+      data: timeline,
+    }
+  }
+
+  public async searchThreatData(searchData: any): Promise<any> {
+    const { page = 1, limit = 50 } = searchData.pagination || {}
+    const keys = await this.redis.keys('threat:*')
+    const threats = await this.redis.mget(keys)
+    return {
+      data: threats.map((t) => JSON.parse(t)),
+      pagination: {
+        total: threats.length,
+        page,
+        limit,
+      },
+    }
+  }
+
+  public async analyzePatterns(threatData: any[]): Promise<any> {
+    return this.aiService.analyzePattern(threatData)
+  }
+
+  public async correlateThreatWithBehavior(threatData: any): Promise<any> {
+    const behavioralData = await this.behavioralService.getBehavioralProfile(
+      threatData.userId,
+    )
+    return {
+      behavioralRisk: behavioralData.profile.riskLevel,
+      correlatedAnomalies: behavioralData.profile.anomalies,
+    }
+  }
+
+  public async predictFutureThreats(historicalData: any[]): Promise<any> {
+    return this.predictiveService.predictThreats(historicalData)
+  }
+
+  public async performRealTimeHunting(huntingData: any): Promise<any> {
+    const matches = []
+    const anomalies = []
+    const actions = []
+    return { matches, anomalies, actions }
+  }
+
+  public async detectRealTimeAnomalies(realTimeData: any[]): Promise<any[]> {
+    const anomalies = []
+    for (const data of realTimeData) {
+      const anomaly = await this.aiService.predictAnomaly(data)
+      if (anomaly.isAnomaly) {
+        anomalies.push(anomaly)
+      }
+    }
+    return anomalies
+  }
 }
