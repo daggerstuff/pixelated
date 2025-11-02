@@ -696,6 +696,15 @@ main {
   border: none;
 }
 
+/* Ensure hidden class works with error-message */
+.error-message.text-sm.hidden {
+  display: none !important;
+}
+
+.error-message.text-sm.block {
+  display: block !important;
+}
+
 /* No icon for form validation error messages */
 .error-message.text-sm::before {
   content: none;

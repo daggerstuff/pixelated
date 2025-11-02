@@ -58,9 +58,7 @@ export default defineConfig({
           'mongodb',
           'recharts',
           'chart.js',
-          'class-variance-authority'
-
-        ],
+          ],
         onwarn(warning, warn) {
           if (
             warning.code === "SOURCEMAP_ERROR" ||
@@ -128,8 +126,6 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js',
-        'class-variance-authority'
-
       ],
     },
     optimizeDeps: {
@@ -159,8 +155,6 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js',
-        'class-variance-authority'
-
       ],
     },
   },

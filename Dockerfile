@@ -36,6 +36,7 @@ COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
 # Install production dependencies
 RUN pnpm install --prod --frozen-lockfile && \
+    pnpm add class-variance-authority && \
     pnpm store prune
 
 # Copy built output and public assets from builder

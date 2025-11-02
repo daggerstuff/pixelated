@@ -6,7 +6,12 @@ export default defineConfig({
     presetAttributify(),
     presetIcons({
       scale: 1.2,
-      warn: true,
+      warn: false, // Suppress warnings for missing icons
+      // Use CDN by default, fallback to local packages if available
+      extraProperties: {
+        display: 'inline-block',
+        'vertical-align': 'middle',
+      },
       collections: {
         // Custom validation for icon names
         custom: {

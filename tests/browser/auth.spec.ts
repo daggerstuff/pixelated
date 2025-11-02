@@ -23,8 +23,8 @@ test('login form shows validation errors', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   await page.waitForTimeout(2000) // Wait for React hydration
 
-  // Submit empty form to trigger validation
-  await page.click('button[type="submit"]')
+  // Submit empty form to trigger validation - use button click to properly trigger React onSubmit
+  await page.locator('button[type="submit"]').click()
 
   // Wait for React to process the form submission and update state
   await page.waitForTimeout(500)
