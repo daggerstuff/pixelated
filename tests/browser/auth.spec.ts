@@ -23,8 +23,8 @@ test('login form shows validation errors', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   await page.waitForTimeout(2000) // Wait for React hydration
 
-  // Submit empty form to trigger validation - use button click to properly trigger React onSubmit
-  await page.locator('button[type="submit"]').click()
+  // Submit empty form to trigger validation
+  await page.click('button[type="submit"]')
 
   // Wait for React to process the form submission and update state
   await page.waitForTimeout(500)
@@ -100,6 +100,9 @@ test('login page has proper transitions', async ({ page }) => {
   await expect(page.locator('button[type="submit"]').filter({ hasText: 'Send Reset Link' })).toBeVisible({
     timeout: 10000,
   })
+
+  // Also verify password field is hidden in reset mode
+  await expect(page.locator('input[type="password"]')).not.toBeVisible()
 })
 
 // Visual regression test for login page

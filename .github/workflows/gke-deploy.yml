@@ -430,6 +430,7 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
           create_credentials_file: true
           export_environment_variables: true
+          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -618,6 +619,7 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || secrets.GCP_WORKLOAD_IDENTITY_AUDIENCE }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -720,6 +722,7 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || secrets.GCP_WORKLOAD_IDENTITY_AUDIENCE }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

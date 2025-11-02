@@ -171,13 +171,34 @@ jobs:
           }
           EOF
 
+      - name: Check Docker Hub credentials
+        id: check_dockerhub_creds
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "has_creds=true" >> $GITHUB_OUTPUT
+            echo "docker_username=$DOCKERHUB_USERNAME" >> $GITHUB_OUTPUT
+            echo "docker_password=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
+          elif [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PAT" ]; then
+            echo "has_creds=true" >> $GITHUB_OUTPUT
+            echo "docker_username=$DOCKER_USER" >> $GITHUB_OUTPUT
+            echo "docker_password=$DOCKER_PAT" >> $GITHUB_OUTPUT
+          else
+            echo "has_creds=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Login to Docker Hub (optional)
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && ((secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') || (secrets.DOCKER_USER != '' && secrets.DOCKER_PAT != '')) }}
+        if: steps.check_dockerhub_creds.outputs.has_creds == 'true'
         id: dockerhub_login
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_PAT }}
+          username: ${{ steps.check_dockerhub_creds.outputs.docker_username }}
+          password: ${{ steps.check_dockerhub_creds.outputs.docker_password }}
           logout: true
 
       - name: Push Docker images to Docker Hub (optional)
