@@ -7,9 +7,9 @@ permissions:
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
-    branches: [main, master]
+    branches: [master]
   workflow_dispatch:
     inputs:
       deployment_strategy:
@@ -32,7 +32,7 @@ on:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.19.0"
+  PNPM_VERSION: "10.20.0"
   PYTHON_VERSION: "3.11"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -151,12 +151,12 @@ jobs:
             else
               echo "⚠️ Install attempt $i failed, checking git status..."
               git status || echo "Git status check completed"
-              
+
               if [ $i -lt 3 ]; then
                 DELAY=$((5 * i))
                 echo "⏳ Retrying in $DELAY seconds..."
                 sleep $DELAY
-                
+
                 # Try to clean up any partial state
                 echo "🧹 Cleaning up partial installation state..."
                 rm -rf node_modules/.pnpm || true
@@ -210,7 +210,7 @@ jobs:
             SENTRY_DSN=$(grep "^SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             PUBLIC_SENTRY_DSN=$(grep "^PUBLIC_SENTRY_DSN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             SENTRY_AUTH_TOKEN=$(grep "^SENTRY_AUTH_TOKEN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            
+
             if [[ -n "$SENTRY_DSN" ]]; then
               echo "SENTRY_DSN=${SENTRY_DSN}" >> $GITHUB_ENV
             fi
@@ -324,7 +324,7 @@ jobs:
             SENTRY_AUTH_TOKEN=$(grep "^SENTRY_AUTH_TOKEN=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             SENTRY_ORG=$(grep "^SENTRY_ORG=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             SENTRY_PROJECT=$(grep "^SENTRY_PROJECT=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
-            
+
             if [[ -n "$SENTRY_DSN" ]]; then
               echo "SENTRY_DSN=${SENTRY_DSN}" >> $GITHUB_ENV
             fi
@@ -384,7 +384,7 @@ jobs:
             GKE_SERVICE_NAME=$(grep "^GKE_SERVICE_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GKE_ENVIRONMENT_URL=$(grep "^GKE_ENVIRONMENT_URL=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
-            
+
             if [[ -n "$GCP_PROJECT_ID" ]]; then
               echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
             fi
@@ -589,7 +589,7 @@ jobs:
             GKE_NAMESPACE=$(grep "^GKE_NAMESPACE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GKE_SERVICE_NAME=$(grep "^GKE_SERVICE_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
-            
+
             if [[ -n "$GCP_PROJECT_ID" ]]; then
               echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
             fi
@@ -697,7 +697,7 @@ jobs:
             GKE_CLUSTER_NAME=$(grep "^GKE_CLUSTER_NAME=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GKE_ZONE=$(grep "^GKE_ZONE=" .env | cut -d'=' -f2- | tr -d "'\"" || echo "")
             GCP_SERVICE_ACCOUNT_KEY=$(grep "^GCP_SERVICE_ACCOUNT_KEY=" .env | cut -d'=' -f2- | sed 's/^'\''//;s/'\''$//' || echo "")
-            
+
             if [[ -n "$GCP_PROJECT_ID" ]]; then
               echo "GCP_PROJECT_ID=${GCP_PROJECT_ID}" >> $GITHUB_ENV
             fi

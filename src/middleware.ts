@@ -2,11 +2,7 @@ import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
-<<<<<<< HEAD
-import type { APIContext, MiddlewareNext } from 'astro';
-=======
 import type { APIContext, MiddlewareNext } from 'astro'
->>>>>>> 335655f248127a872a947ec01aaa8011e6948ad0
 
 // Simple route matcher for protected API routes
 const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
