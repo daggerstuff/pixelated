@@ -115,10 +115,19 @@ cleanup_memory() {
 # Main execution
 main() {
     echo "🚀 Starting memory-optimized build for Pixelated Empathy"
-    
+
     # Pre-build cleanup
     cleanup_memory
-    
+
+    # Install dependencies before build
+    echo "📦 Installing dependencies..."
+    if pnpm install --frozen-lockfile --prefer-offline; then
+        echo "✅ Dependencies installed successfully"
+    else
+        echo "❌ Failed to install dependencies"
+        exit 1
+    fi
+
     # Build with memory optimization
     if build_with_memory_optimization; then
         echo "✅ Memory-optimized build completed successfully"
