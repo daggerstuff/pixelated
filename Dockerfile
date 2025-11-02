@@ -29,10 +29,13 @@ RUN pnpm build
 FROM node:24-slim AS runtime
 WORKDIR /app
 
-# Install pnpm before creating user (install as root, then switch to non-root)
+# Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 ARG PNPM_VERSION=10.20.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libstdc++6 \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version

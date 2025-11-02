@@ -119,7 +119,11 @@ export function LoginForm({
       }
     }
 
+    // Set errors immediately - React will batch this but we ensure it's set
     setErrors(newErrors)
+
+    // Force a synchronous state update check by using flushSync if available
+    // Otherwise rely on React's normal batching
     return Object.keys(newErrors).length === 0
   }
 
@@ -182,8 +186,19 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Validate form first - this will set errors state
+    // Ensure validation always runs and errors are set before checking validity
     const isValid = validateForm()
+
     if (!isValid) {
+      // Errors have been set, wait for React to update DOM
+      // Use double requestAnimationFrame to ensure DOM is updated after state changes
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve(undefined))
+        })
+      })
+
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',

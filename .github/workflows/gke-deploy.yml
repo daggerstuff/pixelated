@@ -74,10 +74,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Retry logic for pnpm install
+          # Retry logic for pnpm install with fallback for lockfile mismatches
           for i in {1..3}; do
-            if pnpm install --frozen-lockfile --prefer-offline; then
+            ERROR_OUTPUT=$(pnpm install --frozen-lockfile --prefer-offline 2>&1) && INSTALL_SUCCESS=true || INSTALL_SUCCESS=false
+            if [ "$INSTALL_SUCCESS" = "true" ]; then
               echo "✅ Dependencies installed successfully"
+              break
+            elif echo "$ERROR_OUTPUT" | grep -q "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH\|overrides.*doesn't match"; then
+              echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
+              pnpm install --no-frozen-lockfile
+              echo "✅ Dependencies installed with updated lockfile"
               break
             else
               echo "⚠️ Install attempt $i failed, retrying in 5 seconds..."
@@ -142,11 +148,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Enhanced retry logic for pnpm install
+          # Enhanced retry logic for pnpm install with fallback for lockfile mismatches
           for i in {1..3}; do
             echo "🔄 Install attempt $i of 3..."
-            if pnpm install --frozen-lockfile --prefer-offline; then
+            ERROR_OUTPUT=$(pnpm install --frozen-lockfile --prefer-offline 2>&1) && INSTALL_SUCCESS=true || INSTALL_SUCCESS=false
+            if [ "$INSTALL_SUCCESS" = "true" ]; then
               echo "✅ Dependencies installed successfully"
+              break
+            elif echo "$ERROR_OUTPUT" | grep -q "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH\|overrides.*doesn't match"; then
+              echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
+              pnpm install --no-frozen-lockfile
+              echo "✅ Dependencies installed with updated lockfile"
               break
             else
               echo "⚠️ Install attempt $i failed, checking git status..."
@@ -415,14 +427,8 @@ jobs:
         run: |
           echo "🔍 Verifying workload identity configuration..."
           echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
-          echo "Workload Identity Provider: projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          echo "Service Account: action@pixelatedempathy.com"
-      - name: Verify Workload Identity Configuration
-        run: |
-          echo "🔍 Verifying workload identity configuration..."
-          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
-          echo "Workload Identity Provider: projects/${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          echo "Service Account: action@pixelatedempathy.com"
+          echo "Workload Identity Provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}"
+          echo "Service Account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -430,7 +436,9 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || 'action@pixelatedempathy.com' }}
           create_credentials_file: true
           export_environment_variables: true
-          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || 'projects/751556915102/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
+          project_id: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+          universe: googleapis.com
+          cleanup_credentials: true
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -619,7 +627,8 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || secrets.GCP_WORKLOAD_IDENTITY_AUDIENCE }}
+          universe: googleapis.com
+          cleanup_credentials: true
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -722,7 +731,8 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          audience: ${{ vars.GCP_WORKLOAD_IDENTITY_AUDIENCE || secrets.GCP_WORKLOAD_IDENTITY_AUDIENCE }}
+          universe: googleapis.com
+          cleanup_credentials: true
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

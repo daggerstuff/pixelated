@@ -44,6 +44,18 @@ vi.mock('../../mcp/phase6-integration', () => ({
   updatePhase6AuthenticationProgress: vi.fn(),
 }))
 
+vi.mock('../../redis', () => ({
+  redis: {
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
+    keys: vi.fn(),
+  },
+  getFromCache: vi.fn(),
+  setInCache: vi.fn(),
+  removeFromCache: vi.fn(),
+}))
+
 describe('Authentication Middleware', () => {
   let mockRequest: Request
   let _mockResponse: Response
