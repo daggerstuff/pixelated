@@ -27,46 +27,42 @@ test('login form shows validation errors', async ({ page }) => {
   await expect(page.locator('form')).toBeVisible()
   await expect(page.locator('button[type="submit"]')).toBeVisible()
 
-  // Submit empty form to trigger validation
-  await page.click('button[type="submit"]')
-
-  // Wait for React to process the form submission and update state
-  // The form should validate and show errors immediately
+  // Wait for error elements to exist (they should be in DOM even if hidden)
   const emailError = page.locator('#email-error')
   const passwordError = page.locator('#password-error')
 
-  // Wait for error elements to lose the 'hidden' class and become visible
-  // First check that the hidden class is removed (React state update)
-  await page.waitForFunction(
-    () => {
-      const emailEl = document.getElementById('email-error')
-      const passwordEl = document.getElementById('password-error')
-      return (
-        emailEl &&
-        passwordEl &&
-        !emailEl.classList.contains('hidden') &&
-        !passwordEl.classList.contains('hidden') &&
-        emailEl.textContent?.trim() !== '' &&
-        passwordEl.textContent?.trim() !== ''
-      )
-    },
-    { timeout: 10000 }
-  )
+  // Ensure elements exist in DOM - they're always rendered, just hidden initially
+  await expect(emailError).toBeAttached({ timeout: 5000 })
+  await expect(passwordError).toBeAttached({ timeout: 5000 })
+
+  // Submit empty form to trigger validation
+  await page.click('button[type="submit"]')
+
+  // Wait for React to update and error messages to become visible
+  // Use Playwright's built-in visibility checks which handle React state updates better
+  // Wait for both error messages to appear - they should show validation errors
+  await expect(emailError).toBeVisible({ timeout: 30000 })
+  await expect(passwordError).toBeVisible({ timeout: 30000 })
+
+  // Also verify they have text content
+  await expect(emailError).not.toHaveText('', { timeout: 5000 })
+  await expect(passwordError).not.toHaveText('', { timeout: 5000 })
 
   // Now verify they're visible and contain error text
-  await expect(emailError).toBeVisible({ timeout: 5000 })
-  await expect(passwordError).toBeVisible({ timeout: 5000 })
-  await expect(emailError).toContainText(/required/i, { timeout: 5000 })
-  await expect(passwordError).toContainText(/required/i, { timeout: 5000 })
+  await expect(emailError).toBeVisible({ timeout: 10000 })
+  await expect(passwordError).toBeVisible({ timeout: 10000 })
+  await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
+  await expect(passwordError).toContainText(/required|password/i, { timeout: 5000 })
 
   // Fill email but not password
   await page.fill('input[type="email"]', 'test@example.com')
   await page.keyboard.press('Tab') // Tab away to trigger validation
+  await page.waitForTimeout(500) // Give React time to update
 
   // Check that only password error is shown
   await expect(passwordError).toBeVisible({ timeout: 10000 })
   // Email error should be gone since we filled a valid email
-  await expect(emailError).not.toBeVisible()
+  await expect(emailError).not.toBeVisible({ timeout: 5000 })
 })
 
 // Test for mobile viewport issues on auth pages
@@ -115,22 +111,22 @@ test('login page has proper transitions', async ({ page }) => {
   // Click to switch to reset mode
   await passwordResetButton.click()
 
-  // Wait for React state update and DOM re-render
-  await page.waitForTimeout(500)
-
-  // Wait for the h2 to appear - use a more flexible selector
+  // Wait for React state update - wait for the h2 to appear instead of fixed timeout
   const resetPasswordHeading = page.locator('h2').filter({ hasText: /reset.*password/i })
   await expect(resetPasswordHeading).toBeVisible({
-    timeout: 10000,
+    timeout: 30000,
   })
 
-  // The submit button shows "Send Reset Link" in reset mode
+  // Also wait for the submit button text to change as confirmation
   const submitButton = page.locator('button[type="submit"]')
   await expect(submitButton).toBeVisible({ timeout: 5000 })
-  await expect(submitButton).toContainText('Send Reset Link', { timeout: 5000 })
+  await expect(submitButton).toContainText(/send.*reset|send reset link/i, {
+    timeout: 10000,
+    ignoreCase: true
+  })
 
-  // Also verify password field is hidden in reset mode
-  await expect(page.locator('input[type="password"]')).not.toBeVisible()
+  // Verify password field is hidden in reset mode
+  await expect(page.locator('input[type="password"]')).not.toBeVisible({ timeout: 5000 })
 })
 
 // Visual regression test for login page

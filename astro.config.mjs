@@ -24,6 +24,12 @@ export default defineConfig({
   build: {
     format: 'directory',
     sourcemap: process.env.NODE_ENV !== 'production',
+    copy: [
+      {
+        from: 'templates/email',
+        to: 'templates/email'
+      }
+    ],
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching

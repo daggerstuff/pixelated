@@ -1,12 +1,36 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
-import { mockPythonBridge } from './fixtures'
+
+// Create a hoisted mock instance that can be accessed by both the mock factory and tests
+const mockBridge = vi.hoisted(() => {
+  return {
+    initialize: vi.fn(),
+    checkHealth: vi.fn(),
+    runPreprocessingAnalysis: vi.fn(),
+    runModelLevelAnalysis: vi.fn(),
+    runInteractiveAnalysis: vi.fn(),
+    runEvaluationAnalysis: vi.fn(),
+    analyze_session: vi.fn(),
+  }
+})
+
+// Export the mock instance for use in tests
+export const mockPythonBridge = mockBridge
 
 // Mock the PythonBiasDetectionBridge
-vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => mockPythonBridge)
-}))
+// Use a class constructor that returns the mock instance
+vi.mock('../python-bridge', () => {
+  // Reference the hoisted mock
+  const mock = mockBridge
+  return {
+    PythonBiasDetectionBridge: class {
+      constructor() {
+        return mock
+      }
+    }
+  }
+})
 
 import {
   createDefaultAnalysisResult,

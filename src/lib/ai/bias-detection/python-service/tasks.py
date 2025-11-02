@@ -8,7 +8,11 @@ from typing import Any, List, Dict
 
 from celery.exceptions import SoftTimeLimitExceeded
 
-from bias_detection_service import BiasDetectionConfig, BiasDetectionService, SessionData
+from bias_detection_service import (
+    BiasDetectionConfig,
+    BiasDetectionService,
+    SessionData,
+)
 from celery_config import app
 
 logger = logging.getLogger(__name__)
@@ -19,7 +23,9 @@ bias_service = BiasDetectionService(config)
 
 
 @app.task(bind=True, name="bias_detection_service.analyze_session_async")
-def analyze_session_async(self, session_data_dict: dict[str, Any], user_id: str) -> dict[str, Any]:
+def analyze_session_async(
+    self, session_data_dict: dict[str, Any], user_id: str
+) -> dict[str, Any]:
     """
     Asynchronous bias analysis for a single session.
     This task can be distributed across multiple workers.
@@ -40,7 +46,9 @@ def analyze_session_async(self, session_data_dict: dict[str, Any], user_id: str)
         # Run analysis asynchronously
         result = asyncio.run(bias_service.analyze_session(session_data, user_id))
 
-        self.update_state(state="PROGRESS", meta={"progress": 90, "message": "Finalizing results"})
+        self.update_state(
+            state="PROGRESS", meta={"progress": 90, "message": "Finalizing results"}
+        )
 
         # Add task metadata
         result["celery_task_id"] = self.request.id
@@ -100,7 +108,9 @@ def batch_analyze_sessions(
                 )
 
                 # Run analysis
-                result = asyncio.run(bias_service.analyze_session(session_data, user_id))
+                result = asyncio.run(
+                    bias_service.analyze_session(session_data, user_id)
+                )
                 results.append(result)
 
             except Exception as e:
@@ -108,12 +118,16 @@ def batch_analyze_sessions(
                     f"Failed to analyze session {session_data_dict.get('session_id', 'unknown')}: {e}"
                 )
                 errors.append(
-                    {"session_id": session_data_dict.get("session_id", "unknown"), "error": str(e)}
+                    {
+                        "session_id": session_data_dict.get("session_id", "unknown"),
+                        "error": str(e),
+                    }
                 )
 
         # Final progress update
         self.update_state(
-            state="PROGRESS", meta={"progress": 95, "message": "Finalizing batch results"}
+            state="PROGRESS",
+            meta={"progress": 95, "message": "Finalizing batch results"},
         )
 
         # Compile final results
@@ -151,7 +165,9 @@ def validate_dataset_quality(
     Can be run on multiple workers for large datasets.
     """
     try:
-        self.update_state(state="PROGRESS", meta={"progress": 10, "message": "Loading dataset"})
+        self.update_state(
+            state="PROGRESS", meta={"progress": 10, "message": "Loading dataset"}
+        )
 
         # Load dataset (placeholder - implement based on your data format)
         # dataset = load_dataset(dataset_path)
@@ -170,7 +186,8 @@ def validate_dataset_quality(
         }
 
         self.update_state(
-            state="PROGRESS", meta={"progress": 70, "message": "Generating validation report"}
+            state="PROGRESS",
+            meta={"progress": 70, "message": "Generating validation report"},
         )
 
         # Determine if dataset passes quality threshold
@@ -222,7 +239,10 @@ def export_dataset_chunk(
         exported_data = list(chunk_data) if export_format == "jsonl" else chunk_data
         self.update_state(
             state="PROGRESS",
-            meta={"progress": 80, "message": f"Formatting chunk {chunk_id} for {export_format}"},
+            meta={
+                "progress": 80,
+                "message": f"Formatting chunk {chunk_id} for {export_format}",
+            },
         )
 
         result = {
@@ -235,7 +255,9 @@ def export_dataset_chunk(
             "processing_node": self.request.hostname,
         }
 
-        logger.info(f"Dataset chunk export completed: chunk {chunk_id}, {len(chunk_data)} items")
+        logger.info(
+            f"Dataset chunk export completed: chunk {chunk_id}, {len(chunk_data)} items"
+        )
 
         return result
 
@@ -332,7 +354,9 @@ def update_performance_metrics(self) -> Dict[str, Any]:
             "processing_node": self.request.hostname,
         }
 
-        logger.info(f"Performance metrics updated: {metrics['active_tasks']} active tasks")
+        logger.info(
+            f"Performance metrics updated: {metrics['active_tasks']} active tasks"
+        )
 
         return metrics
 
@@ -347,7 +371,9 @@ def chunk_data(data: List[Any], chunk_size: int) -> List[List[Any]]:
     return [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
 
 
-def distribute_task(task_name: str, data: List[Any], chunk_size: int = 100, **kwargs) -> List[Any]:
+def distribute_task(
+    task_name: str, data: List[Any], chunk_size: int = 100, **kwargs
+) -> List[Any]:
     """
     Distribute a task across multiple workers.
     Returns a group of async results.
@@ -358,7 +384,8 @@ def distribute_task(task_name: str, data: List[Any], chunk_size: int = 100, **kw
     chunks = chunk_data(data, chunk_size)
 
     task_signatures = [
-        app.signature(task_name, args=[chunk, i], kwargs=kwargs) for i, chunk in enumerate(chunks)
+        app.signature(task_name, args=[chunk, i], kwargs=kwargs)
+        for i, chunk in enumerate(chunks)
     ]
     # Execute tasks as a group
     job = group(task_signatures)

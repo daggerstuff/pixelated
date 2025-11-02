@@ -22,50 +22,50 @@ logger = structlog.get_logger(__name__)
 
 class DatabaseService:
     """Database service for PostgreSQL and MongoDB operations"""
-    
+
     def __init__(self):
         self.pg_pool: Optional[asyncpg.Pool] = None
         self.async_engine = None
         self.async_session = None
         self.is_connected = False
-        
+
     async def connect(self) -> bool:
         """Connect to databases"""
         try:
             logger.info("Connecting to databases")
-            
+
             # Connect to PostgreSQL
             pg_connected = await self._connect_postgresql()
             if not pg_connected:
                 return False
-            
+
             # Initialize database schema
             await self._initialize_schema()
-            
+
             self.is_connected = True
             logger.info("Database connections established successfully")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to connect to databases: {str(e)}", error=str(e))
             return False
-    
+
     async def disconnect(self) -> None:
         """Disconnect from databases"""
         try:
             logger.info("Disconnecting from databases")
-            
+
             # Close PostgreSQL pool
             if self.pg_pool:
                 await self.pg_pool.close()
                 self.pg_pool = None
-            
+
             self.is_connected = False
             logger.info("Database connections closed")
-            
+
         except Exception as e:
             logger.error(f"Error during database disconnect: {str(e)}", error=str(e))
-    
+
     async def _connect_postgresql(self) -> bool:
         """Connect to PostgreSQL"""
         try:
@@ -77,41 +77,39 @@ class DatabaseService:
                 command_timeout=30,
                 server_settings={
                     "application_name": "bias_detection_service",
-                    "jit": "off"  # Disable JIT for better performance
-                }
+                    "jit": "off",  # Disable JIT for better performance
+                },
             )
-            
+
             # Test connection
             async with self.pg_pool.acquire() as conn:
                 await conn.execute("SELECT 1")
-            
+
             # Create SQLAlchemy async engine for ORM operations
             self.async_engine = create_async_engine(
                 str(settings.database_url),
                 pool_size=10,
                 max_overflow=20,
                 pool_pre_ping=True,
-                pool_recycle=3600
+                pool_recycle=3600,
             )
-            
+
             self.async_session = sessionmaker(
-                self.async_engine,
-                class_=AsyncSession,
-                expire_on_commit=False
+                self.async_engine, class_=AsyncSession, expire_on_commit=False
             )
-            
+
             logger.info("PostgreSQL connection established")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to connect to PostgreSQL: {str(e)}", error=str(e))
             return False
-    
+
     async def _initialize_schema(self) -> None:
         """Initialize database schema"""
         try:
             logger.info("Initializing database schema")
-            
+
             schema_sql = """
             -- Bias analysis results table
             CREATE TABLE IF NOT EXISTS bias_analyses (
@@ -226,26 +224,30 @@ class DatabaseService:
             ('enable_async_processing', 'true', 'Enable async processing')
             ON CONFLICT (key) DO NOTHING;
             """
-            
+
             async with self.pg_pool.acquire() as conn:
                 await conn.execute(schema_sql)
-            
+
             logger.info("Database schema initialized successfully")
-            
+
         except Exception as e:
-            logger.error(f"Failed to initialize database schema: {str(e)}", error=str(e))
+            logger.error(
+                f"Failed to initialize database schema: {str(e)}", error=str(e)
+            )
             raise
-    
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
+    )
     async def store_analysis(self, analysis: BiasAnalysisResponse) -> bool:
         """Store bias analysis result"""
         try:
             logger.info(
                 "Storing analysis result",
                 analysis_id=str(analysis.id),
-                request_id=analysis.request_id
+                request_id=analysis.request_id,
             )
-            
+
             # Store main analysis
             async with self.pg_pool.acquire() as conn:
                 await conn.execute(
@@ -282,9 +284,9 @@ class DatabaseService:
                     analysis.language_detected,
                     analysis.word_count,
                     analysis.status.value,
-                    analysis.completed_at
+                    analysis.completed_at,
                 )
-                
+
                 # Store individual bias scores
                 for bias_score in analysis.bias_scores:
                     await conn.execute(
@@ -302,69 +304,68 @@ class DatabaseService:
                         bias_score.confidence,
                         bias_score.confidence_level.value,
                         json.dumps(bias_score.evidence),
-                        bias_score.explanation
+                        bias_score.explanation,
                     )
-            
-            logger.info("Analysis result stored successfully", analysis_id=str(analysis.id))
+
+            logger.info(
+                "Analysis result stored successfully", analysis_id=str(analysis.id)
+            )
             return True
-            
+
         except Exception as e:
             logger.error(
                 f"Failed to store analysis result: {str(e)}",
                 analysis_id=str(analysis.id),
-                error=str(e)
+                error=str(e),
             )
             return False
-    
+
     async def get_analysis_by_id(self, analysis_id: str) -> Optional[Dict[str, Any]]:
         """Get analysis by ID"""
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    "SELECT * FROM bias_analyses WHERE id = $1",
-                    analysis_id
+                    "SELECT * FROM bias_analyses WHERE id = $1", analysis_id
                 )
-                
+
                 if row:
                     return dict(row)
-                
+
                 return None
-                
+
         except Exception as e:
             logger.error(
                 f"Failed to get analysis by ID: {str(e)}",
                 analysis_id=analysis_id,
-                error=str(e)
+                error=str(e),
             )
             return None
-    
-    async def get_analysis_by_request_id(self, request_id: str) -> Optional[Dict[str, Any]]:
+
+    async def get_analysis_by_request_id(
+        self, request_id: str
+    ) -> Optional[Dict[str, Any]]:
         """Get analysis by request ID"""
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    "SELECT * FROM bias_analyses WHERE request_id = $1",
-                    request_id
+                    "SELECT * FROM bias_analyses WHERE request_id = $1", request_id
                 )
-                
+
                 if row:
                     return dict(row)
-                
+
                 return None
-                
+
         except Exception as e:
             logger.error(
                 f"Failed to get analysis by request ID: {str(e)}",
                 request_id=request_id,
-                error=str(e)
+                error=str(e),
             )
             return None
-    
+
     async def get_user_analyses(
-        self,
-        user_id: str,
-        limit: int = 100,
-        offset: int = 0
+        self, user_id: str, limit: int = 100, offset: int = 0
     ) -> List[Dict[str, Any]]:
         """Get analyses for a user"""
         try:
@@ -378,23 +379,18 @@ class DatabaseService:
                     """,
                     user_id,
                     limit,
-                    offset
+                    offset,
                 )
-                
+
                 return [dict(row) for row in rows]
-                
+
         except Exception as e:
             logger.error(
-                f"Failed to get user analyses: {str(e)}",
-                user_id=user_id,
-                error=str(e)
+                f"Failed to get user analyses: {str(e)}", user_id=user_id, error=str(e)
             )
             return []
-    
-    async def get_analytics_summary(
-        self,
-        days: int = 30
-    ) -> Dict[str, Any]:
+
+    async def get_analytics_summary(self, days: int = 30) -> Dict[str, Any]:
         """Get analytics summary for the last N days"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -404,18 +400,18 @@ class DatabaseService:
                     SELECT COUNT(*) FROM bias_analyses 
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
-                    days
+                    days,
                 )
-                
+
                 # Average bias score
                 avg_bias_score = await conn.fetchval(
                     """
                     SELECT AVG(overall_bias_score) FROM bias_analyses 
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
-                    days
+                    days,
                 )
-                
+
                 # Bias type distribution
                 bias_distribution = await conn.fetch(
                     """
@@ -426,9 +422,9 @@ class DatabaseService:
                     GROUP BY bias_type
                     ORDER BY count DESC
                     """,
-                    days
+                    days,
                 )
-                
+
                 # Processing time statistics
                 processing_stats = await conn.fetchrow(
                     """
@@ -439,9 +435,9 @@ class DatabaseService:
                     FROM bias_analyses 
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
-                    days
+                    days,
                 )
-                
+
                 return {
                     "total_analyses": total_analyses or 0,
                     "avg_bias_score": float(avg_bias_score or 0),
@@ -449,18 +445,18 @@ class DatabaseService:
                         {"bias_type": row["bias_type"], "count": row["count"]}
                         for row in bias_distribution
                     ],
-                    "processing_stats": dict(processing_stats) if processing_stats else {},
-                    "time_period_days": days
+                    "processing_stats": (
+                        dict(processing_stats) if processing_stats else {}
+                    ),
+                    "time_period_days": days,
                 }
-                
+
         except Exception as e:
             logger.error(
-                f"Failed to get analytics summary: {str(e)}",
-                days=days,
-                error=str(e)
+                f"Failed to get analytics summary: {str(e)}", days=days, error=str(e)
             )
             return {}
-    
+
     async def track_api_usage(
         self,
         user_id: Optional[str],
@@ -470,7 +466,7 @@ class DatabaseService:
         status_code: int,
         response_time_ms: int,
         request_size_bytes: int = 0,
-        response_size_bytes: int = 0
+        response_size_bytes: int = 0,
     ) -> bool:
         """Track API usage"""
         try:
@@ -489,19 +485,17 @@ class DatabaseService:
                     status_code,
                     response_time_ms,
                     request_size_bytes,
-                    response_size_bytes
+                    response_size_bytes,
                 )
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(
-                f"Failed to track API usage: {str(e)}",
-                endpoint=endpoint,
-                error=str(e)
+                f"Failed to track API usage: {str(e)}", endpoint=endpoint, error=str(e)
             )
             return False
-    
+
     async def update_model_metrics(
         self,
         model_name: str,
@@ -509,34 +503,44 @@ class DatabaseService:
         prediction_count: int = 1,
         processing_time_ms: Optional[int] = None,
         accuracy_score: Optional[float] = None,
-        error_count: int = 0
+        error_count: int = 0,
     ) -> bool:
         """Update model performance metrics"""
         try:
             async with self.pg_pool.acquire() as conn:
                 # Get current metrics
                 current_metrics = await conn.fetchrow(
-                    "SELECT * FROM model_metrics WHERE model_name = $1",
-                    model_name
+                    "SELECT * FROM model_metrics WHERE model_name = $1", model_name
                 )
-                
+
                 if current_metrics:
                     # Update existing metrics
-                    new_prediction_count = current_metrics["prediction_count"] + prediction_count
+                    new_prediction_count = (
+                        current_metrics["prediction_count"] + prediction_count
+                    )
                     new_error_count = current_metrics["error_count"] + error_count
-                    
+
                     # Calculate new average processing time
                     if processing_time_ms and current_metrics["avg_processing_time_ms"]:
-                        total_time = current_metrics["avg_processing_time_ms"] * current_metrics["prediction_count"]
-                        new_avg_time = (total_time + processing_time_ms) / new_prediction_count
+                        total_time = (
+                            current_metrics["avg_processing_time_ms"]
+                            * current_metrics["prediction_count"]
+                        )
+                        new_avg_time = (
+                            total_time + processing_time_ms
+                        ) / new_prediction_count
                     elif processing_time_ms:
                         new_avg_time = processing_time_ms
                     else:
                         new_avg_time = current_metrics["avg_processing_time_ms"]
-                    
+
                     # Update accuracy if provided
-                    new_accuracy = accuracy_score if accuracy_score else current_metrics["accuracy_score"]
-                    
+                    new_accuracy = (
+                        accuracy_score
+                        if accuracy_score
+                        else current_metrics["accuracy_score"]
+                    )
+
                     await conn.execute(
                         """
                         UPDATE model_metrics 
@@ -551,7 +555,7 @@ class DatabaseService:
                         new_avg_time,
                         new_accuracy,
                         new_error_count,
-                        model_name
+                        model_name,
                     )
                 else:
                     # Insert new metrics
@@ -569,81 +573,76 @@ class DatabaseService:
                         prediction_count,
                         processing_time_ms,
                         accuracy_score,
-                        error_count
+                        error_count,
                     )
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(
                 f"Failed to update model metrics: {str(e)}",
                 model_name=model_name,
-                error=str(e)
+                error=str(e),
             )
             return False
-    
+
     async def get_model_metrics(self, model_name: str) -> Optional[Dict[str, Any]]:
         """Get model performance metrics"""
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    "SELECT * FROM model_metrics WHERE model_name = $1",
-                    model_name
+                    "SELECT * FROM model_metrics WHERE model_name = $1", model_name
                 )
-                
+
                 if row:
                     return dict(row)
-                
+
                 return None
-                
+
         except Exception as e:
             logger.error(
                 f"Failed to get model metrics: {str(e)}",
                 model_name=model_name,
-                error=str(e)
+                error=str(e),
             )
             return None
-    
+
     async def get_health_status(self) -> Dict[str, Any]:
         """Get database service health status"""
         if not self.is_connected:
             return {
                 "status": "unhealthy",
                 "connected": False,
-                "error": "Not connected to database"
+                "error": "Not connected to database",
             }
-        
+
         try:
             async with self.pg_pool.acquire() as conn:
                 # Test basic query
                 result = await conn.fetchrow("SELECT 1 as test")
-                
+
                 if result and result["test"] == 1:
                     # Get connection pool stats
                     pool_stats = {
                         "size": self.pg_pool.get_size(),
                         "max_size": self.pg_pool.get_max_size(),
-                        "idle_connections": self.pg_pool.get_idle_size()
+                        "idle_connections": self.pg_pool.get_idle_size(),
                     }
-                    
+
                     return {
                         "status": "healthy",
                         "connected": True,
-                        "pool_stats": pool_stats
+                        "pool_stats": pool_stats,
                     }
                 else:
                     return {
                         "status": "degraded",
                         "connected": True,
-                        "error": "Test query failed"
+                        "error": "Test query failed",
                     }
-                    
+
         except Exception as e:
-            return {
-                "status": "unhealthy",
-                "connected": True,
-                "error": str(e)
-            }
+            return {"status": "unhealthy", "connected": True, "error": str(e)}
 
 
 # Global database service instance

@@ -51,7 +51,9 @@ try:
     HF_EVALUATE_AVAILABLE = True
 except ImportError:
     HF_EVALUATE_AVAILABLE = False
-    logging.warning("Hugging Face evaluate not available, using fallback implementations")
+    logging.warning(
+        "Hugging Face evaluate not available, using fallback implementations"
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +147,12 @@ class RealFairlearnAnalyzer:
                 "gender": ["male", "female", "non-binary", "other"],
                 "ethnicity": ["white", "black", "hispanic", "asian", "native", "mixed"],
                 "language": ["en", "es", "fr", "zh", "other"],
-                "session_type": ["individual", "group", "family", "crisis-intervention"],
+                "session_type": [
+                    "individual",
+                    "group",
+                    "family",
+                    "crisis-intervention",
+                ],
             }
             if feature_name in common_values:
                 self.label_encoders[feature_name].fit(common_values[feature_name])
@@ -172,8 +179,24 @@ class RealFairlearnAnalyzer:
 
     def _calculate_simple_sentiment(self, text: str) -> float:
         """Simple sentiment calculation based on word lists"""
-        positive_words = ["good", "great", "excellent", "amazing", "wonderful", "happy", "joy"]
-        negative_words = ["bad", "terrible", "awful", "horrible", "sad", "angry", "frustrated"]
+        positive_words = [
+            "good",
+            "great",
+            "excellent",
+            "amazing",
+            "wonderful",
+            "happy",
+            "joy",
+        ]
+        negative_words = [
+            "bad",
+            "terrible",
+            "awful",
+            "horrible",
+            "sad",
+            "angry",
+            "frustrated",
+        ]
 
         words = text.lower().split()
         positive_count = sum(1 for word in words if word in positive_words)
@@ -193,14 +216,18 @@ class RealFairlearnAnalyzer:
             return
 
         # Split data for training
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
 
         # Scale features
         X_train_scaled = self.scaler.fit_transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
 
         # Train model (use Random Forest for better interpretability)
-        self.model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10)
+        self.model = RandomForestClassifier(
+            n_estimators=100, random_state=42, max_depth=10
+        )
         self.model.fit(X_train_scaled, y_train)
 
         # Calculate training accuracy
@@ -211,7 +238,9 @@ class RealFairlearnAnalyzer:
         self.is_trained = True
 
     async def analyze_fairness(
-        self, session_data: Dict[str, Any], sensitive_features: Optional[np.ndarray] = None
+        self,
+        session_data: Dict[str, Any],
+        sensitive_features: Optional[np.ndarray] = None,
     ) -> Dict[str, Any]:
         """Perform real fairness analysis using Fairlearn"""
         try:
@@ -222,7 +251,11 @@ class RealFairlearnAnalyzer:
             X_scaled = self.scaler.transform(X) if self.is_trained else X
 
             # Generate predictions
-            if self.is_trained and self.model != "rule_based" and self.model is not None:
+            if (
+                self.is_trained
+                and self.model != "rule_based"
+                and self.model is not None
+            ):
                 predictions = self.model.predict(X_scaled)
                 probabilities = self.model.predict_proba(X_scaled)
             else:
@@ -235,20 +268,28 @@ class RealFairlearnAnalyzer:
                 sensitive_features = sensitive_attrs
 
             # Calculate fairness metrics using Fairlearn
-            if FAIRLEARN_AVAILABLE and len(predictions) > 1 and sensitive_features is not None:
+            if (
+                FAIRLEARN_AVAILABLE
+                and len(predictions) > 1
+                and sensitive_features is not None
+            ):
                 try:
                     # Demographic parity difference
                     dp_diff = demographic_parity_difference(
                         y_true=np.array([0, 1]),  # Dummy for single prediction
                         y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[: len(predictions)],
+                        sensitive_features=sensitive_features.flatten()[
+                            : len(predictions)
+                        ],
                     )
 
                     # Equalized odds difference
                     eo_diff = equalized_odds_difference(
                         y_true=np.array([0, 1]),  # Dummy for single prediction
                         y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[: len(predictions)],
+                        sensitive_features=sensitive_features.flatten()[
+                            : len(predictions)
+                        ],
                     )
 
                     bias_score = float(max(abs(dp_diff), abs(eo_diff)))
@@ -265,7 +306,9 @@ class RealFairlearnAnalyzer:
 
             return {
                 "bias_score": min(bias_score, 1.0),
-                "demographic_parity_difference": dp_diff if "dp_diff" in locals() else 0.0,
+                "demographic_parity_difference": (
+                    dp_diff if "dp_diff" in locals() else 0.0
+                ),
                 "equalized_odds_difference": eo_diff if "eo_diff" in locals() else 0.0,
                 "dataset_size": len(X),
                 "predictions_generated": True,
@@ -299,7 +342,9 @@ class RealInterpretabilityAnalyzer:
             except Exception as e:
                 logger.warning(f"SHAP initialization failed: {e}")
 
-    def _initialize_lime(self, training_data: np.ndarray, feature_names: List[str]) -> None:
+    def _initialize_lime(
+        self, training_data: np.ndarray, feature_names: List[str]
+    ) -> None:
         """Initialize LIME explainer"""
         if LIME_AVAILABLE:
             try:
@@ -346,7 +391,9 @@ class RealInterpretabilityAnalyzer:
                     results["feature_importance"] = feature_importance
                     results["methods_used"].append("shap")
                     results["explanation_quality"] = 0.85
-                    results["bias_score"] = float(np.mean(list(feature_importance.values())))
+                    results["bias_score"] = float(
+                        np.mean(list(feature_importance.values()))
+                    )
 
                 except Exception as e:
                     logger.warning(f"SHAP analysis failed: {e}")
@@ -356,7 +403,11 @@ class RealInterpretabilityAnalyzer:
                 try:
                     lime_exp = self.lime_explainer.explain_instance(
                         input_data[0],
-                        model.predict_proba if hasattr(model, "predict_proba") else model.predict,
+                        (
+                            model.predict_proba
+                            if hasattr(model, "predict_proba")
+                            else model.predict
+                        ),
                         num_features=min(5, len(feature_names)),
                     )
 
@@ -369,7 +420,9 @@ class RealInterpretabilityAnalyzer:
                         results["feature_importance"] = lime_features
 
                     results["methods_used"].append("lime")
-                    results["explanation_quality"] = max(results["explanation_quality"], 0.75)
+                    results["explanation_quality"] = max(
+                        results["explanation_quality"], 0.75
+                    )
 
                 except Exception as e:
                     logger.warning(f"LIME analysis failed: {e}")
@@ -408,7 +461,10 @@ class RealHuggingFaceAnalyzer:
         """Analyze text for bias using Hugging Face models"""
         try:
             if not HF_EVALUATE_AVAILABLE:
-                return {"bias_score": 0.0, "error": "Hugging Face evaluate not available"}
+                return {
+                    "bias_score": 0.0,
+                    "error": "Hugging Face evaluate not available",
+                }
 
             results = {
                 "bias_score": 0.0,
@@ -422,7 +478,14 @@ class RealHuggingFaceAnalyzer:
                 try:
                     if metric_name == "toxicity":
                         # Use a simple heuristic for toxicity (placeholder for real model)
-                        toxic_words = ["hate", "stupid", "idiot", "awful", "terrible", "worst"]
+                        toxic_words = [
+                            "hate",
+                            "stupid",
+                            "idiot",
+                            "awful",
+                            "terrible",
+                            "worst",
+                        ]
                         toxicity_score = (
                             sum(1 for word in toxic_words if word in text.lower())
                             / len(text.split())
@@ -462,12 +525,20 @@ class RealHuggingFaceAnalyzer:
             # Calculate overall bias score
             bias_indicators = [
                 results["toxicity_score"],
-                1.0 - (results["fairness_metrics"].get("regard", 0.5) * 2),  # Convert to bias score
-                1.0 - results["fairness_metrics"].get("honest", 0.8),  # Convert to bias score
+                1.0
+                - (
+                    results["fairness_metrics"].get("regard", 0.5) * 2
+                ),  # Convert to bias score
+                1.0
+                - results["fairness_metrics"].get(
+                    "honest", 0.8
+                ),  # Convert to bias score
             ]
 
             results["bias_score"] = float(np.mean(bias_indicators))
-            results["confidence"] = 0.7  # Moderate confidence for heuristic-based analysis
+            results["confidence"] = (
+                0.7  # Moderate confidence for heuristic-based analysis
+            )
 
             return results
 
@@ -508,7 +579,9 @@ async def get_real_hf_analysis(text: str) -> Dict[str, Any]:
 
 
 # Utility functions for other analysis types
-async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
+async def get_real_interaction_patterns_analysis(
+    session_data: Dict[str, Any],
+) -> Dict[str, Any]:
     """Real analysis of interaction patterns"""
     try:
         # Analyze response patterns, timing, and engagement
@@ -520,7 +593,9 @@ async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -
             response_variance = np.var(response_times)
 
             # Higher variance might indicate inconsistent treatment
-            bias_score = min(float(response_variance / (avg_response_time + 1) * 0.1), 1.0)
+            bias_score = min(
+                float(response_variance / (avg_response_time + 1) * 0.1), 1.0
+            )
         else:
             bias_score = 0.0
 
@@ -536,7 +611,9 @@ async def get_real_interaction_patterns_analysis(session_data: Dict[str, Any]) -
         return {"bias_score": 0.0, "error": str(e)}
 
 
-async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
+async def get_real_engagement_levels_analysis(
+    session_data: Dict[str, Any],
+) -> Dict[str, Any]:
     """Real analysis of engagement levels"""
     try:
         content = session_data.get("content", "")
@@ -545,7 +622,9 @@ async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> D
         # Analyze content depth and response quality
         content_length = len(content)
         avg_response_length = (
-            np.mean([len(r.get("content", "")) for r in ai_responses]) if ai_responses else 0
+            np.mean([len(r.get("content", "")) for r in ai_responses])
+            if ai_responses
+            else 0
         )
 
         # Calculate engagement variance
@@ -567,7 +646,9 @@ async def get_real_engagement_levels_analysis(session_data: Dict[str, Any]) -> D
         return {"bias_score": 0.0, "error": str(e)}
 
 
-async def get_real_outcome_fairness_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
+async def get_real_outcome_fairness_analysis(
+    session_data: Dict[str, Any],
+) -> Dict[str, Any]:
     """Real analysis of outcome fairness"""
     try:
         expected_outcomes = session_data.get("expected_outcomes", [])
@@ -593,7 +674,9 @@ async def get_real_outcome_fairness_analysis(session_data: Dict[str, Any]) -> Di
         return {"bias_score": 0.0, "error": str(e)}
 
 
-async def get_real_performance_disparities_analysis(session_data: Dict[str, Any]) -> Dict[str, Any]:
+async def get_real_performance_disparities_analysis(
+    session_data: Dict[str, Any],
+) -> Dict[str, Any]:
     """Real analysis of performance disparities"""
     try:
         ai_responses = session_data.get("ai_responses", [])

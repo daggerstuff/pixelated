@@ -13,7 +13,7 @@ from .app import create_app
 
 __all__ = [
     "Settings",
-    "BiasAnalysisRequest", 
+    "BiasAnalysisRequest",
     "BiasAnalysisResponse",
     "BiasDetectionService",
     "create_app",

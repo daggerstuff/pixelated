@@ -107,8 +107,14 @@ def create_test_session_data() -> SessionData:
         ],
         expected_outcomes=[{"outcome": "improved_mood", "confidence": 0.8}],
         transcripts=[
-            {"text": "I feel anxious about my job", "timestamp": "2024-01-01T10:00:00Z"},
-            {"text": "The workload is overwhelming", "timestamp": "2024-01-01T10:05:00Z"},
+            {
+                "text": "I feel anxious about my job",
+                "timestamp": "2024-01-01T10:00:00Z",
+            },
+            {
+                "text": "The workload is overwhelming",
+                "timestamp": "2024-01-01T10:05:00Z",
+            },
         ],
         metadata={"version": "1.0", "session_type": "therapy"},
     )

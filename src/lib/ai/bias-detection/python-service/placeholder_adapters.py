@@ -33,7 +33,9 @@ class PlaceholderAdapters:
         # This ensures consistent test results while maintaining some variance
         # Use sensitive_features in the calculation to avoid unused parameter warning
         feature_sum = np.sum(sensitive_features) if len(sensitive_features) > 0 else 0
-        return np.array([1 if (i + int(feature_sum)) % 2 == 0 else 0 for i in range(len(y_true))])
+        return np.array(
+            [1 if (i + int(feature_sum)) % 2 == 0 else 0 for i in range(len(y_true))]
+        )
 
     @staticmethod
     def interpretability_placeholder_analysis() -> dict[str, Any]:

@@ -74,6 +74,7 @@ RUN pnpm install --prod --frozen-lockfile && \
 # Copy built output and public assets from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/start-server.mjs ./start-server.mjs
 COPY --from=builder /app/instrument.mjs ./instrument.mjs
 
