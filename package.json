@@ -342,6 +342,9 @@
     "wait-on": "^9.0.1"
   },
   "pnpm": {
+    "overrides": {
+      "tmp": ">=0.2.4"
+    },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",
       "domexception": "4.0.0",

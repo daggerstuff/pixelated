@@ -252,7 +252,9 @@ jobs:
 
       - name: Output image info
         run: |
-          echo "image-tag=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+          # Extract first tag from multi-line tags output
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
+          echo "image-tag=${FIRST_TAG}" >> $GITHUB_OUTPUT
           echo "image-digest=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
 
   # Security scanning stage

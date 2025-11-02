@@ -1,1 +1,0 @@
-Started addressing Hound comments for PR #98. Fetched PR metadata (partial), ran `pnpm lint` and `pnpm lint:fix`, applied small style fixes to representative files (scripts/blog-cli.js, scripts/blog-web.js, src/lib/quicksort.js), and prepared to paginate PR comments for full hound extraction. Next: fetch all PR review comments for #98 and filter to author 'hound'.

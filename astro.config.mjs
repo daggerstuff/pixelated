@@ -23,13 +23,60 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-    sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
+    sourcemap: process.env.NODE_ENV !== 'production',
+    rollupOptions: {
+      output: {
+        // Manual chunk splitting for better caching
+        manualChunks: (id) => {
+          // React ecosystem
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
+          }
+          // UI libraries
+          if (id.includes('framer-motion') || id.includes('lucide-react')) {
+            return 'ui-vendor';
+          }
+          // Utility libraries
+          if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+            return 'utils-vendor';
+          }
+          // Chart libraries
+          if (id.includes('recharts') || id.includes('chart.js')) {
+            return 'charts-vendor';
+          }
+          // 3D libraries
+          if (id.includes('three') || id.includes('@react-three')) {
+            return 'three-vendor';
+          }
+          // Node modules (keep separate for better caching)
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+        // Optimized chunk naming for better caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    }
   },
   vite: {
     build: {
-      sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
-      target: 'node22',
-      chunkSizeWarningLimit: 1500,
+      sourcemap: process.env.NODE_ENV === 'production' ? false : 'hidden',
+      target: 'node24',
+      chunkSizeWarningLimit: process.env.NODE_ENV === 'production' ? 500 : 1500,
+      // Enable minification in production
+      minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+      terserOptions: process.env.NODE_ENV === 'production' ? {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log', 'console.info', 'console.debug']
+        },
+        mangle: {
+          safari10: true
+        }
+      } : {},
       rollupOptions: {
         external: [
           '@google-cloud/storage',
@@ -58,7 +105,7 @@ export default defineConfig({
           'mongodb',
           'recharts',
           'chart.js',
-          ],
+        ],
         onwarn(warning, warn) {
           if (
             warning.code === "SOURCEMAP_ERROR" ||
@@ -78,7 +125,15 @@ export default defineConfig({
         }
       }
     },
-    plugins: [visualizer()],
+    plugins: [
+      // Bundle analyzer for production builds
+      ...(process.env.ANALYZE_BUNDLE === '1' ? [visualizer({
+        filename: 'dist/bundle-analysis.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true
+      })] : [])
+    ],
     resolve: {
       alias: {
         '~': path.resolve('./src'),
@@ -186,9 +241,17 @@ export default defineConfig({
     }),
     ...(process.env.SENTRY_DSN ? [
       sentry({
-        org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-        project: process.env.SENTRY_PROJECT || "pixel-astro",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        sourceMapsUploadOptions: {
+          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+          project: process.env.SENTRY_PROJECT || 'pixel-astro',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
+            ignore: ['**/node_modules/**'],
+            filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
+          },
+        },
       }),
       ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'
         ? [spotlightjs()]

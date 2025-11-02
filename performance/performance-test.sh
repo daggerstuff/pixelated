@@ -18,10 +18,10 @@ run_lighthouse_tests() {
     echo "Running Lighthouse performance tests..."
     
     # Desktop performance test
-    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-desktop.json"         --preset=desktop         --chrome-flags="--headless --no-sandbox"
-    
+    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-desktop.json"         --preset=perf         --chrome-flags="--headless --no-sandbox"
+
     # Mobile performance test
-    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-mobile.json"         --preset=mobile         --chrome-flags="--headless --no-sandbox"
+    lighthouse "$TARGET_URL"         --output=json         --output-path="$RESULTS_DIR/lighthouse-mobile.json"         --preset=perf         --form-factor=mobile         --chrome-flags="--headless --no-sandbox"
     
     echo "✅ Lighthouse tests completed"
 }
