@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You for Contacting Us</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        background-color: #6366f1;
+        color: white;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #6b7280;
+        background-color: #f3f4f6;
+        border-radius: 0 0 8px 8px;
+      }
+      .button {
+        display: inline-block;
+        background-color: #6366f1;
+        color: white;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        margin: 20px 0;
+        font-weight: 500;
+      }
+      .highlight-box {
+        background-color: #dbeafe;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 0 6px 6px 0;
+      }
+      .social-links {
+        text-align: center;
+        padding: 15px 0;
+      }
+      .social-links a {
+        margin: 0 10px;
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .social-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Thank You for Reaching Out!</h1>
+      </div>
+
+      <div class="content">
+        <p>Hello {{name}},</p>
+
+        <p>
+          Thank you for contacting Pixelated Empathy. We've received your
+          message and appreciate you taking the time to reach out to us.
+        </p>
+
+        <div class="highlight-box">
+          <p><strong>Your message summary:</strong></p>
+          <p><strong>Subject:</strong> {{subject}}</p>
+          <p><strong>Submitted on:</strong> {{timestamp}}</p>
+        </div>
+
+        <p>
+          Our team typically responds within 24-48 hours during business days.
+          In the meantime, here are some resources that might be helpful:
+        </p>
+
+        <ul>
+          <li>
+            <strong>Documentation:</strong> Explore our comprehensive guides and
+            API documentation
+          </li>
+          <li>
+            <strong>FAQ:</strong> Find answers to commonly asked questions
+          </li>
+          <li>
+            <strong>Blog:</strong> Stay updated with our latest insights and
+            developments
+          </li>
+        </ul>
+
+        <div style="text-align: center">
+          <a href="https://pixelatedempathy.com/docs" class="button"
+            >Visit Our Documentation</a
+          >
+        </div>
+
+        <p>
+          If you have an urgent matter or need immediate assistance, please
+          don't hesitate to reach out to us directly at
+          <a href="mailto:info@pixelatedempathy.com"
+            >info@pixelatedempathy.com</a
+          >.
+        </p>
+
+        <p>
+          We're excited to connect with you and learn more about how we can
+          help!
+        </p>
+
+        <p>
+          Best regards,<br />
+          The Pixelated Empathy Team
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>Stay connected with us:</p>
+        <div class="social-links">
+          <a href="https://twitter.com/pixelatedempathy">Twitter</a>
+          <a href="https://www.linkedin.com/company/pixelated-empathy"
+            >LinkedIn</a
+          >
+          <a href="https://github.com/nochadisfaction/pixelated">GitHub</a>
+        </div>
+        <p>
+          This is an automated confirmation. Please do not reply to this email.
+        </p>
+        <p>&copy; 2025 Pixelated Empathy. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

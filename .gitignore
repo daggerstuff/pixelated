@@ -259,7 +259,6 @@ cluster-backup-*/
 memory-bank/
 openspec/
 workspace/
-templates/
 reports/
 
 # Terraform

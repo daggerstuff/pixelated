@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser Compatibility Alert</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        background-color: #f8d7da;
+        color: #721c24;
+        border-radius: 5px;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9fafb;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .button {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 10px;
+        margin: 20px 0;
+      }
+      .issues-list {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .issue-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .issue-item:last-child {
+        border-bottom: none;
+      }
+      .severity-critical {
+        color: #721c24;
+        font-weight: bold;
+      }
+      .severity-major {
+        color: #e65100;
+        font-weight: bold;
+      }
+      .severity-minor {
+        color: #856404;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+      }
+      th {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Browser Compatibility Alert</h1>
+      </div>
+      <div class="content">
+        <p>Hello {{ name }},</p>
+
+        <p>
+          Our automated testing has detected {{ issueCount }} browser
+          compatibility issues that require your attention.
+        </p>
+
+        <div class="warning">
+          <p>
+            <strong>Project:</strong> {{ projectName }}<br />
+            <strong>Branch:</strong> {{ branchName }}<br />
+            <strong>Commit:</strong> {{ commitSha }}<br />
+            <strong>Detected:</strong> {{ detectionTime }}
+          </p>
+        </div>
+
+        <h2>Issue Summary</h2>
+
+        <table>
+          <tr>
+            <th>Browser</th>
+            <th>Issues</th>
+          </tr>
+          {{ browserIssues }}
+          <tr>
+            <td>{{ browser }}</td>
+            <td>{{ count }}</td>
+          </tr>
+          {{ /browserIssues }}
+        </table>
+
+        <h2>Detected Issues</h2>
+
+        <div class="issues-list">
+          {{ issues }}
+          <div class="issue-item">
+            <p>
+              <span class="severity-{{ severity }}">{{ severity }}</span>: {{
+              description }}
+            </p>
+            <p><small>{{ browser }} - {{ component }}</small></p>
+          </div>
+          {{ /issues }}
+        </div>
+
+        <div style="text-align: center">
+          <a href="{{ workflowUrl }}" class="button">View CI/CD Workflow</a>
+          <a href="{{ dashboardUrl }}" class="button">Open Dashboard</a>
+        </div>
+
+        <p>
+          Please investigate these issues as soon as possible to ensure a
+          consistent user experience across all supported browsers and devices.
+        </p>
+
+        <p>Best regards,<br />Your CI/CD System</p>
+      </div>
+
+      <div class="footer">
+        <p>
+          This is an automated notification. Please do not reply to this email.
+        </p>
+        <p>To configure these alerts, visit the project settings page.</p>
+        <p>&copy; 2025 Pixelated. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
