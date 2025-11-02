@@ -1,12 +1,17 @@
-
 /**
  * @module conversion
  * @description This module provides format conversion utilities.
  */
 
-import { validateData } from './validation';
-import { UnifiedProcessingRequestSchema, UnifiedProcessingResponseSchema } from './schemas';
-import type { UnifiedProcessingRequest, UnifiedProcessingResponse } from '../api/unified-api';
+import { validateData } from './validation'
+import {
+  UnifiedProcessingRequestSchema,
+  UnifiedProcessingResponseSchema,
+} from './schemas'
+import type {
+  UnifiedProcessingRequest,
+  UnifiedProcessingResponse,
+} from '../api/unified-api'
 
 /**
  * Converts data to the UnifiedProcessingRequest format.
@@ -14,8 +19,10 @@ import type { UnifiedProcessingRequest, UnifiedProcessingResponse } from '../api
  * @param data - The data to convert.
  * @returns A promise that resolves to the converted data.
  */
-export async function toUnifiedProcessingRequest(data: unknown): Promise<UnifiedProcessingRequest> {
-  return validateData(UnifiedProcessingRequestSchema, data);
+export async function toUnifiedProcessingRequest(
+  data: unknown,
+): Promise<UnifiedProcessingRequest> {
+  return validateData(UnifiedProcessingRequestSchema, data)
 }
 
 /**
@@ -24,6 +31,8 @@ export async function toUnifiedProcessingRequest(data: unknown): Promise<Unified
  * @param data - The data to convert.
  * @returns A promise that resolves to the converted data.
  */
-export async function toUnifiedProcessingResponse(data: unknown): Promise<UnifiedProcessingResponse> {
-  return validateData(UnifiedProcessingResponseSchema, data);
+export async function toUnifiedProcessingResponse(
+  data: unknown,
+): Promise<UnifiedProcessingResponse> {
+  return validateData(UnifiedProcessingResponseSchema, data)
 }

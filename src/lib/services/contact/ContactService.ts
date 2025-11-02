@@ -74,7 +74,7 @@ export class ContactService {
       logger.info('Contact form email templates initialized successfully')
     } catch (error: unknown) {
       logger.error('Failed to initialize contact form templates', { error })
-      throw new Error('Failed to initialize contact service')
+      throw new Error('Failed to initialize contact service', { cause: error })
     }
   }
 

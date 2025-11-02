@@ -20,7 +20,7 @@ export interface ContextTransition {
 
 // Handler signature for responding to transitions (extensible)
 export type ContextTransitionHandler = (
-  transition: ContextTransition
+  transition: ContextTransition,
 ) => void | Promise<void>
 
 /**
@@ -29,10 +29,9 @@ export type ContextTransitionHandler = (
  */
 export function detectContextTransition(
   prev: ContextEvent,
-  curr: ContextEvent
+  curr: ContextEvent,
 ): ContextTransition {
-  const detected =
-    prev.contextType !== curr.contextType
+  const detected = prev.contextType !== curr.contextType
 
   return {
     from: prev,
@@ -47,7 +46,7 @@ export function detectContextTransition(
  */
 export async function handleContextTransition(
   transition: ContextTransition,
-  handler: ContextTransitionHandler
+  handler: ContextTransitionHandler,
 ) {
   if (transition.detected) {
     await handler(transition)

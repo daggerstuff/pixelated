@@ -20,7 +20,7 @@
       return
     }
 
-    const {timing} = window.performance
+    const { timing } = window.performance
     metrics.navigationStart = timing.navigationStart
     metrics.domContentLoaded =
       timing.domContentLoadedEventEnd - timing.navigationStart
@@ -62,7 +62,7 @@
     }
 
     // Simple TTI approximation: when main thread is quiet for 5 seconds
-    const {timing} = window.performance
+    const { timing } = window.performance
     const domInteractive = timing.domInteractive - timing.navigationStart
     metrics.timeToInteractive = domInteractive
   }

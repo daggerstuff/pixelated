@@ -1,22 +1,19 @@
-import React, { useState, useEffect, forwardRef } from 'react';
-import type { ReactNode } from 'react';
-import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp';
+import React, { useState, useEffect, forwardRef } from 'react'
+import type { ReactNode } from 'react'
+import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
 /**
  * Workaround: Inline minimal UI components due to persistent import/alias resolution errors.
  * Remove these and restore imports when tooling is fixed.
  */
-const Card = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const Card = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className="rounded-lg border bg-card text-card-foreground shadow-sm"
     {...props}
   >
     {children}
   </div>
-);
+)
 
 const CardHeader = ({
   children,
@@ -25,7 +22,7 @@ const CardHeader = ({
   <div className="flex flex-col space-y-1.5 p-6" {...props}>
     {children}
   </div>
-);
+)
 
 const CardTitle = ({
   children,
@@ -34,7 +31,7 @@ const CardTitle = ({
   <h3 className="text-2xl font-semibold leading-none tracking-tight" {...props}>
     {children}
   </h3>
-);
+)
 
 const CardDescription = ({
   children,
@@ -43,7 +40,7 @@ const CardDescription = ({
   <p className="text-sm text-muted-foreground" {...props}>
     {children}
   </p>
-);
+)
 
 const CardContent = ({
   children,
@@ -52,16 +49,16 @@ const CardContent = ({
   <div className="p-6 pt-0" {...props}>
     {children}
   </div>
-);
+)
 
 const Switch = ({
   checked,
   onCheckedChange,
   id,
 }: {
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  id: string;
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+  id: string
 }) => (
   <input
     type="checkbox"
@@ -70,7 +67,7 @@ const Switch = ({
     onChange={(e) => onCheckedChange(e.target.checked)}
     className="peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary peer-unchecked:bg-input bg-input"
   />
-);
+)
 
 const Button = ({
   children,
@@ -82,16 +79,16 @@ const Button = ({
   >
     {children}
   </button>
-);
+)
 
 /**
  * Workaround: Inline Input component due to persistent import/alias resolution error.
  * Remove this and restore import when tooling is fixed.
  */
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  className?: string;
-  type?: string;
-};
+  className?: string
+  type?: string
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => (
@@ -104,9 +101,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ref={ref}
       {...props}
     />
-  )
-);
-Input.displayName = 'Input';
+  ),
+)
+Input.displayName = 'Input'
 
 // Create an inline Label component
 interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
@@ -155,21 +152,37 @@ Textarea.displayName = 'Textarea'
  * Minimal Select component workaround.
  * Replace with import when alias resolution is fixed.
  */
-const Select = ({ value, onValueChange, children }: { value: string, onValueChange: (value: string) => void, children: React.ReactNode }) => (
+const Select = ({
+  value,
+  onValueChange,
+  children,
+}: {
+  value: string
+  onValueChange: (value: string) => void
+  children: React.ReactNode
+}) => (
   <select
     value={value}
-    onChange={e => onValueChange(e.target.value)}
+    onChange={(e) => onValueChange(e.target.value)}
     className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
   >
     {children}
   </select>
-);
-const SelectContent = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-const SelectItem = ({ value, children }: { value: string, children: React.ReactNode }) => (
-  <option value={value}>{children}</option>
-);
-const SelectTrigger = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-const SelectValue = () => null;
+)
+const SelectContent = ({ children }: { children: React.ReactNode }) => (
+  <>{children}</>
+)
+const SelectItem = ({
+  value,
+  children,
+}: {
+  value: string
+  children: React.ReactNode
+}) => <option value={value}>{children}</option>
+const SelectTrigger = ({ children }: { children: React.ReactNode }) => (
+  <>{children}</>
+)
+const SelectValue = () => null
 
 // Default empty rule
 const defaultRule = {
@@ -278,7 +291,9 @@ export default function DLPRuleEditor() {
       setIsEditing(false)
 
       // Switch back to rules tab
-      const rulesTab = document.querySelector('[value="rules"]') as HTMLElement as HTMLElement
+      const rulesTab = document.querySelector(
+        '[value="rules"]',
+      ) as HTMLElement as HTMLElement
       if (rulesTab) {
         setTimeout(() => {
           rulesTab.click()

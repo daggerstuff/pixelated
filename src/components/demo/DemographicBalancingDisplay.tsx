@@ -86,7 +86,9 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
   currentProfile,
   onBalanceUpdate,
 }) => {
-  const [demographicStats, setDemographicStats] = useState<DemographicData[]>([])
+  const [demographicStats, setDemographicStats] = useState<DemographicData[]>(
+    [],
+  )
   const [overallBalance, setOverallBalance] = useState<number>(0)
 
   const getAgeCategory = (age: number): string => {
@@ -107,32 +109,42 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const getOccupationCategory = (occupation: string): string => {
     const occ = occupation.toLowerCase()
-    if (occ.includes('doctor') ||
-          occ.includes('nurse') ||
-          occ.includes('therapist') ||
-          occ.includes('medical')) {
+    if (
+      occ.includes('doctor') ||
+      occ.includes('nurse') ||
+      occ.includes('therapist') ||
+      occ.includes('medical')
+    ) {
       return 'Healthcare'
     }
-    if (occ.includes('teacher') ||
-          occ.includes('professor') ||
-          occ.includes('education')) {
+    if (
+      occ.includes('teacher') ||
+      occ.includes('professor') ||
+      occ.includes('education')
+    ) {
       return 'Education'
     }
-    if (occ.includes('engineer') ||
-          occ.includes('developer') ||
-          occ.includes('tech') ||
-          occ.includes('software')) {
+    if (
+      occ.includes('engineer') ||
+      occ.includes('developer') ||
+      occ.includes('tech') ||
+      occ.includes('software')
+    ) {
       return 'Technology'
     }
-    if (occ.includes('manager') ||
-          occ.includes('analyst') ||
-          occ.includes('finance') ||
-          occ.includes('business')) {
+    if (
+      occ.includes('manager') ||
+      occ.includes('analyst') ||
+      occ.includes('finance') ||
+      occ.includes('business')
+    ) {
       return 'Business/Finance'
     }
-    if (occ.includes('service') ||
-          occ.includes('retail') ||
-          occ.includes('restaurant')) {
+    if (
+      occ.includes('service') ||
+      occ.includes('retail') ||
+      occ.includes('restaurant')
+    ) {
       return 'Service Industry'
     }
     if (occ.includes('student')) {
@@ -234,10 +246,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
     setOverallBalance(balanceScore)
     onBalanceUpdate?.(balanceScore)
-  }, [
-    currentProfile, 
-    onBalanceUpdate
-  ])
+  }, [currentProfile, onBalanceUpdate])
 
   const getBalanceColor = (percentage: number) => {
     if (percentage >= 90 && percentage <= 110) {
@@ -285,7 +294,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      const {category} = stat
+      const { category } = stat
       if (!acc[category]) {
         acc[category] = []
       }
@@ -412,7 +421,10 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             .filter((stat) => stat.percentage < 75 || stat.percentage > 125)
             .slice(0, 3)
             .map((stat) => (
-              <div key={`${stat.category}-${stat.subcategory}`} className="flex items-start gap-2">
+              <div
+                key={`${stat.category}-${stat.subcategory}`}
+                className="flex items-start gap-2"
+              >
                 <span className="text-indigo-500">•</span>
                 <span>
                   <strong>

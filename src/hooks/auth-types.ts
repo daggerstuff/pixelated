@@ -75,7 +75,7 @@ export interface AuthHookMethods {
   signUp: (
     email: string,
     password: string,
-    fullName: string
+    fullName: string,
   ) => Promise<AuthResult>
   /** Sign out current user */
   signOut: () => Promise<void>
@@ -121,7 +121,7 @@ export const AuthErrorCode = {
   NETWORK_ERROR: 'NETWORK_ERROR',
 } as const
 
-export type AuthErrorCode = typeof AuthErrorCode[keyof typeof AuthErrorCode]
+export type AuthErrorCode = (typeof AuthErrorCode)[keyof typeof AuthErrorCode]
 
 /**
  * Type guard to check if a value is an AuthError
@@ -160,7 +160,7 @@ export function isAuthResult(result: unknown): result is AuthResult {
 export function createAuthError(
   message: string,
   code?: AuthErrorCode,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): AuthError {
   const error = new Error(message) as AuthError
   error.name = 'AuthError'
@@ -174,11 +174,4 @@ export function createAuthError(
 }
 
 // Re-export auth types for convenience
-export type {
-  AuthResult,
-  AuthState,
-  AuthUser,
-  Provider,
-  UserRole,
-  Session,
-}
+export type { AuthResult, AuthState, AuthUser, Provider, UserRole, Session }

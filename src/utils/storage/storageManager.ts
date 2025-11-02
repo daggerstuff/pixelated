@@ -39,10 +39,13 @@ class StorageManager {
   private calculateStorageQuota(): number {
     try {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
-        navigator.storage.estimate().then(estimate => {
+        navigator.storage.estimate().then((estimate) => {
           // Use 80% of available quota or default, whichever is smaller
           const availableQuota = estimate.quota || this.options.maxStorageSize
-          this.storageQuota = Math.min(availableQuota * 0.8, this.options.maxStorageSize)
+          this.storageQuota = Math.min(
+            availableQuota * 0.8,
+            this.options.maxStorageSize,
+          )
         })
       }
     } catch {
@@ -94,7 +97,10 @@ class StorageManager {
     if (this.isStorageAvailable(window.localStorage)) {
       return window.localStorage
     }
-    if (this.options.fallbackStorage !== 'none' && this.isStorageAvailable(window.sessionStorage)) {
+    if (
+      this.options.fallbackStorage !== 'none' &&
+      this.isStorageAvailable(window.sessionStorage)
+    ) {
       return window.sessionStorage
     }
     return null
@@ -132,7 +138,9 @@ class StorageManager {
 
       // Check if data fits in storage quota
       if (compressedData.length > this.storageQuota) {
-        console.warn(`Data size (${compressedData.length} bytes) exceeds storage quota (${this.storageQuota} bytes)`)
+        console.warn(
+          `Data size (${compressedData.length} bytes) exceeds storage quota (${this.storageQuota} bytes)`,
+        )
         return false
       }
 
@@ -180,7 +188,10 @@ class StorageManager {
         return config.defaultValue
       }
 
-      if (storageData.expiry && this.checkExpiry(storageData.timestamp, storageData.expiry)) {
+      if (
+        storageData.expiry &&
+        this.checkExpiry(storageData.timestamp, storageData.expiry)
+      ) {
         this.remove(key)
         return config.defaultValue
       }
@@ -220,7 +231,7 @@ class StorageManager {
             keysToRemove.push(key)
           }
         }
-        keysToRemove.forEach(key => storage.removeItem(key))
+        keysToRemove.forEach((key) => storage.removeItem(key))
       }
       this.memoryStorage.clear()
       return true
@@ -258,7 +269,9 @@ class StorageManager {
   }
 
   isAvailable(): boolean {
-    return this.getStorage() !== null || this.options.fallbackStorage === 'memory'
+    return (
+      this.getStorage() !== null || this.options.fallbackStorage === 'memory'
+    )
   }
 
   getStorageInfo(): {

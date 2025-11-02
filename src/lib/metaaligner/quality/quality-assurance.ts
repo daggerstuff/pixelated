@@ -1,4 +1,3 @@
-
 /**
  * @module quality-assurance
  * @description This module provides a quality assurance workflow for the MetaAligner pipeline.
@@ -14,5 +13,5 @@ export interface IQualityAssurance {
    * @param response - The response to run the workflow on.
    * @returns A promise that resolves when the workflow is complete.
    */
-  run(response: string): Promise<void>;
+  run(response: string): Promise<void>
 }

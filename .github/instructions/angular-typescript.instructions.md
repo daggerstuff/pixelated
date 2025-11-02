@@ -1,8 +1,7 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/*.ts', '**/*.tsx', '**/*.component.html', '**/*.component.scss']
+description: Angular + TypeScript Development Guidelines
+applyTo: '**/*.ts,**/*.tsx,**/*.component.html,**/*.component.scss'
 ---
-
 # Angular + TypeScript Development Guidelines
 
 ## Core Principles
@@ -38,7 +37,7 @@ fileMatchPattern: ['**/*.ts', '**/*.tsx', '**/*.component.html', '**/*.component
 ## Code Organization
 
 ### File Structure
-```
+```text
 src/
 ├── app/
 │   ├── core/           # Singleton services, guards, interceptors

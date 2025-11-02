@@ -105,41 +105,54 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for critical points visualization
   const prepareCriticalPointsData = () => {
-    return data?.['criticalPoints']?.map((point) => ({
-      name: point?.['emotion'],
-      intensity: point?.['intensity'],
-      timestamp: point?.['timestamp']?.toLocaleString(),
-      sessionId: point?.['sessionId'],
-      color: getEmotionColor(point?.['emotion']),
-    })) || []
+    return (
+      data?.['criticalPoints']?.map((point) => ({
+        name: point?.['emotion'],
+        intensity: point?.['intensity'],
+        timestamp: point?.['timestamp']?.toLocaleString(),
+        sessionId: point?.['sessionId'],
+        color: getEmotionColor(point?.['emotion']),
+      })) || []
+    )
   }
 
   // Format data for progression visualization
   const prepareProgressionData = () => {
-    const progression = typeof data === 'object' && data !== null && 'progression' in data
-      ? (data as { progression?: Record<string, unknown> }).progression
-      : undefined
+    const progression =
+      typeof data === 'object' && data !== null && 'progression' in data
+        ? (data as { progression?: Record<string, unknown> }).progression
+        : undefined
 
     return [
       {
         name: 'Overall Improvement',
         value: progression?.['overallImprovement'] || 0,
-        fill: (progression?.['overallImprovement'] || 0) >= 0 ? '#22c55e' : '#ef4444',
+        fill:
+          (progression?.['overallImprovement'] || 0) >= 0
+            ? '#22c55e'
+            : '#ef4444',
       },
       {
         name: 'Stability Change',
         value: progression?.['stabilityChange'] || 0,
-        fill: (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
+        fill:
+          (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
       },
       {
         name: 'Positive Emotion Change',
         value: progression?.['positiveEmotionChange'] || 0,
-        fill: (progression?.['positiveEmotionChange'] || 0) >= 0 ? '#4ade80' : '#f59e0b',
+        fill:
+          (progression?.['positiveEmotionChange'] || 0) >= 0
+            ? '#4ade80'
+            : '#f59e0b',
       },
       {
         name: 'Negative Emotion Change',
         value: progression?.['negativeEmotionChange'] || 0,
-        fill: (progression?.['negativeEmotionChange'] || 0) >= 0 ? '#8b5cf6' : '#6366f1',
+        fill:
+          (progression?.['negativeEmotionChange'] || 0) >= 0
+            ? '#8b5cf6'
+            : '#6366f1',
       },
     ]
   }
@@ -160,23 +173,33 @@ export default function EmotionTemporalAnalysisChart({
 
   // Format data for relationships visualization
   const prepareRelationshipsData = () => {
-    return Array.isArray((data as { dimensionalRelationships?: unknown[] }).dimensionalRelationships)
-      ? ((data as { dimensionalRelationships: unknown[] }).dimensionalRelationships).map((rel) => {
-          if (
-            typeof rel === 'object' &&
-            rel !== null &&
-            'dimensions' in rel &&
-            Array.isArray((rel as { dimensions: unknown[] }).dimensions)
-          ) {
-            return {
-              name: `${(rel as { dimensions: unknown[] }).dimensions?.[0]} & ${(rel as { dimensions: unknown[] }).dimensions?.[1]}`,
-              correlation: (rel as { correlation?: number }).correlation,
-              description: (rel as { description?: string }).description,
-              color: (rel as { correlation?: number }).correlation! >= 0 ? '#22c55e' : '#ef4444',
+    return Array.isArray(
+      (data as { dimensionalRelationships?: unknown[] })
+        .dimensionalRelationships,
+    )
+      ? (
+          data as { dimensionalRelationships: unknown[] }
+        ).dimensionalRelationships
+          .map((rel) => {
+            if (
+              typeof rel === 'object' &&
+              rel !== null &&
+              'dimensions' in rel &&
+              Array.isArray((rel as { dimensions: unknown[] }).dimensions)
+            ) {
+              return {
+                name: `${(rel as { dimensions: unknown[] }).dimensions?.[0]} & ${(rel as { dimensions: unknown[] }).dimensions?.[1]}`,
+                correlation: (rel as { correlation?: number }).correlation,
+                description: (rel as { description?: string }).description,
+                color:
+                  (rel as { correlation?: number }).correlation! >= 0
+                    ? '#22c55e'
+                    : '#ef4444',
+              }
             }
-          }
-          return null
-        }).filter(Boolean)
+            return null
+          })
+          .filter(Boolean)
       : []
   }
 

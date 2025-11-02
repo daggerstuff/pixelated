@@ -12,7 +12,12 @@ const logger = createBuildSafeLogger('threat-detection-system')
 // Production-ready threat detection service
 class ProductionThreatDetectionService {
   private enabled: boolean
-  private riskThresholds: { low: number; medium: number; high: number; critical: number }
+  private riskThresholds: {
+    low: number
+    medium: number
+    high: number
+    critical: number
+  }
 
   constructor(config: any = {}) {
     this.enabled = config.enabled ?? true
@@ -20,7 +25,7 @@ class ProductionThreatDetectionService {
       low: 0.2,
       medium: 0.5,
       high: 0.7,
-      critical: 0.9
+      critical: 0.9,
     }
   }
 
@@ -44,10 +49,10 @@ class ProductionThreatDetectionService {
           riskScore,
           threatLevel,
           indicators: await this.getIndicators(request),
-          timestamp: new Date()
+          timestamp: new Date(),
         },
         action,
-        riskScore
+        riskScore,
       }
     } catch (error) {
       logger.error('Threat detection failed:', { error })
@@ -92,9 +97,13 @@ class ProductionThreatDetectionService {
       // Check against MongoDB threat intelligence
       const db = await mongoClient.db('threat_intelligence')
       const badIP = await db.collection('malicious_ips').findOne({ ip })
-      
+
       if (badIP) {
-        await redis.setex(`ip_reputation:${ip}`, 3600, badIP.riskScore.toString())
+        await redis.setex(
+          `ip_reputation:${ip}`,
+          3600,
+          badIP.riskScore.toString(),
+        )
         return badIP.riskScore
       }
 
@@ -129,20 +138,26 @@ class ProductionThreatDetectionService {
     let score = 0
 
     // SQL injection patterns
-    const sqlPatterns = ['union select', 'drop table', 'insert into', '-- ', '/*']
-    if (sqlPatterns.some(pattern => payloadStr.includes(pattern))) {
+    const sqlPatterns = [
+      'union select',
+      'drop table',
+      'insert into',
+      '-- ',
+      '/*',
+    ]
+    if (sqlPatterns.some((pattern) => payloadStr.includes(pattern))) {
       score += 0.7
     }
 
     // XSS patterns
     const xssPatterns = ['<script', 'javascript:', 'onerror=', 'onload=']
-    if (xssPatterns.some(pattern => payloadStr.includes(pattern))) {
+    if (xssPatterns.some((pattern) => payloadStr.includes(pattern))) {
       score += 0.6
     }
 
     // Command injection patterns
     const cmdPatterns = ['&&', '||', ';', '|', '`']
-    if (cmdPatterns.some(pattern => payloadStr.includes(pattern))) {
+    if (cmdPatterns.some((pattern) => payloadStr.includes(pattern))) {
       score += 0.5
     }
 
@@ -151,16 +166,16 @@ class ProductionThreatDetectionService {
 
   private async analyzeUserAgent(userAgent: string): Promise<number> {
     const ua = userAgent.toLowerCase()
-    
+
     // Bot patterns
     const botPatterns = ['bot', 'crawler', 'spider', 'scraper']
-    if (botPatterns.some(pattern => ua.includes(pattern))) {
+    if (botPatterns.some((pattern) => ua.includes(pattern))) {
       return 0.3
     }
 
     // Suspicious patterns
     const suspiciousPatterns = ['curl', 'wget', 'python', 'scanner']
-    if (suspiciousPatterns.some(pattern => ua.includes(pattern))) {
+    if (suspiciousPatterns.some((pattern) => ua.includes(pattern))) {
       return 0.5
     }
 
@@ -177,17 +192,22 @@ class ProductionThreatDetectionService {
 
   private determineAction(threatLevel: string): string {
     switch (threatLevel) {
-      case 'critical': return 'block'
-      case 'high': return 'challenge'
-      case 'medium': return 'monitor'
-      case 'low': return 'log'
-      default: return 'allow'
+      case 'critical':
+        return 'block'
+      case 'high':
+        return 'challenge'
+      case 'medium':
+        return 'monitor'
+      case 'low':
+        return 'log'
+      default:
+        return 'allow'
     }
   }
 
   private async getIndicators(request: any): Promise<string[]> {
     const indicators: string[] = []
-    
+
     if (request.ip) {
       const reputation = await redis.get(`ip_reputation:${request.ip}`)
       if (reputation && parseFloat(reputation) > 0.5) {
@@ -198,7 +218,12 @@ class ProductionThreatDetectionService {
     return indicators
   }
 
-  private async logThreatDetection(request: any, riskScore: number, threatLevel: string, action: string) {
+  private async logThreatDetection(
+    request: any,
+    riskScore: number,
+    threatLevel: string,
+    action: string,
+  ) {
     try {
       const db = await mongoClient.db('security_logs')
       await db.collection('threat_detections').insertOne({
@@ -213,8 +238,8 @@ class ProductionThreatDetectionService {
         request: {
           headers: request.headers,
           query: request.query,
-          body: request.body
-        }
+          body: request.body,
+        },
       })
     } catch (error) {
       logger.error('Failed to log threat detection:', { error })
@@ -225,28 +250,45 @@ class ProductionThreatDetectionService {
     return {
       healthy: this.enabled,
       service: 'threat-detection',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
   }
 
   async getStatistics(): Promise<any> {
     try {
       const db = await mongoClient.db('security_logs')
-      const stats = await db.collection('threat_detections').aggregate([
-        {
-          $group: {
-            _id: null,
-            totalThreats: { $sum: 1 },
-            blockedRequests: { $sum: { $cond: [{ $eq: ['$action', 'block'] }, 1, 0] } },
-            averageRiskScore: { $avg: '$riskScore' }
-          }
-        }
-      ]).toArray()
+      const stats = await db
+        .collection('threat_detections')
+        .aggregate([
+          {
+            $group: {
+              _id: null,
+              totalThreats: { $sum: 1 },
+              blockedRequests: {
+                $sum: { $cond: [{ $eq: ['$action', 'block'] }, 1, 0] },
+              },
+              averageRiskScore: { $avg: '$riskScore' },
+            },
+          },
+        ])
+        .toArray()
 
-      return stats[0] || { totalThreats: 0, blockedRequests: 0, averageRiskScore: 0, threatDistribution: {} }
+      return (
+        stats[0] || {
+          totalThreats: 0,
+          blockedRequests: 0,
+          averageRiskScore: 0,
+          threatDistribution: {},
+        }
+      )
     } catch (error) {
       logger.error('Failed to get statistics:', { error })
-      return { totalThreats: 0, blockedRequests: 0, averageRiskScore: 0, threatDistribution: {} }
+      return {
+        totalThreats: 0,
+        blockedRequests: 0,
+        averageRiskScore: 0,
+        threatDistribution: {},
+      }
     }
   }
 }
@@ -268,13 +310,13 @@ class ProductionMonitoringService {
     const alerts = []
 
     // Analyze threat patterns
-    const highRiskThreats = threats.filter(t => t.threat?.riskScore > 0.7)
+    const highRiskThreats = threats.filter((t) => t.threat?.riskScore > 0.7)
     if (highRiskThreats.length > 0) {
       insights.push({
         type: 'high_risk_activity',
         message: `Detected ${highRiskThreats.length} high-risk requests`,
         severity: 'high',
-        timestamp: new Date()
+        timestamp: new Date(),
       })
     }
 
@@ -285,7 +327,7 @@ class ProductionMonitoringService {
     return {
       healthy: this.enabled,
       service: 'monitoring',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
   }
 
@@ -293,7 +335,7 @@ class ProductionMonitoringService {
     return {
       totalInsights: 0,
       totalAlerts: 0,
-      anomaliesDetected: 0
+      anomaliesDetected: 0,
     }
   }
 }
@@ -310,14 +352,14 @@ class ProductionHuntingService {
     if (!this.enabled) return { success: false, message: 'Hunting disabled' }
 
     logger.info('Threat hunt triggered:', huntRequest)
-    
+
     // Store hunt request for processing
     try {
       const db = await mongoClient.db('security_logs')
       await db.collection('hunt_requests').insertOne({
         ...huntRequest,
         timestamp: new Date(),
-        status: 'queued'
+        status: 'queued',
       })
 
       return { success: true, huntId: Date.now().toString() }
@@ -331,7 +373,7 @@ class ProductionHuntingService {
     return {
       healthy: this.enabled,
       service: 'hunting',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
   }
 
@@ -339,7 +381,7 @@ class ProductionHuntingService {
     return {
       totalHunts: 0,
       totalFindings: 0,
-      activeInvestigations: 0
+      activeInvestigations: 0,
     }
   }
 }
@@ -359,15 +401,15 @@ class ProductionIntelligenceService {
 
     try {
       const db = await mongoClient.db('threat_intelligence')
-      const intelligence = await db.collection('indicators').findOne({ 
-        indicator: indicator.toLowerCase() 
+      const intelligence = await db.collection('indicators').findOne({
+        indicator: indicator.toLowerCase(),
       })
 
       if (intelligence) {
         return {
           found: true,
           intelligence: [intelligence],
-          sources: [intelligence.source || 'internal']
+          sources: [intelligence.source || 'internal'],
         }
       }
 
@@ -382,7 +424,7 @@ class ProductionIntelligenceService {
     return {
       healthy: this.enabled,
       service: 'intelligence',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
   }
 
@@ -390,7 +432,7 @@ class ProductionIntelligenceService {
     return {
       totalIndicators: 0,
       activeFeedCount: 0,
-      lastUpdateTime: new Date()
+      lastUpdateTime: new Date(),
     }
   }
 }
@@ -407,13 +449,17 @@ export function createCompleteThreatDetectionSystem(
     monitoring?: any
     hunting?: any
     intelligence?: any
-  }
+  },
 ) {
   // Create production services
-  const threatDetectionService = new ProductionThreatDetectionService(options?.threatDetection)
+  const threatDetectionService = new ProductionThreatDetectionService(
+    options?.threatDetection,
+  )
   const monitoringService = new ProductionMonitoringService(options?.monitoring)
   const huntingService = new ProductionHuntingService(options?.hunting)
-  const intelligenceService = new ProductionIntelligenceService(options?.intelligence)
+  const intelligenceService = new ProductionIntelligenceService(
+    options?.intelligence,
+  )
 
   return {
     // Core services
@@ -425,15 +471,18 @@ export function createCompleteThreatDetectionSystem(
     // Unified interface
     async processRequest(request: unknown) {
       try {
-        const threatResult = await threatDetectionService.processRequest(request)
-        const insights = await monitoringService.generateInsights([threatResult])
-        
+        const threatResult =
+          await threatDetectionService.processRequest(request)
+        const insights = await monitoringService.generateInsights([
+          threatResult,
+        ])
+
         // Trigger hunting for high-risk requests
         if (threatResult.riskScore > 0.7) {
           await huntingService.triggerHunt({
             type: 'high-risk-request',
             context: request,
-            priority: 'high'
+            priority: 'high',
           })
         }
 
@@ -441,77 +490,86 @@ export function createCompleteThreatDetectionSystem(
           success: true,
           threat: threatResult,
           insights,
-          timestamp: new Date()
+          timestamp: new Date(),
         }
       } catch (error) {
         logger.error('Request processing failed:', { error })
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date()
+          timestamp: new Date(),
         }
       }
     },
 
     async getSystemHealth() {
-      const [threatHealth, monitoringHealth, huntingHealth, intelligenceHealth] = await Promise.all([
+      const [
+        threatHealth,
+        monitoringHealth,
+        huntingHealth,
+        intelligenceHealth,
+      ] = await Promise.all([
         threatDetectionService.getHealthStatus(),
         monitoringService.getHealthStatus(),
         huntingService.getHealthStatus(),
-        intelligenceService.getHealthStatus()
+        intelligenceService.getHealthStatus(),
       ])
 
       return {
-        healthy: threatHealth.healthy && monitoringHealth.healthy && 
-                huntingHealth.healthy && intelligenceHealth.healthy,
+        healthy:
+          threatHealth.healthy &&
+          monitoringHealth.healthy &&
+          huntingHealth.healthy &&
+          intelligenceHealth.healthy,
         services: {
           threatDetection: threatHealth.healthy,
           monitoring: monitoringHealth.healthy,
           hunting: huntingHealth.healthy,
-          intelligence: intelligenceHealth.healthy
+          intelligence: intelligenceHealth.healthy,
         },
         details: {
           threatDetection: threatHealth,
           monitoring: monitoringHealth,
           hunting: huntingHealth,
-          intelligence: intelligenceHealth
+          intelligence: intelligenceHealth,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       }
     },
 
     async getSystemStatistics() {
-      const [threatStats, monitoringStats, huntingStats, intelligenceStats] = await Promise.all([
-        threatDetectionService.getStatistics(),
-        monitoringService.getStatistics(),
-        huntingService.getStatistics(),
-        intelligenceService.getStatistics()
-      ])
+      const [threatStats, monitoringStats, huntingStats, intelligenceStats] =
+        await Promise.all([
+          threatDetectionService.getStatistics(),
+          monitoringService.getStatistics(),
+          huntingService.getStatistics(),
+          intelligenceService.getStatistics(),
+        ])
 
       return {
         threats: {
           total: threatStats.totalThreats,
           blocked: threatStats.blockedRequests,
           averageResponseTime: threatStats.averageResponseTime || 0,
-          distribution: threatStats.threatDistribution || {}
+          distribution: threatStats.threatDistribution || {},
         },
         monitoring: {
           insights: monitoringStats.totalInsights,
           alerts: monitoringStats.totalAlerts,
-          anomalies: monitoringStats.anomaliesDetected
+          anomalies: monitoringStats.anomaliesDetected,
         },
         hunting: {
           hunts: huntingStats.totalHunts,
           findings: huntingStats.totalFindings,
-          investigations: huntingStats.activeInvestigations
+          investigations: huntingStats.activeInvestigations,
         },
         intelligence: {
           indicators: intelligenceStats.totalIndicators,
           feeds: intelligenceStats.activeFeedCount,
-          lastUpdate: intelligenceStats.lastUpdateTime
+          lastUpdate: intelligenceStats.lastUpdateTime,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       }
-    }
+    },
   }
 }

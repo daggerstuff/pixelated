@@ -3,14 +3,6 @@
   "description": "AI-powered bias detection and mental health platform",
   "repository": "https://github.com/pixelatedempathy/pixelated",
   "keywords": ["astro", "ai", "mental-health", "bias-detection"],
-  "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    },
-    {
-      "url": "heroku/python"
-    }
-  ],
   "env": {
     "NODE_ENV": {
       "value": "production"

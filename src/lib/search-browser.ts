@@ -259,7 +259,11 @@ export async function initBrowserSearch(
           'Failed to load flexsearch Document from alternate path:',
           docErr,
         )
-        throw new Error('Cannot load flexsearch Document')
+        throw new Error(
+          'Cannot load flexsearch Document',
+          { cause: err },
+          { cause: docErr },
+        )
       }
     }
 

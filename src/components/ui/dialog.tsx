@@ -11,7 +11,7 @@ import type {
   DialogHookResult,
   ConfirmDialogHookResult,
   DialogMaxWidth,
-  } from './dialog-types'
+} from './dialog-types'
 import { maxWidthClasses } from './dialog-types'
 
 // Custom Dialog Context
@@ -37,13 +37,16 @@ const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
   )
 
   return (
-    <DialogContext.Provider value={{ open: isOpen, onOpenChange: handleOpenChange }}>
+    <DialogContext.Provider
+      value={{ open: isOpen, onOpenChange: handleOpenChange }}
+    >
       {children}
     </DialogContext.Provider>
   )
 }
 
-interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogTriggerProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
@@ -70,7 +73,8 @@ const DialogPortal = ({ children }: { children: React.ReactNode }) => {
   return <div className="fixed inset-0 z-50">{children}</div>
 }
 
-interface DialogOverlayProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogOverlayProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 
@@ -115,40 +119,41 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       return null
     }
 
-  return (
-    <DialogPortal>
-      <DialogOverlay />
-      <div
-        ref={ref}
-        className={cn(
-          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg',
-          className,
-        )}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            e.stopPropagation()
-          }
-        }}
-        role="dialog"
-        aria-modal="true"
-        tabIndex={-1}
-        {...props}
-      >
-        {children}
-        <button
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-          onClick={() => onOpenChange(false)}
-          aria-label="Close dialog"
+    return (
+      <DialogPortal>
+        <DialogOverlay />
+        <div
+          ref={ref}
+          className={cn(
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg',
+            className,
+          )}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              e.stopPropagation()
+            }
+          }}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          {...props}
         >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </button>
-      </div>
-    </DialogPortal>
-  )
-})
+          {children}
+          <button
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+            onClick={() => onOpenChange(false)}
+            aria-label="Close dialog"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
+        </div>
+      </DialogPortal>
+    )
+  },
+)
 DialogContent.displayName = 'DialogContent'
 
 interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -213,19 +218,21 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
 )
 DialogTitle.displayName = 'DialogTitle'
 
-interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+interface DialogDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
   className?: string
 }
 
-const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
-  ({ className, ...props }, ref) => (
-    <p
-      ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
-      {...props}
-    />
-  ),
-)
+const DialogDescription = React.forwardRef<
+  HTMLParagraphElement,
+  DialogDescriptionProps
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn('text-sm text-muted-foreground', className)}
+    {...props}
+  />
+))
 DialogDescription.displayName = 'DialogDescription'
 
 function DialogModal<TData>({
@@ -409,9 +416,7 @@ function ConfirmDialog<TData>({
         backdropClassName,
       )}
       onClick={
-        !closeOnOutsideClick || isLoading
-          ? (e) => e.stopPropagation()
-          : onClose
+        !closeOnOutsideClick || isLoading ? (e) => e.stopPropagation() : onClose
       }
       onKeyDown={(e) => {
         if (

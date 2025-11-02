@@ -138,7 +138,10 @@ export function unescapeHTML(node: VNode): VNode {
 /**
  * Validate navbar layout
  */
-export function validateNavBarLayout(layout: NavBarLayout): { isValid: boolean; message: string } {
+export function validateNavBarLayout(layout: NavBarLayout): {
+  isValid: boolean
+  message: string
+} {
   const totalItems = layout.left.length + layout.right.length
   return {
     isValid: totalItems > 0 && totalItems <= 5,

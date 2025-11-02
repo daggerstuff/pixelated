@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 /**
  * Integration Tests for Bias Detection API Endpoints
  *
@@ -176,9 +177,8 @@ describe('Bias Detection API Integration Tests', () => {
   })
 
   describe('POST /api/bias-detection/analyze', () => {
-    const analyzeEndpoint = `${testServer.baseUrl}/api/bias-detection/analyze`
-
     it('should successfully analyze a valid session', async () => {
+      const analyzeEndpoint = `${testServer.baseUrl}/api/bias-detection/analyze`
       const requestBody = {
         session: testSession,
         options: {
@@ -405,7 +405,7 @@ describe('Bias Detection API Integration Tests', () => {
 
     it('should handle rate limiting correctly', async () => {
       const requestBody = { session: testSession }
-      const requests = []
+      const requests: Promise<Response>[] = []
 
       // Make multiple rapid requests to trigger rate limiting
       for (let i = 0; i < 65; i++) {
@@ -461,9 +461,10 @@ describe('Bias Detection API Integration Tests', () => {
   })
 
   describe('GET /api/bias-detection/analyze', () => {
-    const analyzeEndpoint = `${testServer.baseUrl}/api/bias-detection/analyze`
+    let analyzeEndpoint: string
 
     beforeEach(async () => {
+      analyzeEndpoint = `${testServer.baseUrl}/api/bias-detection/analyze`
       // Create an analysis first to retrieve later
       await fetch(analyzeEndpoint, {
         method: 'POST',
@@ -575,7 +576,11 @@ describe('Bias Detection API Integration Tests', () => {
   })
 
   describe('GET /api/bias-detection/dashboard', () => {
-    const dashboardEndpoint = `${testServer.baseUrl}/api/bias-detection/dashboard`
+    let dashboardEndpoint: string
+
+    beforeEach(() => {
+      dashboardEndpoint = `${testServer.baseUrl}/api/bias-detection/dashboard`
+    })
 
     it('should successfully return dashboard data with default parameters', async () => {
       const response = await fetch(dashboardEndpoint, {
@@ -727,7 +732,11 @@ describe('Bias Detection API Integration Tests', () => {
   })
 
   describe('GET /api/bias-detection/export', () => {
-    const exportEndpoint = `${testServer.baseUrl}/api/bias-detection/export`
+    let exportEndpoint: string
+
+    beforeEach(() => {
+      exportEndpoint = `${testServer.baseUrl}/api/bias-detection/export`
+    })
 
     it('should export data as JSON format by default', async () => {
       const response = await fetch(exportEndpoint, {

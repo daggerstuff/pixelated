@@ -90,7 +90,10 @@ function generateSessionId(): string {
 /**
  * Generate device fingerprint
  */
-async function generateDeviceFingerprint(deviceInfo: DeviceInfo, userAgent: string): Promise<string> {
+async function generateDeviceFingerprint(
+  deviceInfo: DeviceInfo,
+  userAgent: string,
+): Promise<string> {
   const crypto = await import('crypto')
   const fingerprintData = `${deviceInfo.deviceId}:${deviceInfo.deviceType}:${userAgent}`
   return crypto.createHash('sha256').update(fingerprintData).digest('hex')
@@ -100,7 +103,7 @@ async function generateDeviceFingerprint(deviceInfo: DeviceInfo, userAgent: stri
  * Create new session
  */
 export async function createSession(
-  options: SessionCreationOptions
+  options: SessionCreationOptions,
 ): Promise<SessionData> {
   try {
     const {
@@ -116,7 +119,11 @@ export async function createSession(
     } = options
 
     // Validate 2FA if required
-    const requires2FA = await isTwoFactorRequired(userId, role, deviceInfo.deviceId)
+    const requires2FA = await isTwoFactorRequired(
+      userId,
+      role,
+      deviceInfo.deviceId,
+    )
     if (requires2FA) {
       if (!twoFactorToken) {
         throw new AuthenticationError('2FA verification required')
@@ -168,7 +175,7 @@ export async function createSession(
     await setInCache(
       `session:${sessionId}`,
       sessionData,
-      Math.floor((expiresAt - now) / 1000) // TTL in seconds
+      Math.floor((expiresAt - now) / 1000), // TTL in seconds
     )
 
     // Add session to user's session list
@@ -176,11 +183,14 @@ export async function createSession(
 
     // Add device fingerprint for security binding
     if (SESSION_CONFIG.deviceBindingEnabled) {
-      const deviceFingerprint = await generateDeviceFingerprint(deviceInfo, userAgent)
+      const deviceFingerprint = await generateDeviceFingerprint(
+        deviceInfo,
+        userAgent,
+      )
       await setInCache(
         `session:device:${sessionId}`,
         { fingerprint: deviceFingerprint },
-        Math.floor((expiresAt - now) / 1000)
+        Math.floor((expiresAt - now) / 1000),
       )
     }
 
@@ -198,14 +208,19 @@ export async function createSession(
     await updatePhase6AuthenticationProgress(userId, 'session_created')
 
     return sessionData
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.SESSION_CREATION_FAILED, options.userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      deviceId: options.deviceInfo.deviceId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.SESSION_CREATION_FAILED,
+      options.userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        deviceId: options.deviceInfo.deviceId,
+      },
+    )
 
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to create session')
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to create session')
   }
 }
 
@@ -216,7 +231,7 @@ export async function validateSession(
   sessionId: string,
   deviceInfo: DeviceInfo,
   ipAddress: string,
-  userAgent: string
+  userAgent: string,
 ): Promise<SessionValidationResult> {
   try {
     // Get session data
@@ -241,14 +256,21 @@ export async function validateSession(
     if (SESSION_CONFIG.deviceBindingEnabled) {
       const deviceData = await getFromCache(`session:device:${sessionId}`)
       if (deviceData) {
-        const currentFingerprint = await generateDeviceFingerprint(deviceInfo, userAgent)
+        const currentFingerprint = await generateDeviceFingerprint(
+          deviceInfo,
+          userAgent,
+        )
         if (deviceData.fingerprint !== currentFingerprint) {
-          await logSecurityEvent(SecurityEventType.SESSION_SECURITY_ALERT, sessionData.userId, {
-            sessionId,
-            alertType: 'device_mismatch',
-            expectedDevice: deviceData.fingerprint,
-            actualDevice: currentFingerprint,
-          })
+          await logSecurityEvent(
+            SecurityEventType.SESSION_SECURITY_ALERT,
+            sessionData.userId,
+            {
+              sessionId,
+              alertType: 'device_mismatch',
+              expectedDevice: deviceData.fingerprint,
+              actualDevice: currentFingerprint,
+            },
+          )
 
           return {
             valid: false,
@@ -260,13 +282,20 @@ export async function validateSession(
     }
 
     // Validate IP address
-    if (SESSION_CONFIG.ipValidationEnabled && sessionData.ipAddress !== ipAddress) {
-      await logSecurityEvent(SecurityEventType.SESSION_SECURITY_ALERT, sessionData.userId, {
-        sessionId,
-        alertType: 'ip_change',
-        expectedIp: sessionData.ipAddress,
-        actualIp: ipAddress,
-      })
+    if (
+      SESSION_CONFIG.ipValidationEnabled &&
+      sessionData.ipAddress !== ipAddress
+    ) {
+      await logSecurityEvent(
+        SecurityEventType.SESSION_SECURITY_ALERT,
+        sessionData.userId,
+        {
+          sessionId,
+          alertType: 'ip_change',
+          expectedIp: sessionData.ipAddress,
+          actualIp: ipAddress,
+        },
+      )
 
       return {
         valid: false,
@@ -281,20 +310,23 @@ export async function validateSession(
     await setInCache(
       `session:${sessionId}`,
       sessionData,
-      Math.floor((sessionData.expiresAt - Date.now()) / 1000)
+      Math.floor((sessionData.expiresAt - Date.now()) / 1000),
     )
 
     // Log successful validation
-    await logSecurityEvent(SecurityEventType.SESSION_VALIDATED, sessionData.userId, {
-      sessionId,
-      deviceId: deviceInfo.deviceId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.SESSION_VALIDATED,
+      sessionData.userId,
+      {
+        sessionId,
+        deviceId: deviceInfo.deviceId,
+      },
+    )
 
     return {
       valid: true,
       session: sessionData,
     }
-
   } catch (error) {
     console.error('Error validating session:', error)
     return {
@@ -309,7 +341,7 @@ export async function validateSession(
  */
 export async function refreshSession(
   sessionId: string,
-  extendByMs: number = SESSION_CONFIG.sessionTimeout
+  extendByMs: number = SESSION_CONFIG.sessionTimeout,
 ): Promise<SessionData | null> {
   try {
     const sessionData = await getFromCache(`session:${sessionId}`)
@@ -325,20 +357,27 @@ export async function refreshSession(
     await setInCache(
       `session:${sessionId}`,
       sessionData,
-      Math.floor(extendByMs / 1000)
+      Math.floor(extendByMs / 1000),
     )
 
     // Update user's session list
-    await updateUserSessionExpiry(sessionData.userId, sessionId, sessionData.expiresAt)
+    await updateUserSessionExpiry(
+      sessionData.userId,
+      sessionId,
+      sessionData.expiresAt,
+    )
 
     // Log session refresh
-    await logSecurityEvent(SecurityEventType.SESSION_REFRESHED, sessionData.userId, {
-      sessionId,
-      newExpiry: sessionData.expiresAt,
-    })
+    await logSecurityEvent(
+      SecurityEventType.SESSION_REFRESHED,
+      sessionData.userId,
+      {
+        sessionId,
+        newExpiry: sessionData.expiresAt,
+      },
+    )
 
     return sessionData
-
   } catch (error) {
     console.error('Error refreshing session:', error)
     return null
@@ -350,7 +389,7 @@ export async function refreshSession(
  */
 export async function destroySession(
   sessionId: string,
-  reason: string = 'user_logout'
+  reason: string = 'user_logout',
 ): Promise<void> {
   try {
     const sessionData = await getFromCache(`session:${sessionId}`)
@@ -366,15 +405,21 @@ export async function destroySession(
     await removeUserSession(sessionData.userId, sessionId)
 
     // Log session destruction
-    await logSecurityEvent(SecurityEventType.SESSION_DESTROYED, sessionData.userId, {
-      sessionId,
-      reason,
-      deviceId: sessionData.deviceId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.SESSION_DESTROYED,
+      sessionData.userId,
+      {
+        sessionId,
+        reason,
+        deviceId: sessionData.deviceId,
+      },
+    )
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(sessionData.userId, 'session_destroyed')
-
+    await updatePhase6AuthenticationProgress(
+      sessionData.userId,
+      'session_destroyed',
+    )
   } catch (error) {
     console.error('Error destroying session:', error)
   }
@@ -383,10 +428,12 @@ export async function destroySession(
 /**
  * Get user's active sessions
  */
-export async function getUserSessions(userId: string): Promise<SessionListItem[]> {
+export async function getUserSessions(
+  userId: string,
+): Promise<SessionListItem[]> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    const sessionList = await getFromCache(sessionsKey) || []
+    const sessionList = (await getFromCache(sessionsKey)) || []
 
     const activeSessions: SessionListItem[] = []
 
@@ -405,7 +452,6 @@ export async function getUserSessions(userId: string): Promise<SessionListItem[]
     }
 
     return activeSessions
-
   } catch (error) {
     console.error('Error getting user sessions:', error)
     return []
@@ -417,11 +463,11 @@ export async function getUserSessions(userId: string): Promise<SessionListItem[]
  */
 export async function destroyAllUserSessions(
   userId: string,
-  reason: string = 'security_logout'
+  reason: string = 'security_logout',
 ): Promise<void> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    const sessionList = await getFromCache(sessionsKey) || []
+    const sessionList = (await getFromCache(sessionsKey)) || []
 
     for (const sessionInfo of sessionList) {
       await destroySession(sessionInfo.sessionId, reason)
@@ -435,7 +481,6 @@ export async function destroyAllUserSessions(
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, 'all_sessions_destroyed')
-
   } catch (error) {
     console.error('Error destroying all user sessions:', error)
   }
@@ -447,20 +492,22 @@ export async function destroyAllUserSessions(
 async function enforceSessionLimit(userId: string): Promise<void> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    const sessionList = await getFromCache(sessionsKey) || []
+    const sessionList = (await getFromCache(sessionsKey)) || []
 
     if (sessionList.length >= SESSION_CONFIG.concurrentSessionLimit) {
       // Sort by last activity (oldest first)
       sessionList.sort((a: any, b: any) => a.lastActivity - b.lastActivity)
 
       // Remove oldest sessions to make room
-      const sessionsToRemove = sessionList.slice(0, sessionList.length - SESSION_CONFIG.concurrentSessionLimit + 1)
-      
+      const sessionsToRemove = sessionList.slice(
+        0,
+        sessionList.length - SESSION_CONFIG.concurrentSessionLimit + 1,
+      )
+
       for (const sessionInfo of sessionsToRemove) {
         await destroySession(sessionInfo.sessionId, 'session_limit_exceeded')
       }
     }
-
   } catch (error) {
     console.error('Error enforcing session limit:', error)
   }
@@ -469,10 +516,14 @@ async function enforceSessionLimit(userId: string): Promise<void> {
 /**
  * Add session to user's session list
  */
-async function addUserSession(userId: string, sessionId: string, expiresAt: number): Promise<void> {
+async function addUserSession(
+  userId: string,
+  sessionId: string,
+  expiresAt: number,
+): Promise<void> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    let sessionList = await getFromCache(sessionsKey) || []
+    let sessionList = (await getFromCache(sessionsKey)) || []
 
     sessionList.push({
       sessionId,
@@ -482,7 +533,6 @@ async function addUserSession(userId: string, sessionId: string, expiresAt: numb
 
     // Store with expiration (1 year)
     await setInCache(sessionsKey, sessionList, 365 * 24 * 60 * 60)
-
   } catch (error) {
     console.error('Error adding user session:', error)
   }
@@ -491,10 +541,13 @@ async function addUserSession(userId: string, sessionId: string, expiresAt: numb
 /**
  * Remove session from user's session list
  */
-async function removeUserSession(userId: string, sessionId: string): Promise<void> {
+async function removeUserSession(
+  userId: string,
+  sessionId: string,
+): Promise<void> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    let sessionList = await getFromCache(sessionsKey) || []
+    let sessionList = (await getFromCache(sessionsKey)) || []
 
     sessionList = sessionList.filter((s: any) => s.sessionId !== sessionId)
 
@@ -503,7 +556,6 @@ async function removeUserSession(userId: string, sessionId: string): Promise<voi
     } else {
       await removeFromCache(sessionsKey)
     }
-
   } catch (error) {
     console.error('Error removing user session:', error)
   }
@@ -512,17 +564,20 @@ async function removeUserSession(userId: string, sessionId: string): Promise<voi
 /**
  * Update session expiry in user's session list
  */
-async function updateUserSessionExpiry(userId: string, sessionId: string, newExpiry: number): Promise<void> {
+async function updateUserSessionExpiry(
+  userId: string,
+  sessionId: string,
+  newExpiry: number,
+): Promise<void> {
   try {
     const sessionsKey = `user:sessions:${userId}`
-    const sessionList = await getFromCache(sessionsKey) || []
+    const sessionList = (await getFromCache(sessionsKey)) || []
 
     const sessionInfo = sessionList.find((s: any) => s.sessionId === sessionId)
     if (sessionInfo) {
       sessionInfo.expiresAt = newExpiry
       await setInCache(sessionsKey, sessionList, 365 * 24 * 60 * 60)
     }
-
   } catch (error) {
     console.error('Error updating session expiry:', error)
   }
@@ -546,7 +601,7 @@ export async function cleanupExpiredSessions(): Promise<{
 
     for (const key of sessionKeys) {
       const sessionData = await getFromCache(key)
-      
+
       if (sessionData && Date.now() > sessionData.expiresAt) {
         await destroySession(sessionData.sessionId, 'expired_cleanup')
         cleanedCount++
@@ -559,7 +614,6 @@ export async function cleanupExpiredSessions(): Promise<{
       affectedUsers: Array.from(affectedUsers),
       timestamp: startTime,
     }
-
   } catch (error) {
     console.error('Error cleaning up expired sessions:', error)
     return {
@@ -573,14 +627,23 @@ export async function cleanupExpiredSessions(): Promise<{
 /**
  * Get session security level
  */
-export function getSessionSecurityLevel(role: UserRole, permissions: string[]): 'standard' | 'high' | 'maximum' {
+export function getSessionSecurityLevel(
+  role: UserRole,
+  permissions: string[],
+): 'standard' | 'high' | 'maximum' {
   // High security for admin and sensitive operations
-  if (role === 'admin' || permissions.some(p => p.includes('manage:') || p.includes('delete:'))) {
+  if (
+    role === 'admin' ||
+    permissions.some((p) => p.includes('manage:') || p.includes('delete:'))
+  ) {
     return 'maximum'
   }
 
   // High security for therapist and patient data access
-  if (role === 'therapist' || permissions.some(p => p.includes('patient_data'))) {
+  if (
+    role === 'therapist' ||
+    permissions.some((p) => p.includes('patient_data'))
+  ) {
     return 'high'
   }
 
@@ -595,7 +658,9 @@ export function scheduleSessionCleanup(): void {
     try {
       const result = await cleanupExpiredSessions()
       if (result.cleanedSessions > 0) {
-        console.log(`Cleaned up ${result.cleanedSessions} expired sessions for ${result.affectedUsers.length} users`)
+        console.log(
+          `Cleaned up ${result.cleanedSessions} expired sessions for ${result.affectedUsers.length} users`,
+        )
       }
     } catch (error) {
       console.error('Error in scheduled session cleanup:', error)

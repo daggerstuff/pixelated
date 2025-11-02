@@ -7,11 +7,7 @@ interface Props {
   pageToc?: boolean
 }
 
-const {
-  collectionType,
-  slug,
-  pageToc = false,
-} = Astro.props
+const { collectionType, slug, pageToc = false } = Astro.props
 
 // Handle content rendering at the global scope to avoid TypeScript errors
 let contentResult

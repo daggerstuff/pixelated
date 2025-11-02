@@ -24,11 +24,11 @@ const logger = createBuildSafeLogger('default')
 
 // Dynamic TensorFlow.js imports to reduce bundle size
 async function loadTensorFlow() {
-  return await import('@tensorflow/tfjs');
+  return await import('@tensorflow/tfjs')
 }
 
 async function loadTensorFlowLayers() {
-  return await import('@tensorflow/tfjs-layers');
+  return await import('@tensorflow/tfjs-layers')
 }
 
 /**
@@ -139,7 +139,10 @@ export class FeedbackService implements FeedbackServiceInterface {
     }
   }
 
-  private queueAudioData(data: Float32Array, metadata: { timestamp: number }): void {
+  private queueAudioData(
+    data: Float32Array,
+    metadata: { timestamp: number },
+  ): void {
     // Add to processing queue
     this.processingQueue.push({
       data,

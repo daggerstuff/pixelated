@@ -509,7 +509,9 @@ export function downloadExportData(exportData: ExportData): void {
     URL.revokeObjectURL(url)
   } catch (error: unknown) {
     console.error('Export failed:', error)
-    throw new Error('Failed to export analysis results. Please try again.')
+    throw new Error('Failed to export analysis results. Please try again.', {
+      cause: error,
+    })
   }
 }
 
@@ -561,22 +563,33 @@ export function determineAlertLevel(
  */
 export function generateSessionId(): string {
   // Use cryptographically secure random values for session ID
-  const array = new Uint32Array(2);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(array);
-  } else if (typeof process !== 'undefined' && process.versions && process.versions.node) {
-    // Node.js fallback
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const crypto = require('crypto');
-    const buf = crypto.randomBytes(8);
-    array[0] = buf.readUInt32LE(0);
-    array[1] = buf.readUInt32LE(4);
+  const array = new Uint32Array(2)
+  if (
+    typeof window !== 'undefined' &&
+    window.crypto &&
+    window.crypto.getRandomValues
+  ) {
+    window.crypto.getRandomValues(array)
+  } else if (
+    typeof process !== 'undefined' &&
+    process.versions &&
+    process.versions.node
+  ) {
+    // Node.js fallback - use guarded runtime require to avoid bundler issues
+    // Use tryRequireNode from utils to avoid bundlers including `crypto` in frontend bundles
+    // Import dynamically to prevent circular import at module-eval time
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { tryRequireNode } =
+      require('@/lib/utils') as typeof import('@/lib/utils')
+    const crypto = tryRequireNode('crypto') || require('crypto')
+    const buf = crypto.randomBytes(8)
+    array[0] = buf.readUInt32LE(0)
+    array[1] = buf.readUInt32LE(4)
   } else {
     // Fallback to Math.random (should not happen)
-    array[0] = Math.floor(Math.random() * 0xffffffff);
-    array[1] = Math.floor(Math.random() * 0xffffffff);
+    array[0] = Math.floor(Math.random() * 0xffffffff)
+    array[1] = Math.floor(Math.random() * 0xffffffff)
   }
-  const randomStr =
-    (array[0] ?? 0).toString(36) + (array[1] ?? 0).toString(36);
-  return 'demo_' + Date.now() + '_' + randomStr.slice(0, 9);
+  const randomStr = (array[0] ?? 0).toString(36) + (array[1] ?? 0).toString(36)
+  return 'demo_' + Date.now() + '_' + randomStr.slice(0, 9)
 }

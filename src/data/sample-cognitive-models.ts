@@ -358,7 +358,7 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       skillsAcquired: [
         'Basic thought challenging',
         'Activity scheduling',
-        'Mindfulness techniques'
+        'Mindfulness techniques',
       ],
     },
   },
@@ -746,7 +746,7 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       skillsAcquired: [
         'Deep breathing',
         'Progressive muscle relaxation',
-        'Basic cognitive restructuring'
+        'Basic cognitive restructuring',
       ],
     },
   },
@@ -1133,7 +1133,7 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       skillsAcquired: [
         'Grounding techniques',
         'Safety planning',
-        'Basic emotional regulation'
+        'Basic emotional regulation',
       ],
     },
   },

@@ -5,13 +5,13 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
 import type { AuthUser } from '@/lib/auth/types'
-import { 
-  EmotionTemporalAnalyzer, 
+import {
+  EmotionTemporalAnalyzer,
   type EmotionAnalysisResult,
   type EmotionTrendline,
   type EmotionData,
   type EmotionProgression,
-  type EmotionCorrelation
+  type EmotionCorrelation,
 } from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
 
 const logger = createBuildSafeLogger('temporal-emotions-api')
@@ -75,8 +75,11 @@ export const GET = protectRoute({
     const clientId = user.id
 
     // Perform analysis based on requested type
-    let result: 
-      | { trendlines: EmotionTrendline[] | undefined; volatility: number | undefined }
+    let result:
+      | {
+          trendlines: EmotionTrendline[] | undefined
+          volatility: number | undefined
+        }
       | EmotionAnalysisResult
       | EmotionData[]
       | EmotionProgression

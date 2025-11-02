@@ -126,7 +126,9 @@ export function NotificationPreferences({
 
           <Select
             value={preferences.frequency}
-            onValueChange={(value) => updateFrequency(value as NotificationFrequency)}
+            onValueChange={(value) =>
+              updateFrequency(value as NotificationFrequency)
+            }
             placeholder="Select frequency"
           >
             <SelectTrigger>

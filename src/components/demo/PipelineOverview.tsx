@@ -8,26 +8,27 @@ export default function PipelineOverview() {
       title: 'Data Ingestion',
       description: 'Process clinical content and psychological resources',
       icon: '📥',
-      details: 'Handles text, PDFs, research papers, and clinical notes'
+      details: 'Handles text, PDFs, research papers, and clinical notes',
     },
     {
       title: 'Entity Extraction',
-      description: 'Identify mental health conditions, treatments, and risk factors',
+      description:
+        'Identify mental health conditions, treatments, and risk factors',
       icon: '🔍',
-      details: 'NLP-powered recognition of clinical entities and concepts'
+      details: 'NLP-powered recognition of clinical entities and concepts',
     },
     {
       title: 'Analysis Engine',
       description: 'Apply therapeutic frameworks and diagnostic criteria',
       icon: '🧠',
-      details: 'AI-powered analysis using evidence-based methodologies'
+      details: 'AI-powered analysis using evidence-based methodologies',
     },
     {
       title: 'Scenario Generation',
       description: 'Create training scenarios and treatment recommendations',
       icon: '📋',
-      details: 'Generate realistic client cases and therapeutic interventions'
-    }
+      details: 'Generate realistic client cases and therapeutic interventions',
+    },
   ]
 
   return (
@@ -49,7 +50,9 @@ export default function PipelineOverview() {
                 aria-pressed={activeStep === index}
               >
                 <div className="text-2xl mb-2">{step.icon}</div>
-                <h3 className="font-semibold text-white text-sm mb-1">{step.title}</h3>
+                <h3 className="font-semibold text-white text-sm mb-1">
+                  {step.title}
+                </h3>
                 <p className="text-xs text-slate-300">{step.description}</p>
               </button>
             ))}
@@ -60,8 +63,12 @@ export default function PipelineOverview() {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">{steps[activeStep]?.icon}</span>
               <div>
-                <h3 className="text-xl font-semibold text-white">{steps[activeStep]?.title}</h3>
-                <p className="text-slate-300">{steps[activeStep]?.description}</p>
+                <h3 className="text-xl font-semibold text-white">
+                  {steps[activeStep]?.title}
+                </h3>
+                <p className="text-slate-300">
+                  {steps[activeStep]?.description}
+                </p>
               </div>
             </div>
             <p className="text-slate-400">{steps[activeStep]?.details}</p>

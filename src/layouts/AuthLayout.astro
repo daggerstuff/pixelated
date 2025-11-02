@@ -20,11 +20,6 @@ const {
 } = Astro.props
 ---
 
-<BaseLayout
-  {title}
-  {description}
-  bgType="dot"
-  {transitionMode}
->
+<BaseLayout {title} {description} bgType="dot" {transitionMode}>
   <slot />
 </BaseLayout>

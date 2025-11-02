@@ -38,10 +38,7 @@ interface InsightMessageProps {
   trend: 'info' | 'success' | 'warning'
 }
 
-export const InsightMessage: FC<InsightMessageProps> = ({
-  summary,
-  trend,
-}) => {
+export const InsightMessage: FC<InsightMessageProps> = ({ summary, trend }) => {
   const { color, label, icon } = TREND_CONFIGS[trend]
 
   return (

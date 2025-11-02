@@ -90,7 +90,7 @@ export async function createBreach(breach: SecurityBreach): Promise<void> {
   try {
     const db = await mongodb.connect()
     const collection = db.collection<StoredBreach>('security_breaches')
-    
+
     await collection.insertOne({
       ...toStoredBreach(breach),
       created_at: new Date().toISOString(),
@@ -116,7 +116,7 @@ export async function getBreachesSince(date: Date): Promise<SecurityBreach[]> {
   try {
     const db = await mongodb.connect()
     const collection = db.collection<StoredBreach>('security_breaches')
-    
+
     const data = await collection
       .find({ timestamp: { $gte: date.toISOString() } })
       .sort({ timestamp: -1 })
@@ -144,15 +144,15 @@ export async function updateRemediationStatus(
   try {
     const db = await mongodb.connect()
     const collection = db.collection<StoredBreach>('security_breaches')
-    
+
     const result = await collection.updateOne(
       { id: breachId },
       {
         $set: {
           remediation_status: status,
           updated_at: new Date().toISOString(),
-        }
-      }
+        },
+      },
     )
 
     if (result.matchedCount === 0) {
@@ -177,7 +177,7 @@ export async function getBreachById(
   try {
     const db = await mongodb.connect()
     const collection = db.collection<StoredBreach>('security_breaches')
-    
+
     const data = await collection.findOne({ id })
 
     if (!data) {
@@ -203,7 +203,7 @@ export async function deleteBreach(id: string): Promise<void> {
   try {
     const db = await mongodb.connect()
     const collection = db.collection<StoredBreach>('security_breaches')
-    
+
     const result = await collection.deleteOne({ id })
 
     if (result.deletedCount === 0) {

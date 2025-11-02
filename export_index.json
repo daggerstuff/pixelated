@@ -5327,11 +5327,6 @@
         "type": "decl"
       },
       {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 421,
-        "type": "decl"
-      },
-      {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 444,
         "type": "decl"
@@ -5341,11 +5336,6 @@
       {
         "file": "src/lib/auth/roles.ts",
         "line": 331,
-        "type": "decl"
-      },
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 406,
         "type": "decl"
       },
       {
@@ -5479,22 +5469,12 @@
     ],
     "UserAuthentication": [
       {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 13,
-        "type": "decl"
-      },
-      {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 62,
         "type": "decl"
       }
     ],
     "AuthenticationResult": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 33,
-        "type": "decl"
-      },
       {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 83,
@@ -5508,22 +5488,12 @@
     ],
     "getUserAuthentication": [
       {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 218,
-        "type": "decl"
-      },
-      {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 378,
         "type": "decl"
       }
     ],
     "updateUserAuthentication": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 225,
-        "type": "decl"
-      },
       {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 385,
@@ -23676,11 +23646,6 @@
         "type": "decl"
       },
       {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 421,
-        "type": "decl"
-      },
-      {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 444,
         "type": "decl"
@@ -23690,11 +23655,6 @@
       {
         "file": "src/lib/auth/roles.ts",
         "line": 331,
-        "type": "decl"
-      },
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 406,
         "type": "decl"
       },
       {
@@ -24325,22 +24285,12 @@
     ],
     "UserAuthentication": [
       {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 13,
-        "type": "decl"
-      },
-      {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 62,
         "type": "decl"
       }
     ],
     "AuthenticationResult": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 33,
-        "type": "decl"
-      },
       {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 83,
@@ -24352,31 +24302,7 @@
         "type": "decl"
       }
     ],
-    "getUserAuthenticationByClerkId": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 209,
-        "type": "decl"
-      }
-    ],
-    "getUserAuthentication": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 218,
-        "type": "decl"
-      },
-      {
-        "file": "src/lib/auth/better-auth-integration.ts",
-        "line": 378,
-        "type": "decl"
-      }
-    ],
     "updateUserAuthentication": [
-      {
-        "file": "src/lib/auth/clerk-integration.ts",
-        "line": 225,
-        "type": "decl"
-      },
       {
         "file": "src/lib/auth/better-auth-integration.ts",
         "line": 385,

@@ -26,15 +26,15 @@ interface PopoverContentProps {
   className?: string
 }
 
-export const Popover: FC<PopoverProps> = ({ 
-  trigger, 
-  children, 
-  open, 
+export const Popover: FC<PopoverProps> = ({
+  trigger,
+  children,
+  open,
   onOpenChange,
-  className = '' 
+  className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(open || false)
-  
+
   const handleToggle = () => {
     const newOpen = !isOpen
     setIsOpen(newOpen)
@@ -65,20 +65,18 @@ export const Popover: FC<PopoverProps> = ({
   // Otherwise, use compound component API
   return (
     <PopoverContext.Provider value={{ isOpen, setIsOpen }}>
-      <div className={`relative ${className}`}>
-        {children}
-      </div>
+      <div className={`relative ${className}`}>{children}</div>
     </PopoverContext.Provider>
   )
 }
 
-export const PopoverTrigger: FC<PopoverTriggerProps> = ({ 
-  children, 
+export const PopoverTrigger: FC<PopoverTriggerProps> = ({
+  children,
   onClick,
-  className = '' 
+  className = '',
 }) => {
   const context = useContext(PopoverContext)
-  
+
   const handleClick = () => {
     context?.setIsOpen(!context.isOpen)
     onClick?.()
@@ -91,18 +89,20 @@ export const PopoverTrigger: FC<PopoverTriggerProps> = ({
   )
 }
 
-export const PopoverContent: FC<PopoverContentProps> = ({ 
-  children, 
-  className = '' 
+export const PopoverContent: FC<PopoverContentProps> = ({
+  children,
+  className = '',
 }) => {
   const context = useContext(PopoverContext)
-  
+
   if (!context?.isOpen) {
     return null
   }
 
   return (
-    <div className={`absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${className}`}>
+    <div
+      className={`absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${className}`}
+    >
       {children}
     </div>
   )

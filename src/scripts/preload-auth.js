@@ -197,5 +197,22 @@ function getFirstInputDelay() {
     ? fidEntries[0].processingStart - fidEntries[0].startTime
     : 0
 }
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2cc628ec-2a7b-516a-8129-de92553dbdb7")}catch(e){}}();
+!(function () {
+  try {
+    var e =
+        'undefined' != typeof window
+          ? window
+          : 'undefined' != typeof global
+            ? global
+            : 'undefined' != typeof globalThis
+              ? globalThis
+              : 'undefined' != typeof self
+                ? self
+                : {},
+      n = new e.Error().stack
+    n &&
+      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
+  } catch (e) {}
+})()
 //# debugId=2cc628ec-2a7b-516a-8129-de92553dbdb7

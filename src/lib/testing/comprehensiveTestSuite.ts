@@ -3,7 +3,7 @@
  * Multi-layered testing strategy with coverage and performance validation
  */
 
-import type { TestConfig, TestResult, CoverageReport } from '@/types/testing'
+import type { TestResult, CoverageReport } from '@/types/testing'
 
 export interface TestSuiteConfig {
   layers: ('unit' | 'integration' | 'e2e' | 'performance' | 'security')[]
@@ -99,7 +99,6 @@ class TestSuiteManager {
 
       await this.generateReport(finalMetrics)
       return finalMetrics
-
     } finally {
       this.isRunning = false
     }
@@ -228,7 +227,11 @@ class TestSuiteManager {
         name: testFile,
         status: passed ? 'passed' : 'failed',
         duration: responseTime,
-        error: passed ? undefined : new Error(`Performance threshold exceeded: ${responseTime}ms > ${this.config.performance.maxResponseTime}ms`),
+        error: passed
+          ? undefined
+          : new Error(
+              `Performance threshold exceeded: ${responseTime}ms > ${this.config.performance.maxResponseTime}ms`,
+            ),
         performance: {
           responseTime,
           memoryUsage: Math.random() * 50 + 25, // 25-75MB
@@ -261,10 +264,22 @@ class TestSuiteManager {
         name: testFile,
         status: passed ? 'passed' : 'failed',
         duration: Math.random() * 2000 + 500, // 500-2500ms
-        error: passed ? undefined : new Error('Security vulnerability detected'),
+        error: passed
+          ? undefined
+          : new Error('Security vulnerability detected'),
         security: {
-          vulnerabilities: passed ? [] : [{ type: 'mock', severity: 'high', description: 'Mock security issue' }],
-          complianceScore: passed ? 95 + Math.random() * 5 : 70 + Math.random() * 10,
+          vulnerabilities: passed
+            ? []
+            : [
+                {
+                  type: 'mock',
+                  severity: 'high',
+                  description: 'Mock security issue',
+                },
+              ],
+          complianceScore: passed
+            ? 95 + Math.random() * 5
+            : 70 + Math.random() * 10,
         },
       })
     }
@@ -272,15 +287,17 @@ class TestSuiteManager {
     return results
   }
 
-  private aggregateResults(results: PromiseSettledResult<TestResult[]>[]): Omit<TestMetrics, 'coverage' | 'performance' | 'duration'> {
+  private aggregateResults(
+    results: PromiseSettledResult<TestResult[]>[],
+  ): Omit<TestMetrics, 'coverage' | 'performance' | 'duration'> {
     let totalTests = 0
     let passedTests = 0
     let failedTests = 0
     let skippedTests = 0
 
-    results.forEach(result => {
+    results.forEach((result) => {
       if (result.status === 'fulfilled') {
-        result.value.forEach(test => {
+        result.value.forEach((test) => {
           totalTests++
           switch (test.status) {
             case 'passed':
@@ -395,18 +412,25 @@ class TestSuiteManager {
     const recommendations: string[] = []
 
     if (metrics.failedTests > 0) {
-      recommendations.push(`Fix ${metrics.failedTests} failing tests before deployment`)
+      recommendations.push(
+        `Fix ${metrics.failedTests} failing tests before deployment`,
+      )
     }
 
     if (!metrics.coverage.meetsRequirements) {
       recommendations.push('Improve test coverage to meet requirements')
     }
 
-    if (metrics.performance.averageResponseTime > this.config.performance.maxResponseTime) {
+    if (
+      metrics.performance.averageResponseTime >
+      this.config.performance.maxResponseTime
+    ) {
       recommendations.push('Optimize API response times')
     }
 
-    if (metrics.performance.memoryUsage > this.config.performance.maxMemoryUsage) {
+    if (
+      metrics.performance.memoryUsage > this.config.performance.maxMemoryUsage
+    ) {
       recommendations.push('Reduce memory usage in application')
     }
 
@@ -447,7 +471,9 @@ class TestSuiteManager {
   /**
    * Run tests for specific layer
    */
-  async runLayerTests(layer: TestSuiteConfig['layers'][0]): Promise<TestResult[]> {
+  async runLayerTests(
+    layer: TestSuiteConfig['layers'][0],
+  ): Promise<TestResult[]> {
     switch (layer) {
       case 'unit':
         return this.runUnitTests()
@@ -475,7 +501,9 @@ class TestSuiteManager {
     return {
       isRunning: this.isRunning,
       lastRun: this.optimizationHistory.length > 0 ? new Date() : undefined,
-      nextScheduled: this.config.enableCI ? new Date(Date.now() + 24 * 60 * 60 * 1000) : undefined,
+      nextScheduled: this.config.enableCI
+        ? new Date(Date.now() + 24 * 60 * 60 * 1000)
+        : undefined,
     }
   }
 

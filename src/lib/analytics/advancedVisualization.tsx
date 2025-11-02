@@ -3,7 +3,7 @@
  * Multi-dimensional analysis and interactive data exploration
  */
 
-import type { FC, ReactNode } from 'react'
+import type { FC } from 'react'
 import React from 'react'
 
 export interface DataDimension {
@@ -14,7 +14,14 @@ export interface DataDimension {
 }
 
 export interface VisualizationConfig {
-  type: 'scatter' | 'line' | 'bar' | 'heatmap' | 'network' | 'parallel' | 'treemap'
+  type:
+    | 'scatter'
+    | 'line'
+    | 'bar'
+    | 'heatmap'
+    | 'network'
+    | 'parallel'
+    | 'treemap'
   dimensions: {
     x: DataDimension
     y: DataDimension
@@ -45,15 +52,12 @@ export const AdvancedVisualization: FC<{
   config: VisualizationConfig
   onInsightGenerated?: (insight: AnalyticsInsight) => void
   className?: string
-}> = ({
-  data,
-  config,
-  onInsightGenerated,
-  className = '',
-}) => {
+}> = ({ data, config, onInsightGenerated, className = '' }) => {
   const [insights, setInsights] = React.useState<AnalyticsInsight[]>([])
   const [selectedDataPoints, setSelectedDataPoints] = React.useState<any[]>([])
-  const [viewMode, setViewMode] = React.useState<'overview' | 'detailed' | 'comparative'>('overview')
+  const [viewMode, setViewMode] = React.useState<
+    'overview' | 'detailed' | 'comparative'
+  >('overview')
 
   // Generate insights based on data analysis
   React.useEffect(() => {
@@ -67,7 +71,7 @@ export const AdvancedVisualization: FC<{
     // Generate insights for selected subset
     if (points.length > 0) {
       const subsetInsights = generateInsights(points, config)
-      setInsights(prev => [...prev, ...subsetInsights])
+      setInsights((prev) => [...prev, ...subsetInsights])
     }
   }
 
@@ -88,12 +92,18 @@ export const AdvancedVisualization: FC<{
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Interactive:</span>
-            <button className={`w-10 h-5 rounded-full transition-colors ${
-              config.interactive ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-            }`}>
-              <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                config.interactive ? 'translate-x-5' : 'translate-x-1'
-              }`} />
+            <button
+              className={`w-10 h-5 rounded-full transition-colors ${
+                config.interactive
+                  ? 'bg-blue-500'
+                  : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <div
+                className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                  config.interactive ? 'translate-x-5' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
         </div>
@@ -135,27 +145,62 @@ export const AdvancedVisualization: FC<{
           <h4 className="font-medium mb-3">Selected Data Analysis</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">Points</div>
-              <div className="text-lg font-bold">{selectedDataPoints.length}</div>
-            </div>
-            <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">Avg Value</div>
+              <div className="font-medium text-gray-600 dark:text-gray-400">
+                Points
+              </div>
               <div className="text-lg font-bold">
-                {(selectedDataPoints.reduce((sum, p) => sum + (p[config.dimensions.y.field] || 0), 0) / selectedDataPoints.length).toFixed(2)}
+                {selectedDataPoints.length}
               </div>
             </div>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">Range</div>
+              <div className="font-medium text-gray-600 dark:text-gray-400">
+                Avg Value
+              </div>
               <div className="text-lg font-bold">
-                {Math.min(...selectedDataPoints.map(p => p[config.dimensions.y.field] || 0)).toFixed(1)} - {Math.max(...selectedDataPoints.map(p => p[config.dimensions.y.field] || 0)).toFixed(1)}
+                {(
+                  selectedDataPoints.reduce(
+                    (sum, p) => sum + (p[config.dimensions.y.field] || 0),
+                    0,
+                  ) / selectedDataPoints.length
+                ).toFixed(2)}
               </div>
             </div>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">Trend</div>
-              <div className={`text-lg font-bold ${
-                calculateTrend(selectedDataPoints, config.dimensions.x.field) > 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {calculateTrend(selectedDataPoints, config.dimensions.x.field) > 0 ? '↗' : '↘'}
+              <div className="font-medium text-gray-600 dark:text-gray-400">
+                Range
+              </div>
+              <div className="text-lg font-bold">
+                {Math.min(
+                  ...selectedDataPoints.map(
+                    (p) => p[config.dimensions.y.field] || 0,
+                  ),
+                ).toFixed(1)}{' '}
+                -{' '}
+                {Math.max(
+                  ...selectedDataPoints.map(
+                    (p) => p[config.dimensions.y.field] || 0,
+                  ),
+                ).toFixed(1)}
+              </div>
+            </div>
+            <div>
+              <div className="font-medium text-gray-600 dark:text-gray-400">
+                Trend
+              </div>
+              <div
+                className={`text-lg font-bold ${
+                  calculateTrend(
+                    selectedDataPoints,
+                    config.dimensions.x.field,
+                  ) > 0
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}
+              >
+                {calculateTrend(selectedDataPoints, config.dimensions.x.field) >
+                0
+                  ? '↗'
+                  : '↘'}
               </div>
             </div>
           </div>
@@ -180,8 +225,8 @@ const VisualizationChart: FC<{
   const chartHeight = 400
   const chartWidth = 600
 
-  const xValues = data.map(d => d[config.dimensions.x.field] || 0)
-  const yValues = data.map(d => d[config.dimensions.y.field] || 0)
+  const xValues = data.map((d) => d[config.dimensions.x.field] || 0)
+  const yValues = data.map((d) => d[config.dimensions.y.field] || 0)
 
   const xMin = Math.min(...xValues)
   const xMax = Math.max(...xValues)
@@ -189,16 +234,27 @@ const VisualizationChart: FC<{
   const yMax = Math.max(...yValues)
 
   const getPointPosition = (point: any) => {
-    const x = ((point[config.dimensions.x.field] || 0) - xMin) / (xMax - xMin) * (chartWidth - 40) + 20
-    const y = chartHeight - 20 - ((point[config.dimensions.y.field] || 0) - yMin) / (yMax - yMin) * (chartHeight - 40)
+    const x =
+      (((point[config.dimensions.x.field] || 0) - xMin) / (xMax - xMin)) *
+        (chartWidth - 40) +
+      20
+    const y =
+      chartHeight -
+      20 -
+      (((point[config.dimensions.y.field] || 0) - yMin) / (yMax - yMin)) *
+        (chartHeight - 40)
     return { x, y }
   }
 
   return (
     <div className="relative">
-      <svg width={chartWidth} height={chartHeight} className="border border-gray-200 dark:border-gray-700">
+      <svg
+        width={chartWidth}
+        height={chartHeight}
+        className="border border-gray-200 dark:border-gray-700"
+      >
         {/* Grid lines */}
-        {[0.25, 0.5, 0.75].map(ratio => (
+        {[0.25, 0.5, 0.75].map((ratio) => (
           <g key={ratio}>
             <line
               x1="20"
@@ -250,11 +306,13 @@ const VisualizationChart: FC<{
 
       {/* Tooltip */}
       {hoveredPoint && (
-        <div className="absolute bg-gray-900 text-white text-xs rounded-lg px-2 py-1 pointer-events-none z-10"
-             style={{
-               left: getPointPosition(hoveredPoint).x + 10,
-               top: getPointPosition(hoveredPoint).y - 10,
-             }}>
+        <div
+          className="absolute bg-gray-900 text-white text-xs rounded-lg px-2 py-1 pointer-events-none z-10"
+          style={{
+            left: getPointPosition(hoveredPoint).x + 10,
+            top: getPointPosition(hoveredPoint).y - 10,
+          }}
+        >
           {config.dimensions.x.label}: {hoveredPoint[config.dimensions.x.field]}
           <br />
           {config.dimensions.y.label}: {hoveredPoint[config.dimensions.y.field]}
@@ -292,7 +350,9 @@ const InsightCard: FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
             <span className="text-lg">{typeIcons[insight.type]}</span>
             <h4 className="font-medium text-sm">{insight.title}</h4>
           </div>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]}`}>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]}`}
+          >
             {insight.impact}
           </span>
         </div>
@@ -317,7 +377,9 @@ const InsightCard: FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <div className="space-y-2">
               <div>
-                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Recommendations:</h5>
+                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Recommendations:
+                </h5>
                 <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                   {insight.recommendations.map((rec, index) => (
                     <li key={index}>• {rec}</li>
@@ -335,7 +397,10 @@ const InsightCard: FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
 /**
  * Generate insights from data analysis
  */
-function generateInsights(data: any[], config: VisualizationConfig): AnalyticsInsight[] {
+function generateInsights(
+  data: any[],
+  config: VisualizationConfig,
+): AnalyticsInsight[] {
   const insights: AnalyticsInsight[] = []
 
   if (data.length < 5) return insights
@@ -360,11 +425,14 @@ function generateInsights(data: any[], config: VisualizationConfig): AnalyticsIn
   }
 
   // Anomaly detection (simplified)
-  const yValues = data.map(d => d[config.dimensions.y.field] || 0)
+  const yValues = data.map((d) => d[config.dimensions.y.field] || 0)
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
-  const stdDev = Math.sqrt(yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / yValues.length)
+  const stdDev = Math.sqrt(
+    yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      yValues.length,
+  )
 
-  const anomalies = data.filter(d => {
+  const anomalies = data.filter((d) => {
     const val = d[config.dimensions.y.field] || 0
     return Math.abs(val - mean) > 2 * stdDev
   })
@@ -388,7 +456,11 @@ function generateInsights(data: any[], config: VisualizationConfig): AnalyticsIn
 
   // Correlation analysis (simplified)
   if (config.dimensions.color) {
-    const correlation = calculateCorrelation(data, config.dimensions.x.field, config.dimensions.color.field)
+    const correlation = calculateCorrelation(
+      data,
+      config.dimensions.x.field,
+      config.dimensions.color.field,
+    )
     if (Math.abs(correlation) > 0.5) {
       insights.push({
         id: `correlation_${Date.now()}`,
@@ -396,7 +468,10 @@ function generateInsights(data: any[], config: VisualizationConfig): AnalyticsIn
         title: 'Strong Correlation Found',
         description: `Significant ${correlation > 0 ? 'positive' : 'negative'} correlation detected between ${config.dimensions.x.label} and ${config.dimensions.color.label}`,
         confidence: Math.abs(correlation),
-        data: { correlation, fields: [config.dimensions.x.field, config.dimensions.color.field] },
+        data: {
+          correlation,
+          fields: [config.dimensions.x.field, config.dimensions.color.field],
+        },
         recommendations: [
           'Explore causal relationships between correlated factors',
           'Consider this correlation in treatment planning',
@@ -429,16 +504,27 @@ function calculateTrend(data: any[], xField: string): number {
 /**
  * Calculate correlation between two fields (simplified)
  */
-function calculateCorrelation(data: any[], field1: string, field2: string): number {
-  const values1 = data.map(d => d[field1] || 0)
-  const values2 = data.map(d => d[field2] || 0)
+function calculateCorrelation(
+  data: any[],
+  field1: string,
+  field2: string,
+): number {
+  const values1 = data.map((d) => d[field1] || 0)
+  const values2 = data.map((d) => d[field2] || 0)
 
   const mean1 = values1.reduce((sum, val) => sum + val, 0) / values1.length
   const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length
 
-  const numerator = values1.reduce((sum, val1, i) => sum + (val1 - mean1) * (values2[i] - mean2), 0)
-  const denom1 = Math.sqrt(values1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0))
-  const denom2 = Math.sqrt(values2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0))
+  const numerator = values1.reduce(
+    (sum, val1, i) => sum + (val1 - mean1) * (values2[i] - mean2),
+    0,
+  )
+  const denom1 = Math.sqrt(
+    values1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0),
+  )
+  const denom2 = Math.sqrt(
+    values2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0),
+  )
 
   return numerator / (denom1 * denom2)
 }

@@ -24,7 +24,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     mockRateLimiter = {
       checkLimit: vi.fn().mockResolvedValue({ allowed: true }),
       consume: vi.fn().mockResolvedValue({ allowed: true }),
-      reset: vi.fn().mockResolvedValue(true)
+      reset: vi.fn().mockResolvedValue(true),
     }
 
     // Create complete threat detection system
@@ -35,21 +35,21 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         threatDetection: {
           mongoUri,
           redisUrl: 'redis://localhost:6379',
-          enabled: true
+          enabled: true,
         },
         monitoring: {
           enabled: true,
           aiInsightsEnabled: true,
           monitoringIntervals: {
             realTime: 1000, // 1 second for testing
-            batch: 5000,    // 5 seconds for testing
-            anomalyDetection: 2000 // 2 seconds for testing
-          }
+            batch: 5000, // 5 seconds for testing
+            anomalyDetection: 2000, // 2 seconds for testing
+          },
         },
         hunting: {
           enabled: true,
           huntingFrequency: 10000, // 10 seconds for testing
-          investigationTimeout: 30000 // 30 seconds for testing
+          investigationTimeout: 30000, // 30 seconds for testing
         },
         intelligence: {
           enabled: true,
@@ -64,11 +64,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
               supportedIOCTypes: ['ip', 'domain'],
               updateFrequency: 60000,
               enabled: true,
-              priority: 1
-            }
-          ]
-        }
-      }
+              priority: 1,
+            },
+          ],
+        },
+      },
     )
   })
 
@@ -91,11 +91,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         userId: 'user123',
         ip: '192.168.1.1',
         success: false,
-        timestamp: new Date()
+        timestamp: new Date(),
       })
 
       // Wait for metrics collection
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       // Check if metrics were collected
       const metrics = await monitoringService.getMetrics()
@@ -113,7 +113,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         name: 'failed_login_attempts',
         value: 15,
         timestamp: new Date(),
-        tags: { severity: 'high', userId: 'user123' }
+        tags: { severity: 'high', userId: 'user123' },
       })
 
       // Generate insights
@@ -137,12 +137,12 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
           name: 'failed_login_attempts',
           value: 1,
           timestamp: new Date(),
-          tags: { severity: 'high', userId: `user${i}` }
+          tags: { severity: 'high', userId: `user${i}` },
         })
       }
 
       // Wait for alert processing
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       expect(alertSpy).toHaveBeenCalled()
       const alert = alertSpy.mock.calls[0][0]
@@ -167,11 +167,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         severity: 'high',
         userId: 'user123',
         ip: '192.168.1.1',
-        timestamp: new Date()
+        timestamp: new Date(),
       })
 
       // Wait for hunting execution
-      await new Promise(resolve => setTimeout(resolve, 15000))
+      await new Promise((resolve) => setTimeout(resolve, 15000))
 
       expect(investigationSpy).toHaveBeenCalled()
 
@@ -185,7 +185,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         threatId: 'threat456',
         userId: 'user456',
         severity: 'medium',
-        templateId: 'standard_threat_investigation'
+        templateId: 'standard_threat_investigation',
       })
 
       expect(investigation).toBeDefined()
@@ -193,9 +193,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       expect(investigation.status).toBe('running')
 
       // Wait for investigation to complete
-      await new Promise(resolve => setTimeout(resolve, 35000))
+      await new Promise((resolve) => setTimeout(resolve, 35000))
 
-      const result = await huntingService.getInvestigationResult(investigation.id)
+      const result = await huntingService.getInvestigationResult(
+        investigation.id,
+      )
       expect(result).toBeDefined()
       expect(result.status).toBe('completed')
     })
@@ -211,14 +213,14 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
           userId: `user${i}`,
           ip: suspiciousIP,
           success: false,
-          timestamp: new Date()
+          timestamp: new Date(),
         })
       }
 
       // Trigger pattern analysis
       const patterns = await huntingService.analyzePatterns({
         type: 'ip_analysis',
-        timeWindow: 3600000 // 1 hour
+        timeWindow: 3600000, // 1 hour
       })
 
       expect(patterns).toBeDefined()
@@ -239,19 +241,22 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
               id: '12345',
               url: 'http://malicious-site.com',
               threat: 'malware',
-              date_added: new Date().toISOString()
-            }
-          ]
-        })
+              date_added: new Date().toISOString(),
+            },
+          ],
+        }),
       })
 
       await intelligenceService.start()
 
       // Wait for feed update
-      await new Promise(resolve => setTimeout(resolve, 35000))
+      await new Promise((resolve) => setTimeout(resolve, 35000))
 
       // Check if IOCs were processed
-      const iocs = await intelligenceService.lookupIOC('malicious-site.com', 'domain')
+      const iocs = await intelligenceService.lookupIOC(
+        'malicious-site.com',
+        'domain',
+      )
       expect(iocs).toBeDefined()
       expect(iocs.length).toBeGreaterThan(0)
 
@@ -264,7 +269,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       // Mock external API
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ data: [] })
+        json: async () => ({ data: [] }),
       })
 
       const ip = '192.168.1.200'
@@ -286,14 +291,19 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       const { intelligenceService } = threatDetectionSystem
 
       // Mock multiple feed responses
-      global.fetch = vi.fn()
+      global.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ data: [{ indicator: 'malicious.com', type: 'domain' }] })
+          json: async () => ({
+            data: [{ indicator: 'malicious.com', type: 'domain' }],
+          }),
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ results: [{ ip: '192.168.1.1', reputation: 'bad' }] })
+          json: async () => ({
+            results: [{ ip: '192.168.1.1', reputation: 'bad' }],
+          }),
         })
 
       await intelligenceService.updateFeeds()
@@ -305,17 +315,14 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
   describe('Integration Tests', () => {
     it('should coordinate between all Phase 8 services', async () => {
-      const {
-        monitoringService,
-        huntingService,
-        intelligenceService
-      } = threatDetectionSystem
+      const { monitoringService, huntingService, intelligenceService } =
+        threatDetectionSystem
 
       // Start all services
       await Promise.all([
         monitoringService.start(),
         huntingService.start(),
-        intelligenceService.start()
+        intelligenceService.start(),
       ])
 
       // Simulate a complex threat scenario
@@ -325,36 +332,39 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         ip: 'malicious.ip.address',
         severity: 'critical',
         type: 'data_exfiltration',
-        timestamp: new Date()
+        timestamp: new Date(),
       }
 
       // Emit threat to orchestrator
       mockOrchestrator.emit('threat:detected', threatData)
 
       // Wait for processing
-      await new Promise(resolve => setTimeout(resolve, 20000))
+      await new Promise((resolve) => setTimeout(resolve, 20000))
 
       // Verify monitoring captured the event
       const metrics = await monitoringService.getMetrics()
-      const threatMetric = metrics.find(m => m.name === 'threats_detected')
+      const threatMetric = metrics.find((m) => m.name === 'threats_detected')
       expect(threatMetric).toBeDefined()
 
       // Verify hunting service initiated investigation
       const investigations = await huntingService.getActiveInvestigations()
-      const relatedInvestigation = investigations.find(inv =>
-        inv.threatId === threatData.threatId
+      const relatedInvestigation = investigations.find(
+        (inv) => inv.threatId === threatData.threatId,
       )
       expect(relatedInvestigation).toBeDefined()
 
       // Verify intelligence service checked IOCs
-      const iocResults = await intelligenceService.lookupIOC(threatData.ip, 'ip')
+      const iocResults = await intelligenceService.lookupIOC(
+        threatData.ip,
+        'ip',
+      )
       expect(iocResults).toBeDefined()
 
       // Stop all services
       await Promise.all([
         monitoringService.stop(),
         huntingService.stop(),
-        intelligenceService.stop()
+        intelligenceService.stop(),
       ])
     })
 
@@ -367,13 +377,15 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate service failure
       const originalGetMetrics = monitoringService.getMetrics
-      monitoringService.getMetrics = vi.fn().mockRejectedValue(new Error('Service failure'))
+      monitoringService.getMetrics = vi
+        .fn()
+        .mockRejectedValue(new Error('Service failure'))
 
       // Verify hunting service continues despite monitoring failure
       const investigation = await huntingService.startInvestigation({
         threatId: 'failure_test',
         userId: 'test_user',
-        severity: 'low'
+        severity: 'low',
       })
 
       expect(investigation).toBeDefined()
@@ -403,9 +415,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
           value: Math.random() * 100,
           timestamp: new Date(),
           tags: {
-            type: ['login', 'api_call', 'data_access'][Math.floor(Math.random() * 3)],
-            userId: `user${i % 100}`
-          }
+            type: ['login', 'api_call', 'data_access'][
+              Math.floor(Math.random() * 3)
+            ],
+            userId: `user${i % 100}`,
+          },
         })
       }
 
@@ -454,10 +468,11 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         threatId: 'threat123<script>alert("xss")</script>',
         userId: 'user456<img src=x onerror=alert(1)>',
         severity: 'high',
-        description: 'Malicious description with <script>payload</script>'
+        description: 'Malicious description with <script>payload</script>',
       }
 
-      const investigation = await huntingService.startInvestigation(maliciousInput)
+      const investigation =
+        await huntingService.startInvestigation(maliciousInput)
 
       // Verify inputs were sanitized
       expect(investigation.threatId).not.toContain('<script>')
@@ -486,7 +501,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       const sensitiveOperations = [
         () => monitoringService.clearMetrics(),
         () => monitoringService.getSystemConfig(),
-        () => monitoringService.exportData()
+        () => monitoringService.exportData(),
       ]
 
       for (const operation of sensitiveOperations) {
@@ -501,12 +516,12 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate database failure
       const originalGetMetrics = monitoringService.getMetrics
-      monitoringService.getMetrics = vi.fn().mockRejectedValue(
-        new Error('Database connection failed')
-      )
+      monitoringService.getMetrics = vi
+        .fn()
+        .mockRejectedValue(new Error('Database connection failed'))
 
       await expect(monitoringService.generateInsights()).rejects.toThrow(
-        'Database connection failed'
+        'Database connection failed',
       )
 
       // Restore original method
@@ -518,14 +533,14 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate Redis failure
       const originalLookup = intelligenceService.lookupIOC
-      intelligenceService.lookupIOC = vi.fn().mockRejectedValue(
-        new Error('Redis connection failed')
-      )
+      intelligenceService.lookupIOC = vi
+        .fn()
+        .mockRejectedValue(new Error('Redis connection failed'))
 
       // Should fall back to direct API call
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ data: [] })
+        json: async () => ({ data: [] }),
       })
 
       const result = await intelligenceService.lookupIOC('test.com', 'domain')
@@ -540,13 +555,13 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate ML model failure
       const originalAnalyze = huntingService.analyzeWithML
-      huntingService.analyzeWithML = vi.fn().mockRejectedValue(
-        new Error('ML model not available')
-      )
+      huntingService.analyzeWithML = vi
+        .fn()
+        .mockRejectedValue(new Error('ML model not available'))
 
       // Should fall back to rule-based analysis
       const result = await huntingService.analyzePatterns({
-        type: 'behavioral_analysis'
+        type: 'behavioral_analysis',
       })
 
       expect(result).toBeDefined()
@@ -568,21 +583,23 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       await monitoringService.recordMetric({
         name: 'test_metric',
         value: 42,
-        timestamp: new Date()
+        timestamp: new Date(),
       })
 
       await huntingService.startInvestigation({
         threatId: 'audit_test',
         userId: 'test_user',
-        severity: 'medium'
+        severity: 'medium',
       })
 
       // Verify audit logs were created
       expect(auditSpy).toHaveBeenCalled()
 
-      const auditLogs = auditSpy.mock.calls.map(call => call[0])
-      expect(auditLogs.some(log => log.action === 'record_metric')).toBe(true)
-      expect(auditLogs.some(log => log.action === 'start_investigation')).toBe(true)
+      const auditLogs = auditSpy.mock.calls.map((call) => call[0])
+      expect(auditLogs.some((log) => log.action === 'record_metric')).toBe(true)
+      expect(
+        auditLogs.some((log) => log.action === 'start_investigation'),
+      ).toBe(true)
     })
 
     it('should implement data retention policies', async () => {
@@ -593,14 +610,14 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       await monitoringService.recordMetric({
         name: 'old_metric',
         value: 1,
-        timestamp: oldDate
+        timestamp: oldDate,
       })
 
       // Add recent data
       await monitoringService.recordMetric({
         name: 'recent_metric',
         value: 2,
-        timestamp: new Date()
+        timestamp: new Date(),
       })
 
       // Run cleanup
@@ -608,8 +625,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify old data was removed
       const metrics = await monitoringService.getMetrics()
-      expect(metrics.some(m => m.name === 'old_metric')).toBe(false)
-      expect(metrics.some(m => m.name === 'recent_metric')).toBe(true)
+      expect(metrics.some((m) => m.name === 'old_metric')).toBe(false)
+      expect(metrics.some((m) => m.name === 'recent_metric')).toBe(true)
     })
 
     it('should encrypt sensitive data at rest', async () => {
@@ -621,8 +638,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         type: 'ip',
         metadata: {
           victim_info: 'confidential_data',
-          attack_details: 'sensitive_information'
-        }
+          attack_details: 'sensitive_information',
+        },
       }
 
       await intelligenceService.addIOC(sensitiveData)

@@ -118,7 +118,13 @@ export const GET = protectRoute()(async ({ locals }) => {
   }
 })
 
-export const PUT = protectRoute()(async ({ request, locals }: { request: Request, locals: { user: AuthUser } }): Promise<Response> => {
+export const PUT = protectRoute()(async ({
+  request,
+  locals,
+}: {
+  request: Request
+  locals: { user: AuthUser }
+}): Promise<Response> => {
   try {
     const { user } = locals
     const body = await request.json()
@@ -138,11 +144,7 @@ export const PUT = protectRoute()(async ({ request, locals }: { request: Request
       ai: body.preferences,
     }
 
-    await updateUserSettings(
-      user.id,
-      { preferences: newPrefs },
-      request,
-    )
+    await updateUserSettings(user.id, { preferences: newPrefs }, request)
     logger.info('AI preferences updated', { userId: user.id })
     return new Response(JSON.stringify({ success: true }), { status: 200 })
   } catch (error: unknown) {
@@ -159,7 +161,13 @@ export const PUT = protectRoute()(async ({ request, locals }: { request: Request
   }
 })
 
-export const DELETE = protectRoute()(async ({ locals, request }: { locals: { user: AuthUser }, request: Request }): Promise<Response> => {
+export const DELETE = protectRoute()(async ({
+  locals,
+  request,
+}: {
+  locals: { user: AuthUser }
+  request: Request
+}): Promise<Response> => {
   try {
     const { user } = locals
     const settings = await getOrCreateUserSettings(user.id, request)
@@ -172,11 +180,7 @@ export const DELETE = protectRoute()(async ({ locals, request }: { locals: { use
       ai: DEFAULT_AI_PREFERENCES,
     }
 
-    await updateUserSettings(
-      user.id,
-      { preferences: newPrefs },
-      request,
-    )
+    await updateUserSettings(user.id, { preferences: newPrefs }, request)
     logger.info('AI preferences reset to defaults', { userId: user.id })
     return new Response(JSON.stringify({ success: true }), { status: 200 })
   } catch (error: unknown) {

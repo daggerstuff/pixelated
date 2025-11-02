@@ -96,7 +96,8 @@ test.describe('Page Performance Tests', () => {
 
       // Calculate TTFB
       const ttfb = response
-        ? (response as any).timing?.().responseStart - (response as any).timing?.().requestStart
+        ? (response as any).timing?.().responseStart -
+          (response as any).timing?.().requestStart
         : 0
 
       // Get final loadTime

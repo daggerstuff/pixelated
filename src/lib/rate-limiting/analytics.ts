@@ -9,7 +9,7 @@ import type {
   RateLimitAnalytics,
   RateLimitAlert,
   RateLimitMonitor,
-  RateLimitRule
+  RateLimitRule,
 } from './types'
 
 const logger = createBuildSafeLogger('rate-limit-analytics')
@@ -33,7 +33,7 @@ export class RateLimitAnalytics {
     eventType: 'request' | 'blocked' | 'attack_detected' | 'error',
     rule: RateLimitRule,
     identifier: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     const timestamp = Date.now()
     const date = new Date(timestamp).toISOString().slice(0, 10)
@@ -65,9 +65,13 @@ export class RateLimitAnalytics {
       if (eventType === 'blocked' || eventType === 'attack_detected') {
         await this.checkAlertConditions(rule, identifier, eventType, metadata)
       }
-
     } catch (error) {
-      logger.error('Failed to record rate limit event:', { error, eventType, rule: rule.name, identifier })
+      logger.error('Failed to record rate limit event:', {
+        error,
+        eventType,
+        rule: rule.name,
+        identifier,
+      })
     }
   }
 
@@ -77,7 +81,7 @@ export class RateLimitAnalytics {
   async getAnalytics(
     ruleName: string,
     days = 7,
-    includeHourly = false
+    includeHourly = false,
   ): Promise<RateLimitAnalytics[]> {
     const analytics: RateLimitAnalytics[] = []
     const now = new Date()
@@ -97,7 +101,7 @@ export class RateLimitAnalytics {
             blockedRequests: parseInt(dailyData.blocked_total || '0'),
             uniqueIdentifiers: parseInt(dailyData.unique_identifiers || '0'),
             topBlocked: [],
-            attackPatterns: []
+            attackPatterns: [],
           }
 
           // Get hourly data if requested
@@ -121,7 +125,7 @@ export class RateLimitAnalytics {
    */
   private async getHourlyAnalytics(
     ruleName: string,
-    date: string
+    date: string,
   ): Promise<
     Array<{
       hour: number
@@ -143,7 +147,7 @@ export class RateLimitAnalytics {
           totalRequests: parseInt(data.request_total || '0'),
           blockedRequests: parseInt(data.blocked_total || '0'),
           attackDetections: parseInt(data.attack_detected_total || '0'),
-          errors: parseInt(data.error_total || '0')
+          errors: parseInt(data.error_total || '0'),
         })
       }
     }
@@ -200,13 +204,13 @@ export class RateLimitAnalytics {
         attackDetections,
         errorRate: Math.round(errorRate * 100) / 100,
         topRules: Object.entries(ruleStats)
-          .sort(([,a], [,b]) => b - a)
+          .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
           .map(([rule, requests]) => ({ rule, requests })),
         topIdentifiers: Object.entries(identifierStats)
-          .sort(([,a], [,b]) => b - a)
+          .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
-          .map(([identifier, requests]) => ({ identifier, requests }))
+          .map(([identifier, requests]) => ({ identifier, requests })),
       }
     } catch (error) {
       logger.error('Failed to get real-time metrics:', { error })
@@ -216,7 +220,7 @@ export class RateLimitAnalytics {
         attackDetections: 0,
         errorRate: 0,
         topRules: [],
-        topIdentifiers: []
+        topIdentifiers: [],
       }
     }
   }
@@ -228,7 +232,7 @@ export class RateLimitAnalytics {
     rule: RateLimitRule,
     identifier: string,
     eventType: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     const metrics = await this.getRealTimeMetrics()
 
@@ -244,8 +248,8 @@ export class RateLimitAnalytics {
           identifier,
           blockedRate: metrics.blockedRequests,
           errorRate: metrics.errorRate,
-          metadata
-        }
+          metadata,
+        },
       })
     }
 
@@ -259,13 +263,16 @@ export class RateLimitAnalytics {
         details: {
           rule: rule.name,
           identifier,
-          metadata
-        }
+          metadata,
+        },
       })
     }
 
     // Check for DDoS-like patterns
-    if (metrics.totalRequests > 1000 && metrics.blockedRequests > metrics.totalRequests * 0.5) {
+    if (
+      metrics.totalRequests > 1000 &&
+      metrics.blockedRequests > metrics.totalRequests * 0.5
+    ) {
       await this.triggerAlert({
         type: 'ddos_detected',
         severity: 'critical',
@@ -276,8 +283,9 @@ export class RateLimitAnalytics {
           identifier,
           totalRequests: metrics.totalRequests,
           blockedRequests: metrics.blockedRequests,
-          blockPercentage: (metrics.blockedRequests / metrics.totalRequests) * 100
-        }
+          blockPercentage:
+            (metrics.blockedRequests / metrics.totalRequests) * 100,
+        },
       })
     }
   }
@@ -300,12 +308,18 @@ export class RateLimitAnalytics {
               try {
                 await handler(alert)
               } catch (handlerError) {
-                logger.error('Monitor handler failed:', { error: handlerError, monitor: monitor.name })
+                logger.error('Monitor handler failed:', {
+                  error: handlerError,
+                  monitor: monitor.name,
+                })
               }
             }
           }
         } catch (monitorError) {
-          logger.error('Monitor check failed:', { error: monitorError, monitor: monitor.name })
+          logger.error('Monitor check failed:', {
+            error: monitorError,
+            monitor: monitor.name,
+          })
         }
       }
 
@@ -318,7 +332,10 @@ export class RateLimitAnalytics {
   /**
    * Check if monitor should be triggered
    */
-  private async shouldTriggerMonitor(monitor: RateLimitMonitor, alert: RateLimitAlert): Promise<boolean> {
+  private async shouldTriggerMonitor(
+    monitor: RateLimitMonitor,
+    alert: RateLimitAlert,
+  ): Promise<boolean> {
     const { thresholds } = monitor
 
     switch (alert.type) {
@@ -327,10 +344,15 @@ export class RateLimitAnalytics {
       case 'attack_detected':
         return true // Always trigger for attack detection
       case 'ddos_detected':
-        return !thresholds.blockedPercentage ||
-               (alert.details.blockPercentage > thresholds.blockedPercentage)
+        return (
+          !thresholds.blockedPercentage ||
+          alert.details.blockPercentage > thresholds.blockedPercentage
+        )
       case 'system_error':
-        return !thresholds.errorRate || (alert.details.errorRate > thresholds.errorRate)
+        return (
+          !thresholds.errorRate ||
+          alert.details.errorRate > thresholds.errorRate
+        )
       default:
         return false
     }
@@ -348,7 +370,7 @@ export class RateLimitAnalytics {
    * Remove a monitor
    */
   removeMonitor(name: string): void {
-    this.monitors = this.monitors.filter(m => m.name !== name)
+    this.monitors = this.monitors.filter((m) => m.name !== name)
     logger.info('Removed rate limit monitor:', { name })
   }
 
@@ -359,10 +381,10 @@ export class RateLimitAnalytics {
     try {
       const alertKeys = await redis.keys(`${this.alertPrefix}*`)
       const recentKeys = alertKeys
-        .map(key => ({ key, timestamp: parseInt(key.split(':')[1] || '0') }))
+        .map((key) => ({ key, timestamp: parseInt(key.split(':')[1] || '0') }))
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, limit)
-        .map(item => item.key)
+        .map((item) => item.key)
 
       const alerts: RateLimitAlert[] = []
       for (const key of recentKeys) {
@@ -371,7 +393,10 @@ export class RateLimitAnalytics {
           try {
             alerts.push(JSON.parse(alertData))
           } catch (parseError) {
-            logger.error('Failed to parse alert data:', { error: parseError, key })
+            logger.error('Failed to parse alert data:', {
+              error: parseError,
+              key,
+            })
           }
         }
       }
@@ -410,12 +435,17 @@ export class RateLimitAnalytics {
       totalRequests: 0,
       totalBlocked: 0,
       blockRate: 0,
-      topRules: [] as Array<{ rule: string; requests: number; blocked: number }>,
-      trends: [] as Array<{ date: string; requests: number; blocked: number }>
+      topRules: [] as Array<{
+        rule: string
+        requests: number
+        blocked: number
+      }>,
+      trends: [] as Array<{ date: string; requests: number; blocked: number }>,
     }
 
     const ruleStats: Record<string, { requests: number; blocked: number }> = {}
-    const dailyTrends: Record<string, { requests: number; blocked: number }> = {}
+    const dailyTrends: Record<string, { requests: number; blocked: number }> =
+      {}
 
     for (const analytics of allAnalytics) {
       summary.totalRequests += analytics.totalRequests
@@ -436,17 +466,27 @@ export class RateLimitAnalytics {
       dailyTrends[analytics.date].blocked += analytics.blockedRequests
     }
 
-    summary.blockRate = summary.totalRequests > 0
-      ? Math.round((summary.totalBlocked / summary.totalRequests) * 10000) / 100
-      : 0
+    summary.blockRate =
+      summary.totalRequests > 0
+        ? Math.round((summary.totalBlocked / summary.totalRequests) * 10000) /
+          100
+        : 0
 
     summary.topRules = Object.entries(ruleStats)
-      .map(([date, stats]) => ({ rule: date, requests: stats.requests, blocked: stats.blocked }))
+      .map(([date, stats]) => ({
+        rule: date,
+        requests: stats.requests,
+        blocked: stats.blocked,
+      }))
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 10)
 
     summary.trends = Object.entries(dailyTrends)
-      .map(([date, stats]) => ({ date, requests: stats.requests, blocked: stats.blocked }))
+      .map(([date, stats]) => ({
+        date,
+        requests: stats.requests,
+        blocked: stats.blocked,
+      }))
       .sort((a, b) => a.date.localeCompare(b.date))
 
     return summary
@@ -468,7 +508,7 @@ export class RateLimitAnalytics {
             severity: metrics.errorRate > 10 ? 'critical' : 'high',
             message: `System health check: ${metrics.blockedRequests} blocked, ${metrics.errorRate}% error rate`,
             timestamp: Date.now(),
-            details: metrics
+            details: metrics,
           })
         }
       } catch (error) {
@@ -488,14 +528,16 @@ export class RateLimitAnalytics {
       const cutoffStr = cutoffDate.toISOString().slice(0, 10)
 
       const keys = await redis.keys(`${this.analyticsPrefix}*`)
-      const keysToDelete = keys.filter(key => {
+      const keysToDelete = keys.filter((key) => {
         const keyDate = key.split(':').pop()
         return keyDate && keyDate < cutoffStr
       })
 
       if (keysToDelete.length > 0) {
         await redis.del(...keysToDelete)
-        logger.info('Cleaned up old analytics data:', { deletedKeys: keysToDelete.length })
+        logger.info('Cleaned up old analytics data:', {
+          deletedKeys: keysToDelete.length,
+        })
       }
     } catch (error) {
       logger.error('Failed to cleanup analytics data:', { error })

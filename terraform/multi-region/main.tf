@@ -209,12 +209,19 @@ resource "google_compute_network" "gcp_europe" {
 }
 
 resource "google_compute_subnetwork" "gcp_europe_subnets" {
-  provider      = google.gcp_europe
-  for_each      = toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"])
-  name          = "${var.project_name}-subnet-${each.key}"
-  ip_cidr_range = "10.5.${index(toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"]), each.key)}.0/24"
-  region        = "europe-west3"
-  network       = google_compute_network.gcp_europe.id
+  provider                 = google.gcp_europe
+  for_each                 = toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"])
+  name                     = "${var.project_name}-subnet-${each.key}"
+  ip_cidr_range            = "10.5.${index(toset(["europe-west3-a", "europe-west3-b", "europe-west3-c"]), each.key)}.0/24"
+  region                   = "europe-west3"
+  network                  = google_compute_network.gcp_europe.id
+  private_ip_google_access = true
+  
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_network" "gcp_asia" {
@@ -229,12 +236,19 @@ resource "google_compute_network" "gcp_asia" {
 }
 
 resource "google_compute_subnetwork" "gcp_asia_subnets" {
-  provider      = google.gcp_asia
-  for_each      = toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"])
-  name          = "${var.project_name}-subnet-${each.key}"
-  ip_cidr_range = "10.6.${index(toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"]), each.key)}.0/24"
-  region        = "asia-southeast1"
-  network       = google_compute_network.gcp_asia.id
+  provider                 = google.gcp_asia
+  for_each                 = toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"])
+  name                     = "${var.project_name}-subnet-${each.key}"
+  ip_cidr_range            = "10.6.${index(toset(["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"]), each.key)}.0/24"
+  region                   = "asia-southeast1"
+  network                  = google_compute_network.gcp_asia.id
+  private_ip_google_access = true
+  
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 # Enable required Google APIs
@@ -763,24 +777,34 @@ resource "aws_security_group" "multi_region" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS from anywhere"
+    cidr_blocks = ["10.0.0.0/8"]  # Restrict to private networks
+    description = "HTTPS from private networks"
   }
   
-  ingress {
-    from_port   = 80
-    to_port     = 80
+  # Remove HTTP port 80 ingress for security
+  
+  egress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP from anywhere"
+    description = "HTTPS outbound"
   }
   
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound traffic"
+    description = "DNS TCP outbound"
+  }
+  
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "DNS UDP outbound"
   }
   
   tags = merge(var.common_tags, {
@@ -817,6 +841,40 @@ resource "aws_iam_role" "multi_region_role" {
   tags = var.common_tags
 }
 
+# KMS keys for backup encryption
+resource "aws_kms_key" "backup_encryption" {
+  for_each = {
+    us_east    = aws.us_east
+    us_west    = aws.us_west
+    eu_central = aws.eu_central
+    ap_southeast = aws.ap_southeast
+  }
+  
+  provider = each.value
+  
+  description             = "KMS key for RDS backup encryption in ${each.key}"
+  deletion_window_in_days = 7
+  
+  tags = merge(var.common_tags, {
+    Name   = "${var.project_name}-backup-key-${each.key}"
+    Region = each.key
+  })
+}
+
+resource "aws_kms_alias" "backup_encryption" {
+  for_each = {
+    us_east    = aws.us_east
+    us_west    = aws.us_west
+    eu_central = aws.eu_central
+    ap_southeast = aws.ap_southeast
+  }
+  
+  provider = each.value
+  
+  name          = "alias/${var.project_name}-backup-${each.key}"
+  target_key_id = aws_kms_key.backup_encryption[each.key].key_id
+}
+
 # Cross-region replication and backup
 resource "aws_db_instance_automated_backups_replication" "multi_region_backup" {
   for_each = {
@@ -829,7 +887,8 @@ resource "aws_db_instance_automated_backups_replication" "multi_region_backup" {
   provider = each.value
   
   source_db_instance_arn = module.rds_multi_region[each.key].db_instance_arn
-  retention_period       = var.db_backup_retention_period
+  kms_key_id            = aws_kms_key.backup_encryption[each.key].arn
+  retention_period      = var.db_backup_retention_period
   
   tags = var.common_tags
 }

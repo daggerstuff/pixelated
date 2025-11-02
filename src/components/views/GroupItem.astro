@@ -29,7 +29,7 @@ const { maxGroupColumns } = UI.groupView
       >
         <div class="pt-2 pr-5">
           <div
-            class={`icon op-50 saturate-0 leading-9 text-7.5 ${item.icon && item.icon.trim() && item.icon !== '-' ? item.icon : 'i-lucide-file'}`}
+            class={`icon op-50 saturate-0 leading-9 text-7.5 ${item.icon && item.icon.trim() && item.icon !== '-' ? item.icon.trim() : 'i-lucide-file'}`}
           />
         </div>
         <div class="flex-auto">

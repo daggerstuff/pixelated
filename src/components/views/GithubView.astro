@@ -92,7 +92,9 @@ if (collectionType === 'releases') {
           `https://github.com/${repoOwner}.png`
         const subLogo = matchLogo((pkgName || '') as string, subLogoMatches)
 
-        const [versionType, ...versionParts] = processVersion(versionNum || '0.0.0')
+        const [versionType, ...versionParts] = processVersion(
+          versionNum || '0.0.0',
+        )
 
         // Use current date if publishedAt is not available
         const currentDate = new Date().toISOString()
@@ -151,9 +153,14 @@ if (collectionType === 'prs') {
       )
       .map((item): ExtendedPrData => {
         const mainLogo =
-          matchLogo((item.repository.name || '') as string, mainLogoOverrides) ||
-          `https://github.com/${item.repository.owner.login}.png`
-        const subLogo = matchLogo((item.repository.name || '') as string, subLogoMatches)
+          matchLogo(
+            (item.repository.name || '') as string,
+            mainLogoOverrides,
+          ) || `https://github.com/${item.repository.owner.login}.png`
+        const subLogo = matchLogo(
+          (item.repository.name || '') as string,
+          subLogoMatches,
+        )
 
         return {
           ...item,

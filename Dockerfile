@@ -1,45 +1,66 @@
-# Build stage
-FROM node:24-alpine AS builder
+# Single, clean multi-stage Dockerfile for building and running Pixelated
 
-RUN corepack enable pnpm
-
+# Builder stage: install deps and run the static build
+FROM node:24-slim AS builder
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Install build-time tools and enable pnpm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    git \
+    python3 \
+    make \
+    g++ \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+RUN corepack enable pnpm
 
-# Install dependencies
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+# Copy package manifests first for better layer caching
+COPY package.json pnpm-lock.yaml* ./
 
-# Copy source files
+# Install all dependencies (dev + prod) required for build
+RUN pnpm install --frozen-lockfile
+
+# Copy source and run the build
 COPY . .
+RUN pnpm build
 
-# Build the application
-RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) \
-    pnpm run build
-
-# Runtime stage
-FROM node:24-alpine AS runtime
-
-RUN corepack enable pnpm
-
+# Runtime stage: minimal image with only production bits
+FROM node:24-slim AS runtime
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Install pnpm and build tools needed for native dependencies (like better-sqlite3)
+ARG PNPM_VERSION=10.20.0
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libstdc++6 \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+RUN npm install -g pnpm@$PNPM_VERSION && \
+    pnpm --version
 
-# Install production dependencies only
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --frozen-lockfile
+# Create non-root user
+RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -m nextjs
 
-# Copy built application from builder
+# Copy package files and install production dependencies
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+
+# Install production dependencies
+RUN pnpm install --prod --frozen-lockfile && \
+    pnpm add class-variance-authority && \
+    pnpm store prune
+
+# Copy built output and public assets from builder
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/start-server.mjs ./start-server.mjs
+COPY --from=builder /app/instrument.mjs ./instrument.mjs
+
+# Set ownership and drop to non-root
+RUN chown -R nextjs:nodejs /app && chmod -R g+rX /app
+USER nextjs
 
 EXPOSE 4321
-ENV HOST=0.0.0.0
-ENV PORT=4321
-ENV NODE_ENV=production
-
-CMD ["pnpm", "start"]
+CMD ["node", "start-server.mjs"]

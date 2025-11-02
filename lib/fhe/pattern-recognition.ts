@@ -20,24 +20,24 @@ export interface TrendPattern {
   /**
    * Unique, stable identifier for this analytic pattern instance.
    */
-  id: string;
+  id: string
 
   /**
    * Human-readable summary describing the nature or significance of the pattern.
    * Suggests typical cause, outcome, or interpretation.
    */
-  description: string;
+  description: string
 
   /**
    * List of metric names, factors, or signals that indicate this pattern's presence.
    * E.g. ["spike", "deviation", "sentiment_shift"]
    */
-  indicators: string[];
+  indicators: string[]
 
   /**
    * Optional: Additional free-form metadata for extensibility.
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
@@ -48,27 +48,27 @@ export interface CrossSessionPattern {
   /**
    * Globally unique identifier for this pattern instance.
    */
-  id: string;
+  id: string
 
   /**
    * General description of what links the sessions in this cross-session pattern.
    */
-  description: string;
+  description: string
 
   /**
    * List of unique session identifiers involved in this pattern.
    */
-  sessionIds: string[];
+  sessionIds: string[]
 
   /**
    * The timespan in whole days encompassing all related sessions.
    */
-  timeSpanDays: number;
+  timeSpanDays: number
 
   /**
    * Optional: Extensible field for future multi-session attributes.
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
@@ -79,20 +79,20 @@ export interface RiskCorrelation {
   /**
    * Unique identifier for this risk-correlation instance.
    */
-  id: string;
+  id: string
 
   /**
    * Description of the risk, trigger, or statistical relation detected.
    */
-  description: string;
+  description: string
 
   /**
    * Relative strength or confidence of the correlation, normalized (e.g. -1.0 to 1.0 or 0-1).
    */
-  strength: number;
+  strength: number
 
   /**
    * Optional: Room for domain-specific confidence, p-value, or reference attributions.
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }

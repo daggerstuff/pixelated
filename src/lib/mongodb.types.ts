@@ -21,7 +21,7 @@ export interface UserDocument extends MongoDocument {
   metadata?: Json
 }
 
-// Profile Collection Interface  
+// Profile Collection Interface
 export interface ProfileDocument extends MongoDocument {
   userId: ObjectId
   fullName?: string
@@ -46,7 +46,11 @@ export interface SessionDocument extends MongoDocument {
 // Security Events Collection Interface
 export interface SecurityEventDocument extends MongoDocument {
   userId?: ObjectId
-  eventType: 'login_failed' | 'password_changed' | 'suspicious_activity' | 'account_locked'
+  eventType:
+    | 'login_failed'
+    | 'password_changed'
+    | 'suspicious_activity'
+    | 'account_locked'
   eventData: Json
   ipAddress?: string
   userAgent?: string
@@ -122,7 +126,11 @@ export interface CrisisDetectionDocument extends MongoDocument {
 // Consent Management Collection Interface
 export interface ConsentDocument extends MongoDocument {
   userId: ObjectId
-  consentType: 'data_processing' | 'marketing_communications' | 'analytics' | 'research'
+  consentType:
+    | 'data_processing'
+    | 'marketing_communications'
+    | 'analytics'
+    | 'research'
   granted: boolean
   version: string
   ipAddress?: string

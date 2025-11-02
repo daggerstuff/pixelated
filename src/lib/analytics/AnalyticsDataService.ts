@@ -115,7 +115,7 @@ export class AnalyticsDataService {
       return this.aggregateSessionData(events, filters.timeRange)
     } catch (error: unknown) {
       logger.error('Failed to fetch session metrics', { error })
-      throw new Error('Failed to fetch session metrics')
+      throw new Error('Failed to fetch session metrics', { cause: error })
     }
   }
 
@@ -136,7 +136,7 @@ export class AnalyticsDataService {
       return skillMetrics.filter(Boolean) as SkillProgressData[]
     } catch (error: unknown) {
       logger.error('Failed to fetch skill progress', { error })
-      throw new Error('Failed to fetch skill progress data')
+      throw new Error('Failed to fetch skill progress data', { cause: error })
     }
   }
 
@@ -194,7 +194,7 @@ export class AnalyticsDataService {
       ]
     } catch (error: unknown) {
       logger.error('Failed to fetch summary stats', { error })
-      throw new Error('Failed to fetch summary statistics')
+      throw new Error('Failed to fetch summary statistics', { cause: error })
     }
   }
 

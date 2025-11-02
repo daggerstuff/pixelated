@@ -100,7 +100,7 @@ describe('ContextDetector', () => {
           completionTokens: 20,
           totalTokens: 30,
         },
-        provider: 'test'
+        provider: 'test',
       }
 
       vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
@@ -196,7 +196,7 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test'
+          provider: 'test',
         }
 
         mockDetectCrisis.mockResolvedValue(crisisResult)
@@ -249,9 +249,9 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test'
+          provider: 'test',
         }
- 
+
         const crisisResult: CrisisDetectionResult = {
           isCrisis: false,
           confidence: 0.1,
@@ -263,16 +263,16 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: 'What are the symptoms of anxiety?',
         }
- 
+
         mockDetectCrisis.mockResolvedValue(crisisResult)
         vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
           aiResponse,
         )
- 
+
         const result = await contextDetector.detectContext(
           'What are the symptoms of anxiety?',
         )
- 
+
         expect(result.detectedContext).toBe(ContextType.EDUCATIONAL)
         expect(result.confidence).toBe(0.85)
         expect(result.urgency).toBe('low')
@@ -300,7 +300,9 @@ describe('ContextDetector', () => {
           const result = await contextDetector.detectContext(q)
           expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
           expect(result.confidence).toBeGreaterThanOrEqual(0.9)
-          expect(result.contextualIndicators?.[0]?.type).toMatch(/clinical_assessment/i)
+          expect(result.contextualIndicators?.[0]?.type).toMatch(
+            /clinical_assessment/i,
+          )
         }
       })
 
@@ -310,7 +312,7 @@ describe('ContextDetector', () => {
           'What number to call for crisis counseling?',
           'How do I sign up for mental health services?',
           'Info on affordable counseling options.',
-          'What are the hours of operation for the hotline?'
+          'What are the hours of operation for the hotline?',
         ]
         for (const q of informationalQueries) {
           mockDetectCrisis.mockResolvedValue({
@@ -327,7 +329,9 @@ describe('ContextDetector', () => {
           const result = await contextDetector.detectContext(q)
           expect(result.detectedContext).toBe(ContextType.INFORMATIONAL)
           expect(result.confidence).toBeGreaterThanOrEqual(0.8)
-          expect(result.contextualIndicators?.[0]?.type).toMatch(/informational/i)
+          expect(result.contextualIndicators?.[0]?.type).toMatch(
+            /informational/i,
+          )
         }
       })
     })
@@ -376,7 +380,7 @@ describe('ContextDetector', () => {
             completionTokens: 20,
             totalTokens: 30,
           },
-          provider: 'test'
+          provider: 'test',
         }
 
         mockDetectCrisis.mockResolvedValue({
@@ -450,7 +454,7 @@ describe('ContextDetector', () => {
           completionTokens: 20,
           totalTokens: 30,
         },
-        provider: 'test'
+        provider: 'test',
       }))
 
       vi.mocked(mockAIService.createChatCompletion)

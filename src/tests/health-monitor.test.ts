@@ -15,7 +15,7 @@ describe('HealthMonitor', () => {
 
   it('should return system health information', async () => {
     const health = await healthMonitor.getHealth()
-    
+
     expect(health).toBeDefined()
     expect(health.status).toMatch(/^(healthy|degraded|unhealthy)$/)
     expect(health.timestamp).toBeDefined()
@@ -32,26 +32,33 @@ describe('HealthMonitor', () => {
       name: 'custom-service',
       status: 'healthy' as const,
       responseTime: 10,
-      message: 'Custom service is running'
+      message: 'Custom service is running',
     })
 
     healthMonitor.registerCheck('custom-service', customCheck)
-    
+
     const health = await healthMonitor.getHealth()
-    
+
     expect(customCheck).toHaveBeenCalled()
-    expect(health.checks.some(check => check.name === 'custom-service')).toBe(true)
+    expect(health.checks.some((check) => check.name === 'custom-service')).toBe(
+      true,
+    )
   })
 
   it('should handle failing health checks gracefully', async () => {
-    const failingCheck = vi.fn().mockRejectedValue(new Error('Service unavailable'))
+    const failingCheck = vi
+      .fn()
+      .mockRejectedValue(new Error('Service unavailable'))
 
     healthMonitor.registerCheck('failing-service', failingCheck)
-    
+
     const health = await healthMonitor.getHealth()
-    
-    expect(health.checks.some(check => 
-      check.name === 'failing-service' && check.status === 'unhealthy'
-    )).toBe(true)
+
+    expect(
+      health.checks.some(
+        (check) =>
+          check.name === 'failing-service' && check.status === 'unhealthy',
+      ),
+    ).toBe(true)
   })
 })

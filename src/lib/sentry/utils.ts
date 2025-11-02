@@ -10,7 +10,10 @@ import * as Sentry from '@sentry/astro'
 /**
  * Manually capture an error with additional context
  */
-export function captureError(error: Error, context?: Record<string, unknown>): void {
+export function captureError(
+  error: Error,
+  context?: Record<string, unknown>,
+): void {
   // Sentry.withScope may return a value in some SDKs; we intentionally do not return it
   // to keep this function typed as void and avoid leaking SDK internals to callers.
   Sentry.withScope((scope) => {
@@ -82,7 +85,10 @@ export function addBreadcrumb(
  *
  * @deprecated Sentry Astro does not support manual transactions. This is a no-op.
  */
-export function startTransaction(_name: string, _operation: string): { setData: () => void; finish: () => void } {
+export function startTransaction(
+  _name: string,
+  _operation: string,
+): { setData: () => void; finish: () => void } {
   // Sentry Astro does not support manual transactions.
   // This function is a no-op for compatibility.
   if (import.meta.env.DEV) {
@@ -131,7 +137,9 @@ export const performance = {
   /**
    * Measure page load performance (no-op)
    */
-  measurePageLoad: (_pageName: string): { setData: () => void; finish: () => void } => {
+  measurePageLoad: (
+    _pageName: string,
+  ): { setData: () => void; finish: () => void } => {
     if (import.meta.env.DEV) {
       console.warn(
         '[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.',
@@ -146,7 +154,10 @@ export const performance = {
   /**
    * Measure API call performance (no-op)
    */
-  measureApiCall: (_endpoint: string, _method: string = 'GET'): { setData: () => void; finish: () => void } => {
+  measureApiCall: (
+    _endpoint: string,
+    _method: string = 'GET',
+  ): { setData: () => void; finish: () => void } => {
     if (import.meta.env.DEV) {
       console.warn(
         '[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.',

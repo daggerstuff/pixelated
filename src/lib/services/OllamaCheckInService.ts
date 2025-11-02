@@ -47,9 +47,7 @@ export class OllamaCheckInService {
 
   constructor(baseUrl?: string, defaultModel?: string) {
     this.baseUrl =
-      baseUrl ||
-      getEnv('OLLAMA_BASE_URL') ||
-      'https://api.pixelatedempathy.com'
+      baseUrl || getEnv('OLLAMA_BASE_URL') || 'https://api.pixelatedempathy.com'
     this.defaultModel = defaultModel || 'granite3.3'
   }
 

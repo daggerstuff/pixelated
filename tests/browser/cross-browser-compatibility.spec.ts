@@ -8,10 +8,15 @@
 import { test, expect } from '@playwright/test'
 import type { Page, ConsoleMessage } from '@playwright/test'
 
-import { TEST_PAGES, navigateToPage, verifyPageElements, waitForPageStable, ensureTestResultsDir } from '../helpers/test-utils'
+import {
+  TEST_PAGES,
+  navigateToPage,
+  verifyPageElements,
+  waitForPageStable,
+  ensureTestResultsDir,
+} from '../helpers/test-utils'
 
 // Use TEST_PAGES from test-utils
-
 
 // Define a reusable function to test core functionality
 async function testCoreFunctionality(
@@ -46,16 +51,21 @@ async function testCoreFunctionality(
       // Admin pages should redirect to login when not authenticated
       // Check for login form elements
       const hasLoginForm = (await page.locator('form').count()) > 0
-      const hasEmailInput = (await page.locator('input[type="email"]').count()) > 0
-      const hasPasswordInput = (await page.locator('input[type="password"]').count()) > 0
-      const hasLoginButton = (await page.locator('button[type="submit"]').count()) > 0
+      const hasEmailInput =
+        (await page.locator('input[type="email"]').count()) > 0
+      const hasPasswordInput =
+        (await page.locator('input[type="password"]').count()) > 0
+      const hasLoginButton =
+        (await page.locator('button[type="submit"]').count()) > 0
 
       console.log(
         `Found login form: ${hasLoginForm}, email input: ${hasEmailInput}, password input: ${hasPasswordInput}, login button: ${hasLoginButton}`,
       )
 
       // Expect to find login elements (redirected to login page)
-      expect(hasLoginForm && hasEmailInput && hasPasswordInput && hasLoginButton).toBeTruthy()
+      expect(
+        hasLoginForm && hasEmailInput && hasPasswordInput && hasLoginButton,
+      ).toBeTruthy()
     } else {
       // For non-admin pages, check for main content with increased timeout
       await expect(page.locator('main')).toBeVisible({ timeout: 30000 })

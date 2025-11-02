@@ -33,7 +33,7 @@ Sentry.init({
   ],
 
   // Before send hook for filtering sensitive data
-  beforeSend: (event, hint) => {
+  beforeSend: (event, _hint) => {
     // Filter out sensitive data from events
     if (event.request?.data) {
       // Remove sensitive fields from request data

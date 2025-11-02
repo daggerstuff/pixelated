@@ -148,7 +148,11 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         // Notify parent component
         onAnalysisComplete?.(results)
       } catch (err: unknown) {
-        setError(err instanceof Error ? (err as Error)?.message || String(err) : 'Analysis failed')
+        setError(
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'Analysis failed',
+        )
       } finally {
         setIsAnalyzing(false)
       }
@@ -204,7 +208,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         sevenDayTrend: 'stable' as const,
         percentileRank: 50,
         comparisonToAverage: 0,
-        trendDirection: 'neutral'
+        trendDirection: 'neutral',
       },
     )
 

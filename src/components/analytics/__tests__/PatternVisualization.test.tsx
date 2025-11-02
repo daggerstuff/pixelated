@@ -57,14 +57,16 @@ describe('PatternVisualization', () => {
     expect(screen.getByText('Trend Patterns')).toBeInTheDocument()
     expect(screen.getByText('No trends found')).toBeInTheDocument()
     expect(screen.getByText('Cross-Session Patterns')).toBeInTheDocument()
-    expect(screen.getByText('No cross-session patterns found')).toBeInTheDocument()
+    expect(
+      screen.getByText('No cross-session patterns found'),
+    ).toBeInTheDocument()
     expect(screen.getByText('Risk Correlations')).toBeInTheDocument()
     expect(screen.getByText('No risk correlations found')).toBeInTheDocument()
   })
 
   it('renders all sections with data', () => {
-  const handlePatternSelect = vi.fn()
-  render(
+    const handlePatternSelect = vi.fn()
+    render(
       <PatternVisualization
         trends={mockTrends}
         onPatternSelect={handlePatternSelect}
@@ -110,7 +112,9 @@ describe('PatternVisualization', () => {
     patternItem.click()
 
     expect(handlePatternSelect).toHaveBeenCalledTimes(1)
-    expect(handlePatternSelect).toHaveBeenCalledWith(mockCrossSessionPatterns[0])
+    expect(handlePatternSelect).toHaveBeenCalledWith(
+      mockCrossSessionPatterns[0],
+    )
   })
 
   it('calls onPatternSelect when a risk correlation is clicked', () => {

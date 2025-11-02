@@ -8,16 +8,20 @@
 import type { Event } from '@sentry/browser'
 
 export const SENTRY_CONFIG = {
-  dsn: import.meta.env['PUBLIC_SENTRY_DSN'] || "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
+  dsn:
+    import.meta.env['PUBLIC_SENTRY_DSN'] ||
+    'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
 
   environment: import.meta.env.MODE || 'production',
   release: import.meta.env['PUBLIC_APP_VERSION'] || '0.0.1',
 
   tracesSampleRate: Number(
-    import.meta.env['PUBLIC_SENTRY_TRACES_SAMPLE_RATE'] ?? (import.meta.env.DEV ? 1.0 : 0.1)
+    import.meta.env['PUBLIC_SENTRY_TRACES_SAMPLE_RATE'] ??
+      (import.meta.env.DEV ? 1.0 : 0.1),
   ),
   profilesSampleRate: Number(
-    import.meta.env['PUBLIC_SENTRY_PROFILES_SAMPLE_RATE'] ?? (import.meta.env.DEV ? 0.2 : 0.05)
+    import.meta.env['PUBLIC_SENTRY_PROFILES_SAMPLE_RATE'] ??
+      (import.meta.env.DEV ? 0.2 : 0.05),
   ),
 
   replaysSessionSampleRate: 0,
@@ -43,7 +47,9 @@ export function beforeSend(event: Event): Event | null {
   return event
 }
 
-export function initSentry(additionalConfig: Record<string, unknown> = {}): Record<string, unknown> {
+export function initSentry(
+  additionalConfig: Record<string, unknown> = {},
+): Record<string, unknown> {
   return {
     ...SENTRY_CONFIG,
     beforeSend,

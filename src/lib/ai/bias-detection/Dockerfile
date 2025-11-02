@@ -1,11 +1,22 @@
 # Dockerfile for Bias Detection Service
-FROM python:3.12-slim
+FROM python:3.15-rc-alpine3.22
 
 # Set working directory
 WORKDIR /app
 
+# Install system dependencies and curl for healthcheck
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    cargo \
+    rust \
+    curl \
+    && rm -rf /var/cache/apk/*
+
 # Install uv
-RUN pip install uv
+RUN pip install --no-cache-dir uv
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
@@ -27,7 +38,7 @@ ENV BIAS_SERVICE_HOST=0.0.0.0
 ENV BIAS_SERVICE_PORT=5001
 
 # Create non-root user
-RUN addgroup --system bias && adduser --system --ingroup bias bias
+RUN addgroup -S bias && adduser -S -G bias bias
 USER bias
 
 # Command to run the service

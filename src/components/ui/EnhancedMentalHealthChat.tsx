@@ -3,15 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Send,
-  Brain,
-  User,
-  Bot,
-  Sparkles,
-  Activity
-} from 'lucide-react'
-import MindMirrorDashboard, { type MindMirrorAnalysis } from './MindMirrorDashboard'
+import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
+import MindMirrorDashboard, {
+  type MindMirrorAnalysis,
+} from './MindMirrorDashboard'
 import BrainVisualization from './BrainVisualization'
 
 interface Message {
@@ -32,32 +27,64 @@ interface EnhancedMentalHealthChatProps {
 // Mock analysis function for demo purposes
 const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  
+  await new Promise((resolve) => setTimeout(resolve, 1500))
+
   // Simple keyword-based analysis for demo
   const words = text.toLowerCase()
-  
-  let archetype = "visionary"
+
+  let archetype = 'visionary'
   let confidence = 0.75
-  
-  if (words.includes("hurt") || words.includes("pain") || words.includes("heal")) {
-    archetype = "wounded_healer"
+
+  if (
+    words.includes('hurt') ||
+    words.includes('pain') ||
+    words.includes('heal')
+  ) {
+    archetype = 'wounded_healer'
     confidence = 0.85
-  } else if (words.includes("plan") || words.includes("strategy") || words.includes("control")) {
-    archetype = "shadow_strategist"
-    confidence = 0.80
-  } else if (words.includes("dream") || words.includes("future") || words.includes("create")) {
-    archetype = "visionary"
+  } else if (
+    words.includes('plan') ||
+    words.includes('strategy') ||
+    words.includes('control')
+  ) {
+    archetype = 'shadow_strategist'
+    confidence = 0.8
+  } else if (
+    words.includes('dream') ||
+    words.includes('future') ||
+    words.includes('create')
+  ) {
+    archetype = 'visionary'
     confidence = 0.82
-  } else if (words.includes("care") || words.includes("help") || words.includes("support")) {
-    archetype = "caregiver"
+  } else if (
+    words.includes('care') ||
+    words.includes('help') ||
+    words.includes('support')
+  ) {
+    archetype = 'caregiver'
     confidence = 0.78
   }
 
-  const emotional_intensity = Math.min(0.9, (words.match(/feel|emotion|sad|happy|angry|excited/g) || []).length * 0.2 + 0.3)
-  const cognitive_clarity = Math.min(0.9, (words.match(/think|understand|realize|know|clear/g) || []).length * 0.15 + 0.4)
-  const energy_level = Math.min(0.9, (words.match(/energy|tired|excited|motivated|drive/g) || []).length * 0.2 + 0.5)
-  const social_connection = Math.min(0.9, (words.match(/friend|family|people|together|alone/g) || []).length * 0.25 + 0.4)
+  const emotional_intensity = Math.min(
+    0.9,
+    (words.match(/feel|emotion|sad|happy|angry|excited/g) || []).length * 0.2 +
+      0.3,
+  )
+  const cognitive_clarity = Math.min(
+    0.9,
+    (words.match(/think|understand|realize|know|clear/g) || []).length * 0.15 +
+      0.4,
+  )
+  const energy_level = Math.min(
+    0.9,
+    (words.match(/energy|tired|excited|motivated|drive/g) || []).length * 0.2 +
+      0.5,
+  )
+  const social_connection = Math.min(
+    0.9,
+    (words.match(/friend|family|people|together|alone/g) || []).length * 0.25 +
+      0.4,
+  )
   const coherence_index = (cognitive_clarity + energy_level) / 2
   // Use cryptographically secure random if available, otherwise use a deterministic value for demo
   const getRandomValue = () => {
@@ -66,17 +93,26 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
       if (crypto && typeof crypto.getRandomValues === 'function') {
         const randomArray = crypto.getRandomValues(new Uint32Array(1))
         if (Array.isArray(randomArray) && randomArray.length > 0) {
-          const randomValue = randomArray[0];
-          if (typeof randomValue === 'number' && Number.isInteger(randomValue)) {
+          const randomValue = randomArray[0]
+          if (
+            typeof randomValue === 'number' &&
+            Number.isInteger(randomValue)
+          ) {
             // 0xFFFFFFFF is the max value for Uint32, so this normalizes to [0, 1)
-            return randomValue / (0xFFFFFFFF + 1);
+            return randomValue / (0xffffffff + 1)
           } else {
-            console.warn('crypto.getRandomValues returned a non-integer value:', randomValue);
-            return 0; // fallback to 0 if unexpected value
+            console.warn(
+              'crypto.getRandomValues returned a non-integer value:',
+              randomValue,
+            )
+            return 0 // fallback to 0 if unexpected value
           }
         } else {
-          console.warn('crypto.getRandomValues did not return a valid array:', randomArray);
-          return 0; // fallback to 0 if array is invalid
+          console.warn(
+            'crypto.getRandomValues did not return a valid array:',
+            randomArray,
+          )
+          return 0 // fallback to 0 if array is invalid
         }
       }
     } catch {
@@ -84,16 +120,19 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
     }
     // For demo purposes, use a deterministic value based on text length to avoid security warnings
     // In production, ensure crypto.getRandomValues is available
-    return (text.length % 100) / 100 * 0.3
+    return ((text.length % 100) / 100) * 0.3
   }
-  const urgency_score = words.includes("crisis") || words.includes("emergency") ? 0.9 : getRandomValue() + 0.1
+  const urgency_score =
+    words.includes('crisis') || words.includes('emergency')
+      ? 0.9
+      : getRandomValue() + 0.1
 
   return {
     archetype: {
       main_archetype: archetype,
       confidence,
-      color: "#45B7D1",
-      description: "AI-detected psychological archetype"
+      color: '#45B7D1',
+      description: 'AI-detected psychological archetype',
     },
     mood_vector: {
       emotional_intensity,
@@ -101,40 +140,43 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
       energy_level,
       social_connection,
       coherence_index,
-      urgency_score
+      urgency_score,
     },
     timestamp: Date.now(),
-    session_id: "demo_session",
+    session_id: 'demo_session',
     insights: [
-      "Strong emotional expression detected in your message",
-      "Cognitive processing appears clear and structured",
-      "Social awareness indicators present"
+      'Strong emotional expression detected in your message',
+      'Cognitive processing appears clear and structured',
+      'Social awareness indicators present',
     ],
     recommendations: [
-      "Continue expressing your thoughts openly",
-      "Consider journaling to track emotional patterns",
-      "Maintain social connections for support"
-    ]
+      'Continue expressing your thoughts openly',
+      'Consider journaling to track emotional patterns',
+      'Maintain social connections for support',
+    ],
   }
 }
 
 export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
   onAnalyze = mockAnalyze,
-  className = "",
+  className = '',
   showBrainViz = true,
-  showAnalysisPanel = true
+  showAnalysisPanel = true,
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm your enhanced mental health AI assistant. I can provide real-time psychological analysis and insights. How are you feeling today?",
+      content:
+        "Hello! I'm your enhanced mental health AI assistant. I can provide real-time psychological analysis and insights. How are you feeling today?",
       role: 'assistant',
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ])
   const [input, setInput] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [currentAnalysis, setCurrentAnalysis] = useState<MindMirrorAnalysis | undefined>(undefined)
+  const [currentAnalysis, setCurrentAnalysis] = useState<
+    MindMirrorAnalysis | undefined
+  >(undefined)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -154,10 +196,10 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
       id: Date.now().toString(),
       content: input.trim(),
       role: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
 
-    setMessages(prev => [...prev, userMessage])
+    setMessages((prev) => [...prev, userMessage])
     setInput('')
     setIsAnalyzing(true)
 
@@ -168,25 +210,26 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
 
       // Generate AI response based on analysis
       const responseContent = generateResponse(analysis)
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: responseContent,
         role: 'assistant',
         timestamp: new Date(),
-        analysis
+        analysis,
       }
 
-      setMessages(prev => [...prev, assistantMessage])
+      setMessages((prev) => [...prev, assistantMessage])
     } catch (error: unknown) {
       console.error('Analysis failed:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I encountered an issue analyzing your message. Please try again.",
+        content:
+          "I'm sorry, I encountered an issue analyzing your message. Please try again.",
         role: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
       }
-      setMessages(prev => [...prev, errorMessage])
+      setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsAnalyzing(false)
     }
@@ -195,22 +238,32 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
   const generateResponse = (analysis: MindMirrorAnalysis): string => {
     const archetype = analysis.archetype.main_archetype
     const urgency = analysis.mood_vector.urgency_score
-    
+
     if (urgency > 0.8) {
       return "I notice some urgency in your message. It's important that you know support is available. Would you like to talk about what's concerning you most right now?"
     }
-    
+
     const responses = {
-      wounded_healer: "I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?",
-      shadow_strategist: "Your analytical approach is clear in your message. You seem to be processing this situation strategically. What factors are you considering most important?",
-      visionary: "I can feel the creative energy in your words. Your forward-thinking perspective is inspiring. What vision are you working toward?",
-      caregiver: "Your caring nature comes through strongly. It's beautiful how you focus on supporting others. How are you taking care of yourself too?",
-      inner_child: "There's a wonderful authenticity in your expression. Your openness is refreshing. What brings you the most joy right now?",
-      wise_elder: "Your thoughtful perspective shows real wisdom. I appreciate the depth of your reflection. What insights have been most meaningful to you?",
-      rebel_spirit: "I can sense your drive for change and independence. Your energy is powerful. What transformation are you working toward?"
+      wounded_healer:
+        'I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?',
+      shadow_strategist:
+        'Your analytical approach is clear in your message. You seem to be processing this situation strategically. What factors are you considering most important?',
+      visionary:
+        'I can feel the creative energy in your words. Your forward-thinking perspective is inspiring. What vision are you working toward?',
+      caregiver:
+        "Your caring nature comes through strongly. It's beautiful how you focus on supporting others. How are you taking care of yourself too?",
+      inner_child:
+        "There's a wonderful authenticity in your expression. Your openness is refreshing. What brings you the most joy right now?",
+      wise_elder:
+        'Your thoughtful perspective shows real wisdom. I appreciate the depth of your reflection. What insights have been most meaningful to you?',
+      rebel_spirit:
+        'I can sense your drive for change and independence. Your energy is powerful. What transformation are you working toward?',
     }
-    
-    return responses[archetype as keyof typeof responses] || "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
+
+    return (
+      responses[archetype as keyof typeof responses] ||
+      "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
+    )
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -233,8 +286,12 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                   <Brain className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Enhanced Mental Health Chat</CardTitle>
-                  <p className="text-sm text-gray-600">Real-time psychological analysis</p>
+                  <CardTitle className="text-lg">
+                    Enhanced Mental Health Chat
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Real-time psychological analysis
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
@@ -275,9 +332,13 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                     )}
                     <div className="flex-1">
                       <p className="text-sm">{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                      }`}>
+                      <p
+                        className={`text-xs mt-1 ${
+                          message.role === 'user'
+                            ? 'text-blue-100'
+                            : 'text-gray-500'
+                        }`}
+                      >
                         {message.timestamp.toLocaleTimeString()}
                       </p>
                     </div>

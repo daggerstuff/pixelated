@@ -10,29 +10,31 @@ export const GET: APIRoute = async () => {
           status: 'healthy',
           uptime: process.uptime(),
           memory: process.memoryUsage(),
-          version: process.version
-        }
+          version: process.version,
+        },
       },
       version: '2.0.0',
-      environment: process.env['NODE_ENV'] || 'development'
+      environment: process.env['NODE_ENV'] || 'development',
     }
 
     return new Response(JSON.stringify(healthResponse, null, 2), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
-      }
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+      },
     })
-
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: error.message
-    }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: error.message,
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

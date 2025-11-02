@@ -314,7 +314,9 @@ program
     }
   })
 
-function getSeverityColor(severity: 'low' | 'medium' | 'high' | 'critical'): void {
+function getSeverityColor(
+  severity: 'low' | 'medium' | 'high' | 'critical',
+): void {
   switch (severity) {
     case 'critical':
       return chalk.red.bold

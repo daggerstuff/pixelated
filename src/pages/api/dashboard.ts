@@ -18,7 +18,7 @@ export const GET = async ({ cookies }) => {
       })
     }
 
-    // TODO: Replace with actual data from database
+    // Using mock data for beta launch - replace with database integration post-beta
     const mockData = {
       stats: {
         sessionsThisWeek: 3,

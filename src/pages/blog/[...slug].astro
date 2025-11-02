@@ -3,11 +3,11 @@ import { getCollection, type CollectionEntry, render } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Badge from '@/components/ui/Badge.astro'
 import { Button } from '@/components/ui/button'
-import Card from '@/components/ui/Card.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
+import Card from '@/components/ui/Card.astro'
+import CardContent from '@/components/ui/CardContent.astro'
+import CardDescription from '@/components/ui/CardDescription.astro'
+import CardHeader from '@/components/ui/CardHeader.astro'
+import CardTitle from '@/components/ui/CardTitle.astro'
 
 export const prerender = true
 
@@ -50,7 +50,8 @@ const categoryColors: Record<string, string> = {
   'University Spotlight': 'red',
 }
 
-const categoryColor = categoryColors[entry.data.category as keyof typeof categoryColors] || 'gray'
+const categoryColor =
+  categoryColors[entry.data.category as keyof typeof categoryColors] || 'gray'
 
 // Reading time calculation (rough estimate)
 const wordsPerMinute = 200
@@ -82,7 +83,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
           <Button
             variant="outline"
             size="sm"
-            className="border-green-500/50 text-green-300 hover:bg-green-500/10"
+            class="border-green-500/50 text-green-300 hover:bg-green-500/10"
             data-back-button="true"
           >
             ← Back to Blog
@@ -190,14 +191,14 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
                 class="flex flex-col sm:flex-row gap-4 justify-center items-center"
               >
                 <Button
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-6 py-3 rounded-full"
+                  class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-6 py-3 rounded-full"
                   data-demo-link="/demo-hub"
                 >
                   Try Our Training Demos →
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-green-500/50 text-green-300 hover:bg-green-500/10 px-6 py-3 rounded-full"
+                  class="border-green-500/50 text-green-300 hover:bg-green-500/10 px-6 py-3 rounded-full"
                   data-blog-link="/blog"
                 >
                   Read More Articles
@@ -225,54 +226,44 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {relatedPosts.map((post: CollectionEntry<'blog'>) => (
-                    <Card
-                      class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50"
-                    >
-                      <CardHeader class="pb-4">
-                        {post.data.image && (
-                          <div class="w-full h-40 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-lg mb-4 overflow-hidden">
-                            <img
-                              src={post.data.image.url}
-                              alt={post.data.image.alt}
-                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
-                          </div>
-                        )}
-
-                        {post.data.category && (
-                          <Badge
-                            class="bg-slate-500/20 text-slate-300 text-xs mb-3"
-                          >
-                            {post.data.category}
-                          </Badge>
-                        )}
-
-                        <CardTitle
-                          class="text-base font-bold text-slate-100 tracking-wide mb-3 group-hover:text-slate-50 transition-colors"
-                        >
-                          <a
-                            href={`/blog/${post.data.slug || post.slug}`}
-                            class="hover:underline"
-                          >
-                            {post.data.title}
-                          </a>
-                        </CardTitle>
-
-                        <CardDescription
-                          class="text-sm text-slate-200/80 leading-relaxed mb-4"
-                        >
-                          {post.data.description}
-                        </CardDescription>
-
-                        <div
-                          class="flex items-center justify-between text-xs text-slate-300/70"
-                        >
-                          <span>
-                            {new Date(post.data.pubDate).toLocaleDateString()}
-                          </span>
+                  <Card class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
+                    <CardHeader class="pb-4">
+                      {post.data.image && (
+                        <div class="w-full h-40 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-lg mb-4 overflow-hidden">
+                          <img
+                            src={post.data.image.url}
+                            alt={post.data.image.alt}
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
                         </div>
-                      </CardHeader>
-                    </Card>
+                      )}
+
+                      {post.data.category && (
+                        <Badge class="bg-slate-500/20 text-slate-300 text-xs mb-3">
+                          {post.data.category}
+                        </Badge>
+                      )}
+
+                      <CardTitle class="text-base font-bold text-slate-100 tracking-wide mb-3 group-hover:text-slate-50 transition-colors">
+                        <a
+                          href={`/blog/${post.data.slug || post.slug}`}
+                          class="hover:underline"
+                        >
+                          {post.data.title}
+                        </a>
+                      </CardTitle>
+
+                      <CardDescription class="text-sm text-slate-200/80 leading-relaxed mb-4">
+                        {post.data.description}
+                      </CardDescription>
+
+                      <div class="flex items-center justify-between text-xs text-slate-300/70">
+                        <span>
+                          {new Date(post.data.pubDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </CardHeader>
+                  </Card>
                 ))}
               </div>
             </div>
@@ -312,7 +303,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
                   class="flex-1 px-4 py-3 rounded-full bg-slate-800/50 border border-blue-500/30 text-blue-100 placeholder-blue-300/50 focus:outline-none focus:border-blue-400"
                 />
                 <Button
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300"
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300"
                 >
                   Subscribe
                 </Button>
@@ -558,7 +549,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track page view
     if (typeof (window as any).gtag !== 'undefined') {
-      (window as any).gtag('event', 'page_view', {
+      ;(window as any).gtag('event', 'page_view', {
         page_title: document.title,
         page_location: window.location.href,
         content_type: 'blog_post',
@@ -575,8 +566,11 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent
 
-        if (maxScroll % 25 === 0 && typeof (window as any).gtag !== 'undefined') {
-          (window as any).gtag('event', 'blog_reading_progress', {
+        if (
+          maxScroll % 25 === 0 &&
+          typeof (window as any).gtag !== 'undefined'
+        ) {
+          ;(window as any).gtag('event', 'blog_reading_progress', {
             article_title: document.title,
             scroll_depth: maxScroll,
           })
@@ -589,7 +583,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
       button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
-          (window as any).gtag('event', 'blog_cta_click', {
+          ;(window as any).gtag('event', 'blog_cta_click', {
             article_title: document.title,
             cta_text: target?.textContent || '',
           })
@@ -602,7 +596,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
       link.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
-          (window as any).gtag('event', 'related_post_click', {
+          ;(window as any).gtag('event', 'related_post_click', {
             current_article: document.title,
             clicked_article: target?.textContent || '',
           })

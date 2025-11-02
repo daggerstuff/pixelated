@@ -3,6 +3,7 @@ import * as cron from 'node-cron'
 import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { securePathJoin } from '../utils/index'
 
 const logger = createBuildSafeLogger('blog-publishing')
 
@@ -218,7 +219,19 @@ export class BlogPublishingService {
       const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
       for (const entry of entries) {
-        const fullPath = path.join(dirPath, entry.name)
+        // Validate entry name for security - prevent path traversal
+        if (
+          !entry.name ||
+          entry.name.includes('..') ||
+          entry.name.includes('/') ||
+          entry.name.includes('\\')
+        ) {
+          logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
+          continue
+        }
+
+        // Use securePathJoin to prevent path traversal
+        const fullPath = securePathJoin(dirPath, entry.name)
 
         if (entry.isDirectory()) {
           await this.walkDirectory(fullPath)

@@ -57,8 +57,8 @@ export default defineConfig({
           '@react-three/drei',
           'mongodb',
           'recharts',
-          'chart.js'
-        ],
+          'chart.js',
+          ],
         onwarn(warning, warn) {
           if (
             warning.code === "SOURCEMAP_ERROR" ||
@@ -88,7 +88,7 @@ export default defineConfig({
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
       },
-      extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
+      extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
       mainFields: ['module', 'main'],
       conditions: ['import', 'module', 'browser', 'default'],
@@ -125,7 +125,7 @@ export default defineConfig({
         '@react-three/drei',
         'mongodb',
         'recharts',
-        'chart.js'
+        'chart.js',
       ],
     },
     optimizeDeps: {
@@ -154,7 +154,7 @@ export default defineConfig({
         '@react-three/drei',
         'mongodb',
         'recharts',
-        'chart.js'
+        'chart.js',
       ],
     },
   },
@@ -186,10 +186,9 @@ export default defineConfig({
     }),
     ...(process.env.SENTRY_DSN ? [
       sentry({
-        sourceMapsUploadOptions: {
-          project: "pixel-astro",
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-        },
+        org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+        project: process.env.SENTRY_PROJECT || "pixel-astro",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
       }),
       ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'
         ? [spotlightjs()]
@@ -210,18 +209,30 @@ export default defineConfig({
     host: '0.0.0.0',
     watch: {
       ignored: [
-        '**/ai/**',
+        '/ai/**',
         '**/dataset/**',
         '**/MER2025/**',
         '**/VideoChat2/**',
-        '**/*.py',
-        '**/*.pyc',
-        '**/__pycache__/**',
-        '**/venv/**',
-        '**/env/**',
-        '**/logs/**',
-        '**/tmp/**',
-        '**/temp/**'
+        '*.py',
+        '*.pyc',
+        '/__pycache__/**',
+        '__pycache__/**',
+        '/venv/**',
+        '/env/**',
+        '/logs/**',
+        '/tmp/**',
+        '/temp/**',
+        '/coverage/**',
+        '/mcp_server/**',
+        '**/.venv/**',
+        '**/.venv/*',
+        '/.venv/**',
+        '**/node_modules/**',
+        '**/node_modules/*',
+        '/node_modules/**',
+        'node_modules/**',
+        'mcp_server/**',
+        '/mcp_server/**'
       ]
     }
   },

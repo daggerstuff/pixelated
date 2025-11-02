@@ -7,7 +7,12 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import crypto from 'node:crypto'
-import type { ThreatData, ThreatResponse, ResponseAction } from '../response-orchestration'
+import type {
+  ThreatData,
+  ThreatResponse,
+  ResponseAction,
+} from '../response-orchestration'
+import { ExternalThreatIntelligenceService } from './external-threat-intelligence'
 
 const logger = createBuildSafeLogger('threat-detection-utils')
 
@@ -28,7 +33,9 @@ export function generateThreatId(): string {
     }
   } catch (_err) {
     // Log at debug level to avoid swallowing errors silently
-    logger.debug('generateThreatId: crypto fallback failed', { error: String(_err) })
+    logger.debug('generateThreatId: crypto fallback failed', {
+      error: String(_err),
+    })
   }
   return _secureId('threat_')
 }
@@ -66,7 +73,10 @@ export function validateThreatData(threatData: Partial<ThreatData>): boolean {
     return false
   }
 
-  if (!threatData.severity || !['low', 'medium', 'high', 'critical'].includes(threatData.severity)) {
+  if (
+    !threatData.severity ||
+    !['low', 'medium', 'high', 'critical'].includes(threatData.severity)
+  ) {
     logger.warn('Valid severity level is required')
     return false
   }
@@ -82,25 +92,38 @@ export function validateThreatData(threatData: Partial<ThreatData>): boolean {
 /**
  * Sanitize sensitive data from threat context
  */
-export function sanitizeThreatContext(context: Record<string, unknown>): Record<string, unknown> {
+export function sanitizeThreatContext(
+  context: Record<string, unknown>,
+): Record<string, unknown> {
   const sensitiveFields = [
-    'password', 'token', 'secret', 'key', 'authorization',
-    'credit_card', 'ssn', 'pii', 'personal', 'private'
+    'password',
+    'token',
+    'secret',
+    'key',
+    'authorization',
+    'credit_card',
+    'ssn',
+    'pii',
+    'personal',
+    'private',
   ]
 
   const sanitized = { ...context }
 
-  Object.keys(sanitized).forEach(key => {
+  Object.keys(sanitized).forEach((key) => {
     const lowerKey = key.toLowerCase()
 
     // Remove sensitive fields
-    if (sensitiveFields.some(field => lowerKey.includes(field))) {
+    if (sensitiveFields.some((field) => lowerKey.includes(field))) {
       delete sanitized[key]
       logger.debug('Removed sensitive field:', { field: key })
     }
 
     // Sanitize string values that might contain sensitive info
-    if (typeof sanitized[key] === 'string' && (sanitized[key] as string).length > 100) {
+    if (
+      typeof sanitized[key] === 'string' &&
+      (sanitized[key] as string).length > 100
+    ) {
       // Truncate long strings to prevent data leakage
       sanitized[key] = (sanitized[key] as string).substring(0, 100) + '...'
     }
@@ -117,10 +140,18 @@ export function calculateThreatScore(threatData: ThreatData): number {
 
   // Base score from severity
   switch (threatData.severity) {
-    case 'critical': score += 90; break
-    case 'high': score += 70; break
-    case 'medium': score += 50; break
-    case 'low': score += 30; break
+    case 'critical':
+      score += 90
+      break
+    case 'high':
+      score += 70
+      break
+    case 'medium':
+      score += 50
+      break
+    case 'low':
+      score += 30
+      break
   }
 
   // Add risk factor contributions
@@ -133,15 +164,24 @@ export function calculateThreatScore(threatData: ThreatData): number {
     score += Math.min(violationRate * 10, 20) // Max 20 points from violation rate
 
     // Add points for suspicious patterns
-    if (threatData.riskFactors.ip && isSuspiciousIP(threatData.riskFactors.ip)) {
+    if (
+      threatData.riskFactors.ip &&
+      isSuspiciousIP(threatData.riskFactors.ip)
+    ) {
       score += 15
     }
 
-    if (threatData.riskFactors.userAgent && isSuspiciousUserAgent(threatData.riskFactors.userAgent)) {
+    if (
+      threatData.riskFactors.userAgent &&
+      isSuspiciousUserAgent(threatData.riskFactors.userAgent)
+    ) {
       score += 10
     }
 
-    if (threatData.riskFactors.endpoint && isSensitiveEndpoint(threatData.riskFactors.endpoint)) {
+    if (
+      threatData.riskFactors.endpoint &&
+      isSensitiveEndpoint(threatData.riskFactors.endpoint)
+    ) {
       score += 20
     }
   }
@@ -153,18 +193,21 @@ export function calculateThreatScore(threatData: ThreatData): number {
 /**
  * Check if IP address is suspicious
  */
-export function isSuspiciousIP(ip: string): boolean {
+export async function isSuspiciousIP(
+  ip: string,
+  threatIntelligenceService?: ExternalThreatIntelligenceService,
+): Promise<boolean> {
   // Private IP ranges
   const privateRanges = [
     /^10\./,
     /^192\.168\./,
     /^172\.(1[6-9]|2[0-9]|3[01])\./,
     /^127\./,
-    /^169\.254\./
+    /^169\.254\./,
   ]
 
   // Check if IP is in private range
-  if (privateRanges.some(range => range.test(ip))) {
+  if (privateRanges.some((range) => range.test(ip))) {
     return false // Private IPs are not suspicious
   }
 
@@ -173,9 +216,102 @@ export function isSuspiciousIP(ip: string): boolean {
     return false
   }
 
-  // TODO: Add external threat intelligence checks here
-  // For now, consider non-private IPs as potentially suspicious
+  // External threat intelligence checks
+  if (threatIntelligenceService) {
+    try {
+      const threatResult = await threatIntelligenceService.queryIntelligence({
+        iocType: 'ip',
+        iocValue: ip,
+      })
+
+      // If we found threat intelligence for this IP, it's suspicious
+      if (threatResult.intelligence.length > 0) {
+        logger.info(`IP ${ip} found in threat intelligence`, {
+          sources: threatResult.sources,
+          threatCount: threatResult.intelligence.length,
+        })
+        return true
+      }
+
+      // Log cache hit/miss for monitoring
+      logger.debug(`Threat intelligence query for IP ${ip}`, {
+        cacheHit: threatResult.cacheHit,
+        sources: threatResult.sources,
+      })
+    } catch (error) {
+      // Log error but don't fail the check - fallback to basic heuristics
+      logger.warn(`Failed to query threat intelligence for IP ${ip}`, {
+        error: String(error),
+      })
+    }
+  }
+
+  // Fallback: consider non-private IPs as potentially suspicious
+  // This maintains the original behavior when threat intelligence is unavailable
   return true
+}
+
+/**
+ * Check if IP address is suspicious (synchronous version for backward compatibility)
+ * @deprecated Use isSuspiciousIP with threat intelligence service for better accuracy
+ */
+export function isSuspiciousIPSync(ip: string): boolean {
+  // Private IP ranges
+  const privateRanges = [
+    /^10\./,
+    /^192\.168\./,
+    /^172\.(1[6-9]|2[0-9]|3[01])\./,
+    /^127\./,
+    /^169\.254\./,
+  ]
+
+  // Check if IP is in private range
+  if (privateRanges.some((range) => range.test(ip))) {
+    return false // Private IPs are not suspicious
+  }
+
+  // Check for localhost
+  if (ip === '127.0.0.1' || ip === '::1') {
+    return false
+  }
+
+  // Fallback: consider non-private IPs as potentially suspicious
+  return true
+}
+
+/**
+ * Check if IP address is suspicious with enhanced threat intelligence
+ * This is a convenience function that initializes the threat intelligence service if needed
+ */
+export async function checkSuspiciousIPWithIntelligence(
+  ip: string,
+  config?: {
+    mongoUrl?: string
+    redisUrl?: string
+    enabled?: boolean
+  },
+): Promise<boolean> {
+  if (!config?.enabled) {
+    return isSuspiciousIPSync(ip)
+  }
+
+  try {
+    const threatService = new ExternalThreatIntelligenceService({
+      mongoUrl: config.mongoUrl || process.env.MONGODB_URL || 'mongodb://localhost:27017',
+      redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
+      enabled: true,
+    })
+
+    await threatService.initialize()
+    const result = await isSuspiciousIP(ip, threatService)
+    await threatService.shutdown()
+    return result
+  } catch (error) {
+    logger.warn('Failed to use threat intelligence service, falling back to basic check', {
+      error: String(error),
+    })
+    return isSuspiciousIPSync(ip)
+  }
 }
 
 /**
@@ -192,10 +328,10 @@ export function isSuspiciousUserAgent(userAgent: string): boolean {
     /wget/i,
     /python/i,
     /java/i,
-    /perl/i
+    /perl/i,
   ]
 
-  return suspiciousPatterns.some(pattern => pattern.test(userAgent))
+  return suspiciousPatterns.some((pattern) => pattern.test(userAgent))
 }
 
 /**
@@ -212,29 +348,31 @@ export function isSensitiveEndpoint(endpoint: string): boolean {
     /\/auth/i,
     /\/login/i,
     /\/password/i,
-    /\/reset/i
+    /\/reset/i,
   ]
 
-  return sensitivePatterns.some(pattern => pattern.test(endpoint))
+  return sensitivePatterns.some((pattern) => pattern.test(endpoint))
 }
 
 /**
  * Format threat response for logging
  */
-export function formatThreatResponseForLogging(response: ThreatResponse): Record<string, unknown> {
+export function formatThreatResponseForLogging(
+  response: ThreatResponse,
+): Record<string, unknown> {
   return {
     responseId: response.responseId,
     threatId: response.threatId,
     severity: response.severity,
     confidence: response.confidence,
-    actions: response.actions.map(action => ({
+    actions: response.actions.map((action) => ({
       type: action.actionType,
       target: action.target,
-      metadata: action.metadata
+      metadata: action.metadata,
     })),
     recommendations: response.recommendations,
     timestamp: response.metadata?.timestamp,
-    source: response.metadata?.source
+    source: response.metadata?.source,
   }
 }
 
@@ -242,9 +380,8 @@ export function formatThreatResponseForLogging(response: ThreatResponse): Record
  * Determine if a request should be blocked based on threat response
  */
 export function shouldBlockRequest(response: ThreatResponse): boolean {
-  return response.actions.some(action =>
-    action.actionType === 'block' ||
-    action.actionType === 'deny'
+  return response.actions.some(
+    (action) => action.actionType === 'block' || action.actionType === 'deny',
   )
 }
 
@@ -252,9 +389,9 @@ export function shouldBlockRequest(response: ThreatResponse): boolean {
  * Determine if a request should be rate limited based on threat response
  */
 export function shouldRateLimitRequest(response: ThreatResponse): boolean {
-  return response.actions.some(action =>
-    action.actionType === 'rate_limit' ||
-    action.actionType === 'throttle'
+  return response.actions.some(
+    (action) =>
+      action.actionType === 'rate_limit' || action.actionType === 'throttle',
   )
 }
 
@@ -266,22 +403,22 @@ export function extractRateLimitParams(response: ThreatResponse): {
   windowMs: number
   message?: string
 } {
-  const rateLimitAction = response.actions.find(action =>
-    action.actionType === 'rate_limit' ||
-    action.actionType === 'throttle'
+  const rateLimitAction = response.actions.find(
+    (action) =>
+      action.actionType === 'rate_limit' || action.actionType === 'throttle',
   )
 
   if (!rateLimitAction) {
     return {
       maxRequests: 100,
-      windowMs: 60000
+      windowMs: 60000,
     }
   }
 
   return {
     maxRequests: rateLimitAction.metadata?.maxRequests || 10,
     windowMs: rateLimitAction.metadata?.windowMs || 60000,
-    message: rateLimitAction.metadata?.message
+    message: rateLimitAction.metadata?.message,
   }
 }
 
@@ -291,7 +428,7 @@ export function extractRateLimitParams(response: ThreatResponse): {
 export function createErrorResponse(
   error: string,
   code: string = 'THREAT_DETECTION_ERROR',
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): ThreatResponse {
   logger.error('Threat detection error:', { error, code, details })
 
@@ -307,8 +444,8 @@ export function createErrorResponse(
       timestamp: new Date().toISOString(),
       error,
       code,
-      details
-    }
+      details,
+    },
   }
 }
 
@@ -317,7 +454,7 @@ export function createErrorResponse(
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
 
@@ -329,7 +466,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     timeout = setTimeout(() => {
       // We intentionally ignore the return value of func for debounce
       // and cast args to unknown[] to call safely.
-      ; (func as (...a: unknown[]) => unknown)(...args as unknown[])
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       timeout = null
     }, wait)
   }
@@ -340,13 +477,13 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
  */
 export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
-  limit: number
+  limit: number,
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false
 
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
-      ; (func as (...a: unknown[]) => unknown)(...args as unknown[])
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       inThrottle = true
       setTimeout(() => {
         inThrottle = false
@@ -360,7 +497,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
  */
 export function memoize<T extends (...args: unknown[]) => unknown>(
   func: T,
-  keyGenerator?: (...args: Parameters<T>) => string
+  keyGenerator?: (...args: Parameters<T>) => string,
 ): T {
   const cache = new Map<string, ReturnType<T>>()
 
@@ -371,7 +508,9 @@ export function memoize<T extends (...args: unknown[]) => unknown>(
       return cache.get(key)!
     }
 
-    const result = (func as (...a: unknown[]) => unknown)(...args as unknown[])
+    const result = (func as (...a: unknown[]) => unknown)(
+      ...(args as unknown[]),
+    )
     cache.set(key, result as ReturnType<T>)
     return result as ReturnType<T>
   }) as T
@@ -382,11 +521,16 @@ export function memoize<T extends (...args: unknown[]) => unknown>(
  */
 export function severityToNumber(severity: string): number {
   switch (severity) {
-    case 'critical': return 4
-    case 'high': return 3
-    case 'medium': return 2
-    case 'low': return 1
-    default: return 0
+    case 'critical':
+      return 4
+    case 'high':
+      return 3
+    case 'medium':
+      return 2
+    case 'low':
+      return 1
+    default:
+      return 0
   }
 }
 
@@ -414,11 +558,16 @@ export function numberToSeverity(number: number): string {
  */
 export function calculateRateLimitWindow(severity: string): number {
   switch (severity) {
-    case 'critical': return 300000 // 5 minutes
-    case 'high': return 60000 // 1 minute
-    case 'medium': return 300000 // 5 minutes
-    case 'low': return 600000 // 10 minutes
-    default: return 60000 // 1 minute
+    case 'critical':
+      return 300000 // 5 minutes
+    case 'high':
+      return 60000 // 1 minute
+    case 'medium':
+      return 300000 // 5 minutes
+    case 'low':
+      return 600000 // 10 minutes
+    default:
+      return 60000 // 1 minute
   }
 }
 
@@ -427,11 +576,16 @@ export function calculateRateLimitWindow(severity: string): number {
  */
 export function calculateRateLimitMaxRequests(severity: string): number {
   switch (severity) {
-    case 'critical': return 1
-    case 'high': return 5
-    case 'medium': return 10
-    case 'low': return 50
-    default: return 100
+    case 'critical':
+      return 1
+    case 'high':
+      return 5
+    case 'medium':
+      return 10
+    case 'low':
+      return 50
+    default:
+      return 100
   }
 }
 
@@ -449,20 +603,40 @@ export function isRateLimitBypassAllowed(
     userRole?: string
     ip?: string
     endpoint?: string
-  }
+  },
 ): boolean {
   // Check role-based bypass
-  if (bypassRules.allowedRoles && context.userRole && bypassRules.allowedRoles.includes(context.userRole)) {
+  if (
+    bypassRules.allowedRoles &&
+    context.userRole &&
+    bypassRules.allowedRoles.includes(context.userRole)
+  ) {
     return true
   }
 
   // Check IP-based bypass
-  if (bypassRules.allowedIPRanges && context.ip && bypassRules.allowedIPRanges.some(range => context.ip!.startsWith(range.replace('*', '')))) {
+  if (
+    bypassRules.allowedIPRanges &&
+    context.ip &&
+    bypassRules.allowedIPRanges.some((range) => {
+      // Fix: ensure ALL '*' occurrences are removed before matching.
+      // Using split/join avoids relying on regex replace semantics and
+      // guarantees all '*' characters are removed.
+      const normalizedRange = range.split('*').join('')
+      return context.ip!.startsWith(normalizedRange)
+    })
+  ) {
     return true
   }
 
   // Check endpoint-based bypass
-  if (bypassRules.allowedEndpoints && context.endpoint && bypassRules.allowedEndpoints.some(pattern => context.endpoint!.includes(pattern))) {
+  if (
+    bypassRules.allowedEndpoints &&
+    context.endpoint &&
+    bypassRules.allowedEndpoints.some((pattern) =>
+      context.endpoint!.includes(pattern),
+    )
+  ) {
     return true
   }
 
@@ -498,12 +672,12 @@ export function generateCorrelationId(): string {
 export function createThreatAction(
   actionType: ResponseAction['actionType'],
   target: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): ResponseAction {
   return {
     actionType,
     target,
     timestamp: new Date().toISOString(),
-    metadata: (metadata as Record<string, unknown>) || {}
+    metadata: (metadata as Record<string, unknown>) || {},
   }
 }

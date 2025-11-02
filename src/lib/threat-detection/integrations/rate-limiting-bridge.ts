@@ -15,7 +15,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   ThreatResponse,
   RateLimitRule,
-  RateLimitResult
+  RateLimitResult,
 } from '../response-orchestration'
 
 const logger = createBuildSafeLogger('threat-rate-limit-bridge')
@@ -67,7 +67,7 @@ export class RateLimitingBridge {
   constructor(
     rateLimiter: DistributedRateLimiter,
     orchestrator: AdvancedResponseOrchestrator,
-    config: RateLimitIntegrationConfig
+    config: RateLimitIntegrationConfig,
   ) {
     this.rateLimiter = rateLimiter
     this.orchestrator = orchestrator
@@ -86,7 +86,7 @@ export class RateLimitingBridge {
       userAgent?: string
       method?: string
       headers?: Record<string, string>
-    }
+    },
   ): Promise<{
     rateLimitResult: RateLimitResult
     threatResponse?: ThreatResponse
@@ -100,7 +100,7 @@ export class RateLimitingBridge {
       const rateLimitResult = await this.rateLimiter.checkLimit(
         identifier,
         rule,
-        context
+        context,
       )
 
       // If rate limited, trigger threat detection
@@ -108,13 +108,13 @@ export class RateLimitingBridge {
         const threatResponse = await this.handleRateLimitViolation(
           identifier,
           context,
-          rateLimitResult
+          rateLimitResult,
         )
 
         return {
           rateLimitResult,
           threatResponse,
-          shouldBlock: true
+          shouldBlock: true,
         }
       }
 
@@ -122,23 +122,26 @@ export class RateLimitingBridge {
       const threatResponse = await this.checkForPotentialThreats(
         identifier,
         context,
-        rateLimitResult
+        rateLimitResult,
       )
 
       return {
         rateLimitResult,
         threatResponse,
-        shouldBlock: false
+        shouldBlock: false,
       }
     } catch (error) {
-      logger.error('Rate limit check with threat detection failed:', { error, identifier })
+      logger.error('Rate limit check with threat detection failed:', {
+        error,
+        identifier,
+      })
       // Fail open - allow request if bridge fails
       const rule = this.selectRateLimitRule(context)
       const fallbackResult = await this.rateLimiter.getStatus(identifier, rule)
 
       return {
         rateLimitResult: fallbackResult,
-        shouldBlock: false
+        shouldBlock: false,
       }
     }
   }
@@ -148,7 +151,7 @@ export class RateLimitingBridge {
    */
   async applyThreatBasedRateLimiting(
     threatResponse: ThreatResponse,
-    context: RateLimitContext
+    context: RateLimitContext,
   ): Promise<boolean> {
     if (!this.config.enableAutoRateLimiting) {
       return false
@@ -156,7 +159,7 @@ export class RateLimitingBridge {
 
     try {
       const actions = threatResponse.actions.filter(
-        action => action.actionType === 'rate_limiting'
+        (action) => action.actionType === 'rate_limiting',
       )
 
       for (const action of actions) {
@@ -167,21 +170,24 @@ export class RateLimitingBridge {
               name: `threat_${threatResponse.responseId}`,
               maxRequests: action.parameters.limit,
               windowMs: action.parameters.windowMs || 60000,
-              enableAttackDetection: true
+              enableAttackDetection: true,
             },
-            context
+            context,
           )
         }
       }
 
       logger.info('Applied threat-based rate limiting', {
         responseId: threatResponse.responseId,
-        actions: actions.length
+        actions: actions.length,
       })
 
       return true
     } catch (error) {
-      logger.error('Failed to apply threat-based rate limiting:', { error, responseId: threatResponse.responseId })
+      logger.error('Failed to apply threat-based rate limiting:', {
+        error,
+        responseId: threatResponse.responseId,
+      })
       return false
     }
   }
@@ -192,7 +198,7 @@ export class RateLimitingBridge {
   private async handleRateLimitViolation(
     identifier: string,
     context: RateLimitContext,
-    rateLimitResult: RateLimitResult
+    rateLimitResult: RateLimitResult,
   ): Promise<ThreatResponse | undefined> {
     if (!this.config.enableThreatDetection) {
       return undefined
@@ -212,18 +218,18 @@ export class RateLimitingBridge {
           endpoint: context.endpoint,
           userAgent: context.userAgent,
           violationCount: rateLimitResult.limit - rateLimitResult.remaining + 1,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         metadata: {
           rateLimitResult,
-          context
-        }
+          context,
+        },
       }
 
       // Orchestrate response
       const threatResponse = await this.orchestrator.orchestrateResponse(
         threatData.threatId,
-        threatData
+        threatData,
       )
 
       // Apply rate limiting based on threat response
@@ -231,7 +237,10 @@ export class RateLimitingBridge {
 
       return threatResponse
     } catch (error) {
-      logger.error('Failed to handle rate limit violation:', { error, identifier })
+      logger.error('Failed to handle rate limit violation:', {
+        error,
+        identifier,
+      })
       return undefined
     }
   }
@@ -242,12 +251,15 @@ export class RateLimitingBridge {
   private async checkForPotentialThreats(
     identifier: string,
     context: RateLimitContext,
-    rateLimitResult: RateLimitResult
+    rateLimitResult: RateLimitResult,
   ): Promise<ThreatResponse | undefined> {
     // Check if we're approaching rate limits (potential threat indicator)
-    const usagePercentage = (rateLimitResult.limit - rateLimitResult.remaining) / rateLimitResult.limit
+    const usagePercentage =
+      (rateLimitResult.limit - rateLimitResult.remaining) /
+      rateLimitResult.limit
 
-    if (usagePercentage > 0.8) { // 80% usage threshold
+    if (usagePercentage > 0.8) {
+      // 80% usage threshold
       const threatData = {
         threatId: `high_usage_${identifier}_${Date.now()}`,
         source: 'rate_monitoring',
@@ -259,21 +271,24 @@ export class RateLimitingBridge {
           ip: context.ip,
           endpoint: context.endpoint,
           usagePercentage,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         metadata: {
           rateLimitResult,
-          context
-        }
+          context,
+        },
       }
 
       try {
         return await this.orchestrator.orchestrateResponse(
           threatData.threatId,
-          threatData
+          threatData,
         )
       } catch (error) {
-        logger.error('Failed to orchestrate high usage response:', { error, identifier })
+        logger.error('Failed to orchestrate high usage response:', {
+          error,
+          identifier,
+        })
         return undefined
       }
     }
@@ -291,7 +306,7 @@ export class RateLimitingBridge {
         name: 'bypass',
         maxRequests: 1000, // High limit for bypassed requests
         windowMs: 60000,
-        enableAttackDetection: false
+        enableAttackDetection: false,
       }
     }
 
@@ -304,7 +319,12 @@ export class RateLimitingBridge {
    */
   private shouldBypass(context: RateLimitContext): boolean {
     // Check role-based bypass
-    if (context.userId && this.config.bypassRules.allowedRoles.includes(context.userId).slice(________)) {
+    if (
+      context.userId &&
+      this.config.bypassRules.allowedRoles
+        .includes(context.userId)
+        .slice(________)
+    ) {
       return true
     }
 
@@ -314,7 +334,10 @@ export class RateLimitingBridge {
     }
 
     // Check endpoint-based bypass
-    if (context.endpoint && this.config.bypassRules.allowedEndpoints.includes(context.endpoint)) {
+    if (
+      context.endpoint &&
+      this.config.bypassRules.allowedEndpoints.includes(context.endpoint)
+    ) {
       return true
     }
 
@@ -325,14 +348,14 @@ export class RateLimitingBridge {
    * Check if IP is in allowed ranges
    */
   private isAllowedIP(ip: string): boolean {
-    return this.config.bypassRules.allowedIPRanges.some(range => {
+    return this.config.bypassRules.allowedIPRanges.some((range) => {
       if (range.includes('/')) {
         // CIDR notation
         const [network, prefixLength] = range.split('/')
         const mask = parseInt(prefixLength)
         const ipInt = this.ipToInt(ip)
         const networkInt = this.ipToInt(network)
-        const maskInt = (0xFFFFFFFF << (32 - mask)) >>> 0
+        const maskInt = (0xffffffff << (32 - mask)) >>> 0
         return (ipInt & maskInt) === (networkInt & maskInt)
       } else {
         // Exact match
@@ -357,13 +380,19 @@ export class RateLimitingBridge {
       // for IPv4 while preventing crashes.
       return 0
     }
-    return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+    return (
+      ip
+        .split('.')
+        .reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+    )
   }
 
   /**
    * Determine threat severity based on rate limit result
    */
-  private determineThreatSeverity(rateLimitResult: RateLimitResult): 'low' | 'medium' | 'high' | 'critical' {
+  private determineThreatSeverity(
+    rateLimitResult: RateLimitResult,
+  ): 'low' | 'medium' | 'high' | 'critical' {
     if (rateLimitResult.retryAfter && rateLimitResult.retryAfter > 300) {
       return 'critical'
     }
@@ -408,24 +437,19 @@ export class RateLimitingBridge {
       '/api/auth',
       '/api/admin',
       '/api/internal',
-      '/api/v1/private'
+      '/api/v1/private',
     ]
-    return sensitivePatterns.some(pattern => endpoint.includes(pattern))
+    return sensitivePatterns.some((pattern) => endpoint.includes(pattern))
   }
 
   /**
    * Check if user agent indicates automated requests
    */
   private isAutomatedUserAgent(userAgent: string): boolean {
-    const botPatterns = [
-      'bot',
-      'crawler',
-      'spider',
-      'scraper',
-      'curl',
-      'wget'
-    ]
-    return botPatterns.some(pattern => userAgent.toLowerCase().includes(pattern))
+    const botPatterns = ['bot', 'crawler', 'spider', 'scraper', 'curl', 'wget']
+    return botPatterns.some((pattern) =>
+      userAgent.toLowerCase().includes(pattern),
+    )
   }
 
   /**
@@ -439,7 +463,8 @@ export class RateLimitingBridge {
   }> {
     try {
       // Check rate limiter health
-      const rateLimiterHealthy = await this.rateLimiter.isBlocked('health_check')
+      const rateLimiterHealthy =
+        await this.rateLimiter.isBlocked('health_check')
 
       // Check orchestrator health (basic check)
       const orchestratorHealthy = true // Simplified for now
@@ -451,7 +476,7 @@ export class RateLimitingBridge {
         healthy: rateLimiterHealthy && orchestratorHealthy,
         rateLimiterHealthy,
         orchestratorHealthy,
-        recentIntegrations
+        recentIntegrations,
       }
     } catch (error) {
       logger.error('Failed to get integration status:', { error })
@@ -459,7 +484,7 @@ export class RateLimitingBridge {
         healthy: false,
         rateLimiterHealthy: false,
         orchestratorHealthy: false,
-        recentIntegrations: 0
+        recentIntegrations: 0,
       }
     }
   }
@@ -485,7 +510,7 @@ export class RateLimitingBridge {
 export function createRateLimitingBridge(
   rateLimiter: DistributedRateLimiter,
   orchestrator: AdvancedResponseOrchestrator,
-  customConfig?: Partial<RateLimitIntegrationConfig>
+  customConfig?: Partial<RateLimitIntegrationConfig>,
 ): RateLimitingBridge {
   const defaultConfig: RateLimitIntegrationConfig = {
     enableAutoRateLimiting: true,
@@ -495,36 +520,36 @@ export function createRateLimitingBridge(
         name: 'low_threat',
         maxRequests: 100,
         windowMs: 60000,
-        enableAttackDetection: false
+        enableAttackDetection: false,
       },
       medium: {
         name: 'medium_threat',
         maxRequests: 50,
         windowMs: 60000,
-        enableAttackDetection: true
+        enableAttackDetection: true,
       },
       high: {
         name: 'high_threat',
         maxRequests: 10,
         windowMs: 60000,
-        enableAttackDetection: true
+        enableAttackDetection: true,
       },
       critical: {
         name: 'critical_threat',
         maxRequests: 1,
         windowMs: 300000, // 5 minutes
-        enableAttackDetection: true
-      }
+        enableAttackDetection: true,
+      },
     },
     bypassRules: {
       allowedRoles: ['admin', 'system'],
       allowedIPRanges: ['127.0.0.1', '::1'],
-      allowedEndpoints: ['/api/health', '/api/status']
+      allowedEndpoints: ['/api/health', '/api/status'],
     },
     escalationConfig: {
       autoEscalateThreshold: 5,
-      escalationWindowMs: 3600000 // 1 hour
-    }
+      escalationWindowMs: 3600000, // 1 hour
+    },
   }
 
   const config = { ...defaultConfig, ...customConfig }

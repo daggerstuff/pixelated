@@ -38,66 +38,140 @@ export interface ParseResponse {
 const THERAPEUTIC_FRAMEWORKS = [
   {
     name: 'Cognitive Behavioral Therapy (CBT)',
-    techniques: ['Cognitive restructuring', 'Behavioral activation', 'Exposure therapy', 'Thought records'],
+    techniques: [
+      'Cognitive restructuring',
+      'Behavioral activation',
+      'Exposure therapy',
+      'Thought records',
+    ],
     conditions: ['anxiety', 'depression', 'PTSD', 'OCD', 'panic disorder'],
     evidence: 'extensive',
-    description: 'Evidence-based approach focusing on thoughts, feelings, and behaviors'
+    description:
+      'Evidence-based approach focusing on thoughts, feelings, and behaviors',
   },
   {
     name: 'Dialectical Behavior Therapy (DBT)',
-    techniques: ['Mindfulness', 'Distress tolerance', 'Emotion regulation', 'Interpersonal effectiveness'],
-    conditions: ['borderline personality disorder', 'self-harm', 'emotional dysregulation'],
+    techniques: [
+      'Mindfulness',
+      'Distress tolerance',
+      'Emotion regulation',
+      'Interpersonal effectiveness',
+    ],
+    conditions: [
+      'borderline personality disorder',
+      'self-harm',
+      'emotional dysregulation',
+    ],
     evidence: 'strong',
-    description: 'Skills-based therapy for emotional regulation and interpersonal challenges'
+    description:
+      'Skills-based therapy for emotional regulation and interpersonal challenges',
   },
   {
     name: 'Acceptance and Commitment Therapy (ACT)',
-    techniques: ['Psychological flexibility', 'Values clarification', 'Mindfulness', 'Defusion'],
+    techniques: [
+      'Psychological flexibility',
+      'Values clarification',
+      'Mindfulness',
+      'Defusion',
+    ],
     conditions: ['anxiety', 'depression', 'chronic pain', 'substance abuse'],
     evidence: 'growing',
-    description: 'Focus on psychological flexibility and values-based living'
+    description: 'Focus on psychological flexibility and values-based living',
   },
   {
     name: 'Psychodynamic Therapy',
-    techniques: ['Free association', 'Transference analysis', 'Dream interpretation', 'Defense mechanisms'],
+    techniques: [
+      'Free association',
+      'Transference analysis',
+      'Dream interpretation',
+      'Defense mechanisms',
+    ],
     conditions: ['personality disorders', 'relationship issues', 'depression'],
     evidence: 'moderate',
-    description: 'Insight-oriented therapy exploring unconscious patterns'
+    description: 'Insight-oriented therapy exploring unconscious patterns',
   },
   {
     name: 'Trauma-Focused CBT',
-    techniques: ['Trauma narrative', 'Cognitive processing', 'Exposure therapy', 'EMDR'],
+    techniques: [
+      'Trauma narrative',
+      'Cognitive processing',
+      'Exposure therapy',
+      'EMDR',
+    ],
     conditions: ['PTSD', 'complex trauma', 'childhood abuse'],
     evidence: 'extensive',
-    description: 'Specialized CBT approach for trauma-related conditions'
-  }
+    description: 'Specialized CBT approach for trauma-related conditions',
+  },
 ]
 
 // Clinical entity extraction patterns
 const ENTITY_PATTERNS = {
   conditions: [
-    'anxiety', 'depression', 'PTSD', 'OCD', 'bipolar', 'schizophrenia', 'ADHD',
-    'borderline personality disorder', 'narcissistic personality disorder',
-    'eating disorder', 'substance abuse', 'addiction', 'panic disorder',
-    'social anxiety', 'generalized anxiety', 'major depressive disorder'
+    'anxiety',
+    'depression',
+    'PTSD',
+    'OCD',
+    'bipolar',
+    'schizophrenia',
+    'ADHD',
+    'borderline personality disorder',
+    'narcissistic personality disorder',
+    'eating disorder',
+    'substance abuse',
+    'addiction',
+    'panic disorder',
+    'social anxiety',
+    'generalized anxiety',
+    'major depressive disorder',
   ],
   symptoms: [
-    'insomnia', 'fatigue', 'irritability', 'mood swings', 'panic attacks',
-    'flashbacks', 'nightmares', 'hypervigilance', 'dissociation',
-    'anhedonia', 'hopelessness', 'suicidal ideation', 'self-harm'
+    'insomnia',
+    'fatigue',
+    'irritability',
+    'mood swings',
+    'panic attacks',
+    'flashbacks',
+    'nightmares',
+    'hypervigilance',
+    'dissociation',
+    'anhedonia',
+    'hopelessness',
+    'suicidal ideation',
+    'self-harm',
   ],
   treatments: [
-    'CBT', 'DBT', 'EMDR', 'psychotherapy', 'medication', 'group therapy',
-    'family therapy', 'exposure therapy', 'mindfulness', 'meditation'
+    'CBT',
+    'DBT',
+    'EMDR',
+    'psychotherapy',
+    'medication',
+    'group therapy',
+    'family therapy',
+    'exposure therapy',
+    'mindfulness',
+    'meditation',
   ],
   medications: [
-    'sertraline', 'fluoxetine', 'escitalopram', 'venlafaxine', 'bupropion',
-    'aripiprazole', 'quetiapine', 'lithium', 'lamotrigine', 'clonazepam'
+    'sertraline',
+    'fluoxetine',
+    'escitalopram',
+    'venlafaxine',
+    'bupropion',
+    'aripiprazole',
+    'quetiapine',
+    'lithium',
+    'lamotrigine',
+    'clonazepam',
   ],
   riskFactors: [
-    'family history', 'trauma', 'substance abuse', 'social isolation',
-    'financial stress', 'relationship problems', 'chronic illness'
-  ]
+    'family history',
+    'trauma',
+    'substance abuse',
+    'social isolation',
+    'financial stress',
+    'relationship problems',
+    'chronic illness',
+  ],
 }
 
 function extractEntities(content: string): ParseResponse['entities'] {
@@ -107,12 +181,12 @@ function extractEntities(content: string): ParseResponse['entities'] {
     treatments: [],
     medications: [],
     symptoms: [],
-    riskFactors: []
+    riskFactors: [],
   }
 
   for (const [category, patterns] of Object.entries(ENTITY_PATTERNS)) {
-    const found = patterns.filter(pattern => 
-      lowerContent.includes(pattern.toLowerCase())
+    const found = patterns.filter((pattern) =>
+      lowerContent.includes(pattern.toLowerCase()),
     )
     entities[category as keyof typeof entities] = found
   }
@@ -120,7 +194,10 @@ function extractEntities(content: string): ParseResponse['entities'] {
   return entities
 }
 
-function identifyFrameworks(content: string, entities: ParseResponse['entities']): ParseResponse['frameworks'] {
+function identifyFrameworks(
+  content: string,
+  entities: ParseResponse['entities'],
+): ParseResponse['frameworks'] {
   const frameworks: ParseResponse['frameworks'] = []
   const lowerContent = content.toLowerCase()
 
@@ -134,16 +211,16 @@ function identifyFrameworks(content: string, entities: ParseResponse['entities']
     }
 
     // Check for technique mentions
-    const mentionedTechniques = framework.techniques.filter(technique =>
-      lowerContent.includes(technique.toLowerCase())
+    const mentionedTechniques = framework.techniques.filter((technique) =>
+      lowerContent.includes(technique.toLowerCase()),
     )
     confidence += mentionedTechniques.length * 0.1
 
     // Check for condition applicability
-    const applicableConditions = framework.conditions.filter(condition =>
-      entities.conditions.some(entityCondition => 
-        entityCondition.toLowerCase().includes(condition.toLowerCase())
-      )
+    const applicableConditions = framework.conditions.filter((condition) =>
+      entities.conditions.some((entityCondition) =>
+        entityCondition.toLowerCase().includes(condition.toLowerCase()),
+      ),
     )
     confidence += applicableConditions.length * 0.15
 
@@ -161,7 +238,10 @@ function identifyFrameworks(content: string, entities: ParseResponse['entities']
         name: framework.name,
         confidence: Math.min(confidence, 0.95),
         applicability,
-        techniques: mentionedTechniques.length > 0 ? mentionedTechniques : framework.techniques.slice(0, 3)
+        techniques:
+          mentionedTechniques.length > 0
+            ? mentionedTechniques
+            : framework.techniques.slice(0, 3),
       })
     }
   }
@@ -169,7 +249,10 @@ function identifyFrameworks(content: string, entities: ParseResponse['entities']
   return frameworks.sort((a, b) => b.confidence - a.confidence).slice(0, 5)
 }
 
-function generateSummary(content: string, entities: ParseResponse['entities']): string {
+function generateSummary(
+  content: string,
+  entities: ParseResponse['entities'],
+): string {
   const conditionCount = entities.conditions.length
   const treatmentCount = entities.treatments.length
   const wordCount = content.split(/\s+/).length
@@ -205,11 +288,14 @@ function generateSummary(content: string, entities: ParseResponse['entities']): 
   return summary
 }
 
-function calculateComplexity(content: string, entities: ParseResponse['entities']): 'low' | 'medium' | 'high' {
+function calculateComplexity(
+  content: string,
+  entities: ParseResponse['entities'],
+): 'low' | 'medium' | 'high' {
   const wordCount = content.split(/\s+/).length
   const entityCount = Object.values(entities).flat().length
   const uniqueWords = new Set(content.toLowerCase().split(/\s+/)).size
-  const complexity = (entityCount * 2 + uniqueWords / wordCount * 100) / 3
+  const complexity = (entityCount * 2 + (uniqueWords / wordCount) * 100) / 3
 
   if (complexity > 50) {
     return 'high'
@@ -225,67 +311,96 @@ export const POST = async ({ request }: APIContext) => {
 
   try {
     const body: ParseRequest = await request.json()
-    
+
     if (!body.content || typeof body.content !== 'string') {
-      return new Response(JSON.stringify({ 
-        error: 'Invalid request: content is required and must be a string' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid request: content is required and must be a string',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     if (body.content.length < 10) {
-      return new Response(JSON.stringify({ 
-        error: 'Content too short: minimum 10 characters required' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          error: 'Content too short: minimum 10 characters required',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     if (body.content.length > 50000) {
-      return new Response(JSON.stringify({ 
-        error: 'Content too long: maximum 50,000 characters allowed' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({
+          error: 'Content too long: maximum 50,000 characters allowed',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     const options = {
       extractEntities: true,
       identifyFrameworks: true,
       generateSummary: true,
-      ...body.options
+      ...body.options,
     }
 
     // Extract clinical entities
-    const entities = options.extractEntities ? extractEntities(body.content) : {
-      conditions: [],
-      treatments: [],
-      medications: [],
-      symptoms: [],
-      riskFactors: []
-    }
+    const entities = options.extractEntities
+      ? extractEntities(body.content)
+      : {
+          conditions: [],
+          treatments: [],
+          medications: [],
+          symptoms: [],
+          riskFactors: [],
+        }
 
     // Identify applicable frameworks
-    const frameworks = options.identifyFrameworks ? identifyFrameworks(body.content, entities) : []
+    const frameworks = options.identifyFrameworks
+      ? identifyFrameworks(body.content, entities)
+      : []
 
     // Generate summary
-    const summary = options.generateSummary ? generateSummary(body.content, entities) : ''
+    const summary = options.generateSummary
+      ? generateSummary(body.content, entities)
+      : ''
 
     // Calculate confidence based on entity richness and content quality
     const entityCount = Object.values(entities).flat().length
     const wordCount = body.content.split(/\s+/).length
-    const confidence = Math.min(0.95, Math.max(0.1, (entityCount * 10 + wordCount * 0.01) / 100))
+    const confidence = Math.min(
+      0.95,
+      Math.max(0.1, (entityCount * 10 + wordCount * 0.01) / 100),
+    )
 
     // Calculate clinical relevance
-    const clinicalTerms = ['patient', 'client', 'therapy', 'treatment', 'diagnosis', 'symptom', 'intervention']
-    const clinicalMentions = clinicalTerms.filter(term => 
-      body.content.toLowerCase().includes(term)
+    const clinicalTerms = [
+      'patient',
+      'client',
+      'therapy',
+      'treatment',
+      'diagnosis',
+      'symptom',
+      'intervention',
+    ]
+    const clinicalMentions = clinicalTerms.filter((term) =>
+      body.content.toLowerCase().includes(term),
     ).length
-    const clinicalRelevance = Math.min(1.0, clinicalMentions / clinicalTerms.length)
+    const clinicalRelevance = Math.min(
+      1.0,
+      clinicalMentions / clinicalTerms.length,
+    )
 
     const processingTime = Date.now() - startTime
 
@@ -298,26 +413,28 @@ export const POST = async ({ request }: APIContext) => {
       metadata: {
         wordCount,
         complexity: calculateComplexity(body.content, entities),
-        clinicalRelevance
-      }
+        clinicalRelevance,
+      },
     }
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'X-Processing-Time': processingTime.toString()
-      }
+        'X-Processing-Time': processingTime.toString(),
+      },
     })
-
   } catch (error: unknown) {
     console.error('Psychology parse API error:', error)
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error during content analysis',
-      details: error instanceof Error ? String(error) : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error during content analysis',
+        details: error instanceof Error ? String(error) : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }

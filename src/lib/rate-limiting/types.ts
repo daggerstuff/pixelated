@@ -215,7 +215,11 @@ export interface WebSocketRateLimitConfig {
 // Real-time monitoring types
 export interface RateLimitAlert {
   /** Alert type */
-  type: 'attack_detected' | 'ddos_detected' | 'rate_limit_exceeded' | 'system_error'
+  type:
+    | 'attack_detected'
+    | 'ddos_detected'
+    | 'rate_limit_exceeded'
+    | 'system_error'
   /** Alert severity */
   severity: 'low' | 'medium' | 'high' | 'critical'
   /** Alert message */

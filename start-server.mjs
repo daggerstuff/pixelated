@@ -3,7 +3,7 @@
 import { Sentry, closeSentry } from './instrument.mjs'
 
 import { createServer } from 'node:http'
-import { handler as ssrHandler } from './dist/server/entry.mjs'
+import { handler as ssrHandler } from '/app/dist/server/entry.mjs'
 
 const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT;
 const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN;

@@ -37,9 +37,15 @@ const mockHasPointerCapture = vi.fn()
 const mockReleasePointerCapture = vi.fn()
 
 // Use vi.spyOn instead of directly modifying the prototype
-vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(mockScrollIntoView)
-vi.spyOn(HTMLElement.prototype, 'hasPointerCapture').mockImplementation(mockHasPointerCapture)
-vi.spyOn(HTMLElement.prototype, 'releasePointerCapture').mockImplementation(mockReleasePointerCapture)
+vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(
+  mockScrollIntoView,
+)
+vi.spyOn(HTMLElement.prototype, 'hasPointerCapture').mockImplementation(
+  mockHasPointerCapture,
+)
+vi.spyOn(HTMLElement.prototype, 'releasePointerCapture').mockImplementation(
+  mockReleasePointerCapture,
+)
 
 // Mock document methods
 document.createRange = vi.fn(() => ({

@@ -16,7 +16,9 @@ export function BlogSearch() {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
-  async function handleSearch(e: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSearch(
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> {
     e.preventDefault()
     if (!query.trim()) {
       return

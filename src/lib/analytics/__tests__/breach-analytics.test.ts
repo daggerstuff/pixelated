@@ -91,9 +91,7 @@ describe('breachAnalytics', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(listRecentBreaches as unknown).mockResolvedValue(
-      mockBreaches,
-    )
+    ;(listRecentBreaches as unknown).mockResolvedValue(mockBreaches)
     ;(redis.get as unknown).mockResolvedValue(
       JSON.stringify({
         completedAt: Date.now(),
@@ -104,14 +102,14 @@ describe('breachAnalytics', () => {
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
-      recommendations: []
+      recommendations: [],
     })
     ;(RiskScoring.calculateDailyRisk as unknown).mockResolvedValue({
       overallScore: 0.65,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
-      recommendations: []
+      recommendations: [],
     })
     ;(ComplianceMetrics.calculateScore as unknown).mockResolvedValue(0.98)
     ;(NotificationEffectiveness.calculate as unknown).mockResolvedValue({
@@ -127,8 +125,8 @@ describe('breachAnalytics', () => {
         averageTimeToAcknowledge: 3.2,
         deliveryRate: 0.98,
         acknowledgmentRate: 0.85,
-        complianceRate: 0.99
-      }
+        complianceRate: 0.99,
+      },
     })
     ;(NotificationEffectiveness.calculateDaily as unknown).mockResolvedValue({
       overall: 0.92,
@@ -143,8 +141,8 @@ describe('breachAnalytics', () => {
         averageTimeToAcknowledge: 2.8,
         deliveryRate: 0.95,
         acknowledgmentRate: 0.82,
-        complianceRate: 0.96
-      }
+        complianceRate: 0.96,
+      },
     })
     ;(MachineLearning.detectAnomalies as unknown).mockResolvedValue([0.1, 0.2])
     ;(MachineLearning.predictBreaches as unknown).mockResolvedValue([
@@ -155,9 +153,12 @@ describe('breachAnalytics', () => {
       { name: 'factor1', weight: 0.8, score: 0.9 },
       { name: 'factor2', weight: 0.6, score: 0.7 },
     ])
-    ;(SecurityTrends.analyze as unknown).mockResolvedValue(['increasing', 'stable'])
+    ;(SecurityTrends.analyze as unknown).mockResolvedValue([
+      'increasing',
+      'stable',
+    ])
     ;(StatisticalAnalysis.calculateTrend as unknown).mockReturnValue(0.15)
-    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data');
+    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data')
   })
 
   afterEach(() => {
@@ -197,9 +198,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle empty breach list', async () => {
-      ;(listRecentBreaches as unknown).mockResolvedValue(
-        [],
-      )
+      ;(listRecentBreaches as unknown).mockResolvedValue([])
 
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
@@ -319,8 +318,8 @@ describe('breachAnalytics', () => {
           averageTimeToAcknowledge: 2.8,
           deliveryRate: 0.95,
           acknowledgmentRate: 0.82,
-          complianceRate: 0.96
-        }
+          complianceRate: 0.96,
+        },
       })
 
       const insights = await BreachAnalytics.generateInsights()

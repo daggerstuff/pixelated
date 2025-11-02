@@ -22,7 +22,7 @@ export interface VersionConfig {
   supportedVersions: ApiVersion[]
   deprecationPolicy: {
     minorVersions: number // How many minor versions to support
-    patchVersions: number  // How many patch versions to support
+    patchVersions: number // How many patch versions to support
     deprecationNoticeDays: number // Days before deprecation
   }
   breakingChanges: {
@@ -87,7 +87,10 @@ class ApiVersionManager {
    */
   isVersionSupported(version: ApiVersion): boolean {
     return this.config.supportedVersions.some(
-      v => v.major === version.major && v.minor === version.minor && v.patch >= version.patch
+      (v) =>
+        v.major === version.major &&
+        v.minor === version.minor &&
+        v.patch >= version.patch,
     )
   }
 
@@ -98,7 +101,7 @@ class ApiVersionManager {
     return {
       'X-API-Version': `${this.config.currentVersion.major}.${this.config.currentVersion.minor}.${this.config.currentVersion.patch}`,
       'X-API-Supported-Versions': this.config.supportedVersions
-        .map(v => `${v.major}.${v.minor}.${v.patch}`)
+        .map((v) => `${v.major}.${v.minor}.${v.patch}`)
         .join(', '),
       'X-API-Deprecation-Policy': JSON.stringify(this.config.deprecationPolicy),
     }
@@ -108,9 +111,13 @@ class ApiVersionManager {
    * Parse version from request
    */
   parseVersionFromRequest(request: Request): ApiVersion | null {
-    const versionHeader = request.headers.get('X-API-Version') ||
-                         request.headers.get('API-Version') ||
-                         request.url.match(/\/v(\d+)\/(\d+)\/(\d+)\//)?.slice(1).map(Number)
+    const versionHeader =
+      request.headers.get('X-API-Version') ||
+      request.headers.get('API-Version') ||
+      request.url
+        .match(/\/v(\d+)\/(\d+)\/(\d+)\//)
+        ?.slice(1)
+        .map(Number)
 
     if (versionHeader) {
       if (Array.isArray(versionHeader)) {
@@ -137,7 +144,11 @@ class ApiVersionManager {
 
     // Check if version is too old based on deprecation policy
     if (version.major < current.major) return true
-    if (version.major === current.major && version.minor < current.minor - this.config.deprecationPolicy.minorVersions) {
+    if (
+      version.major === current.major &&
+      version.minor <
+        current.minor - this.config.deprecationPolicy.minorVersions
+    ) {
       return true
     }
 
@@ -150,16 +161,21 @@ class ApiVersionManager {
   getDeprecationNotice(endpoint: VersionedEndpoint): string | null {
     if (!this.isDeprecated(endpoint)) return null
 
-    const sunsetDate = endpoint.sunsetDate || this.calculateSunsetDate(endpoint.version)
-    const daysUntilSunset = Math.ceil((sunsetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    const sunsetDate =
+      endpoint.sunsetDate || this.calculateSunsetDate(endpoint.version)
 
     return `This API version (${endpoint.version.major}.${endpoint.version.minor}.${endpoint.version.patch}) is deprecated and will be removed on ${sunsetDate.toISOString().split('T')[0]}. Please migrate to v${this.config.currentVersion.major}.${this.config.currentVersion.minor}.${this.config.currentVersion.patch}.`
   }
 
   private calculateSunsetDate(version: ApiVersion): Date {
     const current = this.config.currentVersion
-    const monthsToAdd = version.major < current.major ? 6 :
-                       version.minor < current.minor - this.config.deprecationPolicy.minorVersions ? 3 : 1
+    const monthsToAdd =
+      version.major < current.major
+        ? 6
+        : version.minor <
+            current.minor - this.config.deprecationPolicy.minorVersions
+          ? 3
+          : 1
 
     const sunsetDate = new Date()
     sunsetDate.setMonth(sunsetDate.getMonth() + monthsToAdd)
@@ -173,7 +189,9 @@ class ApiVersionManager {
     const guides: string[] = []
 
     if (fromVersion.major < this.config.currentVersion.major) {
-      guides.push(`Major version upgrade required: ${fromVersion.major} → ${this.config.currentVersion.major}`)
+      guides.push(
+        `Major version upgrade required: ${fromVersion.major} → ${this.config.currentVersion.major}`,
+      )
       guides.push('Review breaking changes documentation')
       guides.push('Update authentication mechanism')
       guides.push('Modify response handling')

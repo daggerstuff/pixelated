@@ -7,10 +7,7 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { EncryptionMode } from './types'
 import { FHEOperation } from './types'
-import {
-  getSchemeForMode,
-  SealSchemeType,
-} from './seal-types'
+import { getSchemeForMode, SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import type { SealSerializationOptions, SerializedSealKeys } from './seal-types'
 import { SealContext } from './seal-context'
@@ -304,6 +301,7 @@ export class SealService {
       logger.error('Failed to initialize SEAL service', { error })
       throw new Error(
         `SEAL service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -363,6 +361,7 @@ export class SealService {
       logger.error('Failed to generate SEAL keys', { error })
       throw new Error(
         `Key generation failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -573,6 +572,7 @@ export class SealService {
       logger.error('Encryption failed', { error })
       throw new Error(
         `Encryption failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -608,6 +608,7 @@ export class SealService {
       logger.error('Decryption failed', { error })
       throw new Error(
         `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -710,6 +711,7 @@ export class SealService {
       logger.error('Failed to load SEAL keys', { error })
       throw new Error(
         `Key loading failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }

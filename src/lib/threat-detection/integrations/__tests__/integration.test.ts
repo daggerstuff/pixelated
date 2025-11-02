@@ -17,7 +17,7 @@ import {
   sanitizeThreatContext,
   shouldBlockRequest,
   shouldRateLimitRequest,
-  extractRateLimitParams
+  extractRateLimitParams,
 } from '../utils'
 
 vi.mock('../../logging/build-safe-logger')
@@ -35,17 +35,20 @@ describe('Threat Detection Integration', () => {
       analyzeThreat: vi.fn(),
       executeResponse: vi.fn(),
       getStatistics: vi.fn(),
-      getHealthStatus: vi.fn()
+      getHealthStatus: vi.fn(),
     }
 
     mockRateLimiter = {
       checkRateLimit: vi.fn(),
       incrementCounter: vi.fn(),
       getRemainingRequests: vi.fn(),
-      resetCounter: vi.fn()
+      resetCounter: vi.fn(),
     }
 
-    integration = createThreatDetectionIntegration(mockOrchestrator, mockRateLimiter)
+    integration = createThreatDetectionIntegration(
+      mockOrchestrator,
+      mockRateLimiter,
+    )
     threatDetectionService = integration.service
   })
 
@@ -70,8 +73,8 @@ describe('Threat Detection Integration', () => {
         riskFactors: {
           violationCount: 15,
           timeWindow: 60000,
-          endpoint: '/api/sensitive'
-        }
+          endpoint: '/api/sensitive',
+        },
       }
 
       const mockResponse = {
@@ -81,7 +84,7 @@ describe('Threat Detection Integration', () => {
         confidence: 0.8,
         actions: [],
         recommendations: ['Monitor user activity'],
-        metadata: { timestamp: new Date().toISOString() }
+        metadata: { timestamp: new Date().toISOString() },
       }
 
       mockOrchestrator.analyzeThreat.mockResolvedValue(mockResponse)
@@ -97,12 +100,16 @@ describe('Threat Detection Integration', () => {
         threatId: 'test_threat_123',
         source: 'rate_limiting',
         severity: 'medium',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
-      mockOrchestrator.analyzeThreat.mockRejectedValue(new Error('Analysis failed'))
+      mockOrchestrator.analyzeThreat.mockRejectedValue(
+        new Error('Analysis failed'),
+      )
 
-      await expect(threatDetectionService.analyzeThreat(threatData)).rejects.toThrow('Analysis failed')
+      await expect(
+        threatDetectionService.analyzeThreat(threatData),
+      ).rejects.toThrow('Analysis failed')
     })
 
     it('should check request with rate limiting', async () => {
@@ -111,22 +118,28 @@ describe('Threat Detection Integration', () => {
         userId: '123',
         ip: '192.168.1.1',
         endpoint: '/api/data',
-        userAgent: 'Mozilla/5.0...'
+        userAgent: 'Mozilla/5.0...',
       }
 
       const mockRateLimitResult = {
         allowed: true,
         remaining: 45,
         resetTime: Date.now() + 60000,
-        metadata: { source: 'rate_limiting' }
+        metadata: { source: 'rate_limiting' },
       }
 
       mockRateLimiter.checkRateLimit.mockResolvedValue(mockRateLimitResult)
 
-      const result = await threatDetectionService.checkRequest(identifier, context)
+      const result = await threatDetectionService.checkRequest(
+        identifier,
+        context,
+      )
 
       expect(result).toEqual(mockRateLimitResult)
-      expect(mockRateLimiter.checkRateLimit).toHaveBeenCalledWith(identifier, context)
+      expect(mockRateLimiter.checkRateLimit).toHaveBeenCalledWith(
+        identifier,
+        context,
+      )
     })
 
     it('should get health status correctly', async () => {
@@ -135,10 +148,10 @@ describe('Threat Detection Integration', () => {
         services: {
           orchestrator: 'healthy',
           rateLimiter: 'healthy',
-          behavioral: 'healthy'
+          behavioral: 'healthy',
         },
         uptime: 3600000,
-        lastCheck: new Date().toISOString()
+        lastCheck: new Date().toISOString(),
       }
 
       mockOrchestrator.getHealthStatus.mockResolvedValue(mockHealthStatus)
@@ -155,7 +168,7 @@ describe('Threat Detection Integration', () => {
         blockedRequests: 45,
         averageResponseTime: 120,
         topThreatSources: ['rate_limiting', 'behavioral'],
-        uptime: 3600000
+        uptime: 3600000,
       }
 
       mockOrchestrator.getStatistics.mockResolvedValue(mockStats)
@@ -173,23 +186,29 @@ describe('Threat Detection Integration', () => {
       const context = {
         userId: '123',
         ip: '192.168.1.1',
-        endpoint: '/api/sensitive'
+        endpoint: '/api/sensitive',
       }
 
       const mockRateLimitResult = {
         allowed: true,
         remaining: 10,
         resetTime: Date.now() + 60000,
-        metadata: { source: 'rate_limiting' }
+        metadata: { source: 'rate_limiting' },
       }
 
       mockRateLimiter.checkRateLimit.mockResolvedValue(mockRateLimitResult)
 
       const bridge = new RateLimitingBridge(mockOrchestrator, mockRateLimiter)
-      const result = await bridge.checkRateLimitWithThreatDetection(identifier, context)
+      const result = await bridge.checkRateLimitWithThreatDetection(
+        identifier,
+        context,
+      )
 
       expect(result).toEqual(mockRateLimitResult)
-      expect(mockRateLimiter.checkRateLimit).toHaveBeenCalledWith(identifier, context)
+      expect(mockRateLimiter.checkRateLimit).toHaveBeenCalledWith(
+        identifier,
+        context,
+      )
     })
 
     it('should increment counter correctly', async () => {
@@ -197,7 +216,7 @@ describe('Threat Detection Integration', () => {
       const context = {
         userId: '123',
         ip: '192.168.1.1',
-        endpoint: '/api/data'
+        endpoint: '/api/data',
       }
 
       mockRateLimiter.incrementCounter.mockResolvedValue(undefined)
@@ -205,14 +224,17 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockOrchestrator, mockRateLimiter)
       await bridge.incrementCounter(identifier, context)
 
-      expect(mockRateLimiter.incrementCounter).toHaveBeenCalledWith(identifier, context)
+      expect(mockRateLimiter.incrementCounter).toHaveBeenCalledWith(
+        identifier,
+        context,
+      )
     })
 
     it('should get remaining requests correctly', async () => {
       const identifier = 'user:123'
       const context = {
         userId: '123',
-        ip: '192.168.1.1'
+        ip: '192.168.1.1',
       }
 
       const mockRemaining = 25
@@ -222,14 +244,17 @@ describe('Threat Detection Integration', () => {
       const result = await bridge.getRemainingRequests(identifier, context)
 
       expect(result).toBe(mockRemaining)
-      expect(mockRateLimiter.getRemainingRequests).toHaveBeenCalledWith(identifier, context)
+      expect(mockRateLimiter.getRemainingRequests).toHaveBeenCalledWith(
+        identifier,
+        context,
+      )
     })
 
     it('should reset counter correctly', async () => {
       const identifier = 'user:123'
       const context = {
         userId: '123',
-        ip: '192.168.1.1'
+        ip: '192.168.1.1',
       }
 
       mockRateLimiter.resetCounter.mockResolvedValue(undefined)
@@ -237,7 +262,10 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockOrchestrator, mockRateLimiter)
       await bridge.resetCounter(identifier, context)
 
-      expect(mockRateLimiter.resetCounter).toHaveBeenCalledWith(identifier, context)
+      expect(mockRateLimiter.resetCounter).toHaveBeenCalledWith(
+        identifier,
+        context,
+      )
     })
   })
 
@@ -246,10 +274,14 @@ describe('Threat Detection Integration', () => {
       const config = {
         enabled: true,
         enableLogging: true,
-        skipPaths: ['/health', '/status']
+        skipPaths: ['/health', '/status'],
       }
 
-      const middleware = new ThreatDetectionMiddleware(mockOrchestrator, mockRateLimiter, config)
+      const middleware = new ThreatDetectionMiddleware(
+        mockOrchestrator,
+        mockRateLimiter,
+        config,
+      )
 
       expect(middleware).toBeDefined()
       expect(middleware.config).toEqual(config)
@@ -261,10 +293,14 @@ describe('Threat Detection Integration', () => {
       const config = {
         enabled: true,
         enableLogging: false,
-        skipPaths: ['/health']
+        skipPaths: ['/health'],
       }
 
-      const middleware = new ThreatDetectionMiddleware(mockOrchestrator, mockRateLimiter, config)
+      const middleware = new ThreatDetectionMiddleware(
+        mockOrchestrator,
+        mockRateLimiter,
+        config,
+      )
 
       const mockReq = {
         ip: '192.168.1.1',
@@ -272,13 +308,13 @@ describe('Threat Detection Integration', () => {
         path: '/api/data',
         get: vi.fn((_header: string) => 'Mozilla/5.0...'),
         user: { id: '123', role: 'user' },
-        session: { id: 'session_123' }
+        session: { id: 'session_123' },
       }
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn(),
-        set: vi.fn()
+        set: vi.fn(),
       }
 
       const mockNext = vi.fn()
@@ -286,7 +322,7 @@ describe('Threat Detection Integration', () => {
       mockRateLimiter.checkRateLimit.mockResolvedValue({
         allowed: true,
         remaining: 50,
-        resetTime: Date.now() + 60000
+        resetTime: Date.now() + 60000,
       })
 
       await middleware.middleware()(mockReq, mockRes, mockNext)
@@ -299,10 +335,14 @@ describe('Threat Detection Integration', () => {
       const config = {
         enabled: true,
         enableLogging: false,
-        skipPaths: ['/health', '/status']
+        skipPaths: ['/health', '/status'],
       }
 
-      const middleware = new ThreatDetectionMiddleware(mockOrchestrator, mockRateLimiter, config)
+      const middleware = new ThreatDetectionMiddleware(
+        mockOrchestrator,
+        mockRateLimiter,
+        config,
+      )
 
       const mockReq = {
         ip: '192.168.1.1',
@@ -310,13 +350,13 @@ describe('Threat Detection Integration', () => {
         path: '/health',
         get: vi.fn(),
         user: undefined,
-        session: undefined
+        session: undefined,
       }
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn(),
-        set: vi.fn()
+        set: vi.fn(),
       }
 
       const mockNext = vi.fn()
@@ -330,10 +370,14 @@ describe('Threat Detection Integration', () => {
     it('should block requests when rate limit exceeded', async () => {
       const config = {
         enabled: true,
-        enableLogging: false
+        enableLogging: false,
       }
 
-      const middleware = new ThreatDetectionMiddleware(mockOrchestrator, mockRateLimiter, config)
+      const middleware = new ThreatDetectionMiddleware(
+        mockOrchestrator,
+        mockRateLimiter,
+        config,
+      )
 
       const mockReq = {
         ip: '192.168.1.1',
@@ -341,13 +385,13 @@ describe('Threat Detection Integration', () => {
         path: '/api/data',
         get: vi.fn(),
         user: undefined,
-        session: undefined
+        session: undefined,
       }
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn(),
-        set: vi.fn()
+        set: vi.fn(),
       }
 
       const mockNext = vi.fn()
@@ -357,15 +401,17 @@ describe('Threat Detection Integration', () => {
         allowed: false,
         remaining: 0,
         resetTime: Date.now() + 60000,
-        metadata: { source: 'rate_limiting' }
+        metadata: { source: 'rate_limiting' },
       })
 
       await middleware.middleware()(mockReq, mockRes, mockNext)
 
       expect(mockRes.status).toHaveBeenCalledWith(429)
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
-        error: 'Too many requests'
-      }))
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Too many requests',
+        }),
+      )
       expect(mockNext).not.toHaveBeenCalled()
     })
   })
@@ -385,13 +431,13 @@ describe('Threat Detection Integration', () => {
         threatId: 'threat_123',
         source: 'rate_limiting',
         severity: 'medium',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       const invalidThreatData = {
         source: 'rate_limiting',
         severity: 'medium',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
         // Missing threatId
       }
 
@@ -410,8 +456,8 @@ describe('Threat Detection Integration', () => {
           timeWindow: 60000,
           endpoint: '/api/admin',
           ip: '192.168.1.100',
-          userAgent: 'bot/scanner'
-        }
+          userAgent: 'bot/scanner',
+        },
       }
 
       const score = calculateThreatScore(threatData)
@@ -426,7 +472,7 @@ describe('Threat Detection Integration', () => {
         token: 'abc123def',
         creditCard: '4111111111111111',
         normalData: 'this is fine',
-        longString: 'a'.repeat(200)
+        longString: 'a'.repeat(200),
       }
 
       const sanitized = sanitizeThreatContext(context)
@@ -445,10 +491,14 @@ describe('Threat Detection Integration', () => {
         severity: 'high',
         confidence: 0.9,
         actions: [
-          { actionType: 'block', target: 'request', timestamp: new Date().toISOString() }
+          {
+            actionType: 'block',
+            target: 'request',
+            timestamp: new Date().toISOString(),
+          },
         ],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       const responseWithoutBlock = {
@@ -457,10 +507,14 @@ describe('Threat Detection Integration', () => {
         severity: 'low',
         confidence: 0.5,
         actions: [
-          { actionType: 'log', target: 'request', timestamp: new Date().toISOString() }
+          {
+            actionType: 'log',
+            target: 'request',
+            timestamp: new Date().toISOString(),
+          },
         ],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       expect(shouldBlockRequest(responseWithBlock)).toBe(true)
@@ -474,10 +528,14 @@ describe('Threat Detection Integration', () => {
         severity: 'medium',
         confidence: 0.7,
         actions: [
-          { actionType: 'rate_limit', target: 'request', timestamp: new Date().toISOString() }
+          {
+            actionType: 'rate_limit',
+            target: 'request',
+            timestamp: new Date().toISOString(),
+          },
         ],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       const responseWithoutRateLimit = {
@@ -486,10 +544,14 @@ describe('Threat Detection Integration', () => {
         severity: 'low',
         confidence: 0.3,
         actions: [
-          { actionType: 'log', target: 'request', timestamp: new Date().toISOString() }
+          {
+            actionType: 'log',
+            target: 'request',
+            timestamp: new Date().toISOString(),
+          },
         ],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       expect(shouldRateLimitRequest(responseWithRateLimit)).toBe(true)
@@ -510,12 +572,12 @@ describe('Threat Detection Integration', () => {
             metadata: {
               maxRequests: 10,
               windowMs: 60000,
-              message: 'Rate limit exceeded'
-            }
-          }
+              message: 'Rate limit exceeded',
+            },
+          },
         ],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       const params = extractRateLimitParams(response)
@@ -533,7 +595,7 @@ describe('Threat Detection Integration', () => {
         confidence: 0.3,
         actions: [],
         recommendations: [],
-        metadata: {}
+        metadata: {},
       }
 
       const params = extractRateLimitParams(response)
@@ -546,7 +608,10 @@ describe('Threat Detection Integration', () => {
 
   describe('Integration Factory', () => {
     it('should create complete integration setup', () => {
-      const integration = createThreatDetectionIntegration(mockOrchestrator, mockRateLimiter)
+      const integration = createThreatDetectionIntegration(
+        mockOrchestrator,
+        mockRateLimiter,
+      )
 
       expect(integration).toBeDefined()
       expect(integration.service).toBeInstanceOf(ThreatDetectionService)
@@ -555,7 +620,10 @@ describe('Threat Detection Integration', () => {
     })
 
     it('should provide convenience methods', () => {
-      const integration = createThreatDetectionIntegration(mockOrchestrator, mockRateLimiter)
+      const integration = createThreatDetectionIntegration(
+        mockOrchestrator,
+        mockRateLimiter,
+      )
 
       expect(typeof integration.analyzeThreat).toBe('function')
       expect(typeof integration.checkRequest).toBe('function')
@@ -567,42 +635,50 @@ describe('Threat Detection Integration', () => {
       const customConfig = {
         enabled: true,
         enableRateLimiting: false,
-        enableResponseOrchestration: true
+        enableResponseOrchestration: true,
       }
 
       const integration = createThreatDetectionIntegration(
         mockOrchestrator,
         mockRateLimiter,
-        customConfig
+        customConfig,
       )
 
       expect(integration.service.config).toEqual(
-        expect.objectContaining(customConfig)
+        expect.objectContaining(customConfig),
       )
     })
   })
 
   describe('Error Handling', () => {
     it('should handle orchestrator errors gracefully', async () => {
-      mockOrchestrator.analyzeThreat.mockRejectedValue(new Error('Orchestrator error'))
+      mockOrchestrator.analyzeThreat.mockRejectedValue(
+        new Error('Orchestrator error'),
+      )
 
       const threatData = {
         threatId: 'test_threat',
         source: 'rate_limiting',
         severity: 'medium',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
-      await expect(threatDetectionService.analyzeThreat(threatData)).rejects.toThrow('Orchestrator error')
+      await expect(
+        threatDetectionService.analyzeThreat(threatData),
+      ).rejects.toThrow('Orchestrator error')
     })
 
     it('should handle rate limiter errors gracefully', async () => {
-      mockRateLimiter.checkRateLimit.mockRejectedValue(new Error('Rate limiter error'))
+      mockRateLimiter.checkRateLimit.mockRejectedValue(
+        new Error('Rate limiter error'),
+      )
 
       const identifier = 'user:123'
       const context = { userId: '123', ip: '192.168.1.1' }
 
-      await expect(threatDetectionService.checkRequest(identifier, context)).rejects.toThrow('Rate limiter error')
+      await expect(
+        threatDetectionService.checkRequest(identifier, context),
+      ).rejects.toThrow('Rate limiter error')
     })
 
     it('should handle missing dependencies gracefully', () => {
@@ -617,7 +693,7 @@ describe('Threat Detection Integration', () => {
       const mockRateLimitResult = {
         allowed: true,
         remaining: 50,
-        resetTime: Date.now() + 60000
+        resetTime: Date.now() + 60000,
       }
 
       mockRateLimiter.checkRateLimit.mockResolvedValue(mockRateLimitResult)
@@ -627,13 +703,13 @@ describe('Threat Detection Integration', () => {
 
       // Create multiple concurrent requests
       const requests = Array.from({ length: 10 }, (_, i) =>
-        threatDetectionService.checkRequest(`${identifier}_${i}`, context)
+        threatDetectionService.checkRequest(`${identifier}_${i}`, context),
       )
 
       const results = await Promise.all(requests)
 
       expect(results).toHaveLength(10)
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result).toEqual(mockRateLimitResult)
       })
 

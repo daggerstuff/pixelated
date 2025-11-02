@@ -1,5 +1,5 @@
+
 import requests
-import json
 
 API_URL = "http://127.0.0.1:8000/analyze"
 
@@ -12,10 +12,10 @@ def augment_prompt_with_emotion(user_prompt: str) -> str:
         # Extract relevant emotional metrics
         deviation = emotion_analysis["meta_intelligence"]["deviation"]
         reflection_score = emotion_analysis["meta_intelligence"]["reflection_score"]
-        
+
         # Simple augmentation strategy
         augmented_prompt = (
-            f"User said: \"{user_prompt}\".\n"
+            f'User said: "{user_prompt}".\n'
             f"Emotional analysis: Deviation={deviation:.2f}, Reflection={reflection_score:.2f}.\n"
             f"Based on this, respond with appropriate empathy and context.\n"
         )
@@ -30,7 +30,7 @@ def augment_prompt_with_emotion(user_prompt: str) -> str:
 
 if __name__ == "__main__":
     test_prompt_1 = "I had a terrible day, everything went wrong."
-    test_prompt_2 = "I\'m so excited about the new project!"
+    test_prompt_2 = "I'm so excited about the new project!"
 
     print("--- Testing Prompt 1 ---")
     augmented_1 = augment_prompt_with_emotion(test_prompt_1)

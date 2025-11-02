@@ -4,9 +4,9 @@ test.describe('Browser Compatibility Tests', () => {
   test('homepage loads correctly', async ({ page }) => {
     await page.goto('/')
     await expect(page).toHaveTitle(/Pixelated Empathy/)
-  const heroHeading = page.getByRole('heading', { level: 1 })
-  await expect(heroHeading).toBeVisible()
-  await expect(heroHeading).toContainText(/The Art of Therapy/i)
+    const heroHeading = page.getByRole('heading', { level: 1 })
+    await expect(heroHeading).toBeVisible()
+    await expect(heroHeading).toContainText(/The Art of Therapy/i)
   })
 
   test('navigation works across browsers', async ({ page }) => {

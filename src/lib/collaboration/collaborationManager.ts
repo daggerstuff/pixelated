@@ -3,7 +3,11 @@
  * Secure multi-user collaboration with real-time synchronization
  */
 
-import type { UserProfile, CollaborationSession, Message, Notification } from '@/types/collaboration'
+import type {
+  UserProfile,
+  CollaborationSession,
+  Notification,
+} from '@/types/collaboration'
 
 export interface CollaborationConfig {
   maxParticipants: number
@@ -66,7 +70,10 @@ class CollaborationManager {
    */
   async createSession(
     creator: UserProfile,
-    sessionData: Omit<CollaborationSession, 'id' | 'createdAt' | 'participants' | 'status'>
+    sessionData: Omit<
+      CollaborationSession,
+      'id' | 'createdAt' | 'participants' | 'status'
+    >,
   ): Promise<CollaborationSession> {
     const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
 
@@ -113,7 +120,7 @@ class CollaborationManager {
     sessionId: string,
     invitedBy: string,
     invitedUser: string,
-    role: 'viewer' | 'editor' | 'admin' = 'viewer'
+    role: 'viewer' | 'editor' | 'admin' = 'viewer',
   ): Promise<CollaborationInvite> {
     const session = this.activeSessions.get(sessionId)
     if (!session) {
@@ -121,7 +128,9 @@ class CollaborationManager {
     }
 
     if (session.participants.length >= this.config.maxParticipants) {
-      throw new Error(`Session full (max ${this.config.maxParticipants} participants)`)
+      throw new Error(
+        `Session full (max ${this.config.maxParticipants} participants)`,
+      )
     }
 
     const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
@@ -168,7 +177,10 @@ class CollaborationManager {
   /**
    * Accept collaboration invitation
    */
-  async acceptInvitation(inviteId: string, userId: string): Promise<{
+  async acceptInvitation(
+    inviteId: string,
+    userId: string,
+  ): Promise<{
     success: boolean
     session?: CollaborationSession
     error?: string
@@ -230,7 +242,7 @@ class CollaborationManager {
     options: {
       encrypt?: boolean
       priority?: 'low' | 'normal' | 'high'
-    } = {}
+    } = {},
   ): Promise<SecureMessage> {
     const session = this.activeSessions.get(sessionId)
     if (!session) {
@@ -268,7 +280,10 @@ class CollaborationManager {
     return message
   }
 
-  private async encryptMessage(content: string, sessionId: string): Promise<string> {
+  private async encryptMessage(
+    content: string,
+    sessionId: string,
+  ): Promise<string> {
     // Use session-specific encryption key
     const sessionKey = await this.getSessionEncryptionKey(sessionId)
     return `encrypted_${btoa(content)}` // Mock encryption
@@ -286,7 +301,10 @@ class CollaborationManager {
     this.messages.get(sessionId)!.push(message)
   }
 
-  private async broadcastMessage(session: CollaborationSession, message: SecureMessage): Promise<void> {
+  private async broadcastMessage(
+    session: CollaborationSession,
+    message: SecureMessage,
+  ): Promise<void> {
     // In real implementation, broadcast via WebSocket to all participants
     console.log(`Broadcasting message ${message.id} to session ${session.id}`)
   }
@@ -299,7 +317,7 @@ class CollaborationManager {
     if (!session) return false
 
     // Remove user from participants
-    session.participants = session.participants.filter(id => id !== userId)
+    session.participants = session.participants.filter((id) => id !== userId)
 
     // Remove from user sessions
     const userSessionSet = this.userSessions.get(userId)
@@ -315,7 +333,11 @@ class CollaborationManager {
       await this.endSession(sessionId)
     } else {
       // Notify remaining participants
-      await this.sendMessage(sessionId, 'system', `${userId} has left the session`)
+      await this.sendMessage(
+        sessionId,
+        'system',
+        `${userId} has left the session`,
+      )
     }
 
     return true
@@ -382,7 +404,7 @@ class CollaborationManager {
   async getSessionMessages(
     sessionId: string,
     userId: string,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<SecureMessage[]> {
     const session = this.activeSessions.get(sessionId)
     if (!session) {
@@ -397,7 +419,7 @@ class CollaborationManager {
     const recentMessages = sessionMessages.slice(-limit)
 
     // Mark messages as read
-    recentMessages.forEach(message => {
+    recentMessages.forEach((message) => {
       if (!message.readBy.includes(userId)) {
         message.readBy.push(userId)
       }
@@ -409,7 +431,10 @@ class CollaborationManager {
   /**
    * Send notification to user
    */
-  private async sendNotification(userId: string, notification: Notification): Promise<void> {
+  private async sendNotification(
+    userId: string,
+    notification: Notification,
+  ): Promise<void> {
     if (!this.notifications.has(userId)) {
       this.notifications.set(userId, [])
     }
@@ -423,11 +448,14 @@ class CollaborationManager {
   /**
    * Get user notifications
    */
-  getUserNotifications(userId: string, unreadOnly: boolean = false): Notification[] {
+  getUserNotifications(
+    userId: string,
+    unreadOnly: boolean = false,
+  ): Notification[] {
     const userNotifications = this.notifications.get(userId) || []
 
     if (unreadOnly) {
-      return userNotifications.filter(n => !n.read)
+      return userNotifications.filter((n) => !n.read)
     }
 
     return userNotifications
@@ -440,7 +468,7 @@ class CollaborationManager {
     const userNotifications = this.notifications.get(userId) || []
     let markedCount = 0
 
-    userNotifications.forEach(notification => {
+    userNotifications.forEach((notification) => {
       if (!notificationIds || notificationIds.includes(notification.id)) {
         if (!notification.read) {
           notification.read = true
@@ -458,8 +486,8 @@ class CollaborationManager {
   getUserSessions(userId: string): CollaborationSession[] {
     const userSessionIds = this.userSessions.get(userId) || new Set()
     return Array.from(userSessionIds)
-      .map(sessionId => this.activeSessions.get(sessionId))
-      .filter(session => session !== undefined) as CollaborationSession[]
+      .map((sessionId) => this.activeSessions.get(sessionId))
+      .filter((session) => session !== undefined) as CollaborationSession[]
   }
 
   /**
@@ -468,7 +496,7 @@ class CollaborationManager {
   async updateSessionSettings(
     sessionId: string,
     userId: string,
-    settings: Partial<CollaborationSession['settings']>
+    settings: Partial<CollaborationSession['settings']>,
   ): Promise<CollaborationSession> {
     const session = this.activeSessions.get(sessionId)
     if (!session) {
@@ -485,7 +513,11 @@ class CollaborationManager {
     session.updatedAt = new Date()
 
     // Notify all participants of settings change
-    await this.sendMessage(sessionId, 'system', `Session settings updated by ${userId}`)
+    await this.sendMessage(
+      sessionId,
+      'system',
+      `Session settings updated by ${userId}`,
+    )
 
     return session
   }
@@ -508,17 +540,23 @@ class CollaborationManager {
     const sessions = Array.from(this.activeSessions.values())
 
     const activeSessions = sessions.length
-    const totalParticipants = sessions.reduce((sum, session) => sum + session.participants.length, 0)
+    const totalParticipants = sessions.reduce(
+      (sum, session) => sum + session.participants.length,
+      0,
+    )
 
     // Calculate average session duration
     const totalDuration = sessions.reduce((sum, session) => {
       return sum + (Date.now() - session.createdAt.getTime())
     }, 0)
-    const averageSessionDuration = activeSessions > 0 ? totalDuration / activeSessions : 0
+    const averageSessionDuration =
+      activeSessions > 0 ? totalDuration / activeSessions : 0
 
     // Count total messages
-    const messageCount = Array.from(this.messages.values())
-      .reduce((sum, messages) => sum + messages.length, 0)
+    const messageCount = Array.from(this.messages.values()).reduce(
+      (sum, messages) => sum + messages.length,
+      0,
+    )
 
     // Find top collaborators (users in most sessions)
     const userSessionCounts = new Map<string, number>()
@@ -527,7 +565,7 @@ class CollaborationManager {
     })
 
     const topCollaborators = Array.from(userSessionCounts.entries())
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([userId]) => userId)
 
@@ -543,7 +581,10 @@ class CollaborationManager {
   /**
    * Export session data for compliance
    */
-  async exportSessionData(sessionId: string, format: 'json' | 'csv'): Promise<{
+  async exportSessionData(
+    sessionId: string,
+    format: 'json' | 'csv',
+  ): Promise<{
     data: any
     format: string
     exportedAt: Date
@@ -555,7 +596,7 @@ class CollaborationManager {
     }
 
     const sessionMessages = this.messages.get(sessionId) || []
-    const includesPII = sessionMessages.some(msg => !msg.encrypted)
+    const includesPII = sessionMessages.some((msg) => !msg.encrypted)
 
     let exportData: any
 
@@ -568,14 +609,14 @@ class CollaborationManager {
     } else {
       // CSV format for messages
       const headers = ['Timestamp', 'Sender', 'Content', 'Encrypted']
-      const rows = sessionMessages.map(msg => [
+      const rows = sessionMessages.map((msg) => [
         msg.timestamp.toISOString(),
         msg.senderId,
         msg.encrypted ? '[ENCRYPTED]' : msg.content,
         msg.encrypted ? 'Yes' : 'No',
       ])
 
-      exportData = [headers, ...rows].map(row => row.join(',')).join('\n')
+      exportData = [headers, ...rows].map((row) => row.join(',')).join('\n')
     }
 
     return {

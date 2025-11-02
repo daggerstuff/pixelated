@@ -46,11 +46,7 @@ const DEFAULT_CONFIG: PIIMiddlewareConfig = {
     /\/api\/patients\/.*/,
     /\/api\/medical\/.*/,
   ],
-  excludePathPatterns: [
-    /\/static\/.*/,
-    /\/images\/.*/,
-    /\/favicon\.ico/,
-  ],
+  excludePathPatterns: [/\/static\/.*/, /\/images\/.*/, /\/favicon\.ico/],
   sensitiveContentTypes: [
     'application/json',
     'application/x-www-form-urlencoded',

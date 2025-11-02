@@ -18,8 +18,12 @@ export class DashboardUpdater {
     }
   }
 
-  private updateSecurityLevel(level: SystemMetrics['activeSecurityLevel']): void {
-    const element = document.getElementById('security-level-value') as HTMLElement
+  private updateSecurityLevel(
+    level: SystemMetrics['activeSecurityLevel'],
+  ): void {
+    const element = document.getElementById(
+      'security-level-value',
+    ) as HTMLElement
     if (!element) {
       return
     }
@@ -90,7 +94,11 @@ export class DashboardUpdater {
       this.hideError()
     } catch (err: unknown) {
       console.error('Error updating metrics:', err)
-      this.showError(err instanceof Error ? (err as Error)?.message || String(err) : String(err))
+      this.showError(
+        err instanceof Error
+          ? (err as Error)?.message || String(err)
+          : String(err),
+      )
     }
   }
 

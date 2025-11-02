@@ -6,23 +6,24 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import Database from 'better-sqlite3'
-import { generateTokenPair, validateToken, AuthenticationError } from './jwt-service'
+import {
+  generateTokenPair,
+  validateToken,
+  AuthenticationError,
+} from './jwt-service'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 
-// Database setup for Better-Auth
-const db = new Database(':memory:') // In production, use proper SQLite/MongoDB connection
+const db = new Database(':memory:')
 
-// Better-Auth configuration
 const auth = betterAuth({
   database: drizzleAdapter(db),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Enable in production
+    requireEmailVerification: false,
   },
   socialProviders: {
-    // Add social providers as needed
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -110,7 +111,7 @@ const userAuthStore = new Map<string, UserAuthentication>()
  */
 function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
   const existingUser = Array.from(userAuthStore.values()).find(
-    user => user.betterAuthUserId === betterAuthUser.id
+    (user) => user.betterAuthUserId === betterAuthUser.id,
   )
 
   if (existingUser) {
@@ -132,7 +133,7 @@ function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
     createdAt: Date.now(),
     updatedAt: Date.now(),
   }
-  
+
   userAuthStore.set(newUserAuth.id, newUserAuth)
   return newUserAuth
 }
@@ -149,7 +150,7 @@ function generateUserId(): string {
  */
 export async function registerWithBetterAuth(
   credentials: RegisterCredentials,
-  clientInfo: ClientInfo
+  clientInfo: ClientInfo,
 ): Promise<AuthenticationResult> {
   try {
     // Validate input
@@ -172,7 +173,7 @@ export async function registerWithBetterAuth(
 
     // Map to local user authentication
     const userAuth = mapBetterAuthUserToLocal(result.user)
-    
+
     // Update role if specified
     if (credentials.role) {
       userAuth.role = credentials.role
@@ -183,7 +184,7 @@ export async function registerWithBetterAuth(
     const tokenPair = await generateTokenPair(
       userAuth.id,
       userAuth.role,
-      clientInfo
+      clientInfo,
     )
 
     // Log successful registration
@@ -213,7 +214,8 @@ export async function registerWithBetterAuth(
     return {
       success: false,
       message: 'Registration failed',
-      error: error instanceof Error ? error.message : 'Unknown registration error',
+      error:
+        error instanceof Error ? error.message : 'Unknown registration error',
     }
   }
 }
@@ -223,7 +225,7 @@ export async function registerWithBetterAuth(
  */
 export async function authenticateWithBetterAuth(
   credentials: LoginCredentials,
-  clientInfo: ClientInfo
+  clientInfo: ClientInfo,
 ): Promise<AuthenticationResult> {
   try {
     // Validate input
@@ -249,7 +251,10 @@ export async function authenticateWithBetterAuth(
 
     // Check if account is locked
     if (userAuth.authenticationStatus === AuthenticationStatus.ACCOUNT_LOCKED) {
-      if (userAuth.accountLockedUntil && userAuth.accountLockedUntil > Date.now()) {
+      if (
+        userAuth.accountLockedUntil &&
+        userAuth.accountLockedUntil > Date.now()
+      ) {
         throw new AuthenticationError('Account is locked')
       } else {
         // Unlock account if lock period has expired
@@ -267,14 +272,14 @@ export async function authenticateWithBetterAuth(
       accountLockedUntil: null,
       updatedAt: Date.now(),
     }
-    
+
     userAuthStore.set(userAuth.id, updatedUser)
 
     // Generate JWT tokens
     const tokenPair = await generateTokenPair(
       userAuth.id,
       userAuth.role,
-      clientInfo
+      clientInfo,
     )
 
     // Log successful authentication
@@ -302,18 +307,18 @@ export async function authenticateWithBetterAuth(
 
     // Update failed login attempts
     const userAuth = Array.from(userAuthStore.values()).find(
-      user => user.email === credentials.email
+      (user) => user.email === credentials.email,
     )
-    
+
     if (userAuth) {
       userAuth.loginAttempts += 1
-      
+
       // Lock account after 5 failed attempts
       if (userAuth.loginAttempts >= 5) {
         userAuth.authenticationStatus = AuthenticationStatus.ACCOUNT_LOCKED
-        userAuth.accountLockedUntil = Date.now() + (15 * 60 * 1000) // 15 minutes
+        userAuth.accountLockedUntil = Date.now() + 15 * 60 * 1000 // 15 minutes
       }
-      
+
       userAuthStore.set(userAuth.id, userAuth)
     }
 
@@ -323,7 +328,8 @@ export async function authenticateWithBetterAuth(
     return {
       success: false,
       message: 'Authentication failed',
-      error: error instanceof Error ? error.message : 'Unknown authentication error',
+      error:
+        error instanceof Error ? error.message : 'Unknown authentication error',
     }
   }
 }
@@ -333,11 +339,11 @@ export async function authenticateWithBetterAuth(
  */
 export async function logoutFromBetterAuth(
   userId: string,
-  clientInfo: ClientInfo
+  clientInfo: ClientInfo,
 ): Promise<void> {
   try {
     const userAuth = userAuthStore.get(userId)
-    
+
     if (!userAuth) {
       throw new AuthenticationError('User not found')
     }
@@ -366,16 +372,22 @@ export async function logoutFromBetterAuth(
 /**
  * Get user authentication by Better-Auth user ID
  */
-export function getUserAuthenticationByBetterAuthId(betterAuthUserId: string): UserAuthentication | null {
-  return Array.from(userAuthStore.values()).find(
-    user => user.betterAuthUserId === betterAuthUserId
-  ) || null
+export function getUserAuthenticationByBetterAuthId(
+  betterAuthUserId: string,
+): UserAuthentication | null {
+  return (
+    Array.from(userAuthStore.values()).find(
+      (user) => user.betterAuthUserId === betterAuthUserId,
+    ) || null
+  )
 }
 
 /**
  * Get user authentication by local user ID
  */
-export function getUserAuthentication(userId: string): UserAuthentication | null {
+export function getUserAuthentication(
+  userId: string,
+): UserAuthentication | null {
   return userAuthStore.get(userId) || null
 }
 
@@ -384,10 +396,10 @@ export function getUserAuthentication(userId: string): UserAuthentication | null
  */
 export function updateUserAuthentication(
   userId: string,
-  updates: Partial<UserAuthentication>
+  updates: Partial<UserAuthentication>,
 ): UserAuthentication {
   const user = userAuthStore.get(userId)
-  
+
   if (!user) {
     throw new AuthenticationError('User not found')
   }
@@ -397,7 +409,7 @@ export function updateUserAuthentication(
     ...updates,
     updatedAt: Date.now(),
   }
-  
+
   userAuthStore.set(userId, updatedUser)
   return updatedUser
 }
@@ -407,11 +419,11 @@ export function updateUserAuthentication(
  */
 export async function validateJWTAndGetUser(
   token: string,
-  tokenType: 'access' | 'refresh' = 'access'
+  tokenType: 'access' | 'refresh' = 'access',
 ): Promise<UserAuthentication | null> {
   try {
     const validation = await validateToken(token, tokenType)
-    
+
     if (!validation.valid || !validation.userId) {
       return null
     }
@@ -426,13 +438,16 @@ export async function validateJWTAndGetUser(
 /**
  * Check if user has required role
  */
-export function hasRequiredRole(userRole: UserRole, requiredRole: UserRole): boolean {
+export function hasRequiredRole(
+  userRole: UserRole,
+  requiredRole: UserRole,
+): boolean {
   const roleHierarchy: Record<UserRole, number> = {
-    'admin': 100,
-    'therapist': 80,
-    'researcher': 60,
-    'patient': 40,
-    'guest': 20,
+    admin: 100,
+    therapist: 80,
+    researcher: 60,
+    patient: 40,
+    guest: 20,
   }
 
   return roleHierarchy[userRole] >= roleHierarchy[requiredRole]
@@ -444,11 +459,11 @@ export function hasRequiredRole(userRole: UserRole, requiredRole: UserRole): boo
 export function hasPermission(userRole: UserRole, permission: string): boolean {
   // Define role-based permissions
   const permissions: Record<UserRole, string[]> = {
-    'admin': ['*'], // All permissions
-    'therapist': ['read:patients', 'write:notes', 'read:analytics'],
-    'researcher': ['read:analytics', 'read:research_data'],
-    'patient': ['read:own_data', 'write:own_notes'],
-    'guest': ['read:public_content'],
+    admin: ['*'], // All permissions
+    therapist: ['read:patients', 'write:notes', 'read:analytics'],
+    researcher: ['read:analytics', 'read:research_data'],
+    patient: ['read:own_data', 'write:own_notes'],
+    guest: ['read:public_content'],
   }
 
   const userPermissions = permissions[userRole] || []

@@ -131,6 +131,7 @@ export class HIPAAComplianceService {
       })
       throw new Error(
         `HIPAA++ initialization failed: ${(error as Error).message}`,
+        { cause: error },
       )
     }
   }

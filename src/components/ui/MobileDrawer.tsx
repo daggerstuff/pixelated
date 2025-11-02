@@ -37,7 +37,7 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
         onClick={onClose}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
-            onClose();
+            onClose()
           }
         }}
         aria-label="Close menu"

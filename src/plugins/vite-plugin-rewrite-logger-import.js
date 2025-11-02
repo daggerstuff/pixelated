@@ -7,45 +7,54 @@ export default function rewriteLoggerImportPlugin() {
     resolveId(source, _importer) {
       try {
         if (!source) {
-          return null;
+          return null
         }
-        const relPattern = /^(?:\.\.\/)+lib\/logging\/build-safe-logger$/;
+        const relPattern = /^(?:\.\.\/)+lib\/logging\/build-safe-logger$/
         if (relPattern.test(source)) {
-          return path.resolve(process.cwd(), 'src/lib/logging/build-safe-logger.ts');
+          return path.resolve(
+            process.cwd(),
+            'src/lib/logging/build-safe-logger.ts',
+          )
         }
-        return null;
+        return null
       } catch {
-        return null;
+        return null
       }
     },
     transform(code, id) {
       try {
         if (!id || /node_modules/.test(id)) {
-          return null;
+          return null
         }
         if (!/(\.ts|\.tsx|\.js|\.jsx|\.mjs)$/.test(id)) {
-          return null;
+          return null
         }
 
-        const patternFrom = /from\s+['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]/g;
-        const patternDyn = /import\(\s*['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]\s*\)/g;
+        const patternFrom =
+          /from\s+['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]/g
+        const patternDyn =
+          /import\(\s*['"](?:\.\.\/)+lib\/logging\/build-safe-logger['"]\s*\)/g
 
-        let transformed = code;
-        transformed = transformed.replace(patternFrom, "from '@/lib/logging/build-safe-logger'");
-        transformed = transformed.replace(patternDyn, "import('@/lib/logging/build-safe-logger')");
+        let transformed = code
+        transformed = transformed.replace(
+          patternFrom,
+          "from '@/lib/logging/build-safe-logger'",
+        )
+        transformed = transformed.replace(
+          patternDyn,
+          "import('@/lib/logging/build-safe-logger')",
+        )
 
         if (transformed === code) {
-          return null;
+          return null
         }
-        return { code: transformed, map: null };
+        return { code: transformed, map: null }
       } catch {
-       // Fail open: do not block the build on plugin transform errors
-       // Optionally log error for debugging
-       // console.error('Transform error in rewrite-logger-import plugin');
-       return null;
-     }
+        // Fail open: do not block the build on plugin transform errors
+        // Optionally log error for debugging
+        // console.error('Transform error in rewrite-logger-import plugin');
+        return null
+      }
     },
-  };
+  }
 }
-
-

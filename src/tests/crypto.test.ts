@@ -19,7 +19,6 @@ interface SessionData {
 // Import the actual implementation
 import { createCryptoSystem } from '../lib/crypto'
 
-
 // Check if FHE tests should be skipped
 const SKIP_FHE_TESTS = process.env['SKIP_FHE_TESTS'] === 'true'
 
@@ -53,21 +52,21 @@ const Encryption = {
     if (parts.length < 3) {
       throw new Error('Failed to decrypt data')
     }
-    
+
     // The encrypted format is v{version}:{key}:{data}
     // But if the key contains colons, it will be split across multiple parts
     // We need to reconstruct the key and find where the data starts
-    
+
     // Skip the version part (parts[0])
     // The key should match exactly what was passed to encrypt
     const keyParts = key.split(':')
     const encryptedKeyParts = parts.slice(1, 1 + keyParts.length)
     const reconstructedKey = encryptedKeyParts.join(':')
-    
+
     if (reconstructedKey !== key) {
       throw new Error('Failed to decrypt data')
     }
-    
+
     // Data starts after version + key parts
     return parts.slice(1 + keyParts.length).join(':')
   },
@@ -148,9 +147,9 @@ class KeyRotationManager {
     if (parts.length < 3) {
       throw new Error('Invalid encrypted data format')
     }
-    
+
     const version = parseInt(parts[0]?.substring(1) || '1', 10)
-    
+
     // The original encrypted format could be:
     // v1:keyId:keyValue:data (4 parts) or v1:simpleKey:data (3 parts)
     // We need to find where the actual data starts
@@ -743,7 +742,6 @@ describe('createCryptoSystem', () => {
   })
 })
 
- 
 describe('Fully Homomorphic Encryption Integration Tests', () => {
   // Skip all these tests if SKIP_FHE_TESTS is true
   const itOrSkip = SKIP_FHE_TESTS ? (it as TestFunction).skip : it
@@ -765,10 +763,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
         // Format is test-fhe:v1:{data}, so return everything after the second colon
         return parts.slice(2).join(':')
       },
-      processEncrypted: async (
-        _encryptedData: string,
-        operation: string,
-      ) => {
+      processEncrypted: async (_encryptedData: string, operation: string) => {
         return {
           success: true,
           metadata: {
@@ -777,10 +772,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
           },
         }
       },
-      verifySender: async (
-        senderId: string,
-        authorizedSenders: string[],
-      ) => {
+      verifySender: async (senderId: string, authorizedSenders: string[]) => {
         return authorizedSenders.includes(senderId)
       },
     } as ExtendedFHESystem

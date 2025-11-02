@@ -166,42 +166,47 @@ describe('BiasDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default fetch mock for initial dashboard load unless a test overrides it
-    global.fetch = vi.fn()
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        statusText: 'OK',
-        json: vi.fn().mockResolvedValue({
-          summary: {
-            totalSessions: 100,
-            averageBiasScore: 0.5,
-            highBiasSessions: 5,
-            totalAlerts: 10,
-            complianceScore: 0.85,
-            alertsLast24h: 0,
-          },
-          alerts: [
-            {
-              alertId: '1',
-              type: 'high_bias',
-              message: 'High bias detected',
-              timestamp: new Date().toISOString(),
-              level: 'high',
-              sessionId: 'session-1',
-              acknowledged: false,
-              status: 'active',
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          statusText: 'OK',
+          json: vi.fn().mockResolvedValue({
+            summary: {
+              totalSessions: 100,
+              averageBiasScore: 0.5,
+              highBiasSessions: 5,
+              totalAlerts: 10,
+              complianceScore: 0.85,
+              alertsLast24h: 0,
             },
-          ],
-          trends: [],
-          demographics: {},
-          recentAnalyses: [],
-          recommendations: [],
+            alerts: [
+              {
+                alertId: '1',
+                type: 'high_bias',
+                message: 'High bias detected',
+                timestamp: new Date().toISOString(),
+                level: 'high',
+                sessionId: 'session-1',
+                acknowledged: false,
+                status: 'active',
+              },
+            ],
+            trends: [],
+            demographics: {},
+            recentAnalyses: [],
+            recommendations: [],
+          }),
         }),
-      }))
-      .mockImplementation(() => Promise.resolve({
-        ok: true,
-        statusText: 'OK',
-        json: vi.fn().mockResolvedValue({ success: true }),
-      }))
+      )
+      .mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          statusText: 'OK',
+          json: vi.fn().mockResolvedValue({ success: true }),
+        }),
+      )
   })
 
   afterEach(() => {
@@ -794,11 +799,16 @@ describe('BiasDashboard', () => {
 
     // Find acknowledge button and click it (use getAllByText to handle multiple instances)
     const acknowledgeButtons = screen.getAllByText(/acknowledge/i)
-    const individualAcknowledgeButton = acknowledgeButtons.find(button => 
-      button.closest('button')?.getAttribute('aria-label')?.includes('Acknowledge alert') ||
-      !button.closest('button')?.textContent?.includes('Bulk')
-    ) || acknowledgeButtons[0]
-    
+    const individualAcknowledgeButton =
+      acknowledgeButtons.find(
+        (button) =>
+          button
+            .closest('button')
+            ?.getAttribute('aria-label')
+            ?.includes('Acknowledge alert') ||
+          !button.closest('button')?.textContent?.includes('Bulk'),
+      ) || acknowledgeButtons[0]
+
     fireEvent.click(individualAcknowledgeButton)
 
     // Should update alert status (in real app, would check API calls)

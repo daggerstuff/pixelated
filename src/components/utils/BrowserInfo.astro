@@ -10,7 +10,9 @@ const initialDarkMode = false
 const initialReducedMotion = false
 ---
 
-<script define:vars={{ initialLanguage, initialDarkMode, initialReducedMotion }} is:inline
+<script
+  define:vars={{ initialLanguage, initialDarkMode, initialReducedMotion }}
+  is:inline
 >
   // Function to initialize browser info
   function initBrowserInfo() {
@@ -63,7 +65,7 @@ const initialReducedMotion = false
     // Listen for scheme changes
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', e => {
+      .addEventListener('change', (e) => {
         document.documentElement.style.setProperty(
           '--prefers-dark-mode',
           e.matches ? 'true' : 'false',
@@ -73,7 +75,7 @@ const initialReducedMotion = false
 
     window
       .matchMedia('(prefers-reduced-motion: reduce)')
-      .addEventListener('change', e => {
+      .addEventListener('change', (e) => {
         document.documentElement.style.setProperty(
           '--prefers-reduced-motion',
           e.matches ? 'true' : 'false',

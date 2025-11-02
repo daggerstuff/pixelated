@@ -130,6 +130,7 @@ export class LocalStorageProvider implements StorageProvider {
       )
       throw new Error(
         `LocalStorage error: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }

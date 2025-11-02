@@ -9,7 +9,10 @@ import { getCurrentUser } from '../auth'
 /**
  * Check if the current user has the specified role
  */
-export async function hasRole(cookies: AstroCookies, role: string): Promise<boolean> {
+export async function hasRole(
+  cookies: AstroCookies,
+  role: string,
+): Promise<boolean> {
   const user = await getCurrentUser(cookies)
   if (!user) {
     return false
@@ -90,7 +93,10 @@ export {
   createAuthMiddlewareStack,
 } from './middleware'
 
-export type { AuthenticatedRequest, ClientInfo as MiddlewareClientInfo } from './middleware'
+export type {
+  AuthenticatedRequest,
+  ClientInfo as MiddlewareClientInfo,
+} from './middleware'
 
 // Utility functions
 export * from './utils'
@@ -107,7 +113,9 @@ export { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 export async function initializeAuthSystem(): Promise<void> {
   try {
     // Initialize Better-Auth database connection
-    const { initializeBetterAuthDatabase } = await import('./better-auth-integration')
+    const { initializeBetterAuthDatabase } = await import(
+      './better-auth-integration'
+    )
     await initializeBetterAuthDatabase()
 
     // Start token cleanup scheduler
@@ -144,9 +152,7 @@ export async function getAuthHealth(): Promise<{
   try {
     const { checkRedisConnection } = await import('../redis')
 
-    const [redisHealth] = await Promise.allSettled([
-      checkRedisConnection(),
-    ])
+    const [redisHealth] = await Promise.allSettled([checkRedisConnection()])
 
     const details = {
       jwtService: true, // JWT service is stateless
@@ -155,7 +161,7 @@ export async function getAuthHealth(): Promise<{
       database: true, // Database health would be checked here
     }
 
-    const allHealthy = Object.values(details).every(health => health)
+    const allHealthy = Object.values(details).every((health) => health)
 
     return {
       status: allHealthy ? 'healthy' : 'degraded',
@@ -173,7 +179,6 @@ export async function getAuthHealth(): Promise<{
     }
   }
 }
-
 
 /**
  * Default export for convenience

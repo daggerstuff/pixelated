@@ -80,6 +80,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.cursor/
 
 parts/
 sdist/
@@ -127,43 +128,6 @@ volumes/
 checkov-final-results.sarif/
 *.sarif
 
-# Claude Flow generated files
-.claude/settings.local.json
-.mcp.json
-claude-flow.config.json
-.swarm/
-.hive-mind/
-memory/claude-flow-data.json
-memory/sessions/*
-!memory/sessions/README.md
-memory/agents/*
-!memory/agents/README.md
-coordination/memory_bank/*
-coordination/subtasks/*
-coordination/orchestration/*
-*.db
-*.db-journal
-*.db-wal
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-claude-flow/
-hive-mind/
-swarm/
-**/mcp.json
-QWEN.md
-roo-code-settings.json
-kilo-code-settings.json
-.clinerules/
-.kilocode/
-.roo/
-.windsurf/
-.cursor/
-.kiro/
-.qoder/
-.augment/
-backups/
-backup-drive.sh
 
 # Sentry Config File
 .env.sentry-build-plugin
@@ -179,6 +143,7 @@ tools/gdrive-dataset-manager/
 .idea/
 .qodo/
 .vscode/
+.vscode/settings.json
 .aiignore
 .qwen-config.json
 mcp_agent.config.yaml
@@ -190,5 +155,139 @@ WARP.md
 
 checkov-results-fixed.sarif
 playwright-report-browser-compat
-ai/
 yt-downloader
+
+
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt
+
+kubeconfig
+values.yaml
+gitlab-runner-values.yaml
+gcp-service-account-key.json
+.augment
+.amazonq
+.kilocode
+.roo
+.ruff_cache
+.serena
+CRUSH.md
+CLAUDE.md
+
+# Large files and datasets
+*.jsonl
+*.tar.gz
+*.zip
+*.7z
+processed/
+harbinger_training_package/
+external/
+cluster-backup-*/
+*.backup
+*.dump
+*.sql.gz
+
+# Python virtual environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+.nox/
+
+# Coverage and test reports
+coverage/
+.nyc_output/
+test-results/
+verbose/coverage/
+
+# Large binary files
+*.so
+*.dylib
+*.dll
+
+# AI/ML model files
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.model
+*.bin
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+*.mp3
+*.wav
+*.flac
+*.aac
+
+ai/
+.clinerules/byterover-rules.md
+.kilocode/rules/byterover-rules.md
+.roo/rules/byterover-rules.md
+.windsurf/rules/byterover-rules.md
+.cursor/rules/byterover-rules.mdc
+.kiro/steering/byterover-rules.md
+.qoder/rules/byterover-rules.md
+.augment/rules/byterover-rules.mdterraform/.terraform/
+terraform/.terraform.lock.hcl
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfplan
+terraform/plan.tfplan
+
+
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt
+
+# Claude Flow generated files
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+.claude-flow/
+memory/
+coordination/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+claude-flow
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt

@@ -4,24 +4,23 @@ import type { FC } from 'react'
  * Remove when project types module is restored.
  */
 export interface TrendPattern {
-  id: string;
-  description: string;
-  indicators: string[];
+  id: string
+  description: string
+  indicators: string[]
 }
 
 export interface CrossSessionPattern {
-  id: string;
-  description: string;
-  sessionIds: string[];
-  timeSpanDays: number;
+  id: string
+  description: string
+  sessionIds: string[]
+  timeSpanDays: number
 }
 
 export interface RiskCorrelation {
-  id: string;
-  description: string;
-  strength: number;
+  id: string
+  description: string
+  strength: number
 }
-
 
 export interface PatternVisualizationProps {
   trends?: TrendPattern[]
@@ -83,9 +82,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
 
         {/* Cross-Session Patterns Section */}
         <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-3">
-            Cross-Session Patterns
-          </h3>
+          <h3 className="text-lg font-semibold mb-3">Cross-Session Patterns</h3>
           {crossSessionPatterns.length > 0 ? (
             <div className="space-y-2">
               {crossSessionPatterns.map((pattern: CrossSessionPattern) => (
@@ -103,7 +100,8 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                 >
                   <div className="font-medium">{pattern.description}</div>
                   <div className="text-xs text-gray-500">
-                    Sessions: {pattern.sessionIds.length}, Span: {pattern.timeSpanDays} days
+                    Sessions: {pattern.sessionIds.length}, Span:{' '}
+                    {pattern.timeSpanDays} days
                   </div>
                 </button>
               ))}
@@ -150,9 +148,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
 
       {showControls && (
         <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            Controls are visible.
-          </p>
+          <p className="text-sm text-gray-600">Controls are visible.</p>
         </div>
       )}
     </div>

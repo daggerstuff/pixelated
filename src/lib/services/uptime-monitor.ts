@@ -30,7 +30,8 @@ export class UptimeMonitor {
     this.loadRecords()
   }
 
-  start(intervalMs: number = 60000): void { // Default: check every minute
+  start(intervalMs: number = 60000): void {
+    // Default: check every minute
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
     }
@@ -52,7 +53,7 @@ export class UptimeMonitor {
 
   private async performCheck(): Promise<void> {
     const startTime = performance.now()
-    
+
     try {
       // Perform health check with AbortController timeout
       const controller = new AbortController()
@@ -65,50 +66,49 @@ export class UptimeMonitor {
 
       const responseTime = performance.now() - startTime
       let status: 'up' | 'down' | 'degraded' = 'up'
-      
+
       if (response.status >= 500) {
         status = 'down'
       } else if (response.status >= 400 || responseTime > 2000) {
         status = 'degraded'
       }
-      
+
       const record: UptimeRecord = {
         timestamp: new Date().toISOString(),
         status,
         responseTime,
       }
-      
+
       this.addRecord(record)
-      
     } catch (error: unknown) {
       const record: UptimeRecord = {
         timestamp: new Date().toISOString(),
         status: 'down',
         responseTime: performance.now() - startTime,
-        error: error instanceof Error ? String(error) : 'Unknown error'
+        error: error instanceof Error ? String(error) : 'Unknown error',
       }
-      
+
       this.addRecord(record)
     }
   }
 
   private addRecord(record: UptimeRecord): void {
     this.records.push(record)
-    
+
     // Keep only the most recent records
     if (this.records.length > this.maxRecords) {
       this.records = this.records.slice(-this.maxRecords)
     }
-    
+
     this.saveRecords()
   }
 
   getStats(periodHours: number = 24): UptimeStats {
-  const cutoffTime = new Date(Date.now() - periodHours * 60 * 60 * 1000)
+    const cutoffTime = new Date(Date.now() - periodHours * 60 * 60 * 1000)
     const relevantRecords = this.records.filter(
-      record => new Date(record.timestamp) >= cutoffTime
+      (record) => new Date(record.timestamp) >= cutoffTime,
     )
-    
+
     if (relevantRecords.length === 0) {
       return {
         uptime: 0,
@@ -121,19 +121,23 @@ export class UptimeMonitor {
           timestamp: new Date().toISOString(),
           status: 'down',
           responseTime: 0,
-          error: 'No data available'
+          error: 'No data available',
         },
-        period: `${periodHours}h`
+        period: `${periodHours}h`,
       }
     }
-    
-    const upChecks = relevantRecords.filter(r => r.status === 'up').length
-    const downChecks = relevantRecords.filter(r => r.status === 'down').length
-    const degradedChecks = relevantRecords.filter(r => r.status === 'degraded').length
-    
+
+    const upChecks = relevantRecords.filter((r) => r.status === 'up').length
+    const downChecks = relevantRecords.filter((r) => r.status === 'down').length
+    const degradedChecks = relevantRecords.filter(
+      (r) => r.status === 'degraded',
+    ).length
+
     const uptime = (upChecks / relevantRecords.length) * 100
-    const averageResponseTime = relevantRecords.reduce((sum, r) => sum + r.responseTime, 0) / relevantRecords.length
-    
+    const averageResponseTime =
+      relevantRecords.reduce((sum, r) => sum + r.responseTime, 0) /
+      relevantRecords.length
+
     return {
       uptime: Math.round(uptime * 100) / 100,
       totalChecks: relevantRecords.length,
@@ -142,7 +146,7 @@ export class UptimeMonitor {
       degradedChecks,
       averageResponseTime: Math.round(averageResponseTime * 100) / 100,
       lastCheck: relevantRecords[relevantRecords.length - 1]!,
-      period: `${periodHours}h`
+      period: `${periodHours}h`,
     }
   }
 
@@ -174,7 +178,7 @@ export class UptimeMonitor {
         // Ensure logs directory exists
         mkdirSync(logsDir, { recursive: true })
       }
-      
+
       writeFileSync(this.dataFile, JSON.stringify(this.records, null, 2))
     } catch (error: unknown) {
       console.error('Failed to save uptime records:', error)
@@ -185,7 +189,7 @@ export class UptimeMonitor {
     const stats24h = this.getStats(24)
     const stats7d = this.getStats(24 * 7)
     const stats30d = this.getStats(24 * 30)
-    
+
     return `
 # Uptime Report
 

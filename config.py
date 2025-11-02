@@ -9,7 +9,7 @@ from typing import Any
 
 
 def _load() -> ModuleType:
-    return import_module('mcp_server.config')
+    return import_module("mcp_server.config")
 
 
 def __getattr__(name: str) -> Any:

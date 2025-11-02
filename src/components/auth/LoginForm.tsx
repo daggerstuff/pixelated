@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 
 interface LoginFormProps {
-  redirectTo?: string
-  showSignup?: boolean
-  showResetPassword?: boolean
+  readonly redirectTo?: string
+  readonly showSignup?: boolean
+  readonly showResetPassword?: boolean
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -45,8 +45,8 @@ export function LoginForm({
         setEmail(rememberedEmail)
         setRememberMe(true)
       }
-    } catch (_e) {
-      console.error('LocalStorage access error:', _e)
+    } catch (error_) {
+      console.error('LocalStorage access error:', error_)
     }
   }, [])
 
@@ -105,11 +105,13 @@ export function LoginForm({
       password?: string
     } = {}
 
+    // Always validate email
     const emailError = validateEmail(email)
     if (emailError) {
       newErrors.email = emailError
     }
 
+    // Always validate password in login mode
     if (mode === 'login') {
       const passwordError = validatePassword(password)
       if (passwordError) {
@@ -117,14 +119,86 @@ export function LoginForm({
       }
     }
 
+    // Set errors immediately - React will batch this but we ensure it's set
     setErrors(newErrors)
+
+    // Force a synchronous state update check by using flushSync if available
+    // Otherwise rely on React's normal batching
     return Object.keys(newErrors).length === 0
+  }
+
+  const saveRememberMePreferences = (remember: boolean) => {
+    try {
+      if (remember) {
+        localStorage.setItem(STORAGE_KEY_EMAIL, email)
+        localStorage.setItem(STORAGE_KEY_REMEMBER, 'true')
+      } else {
+        localStorage.removeItem(STORAGE_KEY_EMAIL)
+        localStorage.removeItem(STORAGE_KEY_REMEMBER)
+      }
+    } catch {
+      // Silent fail for private browsing mode
+    }
+  }
+
+  const handleLoginSubmit = async () => {
+    saveRememberMePreferences(rememberMe)
+
+    setToastMessage({ type: 'loading', message: 'Signing in...' })
+
+    const response = await signIn(email, password)
+
+    setToastMessage(null)
+
+    if (response.error) {
+      setToastMessage({
+        type: 'error',
+        message:
+          typeof response.error === 'object' && response.error !== null
+            ? (response.error as { message?: string }).message ||
+              'Login failed'
+            : 'Login failed',
+      })
+      return
+    }
+
+    setToastMessage({ type: 'success', message: 'Successfully signed in!' })
+  }
+
+  const handleResetSubmit = async () => {
+    setToastMessage({
+      type: 'loading',
+      message: 'Sending password reset email...',
+    })
+
+    await resetPassword(email, globalThis.location.origin + '/auth-callback')
+
+    setToastMessage(null)
+
+    setToastMessage({
+      type: 'success',
+      message: 'Password reset email sent!',
+    })
+
+    setResetEmailSent(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) {
+    // Validate form first - this will set errors state
+    // Ensure validation always runs and errors are set before checking validity
+    const isValid = validateForm()
+
+    if (!isValid) {
+      // Errors have been set, wait for React to update DOM
+      // Use double requestAnimationFrame to ensure DOM is updated after state changes
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve(undefined))
+        })
+      })
+
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',
@@ -136,57 +210,9 @@ export function LoginForm({
 
     try {
       if (mode === 'login') {
-        if (rememberMe) {
-          try {
-            localStorage.setItem(STORAGE_KEY_EMAIL, email)
-            localStorage.setItem(STORAGE_KEY_REMEMBER, 'true')
-          } catch {
-            // Silent fail for private browsing mode
-          }
-        } else {
-          try {
-            localStorage.removeItem(STORAGE_KEY_EMAIL)
-            localStorage.removeItem(STORAGE_KEY_REMEMBER)
-          } catch {
-            // Silent fail for private browsing mode
-          }
-        }
-
-        setToastMessage({ type: 'loading', message: 'Signing in...' })
-
-        const response = await signIn(email, password)
-
-        setToastMessage(null)
-
-        if (response.error) {
-          setToastMessage({
-            type: 'error',
-            message:
-              typeof response.error === 'object' && response.error !== null
-                ? (response.error as { message?: string }).message ||
-                  'Login failed'
-                : 'Login failed',
-          })
-          return
-        }
-
-        setToastMessage({ type: 'success', message: 'Successfully signed in!' })
+        await handleLoginSubmit()
       } else if (mode === 'reset') {
-        setToastMessage({
-          type: 'loading',
-          message: 'Sending password reset email...',
-        })
-
-        await resetPassword(email, window.location.origin + '/auth-callback')
-
-        setToastMessage(null)
-
-        setToastMessage({
-          type: 'success',
-          message: 'Password reset email sent!',
-        })
-
-        setResetEmailSent(true)
+        await handleResetSubmit()
       }
     } catch (error: unknown) {
       setToastMessage({
@@ -263,33 +289,31 @@ export function LoginForm({
     setErrors((prev) => ({ ...prev, password: error }))
   }
 
-  if (mode === 'reset' && resetEmailSent) {
-    return (
-      <div className="text-center">
-        <h2 className="text-gradient">Password Reset Email Sent</h2>
-        <p>
-          Check your email for a link to reset your password. If it doesn&apos;t
-          appear within a few minutes, check your spam folder.
-        </p>
-        <button
-          onClick={() => {
-            setMode('login')
-            setResetEmailSent(false)
-          }}
-          className="btn btn-primary mt-4"
-        >
-          Return to Login
-        </button>
-      </div>
-    )
-  }
+  const renderResetSuccess = () => (
+    <div className="text-center">
+      <h2 className="text-gradient">Password Reset Email Sent</h2>
+      <p>
+        Check your email for a link to reset your password. If it doesn&apos;t
+        appear within a few minutes, check your spam folder.
+      </p>
+      <button
+        onClick={() => {
+          setMode('login')
+          setResetEmailSent(false)
+        }}
+        className="btn btn-primary mt-4"
+      >
+        Return to Login
+      </button>
+    </div>
+  )
 
-  return (
+  const renderMainForm = () => (
     <div className="auth-form-container text-center form-container">
       {mode === 'reset' && <h2 className="text-gradient">Reset Password</h2>}
       {mode === 'login' && <h2 className="text-gradient">Sign In</h2>}
 
-      <form onSubmit={handleSubmit} className="auth-form">
+      <form noValidate onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label htmlFor="email" className="form-label">
             Email
@@ -304,72 +328,26 @@ export function LoginForm({
               onChange={handleEmailChange}
               onFocus={() => setFocusedInput('email')}
               onBlur={handleEmailBlur}
-              required
               disabled={isLoading}
               placeholder="your@email.com"
               className="form-input"
               aria-invalid={errors.email ? 'true' : 'false'}
-              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-describedby="email-error"
               autoComplete="email"
             />
           </div>
-          {errors.email && (
-            <div id="email-error" className="error-message text-sm mt-1">
-              {errors.email}
-            </div>
-          )}
+          <div
+            id="email-error"
+            className={`error-message text-sm mt-1 ${errors.email ? 'block' : 'hidden'}`}
+            role="alert"
+            aria-live="polite"
+          >
+            {errors.email || ''}
+          </div>
         </div>
 
-        {mode === 'login' && (
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <div
-              className={`input-wrapper ${focusedInput === 'password' ? 'focused' : ''} ${errors.password ? 'error' : ''}`}
-            >
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={handlePasswordChange}
-                onFocus={() => setFocusedInput('password')}
-                onBlur={handlePasswordBlur}
-                required
-                disabled={isLoading}
-                placeholder="••••••••"
-                className="form-input"
-                aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={
-                  errors.password ? 'password-error' : undefined
-                }
-                autoComplete="current-password"
-              />
-            </div>
-            {errors.password && (
-              <div id="password-error" className="error-message text-sm mt-1">
-                {errors.password}
-              </div>
-            )}
-          </div>
-        )}
-
-        {mode === 'login' && (
-          <div className="form-group remember-me">
-            <label htmlFor="rememberMeCheckbox" className="checkbox-container">
-              <input
-                id="rememberMeCheckbox"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={handleRememberMeChange}
-                disabled={isLoading}
-                className="remember-checkbox"
-              />
-
-              <span className="checkbox-label">Remember me</span>
-            </label>
-          </div>
-        )}
+        {mode === 'login' && renderPasswordField()}
+        {mode === 'login' && renderRememberMe()}
 
         <button type="submit" className="btn btn-primary" disabled={isLoading}>
           {isLoading ? (
@@ -383,51 +361,115 @@ export function LoginForm({
         </button>
       </form>
 
-      {mode === 'login' && (
-        <>
-          <div className="auth-separator">
-            <hr className="my-4" />
-          </div>
+      {mode === 'login' && renderOAuthSection()}
+      {renderAuthLinks()}
+    </div>
+  )
 
-          <button
-            onClick={handleGoogleSignIn}
-            className="btn btn-outline"
-            disabled={isLoading}
-            aria-label="Sign in with Google"
-          >
-            Continue with Google
-          </button>
-        </>
-      )}
-
-      <div className="auth-links">
-        {mode === 'login' && showResetPassword && (
-          <button
-            onClick={() => setMode('reset')}
-            className="text-gray-400 text-sm hover:text-gray-300 underline"
-          >
-            Forgot your password?
-          </button>
-        )}
-
-        {mode === 'reset' && (
-          <button
-            onClick={() => setMode('login')}
-            className="text-gray-400 text-sm hover:text-gray-300 underline"
-          >
-            Back to Login
-          </button>
-        )}
-
-        {mode === 'login' && showSignup && (
-          <button
-            onClick={() => (window.location.href = '/signup')}
-            className="text-gray-400 text-sm hover:text-gray-300 underline mt-2"
-          >
-            Don&apos;t have an account? Sign up
-          </button>
-        )}
+  const renderPasswordField = () => (
+    <div className="form-group">
+      <label htmlFor="password" className="form-label">
+        Password
+      </label>
+      <div
+        className={`input-wrapper ${focusedInput === 'password' ? 'focused' : ''} ${errors.password ? 'error' : ''}`}
+      >
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={handlePasswordChange}
+          onFocus={() => setFocusedInput('password')}
+          onBlur={handlePasswordBlur}
+          disabled={isLoading}
+          placeholder="••••••••"
+          className="form-input"
+          aria-invalid={errors.password ? 'true' : 'false'}
+          aria-describedby="password-error"
+          autoComplete="current-password"
+        />
+      </div>
+      <div
+        id="password-error"
+        className={`error-message text-sm mt-1 ${errors.password ? 'block' : 'hidden'}`}
+        role="alert"
+        aria-live="polite"
+      >
+        {errors.password || ''}
       </div>
     </div>
   )
+
+  const renderRememberMe = () => (
+    <div className="form-group remember-me">
+      <label htmlFor="rememberMeCheckbox" className="checkbox-container">
+        <input
+          id="rememberMeCheckbox"
+          type="checkbox"
+          checked={rememberMe}
+          onChange={handleRememberMeChange}
+          disabled={isLoading}
+          className="remember-checkbox"
+        />
+
+        <span className="checkbox-label">Remember me</span>
+      </label>
+    </div>
+  )
+
+  const renderOAuthSection = () => (
+    <>
+      <div className="auth-separator">
+        <hr className="my-4" />
+      </div>
+
+      <button
+        onClick={handleGoogleSignIn}
+        className="btn btn-outline"
+        disabled={isLoading}
+        aria-label="Sign in with Google"
+      >
+        Continue with Google
+      </button>
+    </>
+  )
+
+  const renderAuthLinks = () => (
+    <div className="auth-links">
+      {mode === 'login' && showResetPassword && (
+        <button
+          type="button"
+          onClick={() => setMode('reset')}
+          className="text-gray-400 text-sm hover:text-gray-300 underline"
+        >
+          Forgot your password?
+        </button>
+      )}
+
+      {mode === 'reset' && (
+        <button
+          type="button"
+          onClick={() => setMode('login')}
+          className="text-gray-400 text-sm hover:text-gray-300 underline"
+        >
+          Back to Login
+        </button>
+      )}
+
+      {mode === 'login' && showSignup && (
+        <button
+          onClick={() => (globalThis.location.href = '/signup')}
+          className="text-gray-400 text-sm hover:text-gray-300 underline mt-2"
+        >
+          Don&apos;t have an account? Sign up
+        </button>
+      )}
+    </div>
+  )
+
+  if (mode === 'reset' && resetEmailSent) {
+    return renderResetSuccess()
+  }
+
+  return renderMainForm()
 }

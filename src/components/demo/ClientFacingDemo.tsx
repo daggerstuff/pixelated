@@ -369,7 +369,10 @@ const ClientFacingDemo: FC = () => {
                   </h4>
                   <div className="space-y-4">
                     {validationResults.map((result) => (
-                      <div key={`validation-${result.category}`} className="bg-slate-700 rounded-lg p-4">
+                      <div
+                        key={`validation-${result.category}`}
+                        className="bg-slate-700 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-white font-medium">
                             {result.category}
@@ -398,9 +401,9 @@ const ClientFacingDemo: FC = () => {
                       Input Content
                     </h5>
                     <div className="bg-slate-900 rounded p-3 text-sm text-gray-300">
-                      &quot;Client presents with persistent worry, restlessness, and
-                      difficulty concentrating for the past 6 months. Symptoms
-                      interfere with work performance and social
+                      &quot;Client presents with persistent worry, restlessness,
+                      and difficulty concentrating for the past 6 months.
+                      Symptoms interfere with work performance and social
                       relationships...&quot;
                     </div>
                   </div>
@@ -457,7 +460,10 @@ const ClientFacingDemo: FC = () => {
                   </h4>
                   <div className="space-y-4">
                     {categoryBalance.map((category) => (
-                      <div key={`category-${category.name}`} className="bg-slate-700 rounded-lg p-4">
+                      <div
+                        key={`category-${category.name}`}
+                        className="bg-slate-700 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-white font-medium">
                             {category.name}

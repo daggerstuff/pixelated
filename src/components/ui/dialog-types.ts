@@ -76,7 +76,9 @@ export interface DialogHookResult {
 
 export interface ConfirmDialogHookResult<TData = unknown> {
   isOpen: boolean
-  confirm: (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => Promise<boolean>
+  confirm: (
+    props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>,
+  ) => Promise<boolean>
   close: () => void
   confirmProps: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>
 }

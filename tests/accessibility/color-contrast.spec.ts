@@ -30,32 +30,32 @@ const CRITICAL_COMPONENTS = [
 
 // Define interfaces for better type safety
 interface ContrastInfo {
-  element: string;
-  textContent: string;
-  fontSize: string;
-  fontWeight: string;
-  fgColor: string;
-  bgColor: string;
-  contrastRatio?: number;
-  requiredRatio?: number;
-  hasValidContrast: boolean;
-  skip: boolean;
+  element: string
+  textContent: string
+  fontSize: string
+  fontWeight: string
+  fgColor: string
+  bgColor: string
+  contrastRatio?: number
+  requiredRatio?: number
+  hasValidContrast: boolean
+  skip: boolean
 }
 
 interface HoverContrastInfo {
-  color: string;
-  bgColor: string;
-  contrastRatio?: number;
-  hasValidContrast: boolean;
-  skip: boolean;
-  states: Record<string, any>;
+  color: string
+  bgColor: string
+  contrastRatio?: number
+  hasValidContrast: boolean
+  skip: boolean
+  states: Record<string, any>
 }
 
 interface FocusContrastInfo extends HoverContrastInfo {
-  hasFocusOutline: boolean;
-  focusOutlineColor: string | null;
-  outlineContrastRatio?: number;
-  outlineHasValidContrast: boolean;
+  hasFocusOutline: boolean
+  focusOutlineColor: string | null
+  outlineContrastRatio?: number
+  outlineHasValidContrast: boolean
 }
 
 test.describe('Color Contrast Accessibility Tests', () => {
@@ -107,7 +107,9 @@ test.describe('Color Contrast Accessibility Tests', () => {
       }
 
       expect(contrastViolations.length).toBe(0)
-      console.log(`Found ${contrastViolations.length} color contrast violations on ${page.name} page`)
+      console.log(
+        `Found ${contrastViolations.length} color contrast violations on ${page.name} page`,
+      )
 
       // Manual check of critical components
       for (const selector of CRITICAL_COMPONENTS) {
@@ -180,14 +182,21 @@ test.describe('Color Contrast Accessibility Tests', () => {
                   : Math.pow((val + 0.055) / 1.055, 2.4)
               })
 
-              if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+              if (
+                sRGB[0] === undefined ||
+                sRGB[1] === undefined ||
+                sRGB[2] === undefined
+              ) {
                 return 0
               }
 
               return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
             }
 
-            function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
+            function calculateContrastRatio(
+              bg: number[] | null,
+              fg: number[] | null,
+            ) {
               if (!bg || !fg) {
                 return 0
               }
@@ -256,7 +265,9 @@ test.describe('Color Contrast Accessibility Tests', () => {
           }
 
           expect(contrastInfo.hasValidContrast).toBe(true)
-          console.log(`Insufficient contrast ratio (${contrastInfo.contrastRatio?.toFixed(2)}:1) for element with text "${contrastInfo.textContent}"`)
+          console.log(
+            `Insufficient contrast ratio (${contrastInfo.contrastRatio?.toFixed(2)}:1) for element with text "${contrastInfo.textContent}"`,
+          )
         }
       }
     })
@@ -339,14 +350,21 @@ test.describe('Color Contrast Accessibility Tests', () => {
               : Math.pow((val + 0.055) / 1.055, 2.4)
           })
 
-          if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+          if (
+            sRGB[0] === undefined ||
+            sRGB[1] === undefined ||
+            sRGB[2] === undefined
+          ) {
             return 0
           }
 
           return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
         }
 
-        function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
+        function calculateContrastRatio(
+          bg: number[] | null,
+          fg: number[] | null,
+        ) {
           if (!bg || !fg) {
             return 0
           }
@@ -365,12 +383,12 @@ test.describe('Color Contrast Accessibility Tests', () => {
 
         // Skip elements with transparent backgrounds or those we can't parse
         if (!bgRgb || !fgRgb) {
-          return { 
-            hasValidContrast: true, 
-            skip: true, 
+          return {
+            hasValidContrast: true,
+            skip: true,
             states: {},
             color: style.color,
-            bgColor: style.backgroundColor
+            bgColor: style.backgroundColor,
           } as HoverContrastInfo
         }
 
@@ -383,7 +401,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           contrastRatio,
           hasValidContrast: contrastRatio >= requiredRatio,
           skip: false,
-          states: {}
+          states: {},
         } as HoverContrastInfo
       }, link)
 
@@ -406,7 +424,9 @@ test.describe('Color Contrast Accessibility Tests', () => {
         }
 
         expect(hoverContrast.skip || hoverContrast.hasValidContrast).toBe(true)
-        console.log(`Link has insufficient contrast ratio (${hoverContrast.contrastRatio?.toFixed(2)}:1) in hover state`)
+        console.log(
+          `Link has insufficient contrast ratio (${hoverContrast.contrastRatio?.toFixed(2)}:1) in hover state`,
+        )
       }
     }
 
@@ -472,14 +492,21 @@ test.describe('Color Contrast Accessibility Tests', () => {
               : Math.pow((val + 0.055) / 1.055, 2.4)
           })
 
-          if (sRGB[0] === undefined || sRGB[1] === undefined || sRGB[2] === undefined) {
+          if (
+            sRGB[0] === undefined ||
+            sRGB[1] === undefined ||
+            sRGB[2] === undefined
+          ) {
             return 0
           }
 
           return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
         }
 
-        function calculateContrastRatio(bg: number[] | null, fg: number[] | null) {
+        function calculateContrastRatio(
+          bg: number[] | null,
+          fg: number[] | null,
+        ) {
           if (!bg || !fg) {
             return 0
           }
@@ -498,15 +525,15 @@ test.describe('Color Contrast Accessibility Tests', () => {
 
         // Skip elements with transparent backgrounds or those we can't parse
         if (!bgRgb || !fgRgb) {
-          return { 
-            hasValidContrast: true, 
+          return {
+            hasValidContrast: true,
             skip: true,
             states: {},
             color: style.color,
             bgColor: style.backgroundColor,
             hasFocusOutline: false,
             focusOutlineColor: null,
-            outlineHasValidContrast: true
+            outlineHasValidContrast: true,
           } as FocusContrastInfo
         }
 
@@ -519,13 +546,14 @@ test.describe('Color Contrast Accessibility Tests', () => {
         const focusOutlineColor = hasFocusOutline ? style.outlineColor : null
 
         // Calculate contrast ratio for the focus outline if present
-        let outlineContrastRatio: number | undefined = undefined;
+        let outlineContrastRatio: number | undefined = undefined
         let outlineHasValidContrast = true
 
         if (hasFocusOutline && focusOutlineColor) {
           const outlineRgb = parseRgb(focusOutlineColor)
           if (outlineRgb) {
-            outlineContrastRatio = calculateContrastRatio(bgRgb, outlineRgb) || 0
+            outlineContrastRatio =
+              calculateContrastRatio(bgRgb, outlineRgb) || 0
             if (outlineContrastRatio !== undefined) {
               outlineHasValidContrast = outlineContrastRatio >= 3.0 // Focus indicator should have at least 3:1
             }
@@ -542,7 +570,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           outlineContrastRatio,
           outlineHasValidContrast,
           skip: false,
-          states: {}
+          states: {},
         } as FocusContrastInfo
       }, button)
 
@@ -645,6 +673,8 @@ test.describe('Color Contrast Accessibility Tests', () => {
     }
 
     expect(contrastViolations.length).toBe(0)
-    console.log(`Found ${contrastViolations.length} color contrast violations in dark mode`)
+    console.log(
+      `Found ${contrastViolations.length} color contrast violations in dark mode`,
+    )
   })
 })

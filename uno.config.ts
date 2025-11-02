@@ -1,221 +1,110 @@
-import {
-  defineConfig,
-  presetIcons,
-  presetAttributify,
-  presetTypography,
-  presetWind,
-} from 'unocss'
+import { defineConfig, presetUno, presetAttributify, presetIcons } from 'unocss'
 
 export default defineConfig({
-  rules: [
-    // Match problematic icon patterns and ignore them
-    [/^i-(-)?$/, () => ({})],           // Matches 'i-' and 'i--'
-    [/^i--.*/, () => ({})],             // Matches anything starting with 'i--'
-    [/^i-$/, () => ({})],               // Matches just 'i-'
-    [/^i-\s*$/, () => ({})],            // Matches 'i-' with whitespace
-  ],
-  safelist: [
-    // Prevent UnoCSS from trying to generate invalid icon classes
-    'i-', 'i--', 'i---'
-  ],
-  blocklist: [
-    // Block problematic icon patterns
-    /^i-(-)*$/,     // Block 'i-', 'i--', 'i---', etc.
-    /^i-\s*$/,      // Block 'i-' with whitespace
-    /^icon-(-)*$/,  // Block similar 'icon-' patterns
-  ],
-  shortcuts: [
-    [
-      'btn',
-      'px-4 py-1 rounded inline-block bg-teal-600 text-white cursor-pointer hover:bg-teal-700 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50',
-    ],
-    [
-      'icon-btn',
-      'text-[0.9em] inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600',
-    ],
-    ['container-responsive', 'w-full mx-auto px-4 sm:px-6 lg:px-8'],
-    ['grid-responsive', 'grid gap-4 sm:gap-6 lg:gap-8'],
-    ['flex-responsive', 'flex gap-4 sm:gap-6 lg:gap-8'],
-    [
-      'card-responsive',
-      'bg-card border border-border rounded-lg p-4 sm:p-6 lg:p-8',
-    ],
-    ['text-responsive', 'text-sm sm:text-base lg:text-lg'],
-    [
-      'touch-target',
-      'min-h-11 min-w-11 inline-flex items-center justify-center cursor-pointer select-none',
-    ],
-  ],
   presets: [
-    presetWind(),
+    presetUno({
+      // Enable all default rules
+      preflight: true,
+      rules: [
+        // Handle class-variance-authority generated classes
+        [/^class-variance-authority-(.+)$/, ([, c]) => ({ class: c })],
+        // Handle Tailwind-like classes (which are actually UnoCSS classes)
+        [/^text-([a-zA-Z0-9-]+)$/, ([, c]) => ({ color: c })],
+        [/^bg-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'background-color': c })],
+        [/^border-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'border-color': c })],
+        [/^p-([a-zA-Z0-9-]+)$/, ([, c]) => ({ padding: c })],
+        [/^px-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-left': c, 'padding-right': c })],
+        [/^py-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-top': c, 'padding-bottom': c })],
+        [/^pt-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-top': c })],
+        [/^pb-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-bottom': c })],
+        [/^pl-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-left': c })],
+        [/^pr-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'padding-right': c })],
+        [/^m-([a-zA-Z0-9-]+)$/, ([, c]) => ({ margin: c })],
+        [/^mx-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-left': c, 'margin-right': c })],
+        [/^my-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-top': c, 'margin-bottom': c })],
+        [/^mt-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-top': c })],
+        [/^mb-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-bottom': c })],
+        [/^ml-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-left': c })],
+        [/^mr-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'margin-right': c })],
+        [/^w-([a-zA-Z0-9-]+)$/, ([, c]) => ({ width: c })],
+        [/^h-([a-zA-Z0-9-]+)$/, ([, c]) => ({ height: c })],
+        [/^max-w-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'max-width': c })],
+        [/^max-h-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'max-height': c })],
+        [/^min-w-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'min-width': c })],
+        [/^min-h-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'min-height': c })],
+        [/^flex-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'flex': c })],
+        [/^grid-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'display': 'grid', 'grid-template-columns': c })],
+        [/^gap-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'gap': c })],
+        [/^rounded-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'border-radius': c })],
+        [/^shadow-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'box-shadow': c })],
+        [/^opacity-([a-zA-Z0-9-]+)$/, ([, c]) => ({ opacity: c })],
+        [/^z-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'z-index': c })],
+        [/^absolute$/, () => ({ position: 'absolute' })],
+        [/^relative$/, () => ({ position: 'relative' })],
+        [/^fixed$/, () => ({ position: 'fixed' })],
+        [/^inset-([a-zA-Z0-9-]+)$/, ([, c]) => ({ inset: c })],
+        [/^top-([a-zA-Z0-9-]+)$/, ([, c]) => ({ top: c })],
+        [/^bottom-([a-zA-Z0-9-]+)$/, ([, c]) => ({ bottom: c })],
+        [/^left-([a-zA-Z0-9-]+)$/, ([, c]) => ({ left: c })],
+        [/^right-([a-zA-Z0-9-]+)$/, ([, c]) => ({ right: c })],
+        [/^text-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'font-size': c })],
+        [/^font-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'font-weight': c })],
+        [/^leading-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'line-height': c })],
+        [/^tracking-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'letter-spacing': c })],
+        [/^italic$/, () => ({ 'font-style': 'italic' })],
+        [/^normal-case$/, () => ({ 'text-transform': 'none' })],
+        [/^uppercase$/, () => ({ 'text-transform': 'uppercase' })],
+        [/^lowercase$/, () => ({ 'text-transform': 'lowercase' })],
+        [/^capitalize$/, () => ({ 'text-transform': 'capitalize' })],
+        [/^truncate$/, () => ({ 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'white-space': 'nowrap' })],
+        [/^whitespace-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'white-space': c })],
+        [/^overflow-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'overflow': c })],
+        [/^text-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'color': c })],
+        [/^cursor-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'cursor': c })],
+        [/^pointer-events-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'pointer-events': c })],
+        [/^user-select-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'user-select': c })],
+        [/^transform$/, () => ({ 'transform': 'translate(0, 0)' })],
+        [/^transition-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'transition-property': c })],
+        [/^duration-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'transition-duration': c })],
+        [/^ease-([a-zA-Z0-9-]+)$/, ([, c]) => ({ 'transition-timing-function': c })],
+        [/^hover:(.+)$/, ([, c]) => ({ '&:hover': { class: c } })],
+        [/^focus:(.+)$/, ([, c]) => ({ '&:focus': { class: c } })],
+        [/^active:(.+)$/, ([, c]) => ({ '&:active': { class: c } })],
+        [/^disabled:(.+)$/, ([, c]) => ({ '&:disabled': { class: c } })],
+        [/^group-hover:(.+)$/, ([, c]) => ({ '.group:hover &': { class: c } })],
+        [/^peer-hover:(.+)$/, ([, c]) => ({ '.peer:hover ~ &': { class: c } })],
+        [/^first:(.+)$/, ([, c]) => ({ '&:first-child': { class: c } })],
+        [/^last:(.+)$/, ([, c]) => ({ '&:last-child': { class: c } })],
+        [/^odd:(.+)$/, ([, c]) => ({ '&:nth-child(odd)': { class: c } })],
+        [/^even:(.+)$/, ([, c]) => ({ '&:nth-child(even)': { class: c } })],
+        [/^before:(.+)$/, ([, c]) => ({ '&::before': { class: c } })],
+        [/^after:(.+)$/, ([, c]) => ({ '&::after': { class: c } })],
+      ],
+    }),
     presetAttributify(),
     presetIcons({
       scale: 1.2,
-      warn: true,
+      warn: false, // Suppress warnings for missing icons
+      // Use CDN by default, fallback to local packages if available
+      extraProperties: {
+        display: 'inline-block',
+        'vertical-align': 'middle',
+      },
       collections: {
-        // Only include icon collections that are actually used in the codebase
-        'ri': () =>
-          import('@iconify-json/ri/icons.json').then((i) => i.default),
-        'uil': () =>
-          import('@iconify-json/uil/icons.json').then((i) => i.default),
-        'lucide': () =>
-          import('@iconify-json/lucide/icons.json').then((i) => i.default),
-        'bx': () =>
-          import('@iconify-json/bx/icons.json').then((i) => i.default),
-        'grommet-icons': () =>
-          import('@iconify-json/grommet-icons/icons.json').then(
-            (i) => i.default,
-          ),
-        // Removed unused collections to reduce bundle size:
-        // - carbon: Only used in external link plugin, not in actual UI
-        // - fa-solid: Not used anywhere in the codebase
-      },
-      customizations: {
-        customize(defaultCustomizations: unknown, name: unknown): unknown {
-          // Hardened: type guard and block empty, dash, double-dash, multiple dashes, or invalid values
-          if (
-            typeof name !== 'string' ||
-            !name ||
-            name === '-' ||
-            name === '--' ||
-            (typeof name === 'string' && name.startsWith('--')) ||
-            /^-+$/.test(name)
-          ) {
-            // Block invalid icon names by returning undefined (prevents rendering)
-            return undefined
-          }
-          // No additional customization, return defaults
-          return defaultCustomizations
-        },
-      },
+        // Custom validation for icon names
+        custom: {
+          // This will be used for invalid icon names
+          'question': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>',
+        }
+      }
     }),
-    presetTypography(),
   ],
-  theme: {
-    fontFamily: {
-      sans: [
-        'Inter',
-        'apple-system',
-        'BlinkMacSystemFont',
-        'Segoe UI',
-        'Roboto',
-        'Helvetica Neue',
-        'Arial',
-        'sans-serif',
-      ],
-      mono: [
-        'DM Mono',
-        'ui-monospace',
-        'SFMono-Regular',
-        'Menlo',
-        'Monaco',
-        'Consolas',
-        'Liberation Mono',
-        'Courier New',
-        'monospace',
-      ],
-      condensed: ['Inter', 'Arial Narrow', 'Arial', 'sans-serif'],
-      babies: ['Babies Playtime', 'cursive', 'sans-serif'],
-    },
-    colors: {
-      'card': 'rgb(var(--color-card))',
-      'border': 'rgb(var(--color-border))',
-      'background': 'rgb(var(--color-background))',
-      'foreground': 'rgb(var(--color-foreground))',
-      'muted': 'rgb(var(--color-muted))',
-      'primary': 'rgb(var(--color-primary))',
-      'secondary': 'rgb(var(--color-secondary))',
-      'accent': 'rgb(var(--color-accent))',
-      'success': 'rgb(var(--color-success))',
-      'info': 'rgb(var(--color-info))',
-      'warning': 'rgb(var(--color-warning))',
-      'error': 'rgb(var(--color-error))',
-      'card-foreground': 'rgb(var(--color-foreground))',
-      'green': {
-        100: '#dcfce7',
-        200: '#bbf7d0',
-        300: '#86efac',
-        400: '#4ade80',
-        500: '#22c55e',
-        600: '#16a34a',
-        700: '#15803d',
-        800: '#166534',
-        900: '#14532d',
-      },
-      'emerald': {
-        100: '#d1fae5',
-        200: '#a7f3d0',
-        300: '#6ee7b7',
-        400: '#34d399',
-        500: '#10b981',
-        600: '#059669',
-        700: '#047857',
-        800: '#065f46',
-        900: '#064e3b',
-      },
-      'plum': {
-        100: '#f3e8ff',
-        200: '#e9d5ff',
-        300: '#d8b4fe',
-        400: '#c084fc',
-        500: '#a855f7',
-        600: '#9333ea',
-        700: '#7e22ce',
-        800: '#6b21a8',
-        900: '#581c87',
-      },
-    },
-
-    breakpoints: {
-      'xs': '320px',
-      'sm': '640px',
-      'md': '768px',
-      'lg': '1024px',
-      'xl': '1280px',
-      '2xl': '1536px',
-    },
-    spacing: {
-      'responsive-xs': 'clamp(0.25rem, 1vw, 0.5rem)',
-      'responsive-sm': 'clamp(0.5rem, 2vw, 1rem)',
-      'responsive-md': 'clamp(1rem, 3vw, 1.5rem)',
-      'responsive-lg': 'clamp(1.5rem, 4vw, 2.5rem)',
-      'responsive-xl': 'clamp(2rem, 5vw, 4rem)',
-    },
-    fontSize: {
-      'responsive-xs': 'clamp(0.75rem, 1.5vw, 0.875rem)',
-      'responsive-sm': 'clamp(0.875rem, 2vw, 1rem)',
-      'responsive-base': 'clamp(1rem, 2.5vw, 1.125rem)',
-      'responsive-lg': 'clamp(1.125rem, 3vw, 1.25rem)',
-      'responsive-xl': 'clamp(1.25rem, 3.5vw, 1.5rem)',
-      'responsive-2xl': 'clamp(1.5rem, 4vw, 2rem)',
-      'responsive-3xl': 'clamp(2rem, 5vw, 3rem)',
-    },
+  shortcuts: {
+    'btn': 'px-4 py-2 rounded inline-block bg-teal-600 text-white cursor-pointer hover:bg-teal-700 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50',
+    'icon-btn': 'text-[0.9em] inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600',
   },
-  transformers: [],
-  safelist: [
-    'prose',
-    'prose-sm',
-    'prose-lg',
-    'prose-xl',
-    'prose-2xl',
-    'dark:prose-invert',
-    'container-responsive',
-    'grid-responsive',
-    'flex-responsive',
-    'card-responsive',
-    'text-responsive',
-    'touch-target',
-    'hidden-xs',
-    'visible-xs',
-    'hidden-sm',
-    'visible-sm',
-    'hidden-md',
-    'visible-md',
-    'hidden-lg',
-    'visible-lg',
-    'mobile-stack',
-    'mobile-full-width',
-    'mobile-center',
-    'mobile-hide',
+  rules: [
+    [/^text-([a-zA-Z0-9-]+)$/, ([, c]) => ({ color: c })],
+    [/^class-variance-authority-(.+)$/, ([, c]) => ({ class: c })],
   ],
 })

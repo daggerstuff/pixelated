@@ -19,7 +19,10 @@ export const POST = async ({ request }) => {
       )
     }
 
-    const { user, token } = await adapter.signIn(email, password) as unknown as { user: unknown; token: string }
+    const { user, token } = (await adapter.signIn(
+      email,
+      password,
+    )) as unknown as { user: unknown; token: string }
 
     return new Response(
       JSON.stringify({

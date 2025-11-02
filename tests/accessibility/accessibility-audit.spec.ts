@@ -262,8 +262,12 @@ test.describe('Accessibility Audit and Compliance', () => {
           const currentLevel = headingLevels[i]?.level
           const previousLevel = headingLevels[i - 1]?.level
 
-          if (currentLevel !== undefined && previousLevel !== undefined && currentLevel > previousLevel) {
-                expect(currentLevel - previousLevel).toBeLessThanOrEqual(1)
+          if (
+            currentLevel !== undefined &&
+            previousLevel !== undefined &&
+            currentLevel > previousLevel
+          ) {
+            expect(currentLevel - previousLevel).toBeLessThanOrEqual(1)
           }
         }
       }
@@ -355,7 +359,10 @@ test.describe('Accessibility Audit and Compliance', () => {
 
           if (!hasGoodContrast) {
             const text = await element.textContent()
-            ;(contrastIssues as any[]).push({ text: text?.slice(0, 50), styles })
+            ;(contrastIssues as any[]).push({
+              text: text?.slice(0, 50),
+              styles,
+            })
           }
         }
       }

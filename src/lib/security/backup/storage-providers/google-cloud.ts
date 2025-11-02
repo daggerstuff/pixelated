@@ -8,110 +8,114 @@
 import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 
 interface GoogleCloudCredentials {
-  project_id: string;
-  client_email: string;
-  private_key: string;
-  [key: string]: string;
+  project_id: string
+  client_email: string
+  private_key: string
+  [key: string]: string
 }
 
 interface GoogleCloudStorageOptions {
-  apiEndpoint?: string;
-  autoRetry?: boolean;
-  maxRetries?: number;
-  promise?: Promise<unknown>;
-  timeout?: number;
-  [key: string]: unknown;
+  apiEndpoint?: string
+  autoRetry?: boolean
+  maxRetries?: number
+  promise?: Promise<unknown>
+  timeout?: number
+  [key: string]: unknown
 }
 
 interface GoogleCloudStorage {
-  bucket: (name: string) => GoogleCloudBucket;
+  bucket: (name: string) => GoogleCloudBucket
 }
 
 interface GoogleCloudBucket {
-  file: (name: string) => GoogleCloudFile;
-  getFiles: (options: GoogleCloudListOptions) => Promise<[GoogleCloudFile[]]>;
+  file: (name: string) => GoogleCloudFile
+  getFiles: (options: GoogleCloudListOptions) => Promise<[GoogleCloudFile[]]>
 }
 
 interface GoogleCloudFile {
-  name: string;
-  exists: () => Promise<[boolean]>;
-  download: () => Promise<[Buffer]>;
-  delete: () => Promise<void>;
-  createWriteStream: (options: GoogleCloudWriteStreamOptions) => NodeJS.WritableStream;
+  name: string
+  exists: () => Promise<[boolean]>
+  download: () => Promise<[Buffer]>
+  delete: () => Promise<void>
+  createWriteStream: (
+    options: GoogleCloudWriteStreamOptions,
+  ) => NodeJS.WritableStream
 }
 
 interface GoogleCloudListOptions {
-  prefix?: string;
-  delimiter?: string;
-  autoPaginate?: boolean;
-  maxResults?: number;
+  prefix?: string
+  delimiter?: string
+  autoPaginate?: boolean
+  maxResults?: number
 }
 
 interface GoogleCloudWriteStreamOptions {
-  resumable: boolean;
+  resumable: boolean
   metadata: {
-    contentType: string;
-  };
+    contentType: string
+  }
 }
 
 export class GoogleCloudStorageProvider implements StorageProvider {
-  private storage: GoogleCloudStorage | null = null;
-  private bucket: GoogleCloudBucket | null = null;
-  private bucketName: string;
-  private initialized = false;
+  private storage: GoogleCloudStorage | null = null
+  private bucket: GoogleCloudBucket | null = null
+  private bucketName: string
+  private initialized = false
 
   constructor(private config: StorageProviderConfig) {
-    this.bucketName = (config.bucket as string) || '';
+    this.bucketName = (config.bucket as string) || ''
     if (!this.bucketName) {
       throw new Error(
         'Bucket name is required for Google Cloud Storage provider',
-      );
+      )
     }
   }
 
   async initialize(): Promise<void> {
     try {
       // Dynamically import Google Cloud Storage to prevent bundling with client code
-      const { Storage } = await import('@google-cloud/storage');
+      const { Storage } = await import('@google-cloud/storage')
 
       // Create Storage instance with provided credentials
       this.storage = new Storage({
         credentials: this.config.credentials as GoogleCloudCredentials,
-        projectId: (this.config.credentials as GoogleCloudCredentials)?.project_id,
-        ...this.config.options as GoogleCloudStorageOptions,
-      });
+        projectId: (this.config.credentials as GoogleCloudCredentials)
+          ?.project_id,
+        ...(this.config.options as GoogleCloudStorageOptions),
+      })
 
-      this.bucket = this.storage.bucket(this.bucketName);
-      this.initialized = true;
+      this.bucket = this.storage.bucket(this.bucketName)
+      this.initialized = true
 
       console.info(
         `Google Cloud Storage provider initialized for bucket: ${this.bucketName}`,
-      );
+      )
     } catch (error: unknown) {
       console.error(
         'Failed to initialize Google Cloud Storage provider:',
         error,
-      );
+      )
       throw new Error(
         `Google Cloud Storage initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
-      );
+        { cause: error },
+      )
     }
   }
 
   async listFiles(pattern?: string): Promise<string[]> {
-    this.checkInitialized();
+    this.checkInitialized()
 
     try {
-      const options: GoogleCloudListOptions = {};
+      const options: GoogleCloudListOptions = {}
 
       // Add prefix filter if a pattern is provided
       if (pattern) {
-        const patternParts = pattern.split('*');
+        const patternParts = pattern.split('*')
         if (patternParts.length > 1) {
           // Use the part before the first wildcard as prefix
-          options.prefix = patternParts[0];
+          options.prefix = patternParts[0]
         } else {
-          options.prefix = pattern;
+          options.prefix = pattern
         }
       }
 
@@ -134,6 +138,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       console.error('Failed to list files from Google Cloud Storage:', error)
       throw new Error(
         `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -171,6 +176,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -199,6 +205,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -225,6 +232,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       )
       throw new Error(
         `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
       )
     }
   }

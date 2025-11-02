@@ -1,6 +1,13 @@
 // Minimal placeholder for requirePageAuth
-import type { AstroCookies } from 'astro'
 import { type Role } from './access-control'
+
+// Re-export session management functions
+export { getSession } from './auth/session'
+
+// Use a generic cookies interface to avoid type conflicts
+type CookiesLike = {
+  get(key: string): { value: string } | undefined
+}
 
 export async function requirePageAuth(
   _context: { request: Request },
@@ -11,7 +18,7 @@ export async function requirePageAuth(
 }
 
 export async function getCurrentUser(
-  cookies: AstroCookies,
+  cookies: CookiesLike,
 ): Promise<{ id: string; role: string } | null> {
   // This is a mock implementation. In a real app, you'd verify a session cookie
   // and fetch the user from a database.
@@ -26,7 +33,7 @@ export async function getCurrentUser(
 }
 
 export async function hasRole(
-  cookies: AstroCookies,
+  cookies: CookiesLike,
   role: Role,
 ): Promise<boolean> {
   const user = await getCurrentUser(cookies)
@@ -37,9 +44,7 @@ export async function hasRole(
   return user.role === role
 }
 
-export async function isAuthenticated(
-  cookies: AstroCookies,
-): Promise<boolean> {
+export async function isAuthenticated(cookies: CookiesLike): Promise<boolean> {
   return (await getCurrentUser(cookies)) !== null
 }
 

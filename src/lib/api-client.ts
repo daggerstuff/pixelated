@@ -11,12 +11,12 @@ export class EnterpriseAPIClient {
   }
 
   private async wait(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   private async retryWithBackoff<T>(
     operation: () => Promise<T>,
-    attempt: number = 1
+    attempt: number = 1,
   ): Promise<T> {
     try {
       return await operation()
@@ -26,7 +26,10 @@ export class EnterpriseAPIClient {
       }
 
       const delay = this.retryDelay * Math.pow(2, attempt - 1) // Exponential backoff
-      console.warn(`API request failed (attempt ${attempt}/${this.maxRetries}), retrying in ${delay}ms...`, error)
+      console.warn(
+        `API request failed (attempt ${attempt}/${this.maxRetries}), retrying in ${delay}ms...`,
+        error,
+      )
 
       await this.wait(delay)
       return this.retryWithBackoff(operation, attempt + 1)
@@ -39,10 +42,14 @@ export class EnterpriseAPIClient {
       timeout?: number
       retryOn?: number[]
       validator?: (obj: unknown) => ValidationResult<T>
-    } = {}
+    } = {},
   ): Promise<T> {
-    const { timeout = 30000, retryOn = [408, 429, 500, 502, 503, 504], ...fetchOptions } = options
-    
+    const {
+      timeout = 30000,
+      retryOn = [408, 429, 500, 502, 503, 504],
+      ...fetchOptions
+    } = options
+
     const operation = async (): Promise<T> => {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
@@ -54,7 +61,8 @@ export class EnterpriseAPIClient {
           headers: {
             'Content-Type': 'application/json',
             'X-Client-Version': '2.0.0',
-            'X-Request-ID': crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,
+            'X-Request-ID':
+              crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,
             ...fetchOptions.headers,
           },
         })
@@ -62,20 +70,32 @@ export class EnterpriseAPIClient {
         clearTimeout(timeoutId)
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          const errorData = await response
+            .json()
+            .catch(() => ({ error: 'Unknown error' }))
 
           if (retryOn.includes(response.status)) {
-            throw new APIRetryableError(`HTTP ${response.status}: ${errorData.error || response.statusText}`, response.status)
+            throw new APIRetryableError(
+              `HTTP ${response.status}: ${errorData.error || response.statusText}`,
+              response.status,
+            )
           }
 
-          throw new APIError(`HTTP ${response.status}: ${errorData.error || response.statusText}`, response.status, errorData)
+          throw new APIError(
+            `HTTP ${response.status}: ${errorData.error || response.statusText}`,
+            response.status,
+            errorData,
+          )
         }
 
         // Use validator if provided, otherwise fallback to direct parsing
         if (options.validator) {
           const validation = await parseApiResponse(response, options.validator)
           if (!validation.success) {
-            throw new APIError(`Response validation failed: ${validation.error}`, 422)
+            throw new APIError(
+              `Response validation failed: ${validation.error}`,
+              422,
+            )
           }
           return validation.data
         }
@@ -83,11 +103,11 @@ export class EnterpriseAPIClient {
         return await response.json()
       } catch (error: unknown) {
         clearTimeout(timeoutId)
-        
+
         if (error instanceof Error && (error as Error)?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
-        
+
         throw error
       }
     }
@@ -103,7 +123,9 @@ export class EnterpriseAPIClient {
     })
   }
 
-  async generateScenario(data: GenerateScenarioRequest): Promise<GenerateScenarioResponse> {
+  async generateScenario(
+    data: GenerateScenarioRequest,
+  ): Promise<GenerateScenarioResponse> {
     return this.request('/api/psychology/generate-scenario', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -111,7 +133,9 @@ export class EnterpriseAPIClient {
   }
 
   async getFrameworks(params?: FrameworksRequest): Promise<FrameworksResponse> {
-    const query = params ? `?${new URLSearchParams(Object.entries(params).filter(([, v]) => v))}` : ''
+    const query = params
+      ? `?${new URLSearchParams(Object.entries(params).filter(([, v]) => v))}`
+      : ''
     return this.request(`/api/psychology/frameworks${query}`)
   }
 
@@ -129,7 +153,9 @@ export class EnterpriseAPIClient {
     })
   }
 
-  async detectCrisis(data: CrisisDetectionRequest): Promise<CrisisDetectionResponse> {
+  async detectCrisis(
+    data: CrisisDetectionRequest,
+  ): Promise<CrisisDetectionResponse> {
     return this.request('/api/mental-health/crisis-detection', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -141,7 +167,7 @@ export class APIError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: unknown
+    public data?: unknown,
   ) {
     super(message)
     this.name = 'APIError'
@@ -244,7 +270,12 @@ interface FrameworksResponse {
 
 interface AnalyzeRequest {
   content: string
-  analysisType: 'session' | 'progress' | 'intervention' | 'risk' | 'comprehensive'
+  analysisType:
+    | 'session'
+    | 'progress'
+    | 'intervention'
+    | 'risk'
+    | 'comprehensive'
   clientContext?: unknown
   analysisOptions?: unknown
 }

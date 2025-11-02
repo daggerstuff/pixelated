@@ -3,7 +3,11 @@
  */
 
 // Import types from backup-types.ts to avoid duplication
-import type { BackupStatus, RecoveryTestStatus, VerificationMethod } from './backup-types'
+import type {
+  BackupStatus,
+  RecoveryTestStatus,
+  VerificationMethod,
+} from './backup-types'
 import { BackupType } from './backup-types'
 
 // Only export types needed by this file, not re-export from backup-types.ts

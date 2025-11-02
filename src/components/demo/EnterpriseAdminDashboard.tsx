@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Shield, 
-  Activity, 
-  Users, 
-  Server, 
+import {
+  Shield,
+  Activity,
+  Users,
+  Server,
   Zap,
   AlertTriangle,
   CheckCircle,
@@ -17,7 +17,7 @@ import {
   RefreshCw,
   Download,
   Clock,
-  Lock
+  Lock,
 } from 'lucide-react'
 
 interface SystemMetrics {
@@ -82,7 +82,8 @@ interface APIHealth {
 
 export default function EnterpriseAdminDashboard() {
   const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null)
-  const [securityMetrics, setSecurityMetrics] = useState<SecurityMetrics | null>(null)
+  const [securityMetrics, setSecurityMetrics] =
+    useState<SecurityMetrics | null>(null)
   const [userAnalytics, setUserAnalytics] = useState<UserAnalytics | null>(null)
   const [apiHealth, setApiHealth] = useState<APIHealth | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -101,7 +102,7 @@ export default function EnterpriseAdminDashboard() {
         databaseConnections: 23,
         cacheHitRate: 94.7,
         memoryUsage: 67.3,
-        cpuUsage: 23.8
+        cpuUsage: 23.8,
       }
 
       const security: SecurityMetrics = {
@@ -114,18 +115,18 @@ export default function EnterpriseAdminDashboard() {
             type: 'Unusual Login Pattern',
             severity: 'medium',
             message: 'Multiple login attempts from new location detected',
-            timestamp: Date.now() - 3600000
+            timestamp: Date.now() - 3600000,
           },
           {
             id: '2',
             type: 'Rate Limiting Triggered',
             severity: 'low',
             message: 'API rate limit exceeded for user session',
-            timestamp: Date.now() - 7200000
-          }
+            timestamp: Date.now() - 7200000,
+          },
         ],
         lastSecurityScan: Date.now() - 86400000,
-        vulnerabilities: 0
+        vulnerabilities: 0,
       }
 
       const users: UserAnalytics = {
@@ -141,8 +142,8 @@ export default function EnterpriseAdminDashboard() {
           { feature: 'Chat Analysis', usage: 76.8 },
           { feature: 'Knowledge Parsing', usage: 65.3 },
           { feature: 'Therapy Scenarios', usage: 58.7 },
-          { feature: 'Risk Assessment', usage: 45.9 }
-        ]
+          { feature: 'Risk Assessment', usage: 45.9 },
+        ],
       }
 
       const api: APIHealth = {
@@ -154,7 +155,7 @@ export default function EnterpriseAdminDashboard() {
             responseTime: 187,
             successRate: 99.8,
             lastCheck: Date.now(),
-            errors: []
+            errors: [],
           },
           {
             name: 'Crisis Detection',
@@ -163,7 +164,7 @@ export default function EnterpriseAdminDashboard() {
             responseTime: 423,
             successRate: 99.7,
             lastCheck: Date.now(),
-            errors: []
+            errors: [],
           },
           {
             name: 'Chat API',
@@ -172,7 +173,7 @@ export default function EnterpriseAdminDashboard() {
             responseTime: 256,
             successRate: 99.9,
             lastCheck: Date.now(),
-            errors: []
+            errors: [],
           },
           {
             name: 'Scenario Generation',
@@ -185,14 +186,14 @@ export default function EnterpriseAdminDashboard() {
               {
                 timestamp: Date.now() - 1800000,
                 error: 'Timeout on AI model request',
-                count: 3
-              }
-            ]
-          }
+                count: 3,
+              },
+            ],
+          },
         ],
         totalRequests: 2847293,
         successfulRequests: 2844156,
-        failedRequests: 3137
+        failedRequests: 3137,
       }
 
       setSystemMetrics(metrics)
@@ -249,10 +250,12 @@ export default function EnterpriseAdminDashboard() {
       securityMetrics,
       userAnalytics,
       apiHealth,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
-    
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json',
+    })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -277,9 +280,12 @@ export default function EnterpriseAdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Enterprise Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Enterprise Admin Dashboard
+          </h1>
           <p className="text-gray-600 mt-1">
-            Comprehensive system monitoring and analytics • Last updated: {lastRefresh.toLocaleTimeString()}
+            Comprehensive system monitoring and analytics • Last updated:{' '}
+            {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -289,14 +295,19 @@ export default function EnterpriseAdminDashboard() {
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={autoRefresh ? 'bg-green-50 border-green-200' : ''}
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`}
+            />
             Auto Refresh
           </Button>
           <Button variant="outline" size="sm" onClick={exportMetrics}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200"
+          >
             <Shield className="w-4 h-4 mr-2" />
             System Healthy
           </Badge>
@@ -327,7 +338,9 @@ export default function EnterpriseAdminDashboard() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold">{systemMetrics?.activeUsers.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {systemMetrics?.activeUsers.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -341,7 +354,9 @@ export default function EnterpriseAdminDashboard() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Total Requests</p>
-                <p className="text-2xl font-bold">{systemMetrics?.totalRequests.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {systemMetrics?.totalRequests.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -355,7 +370,9 @@ export default function EnterpriseAdminDashboard() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Avg Response</p>
-                <p className="text-2xl font-bold">{systemMetrics?.averageResponseTime}ms</p>
+                <p className="text-2xl font-bold">
+                  {systemMetrics?.averageResponseTime}ms
+                </p>
               </div>
             </div>
           </CardContent>
@@ -395,7 +412,9 @@ export default function EnterpriseAdminDashboard() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">CPU Usage</span>
-                    <span className="font-medium">{systemMetrics?.cpuUsage}%</span>
+                    <span className="font-medium">
+                      {systemMetrics?.cpuUsage}%
+                    </span>
                   </div>
                   <Progress value={systemMetrics?.cpuUsage} className="h-2" />
                 </div>
@@ -403,22 +422,38 @@ export default function EnterpriseAdminDashboard() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Memory Usage</span>
-                    <span className="font-medium">{systemMetrics?.memoryUsage}%</span>
+                    <span className="font-medium">
+                      {systemMetrics?.memoryUsage}%
+                    </span>
                   </div>
-                  <Progress value={systemMetrics?.memoryUsage} className="h-2" />
+                  <Progress
+                    value={systemMetrics?.memoryUsage}
+                    className="h-2"
+                  />
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Cache Hit Rate</span>
-                    <span className="font-medium">{systemMetrics?.cacheHitRate}%</span>
+                    <span className="text-sm text-gray-600">
+                      Cache Hit Rate
+                    </span>
+                    <span className="font-medium">
+                      {systemMetrics?.cacheHitRate}%
+                    </span>
                   </div>
-                  <Progress value={systemMetrics?.cacheHitRate} className="h-2" />
+                  <Progress
+                    value={systemMetrics?.cacheHitRate}
+                    className="h-2"
+                  />
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-sm text-gray-600">Database Connections</span>
-                  <span className="font-medium">{systemMetrics?.databaseConnections}/100</span>
+                  <span className="text-sm text-gray-600">
+                    Database Connections
+                  </span>
+                  <span className="font-medium">
+                    {systemMetrics?.databaseConnections}/100
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -433,20 +468,31 @@ export default function EnterpriseAdminDashboard() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Error Rate</span>
-                  <Badge 
-                    variant="outline" 
-                    className={systemMetrics && systemMetrics.errorRate < 1 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}
+                  <Badge
+                    variant="outline"
+                    className={
+                      systemMetrics && systemMetrics.errorRate < 1
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    }
                   >
                     {systemMetrics?.errorRate}%
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Average Response Time</span>
-                  <span className="font-medium">{systemMetrics?.averageResponseTime}ms</span>
+                  <span className="text-sm text-gray-600">
+                    Average Response Time
+                  </span>
+                  <span className="font-medium">
+                    {systemMetrics?.averageResponseTime}ms
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Uptime</span>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     <CheckCircle className="w-3 h-3 mr-1" />
                     {systemMetrics?.uptime}%
                   </Badge>
@@ -467,25 +513,38 @@ export default function EnterpriseAdminDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Auth Attempts</span>
-                  <span className="font-medium">{securityMetrics?.authenticationAttempts.toLocaleString()}</span>
+                  <span className="text-sm text-gray-600">
+                    Total Auth Attempts
+                  </span>
+                  <span className="font-medium">
+                    {securityMetrics?.authenticationAttempts.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Failed Logins</span>
-                  <Badge 
-                    variant="outline" 
-                    className={securityMetrics && securityMetrics.failedLogins < 200 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}
+                  <Badge
+                    variant="outline"
+                    className={
+                      securityMetrics && securityMetrics.failedLogins < 200
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                    }
                   >
                     {securityMetrics?.failedLogins}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Blocked IPs</span>
-                  <span className="font-medium">{securityMetrics?.blockedIPs.length}</span>
+                  <span className="font-medium">
+                    {securityMetrics?.blockedIPs.length}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Vulnerabilities</span>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     {securityMetrics?.vulnerabilities}
                   </Badge>
                 </div>
@@ -504,8 +563,8 @@ export default function EnterpriseAdminDashboard() {
                   {securityMetrics?.securityAlerts.map((alert) => (
                     <div key={alert.id} className="p-3 border rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={getSeverityColor(alert.severity)}
                         >
                           {alert.severity.toUpperCase()}
@@ -515,7 +574,9 @@ export default function EnterpriseAdminDashboard() {
                         </span>
                       </div>
                       <p className="text-sm font-medium">{alert.type}</p>
-                      <p className="text-xs text-gray-600 mt-1">{alert.message}</p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {alert.message}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -536,23 +597,38 @@ export default function EnterpriseAdminDashboard() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total Users</span>
-                  <span className="font-medium">{userAnalytics?.totalUsers.toLocaleString()}</span>
+                  <span className="font-medium">
+                    {userAnalytics?.totalUsers.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Active Today</span>
-                  <span className="font-medium">{userAnalytics?.activeToday.toLocaleString()}</span>
+                  <span className="font-medium">
+                    {userAnalytics?.activeToday.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Active This Week</span>
-                  <span className="font-medium">{userAnalytics?.activeThisWeek.toLocaleString()}</span>
+                  <span className="text-sm text-gray-600">
+                    Active This Week
+                  </span>
+                  <span className="font-medium">
+                    {userAnalytics?.activeThisWeek.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">New Registrations</span>
-                  <span className="font-medium">{userAnalytics?.newRegistrations}</span>
+                  <span className="text-sm text-gray-600">
+                    New Registrations
+                  </span>
+                  <span className="font-medium">
+                    {userAnalytics?.newRegistrations}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Retention Rate</span>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     {userAnalytics?.userRetention}%
                   </Badge>
                 </div>
@@ -594,15 +670,24 @@ export default function EnterpriseAdminDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {apiHealth?.endpoints.map((endpoint) => (
-                  <div key={endpoint.name + endpoint.url} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={endpoint.name + endpoint.url}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <Badge
                         variant="outline"
                         className={getStatusColor(endpoint.status)}
                       >
-                        {endpoint.status === 'healthy' && <CheckCircle className="w-3 h-3 mr-1" />}
-                        {endpoint.status === 'degraded' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                        {endpoint.status === 'down' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        {endpoint.status === 'healthy' && (
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                        )}
+                        {endpoint.status === 'degraded' && (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
+                        {endpoint.status === 'down' && (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
                         {endpoint.status}
                       </Badge>
                       <div>
@@ -611,8 +696,12 @@ export default function EnterpriseAdminDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">{endpoint.responseTime}ms</div>
-                      <div className="text-xs text-gray-500">{endpoint.successRate}% success</div>
+                      <div className="text-sm font-medium">
+                        {endpoint.responseTime}ms
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {endpoint.successRate}% success
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -629,7 +718,9 @@ export default function EnterpriseAdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Total Requests</p>
-                    <p className="text-2xl font-bold">{apiHealth?.totalRequests.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {apiHealth?.totalRequests.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -643,7 +734,9 @@ export default function EnterpriseAdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Successful</p>
-                    <p className="text-2xl font-bold">{apiHealth?.successfulRequests.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {apiHealth?.successfulRequests.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -657,7 +750,9 @@ export default function EnterpriseAdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Failed</p>
-                    <p className="text-2xl font-bold">{apiHealth?.failedRequests.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {apiHealth?.failedRequests.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>

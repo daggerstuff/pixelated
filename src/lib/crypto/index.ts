@@ -104,7 +104,9 @@ class RedisStorageProvider implements StorageProvider {
     this.client = createClient({ url: redisUrl })
 
     this.client.on('error', (err) => {
-      logger.error('Redis connection error', { error: (err as Error)?.message || String(err) })
+      logger.error('Redis connection error', {
+        error: (err as Error)?.message || String(err),
+      })
       this.connected = false
     })
 
@@ -133,7 +135,8 @@ class RedisStorageProvider implements StorageProvider {
 
   async get(key: string): Promise<string | null> {
     await this.ensureConnection()
-    return this.client.get(key)
+    const result = await this.client.get(key)
+    return typeof result === 'string' ? result : null
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
@@ -325,7 +328,7 @@ export function decrypt(data: string, key: string): string {
       error: error instanceof Error ? String(error) : String(error),
     })
     throw new Error(
-      `Decryption failed: ${error instanceof Error ? String(error) : String(error)}`,
+      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
     )
   }
 }
@@ -521,20 +524,22 @@ export interface CryptoSystemOptions {
  * Return type for createCryptoSystem function
  */
 export interface CryptoSystem {
-  encrypt: typeof encrypt;
-  decrypt: typeof decrypt;
-  generateSecureKey: typeof generateSecureKey;
-  createHash: typeof createHash;
-  createHMAC: typeof createHMAC;
-  keyStorage: KeyStorage;
-  keyRotationManager: KeyRotationManager;
-  encryptWithKeyManagement(data: string, purpose?: string): Promise<string>;
-  decryptWithKeyManagement(encryptedData: string): Promise<string>;
-  rotateExpiredKeys(): Promise<string[]>;
-  close(): Promise<void>;
+  encrypt: typeof encrypt
+  decrypt: typeof decrypt
+  generateSecureKey: typeof generateSecureKey
+  createHash: typeof createHash
+  createHMAC: typeof createHMAC
+  keyStorage: KeyStorage
+  keyRotationManager: KeyRotationManager
+  encryptWithKeyManagement(data: string, purpose?: string): Promise<string>
+  decryptWithKeyManagement(encryptedData: string): Promise<string>
+  rotateExpiredKeys(): Promise<string[]>
+  close(): Promise<void>
 }
 
-export function createCryptoSystem(options: CryptoSystemOptions = {}): CryptoSystem {
+export function createCryptoSystem(
+  options: CryptoSystemOptions = {},
+): CryptoSystem {
   const {
     namespace = 'app',
     useSecureStorage = false,

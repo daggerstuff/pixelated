@@ -26,21 +26,24 @@ export async function POST({ request }: { request: Request }) {
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
   if (!isBatchBody(body)) {
-    return new Response(JSON.stringify({ error: 'Request body does not match BatchBody shape' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({ error: 'Request body does not match BatchBody shape' }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 
   if (!body || typeof body !== 'object') {
     return new Response(JSON.stringify({ error: 'Invalid request body' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
@@ -51,20 +54,26 @@ export async function POST({ request }: { request: Request }) {
     batchSessions.length === 0 ||
     batchSessions.length > MAX_BATCH
   ) {
-    return new Response(JSON.stringify({ error: 'Missing or invalid sessions array' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({ error: 'Missing or invalid sessions array' }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 
   // Prefer forNext utility if available, otherwise use for-of loop
   // forNext(sessions, (session) => { ... })
   for (const session of batchSessions) {
     if (!session || typeof session !== 'object' || !('sessionId' in session)) {
-      return new Response(JSON.stringify({ error: 'Invalid session object in array' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return new Response(
+        JSON.stringify({ error: 'Invalid session object in array' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
   }
 
@@ -80,16 +89,16 @@ export async function POST({ request }: { request: Request }) {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store'
-      }
+        'Cache-Control': 'no-store',
+      },
     })
   } catch (error) {
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store'
-      }
+        'Cache-Control': 'no-store',
+      },
     })
   }
 }

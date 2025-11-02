@@ -302,7 +302,7 @@ async function main() {
 }
 
 // Execute main function
-main().catch(() => {
-  console.error('Unhandled error')
+main().catch((error: unknown) => {
+  console.error('Unhandled error', String(error))
   process.exit(1)
 })

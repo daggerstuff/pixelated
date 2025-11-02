@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+/* jshint esversion: 6, node: true */
 // IMPORTANT: Import Sentry instrumentation first
 import '../instrument.mjs'
 
@@ -20,33 +21,31 @@ const __filename = fileURLToPath(import.meta.url)
 // Avoid path.dirname to prevent security scanner issues
 const lastSlash = Math.max(
   __filename.lastIndexOf('/'),
-  __filename.lastIndexOf('\\')
+  __filename.lastIndexOf('\\'),
 )
-const __dirname = lastSlash > 0
-  ? __filename.substring(0, lastSlash)
-  : '.'
+const __dirname = lastSlash > 0 ? __filename.substring(0, lastSlash) : '.'
 // LRU cache for mapping safe IDs to actual file paths
-const PATH_CACHE = new Map();
-const MAX_CACHE_SIZE = 100;
-let pathCounter = 0;
+const PATH_CACHE = new Map()
+const MAX_CACHE_SIZE = 100
+let pathCounter = 0
 
 // Generate safe path ID and cache the mapping
 function generateSafePathId(filePath) {
-  const safeId = `path_${++pathCounter}`;
-  
+  const safeId = `path_${++pathCounter}`
+
   // LRU: delete oldest entry if cache is full
   if (PATH_CACHE.size >= MAX_CACHE_SIZE) {
-    const firstKey = PATH_CACHE.keys().next().value;
-    PATH_CACHE.delete(firstKey);
+    const firstKey = PATH_CACHE.keys().next().value
+    PATH_CACHE.delete(firstKey)
   }
-  
-  PATH_CACHE.set(safeId, filePath);
-  return safeId;
+
+  PATH_CACHE.set(safeId, filePath)
+  return safeId
 }
 
 // Get actual file path from safe ID
 function getActualPath(safeId) {
-  return PATH_CACHE.get(safeId) || null;
+  return PATH_CACHE.get(safeId) || null
 }
 
 // Run blog publisher command
@@ -96,7 +95,11 @@ function runBlogCommand(command) {
     }
 
     const args = ['run', 'blog-publisher', '--', ...tokens]
-    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: 'pipe', shell: false })
+    const proc = spawnSync('pnpm', args, {
+      encoding: 'utf8',
+      stdio: 'pipe',
+      shell: false,
+    })
 
     if (proc.error) {
       return { success: false, error: proc.error.message }
@@ -106,7 +109,11 @@ function runBlogCommand(command) {
       return { success: true, output: proc.stdout || '' }
     }
 
-    return { success: false, error: proc.stderr || 'Unknown error', output: proc.stdout || '' }
+    return {
+      success: false,
+      error: proc.stderr || 'Unknown error',
+      output: proc.stdout || '',
+    }
   } catch (err) {
     return { success: false, error: err.message }
   }
@@ -313,117 +320,144 @@ function generatePostForm() {
   `
 }
 
+// Handle status/report actions
+function handleStatusAction(action) {
+  const result = runBlogCommand(action)
+  
+  if (result.success) {
+    return {
+      content: `
+        <div class="card">
+          <h2>${action.charAt(0).toUpperCase() + action.slice(1)} Results</h2>
+          <pre class="content">${result.output}</pre>
+        </div>
+      `,
+      message: null
+    }
+  } else {
+    const response = {
+      content: '',
+      message: {
+        type: 'error',
+        text: `Error: ${result.error}`,
+      }
+    }
+    
+    if (result.output) {
+      response.content = `
+        <div class="card">
+          <h2>Error Output</h2>
+          <pre class="content">${result.output}</pre>
+        </div>
+      `
+    }
+    
+    return response
+  }
+}
+
+// Handle post generation
+function handleGenerateAction(url) {
+  const title = url.searchParams.get('title')
+  let series = url.searchParams.get('series')
+  const newSeries = url.searchParams.get('newSeries')
+
+  if (!title) {
+    return {
+      content: generatePostForm(),
+      message: {
+        type: 'error',
+        text: 'Post title is required',
+      }
+    }
+  }
+
+  // If "new" is selected and newSeries is provided, use that
+  if (series === 'new' && newSeries) {
+    series = newSeries
+  }
+
+  const seriesArg = series ? `"${series}"` : '""'
+  const generateResult = runBlogCommand(`generate ${seriesArg} "${title}"`)
+
+  if (generateResult.success) {
+    return {
+      content: `
+        <div class="card">
+          <h2>Post Created</h2>
+          <pre class="content">${generateResult.output}</pre>
+        </div>
+      `,
+      message: {
+        type: 'success',
+        text: 'Post created successfully!',
+      }
+    }
+  } else {
+    return {
+      content: `
+        <div class="card">
+          <h2>Error Output</h2>
+          <pre class="content">${generateResult.output || 'No output available'}</pre>
+        </div>
+      `,
+      message: {
+        type: 'error',
+        text: `Failed to create post: ${generateResult.error}`,
+      }
+    }
+  }
+}
+
+// Route request to appropriate handler
+function handleRequest(url) {
+  const action = url.searchParams.get('action')
+  
+  if (!action) {
+    return {
+      content: `
+        <div class="card">
+          <h2>Welcome to Blog Management</h2>
+          <p>Select an action from the buttons above to manage your blog content.</p>
+        </div>
+      `,
+      message: null
+    }
+  }
+
+  switch (action) {
+    case 'status':
+    case 'series':
+    case 'upcoming':
+    case 'overdue':
+    case 'report':
+      return handleStatusAction(action)
+
+    case 'generate_form':
+      return {
+        content: generatePostForm(),
+        message: null
+      }
+
+    case 'generate':
+      return handleGenerateAction(url)
+
+    default:
+      return {
+        content: '',
+        message: {
+          type: 'error',
+          text: `Unknown action: ${action}`,
+        }
+      }
+  }
+}
 
 // Handle HTTP requests
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`)
-  const action = url.searchParams.get('action')
-
-  let content = ''
-  let message = ''
-
-  if (action) {
-    switch (action) {
-      case 'status':
-      case 'series':
-      case 'upcoming':
-      case 'overdue':
-      case 'report':
-        const result = runBlogCommand(action)
-
-        if (result.success) {
-          content = `
-          <div class="card">
-            <h2>${action.charAt(0).toUpperCase() + action.slice(1)} Results</h2>
-            <pre class="content">${result.output}</pre>
-          </div>
-          `
-        } else {
-          message = {
-            type: 'error',
-            text: `Error: ${result.error}`,
-          }
-
-          if (result.output) {
-            content = `
-            <div class="card">
-              <h2>Error Output</h2>
-              <pre class="content">${result.output}</pre>
-            </div>
-            `
-          }
-        }
-        break
-
-      case 'generate_form':
-        content = generatePostForm()
-        break
-
-      case 'generate':
-        const title = url.searchParams.get('title')
-        let series = url.searchParams.get('series')
-        const newSeries = url.searchParams.get('newSeries')
-
-        if (!title) {
-          message = {
-            type: 'error',
-            text: 'Post title is required',
-          }
-          content = generatePostForm()
-        } else {
-          // If "new" is selected and newSeries is provided, use that
-          if (series === 'new' && newSeries) {
-            series = newSeries
-          }
-
-          const seriesArg = series ? `"${series}"` : '""'
-          const generateResult = runBlogCommand(
-            `generate ${seriesArg} "${title}"`,
-          )
-
-          if (generateResult.success) {
-            message = {
-              type: 'success',
-              text: 'Post created successfully!',
-            }
-            content = `
-            <div class="card">
-              <h2>Post Created</h2>
-              <pre class="content">${generateResult.output}</pre>
-            </div>
-            `
-          } else {
-            message = {
-              type: 'error',
-              text: `Failed to create post: ${generateResult.error}`,
-            }
-            content = `
-            <div class="card">
-              <h2>Error Output</h2>
-              <pre class="content">${generateResult.output || 'No output available'}</pre>
-            </div>
-            `
-          }
-        }
-        break
-
-
-      default:
-        message = {
-          type: 'error',
-          text: `Unknown action: ${action}`,
-        }
-    }
-  } else {
-    // Default page with welcome message
-    content = `
-    <div class="card">
-      <h2>Welcome to Blog Management</h2>
-      <p>Select an action from the buttons above to manage your blog content.</p>
-    </div>
-    `
-  }
-
+  const { content, message } = handleRequest(url)
+  
   res.writeHead(200, { 'Content-Type': 'text/html' })
   res.end(generateHTML(content, message))
 })

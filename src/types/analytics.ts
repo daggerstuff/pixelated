@@ -142,14 +142,14 @@ export interface AnalyticsError {
  * AnalyticsError class for error handling in analytics hooks/services.
  */
 export class AnalyticsError implements AnalyticsError {
-  code: string;
-  message: string;
-  details?: unknown;
+  code: string
+  message: string
+  details?: unknown
 
   constructor(code: string, message: string, details?: unknown) {
-    this.code = code;
-    this.message = message;
-    this.details = details;
+    this.code = code
+    this.message = message
+    this.details = details
   }
 }
 

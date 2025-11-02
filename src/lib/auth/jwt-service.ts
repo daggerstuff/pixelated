@@ -1,11 +1,11 @@
 /**
  * JWT Token Service - Core authentication logic for Phase 7
  * Implements secure JWT token generation, validation, and management
- * with integration to existing Clerk infrastructure and Phase 6 MCP server tracking
+ * with integration to existing authentication infrastructure (Better-Auth) and Phase 6 MCP server tracking
  */
 
 import jwt from 'jsonwebtoken'
-import { nanoid } from 'nanoid'
+import { randomBytes } from 'crypto'
 import { redis, getFromCache, setInCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -18,6 +18,15 @@ const JWT_CONFIG = {
   accessTokenExpiry: 15 * 60, // 15 minutes
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
   algorithm: 'HS256' as const,
+}
+
+// --- Security hardening: require explicit secret in production ---
+// Prevent accidental use of a predictable fallback secret in production environments.
+// This avoids reliance on insecure randomness or predictable secrets.
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'fallback-secret-change-in-production')) {
+  // Fail fast so deployments are not started with an insecure secret.
+  // Operators should provide a strong secret via environment variables or a secret store.
+  throw new Error('JWT_SECRET must be set to a strong secret in production')
 }
 
 // Types
@@ -48,7 +57,12 @@ export interface ClientInfo {
   deviceId?: string
 }
 
-export type UserRole = 'admin' | 'therapist' | 'patient' | 'researcher' | 'guest'
+export type UserRole =
+  | 'admin'
+  | 'therapist'
+  | 'patient'
+  | 'researcher'
+  | 'guest'
 export type TokenType = 'access' | 'refresh'
 
 // JWT payload shape (partial) used by this service
@@ -75,17 +89,31 @@ export interface TokenMetadata {
 }
 
 export class AuthenticationError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
     super(message)
     this.name = 'AuthenticationError'
   }
 }
 
 /**
+ * Generate secure random hex string
+ * Uses Node's crypto.randomBytes (cryptographically secure).
+ * Replaces any use of Math.random for security-sensitive identifiers.
+ */
+function secureRandomHex(bytes = 32): string {
+  // 32 bytes => 64 hex characters (256 bits of entropy)
+  return randomBytes(bytes).toString('hex')
+}
+
+/**
  * Generate secure random token identifier
  */
 function generateSecureToken(): string {
-  return nanoid(32)
+  // Use secureRandomHex to avoid accidental insecure randomness (e.g., Math.random)
+  return secureRandomHex(32)
 }
 
 /**
@@ -107,7 +135,7 @@ async function storeTokenMetadata(
     expiresAt: number
     clientInfo?: ClientInfo
     accessTokenId?: string
-  }
+  },
 ): Promise<void> {
   const key = `token:${tokenId}`
   await setInCache(key, metadata, metadata.expiresAt - currentTimestamp())
@@ -116,7 +144,9 @@ async function storeTokenMetadata(
 /**
  * Get token metadata from Redis
  */
-async function getTokenMetadata(tokenId: string): Promise<TokenMetadata | null> {
+async function getTokenMetadata(
+  tokenId: string,
+): Promise<TokenMetadata | null> {
   const key = `token:${tokenId}`
   return (await getFromCache(key)) as TokenMetadata | null
 }
@@ -133,12 +163,19 @@ async function isTokenRevoked(tokenId: string): Promise<boolean> {
 /**
  * Mark token as revoked
  */
-async function markTokenRevoked(tokenId: string, reason: string): Promise<void> {
+async function markTokenRevoked(
+  tokenId: string,
+  reason: string,
+): Promise<void> {
   const revokedKey = `revoked:${tokenId}`
   const metadata = await getTokenMetadata(tokenId)
 
   if (metadata) {
-    await setInCache(revokedKey, { reason, revokedAt: currentTimestamp() }, 24 * 60 * 60) // 24 hours
+    await setInCache(
+      revokedKey,
+      { reason, revokedAt: currentTimestamp() },
+      24 * 60 * 60,
+    ) // 24 hours
     await removeFromCache(`token:${tokenId}`)
   }
 }
@@ -146,10 +183,20 @@ async function markTokenRevoked(tokenId: string, reason: string): Promise<void> 
 /**
  * Validate token security checks
  */
-function validateTokenSecurity(payload: JwtPayload, metadata: TokenMetadata | null): void {
+function validateTokenSecurity(
+  payload: JwtPayload,
+  metadata: TokenMetadata | null,
+): void {
   // Check for token binding (prevent session hijacking)
-  if (payload.client?.deviceId && metadata?.clientInfo?.deviceId && payload.client.deviceId !== metadata.clientInfo.deviceId) {
-    throw new AuthenticationError('Token device binding mismatch', 'DEVICE_MISMATCH')
+  if (
+    payload.client?.deviceId &&
+    metadata?.clientInfo?.deviceId &&
+    payload.client.deviceId !== metadata.clientInfo.deviceId
+  ) {
+    throw new AuthenticationError(
+      'Token device binding mismatch',
+      'DEVICE_MISMATCH',
+    )
   }
 }
 
@@ -171,7 +218,7 @@ function extractTokenId(token: string): string {
 export async function generateTokenPair(
   userId: string,
   role: UserRole,
-  clientInfo: ClientInfo
+  clientInfo: ClientInfo,
 ): Promise<TokenPair> {
   // Validate input parameters
   if (!userId || !role || !clientInfo) {
@@ -259,7 +306,7 @@ export async function generateTokenPair(
  */
 export async function validateToken(
   token: string,
-  tokenType: TokenType
+  tokenType: TokenType,
 ): Promise<TokenValidationResult> {
   try {
     // Verify token signature and decode
@@ -271,7 +318,7 @@ export async function validateToken(
     // Validate token type matches expected
     if (payload.type !== tokenType) {
       throw new AuthenticationError(
-        `Invalid token type: expected ${tokenType}, got ${payload.type}`
+        `Invalid token type: expected ${tokenType}, got ${payload.type}`,
       )
     }
 
@@ -292,7 +339,7 @@ export async function validateToken(
     }
 
     // Additional security checks
-  validateTokenSecurity(payload, tokenMetadata)
+    validateTokenSecurity(payload, tokenMetadata)
 
     // Log successful validation
     await logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, payload.sub, {
@@ -327,7 +374,7 @@ export async function validateToken(
  */
 export async function refreshAccessToken(
   refreshToken: string,
-  clientInfo: ClientInfo
+  clientInfo: ClientInfo,
 ): Promise<TokenPair> {
   // Validate refresh token
   const validation = await validateToken(refreshToken, 'refresh')
@@ -351,18 +398,25 @@ export async function refreshAccessToken(
   const newTokenPair = await generateTokenPair(
     validation.userId!,
     validation.role!,
-    clientInfo
+    clientInfo,
   )
 
   // Log token refresh event
-  await logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, validation.userId!, {
-    oldTokenId: validation.tokenId!,
-    newAccessTokenId: extractTokenId(newTokenPair.accessToken),
-    newRefreshTokenId: extractTokenId(newTokenPair.refreshToken),
-  })
+  await logSecurityEvent(
+    SecurityEventType.TOKEN_REFRESHED,
+    validation.userId!,
+    {
+      oldTokenId: validation.tokenId!,
+      newAccessTokenId: extractTokenId(newTokenPair.accessToken),
+      newRefreshTokenId: extractTokenId(newTokenPair.refreshToken),
+    },
+  )
 
   // Update Phase 6 MCP server with refresh progress
-  await updatePhase6AuthenticationProgress(validation.userId!, 'token_refreshed')
+  await updatePhase6AuthenticationProgress(
+    validation.userId!,
+    'token_refreshed',
+  )
 
   return newTokenPair
 }
@@ -370,7 +424,10 @@ export async function refreshAccessToken(
 /**
  * Revoke token and clean up
  */
-export async function revokeToken(tokenId: string, reason: string): Promise<void> {
+export async function revokeToken(
+  tokenId: string,
+  reason: string,
+): Promise<void> {
   // Mark token as revoked in Redis
   await markTokenRevoked(tokenId, reason)
 
@@ -418,10 +475,14 @@ export async function cleanupExpiredTokens(): Promise<{
       cleanedCount++
 
       // Log cleanup event
-      await logSecurityEvent(SecurityEventType.TOKEN_CLEANED_UP, metadata.userId, {
-        tokenId: metadata.id || key.replace('token:', ''),
-        reason: 'expired_cleanup',
-      })
+      await logSecurityEvent(
+        SecurityEventType.TOKEN_CLEANED_UP,
+        metadata.userId,
+        {
+          tokenId: metadata.id || key.replace('token:', ''),
+          reason: 'expired_cleanup',
+        },
+      )
     }
   }
 
@@ -437,7 +498,7 @@ export async function cleanupExpiredTokens(): Promise<{
  */
 export async function measureTokenOperation<T>(
   operation: () => Promise<T>,
-  operationName: string
+  operationName: string,
 ): Promise<T> {
   const start = performance.now()
 
@@ -447,13 +508,18 @@ export async function measureTokenOperation<T>(
 
     // Log performance metrics
     if (duration > 100) {
-      console.warn(`Token operation ${operationName} took ${duration.toFixed(2)}ms`)
+      console.warn(
+        `Token operation ${operationName} took ${duration.toFixed(2)}ms`,
+      )
     }
 
     return result
   } catch (error) {
     const duration = performance.now() - start
-    console.error(`Token operation ${operationName} failed after ${duration.toFixed(2)}ms:`, error)
+    console.error(
+      `Token operation ${operationName} failed after ${duration.toFixed(2)}ms:`,
+      error,
+    )
     throw error
   }
 }

@@ -50,9 +50,13 @@ export function securePathJoin(
     allowAbsolute?: boolean
     allowedExtensions?: string[]
     maxDepth?: number
-  } = {}
+  } = {},
 ): string {
-  const { allowAbsolute = false, allowedExtensions = [], maxDepth = 10 } = options
+  const {
+    allowAbsolute = false,
+    allowedExtensions = [],
+    maxDepth = 10,
+  } = options
 
   // Reject absolute paths unless explicitly allowed
   if (!allowAbsolute && path.isAbsolute(userPath)) {
@@ -60,7 +64,11 @@ export function securePathJoin(
   }
 
   // Reject paths with .. segments (directory traversal)
-  if (userPath.includes('..') || userPath.includes('../') || userPath.includes('..\\')) {
+  if (
+    userPath.includes('..') ||
+    userPath.includes('../') ||
+    userPath.includes('..\\')
+  ) {
     throw new Error('Directory traversal sequences (..) are not allowed')
   }
 
@@ -71,7 +79,9 @@ export function securePathJoin(
   }
 
   // Check depth limit
-  const segments = userPath.split(/[/\\]/).filter(segment => segment.length > 0)
+  const segments = userPath
+    .split(/[/\\]/)
+    .filter((segment) => segment.length > 0)
   if (segments.length > maxDepth) {
     throw new Error(`Path depth exceeds maximum allowed depth of ${maxDepth}`)
   }
@@ -80,7 +90,9 @@ export function securePathJoin(
   if (allowedExtensions.length > 0) {
     const ext = path.extname(userPath).toLowerCase()
     if (!allowedExtensions.includes(ext)) {
-      throw new Error(`File extension '${ext}' is not allowed. Allowed extensions: ${allowedExtensions.join(', ')}`)
+      throw new Error(
+        `File extension '${ext}' is not allowed. Allowed extensions: ${allowedExtensions.join(', ')}`,
+      )
     }
   }
 
@@ -89,8 +101,13 @@ export function securePathJoin(
   const resolvedBase = path.resolve(basePath)
 
   // Verify the resolved path starts with the base path
-  if (!resolvedPath.startsWith(resolvedBase + path.sep) && resolvedPath !== resolvedBase) {
-    throw new Error('Path traversal detected: resolved path escapes base directory')
+  if (
+    !resolvedPath.startsWith(resolvedBase + path.sep) &&
+    resolvedPath !== resolvedBase
+  ) {
+    throw new Error(
+      'Path traversal detected: resolved path escapes base directory',
+    )
   }
 
   return resolvedPath
@@ -105,14 +122,18 @@ export function securePathJoin(
  */
 export function validateFilename(
   filename: string,
-  allowedPattern: RegExp = /^[a-zA-Z0-9._-]+$/
+  allowedPattern: RegExp = /^[a-zA-Z0-9._-]+$/,
 ): string {
   if (!allowedPattern.test(filename)) {
     throw new Error('Filename contains invalid characters')
   }
 
   // Additional checks for common attack vectors
-  if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+  if (
+    filename.includes('..') ||
+    filename.includes('/') ||
+    filename.includes('\\')
+  ) {
     throw new Error('Filename contains path traversal sequences')
   }
 

@@ -326,18 +326,30 @@ const deletionReasons = [
 <script>
   // Toggle data categories visibility based on deletion scope selection
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
-    const scopeAllRadio = document.getElementById('scope-all') as HTMLInputElement | null
-    const scopeSpecificRadio = document.getElementById('scope-specific') as HTMLInputElement | null
+    const scopeAllRadio = document.getElementById(
+      'scope-all',
+    ) as HTMLInputElement | null
+    const scopeSpecificRadio = document.getElementById(
+      'scope-specific',
+    ) as HTMLInputElement | null
     const dataCategoriesContainer = document.getElementById(
       'data-categories-container',
     )
     const dataCategoryCheckboxes = document.querySelectorAll(
       'input[name="data-categories"]',
     )
-    const form = document.getElementById('deletion-request-form') as HTMLFormElement | null
+    const form = document.getElementById(
+      'deletion-request-form',
+    ) as HTMLFormElement | null
     const cancelButton = document.getElementById('cancel-button')
 
-    if (!scopeAllRadio || !scopeSpecificRadio || !dataCategoriesContainer || !form || !cancelButton) {
+    if (
+      !scopeAllRadio ||
+      !scopeSpecificRadio ||
+      !dataCategoriesContainer ||
+      !form ||
+      !cancelButton
+    ) {
       console.error('Required DOM elements not found')
       return
     }
@@ -348,13 +360,13 @@ const deletionReasons = [
         dataCategoriesContainer?.classList.remove('hidden')
         // Make at least one category required when specific is selected
         dataCategoryCheckboxes.forEach((checkbox) => {
-          (checkbox as HTMLInputElement).setAttribute('required', 'required')
+          ;(checkbox as HTMLInputElement).setAttribute('required', 'required')
         })
       } else {
         dataCategoriesContainer?.classList.add('hidden')
         // Remove required attribute when "All" is selected
         dataCategoryCheckboxes.forEach((checkbox) => {
-          (checkbox as HTMLInputElement).removeAttribute('required')
+          ;(checkbox as HTMLInputElement).removeAttribute('required')
         })
       }
     }
@@ -374,12 +386,12 @@ const deletionReasons = [
 
       if (atLeastOneChecked) {
         dataCategoryCheckboxes.forEach((checkbox) => {
-          (checkbox as HTMLInputElement).removeAttribute('required')
+          ;(checkbox as HTMLInputElement).removeAttribute('required')
         })
       } else {
         dataCategoryCheckboxes.forEach((checkbox) => {
           if (scopeSpecificRadio?.checked) {
-            (checkbox as HTMLInputElement).setAttribute('required', 'required')
+            ;(checkbox as HTMLInputElement).setAttribute('required', 'required')
           }
         })
       }
@@ -417,9 +429,11 @@ const deletionReasons = [
 
       try {
         // Show loading state
-        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+        const submitButton = form.querySelector(
+          'button[type="submit"]',
+        ) as HTMLButtonElement | null
         if (!submitButton) return
-        
+
         const originalButtonText = submitButton.innerHTML
         submitButton.disabled = true
         submitButton.innerHTML =
@@ -476,7 +490,9 @@ const deletionReasons = [
         }
 
         // Reset button
-        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+        const submitButton = form.querySelector(
+          'button[type="submit"]',
+        ) as HTMLButtonElement | null
         if (submitButton) {
           const originalButtonText = submitButton.innerHTML
           submitButton.disabled = false

@@ -1,5 +1,11 @@
 import { defineConfig, devices } from '@playwright/test'
-import { isCI, getBaseUrl, getDevCommand, getDevPort, shouldReuseServer } from '../utils/env'
+import {
+  isCI,
+  getBaseUrl,
+  getDevCommand,
+  getDevPort,
+  shouldReuseServer,
+} from '../utils/env'
 
 /**
  * Playwright configuration for accessibility testing

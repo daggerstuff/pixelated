@@ -1,6 +1,6 @@
 /**
  * Phase 3: Comprehensive Service Integration Testing & Performance Optimization
- * 
+ *
  * This module provides comprehensive testing of cross-service communication,
  * performance benchmarking, and production readiness validation.
  */
@@ -60,7 +60,7 @@ export class Phase3IntegrationTester {
       host: process.env['REDIS_HOST'] || 'localhost',
       port: parseInt(process.env['REDIS_PORT'] || '6379'),
       retryAttempts: 3,
-      retryDelay: 1000
+      retryDelay: 1000,
     })
     this.notificationService = new NotificationService()
     this.contactService = new ContactService()
@@ -82,7 +82,7 @@ export class Phase3IntegrationTester {
       errorRecovery: false,
       concurrencyHandling: false,
       memoryManagement: false,
-      productionReadiness: false
+      productionReadiness: false,
     }
 
     logger.info('Starting Phase 3: Service Integration & Performance Testing')
@@ -95,7 +95,8 @@ export class Phase3IntegrationTester {
 
       // 2. Cross-Service Communication
       const commStart = Date.now()
-      results.crossServiceCommunication = await this.testCrossServiceCommunication()
+      results.crossServiceCommunication =
+        await this.testCrossServiceCommunication()
       serviceTimings.crossServiceCommunication = Date.now() - commStart
 
       // 3. Performance Benchmarks
@@ -115,7 +116,8 @@ export class Phase3IntegrationTester {
       const concurrencyStart = Date.now()
       const concurrencyResults = await this.testConcurrencyHandling()
       results.concurrencyHandling = concurrencyResults.success
-      throughputMetrics.concurrentOperations = concurrencyResults.operationsPerSecond
+      throughputMetrics.concurrentOperations =
+        concurrencyResults.operationsPerSecond
       serviceTimings.concurrencyHandling = Date.now() - concurrencyStart
 
       // 6. Memory Management
@@ -133,23 +135,32 @@ export class Phase3IntegrationTester {
       results.productionReadiness = prodResults.success
       recommendations.push(...prodResults.recommendations)
       serviceTimings.productionReadiness = Date.now() - prodStart
-
     } catch (error: unknown) {
-      errors.push(`Phase 3 integration test failed: ${error instanceof Error ? String(error) : String(error)}`)
+      errors.push(
+        `Phase 3 integration test failed: ${error instanceof Error ? String(error) : String(error)}`,
+      )
     }
 
     const totalTime = Date.now() - startTime
-    const success = Object.values(results).every(result => result === true) && errors.length === 0
+    const success =
+      Object.values(results).every((result) => result === true) &&
+      errors.length === 0
 
     // Generate performance recommendations
     if (serviceTimings.crossServiceCommunication > 5000) {
-      recommendations.push('Cross-service communication is slow (>5s). Consider optimizing API calls or adding caching.')
+      recommendations.push(
+        'Cross-service communication is slow (>5s). Consider optimizing API calls or adding caching.',
+      )
     }
     if (throughputMetrics.apiRequests < 100) {
-      recommendations.push('API throughput is low (<100 req/s). Consider connection pooling and request optimization.')
+      recommendations.push(
+        'API throughput is low (<100 req/s). Consider connection pooling and request optimization.',
+      )
     }
     if (memoryUsage.peak > memoryUsage.baseline * 3) {
-      recommendations.push('Memory usage spikes significantly. Implement better memory management and garbage collection.')
+      recommendations.push(
+        'Memory usage spikes significantly. Implement better memory management and garbage collection.',
+      )
     }
 
     logger.info('Phase 3 integration test completed', {
@@ -157,7 +168,7 @@ export class Phase3IntegrationTester {
       totalTime,
       results,
       errorCount: errors.length,
-      recommendationCount: recommendations.length
+      recommendationCount: recommendations.length,
     })
 
     return {
@@ -168,10 +179,10 @@ export class Phase3IntegrationTester {
         totalTime,
         serviceTimings,
         throughputMetrics,
-        memoryUsage
+        memoryUsage,
       },
       errors,
-      recommendations
+      recommendations,
     }
   }
 
@@ -186,23 +197,24 @@ export class Phase3IntegrationTester {
         this.analyticsService.healthCheck?.() || Promise.resolve(true),
         this.notificationService.healthCheck?.() || Promise.resolve(true),
         this.contactService.healthCheck?.() || Promise.resolve(true),
-        this.emailService.healthCheck?.() || Promise.resolve(true)
+        this.emailService.healthCheck?.() || Promise.resolve(true),
       ])
 
-      const healthResults = healthChecks.map(result => 
-        result.status === 'fulfilled' ? result.value : false
+      const healthResults = healthChecks.map((result) =>
+        result.status === 'fulfilled' ? result.value : false,
       )
 
-      const allHealthy = healthResults.every(result => result === true)
-      
+      const allHealthy = healthResults.every((result) => result === true)
+
       if (!allHealthy) {
         logger.warn('Some services are unhealthy', { healthResults })
       }
 
       return allHealthy
-
     } catch (error: unknown) {
-      logger.error('Service health check failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Service health check failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return false
     }
   }
@@ -212,12 +224,20 @@ export class Phase3IntegrationTester {
       logger.info('Testing cross-service communication...')
 
       const userId = 'phase3-test-user-' + Date.now()
-      const sessionText = 'I have been feeling overwhelmed with work stress and anxiety lately'
+      const sessionText =
+        'I have been feeling overwhelmed with work stress and anxiety lately'
 
       // 1. Emotion Analysis
-      const emotionResult = await (this.emotionMapper as unknown as { analyzeText?: (text: string, opts: Record<string, unknown>) => Promise<unknown> })?.analyzeText?.(sessionText, {
+      const emotionResult = await (
+        this.emotionMapper as unknown as {
+          analyzeText?: (
+            text: string,
+            opts: Record<string, unknown>,
+          ) => Promise<unknown>
+        }
+      )?.analyzeText?.(sessionText, {
         depth: 'detailed',
-        sessionId: 'phase3-cross-test'
+        sessionId: 'phase3-cross-test',
       })
 
       // 2. Store emotion analysis in memory
@@ -229,16 +249,16 @@ export class Phase3IntegrationTester {
           metadata: {
             sessionId: 'phase3-cross-test',
             analysisType: 'emotion',
-            timestamp: Date.now()
-          }
-        }
+            timestamp: Date.now(),
+          },
+        },
       )
 
       // 3. Bias detection analysis
       const biasResult = await this.biasEngine.analyzeSession({
         messages: [{ content: sessionText, role: 'user' }],
         sessionId: 'phase3-cross-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
 
       // 4. Store bias analysis
@@ -250,9 +270,9 @@ export class Phase3IntegrationTester {
           metadata: {
             sessionId: 'phase3-cross-test',
             analysisType: 'bias',
-            timestamp: Date.now()
-          }
-        }
+            timestamp: Date.now(),
+          },
+        },
       )
 
       // 5. Track analytics event
@@ -263,8 +283,8 @@ export class Phase3IntegrationTester {
         timestamp: Date.now(),
         metadata: {
           emotionPrimary: emotionResult['primary'],
-          biasScore: biasResult['biasScore']
-        }
+          biasScore: biasResult['biasScore'],
+        },
       })
 
       // 6. Send notification if high bias detected
@@ -274,29 +294,34 @@ export class Phase3IntegrationTester {
           userId,
           title: 'High Bias Detected',
           message: `Bias score: ${biasResult['biasScore']}`,
-          priority: 'high'
+          priority: 'high',
         })
       }
 
       // 7. Encrypt sensitive data
       await fheService.initialize({
         mode: EncryptionMode.STANDARD,
-        securityLevel: 'medium'
+        securityLevel: 'medium',
       })
-      const encryptedData = await fheService.encrypt(JSON.stringify({
-        emotion: emotionResult,
-        bias: biasResult
-      }))
+      const encryptedData = await fheService.encrypt(
+        JSON.stringify({
+          emotion: emotionResult,
+          bias: biasResult,
+        }),
+      )
 
       // Verify all operations succeeded
-      return emotionMemory['id'] !== undefined &&
-             biasMemory['id'] !== undefined &&
-             emotionResult['primary'] !== undefined &&
-             biasResult['biasScore'] !== undefined &&
-             encryptedData !== sessionText
-
+      return (
+        emotionMemory['id'] !== undefined &&
+        biasMemory['id'] !== undefined &&
+        emotionResult['primary'] !== undefined &&
+        biasResult['biasScore'] !== undefined &&
+        encryptedData !== sessionText
+      )
     } catch (error: unknown) {
-      logger.error('Cross-service communication test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Cross-service communication test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return false
     }
   }
@@ -312,14 +337,14 @@ export class Phase3IntegrationTester {
       // API Throughput Test
       const apiStartTime = Date.now()
       const apiOperations = []
-      
+
       for (let i = 0; i < 100; i++) {
-        (apiOperations as unknown[]).push(
+        ;(apiOperations as unknown[]).push(
           this.memoryService.createMemory(`Performance test ${i}`, {
             userId: `perf-user-${i}`,
             tags: ['performance-test'],
-            metadata: { testRun: Date.now() }
-          })
+            metadata: { testRun: Date.now() },
+          }),
         )
       }
 
@@ -332,11 +357,18 @@ export class Phase3IntegrationTester {
       const dataOperations = []
 
       for (let i = 0; i < 50; i++) {
-        (dataOperations as unknown[]).push(
-          (this.emotionMapper as unknown as { analyzeText: (text: string, opts: Record<string, unknown>) => Promise<unknown> })['analyzeText'](`Test message ${i} with various emotional content`, {
+        ;(dataOperations as unknown[]).push(
+          (
+            this.emotionMapper as unknown as {
+              analyzeText: (
+                text: string,
+                opts: Record<string, unknown>,
+              ) => Promise<unknown>
+            }
+          )['analyzeText'](`Test message ${i} with various emotional content`, {
             depth: 'basic',
-            sessionId: `perf-session-${i}`
-          })
+            sessionId: `perf-session-${i}`,
+          }),
         )
       }
 
@@ -349,21 +381,22 @@ export class Phase3IntegrationTester {
       logger.info('Performance benchmarks completed', {
         apiThroughput,
         dataProcessingRate,
-        success
+        success,
       })
 
       return {
         success,
         apiThroughput,
-        dataProcessingRate
+        dataProcessingRate,
       }
-
     } catch (error: unknown) {
-      logger.error('Performance benchmark test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Performance benchmark test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return {
         success: false,
         apiThroughput: 0,
-        dataProcessingRate: 0
+        dataProcessingRate: 0,
       }
     }
   }
@@ -380,11 +413,14 @@ export class Phase3IntegrationTester {
         await this.memoryService.createMemory('', { userId: '', tags: [] }) // Invalid data
       } catch {
         // Expected error - test if service can continue after error
-        const recovery = await this.memoryService.createMemory('Recovery test', {
-          userId: 'recovery-user',
-          tags: ['recovery-test'],
-          metadata: { test: 'error-recovery' }
-        })
+        const recovery = await this.memoryService.createMemory(
+          'Recovery test',
+          {
+            userId: 'recovery-user',
+            tags: ['recovery-test'],
+            metadata: { test: 'error-recovery' },
+          },
+        )
         if (!recovery?.['id']) {
           recoverySuccess = false
         }
@@ -394,7 +430,11 @@ export class Phase3IntegrationTester {
       try {
         await this.redisService.disconnect()
         await this.redisService.connect()
-        const testValue = await this.redisService.set('recovery-test', 'success', 1000)
+        const testValue = await this.redisService.set(
+          'recovery-test',
+          'success',
+          1000,
+        )
         if (testValue === undefined || testValue === null) {
           recoverySuccess = false
         }
@@ -403,9 +443,10 @@ export class Phase3IntegrationTester {
       }
 
       return recoverySuccess
-
     } catch (error: unknown) {
-      logger.error('Error recovery test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Error recovery test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return false
     }
   }
@@ -422,28 +463,32 @@ export class Phase3IntegrationTester {
 
       // Create 50 concurrent operations across different services
       for (let i = 0; i < 50; i++) {
-        (concurrentOperations as unknown[]).push(
+        ;(concurrentOperations as unknown[]).push(
           Promise.all([
             this.memoryService.createMemory(`Concurrent test ${i}`, {
               userId: `concurrent-user-${i}`,
               tags: ['concurrency-test'],
-              metadata: { index: i }
+              metadata: { index: i },
             }),
             this.analyticsService.trackEvent({
               type: 'concurrency_test' as unknown as string,
               userId: `concurrent-user-${i}`,
               timestamp: Date.now(),
-              metadata: { index: i }
+              metadata: { index: i },
             }),
-            this.redisService.set(`concurrent-key-${i}`, `value-${i}`, 5000)
-          ])
+            this.redisService.set(`concurrent-key-${i}`, `value-${i}`, 5000),
+          ]),
         )
       }
 
       const results = await Promise.allSettled(concurrentOperations)
-      const successfulOperations = results.filter(result => result['status'] === 'fulfilled').length
+      const successfulOperations = results.filter(
+        (result) => result['status'] === 'fulfilled',
+      ).length
       const duration = Date.now() - startTime
-      const operationsPerSecond = Math.round((successfulOperations * 1000) / duration)
+      const operationsPerSecond = Math.round(
+        (successfulOperations * 1000) / duration,
+      )
 
       const success = successfulOperations >= 45 && operationsPerSecond > 20 // 90% success rate minimum
 
@@ -451,19 +496,20 @@ export class Phase3IntegrationTester {
         successfulOperations,
         totalOperations: 50,
         operationsPerSecond,
-        success
+        success,
       })
 
       return {
         success,
-        operationsPerSecond
+        operationsPerSecond,
       }
-
     } catch (error: unknown) {
-      logger.error('Concurrency handling test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Concurrency handling test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return {
         success: false,
-        operationsPerSecond: 0
+        operationsPerSecond: 0,
       }
     }
   }
@@ -489,11 +535,21 @@ export class Phase3IntegrationTester {
       // Create memory-intensive operations
       const memoryOperations = []
       for (let i = 0; i < 100; i++) {
-        (memoryOperations as unknown[]).push(
-          (this.emotionMapper as unknown as { analyzeText: (text: string, opts: Record<string, unknown>) => Promise<unknown> })['analyzeText'](`Memory test ${i} with extensive emotional analysis content that should consume significant memory during processing`, {
-            depth: 'detailed',
-            sessionId: `memory-test-${i}`
-          })
+        ;(memoryOperations as unknown[]).push(
+          (
+            this.emotionMapper as unknown as {
+              analyzeText: (
+                text: string,
+                opts: Record<string, unknown>,
+              ) => Promise<unknown>
+            }
+          )['analyzeText'](
+            `Memory test ${i} with extensive emotional analysis content that should consume significant memory during processing`,
+            {
+              depth: 'detailed',
+              sessionId: `memory-test-${i}`,
+            },
+          ),
         )
       }
 
@@ -506,7 +562,7 @@ export class Phase3IntegrationTester {
       }
 
       // Wait for cleanup
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       const afterCleanupMemory = getMemoryUsage()
 
       const memoryIncrease = peakMemory - baselineMemory
@@ -521,23 +577,24 @@ export class Phase3IntegrationTester {
         afterCleanupMemory: Math.round(afterCleanupMemory),
         memoryIncrease: Math.round(memoryIncrease),
         recoveryRate: Math.round(recoveryRate * 100),
-        success
+        success,
       })
 
       return {
         success,
         baselineMemory: Math.round(baselineMemory),
         peakMemory: Math.round(peakMemory),
-        afterCleanupMemory: Math.round(afterCleanupMemory)
+        afterCleanupMemory: Math.round(afterCleanupMemory),
       }
-
     } catch (error: unknown) {
-      logger.error('Memory management test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Memory management test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return {
         success: false,
         baselineMemory: 0,
         peakMemory: 0,
-        afterCleanupMemory: 0
+        afterCleanupMemory: 0,
       }
     }
   }
@@ -557,7 +614,9 @@ export class Phase3IntegrationTester {
       if (process.env['NODE_ENV'] === 'production') {
         readinessScore += 1
       } else {
-        recommendations.push('Set NODE_ENV=production for production deployment')
+        recommendations.push(
+          'Set NODE_ENV=production for production deployment',
+        )
       }
 
       // Check Redis configuration
@@ -578,7 +637,9 @@ export class Phase3IntegrationTester {
       if (process.env['JWT_SECRET'] && process.env['ENCRYPTION_KEY']) {
         readinessScore += 2
       } else {
-        recommendations.push('Configure JWT_SECRET and ENCRYPTION_KEY for security')
+        recommendations.push(
+          'Configure JWT_SECRET and ENCRYPTION_KEY for security',
+        )
       }
 
       // Check database configuration
@@ -622,19 +683,22 @@ export class Phase3IntegrationTester {
         readinessScore,
         maxScore,
         success,
-        recommendationCount: recommendations.length
+        recommendationCount: recommendations.length,
       })
 
       return {
         success,
-        recommendations
+        recommendations,
       }
-
     } catch (error: unknown) {
-      logger.error('Production readiness test failed:', { error: error instanceof Error ? String(error) : String(error) })
+      logger.error('Production readiness test failed:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       return {
         success: false,
-        recommendations: ['Production readiness test failed - check system configuration']
+        recommendations: [
+          'Production readiness test failed - check system configuration',
+        ],
       }
     }
   }

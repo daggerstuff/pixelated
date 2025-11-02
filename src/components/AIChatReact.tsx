@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import type { AIModel } from '../lib/ai/models/types'
 
 interface Message {
-  id: string; // Add unique ID to each message
+  id: string // Add unique ID to each message
   role: 'user' | 'assistant'
   content: string
 }
@@ -17,7 +17,8 @@ export interface AIChatReactProps {
 }
 
 // Helper function to generate unique IDs
-const generateId = () => `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+const generateId = () =>
+  `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
 export default function AIChatReact({
   availableModels,

@@ -19,7 +19,10 @@ vi.mock('@/lib/utils/logger', () => ({
 vi.mock('@/config/env.config')
 
 // --- Mock for 'ws' module ---
-const mockWssEventHandlers = new Map<string, Array<(event?: any, ...args: any[]) => void>>()
+const mockWssEventHandlers = new Map<
+  string,
+  Array<(event?: any, ...args: any[]) => void>
+>()
 
 const mockWssInstance = {
   on: vi.fn((event: string, handler: (event?: any, ...args: any[]) => void) => {
@@ -31,7 +34,7 @@ const mockWssInstance = {
   close: vi.fn(),
   emit: vi.fn((event: string, ...args: any[]) => {
     const handlers = mockWssEventHandlers.get(event) || []
-    handlers.forEach(handler => handler(...args))
+    handlers.forEach((handler) => handler(...args))
   }),
   // Add other methods if used by worker
 }

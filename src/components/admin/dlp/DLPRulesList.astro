@@ -2,12 +2,12 @@
 // DLPRulesList.astro
 // Displays the list of DLP rules with toggle controls
 
-import Badge from '../../ui/Badge.astro';
-import Card from '../../ui/Card.astro';
-import CardContent from '../../ui/CardContent.astro';
-import CardDescription from '../../ui/CardDescription.astro';
-import CardHeader from '../../ui/CardHeader.astro';
-import CardTitle from '../../ui/CardTitle.astro';
+import Badge from '../../ui/Badge.astro'
+import Card from '../../ui/Card.astro'
+import CardContent from '../../ui/CardContent.astro'
+import CardDescription from '../../ui/CardDescription.astro'
+import CardHeader from '../../ui/CardHeader.astro'
+import CardTitle from '../../ui/CardTitle.astro'
 import { Switch } from '../../ui/switch'
 import Button from '../../ui/Button.astro'
 import { DLPAction, type DLPRule } from '../../../lib/security/dlp'
@@ -57,7 +57,7 @@ const getActionBadge = (action: DLPAction) => {
     ) : (
       <div class="space-y-4">
         {rules.map((ruleItem: DLPRule) => {
-          const actionBadge = getActionBadge(ruleItem.action as DLPAction);
+          const actionBadge = getActionBadge(ruleItem.action as DLPAction)
           return (
             <div class="rule-card">
               <Card>
@@ -77,27 +77,33 @@ const getActionBadge = (action: DLPAction) => {
                         data-rule-name={ruleItem.name}
                         className="toggle-rule"
                         onCheckedChange={(isChecked: boolean) => {
-                          const ruleId = ruleItem.id;
-                          const ruleName = ruleItem.name;
+                          const ruleId = ruleItem.id
+                          const ruleName = ruleItem.name
 
                           // Update rule in the service
-                          const allRules = dlpService.getRules();
-                          const existingRule = allRules.find(r => r.id === ruleId);
+                          const allRules = dlpService.getRules()
+                          const existingRule = allRules.find(
+                            (r) => r.id === ruleId,
+                          )
 
                           if (existingRule) {
                             const updatedRule: DLPRule = {
                               ...existingRule,
-                              isActive: isChecked
-                            };
-                            dlpService.removeRule(ruleId);
-                            dlpService.addRule(updatedRule);
-                            
+                              isActive: isChecked,
+                            }
+                            dlpService.removeRule(ruleId)
+                            dlpService.addRule(updatedRule)
+
                             // Dispatch event for the parent component to handle
                             document.dispatchEvent(
                               new CustomEvent('dlp:rule-updated', {
-                                detail: { id: ruleId, name: ruleName, isActive: isChecked },
+                                detail: {
+                                  id: ruleId,
+                                  name: ruleName,
+                                  isActive: isChecked,
+                                },
                               }),
-                            );
+                            )
                           }
                         }}
                       />
@@ -146,49 +152,53 @@ const getActionBadge = (action: DLPAction) => {
 
 <!-- Import the TypeScript file for client-side logic -->
 <script>
-  import './DLPRules';
+  import './DLPRules'
 
   // Set up event listeners when the component mounts
   document.addEventListener('astro:mount', (_event: Event) => {
     // Set up edit handlers
     document.querySelectorAll('[data-edit-rule]').forEach((button) => {
       button.addEventListener('click', (event: Event) => {
-        const target = event.currentTarget as HTMLElement;
-        const ruleData = target.getAttribute('data-rule');
+        const target = event.currentTarget as HTMLElement
+        const ruleData = target.getAttribute('data-rule')
 
-        if (!ruleData) return;
+        if (!ruleData) return
 
         try {
           // Switch to the editor tab
-          const editorTab = document.querySelector('[data-tab="editor"]') as HTMLElement;
+          const editorTab = document.querySelector(
+            '[data-tab="editor"]',
+          ) as HTMLElement
           if (editorTab) {
-            editorTab.click();
+            editorTab.click()
           }
 
           // Populate the editor form
-          const editor = document.querySelector('dlp-rule-editor');
+          const editor = document.querySelector('dlp-rule-editor')
           if (editor) {
-            editor.setAttribute('data-rule', ruleData);
+            editor.setAttribute('data-rule', ruleData)
           }
         } catch (error) {
-          console.error('Error parsing rule data:', error);
+          console.error('Error parsing rule data:', error)
         }
-      });
-    });
+      })
+    })
 
     // Set up new rule button
-    const newRuleButton = document.querySelector('[data-new-rule]');
+    const newRuleButton = document.querySelector('[data-new-rule]')
     if (newRuleButton) {
       newRuleButton.addEventListener('click', (_event: Event) => {
         // Switch to the editor tab
-        const editorTab = document.querySelector('[data-tab="editor"]') as HTMLElement;
+        const editorTab = document.querySelector(
+          '[data-tab="editor"]',
+        ) as HTMLElement
         if (editorTab) {
-          editorTab.click();
+          editorTab.click()
         }
 
         // Dispatch event to reset the form
-        document.dispatchEvent(new CustomEvent('dlp:new-rule'));
-      });
+        document.dispatchEvent(new CustomEvent('dlp:new-rule'))
+      })
     }
-  });
+  })
 </script>

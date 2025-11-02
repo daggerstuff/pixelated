@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'ai'))
 from pixel_voice.audio_quality_control import compute_quality_metrics
 from pydub import AudioSegment
 

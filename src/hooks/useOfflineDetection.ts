@@ -39,7 +39,10 @@ export function useOfflineDetection({
     if (typeof navigator === 'undefined') return
 
     const isOnline = navigator.onLine
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection
 
     setNetworkState({
       isOnline,
@@ -87,7 +90,11 @@ export function useOfflineDetection({
     }
   }, [updateNetworkState, enableNetworkInfo])
 
-  const getConnectionQuality = useCallback((): 'slow' | 'moderate' | 'fast' | 'unknown' => {
+  const getConnectionQuality = useCallback(():
+    | 'slow'
+    | 'moderate'
+    | 'fast'
+    | 'unknown' => {
     if (!networkState.isOnline) return 'unknown'
 
     const { effectiveType, downlink, rtt } = networkState

@@ -5,9 +5,7 @@ interface MindMirrorDemoProps {
   className?: string
 }
 
-export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({
-  className = ""
-}) => {
+export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
   return (
     <div className={`w-full ${className}`}>
       <MentalHealthChatDemo

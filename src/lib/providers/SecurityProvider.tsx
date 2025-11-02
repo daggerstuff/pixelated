@@ -150,7 +150,7 @@ export function SecurityProvider({
       }
     } catch (error: unknown) {
       console.error('Failed to change security level:', error)
-      throw new Error('Security level change failed')
+      throw new Error('Security level change failed', { cause: error })
     }
   }
 
@@ -170,7 +170,7 @@ export function SecurityProvider({
       }))
     } catch (error: unknown) {
       console.error('Key rotation failed:', error)
-      throw new Error('Key rotation failed')
+      throw new Error('Key rotation failed', { cause: error })
     }
   }
 

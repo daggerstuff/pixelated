@@ -2,14 +2,15 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('bias-detection-api')
 
-export const GET = async ({ request }: { request: Request }): Promise<Response> => {
+export const GET = async ({
+  request,
+}: {
+  request: Request
+}): Promise<Response> => {
   const startTime = Date.now()
-  
+
   try {
     // Parse URL parameters
-    
-    
-    
 
     // Return mock dashboard data matching test expectations
     const mockDashboardData = {
@@ -177,16 +178,19 @@ export const GET = async ({ request }: { request: Request }): Promise<Response> 
 
     const processingTime = Math.max(Date.now() - startTime, 1) // Ensure > 0
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: mockDashboardData,
-      processingTime,
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: mockDashboardData,
+        processingTime,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   } catch (error: unknown) {
     logger.error('Error fetching dashboard data:', error)
 

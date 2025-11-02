@@ -7,7 +7,7 @@ import { Pool, PoolClient, PoolConfig } from 'pg'
 import { EventEmitter } from 'events'
 import { getLogger } from '@/lib/logging'
 
-const logger = getLogger('connection-pool')
+const logger = getLogger('connection-pool') as any
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -60,7 +60,10 @@ interface PoolEvents {
   'connection-error': [error: Error, client?: PoolClient]
   'pool-exhausted': []
   'slow-query': [query: string, duration: number]
-  'health-changed': [score: number, status: 'healthy' | 'degraded' | 'unhealthy']
+  'health-changed': [
+    score: number,
+    status: 'healthy' | 'degraded' | 'unhealthy',
+  ]
   'failover-activated': [host: string]
   'metrics-updated': [metrics: PoolMetrics]
 }
@@ -75,7 +78,11 @@ export class OptimizedConnectionPool extends EventEmitter {
   private healthCheckTimer?: NodeJS.Timeout
   private metricsTimer?: NodeJS.Timeout
   private startTime: number
-  private queryStats: Array<{ duration: number; success: boolean; timestamp: number }> = []
+  private queryStats: Array<{
+    duration: number
+    success: boolean
+    timestamp: number
+  }> = []
 
   constructor(config: Partial<OptimizedPoolConfig> = {}) {
     super()
@@ -94,7 +101,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       slowQueryThreshold: 1000, // 1 second
       retryAttempts: 3,
       retryDelay: 1000,
-      ...config
+      ...config,
     }
 
     // Initialize metrics
@@ -111,7 +118,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       slowQueries: 0,
       poolUptime: 0,
       lastReset: new Date(),
-      healthScore: 100
+      healthScore: 100,
     }
 
     this.initializePool()
@@ -136,7 +143,10 @@ export class OptimizedConnectionPool extends EventEmitter {
 
       this.pool.on('remove', (client) => {
         logger.debug('Client removed from pool')
-        this.metrics.totalConnections = Math.max(0, this.metrics.totalConnections - 1)
+        this.metrics.totalConnections = Math.max(
+          0,
+          this.metrics.totalConnections - 1,
+        )
         this.updateMetrics()
         this.emit('connection-released', client)
       })
@@ -151,10 +161,9 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.info('Connection pool initialized', {
         min: this.config.min,
         max: this.config.max,
-        host: this.config.host,
-        database: this.config.database
+        host: this.config.host || 'localhost',
+        database: this.config.database || 'pixelated',
       })
-
     } catch (error) {
       logger.error('Failed to initialize connection pool', { error })
       throw error
@@ -175,7 +184,10 @@ export class OptimizedConnectionPool extends EventEmitter {
       // Set acquire timeout
       const acquirePromise = this.pool.connect()
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Connection acquire timeout')), this.config.acquireTimeoutMillis)
+        setTimeout(
+          () => reject(new Error('Connection acquire timeout')),
+          this.config.acquireTimeoutMillis,
+        )
       })
 
       const client = await Promise.race([acquirePromise, timeoutPromise])
@@ -186,11 +198,10 @@ export class OptimizedConnectionPool extends EventEmitter {
 
       logger.debug('Client acquired from pool', {
         acquireTime: Date.now() - startTime,
-        activeConnections: this.metrics.activeConnections
+        activeConnections: this.metrics.activeConnections,
       })
 
       return client
-
     } catch (error) {
       this.metrics.waitingClients++
       this.updateMetrics()
@@ -222,9 +233,11 @@ export class OptimizedConnectionPool extends EventEmitter {
         client.release()
       }
 
-      this.metrics.activeConnections = Math.max(0, this.metrics.activeConnections - 1)
+      this.metrics.activeConnections = Math.max(
+        0,
+        this.metrics.activeConnections - 1,
+      )
       this.updateMetrics()
-
     } catch (error) {
       logger.error('Failed to release client', { error })
       this.metrics.failedQueries++
@@ -235,7 +248,10 @@ export class OptimizedConnectionPool extends EventEmitter {
   /**
    * Execute a query with enhanced monitoring
    */
-  async query<T = any>(text: string, params?: any[]): Promise<{ rows: T[]; rowCount: number; duration: number }> {
+  async query<T = any>(
+    text: string,
+    params?: any[],
+  ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
     const startTime = Date.now()
     let client: PoolClient | null = null
 
@@ -260,7 +276,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         logger.warn('Slow query detected', {
           query: text.substring(0, 100),
           duration,
-          params
+          params,
         })
         this.emit('slow-query', text, duration)
       }
@@ -268,9 +284,8 @@ export class OptimizedConnectionPool extends EventEmitter {
       return {
         rows: result.rows,
         rowCount: result.rowCount || 0,
-        duration
+        duration,
       }
-
     } catch (error) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
@@ -278,11 +293,10 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.error('Query execution failed', {
         query: text.substring(0, 100),
         duration,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
 
       throw error
-
     } finally {
       if (client) {
         await this.releaseClient(client)
@@ -293,7 +307,9 @@ export class OptimizedConnectionPool extends EventEmitter {
   /**
    * Execute a transaction with enhanced error handling
    */
-  async transaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
+  async transaction<T>(
+    callback: (client: PoolClient) => Promise<T>,
+  ): Promise<T> {
     const client = await this.acquireClient()
     const startTime = Date.now()
 
@@ -306,7 +322,6 @@ export class OptimizedConnectionPool extends EventEmitter {
       this.recordQueryStats(duration, true)
 
       return result
-
     } catch (error) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
@@ -318,7 +333,6 @@ export class OptimizedConnectionPool extends EventEmitter {
       }
 
       throw error
-
     } finally {
       await this.releaseClient(client)
     }
@@ -341,7 +355,7 @@ export class OptimizedConnectionPool extends EventEmitter {
     }
 
     // Update average query time (moving average)
-    this.metrics.avgQueryTime = (this.metrics.avgQueryTime * 0.9) + (duration * 0.1)
+    this.metrics.avgQueryTime = this.metrics.avgQueryTime * 0.9 + duration * 0.1
 
     // Keep only recent stats for memory management
     if (this.queryStats.length > 1000) {
@@ -398,8 +412,12 @@ export class OptimizedConnectionPool extends EventEmitter {
     this.metrics.healthScore = Math.max(0, Math.min(100, healthScore))
 
     // Emit health change events
-    const status = this.metrics.healthScore > 80 ? 'healthy' :
-                  this.metrics.healthScore > 50 ? 'degraded' : 'unhealthy'
+    const status =
+      this.metrics.healthScore > 80
+        ? 'healthy'
+        : this.metrics.healthScore > 50
+          ? 'degraded'
+          : 'unhealthy'
 
     this.emit('health-changed', this.metrics.healthScore, status)
   }
@@ -441,9 +459,8 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.debug('Health check completed', {
         responseTime,
         healthScore: this.metrics.healthScore,
-        activeConnections: this.metrics.activeConnections
+        activeConnections: this.metrics.activeConnections,
       })
-
     } catch (error) {
       logger.error('Health check failed', { error })
       this.metrics.healthScore = Math.max(0, this.metrics.healthScore - 30)
@@ -494,7 +511,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       healthy: this.metrics.healthScore > 70,
       connections: this.metrics.activeConnections,
       utilization,
-      performance
+      performance,
     }
   }
 
@@ -514,7 +531,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       slowQueries: 0,
       poolUptime: Date.now() - this.startTime,
       lastReset: new Date(),
-      healthScore: 100
+      healthScore: 100,
     }
 
     this.queryStats = []
@@ -576,7 +593,9 @@ export function getConnectionPool(): OptimizedConnectionPool {
 /**
  * Initialize connection pool with custom config
  */
-export function initializeConnectionPool(config?: Partial<OptimizedPoolConfig>): OptimizedConnectionPool {
+export function initializeConnectionPool(
+  config?: Partial<OptimizedPoolConfig>,
+): OptimizedConnectionPool {
   if (connectionPool) {
     logger.warn('Connection pool already initialized, creating new instance')
   }
@@ -595,7 +614,7 @@ export async function optimizedQuery<T = any>(
     timeout?: number
     retries?: number
     client?: PoolClient
-  } = {}
+  } = {},
 ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
   const pool = getConnectionPool()
 
@@ -609,7 +628,7 @@ export async function optimizedQuery<T = any>(
       return {
         rows: result.rows,
         rowCount: result.rowCount || 0,
-        duration
+        duration,
       }
     } catch (error) {
       throw error
@@ -627,7 +646,7 @@ export async function optimizedTransaction<T>(
   options: {
     timeout?: number
     retries?: number
-  } = {}
+  } = {},
 ): Promise<T> {
   const pool = getConnectionPool()
   return pool.transaction(callback)
@@ -653,7 +672,9 @@ export async function monitorPoolPerformance(): Promise<{
   }
 
   if (metrics.avgQueryTime > 1000) {
-    recommendations.push('High query times detected - consider query optimization')
+    recommendations.push(
+      'High query times detected - consider query optimization',
+    )
   }
 
   if (metrics.failedQueries > metrics.totalQueries * 0.1) {
@@ -667,7 +688,7 @@ export async function monitorPoolPerformance(): Promise<{
   return {
     status: status.healthy ? 'healthy' : 'unhealthy',
     metrics,
-    recommendations
+    recommendations,
   }
 }
 

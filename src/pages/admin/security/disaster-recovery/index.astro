@@ -93,7 +93,9 @@ function formatDate(date: Date): string {
 }
 
 // Helper function to get status badge class
-function getStatusBadgeClass(status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development'): string {
+function getStatusBadgeClass(
+  status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development',
+): string {
   switch (status) {
     case 'verified':
       return 'bg-green-100 text-green-800'
@@ -109,7 +111,9 @@ function getStatusBadgeClass(status: 'verified' | 'needs-testing' | 'needs-updat
 }
 
 // Helper function to get status display text
-function getStatusDisplayText(status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development'): string {
+function getStatusDisplayText(
+  status: 'verified' | 'needs-testing' | 'needs-update' | 'in-development',
+): string {
   switch (status) {
     case 'verified':
       return 'Verified'

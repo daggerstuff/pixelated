@@ -24,7 +24,7 @@ function resolveWsPort(): number {
         return typeof val === 'string' ? Number(val) : val
       }
     }
-    
+
     if (typeof env === 'function') {
       // Real implementation
       return (env() as { ANALYTICS_WS_PORT: number }).ANALYTICS_WS_PORT ?? 8083
@@ -53,7 +53,11 @@ async function startWorker() {
       processingInterval: PROCESSING_INTERVAL,
     })
     // If running under tests with a mocked class, prefer the first mock instance
-    const mockedInstances = (AnalyticsService as unknown as { mock?: { instances: AnalyticsService[] } })?.mock?.instances
+    const mockedInstances = (
+      AnalyticsService as unknown as {
+        mock?: { instances: AnalyticsService[] }
+      }
+    )?.mock?.instances
     if (mockedInstances && mockedInstances.length > 0) {
       analyticsService = mockedInstances[0]!
     }
@@ -65,7 +69,12 @@ async function startWorker() {
     wss = new WebSocketServer({ port: WS_PORT })
 
     // Determine service reference (prefer mocked instance in tests)
-    const serviceRef = (AnalyticsService as unknown as { mock?: { instances: AnalyticsService[] } })?.mock?.instances?.[0] ?? analyticsService
+    const serviceRef =
+      (
+        AnalyticsService as unknown as {
+          mock?: { instances: AnalyticsService[] }
+        }
+      )?.mock?.instances?.[0] ?? analyticsService
 
     // Handle WebSocket connections
     wss.on('connection', async (ws) => {
@@ -104,7 +113,10 @@ async function startWorker() {
     })
 
     // Expose an emit method on the mock instance if present (testing helper)
-    if (typeof (wss as unknown as { emit?: (...args: unknown[]) => void }).emit === 'function') {
+    if (
+      typeof (wss as unknown as { emit?: (...args: unknown[]) => void })
+        .emit === 'function'
+    ) {
       // no-op: tests call mockWssInstance.emit('error', err) which triggers above handler
     }
 
@@ -115,7 +127,7 @@ async function startWorker() {
       } catch (error: unknown) {
         logger.error('Error processing analytics events:', error)
       }
-      
+
       // In test environment, don't auto-schedule the next call to avoid timer issues
       if (!(process.env['NODE_ENV'] === 'test' || process.env['VITEST'])) {
         setTimeout(processEvents, PROCESSING_INTERVAL)
@@ -129,7 +141,7 @@ async function startWorker() {
       } catch (error: unknown) {
         logger.error('Error during analytics cleanup:', error)
       }
-      
+
       // In test environment, don't auto-schedule the next call to avoid timer issues
       if (!(process.env['NODE_ENV'] === 'test' || process.env['VITEST'])) {
         setTimeout(cleanup, CLEANUP_INTERVAL)
@@ -138,7 +150,7 @@ async function startWorker() {
 
     // Start processing and cleanup loops
     processEvents()
-    
+
     // In test environment, set up cleanup timer manually to avoid recursion issues
     if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       setTimeout(cleanup, CLEANUP_INTERVAL)

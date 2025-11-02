@@ -3,7 +3,7 @@
     "enabled": true,
     "test_categories": [
       "authentication",
-      "chat_functionality", 
+      "chat_functionality",
       "ui_ux",
       "performance",
       "data_integrity",

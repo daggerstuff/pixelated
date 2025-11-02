@@ -14,7 +14,7 @@ import {
   validateUserRole,
   AuthenticationError,
   type User,
-  type UserRole
+  type UserRole,
 } from '../better-auth-integration'
 
 vi.mock('../../redis', () => ({
@@ -39,7 +39,7 @@ vi.mock('../../security', () => ({
     USER_PROFILE_UPDATED: 'USER_PROFILE_UPDATED',
     PASSWORD_CHANGED: 'PASSWORD_CHANGED',
     ROLE_VALIDATION_FAILED: 'ROLE_VALIDATION_FAILED',
-  }
+  },
 }))
 
 vi.mock('../../mcp/phase6-integration', () => ({
@@ -89,7 +89,7 @@ describe('Better-Auth Integration', () => {
       vi.mocked(bcrypt.genSalt).mockResolvedValue('salt123' as any)
       vi.mocked(bcrypt.hash).mockResolvedValue('hashedPassword123')
 
-        vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
         return true
       })
 
@@ -121,37 +121,44 @@ describe('Better-Auth Integration', () => {
     it('should validate email format', async () => {
       const invalidEmailData = { ...mockUserData, email: 'invalid-email' }
 
-      await expect(registerUser(invalidEmailData, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        registerUser(invalidEmailData, mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should validate password complexity', async () => {
       const weakPasswordData = { ...mockUserData, password: '123' }
 
-      await expect(registerUser(weakPasswordData, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        registerUser(weakPasswordData, mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should validate required fields', async () => {
-      const incompleteData = { email: 'test@example.com', password: 'SecurePass123!' }
+      const incompleteData = {
+        email: 'test@example.com',
+        password: 'SecurePass123!',
+      }
 
-      await expect(registerUser(incompleteData as any, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        registerUser(incompleteData as any, mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should check for existing email', async () => {
       const { getFromCache } = await import('../../redis')
 
       // Mock existing user
-        vi.mocked(getFromCache).mockImplementation(async (_key) => {
+      vi.mocked(getFromCache).mockImplementation(async (_key) => {
         if (_key.startsWith('user:email:')) {
           return { id: 'existing-user-id', email: mockUserData.email }
         }
         return null
       })
 
-      await expect(registerUser(mockUserData, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(registerUser(mockUserData, mockClientInfo)).rejects.toThrow(
+        AuthenticationError,
+      )
     })
 
     it('should log registration event', async () => {
@@ -169,12 +176,14 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           email: mockUserData.email,
           role: mockUserData.role,
-        })
+        }),
       )
     })
 
     it('should update Phase 6 MCP server', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
       const bcrypt = await import('bcryptjs')
 
       vi.mocked(bcrypt.genSalt).mockResolvedValue('salt123' as any)
@@ -184,7 +193,7 @@ describe('Better-Auth Integration', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         result.user.id,
-        'user_registered'
+        'user_registered',
       )
     })
 
@@ -195,7 +204,7 @@ describe('Better-Auth Integration', () => {
       vi.mocked(bcrypt.genSalt).mockResolvedValue('salt123' as any)
       vi.mocked(bcrypt.hash).mockResolvedValue('hashedPassword123')
 
-        vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
         if (_key.startsWith('user:')) {
           const userData = _data as any
           expect(userData.password).toBeUndefined()
@@ -237,7 +246,11 @@ describe('Better-Auth Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      const result = await loginUser(mockUserData.email, mockUserData.password, mockClientInfo)
+      const result = await loginUser(
+        mockUserData.email,
+        mockUserData.password,
+        mockClientInfo,
+      )
 
       expect(result).toHaveProperty('user')
       expect(result.user).toHaveProperty('id', mockUser.id)
@@ -251,8 +264,9 @@ describe('Better-Auth Integration', () => {
 
       vi.mocked(getFromCache).mockResolvedValue(null)
 
-      await expect(loginUser('nonexistent@example.com', 'password123', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        loginUser('nonexistent@example.com', 'password123', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should reject invalid password', async () => {
@@ -283,8 +297,9 @@ describe('Better-Auth Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValue(false as any)
 
-      await expect(loginUser(mockUserData.email, 'wrongpassword', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        loginUser(mockUserData.email, 'wrongpassword', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should reject inactive user', async () => {
@@ -308,8 +323,9 @@ describe('Better-Auth Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValue(true as any)
 
-      await expect(loginUser(mockUserData.email, mockUserData.password, mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        loginUser(mockUserData.email, mockUserData.password, mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should update last login timestamp', async () => {
@@ -346,7 +362,7 @@ describe('Better-Auth Integration', () => {
         `user:${mockUser.id}`,
         expect.objectContaining({
           lastLoginAt: expect.any(Number),
-        })
+        }),
       )
     })
 
@@ -387,7 +403,7 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           email: mockUserData.email,
           clientInfo: mockClientInfo,
-        })
+        }),
       )
     })
 
@@ -399,7 +415,11 @@ describe('Better-Auth Integration', () => {
       vi.mocked(getFromCache).mockResolvedValue(null)
 
       try {
-        await loginUser('nonexistent@example.com', 'password123', mockClientInfo)
+        await loginUser(
+          'nonexistent@example.com',
+          'password123',
+          mockClientInfo,
+        )
       } catch (_error) {
         // Expected to throw
       }
@@ -410,7 +430,7 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           email: 'nonexistent@example.com',
           reason: 'user_not_found',
-        })
+        }),
       )
     })
   })
@@ -434,7 +454,7 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           reason: 'user_logout',
         }),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
@@ -449,18 +469,20 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           sessionId: 'session123',
           clientInfo: mockClientInfo,
-        })
+        }),
       )
     })
 
     it('should update Phase 6 MCP server', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
 
       await logoutUser('user123', 'session123', mockClientInfo)
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'user_logged_out'
+        'user_logged_out',
       )
     })
   })
@@ -581,8 +603,9 @@ describe('Better-Auth Integration', () => {
         firstName: '', // Empty name
       }
 
-      await expect(updateUserProfile('user123', invalidUpdates))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        updateUserProfile('user123', invalidUpdates),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should not allow role updates through profile update', async () => {
@@ -650,7 +673,7 @@ describe('Better-Auth Integration', () => {
         'user123',
         expect.objectContaining({
           updatedFields: ['firstName'],
-        })
+        }),
       )
     })
   })
@@ -680,10 +703,21 @@ describe('Better-Auth Integration', () => {
         return true
       })
 
-      await changePassword('user123', 'OldPassword123!', 'NewPassword123!', mockClientInfo)
+      await changePassword(
+        'user123',
+        'OldPassword123!',
+        'NewPassword123!',
+        mockClientInfo,
+      )
 
-      expect(bcrypt.compare).toHaveBeenCalledWith('OldPassword123!', 'oldHashedPassword')
-      expect(bcrypt.hash).toHaveBeenCalledWith('NewPassword123!', expect.any(String))
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'OldPassword123!',
+        'oldHashedPassword',
+      )
+      expect(bcrypt.hash).toHaveBeenCalledWith(
+        'NewPassword123!',
+        expect.any(String),
+      )
     })
 
     it('should reject invalid current password', async () => {
@@ -705,13 +739,20 @@ describe('Better-Auth Integration', () => {
 
       vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any)
 
-      await expect(changePassword('user123', 'WrongPassword123!', 'NewPassword123!', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        changePassword(
+          'user123',
+          'WrongPassword123!',
+          'NewPassword123!',
+          mockClientInfo,
+        ),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should validate new password complexity', async () => {
-      await expect(changePassword('user123', 'OldPassword123!', 'weak', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        changePassword('user123', 'OldPassword123!', 'weak', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
     })
 
     it('should revoke all existing tokens after password change', async () => {
@@ -737,14 +778,19 @@ describe('Better-Auth Integration', () => {
         return true
       })
 
-      await changePassword('user123', 'OldPassword123!', 'NewPassword123!', mockClientInfo)
+      await changePassword(
+        'user123',
+        'OldPassword123!',
+        'NewPassword123!',
+        mockClientInfo,
+      )
 
       expect(setInCache).toHaveBeenCalledWith(
         expect.stringMatching(/^revoked:/),
         expect.objectContaining({
           reason: 'password_change',
         }),
-        expect.any(Number)
+        expect.any(Number),
       )
     })
 
@@ -772,14 +818,19 @@ describe('Better-Auth Integration', () => {
         return true
       })
 
-      await changePassword('user123', 'OldPassword123!', 'NewPassword123!', mockClientInfo)
+      await changePassword(
+        'user123',
+        'OldPassword123!',
+        'NewPassword123!',
+        mockClientInfo,
+      )
 
       expect(logSecurityEvent).toHaveBeenCalledWith(
         'PASSWORD_CHANGED',
         'user123',
         expect.objectContaining({
           clientInfo: mockClientInfo,
-        })
+        }),
       )
     })
   })
@@ -897,7 +948,7 @@ describe('Better-Auth Integration', () => {
         expect.objectContaining({
           requiredRoles: ['admin'],
           userRole: 'patient',
-        })
+        }),
       )
     })
   })
@@ -970,8 +1021,9 @@ describe('Better-Auth Integration', () => {
 
       for (const weakPassword of weakPasswords) {
         const weakData = { ...mockUserData, password: weakPassword }
-        await expect(registerUser(weakData, mockClientInfo))
-          .rejects.toThrow(AuthenticationError)
+        await expect(registerUser(weakData, mockClientInfo)).rejects.toThrow(
+          AuthenticationError,
+        )
       }
     })
 
@@ -983,8 +1035,9 @@ describe('Better-Auth Integration', () => {
       vi.mocked(getFromCache).mockResolvedValue(null)
 
       const start = performance.now()
-      await expect(loginUser('nonexistent@example.com', 'password123', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        loginUser('nonexistent@example.com', 'password123', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
       const duration1 = performance.now() - start
 
       // Mock user found but wrong password
@@ -1007,8 +1060,9 @@ describe('Better-Auth Integration', () => {
       vi.mocked(bcrypt.compare).mockResolvedValue(false as any)
 
       const start2 = performance.now()
-      await expect(loginUser(mockUserData.email, 'wrongpassword', mockClientInfo))
-        .rejects.toThrow(AuthenticationError)
+      await expect(
+        loginUser(mockUserData.email, 'wrongpassword', mockClientInfo),
+      ).rejects.toThrow(AuthenticationError)
       const duration2 = performance.now() - start2
 
       // Both operations should take similar time to prevent timing attacks

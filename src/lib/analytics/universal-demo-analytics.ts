@@ -128,7 +128,9 @@ export class UniversalDemoAnalytics {
     const config = this.pageConfig.abTestVariants
 
     // Update headline
-    const headlineElement = document.getElementById('headline-text') as HTMLElement
+    const headlineElement = document.getElementById(
+      'headline-text',
+    ) as HTMLElement
     if (headlineElement && config.headline[variant]) {
       headlineElement.textContent = config.headline[variant]
     }
@@ -140,7 +142,9 @@ export class UniversalDemoAnalytics {
     }
 
     // Update urgency badge
-    const urgencyElement = document.getElementById('urgency-text') as HTMLElement
+    const urgencyElement = document.getElementById(
+      'urgency-text',
+    ) as HTMLElement
     if (urgencyElement && config.urgency[variant]) {
       urgencyElement.textContent = config.urgency[variant]
     }

@@ -164,13 +164,21 @@ export class FileSystemStorageProvider implements StorageProvider {
 
         for (const entry of entries) {
           // Validate entry name for security
-          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          if (
+            !entry.name ||
+            entry.name.includes('..') ||
+            entry.name.includes('/') ||
+            entry.name.includes('\\')
+          ) {
             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
             continue
           }
 
-          const fullPath = path.join(dirPath, entry.name)
-          const relPath = path.join(relativePath, entry.name)
+          // Use securePathJoin to prevent path traversal
+          const fullPath = securePathJoin(dirPath, entry.name)
+          const relPath = relativePath
+            ? securePathJoin(relativePath, entry.name)
+            : entry.name
 
           if (entry.isDirectory()) {
             await scanDir(fullPath, relPath)
@@ -353,13 +361,21 @@ export class MockCloudStorageProvider implements StorageProvider {
           }
 
           // Validate entry name for security
-          if (!entry.name || entry.name.includes('..') || entry.name.includes('/') || entry.name.includes('\\')) {
+          if (
+            !entry.name ||
+            entry.name.includes('..') ||
+            entry.name.includes('/') ||
+            entry.name.includes('\\')
+          ) {
             logger.warn(`Skipping potentially unsafe file entry: ${entry.name}`)
             continue
           }
 
-          const entryPath = path.join(dirPath, entry.name)
-          const keyPath = path.join(relativePath, entry.name)
+          // Use securePathJoin to prevent path traversal
+          const entryPath = securePathJoin(dirPath, entry.name)
+          const keyPath = relativePath
+            ? securePathJoin(relativePath, entry.name)
+            : entry.name
 
           if (entry.isDirectory()) {
             await scanDir(entryPath, keyPath)
@@ -445,9 +461,9 @@ export class AWSS3StorageProvider implements StorageProvider {
     const endpoint = config['endpoint'] as string | undefined
     const credentials = config['credentials'] as
       | {
-        accessKeyId: string
-        secretAccessKey: string
-      }
+          accessKeyId: string
+          secretAccessKey: string
+        }
       | undefined
 
     this.config = {
@@ -700,6 +716,35 @@ export class AWSS3StorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }
@@ -774,7 +819,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       }
 
       if (!Storage) {
-        throw new Error('Failed to load GCS Storage constructor', { cause: new Error('Missing Storage export') })
+        throw new Error('Failed to load GCS Storage constructor', {
+          cause: new Error('Missing Storage export'),
+        })
       }
 
       this.storage = new Storage(options) as unknown as GCSStorage
@@ -889,6 +936,35 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }
@@ -1114,6 +1190,35 @@ export class AzureBlobStorageProvider implements StorageProvider {
   }
 
   private getFullKey(key: string): string {
+    // Validate key for security - prevent directory traversal in cloud storage keys
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key provided')
+    }
+
+    // Reject keys with directory traversal sequences
+    if (key.includes('..') || key.includes('../') || key.includes('..\\')) {
+      throw new Error(
+        'Directory traversal sequences (..) are not allowed in keys',
+      )
+    }
+
+    // Reject keys with absolute paths
+    if (key.startsWith('/')) {
+      throw new Error('Absolute paths are not allowed in keys')
+    }
+
+    // Reject keys with unsafe characters
+    // eslint-disable-next-line no-control-regex
+    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
+    if (unsafeChars.test(key)) {
+      throw new Error('Key contains unsafe characters')
+    }
+
+    // Reject keys that are too long (prevent resource exhaustion)
+    if (key.length > 1024) {
+      throw new Error('Key is too long')
+    }
+
     return this.config.prefix ? `${this.config.prefix}${key}` : key
   }
 }

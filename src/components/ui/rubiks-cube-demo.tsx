@@ -1,4 +1,4 @@
-import Scene from "@/components/ui/rubiks-cube";
+import Scene from '@/components/ui/rubiks-cube'
 
 const DemoOne = () => {
   return (
@@ -10,10 +10,10 @@ const DemoOne = () => {
         Solve the Complexity
       </h1>
       <p className="text-lg md:text-xl text-white mix-blend-exclusion max-w-2xl px-6 leading-relaxed">
-         One twist at a time.
+        One twist at a time.
       </p>
     </div>
-  );
-};
+  )
+}
 
-export { DemoOne };
+export { DemoOne }

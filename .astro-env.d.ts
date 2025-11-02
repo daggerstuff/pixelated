@@ -1,6 +1,6 @@
 /// <reference types="astro/client" />
 
-import "./src/env.d.ts"
+import './src/env.d.ts'
 
 declare module 'astro-icon/components' {
   interface IconProps {

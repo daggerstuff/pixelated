@@ -14,7 +14,7 @@ declare module 'scheduler/tracing' {
   }
 
   // Define more specific function types
-  type CallbackFn = (...args: unknown[]) => unknown;
+  type CallbackFn = (...args: unknown[]) => unknown
 
   export function unstable_clear(callback: CallbackFn): unknown
   export function unstable_getCurrent(): Set<Interaction>

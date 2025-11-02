@@ -35,7 +35,7 @@ export function usePersistentState<T>({
     setState(storedValue)
     lastStoredValueRef.current = storedValue
     setIsLoaded(true)
-  }, [key, defaultValue])
+  }, [key, defaultValue, storageOptions])
 
   // Cross-tab synchronization
   useEffect(() => {
@@ -60,41 +60,48 @@ export function usePersistentState<T>({
   }, [key, syncAcrossTabs])
 
   // Debounced save to storage
-  const saveToStorage = useCallback((value: T) => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
-
-    debounceRef.current = setTimeout(() => {
-      const success = storageManager.set(key, value, storageOptions)
-      if (success) {
-        lastStoredValueRef.current = value
-
-        // Trigger cross-tab sync
-        if (syncAcrossTabs && typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('persistentStateChange', {
-            detail: { key, value }
-          }))
-        }
+  const saveToStorage = useCallback(
+    (value: T) => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
       }
-    }, debounceMs)
-  }, [key, debounceMs, syncAcrossTabs, storageOptions])
+
+      debounceRef.current = setTimeout(() => {
+        const success = storageManager.set(key, value, storageOptions)
+        if (success) {
+          lastStoredValueRef.current = value
+
+          // Trigger cross-tab sync
+          if (syncAcrossTabs && typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('persistentStateChange', {
+                detail: { key, value },
+              }),
+            )
+          }
+        }
+      }, debounceMs)
+    },
+    [key, debounceMs, syncAcrossTabs, storageOptions],
+  )
 
   // Enhanced setState that also persists to storage
-  const setPersistentState = useCallback((value: T | ((prev: T) => T)) => {
-    setState(prev => {
-      const newValue = typeof value === 'function'
-        ? (value as (prev: T) => T)(prev)
-        : value
+  const setPersistentState = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      setState((prev) => {
+        const newValue =
+          typeof value === 'function' ? (value as (prev: T) => T)(prev) : value
 
-      // Only save if value actually changed
-      if (newValue !== lastStoredValueRef.current) {
-        saveToStorage(newValue)
-      }
+        // Only save if value actually changed
+        if (newValue !== lastStoredValueRef.current) {
+          saveToStorage(newValue)
+        }
 
-      return newValue
-    })
-  }, [saveToStorage])
+        return newValue
+      })
+    },
+    [saveToStorage],
+  )
 
   // Cleanup debounce timeout on unmount
   useEffect(() => {
@@ -128,25 +135,29 @@ export function usePersistentObject<T extends Record<string, any>>({
     ...storageOptions,
   })
 
-  const updateField = useCallback(<K extends keyof T>(
-    field: K,
-    value: T[K] | ((prev: T[K]) => T[K])
-  ) => {
-    setState(prev => ({
-      ...prev,
-      [field]: typeof value === 'function'
-        ? (value as (prev: T[K]) => T[K])(prev[field])
-        : value,
-    }))
-  }, [setState])
+  const updateField = useCallback(
+    <K extends keyof T>(field: K, value: T[K] | ((prev: T[K]) => T[K])) => {
+      setState((prev) => ({
+        ...prev,
+        [field]:
+          typeof value === 'function'
+            ? (value as (prev: T[K]) => T[K])(prev[field])
+            : value,
+      }))
+    },
+    [setState],
+  )
 
-  const removeField = useCallback((field: keyof T) => {
-    setState(prev => {
-      const newState = { ...prev }
-      delete newState[field]
-      return newState
-    })
-  }, [setState])
+  const removeField = useCallback(
+    (field: keyof T) => {
+      setState((prev) => {
+        const newState = { ...prev }
+        delete newState[field]
+        return newState
+      })
+    },
+    [setState],
+  )
 
   return [state, setState, updateField, removeField, isLoaded] as const
 }
@@ -171,29 +182,43 @@ export function usePersistentArray<T>({
     ...storageOptions,
   })
 
-  const push = useCallback((item: T) => {
-    setState(prev => [...prev, item])
-  }, [setState])
+  const push = useCallback(
+    (item: T) => {
+      setState((prev) => [...prev, item])
+    },
+    [setState],
+  )
 
   const pop = useCallback(() => {
-    setState(prev => prev.slice(0, -1))
+    setState((prev) => prev.slice(0, -1))
   }, [setState])
 
   const shift = useCallback(() => {
-    setState(prev => prev.slice(1))
+    setState((prev) => prev.slice(1))
   }, [setState])
 
-  const unshift = useCallback((item: T) => {
-    setState(prev => [item, ...prev])
-  }, [setState])
+  const unshift = useCallback(
+    (item: T) => {
+      setState((prev) => [item, ...prev])
+    },
+    [setState],
+  )
 
-  const removeAt = useCallback((index: number) => {
-    setState(prev => prev.filter((_, i) => i !== index))
-  }, [setState])
+  const removeAt = useCallback(
+    (index: number) => {
+      setState((prev) => prev.filter((_, i) => i !== index))
+    },
+    [setState],
+  )
 
-  const updateAt = useCallback((index: number, item: T) => {
-    setState(prev => prev.map((existing, i) => i === index ? item : existing))
-  }, [setState])
+  const updateAt = useCallback(
+    (index: number, item: T) => {
+      setState((prev) =>
+        prev.map((existing, i) => (i === index ? item : existing)),
+      )
+    },
+    [setState],
+  )
 
   const clear = useCallback(() => {
     setState([])
@@ -238,31 +263,33 @@ export function usePersistentMap<K extends string | number | symbol, V>({
   // Convert array back to Map for easier manipulation
   const mapState = new Map<K, V>(state)
 
-  const set = useCallback((key: K, value: V) => {
-    const newMap = new Map(mapState)
-    newMap.set(key, value)
-    setState(Array.from(newMap.entries()))
-  }, [mapState, setState])
+  const set = useCallback(
+    (key: K, value: V) => {
+      const newMap = new Map(mapState)
+      newMap.set(key, value)
+      setState(Array.from(newMap.entries()))
+    },
+    [setState],
+  )
 
-  const get = useCallback((key: K) => mapState.get(key), [mapState])
+  const get = useCallback((key: K) => mapState.get(key), [])
 
-  const has = useCallback((key: K) => mapState.has(key), [mapState])
+  const has = useCallback((key: K) => mapState.has(key), [])
 
-  const delete = useCallback((key: K) => {
-    const newMap = new Map(mapState)
-    newMap.delete(key)
-    setState(Array.from(newMap.entries()))
-  }, [mapState, setState])
+  const remove = useCallback(
+    (key: K) => {
+      const newMap = new Map(mapState)
+      newMap.delete(key)
+      setState(Array.from(newMap.entries()))
+    },
+    [setState],
+  )
 
   const clear = useCallback(() => {
     setState([])
   }, [setState])
 
-  return [
-    mapState,
-    { set, get, has, delete, clear },
-    isLoaded,
-  ] as const
+  return [mapState, { set, get, has, remove, clear }, isLoaded] as const
 }
 
 export default usePersistentState

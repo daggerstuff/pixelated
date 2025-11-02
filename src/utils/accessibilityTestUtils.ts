@@ -352,7 +352,8 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
 
           // Check if there's a label with a matching 'for' attribute
           const hasLabelFor =
-            document.querySelector(`label[for="${id}"]`) as HTMLElement !== null
+            (document.querySelector(`label[for="${id}"]`) as HTMLElement) !==
+            null
           return !hasLabelFor
         })
         .map((el) => ({
@@ -694,11 +695,13 @@ function calculateRelativeLuminance([r, g, b]: [
   // Convert RGB to relative luminance
   const relativeLuminanceValues = [r, g, b].map((val) => {
     const normalizedVal = val / 255
-    return normalizedVal <= 0.03928 ? normalizedVal / 12.92 : Math.pow((normalizedVal + 0.055) / 1.055, 2.4)
+    return normalizedVal <= 0.03928
+      ? normalizedVal / 12.92
+      : Math.pow((normalizedVal + 0.055) / 1.055, 2.4)
   })
 
   const [R, G, B] = relativeLuminanceValues
-  
+
   // Ensure we have valid values
   if (R === undefined || G === undefined || B === undefined) {
     return 0

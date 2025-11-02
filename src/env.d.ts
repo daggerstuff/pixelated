@@ -1,13 +1,13 @@
 /// <reference types="astro/client" />
 
-import "../.astro/types.d.ts"
+import '../.astro/types.d.ts'
 
 declare namespace App {
   interface Locals {
     requestId: string
     timestamp: string
-    user: import("better-auth").User | null;
-    session: import("better-auth").Session | null;
+    user: import('better-auth').User | null
+    session: import('better-auth').Session | null
     user?: {
       id: string
       email: string

@@ -1,13 +1,18 @@
 import pytest
+import sys
+import os
 
-from ai.pixel.evaluation.clinical_accuracy_evaluator import ClinicalAccuracyEvaluator
-from ai.pixel.evaluation.conversational_quality_evaluator import (
+# Add ai directory to path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'ai'))
+
+from pixel.evaluation.clinical_accuracy_evaluator import ClinicalAccuracyEvaluator
+from pixel.evaluation.conversational_quality_evaluator import (
     ConversationalQualityEvaluator,
 )
-from ai.pixel.evaluation.empathy_evaluator import EmpathyEvaluator
-from ai.pixel.evaluation.eq_evaluator import EQEvaluator
-from ai.pixel.evaluation.persona_switching_evaluator import PersonaSwitchingEvaluator
-from ai.pixel.evaluation.therapeutic_appropriateness_evaluator import (
+from pixel.evaluation.empathy_evaluator import EmpathyEvaluator
+from pixel.evaluation.eq_evaluator import EQEvaluator
+from pixel.evaluation.persona_switching_evaluator import PersonaSwitchingEvaluator
+from pixel.evaluation.therapeutic_appropriateness_evaluator import (
     TherapeuticAppropriatenessEvaluator,
 )
 

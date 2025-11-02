@@ -25,7 +25,9 @@ export const GET = async ({ request }: APIContext) => {
     }
 
     // Get user's notification preferences
-    const preferences = await notificationService.getPreferences(authResult?.['user']?.['id'])
+    const preferences = await notificationService.getPreferences(
+      authResult?.['user']?.['id'],
+    )
 
     return new Response(JSON.stringify(preferences), {
       status: 200,
@@ -57,7 +59,14 @@ export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!(typeof authResult === 'object' && authResult !== null && 'authenticated' in authResult && (authResult as { authenticated: boolean }).authenticated)) {
+    if (
+      !(
+        typeof authResult === 'object' &&
+        authResult !== null &&
+        'authenticated' in authResult &&
+        (authResult as { authenticated: boolean }).authenticated
+      )
+    ) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -93,7 +102,10 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Update user's notification preferences
     const service = notificationService as unknown as {
-      updatePreferences?: (userId: string, preferences: unknown) => Promise<unknown>
+      updatePreferences?: (
+        userId: string,
+        preferences: unknown,
+      ) => Promise<unknown>
     }
     const userId =
       typeof authResult === 'object' &&
@@ -104,10 +116,7 @@ export const PUT: APIRoute = async ({ request }) => {
         ? (authResult as { user: { id: string } }).user.id
         : undefined
 
-    const result = await service.updatePreferences?.(
-      userId,
-      preferences,
-    )
+    const result = await service.updatePreferences?.(userId, preferences)
 
     return new Response(JSON.stringify(result), {
       status: 200,

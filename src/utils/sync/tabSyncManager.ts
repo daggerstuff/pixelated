@@ -6,7 +6,13 @@
 import storageManager from '@/utils/storage/storageManager'
 
 export interface SyncMessage {
-  type: 'STATE_UPDATE' | 'STATE_REQUEST' | 'STATE_RESPONSE' | 'HEARTBEAT' | 'TAB_JOIN' | 'TAB_LEAVE'
+  type:
+    | 'STATE_UPDATE'
+    | 'STATE_REQUEST'
+    | 'STATE_RESPONSE'
+    | 'HEARTBEAT'
+    | 'TAB_JOIN'
+    | 'TAB_LEAVE'
   key: string
   value?: any
   timestamp: number
@@ -44,7 +50,7 @@ function generateChecksum(data: any): string {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash // Convert to 32-bit integer
     }
     return hash.toString(36)
@@ -87,7 +93,11 @@ class TabSyncManager {
   }
 
   private initialize(): void {
-    if (!this.config.enabled || typeof window === 'undefined' || !window.BroadcastChannel) {
+    if (
+      !this.config.enabled ||
+      typeof window === 'undefined' ||
+      !window.BroadcastChannel
+    ) {
       console.warn('TabSyncManager: BroadcastChannel not supported or disabled')
       return
     }
@@ -219,7 +229,11 @@ class TabSyncManager {
         console.warn('TabSyncManager: Merge failed, using remote value:', error)
         finalValue = value
       }
-    } else if (localValue && value && this.config.conflictStrategy === 'manual') {
+    } else if (
+      localValue &&
+      value &&
+      this.config.conflictStrategy === 'manual'
+    ) {
       finalValue = this.config.onConflict(key, localValue, value)
     }
 
@@ -235,7 +249,7 @@ class TabSyncManager {
   }
 
   private handleStateRequest(message: SyncMessage): void {
-    const { key, tabId } = message
+    const { key } = message
     const value = storageManager.get(key)
 
     if (value !== undefined) {
@@ -262,11 +276,20 @@ class TabSyncManager {
       return [...new Set([...local, ...remote])]
     }
 
-    if (local && remote && typeof local === 'object' && typeof remote === 'object') {
+    if (
+      local &&
+      remote &&
+      typeof local === 'object' &&
+      typeof remote === 'object'
+    ) {
       // For objects, do a deep merge
       const merged = { ...local }
       for (const [key, value] of Object.entries(remote)) {
-        if (merged[key] && typeof merged[key] === 'object' && typeof value === 'object') {
+        if (
+          merged[key] &&
+          typeof merged[key] === 'object' &&
+          typeof value === 'object'
+        ) {
           merged[key] = this.mergeStates(merged[key], value)
         } else {
           merged[key] = value
@@ -281,14 +304,17 @@ class TabSyncManager {
   private emit(event: string, data: any): void {
     const eventListeners = this.listeners.get(event)
     if (eventListeners) {
-      eventListeners.forEach(listener => listener(data))
+      eventListeners.forEach((listener) => listener(data))
     }
   }
 
   /**
    * Subscribe to sync events
    */
-  on(event: 'stateReceived' | 'tabJoined' | 'tabLeft' | 'heartbeat' | 'conflict', listener: (data: any) => void): () => void {
+  on(
+    event: 'stateReceived' | 'tabJoined' | 'tabLeft' | 'heartbeat' | 'conflict',
+    listener: (data: any) => void,
+  ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set())
     }
@@ -360,7 +386,10 @@ class TabSyncManager {
       isAvailable: this.isAvailable(),
       tabId: this.tabId,
       trackedKeys: this.stateVersions.size,
-      listenersCount: Array.from(this.listeners.values()).reduce((sum, set) => sum + set.size, 0),
+      listenersCount: Array.from(this.listeners.values()).reduce(
+        (sum, set) => sum + set.size,
+        0,
+      ),
     }
   }
 

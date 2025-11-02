@@ -3,155 +3,188 @@
  * Provides proactive threat hunting capabilities and advanced investigation tools
  */
 
-import { EventEmitter } from 'events';
-import { Redis } from 'ioredis';
-import { MongoClient } from 'mongodb';
-import * as tf from '@tensorflow/tfjs';
-import { createBuildSafeLogger } from '../../logging/build-safe-logger';
+import { EventEmitter } from 'events'
+import { Redis } from 'ioredis'
+import { MongoClient } from 'mongodb'
+import * as tf from '@tensorflow/tfjs'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('threat-hunting-service');
+const logger = createBuildSafeLogger('threat-hunting-service')
 
 export interface ThreatHuntingConfig {
-  enabled: boolean;
-  huntingFrequency: number; // milliseconds
-  investigationTimeout: number;
+  enabled: boolean
+  huntingFrequency: number // milliseconds
+  investigationTimeout: number
   mlModelConfig: {
-    enabled: boolean;
-    modelPath: string;
-    confidenceThreshold: number;
-  };
-  huntingRules: HuntingRule[];
-  investigationTemplates: InvestigationTemplate[];
+    enabled: boolean
+    modelPath: string
+    confidenceThreshold: number
+  }
+  huntingRules: HuntingRule[]
+  investigationTemplates: InvestigationTemplate[]
 }
 
 export interface HuntingRule {
-  ruleId: string;
-  name: string;
-  description: string;
-  query: Record<string, unknown>;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  enabled: boolean;
-  autoInvestigate: boolean;
-  investigationPriority: number;
+  ruleId: string
+  name: string
+  description: string
+  query: Record<string, unknown>
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  enabled: boolean
+  autoInvestigate: boolean
+  investigationPriority: number
 }
 
 export interface InvestigationTemplate {
-  templateId: string;
-  name: string;
-  description: string;
-  steps: InvestigationStep[];
-  requiredData: string[];
-  estimatedDuration: number;
+  templateId: string
+  name: string
+  description: string
+  steps: InvestigationStep[]
+  requiredData: string[]
+  estimatedDuration: number
 }
 
 export interface InvestigationStep {
-  stepId: string;
-  name: string;
-  description: string;
-  action: string;
-  parameters: Record<string, unknown>;
-  validationRules: ValidationRule[];
-  timeout: number;
+  stepId: string
+  name: string
+  description: string
+  action: string
+  parameters: Record<string, unknown>
+  validationRules: ValidationRule[]
+  timeout: number
 }
 
 export interface ValidationRule {
-  type: 'threshold' | 'pattern' | 'existence';
-  condition: string;
-  expectedValue?: unknown;
-  operator?: 'equals' | 'greater_than' | 'less_than' | 'contains' | 'exists';
+  type: 'threshold' | 'pattern' | 'existence'
+  condition: string
+  expectedValue?: unknown
+  operator?: 'equals' | 'greater_than' | 'less_than' | 'contains' | 'exists'
 }
 
 export interface HuntResult {
-  huntId: string;
-  ruleId: string;
-  timestamp: Date;
-  findings: HuntFinding[];
-  investigationTriggered: boolean;
-  investigationId?: string;
-  confidence: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  metadata: Record<string, unknown>;
+  huntId: string
+  ruleId: string
+  timestamp: Date
+  findings: HuntFinding[]
+  investigationTriggered: boolean
+  investigationId?: string
+  confidence: number
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  metadata: Record<string, unknown>
 }
 
 export interface HuntFinding {
-  findingId: string;
-  type: 'anomaly' | 'suspicious_pattern' | 'iocs' | 'behavioral_deviation';
-  title: string;
-  description: string;
-  evidence: Record<string, unknown>[];
-  confidence: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  recommendedActions: string[];
-  relatedEntities: string[];
+  findingId: string
+  type: 'anomaly' | 'suspicious_pattern' | 'iocs' | 'behavioral_deviation'
+  title: string
+  description: string
+  evidence: Record<string, unknown>[]
+  confidence: number
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  recommendedActions: string[]
+  relatedEntities: string[]
 }
 
 export interface Investigation {
-  investigationId: string;
-  huntId?: string;
-  threatId?: string;
-  templateId?: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  steps: InvestigationStepResult[];
-  findings: InvestigationFinding[];
-  createdAt: Date;
-  startedAt?: Date;
-  completedAt?: Date;
-  metadata: Record<string, unknown>;
+  investigationId: string
+  huntId?: string
+  threatId?: string
+  templateId?: string
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  steps: InvestigationStepResult[]
+  findings: InvestigationFinding[]
+  createdAt: Date
+  startedAt?: Date
+  completedAt?: Date
+  metadata: Record<string, unknown>
 }
 
 export interface InvestigationStepResult {
-  stepId: string;
-  name: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
-  result?: Record<string, unknown>;
-  error?: string;
-  executionTime: number;
-  timestamp: Date;
+  stepId: string
+  name: string
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
+  result?: Record<string, unknown>
+  error?: string
+  executionTime: number
+  timestamp: Date
 }
 
 export interface InvestigationFinding {
-  findingId: string;
-  stepId: string;
-  type: 'evidence' | 'indicator' | 'anomaly' | 'conclusion';
-  title: string;
-  description: string;
-  data: Record<string, unknown>;
-  confidence: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  timestamp: Date;
+  findingId: string
+  stepId: string
+  type: 'evidence' | 'indicator' | 'anomaly' | 'conclusion' | 'iocs'
+  title: string
+  description: string
+  data: Record<string, unknown>
+  confidence: number
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  timestamp: Date
 }
 
 export class ThreatHuntingService extends EventEmitter {
-  private redis: Redis;
-  private mongoClient: MongoClient;
-  private config: ThreatHuntingConfig;
-  private huntingModel: tf.Sequential | null = null;
-  private huntingInterval: NodeJS.Timeout | null = null;
-  private activeInvestigations: Map<string, Investigation> = new Map();
+  redis: Redis
+  mongoClient: MongoClient
+  public config: ThreatHuntingConfig
+  orchestrator: any
+  aiService: any
+  behavioralService: any
+  predictiveService: any
+  investigations: any
+  huntQueries: any
+  private huntingModel: tf.Sequential | null = null
+  private huntingInterval: NodeJS.Timeout | null = null
+  private activeInvestigations: Map<string, Investigation> = new Map()
 
-  constructor(config: ThreatHuntingConfig) {
-    super();
-    this.config = config;
-    this.initializeServices();
+  constructor(
+    redis: Redis,
+    orchestrator: any,
+    aiService: any,
+    behavioralService: any,
+    predictiveService: any,
+    config?: ThreatHuntingConfig,
+  ) {
+    super()
+    this.redis = redis
+    this.orchestrator = orchestrator
+    this.aiService = aiService
+    this.behavioralService = behavioralService
+    this.predictiveService = predictiveService
+    this.config =
+      config ||
+      ({
+        enabled: true,
+        maxInvestigations: 100,
+        maxHuntQueries: 50,
+        timelineRetention: 86400000, // 24 hours
+        enableAIAnalysis: true,
+        enableRealTimeHunting: true,
+        autoArchiveCompleted: true,
+        reportFormats: ['pdf', 'json', 'csv'],
+        maxResultsPerQuery: 1000,
+      } as any)
+    this.investigations = new Map()
+    this.huntQueries = new Map()
   }
 
   private async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-      this.mongoClient = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection');
+      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.mongoClient = new MongoClient(
+        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
+      )
 
-      await this.mongoClient.connect();
+      await this.mongoClient.connect()
 
       if (this.config.mlModelConfig.enabled) {
-        await this.initializeMLModel();
+        await this.initializeMLModel()
       }
 
-      logger.info('Threat hunting service initialized');
-      this.emit('hunting_initialized');
+      logger.info('Threat hunting service initialized')
+      this.emit('hunting_initialized')
     } catch (error) {
-      logger.error('Failed to initialize threat hunting service:', { error });
-      throw error;
+      logger.error('Failed to initialize threat hunting service:', { error })
+      throw error
     }
   }
 
@@ -165,20 +198,20 @@ export class ThreatHuntingService extends EventEmitter {
           tf.layers.dense({ units: 64, activation: 'relu' }),
           tf.layers.dropout({ rate: 0.2 }),
           tf.layers.dense({ units: 32, activation: 'relu' }),
-          tf.layers.dense({ units: 4, activation: 'softmax' }) // 4 threat levels
-        ]
-      });
+          tf.layers.dense({ units: 4, activation: 'softmax' }), // 4 threat levels
+        ],
+      })
 
       this.huntingModel.compile({
         optimizer: tf.train.adam(0.001),
         loss: 'categoricalCrossentropy',
-        metrics: ['accuracy']
-      });
+        metrics: ['accuracy'],
+      })
 
-      logger.info('Threat hunting ML model initialized');
+      logger.info('Threat hunting ML model initialized')
     } catch (error) {
-      logger.error('Failed to initialize ML model:', { error });
-      this.huntingModel = null;
+      logger.error('Failed to initialize ML model:', { error })
+      this.huntingModel = null
     }
   }
 
@@ -187,33 +220,33 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async startHunting(): Promise<void> {
     if (!this.config.enabled) {
-      logger.warn('Threat hunting is disabled');
-      return;
+      logger.warn('Threat hunting is disabled')
+      return
     }
 
     if (this.huntingInterval) {
-      logger.warn('Threat hunting is already running');
-      return;
+      logger.warn('Threat hunting is already running')
+      return
     }
 
     try {
       // Execute initial hunt
-      await this.executeHunts();
+      await this.executeHunts()
 
       // Schedule regular hunts
       this.huntingInterval = setInterval(async () => {
         try {
-          await this.executeHunts();
+          await this.executeHunts()
         } catch (error) {
-          logger.error('Automated hunting error:', { error });
+          logger.error('Automated hunting error:', { error })
         }
-      }, this.config.huntingFrequency);
+      }, this.config.huntingFrequency)
 
-      logger.info('Automated threat hunting started');
-      this.emit('hunting_started');
+      logger.info('Automated threat hunting started')
+      this.emit('hunting_started')
     } catch (error) {
-      logger.error('Failed to start threat hunting:', { error });
-      throw error;
+      logger.error('Failed to start threat hunting:', { error })
+      throw error
     }
   }
 
@@ -222,11 +255,11 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async stopHunting(): Promise<void> {
     if (this.huntingInterval) {
-      clearInterval(this.huntingInterval);
-      this.huntingInterval = null;
+      clearInterval(this.huntingInterval)
+      this.huntingInterval = null
 
-      logger.info('Automated threat hunting stopped');
-      this.emit('hunting_stopped');
+      logger.info('Automated threat hunting stopped')
+      this.emit('hunting_stopped')
     }
   }
 
@@ -235,32 +268,33 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async executeHunts(): Promise<HuntResult[]> {
     try {
-      const enabledRules = this.config.huntingRules.filter(rule => rule.enabled);
-      const results: HuntResult[] = [];
+      const enabledRules = this.config.huntingRules.filter(
+        (rule) => rule.enabled,
+      )
+      const results: HuntResult[] = []
 
       for (const rule of enabledRules) {
         try {
-          const result = await this.executeHuntRule(rule);
-          results.push(result);
+          const result = await this.executeHuntRule(rule)
+          results.push(result)
 
           // Trigger investigation if needed
           if (result.investigationTriggered && rule.autoInvestigate) {
             await this.startInvestigation({
               huntId: result.huntId,
-              ruleId: rule.ruleId,
-              priority: rule.investigationPriority
-            });
+              priority: rule.investigationPriority,
+            })
           }
         } catch (error) {
-          logger.error(`Failed to execute hunt rule ${rule.ruleId}:`, { error });
+          logger.error(`Failed to execute hunt rule ${rule.ruleId}:`, { error })
         }
       }
 
-      this.emit('hunts_completed', { results: results.length });
-      return results;
+      this.emit('hunts_completed', { results: results.length })
+      return results
     } catch (error) {
-      logger.error('Failed to execute hunts:', { error });
-      throw error;
+      logger.error('Failed to execute hunts:', { error })
+      throw error
     }
   }
 
@@ -268,29 +302,35 @@ export class ThreatHuntingService extends EventEmitter {
    * Execute a specific hunting rule
    */
   private async executeHuntRule(rule: HuntingRule): Promise<HuntResult> {
-    const huntId = `hunt_${rule.ruleId}_${Date.now()}`;
+    const huntId = `hunt_${rule.ruleId}_${Date.now()}`
 
     try {
-      logger.info(`Executing hunt rule: ${rule.name}`, { huntId, ruleId: rule.ruleId });
+      logger.info(`Executing hunt rule: ${rule.name}`, {
+        huntId,
+        ruleId: rule.ruleId,
+      })
 
       // Execute the hunt query
-      const findings = await this.executeHuntQuery(rule.query);
+      const findings = await this.executeHuntQuery(rule.query)
 
       // Apply ML analysis if enabled
-      let mlFindings: HuntFinding[] = [];
+      let mlFindings: HuntFinding[] = []
       if (this.huntingModel && findings.length > 0) {
-        mlFindings = await this.applyMLAnalysis(findings);
+        mlFindings = await this.applyMLAnalysis(findings)
       }
 
       // Combine findings
-      const allFindings = [...findings, ...mlFindings];
+      const allFindings = [...findings, ...mlFindings]
 
       // Calculate overall confidence and severity
-      const confidence = this.calculateHuntConfidence(allFindings);
-      const severity = this.determineHuntSeverity(allFindings, rule.severity);
+      const confidence = this.calculateHuntConfidence(allFindings)
+      const severity = this.determineHuntSeverity(allFindings, rule.severity)
 
       // Determine if investigation should be triggered
-      const investigationTriggered = this.shouldTriggerInvestigation(allFindings, rule);
+      const investigationTriggered = this.shouldTriggerInvestigation(
+        allFindings,
+        rule,
+      )
 
       const result: HuntResult = {
         huntId,
@@ -303,70 +343,78 @@ export class ThreatHuntingService extends EventEmitter {
         metadata: {
           ruleName: rule.name,
           executionTime: Date.now(),
-          findingsCount: allFindings.length
-        }
-      };
+          findingsCount: allFindings.length,
+        },
+      }
 
       // Store hunt result
-      await this.storeHuntResult(result);
+      await this.storeHuntResult(result)
 
       logger.info(`Hunt rule completed: ${rule.name}`, {
         huntId,
         findings: allFindings.length,
-        severity
-      });
+        severity,
+      })
 
-      return result;
+      return result
     } catch (error) {
-      logger.error(`Failed to execute hunt rule ${rule.ruleId}:`, { error, huntId });
-      throw error;
+      logger.error(`Failed to execute hunt rule ${rule.ruleId}:`, {
+        error,
+        huntId,
+      })
+      throw error
     }
   }
 
   /**
    * Execute hunt query against data sources
    */
-  private async executeHuntQuery(query: Record<string, unknown>): Promise<HuntFinding[]> {
-    const findings: HuntFinding[] = [];
+  public async executeHuntQuery(
+    query: Record<string, unknown>,
+  ): Promise<HuntFinding[]> {
+    const findings: HuntFinding[] = []
 
     try {
       // Query MongoDB for threat data
-      const dbFindings = await this.queryDatabase(query);
-      findings.push(...dbFindings);
+      const dbFindings = await this.queryDatabase(query)
+      findings.push(...dbFindings)
 
       // Query Redis for recent activity
-      const redisFindings = await this.queryRedis(query);
-      findings.push(...redisFindings);
+      const redisFindings = await this.queryRedis(query)
+      findings.push(...redisFindings)
 
       // Query logs if specified
       if (query.includeLogs) {
-        const logFindings = await this.queryLogs(query);
-        findings.push(...logFindings);
+        const logFindings = await this.queryLogs(query)
+        findings.push(...logFindings)
       }
 
-      return findings;
+      return findings
     } catch (error) {
-      logger.error('Failed to execute hunt query:', { error });
-      return [];
+      logger.error('Failed to execute hunt query:', { error })
+      return []
     }
   }
 
   /**
    * Query MongoDB for threat hunting data
    */
-  private async queryDatabase(query: Record<string, unknown>): Promise<HuntFinding[]> {
+  private async queryDatabase(
+    query: Record<string, unknown>,
+  ): Promise<HuntFinding[]> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      const findings: HuntFinding[] = [];
+      const db = this.mongoClient.db('threat_detection')
+      const findings: HuntFinding[] = []
 
       // Query recent threats
       if (query.recentThreats) {
-        const recentThreats = await db.collection('threat_responses')
+        const recentThreats = await db
+          .collection('threat_responses')
           .find({
-            createdAt: { $gte: new Date(Date.now() - 86400000) } // Last 24 hours
+            createdAt: { $gte: new Date(Date.now() - 86400000) }, // Last 24 hours
           })
           .limit(100)
-          .toArray();
+          .toArray()
 
         if (recentThreats.length > 50) {
           findings.push({
@@ -377,21 +425,25 @@ export class ThreatHuntingService extends EventEmitter {
             evidence: recentThreats.slice(0, 5),
             confidence: 0.8,
             severity: 'medium',
-            recommendedActions: ['investigate_threat_sources', 'review_security_policies'],
-            relatedEntities: recentThreats.map(t => t.threatId).slice(0, 10)
-          });
+            recommendedActions: [
+              'investigate_threat_sources',
+              'review_security_policies',
+            ],
+            relatedEntities: recentThreats.map((t) => t.threatId).slice(0, 10),
+          })
         }
       }
 
       // Query anomalies
       if (query.anomalies) {
-        const anomalies = await db.collection('anomalies')
+        const anomalies = await db
+          .collection('anomalies')
           .find({
             timestamp: { $gte: new Date(Date.now() - 3600000) }, // Last hour
-            score: { $gt: 0.7 }
+            score: { $gt: 0.7 },
           })
           .limit(20)
-          .toArray();
+          .toArray()
 
         if (anomalies.length > 5) {
           findings.push({
@@ -402,29 +454,34 @@ export class ThreatHuntingService extends EventEmitter {
             evidence: anomalies,
             confidence: 0.9,
             severity: 'high',
-            recommendedActions: ['investigate_anomaly_sources', 'check_system_integrity'],
-            relatedEntities: anomalies.map(a => a.anomalyId)
-          });
+            recommendedActions: [
+              'investigate_anomaly_sources',
+              'check_system_integrity',
+            ],
+            relatedEntities: anomalies.map((a) => a.anomalyId),
+          })
         }
       }
 
-      return findings;
+      return findings
     } catch (error) {
-      logger.error('Failed to query database:', { error });
-      return [];
+      logger.error('Failed to query database:', { error })
+      return []
     }
   }
 
   /**
    * Query Redis for recent activity patterns
    */
-  private async queryRedis(query: Record<string, unknown>): Promise<HuntFinding[]> {
+  private async queryRedis(
+    query: Record<string, unknown>,
+  ): Promise<HuntFinding[]> {
     try {
-      const findings: HuntFinding[] = [];
+      const findings: HuntFinding[] = []
 
       // Check for suspicious IP patterns
       if (query.suspiciousIPs) {
-        const suspiciousIPs = await this.redis.smembers('suspicious_ips');
+        const suspiciousIPs = await this.redis.smembers('suspicious_ips')
 
         if (suspiciousIPs.length > 10) {
           findings.push({
@@ -432,18 +489,18 @@ export class ThreatHuntingService extends EventEmitter {
             type: 'iocs',
             title: 'Large Number of Suspicious IPs',
             description: `Redis contains ${suspiciousIPs.length} flagged IP addresses`,
-            evidence: suspiciousIPs.slice(0, 5).map(ip => ({ ip })),
+            evidence: suspiciousIPs.slice(0, 5).map((ip) => ({ ip })),
             confidence: 0.7,
             severity: 'medium',
             recommendedActions: ['review_ip_reputation', 'check_geolocation'],
-            relatedEntities: suspiciousIPs
-          });
+            relatedEntities: suspiciousIPs,
+          })
         }
       }
 
       // Check for rate limiting violations
       if (query.rateLimitViolations) {
-        const violations = await this.redis.keys('rate_limit:*');
+        const violations = await this.redis.keys('rate_limit:*')
 
         if (violations.length > 20) {
           findings.push({
@@ -451,28 +508,33 @@ export class ThreatHuntingService extends EventEmitter {
             type: 'suspicious_pattern',
             title: 'High Rate Limiting Activity',
             description: `Detected ${violations.length} active rate limiting entries`,
-            evidence: violations.slice(0, 5).map(key => ({ key })),
+            evidence: violations.slice(0, 5).map((key) => ({ key })),
             confidence: 0.6,
             severity: 'low',
-            recommendedActions: ['review_rate_limits', 'analyze_traffic_patterns'],
-            relatedEntities: violations
-          });
+            recommendedActions: [
+              'review_rate_limits',
+              'analyze_traffic_patterns',
+            ],
+            relatedEntities: violations,
+          })
         }
       }
 
-      return findings;
+      return findings
     } catch (error) {
-      logger.error('Failed to query Redis:', { error });
-      return [];
+      logger.error('Failed to query Redis:', { error })
+      return []
     }
   }
 
   /**
    * Query logs for suspicious activity
    */
-  private async queryLogs(query: Record<string, unknown>): Promise<HuntFinding[]> {
+  private async queryLogs(
+    query: Record<string, unknown>,
+  ): Promise<HuntFinding[]> {
     try {
-      const findings: HuntFinding[] = [];
+      const findings: HuntFinding[] = []
 
       // This is a simplified implementation
       // In a real system, you would query actual log files or a log aggregation service
@@ -486,34 +548,41 @@ export class ThreatHuntingService extends EventEmitter {
           evidence: [{ pattern: 'authentication_failure', count: 15 }],
           confidence: 0.7,
           severity: 'medium',
-          recommendedActions: ['review_error_logs', 'investigate_authentication_issues'],
-          relatedEntities: ['authentication_service', 'user_management']
-        });
+          recommendedActions: [
+            'review_error_logs',
+            'investigate_authentication_issues',
+          ],
+          relatedEntities: ['authentication_service', 'user_management'],
+        })
       }
 
-      return findings;
+      return findings
     } catch (error) {
-      logger.error('Failed to query logs:', { error });
-      return [];
+      logger.error('Failed to query logs:', { error })
+      return []
     }
   }
 
   /**
    * Apply ML analysis to hunt findings
    */
-  private async applyMLAnalysis(findings: HuntFinding[]): Promise<HuntFinding[]> {
+  private async applyMLAnalysis(
+    findings: HuntFinding[],
+  ): Promise<HuntFinding[]> {
     if (!this.huntingModel) {
-      return [];
+      return []
     }
 
     try {
-      const mlFindings: HuntFinding[] = [];
+      const mlFindings: HuntFinding[] = []
 
       for (const finding of findings) {
-        const features = this.extractMLFeatures(finding);
-        const prediction = await this.predictThreatLevel(features);
+        const features = this.extractMLFeatures(finding)
+        const prediction = await this.predictThreatLevel(features)
 
-        if (prediction.confidence > this.config.mlModelConfig.confidenceThreshold) {
+        if (
+          prediction.confidence > this.config.mlModelConfig.confidenceThreshold
+        ) {
           mlFindings.push({
             findingId: `ml_${finding.findingId}`,
             type: 'behavioral_deviation',
@@ -522,16 +591,19 @@ export class ThreatHuntingService extends EventEmitter {
             evidence: [...finding.evidence, { ml_prediction: prediction }],
             confidence: prediction.confidence,
             severity: this.mapThreatLevelToSeverity(prediction.threatLevel),
-            recommendedActions: [...finding.recommendedActions, 'review_ml_findings'],
-            relatedEntities: finding.relatedEntities
-          });
+            recommendedActions: [
+              ...finding.recommendedActions,
+              'review_ml_findings',
+            ],
+            relatedEntities: finding.relatedEntities,
+          })
         }
       }
 
-      return mlFindings;
+      return mlFindings
     } catch (error) {
-      logger.error('Failed to apply ML analysis:', { error });
-      return [];
+      logger.error('Failed to apply ML analysis:', { error })
+      return []
     }
   }
 
@@ -548,43 +620,45 @@ export class ThreatHuntingService extends EventEmitter {
       finding.type === 'suspicious_pattern' ? 1 : 0,
       finding.type === 'iocs' ? 1 : 0,
       finding.type === 'behavioral_deviation' ? 1 : 0,
-      Date.now() % 86400000 / 3600000, // Hour of day
+      (Date.now() % 86400000) / 3600000, // Hour of day
       new Date().getDay(), // Day of week
       finding.recommendedActions.length,
       finding.title.length / 100, // Normalized title length
-      finding.description.length / 500 // Normalized description length
-    ];
+      finding.description.length / 500, // Normalized description length
+    ]
   }
 
   /**
    * Predict threat level using ML model
    */
   private async predictThreatLevel(features: number[]): Promise<{
-    threatLevel: string;
-    confidence: number;
+    threatLevel: string
+    confidence: number
   }> {
     if (!this.huntingModel) {
-      return { threatLevel: 'unknown', confidence: 0 };
+      return { threatLevel: 'unknown', confidence: 0 }
     }
 
     try {
       const result = await tf.tidy(async () => {
-        const inputTensor = tf.tensor2d([features]);
-        const prediction = await this.huntingModel.predict(inputTensor) as tf.Tensor;
-        const data = await prediction.data();
-        return Array.from(data) as number[];
-      });
+        const inputTensor = tf.tensor2d([features])
+        const prediction = (await this.huntingModel!.predict(
+          inputTensor,
+        )) as tf.Tensor
+        const data = await prediction.data()
+        return Array.from(data) as number[]
+      })
 
-      const maxIndex = result.indexOf(Math.max(...result));
-      const threatLevels = ['low', 'medium', 'high', 'critical'];
+      const maxIndex = result.indexOf(Math.max(...result))
+      const threatLevels = ['low', 'medium', 'high', 'critical']
 
       return {
         threatLevel: threatLevels[maxIndex],
-        confidence: result[maxIndex]
-      };
+        confidence: result[maxIndex],
+      }
     } catch (error) {
-      logger.error('Failed to predict threat level:', { error });
-      return { threatLevel: 'unknown', confidence: 0 };
+      logger.error('Failed to predict threat level:', { error })
+      return { threatLevel: 'unknown', confidence: 0 }
     }
   }
 
@@ -593,11 +667,14 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async storeHuntResult(result: HuntResult): Promise<void> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      await db.collection('hunt_results').insertOne(result);
+      const db = this.mongoClient.db('threat_detection')
+      await db.collection('hunt_results').insertOne(result)
     } catch (error) {
-      logger.error('Failed to store hunt result:', { error, huntId: result.huntId });
-      throw error;
+      logger.error('Failed to store hunt result:', {
+        error,
+        huntId: result.huntId,
+      })
+      throw error
     }
   }
 
@@ -606,61 +683,72 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private calculateHuntConfidence(findings: HuntFinding[]): number {
     if (findings.length === 0) {
-      return 0;
+      return 0
     }
 
-    const avgConfidence = findings.reduce((sum, f) => sum + f.confidence, 0) / findings.length;
-    const findingCountBonus = Math.min(findings.length * 0.05, 0.2); // Bonus for multiple findings
+    const avgConfidence =
+      findings.reduce((sum, f) => sum + f.confidence, 0) / findings.length
+    const findingCountBonus = Math.min(findings.length * 0.05, 0.2) // Bonus for multiple findings
 
-    return Math.min(avgConfidence + findingCountBonus, 1.0);
+    return Math.min(avgConfidence + findingCountBonus, 1.0)
   }
 
   /**
    * Determine hunt severity based on findings
    */
-  private determineHuntSeverity(findings: HuntFinding[], ruleSeverity: string): HuntResult['severity'] {
+  private determineHuntSeverity(
+    findings: HuntFinding[],
+    ruleSeverity: string,
+  ): HuntResult['severity'] {
     if (findings.length === 0) {
-      return 'low';
+      return 'low'
     }
 
-    const maxFindingSeverity = Math.max(...findings.map(f => this.severityToNumber(f.severity)));
-    const ruleSeverityNum = this.severityToNumber(ruleSeverity);
+    const maxFindingSeverity = Math.max(
+      ...findings.map((f) => this.severityToNumber(f.severity)),
+    )
+    const ruleSeverityNum = this.severityToNumber(ruleSeverity)
 
-    return this.numberToSeverity(Math.max(maxFindingSeverity, ruleSeverityNum));
+    return this.numberToSeverity(Math.max(maxFindingSeverity, ruleSeverityNum))
   }
 
   /**
    * Determine if investigation should be triggered
    */
-  private shouldTriggerInvestigation(findings: HuntFinding[], rule: HuntingRule): boolean {
+  private shouldTriggerInvestigation(
+    findings: HuntFinding[],
+    rule: HuntingRule,
+  ): boolean {
     if (findings.length === 0) {
-      return false;
+      return false
     }
 
-    const highSeverityFindings = findings.filter(f =>
-      f.severity === 'high' || f.severity === 'critical'
-    );
+    const highSeverityFindings = findings.filter(
+      (f) => f.severity === 'high' || f.severity === 'critical',
+    )
 
-    return highSeverityFindings.length > 0 ||
-      (findings.length > 3 && rule.autoInvestigate);
+    return (
+      highSeverityFindings.length > 0 ||
+      (findings.length > 3 && rule.autoInvestigate)
+    )
   }
 
   /**
    * Start investigation based on hunt results
    */
   async startInvestigation(params: {
-    huntId?: string;
-    threatId?: string;
-    templateId?: string;
-    priority?: number;
+    huntId?: string
+    threatId?: string
+    templateId?: string
+    priority?: number
   }): Promise<string> {
-    const investigationId = `investigation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    const investigationId = `investigation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 
     try {
-      logger.info('Starting investigation', { investigationId, ...params });
+      logger.info('Starting investigation', { investigationId, ...params })
 
       // Select investigation template
-      const template = this.selectInvestigationTemplate(params);
+      const template = this.selectInvestigationTemplate(params)
 
       // Create investigation
       const investigation: Investigation = {
@@ -670,36 +758,35 @@ export class ThreatHuntingService extends EventEmitter {
         templateId: template.templateId,
         status: 'pending',
         priority: this.mapPriority(params.priority || 1),
-        steps: template.steps.map(step => ({
+        steps: template.steps.map((step) => ({
           stepId: step.stepId,
           name: step.name,
           status: 'pending',
           executionTime: 0,
-          timestamp: new Date()
+          timestamp: new Date(),
         })),
         findings: [],
         createdAt: new Date(),
         metadata: {
           templateName: template.name,
-          estimatedDuration: template.estimatedDuration
-        }
-      };
+          estimatedDuration: template.estimatedDuration,
+        },
+      }
 
       // Store investigation
-      await this.storeInvestigation(investigation);
+      await this.storeInvestigation(investigation)
 
       // Add to active investigations
-      this.activeInvestigations.set(investigationId, investigation);
+      this.activeInvestigations.set(investigationId, investigation)
 
       // Start investigation execution
-      this.executeInvestigation(investigationId);
+      this.executeInvestigation(investigationId)
 
-      this.emit('investigation_started', { investigationId });
-      return investigationId;
-
+      this.emit('investigation_started', { investigationId })
+      return investigationId
     } catch (error) {
-      logger.error('Failed to start investigation:', { error, investigationId });
-      throw error;
+      logger.error('Failed to start investigation:', { error, investigationId })
+      throw error
     }
   }
 
@@ -707,105 +794,123 @@ export class ThreatHuntingService extends EventEmitter {
    * Select appropriate investigation template
    */
   private selectInvestigationTemplate(params: {
-    huntId?: string;
-    threatId?: string;
-    templateId?: string;
+    huntId?: string
+    threatId?: string
+    templateId?: string
   }): InvestigationTemplate {
     if (params.templateId) {
-      const template = this.config.investigationTemplates.find(t => t.templateId === params.templateId);
+      const template = this.config.investigationTemplates.find(
+        (t) => t.templateId === params.templateId,
+      )
       if (template) {
-        return template;
+        return template
       }
     }
 
     // Default template selection based on context
     if (params.huntId) {
-      return this.config.investigationTemplates.find(t => t.name.includes('Hunt')) ||
-        this.config.investigationTemplates[0];
+      return (
+        this.config.investigationTemplates.find((t) =>
+          t.name.includes('Hunt'),
+        ) || this.config.investigationTemplates[0]
+      )
     }
 
     if (params.threatId) {
-      return this.config.investigationTemplates.find(t => t.name.includes('Threat')) ||
-        this.config.investigationTemplates[0];
+      return (
+        this.config.investigationTemplates.find((t) =>
+          t.name.includes('Threat'),
+        ) || this.config.investigationTemplates[0]
+      )
     }
 
-    return this.config.investigationTemplates[0];
+    return this.config.investigationTemplates[0]
   }
 
   /**
    * Execute investigation steps
    */
   private async executeInvestigation(investigationId: string): Promise<void> {
-    const investigation = this.activeInvestigations.get(investigationId);
+    const investigation = this.activeInvestigations.get(investigationId)
     if (!investigation) {
-      logger.error('Investigation not found:', { investigationId });
-      return;
+      logger.error('Investigation not found:', { investigationId })
+      return
     }
 
     try {
-      investigation.status = 'running';
-      investigation.startedAt = new Date();
+      investigation.status = 'running'
+      investigation.startedAt = new Date()
 
-      await this.updateInvestigation(investigation);
+      await this.updateInvestigation(investigation)
 
-      logger.info('Executing investigation', { investigationId, steps: investigation.steps.length });
+      logger.info('Executing investigation', {
+        investigationId,
+        steps: investigation.steps.length,
+      })
 
       for (const step of investigation.steps) {
         if (investigation.status === 'cancelled') {
-          break;
+          break
         }
 
         try {
-          step.status = 'running';
-          step.timestamp = new Date();
+          step.status = 'running'
+          step.timestamp = new Date()
 
-          const startTime = Date.now();
-          const result = await this.executeInvestigationStep(step, investigation);
-          const executionTime = Date.now() - startTime;
+          const startTime = Date.now()
+          const result = await this.executeInvestigationStep(
+            step,
+            investigation,
+          )
+          const executionTime = Date.now() - startTime
 
-          step.result = result;
-          step.executionTime = executionTime;
-          step.status = 'completed';
+          step.result = result
+          step.executionTime = executionTime
+          step.status = 'completed'
 
           // Process findings from step
           if (result && result.findings) {
-            investigation.findings.push(...result.findings);
+            investigation.findings.push(...result.findings)
           }
-
         } catch (error) {
-          step.status = 'failed';
-          step.error = error.message;
+          step.status = 'failed'
+          step.error = (error as any).message
           logger.error(`Investigation step failed: ${step.name}`, {
             error,
             investigationId,
-            stepId: step.stepId
-          });
+            stepId: step.stepId,
+          })
         }
 
-        step.timestamp = new Date();
-        await this.updateInvestigation(investigation);
+        step.timestamp = new Date()
+        await this.updateInvestigation(investigation)
       }
 
       // Complete investigation
-      investigation.status = 'completed';
-      investigation.completedAt = new Date();
+      investigation.status = 'completed'
+      investigation.completedAt = new Date()
 
-      await this.updateInvestigation(investigation);
+      await this.updateInvestigation(investigation)
 
-      logger.info('Investigation completed', { investigationId, findings: investigation.findings.length });
-      this.emit('investigation_completed', { investigationId });
-
+      logger.info('Investigation completed', {
+        investigationId,
+        findings: investigation.findings.length,
+      })
+      this.emit('investigation_completed', { investigationId })
     } catch (error) {
-      investigation.status = 'failed';
-      investigation.completedAt = new Date();
-      await this.updateInvestigation(investigation);
+      investigation.status = 'failed'
+      investigation.completedAt = new Date()
+      await this.updateInvestigation(investigation)
 
-      logger.error('Investigation execution failed:', { error, investigationId });
-      this.emit('investigation_failed', { investigationId, error });
+      logger.error('Investigation execution failed:', {
+        error,
+        investigationId,
+      })
+      this.emit('investigation_failed', { investigationId, error })
     }
 
     // Remove from active investigations
-    this.activeInvestigations.delete(investigationId);
+    this.activeInvestigations.delete(investigationId)
   }
 
   /**
@@ -813,51 +918,54 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async executeInvestigationStep(
     step: InvestigationStepResult,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
     try {
       logger.info(`Executing investigation step: ${step.name}`, {
         investigationId: investigation.investigationId,
-        stepId: step.stepId
-      });
+        stepId: step.stepId,
+      })
 
       // Get the actual step configuration
-      const template = this.config.investigationTemplates.find(t =>
-        t.steps.some(s => s.stepId === step.stepId)
-      );
+      const template = this.config.investigationTemplates.find((t) =>
+        t.steps.some((s) => s.stepId === step.stepId),
+      )
 
-      const stepConfig = template?.steps.find(s => s.stepId === step.stepId);
+      const stepConfig = template?.steps.find((s) => s.stepId === step.stepId)
       if (!stepConfig) {
-        throw new Error(`Step configuration not found: ${step.stepId}`);
+        throw new Error(`Step configuration not found: ${step.stepId}`)
       }
 
       // Execute step based on action type
       switch (stepConfig.action) {
         case 'analyze_logs':
-          return await this.analyzeLogs(stepConfig.parameters, investigation);
+          return await this.analyzeLogs(stepConfig.parameters, investigation)
 
         case 'check_iocs':
-          return await this.checkIOCs(stepConfig.parameters, investigation);
+          return await this.checkIOCs(stepConfig.parameters, investigation)
 
         case 'analyze_behavior':
-          return await this.analyzeBehavior(stepConfig.parameters, investigation);
+          return await this.analyzeBehavior(
+            stepConfig.parameters,
+            investigation,
+          )
 
         case 'correlate_data':
-          return await this.correlateData(stepConfig.parameters, investigation);
+          return await this.correlateData(stepConfig.parameters, investigation)
 
         case 'generate_report':
-          return await this.generateReport(stepConfig.parameters, investigation);
+          return await this.generateReport(stepConfig.parameters, investigation)
 
         default:
-          throw new Error(`Unknown investigation action: ${stepConfig.action}`);
+          throw new Error(`Unknown investigation action: ${stepConfig.action}`)
       }
     } catch (error) {
       logger.error(`Failed to execute investigation step: ${step.name}`, {
         error,
         investigationId: investigation.investigationId,
-        stepId: step.stepId
-      });
-      throw error;
+        stepId: step.stepId,
+      })
+      throw error
     }
   }
 
@@ -866,13 +974,13 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async analyzeLogs(
     parameters: Record<string, unknown>,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
-    const findings: InvestigationFinding[] = [];
+    const findings: InvestigationFinding[] = []
 
     try {
       // Simulate log analysis
-      const timeRange = parameters.timeRange as number || 3600000; // 1 hour default
+      const timeRange = (parameters.timeRange as number) || 3600000 // 1 hour default
 
       findings.push({
         findingId: `log_analysis_${Date.now()}`,
@@ -884,17 +992,20 @@ export class ThreatHuntingService extends EventEmitter {
           logEntries: 150,
           errorCount: 12,
           warningCount: 8,
-          suspiciousPatterns: ['repeated_login_failures', 'unusual_api_calls']
+          suspiciousPatterns: ['repeated_login_failures', 'unusual_api_calls'],
         },
         confidence: 0.8,
         severity: 'medium',
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
-      return { findings };
+      return { findings }
     } catch (error) {
-      logger.error('Log analysis failed:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Log analysis failed:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
@@ -903,13 +1014,17 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async checkIOCs(
     parameters: Record<string, unknown>,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
-    const findings: InvestigationFinding[] = [];
+    const findings: InvestigationFinding[] = []
 
     try {
       // Simulate IOC checking
-      const iocTypes = parameters.iocTypes as string[] || ['ip', 'domain', 'hash'];
+      const iocTypes = (parameters.iocTypes as string[]) || [
+        'ip',
+        'domain',
+        'hash',
+      ]
 
       findings.push({
         findingId: `ioc_check_${Date.now()}`,
@@ -922,17 +1037,20 @@ export class ThreatHuntingService extends EventEmitter {
           maliciousIOCs: 3,
           suspiciousIOCs: 8,
           cleanIOCs: 34,
-          iocTypes: iocTypes
+          iocTypes: iocTypes,
         },
         confidence: 0.9,
         severity: 'high',
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
-      return { findings };
+      return { findings }
     } catch (error) {
-      logger.error('IOC check failed:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('IOC check failed:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
@@ -941,14 +1059,14 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async analyzeBehavior(
     parameters: Record<string, unknown>,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
-    const findings: InvestigationFinding[] = [];
+    const findings: InvestigationFinding[] = []
 
     try {
       // Simulate behavioral analysis
-      const userId = parameters.userId as string;
-      const timeWindow = parameters.timeWindow as number || 86400000; // 24 hours
+      const userId = parameters.userId as string
+      const timeWindow = (parameters.timeWindow as number) || 86400000 // 24 hours
 
       findings.push({
         findingId: `behavior_analysis_${Date.now()}`,
@@ -961,17 +1079,24 @@ export class ThreatHuntingService extends EventEmitter {
           anomalousBehaviors: 12,
           riskScore: 0.7,
           timeWindow: timeWindow,
-          keyFindings: ['unusual_login_times', 'access_pattern_changes', 'geographic_anomalies']
+          keyFindings: [
+            'unusual_login_times',
+            'access_pattern_changes',
+            'geographic_anomalies',
+          ],
         },
         confidence: 0.85,
         severity: 'medium',
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
-      return { findings };
+      return { findings }
     } catch (error) {
-      logger.error('Behavior analysis failed:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Behavior analysis failed:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
@@ -980,36 +1105,48 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async correlateData(
     parameters: Record<string, unknown>,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
-    const findings: InvestigationFinding[] = [];
+    const findings: InvestigationFinding[] = []
 
     try {
       // Simulate data correlation
-      const dataSources = parameters.dataSources as string[] || ['logs', 'metrics', 'threats'];
+      const dataSources = (parameters.dataSources as string[]) || [
+        'logs',
+        'metrics',
+        'threats',
+      ]
 
       findings.push({
         findingId: `data_correlation_${Date.now()}`,
         stepId: 'correlate_data',
         type: 'conclusion',
         title: 'Data Correlation Analysis',
-        description: 'Correlated data from multiple sources to identify patterns',
+        description:
+          'Correlated data from multiple sources to identify patterns',
         data: {
           dataSources: dataSources,
           correlationsFound: 8,
           timelineEvents: 23,
-          relatedEntities: ['user_123', 'ip_192.168.1.1', 'domain_suspicious.com'],
-          confidenceScore: 0.82
+          relatedEntities: [
+            'user_123',
+            'ip_192.168.1.1',
+            'domain_suspicious.com',
+          ],
+          confidenceScore: 0.82,
         },
         confidence: 0.82,
         severity: 'medium',
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
-      return { findings };
+      return { findings }
     } catch (error) {
-      logger.error('Data correlation failed:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Data correlation failed:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
@@ -1018,37 +1155,45 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async generateReport(
     parameters: Record<string, unknown>,
-    investigation: Investigation
+    investigation: Investigation,
   ): Promise<{ findings?: InvestigationFinding[] }> {
-    const findings: InvestigationFinding[] = [];
+    const findings: InvestigationFinding[] = []
 
     try {
       // Generate comprehensive report
       const report = {
         investigationId: investigation.investigationId,
         totalFindings: investigation.findings.length,
-        criticalFindings: investigation.findings.filter(f => f.severity === 'critical').length,
-        highFindings: investigation.findings.filter(f => f.severity === 'high').length,
+        criticalFindings: investigation.findings.filter(
+          (f) => f.severity === 'critical',
+        ).length,
+        highFindings: investigation.findings.filter(
+          (f) => f.severity === 'high',
+        ).length,
         executionTime: Date.now() - investigation.createdAt.getTime(),
-        recommendations: this.generateRecommendations(investigation.findings)
-      };
+        recommendations: this.generateRecommendations(investigation.findings),
+      }
 
       findings.push({
         findingId: `investigation_report_${Date.now()}`,
         stepId: 'generate_report',
         type: 'conclusion',
         title: 'Investigation Report Generated',
-        description: 'Comprehensive investigation report with findings and recommendations',
+        description:
+          'Comprehensive investigation report with findings and recommendations',
         data: report,
         confidence: 0.95,
         severity: 'medium',
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
-      return { findings };
+      return { findings }
     } catch (error) {
-      logger.error('Report generation failed:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Report generation failed:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
@@ -1056,72 +1201,88 @@ export class ThreatHuntingService extends EventEmitter {
    * Generate recommendations based on findings
    */
   private generateRecommendations(findings: InvestigationFinding[]): string[] {
-    const recommendations = new Set<string>();
+    const recommendations = new Set<string>()
 
     for (const finding of findings) {
       if (finding.severity === 'critical') {
-        recommendations.add('immediate_response_required');
-        recommendations.add('escalate_to_security_team');
+        recommendations.add('immediate_response_required')
+        recommendations.add('escalate_to_security_team')
       }
 
       if (finding.severity === 'high') {
-        recommendations.add('increase_monitoring');
-        recommendations.add('review_security_controls');
+        recommendations.add('increase_monitoring')
+        recommendations.add('review_security_controls')
       }
 
       if (finding.type === 'anomaly') {
-        recommendations.add('investigate_anomaly_source');
+        recommendations.add('investigate_anomaly_source')
       }
 
       if (finding.type === 'iocs') {
-        recommendations.add('update_threat_intelligence');
-        recommendations.add('block_malicious_indicators');
+        recommendations.add('update_threat_intelligence')
+        recommendations.add('block_malicious_indicators')
       }
     }
 
-    return Array.from(recommendations);
+    return Array.from(recommendations)
   }
 
   /**
    * Store investigation in database
    */
-  private async storeInvestigation(investigation: Investigation): Promise<void> {
+  private async storeInvestigation(
+    investigation: Investigation,
+  ): Promise<void> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      await db.collection('investigations').insertOne(investigation);
+      const db = this.mongoClient.db('threat_detection')
+      await db.collection('investigations').insertOne(investigation)
     } catch (error) {
-      logger.error('Failed to store investigation:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Failed to store investigation:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
   /**
    * Update investigation in database
    */
-  private async updateInvestigation(investigation: Investigation): Promise<void> {
+  public async updateInvestigation(
+    investigation: Investigation,
+  ): Promise<void> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      await db.collection('investigations').updateOne(
-        { investigationId: investigation.investigationId },
-        { $set: investigation }
-      );
+      const db = this.mongoClient.db('threat_detection')
+      await db
+        .collection('investigations')
+        .updateOne(
+          { investigationId: investigation.investigationId },
+          { $set: investigation },
+        )
     } catch (error) {
-      logger.error('Failed to update investigation:', { error, investigationId: investigation.investigationId });
-      throw error;
+      logger.error('Failed to update investigation:', {
+        error,
+        investigationId: investigation.investigationId,
+      })
+      throw error
     }
   }
 
   /**
    * Get investigation by ID
    */
-  async getInvestigation(investigationId: string): Promise<Investigation | null> {
+  async getInvestigation(
+    investigationId: string,
+  ): Promise<Investigation | null> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      const investigation = await db.collection('investigations').findOne({ investigationId });
-      return investigation as Investigation | null;
+      const db = this.mongoClient.db('threat_detection')
+      const investigation = await db
+        .collection('investigations')
+        .findOne({ investigationId })
+      return investigation as Investigation | null
     } catch (error) {
-      logger.error('Failed to get investigation:', { error, investigationId });
-      return null;
+      logger.error('Failed to get investigation:', { error, investigationId })
+      return null
     }
   }
 
@@ -1130,17 +1291,18 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async getRecentInvestigations(limit: number = 50): Promise<Investigation[]> {
     try {
-      const db = this.mongoClient.db('threat_detection');
-      const investigations = await db.collection('investigations')
+      const db = this.mongoClient.db('threat_detection')
+      const investigations = await db
+        .collection('investigations')
         .find({})
         .sort({ createdAt: -1 })
         .limit(limit)
-        .toArray();
+        .toArray()
 
-      return investigations as Investigation[];
+      return investigations as unknown as Investigation[]
     } catch (error) {
-      logger.error('Failed to get recent investigations:', { error });
-      return [];
+      logger.error('Failed to get recent investigations:', { error })
+      return []
     }
   }
 
@@ -1149,24 +1311,27 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async cancelInvestigation(investigationId: string): Promise<boolean> {
     try {
-      const investigation = this.activeInvestigations.get(investigationId);
+      const investigation = this.activeInvestigations.get(investigationId)
       if (!investigation) {
-        return false;
+        return false
       }
 
-      investigation.status = 'cancelled';
-      investigation.completedAt = new Date();
+      investigation.status = 'cancelled'
+      investigation.completedAt = new Date()
 
-      await this.updateInvestigation(investigation);
-      this.activeInvestigations.delete(investigationId);
+      await this.updateInvestigation(investigation)
+      this.activeInvestigations.delete(investigationId)
 
-      logger.info('Investigation cancelled', { investigationId });
-      this.emit('investigation_cancelled', { investigationId });
+      logger.info('Investigation cancelled', { investigationId })
+      this.emit('investigation_cancelled', { investigationId })
 
-      return true;
+      return true
     } catch (error) {
-      logger.error('Failed to cancel investigation:', { error, investigationId });
-      return false;
+      logger.error('Failed to cancel investigation:', {
+        error,
+        investigationId,
+      })
+      return false
     }
   }
 
@@ -1174,120 +1339,314 @@ export class ThreatHuntingService extends EventEmitter {
    * Get hunting statistics
    */
   async getHuntingStatistics(): Promise<{
-    totalHunts: number;
-    huntsWithFindings: number;
-    investigationsTriggered: number;
-    criticalFindings: number;
-    recentHunts: HuntResult[];
+    totalHunts: number
+    huntsWithFindings: number
+    investigationsTriggered: number
+    criticalFindings: number
+    recentHunts: HuntResult[]
   }> {
     try {
-      const db = this.mongoClient.db('threat_detection');
+      const db = this.mongoClient.db('threat_detection')
 
-      const [totalHunts, huntsWithFindings, investigations, criticalFindings, recentHunts] = await Promise.all([
+      const [
+        totalHunts,
+        huntsWithFindings,
+        investigations,
+        criticalFindings,
+        recentHunts,
+      ] = await Promise.all([
         db.collection('hunt_results').countDocuments(),
-        db.collection('hunt_results').countDocuments({ 'findings.0': { $exists: true } }),
+        db
+          .collection('hunt_results')
+          .countDocuments({ 'findings.0': { $exists: true } }),
         db.collection('investigations').countDocuments(),
-        db.collection('hunt_results').countDocuments({ 'findings.severity': 'critical' }),
-        db.collection('hunt_results')
+        db
+          .collection('hunt_results')
+          .countDocuments({ 'findings.severity': 'critical' }),
+        db
+          .collection('hunt_results')
           .find({})
           .sort({ timestamp: -1 })
           .limit(10)
-          .toArray()
-      ]);
+          .toArray(),
+      ])
 
       return {
         totalHunts,
         huntsWithFindings,
         investigationsTriggered: investigations,
         criticalFindings,
-        recentHunts: recentHunts as HuntResult[]
-      };
+        recentHunts: recentHunts as unknown as HuntResult[],
+      }
     } catch (error) {
-      logger.error('Failed to get hunting statistics:', { error });
+      logger.error('Failed to get hunting statistics:', { error })
       return {
         totalHunts: 0,
         huntsWithFindings: 0,
         investigationsTriggered: 0,
         criticalFindings: 0,
-        recentHunts: []
-      };
+        recentHunts: [],
+      }
     }
   }
 
   // Helper methods
   private severityToNumber(severity: string): number {
-    const map = { low: 1, medium: 2, high: 3, critical: 4 };
-    return map[severity as keyof typeof map] || 1;
+    const map = { low: 1, medium: 2, high: 3, critical: 4 }
+    return map[severity as keyof typeof map] || 1
   }
 
   private numberToSeverity(num: number): HuntResult['severity'] {
     if (num >= 4) {
-      return 'critical';
+      return 'critical'
     }
     if (num >= 3) {
-      return 'high';
+      return 'high'
     }
     if (num >= 2) {
-      return 'medium';
+      return 'medium'
     }
-    return 'low';
+    return 'low'
   }
 
   private mapPriority(priority: number): Investigation['priority'] {
     if (priority >= 4) {
-      return 'critical';
+      return 'critical'
     }
     if (priority >= 3) {
-      return 'high';
+      return 'high'
     }
     if (priority >= 2) {
-      return 'medium';
+      return 'medium'
     }
-    return 'low';
+    return 'low'
   }
 
-  private mapThreatLevelToSeverity(threatLevel: string): HuntFinding['severity'] {
+  private mapThreatLevelToSeverity(
+    threatLevel: string,
+  ): HuntFinding['severity'] {
     const map: Record<string, HuntFinding['severity']> = {
-      'low': 'low',
-      'medium': 'medium',
-      'high': 'high',
-      'critical': 'critical'
-    };
-    return map[threatLevel] || 'low';
+      low: 'low',
+      medium: 'medium',
+      high: 'high',
+      critical: 'critical',
+    }
+    return map[threatLevel] || 'low'
   }
 
   async shutdown(): Promise<void> {
     try {
-      await this.stopHunting();
+      await this.stopHunting()
 
       // Cancel active investigations
       for (const investigationId of this.activeInvestigations.keys()) {
-        await this.cancelInvestigation(investigationId);
+        await this.cancelInvestigation(investigationId)
       }
 
       if (this.redis) {
-        await this.redis.quit();
+        await this.redis.quit()
       }
 
       if (this.mongoClient) {
-        await this.mongoClient.close();
+        await this.mongoClient.close()
       }
 
-      logger.info('Threat hunting service shutdown completed');
-      this.emit('hunting_shutdown');
+      logger.info('Threat hunting service shutdown completed')
+      this.emit('hunting_shutdown')
     } catch (error) {
-      logger.error('Failed to shutdown threat hunting service:', { error });
-      throw error;
+      logger.error('Failed to shutdown threat hunting service:', { error })
+      throw error
     }
   }
-}
 
-export type {
-  ThreatHuntingConfig,
-  HuntingRule,
-  InvestigationTemplate,
-  HuntResult,
-  HuntFinding,
-  Investigation,
-  InvestigationFinding
-};
+  public async createInvestigation(
+    investigationData: any,
+  ): Promise<any | { errors: string[] }> {
+    if (!investigationData.title || !investigationData.priority) {
+      return { errors: ['Invalid investigation data'] }
+    }
+    const investigationId = `inv_${await this.redis.incr('investigation:id')}`
+    const investigation = {
+      id: investigationId,
+      ...investigationData,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    }
+    await this.redis.set(
+      `investigation:${investigationId}`,
+      JSON.stringify(investigation),
+    )
+    return investigation
+  }
+
+  public async closeInvestigation(
+    investigationId: string,
+    resolutionData: any,
+  ): Promise<any> {
+    const investigation = await this.getInvestigation(investigationId)
+    if (!investigation) {
+      return null
+    }
+    const updatedInvestigation = {
+      ...investigation,
+      ...resolutionData,
+      status: 'resolved',
+      resolvedAt: new Date().toISOString(),
+    }
+    await this.redis.set(
+      `investigation:${investigationId}`,
+      JSON.stringify(updatedInvestigation),
+    )
+    return updatedInvestigation
+  }
+
+  public async getActiveInvestigations(): Promise<any[]> {
+    const keys = await this.redis.keys('investigation:inv_*')
+    const investigations = await this.redis.mget(keys)
+    return investigations
+      .map((inv) => JSON.parse(inv))
+      .filter((inv) => inv.status === 'active')
+  }
+
+  public async getInvestigationsByPriority(priority: string): Promise<any[]> {
+    const keys = await this.redis.keys('investigation:inv_*')
+    const investigations = await this.redis.mget(keys)
+    return investigations
+      .map((inv) => JSON.parse(inv))
+      .filter((inv) => inv.priority === priority)
+  }
+
+  public async createHuntQuery(queryData: any): Promise<any> {
+    const huntId = `hunt_${await this.redis.incr('hunt:id')}`
+    const huntQuery = {
+      id: huntId,
+      ...queryData,
+      status: 'active',
+    }
+    await this.redis.set(`hunt:${huntId}`, JSON.stringify(huntQuery))
+    return huntQuery
+  }
+
+  public async saveHuntTemplate(templateData: any): Promise<any> {
+    const templateId = `template_${await this.redis.incr('template:id')}`
+    const template = {
+      id: templateId,
+      ...templateData,
+    }
+    await this.redis.set(`hunt:template:${templateId}`, JSON.stringify(template))
+    return template
+  }
+
+  public async loadHuntTemplates(): Promise<any[]> {
+    const keys = await this.redis.keys('hunt:template:*')
+    const templates = await this.redis.mget(keys)
+    return templates.map((t) => JSON.parse(t))
+  }
+
+  public async scheduleHunt(queryId: string, scheduleData: any): Promise<any> {
+    const huntQuery = await this.redis.get(`hunt:${queryId}`)
+    if (!huntQuery) {
+      return null
+    }
+    const updatedQuery = {
+      ...JSON.parse(huntQuery),
+      schedule: scheduleData,
+    }
+    await this.redis.set(`hunt:${queryId}`, JSON.stringify(updatedQuery))
+    return scheduleData
+  }
+
+  public async createTimeline(
+    investigationId: string,
+    timelineData: any,
+  ): Promise<any> {
+    const timelineId = `timeline_${await this.redis.incr('timeline:id')}`
+    const timeline = {
+      id: timelineId,
+      investigationId,
+      ...timelineData,
+      events: [],
+    }
+    await this.redis.set(`timeline:${timelineId}`, JSON.stringify(timeline))
+    return timeline
+  }
+
+  public async addTimelineEvent(timelineId: string, eventData: any): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    timeline.events.push(eventData)
+    await this.redis.set(`timeline:${timelineId}`, JSON.stringify(timeline))
+    return timeline
+  }
+
+  public async analyzeTimeline(timelineId: string): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    return this.aiService.analyzePattern(timeline.events)
+  }
+
+  public async exportTimeline(timelineId: string, format: string): Promise<any> {
+    const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
+    if (!timeline) {
+      return null
+    }
+    return {
+      format,
+      data: timeline,
+    }
+  }
+
+  public async searchThreatData(searchData: any): Promise<any> {
+    const { page = 1, limit = 50 } = searchData.pagination || {}
+    const keys = await this.redis.keys('threat:*')
+    const threats = await this.redis.mget(keys)
+    return {
+      data: threats.map((t) => JSON.parse(t)),
+      pagination: {
+        total: threats.length,
+        page,
+        limit,
+      },
+    }
+  }
+
+  public async analyzePatterns(threatData: any[]): Promise<any> {
+    return this.aiService.analyzePattern(threatData)
+  }
+
+  public async correlateThreatWithBehavior(threatData: any): Promise<any> {
+    const behavioralData = await this.behavioralService.getBehavioralProfile(
+      threatData.userId,
+    )
+    return {
+      behavioralRisk: behavioralData.profile.riskLevel,
+      correlatedAnomalies: behavioralData.profile.anomalies,
+    }
+  }
+
+  public async predictFutureThreats(historicalData: any[]): Promise<any> {
+    return this.predictiveService.predictThreats(historicalData)
+  }
+
+  public async performRealTimeHunting(huntingData: any): Promise<any> {
+    const matches = []
+    const anomalies = []
+    const actions = []
+    return { matches, anomalies, actions }
+  }
+
+  public async detectRealTimeAnomalies(realTimeData: any[]): Promise<any[]> {
+    const anomalies = []
+    for (const data of realTimeData) {
+      const anomaly = await this.aiService.predictAnomaly(data)
+      if (anomaly.isAnomaly) {
+        anomalies.push(anomaly)
+      }
+    }
+    return anomalies
+  }
+}

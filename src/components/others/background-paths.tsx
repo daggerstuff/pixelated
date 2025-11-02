@@ -62,7 +62,10 @@ export default function BackgroundPaths({
         <FloatingPaths position={-1} />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6 text-center max-w-full sm:max-w-4xl" style={{maxWidth: "100vw", paddingLeft: "8px", paddingRight: "8px"}}>
+      <div
+        className="relative z-10 container mx-auto px-4 md:px-6 text-center max-w-full sm:max-w-4xl"
+        style={{ maxWidth: '100vw', paddingLeft: '8px', paddingRight: '8px' }}
+      >
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -71,7 +74,10 @@ export default function BackgroundPaths({
         >
           <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter">
             {words.map((word, wordIndex) => (
-              <span key={`word-${word}-${wordIndex}`} className="inline-block mr-4 last:mr-0">
+              <span
+                key={`word-${word}-${wordIndex}`}
+                className="inline-block mr-4 last:mr-0"
+              >
                 {word.split('').map((letter, letterIndex) => (
                   <motion.span
                     key={`${word}-${letter}-${wordIndex}-${letterIndex}`}

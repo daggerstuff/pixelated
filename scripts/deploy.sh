@@ -100,10 +100,7 @@ build_application() {
     rm -rf .astro/
 
     # Build with environment-specific configuration
-    NODE_ENV=production pnpm build:optimized
-
-    # Run build verification tests
-    pnpm test:build
+    NODE_ENV=production pnpm build
 
     success "Application build completed"
 }

@@ -5,65 +5,121 @@ import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 
 const demos = [
   {
-    title: "Bias Detection Engine",
-    description: "Interactive, client-side demo showcasing multi-layer cultural bias analysis.",
-    status: "ACTIVE",
-    difficulty: "MEDIUM",
-    href: "/demo/bias-detection",
-    icon: "⚡",
-    stats: { layers: "4", patterns: "200+" },
+    title: 'Enterprise Components Hub',
+    description:
+      'Comprehensive showcase of all 8 enterprise-grade components for therapy platforms.',
+    status: 'NEW',
+    difficulty: 'LOW',
+    href: '/components',
+    icon: '🏗️',
+    stats: { components: '8', status: 'integrated' },
   },
   {
-    title: "Psychology Pipeline",
-    description: "End-to-end pipeline overview with knowledge parsing and scenario generation demos.",
-    status: "ACTIVE",
-    difficulty: "HIGH",
-    href: "/demo/psychology-pipeline",
-    icon: "🧠",
-    stats: { modules: "3", latency: "<500ms" },
+    title: 'Analytics Dashboard',
+    description:
+      'Advanced charting and data visualization tools with Chart.js integration.',
+    status: 'NEW',
+    difficulty: 'MEDIUM',
+    href: '/components/analytics-dashboard',
+    icon: '📊',
+    stats: { charts: '4+', responsive: 'yes' },
   },
   {
-    title: "FHE (Encrypted Analysis)",
-    description: "Explore Fully Homomorphic Encryption capabilities in an interactive demo.",
-    status: "ACTIVE",
-    difficulty: "MEDIUM",
-    href: "/demo/fhe",
-    icon: "�",
-    stats: { privacy: "100%", mode: "client" },
+    title: '3D Emotion Visualization',
+    description:
+      'Immersive 3D emotion mapping using Valence-Arousal-Dominance model with Three.js.',
+    status: 'NEW',
+    difficulty: 'HIGH',
+    href: '/components/emotion-visualization',
+    icon: '🎭',
+    stats: { dimensions: '3D', interactive: 'yes' },
   },
   {
-    title: "Emotion Visualization",
-    description: "Visual demo of emotion metrics and dimensional analysis.",
-    status: "ACTIVE",
-    difficulty: "LOW",
-    href: "/demo/emotion-visualization",
-    icon: "📈",
-    stats: { dims: "x/y", charts: "multiple" },
+    title: 'Treatment Plan Manager',
+    description:
+      'Comprehensive clinical workflow management with goal tracking and milestones.',
+    status: 'NEW',
+    difficulty: 'MEDIUM',
+    href: '/components/treatment-plans',
+    icon: '🎯',
+    stats: { goals: 'unlimited', categories: '5' },
   },
   {
-    title: "Mental Health Chat",
-    description: "Production-grade chat with MentalLLaMA analysis (falls back to demo mode locally).",
-    status: "ACTIVE",
-    difficulty: "MEDIUM",
-    href: "/mental-health-demo",
-    icon: "�",
-    stats: { analysis: "real-time", crisis: "on" },
+    title: 'FHE Privacy Demo',
+    description:
+      'Fully Homomorphic Encryption demonstration for privacy-preserving therapy data analysis.',
+    status: 'NEW',
+    difficulty: 'HIGH',
+    href: '/components/security-demo',
+    icon: '🔒',
+    stats: { privacy: '100%', compliant: 'HIPAA' },
   },
   {
-    title: "Search Demo",
-    description: "Privacy-first in-browser full-text search using FlexSearch.",
-    status: "ACTIVE",
-    difficulty: "LOW",
-    href: "/search-demo",
-    icon: "🔎",
-    stats: { serverCalls: "0", latency: "ms" },
+    title: 'UI Component Showcase',
+    description:
+      'Modern carousel and interface elements with multiple effects and accessibility features.',
+    status: 'NEW',
+    difficulty: 'LOW',
+    href: '/components/ui-showcase',
+    icon: '🎨',
+    stats: { effects: '5+', mobile: 'optimized' },
+  },
+  {
+    title: 'Enhanced Bias Detection',
+    description:
+      'Modernized UI/UX with real-time analysis, counterfactuals, and historical trends.',
+    status: 'NEW',
+    difficulty: 'MEDIUM',
+    href: '/demo/enhanced-bias-detection',
+    icon: '✨',
+    stats: { realtime: 'yes', scenarios: '8+', trends: 'on' },
+  },
+  {
+    title: 'Bias Detection Engine',
+    description:
+      'Interactive, client-side demo showcasing multi-layer cultural bias analysis.',
+    status: 'ACTIVE',
+    difficulty: 'MEDIUM',
+    href: '/demo/bias-detection',
+    icon: '⚡',
+    stats: { layers: '4', patterns: '200+' },
+  },
+  {
+    title: 'Psychology Pipeline',
+    description:
+      'End-to-end pipeline overview with knowledge parsing and scenario generation demos.',
+    status: 'ACTIVE',
+    difficulty: 'HIGH',
+    href: '/demo/psychology-pipeline',
+    icon: '🧠',
+    stats: { modules: '3', latency: '<500ms' },
+  },
+  {
+    title: 'Mental Health Chat',
+    description:
+      'Production-grade chat with MentalLLaMA analysis (falls back to demo mode locally).',
+    status: 'ACTIVE',
+    difficulty: 'MEDIUM',
+    href: '/mental-health-demo',
+    icon: '💬',
+    stats: { analysis: 'real-time', crisis: 'on' },
+  },
+  {
+    title: 'Search Demo',
+    description: 'Privacy-first in-browser full-text search using FlexSearch.',
+    status: 'ACTIVE',
+    difficulty: 'LOW',
+    href: '/search-demo',
+    icon: '🔎',
+    stats: { serverCalls: '0', latency: 'ms' },
   },
 ]
 
 const liveDemo = {
-  title: "Live Chat Simulation",
-  description: "Experience our AI training system with a real-time therapy session simulation.",
-  status: "LIVE"
+  title: 'Live Chat Simulation',
+  description:
+    'Experience our AI training system with a real-time therapy session simulation.',
+  status: 'LIVE',
 }
 ---
 
@@ -72,10 +128,12 @@ const liveDemo = {
   description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
   <!-- Hero Section -->
-  <section class="brutalist-section mesh-bg-1 relative overflow-hidden min-h-screen flex items-center">
+  <section
+    class="brutalist-section mesh-bg-1 relative overflow-hidden min-h-screen flex items-center"
+  >
     <!-- Animated Background Grid -->
     <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
-    
+
     <!-- Floating Neural Network Nodes -->
     <div class="absolute inset-0 pointer-events-none">
       <div class="neural-node neural-node--1" data-speed="0.5"></div>
@@ -96,15 +154,21 @@ const liveDemo = {
     </div>
 
     <!-- Glitch Effect Overlay -->
-    <div class="absolute inset-0 glitch-overlay opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+    <div
+      class="absolute inset-0 glitch-overlay opacity-0 hover:opacity-100 transition-opacity duration-500"
+    >
+    </div>
 
     <div class="brutalist-container relative z-10">
       <div class="text-center">
         <!-- Animated Status Bar -->
         <div class="status-bar mb-8 inline-block">
-          <div class="status-indicator status-indicator--online inline-flex items-center gap-3 px-6 py-3 bg-black/20 backdrop-blur-sm rounded-full border border-green-500/30">
+          <div
+            class="status-indicator status-indicator--online inline-flex items-center gap-3 px-6 py-3 bg-black/20 backdrop-blur-sm rounded-full border border-green-500/30"
+          >
             <div class="pulse-dot pulse-dot--green"></div>
-            <span class="font-bold text-green-400">ALL SYSTEMS OPERATIONAL</span>
+            <span class="font-bold text-green-400">ALL SYSTEMS OPERATIONAL</span
+            >
             <div class="status-dots">
               <span class="status-dot"></span>
               <span class="status-dot"></span>
@@ -112,52 +176,103 @@ const liveDemo = {
             </div>
           </div>
         </div>
-        
+
         <!-- Main Headline with Typewriter Effect -->
         <div class="headline-container mb-8">
-          <h1 class="brutalist-heading text-6xl md:text-8xl lg:text-9xl mb-4 leading-tight">
-            <span class="gradient-text-primary typewriter-text" data-text="EXPERIENCE THE">EXPERIENCE THE</span>
+          <h1
+            class="brutalist-heading text-6xl md:text-8xl lg:text-9xl mb-4 leading-tight"
+          >
+            <span
+              class="gradient-text-primary typewriter-text"
+              data-text="EXPERIENCE THE">EXPERIENCE THE</span
+            >
             <br />
-            <span class="gradient-text-secondary glitch-text" data-text="TRAINING REVOLUTION">TRAINING REVOLUTION</span>
+            <span
+              class="gradient-text-secondary glitch-text"
+              data-text="TRAINING REVOLUTION">TRAINING REVOLUTION</span
+            >
           </h1>
         </div>
-        
+
         <!-- Animated Description -->
         <div class="description-container mb-12">
-          <p class="text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto leading-relaxed fade-in-text">
-            Try our <span class="text-teal-400 font-semibold">AI-powered therapy training simulations</span>. 
-            Each demo represents <span class="text-purple-400 font-semibold">years of development</span> and 
-            <span class="text-blue-400 font-semibold">thousands of hours</span> of clinical expertise.
+          <p
+            class="text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto leading-relaxed fade-in-text"
+          >
+            Try our <span class="text-teal-400 font-semibold"
+              >AI-powered therapy training simulations</span
+            >. Each demo represents <span class="text-purple-400 font-semibold"
+              >years of development</span
+            > and
+            <span class="text-blue-400 font-semibold">thousands of hours</span> of
+            clinical expertise.
           </p>
         </div>
 
         <!-- Interactive Feature Pills -->
         <div class="feature-pills-container mb-16">
           <div class="flex flex-wrap justify-center gap-6">
-            <div class="feature-pill feature-pill--success hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="Practice without consequences">
+            <div
+              class="feature-pill feature-pill--success hover:scale-110 transition-all duration-300 cursor-pointer"
+              data-tooltip="Practice without consequences"
+            >
               <div class="feature-pill-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <span class="feature-pill-text">ZERO RISK TRAINING</span>
               <div class="feature-pill-glow"></div>
             </div>
-            
-            <div class="feature-pill feature-pill--info hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="End-to-end encryption">
+
+            <div
+              class="feature-pill feature-pill--info hover:scale-110 transition-all duration-300 cursor-pointer"
+              data-tooltip="End-to-end encryption"
+            >
               <div class="feature-pill-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  ></path>
                 </svg>
               </div>
               <span class="feature-pill-text">FULLY ENCRYPTED</span>
               <div class="feature-pill-glow"></div>
             </div>
-            
-            <div class="feature-pill feature-pill--warning hover:scale-110 transition-all duration-300 cursor-pointer" data-tooltip="Instant analysis">
+
+            <div
+              class="feature-pill feature-pill--warning hover:scale-110 transition-all duration-300 cursor-pointer"
+              data-tooltip="Instant analysis"
+            >
               <div class="feature-pill-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
               </div>
               <span class="feature-pill-text">REAL-TIME FEEDBACK</span>
@@ -168,22 +283,49 @@ const liveDemo = {
 
         <!-- CTA Buttons -->
         <div class="cta-container">
-          <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button class="cta-button cta-button--primary group" id="live-demo-btn">
+          <div
+            class="flex flex-col sm:flex-row gap-6 justify-center items-center"
+          >
+            <button
+              class="cta-button cta-button--primary group"
+              id="live-demo-btn"
+            >
               <span class="cta-button-text">LIVE DEMONSTRATION</span>
               <div class="cta-button-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                 </svg>
               </div>
               <div class="cta-button-glow"></div>
             </button>
-            
-            <button class="cta-button cta-button--secondary group" id="modules-btn">
+
+            <button
+              class="cta-button cta-button--secondary group"
+              id="modules-btn"
+            >
               <span class="cta-button-text">VIEW MODULES</span>
               <div class="cta-button-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  ></path>
                 </svg>
               </div>
             </button>
@@ -193,7 +335,9 @@ const liveDemo = {
         <!-- Scroll Indicator -->
         <div class="scroll-indicator mt-16">
           <div class="scroll-arrow"></div>
-          <span class="scroll-text text-sm text-gray-400">Scroll to explore</span>
+          <span class="scroll-text text-sm text-gray-400"
+            >Scroll to explore</span
+          >
         </div>
       </div>
     </div>
@@ -205,17 +349,46 @@ const liveDemo = {
       position: absolute;
       width: 8px;
       height: 8px;
-      background: radial-gradient(circle, rgba(34, 211, 238, 0.8) 0%, rgba(34, 211, 238, 0.2) 70%, transparent 100%);
+      background: radial-gradient(
+        circle,
+        rgba(34, 211, 238, 0.8) 0%,
+        rgba(34, 211, 238, 0.2) 70%,
+        transparent 100%
+      );
       border-radius: 50%;
       animation: float 6s ease-in-out infinite;
     }
-    
-    .neural-node--1 { top: 20%; left: 15%; animation-delay: 0s; }
-    .neural-node--2 { top: 30%; right: 20%; animation-delay: 1s; }
-    .neural-node--3 { bottom: 30%; left: 25%; animation-delay: 2s; }
-    .neural-node--4 { bottom: 20%; right: 15%; animation-delay: 3s; }
-    .neural-node--5 { top: 50%; left: 10%; animation-delay: 4s; }
-    .neural-node--6 { top: 60%; right: 10%; animation-delay: 5s; }
+
+    .neural-node--1 {
+      top: 20%;
+      left: 15%;
+      animation-delay: 0s;
+    }
+    .neural-node--2 {
+      top: 30%;
+      right: 20%;
+      animation-delay: 1s;
+    }
+    .neural-node--3 {
+      bottom: 30%;
+      left: 25%;
+      animation-delay: 2s;
+    }
+    .neural-node--4 {
+      bottom: 20%;
+      right: 15%;
+      animation-delay: 3s;
+    }
+    .neural-node--5 {
+      top: 50%;
+      left: 10%;
+      animation-delay: 4s;
+    }
+    .neural-node--6 {
+      top: 60%;
+      right: 10%;
+      animation-delay: 5s;
+    }
 
     /* Particle System */
     .particle {
@@ -226,19 +399,39 @@ const liveDemo = {
       border-radius: 50%;
       animation: particle-float 8s linear infinite;
     }
-    
-    .particle--1 { top: 10%; left: 20%; animation-delay: 0s; }
-    .particle--2 { top: 25%; right: 30%; animation-delay: 2s; }
-    .particle--3 { bottom: 15%; left: 40%; animation-delay: 4s; }
-    .particle--4 { bottom: 35%; right: 25%; animation-delay: 6s; }
-    .particle--5 { top: 70%; left: 50%; animation-delay: 1s; }
+
+    .particle--1 {
+      top: 10%;
+      left: 20%;
+      animation-delay: 0s;
+    }
+    .particle--2 {
+      top: 25%;
+      right: 30%;
+      animation-delay: 2s;
+    }
+    .particle--3 {
+      bottom: 15%;
+      left: 40%;
+      animation-delay: 4s;
+    }
+    .particle--4 {
+      bottom: 35%;
+      right: 25%;
+      animation-delay: 6s;
+    }
+    .particle--5 {
+      top: 70%;
+      left: 50%;
+      animation-delay: 1s;
+    }
 
     /* Status Dots */
     .status-dots {
       display: flex;
       gap: 2px;
     }
-    
+
     .status-dot {
       width: 4px;
       height: 4px;
@@ -246,16 +439,22 @@ const liveDemo = {
       border-radius: 50%;
       animation: status-pulse 2s ease-in-out infinite;
     }
-    
-    .status-dot:nth-child(2) { animation-delay: 0.3s; }
-    .status-dot:nth-child(3) { animation-delay: 0.6s; }
+
+    .status-dot:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    .status-dot:nth-child(3) {
+      animation-delay: 0.6s;
+    }
 
     /* Typewriter Effect */
     .typewriter-text {
       overflow: hidden;
       border-right: 3px solid #22d3ee;
       white-space: nowrap;
-      animation: typewriter 3s steps(12) 1s forwards, blink-caret 1s step-end infinite;
+      animation:
+        typewriter 3s steps(12) 1s forwards,
+        blink-caret 1s step-end infinite;
     }
 
     /* Glitch Text */
@@ -263,7 +462,7 @@ const liveDemo = {
       position: relative;
       animation: glitch 2s infinite;
     }
-    
+
     .glitch-text::before,
     .glitch-text::after {
       content: attr(data-text);
@@ -273,13 +472,13 @@ const liveDemo = {
       width: 100%;
       height: 100%;
     }
-    
+
     .glitch-text::before {
       animation: glitch-1 0.5s infinite;
       color: #ff0080;
       z-index: -1;
     }
-    
+
     .glitch-text::after {
       animation: glitch-2 0.5s infinite;
       color: #00ffff;
@@ -299,19 +498,30 @@ const liveDemo = {
       border-radius: 50px;
       overflow: hidden;
     }
-    
-    .feature-pill--success { border-color: rgba(34, 197, 94, 0.3); }
-    .feature-pill--info { border-color: rgba(59, 130, 246, 0.3); }
-    .feature-pill--warning { border-color: rgba(245, 158, 11, 0.3); }
-    
+
+    .feature-pill--success {
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .feature-pill--info {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .feature-pill--warning {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
     .feature-pill-glow {
       position: absolute;
       inset: 0;
-      background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(34, 211, 238, 0.1),
+        transparent
+      );
       opacity: 0;
       transition: opacity 0.3s;
     }
-    
+
     .feature-pill:hover .feature-pill-glow {
       opacity: 1;
     }
@@ -333,25 +543,34 @@ const liveDemo = {
       overflow: hidden;
       transition: all 0.3s;
     }
-    
+
     .cta-button--secondary {
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(59, 130, 246, 0.1));
+      background: linear-gradient(
+        135deg,
+        rgba(34, 211, 238, 0.1),
+        rgba(59, 130, 246, 0.1)
+      );
       border: 1px solid rgba(34, 211, 238, 0.3);
       color: #22d3ee;
     }
-    
+
     .cta-button-glow {
       position: absolute;
       inset: 0;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
       opacity: 0;
       transition: opacity 0.3s;
     }
-    
+
     .cta-button:hover .cta-button-glow {
       opacity: 1;
     }
-    
+
     .cta-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
@@ -364,7 +583,7 @@ const liveDemo = {
       align-items: center;
       gap: 8px;
     }
-    
+
     .scroll-arrow {
       width: 2px;
       height: 30px;
@@ -374,66 +593,139 @@ const liveDemo = {
 
     /* Animations */
     @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(180deg); }
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(180deg);
+      }
     }
-    
+
     @keyframes particle-float {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
     }
-    
+
     @keyframes status-pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 1;
+      }
     }
-    
+
     @keyframes typewriter {
-      from { width: 0; }
-      to { width: 100%; }
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
     }
-    
+
     @keyframes blink-caret {
-      from, to { border-color: transparent; }
-      50% { border-color: #22d3ee; }
+      from,
+      to {
+        border-color: transparent;
+      }
+      50% {
+        border-color: #22d3ee;
+      }
     }
-    
+
     @keyframes glitch {
-      0%, 100% { transform: translate(0); }
-      20% { transform: translate(-2px, 2px); }
-      40% { transform: translate(-2px, -2px); }
-      60% { transform: translate(2px, 2px); }
-      80% { transform: translate(2px, -2px); }
+      0%,
+      100% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(-2px, 2px);
+      }
+      40% {
+        transform: translate(-2px, -2px);
+      }
+      60% {
+        transform: translate(2px, 2px);
+      }
+      80% {
+        transform: translate(2px, -2px);
+      }
     }
-    
+
     @keyframes glitch-1 {
-      0%, 100% { transform: translate(0); }
-      20% { transform: translate(-3px, 3px); }
-      40% { transform: translate(-3px, -3px); }
-      60% { transform: translate(3px, 3px); }
-      80% { transform: translate(3px, -3px); }
+      0%,
+      100% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(-3px, 3px);
+      }
+      40% {
+        transform: translate(-3px, -3px);
+      }
+      60% {
+        transform: translate(3px, 3px);
+      }
+      80% {
+        transform: translate(3px, -3px);
+      }
     }
-    
+
     @keyframes glitch-2 {
-      0%, 100% { transform: translate(0); }
-      20% { transform: translate(3px, -3px); }
-      40% { transform: translate(3px, 3px); }
-      60% { transform: translate(-3px, -3px); }
-      80% { transform: translate(-3px, 3px); }
+      0%,
+      100% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(3px, -3px);
+      }
+      40% {
+        transform: translate(3px, 3px);
+      }
+      60% {
+        transform: translate(-3px, -3px);
+      }
+      80% {
+        transform: translate(-3px, 3px);
+      }
     }
-    
+
     @keyframes scroll-bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(10px); }
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(10px);
+      }
     }
-    
+
     @keyframes fade-in {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
+
     .fade-in-text {
       animation: fade-in 1s ease-out 2s both;
     }
@@ -441,54 +733,62 @@ const liveDemo = {
 
   <script is:inline>
     // Add event listeners when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Live demo button
-      const liveDemoBtn = document.getElementById('live-demo-btn');
+      const liveDemoBtn = document.getElementById('live-demo-btn')
       if (liveDemoBtn) {
-        liveDemoBtn.addEventListener('click', function() {
-          const liveDemoSection = document.querySelector('.brutalist-section:nth-of-type(2)');
+        liveDemoBtn.addEventListener('click', function () {
+          const liveDemoSection = document.querySelector(
+            '.brutalist-section:nth-of-type(2)',
+          )
           if (liveDemoSection) {
-            liveDemoSection.scrollIntoView({ 
-              behavior: 'smooth' 
-            });
+            liveDemoSection.scrollIntoView({
+              behavior: 'smooth',
+            })
           }
-        });
+        })
       }
-      
+
       // Modules button
-      const modulesBtn = document.getElementById('modules-btn');
+      const modulesBtn = document.getElementById('modules-btn')
       if (modulesBtn) {
-        modulesBtn.addEventListener('click', function() {
-          const modulesSection = document.querySelector('.brutalist-section:nth-of-type(3)');
+        modulesBtn.addEventListener('click', function () {
+          const modulesSection = document.querySelector(
+            '.brutalist-section:nth-of-type(3)',
+          )
           if (modulesSection) {
-            modulesSection.scrollIntoView({ 
-              behavior: 'smooth' 
-            });
+            modulesSection.scrollIntoView({
+              behavior: 'smooth',
+            })
           }
-        });
+        })
       }
-    });
-    
+    })
+
     // Parallax effect for neural nodes
     document.addEventListener('mousemove', (e) => {
-      const nodes = document.querySelectorAll('.neural-node');
-      const speed = 0.5;
-      
+      const nodes = document.querySelectorAll('.neural-node')
+      const speed = 0.5
+
       nodes.forEach((node) => {
-        const nodeSpeed = node.getAttribute('data-speed') || '1';
-        const x = (window.innerWidth - e.pageX * parseFloat(nodeSpeed) * speed) / 100;
-        const y = (window.innerHeight - e.pageY * parseFloat(nodeSpeed) * speed) / 100;
-        
-        node.style.transform = `translateX(${x}px) translateY(${y}px)`;
-      });
-    });
+        const nodeSpeed = node.getAttribute('data-speed') || '1'
+        const x =
+          (window.innerWidth - e.pageX * parseFloat(nodeSpeed) * speed) / 100
+        const y =
+          (window.innerHeight - e.pageY * parseFloat(nodeSpeed) * speed) / 100
+
+        node.style.transform = `translateX(${x}px) translateY(${y}px)`
+      })
+    })
   </script>
 
   <!-- Live Demo Section -->
   <section class="brutalist-section bg-gray-900/50">
     <div class="brutalist-container">
       <div class="text-center mb-12">
-        <div class="status-indicator status-indicator--processing inline-flex mb-4">
+        <div
+          class="status-indicator status-indicator--processing inline-flex mb-4"
+        >
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">{liveDemo.status} DEMONSTRATION</span>
         </div>
@@ -517,56 +817,70 @@ const liveDemo = {
           <span class="text-blue-400">TRAINING MODULES</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Each module targets specific therapeutic competencies with measurable outcomes.
+          Each module targets specific therapeutic competencies with measurable
+          outcomes.
         </p>
       </div>
 
       <div class="brutalist-grid brutalist-grid--3">
-        {demos.map((demo) => (
-          <div class="brutalist-card hover-lift group">
-            {/* Demo Header */}
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-3xl">{demo.icon}</div>
-              <div class="flex gap-2">
-                <div class={`brutalist-badge ${
-                  demo.status === 'ACTIVE' ? 'brutalist-badge--success' : 'brutalist-badge--warning'
-                } text-xs`}>
-                  {demo.status}
-                </div>
-                <div class={`brutalist-badge ${
-                  demo.difficulty === 'HIGH' ? 'brutalist-badge--danger' :
-                  demo.difficulty === 'MEDIUM' ? 'brutalist-badge--warning' : 'brutalist-badge--info'
-                } text-xs`}>
-                  {demo.difficulty}
+        {
+          demos.map((demo) => (
+            <div class="brutalist-card hover-lift group">
+              {/* Demo Header */}
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-3xl">{demo.icon}</div>
+                <div class="flex gap-2">
+                  <div
+                    class={`brutalist-badge ${
+                      demo.status === 'ACTIVE'
+                        ? 'brutalist-badge--success'
+                        : 'brutalist-badge--warning'
+                    } text-xs`}
+                  >
+                    {demo.status}
+                  </div>
+                  <div
+                    class={`brutalist-badge ${
+                      demo.difficulty === 'HIGH'
+                        ? 'brutalist-badge--danger'
+                        : demo.difficulty === 'MEDIUM'
+                          ? 'brutalist-badge--warning'
+                          : 'brutalist-badge--info'
+                    } text-xs`}
+                  >
+                    {demo.difficulty}
+                  </div>
                 </div>
               </div>
+
+              {/* Demo Content */}
+              <h3 class="brutalist-subheading text-lg mb-3">{demo.title}</h3>
+              <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                {demo.description}
+              </p>
+
+              {/* Demo Stats */}
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                {Object.entries(demo.stats).map(([key, value]) => (
+                  <div class="text-center">
+                    <div class="text-lg font-bold text-green-400">{value}</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wide">
+                      {key}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Demo Action */}
+              <a
+                href={demo.href}
+                class="brutalist-button brutalist-button--primary w-full text-center group-hover:scale-105 transition-transform"
+              >
+                LAUNCH DEMO →
+              </a>
             </div>
-
-            {/* Demo Content */}
-            <h3 class="brutalist-subheading text-lg mb-3">{demo.title}</h3>
-            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-              {demo.description}
-            </p>
-
-            {/* Demo Stats */}
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              {Object.entries(demo.stats).map(([key, value]) => (
-                <div class="text-center">
-                  <div class="text-lg font-bold text-green-400">{value}</div>
-                  <div class="text-xs text-gray-500 uppercase tracking-wide">{key}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Demo Action */}
-            <a
-              href={demo.href}
-              class="brutalist-button brutalist-button--primary w-full text-center group-hover:scale-105 transition-transform"
-            >
-              LAUNCH DEMO →
-            </a>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
   </section>
@@ -581,7 +895,8 @@ const liveDemo = {
           <span class="confidence-boost">OUTCOMES</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Every training session generates actionable data to track your progress.
+          Every training session generates actionable data to track your
+          progress.
         </p>
       </div>
 
@@ -615,30 +930,43 @@ const liveDemo = {
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
         <div class="text-5xl mb-6 text-green-400">🚀</div>
-        
+
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
           READY TO TRANSFORM
           <br />
           <span class="confidence-boost">YOUR TRAINING?</span>
         </h2>
-        
+
         <p class="text-xl text-gray-300 mb-8">
-          Join 15+ universities and 2,500+ students who've revolutionized their therapy education.
+          Experience the AI training platform that's about to revolutionize
+          therapy education.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <a href="/contact" class="brutalist-button brutalist-button--primary text-lg px-8 py-4">
+          <a
+            href="/contact"
+            class="brutalist-button brutalist-button--primary text-lg px-8 py-4"
+          >
             START YOUR PROGRAM →
           </a>
-          <a href="/features" class="brutalist-button brutalist-button--secondary text-lg px-8 py-4">
+          <a
+            href="/features"
+            class="brutalist-button brutalist-button--secondary text-lg px-8 py-4"
+          >
             VIEW ALL FEATURES
           </a>
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <span class="brutalist-badge brutalist-badge--success">✓ 30-DAY GUARANTEE</span>
-          <span class="brutalist-badge brutalist-badge--info">✓ FULL SUPPORT</span>
-          <span class="brutalist-badge brutalist-badge--warning">✓ CUSTOM INTEGRATION</span>
+          <span class="brutalist-badge brutalist-badge--success"
+            >✓ 30-DAY GUARANTEE</span
+          >
+          <span class="brutalist-badge brutalist-badge--info"
+            >✓ FULL SUPPORT</span
+          >
+          <span class="brutalist-badge brutalist-badge--warning"
+            >✓ CUSTOM INTEGRATION</span
+          >
         </div>
       </div>
     </div>

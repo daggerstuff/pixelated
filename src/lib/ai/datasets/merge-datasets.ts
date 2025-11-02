@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { securePathJoin } from '../../utils/index'
 
 const logger = createBuildSafeLogger('default')
 import { existsSync } from 'fs'
@@ -68,11 +69,24 @@ export function getMergedDatasetPath(
   format: 'jsonl' | 'json' | 'csv' = 'jsonl',
 ): string {
   const extension = format === 'jsonl' ? 'jsonl' : format
-  const path = join(
-    process.cwd(),
-    'data',
-    'merged',
-    `mental_health_dataset.${extension}`,
+  const filename = `mental_health_dataset.${extension}`
+
+  // Validate filename to prevent path traversal
+  if (
+    filename.includes('..') ||
+    filename.includes('/') ||
+    filename.includes('\\') ||
+    filename.length > 255
+  ) {
+    throw new Error('Invalid filename for dataset path')
+  }
+
+  const path = securePathJoin(
+    join(process.cwd(), 'data', 'merged'),
+    filename,
+    {
+      allowedExtensions: ['.jsonl', '.json', '.csv'],
+    },
   )
 
   logger.debug('Generated merged dataset path', { format, path })

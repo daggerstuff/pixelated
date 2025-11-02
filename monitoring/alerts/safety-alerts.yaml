@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: pixel-safety-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: safety.rules
+    rules:
+    - alert: PixelSafetyGateViolationsHigh
+      expr: increase(pixel_gate_violations[5m]) > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High rate of safety gate violations"
+        description: "More than 5 gate violations in the last 5 minutes."
+
+    - alert: PixelInvalidationsSpike
+      expr: increase(pixel_invalidations[10m]) > 20
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Spike in content invalidations"
+        description: "More than 20 invalidations in the last 10 minutes."
+
+    - alert: PixelPIIAlerts
+      expr: increase(pixel_pii[10m]) > 10
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High PII detections"
+        description: "Detected more than 10 PII hits in the last 10 minutes."

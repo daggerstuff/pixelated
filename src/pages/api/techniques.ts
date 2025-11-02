@@ -35,24 +35,24 @@ export const GET = async ({ request }: { request: Request }) => {
 
     // Get techniques from content collection
     const techniques = await getCollection('techniques')
-    
+
     // Filter techniques based on query parameters
     let filteredTechniques = techniques
-    
+
     if (categoryFilter) {
       filteredTechniques = filteredTechniques.filter(
-        technique => technique.data.category === categoryFilter
+        (technique) => technique.data.category === categoryFilter,
       )
     }
-    
+
     if (evidenceFilter) {
       filteredTechniques = filteredTechniques.filter(
-        technique => technique.data.evidenceLevel === evidenceFilter
+        (technique) => technique.data.evidenceLevel === evidenceFilter,
       )
     }
 
     // Transform for API response
-    const responseData = filteredTechniques.map(technique => ({
+    const responseData = filteredTechniques.map((technique) => ({
       id: technique.id,
       slug: technique.slug,
       title: technique.data.title,
@@ -61,7 +61,7 @@ export const GET = async ({ request }: { request: Request }) => {
       evidenceLevel: technique.data.evidenceLevel,
       duration: technique.data.duration,
       difficulty: technique.data.difficulty,
-      tags: technique.data.tags || []
+      tags: technique.data.tags || [],
     }))
 
     return new Response(
@@ -71,8 +71,8 @@ export const GET = async ({ request }: { request: Request }) => {
         total: responseData.length,
         filters: {
           category: categoryFilter,
-          evidenceLevel: evidenceFilter
-        }
+          evidenceLevel: evidenceFilter,
+        },
       }),
       {
         status: 200,
@@ -84,7 +84,7 @@ export const GET = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch techniques',
-        message: error instanceof Error ? String(error) : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -99,13 +99,10 @@ export const POST = async ({ request, cookies }) => {
     // Authentication check
     const sessionCookie = cookies.get('session')
     if (!sessionCookie) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     const body = await request.json()
@@ -113,7 +110,9 @@ export const POST = async ({ request, cookies }) => {
 
     if (!patientData) {
       return new Response(
-        JSON.stringify({ error: 'Patient data is required for recommendations' }),
+        JSON.stringify({
+          error: 'Patient data is required for recommendations',
+        }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -129,7 +128,7 @@ export const POST = async ({ request, cookies }) => {
       JSON.stringify({
         success: true,
         recommendations,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }),
       {
         status: 200,
@@ -141,7 +140,7 @@ export const POST = async ({ request, cookies }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to generate recommendations',
-        message: error instanceof Error ? String(error) : 'Unknown error'
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

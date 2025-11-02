@@ -1,11 +1,10 @@
-
 /**
  * @module fallback-generator
  * @description This module provides a fallback response generator for the MetaAligner pipeline.
  */
 
-import type { UnifiedProcessingResponse } from '../api/unified-api';
-import { MetaAlignerError } from './error-handler';
+import type { UnifiedProcessingResponse } from '../api/unified-api'
+import { MetaAlignerError } from './error-handler'
 
 /**
  * Defines the interface for the FallbackGenerator.
@@ -17,7 +16,7 @@ export interface IFallbackGenerator {
    * @param error - The error that occurred.
    * @returns A fallback response.
    */
-  generate(error: Error): UnifiedProcessingResponse;
+  generate(error: Error): UnifiedProcessingResponse
 }
 
 /**
@@ -31,14 +30,15 @@ export class FallbackGenerator implements IFallbackGenerator {
         originalResponse: '',
         alignment: {} as any,
         errors: [{ message: error.message, stage: 'unknown' }],
-      };
+      }
     } else {
       return {
-        enhancedResponse: 'An unexpected error occurred. Please try again later.',
+        enhancedResponse:
+          'An unexpected error occurred. Please try again later.',
         originalResponse: '',
         alignment: {} as any,
         errors: [{ message: error.message, stage: 'unknown' }],
-      };
+      }
     }
   }
 }

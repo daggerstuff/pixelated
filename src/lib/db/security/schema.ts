@@ -17,20 +17,18 @@ function createMockClient() {
   logger.warn(message)
 
   return {
-    connect: () => Promise.resolve({
-      collection: () => ({
-        createIndex: () => Promise.resolve(),
-        insertOne: () => Promise.resolve(),
+    connect: () =>
+      Promise.resolve({
+        collection: () => ({
+          createIndex: () => Promise.resolve(),
+          insertOne: () => Promise.resolve(),
+        }),
       }),
-    }),
   }
 }
 
 // Create MongoDB client only if we have valid credentials
-const mongoAdmin =
-  mongoUri && mongoDbName
-    ? mongodb
-    : createMockClient()
+const mongoAdmin = mongoUri && mongoDbName ? mongodb : createMockClient()
 
 /**
  * Initialize security collections in the database
@@ -38,10 +36,10 @@ const mongoAdmin =
 export async function initializeSecurityTables(): Promise<void> {
   try {
     const db = await mongoAdmin.connect()
-    
+
     // Create security_events collection with indexes
     const securityEventsCollection = db.collection('security_events')
-    
+
     // Create indexes for better query performance
     await securityEventsCollection.createIndex({ type: 1 })
     await securityEventsCollection.createIndex({ user_id: 1 })

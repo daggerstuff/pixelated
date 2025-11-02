@@ -68,6 +68,7 @@ export async function recordCrisisEventToDb(
     // Rethrow to allow calling code to handle the error if needed
     throw new Error(
       `Failed to record crisis event: ${error instanceof Error ? String(error) : String(error)}`,
+      { cause: error },
     )
   }
 }

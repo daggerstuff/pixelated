@@ -1,7 +1,6 @@
 // Dynamic Objective Weighting Algorithms for Context-Sensitive Alignment
 // Provides strategy-based weighting adjustment based on context, urgency, and extensible factors.
 
-
 import type { ObjectivePriority } from './context-objective-mapping'
 
 export interface WeightingParams {
@@ -11,7 +10,10 @@ export interface WeightingParams {
 }
 
 export interface ObjectiveWeightingStrategy {
-  (objectives: ObjectivePriority[], params: WeightingParams): ObjectivePriority[]
+  (
+    objectives: ObjectivePriority[],
+    params: WeightingParams,
+  ): ObjectivePriority[]
 }
 
 /**
@@ -22,12 +24,16 @@ export interface ObjectiveWeightingStrategy {
  */
 export const defaultWeightingStrategy: ObjectiveWeightingStrategy = (
   objectives,
-  params
+  params,
 ) => {
   let adjusted = [...objectives]
 
   // Example: Boost weighting of safety & empathy if high urgency or special protocols
-  if (params.urgency === 'high' || params.urgency === 'critical' || params.needsSpecialHandling) {
+  if (
+    params.urgency === 'high' ||
+    params.urgency === 'critical' ||
+    params.needsSpecialHandling
+  ) {
     adjusted = adjusted.map((obj) => {
       if (['safety', 'empathy'].includes(obj.key)) {
         return { ...obj, weight: Math.min(1, obj.weight * 1.2) }
@@ -41,7 +47,7 @@ export const defaultWeightingStrategy: ObjectiveWeightingStrategy = (
     adjusted = adjusted.map((obj) =>
       obj.key in params.customFactors
         ? { ...obj, weight: obj.weight * (params.customFactors![obj.key] || 1) }
-        : obj
+        : obj,
     )
   }
 
@@ -49,7 +55,7 @@ export const defaultWeightingStrategy: ObjectiveWeightingStrategy = (
   const sum = adjusted.reduce((acc, obj) => acc + obj.weight, 0) || 1
   adjusted = adjusted.map((obj) => ({
     ...obj,
-    weight: Number((obj.weight / sum).toFixed(4))
+    weight: Number((obj.weight / sum).toFixed(4)),
   }))
 
   return adjusted

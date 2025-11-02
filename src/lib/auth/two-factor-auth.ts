@@ -91,7 +91,7 @@ function generateTOTPSecret(): string {
 function generateBackupCodes(): string[] {
   const codes: string[] = []
   const charset = BACKUP_CODES_CONFIG.charset
-  
+
   for (let i = 0; i < BACKUP_CODES_CONFIG.count; i++) {
     let code = ''
     for (let j = 0; j < BACKUP_CODES_CONFIG.length; j++) {
@@ -100,7 +100,7 @@ function generateBackupCodes(): string[] {
     }
     codes.push(code)
   }
-  
+
   return codes
 }
 
@@ -124,7 +124,7 @@ export async function setupTwoFactorAuth(
     deviceType: string
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<TwoFactorSetup> {
   try {
     // Check if 2FA is already enabled
@@ -135,10 +135,10 @@ export async function setupTwoFactorAuth(
 
     // Generate TOTP secret
     const secret = generateTOTPSecret()
-    
+
     // Generate backup codes
     const backupCodes = generateBackupCodes()
-    
+
     // Store hashed backup codes
     const hashedCodes: string[] = []
     for (const code of backupCodes) {
@@ -147,12 +147,8 @@ export async function setupTwoFactorAuth(
     }
 
     // Generate QR code for authenticator apps
-    const otpauth = authenticator.keyuri(
-      userEmail,
-      TOTP_CONFIG.issuer,
-      secret
-    )
-    
+    const otpauth = authenticator.keyuri(userEmail, TOTP_CONFIG.issuer, secret)
+
     const qrCode = await QRCode.toDataURL(otpauth)
 
     // Store setup data temporarily (expires in 15 minutes)
@@ -162,18 +158,22 @@ export async function setupTwoFactorAuth(
       setupComplete: false,
       createdAt: Date.now(),
     }
-    
+
     await setInCache(
       `2fa:setup:${userId}`,
       setupData,
-      15 * 60 // 15 minutes
+      15 * 60, // 15 minutes
     )
 
     // Log setup initiation
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_INITIATED, userId, {
-      deviceId: deviceInfo.deviceId,
-      deviceName: deviceInfo.deviceName,
-    })
+    await logSecurityEvent(
+      SecurityEventType.TWO_FACTOR_SETUP_INITIATED,
+      userId,
+      {
+        deviceId: deviceInfo.deviceId,
+        deviceName: deviceInfo.deviceName,
+      },
+    )
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_initiated')
@@ -189,7 +189,7 @@ export async function setupTwoFactorAuth(
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
-    
+
     throw new AuthenticationError('Failed to setup 2FA')
   }
 }
@@ -206,7 +206,7 @@ export async function completeTwoFactorSetup(
     deviceType: string
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<void> {
   try {
     // Get setup data
@@ -242,7 +242,7 @@ export async function completeTwoFactorSetup(
     await setInCache(
       `2fa:config:${userId}`,
       twoFactorConfig,
-      365 * 24 * 60 * 60 // 1 year
+      365 * 24 * 60 * 60, // 1 year
     )
 
     // Add device as trusted if requested
@@ -252,21 +252,26 @@ export async function completeTwoFactorSetup(
     await removeFromCache(`2fa:setup:${userId}`)
 
     // Log successful setup
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_COMPLETED, userId, {
-      deviceId: deviceInfo.deviceId,
-      deviceName: deviceInfo.deviceName,
-    })
+    await logSecurityEvent(
+      SecurityEventType.TWO_FACTOR_SETUP_COMPLETED,
+      userId,
+      {
+        deviceId: deviceInfo.deviceId,
+        deviceName: deviceInfo.deviceName,
+      },
+    )
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_completed')
-
   } catch (error) {
     await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_FAILED, userId, {
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
-    
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to complete 2FA setup')
+
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to complete 2FA setup')
   }
 }
 
@@ -274,9 +279,10 @@ export async function completeTwoFactorSetup(
  * Verify 2FA token
  */
 export async function verifyTwoFactorToken(
-  verification: TwoFactorVerification
+  verification: TwoFactorVerification,
 ): Promise<boolean> {
-  const { userId, token, deviceId, deviceName, trustDevice, backupCode } = verification
+  const { userId, token, deviceId, deviceName, trustDevice, backupCode } =
+    verification
 
   try {
     // Get 2FA configuration
@@ -289,7 +295,9 @@ export async function verifyTwoFactorToken(
     const lockoutKey = `2fa:lockout:${userId}`
     const lockoutData = await getFromCache(lockoutKey)
     if (lockoutData && lockoutData.lockedUntil > Date.now()) {
-      throw new AuthenticationError('Account is locked due to too many failed attempts')
+      throw new AuthenticationError(
+        'Account is locked due to too many failed attempts',
+      )
     }
 
     let isValid = false
@@ -315,20 +323,27 @@ export async function verifyTwoFactorToken(
     if (!isValid) {
       // Increment failed attempts
       const attemptsKey = `2fa:attempts:${userId}`
-      const attempts = (await getFromCache(attemptsKey)) || { count: 0, lastAttempt: 0 }
-      
+      const attempts = (await getFromCache(attemptsKey)) || {
+        count: 0,
+        lastAttempt: 0,
+      }
+
       attempts.count += 1
       attempts.lastAttempt = Date.now()
-      
+
       await setInCache(attemptsKey, attempts, 60 * 60) // 1 hour
 
       // Lock account after 5 failed attempts
       if (attempts.count >= 5) {
         const lockoutDuration = 15 * 60 * 1000 // 15 minutes
-        await setInCache(lockoutKey, {
-          lockedUntil: Date.now() + lockoutDuration,
-          attempts: attempts.count,
-        }, 60 * 60) // 1 hour
+        await setInCache(
+          lockoutKey,
+          {
+            lockedUntil: Date.now() + lockoutDuration,
+            attempts: attempts.count,
+          },
+          60 * 60,
+        ) // 1 hour
 
         await logSecurityEvent(SecurityEventType.ACCOUNT_LOCKED, userId, {
           reason: '2fa_failed_attempts',
@@ -336,11 +351,15 @@ export async function verifyTwoFactorToken(
         })
       }
 
-      await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED, userId, {
-        method: verificationMethod,
-        deviceId,
-        attempts: attempts.count,
-      })
+      await logSecurityEvent(
+        SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED,
+        userId,
+        {
+          method: verificationMethod,
+          deviceId,
+          attempts: attempts.count,
+        },
+      )
 
       throw new AuthenticationError('Invalid verification code')
     }
@@ -365,37 +384,49 @@ export async function verifyTwoFactorToken(
     }
 
     // Log successful verification
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_SUCCESS, userId, {
-      method: verificationMethod,
-      deviceId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.TWO_FACTOR_VERIFICATION_SUCCESS,
+      userId,
+      {
+        method: verificationMethod,
+        deviceId,
+      },
+    )
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_verification_success')
 
     return true
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED, userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      deviceId,
-    })
-    
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('2FA verification failed')
+    await logSecurityEvent(
+      SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED,
+      userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        deviceId,
+      },
+    )
+
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('2FA verification failed')
   }
 }
 
 /**
  * Verify backup code
  */
-async function verifyBackupCode(userId: string, code: string): Promise<boolean> {
+async function verifyBackupCode(
+  userId: string,
+  code: string,
+): Promise<boolean> {
   const config = await getFromCache(`2fa:config:${userId}`)
   if (!config || !config.backupCodes || config.backupCodes.length === 0) {
     return false
   }
 
   const hashedInput = await hashBackupCode(code)
-  
+
   // Find matching backup code
   const codeIndex = config.backupCodes.indexOf(hashedInput)
   if (codeIndex === -1) {
@@ -425,14 +456,16 @@ export async function addTrustedDevice(
     deviceType: string
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<void> {
   try {
     const trustedKey = `2fa:trusted:${userId}`
-    let trustedDevices = await getFromCache(trustedKey) || []
+    let trustedDevices = (await getFromCache(trustedKey)) || []
 
     // Check if device already exists
-    const existingDevice = trustedDevices.find((d: TrustedDevice) => d.deviceId === deviceInfo.deviceId)
+    const existingDevice = trustedDevices.find(
+      (d: TrustedDevice) => d.deviceId === deviceInfo.deviceId,
+    )
     if (existingDevice) {
       // Update existing device
       existingDevice.lastUsed = Date.now()
@@ -442,8 +475,13 @@ export async function addTrustedDevice(
       // Add new device
       if (trustedDevices.length >= DEVICE_TRUST_CONFIG.maxTrustedDevices) {
         // Remove oldest device
-        trustedDevices.sort((a: TrustedDevice, b: TrustedDevice) => a.lastUsed - b.lastUsed)
-        trustedDevices = trustedDevices.slice(0, DEVICE_TRUST_CONFIG.maxTrustedDevices - 1)
+        trustedDevices.sort(
+          (a: TrustedDevice, b: TrustedDevice) => a.lastUsed - b.lastUsed,
+        )
+        trustedDevices = trustedDevices.slice(
+          0,
+          DEVICE_TRUST_CONFIG.maxTrustedDevices - 1,
+        )
       }
 
       const newDevice: TrustedDevice = {
@@ -467,13 +505,12 @@ export async function addTrustedDevice(
       deviceId: deviceInfo.deviceId,
       deviceName: deviceInfo.deviceName,
     })
-
   } catch (error) {
     await logSecurityEvent(SecurityEventType.DEVICE_TRUST_FAILED, userId, {
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
-    
+
     throw new AuthenticationError('Failed to trust device')
   }
 }
@@ -481,13 +518,16 @@ export async function addTrustedDevice(
 /**
  * Check if device is trusted
  */
-export async function isTrustedDevice(userId: string, deviceId: string): Promise<boolean> {
+export async function isTrustedDevice(
+  userId: string,
+  deviceId: string,
+): Promise<boolean> {
   try {
     const trustedKey = `2fa:trusted:${userId}`
-    const trustedDevices = await getFromCache(trustedKey) || []
+    const trustedDevices = (await getFromCache(trustedKey)) || []
 
-    const device = trustedDevices.find((d: TrustedDevice) => 
-      d.deviceId === deviceId && d.expiresAt > Date.now()
+    const device = trustedDevices.find(
+      (d: TrustedDevice) => d.deviceId === deviceId && d.expiresAt > Date.now(),
     )
 
     if (device) {
@@ -498,7 +538,6 @@ export async function isTrustedDevice(userId: string, deviceId: string): Promise
     }
 
     return false
-
   } catch (error) {
     console.error('Error checking trusted device:', error)
     return false
@@ -508,10 +547,12 @@ export async function isTrustedDevice(userId: string, deviceId: string): Promise
 /**
  * Get 2FA status for user
  */
-export async function getTwoFactorStatus(userId: string): Promise<TwoFactorStatus> {
+export async function getTwoFactorStatus(
+  userId: string,
+): Promise<TwoFactorStatus> {
   try {
     const config = await getFromCache(`2fa:config:${userId}`)
-    const trustedDevices = await getFromCache(`2fa:trusted:${userId}`) || []
+    const trustedDevices = (await getFromCache(`2fa:trusted:${userId}`)) || []
 
     if (!config) {
       return {
@@ -526,10 +567,11 @@ export async function getTwoFactorStatus(userId: string): Promise<TwoFactorStatu
       enabled: config.enabled,
       setupComplete: config.setupComplete,
       backupCodesRemaining: config.backupCodes ? config.backupCodes.length : 0,
-      trustedDevices: trustedDevices.filter((d: TrustedDevice) => d.expiresAt > Date.now()),
+      trustedDevices: trustedDevices.filter(
+        (d: TrustedDevice) => d.expiresAt > Date.now(),
+      ),
       lastUsed: config.lastUsed,
     }
-
   } catch (error) {
     console.error('Error getting 2FA status:', error)
     return {
@@ -552,7 +594,7 @@ export async function disableTwoFactorAuth(
     deviceName: string
     ipAddress: string
     userAgent: string
-  }
+  },
 ): Promise<void> {
   try {
     // Verify token first
@@ -580,14 +622,19 @@ export async function disableTwoFactorAuth(
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_disabled')
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_DISABLE_FAILED, userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      deviceId: deviceInfo.deviceId,
-    })
-    
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to disable 2FA')
+    await logSecurityEvent(
+      SecurityEventType.TWO_FACTOR_DISABLE_FAILED,
+      userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        deviceId: deviceInfo.deviceId,
+      },
+    )
+
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to disable 2FA')
   }
 }
 
@@ -596,7 +643,7 @@ export async function disableTwoFactorAuth(
  */
 export async function generateNewBackupCodes(
   userId: string,
-  verificationToken: string
+  verificationToken: string,
 ): Promise<string[]> {
   try {
     // Verify token first
@@ -612,7 +659,7 @@ export async function generateNewBackupCodes(
     // Generate new backup codes
     const newCodes = generateBackupCodes()
     const hashedCodes: string[] = []
-    
+
     for (const code of newCodes) {
       const hashedCode = await hashBackupCode(code)
       hashedCodes.push(hashedCode)
@@ -633,13 +680,18 @@ export async function generateNewBackupCodes(
     })
 
     return newCodes
-
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.BACKUP_CODES_GENERATION_FAILED, userId, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
-    
-    throw error instanceof AuthenticationError ? error : new AuthenticationError('Failed to generate backup codes')
+    await logSecurityEvent(
+      SecurityEventType.BACKUP_CODES_GENERATION_FAILED,
+      userId,
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+    )
+
+    throw error instanceof AuthenticationError
+      ? error
+      : new AuthenticationError('Failed to generate backup codes')
   }
 }
 
@@ -649,7 +701,7 @@ export async function generateNewBackupCodes(
 export async function isTwoFactorRequired(
   userId: string,
   role: UserRole,
-  deviceId?: string
+  deviceId?: string,
 ): Promise<boolean> {
   try {
     // Check user-specific 2FA status
@@ -659,13 +711,13 @@ export async function isTwoFactorRequired(
     }
 
     // Check if device is trusted
-    if (deviceId && await isTrustedDevice(userId, deviceId)) {
+    if (deviceId && (await isTrustedDevice(userId, deviceId))) {
       return false
     }
 
     // Check role-based requirements
     const config = await getTwoFactorConfig()
-    
+
     if (config.requiredRoles.includes(role)) {
       return true
     }
@@ -677,7 +729,6 @@ export async function isTwoFactorRequired(
     }
 
     return false
-
   } catch (error) {
     console.error('Error checking 2FA requirement:', error)
     return false

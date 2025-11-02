@@ -1,0 +1,537 @@
+---
+export const prerender = false
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import EnhancedChartComponent from '@/components/analytics/EnhancedChartComponent.tsx'
+import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmotionChart.tsx'
+import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.tsx'
+import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
+import Particle from '@/components/three/Particle.tsx'
+import FHEDemo from '@/components/security/FHEDemo.tsx'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+
+// Get query parameters for dashboard customization
+const dashboardMode = Astro.url.searchParams.get('mode') || 'standard'
+const clientId = Astro.url.searchParams.get('clientId') || user?.id
+const sessionId = Astro.url.searchParams.get('sessionId')
+const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
+---
+
+<DashboardLayout
+  title="Enhanced Dashboard | Pixelated Empathy Therapy"
+  description="Comprehensive therapy dashboard with advanced analytics and visualization tools"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <!-- Dashboard Header with Mode Selector -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-4xl font-bold tracking-tight mb-2">
+          Enhanced Dashboard
+          {user?.name && <span class="text-primary">for {user.name.split(' ')[0]}</span>}
+        </h1>
+        <p class="text-muted-foreground text-lg">
+          Advanced therapy insights with real-time analytics and 3D visualizations
+        </p>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <!-- Dashboard Mode Toggle -->
+        <div class="flex items-center gap-2 bg-card border rounded-lg p-1">
+          <a 
+            href="/dashboard/enhanced?mode=standard" 
+            class={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              dashboardMode === 'standard' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-muted'
+            }`}
+          >
+            Standard
+          </a>
+          <a 
+            href="/dashboard/enhanced?mode=therapist" 
+            class={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              dashboardMode === 'therapist' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-muted'
+            }`}
+          >
+            Therapist
+          </a>
+          <a 
+            href="/dashboard/enhanced?mode=analytics" 
+            class={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              dashboardMode === 'analytics' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-muted'
+            }`}
+          >
+            Analytics
+          </a>
+        </div>
+
+        <!-- Advanced Features Toggle -->
+        <a 
+          href={`/dashboard/enhanced?mode=${dashboardMode}&advanced=${!showAdvanced}`}
+          class="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          <span class="material-symbols-outlined text-lg">
+            {showAdvanced ? 'visibility_off' : 'visibility'}
+          </span>
+          <span class="text-sm font-medium">
+            {showAdvanced ? 'Hide' : 'Show'} Advanced
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Real-time Status Bar -->
+    <Card class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+      <div class="p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span class="text-sm font-medium">Live Data Active</span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+              Last updated: <span id="last-update">just now</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-blue-600">database</span>
+              <span>Backend Connected</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">security</span>
+              <span>FHE Enabled</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-600">psychology</span>
+              <span>AI Analytics Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+
+    {dashboardMode === 'standard' && (
+      <div class="space-y-6">
+        <!-- Patient Overview Carousel -->
+        <Card>
+          <div class="p-6">
+            <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">dashboard</span>
+              Therapy Journey Overview
+            </h2>
+            <SwiperCarousel 
+              client:load
+              effect="slide"
+              autoplay={{delay: 5000, disableOnInteraction: false}}
+              navigation={true}
+              pagination={{clickable: true, dynamicBullets: true}}
+              loop={true}
+              slidesPerView={1}
+              spaceBetween={30}
+              height="300px"
+              class="rounded-lg"
+            />
+          </div>
+        </Card>
+
+        <!-- Progress Analytics Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600">trending_up</span>
+                Progress Tracking
+              </h3>
+              <EnhancedChartComponent 
+                client:load
+                type="line"
+                title="Therapy Progress Over Time"
+                data={{
+                  category: 'progress',
+                  timeRange: 30,
+                  clientId: clientId,
+                  sessionId: sessionId,
+                  dataPoints: 20,
+                  useBackendData: true,
+                  autoRefresh: true,
+                  refreshInterval: 30000
+                }}
+                class="h-64"
+              />
+            </div>
+          </Card>
+
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-600">psychology</span>
+                Session Metrics
+              </h3>
+              <EnhancedChartComponent 
+                client:load
+                type="bar"
+                title="Weekly Session Analysis"
+                data={{
+                  category: 'sessions',
+                  timeRange: 7,
+                  clientId: clientId,
+                  useBackendData: true
+                }}
+                class="h-64"
+              />
+            </div>
+          </Card>
+        </div>
+
+        <!-- Emotion Analysis -->
+        <Card>
+          <div class="p-6">
+            <h3 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-600">mood</span>
+              Emotional State Analysis
+            </h3>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div>
+                <h4 class="text-lg font-medium mb-3">3D Emotion Mapping</h4>
+                <MultidimensionalEmotionChart 
+                  client:load
+                  showTrails={true}
+                  showAxes={true}
+                  class="h-96"
+                />
+              </div>
+              <div>
+                <h4 class="text-lg font-medium mb-3">Emotion Distribution</h4>
+                <EnhancedChartComponent 
+                  client:load
+                  type="pie"
+                  title="Current Emotional State"
+                  data={{
+                    category: 'emotions',
+                    timeRange: 7,
+                    clientId: clientId,
+                    useBackendData: true
+                  }}
+                  class="h-96"
+                />
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+            <div class="p-6 text-center">
+              <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-white text-2xl">chat</span>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Start Therapy Session</h3>
+              <p class="text-sm text-muted-foreground mb-4">Begin a new AI-assisted therapy conversation</p>
+              <a href="/therapy-chat" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <span>Start Session</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+            <div class="p-6 text-center">
+              <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-white text-2xl">assignment</span>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Treatment Plan</h3>
+              <p class="text-sm text-muted-foreground mb-4">Review and update your treatment goals</p>
+              <a href="/dashboard/enhanced?mode=therapist" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <span>View Plan</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+            <div class="p-6 text-center">
+              <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-white text-2xl">analytics</span>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Advanced Analytics</h3>
+              <p class="text-sm text-muted-foreground mb-4">Deep dive into your progress data</p>
+              <a href="/dashboard/enhanced?mode=analytics" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                <span>View Analytics</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+          </Card>
+        </div>
+      </div>
+    )}
+
+    {dashboardMode === 'therapist' && (
+      <div class="space-y-6">
+        <!-- Treatment Plan Manager -->
+        <Card>
+          <div class="p-6">
+            <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">medical_services</span>
+              Treatment Plan Management
+            </h2>
+            <TreatmentPlanManager 
+              client:load
+              class="w-full"
+              readOnly={false}
+            />
+          </div>
+        </Card>
+
+        <!-- Therapist Analytics Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4">Patient Outcomes</h3>
+              <EnhancedChartComponent 
+                client:load
+                type="line"
+                title="Treatment Effectiveness"
+                data={{
+                  category: 'outcomes',
+                  timeRange: 90,
+                  clientId: clientId,
+                  useBackendData: true,
+                  autoRefresh: true,
+                  refreshInterval: 60000
+                }}
+                class="h-64"
+              />
+            </div>
+          </Card>
+
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4">Session Analysis</h3>
+              <EnhancedChartComponent 
+                client:load
+                type="scatter"
+                title="Engagement vs Progress"
+                data={{
+                  category: 'sessions',
+                  timeRange: 30,
+                  clientId: clientId,
+                  useBackendData: true
+                }}
+                class="h-64"
+              />
+            </div>
+          </Card>
+        </div>
+
+        {showAdvanced && (
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-red-600">security</span>
+                Privacy-Preserving Analytics
+              </h3>
+              <FHEDemo 
+                client:load
+                class="w-full"
+                showAdvanced={true}
+                enableBenchmarks={true}
+              />
+            </div>
+          </Card>
+        )}
+      </div>
+    )}
+
+    {dashboardMode === 'analytics' && (
+      <div class="space-y-6">
+        <!-- Analytics Header -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20">
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-blue-600">Active Sessions</p>
+                  <p class="text-2xl font-bold">24</p>
+                </div>
+                <span class="material-symbols-outlined text-blue-600 text-3xl">psychology</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20">
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-green-600">Improvement Rate</p>
+                  <p class="text-2xl font-bold">+28%</p>
+                </div>
+                <span class="material-symbols-outlined text-green-600 text-3xl">trending_up</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20">
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-purple-600">Emotion Stability</p>
+                  <p class="text-2xl font-bold">7.8/10</p>
+                </div>
+                <span class="material-symbols-outlined text-purple-600 text-3xl">mood</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20">
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-orange-600">Goal Completion</p>
+                  <p class="text-2xl font-bold">67%</p>
+                </div>
+                <span class="material-symbols-outlined text-orange-600 text-3xl">task_alt</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <!-- Advanced Visualizations -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4">3D Emotion Journey</h3>
+              <MultidimensionalEmotionChart 
+                client:load
+                showTrails={true}
+                showAxes={true}
+                class="h-96"
+              />
+            </div>
+          </Card>
+
+          <Card>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-4">Interactive Emotion Particles</h3>
+              <Particle 
+                client:load
+                particleCount={60}
+                emotion="neutral"
+                interactive={true}
+                autoAnimate={true}
+                enableMouse={true}
+                showTrails={true}
+                class="h-96"
+              />
+            </div>
+          </Card>
+        </div>
+
+        <!-- Comprehensive Analytics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <Card>
+            <div class="p-6">
+              <h4 class="text-lg font-medium mb-3">Progress Trends</h4>
+              <EnhancedChartComponent 
+                client:load
+                type="line"
+                title="6-Month Progress"
+                data={{
+                  category: 'progress',
+                  timeRange: 180,
+                  clientId: clientId,
+                  dataPoints: 30,
+                  useBackendData: true
+                }}
+                class="h-48"
+              />
+            </div>
+          </Card>
+
+          <Card>
+            <div class="p-6">
+              <h4 class="text-lg font-medium mb-3">Emotion Categories</h4>
+              <EnhancedChartComponent 
+                client:load
+                type="pie"
+                title="Emotion Distribution"
+                data={{
+                  category: 'emotions',
+                  timeRange: 30,
+                  clientId: clientId,
+                  useBackendData: true
+                }}
+                class="h-48"
+              />
+            </div>
+          </Card>
+
+          <Card>
+            <div class="p-6">
+              <h4 class="text-lg font-medium mb-3">Weekly Sessions</h4>
+              <EnhancedChartComponent 
+                client:load
+                type="bar"
+                title="Session Frequency"
+                data={{
+                  category: 'sessions',
+                  timeRange: 28,
+                  clientId: clientId,
+                  useBackendData: true
+                }}
+                class="h-48"
+              />
+            </div>
+          </Card>
+        </div>
+      </div>
+    )}
+
+    <!-- Footer Actions -->
+    <div class="flex items-center justify-between pt-6 border-t border-border">
+      <div class="flex items-center gap-4 text-sm text-muted-foreground">
+        <span>Dashboard Mode: <span class="font-medium capitalize">{dashboardMode}</span></span>
+        <span>•</span>
+        <span>Advanced Features: <span class="font-medium">{showAdvanced ? 'Enabled' : 'Disabled'}</span></span>
+        <span>•</span>
+        <span>Live Data: <span class="font-medium text-green-600">Active</span></span>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <a 
+          href="/components" 
+          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          View All Components
+        </a>
+        <a 
+          href="/dashboard" 
+          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Standard Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-update timestamp script -->
+  <script>
+    function updateTimestamp() {
+      const element = document.getElementById('last-update');
+      if (element) {
+        element.textContent = new Date().toLocaleTimeString();
+      }
+    }
+    
+    // Update every 30 seconds
+    setInterval(updateTimestamp, 30000);
+  </script>
+</DashboardLayout>

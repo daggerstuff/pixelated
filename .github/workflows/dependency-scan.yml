@@ -5,17 +5,22 @@ permissions:
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
+<<<<<<< HEAD
   - cron: '0 0 * * 0' # Run every Sunday at midnight
+=======
+    - cron: "0 0 * * 0"
+>>>>>>> master
 
 jobs:
   node_scan:
     name: Scan Node.js Dependencies
     runs-on: ubuntu-latest
     steps:
+<<<<<<< HEAD
     - name: Checkout code
       uses: actions/checkout@v5
 
@@ -35,31 +40,157 @@ jobs:
 
     - name: Run pnpm audit
       run: pnpm audit
+=======
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run pnpm audit
+        run: pnpm audit
+>>>>>>> master
 
   python_scan:
     name: Scan Python Dependencies
     runs-on: ubuntu-latest
     steps:
+<<<<<<< HEAD
     - name: Checkout code
       uses: actions/checkout@v5
+=======
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
 
-    - name: Install uv (force latest)
-      run: pip install --upgrade 'uv>=0.8.6'
+      - name: Install uv (force latest)
+        run: pip install --upgrade 'uv>=0.8.6'
 
-    - name: Create virtual environment
-      run: uv venv
+      - name: Create virtual environment
+        run: uv venv
 
-    - name: Install project dependencies
-      run: uv pip sync pyproject.toml
+      - name: Install project dependencies
+        run: uv pip sync pyproject.toml
 
-    - name: Install pip-audit in venv
-      run: uv pip install --upgrade pip pip-audit
+      - name: Install pip-audit in venv
+        run: uv pip install --upgrade pip pip-audit
 
+      - name: Run pip-audit (skip editable/local package)
+        id: pip_audit
+        continue-on-error: true
+        run: |
+          uv run pip-audit --skip-editable --format=columns 2>&1 | tee pip-audit-output.txt
+          exit ${PIPESTATUS[0]}
+>>>>>>> master
+
+      - name: Check for actionable vulnerabilities
+        if: always()
+        run: |
+          # Check if pip-audit found any vulnerabilities
+          if [ ! -f pip-audit-output.txt ]; then
+            echo "❌ pip-audit output file not found"
+            exit 1
+          fi
+
+          # Known acceptable vulnerabilities (CI/build tools only, not runtime dependencies)
+          ACCEPTABLE_VULNS=(
+            "GHSA-4xh5-x5gv-qwph"  # pip 25.2 (tool only)
+            "GHSA-w476-p2h3-79g9"  # uv (tool only)
+            "GHSA-pqhf-p39g-3x64"  # uv (tool only)
+          )
+
+          # Extract vulnerability lines (skip header and separator lines)
+          # Format: package_name  version  GHSA-ID  fix_version
+          VULN_LINES=$(grep -E "^[a-zA-Z0-9_-]+[[:space:]]+[^[:space:]]+[[:space:]]+GHSA-" pip-audit-output.txt || true)
+
+          if [ -z "$VULN_LINES" ]; then
+            echo "✅ No vulnerabilities found"
+            exit 0
+          fi
+
+          # Count actionable vulnerabilities (excluding acceptable ones)
+          ACTIONABLE_COUNT=0
+          ACTIONABLE_VULNS=""
+          FOUND_ACCEPTABLE=""
+          TOTAL_COUNT=$(echo "$VULN_LINES" | wc -l)
+
+<<<<<<< HEAD
     # Run pip-audit, excluding local editable package to avoid false negative on 'pixelated'
     - name: Run pip-audit (skip editable/local package)
       run: uv run pip-audit --skip-editable --format=columns
+=======
+          while IFS= read -r line; do
+            # Extract GHSA ID from line
+            GHSA_ID=$(echo "$line" | grep -o "GHSA-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*" | head -1)
+
+            if [ -n "$GHSA_ID" ]; then
+              # Check if this is an acceptable vulnerability
+              IS_ACCEPTABLE=false
+              for acceptable in "${ACCEPTABLE_VULNS[@]}"; do
+                if [ "$GHSA_ID" = "$acceptable" ]; then
+                  IS_ACCEPTABLE=true
+                  FOUND_ACCEPTABLE="${FOUND_ACCEPTABLE}${GHSA_ID}\n"
+                  break
+                fi
+              done
+
+              if [ "$IS_ACCEPTABLE" = false ]; then
+                ACTIONABLE_COUNT=$((ACTIONABLE_COUNT + 1))
+                ACTIONABLE_VULNS="${ACTIONABLE_VULNS}${line}\n"
+              fi
+            fi
+          done <<< "$VULN_LINES"
+
+          # Report results
+          echo "📊 Vulnerability Scan Results:"
+          echo "   Total vulnerabilities found: $TOTAL_COUNT"
+          echo "   Acceptable (CI tools): $((TOTAL_COUNT - ACTIONABLE_COUNT))"
+          echo "   Actionable (requires update): $ACTIONABLE_COUNT"
+
+          if [ "$ACTIONABLE_COUNT" -eq 0 ]; then
+            echo ""
+            echo "✅ All vulnerabilities are in CI/build tools and are acceptable"
+            if [ -n "$FOUND_ACCEPTABLE" ]; then
+              echo "📌 Accepted vulnerabilities (CI tools only):"
+              echo "$FOUND_ACCEPTABLE" | while IFS= read -r vuln_id; do
+                [ -n "$vuln_id" ] || continue
+                case "$vuln_id" in
+                  "GHSA-4xh5-x5gv-qwph")
+                    echo "   - pip 25.2 (GHSA-4xh5-x5gv-qwph): Minimal impact, affects package installation only"
+                    ;;
+                  "GHSA-w476-p2h3-79g9"|"GHSA-pqhf-p39g-3x64")
+                    echo "   - uv (${vuln_id}): Build tool, not a runtime dependency"
+                    ;;
+                  *)
+                    echo "   - ${vuln_id}: CI/build tool vulnerability (acceptable)"
+                    ;;
+                esac
+              done
+            fi
+            exit 0
+          else
+            echo ""
+            echo "❌ Found $ACTIONABLE_COUNT actionable vulnerabilities that need to be addressed:"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo -e "$ACTIONABLE_VULNS"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+            echo "📋 Full audit output:"
+            cat pip-audit-output.txt
+            exit 1
+          fi
+>>>>>>> master

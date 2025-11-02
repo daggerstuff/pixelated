@@ -1,0 +1,18 @@
+---
+interface Props {
+  value: string
+  label: string
+  subtitle?: string
+  class?: string
+}
+
+const { value, label, subtitle = '', class: className = '' } = Astro.props
+---
+
+<div class={`theme-card metric-card--enhanced ${className}`.trim()}>
+  <div class="metric-value--large organic-counter">{value}</div>
+  <div class="font-semibold text-white mb-1">{label}</div>
+  {subtitle && <div class="text-sm text-gray-400">{subtitle}</div>}
+</div>
+
+

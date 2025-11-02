@@ -46,7 +46,7 @@ export function ChatInput({
     'transition-shadow',
     isDark
       ? 'text-white bg-gray-800 placeholder-gray-300'
-      : 'text-gray-900 bg-white placeholder-gray-500'
+      : 'text-gray-900 bg-white placeholder-gray-500',
   )
 
   const buttonClasses = cn(
@@ -56,7 +56,7 @@ export function ChatInput({
     'focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500',
     isDark
       ? 'bg-blue-700 text-white hover:bg-blue-800'
-      : 'bg-blue-600 text-white hover:bg-blue-700'
+      : 'bg-blue-600 text-white hover:bg-blue-700',
   )
 
   return (
@@ -64,9 +64,7 @@ export function ChatInput({
       onSubmit={onSubmit}
       className={cn(
         'relative flex items-end space-x-3 rounded-lg border p-3 shadow-sm',
-        isDark
-          ? 'border-gray-700 bg-black'
-          : 'border-gray-200 bg-white'
+        isDark ? 'border-gray-700 bg-black' : 'border-gray-200 bg-white',
       )}
     >
       <textarea

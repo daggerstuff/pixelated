@@ -2,12 +2,10 @@ import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence } from 'astro/middleware'
 import { getSession } from './lib/auth/session'
+import type { APIContext, MiddlewareNext } from 'astro'
 
-// Simple route matcher replacement for Clerk's createRouteMatcher
-const protectedRoutePatterns: RegExp[] = [
-  /\/api\/clerk-protected-example(.*)/, // keep original example pattern for compatibility
-  /\/api\/protected(.*)/,
-]
+// Simple route matcher for protected API routes
+const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
 
 function isProtectedRoute(request: Request) {
   try {
@@ -23,7 +21,7 @@ function isProtectedRoute(request: Request) {
  * Auth middleware that uses the project's session system.
  * If a request targets a protected route and there's no session, redirect to sign-in.
  */
-const projectAuthMiddleware = async (context: Record<string, unknown>, next: () => Promise<Response>) => {
+const projectAuthMiddleware = async (context: APIContext, next: MiddlewareNext) => {
   const { request } = context
 
   // Allow non-protected routes through quickly
@@ -43,6 +41,12 @@ const projectAuthMiddleware = async (context: Record<string, unknown>, next: () 
         headers: { Location: signInUrl.toString() },
       })
     }
+
+    // Store session data in locals for use in routes
+    if (context.locals) {
+      ;(context.locals as any).user = session.user
+      ;(context.locals as any).session = session.session
+    }
   } catch (_err) {
     // If session check fails treat as unauthenticated for protected routes
     const signInUrl = new URL('/auth/sign-in', request.url)
@@ -57,4 +61,8 @@ const projectAuthMiddleware = async (context: Record<string, unknown>, next: () 
 }
 
 // Single, clean middleware sequence
-export const onRequest = sequence(generateCspNonce, securityHeaders, projectAuthMiddleware)
+export const onRequest = sequence(
+  generateCspNonce as any,
+  securityHeaders as any,
+  projectAuthMiddleware as any,
+)

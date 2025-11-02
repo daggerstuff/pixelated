@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
 import path from 'path'
-import { exec } from 'child_process'
+import { spawn } from 'child_process'
 import readline from 'readline'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
-import { promisify } from 'util'
-
-// Convert exec to promise-based
-const execPromise = promisify(exec)
 
 // Get current file and directory path for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -65,27 +61,46 @@ async function runScript(scriptPath, args = []) {
   const command = `node ${scriptPath} ${args.join(' ')}`
   console.log(`Running: ${command}`)
 
-  try {
-    const { stdout, stderr } = await execPromise(command, {
-      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+  return new Promise((resolve) => {
+    // Use spawn with shell: false to avoid security warning
+    // Pass command and args as separate array elements
+    const child = spawn('node', [scriptPath, ...args], {
+      stdio: 'pipe',
+      shell: false,
     })
 
-    if (stderr && stderr.trim() !== '') {
-      console.error(`Error output: ${stderr}`)
-    }
+    let stdout = ''
+    let stderr = ''
 
-    console.log(stdout)
-    return true
-  } catch (error) {
-    console.error(`Failed to run script: ${error.message}`)
-    if (error.stdout) {
-      console.log(error.stdout)
-    }
-    if (error.stderr) {
-      console.error(error.stderr)
-    }
-    return false
-  }
+    child.stdout.on('data', (data) => {
+      const output = data.toString()
+      stdout += output
+      process.stdout.write(output)
+    })
+
+    child.stderr.on('data', (data) => {
+      const error = data.toString()
+      stderr += error
+      process.stderr.write(error)
+    })
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve(true)
+      } else {
+        console.error(`Script failed with exit code ${code}`)
+        if (stderr.trim() !== '') {
+          console.error(`Error output: ${stderr}`)
+        }
+        resolve(false)
+      }
+    })
+
+    child.on('error', (error) => {
+      console.error(`Failed to run script: ${error.message}`)
+      resolve(false)
+    })
+  })
 }
 
 // Display main menu and get user choice

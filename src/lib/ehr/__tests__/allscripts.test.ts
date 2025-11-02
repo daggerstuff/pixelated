@@ -68,9 +68,10 @@ describe('allscripts Provider', () => {
   describe('initialization', () => {
     it('should successfully initialize provider', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        true,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(true)
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
@@ -123,18 +124,20 @@ describe('allscripts Provider', () => {
 
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        false,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(false)
 
       await expect(allscriptsProvider.initialize()).rejects.toThrow()
     })
 
     it('should throw error when CapabilityStatement is not found', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        true,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(true)
 
       // Mock the FHIR client's searchResources method to return empty array
       const mockSearchResources = vi.fn().mockResolvedValue([])
@@ -149,9 +152,10 @@ describe('allscripts Provider', () => {
 
     it('should throw error when required endpoints are not available', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        true,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(true)
 
       // Mock the FHIR client's searchResources method to succeed for CapabilityStatement
       // but fail for endpoint verification
@@ -201,9 +205,10 @@ describe('allscripts Provider', () => {
 
     it('should throw error when OAuth2 configuration is missing', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        true,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(true)
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
@@ -236,9 +241,10 @@ describe('allscripts Provider', () => {
 
     it('should throw error when SMART on FHIR endpoints are missing', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(allscriptsProvider as unknown, 'validateEndpoint').mockResolvedValue(
-        true,
-      )
+      vi.spyOn(
+        allscriptsProvider as unknown,
+        'validateEndpoint',
+      ).mockResolvedValue(true)
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(

@@ -1,0 +1,21 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@pixelatedempathy.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+<<<<<<< HEAD:k8s/cluster-issuer.yaml
+      - http01:
+          ingress:
+            class: traefik
+=======
+    - http01:
+        ingress:
+          class: traefik
+>>>>>>> master:clusters/pixelkube/pixelated/clusterissuer.yaml

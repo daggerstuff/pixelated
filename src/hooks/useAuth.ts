@@ -51,17 +51,14 @@ export function useAuth(): UseAuthReturn {
       }
 
       const checkRole = (r: AuthRole | UserRole): boolean => {
-        const mappedRole = (r as AuthRole) in roleMap
-          ? roleMap[r as AuthRole]
-          : (r as UserRole)
+        const mappedRole =
+          (r as AuthRole) in roleMap ? roleMap[r as AuthRole] : (r as UserRole)
         return user.roles.includes(mappedRole)
       }
 
-      return Array.isArray(role)
-        ? role.some(checkRole)
-        : checkRole(role)
+      return Array.isArray(role) ? role.some(checkRole) : checkRole(role)
     },
-    [user]
+    [user],
   )
 
   // Load user on initial mount with proper error handling
@@ -72,24 +69,24 @@ export function useAuth(): UseAuthReturn {
       try {
         setLoading(true)
         const currentUser = await getCurrentUser()
-        
+
         if (!mounted) {
           return
         }
-        
+
         if (isAuthUser(currentUser)) {
           setUser(currentUser)
         } else {
           throw createAuthError(
             'Invalid user data received',
-            AuthErrorCode.INVALID_USER
+            AuthErrorCode.INVALID_USER,
           )
         }
       } catch (err: unknown) {
         if (!mounted) {
           return
         }
-        
+
         console.error('Error loading user:', err)
         setUser(null)
         setError(
@@ -97,8 +94,8 @@ export function useAuth(): UseAuthReturn {
             ? err
             : createAuthError(
                 'Failed to load user',
-                AuthErrorCode.NETWORK_ERROR
-              )
+                AuthErrorCode.NETWORK_ERROR,
+              ),
         )
       } finally {
         if (mounted) {
@@ -108,24 +105,26 @@ export function useAuth(): UseAuthReturn {
     }
 
     loadUser()
-    return () => { mounted = false }
+    return () => {
+      mounted = false
+    }
   }, [])
 
   // Sign in with proper type inference and error handling
   const signIn = async (
     email: string,
-    password: string
+    password: string,
   ): Promise<AuthResult> => {
     try {
       setLoading(true)
       setError(null)
-      
+
       const result = await signInWithEmail(email, password)
-      
+
       if (!isAuthResult(result) || !result?.['success'] || !result?.['user']) {
         throw createAuthError(
           result?.['error'] || 'Authentication failed',
-          AuthErrorCode.AUTH_FAILED
+          AuthErrorCode.AUTH_FAILED,
         )
       }
 
@@ -135,10 +134,12 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'Authentication failed',
-            AuthErrorCode.AUTH_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'Authentication failed',
+            AuthErrorCode.AUTH_FAILED,
           )
-      
+
       setError(authError)
       return { success: false, error: authError.message }
     } finally {
@@ -150,18 +151,18 @@ export function useAuth(): UseAuthReturn {
   const signUp = async (
     email: string,
     password: string,
-    fullName: string
+    fullName: string,
   ): Promise<AuthResult> => {
     try {
       setLoading(true)
       setError(null)
-      
+
       const result = await authSignUp(email, password, { fullName })
-      
+
       if (!isAuthResult(result) || !result.success || !result.user) {
         throw createAuthError(
           result.error || 'Registration failed',
-          AuthErrorCode.SIGNUP_FAILED
+          AuthErrorCode.SIGNUP_FAILED,
         )
       }
 
@@ -171,10 +172,12 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'Registration failed',
-            AuthErrorCode.SIGNUP_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'Registration failed',
+            AuthErrorCode.SIGNUP_FAILED,
           )
-      
+
       setError(authError)
       return { success: false, error: authError.message }
     } finally {
@@ -185,7 +188,7 @@ export function useAuth(): UseAuthReturn {
   // Sign in with OAuth with proper error handling
   const signInWithOAuth = async (
     provider: Provider,
-    redirectTo?: string
+    redirectTo?: string,
   ): Promise<void> => {
     try {
       setLoading(true)
@@ -195,8 +198,10 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'OAuth sign in failed',
-            AuthErrorCode.OAUTH_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'OAuth sign in failed',
+            AuthErrorCode.OAUTH_FAILED,
           )
       setError(authError)
       throw authError
@@ -216,8 +221,10 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'Sign out failed',
-            AuthErrorCode.SIGNOUT_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'Sign out failed',
+            AuthErrorCode.SIGNOUT_FAILED,
           )
       setError(authError)
       throw authError
@@ -229,7 +236,7 @@ export function useAuth(): UseAuthReturn {
   // Reset password with proper error handling
   const resetPassword = async (
     email: string,
-    redirectTo?: string
+    redirectTo?: string,
   ): Promise<boolean> => {
     try {
       setError(null)
@@ -238,8 +245,10 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'Password reset failed',
-            AuthErrorCode.RESET_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'Password reset failed',
+            AuthErrorCode.RESET_FAILED,
           )
       setError(authError)
       throw authError
@@ -248,7 +257,7 @@ export function useAuth(): UseAuthReturn {
 
   // Verify OTP with proper type inference and error handling
   const verifyOtp = async (
-    params: OtpVerificationParams
+    params: OtpVerificationParams,
   ): Promise<AuthResult> => {
     try {
       setError(null)
@@ -257,7 +266,7 @@ export function useAuth(): UseAuthReturn {
       if (!isAuthResult(response) || !response.success) {
         throw createAuthError(
           response.error || 'OTP verification failed',
-          AuthErrorCode.OTP_FAILED
+          AuthErrorCode.OTP_FAILED,
         )
       }
 
@@ -270,8 +279,10 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'OTP verification failed',
-            AuthErrorCode.OTP_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'OTP verification failed',
+            AuthErrorCode.OTP_FAILED,
           )
       setError(authError)
       return { success: false, error: authError.message }
@@ -279,14 +290,9 @@ export function useAuth(): UseAuthReturn {
   }
 
   // Update profile with proper type inference and error handling
-  const updateProfile = async (
-    profile: ProfileUpdateParams
-  ): Promise<void> => {
+  const updateProfile = async (profile: ProfileUpdateParams): Promise<void> => {
     if (!user?.id) {
-      throw createAuthError(
-        'No authenticated user',
-        AuthErrorCode.NO_USER
-      )
+      throw createAuthError('No authenticated user', AuthErrorCode.NO_USER)
     }
 
     try {
@@ -298,7 +304,7 @@ export function useAuth(): UseAuthReturn {
           ? result.error
           : createAuthError(
               'Profile update failed',
-              AuthErrorCode.UPDATE_FAILED
+              AuthErrorCode.UPDATE_FAILED,
             )
       }
 
@@ -322,8 +328,10 @@ export function useAuth(): UseAuthReturn {
       const authError = isAuthError(err)
         ? err
         : createAuthError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'Profile update failed',
-            AuthErrorCode.UPDATE_FAILED
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'Profile update failed',
+            AuthErrorCode.UPDATE_FAILED,
           )
       setError(authError)
       throw authError

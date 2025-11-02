@@ -95,7 +95,9 @@ async function loadEnhancementPolyfills() {
     // Removed due to security concerns with the polyfill
     // polyfillsToLoad.push(loadScript('/polyfills/intersection-observer.js'));
     // For now, we'll not load any polyfill and let the code handle the absence gracefully
-    console.warn('IntersectionObserver is not supported in this browser. Some features may not work correctly.');
+    console.warn(
+      'IntersectionObserver is not supported in this browser. Some features may not work correctly.',
+    )
   }
 
   // Load ResizeObserver polyfill only if needed

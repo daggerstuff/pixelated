@@ -1,0 +1,173 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Foundation Model Training - Pixelated Empathy",
+    "tags": ["training", "ai", "gpu", "foundation-model"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Training Progress",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "training_epoch_current",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "red", "value": 80}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Training Loss",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "training_loss",
+            "refId": "A",
+            "legendFormat": "Training Loss"
+          },
+          {
+            "expr": "validation_loss", 
+            "refId": "B",
+            "legendFormat": "Validation Loss"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "GPU Utilization",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "nvidia_gpu_utilization_percent",
+            "refId": "A",
+            "legendFormat": "GPU {{gpu}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "GPU Memory Usage",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "nvidia_gpu_memory_used_bytes / nvidia_gpu_memory_total_bytes * 100",
+            "refId": "A",
+            "legendFormat": "GPU Memory {{gpu}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Training Throughput",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(training_batches_processed_total[5m])",
+            "refId": "A",
+            "legendFormat": "Batches/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Model Performance Metrics",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "training_accuracy",
+            "refId": "A",
+            "format": "table"
+          },
+          {
+            "expr": "training_perplexity",
+            "refId": "B", 
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "System Resources",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{pod=~\"training-service.*\"}[5m]) * 100",
+            "refId": "A",
+            "legendFormat": "CPU Usage %"
+          },
+          {
+            "expr": "container_memory_usage_bytes{pod=~\"training-service.*\"} / container_spec_memory_limit_bytes * 100",
+            "refId": "B",
+            "legendFormat": "Memory Usage %"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "Training Data Processing",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "training_data_loading_time_seconds",
+            "refId": "A",
+            "legendFormat": "Data Loading Time"
+          },
+          {
+            "expr": "training_preprocessing_time_seconds",
+            "refId": "B",
+            "legendFormat": "Preprocessing Time"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

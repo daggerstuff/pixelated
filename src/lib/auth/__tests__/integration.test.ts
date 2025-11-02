@@ -4,15 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import type { APIContext } from 'astro'
+
 import { POST as registerHandler } from '../../../pages/api/auth/register'
 import { POST as loginHandler } from '../../../pages/api/auth/login'
 import { POST as logoutHandler } from '../../../pages/api/auth/logout'
 import { POST as refreshHandler } from '../../../pages/api/auth/refresh'
-import {
-  authenticateRequest,
-  requireRole,
-} from '../middleware'
+import { authenticateRequest, requireRole } from '../middleware'
 
 // Mock dependencies
 vi.mock('../../redis', () => ({
@@ -39,7 +36,7 @@ vi.mock('../../security', () => ({
     AUTHORIZATION_FAILED: 'AUTHORIZATION_FAILED',
     RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
     CSRF_VIOLATION: 'CSRF_VIOLATION',
-  }
+  },
 }))
 
 vi.mock('../../mcp/phase6-integration', () => ({
@@ -71,11 +68,11 @@ describe('Authentication System Integration', () => {
       const { setInCache, getFromCache } = await import('../../redis')
 
       // Mock Redis operations for registration
-        vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
         return true
       })
 
-        vi.mocked(getFromCache).mockImplementation(async (_key) => {
+      vi.mocked(getFromCache).mockImplementation(async (_key) => {
         if (_key.startsWith('user:email:')) {
           return null // No existing user
         }
@@ -83,21 +80,24 @@ describe('Authentication System Integration', () => {
       })
 
       // Step 1: Register new user
-      const registerRequest = new Request('https://example.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const registerRequest = new Request(
+        'https://example.com/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'SecurePass123!',
+            firstName: 'John',
+            lastName: 'Doe',
+            role: 'patient',
+          }),
         },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'SecurePass123!',
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-        }),
-      })
+      )
 
       const registerResponse = await registerHandler({
         request: registerRequest,
@@ -108,9 +108,9 @@ describe('Authentication System Integration', () => {
       const registerData = await registerResponse.json()
       expect(registerData.success).toBe(true)
       expect(registerData.user).toBeDefined()
-    expect(registerData.tokenPair).toBeDefined()
+      expect(registerData.tokenPair).toBeDefined()
 
-    const { user } = registerData
+      const { user } = registerData
 
       // Step 2: Login with registered user
       const loginRequest = new Request('https://example.com/api/auth/login', {
@@ -158,20 +158,23 @@ describe('Authentication System Integration', () => {
       const loginData = await loginResponse.json()
       expect(loginData.success).toBe(true)
       expect(loginData.user).toBeDefined()
-        expect(loginData.tokenPair).toBeDefined()
+      expect(loginData.tokenPair).toBeDefined()
 
       // Step 3: Refresh token
-      const refreshRequest = new Request('https://example.com/api/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const refreshRequest = new Request(
+        'https://example.com/api/auth/refresh',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            refreshToken: loginData.tokenPair.refreshToken,
+          }),
         },
-        body: JSON.stringify({
-          refreshToken: loginData.tokenPair.refreshToken,
-        }),
-      })
+      )
 
       const refreshResponse = await refreshHandler({
         request: refreshRequest,
@@ -182,7 +185,9 @@ describe('Authentication System Integration', () => {
       const refreshData = await refreshResponse.json()
       expect(refreshData.success).toBe(true)
       expect(refreshData.tokenPair).toBeDefined()
-      expect(refreshData.tokenPair.accessToken).not.toBe(loginData.tokenPair.accessToken)
+      expect(refreshData.tokenPair.accessToken).not.toBe(
+        loginData.tokenPair.accessToken,
+      )
 
       // Step 4: Logout
       const logoutRequest = new Request('https://example.com/api/auth/logout', {
@@ -207,7 +212,9 @@ describe('Authentication System Integration', () => {
     })
 
     it('should enforce rate limiting across the flow', async () => {
-  const { getFromCache, setInCache: _setInCache } = await import('../../redis')
+      const { getFromCache, setInCache: _setInCache } = await import(
+        '../../redis'
+      )
 
       // Mock rate limit exceeded
       vi.mocked(getFromCache).mockImplementation(async (_key) => {
@@ -280,8 +287,8 @@ describe('Authentication System Integration', () => {
     })
 
     it('should handle authentication middleware correctly', async () => {
-  const { validateToken, getUserById } = await import('../jwt-service')
-  const { getFromCache: _getFromCache } = await import('../../redis')
+      const { validateToken, getUserById } = await import('../jwt-service')
+      const { getFromCache: _getFromCache } = await import('../../redis')
 
       // Mock valid token validation
       vi.mocked(validateToken).mockResolvedValue({
@@ -301,7 +308,7 @@ describe('Authentication System Integration', () => {
 
       const request = new Request('https://example.com/api/protected', {
         headers: {
-          'Authorization': 'Bearer valid-token',
+          Authorization: 'Bearer valid-token',
         },
       })
 
@@ -326,7 +333,10 @@ describe('Authentication System Integration', () => {
         tokenId: 'token123',
       } as any
 
-      const result = await requireRole(authenticatedRequest, ['admin', 'therapist'])
+      const result = await requireRole(authenticatedRequest, [
+        'admin',
+        'therapist',
+      ])
 
       expect(result.success).toBe(false)
       expect(result.response?.status).toBe(403)
@@ -355,21 +365,24 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new Request('https://example.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const registerRequest = new Request(
+        'https://example.com/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'SecurePass123!',
+            firstName: '<script>alert("XSS")</script>',
+            lastName: 'Doe',
+            role: 'patient',
+          }),
         },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'SecurePass123!',
-          firstName: '<script>alert("XSS")</script>',
-          lastName: 'Doe',
-          role: 'patient',
-        }),
-      })
+      )
 
       const response = await registerHandler({
         request: registerRequest,
@@ -398,21 +411,24 @@ describe('Authentication System Integration', () => {
       ]
 
       for (const weakPassword of weakPasswords) {
-        const registerRequest = new Request('https://example.com/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': mockClientInfo.userAgent,
-            'X-Device-ID': mockClientInfo.deviceId,
+        const registerRequest = new Request(
+          'https://example.com/api/auth/register',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': mockClientInfo.userAgent,
+              'X-Device-ID': mockClientInfo.deviceId,
+            },
+            body: JSON.stringify({
+              email: 'test@example.com',
+              password: weakPassword,
+              firstName: 'John',
+              lastName: 'Doe',
+              role: 'patient',
+            }),
           },
-          body: JSON.stringify({
-            email: 'test@example.com',
-            password: weakPassword,
-            firstName: 'John',
-            lastName: 'Doe',
-            role: 'patient',
-          }),
-        })
+        )
 
         const response = await registerHandler({
           request: registerRequest,
@@ -421,7 +437,9 @@ describe('Authentication System Integration', () => {
 
         expect(response.status).toBe(400)
         const data = await response.json()
-        expect(data.error).toContain('Password does not meet complexity requirements')
+        expect(data.error).toContain(
+          'Password does not meet complexity requirements',
+        )
       }
     })
 
@@ -517,21 +535,24 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new Request('https://example.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const registerRequest = new Request(
+        'https://example.com/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'SecurePass123!',
+            firstName: 'John',
+            lastName: 'Doe',
+            role: 'patient',
+          }),
         },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'SecurePass123!',
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-        }),
-      })
+      )
 
       const start = performance.now()
 
@@ -709,21 +730,24 @@ describe('Authentication System Integration', () => {
         return true
       })
 
-      const registerRequest = new Request('https://example.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const registerRequest = new Request(
+        'https://example.com/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'SecurePass123!',
+            firstName: 'John',
+            lastName: 'Doe',
+            role: 'patient',
+          }),
         },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'SecurePass123!',
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-        }),
-      })
+      )
 
       await registerHandler({
         request: registerRequest,
@@ -734,7 +758,9 @@ describe('Authentication System Integration', () => {
 
   describe('Phase 6 MCP Server Integration', () => {
     it('should track authentication progress throughout the flow', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
       const { setInCache, getFromCache } = await import('../../redis')
 
       vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
@@ -748,21 +774,24 @@ describe('Authentication System Integration', () => {
         return null
       })
 
-      const registerRequest = new Request('https://example.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const registerRequest = new Request(
+        'https://example.com/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'SecurePass123!',
+            firstName: 'John',
+            lastName: 'Doe',
+            role: 'patient',
+          }),
         },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'SecurePass123!',
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-        }),
-      })
+      )
 
       await registerHandler({
         request: registerRequest,
@@ -772,12 +801,14 @@ describe('Authentication System Integration', () => {
       // Verify Phase 6 tracking was called
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         expect.any(String),
-        'user_registered'
+        'user_registered',
       )
     })
 
     it('should track login events', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
@@ -819,24 +850,29 @@ describe('Authentication System Integration', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
-        'user_logged_in'
+        'user_logged_in',
       )
     })
 
     it('should track token refresh events', async () => {
-      const { updatePhase6AuthenticationProgress } = await import('../../mcp/phase6-integration')
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../../mcp/phase6-integration'
+      )
 
-      const refreshRequest = new Request('https://example.com/api/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': mockClientInfo.userAgent,
-          'X-Device-ID': mockClientInfo.deviceId,
+      const refreshRequest = new Request(
+        'https://example.com/api/auth/refresh',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': mockClientInfo.userAgent,
+            'X-Device-ID': mockClientInfo.deviceId,
+          },
+          body: JSON.stringify({
+            refreshToken: 'valid.refresh.token',
+          }),
         },
-        body: JSON.stringify({
-          refreshToken: 'valid.refresh.token',
-        }),
-      })
+      )
 
       await refreshHandler({
         request: refreshRequest,
@@ -845,7 +881,7 @@ describe('Authentication System Integration', () => {
 
       expect(updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         null,
-        'token_refreshed'
+        'token_refreshed',
       )
     })
   })

@@ -113,7 +113,9 @@ export async function encrypt(data: unknown): Promise<string> {
 
     return JSON.stringify(result)
   } catch (error: unknown) {
-    throw new Error(`Encryption failed: ${(error as Error).message}`)
+    throw new Error(`Encryption failed: ${(error as Error).message}`, {
+      cause: error,
+    })
   }
 }
 
@@ -163,7 +165,9 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     const decoder = new TextDecoder()
     return JSON.parse(decoder.decode(decrypted))
   } catch (error: unknown) {
-    throw new Error(`Decryption failed: ${(error as Error).message}`)
+    throw new Error(`Decryption failed: ${(error as Error).message}`, {
+      cause: error,
+    })
   }
 }
 

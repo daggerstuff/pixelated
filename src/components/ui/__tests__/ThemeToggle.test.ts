@@ -100,7 +100,9 @@ describe('ThemeToggle', () => {
 
   it('applies custom class from props', async () => {
     const customClass = 'custom-theme-toggle'
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown, { class: customClass })
+    const { astroContainer } = await renderAstro(ThemeToggle as unknown, {
+      class: customClass,
+    })
     const button = astroContainer.querySelector('button')
 
     expect(button).toHaveClass(customClass)
@@ -132,6 +134,8 @@ describe('ThemeToggle', () => {
     const { astroContainer } = await renderAstro(ThemeToggle as unknown)
 
     expect(document.documentElement.classList.contains('dark')).toBe(true)
-    expect(astroContainer.querySelector('#system-icon')).not.toHaveClass('hidden')
+    expect(astroContainer.querySelector('#system-icon')).not.toHaveClass(
+      'hidden',
+    )
   })
 })

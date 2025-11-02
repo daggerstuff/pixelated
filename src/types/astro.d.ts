@@ -31,10 +31,12 @@ declare module 'astro' {
   interface AstroGlobal {
     locals: Locals
   }
-  interface Locals {
+  interface Locals extends Record<string, unknown> {
     headers: Record<string, string>
     isPrerendered: boolean
     isSSR: boolean
+    cspNonce?: string
+    session?: any
     userPreferences: {
       language: string
       darkMode: boolean
@@ -55,9 +57,12 @@ declare module 'astro' {
 }
 
 declare namespace App {
-  interface Locals {
+  interface Locals extends Record<string, unknown> {
     isSSR?: boolean
     isPrerendered?: boolean
+    cspNonce?: string
+    user?: any
+    session?: any
     userPreferences?: {
       darkMode?: boolean
       language?: string
@@ -89,12 +94,12 @@ declare module 'astro:content' {
 declare module '*.md' {
   // Define a proper interface for markdown content
   interface MarkdownContent {
-    frontmatter: Record<string, unknown>;
-    file: string;
-    rawContent: () => string;
-    compiledContent: () => string;
-    getHeadings: () => Array<{ depth: number; slug: string; text: string }>;
-    default: unknown;
+    frontmatter: Record<string, unknown>
+    file: string
+    rawContent: () => string
+    compiledContent: () => string
+    getHeadings: () => Array<{ depth: number; slug: string; text: string }>
+    default: unknown
   }
 
   const MarkdownFile: MarkdownContent

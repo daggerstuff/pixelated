@@ -8,7 +8,9 @@ const logger = createBuildSafeLogger('compatibility-service')
 if (!logger || typeof logger.info !== 'function') {
   // This will show up in the build or runtime logs if the import fails
   // eslint-disable-next-line no-console
-  console.error('[CompatibilityService] Logger import failed or is not a valid logger instance')
+  console.error(
+    '[CompatibilityService] Logger import failed or is not a valid logger instance',
+  )
 } else {
   // eslint-disable-next-line no-console
   console.info('[CompatibilityService] Logger import succeeded')

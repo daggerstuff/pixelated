@@ -4,14 +4,18 @@
  * It allows the MetaAligner pipeline to process responses from various LLMs in a standardized way.
  */
 
-import type { LLMOutput, UnifiedContext, UnifiedProcessingRequest } from './unified-api';
-import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes';
+import type {
+  LLMOutput,
+  UnifiedContext,
+  UnifiedProcessingRequest,
+} from './unified-api'
+import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes'
 
 /**
  * Represents the supported LLM providers.
  * This enum is used to identify the source of the LLM output.
  */
-export type LLMProvider = 'MentalLLaMA' | 'OpenAI' | 'Anthropic' | 'Gemini';
+export type LLMProvider = 'MentalLLaMA' | 'OpenAI' | 'Anthropic' | 'Gemini'
 
 /**
  * The LLM adapter class.
@@ -28,21 +32,28 @@ export class LLMAdapter {
    * @returns The transformed processing request, ready to be sent to the MetaAligner pipeline.
    * @throws An error if the provider is not supported.
    */
-  public transform(provider: LLMProvider, rawOutput: unknown, context: UnifiedContext): UnifiedProcessingRequest {
+  public transform(
+    provider: LLMProvider,
+    rawOutput: unknown,
+    context: UnifiedContext,
+  ): UnifiedProcessingRequest {
     switch (provider) {
       case 'MentalLLaMA':
-        return this.transformMentalLLaMA(rawOutput as MentalLLaMAResponse, context);
+        return this.transformMentalLLaMA(
+          rawOutput as MentalLLaMAResponse,
+          context,
+        )
       case 'OpenAI':
         // Placeholder for OpenAI adapter
-        throw new Error('OpenAI adapter not implemented yet.');
+        throw new Error('OpenAI adapter not implemented yet.')
       case 'Anthropic':
         // Placeholder for Anthropic adapter
-        throw new Error('Anthropic adapter not implemented yet.');
+        throw new Error('Anthropic adapter not implemented yet.')
       case 'Gemini':
         // Placeholder for Gemini adapter
-        throw new Error('Gemini adapter not implemented yet.');
+        throw new Error('Gemini adapter not implemented yet.')
       default:
-        throw new Error(`Unsupported LLM provider: ${provider}`);
+        throw new Error(`Unsupported LLM provider: ${provider}`)
     }
   }
 
@@ -54,7 +65,10 @@ export class LLMAdapter {
    * @param context - The context for the processing request.
    * @returns The transformed processing request.
    */
-  private transformMentalLLaMA(rawOutput: MentalLLaMAResponse, context: UnifiedContext): UnifiedProcessingRequest {
+  private transformMentalLLaMA(
+    rawOutput: MentalLLaMAResponse,
+    context: UnifiedContext,
+  ): UnifiedProcessingRequest {
     const llmOutput: LLMOutput = {
       content: rawOutput.content,
       metadata: {
@@ -63,11 +77,11 @@ export class LLMAdapter {
         tokenUsage: rawOutput.tokenUsage,
         model: rawOutput.model,
       },
-    };
+    }
 
     return {
       llmOutput,
       context,
-    };
+    }
   }
 }

@@ -66,12 +66,12 @@ export enum UserRole {
   USER = 'user',
   STAFF = 'staff',
   ADMIN = 'admin',
-  SUPER_ADMIN = 'super_admin'
+  SUPER_ADMIN = 'super_admin',
 }
 
 export enum TokenType {
   ACCESS = 'access',
-  REFRESH = 'refresh'
+  REFRESH = 'refresh',
 }
 
 export interface TokenMetadata {
@@ -130,7 +130,7 @@ export class JWTTokenService {
   async generateTokenPair(
     userId: string,
     role: UserRole,
-    clientInfo: ClientInfo
+    clientInfo: ClientInfo,
   ): Promise<TokenPair> {
     try {
       // Validate input parameters
@@ -164,11 +164,11 @@ export class JWTTokenService {
         sessionId,
         complianceLevel: 'hipaa_plus_plus',
         ...(this.config.enableIPValidation && {
-          ipHash: this.hashClientIP(clientInfo.ipAddress)
+          ipHash: this.hashClientIP(clientInfo.ipAddress),
         }),
         ...(this.config.enableUserAgentValidation && {
-          userAgentHash: this.hashUserAgent(clientInfo.userAgent)
-        })
+          userAgentHash: this.hashUserAgent(clientInfo.userAgent),
+        }),
       }
 
       // Create refresh token payload
@@ -181,16 +181,16 @@ export class JWTTokenService {
         aud: this.config.audience,
         iss: this.config.issuer,
         complianceLevel: 'hipaa_plus_plus',
-        accessTokenId
+        accessTokenId,
       }
 
       // Sign tokens with secret key
       const accessToken = jwt.sign(accessPayload, this.config.secretKey, {
-        algorithm: this.config.algorithm
+        algorithm: this.config.algorithm,
       })
 
       const refreshToken = jwt.sign(refreshPayload, this.config.secretKey, {
-        algorithm: this.config.algorithm
+        algorithm: this.config.algorithm,
       })
 
       // Store token metadata in Redis for validation and revocation
@@ -199,7 +199,7 @@ export class JWTTokenService {
         role,
         type: 'access',
         expiresAt: accessPayload.exp,
-        clientInfo
+        clientInfo,
       })
 
       await this.storeTokenMetadata(refreshTokenId, {
@@ -207,7 +207,7 @@ export class JWTTokenService {
         type: 'refresh',
         expiresAt: refreshPayload.exp,
         clientInfo,
-        accessTokenId
+        accessTokenId,
       })
 
       // Cache tokens for fast validation
@@ -215,7 +215,12 @@ export class JWTTokenService {
       await this.cacheService.cacheToken(refreshTokenId, refreshPayload)
 
       // Log authentication event for audit trail
-      await this.securityLogger.logTokenGeneration(userId, accessTokenId, refreshTokenId, clientInfo)
+      await this.securityLogger.logTokenGeneration(
+        userId,
+        accessTokenId,
+        refreshTokenId,
+        clientInfo,
+      )
 
       // Update Phase 6 MCP server with authentication progress
       await this.phase6.trackAuthenticationProgress(userId, 'token_generated')
@@ -228,31 +233,37 @@ export class JWTTokenService {
         user: {
           id: userId,
           role,
-          email: user.email
-        }
+          email: user.email,
+        },
       }
-
     } catch (error) {
       await this.securityLogger.logTokenGenerationFailure(userId, error)
-      throw error instanceof AuthenticationError ? error : new AuthenticationError('Token generation failed')
+      throw error instanceof AuthenticationError
+        ? error
+        : new AuthenticationError('Token generation failed')
     }
   }
 
   /**
    * Validate and decode JWT token with comprehensive security checks
    */
-  async validateToken(token: string, tokenType: TokenType): Promise<TokenValidationResult> {
+  async validateToken(
+    token: string,
+    tokenType: TokenType,
+  ): Promise<TokenValidationResult> {
     try {
       // Verify token signature and decode
       const payload = jwt.verify(token, this.config.secretKey, {
         algorithms: [this.config.algorithm],
         audience: this.config.audience,
-        issuer: this.config.issuer
+        issuer: this.config.issuer,
       }) as JWTPayload
 
       // Validate token type matches expected
       if (payload.type !== tokenType) {
-        throw new TokenValidationError(`Invalid token type: expected ${tokenType}, got ${payload.type}`)
+        throw new TokenValidationError(
+          `Invalid token type: expected ${tokenType}, got ${payload.type}`,
+        )
       }
 
       // Check if token is expired
@@ -276,7 +287,11 @@ export class JWTTokenService {
       await this.validateTokenSecurity(payload, tokenMetadata)
 
       // Log successful validation
-      await this.securityLogger.logTokenValidation(payload.sub, payload.jti, tokenType)
+      await this.securityLogger.logTokenValidation(
+        payload.sub,
+        payload.jti,
+        tokenType,
+      )
 
       return {
         valid: true,
@@ -284,9 +299,8 @@ export class JWTTokenService {
         role: payload.role,
         tokenId: payload.jti,
         expiresAt: payload.exp,
-        payload
+        payload,
       }
-
     } catch (error) {
       // Log validation failure
       await this.securityLogger.logTokenValidationFailure(error, tokenType)
@@ -297,7 +311,8 @@ export class JWTTokenService {
 
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Token validation failed'
+        error:
+          error instanceof Error ? error.message : 'Token validation failed',
       }
     }
   }
@@ -305,7 +320,10 @@ export class JWTTokenService {
   /**
    * Refresh access token using refresh token
    */
-  async refreshAccessToken(refreshToken: string, clientInfo: ClientInfo): Promise<TokenPair> {
+  async refreshAccessToken(
+    refreshToken: string,
+    clientInfo: ClientInfo,
+  ): Promise<TokenPair> {
     try {
       // Validate refresh token
       const validation = await this.validateToken(refreshToken, 'refresh')
@@ -321,27 +339,45 @@ export class JWTTokenService {
       }
 
       // Revoke the refresh token (single use)
-      await this.revocationService.revokeToken(validation.tokenId, 'refresh_token_used')
+      await this.revocationService.revokeToken(
+        validation.tokenId,
+        'refresh_token_used',
+      )
 
       // Revoke associated access token
       if (refreshMetadata.accessTokenId) {
-        await this.revocationService.revokeToken(refreshMetadata.accessTokenId, 'refresh_cycle')
+        await this.revocationService.revokeToken(
+          refreshMetadata.accessTokenId,
+          'refresh_cycle',
+        )
       }
 
       // Generate new token pair
-      const newTokenPair = await this.generateTokenPair(validation.userId, validation.role, clientInfo)
+      const newTokenPair = await this.generateTokenPair(
+        validation.userId,
+        validation.role,
+        clientInfo,
+      )
 
       // Log token refresh event
-      await this.securityLogger.logTokenRefresh(validation.userId, validation.tokenId, newTokenPair)
+      await this.securityLogger.logTokenRefresh(
+        validation.userId,
+        validation.tokenId,
+        newTokenPair,
+      )
 
       // Update Phase 6 MCP server with refresh progress
-      await this.phase6.trackAuthenticationProgress(validation.userId, 'token_refreshed')
+      await this.phase6.trackAuthenticationProgress(
+        validation.userId,
+        'token_refreshed',
+      )
 
       return newTokenPair
-
     } catch (error) {
       await this.securityLogger.logTokenRefreshFailure(error)
-      throw error instanceof AuthenticationError ? error : new AuthenticationError('Token refresh failed')
+      throw error instanceof AuthenticationError
+        ? error
+        : new AuthenticationError('Token refresh failed')
     }
   }
 
@@ -361,24 +397,36 @@ export class JWTTokenService {
 
       // Revoke related tokens if this is a refresh token
       if (metadata.type === 'refresh' && metadata.accessTokenId) {
-        await this.revocationService.revokeToken(metadata.accessTokenId, 'linked_revocation')
+        await this.revocationService.revokeToken(
+          metadata.accessTokenId,
+          'linked_revocation',
+        )
       }
 
       // Log revocation event
-      await this.securityLogger.logTokenRevocation(metadata.userId, tokenId, reason, metadata.type)
+      await this.securityLogger.logTokenRevocation(
+        metadata.userId,
+        tokenId,
+        reason,
+        metadata.type,
+      )
 
       // Update Phase 6 MCP server with revocation progress
-      await this.phase6.trackAuthenticationProgress(metadata.userId, 'token_revoked')
+      await this.phase6.trackAuthenticationProgress(
+        metadata.userId,
+        'token_revoked',
+      )
 
       // Clean up cached data
       await this.cacheService.invalidateToken(tokenId)
       if (metadata.accessTokenId) {
         await this.cacheService.invalidateToken(metadata.accessTokenId)
       }
-
     } catch (error) {
       await this.securityLogger.logTokenRevocationFailure(tokenId, error)
-      throw error instanceof AuthenticationError ? error : new AuthenticationError('Token revocation failed')
+      throw error instanceof AuthenticationError
+        ? error
+        : new AuthenticationError('Token revocation failed')
     }
   }
 
@@ -405,31 +453,38 @@ export class JWTTokenService {
           await this.cacheService.invalidateToken(metadata.id)
 
           // Log cleanup event
-          await this.securityLogger.logTokenCleanup(metadata.userId, metadata.id)
+          await this.securityLogger.logTokenCleanup(
+            metadata.userId,
+            metadata.id,
+          )
         }
       }
 
       return {
         cleanedTokens: cleanedCount,
         timestamp: now,
-        nextCleanup: this.calculateNextCleanupTime()
+        nextCleanup: this.calculateNextCleanupTime(),
       }
-
     } catch (error) {
       await this.securityLogger.logTokenCleanupFailure(error)
-      throw new Error('Token cleanup failed')
+      throw new Error('Token cleanup failed', { cause: error })
     }
   }
 
   /**
    * Validate additional security constraints on token
    */
-  private async validateTokenSecurity(payload: JWTPayload, metadata: TokenMetadata): Promise<void> {
+  private async validateTokenSecurity(
+    payload: JWTPayload,
+    metadata: TokenMetadata,
+  ): Promise<void> {
     // Validate session context (IP/User-Agent hash matching)
     if (this.config.enableIPValidation && payload.ipHash) {
       const currentIPHash = this.hashClientIP(metadata.clientInfo.ipAddress)
       if (payload.ipHash !== currentIPHash) {
-        await this.securityLogger.logSecurityEvent('ip_mismatch', payload.sub, { tokenId: payload.jti })
+        await this.securityLogger.logSecurityEvent('ip_mismatch', payload.sub, {
+          tokenId: payload.jti,
+        })
         throw new TokenValidationError('IP address mismatch detected')
       }
     }
@@ -437,7 +492,11 @@ export class JWTTokenService {
     if (this.config.enableUserAgentValidation && payload.userAgentHash) {
       const currentUAHash = this.hashUserAgent(metadata.clientInfo.userAgent)
       if (payload.userAgentHash !== currentUAHash) {
-        await this.securityLogger.logSecurityEvent('user_agent_mismatch', payload.sub, { tokenId: payload.jti })
+        await this.securityLogger.logSecurityEvent(
+          'user_agent_mismatch',
+          payload.sub,
+          { tokenId: payload.jti },
+        )
         throw new TokenValidationError('User-Agent mismatch detected')
       }
     }
@@ -446,7 +505,11 @@ export class JWTTokenService {
     if (this.config.enableReplayProtection) {
       const isReplay = await this.detectReplayAttack(payload)
       if (isReplay) {
-        await this.securityLogger.logSecurityEvent('replay_attack_detected', payload.sub, { tokenId: payload.jti })
+        await this.securityLogger.logSecurityEvent(
+          'replay_attack_detected',
+          payload.sub,
+          { tokenId: payload.jti },
+        )
         throw new TokenValidationError('Potential replay attack detected')
       }
     }
@@ -455,7 +518,10 @@ export class JWTTokenService {
   /**
    * Store token metadata in Redis for validation and revocation
    */
-  private async storeTokenMetadata(tokenId: string, metadata: TokenMetadata): Promise<void> {
+  private async storeTokenMetadata(
+    tokenId: string,
+    metadata: TokenMetadata,
+  ): Promise<void> {
     const key = `token:metadata:${tokenId}`
     const ttl = metadata.expiresAt - Math.floor(Date.now() / 1000)
 
@@ -463,16 +529,22 @@ export class JWTTokenService {
       throw new Error('Cannot store expired token metadata')
     }
 
-    await this.redis.setex(key, ttl, JSON.stringify({
-      ...metadata,
-      id: tokenId
-    }))
+    await this.redis.setex(
+      key,
+      ttl,
+      JSON.stringify({
+        ...metadata,
+        id: tokenId,
+      }),
+    )
   }
 
   /**
    * Retrieve token metadata from Redis
    */
-  private async getTokenMetadata(tokenId: string): Promise<TokenMetadata | null> {
+  private async getTokenMetadata(
+    tokenId: string,
+  ): Promise<TokenMetadata | null> {
     const key = `token:metadata:${tokenId}`
     const data = await this.redis.get(key)
 
@@ -488,7 +560,9 @@ export class JWTTokenService {
   /**
    * Retrieve token metadata by Redis key
    */
-  private async getTokenMetadataByKey(key: string): Promise<TokenMetadata | null> {
+  private async getTokenMetadataByKey(
+    key: string,
+  ): Promise<TokenMetadata | null> {
     const data = await this.redis.get(key)
 
     if (!data) return null
@@ -503,15 +577,21 @@ export class JWTTokenService {
   /**
    * Check if token should be cleaned up
    */
-  private shouldCleanupToken(metadata: TokenMetadata, currentTime: number): boolean {
+  private shouldCleanupToken(
+    metadata: TokenMetadata,
+    currentTime: number,
+  ): boolean {
     // Clean up expired tokens
     if (metadata.expiresAt < currentTime) {
       return true
     }
 
     // Clean up revoked tokens after grace period (1 hour)
-    if (metadata.isRevoked && metadata.revokedAt &&
-        currentTime - metadata.revokedAt > 3600) {
+    if (
+      metadata.isRevoked &&
+      metadata.revokedAt &&
+      currentTime - metadata.revokedAt > 3600
+    ) {
       return true
     }
 
@@ -523,7 +603,7 @@ export class JWTTokenService {
    */
   private calculateNextCleanupTime(): number {
     // Run cleanup every 6 hours
-    return Math.floor(Date.now() / 1000) + (6 * 3600)
+    return Math.floor(Date.now() / 1000) + 6 * 3600
   }
 
   /**
@@ -570,14 +650,19 @@ export class JWTTokenService {
    */
   private validateConfiguration(): void {
     if (!this.config.secretKey || this.config.secretKey.length < 32) {
-      throw new Error('JWT secret key must be at least 256 bits (32 characters)')
+      throw new Error(
+        'JWT secret key must be at least 256 bits (32 characters)',
+      )
     }
 
     if (!['HS256', 'RS256'].includes(this.config.algorithm)) {
       throw new Error('Unsupported JWT algorithm. Use HS256 or RS256')
     }
 
-    if (this.config.accessTokenExpiry <= 0 || this.config.refreshTokenExpiry <= 0) {
+    if (
+      this.config.accessTokenExpiry <= 0 ||
+      this.config.refreshTokenExpiry <= 0
+    ) {
       throw new Error('Token expiry times must be positive')
     }
 

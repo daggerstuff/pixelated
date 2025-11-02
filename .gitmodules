@@ -1,4 +1,0 @@
-[submodule "ai"]
-	path = ai
-	url = git@gitlab-gemcity:gemcity/ai.git
-	ignore = all

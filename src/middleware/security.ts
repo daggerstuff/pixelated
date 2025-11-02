@@ -17,7 +17,7 @@ const SECURITY_HEADERS = {
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "upgrade-insecure-requests"
+    'upgrade-insecure-requests',
   ].join('; '),
 
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
@@ -29,7 +29,7 @@ const SECURITY_HEADERS = {
     'gyroscope=()',
     'magnetometer=()',
     'payment=()',
-    'usb=()'
+    'usb=()',
   ].join(', '),
 
   'Cross-Origin-Embedder-Policy': 'require-corp',
@@ -41,7 +41,7 @@ const SECURITY_HEADERS = {
 
   'X-Download-Options': 'noopen',
 
-  'X-DNS-Prefetch-Control': 'off'
+  'X-DNS-Prefetch-Control': 'off',
 }
 
 export function sanitizeString(input: unknown): string {
@@ -63,7 +63,10 @@ export function validateEmail(email: string): boolean {
   return emailRegex.test(email) && email.length <= 254
 }
 
-export function validatePassword(password: string): { valid: boolean; errors: string[] } {
+export function validatePassword(password: string): {
+  valid: boolean
+  errors: string[]
+} {
   const errors: string[] = []
 
   if (password.length < 12) {
@@ -93,16 +96,12 @@ export function validatePassword(password: string): { valid: boolean; errors: st
 }
 
 export function validateBiasScore(score: number): boolean {
-  return (
-    typeof score === 'number' &&
-    !isNaN(score) &&
-    score >= 0 &&
-    score <= 1
-  )
+  return typeof score === 'number' && !isNaN(score) && score >= 0 && score <= 1
 }
 
 export function validateSessionId(sessionId: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
   return uuidRegex.test(sessionId)
 }
 
@@ -117,7 +116,11 @@ export const InputValidator = {
 class RateLimiter {
   private requests = new Map<string, { count: number; resetTime: number }>()
 
-  checkLimit(identifier: string): { allowed: boolean; remaining: number; resetTime: number } {
+  checkLimit(identifier: string): {
+    allowed: boolean
+    remaining: number
+    resetTime: number
+  } {
     const now = Date.now()
     const { windowMs, maxRequests } = RATE_LIMITS
 
@@ -126,9 +129,13 @@ class RateLimiter {
     if (!existing || now > existing.resetTime) {
       this.requests.set(identifier, {
         count: 1,
-        resetTime: now + windowMs
+        resetTime: now + windowMs,
       })
-      return { allowed: true, remaining: maxRequests - 1, resetTime: now + windowMs }
+      return {
+        allowed: true,
+        remaining: maxRequests - 1,
+        resetTime: now + windowMs,
+      }
     }
 
     if (existing.count >= maxRequests) {
@@ -139,7 +146,7 @@ class RateLimiter {
     return {
       allowed: true,
       remaining: maxRequests - existing.count,
-      resetTime: existing.resetTime
+      resetTime: existing.resetTime,
     }
   }
 
@@ -155,13 +162,16 @@ class RateLimiter {
 
 const rateLimiter = new RateLimiter()
 
-setInterval(() => {
-  rateLimiter.cleanup()
-}, 5 * 60 * 1000)
+setInterval(
+  () => {
+    rateLimiter.cleanup()
+  },
+  5 * 60 * 1000,
+)
 
 export async function securityMiddleware(
   request: Request,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
 ): Promise<Response | null> {
   const _url = new URL(request.url)
   const _method = request.method
@@ -170,18 +180,23 @@ export async function securityMiddleware(
   const rateLimitResult = rateLimiter.checkLimit(clientIP)
 
   if (!rateLimitResult.allowed) {
-    return new Response(JSON.stringify({
-      error: 'Too many requests',
-      retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-    }), {
-      status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
-        'X-Rate-Limit-Remaining': rateLimitResult.remaining.toString(),
-        'X-Rate-Limit-Reset': rateLimitResult.resetTime.toString()
-      }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Too many requests',
+        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': Math.ceil(
+            (rateLimitResult.resetTime - Date.now()) / 1000,
+          ).toString(),
+          'X-Rate-Limit-Remaining': rateLimitResult.remaining.toString(),
+          'X-Rate-Limit-Reset': rateLimitResult.resetTime.toString(),
+        },
+      },
+    )
   }
 
   const responseHeaders = new Headers()
@@ -192,16 +207,24 @@ export async function securityMiddleware(
     }
   })
 
-  responseHeaders.set('X-Rate-Limit-Remaining', rateLimitResult.remaining.toString())
-  responseHeaders.set('X-Rate-Limit-Reset', rateLimitResult.resetTime.toString())
+  responseHeaders.set(
+    'X-Rate-Limit-Remaining',
+    rateLimitResult.remaining.toString(),
+  )
+  responseHeaders.set(
+    'X-Rate-Limit-Reset',
+    rateLimitResult.resetTime.toString(),
+  )
   responseHeaders.set('X-Rate-Limit-Limit', RATE_LIMITS.maxRequests.toString())
-
-    ; (context as Record<string, unknown>)['securityHeaders'] = responseHeaders
+  ;(context as Record<string, unknown>)['securityHeaders'] = responseHeaders
 
   return null
 }
 
-export function applySecurityHeaders(response: Response, additionalHeaders?: Record<string, string>): Response {
+export function applySecurityHeaders(
+  response: Response,
+  additionalHeaders?: Record<string, string>,
+): Response {
   const headers = new Headers(response.headers)
 
   Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
@@ -219,11 +242,14 @@ export function applySecurityHeaders(response: Response, additionalHeaders?: Rec
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   })
 }
 
-export function validatePHIContent(content: string): { compliant: boolean; issues: string[] } {
+export function validatePHIContent(content: string): {
+  compliant: boolean
+  issues: string[]
+} {
   const issues: string[] = []
 
   // Check for sensitive information patterns
@@ -258,11 +284,19 @@ export function sanitizeForAudit(content: string): string {
   return content
     .replace(/\b\d{3}-?\d{2}-?\d{4}\b/g, '[SSN_MASKED]')
     .replace(/\b\d{3}-?\d{3}-?\d{4}\b/g, '[PHONE_MASKED]')
-    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL_MASKED]')
+    .replace(
+      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+      '[EMAIL_MASKED]',
+    )
     .replace(/\b\d+\s+[A-Za-z0-9\s,.-]+\b/g, '[ADDRESS_MASKED]')
 }
 
-export function generateAuditLog(action: string, userId: string, resource: string, details: unknown): Record<string, unknown> {
+export function generateAuditLog(
+  action: string,
+  userId: string,
+  resource: string,
+  details: unknown,
+): Record<string, unknown> {
   return {
     timestamp: new Date().toISOString(),
     action,
@@ -281,9 +315,4 @@ export const HIPAACompliance = {
   generateAuditLog,
 }
 
-export {
-  SECURITY_HEADERS,
-  RATE_LIMITS,
-  REQUEST_LIMITS,
-  CORS_CONFIG
-}
+export { SECURITY_HEADERS, RATE_LIMITS, REQUEST_LIMITS, CORS_CONFIG }

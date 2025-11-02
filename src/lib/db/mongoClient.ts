@@ -16,7 +16,9 @@ interface ProcessEnv {
   [key: string]: string | undefined
 }
 
-const processEnv = (typeof process !== 'undefined' ? process.env : {}) as ProcessEnv
+const processEnv = (
+  typeof process !== 'undefined' ? process.env : {}
+) as ProcessEnv
 
 function getEnvVar(keys: string[], fallback?: string): string {
   for (const key of keys) {
@@ -28,7 +30,9 @@ function getEnvVar(keys: string[], fallback?: string): string {
   if (fallback) {
     return fallback
   }
-  throw new Error(`Missing required environment variable(s): ${keys.join(', ')}`)
+  throw new Error(
+    `Missing required environment variable(s): ${keys.join(', ')}`,
+  )
 }
 
 export function getMongoDBUri(): string {

@@ -47,51 +47,51 @@ export enum SecurityEventType {
   TOKEN_VALIDATION_FAILED = 'token_validation_failed',
   TOKEN_REFRESHED = 'token_refreshed',
   TOKEN_REVOKED = 'token_revoked',
-  
+
   // Authorization events
   PERMISSION_GRANTED = 'permission_granted',
   PERMISSION_DENIED = 'permission_denied',
   ROLE_ASSIGNED = 'role_assigned',
   ROLE_REMOVED = 'role_removed',
-  
+
   // Security incidents
   RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
   ACCOUNT_LOCKED = 'account_locked',
   ACCOUNT_UNLOCKED = 'account_unlocked',
   SUSPICIOUS_ACTIVITY = 'suspicious_activity',
   SECURITY_BREACH = 'security_breach',
-  
+
   // MFA events
   MFA_ENABLED = 'mfa_enabled',
   MFA_DISABLED = 'mfa_disabled',
   MFA_VERIFICATION_SUCCESS = 'mfa_verification_success',
   MFA_VERIFICATION_FAILED = 'mfa_verification_failed',
-  
+
   // Password events
   PASSWORD_CHANGED = 'password_changed',
   PASSWORD_RESET_REQUESTED = 'password_reset_requested',
   PASSWORD_RESET_COMPLETED = 'password_reset_completed',
-  
+
   // Session events
   SESSION_CREATED = 'session_created',
   SESSION_ENDED = 'session_ended',
   SESSION_EXPIRED = 'session_expired',
   SESSION_HIJACKING_DETECTED = 'session_hijacking_detected',
-  
+
   // Configuration events
   SECURITY_SETTINGS_CHANGED = 'security_settings_changed',
   API_KEY_CREATED = 'api_key_created',
   API_KEY_REVOKED = 'api_key_revoked',
-  
+
   // Compliance events
   HIPAA_VIOLATION_DETECTED = 'hipaa_violation_detected',
   COMPLIANCE_AUDIT_PASSED = 'compliance_audit_passed',
   COMPLIANCE_AUDIT_FAILED = 'compliance_audit_failed',
-  
+
   // System events
   TOKEN_CLEANED_UP = 'token_cleaned_up',
   SECURITY_SCAN_COMPLETED = 'security_scan_completed',
-  THREAT_NEUTRALIZED = 'threat_neutralized'
+  THREAT_NEUTRALIZED = 'threat_neutralized',
 }
 
 export interface SecurityEventLoggerConfig {
@@ -124,7 +124,7 @@ export class SecurityEventLogger {
       alertThreshold: 0.7,
       batchSize: 100,
       flushInterval: 60, // 1 minute
-      ...config
+      ...config,
     }
 
     this.eventBuffer = []
@@ -148,7 +148,7 @@ export class SecurityEventLogger {
       statusCode?: number
       sessionId?: string
       correlationId?: string
-    } = {}
+    } = {},
   ): Promise<void> {
     try {
       const event: SecurityEvent = {
@@ -165,7 +165,7 @@ export class SecurityEventLogger {
         encrypted: this.config.enableEncryption,
         timestamp: new Date().toISOString(),
         sessionId: context.sessionId,
-        correlationId: context.correlationId || randomUUID()
+        correlationId: context.correlationId || randomUUID(),
       }
 
       // Buffer the event for batch processing
@@ -180,13 +180,15 @@ export class SecurityEventLogger {
       }
 
       // Immediate flush if buffer is full or high-risk event
-      if (this.eventBuffer.length >= this.config.batchSize || event.riskScore >= this.config.alertThreshold) {
+      if (
+        this.eventBuffer.length >= this.config.batchSize ||
+        event.riskScore >= this.config.alertThreshold
+      ) {
         await this.flushEvents()
       }
 
       // Log to console for development
       this.logToConsole(event)
-
     } catch (error) {
       logger.error('Error logging security event', { error, eventType, userId })
     }
@@ -199,46 +201,68 @@ export class SecurityEventLogger {
     userId: string,
     accessTokenId: string,
     refreshTokenId: string,
-    clientInfo: any
+    clientInfo: any,
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_CREATED, userId, {
-      accessTokenId,
-      refreshTokenId,
-      clientInfo
-    }, {
-      endpoint: '/api/auth/login',
-      method: 'POST',
-      statusCode: 200
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_CREATED,
+      userId,
+      {
+        accessTokenId,
+        refreshTokenId,
+        clientInfo,
+      },
+      {
+        endpoint: '/api/auth/login',
+        method: 'POST',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
    * Log token validation event
    */
-  async logTokenValidation(userId: string, tokenId: string, tokenType: string): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, userId, {
-      tokenId,
-      tokenType
-    }, {
-      endpoint: '/api/auth/validate',
-      method: 'POST',
-      statusCode: 200
-    })
+  async logTokenValidation(
+    userId: string,
+    tokenId: string,
+    tokenType: string,
+  ): Promise<void> {
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_VALIDATED,
+      userId,
+      {
+        tokenId,
+        tokenType,
+      },
+      {
+        endpoint: '/api/auth/validate',
+        method: 'POST',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
    * Log token validation failure
    */
-  async logTokenValidationFailure(error: Error, tokenType?: string): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
-      error: error.message,
-      tokenType,
-      errorType: error.constructor.name
-    }, {
-      endpoint: '/api/auth/validate',
-      method: 'POST',
-      statusCode: 401
-    })
+  async logTokenValidationFailure(
+    error: Error,
+    tokenType?: string,
+  ): Promise<void> {
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_VALIDATION_FAILED,
+      null,
+      {
+        error: error.message,
+        tokenType,
+        errorType: error.constructor.name,
+      },
+      {
+        endpoint: '/api/auth/validate',
+        method: 'POST',
+        statusCode: 401,
+      },
+    )
   }
 
   /**
@@ -247,17 +271,22 @@ export class SecurityEventLogger {
   async logTokenRefresh(
     userId: string,
     oldTokenId: string,
-    newTokenPair: any
+    newTokenPair: any,
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, userId, {
-      oldTokenId,
-      newAccessTokenId: this.extractTokenId(newTokenPair.accessToken),
-      newRefreshTokenId: this.extractTokenId(newTokenPair.refreshToken)
-    }, {
-      endpoint: '/api/auth/refresh',
-      method: 'POST',
-      statusCode: 200
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_REFRESHED,
+      userId,
+      {
+        oldTokenId,
+        newAccessTokenId: this.extractTokenId(newTokenPair.accessToken),
+        newRefreshTokenId: this.extractTokenId(newTokenPair.refreshToken),
+      },
+      {
+        endpoint: '/api/auth/refresh',
+        method: 'POST',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
@@ -267,90 +296,126 @@ export class SecurityEventLogger {
     userId: string,
     tokenId: string,
     reason: string,
-    metadata: Record<string, unknown> = {}
+    metadata: Record<string, unknown> = {},
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_REVOKED, userId, {
-      tokenId,
-      reason,
-      ...metadata
-    }, {
-      endpoint: '/api/auth/revoke',
-      method: 'POST',
-      statusCode: 200
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_REVOKED,
+      userId,
+      {
+        tokenId,
+        reason,
+        ...metadata,
+      },
+      {
+        endpoint: '/api/auth/revoke',
+        method: 'POST',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
    * Log token generation failure
    */
-  async logTokenGenerationFailure(userId: string | null, error: Error): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, userId, {
-      error: error.message,
-      errorType: error.constructor.name,
-      phase: 'generation'
-    }, {
-      endpoint: '/api/auth/login',
-      method: 'POST',
-      statusCode: 401
-    })
+  async logTokenGenerationFailure(
+    userId: string | null,
+    error: Error,
+  ): Promise<void> {
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_VALIDATION_FAILED,
+      userId,
+      {
+        error: error.message,
+        errorType: error.constructor.name,
+        phase: 'generation',
+      },
+      {
+        endpoint: '/api/auth/login',
+        method: 'POST',
+        statusCode: 401,
+      },
+    )
   }
 
   /**
    * Log token refresh failure
    */
   async logTokenRefreshFailure(error: Error): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
-      error: error.message,
-      errorType: error.constructor.name,
-      phase: 'refresh'
-    }, {
-      endpoint: '/api/auth/refresh',
-      method: 'POST',
-      statusCode: 401
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_VALIDATION_FAILED,
+      null,
+      {
+        error: error.message,
+        errorType: error.constructor.name,
+        phase: 'refresh',
+      },
+      {
+        endpoint: '/api/auth/refresh',
+        method: 'POST',
+        statusCode: 401,
+      },
+    )
   }
 
   /**
    * Log token revocation failure
    */
-  async logTokenRevocationFailure(tokenId: string, error: Error): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_REVOKED, null, {
-      tokenId,
-      error: error.message,
-      errorType: error.constructor.name
-    }, {
-      endpoint: '/api/auth/revoke',
-      method: 'POST',
-      statusCode: 500
-    })
+  async logTokenRevocationFailure(
+    tokenId: string,
+    error: Error,
+  ): Promise<void> {
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_REVOKED,
+      null,
+      {
+        tokenId,
+        error: error.message,
+        errorType: error.constructor.name,
+      },
+      {
+        endpoint: '/api/auth/revoke',
+        method: 'POST',
+        statusCode: 500,
+      },
+    )
   }
 
   /**
    * Log token cleanup event
    */
   async logTokenCleanup(userId: string, tokenId: string): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_CLEANED_UP, userId, {
-      tokenId,
-      reason: 'expired_cleanup'
-    }, {
-      endpoint: '/system/cleanup',
-      method: 'SYSTEM',
-      statusCode: 200
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_CLEANED_UP,
+      userId,
+      {
+        tokenId,
+        reason: 'expired_cleanup',
+      },
+      {
+        endpoint: '/system/cleanup',
+        method: 'SYSTEM',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
    * Log token cleanup failure
    */
   async logTokenCleanupFailure(error: Error): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.TOKEN_CLEANED_UP, null, {
-      error: error.message,
-      errorType: error.constructor.name
-    }, {
-      endpoint: '/system/cleanup',
-      method: 'SYSTEM',
-      statusCode: 500
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.TOKEN_CLEANED_UP,
+      null,
+      {
+        error: error.message,
+        errorType: error.constructor.name,
+      },
+      {
+        endpoint: '/system/cleanup',
+        method: 'SYSTEM',
+        statusCode: 500,
+      },
+    )
   }
 
   /**
@@ -360,17 +425,22 @@ export class SecurityEventLogger {
     userId: string,
     requiredPermission: string,
     actualPermission: string,
-    resource: string
+    resource: string,
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.PERMISSION_DENIED, userId, {
-      requiredPermission,
-      actualPermission,
-      resource
-    }, {
-      endpoint: resource,
-      method: 'UNKNOWN',
-      statusCode: 403
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.PERMISSION_DENIED,
+      userId,
+      {
+        requiredPermission,
+        actualPermission,
+        resource,
+      },
+      {
+        endpoint: resource,
+        method: 'UNKNOWN',
+        statusCode: 403,
+      },
+    )
   }
 
   /**
@@ -380,18 +450,23 @@ export class SecurityEventLogger {
     userId: string | null,
     endpoint: string,
     limit: number,
-    window: number
+    window: number,
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.RATE_LIMIT_EXCEEDED, userId, {
-      endpoint,
-      limit,
-      window,
-      retryAfter: window
-    }, {
-      endpoint,
-      method: 'UNKNOWN',
-      statusCode: 429
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.RATE_LIMIT_EXCEEDED,
+      userId,
+      {
+        endpoint,
+        limit,
+        window,
+        retryAfter: window,
+      },
+      {
+        endpoint,
+        method: 'UNKNOWN',
+        statusCode: 429,
+      },
+    )
   }
 
   /**
@@ -400,36 +475,42 @@ export class SecurityEventLogger {
   async logSuspiciousActivity(
     userId: string | null,
     activity: string,
-    details: Record<string, unknown> = {}
+    details: Record<string, unknown> = {},
   ): Promise<void> {
-    await this.logSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, userId, {
-      activity,
-      ...details
-    }, {
-      endpoint: '/security/monitor',
-      method: 'SYSTEM',
-      statusCode: 200
-    })
+    await this.logSecurityEvent(
+      SecurityEventType.SUSPICIOUS_ACTIVITY,
+      userId,
+      {
+        activity,
+        ...details,
+      },
+      {
+        endpoint: '/security/monitor',
+        method: 'SYSTEM',
+        statusCode: 200,
+      },
+    )
   }
 
   /**
    * Get security metrics
    */
-  async getSecurityMetrics(timeWindow: number = 24 * 3600 * 1000): Promise<SecurityMetrics> {
+  async getSecurityMetrics(
+    timeWindow: number = 24 * 3600 * 1000,
+  ): Promise<SecurityMetrics> {
     try {
       const since = new Date(Date.now() - timeWindow).toISOString()
-      
+
       // Get events from Redis for the time window
       const recentEvents = await this.getRecentEvents(since)
-      
+
       // Calculate metrics
       const metrics = this.calculateMetricsFromEvents(recentEvents)
-      
+
       return {
         ...this.metrics,
-        ...metrics
+        ...metrics,
       }
-
     } catch (error) {
       logger.error('Error getting security metrics', error)
       return this.metrics
@@ -439,7 +520,10 @@ export class SecurityEventLogger {
   /**
    * Get recent security events
    */
-  async getRecentEvents(since: string, limit: number = 1000): Promise<SecurityEvent[]> {
+  async getRecentEvents(
+    since: string,
+    limit: number = 1000,
+  ): Promise<SecurityEvent[]> {
     try {
       // Get events from Redis sorted set by timestamp
       const eventIds = await this.redis.zrangebyscore(
@@ -448,7 +532,7 @@ export class SecurityEventLogger {
         Date.now(),
         'LIMIT',
         0,
-        limit
+        limit,
       )
 
       if (eventIds.length === 0) {
@@ -475,8 +559,10 @@ export class SecurityEventLogger {
         }
       }
 
-      return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-
+      return events.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      )
     } catch (error) {
       logger.error('Error getting recent security events', error)
       return []
@@ -486,7 +572,10 @@ export class SecurityEventLogger {
   /**
    * Generate security audit report
    */
-  async generateAuditReport(startDate: Date, endDate: Date): Promise<{
+  async generateAuditReport(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{
     summary: SecurityMetrics
     highRiskEvents: SecurityEvent[]
     complianceStatus: {
@@ -498,23 +587,27 @@ export class SecurityEventLogger {
   }> {
     try {
       const events = await this.getEventsInDateRange(startDate, endDate)
-      
+
       const summary = this.calculateMetricsFromEvents(events)
-      const highRiskEvents = events.filter(event => event.riskScore >= this.config.alertThreshold)
-      
+      const highRiskEvents = events.filter(
+        (event) => event.riskScore >= this.config.alertThreshold,
+      )
+
       const complianceStatus = await this.checkComplianceStatus(events)
-      const recommendations = this.generateRecommendations(events, complianceStatus.violations)
-      
+      const recommendations = this.generateRecommendations(
+        events,
+        complianceStatus.violations,
+      )
+
       return {
         summary,
         highRiskEvents,
         complianceStatus,
-        recommendations
+        recommendations,
       }
-
     } catch (error) {
       logger.error('Error generating audit report', error)
-      throw new Error('Audit report generation failed')
+      throw new Error('Audit report generation failed', { cause: error })
     }
   }
 
@@ -534,14 +627,18 @@ export class SecurityEventLogger {
         // Store event details
         const eventKey = `security:event:${event.id}`
         const eventData = this.serializeEvent(event)
-        
+
         pipeline.hmset(eventKey, eventData)
         pipeline.expire(eventKey, this.config.retentionPeriod * 24 * 3600)
 
         // Add to timeline index
         const timelineKey = 'security:events:timeline'
-        pipeline.zadd(timelineKey, new Date(event.timestamp).getTime(), event.id)
-        
+        pipeline.zadd(
+          timelineKey,
+          new Date(event.timestamp).getTime(),
+          event.id,
+        )
+
         // Add to user index
         if (event.userId) {
           const userKey = `security:events:user:${event.userId}`
@@ -556,9 +653,8 @@ export class SecurityEventLogger {
       }
 
       await pipeline.exec()
-      
-      logger.debug(`Flushed ${eventsToFlush.length} security events to storage`)
 
+      logger.debug(`Flushed ${eventsToFlush.length} security events to storage`)
     } catch (error) {
       logger.error('Error flushing security events', error)
       // Re-add events to buffer for retry
@@ -585,7 +681,10 @@ export class SecurityEventLogger {
   /**
    * Calculate risk score for security event
    */
-  private calculateRiskScore(eventType: SecurityEventType, details: Record<string, unknown>): number {
+  private calculateRiskScore(
+    eventType: SecurityEventType,
+    details: Record<string, unknown>,
+  ): number {
     const baseScores: Record<SecurityEventType, number> = {
       [SecurityEventType.LOGIN_SUCCESS]: 0.1,
       [SecurityEventType.LOGIN_FAILURE]: 0.3,
@@ -623,7 +722,7 @@ export class SecurityEventLogger {
       [SecurityEventType.COMPLIANCE_AUDIT_FAILED]: 0.8,
       [SecurityEventType.TOKEN_CLEANED_UP]: 0.1,
       [SecurityEventType.SECURITY_SCAN_COMPLETED]: 0.2,
-      [SecurityEventType.THREAT_NEUTRALIZED]: 0.6
+      [SecurityEventType.THREAT_NEUTRALIZED]: 0.6,
     }
 
     let riskScore = baseScores[eventType] || 0.5
@@ -640,16 +739,25 @@ export class SecurityEventLogger {
   /**
    * Sanitize event details for HIPAA compliance
    */
-  private sanitizeDetails(details: Record<string, unknown>): Record<string, unknown> {
+  private sanitizeDetails(
+    details: Record<string, unknown>,
+  ): Record<string, unknown> {
     if (!this.config.enableHIPAACompliance) {
       return details
     }
 
     const sanitized = { ...details }
-    
+
     // Remove or mask PHI (Protected Health Information)
-    const phiFields = ['ssn', 'dob', 'medical_record', 'diagnosis', 'treatment', 'patient_id']
-    
+    const phiFields = [
+      'ssn',
+      'dob',
+      'medical_record',
+      'diagnosis',
+      'treatment',
+      'patient_id',
+    ]
+
     for (const field of phiFields) {
       if (sanitized[field]) {
         sanitized[field] = '[PHI_MASKED]'
@@ -671,7 +779,7 @@ export class SecurityEventLogger {
       tokenRevocations: 0,
       rateLimitViolations: 0,
       suspiciousActivities: 0,
-      averageRiskScore: 0
+      averageRiskScore: 0,
     }
   }
 
@@ -680,7 +788,7 @@ export class SecurityEventLogger {
    */
   private updateMetrics(event: SecurityEvent): void {
     this.metrics.totalEvents++
-    
+
     if (event.riskScore >= this.config.alertThreshold) {
       this.metrics.highRiskEvents++
     }
@@ -692,19 +800,19 @@ export class SecurityEventLogger {
       case SecurityEventType.MFA_VERIFICATION_FAILED:
         this.metrics.authenticationFailures++
         break
-      
+
       case SecurityEventType.PERMISSION_DENIED:
         this.metrics.authorizationFailures++
         break
-      
+
       case SecurityEventType.TOKEN_REVOKED:
         this.metrics.tokenRevocations++
         break
-      
+
       case SecurityEventType.RATE_LIMIT_EXCEEDED:
         this.metrics.rateLimitViolations++
         break
-      
+
       case SecurityEventType.SUSPICIOUS_ACTIVITY:
       case SecurityEventType.SECURITY_BREACH:
       case SecurityEventType.SESSION_HIJACKING_DETECTED:
@@ -713,8 +821,9 @@ export class SecurityEventLogger {
     }
 
     // Update average risk score
-    this.metrics.averageRiskScore = 
-      (this.metrics.averageRiskScore * (this.metrics.totalEvents - 1) + event.riskScore) / 
+    this.metrics.averageRiskScore =
+      (this.metrics.averageRiskScore * (this.metrics.totalEvents - 1) +
+        event.riskScore) /
       this.metrics.totalEvents
   }
 
@@ -735,7 +844,7 @@ export class SecurityEventLogger {
     }, this.config.flushInterval * 1000)
 
     // Run initial flush
-    this.flushEvents().catch(error => {
+    this.flushEvents().catch((error) => {
       logger.error('Error in initial security event flush', error)
     })
   }
@@ -766,7 +875,10 @@ export class SecurityEventLogger {
     logger.debug('Updating real-time metrics', { event })
   }
 
-  private async getEventsInDateRange(startDate: Date, endDate: Date): Promise<SecurityEvent[]> {
+  private async getEventsInDateRange(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<SecurityEvent[]> {
     // TODO: Implement date range query
     return []
   }
@@ -780,11 +892,14 @@ export class SecurityEventLogger {
     return {
       hipaaCompliant: true,
       violations: [],
-      recommendations: []
+      recommendations: [],
     }
   }
 
-  private generateRecommendations(events: SecurityEvent[], violations: string[]): string[] {
+  private generateRecommendations(
+    events: SecurityEvent[],
+    violations: string[],
+  ): string[] {
     // TODO: Implement recommendation generation
     return []
   }
@@ -810,13 +925,14 @@ export class SecurityEventLogger {
   }
 
   private logToConsole(event: SecurityEvent): void {
-    const logLevel = event.riskScore >= this.config.alertThreshold ? 'warn' : 'info'
+    const logLevel =
+      event.riskScore >= this.config.alertThreshold ? 'warn' : 'info'
     logger[logLevel]('Security event logged', {
       eventId: event.id,
       type: event.eventType,
       userId: event.userId,
       riskScore: event.riskScore,
-      timestamp: event.timestamp
+      timestamp: event.timestamp,
     })
   }
 }

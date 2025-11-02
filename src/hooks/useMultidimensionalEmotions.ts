@@ -333,7 +333,7 @@ export function useMultidimensionalEmotions(
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: 'Bearer demo-token',
+              'Authorization': 'Bearer demo-token',
             },
             // pass external abort controller; helper composes signals and adds per-attempt timeout
             signal: abortControllerRef.current.signal,
@@ -395,7 +395,9 @@ export function useMultidimensionalEmotions(
         // Only update state if the component is still mounted and it's not an abort error
         if (
           isMountedRef.current &&
-          !(err instanceof DOMException && (err as Error)?.name === 'AbortError')
+          !(
+            err instanceof DOMException && (err as Error)?.name === 'AbortError'
+          )
         ) {
           console.error('Error fetching emotion data:', err)
           setError(err instanceof Error ? err : new Error(String(err)))

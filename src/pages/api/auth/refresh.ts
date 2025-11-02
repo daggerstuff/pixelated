@@ -20,7 +20,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   try {
     // Apply rate limiting
-    const rateLimitResult = await rateLimitMiddleware(request, 'refresh', 20, 60)
+    const rateLimitResult = await rateLimitMiddleware(
+      request,
+      'refresh',
+      20,
+      60,
+    )
 
     if (!rateLimitResult.success) {
       return rateLimitResult.response!
@@ -31,11 +36,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (!body || !body.refreshToken) {
       return new Response(
-        JSON.stringify({ error: 'Missing refresh token', details: ['refreshToken'] }),
+        JSON.stringify({
+          error: 'Missing refresh token',
+          details: ['refreshToken'],
+        }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -50,16 +58,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       timestamp: Date.now(),
     })
 
-    return new Response(
-      JSON.stringify({ success: true, tokenPair }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, no-cache, must-revalidate, private',
-        },
-      }
-    )
+    return new Response(JSON.stringify({ success: true, tokenPair }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      },
+    })
   } catch (err: unknown) {
     // Narrow the unknown error to access properties safely
     const error =
@@ -80,7 +85,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -94,11 +99,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     })
 
     return new Response(
-      JSON.stringify({ error: 'Token refresh failed', message: 'An unexpected error occurred. Please try again later.' }),
+      JSON.stringify({
+        error: 'Token refresh failed',
+        message: 'An unexpected error occurred. Please try again later.',
+      }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }
@@ -110,7 +118,8 @@ export const OPTIONS: APIRoute = async ({ request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

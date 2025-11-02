@@ -6,20 +6,23 @@
  */
 
 // Export rate limiting bridge
-export { RateLimitingBridge, type RateLimitIntegrationConfig } from './rate-limiting-bridge'
+export {
+  RateLimitingBridge,
+  type RateLimitIntegrationConfig,
+} from './rate-limiting-bridge'
 
 // Export API middleware
 export {
   ThreatDetectionMiddleware,
   createThreatDetectionMiddleware,
-  type ApiMiddlewareConfig
+  type ApiMiddlewareConfig,
 } from './api-middleware'
 
 // Export main threat detection service
 export {
   ThreatDetectionService,
   createThreatDetectionService,
-  type ThreatDetectionConfig
+  type ThreatDetectionConfig,
 } from './threat-detection-service'
 
 // Export utility functions
@@ -31,7 +34,7 @@ export {
   type MonitoringConfig,
   type SecurityMetrics,
   type AIInsight,
-  type Alert
+  type Alert,
 } from '../monitoring/ai-enhanced-monitoring'
 
 // Export threat hunting service
@@ -43,7 +46,7 @@ export {
   type HuntResult,
   type HuntFinding,
   type Investigation,
-  type InvestigationFinding
+  type InvestigationFinding,
 } from '../threat-hunting/threat-hunting-service'
 
 // Export external threat intelligence
@@ -53,7 +56,7 @@ export {
   type ThreatIntelligenceFeed,
   type ThreatIntelligence,
   type ThreatIntelligenceQuery,
-  type ThreatIntelligenceResult
+  type ThreatIntelligenceResult,
 } from './external-threat-intelligence'
 
 // Re-export types from response orchestration
@@ -63,7 +66,7 @@ export type {
   ResponseAction,
   RateLimitRule,
   RateLimitResult,
-  ThreatAnalysis
+  ThreatAnalysis,
 } from '../response-orchestration'
 
 /**
@@ -72,12 +75,12 @@ export type {
 export function createThreatDetectionIntegration(
   orchestrator: unknown,
   rateLimiter: unknown,
-  config?: Partial<ThreatDetectionConfig>
+  config?: Partial<ThreatDetectionConfig>,
 ) {
   const threatDetectionService = createThreatDetectionService(
     orchestrator,
     rateLimiter,
-    config
+    config,
   )
 
   const middleware = threatDetectionService.getMiddleware()
@@ -88,11 +91,12 @@ export function createThreatDetectionIntegration(
     bridge: threatDetectionService['rateLimitingBridge'],
 
     // Convenience methods
-    analyzeThreat: (threatData: unknown) => threatDetectionService.analyzeThreat(threatData),
+    analyzeThreat: (threatData: unknown) =>
+      threatDetectionService.analyzeThreat(threatData),
     checkRequest: (identifier: string, context: unknown) =>
       threatDetectionService.checkRequest(identifier, context),
     getHealthStatus: () => threatDetectionService.getHealthStatus(),
-    getStatistics: () => threatDetectionService.getStatistics()
+    getStatistics: () => threatDetectionService.getStatistics(),
   }
 }
 
@@ -113,36 +117,36 @@ export const defaultThreatDetectionConfig: ThreatDetectionConfig = {
         name: 'low_threat',
         maxRequests: 100,
         windowMs: 60000,
-        enableAttackDetection: false
+        enableAttackDetection: false,
       },
       medium: {
         name: 'medium_threat',
         maxRequests: 50,
         windowMs: 60000,
-        enableAttackDetection: true
+        enableAttackDetection: true,
       },
       high: {
         name: 'high_threat',
         maxRequests: 10,
         windowMs: 60000,
-        enableAttackDetection: true
+        enableAttackDetection: true,
       },
       critical: {
         name: 'critical_threat',
         maxRequests: 1,
         windowMs: 300000,
-        enableAttackDetection: true
-      }
+        enableAttackDetection: true,
+      },
     },
     bypassRules: {
       allowedRoles: ['admin', 'system'],
       allowedIPRanges: ['127.0.0.1', '::1'],
-      allowedEndpoints: ['/api/health', '/api/status']
+      allowedEndpoints: ['/api/health', '/api/status'],
     },
     escalationConfig: {
       autoEscalateThreshold: 5,
-      escalationWindowMs: 3600000
-    }
+      escalationWindowMs: 3600000,
+    },
   },
   responseConfig: {
     enableAutoResponses: true,
@@ -151,19 +155,19 @@ export const defaultThreatDetectionConfig: ThreatDetectionConfig = {
       low: 3,
       medium: 5,
       high: 8,
-      critical: 10
-    }
+      critical: 10,
+    },
   },
   behavioralConfig: {
     enableProfiling: true,
     anomalyThreshold: 0.8,
-    baselineUpdateInterval: 86400000
+    baselineUpdateInterval: 86400000,
   },
   predictiveConfig: {
     enableForecasting: true,
     forecastingWindow: 24,
-    confidenceThreshold: 0.7
-  }
+    confidenceThreshold: 0.7,
+  },
 }
 
 /**
@@ -195,10 +199,14 @@ export const expressMiddlewareConfig = {
     userRole: req.user?.role,
     sessionId: req.session?.id,
     headers: Object.fromEntries(
-      Object.entries(req.headers)
-        .filter(([key]) => !['authorization', 'cookie', 'set-cookie'].includes(key.toLowerCase()))
-    )
-  })
+      Object.entries(req.headers).filter(
+        ([key]) =>
+          !['authorization', 'cookie', 'set-cookie'].includes(
+            key.toLowerCase(),
+          ),
+      ),
+    ),
+  }),
 }
 
 /**
@@ -775,5 +783,5 @@ const { service } = createThreatDetectionIntegration(
   rateLimiter,
   customConfig
 )
-  `
+  `,
 }

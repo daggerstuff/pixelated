@@ -11,20 +11,21 @@ export const ScrollArea: FC<ScrollAreaProps> = ({
   children,
   className = '',
   height,
-  maxHeight = '400px'
+  maxHeight = '400px',
 }) => {
   const style: React.CSSProperties = {}
-  
+
   if (height) {
     style.height = typeof height === 'number' ? `${height}px` : height
   }
-  
+
   if (maxHeight) {
-    style.maxHeight = typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight
+    style.maxHeight =
+      typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight
   }
 
   return (
-    <div 
+    <div
       className={`overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 ${className}`}
       style={style}
     >

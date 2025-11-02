@@ -38,12 +38,20 @@ export async function authGuard(
       {
         reason: 'missing_token',
         ipAddress:
-        (context as unknown as APIContextWithUser).request?.headers?.get('x-forwarded-for') ||
-        (context as unknown as APIContextWithUser).request?.headers?.get('x-real-ip') ||
-        'unknown',
-      userAgent: (context as unknown as APIContextWithUser).request?.headers?.get('user-agent') || 'unknown',
-      method: (context as unknown as APIContextWithUser).request?.method,
-      path: new URL((context as unknown as APIContextWithUser).request?.url).pathname,
+          (context as unknown as APIContextWithUser).request?.headers?.get(
+            'x-forwarded-for',
+          ) ||
+          (context as unknown as APIContextWithUser).request?.headers?.get(
+            'x-real-ip',
+          ) ||
+          'unknown',
+        userAgent:
+          (context as unknown as APIContextWithUser).request?.headers?.get(
+            'user-agent',
+          ) || 'unknown',
+        method: (context as unknown as APIContextWithUser).request?.method,
+        path: new URL((context as unknown as APIContextWithUser).request?.url)
+          .pathname,
       } as AuditMetadata,
     )
 
@@ -59,7 +67,8 @@ export async function authGuard(
   }
 
   // Attach user to context
-  ;((context as unknown as APIContextWithUser).locals as AstroLocals).user = user as AuthUser
+  ;((context as unknown as APIContextWithUser).locals as AstroLocals).user =
+    user as AuthUser
 
   return undefined
 }
@@ -99,8 +108,11 @@ export function roleGuard(role: AuthRole): void {
       })
     }
 
-  // Check the user's role
-  const hasRequiredRole = hasRolePrivilege((user as any)['role'] as AuthRole, role)
+    // Check the user's role
+    const hasRequiredRole = hasRolePrivilege(
+      (user as any)['role'] as AuthRole,
+      role,
+    )
 
     if (!hasRequiredRole) {
       await createResourceAuditLog(
@@ -131,7 +143,8 @@ export function roleGuard(role: AuthRole): void {
     }
 
     // Attach user to context
-    ;((context as unknown as APIContextWithUser).locals as AstroLocals).user = user as AuthUser
+    ;((context as unknown as APIContextWithUser).locals as AstroLocals).user =
+      user as AuthUser
 
     return undefined
   }
@@ -246,7 +259,7 @@ export function apiRoleGuard(role: AuthRole): void {
     const user = (apiContext as any)['user'] as AuthUser
 
     // Check if the user has the required role
-  if (!hasRolePrivilege(user?.['role'], role)) {
+    if (!hasRolePrivilege(user?.['role'], role)) {
       await createResourceAuditLog(
         'api_access_denied',
         user.id,

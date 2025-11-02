@@ -410,7 +410,8 @@ export function SupervisorFeedback({
                     {missedOpportunities.map((opportunity) => (
                       <div
                         key={`${opportunity.suggestedTechnique}-${opportunity.context.slice(0, 20)}`}
-                        className="bg-blue-50 p-3 rounded-md">
+                        className="bg-blue-50 p-3 rounded-md"
+                      >
                         <div className="font-medium flex justify-between">
                           <span>
                             Opportunity for {opportunity.suggestedTechnique}

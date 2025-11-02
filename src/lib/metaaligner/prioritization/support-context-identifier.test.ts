@@ -31,7 +31,7 @@ const mockAIService: TestAIService = {
   // Minimal mock stubs for required AIService methods
   getModelInfo: vi.fn(),
   createChatCompletion: vi.fn(),
-  createChatStream: vi.fn()
+  createChatStream: vi.fn(),
 }
 
 describe('SupportContextIdentifier', () => {
@@ -240,9 +240,7 @@ describe('SupportContextIdentifier', () => {
     })
 
     it('should handle malformed AI responses', async () => {
-      mockAIService.generateText.mockResolvedValue(
-        'Invalid JSON response',
-      )
+      mockAIService.generateText.mockResolvedValue('Invalid JSON response')
 
       const query = 'I need support'
       const result = await identifier.identifySupportContext(query)
@@ -334,8 +332,12 @@ describe('SupportContextIdentifier', () => {
       const recommendations =
         identifier.generateSupportRecommendations(mockResult)
 
-      expect(recommendations['longerTermStrategies'].join(' ')).toMatch(/skill|practice|develop/i)
-      expect(recommendations['responseStyle']['approach']).toBe('solution-focused')
+      expect(recommendations['longerTermStrategies'].join(' ')).toMatch(
+        /skill|practice|develop/i,
+      )
+      expect(recommendations['responseStyle']['approach']).toBe(
+        'solution-focused',
+      )
     })
   })
 
@@ -462,7 +464,9 @@ describe('SupportContextIdentifier', () => {
       const query = "I'm struggling with this situation but trying to manage"
       const result = await identifier.identifySupportContext(query)
 
-      expect(['low', 'medium', 'high']).toContain(result['metadata']['copingCapacity'])
+      expect(['low', 'medium', 'high']).toContain(
+        result['metadata']['copingCapacity'],
+      )
     })
 
     it('should identify high coping capacity', async () => {
@@ -478,7 +482,7 @@ describe('SupportContextIdentifier', () => {
       const query = 'What is the capital of France?'
       const result = await identifier.identifySupportContext(query)
 
-      expect([false,true]).toContain(result['isSupport']) // Accepts both - business logic may auto-identify indirect support
+      expect([false, true]).toContain(result['isSupport']) // Accepts both - business logic may auto-identify indirect support
       expect(result['confidence']).toBeLessThan(0.3)
     })
 
@@ -521,7 +525,9 @@ describe('SupportContextIdentifier', () => {
 
       expect(result['isSupport']).toBe(true)
       expect(result['emotionalState']).toBeDefined()
-      expect(result['metadata']['emotionalIndicators'].length).toBeGreaterThan(1)
+      expect(result['metadata']['emotionalIndicators'].length).toBeGreaterThan(
+        1,
+      )
     })
 
     it('should maintain consistent results for similar queries', async () => {

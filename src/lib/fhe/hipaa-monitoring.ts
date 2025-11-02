@@ -299,7 +299,7 @@ export class HIPAAMonitoringService extends EventEmitter {
     try {
       // For now, we'll use an in-memory cache of recent events
       // In production, this would connect to persistent audit storage (e.g., DynamoDB, PostgreSQL)
-      
+
       logger.debug('Retrieving recent audit events', {
         eventType,
         since: new Date(since).toISOString(),
@@ -309,19 +309,20 @@ export class HIPAAMonitoringService extends EventEmitter {
       // Simulate audit event storage with some sample events for demonstration
       // In production, this would query the actual audit database
       const simulatedAuditEvents: AuditEvent[] = this.getSimulatedAuditEvents()
-      
+
       // Filter events by time range
-      const recentEvents = simulatedAuditEvents.filter(event => {
+      const recentEvents = simulatedAuditEvents.filter((event) => {
         const eventTime = new Date(event.timestamp).getTime()
         return eventTime >= since
       })
 
       // Filter by event type if specified (and not 'all')
       if (eventType !== 'all') {
-        return recentEvents.filter(event =>
-          event.action.includes(eventType) ||
-          (event.keyId && event.keyId.includes(eventType)) ||
-          (eventType === 'key' && event.action.includes('key'))
+        return recentEvents.filter(
+          (event) =>
+            event.action.includes(eventType) ||
+            (event.keyId && event.keyId.includes(eventType)) ||
+            (eventType === 'key' && event.action.includes('key')),
         )
       }
 
@@ -332,14 +333,13 @@ export class HIPAAMonitoringService extends EventEmitter {
       })
 
       return recentEvents
-
     } catch (error: unknown) {
       logger.error('Failed to retrieve recent audit events', {
         eventType,
         since,
         error: error instanceof Error ? error.message : 'Unknown error',
       })
-      
+
       // Return empty array to prevent system failure
       // In production, you might want to implement a fallback to local storage
       return []
@@ -391,9 +391,10 @@ export class HIPAAMonitoringService extends EventEmitter {
 
     // Create events with timestamps spread over the last hour
     for (let i = 0; i < 20; i++) {
-      const randomEvent = sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
+      const randomEvent =
+        sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
       const randomTime = oneHourAgo + Math.random() * 3600000
-      
+
       events.push({
         eventId: `simulated_event_${i}_${Date.now()}`,
         timestamp: new Date(randomTime).toISOString(),
@@ -433,7 +434,8 @@ export class HIPAAMonitoringService extends EventEmitter {
       const auditStorageConfig = {
         type: process.env['HIPAA_AUDIT_STORAGE_TYPE'] || 'dynamodb',
         region: process.env['AWS_REGION'] || 'us-east-1',
-        tableName: process.env['HIPAA_AUDIT_TABLE_NAME'] || 'hipaa_audit_events',
+        tableName:
+          process.env['HIPAA_AUDIT_TABLE_NAME'] || 'hipaa_audit_events',
         connectionString: process.env['HIPAA_AUDIT_CONNECTION_STRING'],
       }
 
@@ -464,7 +466,6 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       logger.info('Successfully connected to persistent audit storage')
       return true
-
     } catch (error: unknown) {
       logger.error('Failed to connect to persistent audit storage', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -491,7 +492,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       simulatedEvents.push(event)
 
       // Simulate database write operation
-      await new Promise(resolve => setTimeout(resolve, 10)) // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 10)) // Simulate network delay
 
       logger.debug('Audit event stored successfully', {
         eventId: event.eventId,
@@ -499,7 +500,6 @@ export class HIPAAMonitoringService extends EventEmitter {
       })
 
       return true
-
     } catch (error: unknown) {
       logger.error('Failed to store audit event', {
         eventId: event.eventId,
@@ -645,7 +645,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       logger.error('Threat detection analysis failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       })
-      
+
       // Generate alert for threat detection failure
       const threatDetectionFailureEvent: AuditEvent = {
         eventId: this.generateAlertId(),
@@ -660,7 +660,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'high',
       }
-      
+
       this.generateSecurityAlert(threatDetectionFailureEvent)
     }
   }
@@ -669,8 +669,10 @@ export class HIPAAMonitoringService extends EventEmitter {
    * Analyze key rotation patterns for anomalies
    */
   private analyzeKeyRotationPatterns(events: AuditEvent[]): void {
-    const rotationEvents = events.filter(e =>
-      e.action.includes('key_rotation') || e.action.includes('key_generation')
+    const rotationEvents = events.filter(
+      (e) =>
+        e.action.includes('key_rotation') ||
+        e.action.includes('key_generation'),
     )
 
     if (rotationEvents.length < 2) {
@@ -678,26 +680,33 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Sort by timestamp
-    const sortedEvents = rotationEvents.sort((a, b) =>
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    const sortedEvents = rotationEvents.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     )
 
     // Calculate time intervals between rotations
     const intervals: number[] = []
     for (let i = 1; i < sortedEvents.length; i++) {
-      const interval = new Date(sortedEvents[i].timestamp).getTime() -
-                      new Date(sortedEvents[i-1].timestamp).getTime()
+      const interval =
+        new Date(sortedEvents[i].timestamp).getTime() -
+        new Date(sortedEvents[i - 1].timestamp).getTime()
       intervals.push(interval)
     }
 
     // Calculate statistics
-    const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length
-    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length
+    const avgInterval =
+      intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length
+    const variance =
+      intervals.reduce(
+        (sum, interval) => sum + Math.pow(interval - avgInterval, 2),
+        0,
+      ) / intervals.length
     const stdDev = Math.sqrt(variance)
 
     // Detect anomalies (intervals more than 2 standard deviations from mean)
-    const anomalousIntervals = intervals.filter(interval =>
-      Math.abs(interval - avgInterval) > 2 * stdDev
+    const anomalousIntervals = intervals.filter(
+      (interval) => Math.abs(interval - avgInterval) > 2 * stdDev,
     )
 
     if (anomalousIntervals.length > 0) {
@@ -716,12 +725,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'medium',
       }
-      
+
       this.generateSecurityAlert(anomalyEvent)
     }
 
     // Check for rapid successive rotations (potential attack)
-    const rapidRotations = intervals.filter(interval => interval < 60000) // Less than 1 minute
+    const rapidRotations = intervals.filter((interval) => interval < 60000) // Less than 1 minute
     if (rapidRotations.length >= 3) {
       const rapidRotationEvent: AuditEvent = {
         eventId: this.generateAlertId(),
@@ -737,7 +746,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'high',
       }
-      
+
       this.generateSecurityAlert(rapidRotationEvent)
     }
   }
@@ -746,8 +755,8 @@ export class HIPAAMonitoringService extends EventEmitter {
    * Detect unusual access patterns
    */
   private detectUnusualAccessPatterns(events: AuditEvent[]): void {
-    const accessEvents = events.filter(e =>
-      e.action.includes('access') || e.action.includes('authentication')
+    const accessEvents = events.filter(
+      (e) => e.action.includes('access') || e.action.includes('authentication'),
     )
 
     if (accessEvents.length === 0) {
@@ -755,19 +764,23 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Group by actor
-    const accessByActor = accessEvents.reduce((acc, event) => {
-      const actor = event.userId || 'unknown'
-      if (!acc[actor]) {
-        acc[actor] = []
-      }
-      acc[actor].push(event)
-      return acc
-    }, {} as Record<string, AuditEvent[]>)
+    const accessByActor = accessEvents.reduce(
+      (acc, event) => {
+        const actor = event.userId || 'unknown'
+        if (!acc[actor]) {
+          acc[actor] = []
+        }
+        acc[actor].push(event)
+        return acc
+      },
+      {} as Record<string, AuditEvent[]>,
+    )
 
     // Analyze patterns for each actor
     Object.entries(accessByActor).forEach(([actor, actorEvents]) => {
       // Check for high frequency access
-      if (actorEvents.length > 50) { // More than 50 access events in 1 hour
+      if (actorEvents.length > 50) {
+        // More than 50 access events in 1 hour
         const highFrequencyEvent: AuditEvent = {
           eventId: this.generateAlertId(),
           timestamp: new Date().toISOString(),
@@ -783,16 +796,17 @@ export class HIPAAMonitoringService extends EventEmitter {
           },
           riskLevel: 'medium',
         }
-        
+
         this.generateSecurityAlert(highFrequencyEvent)
       }
 
       // Check for failed access attempts
-      const failedAttempts = actorEvents.filter(e =>
-        e.action.includes('failed') || e.action.includes('unauthorized')
+      const failedAttempts = actorEvents.filter(
+        (e) => e.action.includes('failed') || e.action.includes('unauthorized'),
       )
-      
-      if (failedAttempts.length >= 5) { // 5 or more failed attempts
+
+      if (failedAttempts.length >= 5) {
+        // 5 or more failed attempts
         const failedAccessEvent: AuditEvent = {
           eventId: this.generateAlertId(),
           timestamp: new Date().toISOString(),
@@ -808,7 +822,7 @@ export class HIPAAMonitoringService extends EventEmitter {
           },
           riskLevel: 'high',
         }
-        
+
         this.generateSecurityAlert(failedAccessEvent)
       }
     })
@@ -823,14 +837,15 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Check for unusual activity patterns (e.g., activity outside business hours)
-    const businessHoursEvents = events.filter(e => {
+    const businessHoursEvents = events.filter((e) => {
       const hour = new Date(e.timestamp).getHours()
       return hour >= 9 && hour <= 17 // 9 AM to 5 PM
     })
 
     const outsideBusinessHours = events.length - businessHoursEvents.length
-    
-    if (outsideBusinessHours > events.length * 0.7) { // More than 70% outside business hours
+
+    if (outsideBusinessHours > events.length * 0.7) {
+      // More than 70% outside business hours
       const timingAnomalyEvent: AuditEvent = {
         eventId: this.generateAlertId(),
         timestamp: new Date().toISOString(),
@@ -846,7 +861,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'low',
       }
-      
+
       this.generateSecurityAlert(timingAnomalyEvent)
     }
   }
@@ -865,31 +880,46 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Analyze event distribution
-    const eventTypes = events.reduce((acc, event) => {
-      acc[event.action] = (acc[event.action] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
+    const eventTypes = events.reduce(
+      (acc, event) => {
+        acc[event.action] = (acc[event.action] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
 
     // Identify key findings
     if (Object.keys(eventTypes).length > 10) {
       report.keyFindings.push('High diversity of event types detected')
     }
 
-    const highRiskEvents = events.filter(e => e.riskLevel === 'high' || e.riskLevel === 'critical')
+    const highRiskEvents = events.filter(
+      (e) => e.riskLevel === 'high' || e.riskLevel === 'critical',
+    )
     if (highRiskEvents.length > 0) {
-      report.keyFindings.push(`${highRiskEvents.length} high-risk events detected`)
+      report.keyFindings.push(
+        `${highRiskEvents.length} high-risk events detected`,
+      )
       report.riskIndicators.push('Presence of high-risk security events')
     }
 
     // Generate recommendations
-    if (eventTypes['key_rotation_failed'] && eventTypes['key_rotation_failed'] > 3) {
+    if (
+      eventTypes['key_rotation_failed'] &&
+      eventTypes['key_rotation_failed'] > 3
+    ) {
       report.recommendedActions.push('Investigate key rotation failures')
       report.recommendedActions.push('Check system health and connectivity')
     }
 
-    if (eventTypes['unauthorized_access'] && eventTypes['unauthorized_access'] > 5) {
+    if (
+      eventTypes['unauthorized_access'] &&
+      eventTypes['unauthorized_access'] > 5
+    ) {
       report.recommendedActions.push('Review access control policies')
-      report.recommendedActions.push('Consider IP blocking for suspicious sources')
+      report.recommendedActions.push(
+        'Consider IP blocking for suspicious sources',
+      )
     }
 
     // Log the threat intelligence report
@@ -916,7 +946,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       },
       riskLevel: 'low',
     }
-    
+
     this.processSecurityEvent(threatIntelEvent)
   }
 
@@ -944,7 +974,7 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       // 5. Generate compliance status
       const complianceScore = this.calculateComplianceScore(complianceIssues)
-      
+
       // 6. Create compliance report event
       const complianceEvent: AuditEvent = {
         eventId: this.generateAlertId(),
@@ -971,7 +1001,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       this.processSecurityEvent(complianceEvent)
 
       // 7. Generate alerts for critical compliance issues
-      if (complianceIssues.some(issue => issue.includes('CRITICAL'))) {
+      if (complianceIssues.some((issue) => issue.includes('CRITICAL'))) {
         const criticalComplianceEvent: AuditEvent = {
           eventId: this.generateAlertId(),
           timestamp: now.toISOString(),
@@ -981,11 +1011,13 @@ export class HIPAAMonitoringService extends EventEmitter {
           riskLevel: 'high',
           metadata: {
             complianceScore,
-            criticalIssues: complianceIssues.filter(issue => issue.includes('CRITICAL')),
+            criticalIssues: complianceIssues.filter((issue) =>
+              issue.includes('CRITICAL'),
+            ),
             immediateActionRequired: true,
           },
         }
-        
+
         this.generateSecurityAlert(criticalComplianceEvent)
       }
 
@@ -994,12 +1026,11 @@ export class HIPAAMonitoringService extends EventEmitter {
         issuesFound: complianceIssues.length,
         issues: complianceIssues,
       })
-
     } catch (error: unknown) {
       logger.error('Compliance check failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       })
-      
+
       // Generate alert for compliance check failure
       const complianceFailureEvent: AuditEvent = {
         eventId: this.generateAlertId(),
@@ -1014,7 +1045,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'high',
       }
-      
+
       this.generateSecurityAlert(complianceFailureEvent)
     }
   }
@@ -1030,58 +1061,81 @@ export class HIPAAMonitoringService extends EventEmitter {
       const now = new Date()
 
       // Get recent key events
-      const recentEvents = this.getRecentEvents('key', Date.now() - 86400000 * maxKeyAge) // Last maxKeyAge days
+      const recentEvents = this.getRecentEvents(
+        'key',
+        Date.now() - 86400000 * maxKeyAge,
+      ) // Last maxKeyAge days
 
-      const keyEvents = recentEvents.filter(e =>
-        e.action.includes('key_rotation') || e.action.includes('key_generation')
+      const keyEvents = recentEvents.filter(
+        (e) =>
+          e.action.includes('key_rotation') ||
+          e.action.includes('key_generation'),
       )
 
       if (keyEvents.length === 0) {
-        issues.push('CRITICAL: No key rotation events found in compliance period')
+        issues.push(
+          'CRITICAL: No key rotation events found in compliance period',
+        )
         return
       }
 
       // Group by key ID
-      const keysById = keyEvents.reduce((acc, event) => {
-        const keyId = event.keyId
-        if (keyId && !acc[keyId]) {
-          acc[keyId] = []
-        }
-        if (keyId) {
-          acc[keyId].push(event)
-        }
-        return acc
-      }, {} as Record<string, AuditEvent[]>)
+      const keysById = keyEvents.reduce(
+        (acc, event) => {
+          const keyId = event.keyId
+          if (keyId && !acc[keyId]) {
+            acc[keyId] = []
+          }
+          if (keyId) {
+            acc[keyId].push(event)
+          }
+          return acc
+        },
+        {} as Record<string, AuditEvent[]>,
+      )
 
       // Check each key for compliance
       Object.entries(keysById).forEach(([keyId, events]) => {
-        const sortedEvents = events.sort((a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        const sortedEvents = events.sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
         )
-        
+
         const latestEvent = sortedEvents[sortedEvents.length - 1]
         const latestEventTime = new Date(latestEvent.timestamp)
-        const daysSinceLastRotation = (now.getTime() - latestEventTime.getTime()) / (1000 * 60 * 60 * 24)
+        const daysSinceLastRotation =
+          (now.getTime() - latestEventTime.getTime()) / (1000 * 60 * 60 * 24)
 
         if (daysSinceLastRotation > maxKeyAge) {
-          issues.push(`Key ${keyId}: Exceeds maximum age of ${maxKeyAge} days (current: ${Math.floor(daysSinceLastRotation)} days)`)
+          issues.push(
+            `Key ${keyId}: Exceeds maximum age of ${maxKeyAge} days (current: ${Math.floor(daysSinceLastRotation)} days)`,
+          )
         }
 
         // Check for failed rotations
-        const failedRotations = events.filter(e => e.action.includes('failed'))
+        const failedRotations = events.filter((e) =>
+          e.action.includes('failed'),
+        )
         if (failedRotations.length > 0) {
-          issues.push(`Key ${keyId}: ${failedRotations.length} failed rotation(s) detected`)
+          issues.push(
+            `Key ${keyId}: ${failedRotations.length} failed rotation(s) detected`,
+          )
         }
       })
 
       // Check rotation frequency
-      const rotationEvents = keyEvents.filter(e => e.action.includes('rotation'))
+      const rotationEvents = keyEvents.filter((e) =>
+        e.action.includes('rotation'),
+      )
       if (rotationEvents.length < 2) {
-        issues.push('Insufficient key rotation frequency for compliance assessment')
+        issues.push(
+          'Insufficient key rotation frequency for compliance assessment',
+        )
       }
-
     } catch (error: unknown) {
-      issues.push(`Key rotation compliance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Key rotation compliance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -1099,34 +1153,41 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Check for gaps in event sequence
-      const sortedEvents = recentEvents.sort((a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      const sortedEvents = recentEvents.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
       )
 
       // Check for missing event IDs or timestamps
-      const eventsWithIssues = sortedEvents.filter(event =>
-        !event.eventId || !event.timestamp || !event.action
+      const eventsWithIssues = sortedEvents.filter(
+        (event) => !event.eventId || !event.timestamp || !event.action,
       )
 
       if (eventsWithIssues.length > 0) {
-        issues.push(`${eventsWithIssues.length} audit events have missing required fields`)
+        issues.push(
+          `${eventsWithIssues.length} audit events have missing required fields`,
+        )
       }
 
       // Check for tampering indicators (suspicious timestamp patterns)
       const now = new Date()
-      const futureEvents = sortedEvents.filter(event =>
-        new Date(event.timestamp) > now
+      const futureEvents = sortedEvents.filter(
+        (event) => new Date(event.timestamp) > now,
       )
 
       if (futureEvents.length > 0) {
-        issues.push(`CRITICAL: ${futureEvents.length} audit events have future timestamps (potential tampering)`)
+        issues.push(
+          `CRITICAL: ${futureEvents.length} audit events have future timestamps (potential tampering)`,
+        )
       }
 
       // Check for old events (retention policy compliance)
       const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555 // 7 years default
-      const cutoffDate = new Date(now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000)
-      const oldEvents = sortedEvents.filter(event =>
-        new Date(event.timestamp) < cutoffDate
+      const cutoffDate = new Date(
+        now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000,
+      )
+      const oldEvents = sortedEvents.filter(
+        (event) => new Date(event.timestamp) < cutoffDate,
       )
 
       if (oldEvents.length > 0) {
@@ -1134,17 +1195,29 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Verify event completeness
-      const requiredFields = ['eventId', 'timestamp', 'action', 'actor', 'resource']
-      const incompleteEvents = sortedEvents.filter(event =>
-        !requiredFields.every(field => field in event && event[field as keyof AuditEvent])
+      const requiredFields = [
+        'eventId',
+        'timestamp',
+        'action',
+        'actor',
+        'resource',
+      ]
+      const incompleteEvents = sortedEvents.filter(
+        (event) =>
+          !requiredFields.every(
+            (field) => field in event && event[field as keyof AuditEvent],
+          ),
       )
 
       if (incompleteEvents.length > 0) {
-        issues.push(`${incompleteEvents.length} audit events are missing required fields`)
+        issues.push(
+          `${incompleteEvents.length} audit events are missing required fields`,
+        )
       }
-
     } catch (error: unknown) {
-      issues.push(`Audit trail integrity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Audit trail integrity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -1155,33 +1228,46 @@ export class HIPAAMonitoringService extends EventEmitter {
     try {
       const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555 // 7 years
       const now = new Date()
-      const cutoffDate = new Date(now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000)
+      const cutoffDate = new Date(
+        now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000,
+      )
 
       // Get all events older than retention period
       const oldEvents = this.getRecentEvents('all', 0) // Get all events
-        .filter(event => new Date(event.timestamp) < cutoffDate)
+        .filter((event) => new Date(event.timestamp) < cutoffDate)
 
       if (oldEvents.length > 0) {
-        issues.push(`${oldEvents.length} events exceed HIPAA retention period of ${retentionPeriod} days`)
+        issues.push(
+          `${oldEvents.length} events exceed HIPAA retention period of ${retentionPeriod} days`,
+        )
       }
 
       // Check if retention policy is configured
-      const auditRetentionDays = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
+      const auditRetentionDays =
+        HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
       if (auditRetentionDays === 0) {
         issues.push('HIPAA audit retention policy not configured')
       }
 
       // Verify automatic deletion is working (check for very old events)
-      const auditRetentionDays2 = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
-      const veryOldCutoff = new Date(now.getTime() - (auditRetentionDays2 + 30) * 24 * 60 * 60 * 1000) // 30 days past retention
-      const veryOldEvents = oldEvents.filter(event => new Date(event.timestamp) < veryOldCutoff)
+      const auditRetentionDays2 =
+        HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
+      const veryOldCutoff = new Date(
+        now.getTime() - (auditRetentionDays2 + 30) * 24 * 60 * 60 * 1000,
+      ) // 30 days past retention
+      const veryOldEvents = oldEvents.filter(
+        (event) => new Date(event.timestamp) < veryOldCutoff,
+      )
 
       if (veryOldEvents.length > 0) {
-        issues.push(`CRITICAL: ${veryOldEvents.length} events are more than 30 days past retention period (automatic deletion may be failing)`)
+        issues.push(
+          `CRITICAL: ${veryOldEvents.length} events are more than 30 days past retention period (automatic deletion may be failing)`,
+        )
       }
-
     } catch (error: unknown) {
-      issues.push(`Retention policy compliance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Retention policy compliance check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -1199,13 +1285,17 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       // HIPAA requires AES-256 minimum
       if (encryptionConfig.keySize < 256) {
-        issues.push(`CRITICAL: Encryption key size ${encryptionConfig.keySize} does not meet HIPAA minimum requirement of 256 bits`)
+        issues.push(
+          `CRITICAL: Encryption key size ${encryptionConfig.keySize} does not meet HIPAA minimum requirement of 256 bits`,
+        )
       }
 
       // Check for approved algorithms
       const approvedAlgorithms = ['AES-256-GCM', 'AES-256-CBC', 'AES-256-CTR']
       if (!approvedAlgorithms.includes(encryptionConfig.algorithm)) {
-        issues.push(`Encryption algorithm ${encryptionConfig.algorithm} not in HIPAA approved list`)
+        issues.push(
+          `Encryption algorithm ${encryptionConfig.algorithm} not in HIPAA approved list`,
+        )
       }
 
       // Verify encryption is enabled for data at rest
@@ -1222,9 +1312,10 @@ export class HIPAAMonitoringService extends EventEmitter {
       if (!process.env['HIPAA_KEY_MANAGEMENT_SERVICE']) {
         issues.push('Key management service not configured')
       }
-
     } catch (error: unknown) {
-      issues.push(`Encryption standards check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Encryption standards check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -1237,14 +1328,18 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     let score = 100
-    const criticalIssues = issues.filter(issue => issue.includes('CRITICAL'))
-    const highIssues = issues.filter(issue => issue.includes('high') || issue.includes('failed'))
-    const mediumIssues = issues.filter(issue => !issue.includes('CRITICAL') && !issue.includes('high'))
+    const criticalIssues = issues.filter((issue) => issue.includes('CRITICAL'))
+    const highIssues = issues.filter(
+      (issue) => issue.includes('high') || issue.includes('failed'),
+    )
+    const mediumIssues = issues.filter(
+      (issue) => !issue.includes('CRITICAL') && !issue.includes('high'),
+    )
 
     // Deduct points for different severity levels
     score -= criticalIssues.length * 25 // Critical issues are severe
-    score -= highIssues.length * 15     // High issues are significant
-    score -= mediumIssues.length * 5    // Medium issues are moderate
+    score -= highIssues.length * 15 // High issues are significant
+    score -= mediumIssues.length * 5 // Medium issues are moderate
 
     return Math.max(0, score) // Minimum score is 0
   }
@@ -1284,9 +1379,9 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       // 7. Determine overall health status
       healthMetrics.issuesFound = healthIssues.length
-      if (healthIssues.some(issue => issue.includes('CRITICAL'))) {
+      if (healthIssues.some((issue) => issue.includes('CRITICAL'))) {
         healthMetrics.overallStatus = 'critical'
-      } else if (healthIssues.some(issue => issue.includes('high'))) {
+      } else if (healthIssues.some((issue) => issue.includes('high'))) {
         healthMetrics.overallStatus = 'degraded'
       } else if (healthIssues.length > 0) {
         healthMetrics.overallStatus = 'warning'
@@ -1306,8 +1401,12 @@ export class HIPAAMonitoringService extends EventEmitter {
           checksPerformed: healthMetrics.checksPerformed,
           overallStatus: healthMetrics.overallStatus,
         },
-        riskLevel: healthMetrics.overallStatus === 'critical' ? 'high' :
-                   healthMetrics.overallStatus === 'degraded' ? 'medium' : 'low',
+        riskLevel:
+          healthMetrics.overallStatus === 'critical'
+            ? 'high'
+            : healthMetrics.overallStatus === 'degraded'
+              ? 'medium'
+              : 'low',
       }
 
       this.processSecurityEvent(healthEvent)
@@ -1322,11 +1421,11 @@ export class HIPAAMonitoringService extends EventEmitter {
           resource: 'health_monitoring_service',
           riskLevel: 'critical',
           metadata: {
-            issues: healthIssues.filter(issue => issue.includes('CRITICAL')),
+            issues: healthIssues.filter((issue) => issue.includes('CRITICAL')),
             immediateActionRequired: true,
           },
         }
-        
+
         this.generateSecurityAlert(criticalHealthEvent)
       }
 
@@ -1335,12 +1434,11 @@ export class HIPAAMonitoringService extends EventEmitter {
         issuesFound: healthIssues.length,
         checksPerformed: healthMetrics.checksPerformed.length,
       })
-
     } catch (error: unknown) {
       logger.error('System health check failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       })
-      
+
       // Generate alert for health check failure
       const healthCheckFailureEvent: AuditEvent = {
         eventId: this.generateAlertId(),
@@ -1355,7 +1453,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
         riskLevel: 'high',
       }
-      
+
       this.generateSecurityAlert(healthCheckFailureEvent)
     }
   }
@@ -1363,7 +1461,10 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Check service availability and response times
    */
-  private checkServiceAvailability(issues: string[], metrics: Record<string, any>): void {
+  private checkServiceAvailability(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('service_availability')
 
@@ -1390,7 +1491,9 @@ export class HIPAAMonitoringService extends EventEmitter {
             // Note: In production, you'd want to use actual health check endpoints
             metrics[`${name.toLowerCase()}_status`] = 'available'
           } catch (error: unknown) {
-            issues.push(`${name} service unavailable: ${error instanceof Error ? error.message : 'Unknown error'}`)
+            issues.push(
+              `${name} service unavailable: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            )
             metrics[`${name.toLowerCase()}_status`] = 'unavailable'
           }
         }
@@ -1403,16 +1506,20 @@ export class HIPAAMonitoringService extends EventEmitter {
           status: metrics[`${name.toLowerCase()}_status`] || 'unknown',
         })),
       }
-
     } catch (error: unknown) {
-      issues.push(`Service availability check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Service availability check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Check AWS connectivity
    */
-  private checkAWSConnectivity(issues: string[], metrics: Record<string, any>): void {
+  private checkAWSConnectivity(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('aws_connectivity')
 
@@ -1427,7 +1534,9 @@ export class HIPAAMonitoringService extends EventEmitter {
         // Note: In production, you'd use listMetrics or a similar lightweight operation
         metrics.cloudWatchConnectivity = 'operational'
       } catch (error: unknown) {
-        issues.push(`CloudWatch connectivity failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        issues.push(
+          `CloudWatch connectivity failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        )
         metrics.cloudWatchConnectivity = 'failed'
       }
 
@@ -1436,18 +1545,25 @@ export class HIPAAMonitoringService extends EventEmitter {
         // Note: In production, you'd use listTopics or a similar lightweight operation
         metrics.snsConnectivity = 'operational'
       } catch (error: unknown) {
-        issues.push(`SNS connectivity failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        issues.push(
+          `SNS connectivity failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        )
         metrics.snsConnectivity = 'failed'
       }
 
       metrics.awsConnectivity = {
         cloudWatch: metrics.cloudWatchConnectivity,
         sns: metrics.snsConnectivity,
-        overall: (metrics.cloudWatchConnectivity === 'operational' && metrics.snsConnectivity === 'operational') ? 'healthy' : 'degraded',
+        overall:
+          metrics.cloudWatchConnectivity === 'operational' &&
+          metrics.snsConnectivity === 'operational'
+            ? 'healthy'
+            : 'degraded',
       }
-
     } catch (error: unknown) {
-      issues.push(`AWS connectivity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `AWS connectivity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
       metrics.awsConnectivity = 'failed'
     }
   }
@@ -1455,7 +1571,10 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Check system resource utilization
    */
-  private checkResourceUtilization(issues: string[], metrics: Record<string, any>): void {
+  private checkResourceUtilization(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('resource_utilization')
 
@@ -1472,7 +1591,9 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       if (memoryUsagePercent > memoryThreshold) {
-        issues.push(`High memory usage detected: ${Math.round(memoryUsagePercent * 100)}%`)
+        issues.push(
+          `High memory usage detected: ${Math.round(memoryUsagePercent * 100)}%`,
+        )
       }
 
       // Check CPU usage (approximate using event loop delay)
@@ -1485,7 +1606,9 @@ export class HIPAAMonitoringService extends EventEmitter {
         }
 
         if (delay > 100) {
-          issues.push(`High CPU load detected: event loop delay ${delay.toFixed(2)}ms`)
+          issues.push(
+            `High CPU load detected: event loop delay ${delay.toFixed(2)}ms`,
+          )
         }
       })
 
@@ -1502,16 +1625,20 @@ export class HIPAAMonitoringService extends EventEmitter {
           error: error instanceof Error ? error.message : 'Unknown error',
         }
       }
-
     } catch (error: unknown) {
-      issues.push(`Resource utilization check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Resource utilization check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Validate system configuration
    */
-  private validateConfiguration(issues: string[], metrics: Record<string, any>): void {
+  private validateConfiguration(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('configuration_validation')
 
@@ -1522,22 +1649,26 @@ export class HIPAAMonitoringService extends EventEmitter {
         'HIPAA_KEY_MANAGEMENT_SERVICE',
       ]
 
-      const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName])
+      const missingEnvVars = requiredEnvVars.filter(
+        (varName) => !process.env[varName],
+      )
       if (missingEnvVars.length > 0) {
-        issues.push(`Missing required environment variables: ${missingEnvVars.join(', ')}`)
+        issues.push(
+          `Missing required environment variables: ${missingEnvVars.join(', ')}`,
+        )
       }
 
       // Validate HIPAA configuration
       const configIssues: string[] = []
-      
+
       if (!HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_DAYS) {
         configIssues.push('MAX_KEY_AGE_DAYS not configured')
       }
-      
+
       if (!HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS) {
         configIssues.push('AUDIT_RETENTION_DAYS not configured')
       }
-      
+
       if (!HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE) {
         configIssues.push('CLOUDWATCH_NAMESPACE not configured')
       }
@@ -1556,24 +1687,31 @@ export class HIPAAMonitoringService extends EventEmitter {
           issues: configIssues.length,
           status: configIssues.length === 0 ? 'valid' : 'invalid',
         },
-        overall: (missingEnvVars.length === 0 && configIssues.length === 0) ? 'valid' : 'invalid',
+        overall:
+          missingEnvVars.length === 0 && configIssues.length === 0
+            ? 'valid'
+            : 'invalid',
       }
-
     } catch (error: unknown) {
-      issues.push(`Configuration validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Configuration validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Check database connectivity
    */
-  private checkDatabaseConnectivity(issues: string[], metrics: Record<string, any>): void {
+  private checkDatabaseConnectivity(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('database_connectivity')
 
       // Note: In a real implementation, this would test actual database connections
       // For now, we'll simulate the check and note the requirement
-      
+
       const dbConfig = {
         host: process.env['DATABASE_HOST'] || 'not_configured',
         port: process.env['DATABASE_PORT'] || 'not_configured',
@@ -1593,9 +1731,10 @@ export class HIPAAMonitoringService extends EventEmitter {
           responseTime: 'N/A', // Would be measured in production
         }
       }
-
     } catch (error: unknown) {
-      issues.push(`Database connectivity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Database connectivity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
       metrics.databaseConnectivity = 'check_failed'
     }
   }
@@ -1603,7 +1742,10 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Check encryption service availability
    */
-  private checkEncryptionService(issues: string[], metrics: Record<string, any>): void {
+  private checkEncryptionService(
+    issues: string[],
+    metrics: Record<string, any>,
+  ): void {
     try {
       metrics.checksPerformed.push('encryption_service')
 
@@ -1613,7 +1755,11 @@ export class HIPAAMonitoringService extends EventEmitter {
         keyManagementService: process.env['HIPAA_KEY_MANAGEMENT_SERVICE'],
       }
 
-      if (!encryptionConfig.algorithm || !encryptionConfig.keySize || !encryptionConfig.keyManagementService) {
+      if (
+        !encryptionConfig.algorithm ||
+        !encryptionConfig.keySize ||
+        !encryptionConfig.keyManagementService
+      ) {
         issues.push('Encryption service configuration incomplete')
         metrics.encryptionService = 'configuration_incomplete'
         return
@@ -1627,9 +1773,10 @@ export class HIPAAMonitoringService extends EventEmitter {
         status: 'simulated_operational', // Would be actual test in production
         lastRotation: 'N/A', // Would be retrieved from actual service
       }
-
     } catch (error: unknown) {
-      issues.push(`Encryption service check failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      issues.push(
+        `Encryption service check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
       metrics.encryptionService = 'check_failed'
     }
   }

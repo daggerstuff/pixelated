@@ -1,0 +1,137 @@
+groups:
+  - name: launch-monitoring
+    rules:
+      # Launch Success Metrics
+      - alert: LowSessionCompletionRate
+        expr: sum(rate(pixelated_empathy_sessions_completed_total[5m])) / sum(rate(pixelated_empathy_sessions_started_total[5m])) * 100) < 80
+        for: 10m
+        labels:
+          severity: warning
+          category: launch-metric
+        annotations:
+          summary: "Session completion rate below 80%"
+          description: "Session completion rate is {{ $value }}%, target is >80%"
+
+      - alert: HighResponseTimeLaunch
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          category: launch-metric
+        annotations:
+          summary: "Response time above 2 seconds (95th percentile)"
+          description: "95th percentile response time is {{ $value }}s, target is <2s"
+
+      - alert: LowUserSatisfaction
+        expr: avg(pixelated_empathy_user_satisfaction_score) < 7
+        for: 1h
+        labels:
+          severity: warning
+          category: launch-metric
+        annotations:
+          summary: "User satisfaction score below 7/10"
+          description: "Average user satisfaction is {{ $value }}/10, target is >7/10"
+
+      - alert: HighSystemDowntime
+        expr: avg_over_time(up{job="pixelated-empathy"}[24h]) * 100 < 99
+        for: 1h
+        labels:
+          severity: critical
+          category: launch-metric
+        annotations:
+          summary: "System uptime below 99%"
+          description: "System uptime is {{ $value }}%, target is >99%"
+
+      # Crisis and Safety Alerts
+      - alert: HighCrisisDetectionRate
+        expr: rate(pixelated_empathy_crisis_detections_total[1h]) > 5
+        for: 30m
+        labels:
+          severity: warning
+          category: safety
+        annotations:
+          summary: "High crisis detection rate"
+          description: "{{ $value }} crisis detections per hour, review may be needed"
+
+      - alert: CrisisEscalationFailure
+        expr: rate(pixelated_empathy_crisis_escalation_failures_total[10m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          category: safety
+        annotations:
+          summary: "Crisis escalation failures detected"
+          description: "{{ $value }} escalation failures in the last 10 minutes - IMMEDIATE REVIEW REQUIRED"
+
+      # User Engagement Alerts
+      - alert: ZeroActiveUsers
+        expr: sum(pixelated_empathy_active_users) == 0
+        for: 2h
+        labels:
+          severity: warning
+          category: engagement
+        annotations:
+          summary: "No active users for 2 hours"
+          description: "No users have been active for 2 hours during launch period"
+
+      - alert: UserRegistrationFailure
+        expr: rate(pixelated_empathy_user_registrations_failed_total[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: engagement
+        annotations:
+          summary: "User registration failures"
+          description: "{{ $value }} registration failures per minute"
+
+      # Performance Degradation Alerts
+      - alert: MemoryUsageCritical
+        expr: (process_resident_memory_bytes / 1024 / 1024) > 4096
+        for: 10m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "Memory usage critical (>4GB)"
+          description: "Memory usage is {{ $value }}MB, investigating required"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value }}% of max connections in use"
+
+      - alert: HighErrorRateLaunch
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100 > 1
+        for: 5m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "Error rate above 1%"
+          description: "Error rate is {{ $value }}%, target is <1%"
+
+      # Launch Readiness Checks
+      - alert: MonitoringSystemDown
+        expr: up{job=~"prometheus|grafana|alertmanager"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Monitoring system component down"
+          description: "{{ $labels.job }} is down - monitoring may be incomplete"
+
+      - alert: BackupSystemFailure
+        expr: pixelated_empathy_backup_status == 0
+        for: 30m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Backup system failure"
+          description: "Backup system is not reporting success - investigation required"

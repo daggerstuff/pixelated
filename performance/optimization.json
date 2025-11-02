@@ -3,7 +3,7 @@
     "name": "pixelated-empathy-performance",
     "version": "1.0.0",
     "last_updated": "2024-01-01T00:00:00Z",
-    
+
     "application_optimization": {
       "node_js": {
         "memory_management": {
@@ -63,7 +63,7 @@
         }
       }
     },
-    
+
     "infrastructure_optimization": {
       "load_balancing": {
         "algorithm": "least_connections",
@@ -84,7 +84,7 @@
             "scale_down_threshold": 30
           },
           {
-            "name": "memory_utilization", 
+            "name": "memory_utilization",
             "target": 75,
             "scale_up_threshold": 85,
             "scale_down_threshold": 40
@@ -109,7 +109,7 @@
         "ephemeral_storage": "1Gi"
       }
     },
-    
+
     "network_optimization": {
       "compression": {
         "gzip": true,
@@ -134,7 +134,7 @@
         "timeout": 60000
       }
     },
-    
+
     "monitoring_optimization": {
       "metrics_collection": {
         "interval": 15,
@@ -147,7 +147,7 @@
         "error_rate_threshold": 0.01,
         "availability_threshold": 0.999,
         "memory_threshold": 0.85,
-        "cpu_threshold": 0.80
+        "cpu_threshold": 0.8
       },
       "logging": {
         "level": "info",
@@ -157,7 +157,7 @@
         "buffer_size": 1000
       }
     },
-    
+
     "security_optimization": {
       "rate_limiting": {
         "global": {
@@ -186,7 +186,7 @@
         "ocsp_stapling": true
       }
     },
-    
+
     "content_optimization": {
       "static_assets": {
         "minification": true,
@@ -207,7 +207,7 @@
         "compression": true
       }
     },
-    
+
     "performance_budgets": {
       "page_load_time": {
         "target": 2000,

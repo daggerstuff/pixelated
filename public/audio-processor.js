@@ -121,5 +121,22 @@ class AudioProcessor extends AudioWorkletProcessor {
 
 // Register the processor
 registerProcessor('audio-processor', AudioProcessor)
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d4df62f5-8102-57f4-b98f-792553d7d6d1")}catch(e){}}();
+!(function () {
+  try {
+    var e =
+        'undefined' != typeof window
+          ? window
+          : 'undefined' != typeof global
+            ? global
+            : 'undefined' != typeof globalThis
+              ? globalThis
+              : 'undefined' != typeof self
+                ? self
+                : {},
+      n = new e.Error().stack
+    n &&
+      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
+  } catch (e) {}
+})()
 //# debugId=d4df62f5-8102-57f4-b98f-792553d7d6d1

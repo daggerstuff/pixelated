@@ -77,7 +77,9 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
         }
       } catch (detErr) {
         // Non-fatal: record detection error in summary but still return redacted text
-        summary.errors = [detErr instanceof Error ? detErr.message : String(detErr)]
+        summary.errors = [
+          detErr instanceof Error ? detErr.message : String(detErr),
+        ]
       }
 
       return {

@@ -30,7 +30,7 @@ export function createSignedVerificationToken(payload: unknown): string {
     return btoa(jsonString)
   } catch (error: unknown) {
     logger.error('Failed to create verification token', { error })
-    throw new Error('Verification token creation failed')
+    throw new Error('Verification token creation failed', { cause: error })
   }
 }
 

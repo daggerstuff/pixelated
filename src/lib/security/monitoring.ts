@@ -172,7 +172,6 @@ export class SecurityMonitoringService {
     }
   }
 
-
   /**
    * Check if an account is locked
    */

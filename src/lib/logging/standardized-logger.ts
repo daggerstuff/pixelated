@@ -46,8 +46,12 @@ export function getSecurityLogger(scope: string): Logger {
   return getLogger(`security:${scope}`) as unknown as Logger
 }
 
-export function getAdvancedPHILogger(config: { enableLogCollection?: boolean } = {}): Logger {
-  return getLogger(`advanced-phi${config.enableLogCollection ? ':collect' : ''}`) as unknown as Logger
+export function getAdvancedPHILogger(
+  config: { enableLogCollection?: boolean } = {},
+): Logger {
+  return getLogger(
+    `advanced-phi${config.enableLogCollection ? ':collect' : ''}`,
+  ) as unknown as Logger
 }
 
 export function getHipaaCompliantLogger(scope: string): Logger {
@@ -56,19 +60,32 @@ export function getHipaaCompliantLogger(scope: string): Logger {
 
 // Default/general loggers - provide thin runtime proxies to getLogger
 const makeProxy = (name: string): Logger => {
-  const callLoggerMethod = (method: keyof Logger, message: unknown, ...args: unknown[]) => {
-    const targetUnknown: unknown = getLogger(name);
+  const callLoggerMethod = (
+    method: keyof Logger,
+    message: unknown,
+    ...args: unknown[]
+  ) => {
+    const targetUnknown: unknown = getLogger(name)
     // Narrow the runtime type to Partial<Logger> so we can safely check methods
-    const target = (typeof targetUnknown === 'object' && targetUnknown !== null) ? (targetUnknown as Partial<Logger>) : undefined;
+    const target =
+      typeof targetUnknown === 'object' && targetUnknown !== null
+        ? (targetUnknown as Partial<Logger>)
+        : undefined
 
     let methodFn: (...innerArgs: unknown[]) => void
 
     if (target && typeof target[method] === 'function') {
-      methodFn = (target[method] as (...innerArgs: unknown[]) => void).bind(target)
+      methodFn = (target[method] as (...innerArgs: unknown[]) => void).bind(
+        target,
+      )
     } else {
-      const consoleCandidate = (console as unknown as Record<string, unknown>)[method]
+      const consoleCandidate = (console as unknown as Record<string, unknown>)[
+        method
+      ]
       if (typeof consoleCandidate === 'function') {
-        methodFn = (consoleCandidate as (...innerArgs: unknown[]) => void).bind(console)
+        methodFn = (consoleCandidate as (...innerArgs: unknown[]) => void).bind(
+          console,
+        )
       } else {
         // As a last resort, provide a no-op so callers never throw.
         methodFn = () => {}
@@ -79,10 +96,14 @@ const makeProxy = (name: string): Logger => {
   }
 
   return {
-    info: (message: string, ...args: unknown[]) => callLoggerMethod('info', message, ...args),
-    warn: (message: string, ...args: unknown[]) => callLoggerMethod('warn', message, ...args),
-    error: (message: string | Error, ...args: unknown[]) => callLoggerMethod('error', message, ...args),
-    debug: (message: string, ...args: unknown[]) => callLoggerMethod('debug', message, ...args),
+    info: (message: string, ...args: unknown[]) =>
+      callLoggerMethod('info', message, ...args),
+    warn: (message: string, ...args: unknown[]) =>
+      callLoggerMethod('warn', message, ...args),
+    error: (message: string | Error, ...args: unknown[]) =>
+      callLoggerMethod('error', message, ...args),
+    debug: (message: string, ...args: unknown[]) =>
+      callLoggerMethod('debug', message, ...args),
   }
 }
 

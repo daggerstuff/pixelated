@@ -1,25 +1,28 @@
-import React, { useState, useEffect, useMemo } from "react";
-import type { TherapistDashboardProps } from "@/types/dashboard";
-import { AnalyticsCharts } from "./AnalyticsCharts";
+import React, { useState, useEffect, useMemo } from 'react'
+import type { TherapistDashboardProps } from '@/types/dashboard'
+import { AnalyticsCharts } from './AnalyticsCharts'
 
-
-import SessionControls from "./SessionControls";
-import { TherapistProgressTracker } from "./TherapistProgressTracker";
-import TherapyProgressCharts from "./TherapyProgressCharts";
-import { useTherapistAnalytics } from "@/hooks/useTherapistAnalytics";
-import type { AnalyticsFilters } from "@/types/analytics";
-import { cn } from "@/lib/utils";
+import SessionControls from './SessionControls'
+import { TherapistProgressTracker } from './TherapistProgressTracker'
+import TherapyProgressCharts from './TherapyProgressCharts'
+import { useTherapistAnalytics } from '@/hooks/useTherapistAnalytics'
+import type { AnalyticsFilters } from '@/types/analytics'
+import { cn } from '@/lib/utils'
 
 // Accessibility: ARIA roles, keyboard navigation, WCAG 2.1 compliance
 // Responsive grid layout using Tailwind
 
-export function TherapistDashboard({ sessions, onSessionControl, children }: TherapistDashboardProps) {
+export function TherapistDashboard({
+  sessions,
+  onSessionControl,
+  children,
+}: TherapistDashboardProps) {
   // Find the session with the latest valid startTime for progress tracking
   const latestSession = useMemo(() => {
     if (!Array.isArray(sessions) || sessions.length === 0) {
       return null
     }
-    let latest: typeof sessions[0] | null = null
+    let latest: (typeof sessions)[0] | null = null
     let latestTime = -Infinity
     for (const session of sessions) {
       const t = session?.startTime ? new Date(session.startTime).getTime() : NaN
@@ -31,7 +34,7 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
     return latest ?? null
   }, [sessions])
   if (!onSessionControl) {
-    throw new Error("TherapistDashboard requires onSessionControl prop");
+    throw new Error('TherapistDashboard requires onSessionControl prop')
   }
 
   // Skip link state for accessibility
@@ -60,23 +63,28 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
 
   // Use therapist analytics hook
   const defaultFilters: AnalyticsFilters = { timeRange: '30d' }
-  const { data: therapistData, } = useTherapistAnalytics(defaultFilters, sessions)
+  const { data: therapistData } = useTherapistAnalytics(
+    defaultFilters,
+    sessions,
+  )
 
   return (
     <div className="relative">
       {/* Navigation for accessibility tests */}
-      <nav  aria-label="Dashboard Navigation" className="sr-only">
+      <nav aria-label="Dashboard Navigation" className="sr-only">
         <ul>
-          <li><a href="#main-content">Main Content</a></li>
+          <li>
+            <a href="#main-content">Main Content</a>
+          </li>
         </ul>
       </nav>
-      
+
       {/* Skip to main content link for keyboard users */}
       {showSkipLink && (
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground focus:underline focus:ring-2 focus:ring-primary"
-            onClick={(e) => {
+          onClick={(e) => {
             e.preventDefault()
             const mainContent = document.getElementById('main-content')
             if (mainContent) {
@@ -93,7 +101,7 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
         className={cn(
           'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6',
           'bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]',
-          'focus:outline-none'
+          'focus:outline-none',
         )}
         aria-label="Therapist Dashboard"
         role="main"
@@ -106,7 +114,10 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
           role="region"
           tabIndex={0}
         >
-          <SessionControls sessions={sessions} onSessionControl={onSessionControl} />
+          <SessionControls
+            sessions={sessions}
+            onSessionControl={onSessionControl}
+          />
         </aside>
 
         {/* Analytics Charts */}
@@ -128,7 +139,9 @@ export function TherapistDashboard({ sessions, onSessionControl, children }: The
           tabIndex={0}
         >
           <h3 className="text-lg font-semibold">Session Progress</h3>
-          {latestSession && <TherapistProgressTracker session={latestSession} />}
+          {latestSession && (
+            <TherapistProgressTracker session={latestSession} />
+          )}
         </section>
 
         {/* Therapy Progress Charts - Full width on larger screens */}

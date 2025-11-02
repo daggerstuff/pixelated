@@ -101,7 +101,7 @@ export enum TherapySentiment {
 }
 
 //---------------------------------------------------------------
- // Core Types and Interfaces
+// Core Types and Interfaces
 //---------------------------------------------------------------
 
 /**
@@ -110,7 +110,6 @@ export enum TherapySentiment {
 export type ClientKey = unknown
 export type ServerKey = unknown
 export type PublicKey = unknown
-
 
 /**
  * Polynomial Representation

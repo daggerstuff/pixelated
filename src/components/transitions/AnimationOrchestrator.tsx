@@ -99,7 +99,9 @@ export function AnimationOrchestrator({
         animate: {
           ...baseVariants['animate'],
           transition: {
-            ...((baseVariants['animate'] as Record<string, unknown>)['transition'] || {}),
+            ...((baseVariants['animate'] as Record<string, unknown>)[
+              'transition'
+            ] || {}),
             staggerChildren: staggerDelay,
           },
         },

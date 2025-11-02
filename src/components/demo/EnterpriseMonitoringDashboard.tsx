@@ -3,18 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Activity, 
-  TrendingUp, 
-  Clock, 
-  Shield, 
+import {
+  Activity,
+  TrendingUp,
+  Clock,
+  Shield,
   AlertTriangle,
   CheckCircle,
   Zap,
   Brain,
   Heart,
   BarChart3,
-  PieChart
+  PieChart,
 } from 'lucide-react'
 
 interface PerformanceMetric {
@@ -65,9 +65,13 @@ interface UsageAnalytics {
 }
 
 export default function EnterpriseMonitoringDashboard() {
-  const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetric[]>([])
+  const [performanceMetrics, setPerformanceMetrics] = useState<
+    PerformanceMetric[]
+  >([])
   const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null)
-  const [usageAnalytics, setUsageAnalytics] = useState<UsageAnalytics | null>(null)
+  const [usageAnalytics, setUsageAnalytics] = useState<UsageAnalytics | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
 
@@ -83,7 +87,7 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'down',
           status: 'good',
           threshold: 500,
-          history: generateTimeSeriesData(50, 200, 300)
+          history: generateTimeSeriesData(50, 200, 300),
         },
         {
           id: 'accuracy',
@@ -93,7 +97,7 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'up',
           status: 'good',
           threshold: 90,
-          history: generateTimeSeriesData(50, 92, 96)
+          history: generateTimeSeriesData(50, 92, 96),
         },
         {
           id: 'throughput',
@@ -103,7 +107,7 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'up',
           status: 'good',
           threshold: 1000,
-          history: generateTimeSeriesData(50, 800, 1400)
+          history: generateTimeSeriesData(50, 800, 1400),
         },
         {
           id: 'error_rate',
@@ -113,7 +117,7 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'down',
           status: 'good',
           threshold: 1,
-          history: generateTimeSeriesData(50, 0.1, 0.8)
+          history: generateTimeSeriesData(50, 0.1, 0.8),
         },
         {
           id: 'intervention_success',
@@ -123,7 +127,7 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'stable',
           status: 'good',
           threshold: 85,
-          history: generateTimeSeriesData(50, 87, 92)
+          history: generateTimeSeriesData(50, 87, 92),
         },
         {
           id: 'user_satisfaction',
@@ -133,8 +137,8 @@ export default function EnterpriseMonitoringDashboard() {
           trend: 'up',
           status: 'good',
           threshold: 4,
-          history: generateTimeSeriesData(50, 4.2, 4.8)
-        }
+          history: generateTimeSeriesData(50, 4.2, 4.8),
+        },
       ]
 
       const health: SystemHealth = {
@@ -145,7 +149,7 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 187,
             successRate: 99.8,
-            lastCheck: Date.now()
+            lastCheck: Date.now(),
           },
           {
             name: 'Scenario Generation API',
@@ -153,7 +157,7 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 312,
             successRate: 99.2,
-            lastCheck: Date.now()
+            lastCheck: Date.now(),
           },
           {
             name: 'Mental Health Chat API',
@@ -161,7 +165,7 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 256,
             successRate: 99.9,
-            lastCheck: Date.now()
+            lastCheck: Date.now(),
           },
           {
             name: 'Crisis Detection API',
@@ -169,7 +173,7 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 423,
             successRate: 99.7,
-            lastCheck: Date.now()
+            lastCheck: Date.now(),
           },
           {
             name: 'Frameworks API',
@@ -177,7 +181,7 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 89,
             successRate: 99.9,
-            lastCheck: Date.now()
+            lastCheck: Date.now(),
           },
           {
             name: 'Clinical Analysis API',
@@ -185,21 +189,21 @@ export default function EnterpriseMonitoringDashboard() {
             status: 'online',
             responseTime: 445,
             successRate: 99.5,
-            lastCheck: Date.now()
-          }
+            lastCheck: Date.now(),
+          },
         ],
         database: {
           status: 'online',
           responseTime: 23,
           connections: 12,
-          maxConnections: 100
+          maxConnections: 100,
         },
         cache: {
           status: 'online',
           hitRate: 94.3,
           memory: 2.1,
-          maxMemory: 8
-        }
+          maxMemory: 8,
+        },
       }
 
       const analytics: UsageAnalytics = {
@@ -212,7 +216,7 @@ export default function EnterpriseMonitoringDashboard() {
         peakUsageTime: '14:00-16:00',
         dailyActiveUsers: 1834,
         weeklyActiveUsers: 8921,
-        monthlyActiveUsers: 28456
+        monthlyActiveUsers: 28456,
       }
 
       setPerformanceMetrics(metrics)
@@ -234,16 +238,16 @@ export default function EnterpriseMonitoringDashboard() {
 
   // Cryptographically secure random number generator for browser
   const secureRandom = () => {
-    const array = new Uint32Array(1);
-    window.crypto.getRandomValues(array);
+    const array = new Uint32Array(1)
+    window.crypto.getRandomValues(array)
     // Defensive: array is always length 1, but TypeScript may warn
-    return (array?.[0] ?? 0) / (0xFFFFFFFF + 1);
+    return (array?.[0] ?? 0) / (0xffffffff + 1)
   }
 
   const generateTimeSeriesData = (points: number, min: number, max: number) => {
     return Array.from({ length: points }, (_, i) => ({
       timestamp: Date.now() - (points - i) * 60000,
-      value: min + secureRandom() * (max - min)
+      value: min + secureRandom() * (max - min),
     }))
   }
 
@@ -306,12 +310,18 @@ export default function EnterpriseMonitoringDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Enterprise Monitoring Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Enterprise Monitoring Dashboard
+          </h1>
           <p className="text-gray-600 mt-1">
-            Real-time system performance and analytics • Last updated: {lastUpdate.toLocaleTimeString()}
+            Real-time system performance and analytics • Last updated:{' '}
+            {lastUpdate.toLocaleTimeString()}
           </p>
         </div>
-        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+        <Badge
+          variant="outline"
+          className="bg-green-50 text-green-700 border-green-200"
+        >
           <Activity className="w-4 h-4 mr-2" />
           All Systems Operational
         </Badge>
@@ -353,21 +363,24 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                     <span className="text-sm text-gray-500">{metric.unit}</span>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs text-gray-500">
-                      <span>Threshold: {metric.threshold}{metric.unit}</span>
-                      <Badge 
-                        variant="outline" 
+                      <span>
+                        Threshold: {metric.threshold}
+                        {metric.unit}
+                      </span>
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getStatusColor(metric.status)}`}
                       >
                         {getStatusIcon(metric.status)}
                         <span className="ml-1 capitalize">{metric.status}</span>
                       </Badge>
                     </div>
-                    
-                    <Progress 
-                      value={(metric.value / metric.threshold) * 100} 
+
+                    <Progress
+                      value={(metric.value / metric.threshold) * 100}
                       className="h-2"
                     />
                   </div>
@@ -389,10 +402,13 @@ export default function EnterpriseMonitoringDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {systemHealth?.apis.map((api) => (
-                  <div key={api.endpoint} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={api.endpoint}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`${getStatusColor(api.status)}`}
                       >
                         {getStatusIcon(api.status)}
@@ -404,8 +420,12 @@ export default function EnterpriseMonitoringDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">{api.responseTime}ms</div>
-                      <div className="text-xs text-gray-500">{api.successRate}% uptime</div>
+                      <div className="text-sm font-medium">
+                        {api.responseTime}ms
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {api.successRate}% uptime
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -426,26 +446,35 @@ export default function EnterpriseMonitoringDashboard() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Status</span>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={`${getStatusColor(systemHealth?.database.status || '')}`}
                     >
                       {getStatusIcon(systemHealth?.database.status || '')}
-                      <span className="ml-1 capitalize">{systemHealth?.database.status}</span>
+                      <span className="ml-1 capitalize">
+                        {systemHealth?.database.status}
+                      </span>
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Response Time</span>
-                    <span className="font-medium">{systemHealth?.database.responseTime}ms</span>
+                    <span className="font-medium">
+                      {systemHealth?.database.responseTime}ms
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Connections</span>
                     <span className="font-medium">
-                      {systemHealth?.database.connections}/{systemHealth?.database.maxConnections}
+                      {systemHealth?.database.connections}/
+                      {systemHealth?.database.maxConnections}
                     </span>
                   </div>
-                  <Progress 
-                    value={(systemHealth?.database.connections || 0) / (systemHealth?.database.maxConnections || 1) * 100} 
+                  <Progress
+                    value={
+                      ((systemHealth?.database.connections || 0) /
+                        (systemHealth?.database.maxConnections || 1)) *
+                      100
+                    }
                     className="h-2"
                   />
                 </div>
@@ -463,26 +492,35 @@ export default function EnterpriseMonitoringDashboard() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Status</span>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={`${getStatusColor(systemHealth?.cache.status || '')}`}
                     >
                       {getStatusIcon(systemHealth?.cache.status || '')}
-                      <span className="ml-1 capitalize">{systemHealth?.cache.status}</span>
+                      <span className="ml-1 capitalize">
+                        {systemHealth?.cache.status}
+                      </span>
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Hit Rate</span>
-                    <span className="font-medium">{systemHealth?.cache.hitRate}%</span>
+                    <span className="font-medium">
+                      {systemHealth?.cache.hitRate}%
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Memory Usage</span>
                     <span className="font-medium">
-                      {systemHealth?.cache.memory}GB / {systemHealth?.cache.maxMemory}GB
+                      {systemHealth?.cache.memory}GB /{' '}
+                      {systemHealth?.cache.maxMemory}GB
                     </span>
                   </div>
-                  <Progress 
-                    value={(systemHealth?.cache.memory || 0) / (systemHealth?.cache.maxMemory || 1) * 100} 
+                  <Progress
+                    value={
+                      ((systemHealth?.cache.memory || 0) /
+                        (systemHealth?.cache.maxMemory || 1)) *
+                      100
+                    }
                     className="h-2"
                   />
                 </div>
@@ -502,7 +540,9 @@ export default function EnterpriseMonitoringDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Active Sessions</p>
-                    <p className="text-2xl font-bold">{usageAnalytics?.activeSessions.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {usageAnalytics?.activeSessions.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -515,8 +555,12 @@ export default function EnterpriseMonitoringDashboard() {
                     <Heart className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Crisis Interventions</p>
-                    <p className="text-2xl font-bold">{usageAnalytics?.crisisInterventions.toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">
+                      Crisis Interventions
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {usageAnalytics?.crisisInterventions.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -529,8 +573,12 @@ export default function EnterpriseMonitoringDashboard() {
                     <Clock className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Avg Session Duration</p>
-                    <p className="text-2xl font-bold">{usageAnalytics?.averageSessionDuration}min</p>
+                    <p className="text-sm text-gray-600">
+                      Avg Session Duration
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {usageAnalytics?.averageSessionDuration}min
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -544,7 +592,9 @@ export default function EnterpriseMonitoringDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">User Satisfaction</p>
-                    <p className="text-2xl font-bold">{usageAnalytics?.userSatisfaction}/5</p>
+                    <p className="text-2xl font-bold">
+                      {usageAnalytics?.userSatisfaction}/5
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -560,20 +610,36 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Daily Active Users</span>
-                    <span className="font-medium">{usageAnalytics?.dailyActiveUsers.toLocaleString()}</span>
+                    <span className="text-sm text-gray-600">
+                      Daily Active Users
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.dailyActiveUsers.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Weekly Active Users</span>
-                    <span className="font-medium">{usageAnalytics?.weeklyActiveUsers.toLocaleString()}</span>
+                    <span className="text-sm text-gray-600">
+                      Weekly Active Users
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.weeklyActiveUsers.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Monthly Active Users</span>
-                    <span className="font-medium">{usageAnalytics?.monthlyActiveUsers.toLocaleString()}</span>
+                    <span className="text-sm text-gray-600">
+                      Monthly Active Users
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.monthlyActiveUsers.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Peak Usage Time</span>
-                    <span className="font-medium">{usageAnalytics?.peakUsageTime}</span>
+                    <span className="text-sm text-gray-600">
+                      Peak Usage Time
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.peakUsageTime}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -586,21 +652,38 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Interventions</span>
-                    <span className="font-medium">{usageAnalytics?.crisisInterventions.toLocaleString()}</span>
+                    <span className="text-sm text-gray-600">
+                      Total Interventions
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.crisisInterventions.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Successful Interventions</span>
-                    <span className="font-medium">{usageAnalytics?.successfulInterventions.toLocaleString()}</span>
+                    <span className="text-sm text-gray-600">
+                      Successful Interventions
+                    </span>
+                    <span className="font-medium">
+                      {usageAnalytics?.successfulInterventions.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Success Rate</span>
                     <span className="font-medium">
-                      {((usageAnalytics?.successfulInterventions || 0) / (usageAnalytics?.crisisInterventions || 1) * 100).toFixed(1)}%
+                      {(
+                        ((usageAnalytics?.successfulInterventions || 0) /
+                          (usageAnalytics?.crisisInterventions || 1)) *
+                        100
+                      ).toFixed(1)}
+                      %
                     </span>
                   </div>
-                  <Progress 
-                    value={(usageAnalytics?.successfulInterventions || 0) / (usageAnalytics?.crisisInterventions || 1) * 100} 
+                  <Progress
+                    value={
+                      ((usageAnalytics?.successfulInterventions || 0) /
+                        (usageAnalytics?.crisisInterventions || 1)) *
+                      100
+                    }
                     className="h-3"
                   />
                 </div>

@@ -69,8 +69,8 @@ export function createEnhancedRateLimiter(
       const count = parseInt((countStr as string) || '0', 10)
 
       // If key doesn't exist or has expired, create new entry
-  if (ttl < 0) {
-  await r.setex(key, Math.ceil(effectiveWindowMs / 1000), '1')
+      if (ttl < 0) {
+        await r.setex(key, Math.ceil(effectiveWindowMs / 1000), '1')
         return {
           allowed: true,
           limit,
@@ -102,7 +102,7 @@ export function createEnhancedRateLimiter(
       }
 
       // Increment counter
-  await r.incr(key)
+      await r.incr(key)
 
       return {
         allowed: true,

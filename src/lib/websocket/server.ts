@@ -64,7 +64,10 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private async handleChatMessage(clientId: string, message: WebSocketMessage): Promise<void> {
+  private async handleChatMessage(
+    clientId: string,
+    message: WebSocketMessage,
+  ): Promise<void> {
     if (!message.sessionId) {
       this.sendError(this.clients.get(clientId)!, 'Session ID required')
       return
@@ -74,18 +77,27 @@ class TherapyChatWebSocketServer {
     if (message.encrypted) {
       try {
         const fhe = fheService as unknown as {
-          processEncrypted?: (data: string, operation: string) => Promise<{ data: string }>
+          processEncrypted?: (
+            data: string,
+            operation: string,
+          ) => Promise<{ data: string }>
         }
 
         if (typeof fhe.processEncrypted === 'function') {
-          const result = await fhe.processEncrypted(message.data as string, 'CHAT')
+          const result = await fhe.processEncrypted(
+            message.data as string,
+            'CHAT',
+          )
           message.data = result.data
         } else {
           // No processEncrypted available on fheService; treat as no-op for now
-          logger.info('FHE service processEncrypted not available; skipping processing')
+          logger.info(
+            'FHE service processEncrypted not available; skipping processing',
+          )
         }
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? String(error) : String(error)
+        const errorMessage =
+          error instanceof Error ? String(error) : String(error)
         logger.error('FHE processing error:', { error: errorMessage })
         this.sendError(this.clients.get(clientId)!, 'Encryption error')
         return
@@ -101,7 +113,10 @@ class TherapyChatWebSocketServer {
     })
   }
 
-  private handleStatusUpdate(clientId: string, message: WebSocketMessage): void {
+  private handleStatusUpdate(
+    clientId: string,
+    message: WebSocketMessage,
+  ): void {
     if (!message.sessionId) {
       this.sendError(this.clients.get(clientId)!, 'Session ID required')
       return
@@ -137,7 +152,10 @@ class TherapyChatWebSocketServer {
     logger.info(`Client disconnected: ${clientId}`)
   }
 
-  private broadcastToSession(sessionId: string, message: WebSocketMessage): void {
+  private broadcastToSession(
+    sessionId: string,
+    message: WebSocketMessage,
+  ): void {
     const sessionClients = this.sessions.get(sessionId)
     if (!sessionClients) {
       return

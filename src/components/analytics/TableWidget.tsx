@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { DashboardWidget } from './DashboardWidget';
-import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { DashboardWidget } from './DashboardWidget'
+import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react';
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
 // TableState type is not currently used in this component
 
 // Define a generic type for table row data
@@ -131,12 +131,12 @@ export function TableWidget({
         return {
           key,
           direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
-        };
+        }
       }
       // Default to ascending for a new key
-      return { key, direction: 'asc' };
-    });
-  }, []);
+      return { key, direction: 'asc' }
+    })
+  }, [])
 
   // Apply sorting and filtering
   const filteredAndSortedData = useMemo<TableRowData[]>(() => {
@@ -161,13 +161,13 @@ export function TableWidget({
         const bValue = b[key]
 
         if (aValue === bValue) {
-          return 0;
+          return 0
         }
         if (aValue == null) {
-          return direction === 'asc' ? -1 : 1;
+          return direction === 'asc' ? -1 : 1
         }
         if (bValue == null) {
-          return direction === 'asc' ? 1 : -1;
+          return direction === 'asc' ? 1 : -1
         }
 
         const comparison = String(aValue).localeCompare(String(bValue))
@@ -177,7 +177,7 @@ export function TableWidget({
 
     // Pagination is not currently implemented
     // The pagination object is intentionally unused for now
-    void pagination;
+    void pagination
 
     return result
   }, [data, searchTerm, sortConfig, columns, pagination])
@@ -286,7 +286,10 @@ export function TableWidget({
             <TableBody>
               {data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="text-center py-8">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="text-center py-8"
+                  >
                     No data available
                   </TableCell>
                 </TableRow>

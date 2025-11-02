@@ -1,10 +1,10 @@
 declare module 'commander' {
   export class Command {
     // Replace multiple index signatures with specific properties
-    name: string;
-    commands: Command[];
-    options: CommandOption[];
-    parent: Command | null;
+    name: string
+    commands: Command[]
+    options: CommandOption[]
+    parent: Command | null
 
     constructor(name?: string)
 
@@ -28,16 +28,16 @@ declare module 'commander' {
   }
 
   interface CommandOption {
-    flags: string;
-    description: string;
-    required: boolean;
-    optional: boolean;
-    variadic: boolean;
-    mandatory: boolean;
-    negate: boolean;
-    long: string;
-    short?: string;
-    defaultValue?: unknown;
+    flags: string
+    description: string
+    required: boolean
+    optional: boolean
+    variadic: boolean
+    mandatory: boolean
+    negate: boolean
+    long: string
+    short?: string
+    defaultValue?: unknown
   }
 
   export const program: Command

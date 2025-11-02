@@ -41,7 +41,9 @@ function securePathResolve(basePath, userPath) {
   // Validate filename pattern (only allow safe characters for dialogue files)
   const safeFilenamePattern = /^[a-zA-Z0-9._-]+\.txt$/
   if (!safeFilenamePattern.test(userPath)) {
-    throw new Error('Filename does not match expected pattern for dialogue files')
+    throw new Error(
+      'Filename does not match expected pattern for dialogue files',
+    )
   }
 
   // Resolve the path and ensure it stays within the base directory
@@ -53,7 +55,9 @@ function securePathResolve(basePath, userPath) {
     !resolvedPath.startsWith(resolvedBase + path.sep) &&
     resolvedPath !== resolvedBase
   ) {
-    throw new Error('Path traversal detected: resolved path escapes base directory')
+    throw new Error(
+      'Path traversal detected: resolved path escapes base directory',
+    )
   }
 
   return resolvedPath

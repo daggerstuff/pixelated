@@ -12,7 +12,10 @@ class Analyzer {
     return Promise.resolve()
   }
 
-  async analyze(text: string, options: { language: string }): Promise<AnalyzeResult[]> {
+  async analyze(
+    text: string,
+    options: { language: string },
+  ): Promise<AnalyzeResult[]> {
     // Use text and options parameters to avoid unused variable warnings
     console.log(
       `Analyzing text with length ${text.length} in language ${options.language}`,
@@ -56,7 +59,11 @@ function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
 }
 
 // Mock implementation of createLogger
-function createLogger(name: string): { info: (message: string) => void; warn: (message: string, meta?: unknown) => void; error: (message: string, meta?: unknown) => void } {
+function createLogger(name: string): {
+  info: (message: string) => void
+  warn: (message: string, meta?: unknown) => void
+  error: (message: string, meta?: unknown) => void
+} {
   return {
     info: (message: string) => console.log(`[INFO] ${name}: ${message}`),
     warn: (message: string, meta?: unknown) =>
@@ -316,10 +323,7 @@ export class PresidioPHIDetector {
         '\\b(\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b',
         'g',
       ),
-      [PHIEntityType.US_SSN]: new RegExp(
-        '\\b\\d{3}-?\\d{2}-?\\d{4}\\b',
-        'g',
-      ),
+      [PHIEntityType.US_SSN]: new RegExp('\\b\\d{3}-?\\d{2}-?\\d{4}\\b', 'g'),
       [PHIEntityType.IP_ADDRESS]: new RegExp(
         '\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b',
         'g',
@@ -367,10 +371,7 @@ export class PresidioPHIDetector {
         '\\b[A-Z]{2}\\d{2}[A-Z0-9]{4}\\d{7}[A-Z0-9]{0,16}\\b',
         'g',
       ),
-      [PHIEntityType.US_ITIN]: new RegExp(
-        '\\b9\\d{2}-?\\d{2}-?\\d{4}\\b',
-        'g',
-      ),
+      [PHIEntityType.US_ITIN]: new RegExp('\\b9\\d{2}-?\\d{2}-?\\d{4}\\b', 'g'),
       [PHIEntityType.MEDICAL_LICENSE]: new RegExp('\\b[A-Z]{2}\\d{6}\\b', 'g'),
       [PHIEntityType.ORGANIZATION]: new RegExp(
         '\\b[A-Z][a-z]+\\s+(?:Hospital|Medical Center|Clinic|Healthcare|Health)\\b',

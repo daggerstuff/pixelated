@@ -3,10 +3,14 @@
 // Component for displaying audit logs related to data retention, archiving, and destruction
 import SafeIcon from '../ui/SafeIcon.astro'
 function formatDate(dateInput: any, options: any = {}) {
-  if (!dateInput) return '-';
-  const date = new Date(dateInput);
-  const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' } as any;
-  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+  if (!dateInput) return '-'
+  const date = new Date(dateInput)
+  const defaultOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  } as any
+  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options })
 }
 
 interface Props {
@@ -92,8 +96,6 @@ const auditLogs = [
     status: 'success',
   },
 ]
-
-
 
 // Get action icon
 const getActionIcon = (action: string) => {
@@ -258,7 +260,14 @@ const getStatusBadge = (status: string) => {
             auditLogs.map((log) => (
               <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td class="py-3 px-4 whitespace-nowrap">
-                  {formatDate(log.timestamp, { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                  {formatDate(log.timestamp, {
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                  })}
                 </td>
                 <td class="py-3 px-4">
                   <div class="flex items-center">

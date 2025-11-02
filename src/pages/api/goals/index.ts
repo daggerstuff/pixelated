@@ -2,9 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
-import type {
-  TherapeuticGoal,
-} from '../../../lib/ai/types/TherapeuticGoals'
+import type { TherapeuticGoal } from '../../../lib/ai/types/TherapeuticGoals'
 import {
   GoalCategory,
   GoalStatus,
@@ -79,7 +77,10 @@ export const POST = async ({ request }: { request: any }) => {
     return new Response(
       JSON.stringify({
         error: 'Server error',
-        details: err instanceof Error ? (err as Error)?.message || String(err) : String(err),
+        details:
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : String(err),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

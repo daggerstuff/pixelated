@@ -49,7 +49,7 @@ async function sendNotification(message: string, environment: string): void {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env['EMAIL_API_KEY']}`,
+          'Authorization': `Bearer ${process.env['EMAIL_API_KEY']}`,
         },
         body: JSON.stringify({
           from: 'alerts@pixelatedempathy.com',
@@ -122,7 +122,9 @@ async function getLastStableVersion(
       )
     }
 
-    const deployments = JSON.parse(result.stdout.toString() as unknown) as DeploymentInfo[]
+    const deployments = JSON.parse(
+      result.stdout.toString() as unknown,
+    ) as DeploymentInfo[]
 
     // Find last successful deployment (not the current failing one)
     const lastStable = deployments.find(

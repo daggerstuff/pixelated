@@ -9,148 +9,149 @@
 </bg-particle>
 
 <script type="module" is:inline>
-  import loadP5 from '../../utils/loadP5.js';
-  
+  import loadP5 from '../../utils/loadP5.js'
+
   // Only run on client-side to prevent SSR hydration mismatches
   if (typeof window === 'undefined') {
     console.warn('Particle background component requires browser environment')
   } else {
     // Use shared utility to load p5.js
     let p5
-    loadP5().then(loadedP5 => {
-      p5 = loadedP5
+    loadP5()
+      .then((loadedP5) => {
+        p5 = loadedP5
 
-      if (!p5) {
-        console.error('Failed to load p5.js library')
-      } else {
-        // Particle: { x, y, velocity: { x, y } }
+        if (!p5) {
+          console.error('Failed to load p5.js library')
+        } else {
+          // Particle: { x, y, velocity: { x, y } }
 
-        class BgParticleElement extends HTMLElement {
-          p5Instance = null
+          class BgParticleElement extends HTMLElement {
+            p5Instance = null
 
-          constructor() {
-            super()
-            this.p5Instance = null
-          }
-
-          connectedCallback() {
-          const sketch = (p) => {
-            const BACKGROUND = '#fff'
-            const COLOR = '#88888825'
-            const VELOCITY = 0.8
-            const DENSITY = 6000
-            const DISTANCE = 120
-            const INTERACTIVE = false
-
-            const width = window.innerWidth
-            const height = window.innerHeight
-            const particles = []
-
-            function createParticle() {
-              const x = p.random(width)
-              const y = p.random(height)
-              const velocity = {
-                x: (p.random() - 0.5) * VELOCITY,
-                y: (p.random() - 0.5) * VELOCITY,
-              }
-
-              return { x, y, velocity }
+            constructor() {
+              super()
+              this.p5Instance = null
             }
 
-            function drawParticle(particle) {
-              p.noStroke()
-              p.fill(COLOR)
-              p.circle(particle.x, particle.y, 3)
-            }
+            connectedCallback() {
+              const sketch = (p) => {
+                const BACKGROUND = '#fff'
+                const COLOR = '#88888825'
+                const VELOCITY = 0.8
+                const DENSITY = 6000
+                const DISTANCE = 120
+                const INTERACTIVE = false
 
-            function updateParticle(particle) {
-              // change dir if outside map
-              if (particle.x > width + 20 || particle.x < -20) {
-                particle.velocity.x = -particle.velocity.x
-              }
-              if (particle.y > height + 20 || particle.y < -20) {
-                particle.velocity.y = -particle.velocity.y
-              }
+                const width = window.innerWidth
+                const height = window.innerHeight
+                const particles = []
 
-              particle.x += particle.velocity.x
-              particle.y += particle.velocity.y
-            }
+                function createParticle() {
+                  const x = p.random(width)
+                  const y = p.random(height)
+                  const velocity = {
+                    x: (p.random() - 0.5) * VELOCITY,
+                    y: (p.random() - 0.5) * VELOCITY,
+                  }
 
-            p.setup = () => {
-              p.createCanvas(width, height)
-              p.background(BACKGROUND)
-
-              // initialize particles
-              const particleCount = (width * height) / DENSITY
-              for (let i = 0; i < particleCount; i++) {
-                particles.push(createParticle())
-              }
-
-              if (INTERACTIVE) {
-                let mouseParticle = createParticle()
-                mouseParticle.velocity = { x: 0, y: 0 }
-                particles.push(mouseParticle)
-
-                p.mouseMoved = function () {
-                  mouseParticle.x = p.mouseX
-                  mouseParticle.y = p.mouseY
+                  return { x, y, velocity }
                 }
 
-                p.mouseReleased = function () {
-                  mouseParticle.velocity = p.createVector(
-                    (p.random() - 0.5) * 2,
-                    (p.random() - 0.5) * 2,
-                  )
-                  mouseParticle = createParticle()
-                  mouseParticle.velocity = p.createVector(0, 0)
-                  // Limit interactive particles to prevent memory growth
-                  if (particles.length < 50) {
+                function drawParticle(particle) {
+                  p.noStroke()
+                  p.fill(COLOR)
+                  p.circle(particle.x, particle.y, 3)
+                }
+
+                function updateParticle(particle) {
+                  // change dir if outside map
+                  if (particle.x > width + 20 || particle.x < -20) {
+                    particle.velocity.x = -particle.velocity.x
+                  }
+                  if (particle.y > height + 20 || particle.y < -20) {
+                    particle.velocity.y = -particle.velocity.y
+                  }
+
+                  particle.x += particle.velocity.x
+                  particle.y += particle.velocity.y
+                }
+
+                p.setup = () => {
+                  p.createCanvas(width, height)
+                  p.background(BACKGROUND)
+
+                  // initialize particles
+                  const particleCount = (width * height) / DENSITY
+                  for (let i = 0; i < particleCount; i++) {
+                    particles.push(createParticle())
+                  }
+
+                  if (INTERACTIVE) {
+                    let mouseParticle = createParticle()
+                    mouseParticle.velocity = { x: 0, y: 0 }
                     particles.push(mouseParticle)
+
+                    p.mouseMoved = function () {
+                      mouseParticle.x = p.mouseX
+                      mouseParticle.y = p.mouseY
+                    }
+
+                    p.mouseReleased = function () {
+                      mouseParticle.velocity = p.createVector(
+                        (p.random() - 0.5) * 2,
+                        (p.random() - 0.5) * 2,
+                      )
+                      mouseParticle = createParticle()
+                      mouseParticle.velocity = p.createVector(0, 0)
+                      // Limit interactive particles to prevent memory growth
+                      if (particles.length < 50) {
+                        particles.push(mouseParticle)
+                      }
+                    }
                   }
                 }
+
+                p.draw = () => {
+                  p.background(BACKGROUND)
+
+                  // update and draw particles
+                  particles.forEach((particle) => {
+                    updateParticle(particle)
+                    drawParticle(particle)
+
+                    // draw connections
+                    particles.forEach((other) => {
+                      const d = p.dist(particle.x, particle.y, other.x, other.y)
+                      if (d < DISTANCE) {
+                        p.stroke(COLOR)
+                        p.strokeWeight(0.5)
+                        p.line(particle.x, particle.y, other.x, other.y)
+                      }
+                    })
+                  })
+                }
+              }
+
+              this.p5Instance = new p5(sketch, this)
+            }
+
+            // after switching pages, stop the animation loop
+            disconnectedCallback() {
+              if (this.p5Instance) {
+                this.p5Instance.remove()
+                this.p5Instance = null
               }
             }
-
-            p.draw = () => {
-              p.background(BACKGROUND)
-
-              // update and draw particles
-              particles.forEach((particle) => {
-                updateParticle(particle)
-                drawParticle(particle)
-
-                // draw connections
-                particles.forEach((other) => {
-                  const d = p.dist(particle.x, particle.y, other.x, other.y)
-                  if (d < DISTANCE) {
-                    p.stroke(COLOR)
-                    p.strokeWeight(0.5)
-                    p.line(particle.x, particle.y, other.x, other.y)
-                  }
-                })
-              })
-            }
           }
 
-          this.p5Instance = new p5(sketch, this)
-        }
-
-        // after switching pages, stop the animation loop
-        disconnectedCallback() {
-          if (this.p5Instance) {
-            this.p5Instance.remove()
-            this.p5Instance = null
+          if (!customElements.get('bg-particle')) {
+            customElements.define('bg-particle', BgParticleElement)
           }
         }
-      }
-
-      if (!customElements.get('bg-particle')) {
-        customElements.define('bg-particle', BgParticleElement)
-      }
-    }
-    })
-    .catch(error => {
-      console.error('Failed to load p5.js:', error)
-    });
+      })
+      .catch((error) => {
+        console.error('Failed to load p5.js:', error)
+      })
   }
 </script>

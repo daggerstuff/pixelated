@@ -17,7 +17,9 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: 'Unknown error' }))
     throw new Error(errorData.error || `HTTP ${response.status}`)
   }
 
@@ -52,7 +54,10 @@ export async function signInWithEmail(email: string, password: string) {
  * @param provider OAuth provider (google, github)
  * @param redirectTo URL to redirect after authentication
  */
-export async function signInWithOAuth(_provider: Provider, _redirectTo?: string): Promise<void> {
+export async function signInWithOAuth(
+  _provider: Provider,
+  _redirectTo?: string,
+): Promise<void> {
   try {
     // This would need to be implemented based on your OAuth setup
     throw new Error(
@@ -105,13 +110,21 @@ export async function signUp(
 export async function signOut(token?: string): Promise<boolean> {
   try {
     // If auth is disabled, just return success
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && 
-        (import.meta.env.DISABLE_AUTH === 'true' || import.meta.env.PUBLIC_DISABLE_AUTH === 'true')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname === 'localhost' &&
+      (import.meta.env.DISABLE_AUTH === 'true' ||
+        import.meta.env.PUBLIC_DISABLE_AUTH === 'true')
+    ) {
       return true
     }
 
-    const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null)
-    
+    const authToken =
+      token ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('auth_token')
+        : null)
+
     if (!authToken) {
       return true // Already signed out
     }
@@ -119,7 +132,9 @@ export async function signOut(token?: string): Promise<boolean> {
     await apiRequest('signout', {
       method: 'POST',
       headers: {
-        'Authorization': authToken.startsWith('Bearer ') ? authToken : `Bearer ${authToken}`,
+        Authorization: authToken.startsWith('Bearer ')
+          ? authToken
+          : `Bearer ${authToken}`,
       },
     })
     return true
@@ -133,11 +148,17 @@ export async function signOut(token?: string): Promise<boolean> {
  * Get the current user by token
  * @returns Current authenticated user or null
  */
-export async function getCurrentUser(authHeader?: string): Promise<AuthUser | null> {
+export async function getCurrentUser(
+  authHeader?: string,
+): Promise<AuthUser | null> {
   try {
     // If auth is disabled, return mock user
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && 
-        (import.meta.env.DISABLE_AUTH === 'true' || import.meta.env.PUBLIC_DISABLE_AUTH === 'true')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname === 'localhost' &&
+      (import.meta.env.DISABLE_AUTH === 'true' ||
+        import.meta.env.PUBLIC_DISABLE_AUTH === 'true')
+    ) {
       return {
         id: 'test-user-id',
         email: 'test@example.com',
@@ -155,8 +176,12 @@ export async function getCurrentUser(authHeader?: string): Promise<AuthUser | nu
     }
 
     // Get auth header from localStorage if not provided
-    const token = authHeader || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null)
-    
+    const token =
+      authHeader ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('auth_token')
+        : null)
+
     if (!token) {
       return null
     }
@@ -164,7 +189,7 @@ export async function getCurrentUser(authHeader?: string): Promise<AuthUser | nu
     const response = await apiRequest('profile', {
       method: 'GET',
       headers: {
-        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+        Authorization: token.startsWith('Bearer ') ? token : `Bearer ${token}`,
       },
     })
 
@@ -180,7 +205,10 @@ export async function getCurrentUser(authHeader?: string): Promise<AuthUser | nu
  * @param email User email
  * @param redirectTo URL to redirect after reset
  */
-export async function resetPassword(email: string, redirectTo?: string): Promise<void> {
+export async function resetPassword(
+  email: string,
+  redirectTo?: string,
+): Promise<void> {
   try {
     await apiRequest('reset-password', {
       method: 'POST',
@@ -237,7 +265,10 @@ export function createAuthToken(
  * @param purpose Expected token purpose
  * @returns Verified token payload or null
  */
-export function verifyAuthToken(token: string, purpose: string): Record<string, unknown> | null {
+export function verifyAuthToken(
+  token: string,
+  purpose: string,
+): Record<string, unknown> | null {
   const result = verifySecureToken(token)
   if (!result || result['purpose'] !== purpose) {
     return null
@@ -290,7 +321,7 @@ export async function updateProfile(
       method: 'PUT',
       body: JSON.stringify(profile),
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`, // Assuming token is stored
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`, // Assuming token is stored
       },
     })
 

@@ -4,7 +4,6 @@ import { adminGuard } from '../../../lib/admin/middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
-
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 

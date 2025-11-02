@@ -47,7 +47,9 @@ describe('DashboardLayout', () => {
 
     // Check default title and description
     expect(document.title).toBe('Pixelated Empathy | Dashboard')
-    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
+    expect(
+      document.querySelector('meta[name="description"]') as HTMLElement,
+    ).toHaveAttribute(
       'content',
       'Advanced therapeutic tools for mental health professionals',
     )
@@ -66,10 +68,9 @@ describe('DashboardLayout', () => {
 
     // Check custom title and description
     expect(document.title).toBe('Custom Title')
-    expect(document.querySelector('meta[name="description"]') as HTMLElement).toHaveAttribute(
-      'content',
-      'Custom description',
-    )
+    expect(
+      document.querySelector('meta[name="description"]') as HTMLElement,
+    ).toHaveAttribute('content', 'Custom description')
 
     // Check that optional components are not rendered
     expect(container.querySelector('header')).not.toBeInTheDocument()
@@ -90,14 +91,12 @@ describe('DashboardLayout', () => {
     await renderAstro(DashboardLayout as any, {
       meta: { image: '/custom-image.png', type: 'article' },
     })
-    expect(document.querySelector('meta[property="og:image"]') as HTMLElement).toHaveAttribute(
-      'content',
-      '/custom-image.png',
-    )
-    expect(document.querySelector('meta[property="og:type"]') as HTMLElement).toHaveAttribute(
-      'content',
-      'article',
-    )
+    expect(
+      document.querySelector('meta[property="og:image"]') as HTMLElement,
+    ).toHaveAttribute('content', '/custom-image.png')
+    expect(
+      document.querySelector('meta[property="og:type"]') as HTMLElement,
+    ).toHaveAttribute('content', 'article')
   })
 
   it('renders error boundary', async () => {

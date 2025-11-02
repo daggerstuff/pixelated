@@ -14,7 +14,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
@@ -51,7 +51,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
@@ -88,7 +88,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
@@ -125,7 +125,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
@@ -163,7 +163,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
@@ -202,7 +202,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=pixelated
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_in_prod}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./src/lib/ai/bias-detection/python-service:/app
     depends_on:

@@ -7,8 +7,8 @@ declare module 'three' {
 }
 
 declare module 'three/build/three.module.js' {
-  import * as THREE from 'three';
-  export = THREE;
+  import * as THREE from 'three'
+  export = THREE
 }
 
 declare module 'three/addons/controls/OrbitControls.js' {

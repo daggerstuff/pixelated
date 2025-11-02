@@ -33,7 +33,9 @@ export function useOfflineManager({
   useEffect(() => {
     const unsubscribeOnline = offlineManager.on('online', updateQueueStats)
     const unsubscribeOffline = offlineManager.on('offline', updateQueueStats)
-    const unsubscribeSyncStart = offlineManager.on('syncStart', () => setIsSyncing(true))
+    const unsubscribeSyncStart = offlineManager.on('syncStart', () =>
+      setIsSyncing(true),
+    )
     const unsubscribeSyncComplete = offlineManager.on('syncComplete', () => {
       setIsSyncing(false)
       updateQueueStats()
@@ -53,67 +55,70 @@ export function useOfflineManager({
   }, [updateQueueStats, onSyncComplete])
 
   // Enhanced fetch function that handles offline scenarios
-  const offlineFetch = useCallback(async (url: string, options: RequestInit = {}) => {
-    if (!enableQueue) {
-      return fetch(url, options)
-    }
-
-    const isCriticalPath = criticalPaths.some(path => url.includes(path))
-
-    try {
-      const response = await fetch(url, options)
-
-      if (response.ok) {
-        return response
+  const offlineFetch = useCallback(
+    async (url: string, options: RequestInit = {}) => {
+      if (!enableQueue) {
+        return fetch(url, options)
       }
 
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    } catch (error) {
-      if (!networkState.isOnline) {
-        // Queue the request for later
-        const priority = isCriticalPath ? 'critical' : 'normal'
+      const isCriticalPath = criticalPaths.some((path) => url.includes(path))
 
-        const queued = requestQueue.add({
-          url,
-          method: (options.method as any) || 'GET',
-          headers: options.headers as Record<string, string> || {},
-          body: options.body,
-          priority,
-          maxRetries: isCriticalPath ? 5 : 3,
-        })
+      try {
+        const response = await fetch(url, options)
 
-        if (queued) {
-          onRequestQueued?.({
-            id: `req_${Date.now()}`,
+        if (response.ok) {
+          return response
+        }
+
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      } catch (error) {
+        if (!networkState.isOnline) {
+          // Queue the request for later
+          const priority = isCriticalPath ? 'critical' : 'normal'
+
+          const queued = requestQueue.add({
             url,
             method: (options.method as any) || 'GET',
-            headers: options.headers as Record<string, string> || {},
+            headers: (options.headers as Record<string, string>) || {},
             body: options.body,
-            timestamp: Date.now(),
-            retryCount: 0,
             priority,
             maxRetries: isCriticalPath ? 5 : 3,
           })
+
+          if (queued) {
+            onRequestQueued?.({
+              id: `req_${Date.now()}`,
+              url,
+              method: (options.method as any) || 'GET',
+              headers: (options.headers as Record<string, string>) || {},
+              body: options.body,
+              timestamp: Date.now(),
+              retryCount: 0,
+              priority,
+              maxRetries: isCriticalPath ? 5 : 3,
+            })
+          }
+
+          // Return a mock response indicating the request was queued
+          return new Response(
+            JSON.stringify({
+              error: 'Request queued for offline sync',
+              queued: true,
+              willRetry: true,
+            }),
+            {
+              status: 202,
+              statusText: 'Queued',
+              headers: { 'Content-Type': 'application/json' },
+            },
+          )
         }
 
-        // Return a mock response indicating the request was queued
-        return new Response(
-          JSON.stringify({
-            error: 'Request queued for offline sync',
-            queued: true,
-            willRetry: true,
-          }),
-          {
-            status: 202,
-            statusText: 'Queued',
-            headers: { 'Content-Type': 'application/json' },
-          }
-        )
+        throw error
       }
-
-      throw error
-    }
-  }, [enableQueue, criticalPaths, networkState.isOnline, onRequestQueued])
+    },
+    [enableQueue, criticalPaths, networkState.isOnline, onRequestQueued],
+  )
 
   // Manual sync trigger
   const sync = useCallback(async () => {
@@ -149,7 +154,9 @@ export function useOfflineManager({
     updateQueueStats,
 
     // Utilities
-    isOfflineMode: networkState.isOffline || (networkState.isSlowConnection && networkState.saveData),
+    isOfflineMode:
+      networkState.isOffline ||
+      (networkState.isSlowConnection && networkState.saveData),
     canMakeRequests: networkState.isOnline && !networkState.isSlowConnection,
   }
 }

@@ -54,9 +54,12 @@
 
     // Check for saved theme preference or set based on system preference
     const storedTheme = localStorage.getItem('theme')
-    const savedTheme: 'light' | 'dark' = (storedTheme === 'dark' || storedTheme === 'light')
-      ? storedTheme
-      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    const savedTheme: 'light' | 'dark' =
+      storedTheme === 'dark' || storedTheme === 'light'
+        ? storedTheme
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
 
     // Apply the theme
     setTheme(savedTheme)
@@ -64,9 +67,10 @@
     // Toggle theme on button click
     themeToggle?.addEventListener('click', (_event) => {
       const currentStored = localStorage.getItem('theme')
-      const currentTheme: 'light' | 'dark' = (currentStored === 'dark' || currentStored === 'light')
-        ? currentStored
-        : 'light'
+      const currentTheme: 'light' | 'dark' =
+        currentStored === 'dark' || currentStored === 'light'
+          ? currentStored
+          : 'light'
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
       setTheme(newTheme)
     })

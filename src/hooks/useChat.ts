@@ -60,11 +60,27 @@ export function useChat(options: ChatOptions): UseChatReturn {
     setIsLoading(true)
 
     try {
-      // Prepare the request
-      const requestBody = {
-        messages: messages.concat(userMessage),
-        ...body,
-      }
+      // Prepare the request - format for mental health API if needed
+      const requestBody = api.includes('mental-health') 
+        ? {
+            message: content,
+            sessionId: 'session_' + Date.now(),
+            userContext: {
+              previousMessages: messages.map(m => ({
+                role: m.role,
+                content: m.content
+              }))
+            },
+            options: {
+              enableCrisisDetection: true,
+              responseStyle: 'therapeutic'
+            },
+            ...body,
+          }
+        : {
+            messages: messages.concat(userMessage),
+            ...body,
+          }
 
       // Call the API
       const response = await fetch(api, {
@@ -85,18 +101,29 @@ export function useChat(options: ChatOptions): UseChatReturn {
 
       const responseData = await response.json()
 
+      // Handle different API response formats
+      let responseContent: string
+      if (api.includes('mental-health')) {
+        // Mental health API returns { response: { content: "..." } }
+        responseContent = responseData.response?.content || 
+                         responseData.response?.message ||
+                         'No response from therapeutic AI'
+      } else {
+        // Standard chat API format
+        responseContent = responseData.text ||
+                         responseData.content ||
+                         responseData.message ||
+                         'No response content'
+      }
+
       // Add assistant message from response
       const assistantMessage: LocalMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content:
-          responseData.text ||
-          responseData.content ||
-          responseData.message ||
-          'No response content',
+        content: responseContent,
         encrypted: responseData.encrypted,
         verified: responseData.verified,
-        name: 'Assistant',
+        name: 'Therapeutic AI',
       }
 
       setMessages((prev: LocalMessage[]) => [...prev, assistantMessage])

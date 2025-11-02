@@ -1,0 +1,70 @@
+name: Build and Push to Docker Hub
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - 'v*'
+      - 'release-*'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+
+      - name: Generate build timestamp tag
+        id: buildts
+        run: echo "BUILD_TS=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Check Docker Hub credentials
+        id: check_creds
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "has_creds=true" >> $GITHUB_OUTPUT
+            echo "docker_username=$DOCKERHUB_USERNAME" >> $GITHUB_OUTPUT
+            echo "docker_password=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
+          elif [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PAT" ]; then
+            echo "has_creds=true" >> $GITHUB_OUTPUT
+            echo "docker_username=$DOCKER_USER" >> $GITHUB_OUTPUT
+            echo "docker_password=$DOCKER_PAT" >> $GITHUB_OUTPUT
+          else
+            echo "has_creds=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to Docker Hub
+        if: steps.check_creds.outputs.has_creds == 'true'
+        id: docker_login
+        continue-on-error: true
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        with:
+          username: ${{ steps.check_creds.outputs.docker_username }}
+          password: ${{ steps.check_creds.outputs.docker_password }}
+          logout: true
+
+      - name: Build and push
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          context: .
+          push: ${{ steps.docker_login.outcome == 'success' }}
+          tags: |
+            pixelatedempathy/pixelated-empathy:latest
+            pixelatedempathy/pixelated-empathy:${{ github.sha }}
+            pixelatedempathy/pixelated-empathy:build-${{ env.BUILD_TS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production

@@ -72,27 +72,32 @@ export const POST = async ({ request }) => {
     })
 
     // Log which analytics integrations will be attempted
-    const hasGA = Boolean(import.meta.env.PUBLIC_GA_MEASUREMENT_ID && import.meta.env.GA_API_SECRET);
-    const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN);
-    const hasCustom = Boolean(import.meta.env.CUSTOM_ANALYTICS_ENDPOINT && import.meta.env.CUSTOM_ANALYTICS_TOKEN);
+    const hasGA = Boolean(
+      import.meta.env.PUBLIC_GA_MEASUREMENT_ID && import.meta.env.GA_API_SECRET,
+    )
+    const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN)
+    const hasCustom = Boolean(
+      import.meta.env.CUSTOM_ANALYTICS_ENDPOINT &&
+        import.meta.env.CUSTOM_ANALYTICS_TOKEN,
+    )
     console.log('Attempting analytics integrations:', {
       hasGA,
       hasMixpanel,
       hasCustom,
-    });
+    })
 
     // Only call analytics integrations if credentials are present
-    const analyticsPromises = [];
+    const analyticsPromises = []
     if (hasGA) {
-      analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent));
+      analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent))
     }
     if (hasMixpanel) {
-      analyticsPromises.push(sendToMixpanel(enrichedEvent));
+      analyticsPromises.push(sendToMixpanel(enrichedEvent))
     }
     if (hasCustom) {
-      analyticsPromises.push(sendToCustomAnalytics(enrichedEvent));
+      analyticsPromises.push(sendToCustomAnalytics(enrichedEvent))
     }
-    await Promise.allSettled(analyticsPromises);
+    await Promise.allSettled(analyticsPromises)
 
     const response: DemoAnalyticsSuccessResponse = {
       success: true,

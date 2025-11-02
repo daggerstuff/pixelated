@@ -1,4 +1,5 @@
 # Google Cloud Build configuration for Pixelated Empathy
+<<<<<<< HEAD
 # Uses Dockerfile.cloudbuild (no BuildKit required) for maximum compatibility
 
 options:
@@ -53,3 +54,71 @@ tags:
 - 'pixelated-empathy'
 - 'production'
 - 'astro'
+=======
+# Optimized for Cloud Run deployment with proper process management
+
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
+      - '--build-arg'
+      - 'NODE_VERSION=24'
+      - '.'
+    timeout: 1200s
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pixelated'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/pixelated:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '3'
+      - '--min-instances'
+      - '0'
+      - '--port'
+      - '4321'
+      - '--timeout'
+      - '300s'
+      - '--concurrency'
+      - '80'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=4321'
+      - '--set-secrets'
+      - 'DB_PASSWORD=db-password:latest,REDIS_PASSWORD=redis-password:latest,JWT_SECRET=jwt-secret:latest'
+    timeout: 600s
+
+# Use the Cloud Run service account
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/cloud-run@$PROJECT_ID.iam.gserviceaccount.com'
+
+# Use the default network
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_MEDIUM'
+
+# Trigger on push to main branch
+trigger:
+  branchName: main
+>>>>>>> master

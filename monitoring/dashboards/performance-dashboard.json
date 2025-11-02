@@ -1,0 +1,31 @@
+{
+  "title": "Pixel Performance",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Throughput (RPS)",
+      "targets": [{ "expr": "pixel_perf_throughput_rps" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency (p50/p90/p95/p99)",
+      "targets": [
+        { "expr": "pixel_perf_latency_p50_ms" },
+        { "expr": "pixel_perf_latency_p90_ms" },
+        { "expr": "pixel_perf_latency_p95_ms" },
+        { "expr": "pixel_perf_latency_p99_ms" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rate",
+      "targets": [{ "expr": "pixel_perf_error_rate" }],
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

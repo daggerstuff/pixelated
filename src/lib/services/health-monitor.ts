@@ -58,34 +58,36 @@ export class HealthMonitor {
   async getHealth(): Promise<SystemHealth> {
     const startTime = performance.now()
     const checks: HealthCheck[] = []
-    
+
     // Run all health checks in parallel
-    const checkPromises = Array.from(this.checks.entries()).map(async ([name, checkFn]) => {
-      try {
-        const checkStart = performance.now()
-        const result = await Promise.race([
-          checkFn(),
-          this.timeoutPromise(5000, name) // 5 second timeout
-        ])
-        result.responseTime = performance.now() - checkStart
-        return result
-      } catch (_error) {
-        return {
-          name,
-          status: 'unhealthy' as const,
-          message: _error instanceof Error ? _String(error) : 'Unknown error',
-          responseTime: performance.now() - startTime
+    const checkPromises = Array.from(this.checks.entries()).map(
+      async ([name, checkFn]) => {
+        try {
+          const checkStart = performance.now()
+          const result = await Promise.race([
+            checkFn(),
+            this.timeoutPromise(5000, name), // 5 second timeout
+          ])
+          result.responseTime = performance.now() - checkStart
+          return result
+        } catch (_error) {
+          return {
+            name,
+            status: 'unhealthy' as const,
+            message: _error instanceof Error ? _String(error) : 'Unknown error',
+            responseTime: performance.now() - startTime,
+          }
         }
-      }
-    })
+      },
+    )
 
     const checkResults = await Promise.all(checkPromises)
     checks.push(...checkResults)
 
     // Determine overall status
-    const hasUnhealthy = checks.some(check => check.status === 'unhealthy')
-    const hasDegraded = checks.some(check => check.status === 'degraded')
-    
+    const hasUnhealthy = checks.some((check) => check.status === 'unhealthy')
+    const hasDegraded = checks.some((check) => check.status === 'degraded')
+
     let overallStatus: 'healthy' | 'unhealthy' | 'degraded' = 'healthy'
     if (hasUnhealthy) {
       overallStatus = 'unhealthy'
@@ -101,11 +103,14 @@ export class HealthMonitor {
       uptime: process.uptime(),
       responseTime,
       checks,
-      system: this.getSystemInfo()
+      system: this.getSystemInfo(),
     }
   }
 
-  private async timeoutPromise(ms: number, checkName: string): Promise<HealthCheck> {
+  private async timeoutPromise(
+    ms: number,
+    checkName: string,
+  ): Promise<HealthCheck> {
     return new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error(`Health check '${checkName}' timed out after ${ms}ms`))
@@ -118,27 +123,30 @@ export class HealthMonitor {
       const uptime = os.uptime()
       const loadAvg = os.loadavg()
       const cpuCount = os.cpus().length
-      
+
       // Check if system load is reasonable (< 2x CPU cores)
       const highLoad = loadAvg[0] > cpuCount * 2
-      
+
       return {
         name: 'system',
         status: highLoad ? 'degraded' : 'healthy',
-        message: highLoad ? 'High system load detected' : 'System operating normally',
+        message: highLoad
+          ? 'High system load detected'
+          : 'System operating normally',
         details: {
           uptime,
           loadAverage: loadAvg,
           cpuCores: cpuCount,
           platform: os.platform(),
-          release: os.release()
-        }
+          release: os.release(),
+        },
       }
     } catch (_error) {
       return {
         name: 'system',
         status: 'unhealthy',
-        message: _error instanceof Error ? _String(error) : 'System check failed'
+        message:
+          _error instanceof Error ? _String(error) : 'System check failed',
       }
     }
   }
@@ -149,11 +157,11 @@ export class HealthMonitor {
       const freeMem = os.freemem()
       const usedMem = totalMem - freeMem
       const usagePercent = (usedMem / totalMem) * 100
-      
+
       // Memory usage thresholds
       let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
       let message = 'Memory usage normal'
-      
+
       if (usagePercent > 90) {
         status = 'unhealthy'
         message = 'Critical memory usage'
@@ -161,7 +169,7 @@ export class HealthMonitor {
         status = 'degraded'
         message = 'High memory usage'
       }
-      
+
       return {
         name: 'memory',
         status,
@@ -170,14 +178,15 @@ export class HealthMonitor {
           total: totalMem,
           free: freeMem,
           used: usedMem,
-          usagePercent: Math.round(usagePercent * 100) / 100
-        }
+          usagePercent: Math.round(usagePercent * 100) / 100,
+        },
       }
     } catch (_error) {
       return {
         name: 'memory',
         status: 'unhealthy',
-        message: _error instanceof Error ? _String(error) : 'Memory check failed'
+        message:
+          _error instanceof Error ? _String(error) : 'Memory check failed',
       }
     }
   }
@@ -187,16 +196,17 @@ export class HealthMonitor {
       // Basic disk check - in production this would check actual disk usage
       // For now, simulate a basic check
       const processMemory = process.memoryUsage()
-      const heapUsagePercent = (processMemory.heapUsed / processMemory.heapTotal) * 100
-      
+      const heapUsagePercent =
+        (processMemory.heapUsed / processMemory.heapTotal) * 100
+
       let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
       let message = 'Disk usage normal'
-      
+
       if (heapUsagePercent > 90) {
         status = 'degraded'
         message = 'High heap usage detected'
       }
-      
+
       return {
         name: 'disk',
         status,
@@ -204,14 +214,14 @@ export class HealthMonitor {
         details: {
           heapUsed: processMemory.heapUsed,
           heapTotal: processMemory.heapTotal,
-          heapUsagePercent: Math.round(heapUsagePercent * 100) / 100
-        }
+          heapUsagePercent: Math.round(heapUsagePercent * 100) / 100,
+        },
       }
     } catch (_error) {
       return {
         name: 'disk',
         status: 'unhealthy',
-        message: _error instanceof Error ? _String(error) : 'Disk check failed'
+        message: _error instanceof Error ? _String(error) : 'Disk check failed',
       }
     }
   }
@@ -222,28 +232,28 @@ export class HealthMonitor {
       const freeMem = os.freemem()
       const usedMem = totalMem - freeMem
       const cpus = os.cpus()
-      
+
       return {
         memory: {
           total: totalMem,
           free: freeMem,
           used: usedMem,
-          usagePercent: Math.round((usedMem / totalMem) * 100 * 100) / 100
+          usagePercent: Math.round((usedMem / totalMem) * 100 * 100) / 100,
         },
         cpu: {
           cores: cpus.length,
           loadAverage: os.loadavg(),
-          model: cpus[0]?.model || 'Unknown'
+          model: cpus[0]?.model || 'Unknown',
         },
         platform: os.platform(),
-        nodeVersion: process.version
+        nodeVersion: process.version,
       }
     } catch {
       return {
         memory: { total: 0, free: 0, used: 0, usagePercent: 0 },
         cpu: { cores: 0, loadAverage: [0, 0, 0], model: 'Unknown' },
         platform: 'unknown',
-        nodeVersion: process.version
+        nodeVersion: process.version,
       }
     }
   }

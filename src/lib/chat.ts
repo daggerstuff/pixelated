@@ -259,7 +259,9 @@ export function createMentalHealthChat(
       logger.info('MentalHealthChat initialized successfully')
     } catch (error: unknown) {
       logger.error('Failed to initialize MentalHealthChat', { error })
-      throw new Error('MentalHealthChat initialization failed')
+      throw new Error('MentalHealthChat initialization failed', {
+        cause: error,
+      })
     }
   }
 
@@ -435,9 +437,7 @@ export function createMentalHealthChat(
 
         // Type guard to ensure latestAnalysis is in the expected format
         if ('indicators' in latestAnalysis) {
-          logger.warn(
-            'Cannot get recommendations from legacy analysis format.',
-          )
+          logger.warn('Cannot get recommendations from legacy analysis format.')
           return []
         }
 

@@ -536,7 +536,8 @@ async function runTests() {
       const data = JSON.parse(result.output) as TestItem[]
       data.forEach((item: TestItem) => {
         if (item.severity && item.severity in severityCounts) {
-          severityCounts[item.severity] = (severityCounts[item.severity] || 0) + 1
+          severityCounts[item.severity] =
+            (severityCounts[item.severity] || 0) + 1
         }
       })
     } catch {

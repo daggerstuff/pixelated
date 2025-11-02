@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getSecretsManager } from '@/lib/security/secrets-manager'
 
 /**
  * Environment variable schema with validation
@@ -31,7 +32,7 @@ const envSchema = z.object({
   MONGODB_USERNAME: z.string().optional(),
   MONGODB_PASSWORD: z.string().optional(),
   MONGODB_CLUSTER: z.string().optional(),
-  
+
   // Legacy database (PostgreSQL) - kept for migration purposes
   POSTGRES_URL: z.string().optional(),
   POSTGRES_PRISMA_URL: z.string().optional(),
@@ -247,7 +248,7 @@ export const config = {
     mongoUsername: (): string | undefined => env().MONGODB_USERNAME,
     mongoPassword: (): string | undefined => env().MONGODB_PASSWORD,
     mongoCluster: (): string | undefined => env().MONGODB_CLUSTER,
-    
+
     // Legacy PostgreSQL support
     url: (): string | undefined => env().POSTGRES_URL,
     prismaUrl: (): string | undefined => env().POSTGRES_PRISMA_URL,
@@ -310,7 +311,13 @@ export const config = {
 
   email: {
     from: (): string | undefined => env().EMAIL_FROM,
-    resendApiKey: (): string | undefined => env().RESEND_API_KEY,
+    resendApiKey: (): string | undefined => {
+      if (env().RESEND_API_KEY) return env().RESEND_API_KEY
+      const sm = getSecretsManager()
+      return sm.hasSecret('RESEND_API_KEY')
+        ? sm.getSecret('RESEND_API_KEY')
+        : undefined
+    },
   },
 
   security: {

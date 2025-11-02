@@ -58,12 +58,12 @@ export const DynamicMultidimensionalEmotionChart = (
   </Suspense>
 )
 
-// TODO: Create '../../components/analytics/EmotionTemporalAnalysisChart.tsx' or update the import path below to the correct file.
-// Example placeholder to prevent runtime errors:
 export const EmotionTemporalAnalysisChart = React.lazy(() =>
-  Promise.resolve({
-    default: () => <div>EmotionTemporalAnalysisChart not implemented</div>,
-  }),
+  import('../../components/session/EmotionTemporalAnalysisChart').then(
+    (module) => ({
+      default: module.default,
+    }),
+  ),
 )
 
 export const DynamicEmotionTemporalAnalysisChart = (

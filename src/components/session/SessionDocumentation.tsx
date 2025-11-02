@@ -58,10 +58,7 @@ export default function SessionDocumentationComponent({
   }, [documentation])
 
   // Handle changes to editable fields (when not in readOnly mode)
-  const handleChange = (
-    field: string,
-    value: unknown,
-  ) => {
+  const handleChange = (field: string, value: unknown) => {
     if (readOnly || !editableDocumentation) {
       return
     }
@@ -397,7 +394,9 @@ export default function SessionDocumentationComponent({
                   className="w-full p-2 border border-gray-300 rounded-md min-h-[100px]"
                 />
               ) : (
-                <p className="text-gray-700">{editableDocumentation?.['summary']}</p>
+                <p className="text-gray-700">
+                  {editableDocumentation?.['summary']}
+                </p>
               )}
             </section>
 
@@ -516,7 +515,9 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newTechniques = [
-                                ...(editableDocumentation?.['therapeuticTechniques'] || []),
+                                ...(editableDocumentation?.[
+                                  'therapeuticTechniques'
+                                ] || []),
                               ]
 
                               newTechniques[index] = {
@@ -543,7 +544,9 @@ export default function SessionDocumentationComponent({
                             e: React.ChangeEvent<HTMLTextAreaElement>,
                           ) => {
                             const newTechniques = [
-                              ...(editableDocumentation?.['therapeuticTechniques'] || []),
+                              ...(editableDocumentation?.[
+                                'therapeuticTechniques'
+                              ] || []),
                             ]
 
                             newTechniques[index] = {
@@ -653,10 +656,8 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newGoals = [
-                                ...(
-                                  editableDocumentation.treatmentProgress
-                                    ?.goals || []
-                                ),
+                                ...(editableDocumentation.treatmentProgress
+                                  ?.goals || []),
                               ]
 
                               newGoals[index] = {
@@ -690,10 +691,8 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newGoals = [
-                                ...(
-                                  editableDocumentation.treatmentProgress
-                                    ?.goals || []
-                                ),
+                                ...(editableDocumentation.treatmentProgress
+                                  ?.goals || []),
                               ]
 
                               newGoals[index] = {
@@ -727,10 +726,8 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newGoals = [
-                                ...(
-                                  editableDocumentation.treatmentProgress
-                                    ?.goals || []
-                                ),
+                                ...(editableDocumentation.treatmentProgress
+                                  ?.goals || []),
                               ]
 
                               newGoals[index] = {
@@ -756,9 +753,8 @@ export default function SessionDocumentationComponent({
                   <button
                     onClick={() => {
                       const newGoals = [
-                        ...(
-                          editableDocumentation.treatmentProgress?.goals || []
-                        ),
+                        ...(editableDocumentation.treatmentProgress?.goals ||
+                          []),
                         {
                           description: '',
                           progress: 0,
@@ -798,10 +794,7 @@ export default function SessionDocumentationComponent({
                   />
                 ) : (
                   <p className="text-gray-700">
-                    {
-                      editableDocumentation.treatmentProgress
-                        ?.overallAssessment
-                    }
+                    {editableDocumentation.treatmentProgress?.overallAssessment}
                   </p>
                 )}
               </div>
@@ -884,45 +877,47 @@ export default function SessionDocumentationComponent({
                                   ...editableDocumentation.emotionalPatterns,
                                 ]
 
+                                newPatterns[index] = {
+                                  ...pattern,
+                                  pattern: e.target.value,
+                                }
+                                handleChange('emotionalPatterns', newPatterns)
+                              }}
+                              className="w-full p-1 border border-gray-300 rounded-md"
+                            />
+                          ) : (
+                            pattern.pattern
+                          )}
+                        </h5>
+                      </div>
+                      <div>
+                        {!readOnly ? (
+                          <textarea
+                            value={pattern.significance}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLTextAreaElement>,
+                            ) => {
+                              const newPatterns = [
+                                ...editableDocumentation.emotionalPatterns,
+                              ]
+
                               newPatterns[index] = {
                                 ...pattern,
-                                pattern: e.target.value,
+                                significance: e.target.value,
                               }
                               handleChange('emotionalPatterns', newPatterns)
                             }}
                             className="w-full p-1 border border-gray-300 rounded-md"
                           />
                         ) : (
-                          pattern.pattern
+                          <p className="text-gray-700">
+                            {pattern.significance}
+                          </p>
                         )}
-                      </h5>
+                      </div>
                     </div>
-                    <div>
-                      {!readOnly ? (
-                        <textarea
-                          value={pattern.significance}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLTextAreaElement>,
-                          ) => {
-                            const newPatterns = [
-                              ...editableDocumentation.emotionalPatterns,
-                            ]
-
-                            newPatterns[index] = {
-                              ...pattern,
-                              significance: e.target.value,
-                            }
-                            handleChange('emotionalPatterns', newPatterns)
-                          }}
-                          className="w-full p-1 border border-gray-300 rounded-md"
-                        />
-                      ) : (
-                        <p className="text-gray-700">{pattern.significance}</p>
-                      )}
-                    </div>
-                  </div>
-                ),
-              )}
+                  ),
+                )}
             </div>
             {!readOnly && (
               <button
@@ -1006,7 +1001,10 @@ export default function SessionDocumentationComponent({
                 {Array.isArray(editableDocumentation.keyInsights) &&
                   editableDocumentation.keyInsights.map(
                     (insight: string, index: number) => (
-                      <li key={`insight-full-${index}`} className="text-gray-700">
+                      <li
+                        key={`insight-full-${index}`}
+                        className="text-gray-700"
+                      >
                         {insight}
                       </li>
                     ),
@@ -1109,10 +1107,7 @@ export default function SessionDocumentationComponent({
                 Overall Assessment
               </h5>
               <p className="text-gray-700 mb-4">
-                {
-                  editableDocumentation.treatmentProgress
-                    ?.overallAssessment
-                }
+                {editableDocumentation.treatmentProgress?.overallAssessment}
               </p>
             </section>
 
@@ -1196,7 +1191,9 @@ export default function SessionDocumentationComponent({
                         </tr>
                       </thead>
                       <tbody>
-                        {Array.isArray(editableDocumentation?.outcomePredictions) &&
+                        {Array.isArray(
+                          editableDocumentation?.outcomePredictions,
+                        ) &&
                           editableDocumentation.outcomePredictions.map(
                             (
                               pred: {

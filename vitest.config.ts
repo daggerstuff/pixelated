@@ -19,7 +19,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@byterover/cipher': path.resolve(__dirname, './src/lib/cipher/__mocks__/@byterover/cipher.ts'),
       'react-dom/test-utils': path.resolve(
         __dirname,
         '__mocks__/react-dom/test-utils.js',
@@ -41,6 +40,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    css: {
+      modules: {
+        classNameStrategy: 'non-scoped',
+      },
+    },
     include: [
       'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
@@ -111,5 +115,9 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    cssCodeSplit: true,
+  },
+  css: {
+    devSourcemap: true,
   },
 })

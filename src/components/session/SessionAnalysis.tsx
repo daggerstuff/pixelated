@@ -1,4 +1,4 @@
-import { EmotionDataPoint, } from '../../hooks/useSessionAnalytics'
+import { EmotionDataPoint } from '../../hooks/useSessionAnalytics'
 import EmotionTrackingChart from './EmotionTrackingChart'
 
 // Define an interface matching EmotionTimelineData from EmotionTrackingChart
@@ -47,16 +47,16 @@ export default function SessionAnalysis({
 
         // Define an interface for the API response items
         interface EmotionApiItem {
-          timestamp?: string;
+          timestamp?: string
           dimensions?: {
-            valence?: number;
-            arousal?: number;
-            dominance?: number;
-          };
-          valence?: number;
-          arousal?: number;
-          dominance?: number;
-          label?: string;
+            valence?: number
+            arousal?: number
+            dominance?: number
+          }
+          valence?: number
+          arousal?: number
+          dominance?: number
+          label?: string
         }
 
         // Transform API data into the expected format
@@ -98,7 +98,9 @@ export default function SessionAnalysis({
       } catch (err: unknown) {
         console.error('Error fetching session emotion data:', err)
         setError(
-          err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred',
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'An unknown error occurred',
         )
       } finally {
         setIsLoading(false)
@@ -137,8 +139,8 @@ export default function SessionAnalysis({
           />
 
           <p className="mt-4 text-sm text-gray-500">
-            This chart shows the client&apos;s emotional dimensions throughout the
-            session, helping identify patterns and significant shifts.
+            This chart shows the client&apos;s emotional dimensions throughout
+            the session, helping identify patterns and significant shifts.
           </p>
         </div>
 

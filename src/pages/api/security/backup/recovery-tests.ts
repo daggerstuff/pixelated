@@ -9,7 +9,6 @@ import {
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type { AuthRole } from '../../../../config/auth.config'
 
-
 export const prerender = false
 
 const logger = createBuildSafeLogger('recovery-test-api')
@@ -27,7 +26,13 @@ backupManager.initialize().catch((error) => {
 // GET endpoint for recovery tests
 export const GET = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
+})(async ({
+  request,
+}: {
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
+}) => {
   try {
     // Extract action from query params
     const url = new URL(request.url)
@@ -82,7 +87,13 @@ export const GET = protectRoute({
 // POST endpoint for recovery tests
 export const POST = protectRoute({
   requiredRole: 'admin' as AuthRole,
-})(async ({ request }: { params: Record<string, string | undefined>, request: Request, locals: { user: AuthUser } }) => {
+})(async ({
+  request,
+}: {
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
+}) => {
   try {
     // Parse request body
     const requestData = await request.json()
@@ -210,7 +221,9 @@ async function getRecoveryTests() {
 }
 
 // Mock function to get a specific recovery test by ID
-async function getRecoveryTestById(testId: string): Promise<RecoveryTestResult | undefined> {
+async function getRecoveryTestById(
+  testId: string,
+): Promise<RecoveryTestResult | undefined> {
   const tests = await getRecoveryTests()
   return tests.find((test) => test.id === testId)
 }

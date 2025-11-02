@@ -97,7 +97,11 @@ class WebRTCSignalingService {
       //   userId,
       //   data: candidate,
       // })
-      logger.info('WebRTC ICE candidate would be sent', { sessionId, userId, candidate })
+      logger.info('WebRTC ICE candidate would be sent', {
+        sessionId,
+        userId,
+        candidate,
+      })
       logger.debug('Sent ICE candidate', { sessionId, userId })
     } catch (error: unknown) {
       logger.error('Failed to send ICE candidate', { error, sessionId, userId })

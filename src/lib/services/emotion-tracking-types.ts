@@ -100,7 +100,7 @@ export class EmotionTrackingError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: unknown
+    public readonly details?: unknown,
   ) {
     super(message)
     this.name = 'EmotionTrackingError'
@@ -124,7 +124,9 @@ export class FetchError extends EmotionTrackingError {
 /**
  * Type guards
  */
-export function isEmotionDimensions(value: unknown): value is EmotionDimensions {
+export function isEmotionDimensions(
+  value: unknown,
+): value is EmotionDimensions {
   try {
     EmotionDimensionsSchema.parse(value)
     return true
@@ -158,7 +160,9 @@ export function validateEmotionValue(value: number): boolean {
   return value >= 0 && value <= 10
 }
 
-export function validateEmotionDimensions(dimensions: EmotionDimensions): boolean {
+export function validateEmotionDimensions(
+  dimensions: EmotionDimensions,
+): boolean {
   return (
     validateEmotionValue(dimensions.valence) &&
     validateEmotionValue(dimensions.arousal) &&
@@ -185,6 +189,7 @@ export function calculateStandardDeviation(values: number[]): number {
     return 0
   }
   const mean = values.reduce((a, b) => a + b) / values.length
-  const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length
+  const variance =
+    values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length
   return Math.sqrt(variance)
 }

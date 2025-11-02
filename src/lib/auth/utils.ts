@@ -32,7 +32,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Verify password against hash
  */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hash: string,
+): Promise<boolean> {
   return await bcrypt.compare(password, hash)
 }
 
@@ -47,7 +50,10 @@ export function isValidEmail(email: string): boolean {
 /**
  * Validate password strength
  */
-export function isValidPassword(password: string): { valid: boolean; errors: string[] } {
+export function isValidPassword(password: string): {
+  valid: boolean
+  errors: string[]
+} {
   const errors: string[] = []
   const minLength = BETTER_AUTH_CONFIG.emailAndPassword.minPasswordLength
   const maxLength = BETTER_AUTH_CONFIG.emailAndPassword.maxPasswordLength
@@ -103,7 +109,10 @@ export function generateCSRFToken(): string {
 /**
  * Validate CSRF token
  */
-export function validateCSRFToken(token: string, sessionToken: string): boolean {
+export function validateCSRFToken(
+  token: string,
+  sessionToken: string,
+): boolean {
   return token === sessionToken && token.length === 32
 }
 
@@ -120,12 +129,18 @@ export function getEmailDomain(email: string): string {
  */
 export function isDisposableEmail(email: string): boolean {
   const disposableDomains = [
-    'tempmail.org', '10minutemail.com', 'mailinator.com', 'guerrillamail.com',
-    'throwaway.email', 'yopmail.com', 'temp-mail.org', 'fakeinbox.com',
+    'tempmail.org',
+    '10minutemail.com',
+    'mailinator.com',
+    'guerrillamail.com',
+    'throwaway.email',
+    'yopmail.com',
+    'temp-mail.org',
+    'fakeinbox.com',
   ]
-  
+
   const domain = getEmailDomain(email).toLowerCase()
-  return disposableDomains.some(disposable => domain.includes(disposable))
+  return disposableDomains.some((disposable) => domain.includes(disposable))
 }
 
 /**
@@ -152,15 +167,18 @@ export function generateAPISecret(): string {
 /**
  * Mask sensitive data for logging
  */
-export function maskSensitiveData(data: string, visibleChars: number = 4): string {
+export function maskSensitiveData(
+  data: string,
+  visibleChars: number = 4,
+): string {
   if (data.length <= visibleChars * 2) {
     return '*'.repeat(data.length)
   }
-  
+
   const start = data.substring(0, visibleChars)
   const end = data.substring(data.length - visibleChars)
   const middle = '*'.repeat(data.length - visibleChars * 2)
-  
+
   return `${start}${middle}${end}`
 }
 
@@ -168,9 +186,11 @@ export function maskSensitiveData(data: string, visibleChars: number = 4): strin
  * Validate IP address format
  */
 export function isValidIP(ip: string): boolean {
-  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
-  const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/
-  
+  const ipv4Regex =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+  const ipv6Regex =
+    /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/
+
   return ipv4Regex.test(ip) || ipv6Regex.test(ip)
 }
 
@@ -184,7 +204,7 @@ export function parseUserAgent(userAgent: string): {
   isMobile: boolean
 } {
   const ua = userAgent.toLowerCase()
-  
+
   // Browser detection
   let browser = 'Unknown'
   if (ua.includes('chrome')) browser = 'Chrome'
@@ -192,7 +212,7 @@ export function parseUserAgent(userAgent: string): {
   else if (ua.includes('safari')) browser = 'Safari'
   else if (ua.includes('edge')) browser = 'Edge'
   else if (ua.includes('opera')) browser = 'Opera'
-  
+
   // OS detection
   let os = 'Unknown'
   if (ua.includes('windows')) os = 'Windows'
@@ -200,11 +220,11 @@ export function parseUserAgent(userAgent: string): {
   else if (ua.includes('linux')) os = 'Linux'
   else if (ua.includes('android')) os = 'Android'
   else if (ua.includes('iphone')) os = 'iOS'
-  
+
   // Device detection
   let device = 'Desktop'
   let isMobile = false
-  
+
   if (ua.includes('mobile')) {
     device = 'Mobile'
     isMobile = true
@@ -212,7 +232,7 @@ export function parseUserAgent(userAgent: string): {
     device = 'Tablet'
     isMobile = true
   }
-  
+
   return { browser, os, device, isMobile }
 }
 
@@ -222,7 +242,7 @@ export function parseUserAgent(userAgent: string): {
 export function calculatePasswordEntropy(password: string): number {
   const charset = new Set(password)
   const possibleChars = charset.size
-  
+
   return password.length * Math.log2(possibleChars)
 }
 
@@ -238,13 +258,14 @@ export function isStrongPassword(password: string): boolean {
  * Generate secure random string
  */
 export function generateSecureRandomString(length: number = 32): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
   let result = ''
-  
+
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
-  
+
   return result
 }
 
@@ -267,7 +288,7 @@ export function roleToDisplayName(role: string): string {
     patient: 'Patient',
     guest: 'Guest',
   }
-  
+
   return roleMap[role] || role
 }
 
@@ -276,28 +297,44 @@ export function roleToDisplayName(role: string): string {
  */
 export function isBot(userAgent: string): boolean {
   const botPatterns = [
-    'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 'python', 'java',
-    'http', 'client', 'monitor', 'check', 'scan', 'test'
+    'bot',
+    'crawler',
+    'spider',
+    'scraper',
+    'curl',
+    'wget',
+    'python',
+    'java',
+    'http',
+    'client',
+    'monitor',
+    'check',
+    'scan',
+    'test',
   ]
-  
+
   const ua = userAgent.toLowerCase()
-  return botPatterns.some(pattern => ua.includes(pattern))
+  return botPatterns.some((pattern) => ua.includes(pattern))
 }
 
 /**
  * Generate device fingerprint
  */
-export function generateDeviceFingerprint(userAgent: string, acceptLanguage: string, ip?: string): string {
+export function generateDeviceFingerprint(
+  userAgent: string,
+  acceptLanguage: string,
+  ip?: string,
+): string {
   // Simple hash function for device fingerprinting
   const data = `${userAgent}|${acceptLanguage}|${ip || ''}`
-  
+
   // Simple DJB2 hash algorithm
   let hash = 5381
   for (let i = 0; i < data.length; i++) {
-    hash = ((hash << 5) + hash) + data.charCodeAt(i)
+    hash = (hash << 5) + hash + data.charCodeAt(i)
     hash = hash & hash // Convert to 32-bit integer
   }
-  
+
   // Convert to hex string
   return Math.abs(hash).toString(16)
 }
@@ -306,7 +343,7 @@ export function generateDeviceFingerprint(userAgent: string, acceptLanguage: str
  * Sleep function for rate limiting
  */
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
@@ -315,10 +352,10 @@ export function sleep(ms: number): Promise<void> {
 export async function retry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ): Promise<T> {
   let lastError: Error
-  
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn()
@@ -329,7 +366,7 @@ export async function retry<T>(
       }
     }
   }
-  
+
   throw lastError!
 }
 
@@ -338,10 +375,10 @@ export async function retry<T>(
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), wait)
@@ -353,15 +390,15 @@ export function debounce<T extends (...args: any[]) => any>(
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  limit: number
+  limit: number,
 ): (...args: Parameters<T>) => void {
   let inThrottle = false
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args)
       inThrottle = true
-      setTimeout(() => inThrottle = false, limit)
+      setTimeout(() => (inThrottle = false), limit)
     }
   }
 }

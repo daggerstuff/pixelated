@@ -1,7 +1,7 @@
-import type { ObjectId as RealObjectId } from 'mongodb';
-import { betterAuth } from "better-auth";
-import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { client } from "@/db";
+import type { ObjectId as RealObjectId } from 'mongodb'
+import { betterAuth } from 'better-auth'
+import { mongodbAdapter } from 'better-auth/adapters/mongodb'
+import { client } from '@/db'
 import * as adapter from '@/adapters/betterAuthMongoAdapter'
 
 export const auth = betterAuth({
@@ -16,7 +16,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
   },
-});
+})
 
 export interface User {
   _id?: RealObjectId
@@ -151,8 +151,13 @@ export async function verifyAuthToken(
       }
     }
   } else {
-    if (process.env.DISABLE_AUTH === 'true' || process.env.ALLOW_AUTH_DISABLE === 'true') {
-      throw new Error('Auth disabling is not permitted in production. Remove DISABLE_AUTH/ALLOW_AUTH_DISABLE from production environment.')
+    if (
+      process.env.DISABLE_AUTH === 'true' ||
+      process.env.ALLOW_AUTH_DISABLE === 'true'
+    ) {
+      throw new Error(
+        'Auth disabling is not permitted in production. Remove DISABLE_AUTH/ALLOW_AUTH_DISABLE from production environment.',
+      )
     }
   }
 
@@ -187,14 +192,16 @@ export async function verifyAuthToken(
  */
 function extractTokenFromRequest(request: Request): string | null {
   const authHeader = request.headers.get('authorization')
-  if (authHeader && authHeader.startsWith('Bearer ')) return authHeader.split(' ')[1]
+  if (authHeader && authHeader.startsWith('Bearer '))
+    return authHeader.split(' ')[1]
 
   const cookieHeader = request.headers.get('cookie')
   if (!cookieHeader) return null
   const cookies = cookieHeader.split(';').map((c) => c.trim())
   for (const c of cookies) {
     const [name, val] = c.split('=')
-    if (name === 'auth-token' && val !== undefined) return decodeURIComponent(val)
+    if (name === 'auth-token' && val !== undefined)
+      return decodeURIComponent(val)
   }
   return null
 }

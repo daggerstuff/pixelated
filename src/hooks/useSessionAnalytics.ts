@@ -33,7 +33,10 @@ export interface SessionAnalytics {
  * All requests are async, side-effect driven, non-blocking to the UI layer.
  * Optionally add/decorate analytics here.
  */
-export function useSessionAnalytics(sessionId: string, clientId?: string): SessionAnalytics {
+export function useSessionAnalytics(
+  sessionId: string,
+  clientId?: string,
+): SessionAnalytics {
   const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +55,7 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
       try {
         const url = new URL(
           '/api/emotions/session-analysis',
-          window.location.origin
+          window.location.origin,
         )
         url.searchParams.append('sessionId', sessionId)
 
@@ -67,19 +70,22 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
               const baseData = {
                 timestamp: toIsoString(item.timestamp),
                 valence:
-                  item.dimensions?.valence != null && typeof item.dimensions.valence === 'number'
+                  item.dimensions?.valence != null &&
+                  typeof item.dimensions.valence === 'number'
                     ? item.dimensions.valence
                     : typeof item.valence === 'number'
                       ? item.valence
                       : 0,
                 arousal:
-                  item.dimensions?.arousal != null && typeof item.dimensions.arousal === 'number'
+                  item.dimensions?.arousal != null &&
+                  typeof item.dimensions.arousal === 'number'
                     ? item.dimensions.arousal
                     : typeof item.arousal === 'number'
                       ? item.arousal
                       : 0,
                 dominance:
-                  item.dimensions?.dominance != null && typeof item.dimensions.dominance === 'number'
+                  item.dimensions?.dominance != null &&
+                  typeof item.dimensions.dominance === 'number'
                     ? item.dimensions.dominance
                     : typeof item.dominance === 'number'
                       ? item.dominance
@@ -97,7 +103,9 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
       } catch (err: unknown) {
         if (isMounted) {
           setError(
-            err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+            err instanceof Error
+              ? (err as Error)?.message || String(err)
+              : 'An unknown error occurred',
           )
         }
       } finally {
@@ -116,15 +124,15 @@ export function useSessionAnalytics(sessionId: string, clientId?: string): Sessi
   return {
     emotionData,
     isLoading,
-    error
+    error,
   }
 }
 
-  // Helper to safely convert timestamp to ISO string
-  function toIsoString(ts?: string | number): string {
-    if (ts == null) {
-      return ''
-    }
-    const d = new Date(ts)
-    return Number.isNaN(d.getTime()) ? '' : d.toISOString()
+// Helper to safely convert timestamp to ISO string
+function toIsoString(ts?: string | number): string {
+  if (ts == null) {
+    return ''
   }
+  const d = new Date(ts)
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString()
+}

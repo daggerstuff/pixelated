@@ -18,29 +18,29 @@ const PERFORMANCE_CONFIG = {
     ANALYSIS_RESULTS: 3600, // 1 hour
     USER_SUMMARY: 1800, // 30 minutes
     DASHBOARD_DATA: 300, // 5 minutes
-    ML_MODEL_CACHE: 7200 // 2 hours
+    ML_MODEL_CACHE: 7200, // 2 hours
   },
-  
+
   // Database query timeouts
   QUERY_TIMEOUTS: {
     ANALYSIS_INSERT: 5000, // 5 seconds
     CACHE_LOOKUP: 1000, // 1 second
-    SUMMARY_QUERY: 3000 // 3 seconds
+    SUMMARY_QUERY: 3000, // 3 seconds
   },
-  
+
   // ML model optimization
   ML_CONFIG: {
     BATCH_SIZE: 10,
     MAX_CONCURRENT: 5,
-    TIMEOUT_MS: 30000 // 30 seconds
-  }
+    TIMEOUT_MS: 30000, // 30 seconds
+  },
 }
 
 // Optimized bias detection with caching and connection pooling
 export class OptimizedBiasDetectionService {
   private cache = getCache()
   private biasManager = new BiasAnalysisManager()
-  
+
   /**
    * Perform high-performance bias analysis with intelligent caching
    */
@@ -69,12 +69,15 @@ export class OptimizedBiasDetectionService {
     const startTime = performance.now()
     const analysisId = randomUUID()
     const sessionId = randomUUID()
-    
+
     try {
       // Generate content hash for caching
-      const contentHash = createContentHash(params.text, params.demographics || {})
+      const contentHash = createContentHash(
+        params.text,
+        params.demographics || {},
+      )
       const cacheKey = `bias:analysis:${contentHash}`
-      
+
       // Check cache first with timeout
       const cachedResult = await this.getCachedAnalysis(cacheKey)
       if (cachedResult) {
@@ -82,22 +85,22 @@ export class OptimizedBiasDetectionService {
         logger.info('Bias analysis served from cache', {
           analysisId,
           processingTime,
-          cacheHit: true
+          cacheHit: true,
         })
-        
+
         return {
           ...cachedResult,
           id: analysisId,
           sessionId,
           processingTimeMs: processingTime,
           cached: true,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
       }
-      
+
       // Perform actual bias analysis with optimized ML model
       const analysisResult = await this.performOptimizedAnalysis(params.text)
-      
+
       // Store in database with connection pooling
       await this.storeAnalysisResults({
         analysisId,
@@ -108,26 +111,26 @@ export class OptimizedBiasDetectionService {
         demographics: params.demographics || {},
         sessionType: params.sessionType || 'individual',
         contentHash,
-        processingTimeMs: Math.round(performance.now() - startTime)
+        processingTimeMs: Math.round(performance.now() - startTime),
       })
-      
+
       // Cache the result
       await this.cacheAnalysisResults(cacheKey, {
         ...analysisResult,
         demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual'
+        sessionType: params.sessionType || 'individual',
       })
-      
+
       const totalProcessingTime = Math.round(performance.now() - startTime)
-      
+
       logger.info('Bias analysis completed', {
         analysisId,
         processingTime: totalProcessingTime,
         cacheHit: false,
         biasScore: analysisResult.overallBiasScore,
-        alertLevel: analysisResult.alertLevel
+        alertLevel: analysisResult.alertLevel,
       })
-      
+
       return {
         id: analysisId,
         sessionId,
@@ -136,37 +139,39 @@ export class OptimizedBiasDetectionService {
         sessionType: params.sessionType || 'individual',
         processingTimeMs: totalProcessingTime,
         createdAt: new Date().toISOString(),
-        cached: false
+        cached: false,
       }
-      
     } catch (error) {
       const processingTime = Math.round(performance.now() - startTime)
       logger.error('Bias analysis failed', {
         analysisId,
         processingTime,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
   }
-  
+
   /**
    * Optimized cache lookup with timeout
    */
   private async getCachedAnalysis(cacheKey: string): Promise<any | null> {
     try {
       const cachePromise = this.cache.get(cacheKey)
-      const timeoutPromise = new Promise<null>((resolve) => 
-        setTimeout(() => resolve(null), PERFORMANCE_CONFIG.QUERY_TIMEOUTS.CACHE_LOOKUP)
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(
+          () => resolve(null),
+          PERFORMANCE_CONFIG.QUERY_TIMEOUTS.CACHE_LOOKUP,
+        ),
       )
-      
+
       return await Promise.race([cachePromise, timeoutPromise])
     } catch (error) {
       logger.warn('Cache lookup failed', { cacheKey, error })
       return null
     }
   }
-  
+
   /**
    * High-performance bias analysis with optimized algorithms
    */
@@ -179,38 +184,39 @@ export class OptimizedBiasDetectionService {
   }> {
     // Use optimized keyword matching with pre-compiled patterns
     const biasPatterns = this.getOptimizedBiasPatterns()
-    
+
     const textLower = text.toLowerCase()
     let biasScore = 0
     let foundPatterns: string[] = []
     let confidence = 0.7
-    
+
     // Parallel pattern matching for better performance
     const patternPromises = biasPatterns.map(async (pattern) => {
       const matches = textLower.match(pattern.regex)
       if (matches) {
         return {
           pattern: pattern.name,
-          score: pattern.weight * (matches.length / Math.max(text.length / 100, 1)),
-          matches: matches.length
+          score:
+            pattern.weight * (matches.length / Math.max(text.length / 100, 1)),
+          matches: matches.length,
         }
       }
       return null
     })
-    
+
     const patternResults = await Promise.all(patternPromises)
-    
+
     // Aggregate results
-    patternResults.forEach(result => {
+    patternResults.forEach((result) => {
       if (result) {
         biasScore += result.score
         foundPatterns.push(result.pattern)
       }
     })
-    
+
     // Normalize score
     biasScore = Math.min(biasScore, 1.0)
-    
+
     // Determine alert level
     let alertLevel: 'low' | 'medium' | 'high' | 'critical'
     if (biasScore >= 0.8) {
@@ -226,10 +232,13 @@ export class OptimizedBiasDetectionService {
       alertLevel = 'low'
       confidence = 0.8
     }
-    
+
     // Generate recommendations
-    const recommendations = this.generateOptimizedRecommendations(biasScore, foundPatterns)
-    
+    const recommendations = this.generateOptimizedRecommendations(
+      biasScore,
+      foundPatterns,
+    )
+
     return {
       overallBiasScore: Math.round(biasScore * 1000) / 1000, // 3 decimal places
       alertLevel,
@@ -240,25 +249,25 @@ export class OptimizedBiasDetectionService {
           layer: 'pattern_analysis',
           confidence: confidence,
           patterns_found: foundPatterns,
-          processing_time_ms: Math.random() * 50 + 10 // 10-60ms
+          processing_time_ms: Math.random() * 50 + 10, // 10-60ms
         },
         semantic_analysis: {
           bias_score: Math.random() * 0.3,
           layer: 'semantic_analysis',
           confidence: 0.6,
-          processing_time_ms: Math.random() * 30 + 20 // 20-50ms
+          processing_time_ms: Math.random() * 30 + 20, // 20-50ms
         },
         contextual_analysis: {
           bias_score: Math.random() * 0.4,
           layer: 'contextual_analysis',
           confidence: 0.5,
-          processing_time_ms: Math.random() * 40 + 15 // 15-55ms
-        }
+          processing_time_ms: Math.random() * 40 + 15, // 15-55ms
+        },
       },
-      recommendations
+      recommendations,
     }
   }
-  
+
   /**
    * Optimized bias patterns with pre-compiled regex
    */
@@ -269,25 +278,52 @@ export class OptimizedBiasDetectionService {
   }> {
     return [
       // High-bias patterns
-      { name: 'racist_language', regex: /\b(racist|racism|discrimination|racial)\b/gi, weight: 0.8 },
-      { name: 'sexist_language', regex: /\b(sexist|sexism|misogyny|chauvinist)\b/gi, weight: 0.8 },
-      { name: 'homophobic_language', regex: /\b(homophobic|homophobia|anti-gay)\b/gi, weight: 0.8 },
-      
+      {
+        name: 'racist_language',
+        regex: /\b(racist|racism|discrimination|racial)\b/gi,
+        weight: 0.8,
+      },
+      {
+        name: 'sexist_language',
+        regex: /\b(sexist|sexism|misogyny|chauvinist)\b/gi,
+        weight: 0.8,
+      },
+      {
+        name: 'homophobic_language',
+        regex: /\b(homophobic|homophobia|anti-gay)\b/gi,
+        weight: 0.8,
+      },
+
       // Medium-bias patterns
-      { name: 'biased_language', regex: /\b(biased|prejudiced|stereotypical|offensive)\b/gi, weight: 0.4 },
-      { name: 'unfair_language', regex: /\b(unfair|unjust|discriminatory)\b/gi, weight: 0.4 },
-      
+      {
+        name: 'biased_language',
+        regex: /\b(biased|prejudiced|stereotypical|offensive)\b/gi,
+        weight: 0.4,
+      },
+      {
+        name: 'unfair_language',
+        regex: /\b(unfair|unjust|discriminatory)\b/gi,
+        weight: 0.4,
+      },
+
       // Low-bias patterns
-      { name: 'concerning_language', regex: /\b(concerning|questionable|inappropriate|problematic)\b/gi, weight: 0.2 }
+      {
+        name: 'concerning_language',
+        regex: /\b(concerning|questionable|inappropriate|problematic)\b/gi,
+        weight: 0.2,
+      },
     ]
   }
-  
+
   /**
    * Generate optimized recommendations based on bias score
    */
-  private generateOptimizedRecommendations(biasScore: number, patterns: string[]): string[] {
+  private generateOptimizedRecommendations(
+    biasScore: number,
+    patterns: string[],
+  ): string[] {
     const recommendations: string[] = []
-    
+
     if (biasScore > 0.7) {
       recommendations.push('Immediate review recommended: High bias detected')
       recommendations.push('Consult with cultural competency specialist')
@@ -300,7 +336,7 @@ export class OptimizedBiasDetectionService {
       recommendations.push('Continue monitoring for patterns')
       recommendations.push('Maintain awareness of cultural differences')
     }
-    
+
     // Add pattern-specific recommendations
     if (patterns.includes('racist_language')) {
       recommendations.push('Review racial sensitivity guidelines')
@@ -311,10 +347,10 @@ export class OptimizedBiasDetectionService {
     if (patterns.includes('homophobic_language')) {
       recommendations.push('Review LGBTQ+ inclusion guidelines')
     }
-    
+
     return recommendations.slice(0, 3) // Limit to 3 recommendations
   }
-  
+
   /**
    * Store analysis results with optimized database operations
    */
@@ -335,10 +371,10 @@ export class OptimizedBiasDetectionService {
   }): Promise<void> {
     const pool = getPool()
     const client = await pool.connect()
-    
+
     try {
       await client.query('BEGIN')
-      
+
       // Insert session with timeout
       const sessionPromise = client.query(
         `INSERT INTO sessions (
@@ -353,10 +389,10 @@ export class OptimizedBiasDetectionService {
           JSON.stringify({ description: '' }),
           new Date(),
           'completed',
-          ''
-        ]
+          '',
+        ],
       )
-      
+
       // Insert bias analysis with timeout
       const analysisPromise = client.query(
         `INSERT INTO bias_analyses (
@@ -376,20 +412,24 @@ export class OptimizedBiasDetectionService {
           JSON.stringify(data.demographics),
           data.contentHash,
           data.processingTimeMs,
-          new Date()
-        ]
+          new Date(),
+        ],
       )
-      
+
       // Race both operations with timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database operation timeout')), 
-        PERFORMANCE_CONFIG.QUERY_TIMEOUTS.ANALYSIS_INSERT)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Database operation timeout')),
+          PERFORMANCE_CONFIG.QUERY_TIMEOUTS.ANALYSIS_INSERT,
+        ),
       )
-      
-      await Promise.race([Promise.all([sessionPromise, analysisPromise]), timeoutPromise])
-      
+
+      await Promise.race([
+        Promise.all([sessionPromise, analysisPromise]),
+        timeoutPromise,
+      ])
+
       await client.query('COMMIT')
-      
     } catch (error) {
       await client.query('ROLLBACK')
       throw error
@@ -397,27 +437,34 @@ export class OptimizedBiasDetectionService {
       client.release()
     }
   }
-  
+
   /**
    * Cache analysis results with optimized serialization
    */
-  private async cacheAnalysisResults(cacheKey: string, data: any): Promise<void> {
+  private async cacheAnalysisResults(
+    cacheKey: string,
+    data: any,
+  ): Promise<void> {
     try {
       // Use shorter TTL for high-bias results to ensure freshness
-      const ttl = data.overallBiasScore > 0.6 
-        ? PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS / 2 
-        : PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS
-      
+      const ttl =
+        data.overallBiasScore > 0.6
+          ? PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS / 2
+          : PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS
+
       await this.cache.set(cacheKey, data, ttl)
     } catch (error) {
       logger.warn('Failed to cache analysis results', { cacheKey, error })
     }
   }
-  
+
   /**
    * Get optimized bias summary for therapist
    */
-  async getBiasSummary(therapistId: string, days: number = 30): Promise<{
+  async getBiasSummary(
+    therapistId: string,
+    days: number = 30,
+  ): Promise<{
     total_analyses: number
     avg_bias_score: number
     high_alerts: number
@@ -426,67 +473,80 @@ export class OptimizedBiasDetectionService {
     trend: 'improving' | 'stable' | 'worsening'
   }> {
     const cacheKey = `bias:summary:${therapistId}:${days}`
-    
+
     try {
       // Check cache first
       const cached = await this.cache.get(cacheKey)
       if (cached) {
         return cached
       }
-      
+
       // Get from database with timeout
       const summaryPromise = this.biasManager.getBiasSummary(therapistId, days)
-      const timeoutPromise = new Promise<null>((resolve) => 
-        setTimeout(() => resolve(null), PERFORMANCE_CONFIG.QUERY_TIMEOUTS.SUMMARY_QUERY)
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(
+          () => resolve(null),
+          PERFORMANCE_CONFIG.QUERY_TIMEOUTS.SUMMARY_QUERY,
+        ),
       )
-      
+
       const summary = await Promise.race([summaryPromise, timeoutPromise])
-      
+
       if (!summary) {
         throw new Error('Failed to retrieve bias summary')
       }
-      
+
       // Calculate trend
       const trend = this.calculateBiasTrend(summary.avg_bias_score)
-      
+
       const result = {
         ...summary,
-        trend
+        trend,
       }
-      
+
       // Cache the result
-      await this.cache.set(cacheKey, result, PERFORMANCE_CONFIG.CACHE_TTL.USER_SUMMARY)
-      
+      await this.cache.set(
+        cacheKey,
+        result,
+        PERFORMANCE_CONFIG.CACHE_TTL.USER_SUMMARY,
+      )
+
       return result
-      
     } catch (error) {
       logger.error('Failed to get bias summary', { therapistId, days, error })
       throw error
     }
   }
-  
+
   /**
    * Calculate bias trend based on average score
    */
-  private calculateBiasTrend(avgScore: number): 'improving' | 'stable' | 'worsening' {
+  private calculateBiasTrend(
+    avgScore: number,
+  ): 'improving' | 'stable' | 'worsening' {
     if (avgScore < 0.2) return 'improving'
     if (avgScore > 0.6) return 'worsening'
     return 'stable'
   }
-  
+
   /**
    * Batch process multiple texts for bias analysis
    */
-  async batchAnalyzeBias(texts: string[], options: {
-    demographics?: any[]
-    context?: string[]
-  } = {}): Promise<Array<{
-    id: string
-    biasScore: number
-    alertLevel: string
-    confidence: number
-    processingTimeMs: number
-  }>> {
+  async batchAnalyzeBias(
+    texts: string[],
+    options: {
+      demographics?: any[]
+      context?: string[]
+    } = {},
+  ): Promise<
+    Array<{
+      id: string
+      biasScore: number
+      alertLevel: string
+      confidence: number
+      processingTimeMs: number
+    }>
+  > {
     const batchSize = PERFORMANCE_CONFIG.ML_CONFIG.BATCH_SIZE
     const results: Array<{
       id: string
@@ -495,27 +555,25 @@ export class OptimizedBiasDetectionService {
       confidence: number
       processingTimeMs: number
     }> = []
-    
+
     // Process in batches to avoid overwhelming the system
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize)
-      const batchDemographics = options.demographics?.slice(i, i + batchSize) || []
-      const batchContext = options.context?.slice(i, i + batchSize) || []
-      
+
       const batchPromises = batch.map(async (text, index) => {
         const startTime = performance.now()
         const analysisId = randomUUID()
-        
+
         try {
           const result = await this.performOptimizedAnalysis(text)
           const processingTime = Math.round(performance.now() - startTime)
-          
+
           return {
             id: analysisId,
             biasScore: result.overallBiasScore,
             alertLevel: result.alertLevel,
             confidence: result.confidence,
-            processingTimeMs: processingTime
+            processingTimeMs: processingTime,
           }
         } catch (error) {
           logger.error('Batch analysis failed for text', { analysisId, error })
@@ -524,20 +582,20 @@ export class OptimizedBiasDetectionService {
             biasScore: 0,
             alertLevel: 'low',
             confidence: 0,
-            processingTimeMs: Math.round(performance.now() - startTime)
+            processingTimeMs: Math.round(performance.now() - startTime),
           }
         }
       })
-      
+
       const batchResults = await Promise.all(batchPromises)
       results.push(...batchResults)
-      
+
       // Small delay between batches to prevent system overload
       if (i + batchSize < texts.length) {
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
     }
-    
+
     return results
   }
 }

@@ -28,8 +28,10 @@ const DEFAULT_CONFIG: DatabaseConfig = {
   password: process.env['DB_PASSWORD'] || '',
   max: parseInt(process.env['DB_MAX_CONNECTIONS'] || '20'),
   idleTimeoutMillis: parseInt(process.env['DB_IDLE_TIMEOUT'] || '30000'),
-  connectionTimeoutMillis: parseInt(process.env['DB_CONNECTION_TIMEOUT'] || '2000'),
-  ssl: process.env['NODE_ENV'] === 'production'
+  connectionTimeoutMillis: parseInt(
+    process.env['DB_CONNECTION_TIMEOUT'] || '2000',
+  ),
+  ssl: process.env['NODE_ENV'] === 'production',
 }
 
 // Connection pool
@@ -56,7 +58,9 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     console.log('New client connected to database')
   })
 
-  console.log(`Database pool initialized with ${finalConfig.max} max connections`)
+  console.log(
+    `Database pool initialized with ${finalConfig.max} max connections`,
+  )
   return pool
 }
 
@@ -65,7 +69,9 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
  */
 export function getPool(): Pool {
   if (!pool) {
-    throw new Error('Database not initialized. Call initializeDatabase() first.')
+    throw new Error(
+      'Database not initialized. Call initializeDatabase() first.',
+    )
   }
   return pool
 }
@@ -75,7 +81,7 @@ export function getPool(): Pool {
  */
 export async function query<T = any>(
   text: string,
-  params?: any[]
+  params?: any[],
 ): Promise<QueryResult<T>> {
   const client = await getPool().connect()
   try {
@@ -90,7 +96,7 @@ export async function query<T = any>(
  * Execute a transaction with automatic rollback on error
  */
 export async function transaction<T>(
-  callback: (client: PoolClient) => Promise<T>
+  callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const client = await getPool().connect()
   try {
@@ -130,8 +136,8 @@ export async function healthCheck(): Promise<{
       connections: {
         total: poolState.totalCount,
         idle: poolState.idleCount,
-        waiting: poolState.waitingCount
-      }
+        waiting: poolState.waitingCount,
+      },
     }
   } catch (error) {
     return {
@@ -140,8 +146,8 @@ export async function healthCheck(): Promise<{
       connections: {
         total: 0,
         idle: 0,
-        waiting: 0
-      }
+        waiting: 0,
+      },
     }
   }
 }
@@ -167,8 +173,8 @@ export function createContentHash(content: string, demographics: any): string {
       age: demographics.age,
       gender: demographics.gender,
       ethnicity: demographics.ethnicity,
-      primaryLanguage: demographics.primaryLanguage
-    }
+      primaryLanguage: demographics.primaryLanguage,
+    },
   })
   return createHash('sha256').update(hashInput).digest('hex')
 }
@@ -219,8 +225,10 @@ export class DatabaseMigration {
    * Get list of executed migrations
    */
   async getExecutedMigrations(): Promise<string[]> {
-    const result = await query('SELECT name FROM schema_migrations ORDER BY executed_at')
-    return result.rows.map(row => row.name)
+    const result = await query(
+      'SELECT name FROM schema_migrations ORDER BY executed_at',
+    )
+    return result.rows.map((row) => row.name)
   }
 
   /**
@@ -250,22 +258,25 @@ export class UserManager {
     institution?: string
     licenseNumber?: string
   }): Promise<string> {
-    const result = await query(`
+    const result = await query(
+      `
       INSERT INTO users (
         email, password_hash, first_name, last_name,
         role, institution, license_number
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id
-    `, [
-      userData.email,
-      userData.passwordHash,
-      userData.firstName,
-      userData.lastName,
-      userData.role || 'therapist',
-      userData.institution,
-      userData.licenseNumber
-    ])
+    `,
+      [
+        userData.email,
+        userData.passwordHash,
+        userData.firstName,
+        userData.lastName,
+        userData.role || 'therapist',
+        userData.institution,
+        userData.licenseNumber,
+      ],
+    )
 
     return result.rows[0].id
   }
@@ -274,12 +285,15 @@ export class UserManager {
    * Get user by ID
    */
   async getUserById(id: string): Promise<any> {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT u.*, up.*
       FROM users u
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.id = $1 AND u.is_active = true
-    `, [id])
+    `,
+      [id],
+    )
 
     return result.rows[0] || null
   }
@@ -288,12 +302,15 @@ export class UserManager {
    * Get user by email
    */
   async getUserByEmail(email: string): Promise<any> {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT u.*, up.*
       FROM users u
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.email = $1 AND u.is_active = true
-    `, [email])
+    `,
+      [email],
+    )
 
     return result.rows[0] || null
   }
@@ -302,7 +319,8 @@ export class UserManager {
    * Update user profile
    */
   async updateUserProfile(userId: string, profileData: any): Promise<void> {
-    await query(`
+    await query(
+      `
       INSERT INTO user_profiles (
         user_id, bio, specializations, years_experience,
         certifications, languages, timezone
@@ -317,15 +335,17 @@ export class UserManager {
         languages = EXCLUDED.languages,
         timezone = EXCLUDED.timezone,
         updated_at = NOW()
-    `, [
-      userId,
-      profileData.bio,
-      profileData.specializations,
-      profileData.yearsExperience,
-      profileData.certifications,
-      profileData.languages || ['en'],
-      profileData.timezone || 'UTC'
-    ])
+    `,
+      [
+        userId,
+        profileData.bio,
+        profileData.specializations,
+        profileData.yearsExperience,
+        profileData.certifications,
+        profileData.languages || ['en'],
+        profileData.timezone || 'UTC',
+      ],
+    )
   }
 }
 
@@ -342,18 +362,21 @@ export class SessionManager {
     sessionType?: string
     context?: any
   }): Promise<string> {
-    const result = await query(`
+    const result = await query(
+      `
       INSERT INTO sessions (
         therapist_id, client_id, session_type, context, started_at
       )
       VALUES ($1, $2, $3, $4, NOW())
       RETURNING id
-    `, [
-      sessionData.therapistId,
-      sessionData.clientId,
-      sessionData.sessionType || 'individual',
-      JSON.stringify(sessionData.context || {})
-    ])
+    `,
+      [
+        sessionData.therapistId,
+        sessionData.clientId,
+        sessionData.sessionType || 'individual',
+        JSON.stringify(sessionData.context || {}),
+      ],
+    )
 
     return result.rows[0].id
   }
@@ -362,23 +385,29 @@ export class SessionManager {
    * End a session
    */
   async endSession(sessionId: string, summary?: string): Promise<void> {
-    await query(`
+    await query(
+      `
       UPDATE sessions
       SET state = 'completed', ended_at = NOW(), summary = $2
       WHERE id = $1
-    `, [sessionId, summary])
+    `,
+      [sessionId, summary],
+    )
   }
 
   /**
    * Get session by ID
    */
   async getSessionById(sessionId: string): Promise<any> {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT s.*, u.first_name, u.last_name
       FROM sessions s
       JOIN users u ON s.therapist_id = u.id
       WHERE s.id = $1
-    `, [sessionId])
+    `,
+      [sessionId],
+    )
 
     return result.rows[0] || null
   }
@@ -386,15 +415,21 @@ export class SessionManager {
   /**
    * Get sessions for a therapist
    */
-  async getSessionsForTherapist(therapistId: string, limit: number = 50): Promise<any[]> {
-    const result = await query(`
+  async getSessionsForTherapist(
+    therapistId: string,
+    limit: number = 50,
+  ): Promise<any[]> {
+    const result = await query(
+      `
       SELECT s.*, u.first_name, u.last_name
       FROM sessions s
       JOIN users u ON s.therapist_id = u.id
       WHERE s.therapist_id = $1
       ORDER BY s.started_at DESC
       LIMIT $2
-    `, [therapistId, limit])
+    `,
+      [therapistId, limit],
+    )
 
     return result.rows
   }
@@ -419,7 +454,8 @@ export class BiasAnalysisManager {
     contentHash: string
     processingTimeMs: number
   }): Promise<string> {
-    const result = await query(`
+    const result = await query(
+      `
       INSERT INTO bias_analyses (
         session_id, therapist_id, overall_bias_score, alert_level,
         confidence, layer_results, recommendations, demographics,
@@ -427,18 +463,20 @@ export class BiasAnalysisManager {
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id
-    `, [
-      analysisData.sessionId,
-      analysisData.therapistId,
-      analysisData.overallBiasScore,
-      analysisData.alertLevel,
-      analysisData.confidence,
-      JSON.stringify(analysisData.layerResults),
-      analysisData.recommendations,
-      JSON.stringify(analysisData.demographics),
-      analysisData.contentHash,
-      analysisData.processingTimeMs
-    ])
+    `,
+      [
+        analysisData.sessionId,
+        analysisData.therapistId,
+        analysisData.overallBiasScore,
+        analysisData.alertLevel,
+        analysisData.confidence,
+        JSON.stringify(analysisData.layerResults),
+        analysisData.recommendations,
+        JSON.stringify(analysisData.demographics),
+        analysisData.contentHash,
+        analysisData.processingTimeMs,
+      ],
+    )
 
     return result.rows[0].id
   }
@@ -447,12 +485,15 @@ export class BiasAnalysisManager {
    * Get cached analysis by content hash
    */
   async getCachedAnalysis(contentHash: string): Promise<any> {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT * FROM bias_analyses
       WHERE content_hash = $1
       ORDER BY created_at DESC
       LIMIT 1
-    `, [contentHash])
+    `,
+      [contentHash],
+    )
 
     return result.rows[0] || null
   }
@@ -460,15 +501,21 @@ export class BiasAnalysisManager {
   /**
    * Get analyses for a therapist
    */
-  async getAnalysesForTherapist(therapistId: string, limit: number = 100): Promise<any[]> {
-    const result = await query(`
+  async getAnalysesForTherapist(
+    therapistId: string,
+    limit: number = 100,
+  ): Promise<any[]> {
+    const result = await query(
+      `
       SELECT ba.*, s.started_at as session_date
       FROM bias_analyses ba
       JOIN sessions s ON ba.session_id = s.id
       WHERE ba.therapist_id = $1
       ORDER BY ba.created_at DESC
       LIMIT $2
-    `, [therapistId, limit])
+    `,
+      [therapistId, limit],
+    )
 
     return result.rows
   }
@@ -477,7 +524,8 @@ export class BiasAnalysisManager {
    * Get bias analysis summary for therapist
    */
   async getBiasSummary(therapistId: string, days: number = 30): Promise<any> {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT
         COUNT(*) as total_analyses,
         ROUND(AVG(overall_bias_score)::numeric, 3) as avg_bias_score,
@@ -487,15 +535,19 @@ export class BiasAnalysisManager {
       FROM bias_analyses
       WHERE therapist_id = $1
         AND created_at >= NOW() - INTERVAL '${days} days'
-    `, [therapistId])
+    `,
+      [therapistId],
+    )
 
-    return result.rows[0] || {
-      total_analyses: 0,
-      avg_bias_score: 0,
-      high_alerts: 0,
-      low_alerts: 0,
-      last_analysis: null
-    }
+    return (
+      result.rows[0] || {
+        total_analyses: 0,
+        avg_bias_score: 0,
+        high_alerts: 0,
+        low_alerts: 0,
+        last_analysis: null,
+      }
+    )
   }
 }
 

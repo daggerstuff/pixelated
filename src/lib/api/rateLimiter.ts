@@ -64,12 +64,12 @@ class RateLimiter {
     this.metrics.totalRequests++
 
     const results = await Promise.all(
-      this.config.rules.map(rule => this.checkRule(request, rule))
+      this.config.rules.map((rule) => this.checkRule(request, rule)),
     )
 
     // Request is allowed if ANY rule passes (OR logic) or if ALL rules pass (AND logic)
     // For security, we'll use AND logic - all rules must pass
-    const allRulesPass = results.every(result => result.success)
+    const allRulesPass = results.every((result) => result.success)
 
     if (!allRulesPass) {
       this.metrics.blockedRequests++
@@ -80,19 +80,22 @@ class RateLimiter {
       this.metrics.requestCounts.set(clientKey, currentCount + 1)
 
       // Return the most restrictive rule's result
-      const failedResult = results.find(result => !result.success)!
+      const failedResult = results.find((result) => !result.success)!
       return failedResult
     }
 
     return {
       success: true,
-      limit: Math.min(...results.map(r => r.limit)),
-      remaining: Math.min(...results.map(r => r.remaining)),
-      resetTime: Math.min(...results.map(r => r.resetTime)),
+      limit: Math.min(...results.map((r) => r.limit)),
+      remaining: Math.min(...results.map((r) => r.remaining)),
+      resetTime: Math.min(...results.map((r) => r.resetTime)),
     }
   }
 
-  private async checkRule(request: Request, rule: RateLimitRule): Promise<RateLimitResult> {
+  private async checkRule(
+    request: Request,
+    rule: RateLimitRule,
+  ): Promise<RateLimitResult> {
     const key = rule.keyGenerator
       ? rule.keyGenerator(request)
       : this.getDefaultKey(request)
@@ -105,7 +108,10 @@ class RateLimiter {
       if (this.config.burstLimit) {
         const burstCount = await this.config.storage.incr(burstKey)
         if (burstCount === 1) {
-          await this.config.storage.expire(burstKey, Math.ceil(this.config.burstWindowMs! / 1000))
+          await this.config.storage.expire(
+            burstKey,
+            Math.ceil(this.config.burstWindowMs! / 1000),
+          )
         }
 
         if (burstCount > this.config.burstLimit!) {
@@ -114,7 +120,7 @@ class RateLimiter {
             success: false,
             limit: this.config.burstLimit!,
             remaining: 0,
-            resetTime: Date.now() + (ttl * 1000),
+            resetTime: Date.now() + ttl * 1000,
             retryAfter: ttl,
           }
         }
@@ -125,11 +131,14 @@ class RateLimiter {
 
       if (currentCount === 1) {
         // First request in this window, set expiry
-        await this.config.storage.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+        await this.config.storage.expire(
+          windowKey,
+          Math.ceil(rule.windowMs / 1000),
+        )
       }
 
       const ttl = await this.config.storage.ttl(windowKey)
-      const resetTime = Date.now() + (ttl * 1000)
+      const resetTime = Date.now() + ttl * 1000
 
       if (currentCount > rule.maxRequests) {
         return {
@@ -170,10 +179,7 @@ class RateLimiter {
     const realIp = request.headers.get('x-real-ip')
     const clientIp = request.headers.get('x-client-ip')
 
-    const ip = forwardedFor?.split(',')[0] ||
-               realIp ||
-               clientIp ||
-               'unknown'
+    const ip = forwardedFor?.split(',')[0] || realIp || clientIp || 'unknown'
 
     // Include user agent for more granular limiting
     const userAgent = request.headers.get('user-agent') || 'unknown'
@@ -210,14 +216,15 @@ class RateLimiter {
 
     // Get top offenders
     const sortedOffenders = Array.from(this.metrics.requestCounts.entries())
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([key]) => key)
 
     return {
       totalRequests: this.metrics.totalRequests,
       blockedRequests: this.metrics.blockedRequests,
-      averageRequestsPerMinute: timeDiffMinutes > 0 ? this.metrics.totalRequests / timeDiffMinutes : 0,
+      averageRequestsPerMinute:
+        timeDiffMinutes > 0 ? this.metrics.totalRequests / timeDiffMinutes : 0,
       topOffenders: sortedOffenders,
     }
   }
@@ -244,12 +251,13 @@ class RateLimiter {
       const keys = await this.config.storage.keys(pattern)
 
       // Remove keys older than 24 hours
-      const cutoff = Date.now() - (24 * 60 * 60 * 1000)
+
       let cleanedCount = 0
 
       for (const key of keys) {
         const ttl = await this.config.storage.ttl(key)
-        if (ttl === -1) { // Key exists but no expiry
+        if (ttl === -1) {
+          // Key exists but no expiry
           await this.config.storage.del(key)
           cleanedCount++
         }
@@ -272,12 +280,14 @@ export const RATE_LIMIT_RULES = {
     {
       windowMs: 15 * 60 * 1000, // 15 minutes
       maxRequests: 5, // 5 auth attempts per 15 minutes
-      keyGenerator: (req: Request) => `auth:${req.headers.get('x-forwarded-for') || 'unknown'}`,
+      keyGenerator: (req: Request) =>
+        `auth:${req.headers.get('x-forwarded-for') || 'unknown'}`,
     },
     {
       windowMs: 60 * 1000, // 1 minute
       maxRequests: 3,
-      keyGenerator: (req: Request) => `auth_burst:${req.headers.get('x-forwarded-for') || 'unknown'}`,
+      keyGenerator: (req: Request) =>
+        `auth_burst:${req.headers.get('x-forwarded-for') || 'unknown'}`,
     },
   ],
 
@@ -325,7 +335,10 @@ export const RATE_LIMIT_RULES = {
 /**
  * Create rate limiter instance with Redis storage
  */
-export function createRateLimiter(redis: Redis, rules: RateLimitRule[] = RATE_LIMIT_RULES.API): RateLimiter {
+export function createRateLimiter(
+  redis: Redis,
+  rules: RateLimitRule[] = RATE_LIMIT_RULES.API,
+): RateLimiter {
   return new RateLimiter({
     storage: redis,
     rules,

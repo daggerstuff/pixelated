@@ -1,6 +1,6 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 // Detect CI environment to avoid running dev server with file watchers in CI (which can fail under low inotify limits).
-const isCi = !!process.env['CI'];
+const isCi = !!process.env['CI']
 
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests
@@ -21,22 +21,22 @@ export default defineConfig({
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }]
+    ['junit', { outputFile: 'test-results/junit.xml' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env['BASE_URL'] || 'http://localhost:4321',
-    
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    
+
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    
+
     /* Record video on failure */
     video: 'retain-on-failure',
-    
+
     /* Global test timeout */
     actionTimeout: 30000,
     navigationTimeout: 30000,
@@ -83,14 +83,14 @@ export default defineConfig({
         reuseExistingServer: true,
         timeout: 180 * 1000,
       },
-  
+
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',
   // globalTeardown: './tests/e2e/global-teardown.ts',
-  
+
   /* Test output directories */
   outputDir: 'test-results/',
-  
+
   /* Expect options */
   expect: {
     /* Maximum time expect() should wait for the condition to be met. */
@@ -104,5 +104,4 @@ export default defineConfig({
     },
     // ...other expect options if needed...
   },
-});
-
+})

@@ -27,6 +27,8 @@ Our monitoring stack consists of:
 - OpenSearch for log aggregation and analysis
 - Grafana for visualization
 - SNS for alerting
+- GitHub Actions for automated health checks
+- Prometheus and Loki for infrastructure monitoring
 
 ### Architecture
 
@@ -41,7 +43,37 @@ graph TD
     E --> G
     B --> H[SNS]
     E --> H
+    I[GitHub Actions] --> J[Production Health Checks]
+    J --> K[Slack Notifications]
 ```
+
+### Automated Health Checks
+
+We use GitHub Actions to perform automated production health checks:
+
+- **Schedule**: Runs daily at 12:00 UTC and manually via `workflow_dispatch`
+- **Production**: Checks main site availability with retry logic
+- **Staging**: Validates staging environment health
+- **Preview**: Monitors preview deployments
+- **Performance**: Runs Lighthouse CI for performance monitoring
+
+#### Setup Production Monitoring
+
+To enable production health checks, configure the `APP_URL` variable:
+
+1. Go to **Settings** → **Secrets and variables** → **Actions**
+2. Create a repository variable `APP_URL` pointing to your production site
+3. Example values:
+   - `https://pixelatedempathy.com`
+   - `https://yourdomain.com`
+
+**Note**: If you see HTTP 522 errors, this typically means:
+- The site is not actually deployed to a server
+- DNS is not correctly configured
+- Cloudflare settings don't match your hosting provider
+- The origin server is down or unreachable
+
+For detailed monitoring setup, see [monitoring/MONITORING_README.md](/monitoring/MONITORING_README.md).
 
 ## Metrics Reference
 

@@ -142,7 +142,7 @@ export class JobQueueService {
 
     if (currentJobString) {
       job = {
-        ...JSON.parse(currentJobString) as unknown,
+        ...(JSON.parse(currentJobString) as unknown),
         ...updates,
         status,
         updatedAt: new Date().toISOString(),
@@ -199,7 +199,7 @@ export class JobQueueService {
    */
   async getJobStatus(jobId: string): Promise<Job | null> {
     const jobString = await redis.hget(this.jobStatusKeyPrefix + jobId, jobId)
-    return jobString ? JSON.parse(jobString) as unknown : null
+    return jobString ? (JSON.parse(jobString) as unknown) : null
   }
 
   /**
@@ -237,7 +237,8 @@ export class JobQueueService {
         // Cancelled jobs are currently stored in failedKey
         jobStrings = Object.values(await redis.hgetall(this.failedKey))
         jobStrings = jobStrings.filter(
-          (jobStr) => JSON.parse(jobStr) as unknown.status === JobStatus.CANCELLED,
+          (jobStr) =>
+            (JSON.parse(jobStr) as unknown.status) === JobStatus.CANCELLED,
         )
         break
       default:
@@ -273,7 +274,8 @@ export class JobQueueService {
         const cancelledJobs = Object.values(await redis.hgetall(this.failedKey))
         jobIds = cancelledJobs
           .filter(
-            (jobStr: string) => JSON.parse(jobStr) as unknown.status === JobStatus.CANCELLED,
+            (jobStr: string) =>
+              (JSON.parse(jobStr) as unknown.status) === JobStatus.CANCELLED,
           )
           .map((jobStr: string) => JSON.parse(jobStr) as unknown.id)
         break

@@ -31,15 +31,15 @@ const PAGES_TO_TEST = [
 
 // Define interfaces for better type safety
 interface FocusedElement {
-  tagName: string;
-  text: string;
-  href?: string | null;
-  className?: string | null;
-  id?: string;
-  x?: number;
-  y?: number;
-  tabIndex?: number;
-  role?: string | null;
+  tagName: string
+  text: string
+  href?: string | null
+  className?: string | null
+  id?: string
+  x?: number
+  y?: number
+  tabIndex?: number
+  role?: string | null
 }
 
 test.describe('Keyboard Navigation Tests', () => {
@@ -58,18 +58,18 @@ test.describe('Keyboard Navigation Tests', () => {
       // Check if the skip link is the first focusable element
       await pageContext.keyboard.press('Tab')
       const firstFocusedElement = await pageContext.evaluate(() => {
-        const { activeElement } = document;
+        const { activeElement } = document
         if (!activeElement) {
-          return { tagName: '', text: '' };
+          return { tagName: '', text: '' }
         }
-        
+
         return {
           tagName: activeElement.tagName.toLowerCase(),
           text: activeElement.textContent?.trim() || '',
           href: activeElement.getAttribute('href'),
           className: activeElement.className,
         }
-      });
+      })
 
       // Test if the first element is a skip link
       const isSkipLink =
@@ -99,10 +99,10 @@ test.describe('Keyboard Navigation Tests', () => {
       for (const element of elementsToCheck) {
         // Check if the element exists
         const elementCount = await pageContext.locator(element.selector).count()
-        expect(elementCount).toBeGreaterThan(
-          0,
+        expect(elementCount).toBeGreaterThan(0)
+        console.log(
+          `No ${element.name} elements found with selector "${element.selector}" on ${page.name} page`,
         )
-        console.log(`No ${element.name} elements found with selector "${element.selector}" on ${page.name} page`)
 
         // Check if at least one of the elements matching the selector can be focused
         let foundFocusable = false
@@ -132,7 +132,9 @@ test.describe('Keyboard Navigation Tests', () => {
         }
 
         expect(foundFocusable).toBe(true)
-        console.log(`None of the ${element.name} elements (${element.selector}) on ${page.name} page can be focused`)
+        console.log(
+          `None of the ${element.name} elements (${element.selector}) on ${page.name} page can be focused`,
+        )
       }
 
       // Test natural tab order
@@ -191,7 +193,9 @@ test.describe('Keyboard Navigation Tests', () => {
       })
 
       // Check for any focusable elements with a tabindex > 0 (anti-pattern)
-      const highTabIndexElements = focusPath.filter((el) => (el.tabIndex || 0) > 0)
+      const highTabIndexElements = focusPath.filter(
+        (el) => (el.tabIndex || 0) > 0,
+      )
       if (highTabIndexElements.length > 0) {
         console.warn(
           `Found ${highTabIndexElements.length} elements with tabindex > 0 on ${page.name} page. This is an accessibility anti-pattern:`,
@@ -205,7 +209,9 @@ test.describe('Keyboard Navigation Tests', () => {
 
       // Verify at least some elements can be focused
       expect(focusPath.length).toBeGreaterThan(5)
-      console.log(`Found only ${focusPath.length} focusable elements on ${page.name} page, expected more interactive elements`)
+      console.log(
+        `Found only ${focusPath.length} focusable elements on ${page.name} page, expected more interactive elements`,
+      )
     })
   }
 })

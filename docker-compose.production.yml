@@ -5,7 +5,11 @@ services:
   app:
     build:
       context: .
+<<<<<<< HEAD
       dockerfile: Dockerfile.production
+=======
+      dockerfile: Dockerfile
+>>>>>>> master
     container_name: pixelated-app
     restart: unless-stopped
     ports:
@@ -227,4 +231,8 @@ secrets:
 networks:
   default:
     name: pixelated-network
+<<<<<<< HEAD
     driver: bridge
+=======
+    driver: bridge
+>>>>>>> master

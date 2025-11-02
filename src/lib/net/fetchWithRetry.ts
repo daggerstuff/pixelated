@@ -10,7 +10,11 @@ export type RetryOptions = {
   timeout?: number // per-attempt timeout in ms
   retryOn?:
     | number[]
-    | ((response: Response | null, error: unknown | null, attempt: number) => boolean | Promise<boolean>)
+    | ((
+        response: Response | null,
+        error: unknown | null,
+        attempt: number,
+      ) => boolean | Promise<boolean>)
   onRetry?: (attempt: number, responseOrError: Response | unknown) => void
 }
 
@@ -65,16 +69,21 @@ export async function fetchWithRetry(
         externalSignal.addEventListener('abort', abortExternal, { once: true })
       }
 
-      const response = await fetch(input, { ...init, signal: controller.signal })
+      const response = await fetch(input, {
+        ...init,
+        signal: controller.signal,
+      })
 
       if (attempt < retries) {
         const shouldRetry = Array.isArray(retryOn)
           ? retryOn.includes(response.status)
-          : await (retryOn as (
-              response: Response | null,
-              error: unknown | null,
-              attempt: number,
-            ) => boolean | Promise<boolean>)(response, null, attempt)
+          : await (
+              retryOn as (
+                response: Response | null,
+                error: unknown | null,
+                attempt: number,
+              ) => boolean | Promise<boolean>
+            )(response, null, attempt)
 
         if (shouldRetry) {
           onRetry?.(attempt + 1, response)
@@ -90,7 +99,10 @@ export async function fetchWithRetry(
       if (externalSignal && (externalSignal as AbortSignal).aborted) {
         clearTimeout(timeoutId)
         if (externalSignal) {
-          ;(externalSignal as AbortSignal).removeEventListener('abort', abortExternal)
+          ;(externalSignal as AbortSignal).removeEventListener(
+            'abort',
+            abortExternal,
+          )
         }
         throw err
       }
@@ -98,11 +110,13 @@ export async function fetchWithRetry(
       if (attempt < retries) {
         const shouldRetry = Array.isArray(retryOn)
           ? true // if error occurred, we retry regardless of status list
-          : await (retryOn as (
-              response: Response | null,
-              error: unknown | null,
-              attempt: number,
-            ) => boolean | Promise<boolean>)(null, err, attempt)
+          : await (
+              retryOn as (
+                response: Response | null,
+                error: unknown | null,
+                attempt: number,
+              ) => boolean | Promise<boolean>
+            )(null, err, attempt)
 
         if (shouldRetry) {
           onRetry?.(attempt + 1, err)
@@ -116,7 +130,10 @@ export async function fetchWithRetry(
     } finally {
       clearTimeout(timeoutId)
       if (externalSignal) {
-        ;(externalSignal as AbortSignal).removeEventListener('abort', abortExternal)
+        ;(externalSignal as AbortSignal).removeEventListener(
+          'abort',
+          abortExternal,
+        )
       }
     }
   }

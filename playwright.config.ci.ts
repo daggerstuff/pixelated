@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 /**
  * Playwright CI configuration for Pixelated Empathy
@@ -10,7 +10,7 @@ export default defineConfig({
   testMatch: [
     'browser/auth.spec.ts',
     'browser/cross-browser-compatibility.spec.ts',
-    'browser/mobile-compatibility.spec.ts'
+    'browser/mobile-compatibility.spec.ts',
   ],
 
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -29,7 +29,7 @@ export default defineConfig({
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }]
+    ['junit', { outputFile: 'test-results/junit.xml' }],
   ],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -86,16 +86,16 @@ export default defineConfig({
       NODE_ENV: 'test',
       DISABLE_AUTH: 'true',
       DISABLE_WEB_FONTS: 'true',
-      SKIP_MSW: 'true'
-    }
+      SKIP_MSW: 'true',
+    },
   },
 
   /* Test output directories */
- outputDir: 'test-results/',
+  outputDir: 'test-results/',
 
   /* Expect options */
   expect: {
     /* Maximum time expect() should wait for the condition to be met. */
     timeout: 10000,
   },
-});
+})

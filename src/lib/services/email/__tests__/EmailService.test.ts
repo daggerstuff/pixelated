@@ -4,9 +4,9 @@ import { EmailService } from '../EmailService'
 vi.mock('@/lib/env', () => ({
   env: {
     email: {
-      resendApiKey: vi.fn(() => 'test-api-key')
-    }
-  }
+      resendApiKey: vi.fn(() => 'test-api-key'),
+    },
+  },
 }))
 
 // Create mock implementation of Redis methods

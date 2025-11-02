@@ -1,4 +1,9 @@
-import type { ClientKey, ServerKey, PublicKey, EncryptedData } from '../../lib/fhe/types'
+import type {
+  ClientKey,
+  ServerKey,
+  PublicKey,
+  EncryptedData,
+} from '../../lib/fhe/types'
 
 declare module '@tfhe/tfhe-wasm' {
   export function createClientKey(params: unknown): ClientKey

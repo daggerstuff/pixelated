@@ -12,7 +12,9 @@ const limiter = new RateLimiter({
  * @param request The request object
  * @returns A Response if rate limited, undefined otherwise
  */
-export async function rateLimiter(request: Request): Promise<Response | undefined> {
+export async function rateLimiter(
+  request: Request,
+): Promise<Response | undefined> {
   // Get client IP from headers
   const ip =
     request.headers.get('x-forwarded-for') ||
@@ -40,9 +42,11 @@ export async function rateLimiter(request: Request): Promise<Response | undefine
           'X-RateLimit-Limit': result.limit.toString(),
           'X-RateLimit-Remaining': result.remaining.toString(),
           'X-RateLimit-Reset': result.reset.toString(),
-          'Retry-After': Math.ceil((result.reset - Date.now()) / 1000).toString(),
+          'Retry-After': Math.ceil(
+            (result.reset - Date.now()) / 1000,
+          ).toString(),
         },
-      }
+      },
     )
   }
 
