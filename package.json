@@ -424,8 +424,7 @@
       "tree-sitter-rust",
       "tree-sitter-scala",
       "tree-sitter-typescript",
-      "unrs-resolver",
-      "workerd"
+      "unrs-resolver"
     ],
     "ignoredBuiltDependencies": [
       "libpg-query"
