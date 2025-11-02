@@ -76,6 +76,18 @@ export interface NotificationChannel {
   enabled: boolean
 }
 
+export interface ThreatIntelligenceService {
+  getThreat(threatId: string): Promise<unknown>
+}
+
+export interface RateLimitingService {
+  applyRateLimit(
+    userId: string,
+    limit: number,
+    windowMs: number,
+  ): Promise<void>
+}
+
 export interface ResponseOrchestrationService {
   orchestrateResponse(
     threatId: string,
@@ -92,17 +104,17 @@ export class AdvancedResponseOrchestrator
   extends EventEmitter
   implements ResponseOrchestrationService
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private responseExecutor: ResponseExecutor
-  private decisionEngine: DecisionEngine
-  private integrationManager: IntegrationManager
-  private notificationManager: NotificationManager
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private responseExecutor!: ResponseExecutor
+  private decisionEngine!: DecisionEngine
+  private integrationManager!: IntegrationManager
+  private notificationManager!: NotificationManager
 
   constructor(
     private config: OrchestrationConfig,
-    private threatIntelligenceService: unknown,
-    private rateLimitingService: unknown,
+    private threatIntelligenceService: ThreatIntelligenceService,
+    private rateLimitingService: RateLimitingService,
   ) {
     super()
     this.initializeServices()
@@ -304,16 +316,10 @@ export class AdvancedResponseOrchestrator
         throw new Error(`Threat ${threatId} not found`)
       }
 
-      // Escalate threat severity
-      const escalatedThreat = await this.escalateThreatSeverity(
-        threatData,
-        reason,
-      )
-
-      // Generate escalated response
+      // Generate escalated response (escalation is handled in orchestration)
       const escalatedResponse = await this.orchestrateResponse(
         threatId,
-        escalatedThreat,
+        threatData,
       )
 
       this.emit('threat_escalated', {
@@ -361,13 +367,15 @@ export class AdvancedResponseOrchestrator
 
     // Calculate threat severity and impact
     const severity = this.calculateThreatSeverity(threatData, mlAnalysis)
-    const impact = this.calculateThreatImpact(threatData, mlAnalysis)
+    const estimatedImpact = this.calculateThreatImpact(threatData, mlAnalysis)
     const { confidence } = mlAnalysis
 
+    const data = threatData as ThreatData
+
     return {
-      threatId: threatData.threatId,
+      threatId: data.threatId,
       severity,
-      impact,
+      estimatedImpact,
       confidence,
       riskFactors: mlAnalysis.riskFactors,
       recommendedActions: mlAnalysis.recommendedActions,
@@ -386,19 +394,19 @@ export class AdvancedResponseOrchestrator
     // Determine response type based on severity
     if (
       analysis.severity === 'critical' ||
-      analysis.impact > strategies.critical
+      analysis.estimatedImpact > strategies.critical
     ) {
       primaryType = 'block'
       escalationLevel = 4
     } else if (
       analysis.severity === 'high' ||
-      analysis.impact > strategies.high
+      analysis.estimatedImpact > strategies.high
     ) {
       primaryType = 'rate_limit'
       escalationLevel = 3
     } else if (
       analysis.severity === 'medium' ||
-      analysis.impact > strategies.medium
+      analysis.estimatedImpact > strategies.medium
     ) {
       primaryType = 'investigate'
       escalationLevel = 2
@@ -575,7 +583,7 @@ export class AdvancedResponseOrchestrator
     const strategy = await this.determineResponseStrategy({
       threatId: response.threatId,
       severity: response.severity,
-      impact: response.estimatedImpact,
+      estimatedImpact: response.estimatedImpact,
       confidence: response.confidence,
       riskFactors: {},
       recommendedActions: response.actions.map((a) => a.actionType),
@@ -605,9 +613,9 @@ export class AdvancedResponseOrchestrator
     for (const action of response.actions) {
       if (action.actionType === 'rate_limiting') {
         await this.rateLimitingService.applyRateLimit(
-          action.parameters.userId,
-          action.parameters.limit,
-          action.parameters.windowMs,
+          action.parameters.userId as string,
+          action.parameters.limit as number,
+          action.parameters.windowMs as number,
         )
       }
     }
@@ -634,7 +642,7 @@ export class AdvancedResponseOrchestrator
     responseId: string,
   ): Promise<ThreatResponse | null> {
     const db = this.mongoClient.db('threat_detection')
-    const collection = db.collection('threat_responses')
+    const collection = db.collection<ThreatResponse>('threat_responses')
 
     return await collection.findOne({ responseId })
   }
@@ -666,8 +674,8 @@ export class AdvancedResponseOrchestrator
   }
 
   private calculateThreatSeverity(
-    threatData: unknown,
-    mlAnalysis: unknown,
+    _threatData: unknown,
+    mlAnalysis: MLAnalysis,
   ): ThreatResponse['severity'] {
     // Implement severity calculation logic
     if (mlAnalysis.riskScore > 0.8) {
@@ -683,8 +691,8 @@ export class AdvancedResponseOrchestrator
   }
 
   private calculateThreatImpact(
-    threatData: unknown,
-    mlAnalysis: unknown,
+    _threatData: unknown,
+    mlAnalysis: MLAnalysis,
   ): number {
     // Implement impact calculation logic
     return mlAnalysis.riskScore * 100 // Scale to 0-100 range
@@ -744,7 +752,7 @@ export class AdvancedResponseOrchestrator
 interface ThreatAnalysis {
   threatId: string
   severity: ThreatResponse['severity']
-  impact: number
+  estimatedImpact: number
   confidence: number
   riskFactors: Record<string, unknown>
   recommendedActions: string[]
@@ -767,6 +775,37 @@ interface ExecutionResult {
   rollbackPossible: boolean
 }
 
+interface MLAnalysis {
+  riskScore: number
+  confidence: number
+  riskFactors: Record<string, unknown>
+  recommendedActions: string[]
+}
+
+interface ThreatPrediction {
+  riskScore: number
+  confidence: number
+  riskLevel: number
+}
+
+interface ThreatData {
+  threatId: string
+  anomalyScore?: number
+  frequency?: number
+  severity?: number
+  impact?: number
+  userRiskScore?: number
+  ipRiskScore?: number
+  behavioralDeviation?: number
+  temporalAnomaly?: number
+  geographicAnomaly?: number
+  patternNovelty?: number
+  userId?: string
+  sourceIp?: string
+  anomalyTypes?: string[]
+  patternMatches?: string[]
+}
+
 // Abstract base classes for extensibility
 abstract class ResponseExecutor {
   abstract executeActions(actions: ResponseAction[]): Promise<ExecutionResult[]>
@@ -776,7 +815,7 @@ abstract class ResponseExecutor {
 }
 
 abstract class DecisionEngine {
-  abstract analyzeThreat(threatData: unknown): Promise<unknown>
+  abstract analyzeThreat(threatData: unknown): Promise<MLAnalysis>
 }
 
 abstract class IntegrationManager {
@@ -882,7 +921,7 @@ class ConcurrentResponseExecutor extends ResponseExecutor {
 class MLDecisionEngine extends DecisionEngine {
   private model: tf.Sequential | null = null
 
-  async analyzeThreat(threatData: unknown): Promise<unknown> {
+  async analyzeThreat(threatData: unknown): Promise<MLAnalysis> {
     // Initialize model if needed
     if (!this.model) {
       await this.initializeModel()
@@ -935,32 +974,33 @@ class MLDecisionEngine extends DecisionEngine {
 
   private extractFeatures(threatData: unknown): number[] {
     // Extract relevant features for ML analysis
+    const data = threatData as ThreatData
     return [
-      threatData.anomalyScore || 0,
-      threatData.frequency || 0,
-      threatData.severity || 0,
-      threatData.impact || 0,
-      threatData.userRiskScore || 0,
-      threatData.ipRiskScore || 0,
-      threatData.behavioralDeviation || 0,
-      threatData.temporalAnomaly || 0,
-      threatData.geographicAnomaly || 0,
-      threatData.patternNovelty || 0,
+      data.anomalyScore || 0,
+      data.frequency || 0,
+      data.severity || 0,
+      data.impact || 0,
+      data.userRiskScore || 0,
+      data.ipRiskScore || 0,
+      data.behavioralDeviation || 0,
+      data.temporalAnomaly || 0,
+      data.geographicAnomaly || 0,
+      data.patternNovelty || 0,
     ]
   }
 
-  private async predictThreatLevel(features: number[]): Promise<unknown> {
+  private async predictThreatLevel(features: number[]): Promise<ThreatPrediction> {
     if (!this.model) {
       throw new Error('Model not initialized')
     }
 
-    const result = await tf.tidy(async () => {
-      const inputTensor = tf.tensor2d([features])
-      const prediction = this.model.predict(inputTensor) as tf.Tensor
-      const data = await prediction.data()
-      // prediction and inputTensor will be disposed by tidy
-      return Array.from(data) as number[]
-    })
+    const inputTensor = tf.tensor2d([features])
+    const prediction = this.model.predict(inputTensor) as tf.Tensor
+    const data = await prediction.data()
+    const result = Array.from(data)
+
+    inputTensor.dispose()
+    prediction.dispose()
 
     return {
       riskScore: result[0] * 0.3 + result[1] * 0.6 + result[2] * 0.9, // Weighted average
@@ -971,15 +1011,16 @@ class MLDecisionEngine extends DecisionEngine {
 
   private identifyRiskFactors(threatData: unknown): Record<string, unknown> {
     // Identify key risk factors from threat data
+    const data = threatData as ThreatData
     return {
-      userId: threatData.userId,
-      ip: threatData.sourceIp,
-      anomalyTypes: threatData.anomalyTypes || [],
-      patternMatches: threatData.patternMatches || [],
+      userId: data.userId,
+      ip: data.sourceIp,
+      anomalyTypes: data.anomalyTypes || [],
+      patternMatches: data.patternMatches || [],
     }
   }
 
-  private generateRecommendations(prediction: unknown): string[] {
+  private generateRecommendations(prediction: ThreatPrediction): string[] {
     // Generate recommended actions based on prediction
     const recommendations: string[] = []
 
@@ -1159,4 +1200,3 @@ class MultiChannelNotificationManager extends NotificationManager {
   }
 }
 
-export { AdvancedResponseOrchestrator }

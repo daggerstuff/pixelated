@@ -68,6 +68,16 @@ export interface ThreatAttribution {
   attributionConfidence: number
 }
 
+export interface ModelPerformanceMetrics {
+  accuracy: number
+  precision: number
+  recall: number
+  f1Score: number
+  mae: number
+  mse: number
+  rmse: number
+}
+
 export interface ThreatForecast {
   forecastId: string
   timeframe: TimeWindow
@@ -85,6 +95,14 @@ export interface PredictedThreat {
   probability: number
   contributingFactors: string[]
   timeHorizon: string
+}
+
+export interface ThreatCharacteristics {
+  attackVectors: string[]
+  patterns: string[]
+  signatures: string[]
+  behavior: string[]
+  indicators: string[]
 }
 
 export interface NovelThreat {
@@ -127,6 +145,14 @@ export interface RiskAssessment {
   confidenceLevel: number
 }
 
+export interface TimeSeriesPrediction {
+  timestamp: Date
+  predictedValue: number
+  confidence: number
+  lowerBound: number
+  upperBound: number
+}
+
 export interface TimeSeriesForecast {
   forecastId: string
   series: ThreatTimeSeries[]
@@ -163,14 +189,14 @@ export class AdvancedPredictiveThreatIntelligence
   extends EventEmitter
   implements PredictiveThreatIntelligence
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private timeSeriesForecaster: TimeSeriesForecaster
-  private noveltyDetector: NoveltyDetector
-  private propagationModeler: PropagationModeler
-  seasonalAnalyzer: SeasonalAnalyzer
-  private riskAssessor: RiskAssessor
-  private modelRegistry: ModelRegistry
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private timeSeriesForecaster!: TimeSeriesForecaster
+  private noveltyDetector!: NoveltyDetector
+  private propagationModeler!: PropagationModeler
+  seasonalAnalyzer!: SeasonalAnalyzer
+  private riskAssessor!: RiskAssessor
+  private modelRegistry!: ModelRegistry
 
   constructor(
     private config: {
@@ -183,7 +209,10 @@ export class AdvancedPredictiveThreatIntelligence
     },
   ) {
     super()
-    this.initializeServices()
+    // Initialize services - note: this is fire-and-forget
+    this.initializeServices().catch((error) => {
+      this.emit('initialization_error', { error })
+    })
   }
 
   private async initializeServices(): Promise<void> {
@@ -193,15 +222,7 @@ export class AdvancedPredictiveThreatIntelligence
     this.timeSeriesForecaster = new LSTMTimeSeriesForecaster(
       this.config.forecastingConfig,
     )
-    this.noveltyDetector = class MLNoveltyDetector {
-      async detectNovelThreats(
-        _data: ThreatData[],
-        _baseline: ThreatData[],
-      ): Promise<NovelThreat[]> {
-        // Implement ML-based novelty detection
-        return []
-      }
-    }
+    this.noveltyDetector = new MLNoveltyDetector(this.config.noveltyConfig)
     this.propagationModeler = new GraphPropagationModeler(
       this.config.propagationConfig,
     )
@@ -628,14 +649,23 @@ export class AdvancedPredictiveThreatIntelligence
       )
 
       // Generate predictions
-      const predictions = await this.timeSeriesForecaster.forecast(
+      const predictionResults = await this.timeSeriesForecaster.forecast(
         model,
         features,
       )
 
+      // Convert PredictionResult[] to TimeSeriesPrediction[]
+      const predictions: TimeSeriesPrediction[] = predictionResults.map((pred, idx) => ({
+        timestamp: new Date(Date.now() + idx * 24 * 60 * 60 * 1000),
+        predictedValue: pred.value,
+        confidence: pred.confidence,
+        lowerBound: pred.value - (pred.value * 0.1),
+        upperBound: pred.value + (pred.value * 0.1),
+      }))
+
       // Calculate confidence bands
       const confidenceBands =
-        await this.calculateTimeSeriesConfidenceBands(predictions)
+        await this.calculateTimeSeriesConfidenceBands(predictionResults)
 
       // Extract model parameters
       const modelParameters = await this.extractModelParameters(model)
@@ -803,36 +833,48 @@ export class AdvancedPredictiveThreatIntelligence
 
   private async buildPropagationGraph(
     initialThreat: Threat,
-    _network: NetworkGraph,
+    network: NetworkGraph,
   ): Promise<PropagationGraph> {
     // Create propagation graph based on threat characteristics and network topology
     const propagationGraph: PropagationGraph = {
       graphId: this.generateGraphId(),
       nodes: network.nodes.map((node) => ({
         ...node,
-        infectionProbability: this.calculateInfectionProbability(
-          node,
-          initialThreat,
-        ),
-        recoveryRate: this.calculateRecoveryRate(node),
-        vulnerabilityScore: this.calculateVulnerabilityScore(node),
+        infectionProbability: 0,
+        recoveryRate: 0,
+        vulnerabilityScore: 0,
       })),
       edges: network.edges.map((edge) => ({
         ...edge,
-        transmissionProbability: this.calculateTransmissionProbability(
-          edge,
-          initialThreat,
-        ),
-        transmissionRate: this.calculateTransmissionRate(edge),
+        transmissionProbability: 0,
+        transmissionRate: 0,
       })),
+    }
+
+    // Calculate probabilities asynchronously
+    for (const node of propagationGraph.nodes) {
+      node.infectionProbability = await this.calculateInfectionProbability(
+        node,
+        initialThreat,
+      )
+      node.recoveryRate = await this.calculateRecoveryRate(node)
+      node.vulnerabilityScore = await this.calculateVulnerabilityScore(node)
+    }
+
+    for (const edge of propagationGraph.edges) {
+      edge.transmissionProbability = await this.calculateTransmissionProbability(
+        edge,
+        initialThreat,
+      )
+      edge.transmissionRate = await this.calculateTransmissionRate(edge)
     }
 
     return propagationGraph
   }
 
   private async calculatePropagationProbabilities(
-    _propagationGraph: PropagationGraph,
-    _initialThreat: Threat,
+    propagationGraph: PropagationGraph,
+    initialThreat: Threat,
   ): Promise<PropagationProbabilities> {
     // Use epidemic modeling techniques (SIR, SEIR, etc.)
     const probabilities: PropagationProbabilities = {
@@ -992,28 +1034,191 @@ export class AdvancedPredictiveThreatIntelligence
     return []
   }
 
-  private async extractThreatFeatures(_data: ThreatData[]): Promise<any> {
-    return {}
+  private async extractThreatFeatures(_data: ThreatData[]): Promise<ThreatFeatures> {
+    return { statistical: { mean: 0, variance: 0, skewness: 0, kurtosis: 0, percentiles: {} }, temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 }, spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} }, categorical: { threatTypeDistribution: {}, severityDistribution: {}, attributionDistribution: {} } }
   }
 
   private async analyzeTrends(
     _timeSeries: ThreatTimeSeries[],
     _predictions: PredictedThreat[],
-  ): Promise<any> {
-    return {}
+  ): Promise<TrendAnalysis> {
+    return { trendDirection: 'stable', trendStrength: 0, changePoints: [], seasonalityStrength: 0, noiseLevel: 0 }
   }
 
   private async evaluateModelPerformance(
     _models: ForecastingModel[],
     _timeSeries: ThreatTimeSeries[],
-  ): Promise<any> {
-    return {}
+  ): Promise<ModelPerformanceMetrics> {
+    return { accuracy: 0, precision: 0, recall: 0, f1Score: 0, mae: 0, mse: 0, rmse: 0 }
   }
 
   private async identifyAffectedNodes(
     _simulation: PropagationSimulation,
   ): Promise<NetworkNode[]> {
     return []
+  }
+
+  // Missing method implementations
+  private async identifyDailyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+    return null
+  }
+
+  private async identifyWeeklyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+    return null
+  }
+
+  private async identifyMonthlyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+    return null
+  }
+
+  private async identifyYearlyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+    return null
+  }
+
+  private async validateStatisticalSignificance(patterns: SeasonalPattern[]): Promise<SeasonalPattern[]> {
+    return patterns.filter(p => p.statisticalSignificance < 0.05)
+  }
+
+  private async analyzeDailySeasonality(_component: TimeSeriesComponent): Promise<{isSignificant: boolean, amplitude: number, phase: number, frequency: number, confidence: number, pValue: number}> {
+    return { isSignificant: false, amplitude: 0, phase: 0, frequency: 0, confidence: 0, pValue: 1 }
+  }
+
+  private async analyzeWeeklySeasonality(_component: TimeSeriesComponent): Promise<{isSignificant: boolean, amplitude: number, phase: number, frequency: number, confidence: number, pValue: number}> {
+    return { isSignificant: false, amplitude: 0, phase: 0, frequency: 0, confidence: 0, pValue: 1 }
+  }
+
+  private async preprocessThreats(threats: Threat[]): Promise<Threat[]> {
+    return threats
+  }
+
+  private async extractRiskFactors(_threats: Threat[], _context: SecurityContext): Promise<void> {
+    // Implementation placeholder
+  }
+
+  private async calculateThreatLikelihood(_threats: Threat[], _context: SecurityContext): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateThreatImpact(_threats: Threat[], _context: SecurityContext): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateVulnerability(_threats: Threat[], _context: SecurityContext): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateRiskBreakdown(_threats: Threat[], _context: SecurityContext): Promise<RiskBreakdown> {
+    return { byThreatType: {}, bySeverity: {}, byLikelihood: {}, byImpact: {} }
+  }
+
+  private async generateRiskRecommendations(_threats: Threat[], _context: SecurityContext, _breakdown: RiskBreakdown): Promise<RiskRecommendation[]> {
+    return []
+  }
+
+  private calculateRiskConfidence(_likelihood: number, _impact: number, _vulnerability: number, _uncertainty: UncertaintyQuantification): number {
+    return 0.8
+  }
+
+  private async preprocessTimeSeries(series: ThreatTimeSeries[]): Promise<ThreatTimeSeries[]> {
+    return series
+  }
+
+  private async extractTimeSeriesFeatures(_series: ThreatTimeSeries[]): Promise<ThreatFeatures> {
+    return { statistical: { mean: 0, variance: 0, skewness: 0, kurtosis: 0, percentiles: {} }, temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 }, spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} }, categorical: { threatTypeDistribution: {}, severityDistribution: {}, attributionDistribution: {} } }
+  }
+
+  private async calculateTimeSeriesConfidenceBands(_predictions: PredictionResult[]): Promise<ConfidenceBand[]> {
+    return []
+  }
+
+  private async extractModelParameters(_model: ForecastingModel): Promise<ModelParameters> {
+    return { modelType: 'unknown', parameters: {}, trainingMetrics: { loss: 0, accuracy: 0, epochs: 0, trainingTime: 0 } }
+  }
+
+  private async calculateValidationMetrics(_model: ForecastingModel, _series: ThreatTimeSeries[]): Promise<ValidationMetrics> {
+    return { mae: 0, mse: 0, rmse: 0, mape: 0, r2: 0 }
+  }
+
+  private removeDuplicateThreats(threats: ThreatData[]): ThreatData[] {
+    const seen = new Set<string>()
+    return threats.filter(t => {
+      if (seen.has(t.threatId)) return false
+      seen.add(t.threatId)
+      return true
+    })
+  }
+
+  private async imputeMissingValues(threats: ThreatData[]): Promise<ThreatData[]> {
+    return threats
+  }
+
+  private async normalizeThreatData(threats: ThreatData[]): Promise<ThreatData[]> {
+    return threats
+  }
+
+  private groupByThreatType(threats: ThreatData[]): Record<string, ThreatData[]> {
+    return threats.reduce((acc, threat) => {
+      if (!acc[threat.threatType]) acc[threat.threatType] = []
+      acc[threat.threatType].push(threat)
+      return acc
+    }, {} as Record<string, ThreatData[]>)
+  }
+
+  private async trainLSTMModel(_series: ThreatTimeSeries, _components: SeasonalComponents): Promise<ForecastingModel> {
+    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  }
+
+  private async trainARIMAModel(_series: ThreatTimeSeries, _components: SeasonalComponents): Promise<ForecastingModel> {
+    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  }
+
+  private async trainEnsembleModel(_lstm: ForecastingModel, _arima: ForecastingModel): Promise<ForecastingModel> {
+    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  }
+
+  private calculateTimeHorizon(timeframe: TimeWindow): string {
+    const days = Math.ceil((timeframe.end.getTime() - timeframe.start.getTime()) / (1000 * 60 * 60 * 24))
+    return `${days} days`
+  }
+
+  private async calculatePredictionInterval(_prediction: PredictedThreat): Promise<ConfidenceInterval> {
+    return { intervalId: 'interval_1', threatType: 'unknown', lowerBound: 0, upperBound: 1, confidenceLevel: 0.95, predictionHorizon: '1 day' }
+  }
+
+  private async calculateSimilarityToKnownThreats(_threat: NovelThreat, _baselineFeatures: ThreatFeatures): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateInfectionProbability(_node: NetworkNode, _threat: Threat): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateRecoveryRate(_node: NetworkNode): Promise<number> {
+    return 0.1
+  }
+
+  private async calculateVulnerabilityScore(_node: NetworkNode): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateTransmissionProbability(_edge: NetworkEdge, _threat: Threat): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateTransmissionRate(_edge: NetworkEdge): Promise<number> {
+    return 0.1
+  }
+
+  private async calculateBasicReproductionNumber(_graph: PropagationGraph, _threat: Threat): Promise<number> {
+    return 1.0
+  }
+
+  private async calculateNodeInfectionProbability(_node: PropagationNode, _graph: PropagationGraph): Promise<number> {
+    return 0.5
+  }
+
+  private async calculateEdgeTransmissionProbability(_edge: PropagationEdge, _graph: PropagationGraph): Promise<number> {
+    return 0.5
   }
 
   async shutdown(): Promise<void> {
@@ -1025,15 +1230,24 @@ export class AdvancedPredictiveThreatIntelligence
 
 // Supporting interfaces and types
 interface ModelRegistry {
-  // TODO: Add methods if needed
+  registerModel(_id: string, _model: unknown): Promise<void>
+  getModel(_id: string): Promise<unknown>
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(_mongoClient: MongoClient) {}
+  constructor(private _mongoClient: MongoClient) {}
+
+  async registerModel(_id: string, _model: unknown): Promise<void> {
+    // Implementation placeholder
+  }
+
+  async getModel(_id: string): Promise<unknown> {
+    return null
+  }
 }
 interface PropagationSimulation {
   simulationId: string
-  results: any[]
+  results: Array<Record<string, unknown>>
 }
 
 interface TimeWindow {
@@ -1339,30 +1553,21 @@ abstract class RiskAssessor {
   ): Promise<RiskAssessment>
 }
 
-class SeasonalAnalyzer implements SeasonalAnalyzer {
-  async decompose(
-    _timeSeries: ThreatTimeSeries[],
-  ): Promise<SeasonalComponents> {
-    return {}
+// Concrete implementations
+class MLNoveltyDetector extends NoveltyDetector {
+  constructor(private config: NoveltyConfig) {
+    super()
   }
 
-  async identifyPatterns(
-    _components: SeasonalComponents,
-  ): Promise<SeasonalPattern[]> {
+  async detectNovelThreats(
+    _current: ThreatData[],
+    _baseline: ThreatData[],
+  ): Promise<NovelThreat[]> {
+    // Implement ML-based novelty detection
     return []
   }
 }
 
-class RiskAssessor implements RiskAssessor {
-  async assessRisk(
-    _threats: Threat[],
-    _context: SecurityContext,
-  ): Promise<RiskAssessment> {
-    return {} as RiskAssessment
-  }
-}
-
-// Concrete implementations
 class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
   private model: tf.Sequential | null = null
   private isTraining = false
@@ -1381,78 +1586,67 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
 
     this.isTraining = true
     try {
-      // Wrap model creation, data tensors, and training inside tf.tidy to dispose intermediate tensors
-      // Note: model.fit is async so we create and compile the model inside tidy, prepare xs/ys there,
-      // start training, await it, and then return the created forecasting model. We must ensure the
-      // model reference escapes tidy scope so it is not disposed; tidy will not dispose tensors referenced
-      // by the returned object. We therefore return a promise that resolves to the ForecastingModel.
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      return await tf.tidy(() => {
-        // Create LSTM model architecture
-        const model = tf.sequential()
+      // Create LSTM model architecture
+      const model = tf.sequential()
 
-        // Add LSTM layers
-        model.add(
-          tf.layers.lstm({
-            units: 64,
-            inputShape: [this.config.lookbackWindow, 1],
-            returnSequences: true,
-            activation: 'tanh',
-          }),
-        )
+      // Add LSTM layers
+      model.add(
+        tf.layers.lstm({
+          units: 64,
+          inputShape: [this.config.lookbackWindow, 1],
+          returnSequences: true,
+          activation: 'tanh',
+        }),
+      )
 
-        model.add(tf.layers.dropout({ rate: 0.2 }))
+      model.add(tf.layers.dropout({ rate: 0.2 }))
 
-        model.add(
-          tf.layers.lstm({
-            units: 32,
-            returnSequences: false,
-            activation: 'tanh',
-          }),
-        )
+      model.add(
+        tf.layers.lstm({
+          units: 32,
+          returnSequences: false,
+          activation: 'tanh',
+        }),
+      )
 
-        model.add(tf.layers.dropout({ rate: 0.1 }))
+      model.add(tf.layers.dropout({ rate: 0.1 }))
 
-        // Output layer
-        model.add(
-          tf.layers.dense({
-            units: this.config.predictionHorizon,
-            activation: 'linear',
-          }),
-        )
+      // Output layer
+      model.add(
+        tf.layers.dense({
+          units: this.config.predictionHorizon,
+          activation: 'linear',
+        }),
+      )
 
-        // Compile model
-        model.compile({
-          optimizer: tf.train.adam(0.001),
-          loss: 'meanSquaredError',
-          metrics: ['mae'],
-        })
-
-        // Prepare training data
-        const { xs, ys } = this.prepareTrainingData(data)
-
-        // Train the model
-        const trainingPromise = model.fit(xs, ys, {
-          epochs: 100,
-          batchSize: 32,
-          validationSplit: 0.2,
-          callbacks: {
-            onEpochEnd: (epoch, logs) => {
-              console.log(`Epoch ${epoch}: loss = ${logs?.loss}`)
-            },
-          },
-        })
-
-        // Await inside the outer async function by returning a promise that resolves after training
-        return trainingPromise.then(() => {
-          // Keep model reference alive by assigning to this.model before tidy would dispose tensors
-          // Note: tidy will not dispose objects reachable from the returned value; returning the model
-          // directly would risk disposal of internal tensors. Instead, assign to this.model here and
-          // return the ForecastingModel wrapper.
-          this.model = model
-          return this.createForecastingModel('general', model)
-        })
+      // Compile model
+      model.compile({
+        optimizer: tf.train.adam(0.001),
+        loss: 'meanSquaredError',
+        metrics: ['mae'],
       })
+
+      // Prepare training data
+      const { xs, ys } = this.prepareTrainingData(data)
+
+      // Train the model
+      await model.fit(xs, ys, {
+        epochs: 100,
+        batchSize: 32,
+        validationSplit: 0.2,
+        callbacks: {
+          onEpochEnd: (epoch, logs) => {
+            console.log(`Epoch ${epoch}: loss = ${logs?.loss}`)
+          },
+        },
+      })
+
+      // Clean up intermediate tensors
+      xs.dispose()
+      ys.dispose()
+
+      this.model = model
+      return this.createForecastingModel('general', model)
     } finally {
       this.isTraining = false
     }
@@ -1529,11 +1723,13 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
         const inputShape = [1, this.config.lookbackWindow, 1]
         const dummyInput = tf.zeros(inputShape)
 
-        const value = await tf.tidy(async () => {
-          const prediction = model.predict(dummyInput) as tf.Tensor
-          const data = await prediction.data()
-          return data[0] as number
-        })
+        const prediction = model.predict(dummyInput) as tf.Tensor
+        const data = await prediction.data()
+        const value = data[0] as number
+
+        // Clean up tensors
+        dummyInput.dispose()
+        prediction.dispose()
 
         return {
           value: Math.max(0, Math.min(1, value)), // Clamp between 0 and 1
