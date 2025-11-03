@@ -265,9 +265,20 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Determine image tag
         id: image_tag
@@ -281,6 +292,11 @@ jobs:
           fi
           echo "image_ref=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "🔍 Using image: ${IMAGE_TAG}"
+
+      - name: Pull Docker image for scanning
+        run: |
+          docker pull "${{ steps.image_tag.outputs.image_ref }}"
+          echo "✅ Image pulled successfully"
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
@@ -474,16 +490,53 @@ jobs:
             exit 1
           fi
 
+          # Validate provider path format
+          PROVIDER_PATH="${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
+          PROJECT_ID="${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
+
           echo "✅ Required secrets are configured"
-          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
-          echo "Workload Identity Provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
+          echo "GCP_PROJECT_ID: ${PROJECT_ID}"
+          echo "Workload Identity Provider: ${PROVIDER_PATH}"
           echo "Service Account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}"
           echo ""
-          echo "⚠️  If authentication fails with 'invalid_target', check:"
-          echo "   1. The workload identity pool exists: gcloud iam workload-identity-pools list"
-          echo "   2. The provider exists: gcloud iam workload-identity-pools providers list"
-          echo "   3. Use PROJECT_NUMBER (not PROJECT_ID) in the provider path"
-          echo "   4. The pool/provider is ACTIVE (not DISABLED or DELETED)"
+
+          # Validate provider path format
+          echo "🔍 Validating provider path format..."
+
+          # Check if path matches expected format
+          if [[ ! "$PROVIDER_PATH" =~ ^projects/[0-9]+/locations/global/workloadIdentityPools/[^/]+/providers/[^/]+$ ]]; then
+            echo "❌ Invalid provider path format!"
+            echo "Expected: projects/[PROJECT_NUMBER]/locations/global/workloadIdentityPools/[POOL_NAME]/providers/[PROVIDER_NAME]"
+            echo "Got: ${PROVIDER_PATH}"
+            echo ""
+            echo "⚠️  CRITICAL: The path MUST use PROJECT_NUMBER (numeric), not PROJECT_ID (alphanumeric)"
+            echo "   Get your PROJECT_NUMBER with: gcloud projects describe ${PROJECT_ID} --format='value(projectNumber)'"
+            exit 1
+          fi
+
+          # Extract project number from path and check if it's numeric
+          PROVIDER_PROJECT_NUMBER=$(echo "$PROVIDER_PATH" | sed -n 's|^projects/\([^/]*\)/.*|\1|p')
+          if [[ ! "$PROVIDER_PROJECT_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "❌ ERROR: Provider path contains non-numeric project identifier: ${PROVIDER_PROJECT_NUMBER}"
+            echo "   This must be your PROJECT_NUMBER, not PROJECT_ID!"
+            echo "   Your PROJECT_ID is: ${PROJECT_ID}"
+            echo "   Get PROJECT_NUMBER with: gcloud projects describe ${PROJECT_ID} --format='value(projectNumber)'"
+            echo ""
+            echo "   Correct format example:"
+            echo "   projects/123456789012/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+            exit 1
+          fi
+
+          echo "✅ Provider path format is valid"
+          echo "   Project number in path: ${PROVIDER_PROJECT_NUMBER}"
+          echo ""
+          echo "⚠️  If authentication still fails with 'invalid_target', verify:"
+          echo "   1. The workload identity pool exists and is ACTIVE:"
+          echo "      gcloud iam workload-identity-pools list --project=${PROJECT_ID}"
+          echo "   2. The provider exists and is ACTIVE:"
+          echo "      gcloud iam workload-identity-pools providers list --project=${PROJECT_ID} --location=global --workload-identity-pool=github-pool"
+          echo "   3. The provider path uses the correct PROJECT_NUMBER (${PROVIDER_PROJECT_NUMBER})"
+          echo "   4. Run verification script: ./scripts/verify-workload-identity.sh"
           echo "📚 Full troubleshooting: docs/workload-identity-troubleshooting.md"
 
       - name: Authenticate to Google Cloud

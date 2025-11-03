@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pnpm --version
 
 # Create non-root user
-RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -m nextjs
+RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
 
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
@@ -79,8 +79,8 @@ COPY --from=builder /app/start-server.mjs ./start-server.mjs
 COPY --from=builder /app/instrument.mjs ./instrument.mjs
 
 # Set ownership and drop to non-root (separate layer for smaller size)
-RUN chown -R nextjs:nodejs /app && chmod -R g+rX /app
-USER nextjs
+RUN chown -R astro:astro /app && chmod -R g+rX /app
+USER astro
 
 EXPOSE 4321
 CMD ["node", "start-server.mjs"]

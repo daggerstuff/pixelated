@@ -40,10 +40,36 @@ interface ContactSubmissionContext {
 export class ContactService {
   private emailService: EmailService
   private templates = new Map<string, { html: string; text: string }>()
+  private initializationPromise: Promise<void> | null = null
+  private isInitialized = false
 
   constructor() {
     this.emailService = new EmailService()
-    this.initializeTemplates()
+    // Don't initialize here - use lazy initialization pattern
+  }
+
+  private async ensureInitialized(): Promise<void> {
+    if (this.isInitialized) {
+      return
+    }
+
+    // If initialization is already in progress, wait for it
+    if (this.initializationPromise) {
+      await this.initializationPromise
+      return
+    }
+
+    // Start initialization
+    this.initializationPromise = this.initializeTemplates()
+
+    try {
+      await this.initializationPromise
+      this.isInitialized = true
+      this.initializationPromise = null
+    } catch (error) {
+      this.initializationPromise = null
+      throw error
+    }
   }
 
   private async initializeTemplates(): Promise<void> {
@@ -125,6 +151,9 @@ export class ContactService {
     context: ContactSubmissionContext,
   ): Promise<{ success: boolean; message: string; submissionId?: string }> {
     try {
+      // Ensure templates are initialized before processing
+      await this.ensureInitialized()
+
       // Validate form data
       const validatedData = ContactFormSchema.parse(formData)
 

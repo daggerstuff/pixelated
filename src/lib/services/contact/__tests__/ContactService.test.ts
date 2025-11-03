@@ -8,6 +8,13 @@ const logger = createBuildSafeLogger('contact-service')
 // Mock dependencies
 vi.mock('@/lib/services/email/EmailService')
 vi.mock('@/lib/utils/logger')
+vi.mock('@/lib/utils', async () => {
+  const actual = await vi.importActual('@/lib/utils')
+  return {
+    ...actual,
+    securePathJoin: vi.fn((base: string, file: string) => `${base}/${file}`),
+  }
+})
 vi.mock('fs/promises', () => ({
   readFile: vi.fn().mockResolvedValue(`
     <!DOCTYPE html>
@@ -21,6 +28,11 @@ vi.mock('fs/promises', () => ({
       </body>
     </html>
   `),
+  writeFile: vi.fn().mockResolvedValue(undefined),
+  mkdir: vi.fn().mockResolvedValue(undefined),
+  access: vi.fn().mockResolvedValue(undefined),
+  stat: vi.fn().mockResolvedValue({ isFile: () => true, isDirectory: () => false }),
+  readdir: vi.fn().mockResolvedValue([]),
 }))
 
 const mockEmailService = {

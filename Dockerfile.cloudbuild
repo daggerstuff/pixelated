@@ -107,6 +107,7 @@ COPY --chown=astro:astro astro ./astro
 COPY --chown=astro:astro scripts ./scripts
 COPY --chown=astro:astro public ./public
 COPY --chown=astro:astro src ./src
+COPY --chown=astro:astro templates ./templates
 
 COPY --chown=astro:astro .env* ./
 COPY --chown=astro:astro *.config.* ./
@@ -150,6 +151,7 @@ USER astro
 COPY --from=build --chown=astro:astro /app/dist ./dist
 COPY --from=build --chown=astro:astro /app/node_modules ./node_modules
 COPY --from=build --chown=astro:astro /app/package.json ./package.json
+COPY --from=build --chown=astro:astro /app/templates ./templates
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

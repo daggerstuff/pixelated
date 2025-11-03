@@ -191,18 +191,13 @@ export function LoginForm({
     const isValid = validateForm()
 
     if (!isValid) {
-      // Errors have been set, wait for React to update DOM
-      // Use double requestAnimationFrame to ensure DOM is updated after state changes
-      await new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => resolve(undefined))
-        })
-      })
-
+      // Errors have been set, notify user but let React render errors
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',
       })
+      // Force re-render to ensure errors are visible to tests
+      await new Promise(resolve => setTimeout(resolve, 0))
       return
     }
 
