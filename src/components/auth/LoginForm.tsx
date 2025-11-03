@@ -333,9 +333,10 @@ export function LoginForm({
           </div>
           <div
             id="email-error"
-            className={`error-message text-sm mt-1 ${errors.email ? 'block' : 'hidden'}`}
+            className="error-message text-sm mt-1"
             role="alert"
             aria-live="polite"
+            style={{ display: errors.email ? 'block' as const : 'none' as const }}
           >
             {errors.email || ''}
           </div>
@@ -390,9 +391,10 @@ export function LoginForm({
       </div>
       <div
         id="password-error"
-        className={`error-message text-sm mt-1 ${errors.password ? 'block' : 'hidden'}`}
+        className="error-message text-sm mt-1"
         role="alert"
         aria-live="polite"
+        style={{ display: errors.password ? 'block' as const : 'none' as const }}
       >
         {errors.password || ''}
       </div>
