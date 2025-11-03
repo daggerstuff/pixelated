@@ -9,7 +9,10 @@ import type { StorageProviderConfig } from '../backup-types'
 import type { Dirent } from 'fs'
 
 interface FileSystem {
-  mkdir: (path: string, options?: { recursive?: boolean }) => Promise<void>
+  mkdir: (
+    path: string,
+    options?: { recursive?: boolean },
+  ) => Promise<string | undefined>
   readdir: (path: string, options: { withFileTypes: true }) => Promise<Dirent[]>
   writeFile: (path: string, data: Uint8Array) => Promise<void>
   readFile: (path: string) => Promise<Buffer>
@@ -34,7 +37,7 @@ export class LocalFileSystemProvider implements StorageProvider {
   private path: PathModule | null = null
   private initialized = false
 
-  constructor(private config: StorageProviderConfig) {
+  constructor(config: StorageProviderConfig) {
     this.basePath = (config.path as string) || ''
     if (!this.basePath) {
       throw new Error('Path is required for local filesystem storage provider')
@@ -90,7 +93,7 @@ export class LocalFileSystemProvider implements StorageProvider {
 
       // Convert absolute paths to relative paths
       const relativeFiles = allFiles.map((file) =>
-        this.path.relative(this.basePath, file),
+        this.path!.relative(this.basePath, file),
       )
 
       // Filter by pattern if provided
@@ -119,14 +122,14 @@ export class LocalFileSystemProvider implements StorageProvider {
 
     try {
       // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      const fullPath = this.path!.join(this.basePath, key)
 
       // Create directory structure if needed
-      const dir = this.path.dirname(fullPath)
-      await this.fs.mkdir(dir, { recursive: true })
+      const dir = this.path!.dirname(fullPath)
+      await this.fs!.mkdir(dir, { recursive: true })
 
       // Write file
-      await this.fs.writeFile(fullPath, data)
+      await this.fs!.writeFile(fullPath, data)
     } catch (error: unknown) {
       console.error(`Failed to store file ${key} to local filesystem:`, error)
       throw new Error(
@@ -141,13 +144,13 @@ export class LocalFileSystemProvider implements StorageProvider {
 
     try {
       // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      const fullPath = this.path!.join(this.basePath, key)
 
       // Check if file exists
-      await this.fs.access(fullPath)
+      await this.fs!.access(fullPath)
 
       // Read file
-      const data = await this.fs.readFile(fullPath)
+      const data = await this.fs!.readFile(fullPath)
 
       return new Uint8Array(data)
     } catch (error: unknown) {
@@ -164,18 +167,18 @@ export class LocalFileSystemProvider implements StorageProvider {
 
     try {
       // Create full path
-      const fullPath = this.path.join(this.basePath, key)
+      const fullPath = this.path!.join(this.basePath, key)
 
       // Check if file exists
       try {
-        await this.fs.access(fullPath)
+        await this.fs!.access(fullPath)
       } catch {
         console.warn(`File not found for deletion: ${key}`)
         return
       }
 
       // Delete file
-      await this.fs.unlink(fullPath)
+      await this.fs!.unlink(fullPath)
     } catch (error: unknown) {
       console.error(
         `Failed to delete file ${key} from local filesystem:`,

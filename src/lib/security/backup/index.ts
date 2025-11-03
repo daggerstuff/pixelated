@@ -45,14 +45,6 @@ function hexStringToUint8Array(hexString: string): Uint8Array {
   return bytes
 }
 
-// Helper function to ensure Uint8Array is compatible with Web Crypto API
-function toCryptoBufferSource(data: Uint8Array): Uint8Array {
-  // Always create a new Uint8Array backed by a regular ArrayBuffer to ensure type compatibility
-  const newArray = new Uint8Array(data.byteLength)
-  newArray.set(data)
-  return newArray
-}
-
 // Import crypto browser/node implementation
 const getCrypto = async () => {
   if (isBrowser) {
@@ -65,15 +57,15 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          toCryptoBufferSource(key),
+          key,
           { name: 'AES-GCM' },
           false,
           ['encrypt'],
         )
         const encrypted = await subtle.encrypt(
-          { name: 'AES-GCM', iv: toCryptoBufferSource(iv) },
+          { name: 'AES-GCM', iv },
           importedKey,
-          toCryptoBufferSource(data),
+          data,
         )
         // In Web Crypto API, the auth tag is appended to the ciphertext
         const encryptedArray = new Uint8Array(encrypted)
@@ -90,7 +82,7 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          toCryptoBufferSource(key),
+          key,
           { name: 'AES-GCM' },
           false,
           ['decrypt'],
@@ -103,7 +95,7 @@ const getCrypto = async () => {
         const combinedBuffer = new ArrayBuffer(combined.byteLength)
         new Uint8Array(combinedBuffer).set(combined)
         const decrypted = await subtle.decrypt(
-          { name: 'AES-GCM', iv: toCryptoBufferSource(iv) },
+          { name: 'AES-GCM', iv },
           importedKey,
           combinedBuffer,
         )
@@ -227,7 +219,7 @@ export class BackupSecurityManager {
   private isInitialized = false
   private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private recoveryTestingManager!: RecoveryTestingManager
+  // private recoveryTestingManager!: RecoveryTestingManager
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration
@@ -315,18 +307,13 @@ export class BackupSecurityManager {
     this.loadStorageProviders()
 
     // Initialize recovery testing manager
+    /*
     this.recoveryTestingManager = new RecoveryTestingManager(
       this.config.recoveryTesting,
     )
+    */
 
     logger.info('Backup Security Manager initialized')
-  }
-
-  /**
-   * Get random bytes
-   */
-  private getRandomBytes(size: number): Uint8Array {
-    return new Uint8Array(crypto.getRandomValues(new Uint8Array(size)))
   }
 
   /**
@@ -513,10 +500,10 @@ export class BackupSecurityManager {
       }
 
       // Store the backup and its metadata
-      await this.storeBackup(encryptedData, metadata, iv, authTag)
+      await this.storeBackup(encryptedData, metadata, authTag)
 
       // Log the backup creation
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.CREATE,
         'backup_create',
         'system',
@@ -554,16 +541,10 @@ export class BackupSecurityManager {
    * Encrypt data
    */
   private async encrypt(data: Uint8Array): Promise<EncryptedBackupData> {
-    // Generate IV
-    const iv = isBrowser
-      ? (() => {
-          const array = new Uint8Array(16)
-          window.crypto.getRandomValues(array)
-          return array
-        })()
-      : await this.getRandomBytes(16)
-
     const crypto = await getCrypto()
+    // Generate IV
+    const iv = crypto.randomBytes(16)
+
     const { encryptedData, authTag } = await crypto.encrypt(
       data,
       this.encryptionKey,
@@ -631,7 +612,6 @@ export class BackupSecurityManager {
   private async storeBackup(
     encryptedData: Uint8Array,
     metadata: BackupMetadata,
-    iv: Uint8Array,
     authTag: Uint8Array,
   ): Promise<void> {
     logger.info(`Storing backup ${metadata.id} in ${metadata.location}`)
@@ -671,7 +651,7 @@ export class BackupSecurityManager {
       )
 
       // Log storage as an audit event
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'BACKUP_STORED',
         'system',
@@ -767,7 +747,7 @@ export class BackupSecurityManager {
       )
 
       // Log the verification as an audit event
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'backup_verify',
         'system',
@@ -786,7 +766,7 @@ export class BackupSecurityManager {
       )
 
       // Log verification failure as an audit event
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'backup_verify',
         'system',
@@ -901,10 +881,10 @@ export class BackupSecurityManager {
         status: BackupStatus.COMPLETED,
         verificationDate: new Date().toISOString(),
       }
-      await this.storeBackup(encryptedData, updatedMetadata, iv, authTag)
+      await this.storeBackup(encryptedData, updatedMetadata, authTag)
 
       // Log audit event
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'backup_restore_completed',
         'system',
@@ -918,7 +898,7 @@ export class BackupSecurityManager {
       return true
     } catch (error: unknown) {
       // Log audit event
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'backup_restore_failed',
         'system',

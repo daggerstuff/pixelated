@@ -82,9 +82,9 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         projectId: (this.config.credentials as GoogleCloudCredentials)
           ?.project_id,
         ...(this.config.options as GoogleCloudStorageOptions),
-      })
+      }) as any
 
-      this.bucket = this.storage.bucket(this.bucketName)
+      this.bucket = this.storage!.bucket(this.bucketName)
       this.initialized = true
 
       console.info(
@@ -119,7 +119,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         }
       }
 
-      const [files] = await this.bucket.getFiles(options)
+      const [files] = await this.bucket!.getFiles(options)
       const fileNames = files.map((file) => file.name)
 
       // Additional filtering for more complex patterns
@@ -147,7 +147,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      const file = this.bucket.file(key)
+      const file = this.bucket!.file(key)
 
       await new Promise<void>((resolve, reject) => {
         const stream = file.createWriteStream({
@@ -185,7 +185,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      const file = this.bucket.file(key)
+      const file = this.bucket!.file(key)
 
       // Check if file exists
       const [exists] = await file.exists()
@@ -214,7 +214,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     this.checkInitialized()
 
     try {
-      const file = this.bucket.file(key)
+      const file = this.bucket!.file(key)
 
       // Check if file exists
       const [exists] = await file.exists()

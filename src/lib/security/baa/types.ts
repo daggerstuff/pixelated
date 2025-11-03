@@ -15,6 +15,10 @@ export enum BusinessAssociateType {
   SUBCONTRACTOR = 'subcontractor',
   SERVICE_PROVIDER = 'service_provider',
   OTHER = 'other',
+  EHR_VENDOR = 'EHR_VENDOR',
+  CLOUD_SERVICE = 'CLOUD_SERVICE',
+  DATA_ANALYTICS = 'DATA_ANALYTICS',
+  TELEMEDICINE = 'TELEMEDICINE',
 }
 
 /**
@@ -29,6 +33,8 @@ export enum ServiceCategory {
   PATIENT_CARE = 'patient_care',
   ADMINISTRATIVE = 'administrative',
   OTHER = 'other',
+  SOFTWARE_SERVICES = 'software_services',
+  CONSULTING = 'consulting',
 }
 
 /**
@@ -53,6 +59,9 @@ export enum ComplianceLevel {
   THIRD_PARTY_VERIFIED = 'third_party_verified',
   HIPAA_CERTIFIED = 'hipaa_certified',
   NON_COMPLIANT = 'non_compliant',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
 }
 
 /**
@@ -174,6 +183,7 @@ export enum VerificationMethod {
   CERTIFICATION_VALIDATION = 'certification_validation',
   ONSITE_ASSESSMENT = 'onsite_assessment',
   QUESTIONNAIRE = 'questionnaire',
+  SELF_ATTESTATION = 'SELF_ATTESTATION',
 }
 
 /**

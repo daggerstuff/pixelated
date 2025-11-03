@@ -1,173 +1,73 @@
-// Shared backup types and enums for both client and server
+/**
+ * Common types for backup and recovery systems
+ */
 
+// export type StorageProvider = typeof StorageProvider
+
+/**
+ * Type of backup being performed
+ */
 export enum BackupType {
   FULL = 'full',
   DIFFERENTIAL = 'differential',
-  TRANSACTION = 'transaction',
   INCREMENTAL = 'incremental',
+  TRANSACTION = 'transaction',
 }
 
+/**
+ * Status of a backup
+ */
 export enum BackupStatus {
   PENDING = 'pending',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   FAILED = 'failed',
-  VERIFIED = 'verified',
-  VERIFICATION_FAILED = 'verification_failed',
-  EXPIRED = 'expired',
   DELETED = 'deleted',
 }
 
-export enum RecoveryTestStatus {
-  SCHEDULED = 'scheduled',
-  IN_PROGRESS = 'in_progress',
-  PASSED = 'passed',
-  FAILED = 'failed',
-}
-
-export enum BackupEventType {
-  BACKUP_SYSTEM_INITIALIZED = 'BACKUP_SYSTEM_INITIALIZED',
-  BACKUP_SYSTEM_CONFIGURATION_CHANGED = 'BACKUP_SYSTEM_CONFIGURATION_CHANGED',
-  BACKUP_CREATED = 'BACKUP_CREATED',
-  BACKUP_FAILED = 'BACKUP_FAILED',
-  BACKUP_VERIFIED = 'BACKUP_VERIFIED',
-  BACKUP_VERIFICATION_FAILED = 'BACKUP_VERIFICATION_FAILED',
-  BACKUP_RESTORE_STARTED = 'BACKUP_RESTORE_STARTED',
-  BACKUP_RESTORE_COMPLETED = 'BACKUP_RESTORE_COMPLETED',
-  BACKUP_RESTORE_FAILED = 'BACKUP_RESTORE_FAILED',
-  BACKUP_RECOVERY_TEST = 'BACKUP_RECOVERY_TEST',
-  BACKUP_RECOVERY_TEST_FAILED = 'BACKUP_RECOVERY_TEST_FAILED',
-  BACKUP_RETENTION_ENFORCED = 'BACKUP_RETENTION_ENFORCED',
-  BACKUP_RETENTION_ENFORCEMENT_FAILED = 'BACKUP_RETENTION_ENFORCEMENT_FAILED',
-  BACKUP_DELETED = 'BACKUP_DELETED',
-  BACKUP_ARCHIVED = 'BACKUP_ARCHIVED',
-}
-
+/**
+ * Location where a backup is stored
+ */
 export enum StorageLocation {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
   TERTIARY = 'tertiary',
 }
 
-export interface BackupMetadata {
-  id: string
-  type: BackupType
-  timestamp: string
-  size: number
-  contentHash: string
-  encryptionVersion: string
-  location: string
-  path: string
-  status: BackupStatus
-  retentionDays: number
-  iv: string
-  containsSensitiveData?: boolean
-  verificationStatus?: string
-  verificationDate?: string
+/**
+ * Events related to backups
+ */
+export enum BackupEventType {
+  BACKUP_CREATED = 'backup_created',
+  BACKUP_DELETED = 'backup_deleted',
+  BACKUP_RESTORED = 'backup_restored',
+  BACKUP_VERIFIED = 'backup_verified',
 }
 
-export interface BackupReport {
-  id: string
-  generatedAt: string
-  reportPeriod: {
-    start: string
-    end: string
-  }
-  summary: {
-    totalBackups: number
-    successfulBackups: number
-    failedBackups: number
-    averageBackupSize: number
-    totalStorageUsed: number
-    backupsByType: Record<string, number>
-  }
-  verificationSummary: {
-    totalVerifications: number
-    successfulVerifications: number
-    failedVerifications: number
-  }
-  recoveryTestSummary: {
-    totalTests: number
-    successfulTests: number
-    failedTests: number
-    averageRecoveryTime: number
-  }
-  retentionSummary: {
-    backupsExpired: number
-    backupsDeleted: number
-    storageReclaimed: number
-  }
-  complianceStatus: {
-    compliant: boolean
-    issues: Array<{
-      issueType: string
-      description: string
-      severity: 'low' | 'medium' | 'high' | 'critical'
-      remediation: string
-    }>
-  }
+/**
+ * Status of a recovery test
+ */
+export enum RecoveryTestStatus {
+  NOT_STARTED = 'not_started',
+  IN_PROGRESS = 'in_progress',
+  PASSED = 'passed',
+  FAILED = 'failed',
+  SKIPPED = 'skipped',
 }
 
-export interface StorageProviderConfig {
-  type: string
-  credentials?: { [key: string]: string }
-  region?: string
-  bucket?: string
-  container?: string
-  endpoint?: string
-  path?: string
-  options?: Record<string, unknown>
-}
-
-export interface RecoveryTestConfig {
-  enabled?: boolean
-  schedule: string
-  environment: {
-    type: 'docker' | 'vm' | 'kubernetes' | 'sandbox'
-    config: Record<string, unknown>
-  }
-  testCases: Array<{
-    name: string
-    description: string
-    backupType: string
-    dataVerification: Array<{
-      type: VerificationMethod
-      target: string
-      expected?: string | number | boolean
-      query?: string
-      threshold?: number
-    }>
-  }>
-  notifyOnFailure: boolean
-  generateReport: boolean
-}
-
-export interface RecoveryTestResult {
-  id: string
-  testDate: string
-  backupId: string
-  environment: string
-  status: RecoveryTestStatus
-  timeTaken: number
-  verificationResults: Array<{
-    testCase: string
-    passed: boolean
-    details: Record<string, unknown>
-  }>
-  issues?: Array<{
-    description: string
-    severity: 'low' | 'medium' | 'high' | 'critical'
-  }>
-  report?: string
-}
-
+/**
+ * Types of environments for recovery testing
+ */
 export enum TestEnvironmentType {
+  SANDBOX = 'sandbox',
   DOCKER = 'docker',
   KUBERNETES = 'kubernetes',
   VM = 'vm',
-  SANDBOX = 'sandbox',
 }
 
+/**
+ * Type of verification method for data integrity
+ */
 export enum VerificationMethod {
   HASH = 'hash',
   QUERY = 'query',
@@ -175,14 +75,87 @@ export enum VerificationMethod {
   API = 'api',
 }
 
-export interface TestCase {
+/**
+ * Metadata for a single backup
+ */
+export interface BackupMetadata {
   id: string
-  name: string
-  description: string
-  backupType: string
-  verificationSteps: VerificationStep[]
+  type: BackupType
+  timestamp: string
+  size: number
+  contentHash: string
+  encryptionVersion: string
+  location: StorageLocation
+  path: string
+  status: BackupStatus
+  retentionDays: number
+  iv: string
+  containsSensitiveData: boolean
+  verificationStatus: 'pending' | 'verified' | 'failed'
+  verificationDate?: string
 }
 
+/**
+ * Configuration for a storage provider
+ */
+export interface StorageProviderConfig {
+  type: string
+  [key: string]: unknown
+}
+
+/**
+ * Interface for storage providers
+ */
+export interface IStorageProvider {
+  initialize(): Promise<void>
+  listFiles(pattern?: string): Promise<string[]>
+  storeFile(key: string, data: Uint8Array): Promise<void>
+  getFile(key: string): Promise<Uint8Array>
+  deleteFile(key: string): Promise<void>
+}
+export { type IStorageProvider as StorageProvider }
+
+/**
+ * Configuration for recovery testing
+ */
+export interface RecoveryTestConfig {
+  enabled: boolean
+  schedule: string
+  testCases: unknown[]
+  environment: {
+    type: TestEnvironmentType
+    config: Record<string, unknown>
+  }
+  notifyOnFailure: boolean
+  generateReport: boolean
+}
+
+/**
+ * Result of a single recovery test
+ */
+export interface RecoveryTestResult {
+  id: string
+  testDate: string
+  backupId: string
+  environment: TestEnvironmentType
+  status: RecoveryTestStatus
+  timeTaken: number // in milliseconds
+  verificationResults: Array<{
+    testCase: string
+    passed: boolean
+    details: Record<string, unknown>
+  }>
+  report?: string
+  issues?: Array<{
+    type: string
+    description: string
+    severity: 'low' | 'medium' | 'high' | 'critical'
+  }>
+}
+
+/**
+ * Verification step for a test case
+ */
 export interface VerificationStep {
   id: string
   type: VerificationMethod
@@ -190,4 +163,15 @@ export interface VerificationStep {
   expected?: string | number | boolean
   query?: string
   threshold?: number
+}
+
+/**
+ * Test case for data verification
+ */
+export interface TestCase {
+  id: string
+  name: string
+  description: string
+  backupType: string
+  verificationSteps: VerificationStep[]
 }
