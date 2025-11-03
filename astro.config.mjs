@@ -325,24 +325,7 @@ export default defineConfig({
       usePolling: false,
     },
   },
-  vite: {
-    server: {
-      watch: {
-        ignored: [
-          '**/.venv/**',
-          '**/venv/**',
-          '**/__pycache__/**',
-          '**/*.py',
-          '**/*.pyc',
-          '**/node_modules/**',
-          '**/ai/**',
-          '**/logs/**',
-          '**/tmp/**',
-        ],
-        usePolling: false,
-      },
-    },
-  },
+
   preview: {
     port: 4322,
     host: '0.0.0.0',

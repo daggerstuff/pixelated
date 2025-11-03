@@ -1,5 +1,5 @@
 ---
-import '@/styles/enhanced-theme.css'
+import '@/styles/unified-blended-theme.css'
 
 interface Props {
   title: string
@@ -13,7 +13,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="enhanced-dark-theme">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,7 +47,7 @@ const {
     <!-- Background and font loader -->
     <script src="/js/background-loader.js" defer is:inline></script>
   </head>
-  <body class="enhanced-dark-theme min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
+  <body class="min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
@@ -57,7 +57,7 @@ const {
       Skip to content
     </a>
 
-    <header class="glass-panel" style="border-bottom: 1px solid var(--border-primary);">
+    <header class="glass-panel" style="border-bottom: var(--border-primary);">
       <div class="container-refined py-4 flex justify-between items-center">
         <a
           href="/"

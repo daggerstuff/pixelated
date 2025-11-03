@@ -1,0 +1,53 @@
+/* ================================================
+   UNIFIED BLENDED THEME - BORDER SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   ================================================ */
+
+:root {
+  /* === BORDERS - SUBTLE BRUTALIST === */
+  --border-none: 0;
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+  --border-primary: 1px solid rgba(255, 255, 255, 0.1);
+  --border-secondary: 1px solid rgba(255, 255, 255, 0.15);
+  --border-accent: 1px solid rgba(16, 185, 129, 0.3);
+  --border-strong: 2px solid rgba(255, 255, 255, 0.12);
+  --border-brutalist: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* CARD SYSTEM */
+.card {
+  border: var(--border-primary);
+  border-radius: var(--radius-lg);
+}
+
+.card--elegant {
+  border: var(--border-primary);
+}
+
+.card--brutalist {
+  border: var(--border-brutalist);
+}
+
+.card--elevated {
+  border: var(--border-primary);
+}
+
+.card:hover {
+  border-color: var(--border-accent);
+}
+
+/* BUTTON SYSTEM */
+.btn {
+  border: var(--border-primary);
+}
+
+.btn--outline {
+  border: var(--border-brutalist);
+}
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  margin: var(--space-12) 0;
+}

@@ -242,7 +242,7 @@ verbose/coverage/
 *.flac
 *.aac
 
-ai/
+/ai/
 .clinerules/
 .kilocode/
 .roo/
@@ -285,6 +285,10 @@ hive-mind-prompt-*.txt
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
+
+
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt
 
 # Claude Flow generated files
 .claude/settings.local.json

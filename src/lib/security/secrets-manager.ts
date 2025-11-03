@@ -3,9 +3,7 @@
  * Handles sensitive configuration data with encryption and secure storage
  */
 
-import { randomBytes } from 'crypto'
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import * as fs from 'fs'
 import { getLogger } from '@/lib/logging'
 
 const logger = getLogger('secrets-manager')
@@ -40,10 +38,22 @@ export interface SecretConfig {
   expiresAt?: Date
 }
 
+function generateRandomBytes(length: number): Uint8Array {
+  const bytes = new Uint8Array(length)
+  // Prefer Web Crypto when available (browsers, modern Node)
+  if (typeof globalThis !== 'undefined' && (globalThis as any).crypto?.getRandomValues) {
+    ;(globalThis as any).crypto.getRandomValues(bytes)
+    return bytes
+  }
+  // Fallback to Math.random (not cryptographically secure, but avoids bundling node:crypto in client)
+  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256)
+  return bytes
+}
+
 export class SecretsManager {
   private static instance: SecretsManager
   private secrets: Map<string, SecretConfig> = new Map()
-  private encryptionKey: Buffer
+  private encryptionKey: Uint8Array
 
   private constructor() {
     this.encryptionKey = this.loadEncryptionKey()
@@ -61,15 +71,15 @@ export class SecretsManager {
   /**
    * Load encryption key from secure storage
    */
-  private loadEncryptionKey(): Buffer {
-    const keyPath = join(SECURITY_CONFIG.STORAGE.SECRETS_DIR, '.master-key')
+  private loadEncryptionKey(): Uint8Array {
+    const keyPath = `${SECURITY_CONFIG.STORAGE.SECRETS_DIR}/.master-key`
 
-    if (existsSync(keyPath)) {
+    if (fs.existsSync(keyPath)) {
       // Load existing master key
-      return readFileSync(keyPath)
+      return new Uint8Array(fs.readFileSync(keyPath))
     } else {
       // Generate new master key (should be done during setup)
-      const key = randomBytes(SECURITY_CONFIG.ENCRYPTION.KEY_LENGTH)
+      const key = generateRandomBytes(SECURITY_CONFIG.ENCRYPTION.KEY_LENGTH)
       logger.warn(
         'Generated new master key - this should be stored securely outside the application',
       )
@@ -133,7 +143,7 @@ export class SecretsManager {
   private loadFromSecureFiles(): void {
     const secretsDir = SECURITY_CONFIG.STORAGE.SECRETS_DIR
 
-    if (!existsSync(secretsDir)) {
+    if (!fs.existsSync(secretsDir)) {
       logger.warn('Secrets directory not found', { path: secretsDir })
       return
     }
@@ -153,10 +163,10 @@ export class SecretsManager {
     ]
 
     secretFiles.forEach((filename) => {
-      const filePath = join(secretsDir, filename)
-      if (existsSync(filePath)) {
+      const filePath = `${secretsDir}/${filename}`
+      if (fs.existsSync(filePath)) {
         try {
-          const value = readFileSync(filePath, 'utf-8').trim()
+          const value = fs.readFileSync(filePath, 'utf-8').trim()
           if (this.isValidSecret(value)) {
             const key = this.filenameToKey(filename)
             this.secrets.set(key, {

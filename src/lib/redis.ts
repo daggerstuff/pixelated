@@ -202,6 +202,11 @@ function createRedisClient() {
 
 export const redis = createRedisClient()
 
+// Backward-compatible helper for modules expecting a getter
+export function getRedisClient() {
+  return redis
+}
+
 /**
  * Wrapper function for Redis get with error handling
  */

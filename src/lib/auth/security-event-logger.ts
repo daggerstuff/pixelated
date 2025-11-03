@@ -6,7 +6,6 @@
 
 import { logger } from '../logger'
 import { randomUUID } from 'crypto'
-import type { RedisClientType } from 'redis'
 import { getRedisClient } from '../redis'
 
 export interface SecurityEvent {
@@ -108,7 +107,7 @@ export interface SecurityEventLoggerConfig {
  * Security Event Logger for comprehensive audit trail
  */
 export class SecurityEventLogger {
-  private redis: RedisClientType
+  private redis: any
   private config: SecurityEventLoggerConfig
   private eventBuffer: SecurityEvent[]
   private flushTimer?: NodeJS.Timeout
