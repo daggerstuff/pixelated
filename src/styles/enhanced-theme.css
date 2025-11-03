@@ -378,36 +378,40 @@ section,
 }
 
 .display-heading {
-  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-size: clamp(2rem, 5vw, 4rem);
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-/* Hero heading line breaks */
+/* Hero heading line breaks - allow wrapping to prevent overflow */
 .hero-line-1,
 .hero-line-2 {
   display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
+/* Remove problematic white-space: nowrap that causes truncation */
 @media (min-width: 768px) {
-  .hero-line-1 {
-    white-space: nowrap;
+  .display-heading {
+    font-size: clamp(2.25rem, 5.5vw, 4.25rem);
   }
 }
 
 @media (min-width: 1024px) {
   .display-heading {
-    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
   }
+}
 
-  .hero-line-1 {
-    white-space: nowrap;
-  }
-
-  .hero-line-2 {
-    white-space: nowrap;
+@media (min-width: 1280px) {
+  .display-heading {
+    font-size: clamp(3rem, 6.5vw, 5rem);
   }
 }
 

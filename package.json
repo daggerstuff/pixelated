@@ -212,6 +212,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "resend": "^6.3.0",
+    "ruv-swarm": "^1.0.20",
     "simple-git": "^3.29.0",
     "sonner": "^2.0.7",
     "swiper": "^12.0.3",

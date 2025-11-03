@@ -228,6 +228,9 @@ importers:
       resend:
         specifier: ^6.3.0
         version: 6.4.0
+      ruv-swarm:
+        specifier: ^1.0.20
+        version: 1.0.20
       simple-git:
         specifier: ^3.29.0
         version: 3.29.0
@@ -16694,7 +16697,7 @@ snapshots:
   buffer@4.9.2:
     dependencies:
       base64-js: 1.5.1
-      ieee754: 1.1.13
+      ieee754: 1.2.1
       isarray: 1.0.0
 
   buffer@5.7.1:

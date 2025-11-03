@@ -27,6 +27,7 @@ const {
           src="/images/logos/harvard-university.png"
           alt="Harvard University"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Harvard</span>';"
         />
       </div>
       <div
@@ -37,6 +38,7 @@ const {
           src="/images/logos/johns-hopkins.png"
           alt="Johns Hopkins"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Johns Hopkins</span>';"
         />
       </div>
       <div
@@ -47,6 +49,7 @@ const {
           src="/images/logos/mayo-clinic.png"
           alt="Mayo Clinic"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Mayo Clinic</span>';"
         />
       </div>
       <div
@@ -57,6 +60,7 @@ const {
           src="/images/logos/va-health.png"
           alt="VA Health"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>VA Health</span>';"
         />
       </div>
       <div
@@ -67,6 +71,7 @@ const {
           src="/images/logos/kaiser-permanente.png"
           alt="Kaiser Permanente"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Kaiser</span>';"
         />
       </div>
       <div
@@ -77,6 +82,7 @@ const {
           src="/images/logos/nih.png"
           alt="NIMH"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>NIMH</span>';"
         />
       </div>
     </div>
@@ -98,16 +104,31 @@ const {
   /* Ensure logos are properly contained and responsive */
   .logo-item {
     width: 100%;
+    min-height: 48px;
     height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: var(--space-2);
   }
 
   .logo-item img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    width: auto;
+    height: auto;
+  }
+
+  /* Fallback text styling when image fails */
+  .logo-item span {
+    font-size: 0.625rem;
+    color: rgba(156, 163, 175, 0.6);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
   }
 
   /* Improve mobile spacing */
