@@ -869,7 +869,10 @@ jobs:
           fi
 
       - name: Authenticate to Google Cloud
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GCP_SERVICE_ACCOUNT_EMAIL != '' }}
+        env:
+          HAS_GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          HAS_GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        if: ${{ env.HAS_GCP_WORKLOAD_IDENTITY_PROVIDER != '' && env.HAS_GCP_SERVICE_ACCOUNT_EMAIL != '' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
