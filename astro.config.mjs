@@ -280,10 +280,13 @@ export default defineConfig({
       ignored: [
         // Python virtual environments and cache
         '**/.venv/**',
-        '/.venv/**',
         '.venv/**',
+        '**/.uv/**',
+        '.uv/**',
+        '**/.python/**',
+        '.python/**',
+        '**/site-packages/**',
         '**/venv/**',
-        '/venv/**',
         'venv/**',
         '**/__pycache__/**',
         '__pycache__/**',
@@ -291,6 +294,10 @@ export default defineConfig({
         '**/*.pyc',
         '**/*.pyo',
         '**/*.pyd',
+        '**/.ruff_cache/**',
+        '.ruff_cache/**',
+        '**/.pytest_cache/**',
+        '.pytest_cache/**',
         // AI and data directories
         '/ai/**',
         '**/ai/**',
