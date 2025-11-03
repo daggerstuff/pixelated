@@ -2,7 +2,7 @@ name: Monitoring
 
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: '0 12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -13,7 +13,7 @@ env:
   NODE_VERSION: 24.8.0
   PNPM_VERSION: 10.20.0
   NODE_ENV: production
-  DEFAULT_BASE_URL: "https://pixelatedempathy.com"
+  DEFAULT_BASE_URL: 'https://pixelatedempathy.com'
   HEALTH_CHECK_TIMEOUT_PROD: 30
   HEALTH_CHECK_TIMEOUT_STAGING: 20
   HEALTH_CHECK_TIMEOUT_PREVIEW: 15

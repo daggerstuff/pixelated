@@ -117,8 +117,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [validate]
     outputs:
-      image-tag: ${{ steps.build.outputs.image-tag }}
-      image-digest: ${{ steps.build.outputs.image-digest }}
+      image-tag: ${{ steps.out.outputs.image-tag }}
+      image-digest: ${{ steps.out.outputs.image-digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -251,6 +251,7 @@ jobs:
             PUBLIC_SENTRY_DSN=${{ env.PUBLIC_SENTRY_DSN || secrets.PUBLIC_SENTRY_DSN }}
 
       - name: Output image info
+        id: out
         run: |
           # Extract first tag from multi-line tags output
           FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
@@ -283,15 +284,15 @@ jobs:
       - name: Determine image tag
         id: image_tag
         run: |
-          # Try to use the first tag from build step, or fallback to SHA-based tag
-          if [ -n "${{ needs.build.outputs.image-tag }}" ]; then
-            IMAGE_TAG="${{ needs.build.outputs.image-tag }}"
-          else
-            # Fallback: construct tag from registry, image name, and SHA
-            IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          # Use immutable image digest produced by the build job
+          IMAGE_DIGEST="${{ needs.build.outputs.image-digest }}"
+          if [ -z "$IMAGE_DIGEST" ]; then
+            echo "❌ Missing image digest from build outputs"
+            exit 1
           fi
-          echo "image_ref=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          echo "🔍 Using image: ${IMAGE_TAG}"
+          IMAGE_REF="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${IMAGE_DIGEST}"
+          echo "image_ref=${IMAGE_REF}" >> $GITHUB_OUTPUT
+          echo "🔍 Using image: ${IMAGE_REF}"
 
       - name: Pull Docker image for scanning
         run: |
@@ -810,7 +811,7 @@ jobs:
     name: Cleanup
     runs-on: ubuntu-latest
     needs: [deploy-gke, health-check-gke]
-    if: always()
+    if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -840,6 +841,7 @@ jobs:
           fi
 
       - name: Authenticate to Google Cloud
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GCP_SERVICE_ACCOUNT_EMAIL != '' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
