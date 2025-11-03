@@ -75,7 +75,7 @@ jobs:
 
     - name: Upload Trivy diagnostic artifact
       if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v5.0.0
       continue-on-error: true
       with:
         name: trivy-diagnostic
@@ -89,7 +89,7 @@ jobs:
         sarif_file: 'trivy-results.sarif'
 
     - name: Upload Trivy SARIF as artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v5.0.0
       if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
@@ -111,14 +111,14 @@ jobs:
 
     - name: Upload Checkov diagnostic artifact
       if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v5.0.0
       continue-on-error: true
       with:
         name: checkov-diagnostic
         path: checkov-missing.txt
 
     - name: Upload Checkov SARIF as artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v5.0.0
       if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
       continue-on-error: true
       with:
@@ -150,7 +150,7 @@ jobs:
       run: pnpm audit --json > audit-results.json || true
 
     - name: Upload audit results
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v5.0.0
       with:
         name: security-audit-results
         path: audit-results.json

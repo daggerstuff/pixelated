@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: browser-test-results-${{ github.run_id }}
           path: |
@@ -202,7 +202,7 @@ jobs:
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html
