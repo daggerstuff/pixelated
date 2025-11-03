@@ -190,6 +190,10 @@ export default defineConfig({
       ],
     },
     optimizeDeps: {
+      entries: [
+        'src/**/*.{ts,tsx,js,jsx,astro}',
+        'src/**/*.mjs',
+      ],
       exclude: [
         '@aws-sdk/client-s3',
         '@aws-sdk/client-kms',
@@ -219,51 +223,42 @@ export default defineConfig({
       ],
     },
   },
-  integrations: [
-    react({
-      include: ['**/react/*', '**/components/**/*'],
-      experimentalReactChildren: true,
-    }),
-
-    UnoCSS({
-      injectReset: true,
-    }),
-    icon({
-      include: {
-        lucide: [
-          'calendar',
-          'user',
-          'settings',
-          'heart',
-          'brain',
-          'shield-check',
-          'info',
-          'arrow-left',
-          'shield',
-          'user-plus'
-        ]
-      },
-      svgdir: './src/icons',
-    }),
-    ...(process.env.SENTRY_DSN ? [
-      sentry({
-        sourceMapsUploadOptions: {
-          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-          project: process.env.SENTRY_PROJECT || 'pixel-astro',
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-          telemetry: false,
-          sourcemaps: {
-            assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
-            ignore: ['**/node_modules/**'],
-            filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-          },
-        },
+  integrations: (() => {
+    const MIN_DEV = process.env.MIN_DEV === '1'
+    const base = [
+      react({
+        include: ['**/react/*', '**/components/**/*'],
+        experimentalReactChildren: true,
+      })
+    ]
+    if (MIN_DEV) return base
+    return [
+      ...base,
+      UnoCSS({ injectReset: true }),
+      icon({
+        include: { lucide: [
+          'calendar','user','settings','heart','brain','shield-check','info','arrow-left','shield','user-plus'
+        ]},
+        svgdir: './src/icons',
       }),
-      ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1'
-        ? [spotlightjs()]
-        : [])
-    ] : []),
-  ],
+      ...(process.env.SENTRY_DSN ? [
+        sentry({
+          sourceMapsUploadOptions: {
+            org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+            project: process.env.SENTRY_PROJECT || 'pixel-astro',
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            telemetry: false,
+            sourcemaps: {
+              assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
+              ignore: ['**/node_modules/**'],
+              filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
+            },
+          },
+        }),
+        ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1' ? [spotlightjs()] : [])
+      ] : []),
+    ]
+  })(),
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
@@ -279,6 +274,8 @@ export default defineConfig({
     watch: {
       followSymlinks: false,
       ignored: [
+        // Hard guard first: function ignore for .venv anywhere
+        (p) => typeof p === 'string' && (p.includes('/.venv/') || p.includes('\\.venv\\') || p.includes('/ai/') || p.includes('\\ai\\')),
         // Python virtual environments and cache
         '**/.venv/**',
         '.venv/**',
@@ -343,9 +340,30 @@ export default defineConfig({
         '**/.DS_Store',
         '**/dist/**',
         '**/.astro/**',
+        // Final guard: regex-based ignore for ai/.venv on any platform
+        /\/ai\/\.venv\//,
+        // Guard for any .venv path (root or nested)
+        /\/.venv\//,
+        /\.venv\//,
       ],
       usePolling: false,
     },
+      fs: {
+        strict: true,
+        allow: [
+          path.resolve('./src'),
+          path.resolve('./public'),
+          path.resolve('./.astro'),
+        ],
+        deny: [
+          'ai',
+          '/ai',
+          '**/ai/**',
+          '.venv',
+          '/.venv',
+          '**/.venv/**',
+        ],
+      },
   },
 
   preview: {

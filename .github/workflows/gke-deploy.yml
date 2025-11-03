@@ -299,6 +299,14 @@ jobs:
           docker pull "${{ steps.image_tag.outputs.image_ref }}"
           echo "✅ Image pulled successfully"
 
+      - name: Configure Trivy temp and cache directories
+        run: |
+          echo "TMPDIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/.cache" >> $GITHUB_ENV
+          echo "TRIVY_CACHE_DIR=$RUNNER_TEMP/.cache/trivy" >> $GITHUB_ENV
+          mkdir -p "$RUNNER_TEMP/.cache/trivy"
+          echo "✅ Trivy will use $RUNNER_TEMP for temp and cache"
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
@@ -306,6 +314,13 @@ jobs:
           image-ref: ${{ steps.image_tag.outputs.image_ref }}
           format: "sarif"
           output: "trivy-results.sarif"
+          cache-dir: ${{ env.TRIVY_CACHE_DIR }}
+          # Limit scanning to vulnerabilities to reduce temp usage and speed
+          security-checks: vuln
+          # Keep SARIF focused and smaller
+          severity: CRITICAL,HIGH
+          limit-severities-for-sarif: true
+          timeout: 10m
 
       - name: Check for Trivy SARIF file
         id: trivy_sarif
@@ -556,6 +571,28 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Preflight: verify GKE API access permissions
+        run: |
+          PROJECT_ID="${{ env.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}"
+          CLUSTER_NAME="${{ env.GKE_CLUSTER_NAME || secrets.GKE_CLUSTER_NAME }}"
+          ZONE="${{ env.GKE_ZONE || secrets.GKE_ZONE }}"
+
+          echo "🔐 Authenticated as:"
+          gcloud auth list --filter=status:ACTIVE --format='table(account)'
+
+          echo "🔎 Verifying permission to access cluster metadata (container.clusters.get) ..."
+          # This lightweight call will fail with the same 403 if the SA lacks container.clusters.get
+          if ! gcloud container clusters describe "$CLUSTER_NAME" --zone "$ZONE" --project "$PROJECT_ID" --format='value(name)' >/dev/null 2>&1; then
+            echo "❌ Missing required permission: container.clusters.get for $PROJECT_ID/$ZONE/$CLUSTER_NAME"
+            echo "💡 Grant the GitHub Actions service account the IAM role: roles/container.clusterViewer (Project-level)"
+            echo "   gcloud projects add-iam-policy-binding $PROJECT_ID \\";
+            echo "     --member=serviceAccount:${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }} \\");
+            echo "     --role=roles/container.clusterViewer"
+            echo "📚 After granting, re-run the workflow."
+            exit 1
+          fi
+          echo "✅ GKE API permission check passed"
 
       - name: Get GKE credentials
         run: |

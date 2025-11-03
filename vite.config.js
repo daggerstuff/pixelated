@@ -28,14 +28,28 @@ console.log('SENTRY_DSN:', process.env.SENTRY_DSN)
 console.log('SENTRY_ORG:', process.env.SENTRY_ORG)
 console.log('SENTRY_PROJECT:', process.env.SENTRY_PROJECT)
 
+const MIN_DEV = process.env.MIN_DEV === '1'
+
 export default defineConfig({
+  root: MIN_DEV ? path.resolve('./src') : undefined,
   cacheDir: process.env.CI
     ? '$(Agent.WorkFolder)/.vite-cache'
     : 'node_modules/.vite',
   server: {
     watch: {
       followSymlinks: false,
+      usePolling: true,
+      interval: 1200,
+      binaryInterval: 2000,
+      awaitWriteFinish: {
+        stabilityThreshold: 200,
+        pollInterval: 100,
+      },
       ignored: [
+        // Ensure AI workspace and its virtualenv are fully ignored
+        'ai/**',
+        '**/ai/**',
+        '**/ai/.venv/**',
         '/ai/**',
         '**/dataset/**',
         '**/MER2025/**',
@@ -86,64 +100,119 @@ export default defineConfig({
         '.cache/**',
         'mcp_server/**',
         '/mcp_server/**',
+        // Final guard: regex-based ignore for ai/.venv on any platform
+        /\/ai\/\.venv\//,
+        // Guard for any .venv path (root or nested)
+        /\/.venv\//,
+        /\.venv\//,
+      ],
+    },
+    fs: {
+      strict: true,
+      allow: [
+        path.resolve('./src'),
+        path.resolve('./public'),
+        path.resolve('./.astro'),
+      ],
+      deny: [
+        'ai',
+        '/ai',
+        '**/ai/**',
+        '.venv',
+        '/.venv',
+        '**/.venv/**',
       ],
     },
   },
-  plugins: [
-    rewriteLoggerImportPlugin(),
-    {
-      name: 'cdn-asset-replacer',
-      transform(code, id) {
-        try {
-          if (
-            id.endsWith('.astro') ||
-            id.endsWith('.tsx') ||
-            id.endsWith('.jsx') ||
-            id.endsWith('.ts') ||
-            id.endsWith('.js')
-          ) {
-            Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
-              const quotedLocalPath1 = `"${localPath}"`
-              const quotedLocalPath2 = `'${localPath}'`
-              code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`)
-              code = code.replaceAll(quotedLocalPath2, `'${cdnUrl}'`)
-            })
+  plugins: (() => {
+    const minimal = [
+      rewriteLoggerImportPlugin(),
+      {
+        name: 'log-resolved-config',
+        apply: 'serve',
+        configResolved(resolved) {
+          try {
+            // Log only high-signal fields
+            console.log('[vite] resolved.root =', resolved.root)
+            console.log('[vite] server.fs.allow =', resolved.server?.fs?.allow)
+            console.log('[vite] server.fs.deny =', resolved.server?.fs?.deny)
+            console.log('[vite] server.watch.ignored =', resolved.server?.watch?.ignored)
+          } catch {}
+        },
+      },
+    ]
+    if (MIN_DEV) return minimal
+    return [
+      ...minimal,
+      {
+        name: 'force-unwatch-ai-venv',
+        apply: 'serve',
+        configureServer(server) {
+          try {
+            const patternsToUnwatch = [
+              'ai/',
+              'ai/**',
+              '**/ai/**',
+              'ai/.venv/',
+              'ai/.venv/**',
+              '**/ai/.venv/**',
+              '.venv/',
+              '.venv/**',
+              '**/.venv/**',
+              '/.venv/',
+              '/.venv/**',
+              '/ai/',
+              '/ai/**',
+            ]
+
+            // Unwatch all patterns
+            server.watcher.unwatch(patternsToUnwatch)
+          } catch (error) {
+            console.warn('[vite] force-unwatch-ai-venv: Failed to unwatch ai/.venv:', error.message)
           }
-          return code
-        } catch (error) {
-          console.warn(`CDN asset replacement failed for ${id}:`, error.message)
-          return code
-        }
+        },
       },
-    },
-    nodePolyfillPlugin(),
-    nodeExcludePlugin(),
-    externalNodePlugin(),
-    flexsearchSSRPlugin(),
-    middlewarePatchPlugin(),
-    {
-      name: 'exclude-server-only',
-      resolveId(id) {
-        if (
-          id.includes('/server-only/') ||
-          id.includes('MentalLLaMAPythonBridge') ||
-          id === 'mongodb' ||
-          id.includes('mongodb')
-        ) {
-          return false
-        }
+      {
+        name: 'cdn-asset-replacer',
+        transform(code, id) {
+          try {
+            if (id.endsWith('.astro') || id.endsWith('.tsx') || id.endsWith('.jsx') || id.endsWith('.ts') || id.endsWith('.js')) {
+              Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
+                const quotedLocalPath1 = `"${localPath}"`
+                const quotedLocalPath2 = `'${localPath}'`
+                code = code.replaceAll(quotedLocalPath1, `"${cdnUrl}"`)
+                code = code.replaceAll(quotedLocalPath2, `'${cdnUrl}'`)
+              })
+            }
+            return code
+          } catch (error) {
+            console.warn(`CDN asset replacement failed for ${id}:`, error.message)
+            return code
+          }
+        },
       },
-    },
-    ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN
-      ? [
-          sentryVitePlugin({
-            org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-            project: process.env.SENTRY_PROJECT || 'pixel-astro',
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-          }),
-        ]
-      : []),
-  ],
+      nodePolyfillPlugin(),
+      nodeExcludePlugin(),
+      externalNodePlugin(),
+      flexsearchSSRPlugin(),
+      middlewarePatchPlugin(),
+      {
+        name: 'exclude-server-only',
+        resolveId(id) {
+          if (id.includes('/server-only/') || id.includes('MentalLLaMAPythonBridge') || id === 'mongodb' || id.includes('mongodb')) {
+            return false
+          }
+        },
+      },
+      ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN ? [
+        sentryVitePlugin({
+          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+          project: process.env.SENTRY_PROJECT || 'pixel-astro',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        }),
+      ] : []),
+    ]
+  })(),
   base:
     process.env.NODE_ENV === 'production'
       ? process.env.CDN_BASE_URL || '/'
@@ -343,6 +412,10 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    entries: [
+      'src/**/*.{ts,tsx,js,jsx,astro}',
+      'src/**/*.mjs',
+    ],
     esbuildOptions: {
       platform: 'node',
       target: 'node24',
