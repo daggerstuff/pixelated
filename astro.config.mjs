@@ -277,6 +277,7 @@ export default defineConfig({
     port: 4321,
     host: '0.0.0.0',
     watch: {
+      followSymlinks: false,
       ignored: [
         // Python virtual environments and cache
         '**/.venv/**',
@@ -317,6 +318,20 @@ export default defineConfig({
         '**/node_modules/**',
         '/node_modules/**',
         'node_modules/**',
+        // pnpm and Vite caches inside node_modules
+        '**/node_modules/.pnpm/**',
+        'node_modules/.pnpm/**',
+        '**/node_modules/.vite/**',
+        'node_modules/.vite/**',
+        '**/node_modules/.cache/**',
+        'node_modules/.cache/**',
+        // miscellaneous caches
+        '**/.pnpm/**',
+        '.pnpm/**',
+        '**/.vite/**',
+        '.vite/**',
+        '**/.cache/**',
+        '.cache/**',
         // MCP server
         '/mcp_server/**',
         'mcp_server/**',

@@ -34,6 +34,7 @@ export default defineConfig({
     : 'node_modules/.vite',
   server: {
     watch: {
+      followSymlinks: false,
       ignored: [
         '/ai/**',
         '**/dataset/**',
@@ -69,6 +70,20 @@ export default defineConfig({
         '**/node_modules/*',
         '/node_modules/**',
         'node_modules/**',
+        // pnpm & Vite caches/symlinks inside node_modules
+        '**/node_modules/.pnpm/**',
+        'node_modules/.pnpm/**',
+        '**/node_modules/.vite/**',
+        'node_modules/.vite/**',
+        '**/node_modules/.cache/**',
+        'node_modules/.cache/**',
+        // global-level caches
+        '**/.pnpm/**',
+        '.pnpm/**',
+        '**/.vite/**',
+        '.vite/**',
+        '**/.cache/**',
+        '.cache/**',
         'mcp_server/**',
         '/mcp_server/**',
       ],
