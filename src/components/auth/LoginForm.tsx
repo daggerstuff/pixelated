@@ -348,10 +348,6 @@ export function LoginForm({
           type="submit"
           className="btn btn-primary"
           disabled={isLoading}
-          onClick={(e) => {
-            e.preventDefault()
-            void handleSubmit(e as unknown as React.FormEvent)
-          }}
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
