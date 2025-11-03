@@ -485,7 +485,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       // for users who don't use S3 storage
       // Note: This requires installing @aws-sdk/client-s3 as a dependency
       // if you intend to use this provider in production
-      let S3Client
+      let S3Client: any
       try {
         // Using dynamic import with type assertion to avoid TypeScript errors
         const awsModule = await import('@aws-sdk/client-s3')
@@ -533,7 +533,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       const fullKey = this.getFullKey(key)
 
       // Import the PutObjectCommand dynamically
-      let PutObjectCommand
+      let PutObjectCommand: any
       try {
         const { PutObjectCommand: POC } = await import('@aws-sdk/client-s3')
         PutObjectCommand = POC
@@ -574,7 +574,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       const fullKey = this.getFullKey(key)
 
       // Import the GetObjectCommand dynamically
-      let GetObjectCommand
+      let GetObjectCommand: any
       try {
         const { GetObjectCommand: GOC } = await import('@aws-sdk/client-s3')
         GetObjectCommand = GOC
@@ -615,7 +615,7 @@ export class AWSS3StorageProvider implements StorageProvider {
   async listFiles(pattern?: string): Promise<string[]> {
     try {
       // Import the ListObjectsV2Command dynamically
-      let ListObjectsV2Command
+      let ListObjectsV2Command: any
       try {
         const { ListObjectsV2Command: LOC } = await import('@aws-sdk/client-s3')
         ListObjectsV2Command = LOC
@@ -681,7 +681,7 @@ export class AWSS3StorageProvider implements StorageProvider {
     try {
       const fullKey = this.getFullKey(key)
       // Import the DeleteObjectCommand dynamically
-      let DeleteObjectCommand
+      let DeleteObjectCommand: any
       try {
         const { DeleteObjectCommand: DOC } = await import('@aws-sdk/client-s3')
         DeleteObjectCommand = DOC
@@ -1018,8 +1018,8 @@ export class AzureBlobStorageProvider implements StorageProvider {
       // Dynamically import Azure Storage Blob library
       // Note: This requires installing @azure/storage-blob as a dependency
       // if you intend to use this provider in production
-      let BlobServiceClient
-      let StorageSharedKeyCredential
+      let BlobServiceClient: any
+      let StorageSharedKeyCredential: any
 
       try {
         // Using dynamic import with type assertion to avoid TypeScript errors

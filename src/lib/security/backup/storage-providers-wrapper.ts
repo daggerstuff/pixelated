@@ -7,6 +7,7 @@
 
 import type { StorageProvider, StorageProviderConfig } from './types'
 import { isBrowser } from '../../browser/is-browser'
+import { createBuildSafeLogger as getLogger } from '../../logging/build-safe-logger'
 
 /**
  * Get storage provider instance based on provider name
@@ -22,7 +23,7 @@ export async function getStorageProvider(
   }
 
   // Server-side implementation - dynamically load based on provider name
-  let providerModule
+  let providerModule: any
   try {
     switch (providerName) {
       case 'google-cloud-storage': {

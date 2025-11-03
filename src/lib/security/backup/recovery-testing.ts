@@ -329,7 +329,7 @@ export class RecoveryTestingManager {
     // })
 
     // Log scheduling as an audit event
-    await logAuditEvent(
+    logAuditEvent(
       AuditEventType.SECURITY,
       'RECOVERY_TESTS_SCHEDULED',
       'system',
@@ -354,7 +354,7 @@ export class RecoveryTestingManager {
 
     try {
       // Log test initiation
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'RECOVERY_TEST_STARTED',
         'system',
@@ -426,7 +426,7 @@ export class RecoveryTestingManager {
       }
 
       // Log test completion
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         status === RecoveryTestStatus.PASSED
           ? 'RECOVERY_TEST_PASSED'
@@ -459,7 +459,7 @@ export class RecoveryTestingManager {
       })
 
       // Log failure
-      await logAuditEvent(
+      logAuditEvent(
         AuditEventType.SECURITY,
         'RECOVERY_TEST_ERROR',
         'system',

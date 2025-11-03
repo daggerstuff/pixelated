@@ -2,6 +2,8 @@ import type {
   ComplianceDocument,
   ComplianceVerification,
   ComplianceRequirement,
+} from './types'
+import {
   ComplianceLevel,
   VerificationMethod,
   BusinessAssociateType,
@@ -509,24 +511,42 @@ export class ComplianceVerificationService {
     this.createRequirement(
       'Security Risk Assessment',
       'A comprehensive evaluation of potential risks and vulnerabilities to the confidentiality, integrity, and availability of PHI.',
-      ['EHR_VENDOR', 'CLOUD_SERVICE', 'DATA_ANALYTICS', 'TELEMEDICINE'],
-      ['DATA_STORAGE', 'SOFTWARE_SERVICES', 'CONSULTING'],
+      [
+        BusinessAssociateType.EHR_VENDOR,
+        BusinessAssociateType.CLOUD_SERVICE,
+        BusinessAssociateType.DATA_ANALYTICS,
+        BusinessAssociateType.TELEMEDICINE,
+      ],
+      [
+        ServiceCategory.DATA_STORAGE,
+        ServiceCategory.SOFTWARE_SERVICES,
+        ServiceCategory.CONSULTING,
+      ],
       ['risk_assessment'],
-      'high',
+      ComplianceLevel.HIGH,
       true,
-      'THIRD_PARTY_AUDIT',
+      VerificationMethod.THIRD_PARTY_AUDIT,
       'annual',
     )
 
     this.createRequirement(
       'HIPAA Security Training',
       'Evidence of regular HIPAA and security awareness training for all staff with access to PHI.',
-      ['EHR_VENDOR', 'CLOUD_SERVICE', 'DATA_ANALYTICS', 'TELEMEDICINE'],
-      ['DATA_STORAGE', 'SOFTWARE_SERVICES', 'CONSULTING'],
+      [
+        BusinessAssociateType.EHR_VENDOR,
+        BusinessAssociateType.CLOUD_SERVICE,
+        BusinessAssociateType.DATA_ANALYTICS,
+        BusinessAssociateType.TELEMEDICINE,
+      ],
+      [
+        ServiceCategory.DATA_STORAGE,
+        ServiceCategory.SOFTWARE_SERVICES,
+        ServiceCategory.CONSULTING,
+      ],
       ['training_records'],
-      'medium',
+      ComplianceLevel.MEDIUM,
       true,
-      'DOCUMENTATION_REVIEW',
+      VerificationMethod.DOCUMENTATION_REVIEW,
       'annual',
     )
 
@@ -555,16 +575,24 @@ export class ComplianceVerificationService {
     const stats = {
       totalVerifications: verifications.length,
       verificationsByLevel: {
-        low: 0,
-        medium: 0,
-        high: 0,
-      } as Record<ComplianceLevel, number>,
+        [ComplianceLevel.LOW]: 0,
+        [ComplianceLevel.MEDIUM]: 0,
+        [ComplianceLevel.HIGH]: 0,
+        [ComplianceLevel.NOT_VERIFIED]: 0,
+        [ComplianceLevel.SELF_ATTESTED]: 0,
+        [ComplianceLevel.THIRD_PARTY_VERIFIED]: 0,
+        [ComplianceLevel.HIPAA_CERTIFIED]: 0,
+        [ComplianceLevel.NON_COMPLIANT]: 0,
+      },
       verificationsByMethod: {
-        SELF_ATTESTATION: 0,
-        DOCUMENTATION_REVIEW: 0,
-        THIRD_PARTY_AUDIT: 0,
-        ONSITE_ASSESSMENT: 0,
-      } as Record<VerificationMethod, number>,
+        [VerificationMethod.SELF_ATTESTATION]: 0,
+        [VerificationMethod.DOCUMENTATION_REVIEW]: 0,
+        [VerificationMethod.THIRD_PARTY_AUDIT]: 0,
+        [VerificationMethod.ONSITE_ASSESSMENT]: 0,
+        [VerificationMethod.SELF_ASSESSMENT]: 0,
+        [VerificationMethod.CERTIFICATION_VALIDATION]: 0,
+        [VerificationMethod.QUESTIONNAIRE]: 0,
+      },
       documentsUploaded: documents.length,
       expiringVerifications: 0,
     }

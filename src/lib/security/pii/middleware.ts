@@ -9,7 +9,7 @@
  * - Redirect to secure endpoints for sensitive operations
  */
 
-import type { APIContext } from 'astro'
+import type { APIContext, MiddlewareNext } from 'astro'
 import { defineMiddleware } from 'astro/middleware'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { PIIType } from '.'
@@ -119,15 +119,18 @@ async function piiMiddleware(
 /**
  * PII detection middleware to scan and process requests/responses
  */
-export const onRequest = defineMiddleware(async (context: APIContext, next) => {
-  try {
-    // Add PII detection logic here
-    return await next()
-  } catch (error: unknown) {
-    logger.error('Error in PII middleware', { error })
-    return new Response('Internal Server Error', { status: 500 })
-  }
-})
+export const onRequest = defineMiddleware(
+  async (context: APIContext, next: MiddlewareNext) => {
+    try {
+      console.log('onRequest context:', context)
+      // Add PII detection logic here
+      return await next()
+    } catch (error: unknown) {
+      logger.error('Error in PII middleware', { error })
+      return new Response('Internal Server Error', { status: 500 })
+    }
+  },
+)
 
 /**
  * Middleware factory function for easier configuration

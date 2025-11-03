@@ -49,7 +49,7 @@ export class ConsentService {
           createdAt: t['created_at'],
           updatedAt: t['updated_at'],
         }
-      })
+      }) as ConsentType[]
     } catch (error: unknown) {
       logger.error('Unexpected error in getConsentTypes', error)
       throw new Error('Failed to fetch consent types', { cause: error })
@@ -106,17 +106,29 @@ export class ConsentService {
     try {
       // TODO: Replace with MongoDB implementation
       const data: unknown[] = [] // Stub: Replace with MongoDB result
-      return data.map((option: Record<string, unknown>) => ({
-        id: option['id'] as string,
-        consentTypeId: option['consent_type_id'] as string,
-        optionName: option['option_name'] as string,
-        description: option['description'] as string,
-        isRequired: option['is_required'] as boolean,
-        defaultValue: option['default_value'],
-        displayOrder: option['display_order'] as number,
-        createdAt: option['created_at'] as string,
-        updatedAt: option['updated_at'] as string,
-      }))
+      return data.map((option: unknown) => ({
+        id: (option as Record<string, unknown>)['id'] as string,
+        consentTypeId: (option as Record<string, unknown>)[
+          'consent_type_id'
+        ] as string,
+        optionName: (option as Record<string, unknown>)[
+          'option_name'
+        ] as string,
+        description: (option as Record<string, unknown>)[
+          'description'
+        ] as string,
+        isRequired: (option as Record<string, unknown>)[
+          'is_required'
+        ] as boolean,
+        defaultValue: (option as Record<string, unknown>)[
+          'default_value'
+        ] as string,
+        displayOrder: (option as Record<string, unknown>)[
+          'display_order'
+        ] as number,
+        createdAt: (option as Record<string, unknown>)['created_at'] as string,
+        updatedAt: (option as Record<string, unknown>)['updated_at'] as string,
+      })) as ConsentOption[]
     } catch (error: unknown) {
       logger.error('Unexpected error in getConsentOptions', error)
       throw new Error('Failed to fetch consent options', { cause: error })

@@ -12,6 +12,7 @@
 import { fheService } from '../../fhe'
 import { FHEOperation } from '../../fhe/types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { RealFHEService } from '../../fhe/fhe-service'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -389,7 +390,7 @@ class PIIDetectionService {
   ): Promise<PIIDetectionResult> {
     try {
       // Ensure FHE service is available
-      const fheServiceTyped = fheService as FHEService
+      const fheServiceTyped = fheService as unknown as RealFHEService
       if (!fheServiceTyped.isInitialized()) {
         throw new Error('FHE service not initialized')
       }
@@ -407,15 +408,16 @@ class PIIDetectionService {
         },
       )
 
-      // Return encrypted result
-      return {
-        data: { hasPII: 'false', confidence: '0', types: '' },
-        metadata: { operation: FHEOperation.ANALYZE, timestamp: Date.now() },
-      }
-
-      // Parse the result
       // In a real FHE implementation, this would decrypt the result
       // For this implementation, we'll simulate the result
+      if (!result.data) {
+        return {
+          detected: false,
+          types: [],
+          confidence: 0,
+          isEncrypted: true,
+        }
+      }
 
       const hasPII = (result.data as { hasPII: string }).hasPII === 'true'
       const confidence =
@@ -534,7 +536,7 @@ class PIIDetectionService {
     const sensitiveKeys = options.sensitiveKeys ?? []
 
     // Create a copy of the data to avoid modifying the original
-    const result = JSON.parse(JSON.stringify(data) as unknown) as T
+    const result = JSON.parse(JSON.stringify(data)) as T
     let detectedPII = false
 
     // Process the object recursively
@@ -577,7 +579,7 @@ class PIIDetectionService {
       } else if (typeof value === 'object') {
         // Handle arrays
         if (Array.isArray(value)) {
-          const processedArray = []
+          const processedArray: unknown[] = []
 
           for (const item of value) {
             processedArray.push(await processValue(item))
