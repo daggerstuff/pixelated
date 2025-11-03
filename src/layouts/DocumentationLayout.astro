@@ -3,6 +3,7 @@ import BaseHead from '@/components/base/Head.astro'
 import Header from '@/components/layout/Header.astro'
 import Footer from '@/components/layout/Footer.astro'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+import '@/styles/enhanced-theme.css'
 
 interface Props {
   title: string
@@ -33,7 +34,7 @@ const image = frontmatter?.image || propImage
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="enhanced-dark-theme scroll-smooth">
   <head>
     <BaseHead {title} {description} ogImage={image} />
 
@@ -246,52 +247,52 @@ const image = frontmatter?.image || propImage
     </style>
   </head>
 
-  <body class="min-h-screen bg-background font-sans antialiased">
+  <body class="enhanced-dark-theme min-h-screen font-sans antialiased" style="background: var(--bg-primary); color: var(--text-primary);">
     <Header />
 
-    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+    <div class="container-refined py-12 flex flex-col md:flex-row gap-8">
       <!-- Sidebar for navigation -->
-      <aside class="md:w-64 shrink-0" transition:persist>
+      <aside class="md:w-64 shrink-0 glass-panel p-6" transition:persist>
         <div class="sticky top-24">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-lg">Documentation</h3>
+            <h3 class="font-bold text-lg" style="color: var(--text-primary);">Documentation</h3>
             <ThemeToggle />
           </div>
 
           <nav class="space-y-1">
             <a
               href="/docs"
-              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              class="nav-link-refined block"
               transition:animate="slide">Home</a
             >
             <a
               href="/docs/api"
-              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              class="nav-link-refined block"
               transition:animate="slide">API Reference</a
             >
             <a
               href="/docs/components"
-              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              class="nav-link-refined block"
               transition:animate="slide">Components</a
             >
             <a
               href="/docs/security"
-              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              class="nav-link-refined block"
               transition:animate="slide">Security</a
             >
             <a
               href="/docs/guides"
-              class="block px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              class="nav-link-refined block"
               transition:animate="slide">Guides</a
             >
           </nav>
 
           <!-- On this page navigation (generated from headings) -->
-          <div class="mt-8">
-            <h4 class="font-semibold text-sm mb-3 text-muted-foreground">
+          <div class="mt-8 pt-8 border-t" style="border-color: var(--border-primary);">
+            <h4 class="eyebrow-text mb-3">
               ON THIS PAGE
             </h4>
-            <div class="text-sm space-y-1" id="on-this-page">
+            <div class="text-sm space-y-2" id="on-this-page" style="color: var(--text-muted);">
               <!-- This will be populated by JS -->
             </div>
           </div>
@@ -304,11 +305,12 @@ const image = frontmatter?.image || propImage
           class="prose prose-lg dark:prose-invert max-w-none docs-content"
         >
           <!-- Documentation title and metadata -->
-          <header class="mb-8">
-            <h1 class="text-4xl font-bold mb-4" transition:name="doc-title">
+          <header class="mb-12">
+            <div class="section-number mb-6">Documentation</div>
+            <h1 class="display-heading mb-6" transition:name="doc-title">
               {title}
             </h1>
-            <p class="text-muted-foreground" transition:name="doc-desc">
+            <p class="lede-text" transition:name="doc-desc" style="color: var(--text-secondary);">
               {description}
             </p>
           </header>

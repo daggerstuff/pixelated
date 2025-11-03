@@ -3,6 +3,7 @@ import BaseHead from '@/components/base/Head.astro'
 import Header from '@/components/layout/Header.astro'
 import Footer from '@/components/layout/Footer.astro'
 import { BlogSearch } from '@/components/BlogSearch'
+import '@/styles/enhanced-theme.css'
 
 interface Props {
   title: string
@@ -32,7 +33,7 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="enhanced-dark-theme scroll-smooth">
   <head>
     <BaseHead {title} {description} ogImage={image} />
 
@@ -60,11 +61,11 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
     }
   </head>
 
-  <body class="min-h-screen theme-page font-sans antialiased theme-bg-primary">
+  <body class="enhanced-dark-theme min-h-screen font-sans antialiased" style="background: var(--bg-primary); color: var(--text-primary);">
     <Header />
 
-    <main class="container mx-auto px-4 py-8">
-      <article class="prose prose-lg dark:prose-invert mx-auto">
+    <main class="container-refined py-12">
+      <article class="prose prose-lg dark:prose-invert mx-auto max-w-4xl">
         <!-- Blog post header -->
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{title}</h1>

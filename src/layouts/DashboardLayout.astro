@@ -3,6 +3,7 @@
 // Style imports
 import '@unocss/reset/tailwind.css'
 import '@/styles/main.css'
+import '@/styles/enhanced-theme.css'
 import '@/styles/pixelated-theme.css'
 import '@/styles/prose.css'
 import '@/styles/markdown.css'
@@ -52,10 +53,11 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="h-full scroll-smooth">
+<html lang="en" class="enhanced-dark-theme h-full scroll-smooth">
   <Head {title} {description} ogImage={metaImage} />
   <body
-    class="relative font-sans theme-page flex flex-col min-h-screen theme-bg-primary"
+    class="enhanced-dark-theme relative font-sans flex flex-col min-h-screen"
+    style="background: var(--bg-primary); color: var(--text-primary);"
   >
     <!-- Skip to content link for accessibility -->
     <a
@@ -81,9 +83,9 @@ const {
           showSidebar && (
             <aside
               class="sidebar dashboard-sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
-            backdrop-blur-sm bg-card/80 border-r border-border/30
             transform transition-transform duration-300 lg:translate-x-0 lg:static lg:h-auto"
               id="sidebar"
+              style="background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-right: 1px solid var(--border-primary);"
             >
               <Sidebar />
             </aside>

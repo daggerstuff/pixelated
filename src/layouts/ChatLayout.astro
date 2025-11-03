@@ -1,25 +1,30 @@
 ---
+import '@/styles/enhanced-theme.css'
+
 interface Props {
   title?: string
 }
 const { title = 'Chat' } = Astro.props
 ---
 
-<html lang="en">
+<html lang="en" class="enhanced-dark-theme">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    <title>{title} | Pixelated Empathy</title>
   </head>
-  <body>
+  <body class="enhanced-dark-theme" style="background: var(--bg-primary); color: var(--text-primary); min-height: 100vh;">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+      style="background: var(--accent-primary); color: var(--bg-primary);"
     >
       Skip to content
     </a>
-    <main id="main-content">
+    <main id="main-content" class="min-h-screen">
       <slot />
     </main>
   </body>

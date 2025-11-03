@@ -278,32 +278,70 @@ export default defineConfig({
     host: '0.0.0.0',
     watch: {
       ignored: [
+        // Python virtual environments and cache
+        '**/.venv/**',
+        '/.venv/**',
+        '.venv/**',
+        '**/venv/**',
+        '/venv/**',
+        'venv/**',
+        '**/__pycache__/**',
+        '__pycache__/**',
+        '**/*.py',
+        '**/*.pyc',
+        '**/*.pyo',
+        '**/*.pyd',
+        // AI and data directories
         '/ai/**',
+        '**/ai/**',
         '**/dataset/**',
         '**/MER2025/**',
         '**/VideoChat2/**',
-        '*.py',
-        '*.pyc',
-        '/__pycache__/**',
-        '__pycache__/**',
-        '/venv/**',
-        '/env/**',
+        // Build and cache directories
         '/logs/**',
+        'logs/**',
         '/tmp/**',
+        'tmp/**',
         '/temp/**',
+        'temp/**',
         '/coverage/**',
-        '/mcp_server/**',
-        '**/.venv/**',
-        '**/.venv/*',
-        '/.venv/**',
+        'coverage/**',
+        // Node modules (should already be ignored but being explicit)
         '**/node_modules/**',
-        '**/node_modules/*',
         '/node_modules/**',
         'node_modules/**',
+        // MCP server
+        '/mcp_server/**',
         'mcp_server/**',
-        '/mcp_server/**'
-      ]
-    }
+        '**/mcp_server/**',
+        // Other ignored paths
+        '/env/**',
+        'env/**',
+        '**/.git/**',
+        '**/.DS_Store',
+        '**/dist/**',
+        '**/.astro/**',
+      ],
+      usePolling: false,
+    },
+  },
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/.venv/**',
+          '**/venv/**',
+          '**/__pycache__/**',
+          '**/*.py',
+          '**/*.pyc',
+          '**/node_modules/**',
+          '**/ai/**',
+          '**/logs/**',
+          '**/tmp/**',
+        ],
+        usePolling: false,
+      },
+    },
   },
   preview: {
     port: 4322,

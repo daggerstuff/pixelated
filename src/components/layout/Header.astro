@@ -9,41 +9,45 @@ const navLinks = [
 ---
 
 <header
-  class="fixed top-0 z-50 w-full bg-black/70 supports-[backdrop-filter]:backdrop-blur border-b border-gray-800"
+  class="fixed top-0 z-50 w-full"
+  style="background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-primary);"
 >
-  <div class="brutalist-container">
-    <div class="flex items-center justify-between h-14">
-      <!-- Brutalist Branding -->
+  <div class="container-refined" style="max-width: 1280px; margin: 0 auto; padding: 0 var(--space-6);">
+    <div class="flex items-center justify-between" style="height: 3.5rem;">
+      <!-- Refined Branding -->
       <div class="flex items-center">
         <a
-          class="flex items-center gap-3 hover:opacity-90 transition-opacity"
+          class="flex items-center gap-3"
           href="/"
+          style="transition: opacity var(--transition-fast);"
+          onmouseover="this.style.opacity='0.85'"
+          onmouseout="this.style.opacity='1'"
         >
           <img
             src="/apple-touch-icon.png"
             alt="Pixelated Empathy Logo"
-            class="w-8 h-8 rounded-lg"
+            style="width: 2rem; height: 2rem; border-radius: var(--radius-md);"
             width="64"
             height="64"
             fetchpriority="high"
             loading="eager"
             decoding="async"
           />
-          <span class="text-lg font-bold text-white tracking-tight">
+          <span style="font-size: var(--text-lg); font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">
             PIXELATED EMPATHY
           </span>
         </a>
       </div>
 
-      <!-- Desktop Navigation -->
+      <!-- Desktop Navigation - Refined -->
       <nav class="hidden md:flex items-center">
-        <ul class="flex items-center space-x-1">
+        <ul class="nav-minimal">
           {
             navLinks.map((link) => (
               <li>
                 <a
                   href={link.href}
-                  class="nav-link text-sm px-3 py-2 text-gray-400 hover:text-white transition-colors"
+                  class="nav-link-refined"
                 >
                   {link.name}
                 </a>
@@ -53,10 +57,11 @@ const navLinks = [
         </ul>
 
         <!-- Primary CTA -->
-        <div class="ml-6">
+        <div style="margin-left: var(--space-6);">
           <a
             href="/contact"
-            class="brutalist-button brutalist-button--primary text-sm px-5 py-2 rounded-full"
+            class="btn-brutalist btn-brutalist--primary"
+            style="font-size: var(--text-sm); padding: var(--space-2) var(--space-5); border-radius: var(--radius-full);"
           >
             GET STARTED
           </a>
@@ -67,12 +72,14 @@ const navLinks = [
       <div class="md:hidden">
         <button
           id="mobile-menu-button"
-          class="p-2 text-white hover:text-green-400 transition-colors"
+          style="padding: var(--space-2); color: var(--text-primary); transition: color var(--transition-fast);"
           aria-label="Toggle mobile menu"
           aria-expanded="false"
+          onmouseover="this.style.color='var(--accent-primary)'"
+          onmouseout="this.style.color='var(--text-primary)'"
         >
           <svg
-            class="w-6 h-6"
+            style="width: 1.5rem; height: 1.5rem;"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -91,26 +98,32 @@ const navLinks = [
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden md:hidden fixed top-14 left-0 right-0 bg-black border-b-2 border-gray-800 z-40"
+    class="hidden md:hidden fixed left-0 right-0 z-40"
+    style="top: 3.5rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-primary);"
   >
-    <div class="brutalist-container py-4 space-y-2">
-      {
-        navLinks.map((link) => (
+    <div class="container-refined" style="padding: var(--space-4) var(--space-6);">
+      <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+        {
+          navLinks.map((link) => (
+            <a
+              href={link.href}
+              style="display: block; padding: var(--space-3) var(--space-4); color: var(--text-secondary); transition: all var(--transition-fast); border-radius: var(--radius-md);"
+              onmouseover="this.style.color='var(--accent-primary)'; this.style.background='rgba(16, 185, 129, 0.08)'"
+              onmouseout="this.style.color='var(--text-secondary)'; this.style.background='transparent'"
+            >
+              {link.name}
+            </a>
+          ))
+        }
+        <div style="padding-top: var(--space-2); border-top: 1px solid var(--border-primary); margin-top: var(--space-2);">
           <a
-            href={link.href}
-            class="block px-4 py-3 text-gray-200 hover:text-white hover:bg-gray-900 transition-colors"
+            href="/contact"
+            class="btn-brutalist btn-brutalist--primary"
+            style="display: block; text-align: center; padding: var(--space-3); border-radius: var(--radius-md);"
           >
-            {link.name}
+            GET STARTED
           </a>
-        ))
-      }
-      <div class="pt-2 border-t border-gray-800">
-        <a
-          href="/contact"
-          class="block brutalist-button brutalist-button--primary text-center py-3"
-        >
-          GET STARTED
-        </a>
+        </div>
       </div>
     </div>
   </div>

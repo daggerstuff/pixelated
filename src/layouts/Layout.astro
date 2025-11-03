@@ -1,4 +1,6 @@
 ---
+import '@/styles/enhanced-theme.css'
+
 interface Props {
   title: string
   description?: string
@@ -11,13 +13,15 @@ const {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="enhanced-dark-theme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    <title>{title} | Pixelated Empathy</title>
     <meta name="description" content={description} />
 
     <!-- Social media meta tags -->
@@ -43,81 +47,43 @@ const {
     <!-- Background and font loader -->
     <script src="/js/background-loader.js" defer is:inline></script>
   </head>
-  <body
-    class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-  >
+  <body class="enhanced-dark-theme min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+      style="background: var(--accent-primary); color: var(--bg-primary);"
     >
       Skip to content
     </a>
 
-    <header class="border-b border-gray-200 dark:border-gray-800">
-      <div
-        class="container mx-auto px-4 py-4 flex justify-between items-center"
-      >
+    <header class="glass-panel" style="border-bottom: 1px solid var(--border-primary);">
+      <div class="container-refined py-4 flex justify-between items-center">
         <a
           href="/"
-          class="text-2xl font-bold text-primary-600 dark:text-primary-400 brand-title"
+          class="text-2xl font-bold brand-title"
+          style="color: var(--text-primary); font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.01em;"
           >Pixelated Empathy</a
         >
         <nav>
-          <ul class="flex space-x-6">
-            <li>
-              <a
-                href="/"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >Home</a
-              >
-            </li>
-            <li>
-              <a
-                href="/blog"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >Blog</a
-              >
-            </li>
-            <li>
-              <a
-                href="/about"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >About</a
-              >
-            </li>
-            <li>
-              <a
-                href="/company"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >Company</a
-              >
-            </li>
-            <li>
-              <a
-                href="/team"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >Team</a
-              >
-            </li>
-            <li>
-              <a
-                href="/contact"
-                class="hover:text-primary-600 dark:hover:text-primary-400"
-                >Contact</a
-              >
-            </li>
+          <ul class="nav-minimal">
+            <li><a href="/" class="nav-link-refined">Home</a></li>
+            <li><a href="/blog" class="nav-link-refined">Blog</a></li>
+            <li><a href="/about" class="nav-link-refined">About</a></li>
+            <li><a href="/company" class="nav-link-refined">Company</a></li>
+            <li><a href="/team" class="nav-link-refined">Team</a></li>
+            <li><a href="/contact" class="nav-link-refined">Contact</a></li>
           </ul>
         </nav>
       </div>
     </header>
 
-    <main id="main-content">
+    <main id="main-content" class="container-refined py-12">
       <slot />
     </main>
 
-    <footer class="border-t border-gray-200 dark:border-gray-800 mt-12">
-      <div class="container mx-auto px-4 py-8">
+    <footer class="border-t mt-12" style="border-color: var(--border-primary);">
+      <div class="container-refined px-4 py-8">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="mb-4 md:mb-0">
             <p>
@@ -127,7 +93,8 @@ const {
           <div class="flex space-x-4">
             <a
               href="https://twitter.com/tweetpixelated"
-              class="text-gray-500 hover:text-primary-600 dark:hover:text-primary-400"
+              class="nav-link-refined"
+              style="color: var(--text-muted);"
             >
               <span class="sr-only">Twitter</span>
               <svg
@@ -143,7 +110,8 @@ const {
             </a>
             <a
               href="https://github.com/nochadisfaction/pixel"
-              class="text-gray-500 hover:text-primary-600 dark:hover:text-primary-400"
+              class="nav-link-refined"
+              style="color: var(--text-muted);"
             >
               <span class="sr-only">GitHub</span>
               <svg

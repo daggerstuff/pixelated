@@ -84,49 +84,31 @@ const features = [
   description="Safe AI role-play training for therapists. Practice with difficult client personas, get bias detection feedback, and build confidence without real-world risk."
   bgType="plum"
 >
-  <!-- Enhanced Hero Section with Modern Visual Elements -->
+  <!-- Section 01 / Hero -->
   <section
-    class="brutalist-section pt-20 md:pt-24 pb-16 relative overflow-hidden min-h-screen flex items-center"
+    class="section-container relative overflow-hidden min-h-screen flex items-center"
+    style="counter-reset: section-counter; padding-top: calc(3.5rem + var(--space-12)); padding-bottom: var(--space-20);"
   >
-    <!-- Floating Background Elements -->
-    <div
-      class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-teal-500/10 to-blue-500/10 floating-element"
-    >
-    </div>
-    <div
-      class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 floating-element--delayed"
-    >
-    </div>
-    <div
-      class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-green-500/10 to-teal-500/10 floating-element"
-    >
-    </div>
+    <!-- Subtle mesh background -->
+    <div class="mesh-bg-1 absolute inset-0 opacity-30"></div>
 
-    <div class="brutalist-container w-full relative z-10">
+    <div class="container-refined w-full relative z-10">
       <div
         class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center"
       >
         <div class="max-w-lg lg:max-w-xl pr-0 lg:pr-8 mx-auto text-center flex flex-col justify-center">
-          <!-- Enhanced Status Indicator -->
-          <div
-            class="inline-flex items-center gap-3 mb-6 nav-pill nav-pill--active w-fit mx-auto"
-          >
-            <div class="status-dot status-dot--online"></div>
-            <span class="font-semibold">Live AI Training Platform</span>
-          </div>
+          <!-- Section Number -->
+          <div class="section-number justify-center mb-8">Home</div>
 
           <!-- Focused Tagline Treatment -->
           <div class="mb-8">
-            <h1
-              class="brutalist-heading text-3xl md:text-4xl lg:text-5xl tracking-tight leading-tight"
-            >
-              <span class="block text-white/90 font-semibold mb-1"
-                >The Art of Therapy.</span
-              >
-              <span
-                class="block gradient-text-primary font-black text-4xl md:text-5xl lg:text-6xl tracking-tighter"
-                >The Science of Practice.</span
-              >
+            <h1 class="display-heading mb-6">
+              <span class="hero-line-1" style="color: var(--text-secondary);">
+                The Art of Therapy.
+              </span>
+              <span class="hero-line-2 text-gradient-primary">
+                The Science of Practice.
+              </span>
             </h1>
           </div>
 
@@ -141,52 +123,79 @@ const features = [
           >
             <a
               href="/demo-hub"
-              class="nav-pill px-8 py-4 text-lg font-semibold text-white hover:bg-teal-600 transition-colors flex items-center gap-2"
-              style="background: #14b8a6;"
+              class="btn-brutalist btn-brutalist--primary"
+              style="padding: var(--space-3) var(--space-8); font-size: var(--text-lg);"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
               Start Training →
             </a>
             <a
               href="/features"
-              class="nav-pill px-8 py-4 text-lg font-semibold hover:bg-transparent hover:text-teal-400 transition-colors flex items-center gap-2"
+              class="btn-brutalist btn-brutalist--outline"
+              style="padding: var(--space-3) var(--space-8); font-size: var(--text-lg);"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              Explore features
+              Explore Features
             </a>
           </div>
         </div>
 
-        <!-- Enhanced Hero Visual -->
-        <HeroGrid class="relative">
-          <Surface class="p-6">
-            <HeroTabs />
-          </Surface>
-        </HeroGrid>
+        <!-- Interactive Live Demo Preview -->
+        <div class="relative w-full max-w-xl mx-auto">
+          <div class="card-elegant p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="eyebrow-text">Live Demo Preview</div>
+              <div class="flex items-center gap-2">
+                <span class="status-dot status-dot--online"></span>
+                <span class="text-xs" style="color: var(--text-muted);">Active Session</span>
+              </div>
+            </div>
+
+            <!-- Mini Chat Interface -->
+            <div class="space-y-3 mb-4" style="min-height: 200px;">
+              <div class="rounded-md p-3" style="background: var(--bg-elevated); border: 1px solid var(--border-primary); max-width: 85%;">
+                <p class="text-sm" style="color: var(--text-secondary);">
+                  I've been having trouble sleeping for weeks. My anxiety feels overwhelming.
+                </p>
+              </div>
+              <div class="rounded-md p-3 ml-auto" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08)); border: 1px solid rgba(16, 185, 129, 0.3); max-width: 85%;">
+                <p class="text-sm" style="color: var(--accent-primary);">
+                  Thank you for sharing that with me. Can you tell me more about when the anxiety feels most intense?
+                </p>
+              </div>
+              <div class="rounded-md p-3" style="background: var(--bg-elevated); border: 1px solid var(--border-primary); max-width: 85%;">
+                <p class="text-sm" style="color: var(--text-secondary);">
+                  Usually at night when I'm trying to sleep. My mind just won't shut off.
+                </p>
+              </div>
+            </div>
+
+            <!-- Live Metrics -->
+            <div class="grid grid-cols-3 gap-3 pt-4 border-t" style="border-color: var(--border-primary);">
+              <div class="text-center">
+                <div class="text-lg font-bold" style="color: var(--accent-primary);" id="metric-empathy">92%</div>
+                <div class="text-xs" style="color: var(--text-muted);">Empathy</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-bold" style="color: var(--text-primary);" id="metric-safety">100%</div>
+                <div class="text-xs" style="color: var(--text-muted);">Safety</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-bold" style="color: var(--accent-secondary);" id="metric-growth">+3.2x</div>
+                <div class="text-xs" style="color: var(--text-muted);">Growth</div>
+              </div>
+            </div>
+
+            <!-- CTA Link -->
+            <div class="mt-6 text-center">
+              <a
+                href="/demo-hub"
+                class="text-sm hover:underline transition-colors"
+                style="color: var(--accent-primary);"
+              >
+                Try Full Demo →
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-16">
@@ -273,30 +282,57 @@ const features = [
     </div>
   </section>
 
-  <!-- Security Section (calm, enterprise) -->
-  <section class="brutalist-section mesh-bg-2 relative">
-    <div class="brutalist-container">
+  <!-- Animated metrics script -->
+  <script is:inline>
+    // Animate metrics on load
+    function animateMetric(elementId, targetValue, suffix = '') {
+      const element = document.getElementById(elementId)
+      if (!element) return
+
+      const isPercent = targetValue.includes('%')
+      const isMultiplier = targetValue.includes('x')
+      const numericValue = parseFloat(targetValue.replace(/[^\d.]/g, ''))
+      let current = 0
+      const increment = numericValue / 60
+      const suffixStr = isPercent ? '%' : isMultiplier ? 'x' : suffix
+
+      const timer = setInterval(() => {
+        current += increment
+        if (current >= numericValue) {
+          element.textContent = targetValue
+          clearInterval(timer)
+        } else {
+          element.textContent = Math.floor(current) + suffixStr
+        }
+      }, 16)
+    }
+
+    // Start animations when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          animateMetric('metric-empathy', '92%')
+          animateMetric('metric-safety', '100%')
+          animateMetric('metric-growth', '+3.2x')
+        }, 500)
+      })
+    } else {
+      setTimeout(() => {
+        animateMetric('metric-empathy', '92%')
+        animateMetric('metric-safety', '100%')
+        animateMetric('metric-growth', '+3.2x')
+      }, 500)
+    }
+  </script>
+
+  <!-- Section 02 / Security -->
+  <section class="section-container section-spacing-lg mesh-bg-2 relative">
+    <div class="container-refined">
+      <div class="section-number">Security</div>
+
       <div class="mb-12 text-center">
-        <div class="inline-flex items-center gap-2 nav-pill mb-6">
-          <svg
-            class="w-4 h-4 text-teal-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-            ></path>
-          </svg>
-          <span class="font-semibold">Enterprise Security</span>
-        </div>
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          Security and <span class="gradient-text-primary"
-            >privacy by design</span
-          >
+        <h2 class="display-heading mb-6">
+          Security and <span class="text-gradient-primary">privacy by design</span>
         </h2>
         <p class="text-gray-300 max-w-3xl">
           Zero‑knowledge architecture, strong encryption, and institutional
@@ -444,31 +480,28 @@ const features = [
 
   <HowItWorks />
 
-  <!-- Capabilities Section (editorial mosaic) -->
-  <section class="brutalist-section py-20">
-    <div class="brutalist-container">
+  <!-- Section 03 / Capabilities -->
+  <section class="section-container section-spacing-lg">
+    <div class="container-refined">
+      <div class="section-number">Capabilities</div>
+
       <div class="mb-16 flex items-end justify-between gap-6 flex-wrap">
         <div>
-          <div class="brutalist-caption mb-3 text-teal-400 font-medium">
-            What actually feels different
-          </div>
-          <h2
-            class="brutalist-heading text-3xl md:text-4xl lg:text-5xl leading-tight"
-          >
+          <h2 class="display-heading">
             Training capabilities
           </h2>
         </div>
         <a
           href="/features"
-          class="text-sm text-accent hover:underline transition-colors"
-          >Full feature list →</a
-        >
+          class="text-sm hover:underline transition-colors"
+          style="color: var(--accent-primary);"
+        >Full feature list →</a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-responsive gap-6">
         {
           features.map((f) => (
-            <div class="group relative overflow-hidden rounded-xl border border-gray-800 bg-gradient-to-b from-gray-900/60 to-black hover:border-teal-500/30 transition-all duration-300">
+            <div class="card-elegant group">
               <div
                 class="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style="background: radial-gradient(600px circle at var(--x,50%) var(--y,50%), rgba(16,185,129,0.1), transparent 40%);"
@@ -517,29 +550,33 @@ const features = [
     </div>
   </section>
 
-  <!-- Final CTA (quiet, decisive) -->
-  <section class="brutalist-section py-24">
-    <div class="brutalist-container">
+  <!-- Section 04 / CTA -->
+  <section class="section-container section-spacing-lg">
+    <div class="container-refined">
+      <div class="section-number">Get Started</div>
+
       <div class="max-w-4xl mx-auto text-center">
-        <h2
-          class="brutalist-heading text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight"
-        >
+        <h2 class="display-heading mb-6">
           Bring safe AI practice to your program
         </h2>
-        <p class="text-xl text-gray-300 mb-10 leading-relaxed">
+        <p class="lede-text mb-10">
           Launch simulation training in days, not months.
         </p>
         <div class="flex flex-col sm:flex-row gap-6 justify-center">
           <a
             href="/contact"
-            class="brutalist-button brutalist-button--primary text-lg px-10 py-4 font-semibold"
-            >Get started</a
+            class="btn-brutalist btn-brutalist--primary"
+            style="padding: var(--space-4) var(--space-10); font-size: var(--text-lg);"
           >
+            Get started
+          </a>
           <a
             href="/demo-hub"
-            class="brutalist-button brutalist-button--secondary text-lg px-10 py-4 font-semibold"
-            >See it in action</a
+            class="btn-brutalist btn-brutalist--secondary"
+            style="padding: var(--space-4) var(--space-10); font-size: var(--text-lg);"
           >
+            See it in action
+          </a>
         </div>
       </div>
     </div>

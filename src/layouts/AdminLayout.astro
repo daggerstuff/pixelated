@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../config'
+import '@/styles/enhanced-theme.css'
 
 interface Props {
   title?: string
@@ -31,7 +32,7 @@ const {
   }
 </style>
 
-<html lang={SITE.lang}>
+<html lang={SITE.lang} class="enhanced-dark-theme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,6 +40,8 @@ const {
     <meta name="generator" content="Astro" />
     <title>{title} | Admin Dashboard</title>
     <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -52,28 +55,30 @@ const {
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
   </head>
-  <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+  <body class="enhanced-dark-theme min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+      style="background: var(--accent-primary); color: var(--bg-primary);"
     >
       Skip to content
     </a>
     <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <aside class="w-64 bg-white dark:bg-gray-800 shadow-md hidden md:block">
+      <aside class="w-64 hidden md:block glass-panel" style="border-right: 1px solid var(--border-primary);">
         <div class="p-6">
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+          <h1 class="text-2xl font-bold" style="color: var(--text-primary); font-family: var(--font-sans);">
             Admin
           </h1>
         </div>
         <nav class="mt-6">
-          <ul>
+          <ul class="space-y-1">
             <li>
               <a
                 href="/admin/dashboard"
-                class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="nav-link-refined flex items-center px-6 py-3"
+                style="display: flex;"
               >
                 <span class="mr-3">
                   <svg
@@ -93,7 +98,8 @@ const {
             <li>
               <a
                 href="/admin/users"
-                class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="nav-link-refined flex items-center px-6 py-3"
+                style="display: flex;"
               >
                 <span class="mr-3">
                   <svg
@@ -113,7 +119,8 @@ const {
             <li>
               <a
                 href="/admin/ai-performance"
-                class="flex items-center px-6 py-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-800"
+                class="nav-link-refined nav-link-refined--active flex items-center px-6 py-3"
+                style="display: flex; background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);"
               >
                 <span class="mr-3">
                   <svg
@@ -134,7 +141,8 @@ const {
             <li>
               <a
                 href="/admin/security"
-                class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="nav-link-refined flex items-center px-6 py-3"
+                style="display: flex;"
               >
                 <span class="mr-3">
                   <svg
@@ -155,7 +163,8 @@ const {
             <li>
               <a
                 href="/admin/settings"
-                class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="nav-link-refined flex items-center px-6 py-3"
+                style="display: flex;"
               >
                 <span class="mr-3">
                   <svg
@@ -178,9 +187,9 @@ const {
       </aside>
 
       <!-- Main Content -->
-      <main class="flex-1 overflow-x-hidden overflow-y-auto" id="main-content">
+      <main class="flex-1 overflow-x-hidden overflow-y-auto" id="main-content" style="background: var(--bg-primary);">
         <!-- Top Navigation -->
-        <header class="bg-white dark:bg-gray-800 shadow-md py-4 px-6">
+        <header class="glass-panel py-4 px-6" style="border-bottom: 1px solid var(--border-primary);">
           <div class="flex items-center justify-between">
             <button
               class="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none"

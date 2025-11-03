@@ -3,7 +3,8 @@ import Header from '@/components/layout/Header.astro'
 import Footer from '@/components/base/Footer.astro'
 import Background from '@/components/backgrounds/Background.astro'
 import type { BgType } from '@/types'
-// Import brutalist dark theme
+// Import unified enhanced theme
+import '@/styles/enhanced-theme.css'
 import '@/styles/brutalist-dark.css'
 import '@/styles/mobile-layout-fixes.css'
 import '@/styles/pixelated-theme.css'
@@ -19,7 +20,7 @@ const { title, description, bgType, ogImage } = Astro.props
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="enhanced-dark-theme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -85,11 +86,11 @@ const { title, description, bgType, ogImage } = Astro.props
       src="https://js.sentry-cdn.com/ef4ca2c0d2530a95efb0ef55c168b661.min.js"
       crossorigin="anonymous"></script>
   </head>
-  <body class="brutalist-body theme-page">
+  <body class="enhanced-dark-theme" style="background: var(--bg-primary); color: var(--text-primary);">
     {bgType && <Background type={bgType} />}
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col" style="background: var(--bg-primary);">
       <Header />
-      <main class="flex-1 pt-14">
+      <main class="flex-1" style="padding-top: 3.5rem;">
         <!-- <KonamiTrigger client:load /> -->
         <slot />
       </main>

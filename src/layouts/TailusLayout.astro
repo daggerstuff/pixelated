@@ -2,6 +2,7 @@
 import BaseHead from '@components/tailus/BaseHead.astro'
 import AppFooter from '@components/tailus/AppFooter.astro'
 import AppHeader from '@components/tailus/AppHeader.astro'
+import '@/styles/enhanced-theme.css'
 
 interface Props {
   title?: string
@@ -15,9 +16,11 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="enhanced-dark-theme scroll-smooth">
   <head>
     <BaseHead {title} {description} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
     <!-- GoatCounter Analytics -->
     <script
       is:inline
@@ -25,7 +28,7 @@ const {
       async
       src="//gc.zgo.at/count.js"></script>
   </head>
-  <body class="overflow-x-hidden bg-white dark:bg-gray-950">
+  <body class="enhanced-dark-theme overflow-x-hidden" style="background: var(--bg-primary); color: var(--text-primary);">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
