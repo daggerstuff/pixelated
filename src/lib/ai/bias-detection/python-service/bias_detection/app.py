@@ -3,7 +3,7 @@ FastAPI application for bias detection service
 """
 
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 import structlog
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -17,11 +17,14 @@ from .config import settings
 from .models import (
     BiasAnalysisRequest,
     BiasAnalysisResponse,
-    HealthResponse,
     ErrorResponse,
+    HealthResponse,
 )
 from .services import BiasDetectionService, cache_service
-from .services.bias_detection_service import database_service
+from .services.database_service import DatabaseService, database_service
+
+# Type cast to help type checker understand this is an instance, not a module
+database_service = cast(DatabaseService, database_service)
 
 # Prometheus metrics
 request_count = Counter(
@@ -268,7 +271,7 @@ def create_app() -> FastAPI:
             # Perform analysis
             analysis_start = time.time()
             result = await bias_detection_service.analyze_bias(request, request_id)
-            analysis_duration = time.time() - analysis_start
+            analysis_time = time.time() - analysis_start
 
             # Record metrics
             analysis_count.labels(
@@ -276,7 +279,7 @@ def create_app() -> FastAPI:
             ).inc()
 
             analysis_duration.labels(model_framework="ensemble").observe(
-                analysis_duration
+                analysis_time
             )
 
             # Update rate limiting
@@ -292,7 +295,7 @@ def create_app() -> FastAPI:
                 endpoint="/api/bias-analysis/analyze",
                 method="POST",
                 status_code=status.HTTP_200_OK,
-                response_time_ms=int(analysis_duration * 1000),
+                response_time_ms=int(analysis_time * 1000),
             )
 
             return result
@@ -431,7 +434,10 @@ def create_app() -> FastAPI:
     @app.get("/api/errors/500")
     async def test_500_error():
         """Test 500 error"""
-        raise Exception("Internal server error test")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error test",
+        )
 
     return app
 

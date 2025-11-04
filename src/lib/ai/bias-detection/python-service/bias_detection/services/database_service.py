@@ -142,7 +142,7 @@ class DatabaseService:
                 INDEX idx_created_at (created_at),
                 INDEX idx_status (status)
             );
-            
+
             -- Bias scores table (for detailed analysis)
             CREATE TABLE IF NOT EXISTS bias_scores (
                 id UUID PRIMARY KEY,
@@ -158,7 +158,7 @@ class DatabaseService:
                 INDEX idx_bias_type (bias_type),
                 INDEX idx_score (score)
             );
-            
+
             -- User sessions table
             CREATE TABLE IF NOT EXISTS user_sessions (
                 id UUID PRIMARY KEY,
@@ -172,7 +172,7 @@ class DatabaseService:
                 INDEX idx_session_id (session_id),
                 INDEX idx_last_activity (last_activity)
             );
-            
+
             -- API usage tracking
             CREATE TABLE IF NOT EXISTS api_usage (
                 id UUID PRIMARY KEY,
@@ -190,7 +190,7 @@ class DatabaseService:
                 INDEX idx_created_at (created_at),
                 INDEX idx_status_code (status_code)
             );
-            
+
             -- Model performance metrics
             CREATE TABLE IF NOT EXISTS model_metrics (
                 id UUID PRIMARY KEY,
@@ -204,7 +204,7 @@ class DatabaseService:
                 INDEX idx_model_name (model_name),
                 INDEX idx_last_updated (last_updated)
             );
-            
+
             -- System configuration
             CREATE TABLE IF NOT EXISTS system_config (
                 key VARCHAR(100) PRIMARY KEY,
@@ -213,7 +213,7 @@ class DatabaseService:
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_by VARCHAR(255)
             );
-            
+
             -- Insert default configuration
             INSERT INTO system_config (key, value, description) VALUES
             ('max_sequence_length', '512', 'Maximum sequence length for model input'),
@@ -372,9 +372,9 @@ class DatabaseService:
             async with self.pg_pool.acquire() as conn:
                 rows = await conn.fetch(
                     """
-                    SELECT * FROM bias_analyses 
-                    WHERE user_id = $1 
-                    ORDER BY created_at DESC 
+                    SELECT * FROM bias_analyses
+                    WHERE user_id = $1
+                    ORDER BY created_at DESC
                     LIMIT $2 OFFSET $3
                     """,
                     user_id,
@@ -397,7 +397,7 @@ class DatabaseService:
                 # Total analyses
                 total_analyses = await conn.fetchval(
                     """
-                    SELECT COUNT(*) FROM bias_analyses 
+                    SELECT COUNT(*) FROM bias_analyses
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
                     days,
@@ -406,7 +406,7 @@ class DatabaseService:
                 # Average bias score
                 avg_bias_score = await conn.fetchval(
                     """
-                    SELECT AVG(overall_bias_score) FROM bias_analyses 
+                    SELECT AVG(overall_bias_score) FROM bias_analyses
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
                     days,
@@ -415,7 +415,7 @@ class DatabaseService:
                 # Bias type distribution
                 bias_distribution = await conn.fetch(
                     """
-                    SELECT bias_type, COUNT(*) as count 
+                    SELECT bias_type, COUNT(*) as count
                     FROM bias_scores bs
                     JOIN bias_analyses ba ON bs.analysis_id = ba.id
                     WHERE ba.created_at >= NOW() - INTERVAL '%s days'
@@ -428,11 +428,11 @@ class DatabaseService:
                 # Processing time statistics
                 processing_stats = await conn.fetchrow(
                     """
-                    SELECT 
+                    SELECT
                         AVG(processing_time_ms) as avg_time,
                         MIN(processing_time_ms) as min_time,
                         MAX(processing_time_ms) as max_time
-                    FROM bias_analyses 
+                    FROM bias_analyses
                     WHERE created_at >= NOW() - INTERVAL '%s days'
                     """,
                     days,
@@ -543,8 +543,8 @@ class DatabaseService:
 
                     await conn.execute(
                         """
-                        UPDATE model_metrics 
-                        SET prediction_count = $1, 
+                        UPDATE model_metrics
+                        SET prediction_count = $1,
                             avg_processing_time_ms = $2,
                             accuracy_score = $3,
                             error_count = $4,
@@ -646,7 +646,7 @@ class DatabaseService:
 
 
 # Global database service instance
-database_service = DatabaseService()
+database_service: DatabaseService = DatabaseService()
 
 
 async def initialize_database() -> bool:

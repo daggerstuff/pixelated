@@ -16,7 +16,7 @@ import structlog
 import tensorflow as tf
 import torch
 import torch.nn.functional as F
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from ..config import settings
 from ..models import BiasType, ConfidenceLevel

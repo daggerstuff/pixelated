@@ -6,9 +6,9 @@ import json
 import time
 from typing import Any, Dict, List, Optional, Union
 
-import redis
+import redis.asyncio as redis
 import structlog
-from redis.exceptions import RedisError, ConnectionError, TimeoutError
+from redis.asyncio.exceptions import ConnectionError, RedisError, TimeoutError
 
 from ..config import settings
 
@@ -62,15 +62,17 @@ class CacheService:
         """Disconnect from Redis"""
         if self.redis_client:
             try:
-                await self.redis_client.close()
+                await self.redis_client.aclose()
                 self.is_connected = False
                 logger.info("Redis connection closed")
             except Exception as e:
                 logger.warning(f"Error closing Redis connection: {str(e)}")
+            finally:
+                self.redis_client = None
 
     async def get(self, key: str) -> Optional[Any]:
         """Get value from cache"""
-        if not self.is_connected or not settings.enable_caching:
+        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
             return None
 
         try:
@@ -92,7 +94,7 @@ class CacheService:
         self, key: str, value: Any, ttl: Optional[int] = None, serialize: bool = True
     ) -> bool:
         """Set value in cache"""
-        if not self.is_connected or not settings.enable_caching:
+        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
             return False
 
         try:
@@ -114,7 +116,7 @@ class CacheService:
 
     async def delete(self, key: str) -> bool:
         """Delete key from cache"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return False
 
         try:
@@ -127,7 +129,7 @@ class CacheService:
 
     async def exists(self, key: str) -> bool:
         """Check if key exists in cache"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return False
 
         try:
@@ -189,7 +191,7 @@ class CacheService:
         self, identifier: str, window_seconds: int = 60
     ) -> int:
         """Increment rate limit counter"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return 0
 
         try:
@@ -208,7 +210,7 @@ class CacheService:
 
     async def get_rate_limit_counter(self, identifier: str) -> int:
         """Get current rate limit counter"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return 0
 
         try:
@@ -250,7 +252,7 @@ class CacheService:
 
     async def clear_pattern(self, pattern: str) -> int:
         """Clear keys matching a pattern"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return 0
 
         try:
@@ -268,19 +270,14 @@ class CacheService:
                     break
 
             # Delete keys
-            if keys:
-                deleted_count = await self.redis_client.delete(*keys)
-                return deleted_count
-
-            return 0
-
+            return await self.redis_client.delete(*keys) if keys else 0
         except RedisError as e:
             logger.warning(f"Redis clear pattern error: {str(e)}")
             return 0
 
     async def get_health_status(self) -> Dict[str, Any]:
         """Get cache service health status"""
-        if not self.is_connected:
+        if not self.is_connected or self.redis_client is None:
             return {
                 "status": "unhealthy",
                 "connected": False,

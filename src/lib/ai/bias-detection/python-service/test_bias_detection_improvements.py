@@ -16,6 +16,7 @@ from unittest.mock import AsyncMock, patch
 import numpy as np
 import pandas as pd
 import pytest
+from werkzeug.exceptions import Unauthorized
 
 # Import the service and related classes
 from bias_detection_service import (
@@ -26,13 +27,15 @@ from bias_detection_service import (
     SessionData,
     app,
 )
-from placeholder_adapters import placeholder_adapters
-from test_utils import (
+from placeholder_adapters import PlaceholderAdapters
+from bias_utils import (
     create_minimal_test_session_data,
     create_synthetic_dataset,
     create_test_session_data,
 )
-from werkzeug.exceptions import Unauthorized
+
+# Create instance for testing
+placeholder_adapters = PlaceholderAdapters()
 
 
 class TestPlaceholderAdapters(unittest.TestCase):
@@ -42,9 +45,10 @@ class TestPlaceholderAdapters(unittest.TestCase):
         """Test Fairlearn placeholder predictions"""
         # Create test data
         y_true = np.array([0, 1, 0, 1, 1, 0])
-        sensitive_features = pd.DataFrame(
+        sensitive_features_df = pd.DataFrame(
             {"gender": [0, 1, 0, 1, 0, 1], "age": [1, 0, 1, 0, 1, 0]}
         )
+        sensitive_features = sensitive_features_df.to_numpy()
 
         # Test deterministic predictions
         predictions = placeholder_adapters.fairlearn_placeholder_predictions(
@@ -161,6 +165,12 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         self.config = BiasDetectionConfig()
         self.service = BiasDetectionService(self.config)
 
+    def _assert_bias_score_valid(self, result: dict) -> None:
+        """Helper method to assert bias score is valid in result."""
+        assert "bias_score" in result
+        assert isinstance(result["bias_score"], float)
+        assert result["bias_score"] >= 0.0
+
     def test_real_fairlearn_analysis(self):
         """Test real Fairlearn analysis implementation"""
         # Create test session data
@@ -195,10 +205,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
             )
 
             # Should return structured result
-            assert "bias_score" in result
-            assert isinstance(result["bias_score"], float)
-            # Should not be the old random placeholder
-            assert result["bias_score"] >= 0.0
+            self._assert_bias_score_valid(result)
 
     def test_outcome_fairness_analysis(self):
         """Test outcome fairness analysis implementation"""
@@ -209,10 +216,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         result = self.service._analyze_outcome_fairness(session_data)
 
         # Should return structured result
-        assert "bias_score" in result
-        assert isinstance(result["bias_score"], float)
-        # Should not be the old random placeholder
-        assert result["bias_score"] >= 0.0
+        self._assert_bias_score_valid(result)
 
     def test_performance_disparities_analysis(self):
         """Test performance disparities analysis implementation"""
@@ -223,10 +227,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         result = self.service._analyze_performance_disparities(session_data)
 
         # Should return structured result
-        assert "bias_score" in result
-        assert isinstance(result["bias_score"], float)
-        # Should not be the old random placeholder
-        assert result["bias_score"] >= 0.0
+        self._assert_bias_score_valid(result)
 
     def test_engagement_levels_analysis(self):
         """Test engagement levels analysis implementation"""
@@ -237,10 +238,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         result = self.service._analyze_engagement_levels(session_data)
 
         # Should return structured result
-        assert "bias_score" in result
-        assert isinstance(result["bias_score"], float)
-        # Should not be the old random placeholder
-        assert result["bias_score"] >= 0.0
+        self._assert_bias_score_valid(result)
 
     def test_interaction_patterns_analysis(self):
         """Test interaction patterns analysis implementation"""
@@ -251,10 +249,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         result = self.service._analyze_interaction_patterns(session_data)
 
         # Should return structured result
-        assert "bias_score" in result
-        assert isinstance(result["bias_score"], float)
-        # Should not be the old random placeholder
-        assert result["bias_score"] >= 0.0
+        self._assert_bias_score_valid(result)
 
 
 class TestDashboardAndExportEndpoints(unittest.TestCase):

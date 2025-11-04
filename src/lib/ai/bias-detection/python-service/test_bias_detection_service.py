@@ -18,6 +18,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 import jwt
 import pandas as pd
 import pytest
+from werkzeug.exceptions import Unauthorized
 
 # Import the service and related classes
 from bias_detection_service import (
@@ -28,7 +29,6 @@ from bias_detection_service import (
     SessionData,
     app,
 )
-from werkzeug.exceptions import Unauthorized
 
 
 class TestBiasDetectionConfig(unittest.TestCase):
@@ -206,11 +206,9 @@ class TestAuditLogger(unittest.TestCase):
         # Verify log file was created and contains entry
         assert os.path.exists(self.audit_logger.audit_file)
 
-        with open(self.audit_logger.audit_file) as f:
-            log_entry = json.loads(f.read().strip())
-
-        assert log_entry["event_type"] == "analysis_started"
-        assert log_entry["user_id"] == "test_user"
+        log_entry = self._extracted_from_test_log_event_sensitive_18(
+            "event_type", "analysis_started", "user_id", "test_user"
+        )
         assert log_entry["details"]["analysis_type"] == "comprehensive"
 
     def test_log_event_sensitive(self):
@@ -227,12 +225,18 @@ class TestAuditLogger(unittest.TestCase):
             )
         )
 
-        with open(self.audit_logger.audit_file) as f:
-            log_entry = json.loads(f.read().strip())
-
-        assert log_entry["details"] == "ENCRYPTED"
-        assert log_entry["encrypted_details"] == "encrypted_data"
+        log_entry = self._extracted_from_test_log_event_sensitive_18(
+            "details", "ENCRYPTED", "encrypted_details", "encrypted_data"
+        )
         self.security_manager.encrypt_data.assert_called_once()
+
+    # TODO Rename this here and in `test_log_event_non_sensitive` and `test_log_event_sensitive`
+    def _extracted_from_test_log_event_sensitive_18(self, arg0, arg1, arg2, arg3):
+        with open(self.audit_logger.audit_file) as f:
+            result = json.loads(f.read().strip())
+        assert result[arg0] == arg1
+        assert result[arg2] == arg3
+        return result
 
 
 class TestBiasDetectionService(unittest.TestCase):

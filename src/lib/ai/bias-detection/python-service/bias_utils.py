@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Test utilities for bias detection service.
+Utility functions for bias detection service.
 
-This module contains utility functions and classes specifically designed for testing
-the bias detection service, including synthetic dataset generation and test data helpers.
+This module contains utility functions and classes for the bias detection service,
+including synthetic dataset generation and data helpers.
 """
 
 import logging
@@ -11,10 +11,10 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 # Import SessionData from the main service to ensure type compatibility
 from bias_detection_service import SessionData
-from sklearn.preprocessing import LabelEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,8 @@ def create_synthetic_dataset(session_data: SessionData) -> dict[str, Any] | None
     """
     Create synthetic dataset for ML toolkit analysis.
 
-    This function is moved from the main service to keep test utilities separate
-    from production code, as suggested in the TODOs.
+    This function creates synthetic data based on session characteristics
+    for testing and analysis purposes.
 
     Args:
         session_data: SessionData object containing session information

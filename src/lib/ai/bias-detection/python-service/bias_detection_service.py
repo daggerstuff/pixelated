@@ -202,6 +202,7 @@ logger = logging.getLogger(__name__)
 # Initialize Celery integration after logger setup
 try:
     from celery import Celery
+
     from tasks import (
         analyze_session_async,
         batch_analyze_sessions,

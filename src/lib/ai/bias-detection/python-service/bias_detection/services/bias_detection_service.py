@@ -5,7 +5,7 @@ Main bias detection service integrating all components
 import asyncio
 import hashlib
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import structlog
@@ -13,18 +13,18 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..config import settings
 from ..models import (
+    AnalysisStatus,
     BiasAnalysisRequest,
     BiasAnalysisResponse,
     BiasScore,
-    Recommendation,
-    CounterfactualScenario,
-    AnalysisStatus,
     BiasType,
     ConfidenceLevel,
+    CounterfactualScenario,
+    Recommendation,
 )
-from .model_service import ModelEnsembleService
 from .cache_service import cache_service
 from .database_service import DatabaseService
+from .model_service import ModelEnsembleService
 
 logger = structlog.get_logger(__name__)
 
@@ -174,7 +174,7 @@ class BiasDetectionService:
         dominant_bias_types = self._get_dominant_bias_types(bias_scores)
 
         # Create response
-        response = BiasAnalysisResponse(
+        return BiasAnalysisResponse(
             request_id=request_id,
             status=AnalysisStatus.COMPLETED,
             content_hash=content_hash,
@@ -190,10 +190,8 @@ class BiasDetectionService:
             model_version=self._get_model_version(),
             language_detected=self._detect_language(request.content),
             word_count=len(request.content.split()),
-            completed_at=datetime.utcnow(),
+            completed_at=datetime.now(timezone.utc),
         )
-
-        return response
 
     @retry(
         stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
@@ -202,8 +200,7 @@ class BiasDetectionService:
         """Get predictions from ML models"""
         try:
             # Use ensemble service for predictions
-            predictions = await self.model_service.predict_ensemble(text)
-            return predictions
+            return await self.model_service.predict_ensemble(text)
 
         except Exception as e:
             logger.error(f"Model prediction failed: {str(e)}", error=str(e))
@@ -362,8 +359,7 @@ class BiasDetectionService:
         counterfactuals = []
 
         for score in bias_scores[:2]:  # Limit to top 2 bias types
-            scenario = self._create_counterfactual(content, score)
-            if scenario:
+            if scenario := self._create_counterfactual(content, score):
                 counterfactuals.append(scenario)
 
         return counterfactuals
@@ -386,16 +382,14 @@ class BiasDetectionService:
         alternative_text = content
 
         # Basic replacements (simplified)
-        if bias_type == BiasType.GENDER:
-            for evidence_item in evidence:
+        for evidence_item in evidence:
+            if bias_type == BiasType.GENDER:
                 if evidence_item == "he":
                     alternative_text = alternative_text.replace("he", "they")
                 elif evidence_item == "she":
                     alternative_text = alternative_text.replace("she", "they")
-
-        elif bias_type == BiasType.RACIAL:
-            # Remove racial references (simplified)
-            for evidence_item in evidence:
+            elif bias_type == BiasType.RACIAL:
+                # Remove racial references (simplified)
                 alternative_text = alternative_text.replace(evidence_item, "individual")
 
         if alternative_text != original_text:
@@ -418,8 +412,8 @@ class BiasDetectionService:
         negative_words = ["bad", "terrible", "awful", "horrible", "poor"]
 
         words = text.lower().split()
-        positive_count = sum(1 for word in words if word in positive_words)
-        negative_count = sum(1 for word in words if word in negative_words)
+        positive_count = sum(word in positive_words for word in words)
+        negative_count = sum(word in negative_words for word in words)
 
         total_sentiment_words = positive_count + negative_count
 
@@ -496,8 +490,7 @@ class BiasDetectionService:
         if not settings.enable_caching:
             return None
 
-        cached_result = await cache_service.get_analysis_result(content_hash)
-        if cached_result:
+        if cached_result := await cache_service.get_analysis_result(content_hash):
             logger.info("Found cached analysis result", content_hash=content_hash)
             return BiasAnalysisResponse(**cached_result)
 
