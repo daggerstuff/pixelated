@@ -180,6 +180,9 @@ index-strategy = "unsafe-best-match"
 [tool.uv.sources.pytorch-cpu]
 url = "https://download.pytorch.org/whl/cpu"
 
+[[tool.uv.index]]
+url = "https://download.pytorch.org/whl/cpu"
+
 [dependency-groups]
 dev = [
     "pip-audit>=2.9.0",
