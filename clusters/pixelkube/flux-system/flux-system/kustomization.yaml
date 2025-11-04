@@ -4,3 +4,6 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - ../pixelated-kustomization.yaml
+- ../flux-namespace-secret-role.yaml
+patchesStrategicMerge:
+- ../flux-clusterrole-secrets-patch.yaml
