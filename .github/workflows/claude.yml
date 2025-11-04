@@ -30,14 +30,41 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          HAS_NVIDIA=false
+          HAS_ANTHROPIC=false
+
+          if [ -n "${{ secrets.NVIDIA_OPENAI_BASE_URL }}" ] && [ -n "${{ secrets.NVIDIA_API_KEY }}" ] && [ -n "${{ secrets.NVIDIA_OPENAI_MODEL }}" ]; then
+            HAS_NVIDIA=true
+            echo "has_nvidia_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_nvidia_secrets=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ] || [ -n "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
+            HAS_ANTHROPIC=true
+            echo "has_anthropic_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_anthropic_secrets=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [ "$HAS_NVIDIA" == "true" ] || [ "$HAS_ANTHROPIC" == "true" ]; then
+            echo "has_any_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_any_secrets=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
       - name: Setup Bun
-        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        if: steps.check-secrets.outputs.has_nvidia_secrets == 'true'
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: '1.2.11'
+          bun-version: "1.2.11"
 
       - name: Prepare Claude Code Router (OpenAI-compatible)
-        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        if: steps.check-secrets.outputs.has_nvidia_secrets == 'true'
         run: |
           mkdir -p $HOME/.claude-code-router
           cat << 'EOF' > $HOME/.claude-code-router/config.json
@@ -52,13 +79,13 @@ jobs:
         shell: bash
 
       - name: Start Claude Code Router
-        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        if: steps.check-secrets.outputs.has_nvidia_secrets == 'true'
         run: |
           nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.8 start > $HOME/ccr.log 2>&1 &
         shell: bash
 
       - name: Wait for CCR to become healthy
-        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        if: steps.check-secrets.outputs.has_nvidia_secrets == 'true'
         run: |
           for i in {1..30}; do
             if curl -fsS http://localhost:3456/health > /dev/null 2>&1 || curl -fsS http://localhost:3456 > /dev/null 2>&1; then
@@ -75,7 +102,7 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        if: ${{ (secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '') || secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+        if: steps.check-secrets.outputs.has_any_secrets == 'true'
         uses: anthropics/claude-code-action@v1
         env:
           ANTHROPIC_BASE_URL: http://localhost:3456
@@ -98,6 +125,6 @@ jobs:
           # claude_args: '--allowed-tools Bash(gh pr:*)'
 
       - name: Skip Claude Code (no router or Anthropic credentials)
-        if: ${{ !((secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '') || secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '') }}
+        if: steps.check-secrets.outputs.has_any_secrets != 'true'
         run: |
           echo "Skipping Claude Code run: configure NVIDIA_OPENAI_BASE_URL, NVIDIA_API_KEY, NVIDIA_OPENAI_MODEL for CCR or provide ANTHROPIC_API_KEY/CLAUDE_CODE_OAUTH_TOKEN."
