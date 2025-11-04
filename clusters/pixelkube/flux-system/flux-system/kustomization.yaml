@@ -8,3 +8,4 @@ resources:
 - image-automation.yaml
 patchesStrategicMerge:
 - flux-clusterrole-secrets-patch.yaml
+- flux-clusterrolebinding-patch.yaml
