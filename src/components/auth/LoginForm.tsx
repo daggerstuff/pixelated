@@ -191,13 +191,23 @@ export function LoginForm({
     const isValid = validateForm()
 
     if (!isValid) {
-      // Errors have been set, notify user but let React render errors
+      // Errors have been set by validateForm()
+      // Force a re-render by updating state in a way that ensures React processes it
+      // Use a small delay to ensure React has processed the state update
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      
+      // Notify user but let React render errors
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',
       })
-      // Force re-render to ensure errors are visible to tests
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      
+      // Ensure errors are visible - trigger a state update to force render
+      // This helps with test timing issues
+      setErrors((prev) => {
+        // Return a new object to ensure React sees the change
+        return { ...prev }
+      })
       return
     }
 
@@ -465,8 +475,13 @@ export function LoginForm({
       {mode === 'login' && showResetPassword && (
         <button
           type="button"
-          onClick={() => setMode('reset')}
+          onClick={() => {
+            setMode('reset')
+            // Clear errors when switching modes
+            setErrors({})
+          }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
+          data-testid="forgot-password-button"
         >
           Forgot your password?
         </button>

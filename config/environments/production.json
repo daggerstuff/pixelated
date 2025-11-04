@@ -62,8 +62,8 @@
     "cors": {
       "enabled": true,
       "origins": [
-        "https://pixelated-empathy.com",
-        "https://www.pixelated-empathy.com"
+        "https://pixelatedempathy.com",
+        "https://www.pixelatedempathy.com"
       ],
       "credentials": true
     },
@@ -91,7 +91,7 @@
       "google": {
         "client_id": "${GOOGLE_CLIENT_ID_PROD}",
         "client_secret": "${GOOGLE_CLIENT_SECRET_PROD}",
-        "callback_url": "https://pixelated-empathy.com/auth/google/callback"
+        "callback_url": "https://pixelatedempathy.com/auth/google/callback"
       }
     }
   },
@@ -132,7 +132,7 @@
     "region": "${AWS_REGION}",
     "access_key": "${AWS_ACCESS_KEY_PROD}",
     "secret_key": "${AWS_SECRET_KEY_PROD}",
-    "from": "noreply@pixelated-empathy.com"
+    "from": "noreply@pixelatedempathy.com"
   },
   "monitoring": {
     "enabled": true,

@@ -30,11 +30,60 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Setup Bun
+        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: '1.2.11'
+
+      - name: Prepare Claude Code Router (OpenAI-compatible)
+        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        run: |
+          mkdir -p $HOME/.claude-code-router
+          cat << 'EOF' > $HOME/.claude-code-router/config.json
+          {
+            "log": true,
+            "NON_INTERACTIVE_MODE": true,
+            "OPENAI_BASE_URL": "${{ secrets.NVIDIA_OPENAI_BASE_URL }}",
+            "OPENAI_API_KEY": "${{ secrets.NVIDIA_API_KEY }}",
+            "OPENAI_MODEL": "${{ secrets.NVIDIA_OPENAI_MODEL }}"
+          }
+          EOF
+        shell: bash
+
+      - name: Start Claude Code Router
+        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        run: |
+          nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.8 start > $HOME/ccr.log 2>&1 &
+        shell: bash
+
+      - name: Wait for CCR to become healthy
+        if: ${{ secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '' }}
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3456/health > /dev/null 2>&1 || curl -fsS http://localhost:3456 > /dev/null 2>&1; then
+              echo "CCR is up"
+              exit 0
+            fi
+            echo "Waiting for CCR... ($i)"
+            sleep 1
+          done
+          echo "CCR did not become healthy in time"
+          echo "--- CCR LOG (tail) ---"
+          tail -n 200 $HOME/ccr.log || true
+          exit 1
+
       - name: Run Claude Code
         id: claude
+        if: ${{ (secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '') || secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: http://localhost:3456
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY || 'any-string-is-ok' }}
+          claude_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Allow all bot actors to trigger the workflow
+          allowed_bots: "*"
 
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
@@ -48,3 +97,7 @@ jobs:
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
           # claude_args: '--allowed-tools Bash(gh pr:*)'
 
+      - name: Skip Claude Code (no router or Anthropic credentials)
+        if: ${{ !((secrets.NVIDIA_OPENAI_BASE_URL != '' && secrets.NVIDIA_API_KEY != '' && secrets.NVIDIA_OPENAI_MODEL != '') || secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '') }}
+        run: |
+          echo "Skipping Claude Code run: configure NVIDIA_OPENAI_BASE_URL, NVIDIA_API_KEY, NVIDIA_OPENAI_MODEL for CCR or provide ANTHROPIC_API_KEY/CLAUDE_CODE_OAUTH_TOKEN."

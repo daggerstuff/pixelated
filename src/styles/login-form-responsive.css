@@ -10,6 +10,23 @@
   max-width: 100%;
   padding: var(--space-6);
   margin: 0 auto;
+  position: relative;
+  z-index: 10; /* Ensure form is above header on mobile */
+}
+
+/* Ensure form elements are clickable even when header is fixed */
+@media (max-width: 768px) {
+  .responsive-auth-container {
+    padding-top: calc(var(--space-6) + 80px); /* Account for fixed header */
+  }
+  
+  /* Ensure form buttons and inputs have proper stacking context */
+  .form-responsive button,
+  .form-responsive input,
+  .form-responsive .auth-links button {
+    position: relative;
+    z-index: 20;
+  }
 }
 
 .form-responsive {
