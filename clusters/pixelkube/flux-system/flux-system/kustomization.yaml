@@ -5,5 +5,6 @@ resources:
 - gotk-sync.yaml
 - pixelated-kustomization.yaml
 - flux-namespace-secret-role.yaml
+- image-automation.yaml
 patchesStrategicMerge:
 - flux-clusterrole-secrets-patch.yaml
