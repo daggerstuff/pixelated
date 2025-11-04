@@ -323,7 +323,7 @@ function generatePostForm() {
 // Handle status/report actions
 function handleStatusAction(action) {
   const result = runBlogCommand(action)
-  
+
   if (result.success) {
     return {
       content: `
@@ -332,7 +332,7 @@ function handleStatusAction(action) {
           <pre class="content">${result.output}</pre>
         </div>
       `,
-      message: null
+      message: null,
     }
   } else {
     const response = {
@@ -340,9 +340,9 @@ function handleStatusAction(action) {
       message: {
         type: 'error',
         text: `Error: ${result.error}`,
-      }
+      },
     }
-    
+
     if (result.output) {
       response.content = `
         <div class="card">
@@ -351,7 +351,7 @@ function handleStatusAction(action) {
         </div>
       `
     }
-    
+
     return response
   }
 }
@@ -368,7 +368,7 @@ function handleGenerateAction(url) {
       message: {
         type: 'error',
         text: 'Post title is required',
-      }
+      },
     }
   }
 
@@ -391,7 +391,7 @@ function handleGenerateAction(url) {
       message: {
         type: 'success',
         text: 'Post created successfully!',
-      }
+      },
     }
   } else {
     return {
@@ -404,7 +404,7 @@ function handleGenerateAction(url) {
       message: {
         type: 'error',
         text: `Failed to create post: ${generateResult.error}`,
-      }
+      },
     }
   }
 }
@@ -412,7 +412,7 @@ function handleGenerateAction(url) {
 // Route request to appropriate handler
 function handleRequest(url) {
   const action = url.searchParams.get('action')
-  
+
   if (!action) {
     return {
       content: `
@@ -421,7 +421,7 @@ function handleRequest(url) {
           <p>Select an action from the buttons above to manage your blog content.</p>
         </div>
       `,
-      message: null
+      message: null,
     }
   }
 
@@ -436,7 +436,7 @@ function handleRequest(url) {
     case 'generate_form':
       return {
         content: generatePostForm(),
-        message: null
+        message: null,
       }
 
     case 'generate':
@@ -448,7 +448,7 @@ function handleRequest(url) {
         message: {
           type: 'error',
           text: `Unknown action: ${action}`,
-        }
+        },
       }
   }
 }
@@ -457,7 +457,7 @@ function handleRequest(url) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`)
   const { content, message } = handleRequest(url)
-  
+
   res.writeHead(200, { 'Content-Type': 'text/html' })
   res.end(generateHTML(content, message))
 })

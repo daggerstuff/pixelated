@@ -26,7 +26,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 )
 
 interface EnhancedChartComponentProps {
@@ -55,7 +55,9 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   options = {},
   fallbackData,
 }) => {
-  const [useBackend, setUseBackend] = useState(dataConfig?.useBackendData || false)
+  const [useBackend, setUseBackend] = useState(
+    dataConfig?.useBackendData || false,
+  )
   const [error, setError] = useState<string | null>(null)
 
   // Use backend integration hook when enabled
@@ -135,14 +137,18 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   }
 
   // Determine which data to use
-  const chartData = useBackend && backendData?.data 
-    ? backendData.data 
-    : fallbackData || defaultData[type] || defaultData.line
+  const chartData =
+    useBackend && backendData?.data
+      ? backendData.data
+      : fallbackData || defaultData[type] || defaultData.line
 
   // Handle backend errors gracefully
   useEffect(() => {
     if (backendError && useBackend) {
-      console.warn('Backend chart data unavailable, falling back to demo data:', backendError)
+      console.warn(
+        'Backend chart data unavailable, falling back to demo data:',
+        backendError,
+      )
       setError('Live data temporarily unavailable')
       // Optionally fall back to demo data
       setUseBackend(false)
@@ -187,7 +193,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         displayColors: true,
         callbacks: {
           // Add custom tooltip content for therapy context
-          afterBody: function(context: any) {
+          afterBody: function (context: any) {
             if (useBackend && backendData?.metadata) {
               return [
                 '',
@@ -200,33 +206,36 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         },
       },
     },
-    scales: type !== 'pie' ? {
-      x: {
-        grid: {
-          color: 'rgba(156, 163, 175, 0.2)',
-          drawBorder: false,
-        },
-        ticks: {
-          color: 'rgba(75, 85, 99, 0.8)',
-          font: {
-            size: 11,
-          },
-        },
-      },
-      y: {
-        grid: {
-          color: 'rgba(156, 163, 175, 0.2)',
-          drawBorder: false,
-        },
-        ticks: {
-          color: 'rgba(75, 85, 99, 0.8)',
-          font: {
-            size: 11,
-          },
-        },
-        beginAtZero: true,
-      },
-    } : {},
+    scales:
+      type !== 'pie'
+        ? {
+            x: {
+              grid: {
+                color: 'rgba(156, 163, 175, 0.2)',
+                drawBorder: false,
+              },
+              ticks: {
+                color: 'rgba(75, 85, 99, 0.8)',
+                font: {
+                  size: 11,
+                },
+              },
+            },
+            y: {
+              grid: {
+                color: 'rgba(156, 163, 175, 0.2)',
+                drawBorder: false,
+              },
+              ticks: {
+                color: 'rgba(75, 85, 99, 0.8)',
+                font: {
+                  size: 11,
+                },
+              },
+              beginAtZero: true,
+            },
+          }
+        : {},
     animation: {
       duration: 1000,
       easing: 'easeInOutQuart',
@@ -247,7 +256,10 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
           <span className="text-gray-600">Loading chart data...</span>
           {dataConfig?.autoRefresh && (
-            <span className="text-xs text-gray-500 mt-1">Auto-refreshing every {(dataConfig.refreshInterval || 60000) / 1000}s</span>
+            <span className="text-xs text-gray-500 mt-1">
+              Auto-refreshing every{' '}
+              {(dataConfig.refreshInterval || 60000) / 1000}s
+            </span>
           )}
         </div>
       </div>
@@ -271,22 +283,28 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   return (
     <div className={`relative ${className}`}>
       {/* Chart container */}
-      <div className="w-full h-64">
-        {renderChart()}
-      </div>
+      <div className="w-full h-64">{renderChart()}</div>
 
       {/* Status indicators */}
       <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
         <div className="flex items-center space-x-4">
           {/* Data source indicator */}
           <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${
-              useBackend && !backendError ? 'bg-green-500' : 
-              error ? 'bg-red-500' : 'bg-yellow-500'
-            }`}></div>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                useBackend && !backendError
+                  ? 'bg-green-500'
+                  : error
+                    ? 'bg-red-500'
+                    : 'bg-yellow-500'
+              }`}
+            ></div>
             <span>
-              {useBackend && !backendError ? 'Live Data' : 
-               error ? 'Demo Data' : 'Static Data'}
+              {useBackend && !backendError
+                ? 'Live Data'
+                : error
+                  ? 'Demo Data'
+                  : 'Static Data'}
             </span>
           </div>
 
@@ -297,8 +315,18 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
               className="flex items-center space-x-1 hover:text-blue-600 transition-colors"
               title="Refresh data"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
               <span>Refresh</span>
             </button>
@@ -308,13 +336,9 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         {/* Metadata display */}
         {useBackend && backendData?.metadata && (
           <div className="text-right">
-            <div>
-              {backendData.metadata.totalDataPoints} data points
-            </div>
+            <div>{backendData.metadata.totalDataPoints} data points</div>
             {backendData.metadata.timeRange && (
-              <div>
-                Range: {backendData.metadata.timeRange}
-              </div>
+              <div>Range: {backendData.metadata.timeRange}</div>
             )}
           </div>
         )}
@@ -324,8 +348,18 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
       {error && (
         <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
           <div className="flex items-center space-x-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
             </svg>
             <span>{error}</span>
           </div>

@@ -14,7 +14,14 @@ interface ParticleConfig {
   velocity: [number, number, number]
   color: string
   size: number
-  emotion: 'joy' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'disgust' | 'neutral'
+  emotion:
+    | 'joy'
+    | 'sadness'
+    | 'anger'
+    | 'fear'
+    | 'surprise'
+    | 'disgust'
+    | 'neutral'
   intensity: number
   lifetime?: number
   behavior?: {
@@ -66,7 +73,7 @@ interface ParticleSystemResponse {
 /**
  * Particle Emotion System API
  * GET /api/components/particles/emotion-system
- * 
+ *
  * Generates particle configurations for the Particle component based on emotional states
  */
 export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
@@ -87,8 +94,14 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     // Parse query parameters
     const url = new URL(request.url)
     const emotion = url.searchParams.get('emotion') || 'neutral'
-    const particleCount = Math.min(parseInt(url.searchParams.get('particleCount') || '50', 10), 200)
-    const intensity = Math.max(0, Math.min(1, parseFloat(url.searchParams.get('intensity') || '0.5')))
+    const particleCount = Math.min(
+      parseInt(url.searchParams.get('particleCount') || '50', 10),
+      200,
+    )
+    const intensity = Math.max(
+      0,
+      Math.min(1, parseFloat(url.searchParams.get('intensity') || '0.5')),
+    )
     const sessionId = url.searchParams.get('sessionId')
     const useSessionData = url.searchParams.get('useSessionData') === 'true'
     const complexity = url.searchParams.get('complexity') || 'medium'
@@ -104,13 +117,17 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     if (useSessionData && sessionId) {
       try {
         const repository = new AIRepository()
-        const sessionEmotions = await repository.getEmotionsForSession(sessionId)
-        
+        const sessionEmotions =
+          await repository.getEmotionsForSession(sessionId)
+
         if (sessionEmotions.length > 0) {
           emotionProfile = calculateEmotionProfile(sessionEmotions)
         }
       } catch (error) {
-        logger.warn('Failed to fetch session emotion data, using default', { sessionId, error })
+        logger.warn('Failed to fetch session emotion data, using default', {
+          sessionId,
+          error,
+        })
       }
     }
 
@@ -120,8 +137,13 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       emotion: emotionProfile.dominantEmotion,
       intensity: emotionProfile.averageIntensity,
       sessionId,
-      environmentFactors: getEnvironmentFactors(emotionProfile.dominantEmotion, emotionProfile.volatility),
-      visualSettings: getVisualSettings(complexity as 'low' | 'medium' | 'high'),
+      environmentFactors: getEnvironmentFactors(
+        emotionProfile.dominantEmotion,
+        emotionProfile.volatility,
+      ),
+      visualSettings: getVisualSettings(
+        complexity as 'low' | 'medium' | 'high',
+      ),
     }
 
     // Generate particles based on emotion profile
@@ -134,7 +156,8 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
         generationTimestamp: new Date().toISOString(),
         emotionProfile,
         performanceHints: {
-          recommendedFrameRate: complexity === 'high' ? 30 : complexity === 'medium' ? 45 : 60,
+          recommendedFrameRate:
+            complexity === 'high' ? 30 : complexity === 'medium' ? 45 : 60,
           complexity: complexity as 'low' | 'medium' | 'high',
           gpuOptimized: particleCount > 100,
         },
@@ -151,12 +174,11 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'private, max-age=120', // 2-minute cache
       },
     })
-
   } catch (error: unknown) {
     logger.error('Error generating particle emotion system', { error })
 
@@ -176,7 +198,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for real-time particle updates
  */
-export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async (
+  context: AuthAPIContext,
+) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -233,7 +257,6 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-
   } catch (error: unknown) {
     logger.error('Error processing particle system update', { error })
 
@@ -252,20 +275,26 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
 
 // Helper functions
 function calculateEmotionProfile(sessionEmotions: any[]) {
-  const emotionCounts = new Map<string, { count: number; totalIntensity: number }>()
+  const emotionCounts = new Map<
+    string,
+    { count: number; totalIntensity: number }
+  >()
   let totalIntensity = 0
   let intensityValues: number[] = []
 
-  sessionEmotions.forEach(emotion => {
+  sessionEmotions.forEach((emotion) => {
     const emotionName = emotion.primaryEmotion || emotion.emotion || 'neutral'
     const intensity = emotion.confidence || emotion.intensity || 0.5
-    
-    const current = emotionCounts.get(emotionName) || { count: 0, totalIntensity: 0 }
+
+    const current = emotionCounts.get(emotionName) || {
+      count: 0,
+      totalIntensity: 0,
+    }
     emotionCounts.set(emotionName, {
       count: current.count + 1,
       totalIntensity: current.totalIntensity + intensity,
     })
-    
+
     totalIntensity += intensity
     intensityValues.push(intensity)
   })
@@ -273,12 +302,12 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
   // Find dominant emotion
   let dominantEmotion = 'neutral'
   let maxCount = 0
-  
+
   const emotionMix: Record<string, number> = {}
   emotionCounts.forEach((stats, emotion) => {
     const percentage = stats.count / sessionEmotions.length
     emotionMix[emotion] = percentage
-    
+
     if (stats.count > maxCount) {
       maxCount = stats.count
       dominantEmotion = emotion
@@ -287,7 +316,11 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
 
   // Calculate volatility (standard deviation of intensities)
   const averageIntensity = totalIntensity / sessionEmotions.length
-  const variance = intensityValues.reduce((sum, val) => sum + Math.pow(val - averageIntensity, 2), 0) / intensityValues.length
+  const variance =
+    intensityValues.reduce(
+      (sum, val) => sum + Math.pow(val - averageIntensity, 2),
+      0,
+    ) / intensityValues.length
   const volatility = Math.sqrt(variance)
 
   return {
@@ -373,7 +406,10 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
   }
 }
 
-function generateEmotionParticles(config: ParticleSystemConfig, emotionProfile: any): ParticleConfig[] {
+function generateEmotionParticles(
+  config: ParticleSystemConfig,
+  emotionProfile: any,
+): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config
 
@@ -386,7 +422,7 @@ function generateEmotionParticles(config: ParticleSystemConfig, emotionProfile: 
     let particleEmotion = emotion as ParticleConfig['emotion']
     const rand = Math.random()
     let cumulative = 0
-    
+
     for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix)) {
       cumulative += percentage
       if (rand <= cumulative) {
@@ -428,26 +464,34 @@ function generateEmotionParticles(config: ParticleSystemConfig, emotionProfile: 
 
 function getEmotionColor(emotion: string): string {
   const colors = {
-    joy: '#FFD700',      // Gold
-    sadness: '#4682B4',  // Steel Blue
-    anger: '#DC143C',    // Crimson
-    fear: '#9932CC',     // Dark Orchid
+    joy: '#FFD700', // Gold
+    sadness: '#4682B4', // Steel Blue
+    anger: '#DC143C', // Crimson
+    fear: '#9932CC', // Dark Orchid
     surprise: '#FF69B4', // Hot Pink
-    disgust: '#228B22',  // Forest Green
-    neutral: '#708090',  // Slate Gray
+    disgust: '#228B22', // Forest Green
+    neutral: '#708090', // Slate Gray
   }
-  
+
   return colors[emotion as keyof typeof colors] || colors.neutral
 }
 
-function getMovementPattern(emotion: string): 'flow' | 'orbit' | 'chaos' | 'pulse' | 'spiral' {
+function getMovementPattern(
+  emotion: string,
+): 'flow' | 'orbit' | 'chaos' | 'pulse' | 'spiral' {
   switch (emotion) {
-    case 'joy': return 'flow'
-    case 'sadness': return 'pulse'
-    case 'anger': return 'chaos'
-    case 'fear': return 'chaos'
-    case 'surprise': return 'spiral'
-    default: return 'orbit'
+    case 'joy':
+      return 'flow'
+    case 'sadness':
+      return 'pulse'
+    case 'anger':
+      return 'chaos'
+    case 'fear':
+      return 'chaos'
+    case 'surprise':
+      return 'spiral'
+    default:
+      return 'orbit'
   }
 }
 
@@ -459,19 +503,29 @@ function generateEmotionRecommendations(emotion: string, intensity: number) {
   }
 
   if (intensity > 0.8) {
-    recommendations.visualAdjustments.push('Increase particle density for high emotional intensity')
-    recommendations.therapeuticInsights.push('High emotional intensity detected - consider grounding techniques')
+    recommendations.visualAdjustments.push(
+      'Increase particle density for high emotional intensity',
+    )
+    recommendations.therapeuticInsights.push(
+      'High emotional intensity detected - consider grounding techniques',
+    )
   }
 
   if (emotion === 'anger' && intensity > 0.6) {
     recommendations.visualAdjustments.push('Enable chaos movement pattern')
-    recommendations.therapeuticInsights.push('Anger pattern suggests need for calming interventions')
-    recommendations.interactionSuggestions.push('Try slow, circular mouse movements to reduce particle agitation')
+    recommendations.therapeuticInsights.push(
+      'Anger pattern suggests need for calming interventions',
+    )
+    recommendations.interactionSuggestions.push(
+      'Try slow, circular mouse movements to reduce particle agitation',
+    )
   }
 
   if (emotion === 'sadness') {
     recommendations.visualAdjustments.push('Reduce particle buoyancy')
-    recommendations.therapeuticInsights.push('Sadness pattern - consider uplift strategies')
+    recommendations.therapeuticInsights.push(
+      'Sadness pattern - consider uplift strategies',
+    )
   }
 
   return recommendations

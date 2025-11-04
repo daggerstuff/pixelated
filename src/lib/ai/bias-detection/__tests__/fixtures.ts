@@ -15,9 +15,9 @@ export const baselineAnxietyScenario: TherapeuticSession = {
     education: 'bachelors',
   },
   scenario: {
-  scenarioId: 'anxiety-baseline-001',
-  type: 'anxiety',
-   },
+    scenarioId: 'anxiety-baseline-001',
+    type: 'anxiety',
+  },
   content: {
     transcript: `Patient presents with moderate anxiety symptoms. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
     aiResponses: [],
@@ -124,9 +124,34 @@ export const mockPythonBridge = {
 export function createDefaultAnalysisResult() {
   return {
     biasScore: 0.5,
-    linguisticBias: { genderBiasScore: 0, racialBiasScore: 0, ageBiasScore: 0, culturalBiasScore: 0, biasedTerms: [], sentimentAnalysis: { overallSentiment: 0, emotionalValence: 0, subjectivity: 0, demographicVariations: {} } },
-    representationAnalysis: { demographicDistribution: {}, underrepresentedGroups: [], overrepresentedGroups: [], diversityIndex: 0, intersectionalityAnalysis: [] },
-    dataQualityMetrics: { completeness: 1, consistency: 1, accuracy: 1, timeliness: 1, validity: 1, missingDataByDemographic: {} },
+    linguisticBias: {
+      genderBiasScore: 0,
+      racialBiasScore: 0,
+      ageBiasScore: 0,
+      culturalBiasScore: 0,
+      biasedTerms: [],
+      sentimentAnalysis: {
+        overallSentiment: 0,
+        emotionalValence: 0,
+        subjectivity: 0,
+        demographicVariations: {},
+      },
+    },
+    representationAnalysis: {
+      demographicDistribution: {},
+      underrepresentedGroups: [],
+      overrepresentedGroups: [],
+      diversityIndex: 0,
+      intersectionalityAnalysis: [],
+    },
+    dataQualityMetrics: {
+      completeness: 1,
+      consistency: 1,
+      accuracy: 1,
+      timeliness: 1,
+      validity: 1,
+      missingDataByDemographic: {},
+    },
     recommendations: [],
   }
 }
@@ -134,8 +159,23 @@ export function createDefaultAnalysisResult() {
 export function createModelLevelAnalysisResult() {
   return {
     biasScore: 0.5,
-    fairnessMetrics: { demographicParity: 0.5, equalizedOdds: 0.5, equalOpportunity: 0.5, calibration: 0.5, individualFairness: 0.5, counterfactualFairness: 0.5 },
-    performanceMetrics: { accuracy: 0.5, precision: 0.5, recall: 0.5, f1Score: 0.5, auc: 0.5, calibrationError: 0, demographicBreakdown: {} },
+    fairnessMetrics: {
+      demographicParity: 0.5,
+      equalizedOdds: 0.5,
+      equalOpportunity: 0.5,
+      calibration: 0.5,
+      individualFairness: 0.5,
+      counterfactualFairness: 0.5,
+    },
+    performanceMetrics: {
+      accuracy: 0.5,
+      precision: 0.5,
+      recall: 0.5,
+      f1Score: 0.5,
+      auc: 0.5,
+      calibrationError: 0,
+      demographicBreakdown: {},
+    },
     groupPerformanceComparison: [],
     recommendations: [],
   }
@@ -144,7 +184,12 @@ export function createModelLevelAnalysisResult() {
 export function createInteractiveAnalysisResult() {
   return {
     biasScore: 0.5,
-    counterfactualAnalysis: { scenariosAnalyzed: 2, biasDetected: false, consistencyScore: 0, problematicScenarios: [] },
+    counterfactualAnalysis: {
+      scenariosAnalyzed: 2,
+      biasDetected: false,
+      consistencyScore: 0,
+      problematicScenarios: [],
+    },
     featureImportance: [],
     whatIfScenarios: [],
     recommendations: [],
@@ -154,9 +199,25 @@ export function createInteractiveAnalysisResult() {
 export function createEvaluationAnalysisResult() {
   return {
     biasScore: 0.5,
-    huggingFaceMetrics: { toxicity: 0, bias: 0, regard: {}, stereotype: 0, fairness: 0 },
-    customMetrics: { therapeuticBias: 0, culturalSensitivity: 0, professionalEthics: 0, patientSafety: 0 },
-    temporalAnalysis: { trendDirection: "stable", changeRate: 0, seasonalPatterns: [], interventionEffectiveness: [] },
+    huggingFaceMetrics: {
+      toxicity: 0,
+      bias: 0,
+      regard: {},
+      stereotype: 0,
+      fairness: 0,
+    },
+    customMetrics: {
+      therapeuticBias: 0,
+      culturalSensitivity: 0,
+      professionalEthics: 0,
+      patientSafety: 0,
+    },
+    temporalAnalysis: {
+      trendDirection: 'stable',
+      changeRate: 0,
+      seasonalPatterns: [],
+      interventionEffectiveness: [],
+    },
     recommendations: [],
   }
 }

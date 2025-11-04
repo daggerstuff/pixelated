@@ -154,7 +154,9 @@ describe('MentalLLaMAModelProvider', () => {
 
     it('should throw an error if fetch itself fails (network error)', async () => {
       const provider = new MentalLLaMAModelProvider()
-      ;(fetch as unknown).mockRejectedValue(new Error('Network connection failed'))
+      ;(fetch as unknown).mockRejectedValue(
+        new Error('Network connection failed'),
+      )
 
       await expect(provider.chat(messages, options)).rejects.toThrow(
         'Network connection failed',

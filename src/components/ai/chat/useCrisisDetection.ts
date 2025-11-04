@@ -32,7 +32,9 @@ interface UseCrisisDetectionResult {
   alerts: CrisisAlert[]
   detectCrisis: (text: string) => Promise<CrisisDetectionResult | null>
   detectBatch: (texts: string[]) => Promise<CrisisDetectionResult[] | null>
-  monitorStream: (texts: string[]) => AsyncGenerator<CrisisDetectionResult, CrisisDetectionResult[], unknown>
+  monitorStream: (
+    texts: string[],
+  ) => AsyncGenerator<CrisisDetectionResult, CrisisDetectionResult[], unknown>
   redetectLastText: () => Promise<CrisisDetectionResult | null>
   startRealTimeMonitoring: () => void
   stopRealTimeMonitoring: () => void
@@ -78,11 +80,7 @@ function isRetryableError(error: unknown): boolean {
   }
 
   // Rate limit errors (429) are retryable with backoff
-  if (
-    error instanceof Error &&
-    'status' in error &&
-    error.status === 429
-  ) {
+  if (error instanceof Error && 'status' in error && error.status === 429) {
     return true
   }
 
@@ -92,7 +90,9 @@ function isRetryableError(error: unknown): boolean {
 /**
  * Generate crisis analytics from detection results
  */
-function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalytics {
+function generateCrisisAnalytics(
+  results: CrisisDetectionResult[],
+): CrisisAnalytics {
   if (results.length === 0) {
     return {
       riskDistribution: {},
@@ -104,28 +104,39 @@ function generateCrisisAnalytics(results: CrisisDetectionResult[]): CrisisAnalyt
   }
 
   // Calculate risk distribution
-  const riskCounts = results.reduce((acc, result) => {
-    acc[result.riskLevel] = (acc[result.riskLevel] || 0) + 1
-    return acc
-  }, {} as { [key: string]: number })
+  const riskCounts = results.reduce(
+    (acc, result) => {
+      acc[result.riskLevel] = (acc[result.riskLevel] || 0) + 1
+      return acc
+    },
+    {} as { [key: string]: number },
+  )
 
   const riskDistribution = Object.fromEntries(
-    Object.entries(riskCounts).map(([risk, count]) => [risk, count / results.length])
+    Object.entries(riskCounts).map(([risk, count]) => [
+      risk,
+      count / results.length,
+    ]),
   )
 
   // Calculate crisis types
   const crisisTypes = results
-    .filter(r => r.isCrisis && r.category)
-    .reduce((acc, result) => {
-      const type = result.category!
-      acc[type] = (acc[type] || 0) + 1
-      return acc
-    }, {} as { [key: string]: number })
+    .filter((r) => r.isCrisis && r.category)
+    .reduce(
+      (acc, result) => {
+        const type = result.category!
+        acc[type] = (acc[type] || 0) + 1
+        return acc
+      },
+      {} as { [key: string]: number },
+    )
 
   // Generate temporal patterns
   const temporalPatterns: string[] = []
-  const crisisRatio = results.filter(r => r.isCrisis).length / results.length
-  const highRiskRatio = results.filter(r => r.riskLevel === 'high' || r.riskLevel === 'critical').length / results.length
+  const crisisRatio = results.filter((r) => r.isCrisis).length / results.length
+  const highRiskRatio =
+    results.filter((r) => r.riskLevel === 'high' || r.riskLevel === 'critical')
+      .length / results.length
 
   if (crisisRatio > 0.3) {
     temporalPatterns.push('High frequency of crisis indicators')
@@ -199,15 +210,18 @@ export function useCrisisDetection({
   const monitoringIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Calculate metrics
-  const crisisCount = results.filter(r => r.isCrisis).length
-  const highRiskCount = results.filter(r => r.riskLevel === 'high' || r.riskLevel === 'critical').length
-  
-  const averageRiskLevel = results.length > 0
-    ? results.reduce((sum, r) => {
-        const riskValues = { low: 1, medium: 2, high: 3, critical: 4 }
-        return sum + riskValues[r.riskLevel]
-      }, 0) / results.length
-    : 0
+  const crisisCount = results.filter((r) => r.isCrisis).length
+  const highRiskCount = results.filter(
+    (r) => r.riskLevel === 'high' || r.riskLevel === 'critical',
+  ).length
+
+  const averageRiskLevel =
+    results.length > 0
+      ? results.reduce((sum, r) => {
+          const riskValues = { low: 1, medium: 2, high: 3, critical: 4 }
+          return sum + riskValues[r.riskLevel]
+        }, 0) / results.length
+      : 0
 
   // Reset all state
   const reset = useCallback(() => {
@@ -220,7 +234,7 @@ export function useCrisisDetection({
     setTotalDetected(0)
     setAlerts([])
     lastTextRef.current = null
-    
+
     // Abort any ongoing requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
@@ -250,37 +264,40 @@ export function useCrisisDetection({
   }, [])
 
   // Create crisis alert
-  const createAlert = useCallback((result: CrisisDetectionResult): CrisisAlert => {
-    let level: 'warning' | 'danger' | 'critical' = 'warning'
-    let message = 'Crisis indicator detected'
+  const createAlert = useCallback(
+    (result: CrisisDetectionResult): CrisisAlert => {
+      let level: 'warning' | 'danger' | 'critical' = 'warning'
+      let message = 'Crisis indicator detected'
 
-    if (result.riskLevel === 'critical') {
-      level = 'critical'
-      message = 'CRITICAL: Immediate intervention required'
-    } else if (result.riskLevel === 'high') {
-      level = 'danger'
-      message = 'HIGH RISK: Crisis detected, urgent attention needed'
-    } else if (result.isCrisis) {
-      level = 'warning'
-      message = 'Crisis indicator detected, monitoring recommended'
-    }
+      if (result.riskLevel === 'critical') {
+        level = 'critical'
+        message = 'CRITICAL: Immediate intervention required'
+      } else if (result.riskLevel === 'high') {
+        level = 'danger'
+        message = 'HIGH RISK: Crisis detected, urgent attention needed'
+      } else if (result.isCrisis) {
+        level = 'warning'
+        message = 'Crisis indicator detected, monitoring recommended'
+      }
 
-    return {
-      id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-      timestamp: new Date(),
-      level,
-      message,
-      result,
-      acknowledged: false,
-    }
-  }, [])
+      return {
+        id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+        timestamp: new Date(),
+        level,
+        message,
+        result,
+        acknowledged: false,
+      }
+    },
+    [],
+  )
 
   // Core function to make API request
   const makeRequest = useCallback(
     async (requestData: Record<string, unknown>): Promise<Response> => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController()
-      
+
       const timeoutId = setTimeout(() => {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort()
@@ -303,10 +320,12 @@ export function useCrisisDetection({
         })
 
         clearTimeout(timeoutId)
-        
+
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || `API request failed: ${response.status}`)
+          throw new Error(
+            errorData.error || `API request failed: ${response.status}`,
+          )
         }
 
         return response
@@ -315,7 +334,7 @@ export function useCrisisDetection({
         throw err
       }
     },
-    [apiEndpoint, model, temperature, sensitivityLevel, timeout]
+    [apiEndpoint, model, temperature, sensitivityLevel, timeout],
   )
 
   // Detect crisis in a single text
@@ -334,11 +353,11 @@ export function useCrisisDetection({
       while (retries < maxRetries) {
         try {
           const response = await makeRequest({ text })
-          const data = await response.json() as CrisisDetectionResult
+          const data = (await response.json()) as CrisisDetectionResult
 
           setResult(data)
-          setResults(prev => [...prev, data])
-          setTotalDetected(prev => prev + 1)
+          setResults((prev) => [...prev, data])
+          setTotalDetected((prev) => prev + 1)
           setProgress(100)
 
           // Handle crisis detection
@@ -347,10 +366,14 @@ export function useCrisisDetection({
           }
 
           // Create alert if threshold exceeded
-          if (data.confidence >= alertThreshold || data.riskLevel === 'high' || data.riskLevel === 'critical') {
+          if (
+            data.confidence >= alertThreshold ||
+            data.riskLevel === 'high' ||
+            data.riskLevel === 'critical'
+          ) {
             const alert = createAlert(data)
-            setAlerts(prev => [...prev, alert])
-            
+            setAlerts((prev) => [...prev, alert])
+
             if (onAlert) {
               onAlert([alert])
             }
@@ -364,7 +387,9 @@ export function useCrisisDetection({
         } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis'
+              err instanceof Error
+                ? (err as Error)?.message || String(err)
+                : 'Failed to detect crisis'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -376,7 +401,10 @@ export function useCrisisDetection({
           retries++
           // Exponential backoff with jitter
           const secureJitter = Math.floor(Math.random() * 1000)
-          const delay = Math.min(1000 * Math.pow(2, retries) + secureJitter, 10000)
+          const delay = Math.min(
+            1000 * Math.pow(2, retries) + secureJitter,
+            10000,
+          )
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {
           if (retries === maxRetries - 1) {
@@ -387,7 +415,17 @@ export function useCrisisDetection({
 
       return null
     },
-    [isLoading, maxRetries, alertThreshold, createAlert, onCrisisDetected, onComplete, onAlert, onError, makeRequest]
+    [
+      isLoading,
+      maxRetries,
+      alertThreshold,
+      createAlert,
+      onCrisisDetected,
+      onComplete,
+      onAlert,
+      onError,
+      makeRequest,
+    ],
   )
 
   // Detect crisis in a batch of texts
@@ -409,27 +447,35 @@ export function useCrisisDetection({
         // Process in chunks
         for (let i = 0; i < texts.length; i += batchSize) {
           const chunk = texts.slice(i, i + batchSize)
-          
+
           const response = await makeRequest({ batch: chunk })
-          const chunkResults = await response.json() as CrisisDetectionResult[]
+          const chunkResults =
+            (await response.json()) as CrisisDetectionResult[]
 
           batchResults.push(...chunkResults)
-          setResults(prev => [...prev, ...chunkResults])
+          setResults((prev) => [...prev, ...chunkResults])
 
           // Process alerts
-          chunkResults.forEach(result => {
+          chunkResults.forEach((result) => {
             if (result.isCrisis && onCrisisDetected) {
               onCrisisDetected(result)
             }
 
-            if (result.confidence >= alertThreshold || result.riskLevel === 'high' || result.riskLevel === 'critical') {
+            if (
+              result.confidence >= alertThreshold ||
+              result.riskLevel === 'high' ||
+              result.riskLevel === 'critical'
+            ) {
               const alert = createAlert(result)
               newAlerts.push(alert)
             }
           })
 
           // Update progress
-          const currentProgress = Math.min(((i + chunk.length) / texts.length) * 100, 100)
+          const currentProgress = Math.min(
+            ((i + chunk.length) / texts.length) * 100,
+            100,
+          )
           setProgress(currentProgress)
 
           if (onProgress) {
@@ -437,10 +483,10 @@ export function useCrisisDetection({
           }
         }
 
-        setTotalDetected(prev => prev + batchResults.length)
-        
+        setTotalDetected((prev) => prev + batchResults.length)
+
         if (newAlerts.length > 0) {
-          setAlerts(prev => [...prev, ...newAlerts])
+          setAlerts((prev) => [...prev, ...newAlerts])
           if (onAlert) {
             onAlert(newAlerts)
           }
@@ -449,7 +495,9 @@ export function useCrisisDetection({
         return batchResults
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to detect crisis in batch'
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'Failed to detect crisis in batch'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -461,13 +509,23 @@ export function useCrisisDetection({
         setIsMonitoring(false)
       }
     },
-    [isLoading, batchSize, alertThreshold, createAlert, onProgress, onCrisisDetected, onAlert, onError, makeRequest]
+    [
+      isLoading,
+      batchSize,
+      alertThreshold,
+      createAlert,
+      onProgress,
+      onCrisisDetected,
+      onAlert,
+      onError,
+      makeRequest,
+    ],
   )
 
   // Monitor texts as a stream
   const monitorStream = useCallback(
     async function* (
-      texts: string[]
+      texts: string[],
     ): AsyncGenerator<CrisisDetectionResult, CrisisDetectionResult[], unknown> {
       if (texts.length === 0 || isLoading) {
         return []
@@ -484,13 +542,13 @@ export function useCrisisDetection({
       try {
         for (let i = 0; i < texts.length; i++) {
           const text = texts[i]
-          
+
           try {
             const response = await makeRequest({ text })
-            const data = await response.json() as CrisisDetectionResult
+            const data = (await response.json()) as CrisisDetectionResult
 
             streamResults.push(data)
-            setResults(prev => [...prev, data])
+            setResults((prev) => [...prev, data])
 
             // Handle crisis detection
             if (data.isCrisis && onCrisisDetected) {
@@ -498,10 +556,14 @@ export function useCrisisDetection({
             }
 
             // Create alert if threshold exceeded
-            if (data.confidence >= alertThreshold || data.riskLevel === 'high' || data.riskLevel === 'critical') {
+            if (
+              data.confidence >= alertThreshold ||
+              data.riskLevel === 'high' ||
+              data.riskLevel === 'critical'
+            ) {
               const alert = createAlert(data)
               newAlerts.push(alert)
-              setAlerts(prev => [...prev, alert])
+              setAlerts((prev) => [...prev, alert])
             }
 
             // Update progress
@@ -518,8 +580,8 @@ export function useCrisisDetection({
           }
         }
 
-        setTotalDetected(prev => prev + streamResults.length)
-        
+        setTotalDetected((prev) => prev + streamResults.length)
+
         if (newAlerts.length > 0 && onAlert) {
           onAlert(newAlerts)
         }
@@ -530,18 +592,27 @@ export function useCrisisDetection({
         setIsMonitoring(false)
       }
     },
-    [isLoading, alertThreshold, createAlert, onProgress, onCrisisDetected, onAlert, makeRequest]
+    [
+      isLoading,
+      alertThreshold,
+      createAlert,
+      onProgress,
+      onCrisisDetected,
+      onAlert,
+      makeRequest,
+    ],
   )
 
   // Re-detect the last text
-  const redetectLastText = useCallback(async (): Promise<CrisisDetectionResult | null> => {
-    if (!lastTextRef.current) {
-      setError('No previous text to re-detect')
-      return null
-    }
+  const redetectLastText =
+    useCallback(async (): Promise<CrisisDetectionResult | null> => {
+      if (!lastTextRef.current) {
+        setError('No previous text to re-detect')
+        return null
+      }
 
-    return detectCrisis(lastTextRef.current)
-  }, [detectCrisis])
+      return detectCrisis(lastTextRef.current)
+    }, [detectCrisis])
 
   // Start real-time monitoring
   const startRealTimeMonitoring = useCallback(() => {
@@ -551,7 +622,7 @@ export function useCrisisDetection({
     }
 
     setIsMonitoring(true)
-    
+
     // This would typically connect to a real-time data source
     // For now, we'll just set the monitoring state
     console.log('Real-time crisis monitoring started')
@@ -560,12 +631,12 @@ export function useCrisisDetection({
   // Stop real-time monitoring
   const stopRealTimeMonitoring = useCallback(() => {
     setIsMonitoring(false)
-    
+
     if (monitoringIntervalRef.current) {
       clearInterval(monitoringIntervalRef.current)
       monitoringIntervalRef.current = null
     }
-    
+
     console.log('Real-time crisis monitoring stopped')
   }, [])
 

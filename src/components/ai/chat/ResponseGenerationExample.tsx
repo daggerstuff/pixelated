@@ -6,8 +6,10 @@ import { useResponseGeneration } from './useResponseGeneration'
  */
 export function ResponseGenerationExample() {
   const [prompt, setPrompt] = useState('')
-  const [responseType, setResponseType] = useState<'general' | 'therapeutic' | 'creative' | 'analytical'>('general')
-  
+  const [responseType, setResponseType] = useState<
+    'general' | 'therapeutic' | 'creative' | 'analytical'
+  >('general')
+
   const {
     response,
     isLoading,
@@ -32,7 +34,10 @@ export function ResponseGenerationExample() {
       console.log('Accumulated response length:', accumulated.length)
     },
     onComplete: (finalResponse) => {
-      console.log('Response completed:', finalResponse.substring(0, 100) + '...')
+      console.log(
+        'Response completed:',
+        finalResponse.substring(0, 100) + '...',
+      )
     },
     onTherapeuticInsights: (insights) => {
       console.log('Therapeutic insights:', insights)
@@ -64,7 +69,7 @@ export function ResponseGenerationExample() {
     }
 
     const generator = generateStreamingResponse(prompt)
-    
+
     // Example of consuming the streaming response
     for await (const chunk of generator) {
       // Each chunk is automatically handled by the hook
@@ -82,7 +87,10 @@ export function ResponseGenerationExample() {
       {/* Input Section */}
       <div className="space-y-4">
         <div>
-          <label htmlFor="prompt" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="prompt"
+            className="block text-sm font-medium text-gray-700"
+          >
             Enter your prompt:
           </label>
           <textarea
@@ -96,13 +104,18 @@ export function ResponseGenerationExample() {
         </div>
 
         <div>
-          <label htmlFor="responseType" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="responseType"
+            className="block text-sm font-medium text-gray-700"
+          >
             Response Type:
           </label>
           <select
             id="responseType"
             value={responseType}
-            onChange={(e) => setResponseType(e.target.value as typeof responseType)}
+            onChange={(e) =>
+              setResponseType(e.target.value as typeof responseType)
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="general">General</option>
@@ -186,9 +199,7 @@ export function ResponseGenerationExample() {
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             Generated Response:
           </h3>
-          <div className="text-gray-700 whitespace-pre-wrap">
-            {response}
-          </div>
+          <div className="text-gray-700 whitespace-pre-wrap">{response}</div>
         </div>
       )}
 
@@ -199,18 +210,26 @@ export function ResponseGenerationExample() {
             Therapeutic Insights:
           </h3>
           <div className="space-y-2 text-sm text-blue-800">
-            <div><strong>Confidence:</strong> {Math.round(therapeuticInsights.confidence * 100)}%</div>
+            <div>
+              <strong>Confidence:</strong>{' '}
+              {Math.round(therapeuticInsights.confidence * 100)}%
+            </div>
             {therapeuticInsights.intervention && (
-              <div className="text-red-600"><strong>⚠️ Intervention Recommended</strong></div>
-            )}
-            {therapeuticInsights.techniques && therapeuticInsights.techniques.length > 0 && (
-              <div>
-                <strong>Techniques:</strong> {therapeuticInsights.techniques.join(', ')}
+              <div className="text-red-600">
+                <strong>⚠️ Intervention Recommended</strong>
               </div>
             )}
+            {therapeuticInsights.techniques &&
+              therapeuticInsights.techniques.length > 0 && (
+                <div>
+                  <strong>Techniques:</strong>{' '}
+                  {therapeuticInsights.techniques.join(', ')}
+                </div>
+              )}
             {therapeuticInsights.usage && (
               <div>
-                <strong>Token Usage:</strong> {therapeuticInsights.usage.totalTokens} tokens
+                <strong>Token Usage:</strong>{' '}
+                {therapeuticInsights.usage.totalTokens} tokens
               </div>
             )}
           </div>
@@ -223,12 +242,28 @@ export function ResponseGenerationExample() {
           How to Use:
         </h3>
         <ul className="list-disc list-inside text-sm text-yellow-800 space-y-1">
-          <li><strong>General:</strong> For everyday AI assistance and questions</li>
-          <li><strong>Therapeutic:</strong> For mental health support with specialized insights</li>
-          <li><strong>Creative:</strong> For imaginative and artistic content generation</li>
-          <li><strong>Analytical:</strong> For data-driven and logical responses</li>
-          <li><strong>Streaming:</strong> Watch responses appear in real-time as they&apos;re generated</li>
-          <li><strong>Regenerate:</strong> Create a new response using the same prompt</li>
+          <li>
+            <strong>General:</strong> For everyday AI assistance and questions
+          </li>
+          <li>
+            <strong>Therapeutic:</strong> For mental health support with
+            specialized insights
+          </li>
+          <li>
+            <strong>Creative:</strong> For imaginative and artistic content
+            generation
+          </li>
+          <li>
+            <strong>Analytical:</strong> For data-driven and logical responses
+          </li>
+          <li>
+            <strong>Streaming:</strong> Watch responses appear in real-time as
+            they&apos;re generated
+          </li>
+          <li>
+            <strong>Regenerate:</strong> Create a new response using the same
+            prompt
+          </li>
         </ul>
       </div>
     </div>

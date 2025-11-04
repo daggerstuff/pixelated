@@ -1,4 +1,3 @@
-
 /**
  * Lightweight utilities used by unit tests. These functions intentionally avoid
  * external dependencies and operate on the provided Redis-like client (mocked in tests).
@@ -40,9 +39,15 @@ export async function updateInvestigation(
   updateData: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   const raw = await redis.get(`investigation:${investigationId}`)
-  const existing = raw ? (JSON.parse(raw) as Record<string, unknown>) : undefined
+  const existing = raw
+    ? (JSON.parse(raw) as Record<string, unknown>)
+    : undefined
   const updated = {
-    ...(existing || { id: investigationId, status: 'active', createdAt: new Date().toISOString() }),
+    ...(existing || {
+      id: investigationId,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    }),
     ...updateData,
     updatedAt: new Date().toISOString(),
   }
@@ -56,7 +61,9 @@ export async function closeInvestigation(
   resolutionData: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   const raw = await redis.get(`investigation:${investigationId}`)
-  const existing = raw ? (JSON.parse(raw) as Record<string, unknown>) : { id: investigationId }
+  const existing = raw
+    ? (JSON.parse(raw) as Record<string, unknown>)
+    : { id: investigationId }
   const closed = {
     ...existing,
     ...resolutionData,
@@ -69,9 +76,19 @@ export async function closeInvestigation(
 
 export async function generateInvestigationReport(
   investigation: Record<string, unknown>,
-  options: { includeTimeline?: boolean; includeEvidence?: boolean; includeRecommendations?: boolean; format?: string } = {},
+  options: {
+    includeTimeline?: boolean
+    includeEvidence?: boolean
+    includeRecommendations?: boolean
+    format?: string
+  } = {},
 ): Promise<Record<string, unknown>> {
-  const { includeTimeline = true, includeEvidence = true, includeRecommendations = true, format = 'json' } = options
+  const {
+    includeTimeline = true,
+    includeEvidence = true,
+    includeRecommendations = true,
+    format = 'json',
+  } = options
 
   type InvestigationLike = {
     id?: string
@@ -87,8 +104,14 @@ export async function generateInvestigationReport(
 
   const createdAtRaw = inv.createdAt
   const resolvedAtRaw = inv.resolvedAt
-  const createdAt = typeof createdAtRaw === 'string' || createdAtRaw instanceof Date ? new Date(createdAtRaw) : new Date()
-  const resolvedAt = typeof resolvedAtRaw === 'string' || resolvedAtRaw instanceof Date ? new Date(resolvedAtRaw) : new Date()
+  const createdAt =
+    typeof createdAtRaw === 'string' || createdAtRaw instanceof Date
+      ? new Date(createdAtRaw)
+      : new Date()
+  const resolvedAt =
+    typeof resolvedAtRaw === 'string' || resolvedAtRaw instanceof Date
+      ? new Date(resolvedAtRaw)
+      : new Date()
 
   const summary = {
     id: inv.id,

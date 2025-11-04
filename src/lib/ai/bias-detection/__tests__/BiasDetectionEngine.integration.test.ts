@@ -70,11 +70,11 @@ vi.mock('../python-bridge', () => {
   }
 })
 
-import { BiasDetectionEngine, type AnalysisResult } from '../BiasDetectionEngine'
-import type {
-  BiasDetectionConfig,
-  TherapeuticSession,
-} from '../types'
+import {
+  BiasDetectionEngine,
+  type AnalysisResult,
+} from '../BiasDetectionEngine'
+import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
 describe('BiasDetectionEngine Integration Tests', () => {
   let engine: BiasDetectionEngine

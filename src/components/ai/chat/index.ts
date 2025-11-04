@@ -1,5 +1,8 @@
 // === CORE COMPONENTS ===
-export { ChatContainer, type ChatContainerProps } from '../../chat/ChatContainer'
+export {
+  ChatContainer,
+  type ChatContainerProps,
+} from '../../chat/ChatContainer'
 export { ChatInput, type ChatInputProps } from '../../chat/ChatInput'
 export { ChatMessage, type ChatMessageProps } from '../../chat/ChatMessage'
 

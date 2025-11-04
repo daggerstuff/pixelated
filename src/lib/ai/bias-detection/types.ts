@@ -1,6 +1,5 @@
 // Types used by BiasDetectionEngine and tests
 
-
 export interface BiasThresholdsConfig {
   warning: number
   high: number
@@ -15,9 +14,9 @@ export interface BiasLayerWeights {
 }
 
 export interface BiasMetricsConfig {
-/**
- * Type definitions for the Pixelated Empathy Bias Detection Engine
- */
+  /**
+   * Type definitions for the Pixelated Empathy Bias Detection Engine
+   */
 
   // Python service configuration
   pythonServiceUrl?: string
@@ -435,35 +434,35 @@ export interface SessionData {
 
 // Define CacheEntry type
 export interface CacheEntry<T = any> {
-  key: string;
-  value: T;
-  timestamp: Date;
-  expiresAt: Date;
-  accessCount: number;
-  lastAccessed: Date;
-  tags: string[];
+  key: string
+  value: T
+  timestamp: Date
+  expiresAt: Date
+  accessCount: number
+  lastAccessed: Date
+  tags: string[]
 }
 
 // Define CacheStats type
 export interface CacheStats {
-  totalEntries: number;
-  hitRate: number;
-  missRate: number;
-  evictionCount: number;
-  memoryUsage: number;
-  oldestEntry: Date;
-  newestEntry: Date;
-  redisHits: number;
-  redisMisses: number;
-  memoryHits: number;
-  memoryMisses: number;
+  totalEntries: number
+  hitRate: number
+  missRate: number
+  evictionCount: number
+  memoryUsage: number
+  oldestEntry: Date
+  newestEntry: Date
+  redisHits: number
+  redisMisses: number
+  memoryHits: number
+  memoryMisses: number
 }
 
 // Define BiasReport type
 export interface BiasReport {
-  reportId: string;
-  title: string;
-  description: string;
-  createdAt: Date;
-  data: Record<string, any>;
+  reportId: string
+  title: string
+  description: string
+  createdAt: Date
+  data: Record<string, any>
 }

@@ -12,7 +12,10 @@ import {
   cacheReport,
   getCachedReport,
 } from './cache'
-import { getPerformanceOptimizer, type PerformanceOptimizer } from './performance-optimizer'
+import {
+  getPerformanceOptimizer,
+  type PerformanceOptimizer,
+} from './performance-optimizer'
 import { getAuditLogger } from './audit'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import { BiasMetricsCollector } from './metrics-collector'
@@ -50,7 +53,8 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
 }
 
 function validateWeights(w: BiasLayerWeights): void {
-  const sum = w['preprocessing'] + w['modelLevel'] + w['interactive'] + w['evaluation']
+  const sum =
+    w['preprocessing'] + w['modelLevel'] + w['interactive'] + w['evaluation']
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Layer weights must sum to 1.0')
   }
@@ -74,24 +78,69 @@ export class BiasDetectionEngine {
 
   constructor(cfg: BiasDetectionConfig = {}) {
     const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
-    
+
     // Normalize threshold property names for backward compatibility
     const normalizedThresholds = {
-      warning: thresholds['warning'] ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>)['warningLevel'] : undefined) ?? DEFAULT_THRESHOLDS.warning,
-      high: thresholds['high'] ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>)['highLevel'] : undefined) ?? DEFAULT_THRESHOLDS.high,
-      critical: thresholds['critical'] ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>)['criticalLevel'] : undefined) ?? DEFAULT_THRESHOLDS.critical,
+      warning:
+        thresholds['warning'] ??
+        ('warningLevel' in thresholds
+          ? (thresholds as Record<string, number>)['warningLevel']
+          : undefined) ??
+        DEFAULT_THRESHOLDS.warning,
+      high:
+        thresholds['high'] ??
+        ('highLevel' in thresholds
+          ? (thresholds as Record<string, number>)['highLevel']
+          : undefined) ??
+        DEFAULT_THRESHOLDS.high,
+      critical:
+        thresholds['critical'] ??
+        ('criticalLevel' in thresholds
+          ? (thresholds as Record<string, number>)['criticalLevel']
+          : undefined) ??
+        DEFAULT_THRESHOLDS.critical,
     }
-    
+
     this.config = {
       pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
       pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
       thresholds: normalizedThresholds,
       layerWeights: cfg['layerWeights'] ?? DEFAULT_WEIGHTS,
-      evaluationMetrics: cfg['evaluationMetrics'] ?? ['demographic_parity', 'equalized_odds'],
-      metricsConfig: cfg['metricsConfig'] ?? { enableRealTimeMonitoring: true, metricsRetentionDays: 30, aggregationIntervals: ['1h', '1d'], dashboardRefreshRate: 60, exportFormats: ['json'] },
-      alertConfig: cfg['alertConfig'] ?? { enableSlackNotifications: false, enableEmailNotifications: false, emailRecipients: [], alertCooldownMinutes: 5, escalationThresholds: { criticalResponseTimeMinutes: 15, highResponseTimeMinutes: 30 } },
-      reportConfig: cfg['reportConfig'] ?? { includeConfidentialityAnalysis: true, includeDemographicBreakdown: true, includeTemporalTrends: true, includeRecommendations: true, reportTemplate: 'standard', exportFormats: ['json'] },
-      explanationConfig: cfg['explanationConfig'] ?? { explanationMethod: 'shap', maxFeatures: 10, includeCounterfactuals: true, generateVisualization: false },
+      evaluationMetrics: cfg['evaluationMetrics'] ?? [
+        'demographic_parity',
+        'equalized_odds',
+      ],
+      metricsConfig: cfg['metricsConfig'] ?? {
+        enableRealTimeMonitoring: true,
+        metricsRetentionDays: 30,
+        aggregationIntervals: ['1h', '1d'],
+        dashboardRefreshRate: 60,
+        exportFormats: ['json'],
+      },
+      alertConfig: cfg['alertConfig'] ?? {
+        enableSlackNotifications: false,
+        enableEmailNotifications: false,
+        emailRecipients: [],
+        alertCooldownMinutes: 5,
+        escalationThresholds: {
+          criticalResponseTimeMinutes: 15,
+          highResponseTimeMinutes: 30,
+        },
+      },
+      reportConfig: cfg['reportConfig'] ?? {
+        includeConfidentialityAnalysis: true,
+        includeDemographicBreakdown: true,
+        includeTemporalTrends: true,
+        includeRecommendations: true,
+        reportTemplate: 'standard',
+        exportFormats: ['json'],
+      },
+      explanationConfig: cfg['explanationConfig'] ?? {
+        explanationMethod: 'shap',
+        maxFeatures: 10,
+        includeCounterfactuals: true,
+        generateVisualization: false,
+      },
       pythonServiceConfig: {},
       cacheConfig: cfg['cacheConfig'] ?? {},
       batchProcessingConfig: cfg['batchProcessingConfig'] ?? {},
@@ -114,20 +163,30 @@ export class BiasDetectionEngine {
 
     this.pythonService = new PythonBiasDetectionBridge(
       this.config.pythonServiceUrl || 'http://localhost:5000',
-      this.config.pythonServiceTimeout || 30000
+      this.config.pythonServiceTimeout || 30000,
     )
-    this.metricsCollector = new BiasMetricsCollector(this.config, this.pythonService)
-    this.alertSystem = new BiasAlertSystem({
-      pythonServiceUrl: this.config.pythonServiceUrl || 'http://localhost:5000',
-      timeout: this.config.pythonServiceTimeout || 30000,
-      notifications: this.config.alertConfig?.enableSlackNotifications ? { slack: { enabled: true } } : undefined
-    }, this.pythonService)
-    
+    this.metricsCollector = new BiasMetricsCollector(
+      this.config,
+      this.pythonService,
+    )
+    this.alertSystem = new BiasAlertSystem(
+      {
+        pythonServiceUrl:
+          this.config.pythonServiceUrl || 'http://localhost:5000',
+        timeout: this.config.pythonServiceTimeout || 30000,
+        notifications: this.config.alertConfig?.enableSlackNotifications
+          ? { slack: { enabled: true } }
+          : undefined,
+      },
+      this.pythonService,
+    )
+
     // Initialize performance optimizer with engine configuration (optional for backward compatibility)
     try {
       this.performanceOptimizer = getPerformanceOptimizer({
         httpPool: {
-          maxConnections: this.config.performanceConfig?.maxConcurrentAnalyses || 10,
+          maxConnections:
+            this.config.performanceConfig?.maxConcurrentAnalyses || 10,
           connectionTimeout: this.config.pythonServiceTimeout || 30000,
         },
         batchProcessing: {
@@ -138,43 +197,75 @@ export class BiasDetectionEngine {
           enablePrioritization: true,
         },
         cache: {
-          enableCompression: this.config.cacheConfig?.compressionEnabled !== false,
-          compressionThreshold: this.config.cacheConfig?.compressionThreshold || 1024,
+          enableCompression:
+            this.config.cacheConfig?.compressionEnabled !== false,
+          compressionThreshold:
+            this.config.cacheConfig?.compressionThreshold || 1024,
           defaultTtl: (this.config.cacheConfig?.ttl || 300000) / 1000, // Convert to seconds
           maxCacheSize: this.config.cacheConfig?.maxSize || 1000,
-          enableDistributedCache: this.config.cacheConfig?.enableDistributedCache !== false,
-        }
+          enableDistributedCache:
+            this.config.cacheConfig?.enableDistributedCache !== false,
+        },
       })
     } catch (error) {
       // Fallback to null if performance optimizer fails to initialize
       this.performanceOptimizer = null
-      console.warn('Performance optimizer initialization failed, using fallback mode:', error)
+      console.warn(
+        'Performance optimizer initialization failed, using fallback mode:',
+        error,
+      )
     }
   }
 
-  private validateThresholds(thresholds: BiasThresholdsConfig): BiasThresholdsConfig {
+  private validateThresholds(
+    thresholds: BiasThresholdsConfig,
+  ): BiasThresholdsConfig {
     const validated = { ...DEFAULT_THRESHOLDS }
 
     // Handle both new and legacy property names for backward compatibility
-    validated.warning = thresholds.warning ?? ('warningLevel' in thresholds ? (thresholds as Record<string, number>)['warningLevel'] : undefined) ?? DEFAULT_THRESHOLDS.warning
-    validated.high = thresholds.high ?? ('highLevel' in thresholds ? (thresholds as Record<string, number>)['highLevel'] : undefined) ?? DEFAULT_THRESHOLDS.high
-    validated.critical = thresholds.critical ?? ('criticalLevel' in thresholds ? (thresholds as Record<string, number>)['criticalLevel'] : undefined) ?? DEFAULT_THRESHOLDS.critical
+    validated.warning =
+      thresholds.warning ??
+      ('warningLevel' in thresholds
+        ? (thresholds as Record<string, number>)['warningLevel']
+        : undefined) ??
+      DEFAULT_THRESHOLDS.warning
+    validated.high =
+      thresholds.high ??
+      ('highLevel' in thresholds
+        ? (thresholds as Record<string, number>)['highLevel']
+        : undefined) ??
+      DEFAULT_THRESHOLDS.high
+    validated.critical =
+      thresholds.critical ??
+      ('criticalLevel' in thresholds
+        ? (thresholds as Record<string, number>)['criticalLevel']
+        : undefined) ??
+      DEFAULT_THRESHOLDS.critical
 
     // Ensure thresholds are in valid range and properly ordered
-    if (validated.warning >= validated.high || validated.high >= validated.critical) {
-      throw new Error('Invalid threshold configuration: warning < high < critical required')
+    if (
+      validated.warning >= validated.high ||
+      validated.high >= validated.critical
+    ) {
+      throw new Error(
+        'Invalid threshold configuration: warning < high < critical required',
+      )
     }
 
     return validated
   }
 
-  getInitializationStatus() { return this.initialized }
+  getInitializationStatus() {
+    return this.initialized
+  }
 
-  public get isMonitoring(): boolean { return this._isMonitoring }
+  public get isMonitoring(): boolean {
+    return this._isMonitoring
+  }
 
   async initialize() {
-  // Be tolerant of mocks that don't provide initialize
-  await this.pythonService.initialize?.()
+    // Be tolerant of mocks that don't provide initialize
+    await this.pythonService.initialize?.()
     await this.alertSystem.initialize?.()
     this.initialized = true
   }
@@ -203,29 +294,46 @@ export class BiasDetectionEngine {
 
   private computeAlertLevel(score: number): AlertLevel {
     const t = this.config['thresholds']
-    if (score >= t['critical']) { return 'critical' }
-    if (score >= t['high']) { return 'high' }
-    if (score >= t['warning']) { return 'medium' }
+    if (score >= t['critical']) {
+      return 'critical'
+    }
+    if (score >= t['high']) {
+      return 'high'
+    }
+    if (score >= t['warning']) {
+      return 'medium'
+    }
     return 'low'
   }
 
-  private maskDemographics(input?: Record<string, unknown>): Record<string, unknown> | undefined {
-    if (!input) { return undefined }
-    if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) { return input }
+  private maskDemographics(
+    input?: Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
+    if (!input) {
+      return undefined
+    }
+    if (!this.config['hipaaCompliant'] && !this.config['dataMaskingEnabled']) {
+      return input
+    }
     // Drop known PII-looking fields; keep coarse fields
-    const { social_security: _social_security, phone_number: _phone_number, email: _email, ...rest } = input
+    const {
+      social_security: _social_security,
+      phone_number: _phone_number,
+      email: _email,
+      ...rest
+    } = input
     return rest
   }
 
   private weightedAverage(results: LayerResults): number {
     const w = this.config['layerWeights']
-    
+
     // Safely access bias scores with fallback values
     const preprocessingScore = results['preprocessing']?.biasScore ?? 0.5
     const modelLevelScore = results['modelLevel']?.biasScore ?? 0.5
     const interactiveScore = results['interactive']?.biasScore ?? 0.5
     const evaluationScore = results['evaluation']?.biasScore ?? 0.5
-    
+
     return (
       preprocessingScore * w['preprocessing'] +
       modelLevelScore * w['modelLevel'] +
@@ -236,9 +344,15 @@ export class BiasDetectionEngine {
 
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
     this.ensureInitialized()
-    if (!session) { throw new Error('Session data is required') }
-    if (session.sessionId === undefined) { throw new Error('Session ID is required') }
-    if (session.sessionId === '') { throw new Error('Session ID cannot be empty') }
+    if (!session) {
+      throw new Error('Session data is required')
+    }
+    if (session.sessionId === undefined) {
+      throw new Error('Session ID is required')
+    }
+    if (session.sessionId === '') {
+      throw new Error('Session ID cannot be empty')
+    }
 
     let preprocessing: import('./types').PreprocessingAnalysisResult
     let modelLevel: import('./types').ModelLevelAnalysisResult
@@ -386,27 +500,30 @@ export class BiasDetectionEngine {
       layerResults.modelLevel,
       layerResults.interactive,
       layerResults.evaluation,
-    ].some((r) => r && 'fallback' in r && (r as { fallback: boolean }).fallback === true)
+    ].some(
+      (r) =>
+        r && 'fallback' in r && (r as { fallback: boolean }).fallback === true,
+    )
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
-    let recommendations: string[];
+    let recommendations: string[]
     if (recs.length || anyFallback) {
-      const messages: string[] = [...recs];
+      const messages: string[] = [...recs]
       // If any fallback or service failure, ensure "Incomplete analysis..." appears at least once
       if (
         messages.some((rec) =>
-          /(unavailable|fallback|service error|fail|incomplete)/i.test(rec)
-        ) || anyFallback
+          /(unavailable|fallback|service error|fail|incomplete)/i.test(rec),
+        ) ||
+        anyFallback
       ) {
-        messages.push('Incomplete analysis due to service issues.');
+        messages.push('Incomplete analysis due to service issues.')
       }
       // Add limited analysis statement for all tool failures
-      messages.push('Limited analysis available. Results may be incomplete.');
-      recommendations = messages;
+      messages.push('Limited analysis available. Results may be incomplete.')
+      recommendations = messages
     } else {
-      recommendations = ['System performing within acceptable parameters'];
+      recommendations = ['System performing within acceptable parameters']
     }
-
 
     // Trigger monitoring callbacks for high/critical alerts
     if (alertLevel === 'high' || alertLevel === 'critical') {
@@ -427,14 +544,25 @@ export class BiasDetectionEngine {
       layerResults,
       recommendations,
       confidence,
-      demographics: maskedDemo && typeof maskedDemo === 'object'
-        ? {
-            age: (maskedDemo as Record<string, unknown>)['age'] as string ?? '',
-            gender: (maskedDemo as Record<string, unknown>)['gender'] as string ?? '',
-            ethnicity: (maskedDemo as Record<string, unknown>)['ethnicity'] as string ?? '',
-            primaryLanguage: (maskedDemo as Record<string, unknown>)['primaryLanguage'] as string ?? '',
-          }
-        : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
+      demographics:
+        maskedDemo && typeof maskedDemo === 'object'
+          ? {
+              age:
+                ((maskedDemo as Record<string, unknown>)['age'] as string) ??
+                '',
+              gender:
+                ((maskedDemo as Record<string, unknown>)['gender'] as string) ??
+                '',
+              ethnicity:
+                ((maskedDemo as Record<string, unknown>)[
+                  'ethnicity'
+                ] as string) ?? '',
+              primaryLanguage:
+                ((maskedDemo as Record<string, unknown>)[
+                  'primaryLanguage'
+                ] as string) ?? '',
+            }
+          : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
     }
 
     // Only collect metrics when auditLogging is turned OFF (per tests)
@@ -447,44 +575,64 @@ export class BiasDetectionEngine {
     }
 
     // Store result in distributed cache for future retrieval
-    await cacheAnalysisResult(session.sessionId, result as unknown as import('./types').BiasAnalysisResult)
+    await cacheAnalysisResult(
+      session.sessionId,
+      result as unknown as import('./types').BiasAnalysisResult,
+    )
 
     // Patch: Create HIPAA-compliant audit log if enabled (call audit.ts API)
     if (this.config.auditLogging) {
-      const auditLogger = getAuditLogger();
+      const auditLogger = getAuditLogger()
       // Build UserContext from session or fallback
       const user: import('./types').UserContext = {
         userId: (session as any).userId || '',
         email: (session as any).userEmail || '',
-        role: (session as any).userRole || { id: '', name: 'analyst', description: '', level: 1 },
+        role: (session as any).userRole || {
+          id: '',
+          name: 'analyst',
+          description: '',
+          level: 1,
+        },
         permissions: (session as any).userPermissions || [],
         institution: (session as any).userInstitution,
         department: (session as any).userDepartment,
-      };
+      }
       // Build request meta from session or fallback
-      const request = (session as any).requestMeta || { ipAddress: '', userAgent: '' };
+      const request = (session as any).requestMeta || {
+        ipAddress: '',
+        userAgent: '',
+      }
       // Ensure demographics is of type ParticipantDemographics
       const demographics: import('./types').ParticipantDemographics = {
         age: (maskedDemo as any)?.age ?? '',
         gender: (maskedDemo as any)?.gender ?? '',
         ethnicity: (maskedDemo as any)?.ethnicity ?? '',
         primaryLanguage: (maskedDemo as any)?.primaryLanguage ?? '',
-      };
+      }
       await auditLogger.logBiasAnalysis(
         user,
         session.sessionId,
         demographics,
         overallBiasScore,
         alertLevel,
-        request
-      );
+        request,
+      )
     }
 
     return result
   }
-  
+
   // Lightweight metrics pass-through for performance tests
-  async getMetrics(_opts?: unknown): Promise<{ totalAnalyses: number; averageBiasScore: number; alertDistribution: { low: number; medium: number; high: number; critical: number; } }> {
+  async getMetrics(_opts?: unknown): Promise<{
+    totalAnalyses: number
+    averageBiasScore: number
+    alertDistribution: {
+      low: number
+      medium: number
+      high: number
+      critical: number
+    }
+  }> {
     this.ensureInitialized()
     const dashboardMetrics = await this.metricsCollector.getMetrics?.()
     if (dashboardMetrics && dashboardMetrics.overall_stats) {
@@ -495,19 +643,22 @@ export class BiasDetectionEngine {
           low: dashboardMetrics.overall_stats.alert_distribution.low || 0,
           medium: dashboardMetrics.overall_stats.alert_distribution.medium || 0,
           high: dashboardMetrics.overall_stats.alert_distribution.high || 0,
-          critical: dashboardMetrics.overall_stats.alert_distribution.critical || 0,
-        }
+          critical:
+            dashboardMetrics.overall_stats.alert_distribution.critical || 0,
+        },
       }
     }
     return {
       totalAnalyses: 0,
       averageBiasScore: 0,
-      alertDistribution: { low: 0, medium: 0, high: 0, critical: 0 }
+      alertDistribution: { low: 0, medium: 0, high: 0, critical: 0 },
     }
   }
 
   // Fast cached lookup used by performance tests
-  async getSessionAnalysis(sessionId: string): Promise<import('./types').BiasAnalysisResult | null> {
+  async getSessionAnalysis(
+    sessionId: string,
+  ): Promise<import('./types').BiasAnalysisResult | null> {
     this.ensureInitialized()
     // Use distributed cache, not local sessionCache
     return await getCachedAnalysisResult(sessionId)
@@ -527,7 +678,10 @@ export class BiasDetectionEngine {
       overallBiasScore: analysis.overallBiasScore,
       alertLevel: analysis.alertLevel,
       highlights: Object.entries(analysis.layerResults)
-        .map(([name, layer]) => ({ layer: name, biasScore: (layer as any).biasScore }))
+        .map(([name, layer]) => ({
+          layer: name,
+          biasScore: (layer as any).biasScore,
+        }))
         .sort((a, b) => b.biasScore - a.biasScore)
         .slice(0, 3),
       confidence: analysis.confidence,
@@ -535,7 +689,9 @@ export class BiasDetectionEngine {
   }
 
   // Update thresholds with validation
-  async updateThresholds(thresholds: BiasThresholdsConfig): Promise<BiasThresholdsConfig> {
+  async updateThresholds(
+    thresholds: BiasThresholdsConfig,
+  ): Promise<BiasThresholdsConfig> {
     this.config.thresholds = this.validateThresholds(thresholds)
     return this.config.thresholds
   }
@@ -548,17 +704,22 @@ export class BiasDetectionEngine {
   ) {
     this.ensureInitialized()
     // Create a cache key based on session IDs and report parameters
-    const reportKey = `report:${sessions.map(s => s.sessionId).join(',')}:${_range?.start?.toISOString() ?? ''}:${_range?.end?.toISOString() ?? ''}:${_opts?.format ?? 'json'}`
+    const reportKey = `report:${sessions.map((s) => s.sessionId).join(',')}:${_range?.start?.toISOString() ?? ''}:${_range?.end?.toISOString() ?? ''}:${_opts?.format ?? 'json'}`
     const cachedReport = await getCachedReport(reportKey)
     if (cachedReport) {
       return cachedReport
     }
     const results = await Promise.all(
-      sessions.map((s) => getCachedAnalysisResult(s.sessionId) ?? this.analyzeSession(s)),
+      sessions.map(
+        (s) => getCachedAnalysisResult(s.sessionId) ?? this.analyzeSession(s),
+      ),
     )
     const averageBias =
       results.length > 0
-        ? results.filter(Boolean).reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) / results.filter(Boolean).length
+        ? results
+            .filter(Boolean)
+            .reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) /
+          results.filter(Boolean).length
         : 0
     const perf = await this.metricsCollector.getCurrentPerformanceMetrics?.()
     const report = {
@@ -567,10 +728,13 @@ export class BiasDetectionEngine {
         averageBiasScore: averageBias,
       },
       performance: perf ?? {},
-      alerts: results.filter(Boolean).reduce(
-        (acc, r) => r ? ({ ...acc, [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1 }) : acc,
-        {} as Record<string, number>,
-      ),
+      alerts: results
+        .filter(Boolean)
+        .reduce(
+          (acc, r) =>
+            r ? { ...acc, [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1 } : acc,
+          {} as Record<string, number>,
+        ),
     }
     await cacheReport(reportKey, {
       ...report,
@@ -631,7 +795,9 @@ export class BiasDetectionEngine {
     })
     return report
   }
-  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
+  async getDashboardData(
+    _opts: { timeRange?: string; includeDetails?: boolean } = {},
+  ): Promise<{
     summary: {
       totalSessions: number
       averageBiasScore: number
@@ -643,7 +809,10 @@ export class BiasDetectionEngine {
     recentAnalyses: any[]
     alerts: any[]
     trends: any[]
-    demographics: { age: Record<string, number>; gender: Record<string, number> }
+    demographics: {
+      age: Record<string, number>
+      gender: Record<string, number>
+    }
     recommendations: any[]
   }> {
     const dashboardMetrics = await this.metricsCollector.getDashboardData()
@@ -651,9 +820,11 @@ export class BiasDetectionEngine {
       return {
         summary: {
           totalSessions: dashboardMetrics.overall_stats?.total_sessions || 0,
-          averageBiasScore: dashboardMetrics.overall_stats?.average_bias_score || 0,
+          averageBiasScore:
+            dashboardMetrics.overall_stats?.average_bias_score || 0,
           alertsLast24h: dashboardMetrics.recent_alerts?.length || 0,
-          criticalIssues: dashboardMetrics.overall_stats?.alert_distribution?.critical || 0,
+          criticalIssues:
+            dashboardMetrics.overall_stats?.alert_distribution?.critical || 0,
           improvementRate: 0, // Not available in DashboardMetrics
           complianceScore: 0, // Not available in DashboardMetrics
         },
@@ -681,10 +852,12 @@ export class BiasDetectionEngine {
     }
   }
 
-  async startMonitoring(callback: (alert: { level: AlertLevel; sessionId: string }) => void) {
+  async startMonitoring(
+    callback: (alert: { level: AlertLevel; sessionId: string }) => void,
+  ) {
     this.ensureInitialized()
     this._isMonitoring = true
-  this.monitoringCallbacks.push(callback)
+    this.monitoringCallbacks.push(callback)
     // Adapt callback type expected by alert system
     this.alertSystem.addMonitoringCallback?.((a: unknown) => {
       if (
@@ -702,193 +875,245 @@ export class BiasDetectionEngine {
 
   async stopMonitoring() {
     this._isMonitoring = false
-  this.monitoringCallbacks = []
+    this.monitoringCallbacks = []
   }
-async dispose() {
-  try { await this.metricsCollector.dispose?.() } catch { /* swallow */ }
-  try { await this.alertSystem.dispose?.() } catch { /* swallow */ }
-  try { 
+  async dispose() {
+    try {
+      await this.metricsCollector.dispose?.()
+    } catch {
+      /* swallow */
+    }
+    try {
+      await this.alertSystem.dispose?.()
+    } catch {
+      /* swallow */
+    }
+    try {
+      if (this.performanceOptimizer) {
+        await this.performanceOptimizer.dispose()
+      }
+    } catch {
+      /* swallow */
+    }
+  }
+  // Expose cache statistics for monitoring
+  getCacheStats() {
+    return getCacheManager().getCombinedStats()
+  }
+
+  /**
+   * Get comprehensive performance statistics including connection pools, cache, and memory usage
+   */
+  async getPerformanceStats() {
+    this.ensureInitialized()
+
     if (this.performanceOptimizer) {
-      await this.performanceOptimizer.dispose() 
+      return await this.performanceOptimizer.getPerformanceStats()
     }
-  } catch { /* swallow */ }
-}
-// Expose cache statistics for monitoring
-getCacheStats() {
-  return getCacheManager().getCombinedStats();
-}
 
-/**
- * Get comprehensive performance statistics including connection pools, cache, and memory usage
- */
-async getPerformanceStats() {
-  this.ensureInitialized()
-  
-  if (this.performanceOptimizer) {
-    return await this.performanceOptimizer.getPerformanceStats()
-  }
-  
-  // Fallback performance stats
-  return {
-    connections: { http: { total: 0, active: 0, idle: 0, queue: 0 }, redis: { total: 0, active: 0, idle: 0 } },
-    cache: { hitRate: 0, missRate: 0, size: 0, memoryUsage: 0, compressionRatio: 0 },
-    batch: { activeJobs: 0, completedJobs: 0, failedJobs: 0, averageProcessingTime: 0 },
-    memory: { heapUsed: process.memoryUsage().heapUsed, heapTotal: process.memoryUsage().heapTotal, external: process.memoryUsage().external, rss: process.memoryUsage().rss, gcCount: 0 },
-    performance: { averageResponseTime: 0, throughput: 0, errorRate: 0, slowQueries: 0 }
-  }
-}
-
-/**
- * Health check for all performance-critical components
- */
-async getHealthStatus() {
-  this.ensureInitialized()
-  
-  let performanceHealth = { healthy: true, components: {} }
-  
-  if (this.performanceOptimizer) {
-    performanceHealth = await this.performanceOptimizer.healthCheck()
-  }
-  
-  const pythonServiceHealth = await this.pythonService.checkHealth?.()
-  
-  return {
-    overall: performanceHealth.healthy && (pythonServiceHealth?.status === 'healthy'),
-    components: {
-      ...performanceHealth.components,
-      pythonService: pythonServiceHealth?.status === 'healthy',
-      engine: this.initialized,
-      monitoring: this._isMonitoring,
-      performanceOptimizer: this.performanceOptimizer !== null
-    },
-    performance: await this.getPerformanceStats()
-  }
-}
-
-/**
- * Add a session analysis to the background job queue for processing
- */
-async queueSessionAnalysis(
-  session: SessionData,
-  priority: 'low' | 'medium' | 'high' = 'medium'
-): Promise<string> {
-  this.ensureInitialized()
-  
-  if (this.performanceOptimizer) {
-    const priorityMap = { low: 1, medium: 5, high: 10 }
-    
-    return await this.performanceOptimizer.addBackgroundJob(
-      'session-analysis',
-      session,
-      {
-        priority: priorityMap[priority],
-        timeout: this.config.pythonServiceTimeout || 30000,
-        maxAttempts: 3
-      }
-    )
-  }
-  
-  // Fallback: process immediately if no background job queue
-  const result = await this.analyzeSession(session)
-  return `immediate_${result.sessionId}_${Date.now()}`
-}
-
-/**
- * Batch analyze multiple sessions with optimized performance and concurrency control.
- * Uses the performance optimizer for intelligent batching and resource management.
- */
-async batchAnalyzeSessions(
-  sessions: SessionData[],
-  options: {
-    concurrency?: number
-    batchSize?: number
-    onProgress?: (progress: { completed: number; total: number }) => void
-    onError?: (error: Error, session: SessionData) => void
-    retries?: number
-    timeoutMs?: number
-    logProgress?: boolean
-    logErrors?: boolean
-    priority?: 'low' | 'medium' | 'high'
-  } = {}
-): Promise<{ results: AnalysisResult[]; errors: { session: SessionData; error: Error }[]; metrics: { completed: number; total: number; errorCount: number } }> {
-  this.ensureInitialized()
-  
-  const startTime = Date.now()
-  
-  // Use performance optimizer for batch processing if available, otherwise fallback to original implementation
-  let analysisResults: AnalysisResult[]
-  let errors: { session: SessionData; error: Error }[]
-  
-  if (this.performanceOptimizer) {
-    const result = await this.performanceOptimizer.processBatch(
-      sessions,
-      async (session: SessionData) => {
-        return await this.analyzeSession(session)
+    // Fallback performance stats
+    return {
+      connections: {
+        http: { total: 0, active: 0, idle: 0, queue: 0 },
+        redis: { total: 0, active: 0, idle: 0 },
       },
-      {
-        batchSize: options.batchSize,
-        concurrency: options.concurrency,
-        timeout: options.timeoutMs,
-        retries: options.retries,
-        priority: options.priority,
-        onProgress: options.onProgress
-          ? (completed, total) => options.onProgress!({ completed, total })
-          : undefined,
-        onError: options.onError
-          ? (error, item) => options.onError!(error, item as SessionData)
-          : undefined,
-      }
-    )
-    analysisResults = result.results
-    errors = result.errors.map(({ item, error }) => ({ session: item as SessionData, error }))
-  } else {
-    // Fallback to original batch processing implementation
-    analysisResults = []
-    errors = []
-    
-    for (const session of sessions) {
-      try {
-        const result = await this.analyzeSession(session)
-        analysisResults.push(result)
-        if (options.onProgress) {
-          options.onProgress({ completed: analysisResults.length, total: sessions.length })
-        }
-      } catch (error) {
-        const err = { session, error: error as Error }
-        errors.push(err)
-        if (options.onError) {
-          options.onError(error as Error, session)
+      cache: {
+        hitRate: 0,
+        missRate: 0,
+        size: 0,
+        memoryUsage: 0,
+        compressionRatio: 0,
+      },
+      batch: {
+        activeJobs: 0,
+        completedJobs: 0,
+        failedJobs: 0,
+        averageProcessingTime: 0,
+      },
+      memory: {
+        heapUsed: process.memoryUsage().heapUsed,
+        heapTotal: process.memoryUsage().heapTotal,
+        external: process.memoryUsage().external,
+        rss: process.memoryUsage().rss,
+        gcCount: 0,
+      },
+      performance: {
+        averageResponseTime: 0,
+        throughput: 0,
+        errorRate: 0,
+        slowQueries: 0,
+      },
+    }
+  }
+
+  /**
+   * Health check for all performance-critical components
+   */
+  async getHealthStatus() {
+    this.ensureInitialized()
+
+    let performanceHealth = { healthy: true, components: {} }
+
+    if (this.performanceOptimizer) {
+      performanceHealth = await this.performanceOptimizer.healthCheck()
+    }
+
+    const pythonServiceHealth = await this.pythonService.checkHealth?.()
+
+    return {
+      overall:
+        performanceHealth.healthy && pythonServiceHealth?.status === 'healthy',
+      components: {
+        ...performanceHealth.components,
+        pythonService: pythonServiceHealth?.status === 'healthy',
+        engine: this.initialized,
+        monitoring: this._isMonitoring,
+        performanceOptimizer: this.performanceOptimizer !== null,
+      },
+      performance: await this.getPerformanceStats(),
+    }
+  }
+
+  /**
+   * Add a session analysis to the background job queue for processing
+   */
+  async queueSessionAnalysis(
+    session: SessionData,
+    priority: 'low' | 'medium' | 'high' = 'medium',
+  ): Promise<string> {
+    this.ensureInitialized()
+
+    if (this.performanceOptimizer) {
+      const priorityMap = { low: 1, medium: 5, high: 10 }
+
+      return await this.performanceOptimizer.addBackgroundJob(
+        'session-analysis',
+        session,
+        {
+          priority: priorityMap[priority],
+          timeout: this.config.pythonServiceTimeout || 30000,
+          maxAttempts: 3,
+        },
+      )
+    }
+
+    // Fallback: process immediately if no background job queue
+    const result = await this.analyzeSession(session)
+    return `immediate_${result.sessionId}_${Date.now()}`
+  }
+
+  /**
+   * Batch analyze multiple sessions with optimized performance and concurrency control.
+   * Uses the performance optimizer for intelligent batching and resource management.
+   */
+  async batchAnalyzeSessions(
+    sessions: SessionData[],
+    options: {
+      concurrency?: number
+      batchSize?: number
+      onProgress?: (progress: { completed: number; total: number }) => void
+      onError?: (error: Error, session: SessionData) => void
+      retries?: number
+      timeoutMs?: number
+      logProgress?: boolean
+      logErrors?: boolean
+      priority?: 'low' | 'medium' | 'high'
+    } = {},
+  ): Promise<{
+    results: AnalysisResult[]
+    errors: { session: SessionData; error: Error }[]
+    metrics: { completed: number; total: number; errorCount: number }
+  }> {
+    this.ensureInitialized()
+
+    const startTime = Date.now()
+
+    // Use performance optimizer for batch processing if available, otherwise fallback to original implementation
+    let analysisResults: AnalysisResult[]
+    let errors: { session: SessionData; error: Error }[]
+
+    if (this.performanceOptimizer) {
+      const result = await this.performanceOptimizer.processBatch(
+        sessions,
+        async (session: SessionData) => {
+          return await this.analyzeSession(session)
+        },
+        {
+          batchSize: options.batchSize,
+          concurrency: options.concurrency,
+          timeout: options.timeoutMs,
+          retries: options.retries,
+          priority: options.priority,
+          onProgress: options.onProgress
+            ? (completed, total) => options.onProgress!({ completed, total })
+            : undefined,
+          onError: options.onError
+            ? (error, item) => options.onError!(error, item as SessionData)
+            : undefined,
+        },
+      )
+      analysisResults = result.results
+      errors = result.errors.map(({ item, error }) => ({
+        session: item as SessionData,
+        error,
+      }))
+    } else {
+      // Fallback to original batch processing implementation
+      analysisResults = []
+      errors = []
+
+      for (const session of sessions) {
+        try {
+          const result = await this.analyzeSession(session)
+          analysisResults.push(result)
+          if (options.onProgress) {
+            options.onProgress({
+              completed: analysisResults.length,
+              total: sessions.length,
+            })
+          }
+        } catch (error) {
+          const err = { session, error: error as Error }
+          errors.push(err)
+          if (options.onError) {
+            options.onError(error as Error, session)
+          }
         }
       }
     }
-  }
-  
-  const processingTime = Date.now() - startTime
-  
-  // Log performance metrics
-  if (options.logProgress !== false) {
-    console.log(`[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`)
-    console.log(`[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`)
-  }
-  
-  if (options.logErrors !== false && errors.length > 0) {
-    errors.forEach(({ session, error }) => {
-      console.error(`[BatchError] Session ${session.sessionId}: ${error.message}`)
-    })
-  }
-  
-  // Store batch processing metrics
-  // Note: recordAnalysis expects individual analysis results, not batch metrics
-  // await this.metricsCollector.recordAnalysis?.()
-  
-  return {
-    results: analysisResults,
-    errors,
-    metrics: {
-      completed: analysisResults.length,
-      total: sessions.length,
-      errorCount: errors.length
+
+    const processingTime = Date.now() - startTime
+
+    // Log performance metrics
+    if (options.logProgress !== false) {
+      console.log(
+        `[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`,
+      )
+      console.log(
+        `[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`,
+      )
+    }
+
+    if (options.logErrors !== false && errors.length > 0) {
+      errors.forEach(({ session, error }) => {
+        console.error(
+          `[BatchError] Session ${session.sessionId}: ${error.message}`,
+        )
+      })
+    }
+
+    // Store batch processing metrics
+    // Note: recordAnalysis expects individual analysis results, not batch metrics
+    // await this.metricsCollector.recordAnalysis?.()
+
+    return {
+      results: analysisResults,
+      errors,
+      metrics: {
+        completed: analysisResults.length,
+        total: sessions.length,
+        errorCount: errors.length,
+      },
     }
   }
-}
 }

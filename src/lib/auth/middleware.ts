@@ -135,9 +135,7 @@ export async function rateLimitMiddleware(
 /**
  * CSRF protection middleware
  */
-export async function csrfProtection(
-  request: Request,
-): Promise<{
+export async function csrfProtection(request: Request): Promise<{
   success: boolean
   request?: Request
   response?: Response
@@ -247,9 +245,7 @@ export interface AuthenticatedRequest extends Request {
 /**
  * Authenticate request middleware
  */
-export async function authenticateRequest(
-  request: Request,
-): Promise<{
+export async function authenticateRequest(request: Request): Promise<{
   success: boolean
   request?: AuthenticatedRequest
   response?: Response

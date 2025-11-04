@@ -85,35 +85,45 @@ interface MonitoringCallbackData {
  * Production alert system that connects to Python Flask service
  * Handles real-time alerts, notifications, and escalation
  */
-type AlertLike = AlertInstance | _AlertData;
+type AlertLike = AlertInstance | _AlertData
 
 function alertDataToInstance(a: AlertLike): AlertInstance {
   return {
     id:
       'id' in a && typeof a.id === 'string'
         ? a.id
-        : 'alertId' in a && typeof (a as { alertId?: string }).alertId === 'string'
-        ? (a as { alertId: string }).alertId
-        : a.sessionId ?? 'external-alert-' + (a.timestamp || Date.now()),
+        : 'alertId' in a &&
+            typeof (a as { alertId?: string }).alertId === 'string'
+          ? (a as { alertId: string }).alertId
+          : (a.sessionId ?? 'external-alert-' + (a.timestamp || Date.now())),
     timestamp: a.timestamp ? new Date(a.timestamp) : new Date(),
     level:
       'level' in a && typeof a.level === 'string'
-        ? a.level as AlertLevel
-        : 'alertLevel' in a && typeof (a as { alertLevel?: string }).alertLevel === 'string'
-        ? (a as { alertLevel: AlertLevel }).alertLevel
-        : 'medium',
+        ? (a.level as AlertLevel)
+        : 'alertLevel' in a &&
+            typeof (a as { alertLevel?: string }).alertLevel === 'string'
+          ? (a as { alertLevel: AlertLevel }).alertLevel
+          : 'medium',
     sessionId: a.sessionId ?? 'unknown',
     message: a.message ?? '',
-    acknowledged: 'acknowledged' in a && typeof (a as { acknowledged?: boolean }).acknowledged === 'boolean'
-      ? (a as { acknowledged: boolean }).acknowledged
-      : false,
-    escalated: 'escalated' in a && typeof (a as { escalated?: boolean }).escalated === 'boolean'
-      ? (a as { escalated: boolean }).escalated
-      : false,
-    biasScore: 'biasScore' in a ? (a as { biasScore?: number }).biasScore : undefined,
-    recipients: 'recipients' in a ? (a as { recipients?: string[] }).recipients : undefined,
+    acknowledged:
+      'acknowledged' in a &&
+      typeof (a as { acknowledged?: boolean }).acknowledged === 'boolean'
+        ? (a as { acknowledged: boolean }).acknowledged
+        : false,
+    escalated:
+      'escalated' in a &&
+      typeof (a as { escalated?: boolean }).escalated === 'boolean'
+        ? (a as { escalated: boolean }).escalated
+        : false,
+    biasScore:
+      'biasScore' in a ? (a as { biasScore?: number }).biasScore : undefined,
+    recipients:
+      'recipients' in a
+        ? (a as { recipients?: string[] }).recipients
+        : undefined,
     ruleId: 'ruleId' in a ? (a as { ruleId?: string }).ruleId : undefined,
-  };
+  }
 }
 
 // --- REMOVE any duplicate AlertLike type or alertDataToInstance function from inside BiasAlertSystem class below this line ---
@@ -497,9 +507,17 @@ export class BiasAlertSystem {
             const sensitivityValues = Object.values(
               feature.demographicSensitivity,
             )
-            const numericSensitivities = sensitivityValues.map(v => typeof v === 'number' ? v : Number(v)).filter(n => !Number.isNaN(n))
-            const maxSensitivity = numericSensitivities.length > 0 ? Math.max(...numericSensitivities) : 0
-            const minSensitivity = numericSensitivities.length > 0 ? Math.min(...numericSensitivities) : 0
+            const numericSensitivities = sensitivityValues
+              .map((v) => (typeof v === 'number' ? v : Number(v)))
+              .filter((n) => !Number.isNaN(n))
+            const maxSensitivity =
+              numericSensitivities.length > 0
+                ? Math.max(...numericSensitivities)
+                : 0
+            const minSensitivity =
+              numericSensitivities.length > 0
+                ? Math.min(...numericSensitivities)
+                : 0
             const sensitivityDisparity = maxSensitivity - minSensitivity
 
             if (sensitivityDisparity > 0.3) {
@@ -718,7 +736,10 @@ export class BiasAlertSystem {
     const alerts: AlertInstance[] = []
     for (const rule of this.alertRules) {
       try {
-        if (rule.condition.length === 0 && rule.condition(null as unknown as BiasAnalysisResult)) {
+        if (
+          rule.condition.length === 0 &&
+          rule.condition(null as unknown as BiasAnalysisResult)
+        ) {
           const alert = {
             id: `${rule.id}-${Date.now()}`,
             timestamp: new Date(),
@@ -797,7 +818,7 @@ export class BiasAlertSystem {
     const callbackData = {
       alerts,
       sessionId: result.sessionId,
-  timestamp: (result as any)?.timestamp ?? new Date().toISOString(),
+      timestamp: (result as any)?.timestamp ?? new Date().toISOString(),
       overallBiasScore: result.overallBiasScore,
       alertLevel: result.alertLevel,
       recommendations: result.recommendations,
@@ -904,7 +925,9 @@ export class BiasAlertSystem {
     })
   }
 
-  removeMonitoringCallback(callback: (data: MonitoringCallbackData) => void): void {
+  removeMonitoringCallback(
+    callback: (data: MonitoringCallbackData) => void,
+  ): void {
     const index = this.monitoringCallbacks.indexOf(callback)
     if (index > -1) {
       this.monitoringCallbacks.splice(index, 1)
@@ -914,22 +937,23 @@ export class BiasAlertSystem {
     }
   }
 
-
   async getActiveAlerts(): Promise<AlertInstance[]> {
     try {
       // Get alerts from Python service
-      const serverAlerts = await this.pythonBridge.getActiveAlerts();
+      const serverAlerts = await this.pythonBridge.getActiveAlerts()
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const serverInstances: AlertInstance[] = (serverAlerts || []).map(alertDataToInstance);
+      const serverInstances: AlertInstance[] = (serverAlerts || []).map(
+        alertDataToInstance,
+      )
 
       // Combine with local queue
-      const localActive = this.alertQueue.filter((alert) => !alert.acknowledged);
+      const localActive = this.alertQueue.filter((alert) => !alert.acknowledged)
 
-      return [...serverInstances, ...localActive];
+      return [...serverInstances, ...localActive]
     } catch (error: unknown) {
-      logger.error('Failed to fetch active alerts', { error });
-      return this.alertQueue.filter((alert) => !alert.acknowledged);
+      logger.error('Failed to fetch active alerts', { error })
+      return this.alertQueue.filter((alert) => !alert.acknowledged)
     }
   }
 
@@ -981,23 +1005,27 @@ export class BiasAlertSystem {
     }
   }
 
-  async getRecentAlerts(timeRangeMs: number = 86400000): Promise<AlertInstance[]> {
+  async getRecentAlerts(
+    timeRangeMs: number = 86400000,
+  ): Promise<AlertInstance[]> {
     try {
       const response = await this.pythonBridge.getRecentAlerts({
         start: new Date(Date.now() - timeRangeMs).toISOString(),
         end: new Date().toISOString(),
-      });
+      })
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const recentInstances: AlertInstance[] = (response || []).map(alertDataToInstance);
+      const recentInstances: AlertInstance[] = (response || []).map(
+        alertDataToInstance,
+      )
 
-      return recentInstances;
+      return recentInstances
     } catch (error: unknown) {
-      logger.error('Failed to fetch recent alerts', { error });
+      logger.error('Failed to fetch recent alerts', { error })
 
       // Fallback to local alerts
-      const cutoffTime = new Date(Date.now() - timeRangeMs);
-      return this.alertQueue.filter((alert) => alert.timestamp >= cutoffTime);
+      const cutoffTime = new Date(Date.now() - timeRangeMs)
+      return this.alertQueue.filter((alert) => alert.timestamp >= cutoffTime)
     }
   }
 

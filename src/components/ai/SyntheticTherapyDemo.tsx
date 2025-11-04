@@ -106,20 +106,22 @@ export default function SyntheticTherapyDemo() {
           clientProfile: {
             disorders: config.disorders,
             sessionNumber: getSecureRandomInt(1, 10),
-            presenting_concerns: config.disorders.map(d => `Primary concern related to ${d}`),
+            presenting_concerns: config.disorders.map(
+              (d) => `Primary concern related to ${d}`,
+            ),
             demographics: {
               age: getSecureRandomInt(20, 59),
-              gender: getSecureRandomBoolean() ? 'female' : 'male'
-            }
+              gender: getSecureRandomBoolean() ? 'female' : 'male',
+            },
           },
           therapeuticFramework: 'CBT', // Default to CBT
           options: {
             includeSymptoms: true,
             includeAnalysis: true,
             realistic: true,
-            evidenceBased: true
-          }
-        })
+            evidenceBased: true,
+          },
+        }),
       })
 
       if (!response.ok) {
@@ -129,32 +131,37 @@ export default function SyntheticTherapyDemo() {
       const scenarioResult = await response.json()
 
       // Transform API response to match our conversation format
-      const apiConversations: SyntheticConversation[] = [{
-        patientText: scenarioResult.scenario.clientStatement,
-        therapistText: scenarioResult.scenario.therapistResponse,
-        encodedSymptoms: scenarioResult.scenario.symptoms.map((symptom: unknown) => ({
-          // @ts-expect-error: type from API
-          name: symptom.name,
-          // @ts-expect-error: type from API
-          severity: symptom.severity / 10, // Convert 1-10 to 0-1
-          // @ts-expect-error: type from API
-          duration: symptom.duration,
-          // @ts-expect-error: type from API
-          manifestations: symptom.indicators,
-          // @ts-expect-error: type from API
-          cognitions: symptom.cognitivePatterns || []
-        })),
-        decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map((symptom: unknown) =>
-          // @ts-expect-error: type from API
-          symptom.name
-        ),
-        sessionSummary: scenarioResult.analysis.clinicalSummary,
-        accuracyScore: scenarioResult.analysis.accuracyScore || 0.8
-      }]
+      const apiConversations: SyntheticConversation[] = [
+        {
+          patientText: scenarioResult.scenario.clientStatement,
+          therapistText: scenarioResult.scenario.therapistResponse,
+          encodedSymptoms: scenarioResult.scenario.symptoms.map(
+            (symptom: unknown) => ({
+              // @ts-expect-error: type from API
+              name: symptom.name,
+              // @ts-expect-error: type from API
+              severity: symptom.severity / 10, // Convert 1-10 to 0-1
+              // @ts-expect-error: type from API
+              duration: symptom.duration,
+              // @ts-expect-error: type from API
+              manifestations: symptom.indicators,
+              // @ts-expect-error: type from API
+              cognitions: symptom.cognitivePatterns || [],
+            }),
+          ),
+          decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map(
+            (symptom: unknown) =>
+              // @ts-expect-error: type from API
+              symptom.name,
+          ),
+          sessionSummary: scenarioResult.analysis.clinicalSummary,
+          accuracyScore: scenarioResult.analysis.accuracyScore || 0.8,
+        },
+      ]
 
       setConversations(apiConversations)
     } catch (error: unknown) {
-      console.error('Failed to generate conversations:', error);
+      console.error('Failed to generate conversations:', error)
 
       // Fallback to mock data on API failure
       const mockConversations: SyntheticConversation[] = [
@@ -204,12 +211,12 @@ export default function SyntheticTherapyDemo() {
             "Session Summary:\n\nPatient presented with excessive worry, restlessness, fatigue.\nTherapist identified: anxiety, insomnia, fatigue.\n\nSymptom detection accuracy: 67%\n\nThe conversation covered the patient's experiences with excessive worry, fatigue.\nThe therapist may have missed: restlessness.\n\nThis simulated interaction demonstrates the importance of thorough assessment and active listening in the therapeutic relationship.",
           accuracyScore: 0.67,
         },
-      ];
+      ]
 
-      setConversations(mockConversations);
-      setSelectedConversationIndex(0);
+      setConversations(mockConversations)
+      setSelectedConversationIndex(0)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -430,67 +437,62 @@ export default function SyntheticTherapyDemo() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        {selectedConversation.encodedSymptoms.map(
-                          (symptom) => (
-                            <div
-                              key={`${symptom.name}-${symptom.duration}`}
-                              className="rounded-lg border p-4 space-y-2"
-                            >
-                              <div className="flex justify-between items-center">
-                                <h3 className="font-medium">{symptom.name}</h3>
-                                <Badge variant="outline">
-                                  {symptom.duration}
-                                </Badge>
+                        {selectedConversation.encodedSymptoms.map((symptom) => (
+                          <div
+                            key={`${symptom.name}-${symptom.duration}`}
+                            className="rounded-lg border p-4 space-y-2"
+                          >
+                            <div className="flex justify-between items-center">
+                              <h3 className="font-medium">{symptom.name}</h3>
+                              <Badge variant="outline">
+                                {symptom.duration}
+                              </Badge>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">
+                                Severity: {(symptom.severity * 100).toFixed(0)}%
                               </div>
-                              <div className="space-y-1">
-                                <div className="text-sm text-muted-foreground">
-                                  Severity:{' '}
-                                  {(symptom.severity * 100).toFixed(0)}%
-                                </div>
-                                <div className="w-full bg-secondary rounded-full h-2">
-                                  <div
-                                    className="bg-primary h-2 rounded-full"
-                                    style={{
-                                      width: `${symptom.severity * 100}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <div className="text-sm font-medium">
-                                  Manifestations:
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {symptom.manifestations.map(
-                                    (manifestation) => (
-                                      <Badge
-                                        key={`${symptom.name}-${manifestation}`}
-                                        variant="secondary"
-                                      >
-                                        {manifestation}
-                                      </Badge>
-                                    ),
-                                  )}
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <div className="text-sm font-medium">
-                                  Cognitions:
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {symptom.cognitions.map((cognition) => (
-                                    <Badge
-                                      key={`${symptom.name}-${cognition}`}
-                                      variant="outline"
-                                    >
-                                      {cognition}
-                                    </Badge>
-                                  ))}
-                                </div>
+                              <div className="w-full bg-secondary rounded-full h-2">
+                                <div
+                                  className="bg-primary h-2 rounded-full"
+                                  style={{
+                                    width: `${symptom.severity * 100}%`,
+                                  }}
+                                />
                               </div>
                             </div>
-                          ),
-                        )}
+                            <div className="space-y-1">
+                              <div className="text-sm font-medium">
+                                Manifestations:
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {symptom.manifestations.map((manifestation) => (
+                                  <Badge
+                                    key={`${symptom.name}-${manifestation}`}
+                                    variant="secondary"
+                                  >
+                                    {manifestation}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-sm font-medium">
+                                Cognitions:
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {symptom.cognitions.map((cognition) => (
+                                  <Badge
+                                    key={`${symptom.name}-${cognition}`}
+                                    variant="outline"
+                                  >
+                                    {cognition}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </CardContent>
                     </Card>
 
@@ -521,7 +523,7 @@ export default function SyntheticTherapyDemo() {
                                     {symptom}
                                   </Badge>
                                 )
-                              }
+                              },
                             )}
                           </div>
                         </div>

@@ -55,7 +55,10 @@ const {
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
   </head>
-  <body class="enhanced-dark-theme min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
+  <body
+    class="enhanced-dark-theme min-h-screen"
+    style="background: var(--bg-primary); color: var(--text-primary);"
+  >
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
@@ -66,9 +69,15 @@ const {
     </a>
     <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <aside class="w-64 hidden md:block glass-panel" style="border-right: 1px solid var(--border-primary);">
+      <aside
+        class="w-64 hidden md:block glass-panel"
+        style="border-right: 1px solid var(--border-primary);"
+      >
         <div class="p-6">
-          <h1 class="text-2xl font-bold" style="color: var(--text-primary); font-family: var(--font-sans);">
+          <h1
+            class="text-2xl font-bold"
+            style="color: var(--text-primary); font-family: var(--font-sans);"
+          >
             Admin
           </h1>
         </div>
@@ -187,9 +196,16 @@ const {
       </aside>
 
       <!-- Main Content -->
-      <main class="flex-1 overflow-x-hidden overflow-y-auto" id="main-content" style="background: var(--bg-primary);">
+      <main
+        class="flex-1 overflow-x-hidden overflow-y-auto"
+        id="main-content"
+        style="background: var(--bg-primary);"
+      >
         <!-- Top Navigation -->
-        <header class="glass-panel py-4 px-6" style="border-bottom: 1px solid var(--border-primary);">
+        <header
+          class="glass-panel py-4 px-6"
+          style="border-bottom: 1px solid var(--border-primary);"
+        >
           <div class="flex items-center justify-between">
             <button
               class="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none"

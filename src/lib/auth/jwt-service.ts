@@ -23,7 +23,11 @@ const JWT_CONFIG = {
 // --- Security hardening: require explicit secret in production ---
 // Prevent accidental use of a predictable fallback secret in production environments.
 // This avoids reliance on insecure randomness or predictable secrets.
-if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'fallback-secret-change-in-production')) {
+if (
+  process.env.NODE_ENV === 'production' &&
+  (!process.env.JWT_SECRET ||
+    process.env.JWT_SECRET === 'fallback-secret-change-in-production')
+) {
   // Fail fast so deployments are not started with an insecure secret.
   // Operators should provide a strong secret via environment variables or a secret store.
   throw new Error('JWT_SECRET must be set to a strong secret in production')

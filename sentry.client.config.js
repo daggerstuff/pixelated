@@ -6,7 +6,9 @@ import {
 } from '@sentry/browser'
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN || 'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
+  dsn:
+    process.env.SENTRY_DSN ||
+    'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
 
   environment: process.env.NODE_ENV || 'production',
   release: process.env.npm_package_version || '0.0.1',

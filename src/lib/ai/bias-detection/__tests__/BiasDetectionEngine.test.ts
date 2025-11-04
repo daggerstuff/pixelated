@@ -28,7 +28,7 @@ vi.mock('../python-bridge', () => {
       constructor() {
         return mock
       }
-    }
+    },
   }
 })
 
@@ -147,10 +147,18 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       status: 'healthy',
       message: 'Service is running',
     })
-    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
-    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
-    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
-    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult())
+    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(
+      createDefaultAnalysisResult(),
+    )
+    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(
+      createModelLevelAnalysisResult(),
+    )
+    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(
+      createInteractiveAnalysisResult(),
+    )
+    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(
+      createEvaluationAnalysisResult(),
+    )
     mockPythonBridge.analyze_session.mockResolvedValue({
       session_id: 'test-session',
       overall_bias_score: 0.25,
@@ -179,7 +187,13 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         interactive: 0.2,
         evaluation: 0.3,
       },
-      evaluationMetrics: ['toxicity', 'bias', 'regard', 'stereotype', 'fairness'],
+      evaluationMetrics: [
+        'toxicity',
+        'bias',
+        'regard',
+        'stereotype',
+        'fairness',
+      ],
       metricsConfig: {
         dataQualityMetrics: {
           completeness: 1.0,
@@ -234,15 +248,25 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     await biasEngine.initialize()
 
     // Test low bias score (default mocks return 0.5 overall, which should be 'medium')
-    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
-    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
-    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
-    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult())
+    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(
+      createDefaultAnalysisResult(),
+    )
+    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(
+      createModelLevelAnalysisResult(),
+    )
+    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(
+      createInteractiveAnalysisResult(),
+    )
+    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(
+      createEvaluationAnalysisResult(),
+    )
 
-    const lowBiasResult = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'low-bias-session',
-    }))
+    const lowBiasResult = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'low-bias-session',
+      }),
+    )
 
     expect(lowBiasResult).toMatchObject({
       sessionId: 'low-bias-session',
@@ -258,15 +282,25 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
 
     // Test high bias score (default mocks return 0.5 overall, which should be 'medium')
-    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
-    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
-    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
-    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult())
+    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(
+      createDefaultAnalysisResult(),
+    )
+    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(
+      createModelLevelAnalysisResult(),
+    )
+    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(
+      createInteractiveAnalysisResult(),
+    )
+    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(
+      createEvaluationAnalysisResult(),
+    )
 
-    const highBiasResult = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'high-bias-session',
-    }))
+    const highBiasResult = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'high-bias-session',
+      }),
+    )
 
     expect(highBiasResult).toMatchObject({
       sessionId: 'high-bias-session',
@@ -282,15 +316,25 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
 
     // Test critical bias score (default mocks return 0.5 overall, which should be 'medium')
-    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult())
-    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult())
-    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult())
-    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult())
+    mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(
+      createDefaultAnalysisResult(),
+    )
+    mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(
+      createModelLevelAnalysisResult(),
+    )
+    mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(
+      createInteractiveAnalysisResult(),
+    )
+    mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(
+      createEvaluationAnalysisResult(),
+    )
 
-    const criticalBiasResult = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'critical-bias-session',
-    }))
+    const criticalBiasResult = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'critical-bias-session',
+      }),
+    )
 
     expect(criticalBiasResult).toMatchObject({
       sessionId: 'critical-bias-session',
@@ -312,10 +356,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   })
 
   it('should analyze a session with low bias score', async () => {
-    const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'low-bias-session',
-    }))
+    const result = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'low-bias-session',
+      }),
+    )
 
     expect(result).toMatchObject({
       sessionId: 'low-bias-session',
@@ -332,10 +378,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   })
 
   it('should analyze a session with high bias score', async () => {
-    const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'high-bias-session',
-    }))
+    const result = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'high-bias-session',
+      }),
+    )
 
     expect(result).toMatchObject({
       sessionId: 'high-bias-session',
@@ -352,10 +400,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   })
 
   it('should analyze a session with critical bias score', async () => {
-    const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-      ...mockSessionData,
-      sessionId: 'critical-bias-session',
-    }))
+    const result = await biasEngine.analyzeSession(
+      sessionDataToTherapeuticSession({
+        ...mockSessionData,
+        sessionId: 'critical-bias-session',
+      }),
+    )
 
     expect(result).toMatchObject({
       sessionId: 'critical-bias-session',
@@ -469,7 +519,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   describe('Session Analysis', () => {
     it('should analyze session and return bias results', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       expect(result.sessionId).toBe(mockSessionData.sessionId)
@@ -485,13 +537,17 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       delete (invalidSessionData as Partial<SessionData>).sessionId
 
       await expect(
-        biasEngine.analyzeSession(sessionDataToTherapeuticSession(invalidSessionData as SessionData)),
+        biasEngine.analyzeSession(
+          sessionDataToTherapeuticSession(invalidSessionData as SessionData),
+        ),
       ).rejects.toThrow('Session ID is required')
     })
 
     it('should apply HIPAA compliance when enabled', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       // Check that sensitive data is masked or removed
       expect(JSON.stringify(result.demographics)).not.toContain(
@@ -620,7 +676,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         sessionDataToTherapeuticSession({
           ...mockSessionData,
           sessionId: 'low-bias-session',
-        })
+        }),
       )
       // With mock scores (0.5, 0.5, 0.5, 0.5) and equal weights, overall should be 0.5 which is 'medium'
       expect(lowBiasResult.alertLevel).toBe('high')
@@ -651,7 +707,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         sessionDataToTherapeuticSession({
           ...mockSessionData,
           sessionId: 'high-bias-session',
-        })
+        }),
       )
       expect(highBiasResult.alertLevel).toBe('critical')
     })
@@ -660,7 +716,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   describe('Multi-Layer Analysis', () => {
     it('should perform preprocessing layer analysis', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result.layerResults.preprocessing).toBeDefined()
       expect(typeof result.layerResults.preprocessing.biasScore).toBe('number')
@@ -668,7 +726,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should perform model-level analysis', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result.layerResults.modelLevel).toBeDefined()
       expect(result.layerResults.modelLevel.fairnessMetrics).toBeDefined()
@@ -676,7 +736,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should perform interactive analysis', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result.layerResults.interactive).toBeDefined()
       expect(
@@ -686,7 +748,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should perform evaluation layer analysis', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result.layerResults.evaluation).toBeDefined()
       expect(result.layerResults.evaluation.biasScore).toBeDefined()
@@ -800,7 +864,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       await biasEngine.startMonitoring(mockCallback)
 
       // Simulate high bias session by mocking all layers with high scores
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       expect(result.overallBiasScore).toBeGreaterThan(0.6) // Should be high bias
@@ -823,7 +889,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should complete analysis within 10 seconds for simple sessions', async () => {
       await biasEngine.initialize()
       const startTime = Date.now()
-      await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
       const endTime = Date.now()
 
       expect(endTime - startTime).toBeLessThan(10000) // Realistic timing: 10 seconds
@@ -831,10 +899,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should handle concurrent sessions', async () => {
       await biasEngine.initialize()
-      const sessions = Array.from({ length: 5 }, (_, i) => sessionDataToTherapeuticSession({
-        ...mockSessionData,
-        sessionId: `concurrent-session-${i}`,
-      }))
+      const sessions = Array.from({ length: 5 }, (_, i) =>
+        sessionDataToTherapeuticSession({
+          ...mockSessionData,
+          sessionId: `concurrent-session-${i}`,
+        }),
+      )
 
       const startTime = Date.now()
       const results = await Promise.all(
@@ -881,7 +951,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       biasEngine.pythonService = failingService as any
 
       // Should complete with fallback results instead of throwing
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       // Check that fallback values are returned (0.5 is the fallback bias score)
@@ -997,7 +1069,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       biasEngine.pythonService = failingService as any
 
       // Should complete with fallback results instead of throwing
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       // Check that fallback values are returned (0.5 is the fallback bias score)
@@ -1031,7 +1105,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       const originalService = biasEngine.pythonService
       biasEngine.pythonService = failingService as any
 
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       // Check that fallback values are returned for preprocessing (0.5 is the fallback bias score)
@@ -1142,7 +1218,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       const originalService = biasEngine.pythonService
       biasEngine.pythonService = malformedService as any
 
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       // Should handle gracefully with valid data structure
       expect(result.layerResults.preprocessing).toBeDefined()
@@ -1162,13 +1240,20 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle service overload scenarios', async () => {
       await biasEngine.initialize()
 
-      const createOverloadPythonService = () => class OverloadPythonService { analyzePython() { throw new Error("Overload!"); } };
+      const createOverloadPythonService = () =>
+        class OverloadPythonService {
+          analyzePython() {
+            throw new Error('Overload!')
+          }
+        }
       const overloadService = new (createOverloadPythonService())()
       const originalService = biasEngine.pythonService
       biasEngine.pythonService = overloadService as any
 
       // Should complete with fallback results instead of throwing
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       // Check that fallback values are returned for preprocessing (0.5 is the fallback bias score)
@@ -1286,7 +1371,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       biasEngine.pythonService = authFailureService as any
 
       // Should complete with fallback results instead of throwing
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       expect(result).toBeDefined()
       expect(result.layerResults.preprocessing).toBeDefined()
@@ -1321,10 +1408,12 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       await biasEngine.initialize()
       // Simulate concurrent access to shared resources
       const promises = Array.from({ length: 10 }, (_, i) =>
-        biasEngine.analyzeSession(sessionDataToTherapeuticSession({
-          ...mockSessionData,
-          sessionId: `concurrent-${i}`,
-        })),
+        biasEngine.analyzeSession(
+          sessionDataToTherapeuticSession({
+            ...mockSessionData,
+            sessionId: `concurrent-${i}`,
+          }),
+        ),
       )
       const results = await Promise.all(promises)
 
@@ -1337,16 +1426,18 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
     it('should handle memory pressure scenarios', async () => {
       await biasEngine.initialize()
       // Simulate memory pressure by processing many large sessions
-      const largeSessions = Array.from({ length: 5 }, (_, i) => sessionDataToTherapeuticSession({
-        ...mockSessionData,
-        sessionId: `memory-test-${i}`,
-        content: {
-          ...mockSessionData.content,
-          transcript: 'x'.repeat(100000),
-          aiResponses: Array(1000).fill('Large response'),
-          userInputs: Array(1000).fill('Large input'),
-        },
-      } as SessionData))
+      const largeSessions = Array.from({ length: 5 }, (_, i) =>
+        sessionDataToTherapeuticSession({
+          ...mockSessionData,
+          sessionId: `memory-test-${i}`,
+          content: {
+            ...mockSessionData.content,
+            transcript: 'x'.repeat(100000),
+            aiResponses: Array(1000).fill('Large response'),
+            userInputs: Array(1000).fill('Large input'),
+          },
+        } as SessionData),
+      )
       // Should handle without memory errors
       for (const session of largeSessions) {
         const result = await biasEngine.analyzeSession(session)
@@ -1466,7 +1557,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
           },
           recommendations: [],
         })
-      const result = await engineWithZeroWeights.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await engineWithZeroWeights.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
       expect(result).toBeDefined()
     })
 
@@ -1520,7 +1613,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
       const engineWithDefaults = new BiasDetectionEngine(incompleteConfig)
       await engineWithDefaults.initialize()
 
-      const result = await engineWithDefaults.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await engineWithDefaults.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
       expect(result).toBeDefined()
     })
   })
@@ -1528,7 +1623,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   describe('Data Privacy and Security', () => {
     it('should mask sensitive demographic data', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       // Check that specific identifiers are not present in the result
       const resultString = JSON.stringify(result)
@@ -1546,7 +1643,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         'storeAnalysisResult',
       )
 
-      await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       // TODO: Bug - storeAnalysisResult is not called when auditLogging is true.
       expect(storeAnalysisResultSpy).not.toHaveBeenCalled()
@@ -1565,7 +1664,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         'storeAnalysisResult',
       )
 
-      await noAuditEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
+      await noAuditEngine.analyzeSession(
+        sessionDataToTherapeuticSession(mockSessionData),
+      )
 
       // Should still store analysis results (the engine's metrics collector should be called)
       expect(storeAnalysisResultSpy).toHaveBeenCalled()
@@ -1632,7 +1733,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should analyze baseline scenario without detecting bias', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(fixtureScenarios.baseline))
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(fixtureScenarios.baseline),
+      )
 
       expect(result).toBeDefined()
       expect(result.sessionId).toBe('baseline-anxiety-001')
@@ -1643,9 +1746,11 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should detect higher bias in age-discriminatory scenario', async () => {
       await biasEngine.initialize()
-      const elderlyResult = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(fixtureScenarios.elderlyPatient),
+      const elderlyResult = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(fixtureScenarios.elderlyPatient),
       )
-      const youngResult = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(fixtureScenarios.youngPatient),
+      const youngResult = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(fixtureScenarios.youngPatient),
       )
 
       // Both may have same fallback score, so check that they processed successfully
@@ -1679,7 +1784,8 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
     it('should include demographic information in bias analysis', async () => {
       await biasEngine.initialize()
-      const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(fixtureScenarios.elderlyPatient),
+      const result = await biasEngine.analyzeSession(
+        sessionDataToTherapeuticSession(fixtureScenarios.elderlyPatient),
       )
 
       expect(result.demographics).toBeDefined()
@@ -1693,7 +1799,9 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
 
 // Fix: Ensure all analyzeSession calls use TherapeuticSession type
 // Helper to convert SessionData to TherapeuticSession for tests
-function sessionDataToTherapeuticSession(data: SessionData): TherapeuticSession {
+function sessionDataToTherapeuticSession(
+  data: SessionData,
+): TherapeuticSession {
   return {
     sessionId: data.sessionId,
     sessionDate: data.sessionDate || new Date().toISOString(),

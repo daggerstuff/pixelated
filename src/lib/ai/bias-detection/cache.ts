@@ -8,7 +8,14 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getCacheService } from '../../services/cacheService'
-import { CacheEntry, CacheStats, BiasReport, BiasAnalysisResult, TherapeuticSession, ParticipantDemographics } from './types'
+import {
+  CacheEntry,
+  CacheStats,
+  BiasReport,
+  BiasAnalysisResult,
+  TherapeuticSession,
+  ParticipantDemographics,
+} from './types'
 
 import * as zlib from 'zlib'
 import { promisify } from 'util'
@@ -358,7 +365,10 @@ export class BiasDetectionCache {
       // Parse with Date revival
       const cacheData = JSON.parse(cached, (_key, value): any => {
         // Revive Date objects from ISO strings
-        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)) {
+        if (
+          typeof value === 'string' &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)
+        ) {
           return new Date(value)
         }
         return value
@@ -529,15 +539,18 @@ export class BiasDetectionCache {
             ? await this.cacheService.get(redisKey)
             : null
           if (!cached) continue
-          
+
           let cacheData
           try {
             cacheData = JSON.parse(cached)
           } catch {
             continue
           }
-          
-          if (cacheData.tags && cacheData.tags.some((tag: string) => tags.includes(tag))) {
+
+          if (
+            cacheData.tags &&
+            cacheData.tags.some((tag: string) => tags.includes(tag))
+          ) {
             const logicalKey = redisKey.startsWith(this.config.redisKeyPrefix)
               ? redisKey.slice(this.config.redisKeyPrefix.length)
               : redisKey
@@ -556,7 +569,10 @@ export class BiasDetectionCache {
     const invalidated = invalidatedKeys.size
     if (invalidated > 0) {
       this.updateStats()
-      logger.info('Cache entries invalidated by tags', { tags, count: invalidated })
+      logger.info('Cache entries invalidated by tags', {
+        tags,
+        count: invalidated,
+      })
     }
 
     return invalidated

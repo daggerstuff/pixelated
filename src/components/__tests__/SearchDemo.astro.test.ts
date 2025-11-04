@@ -50,7 +50,10 @@ vi.mock('../SearchDemoReact', () => {
 })
 
 // Helper function to render Astro components in tests
-async function renderAstroComponent(Component: any, props = {}): Promise<{ container: HTMLDivElement }> {
+async function renderAstroComponent(
+  Component: any,
+  props = {},
+): Promise<{ container: HTMLDivElement }> {
   const { default: defaultExport } = Component
   const html = await defaultExport.render(props)
   const container = document.createElement('div')

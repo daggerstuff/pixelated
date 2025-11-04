@@ -41,7 +41,10 @@ export interface SecretConfig {
 function generateRandomBytes(length: number): Uint8Array {
   const bytes = new Uint8Array(length)
   // Prefer Web Crypto when available (browsers, modern Node)
-  if (typeof globalThis !== 'undefined' && (globalThis as any).crypto?.getRandomValues) {
+  if (
+    typeof globalThis !== 'undefined' &&
+    (globalThis as any).crypto?.getRandomValues
+  ) {
     ;(globalThis as any).crypto.getRandomValues(bytes)
     return bytes
   }

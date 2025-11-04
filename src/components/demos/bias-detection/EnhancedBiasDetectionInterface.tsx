@@ -30,24 +30,36 @@ interface EnhancedBiasDetectionInterfaceProps {
 
 type AnalysisStep = 'input' | 'analyzing' | 'results' | 'insights'
 
-export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInterfaceProps> = ({
-  className = '',
-}) => {
+export const EnhancedBiasDetectionInterface: React.FC<
+  EnhancedBiasDetectionInterfaceProps
+> = ({ className = '' }) => {
   // Core state management
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('input')
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [analysisResults, setAnalysisResults] = useState<BiasAnalysisResults | null>(null)
-  const [counterfactualScenarios, setCounterfactualScenarios] = useState<CounterfactualScenario[]>([])
-  const [historicalComparison, setHistoricalComparison] = useState<HistoricalComparison | null>(null)
+  const [analysisResults, setAnalysisResults] =
+    useState<BiasAnalysisResults | null>(null)
+  const [counterfactualScenarios, setCounterfactualScenarios] = useState<
+    CounterfactualScenario[]
+  >([])
+  const [historicalComparison, setHistoricalComparison] =
+    useState<HistoricalComparison | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [activeTab, setActiveTab] = useState<'analysis' | 'counterfactual' | 'historical' | 'export'>('analysis')
+  const [activeTab, setActiveTab] = useState<
+    'analysis' | 'counterfactual' | 'historical' | 'export'
+  >('analysis')
   const [progressPercent, setProgressPercent] = useState(0)
 
   // Enhanced state for improved UX
   const [savedSessions, setSavedSessions] = useState<SessionData[]>([])
   const [quickFilters, setQuickFilters] = useState({
     riskLevel: 'all' as 'all' | 'low' | 'medium' | 'high' | 'critical',
-    category: 'all' as 'all' | 'cultural' | 'gender' | 'age' | 'linguistic' | 'intersectional',
+    category: 'all' as
+      | 'all'
+      | 'cultural'
+      | 'gender'
+      | 'age'
+      | 'linguistic'
+      | 'intersectional',
   })
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [analysisSettings, setAnalysisSettings] = useState({
@@ -61,7 +73,7 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
   useEffect(() => {
     if (isAnalyzing) {
       const interval = setInterval(() => {
-        setProgressPercent(prev => {
+        setProgressPercent((prev) => {
           if (prev >= 100) {
             clearInterval(interval)
             return 100
@@ -74,122 +86,133 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
     }
   }, [isAnalyzing])
 
-  const handleAnalyze = useCallback(async (data: SessionData) => {
-    setIsAnalyzing(true)
-    setCurrentStep('analyzing')
-    setSessionData(data)
-    setProgressPercent(0)
+  const handleAnalyze = useCallback(
+    async (data: SessionData) => {
+      setIsAnalyzing(true)
+      setCurrentStep('analyzing')
+      setSessionData(data)
+      setProgressPercent(0)
 
-    try {
-      // Simulate realistic analysis time
-      await new Promise(resolve => setTimeout(resolve, 2500))
+      try {
+        // Simulate realistic analysis time
+        await new Promise((resolve) => setTimeout(resolve, 2500))
 
-      // Calculate bias factors with enhanced settings
-      const biasFactors = calculateBiasFactors(data)
-      
-      // Apply sensitivity adjustment
-      const adjustedFactors = {
-        ...biasFactors,
-        overall: Math.min(1, biasFactors.overall * analysisSettings.sensitivity),
-      }
+        // Calculate bias factors with enhanced settings
+        const biasFactors = calculateBiasFactors(data)
 
-      // Create comprehensive analysis results
-      const results: BiasAnalysisResults = {
-        sessionId: generateSessionId(),
-        timestamp: new Date(),
-        overallBiasScore: adjustedFactors.overall,
-        alertLevel:
-          adjustedFactors.overall >= 0.8
-            ? 'critical'
-            : adjustedFactors.overall >= 0.6
-              ? 'high'
-              : adjustedFactors.overall >= 0.4
-                ? 'medium'
-                : 'low',
-        confidence: Math.min(1, 0.6 + Math.random() * 0.3),
-        layerResults: {
-          preprocessing: {
-            biasScore: adjustedFactors.linguistic,
-            linguisticBias: {
-              genderBiasScore: adjustedFactors.gender,
-              racialBiasScore: adjustedFactors.racial,
-              ageBiasScore: adjustedFactors.age,
-              culturalBiasScore: adjustedFactors.cultural,
+        // Apply sensitivity adjustment
+        const adjustedFactors = {
+          ...biasFactors,
+          overall: Math.min(
+            1,
+            biasFactors.overall * analysisSettings.sensitivity,
+          ),
+        }
+
+        // Create comprehensive analysis results
+        const results: BiasAnalysisResults = {
+          sessionId: generateSessionId(),
+          timestamp: new Date(),
+          overallBiasScore: adjustedFactors.overall,
+          alertLevel:
+            adjustedFactors.overall >= 0.8
+              ? 'critical'
+              : adjustedFactors.overall >= 0.6
+                ? 'high'
+                : adjustedFactors.overall >= 0.4
+                  ? 'medium'
+                  : 'low',
+          confidence: Math.min(1, 0.6 + Math.random() * 0.3),
+          layerResults: {
+            preprocessing: {
+              biasScore: adjustedFactors.linguistic,
+              linguisticBias: {
+                genderBiasScore: adjustedFactors.gender,
+                racialBiasScore: adjustedFactors.racial,
+                ageBiasScore: adjustedFactors.age,
+                culturalBiasScore: adjustedFactors.cultural,
+              },
+              representationAnalysis: {
+                diversityIndex: 1 - adjustedFactors.overall,
+                underrepresentedGroups:
+                  adjustedFactors.age > 0.5 ? ['elderly'] : [],
+              },
             },
-            representationAnalysis: {
-              diversityIndex: 1 - adjustedFactors.overall,
-              underrepresentedGroups:
-                adjustedFactors.age > 0.5 ? ['elderly'] : [],
+            modelLevel: {
+              biasScore: adjustedFactors.model,
+              fairnessMetrics: {
+                demographicParity: 1 - adjustedFactors.model,
+                equalizedOdds: 1 - adjustedFactors.model * 0.8,
+                calibration: 1 - adjustedFactors.model * 0.6,
+              },
             },
-          },
-          modelLevel: {
-            biasScore: adjustedFactors.model,
-            fairnessMetrics: {
-              demographicParity: 1 - adjustedFactors.model,
-              equalizedOdds: 1 - adjustedFactors.model * 0.8,
-              calibration: 1 - adjustedFactors.model * 0.6,
+            interactive: {
+              biasScore: adjustedFactors.interactive,
+              counterfactualAnalysis: {
+                scenariosAnalyzed: 8,
+                biasDetected: adjustedFactors.interactive > 0.3,
+                consistencyScore: 1 - adjustedFactors.interactive,
+              },
             },
-          },
-          interactive: {
-            biasScore: adjustedFactors.interactive,
-            counterfactualAnalysis: {
-              scenariosAnalyzed: 8,
-              biasDetected: adjustedFactors.interactive > 0.3,
-              consistencyScore: 1 - adjustedFactors.interactive,
-            },
-          },
-          evaluation: {
-            biasScore: adjustedFactors.evaluation,
-            huggingFaceMetrics: {
-              bias: adjustedFactors.evaluation,
-              stereotype: adjustedFactors.cultural,
-              regard: {
-                positive: 1 - adjustedFactors.overall,
-                negative: adjustedFactors.overall,
+            evaluation: {
+              biasScore: adjustedFactors.evaluation,
+              huggingFaceMetrics: {
+                bias: adjustedFactors.evaluation,
+                stereotype: adjustedFactors.cultural,
+                regard: {
+                  positive: 1 - adjustedFactors.overall,
+                  negative: adjustedFactors.overall,
+                },
               },
             },
           },
-        },
-        recommendations: generateRecommendations(adjustedFactors),
-        demographics: data.demographics,
+          recommendations: generateRecommendations(adjustedFactors),
+          demographics: data.demographics,
+        }
+
+        setAnalysisResults(results)
+
+        // Generate additional insights if enabled
+        if (analysisSettings.includeCounterfactuals) {
+          const scenarios = generateCounterfactualScenarios(adjustedFactors)
+          setCounterfactualScenarios(scenarios)
+        }
+
+        if (analysisSettings.includeHistorical) {
+          const historical = generateHistoricalComparison(
+            adjustedFactors.overall,
+          )
+          setHistoricalComparison(historical)
+        }
+
+        // Save session to history
+        setSavedSessions((prev) => [data, ...prev.slice(0, 9)]) // Keep last 10 sessions
+
+        setCurrentStep('results')
+      } catch (error) {
+        console.error('Analysis failed:', error)
+        setCurrentStep('input')
+      } finally {
+        setIsAnalyzing(false)
+        setProgressPercent(0)
       }
+    },
+    [analysisSettings],
+  )
 
-      setAnalysisResults(results)
-
-      // Generate additional insights if enabled
-      if (analysisSettings.includeCounterfactuals) {
-        const scenarios = generateCounterfactualScenarios(adjustedFactors)
-        setCounterfactualScenarios(scenarios)
+  const handleLoadPreset = useCallback(
+    (preset: PresetScenario) => {
+      const sessionData: SessionData = {
+        sessionId: generateSessionId(),
+        scenario: preset.scenario,
+        demographics: preset.demographics,
+        content: preset.content,
+        timestamp: new Date(),
       }
-
-      if (analysisSettings.includeHistorical) {
-        const historical = generateHistoricalComparison(adjustedFactors.overall)
-        setHistoricalComparison(historical)
-      }
-
-      // Save session to history
-      setSavedSessions(prev => [data, ...prev.slice(0, 9)]) // Keep last 10 sessions
-
-      setCurrentStep('results')
-    } catch (error) {
-      console.error('Analysis failed:', error)
-      setCurrentStep('input')
-    } finally {
-      setIsAnalyzing(false)
-      setProgressPercent(0)
-    }
-  }, [analysisSettings])
-
-  const handleLoadPreset = useCallback((preset: PresetScenario) => {
-    const sessionData: SessionData = {
-      sessionId: generateSessionId(),
-      scenario: preset.scenario,
-      demographics: preset.demographics,
-      content: preset.content,
-      timestamp: new Date(),
-    }
-    handleAnalyze(sessionData)
-  }, [handleAnalyze])
+      handleAnalyze(sessionData)
+    },
+    [handleAnalyze],
+  )
 
   const handleExport = useCallback(() => {
     if (analysisResults) {
@@ -222,11 +245,17 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
   }, [])
 
   // Filter presets based on quick filters
-  const filteredPresets = PRESET_SCENARIOS.filter(preset => {
-    if (quickFilters.riskLevel !== 'all' && preset.riskLevel !== quickFilters.riskLevel) {
+  const filteredPresets = PRESET_SCENARIOS.filter((preset) => {
+    if (
+      quickFilters.riskLevel !== 'all' &&
+      preset.riskLevel !== quickFilters.riskLevel
+    ) {
       return false
     }
-    if (quickFilters.category !== 'all' && preset.category !== quickFilters.category) {
+    if (
+      quickFilters.category !== 'all' &&
+      preset.category !== quickFilters.category
+    ) {
       return false
     }
     return true
@@ -246,13 +275,16 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
               Enhanced Bias Detection
             </h1>
             <p className="text-gray-600">
-              Advanced AI-powered analysis with real-time insights and recommendations
+              Advanced AI-powered analysis with real-time insights and
+              recommendations
             </p>
           </div>
 
           {/* Step Indicator */}
           <div className="flex items-center space-x-2">
-            {(['input', 'analyzing', 'results', 'insights'] as AnalysisStep[]).map((step, index) => (
+            {(
+              ['input', 'analyzing', 'results', 'insights'] as AnalysisStep[]
+            ).map((step, index) => (
               <div
                 key={step}
                 className={`flex items-center ${index < 3 ? 'mr-2' : ''}`}
@@ -261,7 +293,15 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                     currentStep === step
                       ? 'bg-blue-600 text-white'
-                      : index < (['input', 'analyzing', 'results', 'insights'] as AnalysisStep[]).indexOf(currentStep)
+                      : index <
+                          (
+                            [
+                              'input',
+                              'analyzing',
+                              'results',
+                              'insights',
+                            ] as AnalysisStep[]
+                          ).indexOf(currentStep)
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-500'
                   }`}
@@ -271,7 +311,15 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                 {index < 3 && (
                   <div
                     className={`w-8 h-0.5 mx-1 transition-all duration-300 ${
-                      index < (['input', 'analyzing', 'results', 'insights'] as AnalysisStep[]).indexOf(currentStep)
+                      index <
+                      (
+                        [
+                          'input',
+                          'analyzing',
+                          'results',
+                          'insights',
+                        ] as AnalysisStep[]
+                      ).indexOf(currentStep)
                         ? 'bg-green-500'
                         : 'bg-gray-200'
                     }`}
@@ -317,8 +365,10 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
           >
             {/* Quick Filters */}
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Start Options</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Quick Start Options
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -326,10 +376,12 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                   </label>
                   <select
                     value={quickFilters.riskLevel}
-                    onChange={(e) => setQuickFilters(prev => ({ 
-                      ...prev, 
-                      riskLevel: e.target.value as typeof prev.riskLevel 
-                    }))}
+                    onChange={(e) =>
+                      setQuickFilters((prev) => ({
+                        ...prev,
+                        riskLevel: e.target.value as typeof prev.riskLevel,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Risk Levels</option>
@@ -346,10 +398,12 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                   </label>
                   <select
                     value={quickFilters.category}
-                    onChange={(e) => setQuickFilters(prev => ({ 
-                      ...prev, 
-                      category: e.target.value as typeof prev.category 
-                    }))}
+                    onChange={(e) =>
+                      setQuickFilters((prev) => ({
+                        ...prev,
+                        category: e.target.value as typeof prev.category,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Categories</option>
@@ -376,7 +430,12 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </motion.svg>
                 </button>
 
@@ -398,17 +457,20 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                           max="1.0"
                           step="0.1"
                           value={analysisSettings.sensitivity}
-                          onChange={(e) => setAnalysisSettings(prev => ({
-                            ...prev,
-                            sensitivity: parseFloat(e.target.value)
-                          }))}
+                          onChange={(e) =>
+                            setAnalysisSettings((prev) => ({
+                              ...prev,
+                              sensitivity: parseFloat(e.target.value),
+                            }))
+                          }
                           className="w-full"
                         />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Confidence Threshold: {analysisSettings.confidenceThreshold.toFixed(1)}
+                          Confidence Threshold:{' '}
+                          {analysisSettings.confidenceThreshold.toFixed(1)}
                         </label>
                         <input
                           type="range"
@@ -416,10 +478,12 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                           max="0.9"
                           step="0.1"
                           value={analysisSettings.confidenceThreshold}
-                          onChange={(e) => setAnalysisSettings(prev => ({
-                            ...prev,
-                            confidenceThreshold: parseFloat(e.target.value)
-                          }))}
+                          onChange={(e) =>
+                            setAnalysisSettings((prev) => ({
+                              ...prev,
+                              confidenceThreshold: parseFloat(e.target.value),
+                            }))
+                          }
                           className="w-full"
                         />
                       </div>
@@ -429,13 +493,18 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                           type="checkbox"
                           id="includeCounterfactuals"
                           checked={analysisSettings.includeCounterfactuals}
-                          onChange={(e) => setAnalysisSettings(prev => ({
-                            ...prev,
-                            includeCounterfactuals: e.target.checked
-                          }))}
+                          onChange={(e) =>
+                            setAnalysisSettings((prev) => ({
+                              ...prev,
+                              includeCounterfactuals: e.target.checked,
+                            }))
+                          }
                           className="mr-2"
                         />
-                        <label htmlFor="includeCounterfactuals" className="text-sm text-gray-700">
+                        <label
+                          htmlFor="includeCounterfactuals"
+                          className="text-sm text-gray-700"
+                        >
                           Include Counterfactual Analysis
                         </label>
                       </div>
@@ -445,13 +514,18 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                           type="checkbox"
                           id="includeHistorical"
                           checked={analysisSettings.includeHistorical}
-                          onChange={(e) => setAnalysisSettings(prev => ({
-                            ...prev,
-                            includeHistorical: e.target.checked
-                          }))}
+                          onChange={(e) =>
+                            setAnalysisSettings((prev) => ({
+                              ...prev,
+                              includeHistorical: e.target.checked,
+                            }))
+                          }
                           className="mr-2"
                         />
-                        <label htmlFor="includeHistorical" className="text-sm text-gray-700">
+                        <label
+                          htmlFor="includeHistorical"
+                          className="text-sm text-gray-700"
+                        >
                           Include Historical Comparison
                         </label>
                       </div>
@@ -475,7 +549,9 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
 
             {/* Custom Session Input */}
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Custom Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Custom Analysis
+              </h3>
               <SessionInputForm
                 onSubmit={handleAnalyze}
                 className="enhanced-session-form"
@@ -485,7 +561,9 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
             {/* Session History */}
             {savedSessions.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Sessions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Recent Sessions
+                </h3>
                 <div className="space-y-2">
                   {savedSessions.slice(0, 5).map((session, index) => (
                     <div
@@ -498,8 +576,10 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
                           {session.scenario || 'Custom Session'}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {session.timestamp.toLocaleDateString()} - 
-                          {session.demographics.age}, {session.demographics.gender}, {session.demographics.ethnicity}
+                          {session.timestamp.toLocaleDateString()} -
+                          {session.demographics.age},{' '}
+                          {session.demographics.gender},{' '}
+                          {session.demographics.ethnicity}
                         </div>
                       </div>
                       <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
@@ -546,7 +626,8 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
               Analyzing Bias Patterns
             </h3>
             <p className="text-gray-600 mb-4">
-              Running comprehensive analysis across multiple bias detection layers...
+              Running comprehensive analysis across multiple bias detection
+              layers...
             </p>
             <div className="max-w-md mx-auto">
               <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
@@ -564,133 +645,157 @@ export const EnhancedBiasDetectionInterface: React.FC<EnhancedBiasDetectionInter
           </motion.div>
         )}
 
-        {(currentStep === 'results' || currentStep === 'insights') && analysisResults && (
-          <motion.div
-            key="results"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
-          >
-            {/* Results Header */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Analysis Results</h2>
-                  <p className="text-gray-600">
-                    Session ID: {analysisResults.sessionId} • 
-                    Confidence: {(analysisResults.confidence * 100).toFixed(1)}%
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleExport}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Export
-                  </button>
-                  <button
-                    onClick={resetAnalysis}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    New Analysis
-                  </button>
-                </div>
-              </div>
-
-              {/* Enhanced Tab Navigation */}
-              <div className="mt-6 border-b border-gray-200">
-                <div className="flex space-x-8">
-                  {[
-                    { id: 'analysis', label: 'Main Analysis', icon: '📊' },
-                    { id: 'counterfactual', label: 'What-If Scenarios', icon: '🔍', badge: counterfactualScenarios.length },
-                    { id: 'historical', label: 'Historical Trends', icon: '📈' },
-                    { id: 'export', label: 'Export & Share', icon: '💾' },
-                  ].map((tab) => (
+        {(currentStep === 'results' || currentStep === 'insights') &&
+          analysisResults && (
+            <motion.div
+              key="results"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              {/* Results Header */}
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Analysis Results
+                    </h2>
+                    <p className="text-gray-600">
+                      Session ID: {analysisResults.sessionId} • Confidence:{' '}
+                      {(analysisResults.confidence * 100).toFixed(1)}%
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
                     <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                      className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
-                        activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
+                      onClick={handleExport}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
                     >
-                      <span>{tab.icon}</span>
-                      <span>{tab.label}</span>
-                      {tab.badge && (
-                        <span className="bg-blue-100 text-blue-800 text-xs rounded-full px-2 py-0.5">
-                          {tab.badge}
-                        </span>
-                      )}
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      Export
                     </button>
-                  ))}
+                    <button
+                      onClick={resetAnalysis}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      New Analysis
+                    </button>
+                  </div>
+                </div>
+
+                {/* Enhanced Tab Navigation */}
+                <div className="mt-6 border-b border-gray-200">
+                  <div className="flex space-x-8">
+                    {[
+                      { id: 'analysis', label: 'Main Analysis', icon: '📊' },
+                      {
+                        id: 'counterfactual',
+                        label: 'What-If Scenarios',
+                        icon: '🔍',
+                        badge: counterfactualScenarios.length,
+                      },
+                      {
+                        id: 'historical',
+                        label: 'Historical Trends',
+                        icon: '📈',
+                      },
+                      { id: 'export', label: 'Export & Share', icon: '💾' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                        className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
+                          activeTab === tab.id
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        <span>{tab.icon}</span>
+                        <span>{tab.label}</span>
+                        {tab.badge && (
+                          <span className="bg-blue-100 text-blue-800 text-xs rounded-full px-2 py-0.5">
+                            {tab.badge}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Tab Content */}
-            <AnimatePresence mode="wait">
-              {activeTab === 'analysis' && (
-                <motion.div
-                  key="analysis-tab"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <BiasAnalysisDisplay
-                    results={analysisResults}
-                    sessionData={sessionData}
-                  />
-                </motion.div>
-              )}
+              {/* Tab Content */}
+              <AnimatePresence mode="wait">
+                {activeTab === 'analysis' && (
+                  <motion.div
+                    key="analysis-tab"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <BiasAnalysisDisplay
+                      results={analysisResults}
+                      sessionData={sessionData}
+                    />
+                  </motion.div>
+                )}
 
-              {activeTab === 'counterfactual' && (
-                <motion.div
-                  key="counterfactual-tab"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <CounterfactualAnalysis
-                    scenarios={counterfactualScenarios}
-                    originalSession={sessionData}
-                  />
-                </motion.div>
-              )}
+                {activeTab === 'counterfactual' && (
+                  <motion.div
+                    key="counterfactual-tab"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <CounterfactualAnalysis
+                      scenarios={counterfactualScenarios}
+                      originalSession={sessionData}
+                    />
+                  </motion.div>
+                )}
 
-              {activeTab === 'historical' && historicalComparison && (
-                <motion.div
-                  key="historical-tab"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <HistoricalProgressTracker comparison={historicalComparison} />
-                </motion.div>
-              )}
+                {activeTab === 'historical' && historicalComparison && (
+                  <motion.div
+                    key="historical-tab"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <HistoricalProgressTracker
+                      comparison={historicalComparison}
+                    />
+                  </motion.div>
+                )}
 
-              {activeTab === 'export' && (
-                <motion.div
-                  key="export-tab"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <ExportControls
-                    data={analysisResults}
-                    counterfactual={counterfactualScenarios}
-                    historical={historicalComparison}
-                    onExport={handleExport}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        )}
+                {activeTab === 'export' && (
+                  <motion.div
+                    key="export-tab"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <ExportControls
+                      data={analysisResults}
+                      counterfactual={counterfactualScenarios}
+                      historical={historicalComparison}
+                      onExport={handleExport}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
       </AnimatePresence>
     </div>
   )

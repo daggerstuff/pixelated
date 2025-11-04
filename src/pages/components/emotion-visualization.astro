@@ -4,26 +4,35 @@ import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmo
 import Particle from '@/components/three/Particle.tsx'
 ---
 
-<BaseLayout title="3D Emotion Visualization - Pixelated Empathy" description="Advanced 3D emotion mapping and particle visualization for therapy sessions">
+<BaseLayout
+  title="3D Emotion Visualization - Pixelated Empathy"
+  description="Advanced 3D emotion mapping and particle visualization for therapy sessions"
+>
   <section class="container mx-auto py-8 px-4">
     <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">3D Emotion Visualization</h1>
-      
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">
+        3D Emotion Visualization
+      </h1>
+
       <div class="prose dark:prose-invert max-w-none mb-8 text-center">
         <p class="text-xl">
-          Immersive 3D visualization of emotional states using the Valence-Arousal-Dominance model
-          and interactive particle systems for therapy sessions.
+          Immersive 3D visualization of emotional states using the
+          Valence-Arousal-Dominance model and interactive particle systems for
+          therapy sessions.
         </p>
       </div>
 
       <!-- Multidimensional Emotion Chart -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4">Multidimensional Emotion Mapping</h2>
+        <h2 class="text-2xl font-semibold mb-4">
+          Multidimensional Emotion Mapping
+        </h2>
         <p class="text-gray-600 dark:text-gray-400 mb-6">
-          Interactive 3D visualization of emotions plotted in valence-arousal-dominance space.
-          Hover over emotion points to see details and explore the emotional journey.
+          Interactive 3D visualization of emotions plotted in
+          valence-arousal-dominance space. Hover over emotion points to see
+          details and explore the emotional journey.
         </p>
-        <MultidimensionalEmotionChart 
+        <MultidimensionalEmotionChart
           client:load
           showTrails={true}
           showAxes={true}
@@ -33,12 +42,15 @@ import Particle from '@/components/three/Particle.tsx'
 
       <!-- Particle Emotion System -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4">Interactive Particle Emotions</h2>
+        <h2 class="text-2xl font-semibold mb-4">
+          Interactive Particle Emotions
+        </h2>
         <p class="text-gray-600 dark:text-gray-400 mb-6">
-          Dynamic particle system that responds to different emotional states. 
-          Use the emotion controls to see how particles behave based on different feelings.
+          Dynamic particle system that responds to different emotional states.
+          Use the emotion controls to see how particles behave based on
+          different feelings.
         </p>
-        <Particle 
+        <Particle
           client:load
           particleCount={40}
           emotion="neutral"
@@ -52,32 +64,42 @@ import Particle from '@/components/three/Particle.tsx'
 
       <!-- Technical Details -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-lg p-6">
+        <div
+          class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-lg p-6"
+        >
           <h3 class="text-xl font-semibold mb-4">🧠 Emotion Model</h3>
           <div class="space-y-3">
             <div>
-              <strong>Valence:</strong> Measures how positive or negative an emotion feels
+              <strong>Valence:</strong> Measures how positive or negative an emotion
+              feels
             </div>
             <div>
-              <strong>Arousal:</strong> Measures the intensity or energy level of the emotion
+              <strong>Arousal:</strong> Measures the intensity or energy level of
+              the emotion
             </div>
             <div>
-              <strong>Dominance:</strong> Measures the sense of control or power in the emotion
+              <strong>Dominance:</strong> Measures the sense of control or power
+              in the emotion
             </div>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950 rounded-lg p-6">
+        <div
+          class="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950 rounded-lg p-6"
+        >
           <h3 class="text-xl font-semibold mb-4">🎯 Clinical Applications</h3>
           <div class="space-y-3">
             <div>
-              <strong>Session Analysis:</strong> Visualize emotional patterns during therapy
+              <strong>Session Analysis:</strong> Visualize emotional patterns during
+              therapy
             </div>
             <div>
-              <strong>Progress Tracking:</strong> Monitor emotional stability over time
+              <strong>Progress Tracking:</strong> Monitor emotional stability over
+              time
             </div>
             <div>
-              <strong>Pattern Recognition:</strong> Identify emotional triggers and responses
+              <strong>Pattern Recognition:</strong> Identify emotional triggers and
+              responses
             </div>
           </div>
         </div>
@@ -85,7 +107,9 @@ import Particle from '@/components/three/Particle.tsx'
 
       <!-- Features Grid -->
       <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-center">Visualization Features</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">
+          Visualization Features
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="text-center">
             <div class="text-3xl mb-2">🎨</div>
@@ -123,30 +147,42 @@ import Particle from '@/components/three/Particle.tsx'
         <h3 class="text-xl font-semibold mb-4">🔗 Platform Integration</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <h4 class="font-semibold text-blue-800 dark:text-blue-200">Therapy Sessions</h4>
-            <p class="text-sm">Real-time emotion tracking during therapy sessions</p>
+            <h4 class="font-semibold text-blue-800 dark:text-blue-200">
+              Therapy Sessions
+            </h4>
+            <p class="text-sm">
+              Real-time emotion tracking during therapy sessions
+            </p>
           </div>
           <div>
-            <h4 class="font-semibold text-blue-800 dark:text-blue-200">Progress Reports</h4>
-            <p class="text-sm">Visual progress reporting for patients and therapists</p>
+            <h4 class="font-semibold text-blue-800 dark:text-blue-200">
+              Progress Reports
+            </h4>
+            <p class="text-sm">
+              Visual progress reporting for patients and therapists
+            </p>
           </div>
           <div>
-            <h4 class="font-semibold text-blue-800 dark:text-blue-200">Research Tools</h4>
-            <p class="text-sm">Data collection and analysis for research purposes</p>
+            <h4 class="font-semibold text-blue-800 dark:text-blue-200">
+              Research Tools
+            </h4>
+            <p class="text-sm">
+              Data collection and analysis for research purposes
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Navigation Links -->
       <div class="flex justify-center space-x-4">
-        <a 
-          href="/therapy-session" 
+        <a
+          href="/therapy-session"
           class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
           Try in Session
         </a>
-        <a 
-          href="/components" 
+        <a
+          href="/components"
           class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
         >
           All Components

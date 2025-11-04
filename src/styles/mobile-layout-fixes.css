@@ -383,3 +383,118 @@
     min-height: 100dvh !important;
   }
 }
+
+/* Enhanced Unified Dark Theme Mobile Fixes */
+@media (max-width: 768px) {
+  /* Enhanced container fixes with theme variables */
+  .container,
+  .container-refined {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 auto !important;
+    padding-left: var(--space-4, 1rem) !important;
+    padding-right: var(--space-4, 1rem) !important;
+  }
+
+  /* Enhanced main content with theme spacing */
+  main,
+  #main-content {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: var(--space-4, 1rem) !important;
+  }
+
+  /* Enhanced section spacing with theme variables */
+  section {
+    padding-left: var(--space-4, 1rem) !important;
+    padding-right: var(--space-4, 1rem) !important;
+    margin-bottom: var(--space-8, 2rem) !important;
+  }
+
+  /* Enhanced grid layouts with unified theme */
+  .grid,
+  .grid-brutalist {
+    gap: var(--space-4, 1rem) !important;
+  }
+
+  .grid-cols-1,
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-brutalist--2,
+  .grid-brutalist--3,
+  .grid-brutalist--4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Enhanced flex layouts with theme spacing */
+  .flex-col,
+  .flex-row {
+    gap: var(--space-4, 1rem) !important;
+  }
+
+  /* Enhanced card spacing with brutalist theme */
+  .card,
+  .card-brutalist,
+  [class*='card'] {
+    margin-bottom: var(--space-4, 1rem) !important;
+    padding: var(--space-4, 1rem) !important;
+    border-radius: var(--radius-lg, 0.5rem) !important;
+  }
+
+  /* Enhanced glass surfaces for mobile */
+  .glass-surface,
+  .corporate-header {
+    background: var(--bg-glass, rgba(10, 10, 10, 0.98)) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid var(--border-primary, #2a2a2a) !important;
+  }
+
+  /* Enhanced navigation links */
+  .nav-link-refined {
+    font-size: var(--text-sm, 0.875rem) !important;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem) !important;
+    border-radius: var(--radius-md, 0.375rem) !important;
+  }
+
+  /* Enhanced theme toggle */
+  .theme-toggle,
+  .btn-brutalist--ghost {
+    padding: var(--space-2, 0.5rem) !important;
+    border-radius: var(--radius-md, 0.375rem) !important;
+  }
+
+  /* Enhanced form elements with brutalist theme */
+  input,
+  textarea,
+  select,
+  .input-brutalist {
+    width: 100% !important;
+    padding: var(--space-3, 0.75rem) !important;
+    font-size: var(--text-base, 1rem) !important;
+    background: var(--bg-level-1, #141414) !important;
+    border: 1px solid var(--border-primary, #2a2a2a) !important;
+    border-radius: var(--radius-md, 0.375rem) !important;
+    color: var(--text-primary, #ffffff) !important;
+  }
+
+  .input-brutalist:focus {
+    border-color: var(--accent-primary, #10b981) !important;
+    background: var(--bg-level-2, #1a1a1a) !important;
+    box-shadow: 0 0 0 3px var(--accent-primary-subtle, rgba(16, 185, 129, 0.1)) !important;
+  }
+
+  /* Enhanced focus indicators for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--accent-primary, #10b981) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Enhanced selection styles with theme */
+  ::selection {
+    background: var(--accent-primary-muted, rgba(16, 185, 129, 0.2)) !important;
+    color: var(--text-primary, #ffffff) !important;
+  }
+}

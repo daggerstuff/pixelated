@@ -9,7 +9,10 @@ export interface InterventionRule {
   id: string
   name: string
   description: string
-  condition: (sessionData: SessionData, patientProfile: PatientProfile) => boolean
+  condition: (
+    sessionData: SessionData,
+    patientProfile: PatientProfile,
+  ) => boolean
   suggestions: Intervention[]
   priority: 'low' | 'medium' | 'high' | 'critical'
   evidence: string[]
@@ -51,16 +54,23 @@ class InterventionEngine {
         name: 'Crisis Detection',
         description: 'Immediate intervention for crisis situations',
         condition: (session, patient) => {
-          const crisisKeywords = ['suicide', 'kill myself', 'end it all', 'hurt myself', 'die']
+          const crisisKeywords = [
+            'suicide',
+            'kill myself',
+            'end it all',
+            'hurt myself',
+            'die',
+          ]
           const transcript = session.transcript?.toLowerCase() || ''
-          return crisisKeywords.some(keyword => transcript.includes(keyword))
+          return crisisKeywords.some((keyword) => transcript.includes(keyword))
         },
         suggestions: [
           {
             type: 'immediate',
             category: 'crisis',
             title: 'Crisis Intervention Protocol',
-            description: 'Immediate safety assessment and intervention required',
+            description:
+              'Immediate safety assessment and intervention required',
             actions: [
               'Assess immediate risk',
               'Contact emergency services if needed',
@@ -116,9 +126,10 @@ class InterventionEngine {
 
           if (sessionCount < 5) return false
 
-          const depressedMoodCount = recentSessions.filter(s =>
-            s.emotionAnalysis?.dominantEmotion === 'sad' ||
-            s.emotionAnalysis?.dominantEmotion === 'depressed'
+          const depressedMoodCount = recentSessions.filter(
+            (s) =>
+              s.emotionAnalysis?.dominantEmotion === 'sad' ||
+              s.emotionAnalysis?.dominantEmotion === 'depressed',
           ).length
 
           return depressedMoodCount >= 3
@@ -140,7 +151,7 @@ class InterventionEngine {
         ],
         priority: 'high',
         evidence: ['Depression treatment guidelines', 'Longitudinal studies'],
-        confidence: 0.80,
+        confidence: 0.8,
       },
 
       // Therapeutic alliance building
@@ -202,7 +213,7 @@ class InterventionEngine {
         ],
         priority: 'medium',
         evidence: ['Positive psychology research', 'Motivational interviewing'],
-        confidence: 0.70,
+        confidence: 0.7,
       },
     ]
   }
@@ -211,8 +222,9 @@ class InterventionEngine {
     const recentSessions = patient.sessionHistory?.slice(-5) || []
     if (recentSessions.length === 0) return 0.5
 
-    const sum = recentSessions.reduce((acc, session) =>
-      acc + (session.emotionAnalysis?.moodScore || 0.5), 0
+    const sum = recentSessions.reduce(
+      (acc, session) => acc + (session.emotionAnalysis?.moodScore || 0.5),
+      0,
     )
     return sum / recentSessions.length
   }
@@ -223,7 +235,7 @@ class InterventionEngine {
   async generateInterventions(
     sessionData: SessionData,
     patientProfile: PatientProfile,
-    context?: Partial<InterventionContext>
+    context?: Partial<InterventionContext>,
   ): Promise<InterventionResult> {
     this.context = {
       patientHistory: [patientProfile],
@@ -234,8 +246,8 @@ class InterventionEngine {
       ...context,
     }
 
-    const applicableRules = this.rules.filter(rule =>
-      rule.condition(sessionData, patientProfile)
+    const applicableRules = this.rules.filter((rule) =>
+      rule.condition(sessionData, patientProfile),
     )
 
     // Sort by priority and confidence
@@ -254,53 +266,75 @@ class InterventionEngine {
       const rule = applicableRules[i]
       selectedInterventions.push(...rule.suggestions)
 
-      reasoning.push(`${rule.name}: ${rule.description} (confidence: ${(rule.confidence * 100).toFixed(1)}%)`)
+      reasoning.push(
+        `${rule.name}: ${rule.description} (confidence: ${(rule.confidence * 100).toFixed(1)}%)`,
+      )
 
       // Add alternative interventions
       if (i === 0 && applicableRules.length > 1) {
-        alternatives.push(...applicableRules.slice(1, 3).flatMap(r => r.suggestions))
+        alternatives.push(
+          ...applicableRules.slice(1, 3).flatMap((r) => r.suggestions),
+        )
       }
     }
 
-    const overallConfidence = applicableRules.length > 0
-      ? applicableRules.slice(0, 3).reduce((sum, rule) => sum + rule.confidence, 0) / Math.min(3, applicableRules.length)
-      : 0
+    const overallConfidence =
+      applicableRules.length > 0
+        ? applicableRules
+            .slice(0, 3)
+            .reduce((sum, rule) => sum + rule.confidence, 0) /
+          Math.min(3, applicableRules.length)
+        : 0
 
     return {
       interventions: selectedInterventions,
       reasoning,
       confidence: overallConfidence,
       alternatives,
-      followUp: this.generateFollowUpRecommendations(sessionData, patientProfile),
+      followUp: this.generateFollowUpRecommendations(
+        sessionData,
+        patientProfile,
+      ),
     }
   }
 
   private generateFollowUpRecommendations(
     sessionData: SessionData,
-    patientProfile: PatientProfile
+    patientProfile: PatientProfile,
   ): string[] {
     const recommendations: string[] = []
 
     // Check homework completion
     if (sessionData.homeworkAssigned && !sessionData.homeworkCompleted) {
-      recommendations.push('Follow up on assigned homework and address barriers to completion')
+      recommendations.push(
+        'Follow up on assigned homework and address barriers to completion',
+      )
     }
 
     // Check medication adherence if applicable
     if (patientProfile.medication && sessionData.medicationAdherence < 0.8) {
-      recommendations.push('Review medication adherence and address any concerns or side effects')
+      recommendations.push(
+        'Review medication adherence and address any concerns or side effects',
+      )
     }
 
     // Check session frequency
     const daysSinceLastSession = patientProfile.daysSinceLastSession || 0
     if (daysSinceLastSession > 14) {
-      recommendations.push('Consider increasing session frequency for more intensive support')
+      recommendations.push(
+        'Consider increasing session frequency for more intensive support',
+      )
     }
 
     // Check for emerging patterns
-    const recentEmotions = patientProfile.sessionHistory?.slice(-3).map(s => s.emotionAnalysis?.dominantEmotion) || []
-    if (recentEmotions.every(emotion => emotion === 'anxious')) {
-      recommendations.push('Consider anxiety-focused interventions in next session')
+    const recentEmotions =
+      patientProfile.sessionHistory
+        ?.slice(-3)
+        .map((s) => s.emotionAnalysis?.dominantEmotion) || []
+    if (recentEmotions.every((emotion) => emotion === 'anxious')) {
+      recommendations.push(
+        'Consider anxiety-focused interventions in next session',
+      )
     }
 
     return recommendations
@@ -319,7 +353,7 @@ class InterventionEngine {
    */
   removeRule(ruleId: string): boolean {
     const initialLength = this.rules.length
-    this.rules = this.rules.filter(rule => rule.id !== ruleId)
+    this.rules = this.rules.filter((rule) => rule.id !== ruleId)
     return this.rules.length < initialLength
   }
 
@@ -335,11 +369,14 @@ class InterventionEngine {
    * Update rule based on effectiveness
    */
   updateRuleEffectiveness(ruleId: string, effectiveness: number): boolean {
-    const rule = this.rules.find(r => r.id === ruleId)
+    const rule = this.rules.find((r) => r.id === ruleId)
     if (!rule) return false
 
     // Adjust confidence based on effectiveness feedback
-    rule.confidence = Math.max(0.1, Math.min(0.99, rule.confidence + (effectiveness - 0.5) * 0.1))
+    rule.confidence = Math.max(
+      0.1,
+      Math.min(0.99, rule.confidence + (effectiveness - 0.5) * 0.1),
+    )
     return true
   }
 
@@ -357,9 +394,12 @@ class InterventionEngine {
     rulePerformance: Record<string, { usage: number; effectiveness: number }>
     recommendations: string[]
   }> {
-    const performance: Record<string, { usage: number; effectiveness: number }> = {}
+    const performance: Record<
+      string,
+      { usage: number; effectiveness: number }
+    > = {}
 
-    this.rules.forEach(rule => {
+    this.rules.forEach((rule) => {
       performance[rule.id] = {
         usage: Math.floor(Math.random() * 50), // Mock usage data
         effectiveness: rule.confidence + (Math.random() - 0.5) * 0.2, // Mock effectiveness
@@ -371,15 +411,19 @@ class InterventionEngine {
     // Identify low-performing rules
     Object.entries(performance).forEach(([ruleId, stats]) => {
       if (stats.effectiveness < 0.6) {
-        recommendations.push(`Review rule ${ruleId}: low effectiveness (${(stats.effectiveness * 100).toFixed(1)}%)`)
+        recommendations.push(
+          `Review rule ${ruleId}: low effectiveness (${(stats.effectiveness * 100).toFixed(1)}%)`,
+        )
       }
     })
 
     // Identify underused high-confidence rules
     Object.entries(performance).forEach(([ruleId, stats]) => {
-      const rule = this.rules.find(r => r.id === ruleId)
+      const rule = this.rules.find((r) => r.id === ruleId)
       if (rule && rule.confidence > 0.8 && stats.usage < 5) {
-        recommendations.push(`Consider promoting rule ${ruleId}: high confidence but low usage`)
+        recommendations.push(
+          `Consider promoting rule ${ruleId}: high confidence but low usage`,
+        )
       }
     })
 

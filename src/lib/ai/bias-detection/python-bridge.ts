@@ -6,7 +6,11 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { ConnectionPool, ConnectionPoolConfig, PooledConnection } from './connection-pool'
+import {
+  ConnectionPool,
+  ConnectionPoolConfig,
+  PooledConnection,
+} from './connection-pool'
 import type {
   TherapeuticSession,
   PreprocessingLayerResult,
@@ -61,7 +65,7 @@ export class PythonBiasDetectionBridge {
     public url: string = 'http://localhost:5000',
     public timeoutMs: number = 30000,
     connectionPool?: ConnectionPool,
-    poolConfig?: Partial<ConnectionPoolConfig>
+    poolConfig?: Partial<ConnectionPoolConfig>,
   ) {
     this.baseUrl = url.replace(/\/$/, '') // Remove trailing slash
     this.timeout = timeoutMs
@@ -138,7 +142,7 @@ export class PythonBiasDetectionBridge {
 
   private async queueRequest<T>(
     requestFn: () => Promise<T>,
-    priority: number = 1
+    priority: number = 1,
   ): Promise<T> {
     return new Promise((resolve, reject) => {
       const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -167,16 +171,20 @@ export class PythonBiasDetectionBridge {
 
     while (this.requestQueue.length > 0 || this.activeRequests > 0) {
       // Process requests up to the concurrent limit
-      while (this.requestQueue.length > 0 && this.activeRequests < this.maxConcurrentRequests) {
+      while (
+        this.requestQueue.length > 0 &&
+        this.activeRequests < this.maxConcurrentRequests
+      ) {
         const queuedRequest = this.requestQueue.shift()!
         this.activeRequests++
 
         // Execute request asynchronously
-        queuedRequest.request()
-          .then(result => {
+        queuedRequest
+          .request()
+          .then((result) => {
             queuedRequest.resolve(result)
           })
-          .catch(error => {
+          .catch((error) => {
             queuedRequest.reject(error)
           })
           .finally(() => {
@@ -185,7 +193,7 @@ export class PythonBiasDetectionBridge {
       }
 
       // Wait a bit before checking again
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10))
     }
 
     this.processingQueue = false
@@ -220,7 +228,6 @@ export class PythonBiasDetectionBridge {
     // Build a fetch signal compatible with Node, jsdom, and test envs.
     // We'll create a per-request AbortController if AbortSignal.timeout is not available.
     let timeoutId: NodeJS.Timeout | null = null
-    
 
     const fetchOptions: RequestInit = {
       method,
@@ -239,10 +246,15 @@ export class PythonBiasDetectionBridge {
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
         // Acquire a pooled connection for this request if the pool supports it
-        if (this.connectionPool && typeof (this.connectionPool as any).acquireConnection === 'function') {
+        if (
+          this.connectionPool &&
+          typeof (this.connectionPool as any).acquireConnection === 'function'
+        ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
-          pooledConnection = await (this.connectionPool as any).acquireConnection()
+          pooledConnection = await (
+            this.connectionPool as any
+          ).acquireConnection()
         }
         // Simplified signal handling for test compatibility
         // In test environments, don't use AbortSignal to avoid compatibility issues
@@ -251,10 +263,14 @@ export class PythonBiasDetectionBridge {
         } else {
           // Always create a fresh AbortController to avoid identity issues
           const controller = new AbortController()
-          
+
           // Set up timeout
           timeoutId = setTimeout(() => {
-            try { controller.abort() } catch (e) { /* ignore */ }
+            try {
+              controller.abort()
+            } catch (e) {
+              /* ignore */
+            }
           }, this.timeout)
 
           // Attach the signal to fetch options for this attempt
@@ -265,7 +281,7 @@ export class PythonBiasDetectionBridge {
         )
 
         const response = await fetch(url, fetchOptions)
-        
+
         // Clear timeout
         if (timeoutId) {
           clearTimeout(timeoutId)
@@ -300,7 +316,11 @@ export class PythonBiasDetectionBridge {
         }
       } finally {
         // Always release the connection if it was acquired and the pool supports releaseConnection
-        if (pooledConnection && this.connectionPool && typeof (this.connectionPool as any).releaseConnection === 'function') {
+        if (
+          pooledConnection &&
+          this.connectionPool &&
+          typeof (this.connectionPool as any).releaseConnection === 'function'
+        ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
           ;(this.connectionPool as any).releaseConnection(pooledConnection)
@@ -324,29 +344,45 @@ export class PythonBiasDetectionBridge {
   ): Promise<PreprocessingLayerResult> {
     try {
       // Should call another method, like makeRequest, to get the analysis from Python service
-      const result = (await this.makeRequest('/analyze/preprocessing', 'POST', sessionData)) as PythonAnalysisResult
+      const result = (await this.makeRequest(
+        '/analyze/preprocessing',
+        'POST',
+        sessionData,
+      )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.preprocessing
       if (layerResult) {
         // Map Python response structure to TypeScript expectations
         // Ensure all expected properties and TypeScript fields are filled
         // Defensively hydrate all intermediate metric objects to avoid undefined access errors
-        const metrics = typeof layerResult.metrics === 'object' && layerResult.metrics
-          ? layerResult.metrics as Record<string, any>
-          : {};
-        const ling = typeof metrics['linguistic_bias'] === 'object' && metrics['linguistic_bias']
-          ? metrics['linguistic_bias'] as Record<string, any>
-          : {};
-        const sentiment = typeof ling['sentiment_analysis'] === 'object' && ling['sentiment_analysis']
-          ? ling['sentiment_analysis'] as Record<string, any>
-          : {};
-        const rep = typeof metrics['representation_analysis'] === 'object' && metrics['representation_analysis']
-          ? metrics['representation_analysis'] as Record<string, any>
-          : {};
-        const dq = typeof metrics['data_quality_metrics'] === 'object' && metrics['data_quality_metrics']
-          ? metrics['data_quality_metrics'] as Record<string, any>
-          : {};
+        const metrics =
+          typeof layerResult.metrics === 'object' && layerResult.metrics
+            ? (layerResult.metrics as Record<string, any>)
+            : {}
+        const ling =
+          typeof metrics['linguistic_bias'] === 'object' &&
+          metrics['linguistic_bias']
+            ? (metrics['linguistic_bias'] as Record<string, any>)
+            : {}
+        const sentiment =
+          typeof ling['sentiment_analysis'] === 'object' &&
+          ling['sentiment_analysis']
+            ? (ling['sentiment_analysis'] as Record<string, any>)
+            : {}
+        const rep =
+          typeof metrics['representation_analysis'] === 'object' &&
+          metrics['representation_analysis']
+            ? (metrics['representation_analysis'] as Record<string, any>)
+            : {}
+        const dq =
+          typeof metrics['data_quality_metrics'] === 'object' &&
+          metrics['data_quality_metrics']
+            ? (metrics['data_quality_metrics'] as Record<string, any>)
+            : {}
         return {
-          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          biasScore:
+            typeof layerResult.bias_score === 'number'
+              ? layerResult.bias_score
+              : 0.5,
           linguisticBias: {
             genderBiasScore: ling['gender_bias_score'] ?? 0.5,
             racialBiasScore: ling['racial_bias_score'] ?? 0.5,
@@ -371,7 +407,7 @@ export class PythonBiasDetectionBridge {
             underrepresentedGroups: rep['underrepresented_groups'] ?? [],
             overrepresentedGroups: rep['overrepresented_groups'] ?? [],
             diversityIndex: rep['diversity_index'] ?? 0,
-            intersectionalityAnalysis: rep['intersectionality_analysis'] ?? []
+            intersectionalityAnalysis: rep['intersectionality_analysis'] ?? [],
           },
           dataQualityMetrics: {
             completeness: dq['completeness'] ?? 1,
@@ -382,26 +418,33 @@ export class PythonBiasDetectionBridge {
             validity: dq['validity'] ?? 1,
             missingDataByDemographic: dq['missingDataByDemographic'] ?? {},
           },
-          detectedBiases: layerResult.detected_biases ?? ['service_unavailable'],
-          recommendations: layerResult.recommendations ?? ['Python service unavailable - using fallback analysis'],
+          detectedBiases: layerResult.detected_biases ?? [
+            'service_unavailable',
+          ],
+          recommendations: layerResult.recommendations ?? [
+            'Python service unavailable - using fallback analysis',
+          ],
           layer: layerResult.layer ?? 'preprocessing',
           timestamp: result.timestamp ?? new Date().toISOString(),
-          sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
+          sessionId:
+            (sessionData as TherapeuticSession)?.sessionId || 'unknown',
           fallbackMode: false,
           serviceError: undefined,
-  } as PreprocessingLayerResult;
+        } as PreprocessingLayerResult
       }
       // Fallback: construct and return PreprocessingAnalysisResult with neutral values
-  return this.createFallbackPreprocessingResult(sessionData)
+      return this.createFallbackPreprocessingResult(sessionData)
     } catch (error: unknown) {
-      logger.warn("Error in runPreprocessingAnalysis, returning fallback", { error })
+      logger.warn('Error in runPreprocessingAnalysis, returning fallback', {
+        error,
+      })
       return this.createFallbackPreprocessingResult(sessionData, error)
     }
   }
 
   private createFallbackPreprocessingResult(
     sessionData: TherapeuticSession,
-    error?: unknown
+    error?: unknown,
   ): PreprocessingLayerResult {
     return {
       biasScore: 0.5,
@@ -450,24 +493,43 @@ export class PythonBiasDetectionBridge {
       timestamp: new Date().toISOString(),
       sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
       fallbackMode: true,
-      serviceError: error instanceof Error ? error.message : error ? String(error) : 'Python service unavailable',
-    } as PreprocessingLayerResult;
+      serviceError:
+        error instanceof Error
+          ? error.message
+          : error
+            ? String(error)
+            : 'Python service unavailable',
+    } as PreprocessingLayerResult
   }
 
   async runModelLevelAnalysis(
     sessionData: TherapeuticSession,
   ): Promise<ModelLevelLayerResult> {
     try {
-      const result = (await this.makeRequest('/analyze/model_level', 'POST', sessionData)) as PythonAnalysisResult
+      const result = (await this.makeRequest(
+        '/analyze/model_level',
+        'POST',
+        sessionData,
+      )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
       if (layerResult) {
-  const metrics = layerResult.metrics || {} as Record<string, any>;
-        const fairness = (metrics['fairness_metrics'] ?? {}) as Record<string, any>;
-        const performance = (metrics['performance_metrics'] ?? {}) as Record<string, any>;
-        const groupComp = (metrics['group_performance_comparison'] ?? []) as any[];
+        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const fairness = (metrics['fairness_metrics'] ?? {}) as Record<
+          string,
+          any
+        >
+        const performance = (metrics['performance_metrics'] ?? {}) as Record<
+          string,
+          any
+        >
+        const groupComp = (metrics['group_performance_comparison'] ??
+          []) as any[]
 
         return {
-          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          biasScore:
+            typeof layerResult.bias_score === 'number'
+              ? layerResult.bias_score
+              : 0.5,
           fairnessMetrics: {
             demographicParity: fairness['demographic_parity'] ?? 0.5,
             equalizedOdds: fairness['equalized_odds'] ?? 0.5,
@@ -491,7 +553,9 @@ export class PythonBiasDetectionBridge {
       }
       return this.createFallbackModelLevelResult(sessionData)
     } catch (error: unknown) {
-      logger.warn("Error in runModelLevelAnalysis, returning fallback", { error })
+      logger.warn('Error in runModelLevelAnalysis, returning fallback', {
+        error,
+      })
       return this.createFallbackModelLevelResult(sessionData, error)
     }
   }
@@ -500,16 +564,24 @@ export class PythonBiasDetectionBridge {
     sessionData: TherapeuticSession,
   ): Promise<InteractiveLayerResult> {
     try {
-      const result = (await this.makeRequest('/analyze/interactive', 'POST', sessionData)) as PythonAnalysisResult
+      const result = (await this.makeRequest(
+        '/analyze/interactive',
+        'POST',
+        sessionData,
+      )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
       if (layerResult) {
-  const metrics = layerResult.metrics || {} as Record<string, any>;
-        const counterfactual = (metrics['counterfactual_analysis'] ?? {}) as Record<string, any>;
-        const featureImp = (metrics['feature_importance'] ?? []) as any[];
-        const whatIf = (metrics['what_if_scenarios'] ?? []) as any[];
+        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const counterfactual = (metrics['counterfactual_analysis'] ??
+          {}) as Record<string, any>
+        const featureImp = (metrics['feature_importance'] ?? []) as any[]
+        const whatIf = (metrics['what_if_scenarios'] ?? []) as any[]
 
         return {
-          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          biasScore:
+            typeof layerResult.bias_score === 'number'
+              ? layerResult.bias_score
+              : 0.5,
           counterfactualAnalysis: {
             scenariosAnalyzed: counterfactual['scenarios_analyzed'] ?? 0,
             biasDetected: counterfactual['bias_detected'] ?? false,
@@ -523,7 +595,9 @@ export class PythonBiasDetectionBridge {
       }
       return this.createFallbackInteractiveResult(sessionData)
     } catch (error: unknown) {
-      logger.warn("Error in runInteractiveAnalysis, returning fallback", { error })
+      logger.warn('Error in runInteractiveAnalysis, returning fallback', {
+        error,
+      })
       return this.createFallbackInteractiveResult(sessionData, error)
     }
   }
@@ -532,16 +606,29 @@ export class PythonBiasDetectionBridge {
     sessionData: TherapeuticSession,
   ): Promise<EvaluationLayerResult> {
     try {
-      const result = (await this.makeRequest('/analyze/evaluation', 'POST', sessionData)) as PythonAnalysisResult
+      const result = (await this.makeRequest(
+        '/analyze/evaluation',
+        'POST',
+        sessionData,
+      )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
       if (layerResult) {
-  const metrics = layerResult.metrics || {} as Record<string, any>;
-        const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<string, any>;
-        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>;
-        const temporal = (metrics['temporal_analysis'] ?? {}) as Record<string, any>;
+        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<
+          string,
+          any
+        >
+        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>
+        const temporal = (metrics['temporal_analysis'] ?? {}) as Record<
+          string,
+          any
+        >
 
         return {
-          biasScore: typeof layerResult.bias_score === 'number' ? layerResult.bias_score : 0.5,
+          biasScore:
+            typeof layerResult.bias_score === 'number'
+              ? layerResult.bias_score
+              : 0.5,
           huggingFaceMetrics: {
             toxicity: huggingFace['toxicity'] ?? 0.1,
             bias: huggingFace['bias'] ?? 0.2,
@@ -559,23 +646,29 @@ export class PythonBiasDetectionBridge {
             trendDirection: temporal['trend_direction'] ?? 'stable',
             changeRate: temporal['change_rate'] ?? 0,
             seasonalPatterns: temporal['seasonal_patterns'] ?? [],
-            interventionEffectiveness: temporal['intervention_effectiveness'] ?? [],
+            interventionEffectiveness:
+              temporal['intervention_effectiveness'] ?? [],
           },
           recommendations: layerResult.recommendations ?? [],
         }
       }
       return this.createFallbackEvaluationResult(sessionData)
     } catch (error: unknown) {
-      logger.warn("Error in runEvaluationAnalysis, returning fallback", { error })
+      logger.warn('Error in runEvaluationAnalysis, returning fallback', {
+        error,
+      })
       return this.createFallbackEvaluationResult(sessionData, error)
     }
   }
 
   private createFallbackModelLevelResult(
     sessionData: TherapeuticSession,
-    error?: unknown
+    error?: unknown,
   ): ModelLevelLayerResult {
-    logger.warn("Creating fallback model level result", { sessionId: sessionData.sessionId, error })
+    logger.warn('Creating fallback model level result', {
+      sessionId: sessionData.sessionId,
+      error,
+    })
     return {
       biasScore: 0.5,
       fairnessMetrics: {
@@ -596,15 +689,20 @@ export class PythonBiasDetectionBridge {
         demographicBreakdown: {},
       },
       groupPerformanceComparison: [],
-      recommendations: ['Model-level analysis unavailable; using fallback results'],
+      recommendations: [
+        'Model-level analysis unavailable; using fallback results',
+      ],
     }
   }
 
   private createFallbackInteractiveResult(
     sessionData: TherapeuticSession,
-    error?: unknown
+    error?: unknown,
   ): InteractiveLayerResult {
-    logger.warn("Creating fallback interactive result", { sessionId: sessionData.sessionId, error })
+    logger.warn('Creating fallback interactive result', {
+      sessionId: sessionData.sessionId,
+      error,
+    })
     return {
       biasScore: 0.5,
       counterfactualAnalysis: {
@@ -615,15 +713,20 @@ export class PythonBiasDetectionBridge {
       },
       featureImportance: [],
       whatIfScenarios: [],
-      recommendations: ['Interactive analysis unavailable; using fallback results'],
+      recommendations: [
+        'Interactive analysis unavailable; using fallback results',
+      ],
     }
   }
 
   private createFallbackEvaluationResult(
     sessionData: TherapeuticSession,
-    error?: unknown
+    error?: unknown,
   ): EvaluationLayerResult {
-    logger.warn("Creating fallback evaluation result", { sessionId: sessionData.sessionId, error })
+    logger.warn('Creating fallback evaluation result', {
+      sessionId: sessionData.sessionId,
+      error,
+    })
     return {
       biasScore: 0.5,
       huggingFaceMetrics: {
@@ -645,7 +748,9 @@ export class PythonBiasDetectionBridge {
         seasonalPatterns: [],
         interventionEffectiveness: [],
       },
-      recommendations: ['Evaluation analysis unavailable; using fallback results'],
+      recommendations: [
+        'Evaluation analysis unavailable; using fallback results',
+      ],
     }
   }
 
@@ -654,8 +759,14 @@ export class PythonBiasDetectionBridge {
       const result = await this.makeRequest('/health', 'GET')
       return result as PythonHealthResponse
     } catch (error: unknown) {
-      logger.warn("Error checking health, returning unhealthy status", { error })
-      return { status: 'unhealthy', message: 'Service unavailable', timestamp: new Date().toISOString() }
+      logger.warn('Error checking health, returning unhealthy status', {
+        error,
+      })
+      return {
+        status: 'unhealthy',
+        message: 'Service unavailable',
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
@@ -667,7 +778,11 @@ export class PythonBiasDetectionBridge {
     }
   }
 
-  getHealthStatus(): { status: string; lastCheck: Date; consecutiveFailures: number } {
+  getHealthStatus(): {
+    status: string
+    lastCheck: Date
+    consecutiveFailures: number
+  } {
     return {
       status: this.healthStatus,
       lastCheck: this.lastHealthCheck,
@@ -763,7 +878,10 @@ export class PythonBiasDetectionBridge {
     // Stop internal timers and dispose of connection pool
     try {
       this.stopHealthMonitoring()
-      if (this.connectionPool && typeof (this.connectionPool as any).dispose === 'function') {
+      if (
+        this.connectionPool &&
+        typeof (this.connectionPool as any).dispose === 'function'
+      ) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - runtime check above ensures this exists
         await (this.connectionPool as any).dispose()

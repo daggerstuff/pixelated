@@ -5,7 +5,6 @@
 
 import promClient from 'prom-client'
 
-
 // Create a Registry to register the metrics
 const register = new promClient.Registry()
 

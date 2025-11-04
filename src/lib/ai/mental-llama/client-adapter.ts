@@ -54,7 +54,7 @@ class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
       return result as MentalHealthAnalysisResult
     } catch (error) {
       logger.error('Failed to analyze mental health via API', { error })
-      
+
       // Return a fallback analysis result
       return {
         hasMentalHealthIssue: false,
@@ -81,7 +81,7 @@ export async function createClientMentalLLaMAAdapter(): Promise<{
   adapter: ClientMentalLLaMAAdapter
 }> {
   logger.info('Creating client-side MentalLLaMA adapter')
-  
+
   return {
     adapter: new ApiMentalLLaMAAdapter(),
   }

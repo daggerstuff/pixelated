@@ -11,13 +11,27 @@ interface ParticleProps {
   velocity: [number, number, number]
   color: string
   size: number
-  emotion?: 'joy' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'disgust' | 'neutral'
+  emotion?:
+    | 'joy'
+    | 'sadness'
+    | 'anger'
+    | 'fear'
+    | 'surprise'
+    | 'disgust'
+    | 'neutral'
   intensity: number
 }
 
 interface ParticleSystemProps {
   particleCount?: number
-  emotion?: 'joy' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'disgust' | 'neutral'
+  emotion?:
+    | 'joy'
+    | 'sadness'
+    | 'anger'
+    | 'fear'
+    | 'surprise'
+    | 'disgust'
+    | 'neutral'
   interactive?: boolean
   autoAnimate?: boolean
   className?: string
@@ -25,7 +39,7 @@ interface ParticleSystemProps {
   showTrails?: boolean
 }
 
-const ParticleSystem: React.FC<{ 
+const ParticleSystem: React.FC<{
   particles: ParticleProps[]
   mousePosition: THREE.Vector3
   interactive: boolean
@@ -42,13 +56,16 @@ const ParticleSystem: React.FC<{
     groupRef.current.children.forEach((child, index) => {
       const mesh = child as THREE.Mesh
       const particle = particles[index]
-      
+
       if (!particle) return
 
       // Emotion-based movement patterns
       const time = state.clock.elapsedTime
-      const emotionFactor = getEmotionMovementFactor(particle.emotion || 'neutral', time)
-      
+      const emotionFactor = getEmotionMovementFactor(
+        particle.emotion || 'neutral',
+        time,
+      )
+
       // Base movement
       mesh.position.x += particle.velocity[0] * delta * emotionFactor.speed
       mesh.position.y += particle.velocity[1] * delta * emotionFactor.speed
@@ -57,14 +74,18 @@ const ParticleSystem: React.FC<{
       // Emotion-specific behaviors
       switch (particle.emotion) {
         case 'joy':
-          mesh.position.y += Math.sin(time * 2 + index) * 0.02 * particle.intensity
+          mesh.position.y +=
+            Math.sin(time * 2 + index) * 0.02 * particle.intensity
           break
         case 'sadness':
-          mesh.position.y -= Math.abs(Math.sin(time * 0.5 + index)) * 0.01 * particle.intensity
+          mesh.position.y -=
+            Math.abs(Math.sin(time * 0.5 + index)) * 0.01 * particle.intensity
           break
         case 'anger':
-          mesh.position.x += Math.sin(time * 4 + index) * 0.03 * particle.intensity
-          mesh.position.z += Math.cos(time * 4 + index) * 0.03 * particle.intensity
+          mesh.position.x +=
+            Math.sin(time * 4 + index) * 0.03 * particle.intensity
+          mesh.position.z +=
+            Math.cos(time * 4 + index) * 0.03 * particle.intensity
           break
         case 'fear':
           // Jittery movement
@@ -72,8 +93,8 @@ const ParticleSystem: React.FC<{
             new THREE.Vector3(
               (Math.random() - 0.5) * 0.02 * particle.intensity,
               (Math.random() - 0.5) * 0.02 * particle.intensity,
-              (Math.random() - 0.5) * 0.02 * particle.intensity
-            )
+              (Math.random() - 0.5) * 0.02 * particle.intensity,
+            ),
           )
           break
         case 'surprise':
@@ -83,8 +104,8 @@ const ParticleSystem: React.FC<{
               new THREE.Vector3(
                 (Math.random() - 0.5) * 0.1 * particle.intensity,
                 (Math.random() - 0.5) * 0.1 * particle.intensity,
-                (Math.random() - 0.5) * 0.1 * particle.intensity
-              )
+                (Math.random() - 0.5) * 0.1 * particle.intensity,
+              ),
             )
           }
           break
@@ -94,12 +115,12 @@ const ParticleSystem: React.FC<{
       if (interactive && mousePosition) {
         const distance = mesh.position.distanceTo(mousePosition)
         const maxDistance = 5
-        
+
         if (distance < maxDistance) {
           const direction = new THREE.Vector3()
             .subVectors(mesh.position, mousePosition)
             .normalize()
-          
+
           const force = (1 - distance / maxDistance) * 0.02 * particle.intensity
           mesh.position.add(direction.multiplyScalar(force))
         }
@@ -126,16 +147,18 @@ const ParticleSystem: React.FC<{
       mesh.rotation.z += emotionFactor.rotation * delta * 0.3
 
       // Scale pulsing
-      const scale = 1 + Math.sin(time * emotionFactor.pulse + index) * 0.2 * particle.intensity
+      const scale =
+        1 +
+        Math.sin(time * emotionFactor.pulse + index) * 0.2 * particle.intensity
       mesh.scale.setScalar(scale)
     })
 
     // Update trails if enabled
     if (showTrails && groupRef.current.children.length > 0) {
-      const newTrailPoints = groupRef.current.children.slice(0, 5).map(child => 
-        (child as THREE.Mesh).position.clone()
-      )
-      setTrailPoints(prev => [...prev.slice(-50), ...newTrailPoints])
+      const newTrailPoints = groupRef.current.children
+        .slice(0, 5)
+        .map((child) => (child as THREE.Mesh).position.clone())
+      setTrailPoints((prev) => [...prev.slice(-50), ...newTrailPoints])
     }
   })
 
@@ -153,7 +176,7 @@ const ParticleSystem: React.FC<{
           />
         </mesh>
       ))}
-      
+
       {/* Trail visualization */}
       {showTrails && trailPoints.length > 1 && (
         <line>
@@ -161,7 +184,9 @@ const ParticleSystem: React.FC<{
             <bufferAttribute
               attach="attributes-position"
               count={trailPoints.length}
-              array={new Float32Array(trailPoints.flatMap(p => [p.x, p.y, p.z]))}
+              array={
+                new Float32Array(trailPoints.flatMap((p) => [p.x, p.y, p.z]))
+              }
               itemSize={3}
             />
           </bufferGeometry>
@@ -193,17 +218,17 @@ const getEmotionMovementFactor = (emotion: string, time: number) => {
 
 const getEmotionColor = (emotion: string, intensity: number) => {
   const colors = {
-    joy: '#FFD700',      // Gold
-    sadness: '#4682B4',  // Steel Blue
-    anger: '#DC143C',    // Crimson
-    fear: '#9932CC',     // Dark Orchid
+    joy: '#FFD700', // Gold
+    sadness: '#4682B4', // Steel Blue
+    anger: '#DC143C', // Crimson
+    fear: '#9932CC', // Dark Orchid
     surprise: '#FF69B4', // Hot Pink
-    disgust: '#228B22',  // Forest Green
-    neutral: '#708090',  // Slate Gray
+    disgust: '#228B22', // Forest Green
+    neutral: '#708090', // Slate Gray
   }
-  
+
   const baseColor = colors[emotion as keyof typeof colors] || colors.neutral
-  
+
   // Adjust color intensity
   const color = new THREE.Color(baseColor)
   const factor = 0.5 + intensity * 0.5
@@ -250,11 +275,11 @@ const Particle: React.FC<ParticleSystemProps> = ({
 
   const handleMouseMove = (event: React.MouseEvent) => {
     if (!enableMouse) return
-    
+
     const rect = (event.target as Element).getBoundingClientRect()
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-    
+
     setMousePosition(new THREE.Vector3(x * 8, y * 8, 0))
   }
 
@@ -263,25 +288,30 @@ const Particle: React.FC<ParticleSystemProps> = ({
       <Canvas
         camera={{ position: [8, 8, 8], fov: 60 }}
         onMouseMove={handleMouseMove}
-        style={{ 
-          background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%)',
-          cursor: interactive ? 'pointer' : 'default'
+        style={{
+          background:
+            'linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%)',
+          cursor: interactive ? 'pointer' : 'default',
         }}
       >
         {/* Lighting */}
         <ambientLight intensity={0.3} />
         <pointLight position={[10, 10, 10]} intensity={0.6} />
-        <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4444ff" />
+        <pointLight
+          position={[-10, -10, -10]}
+          intensity={0.3}
+          color="#4444ff"
+        />
         <pointLight position={[0, 0, 0]} intensity={0.4} color="#ff4444" />
 
         {/* Background stars */}
-        <Stars 
-          radius={100} 
-          depth={50} 
-          count={1000} 
-          factor={4} 
-          saturation={0} 
-          fade 
+        <Stars
+          radius={100}
+          depth={50}
+          count={1000}
+          factor={4}
+          saturation={0}
+          fade
           speed={0.5}
         />
 
@@ -310,7 +340,17 @@ const Particle: React.FC<ParticleSystemProps> = ({
       <div className="absolute top-4 left-4 bg-black bg-opacity-60 text-white p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-3">Emotion Controls</h3>
         <div className="grid grid-cols-2 gap-2">
-          {(['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'] as const).map((emotionType) => (
+          {(
+            [
+              'joy',
+              'sadness',
+              'anger',
+              'fear',
+              'surprise',
+              'disgust',
+              'neutral',
+            ] as const
+          ).map((emotionType) => (
             <button
               key={emotionType}
               onClick={() => setCurrentEmotion(emotionType)}
@@ -324,7 +364,7 @@ const Particle: React.FC<ParticleSystemProps> = ({
             </button>
           ))}
         </div>
-        
+
         <div className="mt-4 text-sm text-gray-300">
           <div>Particles: {particleCount}</div>
           <div>Interactive: {interactive ? 'On' : 'Off'}</div>
@@ -335,7 +375,10 @@ const Particle: React.FC<ParticleSystemProps> = ({
       {/* Instructions */}
       {interactive && (
         <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white p-3 rounded text-sm max-w-xs">
-          <p>Move your mouse to interact with particles. Use mouse wheel to zoom and drag to rotate the view.</p>
+          <p>
+            Move your mouse to interact with particles. Use mouse wheel to zoom
+            and drag to rotate the view.
+          </p>
         </div>
       )}
     </div>

@@ -52,8 +52,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@modelcontextprotocol/sdk':
-        specifier: ^1.20.1
-        version: 1.20.2
+        specifier: ^1.21.0
+        version: 1.21.0
       '@opentelemetry/api':
         specifier: ^1.6.0
         version: 1.6.0
@@ -2132,9 +2132,14 @@ packages:
   '@microsoft/clarity@1.0.0':
     resolution: {integrity: sha512-2QY6SmXnqRj6dWhNY8NYCN3e53j4zCFebH4wGnNhdGV1mqAsQwql2fT0w8TISxCvwwfVp8idsWLIdrRHOms1PQ==}
 
-  '@modelcontextprotocol/sdk@1.20.2':
-    resolution: {integrity: sha512-6rqTdFt67AAAzln3NOKsXRmv5ZzPkgbfaebKBqUbts7vK1GZudqnrun5a8d3M/h955cam9RHZ6Jb4Y1XhnmFPg==}
+  '@modelcontextprotocol/sdk@1.21.0':
+    resolution: {integrity: sha512-YFBsXJMFCyI1zP98u7gezMFKX4lgu/XpoZJk7ufI6UlFKXLj2hAMUuRlQX/nrmIPOmhRrG6tw2OQ2ZA/ZlXYpQ==}
     engines: {node: '>=18'}
+    peerDependencies:
+      '@cfworker/json-schema': ^4.1.1
+    peerDependenciesMeta:
+      '@cfworker/json-schema':
+        optional: true
 
   '@mongodb-js/saslprep@1.3.1':
     resolution: {integrity: sha512-6nZrq5kfAz0POWyhljnbWQQJQ5uT8oE2ddX303q1uY0tWsivWKgBDXBBvuFPwOqRRalXJuVO9EjOdVtuhLX0zg==}
@@ -4723,6 +4728,14 @@ packages:
     resolution: {integrity: sha512-007JaqbcuEP0oJLYWZgrR+uwkjmW3kLZuw9IGr3/yaYL5fLCyzDjLv79dBShhFZpz2ow6g0uCw4Ci39nm8ehHA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
+
+  ajv-formats@3.0.1:
+    resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -12314,12 +12327,12 @@ snapshots:
       - encoding
       - supports-color
 
-  '@google/genai@1.28.0(@modelcontextprotocol/sdk@1.20.2)':
+  '@google/genai@1.28.0(@modelcontextprotocol/sdk@1.21.0)':
     dependencies:
       google-auth-library: 10.5.0
       ws: 8.18.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -12813,9 +12826,10 @@ snapshots:
 
   '@microsoft/clarity@1.0.0': {}
 
-  '@modelcontextprotocol/sdk@1.20.2':
+  '@modelcontextprotocol/sdk@1.21.0':
     dependencies:
-      ajv: 6.12.6
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
       cors: 2.8.5
       cross-spawn: 7.0.6
@@ -13086,19 +13100,19 @@ snapshots:
 
   '@opentelemetry/api-logs@0.204.0':
     dependencies:
-      '@opentelemetry/api': 1.6.0
+      '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/api-logs@0.53.0':
     dependencies:
-      '@opentelemetry/api': 1.6.0
+      '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/api-logs@0.57.1':
     dependencies:
-      '@opentelemetry/api': 1.6.0
+      '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/api-logs@0.57.2':
     dependencies:
-      '@opentelemetry/api': 1.6.0
+      '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/api@1.6.0': {}
 
@@ -14575,7 +14589,7 @@ snapshots:
   '@smithery/cli@1.6.3(@types/node@24.9.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@anthropic-ai/mcpb': 1.1.1
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@ngrok/ngrok': 1.5.2
       '@smithery/registry': 0.4.4
       '@smithery/sdk': 1.7.4
@@ -14598,6 +14612,7 @@ snapshots:
       uuidv7: 1.0.2
       yaml: 2.8.1
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@types/node'
       - encoding
       - supports-color
@@ -14608,7 +14623,7 @@ snapshots:
 
   '@smithery/sdk@1.7.4':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       chalk: 5.6.2
       express: 5.1.0
       jose: 6.1.0
@@ -14619,6 +14634,7 @@ snapshots:
       zod: 3.25.76
       zod-to-json-schema: 3.24.6(zod@3.25.76)
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - supports-color
 
   '@smithy/abort-controller@4.2.4':
@@ -14967,6 +14983,7 @@ snapshots:
       '@spotlightjs/spotlight': 3.0.2
       astro: 5.15.3(@azure/storage-blob@12.29.1)(@types/node@24.9.2)(@upstash/redis@1.35.5)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.52.5)(terser@5.44.0)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1)
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - supports-color
 
   '@spotlightjs/overlay@3.2.0': {}
@@ -14974,13 +14991,14 @@ snapshots:
   '@spotlightjs/sidecar@1.12.0':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@sentry/core': 9.22.0
       '@sentry/node': 8.55.0
       kleur: 4.1.5
       launch-editor: 2.11.1
       zod: 3.25.76
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - supports-color
 
   '@spotlightjs/spotlight@3.0.2':
@@ -14990,6 +15008,7 @@ snapshots:
       '@spotlightjs/sidecar': 1.12.0
       import-meta-resolve: 4.2.0
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - supports-color
 
   '@stablelib/base64@1.0.1': {}
@@ -16083,7 +16102,7 @@ snapshots:
 
   agentdb@1.3.9:
     dependencies:
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@xenova/transformers': 2.17.2
       better-sqlite3: 11.10.0
       chalk: 5.6.2
@@ -16092,6 +16111,7 @@ snapshots:
     optionalDependencies:
       sql.js: 1.13.0
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - bare-abort-controller
       - bare-buffer
       - react-native-b4a
@@ -16099,7 +16119,7 @@ snapshots:
 
   agentdb@1.6.1:
     dependencies:
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@xenova/transformers': 2.17.2
       chalk: 5.6.2
       commander: 12.1.0
@@ -16109,16 +16129,17 @@ snapshots:
     optionalDependencies:
       better-sqlite3: 11.10.0
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - bare-abort-controller
       - bare-buffer
       - react-native-b4a
       - supports-color
 
-  agentic-flow@1.8.13(@modelcontextprotocol/sdk@1.20.2):
+  agentic-flow@1.8.13(@modelcontextprotocol/sdk@1.21.0):
     dependencies:
       '@anthropic-ai/claude-agent-sdk': 0.1.30(zod@3.25.76)
       '@anthropic-ai/sdk': 0.65.0(zod@3.25.76)
-      '@google/genai': 1.28.0(@modelcontextprotocol/sdk@1.20.2)
+      '@google/genai': 1.28.0(@modelcontextprotocol/sdk@1.21.0)
       '@supabase/supabase-js': 2.78.0
       '@xenova/transformers': 2.17.2
       agentdb: 1.6.1
@@ -16134,6 +16155,7 @@ snapshots:
       yaml: 2.8.1
       zod: 3.25.76
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@modelcontextprotocol/sdk'
       - '@valibot/to-json-schema'
       - arktype
@@ -16146,6 +16168,10 @@ snapshots:
       - supports-color
       - sury
       - utf-8-validate
+
+  ajv-formats@3.0.1(ajv@8.17.1):
+    optionalDependencies:
+      ajv: 8.17.1
 
   ajv@6.12.6:
     dependencies:
@@ -16900,8 +16926,8 @@ snapshots:
     dependencies:
       '@anthropic-ai/claude-code': 2.0.31
       '@anthropic-ai/sdk': 0.65.0(zod@3.25.76)
-      '@modelcontextprotocol/sdk': 1.20.2
-      agentic-flow: 1.8.13(@modelcontextprotocol/sdk@1.20.2)
+      '@modelcontextprotocol/sdk': 1.21.0
+      agentic-flow: 1.8.13(@modelcontextprotocol/sdk@1.21.0)
       blessed: 0.1.81
       chalk: 4.1.2
       cli-table3: 0.6.5
@@ -16929,6 +16955,7 @@ snapshots:
       node-pty: 1.0.0
       onnxruntime-node: 1.23.0
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@types/node'
       - '@valibot/to-json-schema'
       - arktype
@@ -18080,7 +18107,7 @@ snapshots:
 
   fastmcp@3.22.0:
     dependencies:
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@standard-schema/spec': 1.0.0
       execa: 9.6.0
       file-type: 21.0.0
@@ -18094,6 +18121,7 @@ snapshots:
       zod: 3.25.76
       zod-to-json-schema: 3.24.6(zod@3.25.76)
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@valibot/to-json-schema'
       - arktype
       - effect
@@ -18209,7 +18237,7 @@ snapshots:
   flow-nexus@0.1.128(@types/node@24.9.2):
     dependencies:
       '@anthropic-ai/sdk': 0.60.0
-      '@modelcontextprotocol/sdk': 1.20.2
+      '@modelcontextprotocol/sdk': 1.21.0
       '@supabase/supabase-js': 2.78.0
       bcryptjs: 2.4.3
       chalk: 5.6.2
@@ -18222,6 +18250,7 @@ snapshots:
       rate-limiter-flexible: 7.4.0
       validator: 13.15.20
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@types/node'
       - bufferutil
       - supports-color

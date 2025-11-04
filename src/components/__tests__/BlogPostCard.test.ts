@@ -1,11 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { calculateReadingTime, calculateWordCount, formatBlogDate, validateBlogPost } from '@/utils/blog'
+import {
+  calculateReadingTime,
+  calculateWordCount,
+  formatBlogDate,
+  validateBlogPost,
+} from '@/utils/blog'
 import type { CollectionEntry } from 'astro:content'
 
 describe('Blog utilities', () => {
   describe('calculateReadingTime', () => {
     it('should calculate reading time correctly', () => {
-      const content = 'This is a test post with several words to calculate reading time.'
+      const content =
+        'This is a test post with several words to calculate reading time.'
       expect(calculateReadingTime(content, 200)).toBe(1)
     })
 
@@ -75,7 +81,9 @@ describe('Blog utilities', () => {
 
       const result = validateBlogPost(mockPost)
       expect(result.isValid).toBe(false)
-      expect(result.errors).toContain('Post title is required and must be a string')
+      expect(result.errors).toContain(
+        'Post title is required and must be a string',
+      )
     })
   })
 })

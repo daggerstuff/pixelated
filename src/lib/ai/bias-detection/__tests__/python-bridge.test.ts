@@ -14,7 +14,7 @@ describe('analysis methods', () => {
   beforeEach(() => {
     // Reset all mocks
     vi.clearAllMocks()
-    
+
     // Mock successful responses by default
     ;(global.fetch as any).mockResolvedValue({
       ok: true,
@@ -25,7 +25,7 @@ describe('analysis methods', () => {
     // Create a fresh bridge instance for each test
     bridge = new PythonBiasDetectionBridge(
       mockConfig.pythonServiceUrl,
-      mockConfig.pythonServiceTimeout
+      mockConfig.pythonServiceTimeout,
     )
   })
 
@@ -106,7 +106,7 @@ describe('analysis methods', () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
       const result = await bridge.runPreprocessingAnalysis(mockSession)
-      
+
       // Should return fallback result instead of throwing
       expect(result.fallbackMode).toBe(true)
       expect(result.serviceError).toContain('Request failed after')
@@ -125,11 +125,11 @@ describe('analysis methods', () => {
       // Create bridge with very short timeout
       const timeoutBridge = new PythonBiasDetectionBridge(
         mockConfig.pythonServiceUrl,
-        1 // 1ms timeout
+        1, // 1ms timeout
       )
 
       const result = await timeoutBridge.runPreprocessingAnalysis(mockSession)
-      
+
       // Should return fallback result for timeout
       expect(result.fallbackMode).toBe(true)
     })
@@ -156,9 +156,9 @@ describe('analysis methods', () => {
         content: 'Test content',
       }
 
-      const promises = Array(5).fill(null).map(() =>
-        bridge.runPreprocessingAnalysis(mockSession)
-      )
+      const promises = Array(5)
+        .fill(null)
+        .map(() => bridge.runPreprocessingAnalysis(mockSession))
 
       const results = await Promise.allSettled(promises)
       expect(results.length).toBe(5)

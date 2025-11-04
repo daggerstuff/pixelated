@@ -1,163 +1,560 @@
 ---
-interface Props {
-  /** Show social links in the footer */
-  showSocialLinks?: boolean
-  /** Additional className for styling */
-  className?: string
-}
-
-const { showSocialLinks = true, className = '' } = Astro.props
+// Enhanced Dark Footer - Unified Theme v2.0
+// Brutalist + Minimalist + Corporate + Enterprise + Antfu Elegance
 const currentYear = new Date().getFullYear()
+
+const footerSections = [
+  {
+    title: 'Product',
+    links: [
+      { name: 'Features', href: '/features' },
+      { name: 'Demos', href: '/demo-hub' },
+      { name: 'Pricing', href: '/pricing' },
+      { name: 'Enterprise', href: '/enterprise' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { name: 'Documentation', href: '/docs' },
+      { name: 'Blog', href: '/blog' },
+      { name: 'Support', href: '/support' },
+      { name: 'Status', href: '/status' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { name: 'About', href: '/about' },
+      { name: 'Contact', href: '/contact' },
+      { name: 'Careers', href: '/careers' },
+      { name: 'Privacy', href: '/privacy' },
+    ],
+  },
+]
+
+const socialLinks = [
+  {
+    name: 'GitHub',
+    href: 'https://github.com/pixelated-empathy',
+    icon: `<path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>`,
+  },
+  {
+    name: 'Twitter',
+    href: 'https://twitter.com/pixelatedempathy',
+    icon: `<path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>`,
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://linkedin.com/company/pixelated-empathy',
+    icon: `<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>`,
+  },
+]
 ---
 
 <footer
-  class={`w-full py-8 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-auto ${className}`}
+  class="footer-unified responsive-footer"
+  role="contentinfo"
+  aria-label="Site footer"
 >
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div class="col-span-1 md:col-span-2">
-        <a href="/" class="flex items-center gap-2 mb-4">
-          <img src="/favicon.svg" alt="Logo" class="w-8 h-8" />
-          <span class="text-xl font-bold brand-title">Pixelated Empathy</span>
-        </a>
-        <p class="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-          Secure AI therapy platform with advanced encryption for maximum
-          privacy and HIPAA compliance.
+  <div class="footer-container">
+    <!-- Main Footer Content -->
+    <div class="footer-grid">
+      <!-- Brand Section - Brutalist Bold -->
+      <div class="footer-brand">
+        <div class="brand-header">
+          <div class="brand-logo-wrapper">
+            <img
+              src="/apple-touch-icon.png"
+              alt="Pixelated Empathy Logo"
+              class="brand-logo"
+              width="64"
+              height="64"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="brand-text">
+            <h2 class="brand-title heading-brutalist">PIXELATED EMPATHY</h2>
+            <p class="brand-subtitle">AI-Powered Mental Health Training</p>
+          </div>
+        </div>
+
+        <p class="brand-description">
+          Revolutionizing mental health education through advanced AI simulation
+          and immersive training experiences.
         </p>
+
+        <!-- Social Links - Minimalist Elegance -->
+        <nav class="social-nav" aria-label="Social media links">
+          <ul class="social-list">
+            {
+              socialLinks.map((social) => (
+                <li>
+                  <a
+                    href={social.href}
+                    class="social-link"
+                    aria-label={`Follow us on ${social.name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      set:html={social.icon}
+                    />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Navigation Sections - Enterprise Brevity -->
+      <div class="footer-nav-grid">
         {
-          showSocialLinks && (
-            <div class="flex space-x-4">
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary dark:hover:text-primary"
-                aria-label="Twitter"
+          footerSections.map((section) => (
+            <nav
+              class="footer-nav-section"
+              aria-labelledby={`footer-${section.title.toLowerCase()}`}
+            >
+              <h3
+                id={`footer-${section.title.toLowerCase()}`}
+                class="nav-heading"
               >
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-              </a>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary dark:hover:text-primary"
-                aria-label="GitHub"
-              >
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </a>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary dark:hover:text-primary"
-                aria-label="LinkedIn"
-              >
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </a>
-            </div>
-          )
+                {section.title}
+              </h3>
+              <ul class="nav-list">
+                {section.links.map((link) => (
+                  <li class="nav-item">
+                    <a href={link.href} class="nav-link">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))
         }
-      </div>
-
-      <div>
-        <h3
-          class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4"
-        >
-          Platform
-        </h3>
-        <ul class="space-y-3">
-          <li>
-            <a
-              href="/dashboard"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a
-              href="/chat"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              Chat
-            </a>
-          </li>
-          <li>
-            <a
-              href="/profile"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              Profile
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h3
-          class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4"
-        >
-          Resources
-        </h3>
-        <ul class="space-y-3">
-          <li>
-            <a
-              href="/about"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              About
-            </a>
-          </li>
-          <li>
-            <a
-              href="/contact"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              Contact
-            </a>
-          </li>
-          <li>
-            <a
-              href="/faq"
-              class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-            >
-              FAQ
-            </a>
-          </li>
-        </ul>
       </div>
     </div>
 
-    <div
-      class="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 text-center text-gray-500 dark:text-gray-400"
-    >
-      <p>
-        &copy;
-        {currentYear} Pixelated Empathy. All rights reserved.
-      </p>
+    <!-- Bottom Bar - Corporate Sleekness -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <div class="footer-legal">
+          <p class="copyright">
+            © {currentYear} Pixelated Empathy. All rights reserved.
+          </p>
+          <nav class="legal-nav" aria-label="Legal links">
+            <a href="/terms" class="legal-link">Terms</a>
+            <a href="/privacy" class="legal-link">Privacy</a>
+            <a href="/cookies" class="legal-link">Cookies</a>
+          </nav>
+        </div>
+
+        <!-- Status Indicator - Antfu Elegance -->
+        <div class="system-status">
+          <div class="status-indicator">
+            <div class="status-dot animate-pulse-glow"></div>
+            <span class="status-text">ALL SYSTEMS OPERATIONAL</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </footer>
+
+<style>
+  /* ================================================
+   UNIFIED DARK FOOTER - BRUTALIST + MINIMALIST + CORPORATE + ENTERPRISE + ANTFU ELEGANCE
+   ================================================ */
+
+  .footer-unified {
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-level-1));
+    border-top: 1px solid var(--border-primary);
+    margin-top: var(--space-20);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-unified::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--accent-primary),
+      transparent
+    );
+    opacity: 0.3;
+  }
+
+  .footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-16) var(--space-6) var(--space-8);
+  }
+
+  /* Main Grid - Enterprise Layout */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      gap: var(--space-16);
+    }
+  }
+
+  /* Brand Section - Brutalist Bold */
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .brand-logo-wrapper {
+    width: 3rem;
+    height: 3rem;
+    background: var(--accent-primary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-logo-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+    pointer-events: none;
+  }
+
+  .brand-logo {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--radius-lg);
+    filter: brightness(0) invert(1);
+  }
+
+  .brand-text {
+    min-width: 0;
+  }
+
+  .brand-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-black);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .brand-subtitle {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+    margin-bottom: 0;
+  }
+
+  .brand-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0;
+  }
+
+  /* Social Links - Minimalist Elegance */
+  .social-nav {
+    margin-top: var(--space-2);
+  }
+
+  .social-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--text-secondary);
+    background: var(--bg-level-1);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .social-link:hover {
+    color: var(--accent-primary);
+    background: var(--accent-primary-subtle);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+  }
+
+  /* Navigation Grid - Enterprise Brevity */
+  .footer-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-8);
+  }
+
+  .footer-nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .nav-heading {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .nav-item {
+    margin: 0;
+  }
+
+  .nav-link {
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    display: block;
+    padding: var(--space-1) 0;
+    font-size: var(--text-sm);
+  }
+
+  .nav-link:hover {
+    color: var(--accent-primary);
+  }
+
+  /* Bottom Bar - Corporate Sleekness */
+  .footer-bottom {
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer-bottom-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  @media (min-width: 768px) {
+    .footer-bottom-content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  @media (min-width: 640px) {
+    .footer-legal {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-6);
+    }
+  }
+
+  .copyright {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .legal-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .legal-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+  }
+
+  .legal-link:hover {
+    color: var(--accent-primary);
+  }
+
+  /* Status Indicator - Antfu Elegance */
+  .system-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background: var(--accent-primary-subtle);
+    color: var(--accent-primary);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .status-text {
+    margin: 0;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .footer-container {
+      padding: var(--space-12) var(--space-4) var(--space-6);
+    }
+
+    .footer-grid {
+      gap: var(--space-8);
+    }
+
+    .footer-nav-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    .brand-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .social-list {
+      justify-content: center;
+    }
+
+    .footer-bottom-content {
+      text-align: center;
+    }
+
+    .footer-legal {
+      align-items: center;
+      text-align: center;
+    }
+
+    .legal-nav {
+      justify-content: center;
+    }
+
+    .system-status {
+      justify-content: center;
+    }
+  }
+
+  /* Enhanced Animations */
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+      box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+  }
+
+  /* Accessibility Enhancements */
+  @media (prefers-reduced-motion: reduce) {
+    .social-link,
+    .nav-link,
+    .legal-link {
+      transition-duration: 0.01ms !important;
+    }
+
+    .status-dot {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+
+  /* Focus indicators */
+  .footer-unified :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .footer-unified {
+      border-top-width: 2px;
+    }
+
+    .social-link,
+    .nav-link,
+    .legal-link {
+      border-width: 2px;
+    }
+  }
+</style>

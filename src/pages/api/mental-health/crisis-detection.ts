@@ -3,10 +3,10 @@ export const prerender = false
 export interface CrisisDetectionRequest {
   content: string
   contentType:
-  | 'chat_message'
-  | 'journal_entry'
-  | 'form_response'
-  | 'voice_transcript'
+    | 'chat_message'
+    | 'journal_entry'
+    | 'form_response'
+    | 'voice_transcript'
   context?: {
     userId?: string
     previousAssessments?: CrisisAssessment[]
@@ -65,11 +65,11 @@ export interface CrisisAssessment {
     severity: 'none' | 'passive' | 'active' | 'plan' | 'intent' | 'attempt'
     specificity: number // 1-10
     timeline:
-    | 'no_timeline'
-    | 'vague'
-    | 'within_weeks'
-    | 'within_days'
-    | 'within_hours'
+      | 'no_timeline'
+      | 'vague'
+      | 'within_weeks'
+      | 'within_days'
+      | 'within_hours'
     lethality: 'low' | 'moderate' | 'high'
   }
   selfHarm: {
@@ -154,11 +154,11 @@ export interface CrisisResource {
 
 export interface ProfessionalResource {
   type:
-  | 'psychiatrist'
-  | 'psychologist'
-  | 'counselor'
-  | 'social_worker'
-  | 'crisis_specialist'
+    | 'psychiatrist'
+    | 'psychologist'
+    | 'counselor'
+    | 'social_worker'
+    | 'crisis_specialist'
   specialty: string[]
   availability: string
   location_type: 'in_person' | 'telehealth' | 'both'
@@ -396,11 +396,11 @@ function detectCrisisIndicators(content: string): {
     matches: string[]
   }>
   timeline:
-  | 'no_timeline'
-  | 'vague'
-  | 'within_weeks'
-  | 'within_days'
-  | 'within_hours'
+    | 'no_timeline'
+    | 'vague'
+    | 'within_weeks'
+    | 'within_days'
+    | 'within_hours'
 } {
   const indicators: {
     type: string
@@ -817,8 +817,8 @@ export const POST = async ({ request }: APIContext) => {
           Math.max(
             60,
             85 -
-            (indicators.length > 5 ? 10 : 0) +
-            (timeline !== 'no_timeline' ? 10 : 0),
+              (indicators.length > 5 ? 10 : 0) +
+              (timeline !== 'no_timeline' ? 10 : 0),
           ),
         ),
         processingTime,

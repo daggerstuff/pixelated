@@ -81,11 +81,7 @@ export interface ThreatIntelligenceService {
 }
 
 export interface RateLimitingService {
-  applyRateLimit(
-    userId: string,
-    limit: number,
-    windowMs: number,
-  ): Promise<void>
+  applyRateLimit(userId: string, limit: number, windowMs: number): Promise<void>
 }
 
 export interface ResponseOrchestrationService {
@@ -989,7 +985,9 @@ class MLDecisionEngine extends DecisionEngine {
     ]
   }
 
-  private async predictThreatLevel(features: number[]): Promise<ThreatPrediction> {
+  private async predictThreatLevel(
+    features: number[],
+  ): Promise<ThreatPrediction> {
     if (!this.model) {
       throw new Error('Model not initialized')
     }
@@ -1199,4 +1197,3 @@ class MultiChannelNotificationManager extends NotificationManager {
     console.log(`Sending SMS notification for response ${response.responseId}`)
   }
 }
-

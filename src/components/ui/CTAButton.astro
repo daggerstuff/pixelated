@@ -8,27 +8,27 @@ interface Props {
 const { href = '#', variant = 'primary', class: className = '' } = Astro.props
 ---
 
-{href ? (
-  <a
-    href={href}
-    class={`brutalist-button ${
-      variant === 'primary'
-        ? 'brutalist-button--primary'
-        : 'brutalist-button--secondary'
-    } ${className}`.trim()}
-  >
-    <slot />
-  </a>
-) : (
-  <button
-    class={`brutalist-button ${
-      variant === 'primary'
-        ? 'brutalist-button--primary'
-        : 'brutalist-button--secondary'
-    } ${className}`.trim()}
-  >
-    <slot />
-  </button>
-)}
-
-
+{
+  href ? (
+    <a
+      href={href}
+      class={`brutalist-button ${
+        variant === 'primary'
+          ? 'brutalist-button--primary'
+          : 'brutalist-button--secondary'
+      } ${className}`.trim()}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button
+      class={`brutalist-button ${
+        variant === 'primary'
+          ? 'brutalist-button--primary'
+          : 'brutalist-button--secondary'
+      } ${className}`.trim()}
+    >
+      <slot />
+    </button>
+  )
+}

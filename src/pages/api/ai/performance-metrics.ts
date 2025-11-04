@@ -14,10 +14,10 @@ export const GET = async ({ request }: APIContext) => {
         },
       )
     }
-  // const { user } = session
+    // const { user } = session
 
     // Get query parameters
-  const { searchParams } = new URL(request.url)
+    const { searchParams } = new URL(request.url)
     const timeRange = searchParams.get('timeRange') || '24h'
     const modelType = searchParams.get('modelType') || 'all'
 
@@ -71,31 +71,31 @@ export const GET = async ({ request }: APIContext) => {
       ;(query['model_type'] as string | undefined) = modelType
     }
 
-  const results = (await metricsCollection
+    const results = (await metricsCollection
       .find(query)
       .toArray()) as unknown as RawMetric[]
 
     // Process and format the results
     const metrics =
       results?.map((row: RawMetric) => ({
-          date: row.timestamp,
-          model: row.model_type,
-          requestCount: Number(row.request_count),
-          latency: {
-            avg: Number(row.avg_latency),
-            max: Number(row.max_latency),
-            min: Number(row.min_latency),
-          },
-          tokens: {
-            input: Number(row.total_input_tokens),
-            output: Number(row.total_output_tokens),
-            total: Number(row.total_tokens),
-          },
-          successRate: Number(row.success_count) / Number(row.request_count),
-          cacheHitRate: Number(row.cached_count) / Number(row.request_count),
-          optimizationRate:
-            Number(row.optimized_count) / Number(row.request_count),
-        })) ?? []
+        date: row.timestamp,
+        model: row.model_type,
+        requestCount: Number(row.request_count),
+        latency: {
+          avg: Number(row.avg_latency),
+          max: Number(row.max_latency),
+          min: Number(row.min_latency),
+        },
+        tokens: {
+          input: Number(row.total_input_tokens),
+          output: Number(row.total_output_tokens),
+          total: Number(row.total_tokens),
+        },
+        successRate: Number(row.success_count) / Number(row.request_count),
+        cacheHitRate: Number(row.cached_count) / Number(row.request_count),
+        optimizationRate:
+          Number(row.optimized_count) / Number(row.request_count),
+      })) ?? []
 
     // Get model breakdown
     type ModelAgg = {
@@ -106,7 +106,7 @@ export const GET = async ({ request }: APIContext) => {
       cachedCount: number
       optimizedCount: number
     }
-  const modelBreakdown = results.reduce<ModelAgg[]>((acc, row: RawMetric) => {
+    const modelBreakdown = results.reduce<ModelAgg[]>((acc, row: RawMetric) => {
       const {
         model_type,
         request_count,
@@ -116,7 +116,7 @@ export const GET = async ({ request }: APIContext) => {
         total_tokens,
       } = row
 
-  const existingModel = acc.find((item) => item.model === model_type)
+      const existingModel = acc.find((item) => item.model === model_type)
 
       if (existingModel) {
         existingModel.requestCount += request_count
@@ -162,15 +162,15 @@ export const GET = async ({ request }: APIContext) => {
       JSON.stringify({
         metrics,
         modelBreakdown:
-        modelBreakdown?.map((row: ModelAgg) => ({
-          model: row.model,
-          requestCount: Number(row.requestCount),
-          totalTokens: Number(row.totalTokens),
-          successRate: Number(row.successCount) / Number(row.requestCount),
-          cacheHitRate: Number(row.cachedCount) / Number(row.requestCount),
-          optimizationRate:
-            Number(row.optimizedCount) / Number(row.requestCount),
-        })) ?? [],
+          modelBreakdown?.map((row: ModelAgg) => ({
+            model: row.model,
+            requestCount: Number(row.requestCount),
+            totalTokens: Number(row.totalTokens),
+            successRate: Number(row.successCount) / Number(row.requestCount),
+            cacheHitRate: Number(row.cachedCount) / Number(row.requestCount),
+            optimizationRate:
+              Number(row.optimizedCount) / Number(row.requestCount),
+          })) ?? [],
         errorBreakdown:
           errorBreakdown?.map((row: { errorCode: string; count: number }) => ({
             errorCode: row.errorCode,

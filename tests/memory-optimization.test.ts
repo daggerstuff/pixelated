@@ -30,7 +30,9 @@ describe('Memory Optimization Tests', () => {
       expect(gitlabCi).toContain('KUBERNETES_MEMORY_REQUEST: "4Gi"')
       expect(gitlabCi).toContain('KUBERNETES_MEMORY_LIMIT: "8Gi"')
       expect(gitlabCi).toContain('NODE_OPTIONS: "--max-old-space-size=6144"')
-      expect(gitlabCi).toContain('NODE_OPTIONS_OPTIMIZED: "--max-old-space-size=6144 --optimize-for-size --gc-interval=100"')
+      expect(gitlabCi).toContain(
+        'NODE_OPTIONS_OPTIMIZED: "--max-old-space-size=6144 --optimize-for-size --gc-interval=100"',
+      )
     })
 
     it('should use memory-optimized build script', () => {
@@ -61,7 +63,9 @@ describe('Memory Optimization Tests', () => {
 
       // Check that limits and requests are consistent
       expect(runnerValues).toContain('limits:\n    cpu: 4000m\n    memory: 8Gi')
-      expect(runnerValues).toContain('requests:\n    cpu: 2000m\n    memory: 4Gi')
+      expect(runnerValues).toContain(
+        'requests:\n    cpu: 2000m\n    memory: 4Gi',
+      )
     })
   })
 
@@ -133,9 +137,9 @@ describe('Memory Optimization Tests', () => {
     it('should have proper alert thresholds', () => {
       const monitoring = readFileSync(monitoringPath, 'utf-8')
 
-      expect(monitoring).toContain('threshold: 75')  // Warning
-      expect(monitoring).toContain('threshold: 85')  // Critical
-      expect(monitoring).toContain('threshold: 95')  // Emergency
+      expect(monitoring).toContain('threshold: 75') // Warning
+      expect(monitoring).toContain('threshold: 85') // Critical
+      expect(monitoring).toContain('threshold: 95') // Emergency
     })
 
     it('should have GitLab runner specific alerts', () => {
@@ -203,7 +207,9 @@ describe('Memory Optimization Tests', () => {
       const gitlabCi = readFileSync(gitlabCiPath, 'utf-8')
 
       expect(gitlabCi).toContain('CACHE_COMPRESSION_LEVEL: fast')
-      expect(gitlabCi).toContain('pnpm install --frozen-lockfile --prefer-offline')
+      expect(gitlabCi).toContain(
+        'pnpm install --frozen-lockfile --prefer-offline',
+      )
     })
   })
 })

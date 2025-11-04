@@ -1,6 +1,10 @@
 import { createHash } from 'crypto'
 import { getLogger } from '@/lib/utils/logger'
-import { ResearchQuery, QueryResult, QueryApproval } from '@/lib/research/types/research-types'
+import {
+  ResearchQuery,
+  QueryResult,
+  QueryApproval,
+} from '@/lib/research/types/research-types'
 import { AnonymizationService } from './AnonymizationService'
 import { ConsentManagementService } from './ConsentManagementService'
 import { HIPAADataService } from './HIPAADataService'
@@ -33,7 +37,8 @@ export class ResearchQueryEngine {
   private anonymizationService: AnonymizationService
   private consentService: ConsentManagementService
   private hipaaService: HIPAADataService
-  private queryCache: Map<string, { result: QueryResult; timestamp: Date }> = new Map()
+  private queryCache: Map<string, { result: QueryResult; timestamp: Date }> =
+    new Map()
   private pendingApprovals: Map<string, QueryApproval> = new Map()
 
   constructor(
@@ -42,11 +47,11 @@ export class ResearchQueryEngine {
       maxResultSize: 10000,
       approvalRequired: true,
       queryTimeout: 30000,
-      cacheEnabled: true
+      cacheEnabled: true,
     },
     anonymizationService: AnonymizationService,
     consentService: ConsentManagementService,
-    hipaaService: HIPAADataService
+    hipaaService: HIPAADataService,
   ) {
     this.config = config
     this.anonymizationService = anonymizationService
@@ -60,7 +65,7 @@ export class ResearchQueryEngine {
   async executeQuery(
     query: ResearchQuery,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<QueryResult> {
     const startTime = Date.now()
 
@@ -68,14 +73,16 @@ export class ResearchQueryEngine {
       queryId: query.id,
       userId,
       userRole,
-      queryType: query.type
+      queryType: query.type,
     })
 
     try {
       // Step 1: Validate query
       const validation = await this.validateQuery(query, userId, userRole)
       if (!validation.valid) {
-        throw new Error(`Query validation failed: ${validation.errors.join(', ')}`)
+        throw new Error(
+          `Query validation failed: ${validation.errors.join(', ')}`,
+        )
       }
 
       // Step 2: Check approval requirements
@@ -86,7 +93,7 @@ export class ResearchQueryEngine {
             queryId: query.id,
             status: 'pending-approval',
             data: null,
-            metadata: {}
+            metadata: {},
           }
         }
       }
@@ -98,7 +105,7 @@ export class ResearchQueryEngine {
           logger.info('Returning cached result', { queryId: query.id })
           return {
             ...cached,
-            metadata: { ...cached.metadata, cacheHit: true }
+            metadata: { ...cached.metadata, cacheHit: true },
           }
         }
       }
@@ -107,7 +114,10 @@ export class ResearchQueryEngine {
       const result = await this.executeQueryInternal(query, userId, userRole)
 
       // Step 5: Apply anonymization
-      const anonymizedResult = await this.anonymizeQueryResult(result, query.anonymizationLevel)
+      const anonymizedResult = await this.anonymizeQueryResult(
+        result,
+        query.anonymizationLevel,
+      )
 
       // Step 6: Cache result
       if (this.config.cacheEnabled) {
@@ -119,24 +129,24 @@ export class ResearchQueryEngine {
         executionTime: Date.now() - startTime,
         resultSize: anonymizedResult.data?.length || 0,
         complexityScore: this.calculateComplexityScore(query),
-        cacheHit: false
+        cacheHit: false,
       }
 
       logger.info('Query execution completed', {
         queryId: query.id,
-        metrics
+        metrics,
       })
 
       return {
         ...anonymizedResult,
-        metadata: { ...anonymizedResult.metadata, ...metrics }
+        metadata: { ...anonymizedResult.metadata, ...metrics },
       }
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
       logger.error('Query execution failed', {
         queryId: query.id,
-        error: errorMessage
+        error: errorMessage,
       })
 
       return {
@@ -144,7 +154,7 @@ export class ResearchQueryEngine {
         status: 'error',
         data: null,
         error: errorMessage,
-        metadata: { executionTime: Date.now() - startTime }
+        metadata: { executionTime: Date.now() - startTime },
       }
     }
   }
@@ -152,12 +162,17 @@ export class ResearchQueryEngine {
   /**
    * Convert natural language to SQL query
    */
-  async naturalLanguageToQuery(nlQuery: NaturalLanguageQuery): Promise<ResearchQuery> {
+  async naturalLanguageToQuery(
+    nlQuery: NaturalLanguageQuery,
+  ): Promise<ResearchQuery> {
     logger.info('Converting natural language to query', { nlQuery })
 
     try {
       // Parse natural language query
-      const parsed = await this.parseNaturalLanguage(nlQuery.text, nlQuery.context)
+      const parsed = await this.parseNaturalLanguage(
+        nlQuery.text,
+        nlQuery.context,
+      )
 
       // Generate SQL query
       const sqlQuery = this.generateSQLQuery(parsed)
@@ -174,19 +189,23 @@ export class ResearchQueryEngine {
         requiresApproval: this.requiresApproval(parsed),
         anonymizationLevel: 'high',
         createdAt: new Date().toISOString(),
-        createdBy: 'system'
+        createdBy: 'system',
       }
 
       logger.info('Natural language query converted', {
         queryId: query.id,
-        sql: sqlQuery
+        sql: sqlQuery,
       })
 
       return query
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
       logger.error('Natural language parsing failed', { error: errorMessage })
-      throw new Error(`Failed to parse natural language query: ${errorMessage}`, { cause: error })
+      throw new Error(
+        `Failed to parse natural language query: ${errorMessage}`,
+        { cause: error },
+      )
     }
   }
 
@@ -197,7 +216,7 @@ export class ResearchQueryEngine {
     patternType: 'correlation' | 'trend' | 'anomaly' | 'cluster',
     parameters: Record<string, unknown>,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<QueryResult> {
     logger.info('Starting pattern discovery', { patternType, parameters })
 
@@ -210,7 +229,7 @@ export class ResearchQueryEngine {
       requiresApproval: true,
       anonymizationLevel: 'high',
       createdAt: new Date().toISOString(),
-      createdBy: userId
+      createdBy: userId,
     }
 
     return this.executeQuery(query, userId, userRole)
@@ -224,22 +243,24 @@ export class ResearchQueryEngine {
     metrics: string[],
     timeRange: { start: Date; end: Date },
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<QueryResult> {
     logger.info('Starting longitudinal analysis', {
       clientCount: clientIds.length,
       metrics,
-      timeRange
+      timeRange,
     })
 
     // Validate consent for all clients
     const consentValidation = await this.consentService.validateResearchAccess(
       clientIds,
-      'anonymizedResearch'
+      'anonymizedResearch',
     )
 
     if (consentValidation.invalidClients.length > 0) {
-      throw new Error(`Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`)
+      throw new Error(
+        `Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`,
+      )
     }
 
     const query: ResearchQuery = {
@@ -251,7 +272,7 @@ export class ResearchQueryEngine {
       requiresApproval: true,
       anonymizationLevel: 'high',
       createdAt: new Date().toISOString(),
-      createdBy: userId
+      createdBy: userId,
     }
 
     return this.executeQuery(query, userId, userRole)
@@ -268,22 +289,24 @@ export class ResearchQueryEngine {
     }>,
     metrics: string[],
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<QueryResult> {
     logger.info('Starting cohort comparison', {
       cohortCount: cohorts.length,
-      metrics
+      metrics,
     })
 
     // Validate consent for all clients
-    const allClientIds = cohorts.flatMap(c => c.clientIds)
+    const allClientIds = cohorts.flatMap((c) => c.clientIds)
     const consentValidation = await this.consentService.validateResearchAccess(
       allClientIds,
-      'anonymizedResearch'
+      'anonymizedResearch',
     )
 
     if (consentValidation.invalidClients.length > 0) {
-      throw new Error(`Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`)
+      throw new Error(
+        `Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`,
+      )
     }
 
     const query: ResearchQuery = {
@@ -291,11 +314,11 @@ export class ResearchQueryEngine {
       type: 'cohort-comparison',
       sql: this.generateCohortQuery(cohorts, metrics),
       parameters: { cohorts, metrics },
-      description: `Cohort comparison: ${cohorts.map(c => c.name).join(', ')}`,
+      description: `Cohort comparison: ${cohorts.map((c) => c.name).join(', ')}`,
       requiresApproval: true,
       anonymizationLevel: 'high',
       createdAt: new Date().toISOString(),
-      createdBy: userId
+      createdBy: userId,
     }
 
     return this.executeQuery(query, userId, userRole)
@@ -306,7 +329,7 @@ export class ResearchQueryEngine {
    */
   async requestQueryApproval(
     query: ResearchQuery,
-    requesterId: string
+    requesterId: string,
   ): Promise<QueryApproval> {
     const approval: QueryApproval = {
       id: crypto.randomUUID(),
@@ -317,14 +340,14 @@ export class ResearchQueryEngine {
       requestedAt: new Date().toISOString(),
       reviewedAt: null,
       comments: null,
-      restrictions: []
+      restrictions: [],
     }
 
     this.pendingApprovals.set(approval.id, approval)
 
     logger.info('Query approval requested', {
       approvalId: approval.id,
-      queryId: query.id
+      queryId: query.id,
     })
 
     return approval
@@ -338,7 +361,7 @@ export class ResearchQueryEngine {
     approverId: string,
     approved: boolean,
     comments?: string,
-    restrictions?: string[]
+    restrictions?: string[],
   ): Promise<QueryApproval> {
     const approval = this.pendingApprovals.get(approvalId)
     if (!approval) {
@@ -354,7 +377,7 @@ export class ResearchQueryEngine {
     logger.info('Query approval decision', {
       approvalId,
       approved,
-      approverId
+      approverId,
     })
 
     return approval
@@ -377,7 +400,7 @@ export class ResearchQueryEngine {
    */
   async getQueryStatistics(
     _userId?: string,
-    _dateRange?: { start: Date; end: Date }
+    _dateRange?: { start: Date; end: Date },
   ): Promise<{
     totalQueries: number
     successfulQueries: number
@@ -393,7 +416,7 @@ export class ResearchQueryEngine {
       failedQueries: 0,
       averageExecutionTime: 0,
       mostCommonQueryTypes: [],
-      userStatistics: []
+      userStatistics: [],
     }
 
     return stats
@@ -405,20 +428,28 @@ export class ResearchQueryEngine {
   private async validateQuery(
     query: ResearchQuery,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = []
 
     // Check query complexity
     const complexity = this.calculateComplexityScore(query)
     if (complexity > this.config.maxQueryComplexity) {
-      errors.push(`Query complexity ${complexity} exceeds maximum ${this.config.maxQueryComplexity}`)
+      errors.push(
+        `Query complexity ${complexity} exceeds maximum ${this.config.maxQueryComplexity}`,
+      )
     }
 
     // Check user permissions
-    const hasPermission = await this.checkUserPermissions(userId, userRole, query.type)
+    const hasPermission = await this.checkUserPermissions(
+      userId,
+      userRole,
+      query.type,
+    )
     if (!hasPermission) {
-      errors.push(`User ${userId} lacks permission for query type ${query.type}`)
+      errors.push(
+        `User ${userId} lacks permission for query type ${query.type}`,
+      )
     }
 
     // Validate SQL syntax (basic check)
@@ -452,30 +483,37 @@ export class ResearchQueryEngine {
   private async checkUserPermissions(
     userId: string,
     userRole: string,
-    queryType: string
+    queryType: string,
   ): Promise<boolean> {
     const permissions = {
       'researcher': ['sql', 'pattern-discovery', 'aggregate-analysis'],
-      'data-scientist': ['sql', 'pattern-discovery', 'longitudinal-analysis', 'cohort-comparison'],
+      'data-scientist': [
+        'sql',
+        'pattern-discovery',
+        'longitudinal-analysis',
+        'cohort-comparison',
+      ],
       'therapist': ['own-client-analysis'],
-      'admin': ['all']
+      'admin': ['all'],
     }
 
     const userPermissions = permissions[userRole] || []
-    return userPermissions.includes(queryType) || userPermissions.includes('all')
+    return (
+      userPermissions.includes(queryType) || userPermissions.includes('all')
+    )
   }
 
   private validateSQLSyntax(sql: string): boolean {
     // Basic SQL validation
     const requiredKeywords = ['SELECT', 'FROM']
-    return requiredKeywords.every(keyword =>
-      sql.toUpperCase().includes(keyword)
+    return requiredKeywords.every((keyword) =>
+      sql.toUpperCase().includes(keyword),
     )
   }
 
   private async parseNaturalLanguage(
     text: string,
-    _context?: string
+    _context?: string,
   ): Promise<{
     intent: string
     entities: Record<string, unknown>
@@ -514,10 +552,10 @@ export class ResearchQueryEngine {
 
   private generatePatternQuery(
     patternType: string,
-    _parameters: Record<string, unknown>
+    _parameters: Record<string, unknown>,
   ): string {
     const queries = {
-      'correlation': `
+      correlation: `
         SELECT 
           technique_type,
           emotion_type,
@@ -527,7 +565,7 @@ export class ResearchQueryEngine {
         GROUP BY technique_type, emotion_type
         HAVING COUNT(*) > 10
       `,
-      'trend': `
+      trend: `
         SELECT 
           DATE_TRUNC('week', created_at) as week,
           AVG(emotion_scores->>'overall') as avg_emotion,
@@ -537,7 +575,7 @@ export class ResearchQueryEngine {
         GROUP BY week
         ORDER BY week
       `,
-      'anomaly': `
+      anomaly: `
         SELECT *
         FROM research_data
         WHERE created_at >= $1 AND created_at <= $2
@@ -546,7 +584,7 @@ export class ResearchQueryEngine {
           OR emotion_scores->>'overall' < (SELECT AVG(emotion_scores->>'overall') - 2 * STDDEV(emotion_scores->>'overall') FROM research_data)
         )
       `,
-      'cluster': `
+      cluster: `
         SELECT 
           client_id,
           AVG(emotion_scores->>'happiness') as avg_happiness,
@@ -556,7 +594,7 @@ export class ResearchQueryEngine {
         WHERE created_at >= $1 AND created_at <= $2
         GROUP BY client_id
         HAVING COUNT(*) > 5
-      `
+      `,
     }
 
     return queries[patternType] || queries['correlation']
@@ -564,13 +602,13 @@ export class ResearchQueryEngine {
 
   private generateLongitudinalQuery(
     metrics: string[],
-    _timeRange: { start: Date; end: Date }
+    _timeRange: { start: Date; end: Date },
   ): string {
     return `
       SELECT 
         client_id,
         DATE_TRUNC('week', created_at) as week,
-        ${metrics.map(m => `AVG(${m}) as ${m}`).join(',\n        ')}
+        ${metrics.map((m) => `AVG(${m}) as ${m}`).join(',\n        ')}
       FROM research_data
       WHERE created_at >= $1 AND created_at <= $2
       GROUP BY client_id, week
@@ -579,12 +617,19 @@ export class ResearchQueryEngine {
   }
 
   private generateCohortQuery(
-    cohorts: Array<{ name: string; criteria: Record<string, unknown>; clientIds: string[] }>,
-    metrics: string[]
+    cohorts: Array<{
+      name: string
+      criteria: Record<string, unknown>
+      clientIds: string[]
+    }>,
+    metrics: string[],
   ): string {
-    const cohortCases = cohorts.map((cohort, index) =>
-      `WHEN client_id = ANY($${index + 3}) THEN '${cohort.name}'`
-    ).join('\n        ')
+    const cohortCases = cohorts
+      .map(
+        (cohort, index) =>
+          `WHEN client_id = ANY($${index + 3}) THEN '${cohort.name}'`,
+      )
+      .join('\n        ')
 
     return `
       SELECT 
@@ -592,7 +637,7 @@ export class ResearchQueryEngine {
           ${cohortCases}
           ELSE 'Other'
         END as cohort,
-        ${metrics.map(m => `AVG(${m}) as ${m}`).join(',\n        ')},
+        ${metrics.map((m) => `AVG(${m}) as ${m}`).join(',\n        ')},
         COUNT(*) as sample_size
       FROM research_data
       WHERE created_at >= $1 AND created_at <= $2
@@ -603,7 +648,7 @@ export class ResearchQueryEngine {
 
   private async anonymizeQueryResult(
     result: QueryResult,
-    anonymizationLevel: string
+    anonymizationLevel: string,
   ): Promise<QueryResult> {
     if (!result.data || anonymizationLevel === 'none') {
       return result
@@ -611,18 +656,19 @@ export class ResearchQueryEngine {
 
     // Map anonymization levels to consent levels
     const levelMapping: Record<string, 'full' | 'limited' | 'minimal'> = {
-      'low': 'minimal',
-      'medium': 'limited',
-      'high': 'full'
+      low: 'minimal',
+      medium: 'limited',
+      high: 'full',
     }
 
     const consentLevel = levelMapping[anonymizationLevel] || 'full'
 
     // Apply anonymization based on level
-    const anonymizedData = await this.anonymizationService.anonymizeResearchData(
-      result.data,
-      consentLevel
-    )
+    const anonymizedData =
+      await this.anonymizationService.anonymizeResearchData(
+        result.data,
+        consentLevel,
+      )
 
     return {
       ...result,
@@ -630,8 +676,8 @@ export class ResearchQueryEngine {
       metadata: {
         ...result.metadata,
         anonymizationMetrics: anonymizedData.privacyMetrics,
-        anonymizationAudit: anonymizedData.auditLog
-      }
+        anonymizationAudit: anonymizedData.auditLog,
+      },
     }
   }
 
@@ -644,7 +690,8 @@ export class ResearchQueryEngine {
     const cacheKey = this.generateCacheKey(query)
     const cached = this.queryCache.get(cacheKey)
 
-    if (cached && cached.timestamp > new Date(Date.now() - 3600000)) { // 1 hour cache
+    if (cached && cached.timestamp > new Date(Date.now() - 3600000)) {
+      // 1 hour cache
       return cached.result
     }
 
@@ -655,7 +702,7 @@ export class ResearchQueryEngine {
     const cacheKey = this.generateCacheKey(query)
     this.queryCache.set(cacheKey, {
       result,
-      timestamp: new Date()
+      timestamp: new Date(),
     })
 
     // Limit cache size
@@ -676,7 +723,7 @@ export class ResearchQueryEngine {
   private async executeQueryInternal(
     query: ResearchQuery,
     _userId: string,
-    _userRole: string
+    _userRole: string,
   ): Promise<QueryResult> {
     // In a real implementation, this would execute against a database
     logger.info('Executing query', { queryId: query.id, sql: query.sql })
@@ -689,8 +736,8 @@ export class ResearchQueryEngine {
       metadata: {
         executionTime: 0,
         resultSize: 0,
-        complexityScore: this.calculateComplexityScore(query)
-      }
+        complexityScore: this.calculateComplexityScore(query),
+      },
     }
   }
 }

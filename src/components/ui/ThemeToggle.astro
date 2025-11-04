@@ -1,136 +1,444 @@
 ---
-import { UI } from '../../config'
-
-interface Props {
-  class?: string
-}
-
-const { class: className = '' } = Astro.props
+// Enhanced Theme Toggle - Unified Dark Theme Integration
+// Corporate + Brutalist + Antfu Elegance Design System
 ---
 
+<style>
+  @import url('/src/styles/theme-toggle-responsive.css');
+</style>
+
 <button
-  id="theme-toggle"
-  type="button"
-  class={`p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-  aria-label="Toggle theme"
+  id="theme-toggle-unified"
+  class="btn-brutalist btn-brutalist--ghost theme-toggle-unified"
+  aria-label="Toggle between light, dark, and system themes"
+  aria-pressed="false"
+  style="position: relative; padding: var(--space-2, 0.5rem); border-radius: var(--radius-md, 0.375rem); transition: all var(--transition-fast, 150ms ease);"
 >
-  {
-    UI.theme.toggleIcon && (
-      <>
-        <svg
-          id="sun-icon"
-          class="w-5 h-5 hidden"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
-        <svg
-          id="moon-icon"
-          class="w-5 h-5 hidden"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          />
-        </svg>
-        <svg
-          id="system-icon"
-          class="w-5 h-5 hidden"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          />
-        </svg>
-      </>
-    )
-  }
+  <!-- Sun Icon (Light Mode) -->
+  <svg
+    id="sun-icon-unified"
+    width="20"
+    height="20"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    style="transition: all var(--transition-fast, 150ms ease); color: var(--text-secondary, #e5e5e5);"
+    aria-hidden="true"
+  >
+    <path
+      d="M12 18.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM12 2v1m0 18v1m9-10h1M2 12H1m15.364-6.364l.707-.707M4.929 4.929l-.707-.707m12.728 12.728l.707.707M4.929 19.071l-.707.707"
+    ></path>
+  </svg>
+
+  <!-- Moon Icon (Dark Mode) -->
+  <svg
+    id="moon-icon-unified"
+    width="20"
+    height="20"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all var(--transition-fast, 150ms ease); opacity: 0; color: var(--text-secondary, #e5e5e5);"
+    aria-hidden="true"
+  >
+    <path
+      d="M21.4 13.7C20.2 14.4 18.7 14.8 17.1 14.8C11.9 14.8 7.7 10.6 7.7 5.4C7.7 3.8 8.1 2.3 8.8 1.1C5.2 2.6 2.7 6.1 2.7 10.1C2.7 15.3 6.9 19.5 12.1 19.5C16.1 19.5 19.6 17 21.1 13.4L21.4 13.7Z"
+    ></path>
+  </svg>
+
+  <!-- System Icon (Auto Mode) -->
+  <svg
+    id="system-icon-unified"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all var(--transition-fast, 150ms ease); opacity: 0; stroke: var(--text-secondary, #e5e5e5);"
+    aria-hidden="true"
+  >
+    <rect x="2" y="4" width="20" height="12" rx="2"></rect>
+    <path d="M2 8h20"></path>
+  </svg>
+
+  <!-- Enhanced Tooltip -->
+  <span class="theme-tooltip" aria-hidden="true">
+    <span id="current-theme-text">System</span>
+  </span>
 </button>
 
-<script>
-  // Theme toggle functionality
-  const themeToggle = document.getElementById('theme-toggle')
-  const sunIcon = document.getElementById('sun-icon')
-  const moonIcon = document.getElementById('moon-icon')
-  const systemIcon = document.getElementById('system-icon')
+<style>
+  /* Enhanced Theme Toggle Styles with Unified Dark Theme */
+  .theme-toggle-unified {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: transparent;
+    border: 1px solid var(--border-primary, #2a2a2a);
+    border-radius: var(--radius-md, 0.375rem);
+    cursor: pointer;
+    transition: all var(--transition-fast, 150ms ease);
+    overflow: hidden;
+  }
 
-  // Function to set theme
-  function setTheme(theme: 'light' | 'dark' | 'system') {
-    localStorage.setItem('theme', theme)
+  /* Enhanced hover effects with glass morphism */
+  .theme-toggle-unified:hover {
+    background: var(--accent-primary-subtle, rgba(16, 185, 129, 0.1));
+    border-color: var(--accent-primary, #10b981);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow, 0 0 20px rgba(16, 185, 129, 0.15));
+  }
 
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light'
-      document.documentElement.classList.toggle('dark', systemTheme === 'dark')
-    } else {
-      document.documentElement.classList.toggle('dark', theme === 'dark')
+  .theme-toggle-unified:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
+  /* Enhanced icon animations */
+  .theme-toggle-unified svg {
+    transition: all var(--transition-normal, 250ms ease);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .theme-toggle-unified:hover svg {
+    transform: translate(-50%, -50%) rotate(15deg) scale(1.1);
+    color: var(--accent-primary, #10b981) !important;
+  }
+
+  /* Enhanced tooltip system */
+  .theme-tooltip {
+    position: absolute;
+    bottom: -2.5rem;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: var(--bg-level-2, #1a1a1a);
+    color: var(--text-primary, #ffffff);
+    padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+    border-radius: var(--radius-sm, 0.125rem);
+    font-size: var(--text-xs, 0.75rem);
+    font-weight: var(--weight-medium, 500);
+    white-space: nowrap;
+    opacity: 0;
+    transition: all var(--transition-fast, 150ms ease);
+    pointer-events: none;
+    z-index: 50;
+    border: 1px solid var(--border-primary, #2a2a2a);
+  }
+
+  .theme-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid var(--border-primary, #2a2a2a);
+  }
+
+  .theme-toggle-unified:hover .theme-tooltip {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+
+  /* Enhanced theme-specific visibility with unified dark theme */
+  html.light #sun-icon-unified,
+  html[data-theme='light'] #sun-icon-unified {
+    opacity: 1;
+    color: var(--text-secondary, #e5e5e5);
+  }
+
+  html.dark #moon-icon-unified,
+  html[data-theme='dark'] #moon-icon-unified {
+    opacity: 1;
+    color: var(--text-secondary, #e5e5e5);
+  }
+
+  html.system #system-icon-unified,
+  html[data-theme='system'] #system-icon-unified {
+    opacity: 1;
+    stroke: var(--text-secondary, #e5e5e5);
+  }
+
+  /* Hide non-active icons */
+  html.light #moon-icon-unified,
+  html.light #system-icon-unified,
+  html[data-theme='light'] #moon-icon-unified,
+  html[data-theme='light'] #system-icon-unified,
+  html.dark #sun-icon-unified,
+  html.dark #system-icon-unified,
+  html[data-theme='dark'] #sun-icon-unified,
+  html[data-theme='dark'] #system-icon-unified,
+  html.system #sun-icon-unified,
+  html.system #moon-icon-unified,
+  html[data-theme='system'] #sun-icon-unified,
+  html[data-theme='system'] #moon-icon-unified {
+    opacity: 0;
+  }
+
+  /* Enhanced focus indicators for accessibility */
+  .theme-toggle-unified:focus-visible {
+    outline: 2px solid var(--accent-primary, #10b981);
+    outline-offset: 2px;
+  }
+
+  /* Enhanced high contrast support */
+  @media (forced-colors: active) {
+    .theme-toggle-unified {
+      border-color: CanvasText;
     }
 
-    // Update icons
-    if (sunIcon && moonIcon && systemIcon) {
-      sunIcon.classList.toggle('hidden', theme !== 'light')
-      moonIcon.classList.toggle('hidden', theme !== 'dark')
-      systemIcon.classList.toggle('hidden', theme !== 'system')
+    .theme-toggle-unified:hover {
+      background: Highlight;
+      border-color: Highlight;
     }
   }
 
-  // Initialize theme - use 'dark' as the default instead of 'system'
-  const savedTheme =
-    (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'dark'
-  setTheme(savedTheme)
-
-  // Toggle theme on click
-  themeToggle?.addEventListener('click', (_event) => {
-    const currentTheme = localStorage.getItem('theme') || 'dark'
-
-    // Cycle through themes: dark -> light -> system -> dark
-    if (currentTheme === 'dark') {
-      setTheme('light')
-    } else if (currentTheme === 'light') {
-      setTheme('system')
-    } else {
-      setTheme('dark')
+  /* Enhanced reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle-unified,
+    .theme-toggle-unified svg,
+    .theme-toggle-unified:hover,
+    .theme-toggle-unified .theme-tooltip {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
     }
-  })
-
-  // Listen for system preference changes
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', (_event) => {
-      const currentTheme = localStorage.getItem('theme') || 'dark'
-      if (currentTheme === 'system') {
-        setTheme('system')
-      }
-    })
-</script>
-
-<style>
-  /* Smooth transition for theme changes */
-  :global(html) {
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
   }
 </style>
+
+<script is:inline>
+  // Enhanced Unified Theme Toggle System
+  ;(function () {
+    const themeToggle = document.getElementById('theme-toggle-unified')
+    const sunIcon = document.getElementById('sun-icon-unified')
+    const moonIcon = document.getElementById('moon-icon-unified')
+    const systemIcon = document.getElementById('system-icon-unified')
+    const currentThemeText = document.getElementById('current-theme-text')
+
+    // Theme options with enhanced descriptions
+    const themes = [
+      { key: 'light', name: 'Light', description: 'Bright theme' },
+      { key: 'dark', name: 'Dark', description: 'Dark theme' },
+      { key: 'system', name: 'System', description: 'Auto (system)' },
+    ]
+    let currentThemeIndex = 0
+
+    // Enhanced initial theme detection
+    function getInitialTheme() {
+      const stored = localStorage.getItem('theme')
+      if (stored && themes.some((t) => t.key === stored)) {
+        return stored
+      }
+      return 'system'
+    }
+
+    // Enhanced theme application with unified dark theme
+    function applyTheme(theme) {
+      const html = document.documentElement
+      const body = document.body
+
+      // Remove all theme classes
+      html.classList.remove('light', 'dark', 'system')
+      body.classList.remove('light', 'dark', 'system')
+      html.removeAttribute('data-theme')
+
+      // Reset enhanced theme classes
+      html.classList.remove('enhanced-dark-theme')
+      body.classList.remove('enhanced-dark-theme')
+
+      if (theme === 'system') {
+        // Enhanced system preference handling
+        const systemDark = window.matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches
+        html.classList.add('system')
+        body.classList.add('system')
+        html.setAttribute('data-theme', 'system')
+
+        if (systemDark) {
+          html.classList.add('enhanced-dark-theme')
+          body.classList.add('enhanced-dark-theme')
+        }
+      } else if (theme === 'dark') {
+        html.classList.add('dark', 'enhanced-dark-theme')
+        body.classList.add('dark', 'enhanced-dark-theme')
+        html.setAttribute('data-theme', 'dark')
+      } else {
+        html.classList.add('light')
+        body.classList.add('light')
+        html.setAttribute('data-theme', 'light')
+      }
+
+      // Enhanced meta theme-color updates
+      const metaThemeColors = document.querySelectorAll(
+        'meta[name="theme-color"]',
+      )
+      metaThemeColors.forEach((meta) => {
+        const media = meta.getAttribute('media')
+        if (theme === 'dark') {
+          if (media && media.includes('dark')) {
+            meta.setAttribute('content', '#0a0a0a')
+          }
+        } else if (theme === 'light') {
+          if (media && media.includes('light')) {
+            meta.setAttribute('content', '#ffffff')
+          }
+        } else if (theme === 'system') {
+          const systemDark = window.matchMedia(
+            '(prefers-color-scheme: dark)',
+          ).matches
+          if (systemDark && media && media.includes('dark')) {
+            meta.setAttribute('content', '#0a0a0a')
+          } else if (!systemDark && media && media.includes('light')) {
+            meta.setAttribute('content', '#ffffff')
+          }
+        }
+      })
+
+      // Update tooltip text
+      const themeData = themes.find((t) => t.key === theme)
+      if (currentThemeText && themeData) {
+        currentThemeText.textContent = themeData.name
+      }
+
+      // Update aria-pressed state
+      if (themeToggle) {
+        themeToggle.setAttribute(
+          'aria-pressed',
+          theme === 'dark' ? 'true' : 'false',
+        )
+      }
+    }
+
+    // Enhanced theme persistence and initialization
+    function initializeTheme() {
+      const initialTheme = getInitialTheme()
+      currentThemeIndex = themes.findIndex((t) => t.key === initialTheme)
+      applyTheme(initialTheme)
+
+      // Enhanced accessibility announcement
+      const announcement = document.createElement('div')
+      announcement.setAttribute('aria-live', 'polite')
+      announcement.setAttribute('aria-atomic', 'true')
+      announcement.className = 'sr-only'
+      document.body.appendChild(announcement)
+    }
+
+    // Enhanced theme toggle functionality
+    function cycleTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length
+      const newTheme = themes[currentThemeIndex].key
+      const newThemeName = themes[currentThemeIndex].name
+
+      // Enhanced persistence
+      localStorage.setItem('theme', newTheme)
+      localStorage.setItem('theme-timestamp', Date.now().toString())
+
+      // Apply theme
+      applyTheme(newTheme)
+
+      // Enhanced animation feedback
+      if (themeToggle) {
+        themeToggle.style.transform = 'scale(0.95)'
+        themeToggle.style.background =
+          'var(--accent-primary-subtle, rgba(16, 185, 129, 0.1))'
+
+        setTimeout(() => {
+          themeToggle.style.transform = ''
+          themeToggle.style.background = ''
+        }, 150)
+      }
+
+      // Enhanced accessibility announcement
+      const announcement = document.querySelector('[aria-live="polite"]')
+      if (announcement) {
+        announcement.textContent = `Theme changed to ${newThemeName}`
+        setTimeout(() => {
+          announcement.textContent = ''
+        }, 2000)
+      }
+
+      // Enhanced analytics tracking
+      if (window.peasy && window.peasy.track) {
+        window.peasy.track('theme_changed', {
+          theme: newTheme,
+          timestamp: Date.now(),
+        })
+      }
+    }
+
+    // Enhanced system theme change listener
+    function setupSystemThemeListener() {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+      mediaQuery.addEventListener('change', (e) => {
+        const currentTheme = localStorage.getItem('theme') || 'system'
+        if (currentTheme === 'system') {
+          applyTheme('system')
+
+          // Enhanced accessibility
+          const announcement = document.querySelector('[aria-live="polite"]')
+          if (announcement) {
+            const themeName = e.matches ? 'Dark' : 'Light'
+            announcement.textContent = `System theme changed to ${themeName}`
+            setTimeout(() => {
+              announcement.textContent = ''
+            }, 2000)
+          }
+        }
+      })
+    }
+
+    // Enhanced event listeners
+    if (themeToggle) {
+      // Click handler
+      themeToggle.addEventListener('click', (e) => {
+        e.preventDefault()
+        cycleTheme()
+      })
+
+      // Enhanced keyboard support
+      themeToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          cycleTheme()
+        }
+      })
+
+      // Enhanced touch support
+      themeToggle.addEventListener('touchstart', (e) => {
+        e.preventDefault()
+        themeToggle.style.transform = 'scale(0.95)'
+      })
+
+      themeToggle.addEventListener('touchend', (e) => {
+        e.preventDefault()
+        themeToggle.style.transform = ''
+        cycleTheme()
+      })
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeTheme()
+        setupSystemThemeListener()
+      })
+    } else {
+      initializeTheme()
+      setupSystemThemeListener()
+    }
+
+    // Enhanced cleanup and persistence
+    window.addEventListener('beforeunload', () => {
+      const currentTheme = localStorage.getItem('theme') || 'system'
+      localStorage.setItem('theme-last-seen', currentTheme)
+    })
+  })()
+</script>

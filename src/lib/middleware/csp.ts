@@ -5,10 +5,7 @@ import type { APIContext } from 'astro'
  * Middleware to generate a CSP nonce for each request
  * This nonce will be used in the CSP header and in script tags
  */
-export async function generateCspNonce(
-  context: APIContext,
-  next: any,
-) {
+export async function generateCspNonce(context: APIContext, next: any) {
   const { locals } = context
   // Generate a random nonce for this request
   const nonce = randomBytes(16).toString('base64')

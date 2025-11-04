@@ -91,7 +91,11 @@ function generateForecasts(
   // Consider recent emotion state for risk assessment
   const emotionIntensity = context.recentEmotionState.intensity
   const baseRisk: 'low' | 'moderate' | 'high' =
-    emotionIntensity > 0.7 ? 'high' : emotionIntensity > 0.4 ? 'moderate' : 'low'
+    emotionIntensity > 0.7
+      ? 'high'
+      : emotionIntensity > 0.4
+        ? 'moderate'
+        : 'low'
 
   return desiredOutcomes.map((outcome, index) => {
     // Calculate confidence based on multiple factors
@@ -171,7 +175,9 @@ function calculateRisk(
 /**
  * Generate contraindications based on risk level.
  */
-function generateContraindications(risk: 'low' | 'moderate' | 'high'): string[] {
+function generateContraindications(
+  risk: 'low' | 'moderate' | 'high',
+): string[] {
   const base = ['Acute suicidal ideation', 'Active psychosis']
 
   if (risk === 'high') {

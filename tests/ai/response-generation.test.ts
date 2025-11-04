@@ -1,7 +1,5 @@
 import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
-import {
-  ResponseGenerationService,
-  } from '@/lib/ai/services/response-generation'
+import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
 
 // Mock AI service
 const mockAIService: AIService = {
@@ -48,8 +46,7 @@ describe('responseGenerationService', () => {
         { role: 'user', content: 'Hello, how are you?', name: 'user' },
       ]
 
-      const result =
-        await responseService.generateResponse(messages)
+      const result = await responseService.generateResponse(messages)
 
       // Verify the result
       expect(result).toEqual({
@@ -179,9 +176,9 @@ describe('responseGenerationService', () => {
         { role: 'user', content: 'Hello, how are you?', name: 'user' },
       ]
 
-      await expect(
-        responseService.generateResponse(messages),
-      ).rejects.toThrow('AI service error')
+      await expect(responseService.generateResponse(messages)).rejects.toThrow(
+        'AI service error',
+      )
     })
 
     it('should handle conversation history correctly', async () => {

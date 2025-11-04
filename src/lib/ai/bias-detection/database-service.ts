@@ -37,7 +37,8 @@ export class BiasDetectionDatabaseService {
 
       return db
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
       logger.error('Database connection failed', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -171,39 +172,44 @@ export class BiasDetectionDatabaseService {
       const db = await this.getDatabase()
 
       // Get total sessions in the time range
-      const totalSessions = await db.collection('bias_analyses')
+      const totalSessions = await db
+        .collection('bias_analyses')
         .countDocuments({ createdAt: { $gte: cutoffTime } })
 
       // Get average bias score
-      const avgResult = await db.collection('bias_analyses')
+      const avgResult = (await db
+        .collection('bias_analyses')
         .aggregate([
           { $match: { createdAt: { $gte: cutoffTime } } },
-          { $group: { _id: null, avgScore: { $avg: '$overallBiasScore' } } }
-        ]).toArray() as Array<{ avgScore: number }>
+          { $group: { _id: null, avgScore: { $avg: '$overallBiasScore' } } },
+        ])
+        .toArray()) as Array<{ avgScore: number }>
 
-      const averageBiasScore = avgResult.length > 0 && avgResult[0]?.avgScore != null
-        ? avgResult[0].avgScore
-        : 0
+      const averageBiasScore =
+        avgResult.length > 0 && avgResult[0]?.avgScore != null
+          ? avgResult[0].avgScore
+          : 0
 
       // Get alerts in the last 24 hours
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000)
-      const alertsLast24h = await db.collection('bias_alerts')
+      const alertsLast24h = await db
+        .collection('bias_alerts')
         .countDocuments({ createdAt: { $gte: last24h } })
 
       // Get critical alerts
-      const criticalIssues = await db.collection('bias_alerts')
-        .countDocuments({
-          level: 'critical',
-          createdAt: { $gte: cutoffTime }
-        })
+      const criticalIssues = await db.collection('bias_alerts').countDocuments({
+        level: 'critical',
+        createdAt: { $gte: cutoffTime },
+      })
 
       // Calculate improvement rate (simplified)
       const improvementRate = Math.max(0, Math.min(1, 1 - averageBiasScore))
 
       // Calculate compliance score based on alerts and bias scores
-      const complianceScore = Math.max(0, Math.min(100,
-        100 - (averageBiasScore * 50) - (criticalIssues * 5)
-      ))
+      const complianceScore = Math.max(
+        0,
+        Math.min(100, 100 - averageBiasScore * 50 - criticalIssues * 5),
+      )
 
       return {
         totalSessions,
@@ -238,7 +244,7 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return alerts.map(alert => ({
+      return alerts.map((alert) => ({
         alertId: alert['alertId'],
         timestamp: alert['timestamp'],
         level: alert['level'],
@@ -271,35 +277,42 @@ export class BiasDetectionDatabaseService {
       const trends: BiasTrendData[] = []
 
       for (let i = points - 1; i >= 0; i--) {
-        const endTime = new Date(Date.now() - (i * intervalHours * 60 * 60 * 1000))
-        const startTime = new Date(endTime.getTime() - (intervalHours * 60 * 60 * 1000))
+        const endTime = new Date(
+          Date.now() - i * intervalHours * 60 * 60 * 1000,
+        )
+        const startTime = new Date(
+          endTime.getTime() - intervalHours * 60 * 60 * 1000,
+        )
 
         // Get analyses for this time period
         const analyses = await collection
           .find({
             createdAt: {
               $gte: startTime,
-              $lt: endTime
-            }
+              $lt: endTime,
+            },
           })
           .toArray()
 
-        const alertCount = await db.collection('bias_alerts')
-          .countDocuments({
-            createdAt: {
-              $gte: startTime,
-              $lt: endTime
-            }
-          })
+        const alertCount = await db.collection('bias_alerts').countDocuments({
+          createdAt: {
+            $gte: startTime,
+            $lt: endTime,
+          },
+        })
 
         // Calculate average bias score for this period
-        const avgScore = analyses.length > 0
-          ? analyses.reduce((sum, analysis) => sum + analysis['overallBiasScore'], 0) / analyses.length
-          : 0
+        const avgScore =
+          analyses.length > 0
+            ? analyses.reduce(
+                (sum, analysis) => sum + analysis['overallBiasScore'],
+                0,
+              ) / analyses.length
+            : 0
 
         // Get demographic breakdown for this period
         const demographicBreakdown: Record<string, number> = {}
-        analyses.forEach(analysis => {
+        analyses.forEach((analysis) => {
           const demo = analysis['demographics']
           if (demo) {
             // (Previously unused) key could be used for grouping if needed
@@ -335,7 +348,8 @@ export class BiasDetectionDatabaseService {
     try {
       const db = await this.getDatabase()
 
-      const analyses = await db.collection('bias_analyses')
+      const analyses = await db
+        .collection('bias_analyses')
         .find({ createdAt: { $gte: cutoffTime } })
         .toArray()
 
@@ -350,27 +364,36 @@ export class BiasDetectionDatabaseService {
         sampleSize: number
       }> = []
 
-      analyses.forEach(analysis => {
+      analyses.forEach((analysis) => {
         const demo = analysis['demographics']
         if (demo) {
           // Count demographics
           Object.assign(age, { [demo.age]: (age[demo.age] ?? 0) + 1 })
-          Object.assign(gender, { [demo.gender]: (gender[demo.gender] ?? 0) + 1 })
-          Object.assign(ethnicity, { [demo.ethnicity]: (ethnicity[demo.ethnicity] ?? 0) + 1 })
+          Object.assign(gender, {
+            [demo.gender]: (gender[demo.gender] ?? 0) + 1,
+          })
+          Object.assign(ethnicity, {
+            [demo.ethnicity]: (ethnicity[demo.ethnicity] ?? 0) + 1,
+          })
           // Precompute a stable key for this demographic intersection
-          const intersectionKey = [demo.age, demo.gender, demo.ethnicity].sort().join('|')
-          const existingIntersection = intersectional.find(item =>
-            item.groups.sort().join('|') === intersectionKey
+          const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
+            .sort()
+            .join('|')
+          const existingIntersection = intersectional.find(
+            (item) => item.groups.sort().join('|') === intersectionKey,
           )
 
           if (existingIntersection) {
             existingIntersection.sampleSize++
             // Recalculate representation as the fraction of total analyses
-            existingIntersection.representation = existingIntersection.sampleSize / analyses.length
+            existingIntersection.representation =
+              existingIntersection.sampleSize / analyses.length
             // Update the running average of the bias score for this intersection
             existingIntersection.biasScore =
-              (existingIntersection.biasScore * (existingIntersection.sampleSize - 1) +
-                analysis['overallBiasScore']) / existingIntersection.sampleSize
+              (existingIntersection.biasScore *
+                (existingIntersection.sampleSize - 1) +
+                analysis['overallBiasScore']) /
+              existingIntersection.sampleSize
           } else {
             intersectional.push({
               groups: [demo.age, demo.gender, demo.ethnicity],
@@ -421,7 +444,7 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return analyses.map(analysis => ({
+      return analyses.map((analysis) => ({
         sessionId: analysis['sessionId'],
         timestamp: analysis['timestamp'],
         overallBiasScore: analysis['overallBiasScore'],
@@ -621,7 +644,9 @@ export class BiasDetectionDatabaseService {
         timestamp: new Date(),
         createdAt: new Date(),
         retentionExpiry: entry.retentionPeriodDays
-          ? new Date(Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000)
+          ? new Date(
+              Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
+            )
           : null,
       }
 

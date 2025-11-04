@@ -686,11 +686,10 @@ export class EvidenceExtractor {
           category: item.source || `${category}_semantic`,
           clinicalRelevance: clinical,
           metadata: {
-            semanticRationale:
-              (item.context &&
-                (item.context as Record<string, unknown>)['semanticRationale']) as
-                | string
-                | undefined,
+            semanticRationale: (item.context &&
+              (item.context as Record<string, unknown>)[
+                'semanticRationale'
+              ]) as string | undefined,
           },
         }
       })

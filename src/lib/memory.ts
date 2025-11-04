@@ -32,8 +32,6 @@ export interface UpdateMemoryOptions {
   metadata?: Record<string, unknown>
 }
 
-
-
 export class MemoryService {
   private memories: Memory[] = []
 
@@ -51,8 +49,6 @@ export class MemoryService {
       metadata: options.metadata || {},
     }
     this.memories.push(memory)
-
-
 
     return memory
   }
@@ -77,8 +73,6 @@ export class MemoryService {
       metadata: { ...memory.metadata, ...options.metadata },
       updatedAt: new Date(),
     }
-
-
 
     return this.memories[memoryIndex]
   }

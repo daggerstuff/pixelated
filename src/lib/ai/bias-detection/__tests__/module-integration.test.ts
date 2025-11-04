@@ -69,14 +69,17 @@ describe('Module Integration Tests', () => {
     // Create module instances
     pythonBridge = new PythonBiasDetectionBridge(
       mockConfig.pythonServiceUrl!,
-      mockConfig.pythonServiceTimeout!
+      mockConfig.pythonServiceTimeout!,
     )
 
     metricsCollector = new BiasMetricsCollector(mockConfig, pythonBridge)
-    alertSystem = new BiasAlertSystem({
-      pythonServiceUrl: mockConfig.pythonServiceUrl,
-      timeout: mockConfig.pythonServiceTimeout,
-    }, pythonBridge)
+    alertSystem = new BiasAlertSystem(
+      {
+        pythonServiceUrl: mockConfig.pythonServiceUrl,
+        timeout: mockConfig.pythonServiceTimeout,
+      },
+      pythonBridge,
+    )
   })
 
   describe('Python Bridge ↔ Metrics Collector Integration', () => {
@@ -220,7 +223,9 @@ describe('Module Integration Tests', () => {
       }
 
       // Should not throw error even with invalid data
-      await expect(metricsCollector.storeAnalysisResult?.(invalidResult)).resolves.not.toThrow()
+      await expect(
+        metricsCollector.storeAnalysisResult?.(invalidResult),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -242,13 +247,15 @@ describe('Module Integration Tests', () => {
               racialBiasScore: 0.5,
               ageBiasScore: 0.4,
               culturalBiasScore: 0.3,
-              biasedTerms: [{
-                term: 'concerning term',
-                context: 'therapeutic context',
-                biasType: 'gender_bias',
-                severity: 'medium',
-                suggestedAlternative: 'neutral term',
-              }],
+              biasedTerms: [
+                {
+                  term: 'concerning term',
+                  context: 'therapeutic context',
+                  biasType: 'gender_bias',
+                  severity: 'medium',
+                  suggestedAlternative: 'neutral term',
+                },
+              ],
               sentimentAnalysis: {
                 overallSentiment: -0.4,
                 emotionalValence: -0.5,
@@ -416,12 +423,14 @@ describe('Module Integration Tests', () => {
       }
 
       // Should not throw error even with malformed data
-      await expect(alertSystem.processAlert?.({
-        sessionId: malformedResult.sessionId,
-        level: malformedResult.alertLevel,
-        biasScore: malformedResult.overallBiasScore,
-        analysisResult: malformedResult,
-      })).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.({
+          sessionId: malformedResult.sessionId,
+          level: malformedResult.alertLevel,
+          biasScore: malformedResult.overallBiasScore,
+          analysisResult: malformedResult,
+        }),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -519,7 +528,7 @@ describe('Module Integration Tests', () => {
 
       // All operations should complete (success or failure)
       expect(results).toHaveLength(4)
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(['fulfilled', 'rejected']).toContain(result.status)
       })
     })
@@ -528,12 +537,18 @@ describe('Module Integration Tests', () => {
   describe('Cross-Module Error Propagation', () => {
     it('should handle Python bridge failures across modules', async () => {
       // Mock Python bridge failure
-      pythonBridge.initialize = vi.fn().mockRejectedValue(new Error('Python service unavailable'))
-      
+      pythonBridge.initialize = vi
+        .fn()
+        .mockRejectedValue(new Error('Python service unavailable'))
+
       // Mock the modules to also fail when Python bridge fails
-      metricsCollector.initialize = vi.fn().mockRejectedValue(new Error('Metrics collector failed'))
+      metricsCollector.initialize = vi
+        .fn()
+        .mockRejectedValue(new Error('Metrics collector failed'))
       if (alertSystem.initialize) {
-        alertSystem.initialize = vi.fn().mockRejectedValue(new Error('Alert system failed'))
+        alertSystem.initialize = vi
+          .fn()
+          .mockRejectedValue(new Error('Alert system failed'))
       }
 
       // Both metrics collector and alert system should handle this gracefully
@@ -547,7 +562,9 @@ describe('Module Integration Tests', () => {
       await pythonBridge.initialize()
 
       // Mock metrics collector failure
-      metricsCollector.initialize = vi.fn().mockRejectedValue(new Error('Metrics storage failed'))
+      metricsCollector.initialize = vi
+        .fn()
+        .mockRejectedValue(new Error('Metrics storage failed'))
 
       // Alert system should still work independently
       await expect(alertSystem.initialize?.()).resolves.not.toThrow()
@@ -572,7 +589,9 @@ describe('Module Integration Tests', () => {
       await pythonBridge.initialize()
 
       // Simulate error during metrics collection
-      metricsCollector.storeAnalysisResult = vi.fn().mockRejectedValue(new Error('Storage error'))
+      metricsCollector.storeAnalysisResult = vi
+        .fn()
+        .mockRejectedValue(new Error('Storage error'))
 
       const testResult: BiasAnalysisResult = {
         sessionId: 'resource-test',
@@ -591,7 +610,9 @@ describe('Module Integration Tests', () => {
       }
 
       // Should not leave resources in inconsistent state
-      await expect(metricsCollector.storeAnalysisResult(testResult)).rejects.toThrow()
+      await expect(
+        metricsCollector.storeAnalysisResult(testResult),
+      ).rejects.toThrow()
 
       // Cleanup should still work
       await expect(metricsCollector.dispose?.()).resolves.not.toThrow()
@@ -609,14 +630,20 @@ describe('Module Integration Tests', () => {
       // Create new instances with updated config
       const newPythonBridge = new PythonBiasDetectionBridge(
         newConfig.pythonServiceUrl!,
-        newConfig.pythonServiceTimeout!
+        newConfig.pythonServiceTimeout!,
       )
 
-      const newMetricsCollector = new BiasMetricsCollector(newConfig, newPythonBridge)
-      const newAlertSystem = new BiasAlertSystem({
-        pythonServiceUrl: newConfig.pythonServiceUrl,
-        timeout: newConfig.pythonServiceTimeout,
-      }, newPythonBridge)
+      const newMetricsCollector = new BiasMetricsCollector(
+        newConfig,
+        newPythonBridge,
+      )
+      const newAlertSystem = new BiasAlertSystem(
+        {
+          pythonServiceUrl: newConfig.pythonServiceUrl,
+          timeout: newConfig.pythonServiceTimeout,
+        },
+        newPythonBridge,
+      )
 
       await newPythonBridge.initialize()
       await newMetricsCollector.initialize()
@@ -635,7 +662,10 @@ describe('Module Integration Tests', () => {
         timeout: 60000, // Different timeout
       }
 
-      const mismatchedAlertSystem = new BiasAlertSystem(mismatchedConfig, pythonBridge)
+      const mismatchedAlertSystem = new BiasAlertSystem(
+        mismatchedConfig,
+        pythonBridge,
+      )
 
       // Should still initialize but may have inconsistent behavior
       await expect(mismatchedAlertSystem.initialize?.()).resolves.not.toThrow()

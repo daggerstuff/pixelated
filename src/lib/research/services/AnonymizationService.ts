@@ -36,14 +36,16 @@ export interface AnonymizationAuditLog {
 export class AnonymizationService {
   private config: AnonymizationConfig
 
-  constructor(config: AnonymizationConfig = {
-    kAnonymity: 5,
-    epsilon: 0.1,
-    delta: 0.00001,
-    temporalEpsilon: 0.05,
-    fieldLevelEncryption: true,
-    noiseInjection: true
-  }) {
+  constructor(
+    config: AnonymizationConfig = {
+      kAnonymity: 5,
+      epsilon: 0.1,
+      delta: 0.00001,
+      temporalEpsilon: 0.05,
+      fieldLevelEncryption: true,
+      noiseInjection: true,
+    },
+  ) {
     this.config = config
   }
 
@@ -52,29 +54,32 @@ export class AnonymizationService {
    */
   async anonymizeResearchData(
     rawData: ResearchDataPoint[],
-    consentLevel: 'full' | 'limited' | 'minimal'
+    consentLevel: 'full' | 'limited' | 'minimal',
   ): Promise<AnonymizationResult> {
     logger.info('Starting anonymization pipeline', {
       dataSize: rawData.length,
       consentLevel,
-      config: this.config
+      config: this.config,
     })
 
     try {
       // Step 1: K-anonymity implementation
-      const kAnonymizedData = this.applyKAnonymity(rawData, this.config.kAnonymity)
+      const kAnonymizedData = this.applyKAnonymity(
+        rawData,
+        this.config.kAnonymity,
+      )
 
       // Step 2: Differential privacy noise injection
       const differentialPrivateData = this.applyDifferentialPrivacy(
         kAnonymizedData,
         this.config.epsilon,
-        this.config.delta
+        this.config.delta,
       )
 
       // Step 3: Temporal data obfuscation
       const temporalObfuscatedData = this.obfuscateTemporalData(
         differentialPrivateData,
-        this.config.temporalEpsilon
+        this.config.temporalEpsilon,
       )
 
       // Step 4: Field-level encryption for sensitive fields
@@ -94,32 +99,38 @@ export class AnonymizationService {
       logger.info('Anonymization pipeline completed', {
         privacyMetrics,
         originalSize: rawData.length,
-        finalSize: finalAnonymizedData.length
+        finalSize: finalAnonymizedData.length,
       })
 
       return {
         anonymizedData: finalAnonymizedData,
         privacyMetrics,
-        auditLog
+        auditLog,
       }
     } catch (error) {
       logger.error('Anonymization pipeline failed', { error })
-      throw new Error(`Anonymization failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+      throw new Error(
+        `Anonymization failed: ${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
+      )
     }
   }
 
   /**
    * Apply k-anonymity to prevent re-identification
    */
-  private applyKAnonymity(data: ResearchDataPoint[], k: number): ResearchDataPoint[] {
+  private applyKAnonymity(
+    data: ResearchDataPoint[],
+    k: number,
+  ): ResearchDataPoint[] {
     const quasiIdentifiers = ['age', 'gender', 'location', 'sessionDuration']
 
     // Group by quasi-identifiers
     const groups = new Map<string, ResearchDataPoint[]>()
 
-    data.forEach(record => {
+    data.forEach((record) => {
       const key = quasiIdentifiers
-        .map(field => this.getFieldValue(record, field))
+        .map((field) => this.getFieldValue(record, field))
         .join('|')
 
       if (!groups.has(key)) {
@@ -137,7 +148,10 @@ export class AnonymizationService {
         anonymizedData.push(...group)
       } else {
         // Generalize quasi-identifiers
-        const generalizedGroup = this.generalizeQuasiIdentifiers(group, quasiIdentifiers)
+        const generalizedGroup = this.generalizeQuasiIdentifiers(
+          group,
+          quasiIdentifiers,
+        )
         anonymizedData.push(...generalizedGroup)
       }
     })
@@ -151,11 +165,11 @@ export class AnonymizationService {
   private applyDifferentialPrivacy(
     data: ResearchDataPoint[],
     epsilon: number,
-    _delta: number
+    _delta: number,
   ): ResearchDataPoint[] {
     const sensitivity = this.calculateSensitivity(data)
 
-    return data.map(record => {
+    return data.map((record) => {
       const noisyRecord = { ...record }
 
       // Add Laplacian noise to numerical fields
@@ -163,17 +177,28 @@ export class AnonymizationService {
         noisyRecord.emotionScores = Object.fromEntries(
           Object.entries(record.emotionScores).map(([emotion, score]) => [
             emotion,
-            Math.max(0, Math.min(1, score + this.laplaceNoise(sensitivity / epsilon)))
-          ])
+            Math.max(
+              0,
+              Math.min(1, score + this.laplaceNoise(sensitivity / epsilon)),
+            ),
+          ]),
         )
       }
 
       if (record.techniqueEffectiveness) {
         noisyRecord.techniqueEffectiveness = Object.fromEntries(
-          Object.entries(record.techniqueEffectiveness).map(([technique, effectiveness]) => [
-            technique,
-            Math.max(0, Math.min(100, effectiveness + this.laplaceNoise(sensitivity / epsilon)))
-          ])
+          Object.entries(record.techniqueEffectiveness).map(
+            ([technique, effectiveness]) => [
+              technique,
+              Math.max(
+                0,
+                Math.min(
+                  100,
+                  effectiveness + this.laplaceNoise(sensitivity / epsilon),
+                ),
+              ),
+            ],
+          ),
         )
       }
 
@@ -186,18 +211,16 @@ export class AnonymizationService {
    */
   private obfuscateTemporalData(
     data: ResearchDataPoint[],
-    temporalEpsilon: number
+    temporalEpsilon: number,
   ): ResearchDataPoint[] {
-    return data.map(record => {
+    return data.map((record) => {
       const obfuscatedRecord = { ...record }
 
       // Add noise to timestamps
       if (record.timestamp) {
-        const noise = this.laplaceNoise(3600 * 1000 / temporalEpsilon) // ~1 hour noise
+        const noise = this.laplaceNoise((3600 * 1000) / temporalEpsilon) // ~1 hour noise
         const timestamp = new Date(record.timestamp)
-        obfuscatedRecord.timestamp = new Date(
-          timestamp.getTime() + noise
-        )
+        obfuscatedRecord.timestamp = new Date(timestamp.getTime() + noise)
       }
 
       // Obfuscate session duration
@@ -205,7 +228,7 @@ export class AnonymizationService {
         const noise = this.laplaceNoise(300 / temporalEpsilon) // ~5 minutes noise
         obfuscatedRecord.sessionDuration = Math.max(
           0,
-          record.sessionDuration + noise
+          record.sessionDuration + noise,
         )
       }
 
@@ -216,13 +239,15 @@ export class AnonymizationService {
   /**
    * Encrypt sensitive fields using AES-256
    */
-  private encryptSensitiveFields(data: ResearchDataPoint[]): ResearchDataPoint[] {
+  private encryptSensitiveFields(
+    data: ResearchDataPoint[],
+  ): ResearchDataPoint[] {
     const sensitiveFields = ['clientId', 'therapistId', 'sessionNotes'] as const
 
-    return data.map(record => {
+    return data.map((record) => {
       const encryptedRecord = { ...record }
 
-      sensitiveFields.forEach(field => {
+      sensitiveFields.forEach((field) => {
         const value = this.getFieldValue(record, field)
         if (value && typeof value === 'string') {
           const encryptedValue = this.encryptField(value)
@@ -237,11 +262,13 @@ export class AnonymizationService {
   /**
    * Prevent cross-session linkage attacks
    */
-  private preventCrossSessionLinkage(data: ResearchDataPoint[]): ResearchDataPoint[] {
+  private preventCrossSessionLinkage(
+    data: ResearchDataPoint[],
+  ): ResearchDataPoint[] {
     // Generate unique session identifiers for each record
     const sessionMap = new Map<string, string>()
 
-    return data.map(record => {
+    return data.map((record) => {
       const linkageRecord = { ...record }
 
       // Replace original session ID with anonymized version
@@ -269,9 +296,9 @@ export class AnonymizationService {
     const quasiIdentifiers = ['age', 'gender', 'location']
     const groups = new Map<string, number>()
 
-    data.forEach(record => {
+    data.forEach((record) => {
       const key = quasiIdentifiers
-        .map(field => this.getFieldValue(record, field))
+        .map((field) => this.getFieldValue(record, field))
         .join('|')
       groups.set(key, (groups.get(key) || 0) + 1)
     })
@@ -280,7 +307,9 @@ export class AnonymizationService {
 
     // Calculate uniqueness score
     const totalRecords = data.length
-    const uniqueRecords = Array.from(groups.values()).filter(count => count === 1).length
+    const uniqueRecords = Array.from(groups.values()).filter(
+      (count) => count === 1,
+    ).length
     const uniquenessScore = uniqueRecords / totalRecords
 
     // Estimate re-identification risk
@@ -290,7 +319,7 @@ export class AnonymizationService {
       kValue,
       epsilonValue: this.config.epsilon,
       reidentificationRisk,
-      uniquenessScore
+      uniquenessScore,
     }
   }
 
@@ -299,7 +328,7 @@ export class AnonymizationService {
    */
   private generateAuditLog(
     _originalData: ResearchDataPoint[],
-    _anonymizedData: ResearchDataPoint[]
+    _anonymizedData: ResearchDataPoint[],
   ): AnonymizationAuditLog[] {
     const auditLog: AnonymizationAuditLog[] = []
 
@@ -308,21 +337,21 @@ export class AnonymizationService {
       timestamp: new Date().toISOString(),
       operation: 'k-anonymity',
       field: 'quasi-identifiers',
-      privacyLevel: 'high'
+      privacyLevel: 'high',
     })
 
     auditLog.push({
       timestamp: new Date().toISOString(),
       operation: 'differential-privacy',
       field: 'numerical-fields',
-      privacyLevel: 'high'
+      privacyLevel: 'high',
     })
 
     auditLog.push({
       timestamp: new Date().toISOString(),
       operation: 'temporal-obfuscation',
       field: 'timestamps',
-      privacyLevel: 'medium'
+      privacyLevel: 'medium',
     })
 
     return auditLog
@@ -335,15 +364,19 @@ export class AnonymizationService {
     return (record as unknown as Record<string, unknown>)[field]
   }
 
-  private setFieldValue(record: ResearchDataPoint, field: string, value: unknown): void {
-    (record as unknown as Record<string, unknown>)[field] = value
+  private setFieldValue(
+    record: ResearchDataPoint,
+    field: string,
+    value: unknown,
+  ): void {
+    ;(record as unknown as Record<string, unknown>)[field] = value
   }
 
   private generalizeQuasiIdentifiers(
     records: ResearchDataPoint[],
-    _quasiIdentifiers: string[]
+    _quasiIdentifiers: string[],
   ): ResearchDataPoint[] {
-    return records.map(record => {
+    return records.map((record) => {
       const generalized = { ...record }
 
       // Age generalization (e.g., 25 → 20-30)
@@ -363,11 +396,37 @@ export class AnonymizationService {
 
   private generalizeLocation(location: string): string {
     const regions = {
-      'northeast': ['NY', 'NJ', 'CT', 'MA', 'RI', 'VT', 'NH', 'ME', 'PA'],
-      'southeast': ['FL', 'GA', 'SC', 'NC', 'VA', 'TN', 'KY', 'WV', 'AL', 'MS', 'LA', 'AR'],
-      'midwest': ['OH', 'IN', 'IL', 'MI', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS'],
-      'southwest': ['TX', 'OK', 'NM', 'AZ'],
-      'west': ['CA', 'NV', 'UT', 'CO', 'WY', 'MT', 'ID', 'OR', 'WA', 'AK', 'HI']
+      northeast: ['NY', 'NJ', 'CT', 'MA', 'RI', 'VT', 'NH', 'ME', 'PA'],
+      southeast: [
+        'FL',
+        'GA',
+        'SC',
+        'NC',
+        'VA',
+        'TN',
+        'KY',
+        'WV',
+        'AL',
+        'MS',
+        'LA',
+        'AR',
+      ],
+      midwest: [
+        'OH',
+        'IN',
+        'IL',
+        'MI',
+        'WI',
+        'MN',
+        'IA',
+        'MO',
+        'ND',
+        'SD',
+        'NE',
+        'KS',
+      ],
+      southwest: ['TX', 'OK', 'NM', 'AZ'],
+      west: ['CA', 'NV', 'UT', 'CO', 'WY', 'MT', 'ID', 'OR', 'WA', 'AK', 'HI'],
     }
 
     const state = location.split(',').pop()?.trim()
@@ -395,7 +454,11 @@ export class AnonymizationService {
 
   private encryptField(value: string): string {
     const algorithm = 'aes-256-cbc'
-    const key = crypto.scryptSync(process.env.RESEARCH_ENCRYPTION_KEY || 'default-key', 'salt', 32)
+    const key = crypto.scryptSync(
+      process.env.RESEARCH_ENCRYPTION_KEY || 'default-key',
+      'salt',
+      32,
+    )
     const iv = crypto.randomBytes(16)
 
     const cipher = crypto.createCipheriv(algorithm, key, iv)
@@ -420,21 +483,27 @@ export class AnonymizationService {
     const quasiIdentifiers = ['age', 'gender', 'location']
     const groups = new Map<string, number>()
 
-    data.forEach(record => {
+    data.forEach((record) => {
       const key = quasiIdentifiers
-        .map(field => this.getFieldValue(record, field))
+        .map((field) => this.getFieldValue(record, field))
         .join('|')
       groups.set(key, (groups.get(key) || 0) + 1)
     })
 
     const minK = Math.min(...Array.from(groups.values()))
     if (minK < this.config.kAnonymity) {
-      issues.push(`K-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`)
-      recommendations.push('Increase generalization or reduce quasi-identifiers')
+      issues.push(
+        `K-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`,
+      )
+      recommendations.push(
+        'Increase generalization or reduce quasi-identifiers',
+      )
     }
 
     // Check uniqueness
-    const uniquenessScore = Array.from(groups.values()).filter(count => count === 1).length / data.length
+    const uniquenessScore =
+      Array.from(groups.values()).filter((count) => count === 1).length /
+      data.length
     if (uniquenessScore > 0.05) {
       issues.push(`High uniqueness score: ${uniquenessScore.toFixed(3)}`)
       recommendations.push('Apply stronger generalization or add noise')
@@ -443,7 +512,7 @@ export class AnonymizationService {
     return {
       isValid: issues.length === 0,
       issues,
-      recommendations
+      recommendations,
     }
   }
 }

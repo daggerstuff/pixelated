@@ -26,8 +26,8 @@ vi.mock('../metrics-collector', () => ({
   BiasMetricsCollector: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     getMetrics: vi.fn().mockResolvedValue({
-      overall_stats: { 
-        total_sessions: 100, 
+      overall_stats: {
+        total_sessions: 100,
         average_bias_score: 0.3,
         alert_distribution: {
           low: 50,

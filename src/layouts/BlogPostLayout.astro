@@ -72,13 +72,7 @@ const shareConfig: ShareConfig = {
           {postTitle}
         </h1>
 
-        {
-          description && (
-            <p class="lede-text">
-              {description}
-            </p>
-          )
-        }
+        {description && <p class="lede-text">{description}</p>}
       </div>
 
       {
@@ -117,7 +111,10 @@ const shareConfig: ShareConfig = {
       <slot />
     </div>
 
-    <footer class="mt-12 pt-8 border-t" style="border-color: var(--border-primary);">
+    <footer
+      class="mt-12 pt-8 border-t"
+      style="border-color: var(--border-primary);"
+    >
       <!-- Social Share Section -->
       <div class="flex justify-between items-center">
         <a

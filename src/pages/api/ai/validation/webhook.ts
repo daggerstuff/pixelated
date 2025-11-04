@@ -1,4 +1,4 @@
-import { validationRunner } from '@/lib/ai/validation/ContinuousValidationRunner';
+import { validationRunner } from '@/lib/ai/validation/ContinuousValidationRunner'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,
@@ -6,7 +6,11 @@ import {
   AuditEventStatus,
 } from '../../../../lib/audit'
 
-export const POST = async ({ request }: { request: Request }): Promise<Response> => {
+export const POST = async ({
+  request,
+}: {
+  request: Request
+}): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-webhook')
 
   try {
@@ -32,7 +36,9 @@ export const POST = async ({ request }: { request: Request }): Promise<Response>
         status: result.status,
         signature: signature ? 'present' : 'missing',
       },
-      result.status === 'handled' ? AuditEventStatus.SUCCESS : AuditEventStatus.FAILURE,
+      result.status === 'handled'
+        ? AuditEventStatus.SUCCESS
+        : AuditEventStatus.FAILURE,
     )
 
     if (result.status === 'handled') {

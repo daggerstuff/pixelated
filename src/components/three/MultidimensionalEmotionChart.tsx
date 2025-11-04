@@ -23,26 +23,33 @@ interface MultidimensionalEmotionChartProps {
   className?: string
 }
 
-const EmotionSphere: React.FC<{ point: EmotionPoint; index: number }> = ({ point, index }) => {
+const EmotionSphere: React.FC<{ point: EmotionPoint; index: number }> = ({
+  point,
+  index,
+}) => {
   const meshRef = useRef<THREE.Mesh>(null!)
   const [hovered, setHovered] = useState(false)
 
   useFrame((state) => {
     if (meshRef.current) {
       // Gentle floating animation
-      meshRef.current.position.y += Math.sin(state.clock.elapsedTime + index) * 0.002
-      
+      meshRef.current.position.y +=
+        Math.sin(state.clock.elapsedTime + index) * 0.002
+
       // Scale based on hover
       const targetScale = hovered ? 1.2 : 1
-      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
+      meshRef.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale),
+        0.1,
+      )
     }
   })
 
   // Map emotion values to 3D coordinates
   const position: [number, number, number] = [
     point.valence * 3, // X-axis: valence
-    point.arousal * 3, // Y-axis: arousal  
-    point.dominance * 3 // Z-axis: dominance
+    point.arousal * 3, // Y-axis: arousal
+    point.dominance * 3, // Z-axis: dominance
   ]
 
   // Color based on emotion quadrant
@@ -62,9 +69,9 @@ const EmotionSphere: React.FC<{ point: EmotionPoint; index: number }> = ({ point
       onPointerOut={() => setHovered(false)}
     >
       <sphereGeometry args={[0.1 * point.intensity, 16, 16]} />
-      <meshStandardMaterial 
-        color={getEmotionColor()} 
-        transparent 
+      <meshStandardMaterial
+        color={getEmotionColor()}
+        transparent
         opacity={hovered ? 0.9 : 0.7}
         emissive={getEmotionColor()}
         emissiveIntensity={hovered ? 0.2 : 0.1}
@@ -88,11 +95,14 @@ const EmotionTrail: React.FC<{ points: EmotionPoint[] }> = ({ points }) => {
   const trailPoints = useMemo(() => {
     return points
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-      .map(point => new THREE.Vector3(
-        point.valence * 3,
-        point.arousal * 3,
-        point.dominance * 3
-      ))
+      .map(
+        (point) =>
+          new THREE.Vector3(
+            point.valence * 3,
+            point.arousal * 3,
+            point.dominance * 3,
+          ),
+      )
   }, [points])
 
   if (trailPoints.length < 2) return null
@@ -113,7 +123,10 @@ const CoordinateAxes: React.FC = () => {
     <group>
       {/* X-axis (Valence) */}
       <Line
-        points={[[-4, 0, 0], [4, 0, 0]]}
+        points={[
+          [-4, 0, 0],
+          [4, 0, 0],
+        ]}
         color="#EF4444"
         lineWidth={2}
       />
@@ -126,7 +139,10 @@ const CoordinateAxes: React.FC = () => {
 
       {/* Y-axis (Arousal) */}
       <Line
-        points={[[0, -4, 0], [0, 4, 0]]}
+        points={[
+          [0, -4, 0],
+          [0, 4, 0],
+        ]}
         color="#10B981"
         lineWidth={2}
       />
@@ -139,7 +155,10 @@ const CoordinateAxes: React.FC = () => {
 
       {/* Z-axis (Dominance) */}
       <Line
-        points={[[0, 0, -4], [0, 0, 4]]}
+        points={[
+          [0, 0, -4],
+          [0, 0, 4],
+        ]}
         color="#3B82F6"
         lineWidth={2}
       />
@@ -153,10 +172,10 @@ const CoordinateAxes: React.FC = () => {
   )
 }
 
-const Scene: React.FC<{ 
+const Scene: React.FC<{
   data: EmotionPoint[]
   showTrails: boolean
-  showAxes: boolean 
+  showAxes: boolean
 }> = ({ data, showTrails, showAxes }) => {
   return (
     <>
@@ -189,89 +208,89 @@ const Scene: React.FC<{
   )
 }
 
-const MultidimensionalEmotionChart: React.FC<MultidimensionalEmotionChartProps> = ({
-  data,
-  showTrails = true,
-  showAxes = true,
-  className = '',
-}) => {
+const MultidimensionalEmotionChart: React.FC<
+  MultidimensionalEmotionChartProps
+> = ({ data, showTrails = true, showAxes = true, className = '' }) => {
   const [emotionData, setEmotionData] = useState<EmotionPoint[]>([])
 
   // Default sample data
-  const defaultData: EmotionPoint[] = useMemo(() => [
-    {
-      id: '1',
-      valence: 0.8,
-      arousal: 0.6,
-      dominance: 0.4,
-      emotion: 'Joy',
-      timestamp: new Date(Date.now() - 300000),
-      intensity: 1.2,
-    },
-    {
-      id: '2',
-      valence: -0.6,
-      arousal: 0.8,
-      dominance: -0.2,
-      emotion: 'Anger',
-      timestamp: new Date(Date.now() - 240000),
-      intensity: 1.1,
-    },
-    {
-      id: '3',
-      valence: -0.4,
-      arousal: -0.7,
-      dominance: -0.6,
-      emotion: 'Sadness',
-      timestamp: new Date(Date.now() - 180000),
-      intensity: 0.9,
-    },
-    {
-      id: '4',
-      valence: 0.2,
-      arousal: -0.8,
-      dominance: 0.3,
-      emotion: 'Calm',
-      timestamp: new Date(Date.now() - 120000),
-      intensity: 0.8,
-    },
-    {
-      id: '5',
-      valence: 0.6,
-      arousal: 0.4,
-      dominance: 0.7,
-      emotion: 'Confidence',
-      timestamp: new Date(Date.now() - 60000),
-      intensity: 1.0,
-    },
-    {
-      id: '6',
-      valence: 0.1,
-      arousal: 0.1,
-      dominance: 0.1,
-      emotion: 'Neutral',
-      timestamp: new Date(),
-      intensity: 0.7,
-    },
-  ], [])
+  const defaultData: EmotionPoint[] = useMemo(
+    () => [
+      {
+        id: '1',
+        valence: 0.8,
+        arousal: 0.6,
+        dominance: 0.4,
+        emotion: 'Joy',
+        timestamp: new Date(Date.now() - 300000),
+        intensity: 1.2,
+      },
+      {
+        id: '2',
+        valence: -0.6,
+        arousal: 0.8,
+        dominance: -0.2,
+        emotion: 'Anger',
+        timestamp: new Date(Date.now() - 240000),
+        intensity: 1.1,
+      },
+      {
+        id: '3',
+        valence: -0.4,
+        arousal: -0.7,
+        dominance: -0.6,
+        emotion: 'Sadness',
+        timestamp: new Date(Date.now() - 180000),
+        intensity: 0.9,
+      },
+      {
+        id: '4',
+        valence: 0.2,
+        arousal: -0.8,
+        dominance: 0.3,
+        emotion: 'Calm',
+        timestamp: new Date(Date.now() - 120000),
+        intensity: 0.8,
+      },
+      {
+        id: '5',
+        valence: 0.6,
+        arousal: 0.4,
+        dominance: 0.7,
+        emotion: 'Confidence',
+        timestamp: new Date(Date.now() - 60000),
+        intensity: 1.0,
+      },
+      {
+        id: '6',
+        valence: 0.1,
+        arousal: 0.1,
+        dominance: 0.1,
+        emotion: 'Neutral',
+        timestamp: new Date(),
+        intensity: 0.7,
+      },
+    ],
+    [],
+  )
 
   useEffect(() => {
     setEmotionData(data || defaultData)
   }, [data, defaultData])
 
   return (
-    <div className={`w-full h-96 bg-gray-900 rounded-lg overflow-hidden ${className}`}>
+    <div
+      className={`w-full h-96 bg-gray-900 rounded-lg overflow-hidden ${className}`}
+    >
       <Canvas
         camera={{ position: [8, 6, 8], fov: 50 }}
-        style={{ background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' }}
+        style={{
+          background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+        }}
       >
-        <Scene 
-          data={emotionData} 
-          showTrails={showTrails} 
-          showAxes={showAxes} 
-        />
+        <Scene data={emotionData} showTrails={showTrails} showAxes={showAxes} />
       </Canvas>
-      
+
       {/* Legend */}
       <div className="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white p-3 rounded text-sm">
         <div className="space-y-1">

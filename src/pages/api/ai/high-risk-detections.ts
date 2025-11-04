@@ -1,5 +1,9 @@
 // import type { APIRoute, APIContext } from 'astro'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '../../../lib/audit'
+import {
+  createAuditLog,
+  AuditEventType,
+  AuditEventStatus,
+} from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 import { aiRepository } from '@/lib/db/ai'
 
@@ -41,7 +45,7 @@ export const GET = async ({ request, url }) => {
         limit,
         offset,
       },
-      AuditEventStatus.SUCCESS
+      AuditEventStatus.SUCCESS,
     )
 
     // Retrieve high-risk crisis detections
@@ -62,7 +66,7 @@ export const GET = async ({ request, url }) => {
         detectionsCount: detections.length,
         status: 'success',
       },
-      AuditEventStatus.SUCCESS
+      AuditEventStatus.SUCCESS,
     )
 
     // Return the results

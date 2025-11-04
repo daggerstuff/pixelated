@@ -655,13 +655,15 @@ export class AdvancedPredictiveThreatIntelligence
       )
 
       // Convert PredictionResult[] to TimeSeriesPrediction[]
-      const predictions: TimeSeriesPrediction[] = predictionResults.map((pred, idx) => ({
-        timestamp: new Date(Date.now() + idx * 24 * 60 * 60 * 1000),
-        predictedValue: pred.value,
-        confidence: pred.confidence,
-        lowerBound: pred.value - (pred.value * 0.1),
-        upperBound: pred.value + (pred.value * 0.1),
-      }))
+      const predictions: TimeSeriesPrediction[] = predictionResults.map(
+        (pred, idx) => ({
+          timestamp: new Date(Date.now() + idx * 24 * 60 * 60 * 1000),
+          predictedValue: pred.value,
+          confidence: pred.confidence,
+          lowerBound: pred.value - pred.value * 0.1,
+          upperBound: pred.value + pred.value * 0.1,
+        }),
+      )
 
       // Calculate confidence bands
       const confidenceBands =
@@ -862,10 +864,8 @@ export class AdvancedPredictiveThreatIntelligence
     }
 
     for (const edge of propagationGraph.edges) {
-      edge.transmissionProbability = await this.calculateTransmissionProbability(
-        edge,
-        initialThreat,
-      )
+      edge.transmissionProbability =
+        await this.calculateTransmissionProbability(edge, initialThreat)
       edge.transmissionRate = await this.calculateTransmissionRate(edge)
     }
 
@@ -1034,22 +1034,53 @@ export class AdvancedPredictiveThreatIntelligence
     return []
   }
 
-  private async extractThreatFeatures(_data: ThreatData[]): Promise<ThreatFeatures> {
-    return { statistical: { mean: 0, variance: 0, skewness: 0, kurtosis: 0, percentiles: {} }, temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 }, spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} }, categorical: { threatTypeDistribution: {}, severityDistribution: {}, attributionDistribution: {} } }
+  private async extractThreatFeatures(
+    _data: ThreatData[],
+  ): Promise<ThreatFeatures> {
+    return {
+      statistical: {
+        mean: 0,
+        variance: 0,
+        skewness: 0,
+        kurtosis: 0,
+        percentiles: {},
+      },
+      temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 },
+      spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} },
+      categorical: {
+        threatTypeDistribution: {},
+        severityDistribution: {},
+        attributionDistribution: {},
+      },
+    }
   }
 
   private async analyzeTrends(
     _timeSeries: ThreatTimeSeries[],
     _predictions: PredictedThreat[],
   ): Promise<TrendAnalysis> {
-    return { trendDirection: 'stable', trendStrength: 0, changePoints: [], seasonalityStrength: 0, noiseLevel: 0 }
+    return {
+      trendDirection: 'stable',
+      trendStrength: 0,
+      changePoints: [],
+      seasonalityStrength: 0,
+      noiseLevel: 0,
+    }
   }
 
   private async evaluateModelPerformance(
     _models: ForecastingModel[],
     _timeSeries: ThreatTimeSeries[],
   ): Promise<ModelPerformanceMetrics> {
-    return { accuracy: 0, precision: 0, recall: 0, f1Score: 0, mae: 0, mse: 0, rmse: 0 }
+    return {
+      accuracy: 0,
+      precision: 0,
+      recall: 0,
+      f1Score: 0,
+      mae: 0,
+      mse: 0,
+      rmse: 0,
+    }
   }
 
   private async identifyAffectedNodes(
@@ -1059,137 +1090,293 @@ export class AdvancedPredictiveThreatIntelligence
   }
 
   // Missing method implementations
-  private async identifyDailyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+  private async identifyDailyPattern(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern | null> {
     return null
   }
 
-  private async identifyWeeklyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+  private async identifyWeeklyPattern(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern | null> {
     return null
   }
 
-  private async identifyMonthlyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+  private async identifyMonthlyPattern(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern | null> {
     return null
   }
 
-  private async identifyYearlyPattern(_components: SeasonalComponents): Promise<SeasonalPattern | null> {
+  private async identifyYearlyPattern(
+    _components: SeasonalComponents,
+  ): Promise<SeasonalPattern | null> {
     return null
   }
 
-  private async validateStatisticalSignificance(patterns: SeasonalPattern[]): Promise<SeasonalPattern[]> {
-    return patterns.filter(p => p.statisticalSignificance < 0.05)
+  private async validateStatisticalSignificance(
+    patterns: SeasonalPattern[],
+  ): Promise<SeasonalPattern[]> {
+    return patterns.filter((p) => p.statisticalSignificance < 0.05)
   }
 
-  private async analyzeDailySeasonality(_component: TimeSeriesComponent): Promise<{isSignificant: boolean, amplitude: number, phase: number, frequency: number, confidence: number, pValue: number}> {
-    return { isSignificant: false, amplitude: 0, phase: 0, frequency: 0, confidence: 0, pValue: 1 }
+  private async analyzeDailySeasonality(
+    _component: TimeSeriesComponent,
+  ): Promise<{
+    isSignificant: boolean
+    amplitude: number
+    phase: number
+    frequency: number
+    confidence: number
+    pValue: number
+  }> {
+    return {
+      isSignificant: false,
+      amplitude: 0,
+      phase: 0,
+      frequency: 0,
+      confidence: 0,
+      pValue: 1,
+    }
   }
 
-  private async analyzeWeeklySeasonality(_component: TimeSeriesComponent): Promise<{isSignificant: boolean, amplitude: number, phase: number, frequency: number, confidence: number, pValue: number}> {
-    return { isSignificant: false, amplitude: 0, phase: 0, frequency: 0, confidence: 0, pValue: 1 }
+  private async analyzeWeeklySeasonality(
+    _component: TimeSeriesComponent,
+  ): Promise<{
+    isSignificant: boolean
+    amplitude: number
+    phase: number
+    frequency: number
+    confidence: number
+    pValue: number
+  }> {
+    return {
+      isSignificant: false,
+      amplitude: 0,
+      phase: 0,
+      frequency: 0,
+      confidence: 0,
+      pValue: 1,
+    }
   }
 
   private async preprocessThreats(threats: Threat[]): Promise<Threat[]> {
     return threats
   }
 
-  private async extractRiskFactors(_threats: Threat[], _context: SecurityContext): Promise<void> {
+  private async extractRiskFactors(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<void> {
     // Implementation placeholder
   }
 
-  private async calculateThreatLikelihood(_threats: Threat[], _context: SecurityContext): Promise<number> {
+  private async calculateThreatLikelihood(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateThreatImpact(_threats: Threat[], _context: SecurityContext): Promise<number> {
+  private async calculateThreatImpact(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateVulnerability(_threats: Threat[], _context: SecurityContext): Promise<number> {
+  private async calculateVulnerability(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateRiskBreakdown(_threats: Threat[], _context: SecurityContext): Promise<RiskBreakdown> {
+  private async calculateRiskBreakdown(
+    _threats: Threat[],
+    _context: SecurityContext,
+  ): Promise<RiskBreakdown> {
     return { byThreatType: {}, bySeverity: {}, byLikelihood: {}, byImpact: {} }
   }
 
-  private async generateRiskRecommendations(_threats: Threat[], _context: SecurityContext, _breakdown: RiskBreakdown): Promise<RiskRecommendation[]> {
+  private async generateRiskRecommendations(
+    _threats: Threat[],
+    _context: SecurityContext,
+    _breakdown: RiskBreakdown,
+  ): Promise<RiskRecommendation[]> {
     return []
   }
 
-  private calculateRiskConfidence(_likelihood: number, _impact: number, _vulnerability: number, _uncertainty: UncertaintyQuantification): number {
+  private calculateRiskConfidence(
+    _likelihood: number,
+    _impact: number,
+    _vulnerability: number,
+    _uncertainty: UncertaintyQuantification,
+  ): number {
     return 0.8
   }
 
-  private async preprocessTimeSeries(series: ThreatTimeSeries[]): Promise<ThreatTimeSeries[]> {
+  private async preprocessTimeSeries(
+    series: ThreatTimeSeries[],
+  ): Promise<ThreatTimeSeries[]> {
     return series
   }
 
-  private async extractTimeSeriesFeatures(_series: ThreatTimeSeries[]): Promise<ThreatFeatures> {
-    return { statistical: { mean: 0, variance: 0, skewness: 0, kurtosis: 0, percentiles: {} }, temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 }, spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} }, categorical: { threatTypeDistribution: {}, severityDistribution: {}, attributionDistribution: {} } }
+  private async extractTimeSeriesFeatures(
+    _series: ThreatTimeSeries[],
+  ): Promise<ThreatFeatures> {
+    return {
+      statistical: {
+        mean: 0,
+        variance: 0,
+        skewness: 0,
+        kurtosis: 0,
+        percentiles: {},
+      },
+      temporal: { trend: 0, seasonality: 0, autocorrelation: 0, changeRate: 0 },
+      spatial: { geographicSpread: 0, clustering: 0, distanceMetrics: {} },
+      categorical: {
+        threatTypeDistribution: {},
+        severityDistribution: {},
+        attributionDistribution: {},
+      },
+    }
   }
 
-  private async calculateTimeSeriesConfidenceBands(_predictions: PredictionResult[]): Promise<ConfidenceBand[]> {
+  private async calculateTimeSeriesConfidenceBands(
+    _predictions: PredictionResult[],
+  ): Promise<ConfidenceBand[]> {
     return []
   }
 
-  private async extractModelParameters(_model: ForecastingModel): Promise<ModelParameters> {
-    return { modelType: 'unknown', parameters: {}, trainingMetrics: { loss: 0, accuracy: 0, epochs: 0, trainingTime: 0 } }
+  private async extractModelParameters(
+    _model: ForecastingModel,
+  ): Promise<ModelParameters> {
+    return {
+      modelType: 'unknown',
+      parameters: {},
+      trainingMetrics: { loss: 0, accuracy: 0, epochs: 0, trainingTime: 0 },
+    }
   }
 
-  private async calculateValidationMetrics(_model: ForecastingModel, _series: ThreatTimeSeries[]): Promise<ValidationMetrics> {
+  private async calculateValidationMetrics(
+    _model: ForecastingModel,
+    _series: ThreatTimeSeries[],
+  ): Promise<ValidationMetrics> {
     return { mae: 0, mse: 0, rmse: 0, mape: 0, r2: 0 }
   }
 
   private removeDuplicateThreats(threats: ThreatData[]): ThreatData[] {
     const seen = new Set<string>()
-    return threats.filter(t => {
+    return threats.filter((t) => {
       if (seen.has(t.threatId)) return false
       seen.add(t.threatId)
       return true
     })
   }
 
-  private async imputeMissingValues(threats: ThreatData[]): Promise<ThreatData[]> {
+  private async imputeMissingValues(
+    threats: ThreatData[],
+  ): Promise<ThreatData[]> {
     return threats
   }
 
-  private async normalizeThreatData(threats: ThreatData[]): Promise<ThreatData[]> {
+  private async normalizeThreatData(
+    threats: ThreatData[],
+  ): Promise<ThreatData[]> {
     return threats
   }
 
-  private groupByThreatType(threats: ThreatData[]): Record<string, ThreatData[]> {
-    return threats.reduce((acc, threat) => {
-      if (!acc[threat.threatType]) acc[threat.threatType] = []
-      acc[threat.threatType].push(threat)
-      return acc
-    }, {} as Record<string, ThreatData[]>)
+  private groupByThreatType(
+    threats: ThreatData[],
+  ): Record<string, ThreatData[]> {
+    return threats.reduce(
+      (acc, threat) => {
+        if (!acc[threat.threatType]) acc[threat.threatType] = []
+        acc[threat.threatType].push(threat)
+        return acc
+      },
+      {} as Record<string, ThreatData[]>,
+    )
   }
 
-  private async trainLSTMModel(_series: ThreatTimeSeries, _components: SeasonalComponents): Promise<ForecastingModel> {
-    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  private async trainLSTMModel(
+    _series: ThreatTimeSeries,
+    _components: SeasonalComponents,
+  ): Promise<ForecastingModel> {
+    return {
+      threatType: 'unknown',
+      predict: async () => ({
+        value: 0,
+        confidence: 0,
+        probability: 0,
+        factors: [],
+      }),
+    }
   }
 
-  private async trainARIMAModel(_series: ThreatTimeSeries, _components: SeasonalComponents): Promise<ForecastingModel> {
-    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  private async trainARIMAModel(
+    _series: ThreatTimeSeries,
+    _components: SeasonalComponents,
+  ): Promise<ForecastingModel> {
+    return {
+      threatType: 'unknown',
+      predict: async () => ({
+        value: 0,
+        confidence: 0,
+        probability: 0,
+        factors: [],
+      }),
+    }
   }
 
-  private async trainEnsembleModel(_lstm: ForecastingModel, _arima: ForecastingModel): Promise<ForecastingModel> {
-    return { threatType: 'unknown', predict: async () => ({ value: 0, confidence: 0, probability: 0, factors: [] }) }
+  private async trainEnsembleModel(
+    _lstm: ForecastingModel,
+    _arima: ForecastingModel,
+  ): Promise<ForecastingModel> {
+    return {
+      threatType: 'unknown',
+      predict: async () => ({
+        value: 0,
+        confidence: 0,
+        probability: 0,
+        factors: [],
+      }),
+    }
   }
 
   private calculateTimeHorizon(timeframe: TimeWindow): string {
-    const days = Math.ceil((timeframe.end.getTime() - timeframe.start.getTime()) / (1000 * 60 * 60 * 24))
+    const days = Math.ceil(
+      (timeframe.end.getTime() - timeframe.start.getTime()) /
+        (1000 * 60 * 60 * 24),
+    )
     return `${days} days`
   }
 
-  private async calculatePredictionInterval(_prediction: PredictedThreat): Promise<ConfidenceInterval> {
-    return { intervalId: 'interval_1', threatType: 'unknown', lowerBound: 0, upperBound: 1, confidenceLevel: 0.95, predictionHorizon: '1 day' }
+  private async calculatePredictionInterval(
+    _prediction: PredictedThreat,
+  ): Promise<ConfidenceInterval> {
+    return {
+      intervalId: 'interval_1',
+      threatType: 'unknown',
+      lowerBound: 0,
+      upperBound: 1,
+      confidenceLevel: 0.95,
+      predictionHorizon: '1 day',
+    }
   }
 
-  private async calculateSimilarityToKnownThreats(_threat: NovelThreat, _baselineFeatures: ThreatFeatures): Promise<number> {
+  private async calculateSimilarityToKnownThreats(
+    _threat: NovelThreat,
+    _baselineFeatures: ThreatFeatures,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateInfectionProbability(_node: NetworkNode, _threat: Threat): Promise<number> {
+  private async calculateInfectionProbability(
+    _node: NetworkNode,
+    _threat: Threat,
+  ): Promise<number> {
     return 0.5
   }
 
@@ -1197,11 +1384,16 @@ export class AdvancedPredictiveThreatIntelligence
     return 0.1
   }
 
-  private async calculateVulnerabilityScore(_node: NetworkNode): Promise<number> {
+  private async calculateVulnerabilityScore(
+    _node: NetworkNode,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateTransmissionProbability(_edge: NetworkEdge, _threat: Threat): Promise<number> {
+  private async calculateTransmissionProbability(
+    _edge: NetworkEdge,
+    _threat: Threat,
+  ): Promise<number> {
     return 0.5
   }
 
@@ -1209,15 +1401,24 @@ export class AdvancedPredictiveThreatIntelligence
     return 0.1
   }
 
-  private async calculateBasicReproductionNumber(_graph: PropagationGraph, _threat: Threat): Promise<number> {
+  private async calculateBasicReproductionNumber(
+    _graph: PropagationGraph,
+    _threat: Threat,
+  ): Promise<number> {
     return 1.0
   }
 
-  private async calculateNodeInfectionProbability(_node: PropagationNode, _graph: PropagationGraph): Promise<number> {
+  private async calculateNodeInfectionProbability(
+    _node: PropagationNode,
+    _graph: PropagationGraph,
+  ): Promise<number> {
     return 0.5
   }
 
-  private async calculateEdgeTransmissionProbability(_edge: PropagationEdge, _graph: PropagationGraph): Promise<number> {
+  private async calculateEdgeTransmissionProbability(
+    _edge: PropagationEdge,
+    _graph: PropagationGraph,
+  ): Promise<number> {
     return 0.5
   }
 

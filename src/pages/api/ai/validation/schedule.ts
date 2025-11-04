@@ -34,11 +34,17 @@ export const POST = async ({ request }: { request: Request }) => {
       await createAuditLog(
         AuditEventType.SECURITY,
         'validation-schedule-unauthorized',
-        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'unknown',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.[
+          'id'
+        ] || 'unknown',
         'validation-api',
         {
-          userId: (authResult as unknown as { user?: { id?: string; email?: string } })?.['user']?.['id'],
-          email: (authResult as unknown as { user?: { id?: string; email?: string } })?.['user']?.['email'],
+          userId: (
+            authResult as unknown as { user?: { id?: string; email?: string } }
+          )?.['user']?.['id'],
+          email: (
+            authResult as unknown as { user?: { id?: string; email?: string } }
+          )?.['user']?.['email'],
         },
         AuditEventStatus.FAILURE,
       )
@@ -72,10 +78,14 @@ export const POST = async ({ request }: { request: Request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'validation-schedule-create',
-        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'system',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.[
+          'id'
+        ] || 'system',
         'validation-api',
         {
-          userId: (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'],
+          userId: (authResult as unknown as { user?: { id?: string } })?.[
+            'user'
+          ]?.['id'],
           schedule,
         },
         AuditEventStatus.SUCCESS,
@@ -102,10 +112,14 @@ export const POST = async ({ request }: { request: Request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'validation-schedule-stop',
-        (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'] || 'system',
+        (authResult as unknown as { user?: { id?: string } })?.['user']?.[
+          'id'
+        ] || 'system',
         'validation-api',
         {
-          userId: (authResult as unknown as { user?: { id?: string } })?.['user']?.['id'],
+          userId: (authResult as unknown as { user?: { id?: string } })?.[
+            'user'
+          ]?.['id'],
         },
         AuditEventStatus.SUCCESS,
       )

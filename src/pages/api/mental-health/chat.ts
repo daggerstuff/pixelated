@@ -25,11 +25,11 @@ export interface ChatResponse {
   response: {
     message: string
     type:
-    | 'supportive'
-    | 'psychoeducational'
-    | 'coping_strategy'
-    | 'crisis_intervention'
-    | 'referral'
+      | 'supportive'
+      | 'psychoeducational'
+      | 'coping_strategy'
+      | 'crisis_intervention'
+      | 'referral'
     confidence: number
     sessionId: string
   }
@@ -587,8 +587,8 @@ export const POST = async ({ request }: APIContext) => {
       Math.min(
         10,
         5 +
-        sentimentScore * -3 +
-        (stressLevel === 'high' ? 3 : stressLevel === 'moderate' ? 1 : 0),
+          sentimentScore * -3 +
+          (stressLevel === 'high' ? 3 : stressLevel === 'moderate' ? 1 : 0),
       ),
     )
 
@@ -616,39 +616,39 @@ export const POST = async ({ request }: APIContext) => {
     // Coping strategies
     const copingStrategies = options.includeCopingStrategies
       ? {
-        immediate: (COPING_STRATEGIES['immediate'] ?? [])
-          .filter(
-            () =>
-              analysis.stressLevel === 'high' ||
-              riskAssessment?.crisisLevel !== 'none',
-          )
-          .slice(0, 2),
-        shortTerm: (COPING_STRATEGIES['shortTerm'] ?? [])
-          .filter((strategy) =>
-            strategy.suitability.some((suit) => keyTopics.includes(suit)),
-          )
-          .slice(0, 2),
-        longTerm: (COPING_STRATEGIES['longTerm'] ?? []).slice(0, 1),
-      }
+          immediate: (COPING_STRATEGIES['immediate'] ?? [])
+            .filter(
+              () =>
+                analysis.stressLevel === 'high' ||
+                riskAssessment?.crisisLevel !== 'none',
+            )
+            .slice(0, 2),
+          shortTerm: (COPING_STRATEGIES['shortTerm'] ?? [])
+            .filter((strategy) =>
+              strategy.suitability.some((suit) => keyTopics.includes(suit)),
+            )
+            .slice(0, 2),
+          longTerm: (COPING_STRATEGIES['longTerm'] ?? []).slice(0, 1),
+        }
       : undefined
 
     // Resources (only if high risk or crisis)
     const resources =
       riskAssessment?.crisisLevel === 'high' ||
-        riskAssessment?.crisisLevel === 'imminent'
+      riskAssessment?.crisisLevel === 'imminent'
         ? {
-          crisisHotlines: CRISIS_RESOURCES.crisisHotlines,
-          professionalHelp: CRISIS_RESOURCES.professionalHelp,
-          selfHelpResources: [
-            {
-              title: 'Mindfulness and Meditation Apps',
-              type: 'app' as const,
-              description: 'Guided meditation and mindfulness exercises',
-              category: 'self-help',
-              duration: 'Varies',
-            },
-          ],
-        }
+            crisisHotlines: CRISIS_RESOURCES.crisisHotlines,
+            professionalHelp: CRISIS_RESOURCES.professionalHelp,
+            selfHelpResources: [
+              {
+                title: 'Mindfulness and Meditation Apps',
+                type: 'app' as const,
+                description: 'Guided meditation and mindfulness exercises',
+                category: 'self-help',
+                duration: 'Varies',
+              },
+            ],
+          }
         : undefined
 
     const processingTime = Date.now() - startTime
@@ -685,9 +685,9 @@ export const POST = async ({ request }: APIContext) => {
         suggestedTopics:
           keyTopics.length > 0
             ? [
-              `Continue discussing ${keyTopics[0]}`,
-              'Explore coping strategies',
-            ]
+                `Continue discussing ${keyTopics[0]}`,
+                'Explore coping strategies',
+              ]
             : ['How are you feeling today?'],
         scheduledReminders:
           riskAssessment?.crisisLevel !== 'none'

@@ -9,7 +9,7 @@
 export async function processInChunks<T, R>(
   items: T[],
   chunkSize: number,
-  processChunk: (chunk: T[], chunkIndex: number) => Promise<R>
+  processChunk: (chunk: T[], chunkIndex: number) => Promise<R>,
 ): Promise<R[]> {
   const results: R[] = []
   for (let i = 0; i < items.length; i += chunkSize) {

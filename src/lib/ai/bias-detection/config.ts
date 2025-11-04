@@ -130,8 +130,11 @@ export const DEFAULT_CONFIG: BiasDetectionConfig = {
 /**
  * Validates bias detection configuration
  */
-export function validateConfig(config?: Partial<BiasDetectionConfig>): string[] {
-  const configToValidate = config || BiasDetectionConfigManager.getInstance().getConfig()
+export function validateConfig(
+  config?: Partial<BiasDetectionConfig>,
+): string[] {
+  const configToValidate =
+    config || BiasDetectionConfigManager.getInstance().getConfig()
   const errors: string[] = []
 
   // Validate threshold values
@@ -161,10 +164,14 @@ export function validateConfig(config?: Partial<BiasDetectionConfig>): string[] 
 
     // Validate threshold ordering
     const warning =
-      thresholds.warning ?? (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.warning : 0.3)
-    const high = thresholds.high ?? (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.high : 0.6)
+      thresholds.warning ??
+      (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.warning : 0.3)
+    const high =
+      thresholds.high ??
+      (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.high : 0.6)
     const critical =
-      thresholds.critical ?? (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.critical : 0.8)
+      thresholds.critical ??
+      (DEFAULT_CONFIG.thresholds ? DEFAULT_CONFIG.thresholds.critical : 0.8)
 
     if (warning >= high || high >= critical) {
       errors.push(
@@ -206,7 +213,8 @@ export function validateConfig(config?: Partial<BiasDetectionConfig>): string[] 
 
   if (
     configToValidate.pythonServiceTimeout !== undefined &&
-    (configToValidate.pythonServiceTimeout < 1000 || configToValidate.pythonServiceTimeout > 300000)
+    (configToValidate.pythonServiceTimeout < 1000 ||
+      configToValidate.pythonServiceTimeout > 300000)
   ) {
     errors.push(
       `pythonServiceTimeout must be between 1000ms and 300000ms, got ${configToValidate.pythonServiceTimeout}ms`,
@@ -249,7 +257,7 @@ export function validateConfig(config?: Partial<BiasDetectionConfig>): string[] 
   if (errors.length > 0) {
     throw new Error(`Configuration validation failed: ${errors.join('; ')}`)
   }
-  
+
   return errors
 }
 
@@ -260,11 +268,14 @@ export function mergeWithDefaults(
   userConfig?: Partial<BiasDetectionConfig>,
 ): BiasDetectionConfig {
   if (!userConfig) {
-    return { ...DEFAULT_CONFIG };
+    return { ...DEFAULT_CONFIG }
   }
-  validateConfig(userConfig);
-  const mergedConfig: BiasDetectionConfig = deepMergeConfigs(DEFAULT_CONFIG, userConfig) as BiasDetectionConfig;
-  return mergedConfig;
+  validateConfig(userConfig)
+  const mergedConfig: BiasDetectionConfig = deepMergeConfigs(
+    DEFAULT_CONFIG,
+    userConfig,
+  ) as BiasDetectionConfig
+  return mergedConfig
 }
 
 /**
@@ -332,7 +343,10 @@ export function loadConfigFromEnv(): Partial<BiasDetectionConfig> {
     loggingConfig.enableDebug = true
   }
   if (Object.keys(loggingConfig).length > 0) {
-    envConfig.loggingConfig = { ...DEFAULT_CONFIG.loggingConfig, ...loggingConfig }
+    envConfig.loggingConfig = {
+      ...DEFAULT_CONFIG.loggingConfig,
+      ...loggingConfig,
+    }
   }
   if (process.env.BIAS_EVALUATION_METRICS) {
     envConfig.evaluationMetrics = process.env.BIAS_EVALUATION_METRICS.split(
@@ -360,13 +374,17 @@ export function loadConfigFromEnv(): Partial<BiasDetectionConfig> {
   }
 
   // Load performance configuration
-  const performanceConfig: Partial<BiasDetectionConfig['performanceConfig']> = {}
+  const performanceConfig: Partial<BiasDetectionConfig['performanceConfig']> =
+    {}
   if (process.env.MAX_CONCURRENT_ANALYSES) {
     const parsed = parseInt(process.env.MAX_CONCURRENT_ANALYSES)
     if (!isNaN(parsed)) performanceConfig.maxConcurrentAnalyses = parsed
   }
   if (Object.keys(performanceConfig).length > 0) {
-    envConfig.performanceConfig = { ...DEFAULT_CONFIG.performanceConfig, ...performanceConfig }
+    envConfig.performanceConfig = {
+      ...DEFAULT_CONFIG.performanceConfig,
+      ...performanceConfig,
+    }
   }
   const alertConfig: Partial<BiasDetectionConfig['alertConfig']> = {}
   if (process.env.BIAS_ALERT_SLACK_WEBHOOK) {
@@ -563,11 +581,11 @@ export class BiasDetectionConfigManager {
     return BiasDetectionConfigManager.instance
   }
 
-  public getConfig(): BiasDetectionConfig & { 
-    cache?: any; 
-    security?: any; 
-    performance?: any; 
-    pythonService?: any; 
+  public getConfig(): BiasDetectionConfig & {
+    cache?: any
+    security?: any
+    performance?: any
+    pythonService?: any
   } {
     // Return config with compatibility properties for tests
     return {
@@ -576,13 +594,15 @@ export class BiasDetectionConfigManager {
       cache: this.config.cacheConfig,
       security: {
         ...this.config.securityConfig,
-        encryptionEnabled: this.config.securityConfig?.encryptionEnabled ?? false,
+        encryptionEnabled:
+          this.config.securityConfig?.encryptionEnabled ?? false,
         auditLoggingEnabled: this.config.auditLogging ?? true,
       },
       performance: {
         ...this.config.performanceConfig,
         enableMetrics: this.config.performanceConfig?.enableMetrics ?? false,
-        maxConcurrentAnalyses: this.config.performanceConfig?.maxConcurrentAnalyses ?? 10,
+        maxConcurrentAnalyses:
+          this.config.performanceConfig?.maxConcurrentAnalyses ?? 10,
       },
       pythonService: {
         url: this.config.pythonServiceUrl,
@@ -643,7 +663,9 @@ export class BiasDetectionConfigManager {
       batchSize: this.config.performanceConfig?.batchSize ?? 100,
       enableMetrics:
         this.config.performanceConfig?.enableMetrics ??
-        (this.config.metricsConfig ? this.config.metricsConfig.enableRealTimeMonitoring : true),
+        (this.config.metricsConfig
+          ? this.config.metricsConfig.enableRealTimeMonitoring
+          : true),
       metricsInterval: 60000,
     }
   }
@@ -652,31 +674,44 @@ export class BiasDetectionConfigManager {
     return {
       aif360: {
         enabled: this.config.mlToolkitConfig?.aif360?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.aif360?.fallbackOnError ?? true,
+        fallbackOnError:
+          this.config.mlToolkitConfig?.aif360?.fallbackOnError ?? true,
       },
       fairlearn: {
         enabled: this.config.mlToolkitConfig?.fairlearn?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.fairlearn?.fallbackOnError ?? true,
+        fallbackOnError:
+          this.config.mlToolkitConfig?.fairlearn?.fallbackOnError ?? true,
       },
       tensorflow: {
         enabled: this.config.mlToolkitConfig?.tensorflow?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.tensorflow?.fallbackOnError ?? true,
+        fallbackOnError:
+          this.config.mlToolkitConfig?.tensorflow?.fallbackOnError ?? true,
       },
       huggingFace: {
         enabled: this.config.mlToolkitConfig?.huggingFace?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.huggingFace?.fallbackOnError ?? true,
+        fallbackOnError:
+          this.config.mlToolkitConfig?.huggingFace?.fallbackOnError ?? true,
         apiKey: this.config.mlToolkitConfig?.huggingFace?.apiKey,
-        model: this.config.mlToolkitConfig?.huggingFace?.model ?? 'unitary/toxic-bert',
+        model:
+          this.config.mlToolkitConfig?.huggingFace?.model ??
+          'unitary/toxic-bert',
       },
       interpretability: {
         enabled: this.config.mlToolkitConfig?.interpretability?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.interpretability?.fallbackOnError ?? true,
-        shap: this.config.mlToolkitConfig?.interpretability?.shap ?? { enabled: true },
-        lime: this.config.mlToolkitConfig?.interpretability?.lime ?? { enabled: true },
+        fallbackOnError:
+          this.config.mlToolkitConfig?.interpretability?.fallbackOnError ??
+          true,
+        shap: this.config.mlToolkitConfig?.interpretability?.shap ?? {
+          enabled: true,
+        },
+        lime: this.config.mlToolkitConfig?.interpretability?.lime ?? {
+          enabled: true,
+        },
       },
       spacy: {
         enabled: this.config.mlToolkitConfig?.spacy?.enabled ?? true,
-        fallbackOnError: this.config.mlToolkitConfig?.spacy?.fallbackOnError ?? true,
+        fallbackOnError:
+          this.config.mlToolkitConfig?.spacy?.fallbackOnError ?? true,
         model: this.config.mlToolkitConfig?.spacy?.model ?? 'en_core_web_sm',
       },
     }
@@ -687,7 +722,8 @@ export class BiasDetectionConfigManager {
       level: this.config.loggingConfig?.level ?? 'info',
       enableConsole: this.config.loggingConfig?.enableConsole ?? true,
       enableFile: this.config.loggingConfig?.enableFile ?? true,
-      filePath: this.config.loggingConfig?.filePath ?? './logs/bias-detection.log',
+      filePath:
+        this.config.loggingConfig?.filePath ?? './logs/bias-detection.log',
       maxFileSize: this.config.loggingConfig?.maxFileSize ?? '10MB',
       maxFiles: this.config.loggingConfig?.maxFiles ?? 5,
       enableStructured: this.config.loggingConfig?.enableStructured ?? true,
@@ -696,7 +732,7 @@ export class BiasDetectionConfigManager {
 
   public validateConfiguration(): string[] {
     const errors: string[] = []
-    
+
     try {
       validateConfig(this.config)
     } catch (error: unknown) {
@@ -704,7 +740,7 @@ export class BiasDetectionConfigManager {
         errors.push(String(error))
       }
     }
-    
+
     // Additional validation checks
     const weights = this.config.layerWeights
     if (weights) {
@@ -717,37 +753,56 @@ export class BiasDetectionConfigManager {
         errors.push('Layer weights must sum to 1.0')
       }
     }
-    if (this.config.thresholds && this.config.thresholds.warning >= this.config.thresholds.high) {
+    if (
+      this.config.thresholds &&
+      this.config.thresholds.warning >= this.config.thresholds.high
+    ) {
       errors.push('Warning threshold must be less than high threshold')
     }
-    if (this.config.thresholds && this.config.thresholds.high >= this.config.thresholds.critical) {
+    if (
+      this.config.thresholds &&
+      this.config.thresholds.high >= this.config.thresholds.critical
+    ) {
       errors.push('High threshold must be less than critical threshold')
     }
-    
+
     return errors
   }
 
-  public isProductionReady(): { ready: boolean; warnings: string[]; errors: string[] } {
+  public isProductionReady(): {
+    ready: boolean
+    warnings: string[]
+    errors: string[]
+  } {
     const warnings: string[] = []
     const errors: string[] = []
-    
+
     // Check for JWT secret
-    const jwtSecret = process.env.JWT_SECRET || this.config.securityConfig?.jwtSecret
+    const jwtSecret =
+      process.env.JWT_SECRET || this.config.securityConfig?.jwtSecret
     if (!jwtSecret || jwtSecret.length < 32) {
       errors.push('JWT secret is missing or too short (minimum 32 characters)')
     }
-    
+
     // Check for encryption key
-    const encryptionKey = process.env.ENCRYPTION_KEY || this.config.securityConfig?.encryptionKey
+    const encryptionKey =
+      process.env.ENCRYPTION_KEY || this.config.securityConfig?.encryptionKey
     if (!encryptionKey || encryptionKey.length < 32) {
-      errors.push('Encryption key is missing or too short (minimum 32 characters)')
+      errors.push(
+        'Encryption key is missing or too short (minimum 32 characters)',
+      )
     }
-    
+
     // Check for debug logging in production
-    if (this.config.loggingConfig?.enableDebug || process.env.LOG_LEVEL === 'debug') {
-      warnings.push('Debug logging enabled in production - may expose sensitive data')
+    if (
+      this.config.loggingConfig?.enableDebug ||
+      process.env.LOG_LEVEL === 'debug'
+    ) {
+      warnings.push(
+        'Debug logging enabled in production - may expose sensitive data',
+      )
     }
-    
+
     return {
       ready: errors.length === 0 && warnings.length === 0,
       warnings,
@@ -768,7 +823,7 @@ export class BiasDetectionConfigManager {
   } {
     const errors = this.validateConfiguration()
     const envSummary = getEnvironmentConfigSummary()
-    
+
     return {
       isValid: errors.length === 0,
       environment: this.config.environment,
@@ -786,11 +841,28 @@ export class BiasDetectionConfigManager {
       loadedEnvVars: envSummary.loaded,
       errors,
       mlToolkits: {
-        aif360: { enabled: this.config['mlToolkitConfig']?.['aif360']?.['enabled'] ?? true },
-        fairlearn: { enabled: this.config['mlToolkitConfig']?.['fairlearn']?.['enabled'] ?? true },
-        huggingFace: { enabled: this.config['mlToolkitConfig']?.['huggingFace']?.['enabled'] ?? true },
-        interpretability: { enabled: this.config['mlToolkitConfig']?.['interpretability']?.['enabled'] ?? true },
-        spacy: { enabled: this.config['mlToolkitConfig']?.['spacy']?.['enabled'] ?? true },
+        aif360: {
+          enabled:
+            this.config['mlToolkitConfig']?.['aif360']?.['enabled'] ?? true,
+        },
+        fairlearn: {
+          enabled:
+            this.config['mlToolkitConfig']?.['fairlearn']?.['enabled'] ?? true,
+        },
+        huggingFace: {
+          enabled:
+            this.config['mlToolkitConfig']?.['huggingFace']?.['enabled'] ??
+            true,
+        },
+        interpretability: {
+          enabled:
+            this.config['mlToolkitConfig']?.['interpretability']?.['enabled'] ??
+            true,
+        },
+        spacy: {
+          enabled:
+            this.config['mlToolkitConfig']?.['spacy']?.['enabled'] ?? true,
+        },
       },
     }
   }

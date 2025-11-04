@@ -38,9 +38,8 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       )
 
       // Decrypt the analysis results
-      const crossSessionPatterns = await this.fheService.decryptCrossSessionAnalysis(
-        encryptedAnalysis,
-      )
+      const crossSessionPatterns =
+        await this.fheService.decryptCrossSessionAnalysis(encryptedAnalysis)
 
       // Convert FHE patterns to PatternRecognitionResult format
       const results: PatternRecognitionResult[] = crossSessionPatterns.map(
@@ -50,7 +49,9 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
           frequency: pattern.strength || 0.5,
           confidence: pattern.confidence,
           description: pattern.description,
-          sessionIds: pattern.sessions.filter((s): s is string => typeof s === 'string'),
+          sessionIds: pattern.sessions.filter(
+            (s): s is string => typeof s === 'string',
+          ),
           timelineAnalysis: {
             firstOccurrence: new Date(),
             lastOccurrence: new Date(),
@@ -71,7 +72,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             outlierCount: 0,
             correlationStrength: pattern.strength || 0.5,
           },
-        })
+        }),
       )
 
       logger.info('Cross-session pattern detection completed', {
@@ -81,7 +82,10 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
 
       return results
     } catch (error: unknown) {
-      logger.error('Error detecting cross-session patterns', { error, clientId })
+      logger.error('Error detecting cross-session patterns', {
+        error,
+        clientId,
+      })
       throw new ProcessingError(
         'Failed to detect cross-session patterns',
         error,
@@ -98,14 +102,11 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       // For single session analysis, we can use trend analysis
-      const patterns = await this.fheService.processPatterns(
-        [session],
-        {
-          windowSize: 1,
-          minPoints: 1,
-          threshold: 0.6,
-        }
-      )
+      const patterns = await this.fheService.processPatterns([session], {
+        windowSize: 1,
+        minPoints: 1,
+        threshold: 0.6,
+      })
 
       const trendPatterns = await this.fheService.decryptPatterns(patterns)
 
@@ -117,7 +118,9 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
           frequency: 1,
           confidence: pattern.confidence,
           description: pattern.description,
-          sessionIds: [session.sessionId].filter((s): s is string => typeof s === 'string'),
+          sessionIds: [session.sessionId].filter(
+            (s): s is string => typeof s === 'string',
+          ),
           timelineAnalysis: {
             firstOccurrence: pattern.startDate || new Date(),
             lastOccurrence: pattern.endDate || new Date(),
@@ -138,7 +141,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             outlierCount: 0,
             correlationStrength: 0.3,
           },
-        })
+        }),
       )
 
       logger.info('Session pattern analysis completed', {
@@ -179,7 +182,10 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
         const matchIndex = unique2.findIndex(
           (pattern2) =>
             pattern1.type === pattern2.type &&
-            this.calculateSimilarity(pattern1.description, pattern2.description) > 0.7
+            this.calculateSimilarity(
+              pattern1.description,
+              pattern2.description,
+            ) > 0.7,
         )
 
         if (matchIndex >= 0) {
@@ -214,81 +220,83 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       })
 
       // Use FHE service to process risk correlations
-      const encryptedCorrelations = await this.fheService.processRiskCorrelations(
-        analyses,
-        {
+      const encryptedCorrelations =
+        await this.fheService.processRiskCorrelations(analyses, {
           anxiety: 1.0,
           depression: 0.9,
           sleep: 0.8,
           isolation: 0.7,
           substance: 0.95,
-        }
-      )
+        })
 
       const rawCorrelations = await this.fheService.decryptRiskCorrelations(
         encryptedCorrelations,
       )
 
       // Transform to match the expected RiskCorrelation type
-      const results: RiskCorrelation[] = rawCorrelations.map(rawCorrelation => {
-        // Create a properly structured RiskCorrelation object
-        const correlation: RiskCorrelation = {
-          primaryFactor: 'anxiety', // Default value
-          correlatedFactors: [
-            {
-              factor: 'depression',
-              correlation: 0.7,
-              confidence: 0.8,
-              pValue: 0.05,
-              effectSize: 'medium' as const,
+      const results: RiskCorrelation[] = rawCorrelations.map(
+        (rawCorrelation) => {
+          // Create a properly structured RiskCorrelation object
+          const correlation: RiskCorrelation = {
+            primaryFactor: 'anxiety', // Default value
+            correlatedFactors: [
+              {
+                factor: 'depression',
+                correlation: 0.7,
+                confidence: 0.8,
+                pValue: 0.05,
+                effectSize: 'medium' as const,
+              },
+              {
+                factor: 'sleep',
+                correlation: 0.5,
+                confidence: 0.7,
+                pValue: 0.08,
+                effectSize: 'medium' as const,
+              },
+            ],
+            timeFrame: {
+              start: new Date(),
+              end: new Date(),
+              duration: 30, // days
             },
-            {
-              factor: 'sleep',
-              correlation: 0.5,
-              confidence: 0.7,
-              pValue: 0.08,
-              effectSize: 'medium' as const,
+            severity: 'medium' as const,
+            actionRequired: false,
+            recommendations: ['Monitor this correlation'],
+            statisticalMetrics: {
+              sampleSize: analyses.length,
+              pearsonCorrelation: 0.5,
+              spearmanCorrelation: 0.5,
+              kendallTau: 0.4,
+              confidence95Interval: [0.3, 0.7],
+            },
+            fheAnalysis: {
+              encryptedCorrelationMatrix: 'encrypted-data',
+              homomorphicConfidence: 0.9,
+              privacyPreserved: true,
+            },
+          }
+
+          // Try to use data from rawCorrelation if available
+          if (typeof rawCorrelation === 'object' && rawCorrelation !== null) {
+            // Use any available properties from rawCorrelation
+            const raw = rawCorrelation as unknown as Record<string, unknown>
+
+            if (raw['id']) {
+              correlation.primaryFactor = String(raw['id'])
             }
-          ],
-          timeFrame: {
-            start: new Date(),
-            end: new Date(),
-            duration: 30, // days
-          },
-          severity: 'medium' as const,
-          actionRequired: false,
-          recommendations: ['Monitor this correlation'],
-          statisticalMetrics: {
-            sampleSize: analyses.length,
-            pearsonCorrelation: 0.5,
-            spearmanCorrelation: 0.5,
-            kendallTau: 0.4,
-            confidence95Interval: [0.3, 0.7],
-          },
-          fheAnalysis: {
-            encryptedCorrelationMatrix: 'encrypted-data',
-            homomorphicConfidence: 0.9,
-            privacyPreserved: true,
-          },
-        };
+            if (raw['confidence'] && correlation.correlatedFactors[0]) {
+              correlation.correlatedFactors[0].confidence = Number(
+                raw['confidence'],
+              )
+            }
 
-        // Try to use data from rawCorrelation if available
-        if (typeof rawCorrelation === 'object' && rawCorrelation !== null) {
-          // Use any available properties from rawCorrelation
-          const raw = rawCorrelation as unknown as Record<string, unknown>;
-          
-          if (raw['id']) {
-            correlation.primaryFactor = String(raw['id']);
+            // Add any other mappings as needed
           }
-          if (raw['confidence'] && correlation.correlatedFactors[0]) {
-            correlation.correlatedFactors[0].confidence = Number(raw['confidence']);
-          }
-          
-          // Add any other mappings as needed
-        }
 
-        return correlation;
-      });
+          return correlation
+        },
+      )
 
       logger.info('Risk factor correlation analysis completed', {
         clientId,
@@ -330,13 +338,14 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
           windowSize: Math.min(10, dataPoints.length),
           minPoints: 3,
           threshold: 0.6,
-        }
+        },
       )
 
-      const rawTrendPatterns = await this.fheService.decryptPatterns(encryptedPatterns)
+      const rawTrendPatterns =
+        await this.fheService.decryptPatterns(encryptedPatterns)
 
       // Transform to match the expected TrendPattern type
-      const results: TrendPattern[] = rawTrendPatterns.map(rawPattern => {
+      const results: TrendPattern[] = rawTrendPatterns.map((rawPattern) => {
         // Create a properly structured TrendPattern object
         const pattern: TrendPattern = {
           id: `trend-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
@@ -357,10 +366,13 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             },
             changePoints: [
               {
-                timestamp: new Date(startDate.getTime() + (endDate.getTime() - startDate.getTime()) / 2),
+                timestamp: new Date(
+                  startDate.getTime() +
+                    (endDate.getTime() - startDate.getTime()) / 2,
+                ),
                 confidenceLevel: 0.8,
                 changeType: 'increase' as const,
-              }
+              },
             ],
             seasonalDecomposition: {
               trendComponent: [0.1, 0.2, 0.3, 0.4],
@@ -375,38 +387,38 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             followUpRecommended: true,
             escalationRequired: false,
           },
-        };
+        }
 
         // Try to use data from rawPattern if available
         if (typeof rawPattern === 'object' && rawPattern !== null) {
           // Use any available properties from rawPattern
-          const raw = rawPattern as unknown as Record<string, unknown>;
-          
+          const raw = rawPattern as unknown as Record<string, unknown>
+
           if (raw['id']) {
-            pattern.id = String(raw['id']);
+            pattern.id = String(raw['id'])
           }
           if (raw['type']) {
-            pattern.type = String(raw['type']);
+            pattern.type = String(raw['type'])
           }
           if (raw['confidence']) {
-            pattern.confidence = Number(raw['confidence']);
+            pattern.confidence = Number(raw['confidence'])
           }
           if (raw['description']) {
-            pattern.description = String(raw['description']);
+            pattern.description = String(raw['description'])
           }
           if (raw['startDate'] instanceof Date) {
-            pattern.startDate = raw['startDate'];
+            pattern.startDate = raw['startDate']
           }
           if (raw['endDate'] instanceof Date) {
-            pattern.endDate = raw['endDate'];
+            pattern.endDate = raw['endDate']
           }
           if (Array.isArray(raw['indicators'])) {
-            pattern.indicators = raw['indicators'].map(String);
+            pattern.indicators = raw['indicators'].map(String)
           }
         }
 
-        return pattern;
-      });
+        return pattern
+      })
 
       logger.info('Long-term trend analysis completed', {
         clientId,
@@ -440,17 +452,18 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       )
 
       // Decrypt the analysis results
-      const rawPatterns = await this.fheService.decryptCrossSessionAnalysis(
-        encryptedAnalysis,
-      )
+      const rawPatterns =
+        await this.fheService.decryptCrossSessionAnalysis(encryptedAnalysis)
 
       // Transform to match the expected CrossSessionPattern type
-      const results: CrossSessionPattern[] = rawPatterns.map(rawPattern => {
+      const results: CrossSessionPattern[] = rawPatterns.map((rawPattern) => {
         // Create a properly structured CrossSessionPattern object
         const pattern: CrossSessionPattern = {
           id: `pattern-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           type: 'behavioral',
-          sessions: sessions.map(s => s.sessionId).filter(Boolean) as string[],
+          sessions: sessions
+            .map((s) => s.sessionId)
+            .filter(Boolean) as string[],
           pattern: 'Cross-session pattern detected',
           frequency: 0.7,
           confidence: 0.8,
@@ -462,7 +475,10 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             evolutionRate: 0.3,
             clinicalMagnitude: 0.6,
             networkAnalysis: {
-              centralitySessions: sessions.slice(0, 2).map(s => s.sessionId).filter(Boolean) as string[],
+              centralitySessions: sessions
+                .slice(0, 2)
+                .map((s) => s.sessionId)
+                .filter(Boolean) as string[],
               connectionStrength: 0.7,
               communityDetection: true,
             },
@@ -473,34 +489,34 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             phaseShift: 0,
             amplitudeVariation: 0.2,
           },
-        };
+        }
 
         // Try to use data from rawPattern if available
         if (typeof rawPattern === 'object' && rawPattern !== null) {
           // Use any available properties from rawPattern
-          const raw = rawPattern as unknown as Record<string, unknown>;
-          
+          const raw = rawPattern as unknown as Record<string, unknown>
+
           if (raw['id']) {
-            pattern.id = String(raw['id']);
+            pattern.id = String(raw['id'])
           }
           if (raw['type']) {
-            pattern.type = String(raw['type']);
+            pattern.type = String(raw['type'])
           }
           if (raw['confidence']) {
-            pattern.confidence = Number(raw['confidence']);
+            pattern.confidence = Number(raw['confidence'])
           }
           if (raw['description']) {
-            pattern.pattern = String(raw['description']);
+            pattern.pattern = String(raw['description'])
           }
           if (Array.isArray(raw['sessions'])) {
             pattern.sessions = raw['sessions']
               .filter((s): s is string => typeof s === 'string')
-              .slice(0, sessions.length);
+              .slice(0, sessions.length)
           }
         }
 
-        return pattern;
-      });
+        return pattern
+      })
 
       logger.info('Advanced cross-session pattern detection completed', {
         clientId,
@@ -530,7 +546,10 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
     return commonWords.length / totalWords
   }
 
-  private generateSyntheticDataPoints(startDate: Date, endDate: Date): unknown[] {
+  private generateSyntheticDataPoints(
+    startDate: Date,
+    endDate: Date,
+  ): unknown[] {
     const dataPoints: unknown[] = []
     const timeDiff = endDate.getTime() - startDate.getTime()
     const daysDiff = timeDiff / (1000 * 60 * 60 * 24)
@@ -538,7 +557,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
 
     for (let i = 0; i < pointCount; i++) {
       const timestamp = new Date(
-        startDate.getTime() + (timeDiff * i) / pointCount
+        startDate.getTime() + (timeDiff * i) / pointCount,
       )
       dataPoints.push({
         timestamp,

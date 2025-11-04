@@ -1,0 +1,504 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Unified Dark Theme Demo"
+  description="Comprehensive design system demonstration with brutalist precision, minimalist purity, corporate sleekness, enterprise brevity, and antfu elegance."
+  themeMode="dark"
+>
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="section">
+      <div class="card">
+        <h1
+          class="display-heading display-heading--large gradient-text animate-fade-in-up"
+        >
+          Unified Dark Theme v3.0
+        </h1>
+        <p
+          class="text-lg"
+          style="color: var(--text-secondary); margin-top: var(--space-4);"
+        >
+          A comprehensive design system combining brutalist precision,
+          minimalist purity, corporate sleekness, enterprise brevity, and antfu
+          elegance.
+        </p>
+        <div class="grid grid--2" style="margin-top: var(--space-8);">
+          <div class="card card--glass">
+            <h3 class="text-xl font-bold">Design Philosophy</h3>
+            <p class="text-secondary">
+              Deep dark foundations with emerald accents and sophisticated
+              gradients.
+            </p>
+          </div>
+          <div class="card card--mesh">
+            <h3 class="text-xl font-bold">Enterprise Ready</h3>
+            <p class="text-secondary">
+              Comprehensive component system with accessibility and performance
+              in mind.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Color Palette Section -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Color Palette</h2>
+
+        <h3 class="text-2xl font-semibold mb-6">Primary Colors</h3>
+        <div class="grid grid--4">
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--color-void); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold">Void</h4>
+            <p class="text-sm text-muted">#000000</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--color-primary); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold">Primary</h4>
+            <p class="text-sm text-muted">#0a0a0a</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--color-secondary); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold">Secondary</h4>
+            <p class="text-sm text-muted">#111111</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--color-elevated); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold">Elevated</h4>
+            <p class="text-sm text-muted">#1f1f1f</p>
+          </div>
+        </div>
+
+        <h3 class="text-2xl font-semibold mb-6 mt-12">Accent Colors</h3>
+        <div class="grid grid--4">
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--accent-emerald); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold text-emerald">Emerald</h4>
+            <p class="text-sm text-muted">#10b981</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--accent-blue); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold text-blue">Blue</h4>
+            <p class="text-sm text-muted">#3b82f6</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--accent-purple); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold text-purple">Purple</h4>
+            <p class="text-sm text-muted">#8b5cf6</p>
+          </div>
+          <div class="card card--minimal">
+            <div
+              style="width: 100%; height: 80px; background: var(--gradient-primary); border-radius: var(--radius-md); margin-bottom: var(--space-4);"
+            >
+            </div>
+            <h4 class="font-semibold gradient-text">Gradient</h4>
+            <p class="text-sm text-muted">Primary → Blue</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography Section -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Typography System</h2>
+
+        <div class="space-y-8">
+          <div>
+            <h1 class="display-heading display-heading--large gradient-text">
+              Display Heading Large
+            </h1>
+            <p class="text-lg text-secondary">
+              Used for hero sections and major titles
+            </p>
+          </div>
+
+          <div class="grid grid--2">
+            <div>
+              <h1 class="text-6xl font-black mb-4">Heading 1</h1>
+              <h2 class="text-5xl font-bold mb-4">Heading 2</h2>
+              <h3 class="text-4xl font-bold mb-4">Heading 3</h3>
+              <h4 class="text-3xl font-semibold mb-4">Heading 4</h4>
+              <h5 class="text-2xl font-semibold mb-4">Heading 5</h5>
+              <h6 class="text-xl font-medium mb-4">Heading 6</h6>
+            </div>
+
+            <div>
+              <p class="text-lg mb-4">
+                Large paragraph text for emphasis and readability.
+              </p>
+              <p class="text-base mb-4">
+                Base paragraph text for general content and descriptions.
+              </p>
+              <p class="text-sm mb-4">
+                Small paragraph text for supporting information and details.
+              </p>
+              <p class="text-xs mb-4">
+                Extra small text for labels, captions, and metadata.
+              </p>
+
+              <p class="eyebrow-text mb-4">
+                Eyebrow text for section introductions
+              </p>
+              <p class="font-mono text-sm">
+                Monospace text for code and technical content
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Button System -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Button System</h2>
+
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Primary Variants</h3>
+            <div class="flex gap-4 mb-8">
+              <button class="btn btn-primary">Primary Button</button>
+              <button class="btn btn-secondary">Secondary Button</button>
+              <button class="btn btn-ghost">Ghost Button</button>
+              <button class="btn btn-outline">Outline Button</button>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Button Sizes</h3>
+            <div class="flex gap-4 items-center mb-8">
+              <button class="btn btn-primary btn-sm">Small</button>
+              <button class="btn btn-primary">Default</button>
+              <button class="btn btn-primary btn-lg">Large</button>
+              <button class="btn btn-primary btn-xl">Extra Large</button>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Button States</h3>
+            <div class="flex gap-4 mb-8">
+              <button class="btn btn-primary">Normal</button>
+              <button class="btn btn-primary" disabled>Disabled</button>
+              <button class="btn btn-primary animate-pulse">Loading</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card System -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Card System</h2>
+
+        <div class="grid grid--3">
+          <div class="card">
+            <h3 class="text-xl font-bold mb-4">Standard Card</h3>
+            <p class="text-secondary">
+              Default card with subtle hover effects and clean styling.
+            </p>
+            <button class="btn btn-primary btn-sm mt-6">Learn More</button>
+          </div>
+
+          <div class="card card--elevated">
+            <h3 class="text-xl font-bold mb-4">Elevated Card</h3>
+            <p class="text-secondary">
+              Enhanced card with gradient background for premium feel.
+            </p>
+            <button class="btn btn-secondary btn-sm mt-6">Explore</button>
+          </div>
+
+          <div class="card card--glass">
+            <h3 class="text-xl font-bold mb-4">Glass Card</h3>
+            <p class="text-secondary">
+              Modern glass morphism effect with backdrop blur.
+            </p>
+            <button class="btn btn-ghost btn-sm mt-6">View Details</button>
+          </div>
+        </div>
+
+        <div class="grid grid--2 mt-8">
+          <div class="card card--mesh">
+            <h3 class="text-xl font-bold mb-4">Mesh Gradient Card</h3>
+            <p class="text-secondary">
+              Subtle mesh gradient overlay for visual interest.
+            </p>
+          </div>
+
+          <div class="card card--brutalist">
+            <h3 class="text-xl font-bold mb-4">Brutalist Card</h3>
+            <p class="text-secondary">
+              Bold, architectural styling with strong borders.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form System -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Form System</h2>
+
+        <div class="grid grid--2">
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Input Variants</h3>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium mb-2"
+                  >Default Input</label
+                >
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="Enter your text..."
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Large Input</label
+                >
+                <input
+                  type="text"
+                  class="input input--large"
+                  placeholder="Large input field..."
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Small Input</label
+                >
+                <input
+                  type="text"
+                  class="input input--small"
+                  placeholder="Small input..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Form Components</h3>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium mb-2">Textarea</label>
+                <textarea
+                  class="input"
+                  rows="4"
+                  placeholder="Enter your message..."></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2"
+                  >Select Dropdown</label
+                >
+                <select class="input">
+                  <option>Choose an option</option>
+                  <option>Option 1</option>
+                  <option>Option 2</option>
+                  <option>Option 3</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation System -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Navigation System</h2>
+
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Navigation Links</h3>
+            <nav class="nav">
+              <a href="#" class="nav__link nav__link--active">Dashboard</a>
+              <a href="#" class="nav__link">Projects</a>
+              <a href="#" class="nav__link">Team</a>
+              <a href="#" class="nav__link">Settings</a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Badge System</h3>
+            <div class="flex gap-4">
+              <span class="badge badge--success">Success</span>
+              <span class="badge badge--info">Info</span>
+              <span class="badge badge--warning">Warning</span>
+              <span class="badge badge--error">Error</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Status Indicators -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Status Indicators</h2>
+
+        <div class="grid grid--2">
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Status Dots</h3>
+            <div class="flex gap-6 items-center">
+              <div class="flex items-center gap-2">
+                <span class="status-dot status-dot--online"></span>
+                <span class="text-sm">Online</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="status-dot status-dot--warning"></span>
+                <span class="text-sm">Processing</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="status-dot status-dot--error"></span>
+                <span class="text-sm">Error</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mb-6">Loading States</h3>
+            <div class="space-y-4">
+              <div class="loading-shimmer" style="height: 20px; width: 200px;">
+              </div>
+              <div class="loading-shimmer" style="height: 20px; width: 150px;">
+              </div>
+              <div class="loading-shimmer" style="height: 20px; width: 180px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Animation Showcase -->
+    <section class="section">
+      <div class="card">
+        <h2 class="text-4xl font-bold mb-8">Animation System</h2>
+
+        <div class="grid grid--3">
+          <div class="card animate-fade-in">
+            <h3 class="text-xl font-bold mb-4">Fade In</h3>
+            <p class="text-secondary">
+              Smooth fade-in animation for initial page load.
+            </p>
+          </div>
+
+          <div class="card animate-fade-in-up">
+            <h3 class="text-xl font-bold mb-4">Fade In Up</h3>
+            <p class="text-secondary">Slide up from bottom with fade effect.</p>
+          </div>
+
+          <div class="card animate-pulse-glow">
+            <h3 class="text-xl font-bold mb-4">Pulse Glow</h3>
+            <p class="text-secondary">
+              Subtle pulsing glow effect for attention.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="section text-center">
+      <div class="card">
+        <h3 class="text-2xl font-bold mb-4">Unified Dark Theme v3.0</h3>
+        <p class="text-secondary mb-6">
+          Combining the best elements from brutalist, minimalist, corporate,
+          enterprise, and antfu design philosophies.
+        </p>
+        <div class="divider"></div>
+        <p class="text-sm text-muted">
+          Crafted with precision for modern web applications • Enterprise ready
+          • Accessibility focused
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Add some interactive demo functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      // Animate elements on scroll
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      }
+
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up')
+          }
+        })
+      }, observerOptions)
+
+      // Observe all cards
+      document.querySelectorAll('.card').forEach((card) => {
+        observer.observe(card)
+      })
+
+      // Add click handlers to buttons for demo purposes
+      document.querySelectorAll('.btn').forEach((button) => {
+        button.addEventListener('click', function (e) {
+          if (!this.disabled) {
+            // Create ripple effect
+            const ripple = document.createElement('span')
+            ripple.style.position = 'absolute'
+            ripple.style.borderRadius = '50%'
+            ripple.style.background = 'rgba(255, 255, 255, 0.3)'
+            ripple.style.transform = 'scale(0)'
+            ripple.style.animation = 'ripple 0.6s linear'
+            ripple.style.left = e.clientX - e.target.offsetLeft + 'px'
+            ripple.style.top = e.clientY - e.target.offsetTop + 'px'
+
+            this.appendChild(ripple)
+
+            setTimeout(() => {
+              ripple.remove()
+            }, 600)
+          }
+        })
+      })
+    })
+
+    // Add ripple animation
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `
+    document.head.appendChild(style)
+  </script>
+</BaseLayout>

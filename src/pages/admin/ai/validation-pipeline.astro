@@ -451,18 +451,30 @@ Body: JSON with action and environment
 <script>
   // Client-side functionality for the validation pipeline
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
-    const runValidationBtn = document.getElementById('run-validation') as HTMLButtonElement | null
-    const startContinuousBtn = document.getElementById('start-continuous') as HTMLButtonElement | null
-    const stopContinuousBtn = document.getElementById('stop-continuous') as HTMLButtonElement | null
-    const scheduleValidationBtn = document.getElementById('schedule-validation') as HTMLButtonElement | null
+    const runValidationBtn = document.getElementById(
+      'run-validation',
+    ) as HTMLButtonElement | null
+    const startContinuousBtn = document.getElementById(
+      'start-continuous',
+    ) as HTMLButtonElement | null
+    const stopContinuousBtn = document.getElementById(
+      'stop-continuous',
+    ) as HTMLButtonElement | null
+    const scheduleValidationBtn = document.getElementById(
+      'schedule-validation',
+    ) as HTMLButtonElement | null
     const unscheduleValidationBtn = document.getElementById(
       'unschedule-validation',
     ) as HTMLButtonElement | null
-    const cronScheduleSelect = document.getElementById('cron-schedule') as HTMLSelectElement | null
+    const cronScheduleSelect = document.getElementById(
+      'cron-schedule',
+    ) as HTMLSelectElement | null
     const customScheduleContainer = document.getElementById(
       'custom-schedule-container',
     ) as HTMLElement | null
-    const customCronInput = document.getElementById('custom-cron') as HTMLInputElement | null
+    const customCronInput = document.getElementById(
+      'custom-cron',
+    ) as HTMLInputElement | null
 
     // Get history on page load
     fetchValidationHistory()

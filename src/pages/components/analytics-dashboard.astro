@@ -3,15 +3,20 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import ChartComponent from '@/components/analytics/ChartComponent.tsx'
 ---
 
-<BaseLayout title="Analytics Dashboard - Pixelated Empathy" description="Advanced analytics and visualization tools for therapy data analysis">
+<BaseLayout
+  title="Analytics Dashboard - Pixelated Empathy"
+  description="Advanced analytics and visualization tools for therapy data analysis"
+>
   <section class="container mx-auto py-8 px-4">
     <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Analytics Dashboard</h1>
-      
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">
+        Analytics Dashboard
+      </h1>
+
       <div class="prose dark:prose-invert max-w-none mb-8 text-center">
         <p class="text-xl">
-          Comprehensive analytics and visualization tools for therapy session data, 
-          patient progress tracking, and clinical insights.
+          Comprehensive analytics and visualization tools for therapy session
+          data, patient progress tracking, and clinical insights.
         </p>
       </div>
 
@@ -20,7 +25,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Progress Tracking Chart -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Patient Progress Tracking</h3>
-          <ChartComponent 
+          <ChartComponent
             client:load
             type="line"
             title="Therapy Progress Over Time"
@@ -31,7 +36,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
               dataPoints: 15,
               useBackendData: true,
               autoRefresh: true,
-              refreshInterval: 30000
+              refreshInterval: 30000,
             }}
           />
         </div>
@@ -39,7 +44,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Session Metrics Chart -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Session Metrics</h3>
-          <ChartComponent 
+          <ChartComponent
             client:load
             type="bar"
             title="Session Analysis"
@@ -47,7 +52,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             data={{
               category: 'sessions',
               timeRange: 7,
-              useBackendData: true
+              useBackendData: true,
             }}
           />
         </div>
@@ -55,7 +60,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Emotion Distribution -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Emotion Distribution</h3>
-          <ChartComponent 
+          <ChartComponent
             client:load
             type="pie"
             title="Emotional State Analysis"
@@ -63,7 +68,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             data={{
               category: 'emotions',
               timeRange: 14,
-              useBackendData: true
+              useBackendData: true,
             }}
           />
         </div>
@@ -71,7 +76,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Correlation Analysis -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Correlation Analysis</h3>
-          <ChartComponent 
+          <ChartComponent
             client:load
             type="scatter"
             title="Factor Correlation"
@@ -80,7 +85,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
               category: 'emotions',
               timeRange: 30,
               dataPoints: 50,
-              useBackendData: true
+              useBackendData: true,
             }}
           />
         </div>
@@ -94,42 +99,54 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             <div class="text-2xl">📊</div>
             <div>
               <h4 class="font-semibold">Real-time Analytics</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Live data visualization and updates</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Live data visualization and updates
+              </p>
             </div>
           </div>
           <div class="flex items-start space-x-3">
             <div class="text-2xl">🎯</div>
             <div>
               <h4 class="font-semibold">Progress Tracking</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Monitor patient progress over time</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Monitor patient progress over time
+              </p>
             </div>
           </div>
           <div class="flex items-start space-x-3">
             <div class="text-2xl">🔍</div>
             <div>
               <h4 class="font-semibold">Pattern Recognition</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Identify trends and patterns in therapy data</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Identify trends and patterns in therapy data
+              </p>
             </div>
           </div>
           <div class="flex items-start space-x-3">
             <div class="text-2xl">📈</div>
             <div>
               <h4 class="font-semibold">Performance Metrics</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Comprehensive session and outcome metrics</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Comprehensive session and outcome metrics
+              </p>
             </div>
           </div>
           <div class="flex items-start space-x-3">
             <div class="text-2xl">🎨</div>
             <div>
               <h4 class="font-semibold">Customizable Views</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Flexible chart types and configurations</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Flexible chart types and configurations
+              </p>
             </div>
           </div>
           <div class="flex items-start space-x-3">
             <div class="text-2xl">📱</div>
             <div>
               <h4 class="font-semibold">Responsive Design</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Works seamlessly on all devices</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Works seamlessly on all devices
+              </p>
             </div>
           </div>
         </div>
@@ -137,14 +154,14 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
 
       <!-- Navigation Links -->
       <div class="flex justify-center space-x-4">
-        <a 
-          href="/dashboard" 
+        <a
+          href="/dashboard"
           class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           View Full Dashboard
         </a>
-        <a 
-          href="/components" 
+        <a
+          href="/components"
           class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
         >
           All Components

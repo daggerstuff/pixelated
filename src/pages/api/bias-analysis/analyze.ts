@@ -275,8 +275,8 @@ export const POST: APIRoute = async ({ request }) => {
     const clientMessage = isProduction
       ? 'An internal error occurred. Provide the requestId to support for details.'
       : error instanceof Error
-      ? error.message
-      : String(error)
+        ? error.message
+        : String(error)
 
     return new Response(
       JSON.stringify(
@@ -340,8 +340,8 @@ export const GET: APIRoute = async ({ request }) => {
     const clientMessage = isProduction
       ? 'An internal error occurred. Provide the requestId to support for details.'
       : error instanceof Error
-      ? error.message
-      : String(error)
+        ? error.message
+        : String(error)
 
     return new Response(
       JSON.stringify(

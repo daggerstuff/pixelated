@@ -25,7 +25,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 )
 
 interface ChartComponentProps {
@@ -129,18 +129,21 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
         borderWidth: 1,
       },
     },
-    scales: type !== 'pie' ? {
-      x: {
-        grid: {
-          color: 'rgba(156, 163, 175, 0.3)',
-        },
-      },
-      y: {
-        grid: {
-          color: 'rgba(156, 163, 175, 0.3)',
-        },
-      },
-    } : {},
+    scales:
+      type !== 'pie'
+        ? {
+            x: {
+              grid: {
+                color: 'rgba(156, 163, 175, 0.3)',
+              },
+            },
+            y: {
+              grid: {
+                color: 'rgba(156, 163, 175, 0.3)',
+              },
+            },
+          }
+        : {},
     animation: {
       duration: 1000,
       easing: 'easeInOutQuart',
@@ -186,11 +189,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     }
   }
 
-  return (
-    <div className={`w-full h-64 ${className}`}>
-      {renderChart()}
-    </div>
-  )
+  return <div className={`w-full h-64 ${className}`}>{renderChart()}</div>
 }
 
 export default ChartComponent

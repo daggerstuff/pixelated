@@ -23,7 +23,7 @@ function tryRequireNode(moduleName: string): any | null {
       if (typeof globalRequire === 'function') {
         return globalRequire(moduleName)
       }
-      
+
       // Try to access via global scope
       const module = (globalThis as any)[moduleName]
       if (module) return module

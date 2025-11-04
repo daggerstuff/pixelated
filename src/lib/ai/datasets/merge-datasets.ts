@@ -81,13 +81,9 @@ export function getMergedDatasetPath(
     throw new Error('Invalid filename for dataset path')
   }
 
-  const path = securePathJoin(
-    join(process.cwd(), 'data', 'merged'),
-    filename,
-    {
-      allowedExtensions: ['.jsonl', '.json', '.csv'],
-    },
-  )
+  const path = securePathJoin(join(process.cwd(), 'data', 'merged'), filename, {
+    allowedExtensions: ['.jsonl', '.json', '.csv'],
+  })
 
   logger.debug('Generated merged dataset path', { format, path })
 

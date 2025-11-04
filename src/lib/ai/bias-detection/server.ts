@@ -52,8 +52,12 @@ class BiasDetectionServer {
         timestamp: new Date().toISOString(),
       }
 
-      const engineHealthy = typeof engineHealth.overall === 'string' ? engineHealth.overall === 'healthy' : Boolean(engineHealth.overall)
-      const overallHealth = engineHealthy && this.isRunning ? 'healthy' : 'degraded'
+      const engineHealthy =
+        typeof engineHealth.overall === 'string'
+          ? engineHealth.overall === 'healthy'
+          : Boolean(engineHealth.overall)
+      const overallHealth =
+        engineHealthy && this.isRunning ? 'healthy' : 'degraded'
 
       this.sendJsonResponse(res, 200, {
         success: true,
@@ -92,10 +96,15 @@ class BiasDetectionServer {
       }
 
       // Validate session structure
-      if (!session.participantDemographics || !session.content || !session.aiResponses) {
+      if (
+        !session.participantDemographics ||
+        !session.content ||
+        !session.aiResponses
+      ) {
         this.sendJsonResponse(res, 400, {
           success: false,
-          error: 'Session must include participantDemographics, content, and aiResponses',
+          error:
+            'Session must include participantDemographics, content, and aiResponses',
         })
         return
       }
@@ -219,7 +228,10 @@ class BiasDetectionServer {
       appLogger.error('Dashboard data retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Dashboard data retrieval failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Dashboard data retrieval failed',
       })
     }
   }
@@ -247,7 +259,10 @@ class BiasDetectionServer {
       appLogger.error('Session analysis retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Session analysis retrieval failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Session analysis retrieval failed',
       })
     }
   }
@@ -264,7 +279,10 @@ class BiasDetectionServer {
       appLogger.error('Performance stats retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Performance stats retrieval failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Performance stats retrieval failed',
       })
     }
   }
@@ -286,7 +304,10 @@ class BiasDetectionServer {
     })
   }
 
-  private async handleRequest(req: IncomingMessage, res: NodeServerResponse): Promise<void> {
+  private async handleRequest(
+    req: IncomingMessage,
+    res: NodeServerResponse,
+  ): Promise<void> {
     const { method, url } = req
     const parsedUrl = parse(url || '', true)
     const path = parsedUrl.pathname
@@ -357,30 +378,38 @@ class BiasDetectionServer {
     // Initialize the bias detection engine
     await this.engine.initialize()
 
-    this.server = createServer((req: IncomingMessage, res: NodeServerResponse) => {
-      this.handleRequest(req, res).catch((error) => {
-        appLogger.error('Unhandled request error:', error)
-        if (!res.headersSent) {
-          this.sendJsonResponse(res, 500, {
-            success: false,
-            error: 'Internal server error',
-          })
-        }
-      })
-    })
+    this.server = createServer(
+      (req: IncomingMessage, res: NodeServerResponse) => {
+        this.handleRequest(req, res).catch((error) => {
+          appLogger.error('Unhandled request error:', error)
+          if (!res.headersSent) {
+            this.sendJsonResponse(res, 500, {
+              success: false,
+              error: 'Internal server error',
+            })
+          }
+        })
+      },
+    )
 
     return new Promise((resolve, reject) => {
       this.server!.listen(BIAS_DETECTION_PORT, () => {
         this.isRunning = true
-        appLogger.info(`Bias Detection Service started on port ${BIAS_DETECTION_PORT}`)
-        console.log(`Bias Detection Service started on port ${BIAS_DETECTION_PORT}`)
+        appLogger.info(
+          `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
+        )
+        console.log(
+          `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
+        )
         console.log('Available endpoints:')
         console.log('  GET /health - Health check')
         console.log('  POST /analyze - Single session bias analysis')
         console.log('  POST /analyze/batch - Batch session bias analysis')
         console.log('  GET /dashboard - Dashboard data')
         console.log('  GET /performance - Performance statistics')
-        console.log('  GET /session/{sessionId} - Get analysis result for specific session')
+        console.log(
+          '  GET /session/{sessionId} - Get analysis result for specific session',
+        )
 
         // Keep-alive logging
         setInterval(() => {
@@ -422,8 +451,12 @@ class BiasDetectionServer {
 const biasDetectionServer = new BiasDetectionServer()
 
 // Graceful shutdown
-process.on('SIGTERM', () => biasDetectionServer.stop().then(() => process.exit(0)))
-process.on('SIGINT', () => biasDetectionServer.stop().then(() => process.exit(0)))
+process.on('SIGTERM', () =>
+  biasDetectionServer.stop().then(() => process.exit(0)),
+)
+process.on('SIGINT', () =>
+  biasDetectionServer.stop().then(() => process.exit(0)),
+)
 
 // Start server
 biasDetectionServer.start().catch((error) => {

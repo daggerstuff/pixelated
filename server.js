@@ -8,7 +8,6 @@ app.get('/health', (req, res) => res.status(200).send('OK'))
 app.get('/', (req, res) => res.send('Pixelated Empathy Home'))
 
 app.listen(PORT, () => console.log(`pixelated-app listening on port ${PORT}`))
-
 ;(function () {
   try {
     let e

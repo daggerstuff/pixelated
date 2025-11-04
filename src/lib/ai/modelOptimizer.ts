@@ -55,10 +55,10 @@ class ModelOptimizer {
         expectedImprovement: {
           accuracy: 0.15,
           precision: 0.12,
-          recall: 0.10,
+          recall: 0.1,
           f1Score: 0.13,
-          inferenceTime: -0.20,
-          memoryUsage: 0.30,
+          inferenceTime: -0.2,
+          memoryUsage: 0.3,
         },
         tradeoffs: ['Increased computational cost', 'Higher memory usage'],
         implementationComplexity: 'high',
@@ -79,7 +79,7 @@ class ModelOptimizer {
           precision: -0.01,
           recall: -0.01,
           f1Score: -0.015,
-          inferenceTime: 0.60,
+          inferenceTime: 0.6,
           memoryUsage: 0.75,
         },
         tradeoffs: ['Minimal accuracy loss', 'Significant speed improvement'],
@@ -101,8 +101,8 @@ class ModelOptimizer {
           precision: -0.03,
           recall: -0.04,
           f1Score: -0.04,
-          inferenceTime: 0.20,
-          memoryUsage: 0.80,
+          inferenceTime: 0.2,
+          memoryUsage: 0.8,
         },
         tradeoffs: ['Some accuracy loss', 'Significant memory reduction'],
         implementationComplexity: 'medium',
@@ -124,7 +124,7 @@ class ModelOptimizer {
           recall: -0.07,
           f1Score: -0.07,
           inferenceTime: -0.15,
-          memoryUsage: 0.10,
+          memoryUsage: 0.1,
         },
         tradeoffs: ['Privacy protection', 'Communication overhead'],
         implementationComplexity: 'high',
@@ -145,7 +145,7 @@ class ModelOptimizer {
           precision: 0.03,
           recall: 0.04,
           f1Score: 0.04,
-          inferenceTime: 0.40,
+          inferenceTime: 0.4,
           memoryUsage: 0.25,
         },
         tradeoffs: ['Adaptive performance', 'Implementation complexity'],
@@ -180,32 +180,55 @@ class ModelOptimizer {
 
     // Identify bottlenecks
     if (this.currentMetrics.accuracy < 0.85) {
-      bottlenecks.push('Low accuracy - consider ensemble methods or more training data')
-      recommendations.push(...this.strategies.filter(s => s.name.includes('Ensemble')))
+      bottlenecks.push(
+        'Low accuracy - consider ensemble methods or more training data',
+      )
+      recommendations.push(
+        ...this.strategies.filter((s) => s.name.includes('Ensemble')),
+      )
     }
 
-    if (this.currentMetrics.inferenceTime > 100) { // > 100ms
-      bottlenecks.push('Slow inference - consider quantization or model compression')
-      recommendations.push(...this.strategies.filter(s => s.name.includes('Quantization') || s.name.includes('Compression')))
+    if (this.currentMetrics.inferenceTime > 100) {
+      // > 100ms
+      bottlenecks.push(
+        'Slow inference - consider quantization or model compression',
+      )
+      recommendations.push(
+        ...this.strategies.filter(
+          (s) =>
+            s.name.includes('Quantization') || s.name.includes('Compression'),
+        ),
+      )
     }
 
-    if (this.currentMetrics.memoryUsage > 1000) { // > 1GB
-      bottlenecks.push('High memory usage - consider model compression or pruning')
-      recommendations.push(...this.strategies.filter(s => s.name.includes('Compression')))
+    if (this.currentMetrics.memoryUsage > 1000) {
+      // > 1GB
+      bottlenecks.push(
+        'High memory usage - consider model compression or pruning',
+      )
+      recommendations.push(
+        ...this.strategies.filter((s) => s.name.includes('Compression')),
+      )
     }
 
     if (this.currentMetrics.privacyScore < 0.9) {
-      bottlenecks.push('Privacy concerns - consider federated learning approaches')
-      recommendations.push(...this.strategies.filter(s => s.name.includes('Federated')))
+      bottlenecks.push(
+        'Privacy concerns - consider federated learning approaches',
+      )
+      recommendations.push(
+        ...this.strategies.filter((s) => s.name.includes('Federated')),
+      )
     }
 
     // Sort recommendations by expected improvement for priority metric
     const primaryMetric = this.identifyPrimaryMetric()
-    priorityOrder.push(...recommendations.sort((a, b) => {
-      const aImprovement = Math.abs(a.expectedImprovement[primaryMetric] || 0)
-      const bImprovement = Math.abs(b.expectedImprovement[primaryMetric] || 0)
-      return bImprovement - aImprovement
-    }))
+    priorityOrder.push(
+      ...recommendations.sort((a, b) => {
+        const aImprovement = Math.abs(a.expectedImprovement[primaryMetric] || 0)
+        const bImprovement = Math.abs(b.expectedImprovement[primaryMetric] || 0)
+        return bImprovement - aImprovement
+      }),
+    )
 
     return {
       currentMetrics: this.currentMetrics,
@@ -231,7 +254,7 @@ class ModelOptimizer {
    */
   async applyOptimization(
     strategy: OptimizationStrategy,
-    config?: Partial<TrainingConfig>
+    config?: Partial<TrainingConfig>,
   ): Promise<OptimizationResult> {
     if (!this.currentMetrics) {
       throw new Error('Baseline metrics not set')
@@ -245,10 +268,10 @@ class ModelOptimizer {
 
     // Apply improvements to current metrics
     const optimizedMetrics: ModelMetrics = { ...this.currentMetrics }
-    Object.keys(improvements).forEach(metric => {
+    Object.keys(improvements).forEach((metric) => {
       const key = metric as keyof ModelMetrics
       if (typeof optimizedMetrics[key] === 'number') {
-        (optimizedMetrics[key] as number) *= (1 + improvements[key])
+        ;(optimizedMetrics[key] as number) *= 1 + improvements[key]
       }
     })
 
@@ -266,16 +289,19 @@ class ModelOptimizer {
     return result
   }
 
-  private calculateExpectedImprovements(strategy: OptimizationStrategy): Partial<ModelMetrics> {
+  private calculateExpectedImprovements(
+    strategy: OptimizationStrategy,
+  ): Partial<ModelMetrics> {
     const improvements: Partial<ModelMetrics> = {}
 
-    Object.keys(strategy.expectedImprovement).forEach(metric => {
+    Object.keys(strategy.expectedImprovement).forEach((metric) => {
       const key = metric as keyof ModelMetrics
       const expectedChange = strategy.expectedImprovement[key]
 
       // Add some randomness to simulate real optimization results
       const variance = 0.1 // 10% variance
-      const actualChange = expectedChange * (1 + (Math.random() - 0.5) * variance)
+      const actualChange =
+        expectedChange * (1 + (Math.random() - 0.5) * variance)
 
       improvements[key] = actualChange
     })
@@ -285,30 +311,48 @@ class ModelOptimizer {
 
   private selectTechniques(strategy: OptimizationStrategy): string[] {
     // Simulate selecting subset of techniques based on effectiveness
-    const numTechniques = Math.floor(Math.random() * strategy.techniques.length) + 1
+    const numTechniques =
+      Math.floor(Math.random() * strategy.techniques.length) + 1
     const shuffled = [...strategy.techniques].sort(() => 0.5 - Math.random())
     return shuffled.slice(0, numTechniques)
   }
 
-  private generateRecommendations(strategy: OptimizationStrategy, improvements: Partial<ModelMetrics>): string[] {
+  private generateRecommendations(
+    strategy: OptimizationStrategy,
+    improvements: Partial<ModelMetrics>,
+  ): string[] {
     const recommendations: string[] = []
 
     // Check for significant improvements
     Object.entries(improvements).forEach(([metric, change]) => {
       if (change > 0.1) {
-        recommendations.push(`Great improvement in ${metric}: +${(change * 100).toFixed(1)}%`)
+        recommendations.push(
+          `Great improvement in ${metric}: +${(change * 100).toFixed(1)}%`,
+        )
       } else if (change < -0.1) {
-        recommendations.push(`Consider ${metric} degradation: ${(change * 100).toFixed(1)}%`)
+        recommendations.push(
+          `Consider ${metric} degradation: ${(change * 100).toFixed(1)}%`,
+        )
       }
     })
 
     // Strategy-specific recommendations
-    if (strategy.name.includes('Quantization') && improvements.inferenceTime > 0.3) {
-      recommendations.push('Quantization successful - consider applying to production models')
+    if (
+      strategy.name.includes('Quantization') &&
+      improvements.inferenceTime > 0.3
+    ) {
+      recommendations.push(
+        'Quantization successful - consider applying to production models',
+      )
     }
 
-    if (strategy.name.includes('Compression') && improvements.memoryUsage > 0.5) {
-      recommendations.push('Compression effective - update deployment configurations')
+    if (
+      strategy.name.includes('Compression') &&
+      improvements.memoryUsage > 0.5
+    ) {
+      recommendations.push(
+        'Compression effective - update deployment configurations',
+      )
     }
 
     return recommendations
@@ -337,16 +381,25 @@ class ModelOptimizer {
     let bestMemory = this.optimizationHistory[0]
     let mostBalanced = this.optimizationHistory[0]
 
-    this.optimizationHistory.forEach(result => {
-      if ((result.improvements.accuracy || 0) > (bestAccuracy.improvements.accuracy || 0)) {
+    this.optimizationHistory.forEach((result) => {
+      if (
+        (result.improvements.accuracy || 0) >
+        (bestAccuracy.improvements.accuracy || 0)
+      ) {
         bestAccuracy = result
       }
 
-      if ((result.improvements.inferenceTime || 0) > (bestSpeed.improvements.inferenceTime || 0)) {
+      if (
+        (result.improvements.inferenceTime || 0) >
+        (bestSpeed.improvements.inferenceTime || 0)
+      ) {
         bestSpeed = result
       }
 
-      if ((result.improvements.memoryUsage || 0) > (bestMemory.improvements.memoryUsage || 0)) {
+      if (
+        (result.improvements.memoryUsage || 0) >
+        (bestMemory.improvements.memoryUsage || 0)
+      ) {
         bestMemory = result
       }
 
@@ -369,13 +422,15 @@ class ModelOptimizer {
 
   private calculateBalanceScore(result: OptimizationResult): number {
     const metrics = ['accuracy', 'inferenceTime', 'memoryUsage'] as const
-    const scores = metrics.map(metric => result.improvements[metric] || 0)
-    const positiveScores = scores.filter(score => score > 0)
+    const scores = metrics.map((metric) => result.improvements[metric] || 0)
+    const positiveScores = scores.filter((score) => score > 0)
 
     if (positiveScores.length === 0) return 0
 
     // Harmonic mean of positive improvements
-    const harmonicMean = positiveScores.length / positiveScores.reduce((sum, score) => sum + 1/score, 0)
+    const harmonicMean =
+      positiveScores.length /
+      positiveScores.reduce((sum, score) => sum + 1 / score, 0)
     return harmonicMean
   }
 
@@ -403,7 +458,10 @@ class ModelOptimizer {
       }
     }
 
-    const trends: Record<keyof ModelMetrics, 'improving' | 'declining' | 'stable'> = {
+    const trends: Record<
+      keyof ModelMetrics,
+      'improving' | 'declining' | 'stable'
+    > = {
       accuracy: 'stable',
       precision: 'stable',
       recall: 'stable',
@@ -416,10 +474,13 @@ class ModelOptimizer {
     const totalImprovements: Partial<ModelMetrics> = {}
 
     // Calculate trends for each metric
-    Object.keys(trends).forEach(metric => {
+    Object.keys(trends).forEach((metric) => {
       const key = metric as keyof ModelMetrics
-      const values = this.optimizationHistory.map(h => h.improvements[key] || 0)
-      const avgChange = values.reduce((sum, val) => sum + val, 0) / values.length
+      const values = this.optimizationHistory.map(
+        (h) => h.improvements[key] || 0,
+      )
+      const avgChange =
+        values.reduce((sum, val) => sum + val, 0) / values.length
 
       if (avgChange > 0.01) trends[key] = 'improving'
       else if (avgChange < -0.01) trends[key] = 'declining'
@@ -448,7 +509,7 @@ class ModelOptimizer {
 
     // Select strategies based on targets
     for (const target of targets) {
-      const suitableStrategies = this.strategies.filter(strategy => {
+      const suitableStrategies = this.strategies.filter((strategy) => {
         const improvement = strategy.expectedImprovement[target.metric]
         return improvement && Math.abs(improvement) > 0.05 // Significant improvement expected
       })
@@ -474,12 +535,23 @@ class ModelOptimizer {
     }
 
     const estimatedTime = pipeline.reduce((total, strategy) => {
-      return total + (baseTimePerStrategy * complexityMultiplier[strategy.implementationComplexity])
+      return (
+        total +
+        baseTimePerStrategy *
+          complexityMultiplier[strategy.implementationComplexity]
+      )
     }, 0)
 
     // Assess risk level
-    const highComplexityCount = pipeline.filter(s => s.implementationComplexity === 'high').length
-    const riskLevel = highComplexityCount > 2 ? 'high' : highComplexityCount > 0 ? 'medium' : 'low'
+    const highComplexityCount = pipeline.filter(
+      (s) => s.implementationComplexity === 'high',
+    ).length
+    const riskLevel =
+      highComplexityCount > 2
+        ? 'high'
+        : highComplexityCount > 0
+          ? 'medium'
+          : 'low'
 
     return {
       pipeline,

@@ -45,8 +45,10 @@ describe('Bias Detection Export API Endpoint', () => {
 
       expect(response.status).toBe(200)
       expect(response.headers.get('Content-Type')).toBe('text/csv')
-      expect(response.headers.get('Content-Disposition')).toContain('attachment')
-      
+      expect(response.headers.get('Content-Disposition')).toContain(
+        'attachment',
+      )
+
       const csvData = await response.text()
       expect(csvData).toContain('sessionId,timestamp,biasScore')
     })

@@ -297,8 +297,12 @@ export async function checkSuspiciousIPWithIntelligence(
 
   try {
     const threatService = new ExternalThreatIntelligenceService({
-      mongoUrl: config.mongoUrl || process.env.MONGODB_URL || 'mongodb://localhost:27017',
-      redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
+      mongoUrl:
+        config.mongoUrl ||
+        process.env.MONGODB_URL ||
+        'mongodb://localhost:27017',
+      redisUrl:
+        config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
       enabled: true,
     })
 
@@ -307,9 +311,12 @@ export async function checkSuspiciousIPWithIntelligence(
     await threatService.shutdown()
     return result
   } catch (error) {
-    logger.warn('Failed to use threat intelligence service, falling back to basic check', {
-      error: String(error),
-    })
+    logger.warn(
+      'Failed to use threat intelligence service, falling back to basic check',
+      {
+        error: String(error),
+      },
+    )
     return isSuspiciousIPSync(ip)
   }
 }
@@ -466,7 +473,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     timeout = setTimeout(() => {
       // We intentionally ignore the return value of func for debounce
       // and cast args to unknown[] to call safely.
-      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       timeout = null
     }, wait)
   }
@@ -483,7 +490,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
-      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       inThrottle = true
       setTimeout(() => {
         inThrottle = false

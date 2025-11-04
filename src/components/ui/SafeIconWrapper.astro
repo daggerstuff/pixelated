@@ -12,7 +12,9 @@ const { name, ...rest } = Astro.props as Props
 const isValidIconName = (iconName: string): boolean => {
   if (!iconName || typeof iconName !== 'string') return false
   const trimmed = iconName.trim()
-  return trimmed.length >= 3 && trimmed !== '-' && trimmed !== '—' && trimmed !== '–'
+  return (
+    trimmed.length >= 3 && trimmed !== '-' && trimmed !== '—' && trimmed !== '–'
+  )
 }
 
 const safeName = isValidIconName(name) ? name.trim() : 'i-uil:question'

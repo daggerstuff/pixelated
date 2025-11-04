@@ -158,8 +158,8 @@ const jobsWorker = {
             completedAt: new Date().toISOString(),
           })
           break
-        case 'report-generation': // Payload contains sessions, timeRange, and options
-        {
+        case 'report-generation': {
+          // Payload contains sessions, timeRange, and options
           ;({ sessions, timeRange, options } = job.payload as {
             sessions: TherapeuticSession[]
             timeRange: TimeRange

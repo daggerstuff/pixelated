@@ -32,7 +32,10 @@ interface UseChatCompletionResult {
   tokenUsage: TokenUsage
   conversationStats: ConversationStats
   sendMessage: (message: string, context?: Partial<AIMessage>) => Promise<void>
-  sendStreamingMessage: (message: string, context?: Partial<AIMessage>) => AsyncGenerator<string, void, unknown>
+  sendStreamingMessage: (
+    message: string,
+    context?: Partial<AIMessage>,
+  ) => AsyncGenerator<string, void, unknown>
   editMessage: (index: number, newContent: string) => void
   deleteMessage: (index: number) => void
   resendMessage: (index: number) => Promise<void>
@@ -88,11 +91,7 @@ function isRetryableError(error: unknown): boolean {
   }
 
   // Rate limit errors (429) are retryable with backoff
-  if (
-    error instanceof Error &&
-    'status' in error &&
-    error.status === 429
-  ) {
+  if (error instanceof Error && 'status' in error && error.status === 429) {
     return true
   }
 
@@ -109,7 +108,7 @@ function isRetryableError(error: unknown): boolean {
  */
 function calculateTokenUsage(messages: AIMessage[], model: string): TokenUsage {
   // Rough estimation - in production, you'd get this from the API response
-  const totalText = messages.map(m => m.content).join(' ')
+  const totalText = messages.map((m) => m.content).join(' ')
   const estimatedTokens = Math.ceil(totalText.length / 4) // Rough GPT tokenization
 
   const promptTokens = Math.ceil(estimatedTokens * 0.7)
@@ -155,14 +154,17 @@ export function useChatCompletion({
   const [isTyping, setIsTyping] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<number>(0)
-  const [conversationStats, setConversationStats] = useState<ConversationStats>({
-    messageCount: initialMessages.length,
-    userMessages: initialMessages.filter(m => m.role === 'user').length,
-    assistantMessages: initialMessages.filter(m => m.role === 'assistant').length,
-    avgResponseTime: 0,
-    totalDuration: 0,
-    startTime: initialMessages.length > 0 ? new Date() : null,
-  })
+  const [conversationStats, setConversationStats] = useState<ConversationStats>(
+    {
+      messageCount: initialMessages.length,
+      userMessages: initialMessages.filter((m) => m.role === 'user').length,
+      assistantMessages: initialMessages.filter((m) => m.role === 'assistant')
+        .length,
+      avgResponseTime: 0,
+      totalDuration: 0,
+      startTime: initialMessages.length > 0 ? new Date() : null,
+    },
+  )
   const [messageStats] = useState<MessageStats>({
     longestMessage: 0,
     shortestMessage: 0,
@@ -201,11 +203,14 @@ export function useChatCompletion({
         if (saved) {
           const parsedMessages = JSON.parse(saved) as unknown as AIMessage[]
           setMessages(parsedMessages)
-          setConversationStats(prev => ({
+          setConversationStats((prev) => ({
             ...prev,
             messageCount: parsedMessages.length,
-            userMessages: parsedMessages.filter(m => m.role === 'user').length,
-            assistantMessages: parsedMessages.filter(m => m.role === 'assistant').length,
+            userMessages: parsedMessages.filter((m) => m.role === 'user')
+              .length,
+            assistantMessages: parsedMessages.filter(
+              (m) => m.role === 'assistant',
+            ).length,
             startTime: new Date(),
           }))
         }
@@ -225,11 +230,12 @@ export function useChatCompletion({
     setProgress(0)
     lastUserMessageRef.current = null
     responseTimesRef.current = []
-    
+
     setConversationStats({
       messageCount: initialMessages.length,
-      userMessages: initialMessages.filter(m => m.role === 'user').length,
-      assistantMessages: initialMessages.filter(m => m.role === 'assistant').length,
+      userMessages: initialMessages.filter((m) => m.role === 'user').length,
+      assistantMessages: initialMessages.filter((m) => m.role === 'assistant')
+        .length,
       avgResponseTime: 0,
       totalDuration: 0,
       startTime: initialMessages.length > 0 ? new Date() : null,
@@ -272,7 +278,7 @@ export function useChatCompletion({
     async (requestMessages: AIMessage[]): Promise<Response> => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController()
-      
+
       const timeoutId = setTimeout(() => {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort()
@@ -296,12 +302,11 @@ export function useChatCompletion({
         })
 
         clearTimeout(timeoutId)
-        
+
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error ||
-              `Failed to get AI response: ${response.status}`,
+            errorData.error || `Failed to get AI response: ${response.status}`,
           )
         }
 
@@ -311,7 +316,15 @@ export function useChatCompletion({
         throw err
       }
     },
-    [apiEndpoint, model, temperature, maxTokens, streamingEnabled, messageHistory, timeout]
+    [
+      apiEndpoint,
+      model,
+      temperature,
+      maxTokens,
+      streamingEnabled,
+      messageHistory,
+      timeout,
+    ],
   )
 
   // Send a message to the AI API
@@ -334,7 +347,7 @@ export function useChatCompletion({
       }
 
       // Update conversation stats
-      setConversationStats(prev => ({
+      setConversationStats((prev) => ({
         ...prev,
         startTime: prev.startTime || new Date(),
         messageCount: prev.messageCount + 1,
@@ -354,7 +367,7 @@ export function useChatCompletion({
             name: context?.name || '',
             ...context,
           }
-          
+
           const updatedMessages = [...messages, userMessage]
           setMessages(updatedMessages)
 
@@ -398,7 +411,7 @@ export function useChatCompletion({
                     // Update progress
                     const estimatedProgress = Math.min(
                       (assistantMessage.length / maxTokens) * 100,
-                      95
+                      95,
                     )
                     setProgress(estimatedProgress)
 
@@ -442,12 +455,15 @@ export function useChatCompletion({
             // Handle non-streaming response
             const data = await response.json()
             const assistantMessage = data.choices?.[0]?.message?.content || ''
-            
-            setMessages(prev => [...prev, {
-              role: 'assistant',
-              content: assistantMessage,
-              name: '',
-            }])
+
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: assistantMessage,
+                name: '',
+              },
+            ])
           }
 
           setProgress(100)
@@ -456,10 +472,12 @@ export function useChatCompletion({
           if (messageStartTimeRef.current) {
             const responseTime = Date.now() - messageStartTimeRef.current
             responseTimesRef.current.push(responseTime)
-            
-            const avgResponseTime = responseTimesRef.current.reduce((a, b) => a + b, 0) / responseTimesRef.current.length
-            
-            setConversationStats(prev => ({
+
+            const avgResponseTime =
+              responseTimesRef.current.reduce((a, b) => a + b, 0) /
+              responseTimesRef.current.length
+
+            setConversationStats((prev) => ({
               ...prev,
               assistantMessages: prev.assistantMessages + 1,
               avgResponseTime,
@@ -475,7 +493,9 @@ export function useChatCompletion({
         } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? (err as Error)?.message || String(err) : 'An unknown error occurred'
+              err instanceof Error
+                ? (err as Error)?.message || String(err)
+                : 'An unknown error occurred'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -494,7 +514,7 @@ export function useChatCompletion({
             setIsLoading(false)
             setIsStreaming(false)
             setIsTyping(false)
-            
+
             if (onTypingStop) {
               onTypingStop()
             }
@@ -543,13 +563,13 @@ export function useChatCompletion({
           name: context?.name || '',
           ...context,
         }
-        
+
         const updatedMessages = [...messages, userMessage]
         setMessages(updatedMessages)
 
         const response = await makeRequest(updatedMessages)
         const reader = response.body?.getReader()
-        
+
         if (!reader) {
           throw new Error('No response body reader available')
         }
@@ -584,7 +604,7 @@ export function useChatCompletion({
 
                 const estimatedProgress = Math.min(
                   (assistantMessage.length / maxTokens) * 100,
-                  95
+                  95,
                 )
                 setProgress(estimatedProgress)
 
@@ -629,18 +649,26 @@ export function useChatCompletion({
         setIsLoading(false)
         setIsStreaming(false)
         setIsTyping(false)
-        
+
         if (onTypingStop) {
           onTypingStop()
         }
       }
     },
-    [messages, isLoading, maxTokens, onTypingStart, onTypingStop, onComplete, makeRequest]
+    [
+      messages,
+      isLoading,
+      maxTokens,
+      onTypingStart,
+      onTypingStop,
+      onComplete,
+      makeRequest,
+    ],
   )
 
   // Edit a message
   const editMessage = useCallback((index: number, newContent: string) => {
-    setMessages(prev => {
+    setMessages((prev) => {
       const newMessages = [...prev]
       if (index >= 0 && index < newMessages.length) {
         const message = newMessages[index]
@@ -654,7 +682,7 @@ export function useChatCompletion({
 
   // Delete a message
   const deleteMessage = useCallback((index: number) => {
-    setMessages(prev => {
+    setMessages((prev) => {
       const newMessages = [...prev]
       if (index >= 0 && index < newMessages.length) {
         newMessages.splice(index, 1)
@@ -664,15 +692,18 @@ export function useChatCompletion({
   }, [])
 
   // Resend a message
-  const resendMessage = useCallback(async (index: number) => {
-    const messageToResend = messages[index]
-    if (messageToResend && messageToResend.role === 'user') {
-      // Remove all messages after this one
-      setMessages(prev => prev.slice(0, index))
-      // Resend the message
-      await sendMessage(messageToResend.content)
-    }
-  }, [messages, sendMessage])
+  const resendMessage = useCallback(
+    async (index: number) => {
+      const messageToResend = messages[index]
+      if (messageToResend && messageToResend.role === 'user') {
+        // Remove all messages after this one
+        setMessages((prev) => prev.slice(0, index))
+        // Resend the message
+        await sendMessage(messageToResend.content)
+      }
+    },
+    [messages, sendMessage],
+  )
 
   // Function to retry the last message
   const retryLastMessage = useCallback(async () => {
@@ -713,20 +744,24 @@ export function useChatCompletion({
 
   // Export conversation
   const exportConversation = useCallback(() => {
-    return JSON.stringify({
-      messages,
-      stats: conversationStats,
-      tokenUsage,
-      exportDate: new Date().toISOString(),
-    }, null, 2)
+    return JSON.stringify(
+      {
+        messages,
+        stats: conversationStats,
+        tokenUsage,
+        exportDate: new Date().toISOString(),
+      },
+      null,
+      2,
+    )
   }, [messages, conversationStats, tokenUsage])
 
   // Import conversation
   const importConversation = useCallback((data: string) => {
     try {
       const parsed = JSON.parse(data) as {
-        messages: AIMessage[];
-        stats?: ConversationStats;
+        messages: AIMessage[]
+        stats?: ConversationStats
       }
       setMessages(parsed.messages)
       if (parsed.stats) {

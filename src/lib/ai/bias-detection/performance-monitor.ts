@@ -39,14 +39,14 @@ class PerformanceMonitor {
     let recentRequests = this.requestDetails
     if (timeWindowMs !== undefined) {
       const cutoff = now - timeWindowMs
-      recentRequests = this.requestDetails.filter(r => r.timestamp >= cutoff)
+      recentRequests = this.requestDetails.filter((r) => r.timestamp >= cutoff)
     }
 
     const requestCount = recentRequests.length
-    const errorCount = recentRequests.filter(r => r.statusCode >= 400).length
+    const errorCount = recentRequests.filter((r) => r.statusCode >= 400).length
     const totalResponseTime = recentRequests.reduce(
       (sum, r) => sum + r.duration,
-      0
+      0,
     )
 
     return {
@@ -62,7 +62,7 @@ class PerformanceMonitor {
           requestCount > 0 ? totalResponseTime / requestCount : 0,
         requestCount,
         errorRate: requestCount > 0 ? errorCount / requestCount : 0,
-      }
+      },
     }
   }
 
@@ -122,7 +122,7 @@ class PerformanceMonitor {
         '',
         '# HELP bias_detection_errors_total Total number of errors',
         '# TYPE bias_detection_errors_total counter',
-        `bias_detection_errors_total ${snapshot.metrics.find(m => m.name === 'errors_total')?.value ?? 0}`,
+        `bias_detection_errors_total ${snapshot.metrics.find((m) => m.name === 'errors_total')?.value ?? 0}`,
         '',
         '# HELP bias_detection_response_time_avg Average response time',
         '# TYPE bias_detection_response_time_avg gauge',

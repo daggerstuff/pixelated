@@ -4,16 +4,20 @@
  */
 
 // Re-export from InterventionAnalysisService for consistency
-export type { 
+export type {
   InterventionEffectivenessResult,
   InterventionContext,
-  PatientResponse
+  PatientResponse,
 } from '../services/InterventionAnalysisService'
 
 // Additional intervention-related types
 export interface InterventionRecommendation {
   id: string
-  type: 'technique_adjustment' | 'duration_change' | 'approach_modification' | 'risk_mitigation'
+  type:
+    | 'technique_adjustment'
+    | 'duration_change'
+    | 'approach_modification'
+    | 'risk_mitigation'
   priority: 'low' | 'medium' | 'high' | 'critical'
   description: string
   rationale: string

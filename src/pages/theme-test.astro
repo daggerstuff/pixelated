@@ -1,0 +1,415 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Theme Integration Test"
+  description="Test page for unified dark theme integration with all components"
+  bgType="animated"
+  themeMode="system"
+>
+  <div class="min-h-screen py-8">
+    <!-- Theme Test Header -->
+    <section class="elegant-surface mb-8" style="padding: var(--space-8);">
+      <div class="text-center">
+        <h1 class="heading-brutalist heading-brutalist--hero mb-4">
+          UNIFIED DARK THEME TEST
+        </h1>
+        <p class="text-lg text-secondary mb-6">
+          Comprehensive testing of the new unified dark theme integration
+        </p>
+        <div class="corporate-badge animate-pulse-glow">
+          V2.0 INTEGRATION ACTIVE
+        </div>
+      </div>
+    </section>
+
+    <!-- Color Palette Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">COLOR PALETTE</h2>
+        <div
+          class="grid-brutalist grid-brutalist--4"
+          style="gap: var(--space-4);"
+        >
+          <div class="card-brutalist text-center">
+            <div
+              style="width: 4rem; height: 4rem; background: var(--bg-void); border-radius: var(--radius-lg); margin: 0 auto var(--space-2); border: 1px solid var(--border-primary);"
+            >
+            </div>
+            <h3 class="text-sm font-semibold mb-1">Void Black</h3>
+            <p class="text-xs text-muted">#000000</p>
+          </div>
+          <div class="card-brutalist text-center">
+            <div
+              style="width: 4rem; height: 4rem; background: var(--bg-primary); border-radius: var(--radius-lg); margin: 0 auto var(--space-2); border: 1px solid var(--border-primary);"
+            >
+            </div>
+            <h3 class="text-sm font-semibold mb-1">Primary BG</h3>
+            <p class="text-xs text-muted">#0a0a0a</p>
+          </div>
+          <div class="card-brutalist text-center">
+            <div
+              style="width: 4rem; height: 4rem; background: var(--bg-secondary); border-radius: var(--radius-lg); margin: 0 auto var(--space-2); border: 1px solid var(--border-primary);"
+            >
+            </div>
+            <h3 class="text-sm font-semibold mb-1">Secondary BG</h3>
+            <p class="text-xs text-muted">#111111</p>
+          </div>
+          <div class="card-brutalist text-center">
+            <div
+              style="width: 4rem; height: 4rem; background: var(--accent-primary); border-radius: var(--radius-lg); margin: 0 auto var(--space-2); border: 1px solid var(--border-primary);"
+            >
+            </div>
+            <h3 class="text-sm font-semibold mb-1">Accent</h3>
+            <p class="text-xs text-muted">#10b981</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">TYPOGRAPHY SYSTEM</h2>
+        <div class="card-brutalist">
+          <div class="space-y-4">
+            <div>
+              <h1 class="heading-brutalist">Heading Style H1</h1>
+              <p class="text-muted">
+                Font: Geist Sans, Weight: 900, Size: Responsive
+              </p>
+            </div>
+            <div>
+              <h2 class="heading-brutalist">Heading Style H2</h2>
+              <p class="text-muted">
+                Font: Geist Sans, Weight: 700, Size: Responsive
+              </p>
+            </div>
+            <div>
+              <h3 class="heading-brutalist">Heading Style H3</h3>
+              <p class="text-muted">
+                Font: Geist Sans, Weight: 600, Size: Responsive
+              </p>
+            </div>
+            <div class="text-gradient">
+              <h4 class="heading-brutalist">Gradient Text Example</h4>
+              <p class="text-muted">Using text-gradient class</p>
+            </div>
+            <div class="text-accent">
+              <h5 class="heading-brutalist">Accent Text Example</h5>
+              <p class="text-muted">Using text-accent class</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Button Component Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">BUTTON COMPONENTS</h2>
+        <div
+          class="grid-brutalist grid-brutalist--3"
+          style="gap: var(--space-6);"
+        >
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Primary Button</h3>
+            <button class="btn-brutalist btn-brutalist--primary w-full">
+              PRIMARY ACTION
+            </button>
+          </div>
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Secondary Button</h3>
+            <button class="btn-brutalist btn-brutalist--secondary w-full">
+              SECONDARY ACTION
+            </button>
+          </div>
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Ghost Button</h3>
+            <button class="btn-brutalist btn-brutalist--ghost w-full">
+              GHOST ACTION
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form Component Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">FORM COMPONENTS</h2>
+        <div class="card-brutalist">
+          <form class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-secondary mb-2"
+                >Email Input</label
+              >
+              <input
+                type="email"
+                class="input-brutalist"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div>
+              <label class="text-sm font-medium text-secondary mb-2"
+                >Text Input</label
+              >
+              <input
+                type="text"
+                class="input-brutalist"
+                placeholder="Enter your text"
+              />
+            </div>
+            <div>
+              <label class="text-sm font-medium text-secondary mb-2"
+                >Select Input</label
+              >
+              <select class="input-brutalist">
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn-brutalist btn-brutalist--primary w-full"
+            >
+              SUBMIT FORM
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Glass Morphism Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">GLASS MORPHISM</h2>
+        <div
+          class="grid-brutalist grid-brutalist--2"
+          style="gap: var(--space-6);"
+        >
+          <div class="card-brutalist glass-surface">
+            <h3 class="text-lg font-semibold mb-4">Glass Surface Card</h3>
+            <p class="text-secondary">
+              This card uses glass-surface class with backdrop blur effect.
+            </p>
+          </div>
+          <div class="card-brutalist">
+            <h3 class="text-lg font-semibold mb-4">Regular Card</h3>
+            <p class="text-secondary">
+              This is a regular card-brutalist without glass effect.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Responsive Design Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">RESPONSIVE DESIGN</h2>
+        <div class="card-brutalist">
+          <div
+            class="grid-brutalist grid-brutalist--3"
+            style="gap: var(--space-4);"
+          >
+            <div class="text-center p-4 bg-level-1 rounded-lg">
+              <div class="text-2xl font-bold text-accent mb-2">Mobile</div>
+              <p class="text-sm text-muted">Optimized for mobile devices</p>
+            </div>
+            <div class="text-center p-4 bg-level-1 rounded-lg">
+              <div class="text-2xl font-bold text-accent mb-2">Tablet</div>
+              <p class="text-sm text-muted">Enhanced tablet experience</p>
+            </div>
+            <div class="text-center p-4 bg-level-1 rounded-lg">
+              <div class="text-2xl font-bold text-accent mb-2">Desktop</div>
+              <p class="text-sm text-muted">Full desktop functionality</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Animation Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">ANIMATION SYSTEM</h2>
+        <div
+          class="grid-brutalist grid-brutalist--2"
+          style="gap: var(--space-6);"
+        >
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Fade In Up</h3>
+            <div class="animate-fade-in-up">
+              <div class="w-16 h-16 bg-accent-primary rounded-lg mx-auto mb-4">
+              </div>
+              <p class="text-sm text-muted">
+                This element fades in from bottom
+              </p>
+            </div>
+          </div>
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Pulse Glow</h3>
+            <div class="animate-pulse-glow">
+              <div class="w-16 h-16 bg-accent-primary rounded-lg mx-auto mb-4">
+              </div>
+              <p class="text-sm text-muted">This element pulses with glow</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accessibility Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">
+          ACCESSIBILITY FEATURES
+        </h2>
+        <div class="card-brutalist">
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 bg-accent-primary rounded-full"></div>
+              <span>Focus indicators with proper contrast</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 bg-accent-primary rounded-full"></div>
+              <span>Screen reader announcements</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 bg-accent-primary rounded-full"></div>
+              <span>Keyboard navigation support</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 bg-accent-primary rounded-full"></div>
+              <span>High contrast mode support</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 bg-accent-primary rounded-full"></div>
+              <span>Reduced motion preferences</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Theme Toggle Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">THEME TOGGLE TESTING</h2>
+        <div class="card-brutalist text-center">
+          <h3 class="text-lg font-semibold mb-4">Current Theme State</h3>
+          <div class="space-y-4">
+            <div class="flex justify-center">
+              <div class="p-4 bg-level-1 rounded-lg">
+                <p class="text-sm text-muted mb-2">HTML Theme Class:</p>
+                <code class="text-accent">enhanced-dark-theme</code>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <div class="p-4 bg-level-1 rounded-lg">
+                <p class="text-sm text-muted mb-2">Data Theme Attribute:</p>
+                <code class="text-accent" id="theme-attribute">system</code>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <div class="p-4 bg-level-1 rounded-lg">
+                <p class="text-sm text-muted mb-2">Local Storage:</p>
+                <code class="text-accent" id="local-storage-theme">system</code>
+              </div>
+            </div>
+          </div>
+          <p class="text-sm text-muted mt-4">
+            Use the theme toggle in the header to test different themes
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Performance Test -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <h2 class="heading-brutalist text-center mb-6">PERFORMANCE METRICS</h2>
+        <div
+          class="grid-brutalist grid-brutalist--3"
+          style="gap: var(--space-6);"
+        >
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Font Loading</h3>
+            <div class="text-2xl font-bold text-accent mb-2">Fast</div>
+            <p class="text-sm text-muted">Geist Sans & JetBrains Mono</p>
+          </div>
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">CSS Variables</h3>
+            <div class="text-2xl font-bold text-accent mb-2">Optimized</div>
+            <p class="text-sm text-muted">Unified theme system</p>
+          </div>
+          <div class="card-brutalist text-center">
+            <h3 class="text-lg font-semibold mb-4">Mobile First</h3>
+            <div class="text-2xl font-bold text-accent mb-2">Responsive</div>
+            <p class="text-sm text-muted">Enhanced mobile layout</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="mb-8">
+      <div class="container-refined">
+        <div
+          class="elegant-surface text-center"
+          style="padding: var(--space-12);"
+        >
+          <h2 class="heading-brutalist heading-brutalist--hero mb-4">
+            THEME INTEGRATION COMPLETE
+          </h2>
+          <p class="text-lg text-secondary mb-6">
+            The unified dark theme has been successfully integrated with all
+            components
+          </p>
+          <button
+            class="btn-brutalist btn-brutalist--primary animate-pulse-glow"
+          >
+            RETURN TO HOME
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Enhanced Theme Detection Script -->
+  <script is:inline>
+    // Enhanced theme detection and display
+    ;(function () {
+      function updateThemeDisplay() {
+        const html = document.documentElement
+        const themeAttribute = document.getElementById('theme-attribute')
+        const localStorageTheme = document.getElementById('local-storage-theme')
+
+        if (themeAttribute) {
+          const currentTheme = html.getAttribute('data-theme') || 'system'
+          themeAttribute.textContent = currentTheme
+        }
+
+        if (localStorageTheme) {
+          const storedTheme = localStorage.getItem('theme') || 'system'
+          localStorageTheme.textContent = storedTheme
+        }
+      }
+
+      // Update on load
+      updateThemeDisplay()
+
+      // Update on theme changes
+      window.addEventListener('theme-changed', updateThemeDisplay)
+
+      // Update on storage changes
+      window.addEventListener('storage', updateThemeDisplay)
+
+      // Update periodically
+      setInterval(updateThemeDisplay, 1000)
+    })()
+  </script>
+</BaseLayout>

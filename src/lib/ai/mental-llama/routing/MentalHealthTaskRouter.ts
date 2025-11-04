@@ -51,7 +51,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) { }
+  constructor(private llmInvoker: LLMInvoker) {}
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -105,7 +105,10 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
 
     // LLM-based classification for ambiguous cases: try a structured classification call
     try {
-      const llmDecision = await this.performBroadClassificationLLM(text, input.context)
+      const llmDecision = await this.performBroadClassificationLLM(
+        text,
+        input.context,
+      )
       // If LLM returned a meaningful decision, use it
       if (llmDecision && llmDecision.targetAnalyzer) {
         return llmDecision
@@ -187,19 +190,19 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
   private mapLlmCategoryToAnalyzer(category: string): string {
     const normalized = category.trim().toLowerCase()
     const map: Record<string, string> = {
-      suicidal: 'crisis',
+      'suicidal': 'crisis',
       'self-harm': 'crisis',
-      suicide: 'crisis',
-      crisis: 'crisis',
-      depression: 'depression',
-      depressive: 'depression',
-      anxiety: 'anxiety',
-      panic: 'anxiety',
-      worry: 'anxiety',
-      general: 'general_mental_health',
+      'suicide': 'crisis',
+      'crisis': 'crisis',
+      'depression': 'depression',
+      'depressive': 'depression',
+      'anxiety': 'anxiety',
+      'panic': 'anxiety',
+      'worry': 'anxiety',
+      'general': 'general_mental_health',
       'general_mental_health': 'general_mental_health',
-      unknown: 'unknown',
-      none: 'none',
+      'unknown': 'unknown',
+      'none': 'none',
     }
     return map[normalized] ?? 'general_mental_health'
   }
@@ -226,7 +229,8 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
     text: string,
     context?: RoutingContext,
   ): Promise<RoutingDecision | null> {
-    const system = `You are a classification assistant. Classify the user's text into one of: crisis, depression, anxiety, general, none, unknown. Respond with a JSON object: { "category": "<one of the categories>", "confidence": 0.0, "is_critical": false, "reason": "explain briefly" }`.trim()
+    const system =
+      `You are a classification assistant. Classify the user's text into one of: crisis, depression, anxiety, general, none, unknown. Respond with a JSON object: { "category": "<one of the categories>", "confidence": 0.0, "is_critical": false, "reason": "explain briefly" }`.trim()
     const user = `Text: ${text}\nContext: ${context ? JSON.stringify(context) : '{}'}\nRespond only with the JSON object described.`
 
     const messages = [
@@ -234,13 +238,18 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
       { role: 'user', content: user },
     ]
 
-    const resp = await this.llmInvoker(messages, { temperature: 0.0, max_tokens: 300 })
+    const resp = await this.llmInvoker(messages, {
+      temperature: 0.0,
+      max_tokens: 300,
+    })
     const raw = resp.content || ''
     const jsonLike = this.extractJsonLike(raw)
     if (!jsonLike) {
       // Unable to find JSON in response; as a last resort, try to use the plain text
       const plain = raw.trim().toLowerCase()
-      const mapped = this.mapLlmCategoryToAnalyzer(plain.split(/\s|\.|,|\n/)[0] || 'general')
+      const mapped = this.mapLlmCategoryToAnalyzer(
+        plain.split(/\s|\.|,|\n/)[0] || 'general',
+      )
       return {
         targetAnalyzer: mapped,
         confidence: 0.5,
@@ -251,17 +260,28 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
     }
 
     try {
-      const parsed = JSON.parse(jsonLike) as { category?: string; confidence?: number; is_critical?: boolean; reason?: string }
+      const parsed = JSON.parse(jsonLike) as {
+        category?: string
+        confidence?: number
+        is_critical?: boolean
+        reason?: string
+      }
       const category = parsed.category ?? 'general'
       const mapped = this.mapLlmCategoryToAnalyzer(String(category))
-      const confidence = Math.max(0, Math.min(1, Number(parsed.confidence) || 0.5))
+      const confidence = Math.max(
+        0,
+        Math.min(1, Number(parsed.confidence) || 0.5),
+      )
       const isCritical = parsed.is_critical === true || mapped === 'crisis'
       return {
         targetAnalyzer: mapped,
         confidence,
         isCritical,
         method: 'llm',
-        insights: { llmReasoning: parsed.reason || raw, llmCategory: parsed.category },
+        insights: {
+          llmReasoning: parsed.reason || raw,
+          llmCategory: parsed.category,
+        },
       }
     } catch (err) {
       // Parsing failed - return a conservative fallback decision

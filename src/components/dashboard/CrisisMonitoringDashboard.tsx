@@ -22,7 +22,7 @@ import {
   BarChart3,
   Calendar,
   MessageSquare,
-  Settings
+  Settings,
 } from 'lucide-react'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 import type { EscalationEvent } from '@/lib/ai/services/AutomatedEscalationService'
@@ -65,10 +65,12 @@ export interface CrisisMonitoringDashboardProps {
   showEmergencyControls?: boolean
 }
 
-export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps> = ({
+export const CrisisMonitoringDashboard: React.FC<
+  CrisisMonitoringDashboardProps
+> = ({
   therapistId = 'current_therapist',
   refreshInterval = 30000, // 30 seconds
-  showEmergencyControls = true
+  showEmergencyControls = true,
 }) => {
   const [patients, setPatients] = useState<PatientRiskData[]>([])
   const [alerts, setAlerts] = useState<AlertItem[]>([])
@@ -79,7 +81,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
     todayAssessments: 0,
     averageResponseTime: '0m',
     escalationRate: 0,
-    falsePositiveRate: 0
+    falsePositiveRate: 0,
   })
   const [activeTab, setActiveTab] = useState('overview')
   const [autoRefresh, setAutoRefresh] = useState(true)
@@ -91,11 +93,12 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
     setLoading(true)
     try {
       // Simulated API calls - replace with actual endpoints
-      const [patientsResponse, alertsResponse, metricsResponse] = await Promise.all([
-        fetchPatientRiskData(therapistId),
-        fetchAlerts(therapistId),
-        fetchMetrics(therapistId)
-      ])
+      const [patientsResponse, alertsResponse, metricsResponse] =
+        await Promise.all([
+          fetchPatientRiskData(therapistId),
+          fetchAlerts(therapistId),
+          fetchMetrics(therapistId),
+        ])
 
       setPatients(patientsResponse)
       setAlerts(alertsResponse)
@@ -111,7 +114,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
   // Auto-refresh effect
   useEffect(() => {
     fetchDashboardData()
-    
+
     if (autoRefresh) {
       const interval = setInterval(fetchDashboardData, refreshInterval)
       return () => clearInterval(interval)
@@ -125,7 +128,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       low: 'text-blue-600 bg-blue-50',
       moderate: 'text-yellow-600 bg-yellow-50',
       high: 'text-orange-600 bg-orange-50',
-      imminent: 'text-red-600 bg-red-50'
+      imminent: 'text-red-600 bg-red-50',
     }
     return colors[risk as keyof typeof colors] || colors.minimal
   }
@@ -136,7 +139,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       low: 'border-blue-200 bg-blue-50',
       medium: 'border-yellow-200 bg-yellow-50',
       high: 'border-orange-200 bg-orange-50',
-      critical: 'border-red-200 bg-red-50'
+      critical: 'border-red-200 bg-red-50',
     }
     return colors[severity as keyof typeof colors] || colors.low
   }
@@ -145,9 +148,11 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
   const acknowledgeAlert = async (alertId: string) => {
     try {
       await acknowledgeAlertAPI(alertId)
-      setAlerts(prev => prev.map(alert => 
-        alert.id === alertId ? { ...alert, acknowledged: true } : alert
-      ))
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === alertId ? { ...alert, acknowledged: true } : alert,
+        ),
+      )
     } catch (error) {
       console.error('Error acknowledging alert:', error)
     }
@@ -168,26 +173,28 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Crisis Monitoring Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Crisis Monitoring Dashboard
+          </h1>
           <p className="text-gray-600">
             Real-time crisis risk monitoring and escalation management
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <Button
-            variant={autoRefresh ? "default" : "outline"}
+            variant={autoRefresh ? 'default' : 'outline'}
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
             <Activity className="h-4 w-4 mr-2" />
             Auto-refresh {autoRefresh ? 'ON' : 'OFF'}
           </Button>
-          
+
           <Button onClick={fetchDashboardData} disabled={loading}>
             <Clock className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          
+
           <div className="text-sm text-gray-500">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </div>
@@ -198,11 +205,15 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Patients</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Patients
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{metrics.totalPatients}</span>
+              <span className="text-2xl font-bold">
+                {metrics.totalPatients}
+              </span>
               <Users className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
@@ -210,29 +221,36 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">High Risk</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              High Risk
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold text-red-600">{metrics.highRiskPatients}</span>
+              <span className="text-2xl font-bold text-red-600">
+                {metrics.highRiskPatients}
+              </span>
               <AlertTriangle className="h-5 w-5 text-red-400" />
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {metrics.totalPatients > 0 
+              {metrics.totalPatients > 0
                 ? `${Math.round((metrics.highRiskPatients / metrics.totalPatients) * 100)}% of total`
-                : '0% of total'
-              }
+                : '0% of total'}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Active Escalations</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Active Escalations
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold text-orange-600">{metrics.activeEscalations}</span>
+              <span className="text-2xl font-bold text-orange-600">
+                {metrics.activeEscalations}
+              </span>
               <Bell className="h-5 w-5 text-orange-400" />
             </div>
             <div className="text-xs text-gray-500 mt-1">
@@ -243,11 +261,15 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Today's Assessments</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Today's Assessments
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{metrics.todayAssessments}</span>
+              <span className="text-2xl font-bold">
+                {metrics.todayAssessments}
+              </span>
               <BarChart3 className="h-5 w-5 text-gray-400" />
             </div>
             <div className="text-xs text-gray-500 mt-1">
@@ -261,7 +283,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts ({alerts.filter(a => !a.acknowledged).length})</TabsTrigger>
+          <TabsTrigger value="alerts">
+            Alerts ({alerts.filter((a) => !a.acknowledged).length})
+          </TabsTrigger>
           <TabsTrigger value="patients">Patients</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
@@ -269,21 +293,21 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           {/* Critical Alerts Section */}
-          {alerts.filter(a => a.severity === 'critical' && !a.acknowledged).length > 0 && (
+          {alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
+            .length > 0 && (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
                 <div className="mt-2 space-y-1">
                   {alerts
-                    .filter(a => a.severity === 'critical' && !a.acknowledged)
+                    .filter((a) => a.severity === 'critical' && !a.acknowledged)
                     .slice(0, 3)
-                    .map(alert => (
+                    .map((alert) => (
                       <div key={alert.id} className="text-sm">
                         {alert.message}
                       </div>
-                    ))
-                  }
+                    ))}
                 </div>
               </div>
             </Alert>
@@ -300,27 +324,38 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
             <CardContent>
               <div className="space-y-4">
                 {patients
-                  .filter(p => p.currentRisk === 'high' || p.currentRisk === 'imminent')
+                  .filter(
+                    (p) =>
+                      p.currentRisk === 'high' || p.currentRisk === 'imminent',
+                  )
                   .slice(0, 5)
-                  .map(patient => (
-                    <div key={patient.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  .map((patient) => (
+                    <div
+                      key={patient.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          patient.currentRisk === 'imminent' ? 'bg-red-500' : 'bg-orange-500'
-                        }`} />
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            patient.currentRisk === 'imminent'
+                              ? 'bg-red-500'
+                              : 'bg-orange-500'
+                          }`}
+                        />
                         <div>
                           <div className="font-medium">{patient.name}</div>
                           <div className="text-sm text-gray-500">
-                            Last contact: {new Date(patient.lastContact).toLocaleDateString()}
+                            Last contact:{' '}
+                            {new Date(patient.lastContact).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <Badge className={getRiskColor(patient.currentRisk)}>
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
-                        
+
                         {showEmergencyControls && (
                           <Button
                             size="sm"
@@ -334,8 +369,11 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                       </div>
                     </div>
                   ))}
-                
-                {patients.filter(p => p.currentRisk === 'high' || p.currentRisk === 'imminent').length === 0 && (
+
+                {patients.filter(
+                  (p) =>
+                    p.currentRisk === 'high' || p.currentRisk === 'imminent',
+                ).length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
                     No high-risk patients at this time
@@ -370,13 +408,22 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         {/* Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
-          {alerts.map(alert => (
-            <Card key={alert.id} className={`border-l-4 ${getSeverityColor(alert.severity)}`}>
+          {alerts.map((alert) => (
+            <Card
+              key={alert.id}
+              className={`border-l-4 ${getSeverityColor(alert.severity)}`}
+            >
               <CardContent className="pt-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Badge variant={alert.severity === 'critical' ? 'destructive' : 'secondary'}>
+                      <Badge
+                        variant={
+                          alert.severity === 'critical'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
                         {alert.severity.toUpperCase()}
                       </Badge>
                       <span className="text-sm text-gray-500">
@@ -389,9 +436,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                         </Badge>
                       )}
                     </div>
-                    
+
                     <p className="text-gray-900 mb-2">{alert.message}</p>
-                    
+
                     {alert.actions.length > 0 && (
                       <div className="text-sm text-gray-600">
                         <strong>Recommended actions:</strong>
@@ -403,7 +450,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 ml-4">
                     {!alert.acknowledged && (
                       <Button
@@ -414,7 +461,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                         Acknowledge
                       </Button>
                     )}
-                    
+
                     <Button size="sm" variant="outline">
                       <Eye className="h-4 w-4 mr-1" />
                       Details
@@ -424,7 +471,7 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
               </CardContent>
             </Card>
           ))}
-          
+
           {alerts.length === 0 && (
             <div className="text-center py-12 text-gray-500">
               <Bell className="h-12 w-12 mx-auto mb-2" />
@@ -436,62 +483,87 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
         {/* Patients Tab */}
         <TabsContent value="patients" className="space-y-4">
           <div className="grid gap-4">
-            {patients.map(patient => (
+            {patients.map((patient) => (
               <Card key={patient.id}>
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-4 h-4 rounded-full ${
-                        patient.currentRisk === 'imminent' ? 'bg-red-500' :
-                        patient.currentRisk === 'high' ? 'bg-orange-500' :
-                        patient.currentRisk === 'moderate' ? 'bg-yellow-500' :
-                        patient.currentRisk === 'low' ? 'bg-blue-500' : 'bg-green-500'
-                      }`} />
-                      
+                      <div
+                        className={`w-4 h-4 rounded-full ${
+                          patient.currentRisk === 'imminent'
+                            ? 'bg-red-500'
+                            : patient.currentRisk === 'high'
+                              ? 'bg-orange-500'
+                              : patient.currentRisk === 'moderate'
+                                ? 'bg-yellow-500'
+                                : patient.currentRisk === 'low'
+                                  ? 'bg-blue-500'
+                                  : 'bg-green-500'
+                        }`}
+                      />
+
                       <div>
-                        <h3 className="font-medium text-gray-900">{patient.name}</h3>
-                        <p className="text-sm text-gray-500">ID: {patient.id}</p>
+                        <h3 className="font-medium text-gray-900">
+                          {patient.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          ID: {patient.id}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
                         <Badge className={getRiskColor(patient.currentRisk)}>
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
                         <div className="text-sm text-gray-500 mt-1">
-                          Confidence: {Math.round(patient.prediction.confidence * 100)}%
+                          Confidence:{' '}
+                          {Math.round(patient.prediction.confidence * 100)}%
                         </div>
                       </div>
-                      
+
                       <div className="text-right text-sm text-gray-500">
                         <div>Last assessment:</div>
-                        <div>{new Date(patient.lastAssessment).toLocaleDateString()}</div>
+                        <div>
+                          {new Date(
+                            patient.lastAssessment,
+                          ).toLocaleDateString()}
+                        </div>
                       </div>
-                      
+
                       <div className="text-right text-sm text-gray-500">
                         <div>Last contact:</div>
-                        <div>{new Date(patient.lastContact).toLocaleDateString()}</div>
+                        <div>
+                          {new Date(patient.lastContact).toLocaleDateString()}
+                        </div>
                       </div>
-                      
+
                       {patient.escalationStatus && (
-                        <Badge variant={
-                          patient.escalationStatus === 'active' ? 'destructive' :
-                          patient.escalationStatus === 'monitoring' ? 'secondary' : 'outline'
-                        }>
+                        <Badge
+                          variant={
+                            patient.escalationStatus === 'active'
+                              ? 'destructive'
+                              : patient.escalationStatus === 'monitoring'
+                                ? 'secondary'
+                                : 'outline'
+                          }
+                        >
                           {patient.escalationStatus}
                         </Badge>
                       )}
                     </div>
                   </div>
-                  
+
                   {patient.prediction.primaryRiskFactors.length > 0 && (
                     <div className="mt-3 pt-3 border-t">
                       <div className="text-sm text-gray-600">
-                        <strong>Primary risk factors:</strong> {patient.prediction.primaryRiskFactors.join(', ')}
+                        <strong>Primary risk factors:</strong>{' '}
+                        {patient.prediction.primaryRiskFactors.join(', ')}
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
-                        <strong>Intervention window:</strong> {patient.prediction.interventionWindow.optimal}
+                        <strong>Intervention window:</strong>{' '}
+                        {patient.prediction.interventionWindow.optimal}
                       </div>
                     </div>
                   )}
@@ -517,15 +589,18 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                     </div>
                     <Progress value={87} className="mt-1" />
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between text-sm">
                       <span>False Positive Rate</span>
                       <span>{metrics.falsePositiveRate.toFixed(1)}%</span>
                     </div>
-                    <Progress value={metrics.falsePositiveRate} className="mt-1" />
+                    <Progress
+                      value={metrics.falsePositiveRate}
+                      className="mt-1"
+                    />
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between text-sm">
                       <span>Average Response Time</span>
@@ -542,22 +617,36 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {['imminent', 'high', 'moderate', 'low', 'minimal'].map(risk => {
-                    const count = patients.filter(p => p.currentRisk === risk).length
-                    const percentage = patients.length > 0 ? (count / patients.length) * 100 : 0
-                    
-                    return (
-                      <div key={risk} className="flex items-center justify-between">
-                        <span className="text-sm capitalize">{risk} Risk</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 text-right text-sm">{count} patients</div>
-                          <div className="w-12 text-right text-sm text-gray-500">
-                            {percentage.toFixed(0)}%
+                  {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
+                    (risk) => {
+                      const count = patients.filter(
+                        (p) => p.currentRisk === risk,
+                      ).length
+                      const percentage =
+                        patients.length > 0
+                          ? (count / patients.length) * 100
+                          : 0
+
+                      return (
+                        <div
+                          key={risk}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-sm capitalize">
+                            {risk} Risk
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-20 text-right text-sm">
+                              {count} patients
+                            </div>
+                            <div className="w-12 text-right text-sm text-gray-500">
+                              {percentage.toFixed(0)}%
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    },
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -569,7 +658,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 }
 
 // Simulated API functions - replace with actual implementations
-async function fetchPatientRiskData(therapistId: string): Promise<PatientRiskData[]> {
+async function fetchPatientRiskData(
+  therapistId: string,
+): Promise<PatientRiskData[]> {
   // Simulated data
   return [
     {
@@ -582,15 +673,18 @@ async function fetchPatientRiskData(therapistId: string): Promise<PatientRiskDat
         confidence: 0.89,
         primaryRiskFactors: ['Social isolation', 'Recent trauma disclosure'],
         protectiveFactors: ['Strong therapeutic alliance'],
-        interventionWindow: { optimal: 'Within 24 hours', critical: 'Within 72 hours' },
-        escalationTriggers: ['Immediate clinical review required']
+        interventionWindow: {
+          optimal: 'Within 24 hours',
+          critical: 'Within 72 hours',
+        },
+        escalationTriggers: ['Immediate clinical review required'],
       },
       lastAssessment: '2025-10-29T10:30:00Z',
       lastContact: '2025-10-28T14:20:00Z',
       escalationStatus: 'monitoring',
       therapistId,
-      alerts: []
-    }
+      alerts: [],
+    },
   ]
 }
 
@@ -603,8 +697,11 @@ async function fetchAlerts(therapistId: string): Promise<AlertItem[]> {
       message: 'Patient Jane Doe showing elevated crisis risk indicators',
       timestamp: '2025-10-29T11:15:00Z',
       acknowledged: false,
-      actions: ['Schedule urgent session', 'Contact emergency contact if no response']
-    }
+      actions: [
+        'Schedule urgent session',
+        'Contact emergency contact if no response',
+      ],
+    },
   ]
 }
 
@@ -616,7 +713,7 @@ async function fetchMetrics(therapistId: string): Promise<DashboardMetrics> {
     todayAssessments: 12,
     averageResponseTime: '2.3m',
     escalationRate: 8.5,
-    falsePositiveRate: 4.2
+    falsePositiveRate: 4.2,
   }
 }
 
@@ -625,7 +722,10 @@ async function acknowledgeAlertAPI(alertId: string): Promise<void> {
   console.log('Acknowledging alert:', alertId)
 }
 
-async function triggerEscalationAPI(patientId: string, type: string): Promise<void> {
+async function triggerEscalationAPI(
+  patientId: string,
+  type: string,
+): Promise<void> {
   // API call to trigger escalation
   console.log('Triggering escalation for patient:', patientId, 'type:', type)
 }

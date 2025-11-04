@@ -22,9 +22,7 @@ const SemanticEvidenceResponseSchema = z.object({
  * Parse LLM response for semantic evidence with robust schema validation
  * This function is extracted from EvidenceExtractor to enable independent testing
  */
-export function parseSemanticEvidenceResponse(
-  response: string,
-): Array<
+export function parseSemanticEvidenceResponse(response: string): Array<
   EvidenceItem & {
     // Friendly aliases expected by some tests
     text: string
@@ -158,7 +156,12 @@ export function parseSemanticEvidenceResponse(
         confidence,
         source: category,
         extractedAt: new Date(),
-        severity: relevance === 'high' ? 'high' : relevance === 'medium' ? 'moderate' : 'low',
+        severity:
+          relevance === 'high'
+            ? 'high'
+            : relevance === 'medium'
+              ? 'moderate'
+              : 'low',
         clinicalRelevance,
         context: {
           semanticRationale: rationale,
@@ -288,7 +291,8 @@ export function validateEvidenceItem(item: unknown): {
     source: category,
     extractedAt: new Date(),
     // Cast to satisfy EvidenceItem typing while allowing tests to assert string default
-    clinicalRelevance: clinicalRelevance as unknown as EvidenceItem['clinicalRelevance'],
+    clinicalRelevance:
+      clinicalRelevance as unknown as EvidenceItem['clinicalRelevance'],
     context: {
       semanticRationale: rationale,
     },

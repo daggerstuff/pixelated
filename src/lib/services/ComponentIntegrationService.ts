@@ -29,17 +29,23 @@ export class ComponentIntegrationService {
   }) {
     try {
       const queryParams = new URLSearchParams(params as Record<string, string>)
-      const response = await fetch(`${this.baseUrl}/api/components/analytics/charts?${queryParams}`, {
-        method: 'GET',
-        headers: this.authHeaders,
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/analytics/charts?${queryParams}`,
+        {
+          method: 'GET',
+          headers: this.authHeaders,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Analytics API error: ${response.status}`)
       }
 
       const data = await response.json()
-      logger.info('Retrieved chart data', { type: params.type, category: params.category })
+      logger.info('Retrieved chart data', {
+        type: params.type,
+        category: params.category,
+      })
       return data
     } catch (error) {
       logger.error('Error fetching chart data', { error, params })
@@ -63,19 +69,22 @@ export class ComponentIntegrationService {
         }
       })
 
-      const response = await fetch(`${this.baseUrl}/api/components/emotions/3d-visualization?${queryParams}`, {
-        method: 'GET',
-        headers: this.authHeaders,
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/emotions/3d-visualization?${queryParams}`,
+        {
+          method: 'GET',
+          headers: this.authHeaders,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`3D Emotion API error: ${response.status}`)
       }
 
       const data = await response.json()
-      logger.info('Retrieved 3D emotion data', { 
+      logger.info('Retrieved 3D emotion data', {
         pointCount: data.emotionPoints?.length,
-        sessionId: params.sessionId 
+        sessionId: params.sessionId,
       })
       return data
     } catch (error) {
@@ -93,11 +102,14 @@ export class ComponentIntegrationService {
     sessionId?: string
   }) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/components/emotions/3d-visualization`, {
-        method: 'POST',
-        headers: this.authHeaders,
-        body: JSON.stringify(emotionData),
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/emotions/3d-visualization`,
+        {
+          method: 'POST',
+          headers: this.authHeaders,
+          body: JSON.stringify(emotionData),
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Add emotion point API error: ${response.status}`)
@@ -113,12 +125,14 @@ export class ComponentIntegrationService {
   }
 
   // Treatment Plan Management Integration
-  async getTreatmentPlans(params: {
-    clientId?: string
-    planId?: string
-    status?: string
-    includeMetrics?: boolean
-  } = {}) {
+  async getTreatmentPlans(
+    params: {
+      clientId?: string
+      planId?: string
+      status?: string
+      includeMetrics?: boolean
+    } = {},
+  ) {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -127,19 +141,22 @@ export class ComponentIntegrationService {
         }
       })
 
-      const response = await fetch(`${this.baseUrl}/api/components/treatment-plans/enhanced?${queryParams}`, {
-        method: 'GET',
-        headers: this.authHeaders,
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/treatment-plans/enhanced?${queryParams}`,
+        {
+          method: 'GET',
+          headers: this.authHeaders,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Treatment plans API error: ${response.status}`)
       }
 
       const plans = await response.json()
-      logger.info('Retrieved treatment plans', { 
+      logger.info('Retrieved treatment plans', {
         planCount: plans.length,
-        clientId: params.clientId 
+        clientId: params.clientId,
       })
       return plans
     } catch (error) {
@@ -150,11 +167,14 @@ export class ComponentIntegrationService {
 
   async saveTreatmentPlan(planData: any) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/components/treatment-plans/enhanced`, {
-        method: 'POST',
-        headers: this.authHeaders,
-        body: JSON.stringify(planData),
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/treatment-plans/enhanced`,
+        {
+          method: 'POST',
+          headers: this.authHeaders,
+          body: JSON.stringify(planData),
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Save treatment plan API error: ${response.status}`)
@@ -176,11 +196,14 @@ export class ComponentIntegrationService {
     updates: Record<string, any>
   }) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/components/treatment-plans/enhanced`, {
-        method: 'PATCH',
-        headers: this.authHeaders,
-        body: JSON.stringify(updates),
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/treatment-plans/enhanced`,
+        {
+          method: 'PATCH',
+          headers: this.authHeaders,
+          body: JSON.stringify(updates),
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Update treatment plan API error: ${response.status}`)
@@ -196,14 +219,16 @@ export class ComponentIntegrationService {
   }
 
   // Particle System Integration
-  async getParticleSystem(params: {
-    emotion?: string
-    particleCount?: number
-    intensity?: number
-    sessionId?: string
-    useSessionData?: boolean
-    complexity?: 'low' | 'medium' | 'high'
-  } = {}) {
+  async getParticleSystem(
+    params: {
+      emotion?: string
+      particleCount?: number
+      intensity?: number
+      sessionId?: string
+      useSessionData?: boolean
+      complexity?: 'low' | 'medium' | 'high'
+    } = {},
+  ) {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -212,19 +237,22 @@ export class ComponentIntegrationService {
         }
       })
 
-      const response = await fetch(`${this.baseUrl}/api/components/particles/emotion-system?${queryParams}`, {
-        method: 'GET',
-        headers: this.authHeaders,
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/particles/emotion-system?${queryParams}`,
+        {
+          method: 'GET',
+          headers: this.authHeaders,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Particle system API error: ${response.status}`)
       }
 
       const data = await response.json()
-      logger.info('Retrieved particle system', { 
+      logger.info('Retrieved particle system', {
         particleCount: data.particles?.length,
-        emotion: params.emotion 
+        emotion: params.emotion,
       })
       return data
     } catch (error) {
@@ -240,11 +268,14 @@ export class ComponentIntegrationService {
     particleUpdates?: any[]
   }) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/components/particles/emotion-system`, {
-        method: 'POST',
-        headers: this.authHeaders,
-        body: JSON.stringify(updates),
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/particles/emotion-system`,
+        {
+          method: 'POST',
+          headers: this.authHeaders,
+          body: JSON.stringify(updates),
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Update particle system API error: ${response.status}`)
@@ -260,12 +291,14 @@ export class ComponentIntegrationService {
   }
 
   // UI Carousel Content Integration
-  async getCarouselContent(params: {
-    configId?: string
-    category?: string
-    audience?: string
-    includeExpired?: boolean
-  } = {}) {
+  async getCarouselContent(
+    params: {
+      configId?: string
+      category?: string
+      audience?: string
+      includeExpired?: boolean
+    } = {},
+  ) {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -274,19 +307,22 @@ export class ComponentIntegrationService {
         }
       })
 
-      const response = await fetch(`${this.baseUrl}/api/components/ui/carousel-content?${queryParams}`, {
-        method: 'GET',
-        headers: this.authHeaders,
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/ui/carousel-content?${queryParams}`,
+        {
+          method: 'GET',
+          headers: this.authHeaders,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Carousel content API error: ${response.status}`)
       }
 
       const data = await response.json()
-      logger.info('Retrieved carousel content', { 
+      logger.info('Retrieved carousel content', {
         configCount: data.configurations?.length,
-        audience: params.audience 
+        audience: params.audience,
       })
       return data
     } catch (error) {
@@ -295,20 +331,28 @@ export class ComponentIntegrationService {
     }
   }
 
-  async saveCarouselConfiguration(configData: any, action: 'create' | 'update' = 'create') {
+  async saveCarouselConfiguration(
+    configData: any,
+    action: 'create' | 'update' = 'create',
+  ) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/components/ui/carousel-content`, {
-        method: 'POST',
-        headers: this.authHeaders,
-        body: JSON.stringify({ configuration: configData, action }),
-      })
+      const response = await fetch(
+        `${this.baseUrl}/api/components/ui/carousel-content`,
+        {
+          method: 'POST',
+          headers: this.authHeaders,
+          body: JSON.stringify({ configuration: configData, action }),
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Save carousel config API error: ${response.status}`)
       }
 
       const result = await response.json()
-      logger.info('Saved carousel configuration', { configId: result.configuration?.id })
+      logger.info('Saved carousel configuration', {
+        configId: result.configuration?.id,
+      })
       return result
     } catch (error) {
       logger.error('Error saving carousel configuration', { error, configData })
@@ -317,51 +361,64 @@ export class ComponentIntegrationService {
   }
 
   // Cross-Component Integration Methods
-  async getIntegratedDashboardData(params: {
-    clientId?: string
-    sessionId?: string
-    timeRange?: number
-    includeMetrics?: boolean
-  } = {}) {
+  async getIntegratedDashboardData(
+    params: {
+      clientId?: string
+      sessionId?: string
+      timeRange?: number
+      includeMetrics?: boolean
+    } = {},
+  ) {
     try {
       // Fetch data from multiple endpoints simultaneously
-      const [chartData, emotionData, treatmentPlans, particleSystem] = await Promise.allSettled([
-        this.getChartData({ 
-          type: 'line', 
-          category: 'progress',
-          clientId: params.clientId,
-          sessionId: params.sessionId,
-          timeRange: params.timeRange,
-        }),
-        this.get3DEmotionData({
-          clientId: params.clientId,
-          sessionId: params.sessionId,
-          timeRange: params.timeRange,
-          includeTrajectory: true,
-        }),
-        this.getTreatmentPlans({
-          clientId: params.clientId,
-          includeMetrics: params.includeMetrics,
-        }),
-        this.getParticleSystem({
-          emotion: 'neutral',
-          sessionId: params.sessionId,
-          useSessionData: true,
-        }),
-      ])
+      const [chartData, emotionData, treatmentPlans, particleSystem] =
+        await Promise.allSettled([
+          this.getChartData({
+            type: 'line',
+            category: 'progress',
+            clientId: params.clientId,
+            sessionId: params.sessionId,
+            timeRange: params.timeRange,
+          }),
+          this.get3DEmotionData({
+            clientId: params.clientId,
+            sessionId: params.sessionId,
+            timeRange: params.timeRange,
+            includeTrajectory: true,
+          }),
+          this.getTreatmentPlans({
+            clientId: params.clientId,
+            includeMetrics: params.includeMetrics,
+          }),
+          this.getParticleSystem({
+            emotion: 'neutral',
+            sessionId: params.sessionId,
+            useSessionData: true,
+          }),
+        ])
 
       const dashboardData = {
         charts: chartData.status === 'fulfilled' ? chartData.value : null,
         emotions: emotionData.status === 'fulfilled' ? emotionData.value : null,
-        treatmentPlans: treatmentPlans.status === 'fulfilled' ? treatmentPlans.value : null,
-        particles: particleSystem.status === 'fulfilled' ? particleSystem.value : null,
+        treatmentPlans:
+          treatmentPlans.status === 'fulfilled' ? treatmentPlans.value : null,
+        particles:
+          particleSystem.status === 'fulfilled' ? particleSystem.value : null,
         metadata: {
           timestamp: new Date().toISOString(),
           errors: [
-            ...(chartData.status === 'rejected' ? [{ component: 'charts', error: chartData.reason }] : []),
-            ...(emotionData.status === 'rejected' ? [{ component: 'emotions', error: emotionData.reason }] : []),
-            ...(treatmentPlans.status === 'rejected' ? [{ component: 'treatmentPlans', error: treatmentPlans.reason }] : []),
-            ...(particleSystem.status === 'rejected' ? [{ component: 'particles', error: particleSystem.reason }] : []),
+            ...(chartData.status === 'rejected'
+              ? [{ component: 'charts', error: chartData.reason }]
+              : []),
+            ...(emotionData.status === 'rejected'
+              ? [{ component: 'emotions', error: emotionData.reason }]
+              : []),
+            ...(treatmentPlans.status === 'rejected'
+              ? [{ component: 'treatmentPlans', error: treatmentPlans.reason }]
+              : []),
+            ...(particleSystem.status === 'rejected'
+              ? [{ component: 'particles', error: particleSystem.reason }]
+              : []),
           ],
         },
       }
@@ -377,7 +434,10 @@ export class ComponentIntegrationService {
 
       return dashboardData
     } catch (error) {
-      logger.error('Error fetching integrated dashboard data', { error, params })
+      logger.error('Error fetching integrated dashboard data', {
+        error,
+        params,
+      })
       throw error
     }
   }
@@ -391,9 +451,9 @@ export class ComponentIntegrationService {
   }) {
     try {
       // TODO: Implement WebSocket connection for real-time updates
-      logger.info('Subscribing to real-time updates', { 
+      logger.info('Subscribing to real-time updates', {
         sessionId: params.sessionId,
-        components: params.components 
+        components: params.components,
       })
 
       // Mock implementation - replace with actual WebSocket
@@ -431,27 +491,41 @@ export class ComponentIntegrationService {
 
       const healthChecks = await Promise.allSettled(
         endpoints.map(async (endpoint) => {
-          const response = await fetch(`${this.baseUrl}${endpoint}?healthCheck=true`, {
-            method: 'HEAD',
-            headers: this.authHeaders,
-          })
+          const response = await fetch(
+            `${this.baseUrl}${endpoint}?healthCheck=true`,
+            {
+              method: 'HEAD',
+              headers: this.authHeaders,
+            },
+          )
           return { endpoint, status: response.status, ok: response.ok }
-        })
+        }),
       )
 
       const health = {
-        overall: healthChecks.every(check => check.status === 'fulfilled' && check.value.ok) ? 'healthy' : 'degraded',
-        services: healthChecks.map(check => ({
-          endpoint: check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
-          status: check.status === 'fulfilled' ? (check.value.ok ? 'healthy' : 'unhealthy') : 'error',
+        overall: healthChecks.every(
+          (check) => check.status === 'fulfilled' && check.value.ok,
+        )
+          ? 'healthy'
+          : 'degraded',
+        services: healthChecks.map((check) => ({
+          endpoint:
+            check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
+          status:
+            check.status === 'fulfilled'
+              ? check.value.ok
+                ? 'healthy'
+                : 'unhealthy'
+              : 'error',
           error: check.status === 'rejected' ? check.reason : null,
         })),
         timestamp: new Date().toISOString(),
       }
 
-      logger.info('Component integration health check', { 
+      logger.info('Component integration health check', {
         overall: health.overall,
-        healthyServices: health.services.filter(s => s.status === 'healthy').length,
+        healthyServices: health.services.filter((s) => s.status === 'healthy')
+          .length,
         totalServices: health.services.length,
       })
 
@@ -464,7 +538,9 @@ export class ComponentIntegrationService {
 }
 
 // Factory function for creating service instances
-export function createComponentIntegrationService(authToken?: string): ComponentIntegrationService {
+export function createComponentIntegrationService(
+  authToken?: string,
+): ComponentIntegrationService {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
   return new ComponentIntegrationService(baseUrl, authToken)
 }

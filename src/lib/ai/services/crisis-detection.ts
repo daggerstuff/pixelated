@@ -43,8 +43,8 @@ export class CrisisDetectionService {
       'suicide plan',
       'take my own life',
       'ending it all',
-      'can\'t take it anymore',
-      'can\'t take it',
+      "can't take it anymore",
+      "can't take it",
       'ending it',
       'end it all',
     ],
@@ -109,7 +109,9 @@ export class CrisisDetectionService {
           aiAnalysis = await this.performAIAnalysis(text)
         } catch (error: unknown) {
           // Log AI analysis failure but continue with keyword analysis
-          appLogger.warn('AI analysis failed, using keyword analysis only', { error })
+          appLogger.warn('AI analysis failed, using keyword analysis only', {
+            error,
+          })
         }
       }
 
@@ -140,7 +142,7 @@ export class CrisisDetectionService {
         stack: error instanceof Error ? (error as Error)?.stack : '',
         error,
       })
-      
+
       // Return a safe fallback result instead of throwing
       return {
         isCrisis: false,
@@ -194,16 +196,19 @@ export class CrisisDetectionService {
         // Handle phrases with spaces differently than single words
         const keywordLower = keyword.toLowerCase()
         let matches = false
-        
+
         if (keywordLower.includes(' ')) {
           // For phrases, use simple includes check
           matches = lowerText.includes(keywordLower)
         } else {
           // For single words, use word boundaries
-          const regex = new RegExp(`\\b${keywordLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+          const regex = new RegExp(
+            `\\b${keywordLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`,
+            'i',
+          )
           matches = regex.test(lowerText)
         }
-        
+
         if (matches) {
           indicators.push(keyword)
           categoryMatches++
@@ -212,7 +217,10 @@ export class CrisisDetectionService {
 
       if (categoryMatches > 0) {
         // Calculate category score based on matches and weight
-        const categoryScore = Math.min(categoryMatches * categoryWeight * 0.8, categoryWeight)
+        const categoryScore = Math.min(
+          categoryMatches * categoryWeight * 0.8,
+          categoryWeight,
+        )
         _score += categoryScore
         maxCategoryScore = Math.max(maxCategoryScore, categoryScore)
       }
@@ -255,8 +263,13 @@ export class CrisisDetectionService {
 
     try {
       // Check if aiService exists and has the required method
-      if (!this.aiService || typeof this.aiService.createChatCompletion !== 'function') {
-        appLogger.warn('AI service not available, falling back to keyword analysis only')
+      if (
+        !this.aiService ||
+        typeof this.aiService.createChatCompletion !== 'function'
+      ) {
+        appLogger.warn(
+          'AI service not available, falling back to keyword analysis only',
+        )
         return null
       }
 
@@ -277,7 +290,9 @@ export class CrisisDetectionService {
 
       // Validate response structure
       if (!response || !response.content) {
-        appLogger.warn('Invalid AI response structure, falling back to keyword analysis')
+        appLogger.warn(
+          'Invalid AI response structure, falling back to keyword analysis',
+        )
         return null
       }
 

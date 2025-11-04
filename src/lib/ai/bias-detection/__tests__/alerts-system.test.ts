@@ -110,20 +110,40 @@ describe('BiasAlertSystem', () => {
           problematicScenarios: [
             {
               scenarioId: 'scenario1',
-              originalDemographics: { age: '25', gender: 'male', ethnicity: 'hispanic', primaryLanguage: 'spanish' },
-              alteredDemographics: { age: '80', gender: 'female', ethnicity: 'white', primaryLanguage: 'english' },
+              originalDemographics: {
+                age: '25',
+                gender: 'male',
+                ethnicity: 'hispanic',
+                primaryLanguage: 'spanish',
+              },
+              alteredDemographics: {
+                age: '80',
+                gender: 'female',
+                ethnicity: 'white',
+                primaryLanguage: 'english',
+              },
               outcomeChange: 'decreased_score',
               biasType: 'gender',
-              severity: 'high'
+              severity: 'high',
             },
             {
               scenarioId: 'scenario2',
-              originalDemographics: { age: '45', gender: 'female', ethnicity: 'asian', primaryLanguage: 'chinese' },
-              alteredDemographics: { age: '45', gender: 'male', ethnicity: 'asian', primaryLanguage: 'chinese' },
+              originalDemographics: {
+                age: '45',
+                gender: 'female',
+                ethnicity: 'asian',
+                primaryLanguage: 'chinese',
+              },
+              alteredDemographics: {
+                age: '45',
+                gender: 'male',
+                ethnicity: 'asian',
+                primaryLanguage: 'chinese',
+              },
               outcomeChange: 'increased_score',
               biasType: 'age',
-              severity: 'medium'
-            }
+              severity: 'medium',
+            },
           ],
         },
         featureImportance: [],
@@ -186,11 +206,13 @@ describe('BiasAlertSystem', () => {
     // Create mock Python bridge
     mockPythonBridge = new PythonBiasDetectionBridge(
       mockConfig.pythonServiceUrl!,
-      mockConfig.timeout!
+      mockConfig.timeout!,
     )
-    
+
     // Mock the acknowledgeAlert method
-    mockPythonBridge.acknowledgeAlert = vi.fn().mockResolvedValue({ success: true })
+    mockPythonBridge.acknowledgeAlert = vi
+      .fn()
+      .mockResolvedValue({ success: true })
 
     // Create alert system
     alertSystem = new BiasAlertSystem(mockConfig, mockPythonBridge)
@@ -224,24 +246,40 @@ describe('BiasAlertSystem', () => {
         sessionId: mockAnalysisResult.sessionId,
         level: 'low' as AlertLevel,
         biasScore: 0.1,
-        analysisResult: { ...mockAnalysisResult, alertLevel: 'low' as const, overallBiasScore: 0.1 }
+        analysisResult: {
+          ...mockAnalysisResult,
+          alertLevel: 'low' as const,
+          overallBiasScore: 0.1,
+        },
       }
       const mediumResult = {
         sessionId: mockAnalysisResult.sessionId,
         level: 'medium' as AlertLevel,
         biasScore: 0.4,
-        analysisResult: { ...mockAnalysisResult, alertLevel: 'medium' as const, overallBiasScore: 0.4 }
+        analysisResult: {
+          ...mockAnalysisResult,
+          alertLevel: 'medium' as const,
+          overallBiasScore: 0.4,
+        },
       }
       const highResult = {
         sessionId: mockAnalysisResult.sessionId,
         level: 'high' as AlertLevel,
         biasScore: 0.7,
-        analysisResult: { ...mockAnalysisResult, alertLevel: 'high' as const, overallBiasScore: 0.7 }
+        analysisResult: {
+          ...mockAnalysisResult,
+          alertLevel: 'high' as const,
+          overallBiasScore: 0.7,
+        },
       }
 
       await expect(alertSystem.processAlert?.(lowResult)).resolves.not.toThrow()
-      await expect(alertSystem.processAlert?.(mediumResult)).resolves.not.toThrow()
-      await expect(alertSystem.processAlert?.(highResult)).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.(mediumResult),
+      ).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.(highResult),
+      ).resolves.not.toThrow()
     })
 
     it('should escalate critical alerts', async () => {
@@ -249,10 +287,15 @@ describe('BiasAlertSystem', () => {
         sessionId: mockAnalysisResult.sessionId,
         level: 'critical' as AlertLevel,
         biasScore: mockAnalysisResult.overallBiasScore,
-        analysisResult: { ...mockAnalysisResult, alertLevel: 'critical' as const }
+        analysisResult: {
+          ...mockAnalysisResult,
+          alertLevel: 'critical' as const,
+        },
       }
 
-      await expect(alertSystem.processAlert?.(criticalResult)).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.(criticalResult),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -270,12 +313,14 @@ describe('BiasAlertSystem', () => {
         alertLevel: 'critical',
       }
 
-      await expect(alertSystem.processAlert?.({
-        sessionId: customResult.sessionId,
-        level: customResult.alertLevel,
-        biasScore: customResult.overallBiasScore,
-        analysisResult: customResult,
-      })).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.({
+          sessionId: customResult.sessionId,
+          level: customResult.alertLevel,
+          biasScore: customResult.overallBiasScore,
+          analysisResult: customResult,
+        }),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -290,19 +335,24 @@ describe('BiasAlertSystem', () => {
         },
       }
 
-      const emailAlertSystem = new BiasAlertSystem(emailConfig, mockPythonBridge)
+      const emailAlertSystem = new BiasAlertSystem(
+        emailConfig,
+        mockPythonBridge,
+      )
 
       const result: BiasAnalysisResult = {
         ...mockAnalysisResult,
         alertLevel: 'high' as const,
       }
 
-      await expect(emailAlertSystem.processAlert?.({
-        sessionId: result.sessionId,
-        level: result.alertLevel,
-        biasScore: result.overallBiasScore,
-        analysisResult: result,
-      })).resolves.not.toThrow()
+      await expect(
+        emailAlertSystem.processAlert?.({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
     })
 
     it('should handle Slack notifications when enabled', async () => {
@@ -315,19 +365,24 @@ describe('BiasAlertSystem', () => {
         },
       }
 
-      const slackAlertSystem = new BiasAlertSystem(slackConfig, mockPythonBridge)
+      const slackAlertSystem = new BiasAlertSystem(
+        slackConfig,
+        mockPythonBridge,
+      )
 
       const result: BiasAnalysisResult = {
         ...mockAnalysisResult,
         alertLevel: 'high' as const,
       }
 
-      await expect(slackAlertSystem.processAlert?.({
-        sessionId: result.sessionId,
-        level: result.alertLevel,
-        biasScore: result.overallBiasScore,
-        analysisResult: result,
-      })).resolves.not.toThrow()
+      await expect(
+        slackAlertSystem.processAlert?.({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
     })
 
     it('should handle webhook notifications when enabled', async () => {
@@ -340,19 +395,24 @@ describe('BiasAlertSystem', () => {
         },
       }
 
-      const webhookAlertSystem = new BiasAlertSystem(webhookConfig, mockPythonBridge)
+      const webhookAlertSystem = new BiasAlertSystem(
+        webhookConfig,
+        mockPythonBridge,
+      )
 
       const result: BiasAnalysisResult = {
         ...mockAnalysisResult,
         alertLevel: 'high' as const,
       }
 
-      await expect(webhookAlertSystem.processAlert?.({
-        sessionId: result.sessionId,
-        level: result.alertLevel,
-        biasScore: result.overallBiasScore,
-        analysisResult: result,
-      })).resolves.not.toThrow()
+      await expect(
+        webhookAlertSystem.processAlert?.({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -384,7 +444,10 @@ describe('BiasAlertSystem', () => {
         sessionId: mockAnalysisResult.sessionId,
         level: 'critical' as const,
         biasScore: mockAnalysisResult.overallBiasScore,
-        analysisResult: { ...mockAnalysisResult, alertLevel: 'critical' as const }
+        analysisResult: {
+          ...mockAnalysisResult,
+          alertLevel: 'critical' as const,
+        },
       }
 
       await alertSystem.processAlert?.(criticalResult)
@@ -420,14 +483,18 @@ describe('BiasAlertSystem', () => {
 
       // Mock a notification failure
       const originalProcess = alertSystem.processAlert
-      alertSystem.processAlert = vi.fn().mockRejectedValue(new Error('Notification failed'))
+      alertSystem.processAlert = vi
+        .fn()
+        .mockRejectedValue(new Error('Notification failed'))
 
-      await expect(alertSystem.processAlert({
-        sessionId: result.sessionId,
-        level: result.alertLevel,
-        biasScore: result.overallBiasScore,
-        analysisResult: result,
-      })).rejects.toThrow()
+      await expect(
+        alertSystem.processAlert({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).rejects.toThrow()
 
       // Restore original method
       alertSystem.processAlert = originalProcess
@@ -452,12 +519,14 @@ describe('BiasAlertSystem', () => {
         overallBiasScore: 0.9,
       }
 
-      await expect(alertSystem.processAlert?.({
-        sessionId: criticalResult.sessionId,
-        level: criticalResult.alertLevel,
-        biasScore: criticalResult.overallBiasScore,
-        analysisResult: criticalResult,
-      })).resolves.not.toThrow()
+      await expect(
+        alertSystem.processAlert?.({
+          sessionId: criticalResult.sessionId,
+          level: criticalResult.alertLevel,
+          biasScore: criticalResult.overallBiasScore,
+          analysisResult: criticalResult,
+        }),
+      ).resolves.not.toThrow()
     })
 
     it('should handle alert acknowledgment', async () => {

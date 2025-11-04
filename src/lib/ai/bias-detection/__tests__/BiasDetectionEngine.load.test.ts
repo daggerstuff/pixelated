@@ -10,7 +10,7 @@ vi.mock('../python-bridge', () => ({
     analyzeSession: vi.fn().mockImplementation(async () => {
       // Simulate realistic API response time (50-150ms)
       const delay = 50 + Math.random() * 100
-      await new Promise(resolve => setTimeout(resolve, delay))
+      await new Promise((resolve) => setTimeout(resolve, delay))
       return {
         sessionId: 'test-session',
         overallBiasScore: 0.3 + Math.random() * 0.4,
@@ -33,8 +33,8 @@ vi.mock('../metrics-collector', () => ({
   BiasMetricsCollector: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     getMetrics: vi.fn().mockResolvedValue({
-      overall_stats: { 
-        total_sessions: 100, 
+      overall_stats: {
+        total_sessions: 100,
         average_bias_score: 0.3,
         alert_distribution: {
           low: 50,

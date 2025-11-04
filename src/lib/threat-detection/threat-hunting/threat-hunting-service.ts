@@ -382,9 +382,9 @@ export class ThreatHuntingService extends EventEmitter {
   ): Promise<
     | HuntFinding[]
     | {
-      errors: string[]
-      data: unknown[]
-    }
+        errors: string[]
+        data: unknown[]
+      }
   > {
     const findings: HuntFinding[] = []
 
@@ -1571,7 +1571,9 @@ export class ThreatHuntingService extends EventEmitter {
       .filter((inv: Record<string, unknown>) => inv && inv.status === 'active')
   }
 
-  public async getInvestigationsByPriority(priority: string): Promise<Record<string, unknown>[]> {
+  public async getInvestigationsByPriority(
+    priority: string,
+  ): Promise<Record<string, unknown>[]> {
     // Tests expect per-priority lists, e.g., investigations:high
     const listKey = `investigations:${priority}`
     const items = await this.redis.lrange(listKey, 0, -1)
@@ -1583,10 +1585,14 @@ export class ThreatHuntingService extends EventEmitter {
           return undefined
         }
       })
-      .filter((inv: Record<string, unknown>) => inv && inv.priority === priority)
+      .filter(
+        (inv: Record<string, unknown>) => inv && inv.priority === priority,
+      )
   }
 
-  public async createHuntQuery(queryData: Record<string, unknown>): Promise<Record<string, unknown>> {
+  public async createHuntQuery(
+    queryData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const huntId = `hunt_${await this.redis.incr('hunt:id')}`
     const huntQuery = {
       id: huntId,
@@ -1597,13 +1603,18 @@ export class ThreatHuntingService extends EventEmitter {
     return huntQuery
   }
 
-  public async saveHuntTemplate(templateData: Record<string, unknown>): Promise<Record<string, unknown>> {
+  public async saveHuntTemplate(
+    templateData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const templateId = `template_${await this.redis.incr('template:id')}`
     const template = {
       id: templateId,
       ...templateData,
     }
-    await this.redis.set(`hunt:template:${templateId}`, JSON.stringify(template))
+    await this.redis.set(
+      `hunt:template:${templateId}`,
+      JSON.stringify(template),
+    )
     return template
   }
 
@@ -1619,7 +1630,10 @@ export class ThreatHuntingService extends EventEmitter {
     })
   }
 
-  public async scheduleHunt(queryId: string, scheduleData: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+  public async scheduleHunt(
+    queryId: string,
+    scheduleData: Record<string, unknown>,
+  ): Promise<Record<string, unknown> | null> {
     const huntQuery = await this.redis.get(`hunt:${queryId}`)
     if (!huntQuery) {
       return null
@@ -1647,7 +1661,10 @@ export class ThreatHuntingService extends EventEmitter {
     return timeline
   }
 
-  public async addTimelineEvent(timelineId: string, eventData: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+  public async addTimelineEvent(
+    timelineId: string,
+    eventData: Record<string, unknown>,
+  ): Promise<Record<string, unknown> | null> {
     const timelineRaw = await this.redis.get(`timeline:${timelineId}`)
     const timeline = timelineRaw ? JSON.parse(timelineRaw) : null
     if (!timeline) {
@@ -1663,7 +1680,9 @@ export class ThreatHuntingService extends EventEmitter {
     return timeline
   }
 
-  public async analyzeTimeline(timelineId: string): Promise<Record<string, unknown> | null> {
+  public async analyzeTimeline(
+    timelineId: string,
+  ): Promise<Record<string, unknown> | null> {
     try {
       const raw = await this.redis.get(`timeline:${timelineId}`)
       const timeline = raw ? JSON.parse(raw) : null
@@ -1679,7 +1698,10 @@ export class ThreatHuntingService extends EventEmitter {
     }
   }
 
-  public async exportTimeline(timelineId: string, format: string): Promise<Record<string, unknown> | null> {
+  public async exportTimeline(
+    timelineId: string,
+    format: string,
+  ): Promise<Record<string, unknown> | null> {
     const timeline = JSON.parse(await this.redis.get(`timeline:${timelineId}`))
     if (!timeline) {
       return null
@@ -1690,8 +1712,12 @@ export class ThreatHuntingService extends EventEmitter {
     }
   }
 
-  public async searchThreatData(searchData: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const data = searchData.pagination as { page?: number; limit?: number } | undefined
+  public async searchThreatData(
+    searchData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const data = searchData.pagination as
+      | { page?: number; limit?: number }
+      | undefined
     const { page = 1, limit = 50 } = data || {}
     const keys = await this.redis.keys('threat:*')
     const threats = await this.redis.mget(keys)
@@ -1705,11 +1731,15 @@ export class ThreatHuntingService extends EventEmitter {
     }
   }
 
-  public async analyzePatterns(threatData: Record<string, unknown>[]): Promise<Record<string, unknown>> {
+  public async analyzePatterns(
+    threatData: Record<string, unknown>[],
+  ): Promise<Record<string, unknown>> {
     return this.aiService.analyzePattern(threatData)
   }
 
-  public async correlateThreatWithBehavior(threatData: Record<string, unknown>): Promise<Record<string, unknown>> {
+  public async correlateThreatWithBehavior(
+    threatData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const behavioralData = await this.behavioralService.getBehavioralProfile(
       threatData.userId as string,
     )
@@ -1719,18 +1749,24 @@ export class ThreatHuntingService extends EventEmitter {
     }
   }
 
-  public async predictFutureThreats(historicalData: Record<string, unknown>[]): Promise<Record<string, unknown>> {
+  public async predictFutureThreats(
+    historicalData: Record<string, unknown>[],
+  ): Promise<Record<string, unknown>> {
     return this.predictiveService.predictThreats(historicalData)
   }
 
-  public async performRealTimeHunting(_huntingData: Record<string, unknown>): Promise<Record<string, unknown>> {
+  public async performRealTimeHunting(
+    _huntingData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const matches = []
     const anomalies = []
     const actions = []
     return { matches, anomalies, actions }
   }
 
-  public async detectRealTimeAnomalies(realTimeData: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
+  public async detectRealTimeAnomalies(
+    realTimeData: Record<string, unknown>[],
+  ): Promise<Record<string, unknown>[]> {
     const anomalies = []
     for (const data of realTimeData) {
       const anomaly = await this.aiService.predictAnomaly(data)

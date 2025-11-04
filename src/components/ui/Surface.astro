@@ -9,8 +9,8 @@ const { as = 'div', elevated = false, class: className = '' } = Astro.props
 const Tag = as as any
 ---
 
-<Tag class={`surface${elevated ? ' surface--elevated' : ''} ${className}`.trim()}>
+<Tag
+  class={`surface${elevated ? ' surface--elevated' : ''} ${className}`.trim()}
+>
   <slot />
 </Tag>
-
-

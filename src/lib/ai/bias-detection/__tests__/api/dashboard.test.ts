@@ -15,7 +15,7 @@ vi.mock('@/lib/utils/logger', () => ({
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  }))
+  })),
 }))
 
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection'

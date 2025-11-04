@@ -1,4 +1,7 @@
-import type { AIMessage, TherapeuticResponse } from '../../../lib/ai/models/ai-types'
+import type {
+  AIMessage,
+  TherapeuticResponse,
+} from '../../../lib/ai/models/ai-types'
 import type { AIStreamChunk } from '../../../lib/ai/models/ai-types'
 import { useCallback, useState, useRef } from 'react'
 
@@ -23,14 +26,17 @@ interface UseResponseGenerationResult {
   error: string | null
   progress: number
   therapeuticInsights: TherapeuticResponse | null
-  generateResponse: (prompt: string, context?: AIMessage[]) => Promise<string | null>
+  generateResponse: (
+    prompt: string,
+    context?: AIMessage[],
+  ) => Promise<string | null>
   generateTherapeuticResponse: (
     prompt: string,
-    sessionContext?: Record<string, unknown>
+    sessionContext?: Record<string, unknown>,
   ) => Promise<TherapeuticResponse | null>
   generateStreamingResponse: (
     prompt: string,
-    context?: AIMessage[]
+    context?: AIMessage[],
   ) => AsyncGenerator<string, string, unknown>
   regenerateLastResponse: () => Promise<string | null>
   stopGeneration: () => void
@@ -68,11 +74,7 @@ function isRetryableError(error: unknown): boolean {
   }
 
   // Rate limit errors (429) are retryable with backoff
-  if (
-    error instanceof Error &&
-    'status' in error &&
-    error.status === 429
-  ) {
+  if (error instanceof Error && 'status' in error && error.status === 429) {
     return true
   }
 
@@ -88,10 +90,13 @@ function getSystemPrompt(responseType: string, customPrompt?: string): string {
   }
 
   const prompts = {
-    general: 'You are a helpful AI assistant. Provide clear, accurate, and helpful responses.',
+    general:
+      'You are a helpful AI assistant. Provide clear, accurate, and helpful responses.',
     therapeutic: `You are a compassionate AI therapeutic assistant. Provide supportive, empathetic responses that help users process their emotions and thoughts. Use evidence-based therapeutic techniques when appropriate. Always prioritize user safety and well-being.`,
-    creative: 'You are a creative AI assistant. Generate imaginative, inspiring, and original content. Think outside the box and explore creative possibilities.',
-    analytical: 'You are an analytical AI assistant. Provide thorough, logical, and data-driven responses. Break down complex problems and offer structured solutions.',
+    creative:
+      'You are a creative AI assistant. Generate imaginative, inspiring, and original content. Think outside the box and explore creative possibilities.',
+    analytical:
+      'You are an analytical AI assistant. Provide thorough, logical, and data-driven responses. Break down complex problems and offer structured solutions.',
   }
 
   return prompts[responseType as keyof typeof prompts] || prompts.general
@@ -118,8 +123,9 @@ export function useResponseGeneration({
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<number>(0)
-  const [therapeuticInsights, setTherapeuticInsights] = useState<TherapeuticResponse | null>(null)
-  
+  const [therapeuticInsights, setTherapeuticInsights] =
+    useState<TherapeuticResponse | null>(null)
+
   // Store last request for regeneration
   const lastRequestRef = useRef<ResponseGenerationRequest | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -133,7 +139,7 @@ export function useResponseGeneration({
     setProgress(0)
     setTherapeuticInsights(null)
     lastRequestRef.current = null
-    
+
     // Abort any ongoing requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
@@ -156,7 +162,7 @@ export function useResponseGeneration({
     async (requestData: ResponseGenerationRequest): Promise<Response> => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController()
-      
+
       const timeoutId = setTimeout(() => {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort()
@@ -171,16 +177,21 @@ export function useResponseGeneration({
           },
           body: JSON.stringify({
             ...requestData,
-            systemPrompt: getSystemPrompt(requestData.responseType, requestData.systemPrompt),
+            systemPrompt: getSystemPrompt(
+              requestData.responseType,
+              requestData.systemPrompt,
+            ),
           }),
           signal: abortControllerRef.current.signal,
         })
 
         clearTimeout(timeoutId)
-        
+
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || `API request failed: ${response.status}`)
+          throw new Error(
+            errorData.error || `API request failed: ${response.status}`,
+          )
         }
 
         return response
@@ -189,7 +200,7 @@ export function useResponseGeneration({
         throw err
       }
     },
-    [apiEndpoint]
+    [apiEndpoint],
   )
 
   // Generate a standard response
@@ -244,7 +255,9 @@ export function useResponseGeneration({
         } catch (err: unknown) {
           if (retries === MAX_RETRIES - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate response'
+              err instanceof Error
+                ? (err as Error)?.message || String(err)
+                : 'Failed to generate response'
             setError(errorMessage)
 
             if (onError && err instanceof Error) {
@@ -255,7 +268,10 @@ export function useResponseGeneration({
 
           retries++
           // Exponential backoff with jitter
-          const delay = Math.min(1000 * Math.pow(2, retries) + Math.random() * 1000, 10000)
+          const delay = Math.min(
+            1000 * Math.pow(2, retries) + Math.random() * 1000,
+            10000,
+          )
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {
           if (retries === MAX_RETRIES - 1) {
@@ -277,14 +293,14 @@ export function useResponseGeneration({
       onComplete,
       onTherapeuticInsights,
       makeRequest,
-    ]
+    ],
   )
 
   // Generate a therapeutic response with specialized handling
   const generateTherapeuticResponse = useCallback(
     async (
       prompt: string,
-      sessionContext?: Record<string, unknown>
+      sessionContext?: Record<string, unknown>,
     ): Promise<TherapeuticResponse | null> => {
       if (!prompt.trim() || isLoading) {
         return null
@@ -331,7 +347,9 @@ export function useResponseGeneration({
         return therapeuticResponse
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate therapeutic response'
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'Failed to generate therapeutic response'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -352,14 +370,14 @@ export function useResponseGeneration({
       onComplete,
       onTherapeuticInsights,
       makeRequest,
-    ]
+    ],
   )
 
   // Generate streaming response
   const generateStreamingResponse = useCallback(
     async function* (
       prompt: string,
-      context?: AIMessage[]
+      context?: AIMessage[],
     ): AsyncGenerator<string, string, unknown> {
       if (!prompt.trim() || isLoading || !streamingEnabled) {
         return ''
@@ -387,7 +405,7 @@ export function useResponseGeneration({
       try {
         const response = await makeRequest(requestData)
         const reader = response.body?.getReader()
-        
+
         if (!reader) {
           throw new Error('No response body reader available')
         }
@@ -423,7 +441,7 @@ export function useResponseGeneration({
                 // Update progress based on estimated completion
                 const estimatedProgress = Math.min(
                   (accumulatedResponse.length / maxTokens) * 100,
-                  95
+                  95,
                 )
                 setProgress(estimatedProgress)
 
@@ -452,7 +470,9 @@ export function useResponseGeneration({
         return accumulatedResponse
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to generate streaming response'
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'Failed to generate streaming response'
         setError(errorMessage)
 
         if (onError && err instanceof Error) {
@@ -476,29 +496,34 @@ export function useResponseGeneration({
       onComplete,
       onProgress,
       makeRequest,
-    ]
+    ],
   )
 
   // Regenerate the last response
-  const regenerateLastResponse = useCallback(async (): Promise<string | null> => {
+  const regenerateLastResponse = useCallback(async (): Promise<
+    string | null
+  > => {
     if (!lastRequestRef.current) {
       setError('No previous request to regenerate')
       return null
     }
 
     const lastRequest = lastRequestRef.current
-    
+
     if (lastRequest.stream) {
       // For streaming requests, we need to handle differently
-      const generator = generateStreamingResponse(lastRequest.prompt, lastRequest.context)
+      const generator = generateStreamingResponse(
+        lastRequest.prompt,
+        lastRequest.context,
+      )
       let finalResponse = ''
-      
+
       if (generator) {
         for await (const chunk of generator) {
           finalResponse += chunk
         }
       }
-      
+
       return finalResponse
     } else {
       return generateResponse(lastRequest.prompt, lastRequest.context)

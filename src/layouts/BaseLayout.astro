@@ -1,31 +1,102 @@
 ---
 import Header from '@/components/layout/Header.astro'
-import Footer from '@/components/base/Footer.astro'
+import Footer from '@/components/layout/Footer.astro'
 import Background from '@/components/backgrounds/Background.astro'
 import type { BgType } from '@/types'
-// Import unified enhanced theme
-import '@/styles/enhanced-theme.css'
-import '@/styles/brutalist-dark.css'
+// Import unified dark theme v2.0 with enhanced design system
+import '@/styles/unified-dark-theme.css'
 import '@/styles/mobile-layout-fixes.css'
-import '@/styles/pixelated-theme.css'
+import '@/styles/global.css'
 
 export interface Props {
   title: string
   description?: string
   bgType?: BgType
   ogImage?: string
+  themeMode?: 'light' | 'dark' | 'system'
+  canonicalUrl?: string
+  structuredData?: object
 }
 
-const { title, description, bgType, ogImage } = Astro.props
+const {
+  title,
+  description,
+  bgType,
+  ogImage,
+  themeMode = 'system',
+  canonicalUrl,
+  structuredData,
+} = Astro.props
+
+// Generate structured data for SEO
+const generateStructuredData = () => {
+  const baseData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': 'Pixelated Empathy',
+    'url': Astro.site || 'https://pixelatedempathy.com',
+    'description':
+      description ||
+      'AI-powered therapy training platform for mental health professionals.',
+    'potentialAction': {
+      '@type': 'SearchAction',
+      'target': {
+        '@type': 'EntryPoint',
+        'urlTemplate': Astro.site
+          ? `${Astro.site}/search?q={search_term_string}`
+          : 'https://pixelatedempathy.com/search?q={search_term_string}',
+      },
+      'query-input': 'required name=search_term_string',
+    },
+    'inLanguage': 'en-US',
+  }
+
+  return structuredData ? { ...baseData, ...structuredData } : baseData
+}
 ---
 
 <!doctype html>
-<html lang="en" class="enhanced-dark-theme">
+<html
+  lang="en"
+  class="enhanced-dark-theme"
+  data-theme={themeMode}
+  style="color-scheme: dark;"
+  itemscope
+  itemtype="https://schema.org/WebPage"
+>
   <head>
+    <!-- Core Meta Tags -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Theme & Color Scheme Meta -->
+    <meta name="color-scheme" content="dark light" />
+    <meta name="supported-color-schemes" content="dark light" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#ffffff"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0a0a0a"
+    />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Generator -->
     <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO & Social Meta -->
     <title>{title} | Pixelated Empathy</title>
     <meta
       name="description"
@@ -33,68 +104,457 @@ const { title, description, bgType, ogImage } = Astro.props
         'AI-powered therapy training platform for mental health professionals.'}
     />
     {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:site_name" content="Pixelated Empathy" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={`${title} | Pixelated Empathy`} />
+    <meta
+      property="og:description"
+      content={description ??
+        'AI-powered therapy training platform for mental health professionals.'}
+    />
 
-    <!-- Fonts: preload primary and swap -->
+    <!-- Twitter Card Meta -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@pixelatedempathy" />
+    <meta name="twitter:creator" content="@pixelatedempathy" />
+    <meta name="twitter:title" content={`${title} | Pixelated Empathy`} />
+    <meta
+      name="twitter:description"
+      content={description ??
+        'AI-powered therapy training platform for mental health professionals.'}
+    />
+
+    <!-- Canonical URL -->
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+    <!-- Structured Data -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(generateStructuredData())}
+    />
+
+    <!-- Enhanced Font Loading Strategy with Preload -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap"
       rel="preload"
       as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript
-      ><link
-        href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-      /></noscript
-    >
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- Enhanced Responsive Design System -->
+    <link rel="stylesheet" href="/src/styles/baselayout-responsive.css" />
+
+    <!-- Critical CSS for Enhanced Dark Theme Foundation -->
     <style>
+      /* Enhanced font fallbacks with system fonts and emoji support */
       @font-face {
         font-family: 'Geist Sans';
         font-display: swap;
-        src: local('Geist Sans');
+        src:
+          local('Geist Sans'), local('Inter'), local('Segoe UI'),
+          local('Roboto'), local('Helvetica Neue'), local('Arial'),
+          local('Noto Color Emoji'), sans-serif;
       }
+
       @font-face {
         font-family: 'JetBrains Mono';
         font-display: swap;
-        src: local('JetBrains Mono');
+        src:
+          local('JetBrains Mono'), local('Monaco'), local('Menlo'),
+          local('Consolas'), local('Liberation Mono'), local('Courier New'),
+          local('Noto Color Emoji'), monospace;
+      }
+
+      /* Enhanced CSS custom properties with unified dark theme integration */
+      :root {
+        --font-sans:
+          'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, system-ui, sans-serif;
+        --font-mono:
+          'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono',
+          Consolas, 'Courier New', ui-monospace, monospace;
+        --font-emoji:
+          'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', emoji;
+      }
+
+      /* Critical theme styles with unified dark theme variables */
+      html.enhanced-dark-theme {
+        background: var(--bg-void, #000000);
+        color: var(--text-primary, #ffffff);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        font-synthesis: none;
+        text-size-adjust: 100%;
+        scroll-behavior: smooth;
+      }
+
+      /* Enhanced body styles with unified theme integration */
+      body.enhanced-dark-theme {
+        background: var(--bg-primary, #0a0a0a);
+        color: var(--text-primary, #ffffff);
+        font-family: var(--font-sans);
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Enhanced focus styles with unified theme */
+      :focus-visible {
+        outline: 2px solid var(--accent-primary, #10b981);
+        outline-offset: 2px;
+      }
+
+      /* Enhanced selection styles with unified theme */
+      ::selection {
+        background: var(--accent-primary-muted, rgba(16, 185, 129, 0.2));
+        color: var(--text-primary, #ffffff);
+      }
+
+      /* Enhanced reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      /* Enhanced print styles */
+      @media print {
+        html.enhanced-dark-theme,
+        body.enhanced-dark-theme {
+          background: white !important;
+          color: black !important;
+        }
+      }
+
+      /* Enhanced high contrast mode support */
+      @media (forced-colors: active) {
+        html.enhanced-dark-theme {
+          --accent-primary: Highlight;
+          --text-primary: CanvasText;
+          --bg-primary: Canvas;
+        }
       }
     </style>
 
-    <!-- Theme Meta -->
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0a0a0a" />
-
-    <!-- Peasy Analytics -->
+    <!-- Enhanced Analytics with Privacy-First Approach -->
     <script
       src="https://cdn.peasy.so/peasy.js"
       data-website-id="01k4cn6tfqseytsdq5rv7cn06d"
-      async></script>
+      data-respect-dnt="true"
+      data-domain="pixelatedempathy.com"
+      async
+      defer></script>
 
-    <!-- Sentry Error Tracking -->
+    <!-- Enhanced Sentry Error Tracking with Privacy -->
     <script
       src="https://js.sentry-cdn.com/ef4ca2c0d2530a95efb0ef55c168b661.min.js"
-      crossorigin="anonymous"></script>
+      crossorigin="anonymous"
+      data-lazy
+      defer></script>
+
+    <!-- Enhanced Accessibility Meta Tags -->
+    <meta name="color-scheme" content="dark light" />
+    <meta name="supported-color-schemes" content="dark light" />
   </head>
-  <body class="enhanced-dark-theme" style="background: var(--bg-primary); color: var(--text-primary);">
+  <body
+    class="enhanced-dark-theme min-h-screen main-body"
+    style="background: var(--bg-primary, #0a0a0a); color: var(--text-primary, #ffffff);"
+    itemscope
+    itemtype="https://schema.org/WebPage"
+  >
+    <!-- Enhanced Background System with Unified Theme Integration -->
     {bgType && <Background type={bgType} />}
-    <div class="min-h-screen flex flex-col" style="background: var(--bg-primary);">
+
+    <!-- Enhanced Main Application Container with Unified Theme -->
+    <div
+      class="min-h-screen flex flex-col transition-all duration-300 ease-out glass-surface main-app-container"
+      style="background: var(--bg-primary, #0a0a0a);"
+      role="application"
+      aria-label="Pixelated Empathy Application"
+      id="app-container"
+    >
+      <!-- Enhanced Skip Navigation Link -->
+      <a
+        href="#main-content"
+        class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent-primary focus:text-white transition-all duration-200"
+        style="position: absolute; top: -40px; left: 6px; background: var(--accent-primary); color: white; padding: 8px; border-radius: 4px; z-index: 1000; font-weight: 500;"
+      >
+        Skip to main content
+      </a>
+
+      <!-- Enhanced Header with Unified Theme -->
       <Header />
-      <main class="flex-1" style="padding-top: 3.5rem;">
-        <!-- <KonamiTrigger client:load /> -->
+
+      <!-- Enhanced Main Content Area with Unified Theme -->
+      <main
+        class="flex-1 container-refined transition-all duration-300 ease-out main-content"
+        style="padding-top: var(--space-16, 4rem);"
+        role="main"
+        aria-label="Main content"
+        id="main-content"
+        tabindex="-1"
+      >
         <slot />
       </main>
+
+      <!-- Enhanced Footer with Unified Theme -->
       <Footer />
     </div>
+
+    <!-- Enhanced Accessibility and Theme Management Script -->
+    <script is:inline>
+      ;(function () {
+        'use strict'
+
+        // Enhanced theme management with system preference detection
+        const themeManager = {
+          init: function () {
+            this.detectSystemPreference()
+            this.setupThemeToggle()
+            this.enhanceFocusManagement()
+            this.setupReducedMotion()
+            this.setupHighContrast()
+            this.enhanceKeyboardNavigation()
+            this.setupViewportFixes()
+          },
+
+          detectSystemPreference: function () {
+            const theme =
+              document.documentElement.getAttribute('data-theme') || 'system'
+            if (theme === 'system') {
+              const systemPreference = window.matchMedia(
+                '(prefers-color-scheme: dark)',
+              ).matches
+                ? 'dark'
+                : 'light'
+              document.documentElement.setAttribute(
+                'data-theme',
+                systemPreference,
+              )
+            }
+          },
+
+          setupThemeToggle: function () {
+            // Enhanced theme toggle with localStorage persistence
+            const themeToggle =
+              document.querySelector('[data-theme-toggle]') ||
+              document.querySelector('.theme-toggle')
+            if (themeToggle) {
+              themeToggle.addEventListener('click', function () {
+                const currentTheme =
+                  document.documentElement.getAttribute('data-theme')
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+                document.documentElement.setAttribute('data-theme', newTheme)
+                localStorage.setItem('theme', newTheme)
+
+                // Dispatch custom event for other components
+                window.dispatchEvent(
+                  new CustomEvent('themechange', {
+                    detail: { theme: newTheme },
+                  }),
+                )
+              })
+            }
+
+            // Restore saved theme preference
+            const savedTheme = localStorage.getItem('theme')
+            if (savedTheme) {
+              document.documentElement.setAttribute('data-theme', savedTheme)
+            }
+
+            // Listen for system theme changes
+            window
+              .matchMedia('(prefers-color-scheme: dark)')
+              .addEventListener('change', (e) => {
+                if (localStorage.getItem('theme') === null) {
+                  const newTheme = e.matches ? 'dark' : 'light'
+                  document.documentElement.setAttribute('data-theme', newTheme)
+                }
+              })
+          },
+
+          enhanceFocusManagement: function () {
+            // Enhanced skip link functionality
+            const skipLink = document.querySelector('a[href="#main-content"]')
+            if (skipLink) {
+              skipLink.addEventListener('click', function (e) {
+                e.preventDefault()
+                const mainContent = document.getElementById('main-content')
+                if (mainContent) {
+                  mainContent.setAttribute('tabindex', '0')
+                  mainContent.focus()
+                  // Remove tabindex after focus to prevent tabbing back
+                  setTimeout(
+                    () => mainContent.removeAttribute('tabindex'),
+                    1000,
+                  )
+                }
+              })
+
+              // Enhanced keyboard navigation for skip link
+              document.addEventListener('keydown', (e) => {
+                if (
+                  e.key === 'Tab' &&
+                  !e.shiftKey &&
+                  document.activeElement === skipLink
+                ) {
+                  e.preventDefault()
+                  const mainContent = document.getElementById('main-content')
+                  if (mainContent) {
+                    mainContent.setAttribute('tabindex', '0')
+                    mainContent.focus()
+                    setTimeout(
+                      () => mainContent.removeAttribute('tabindex'),
+                      1000,
+                    )
+                  }
+                }
+              })
+            }
+          },
+
+          setupReducedMotion: function () {
+            // Enhanced reduced motion support
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              document.documentElement.style.setProperty(
+                'scroll-behavior',
+                'auto',
+                'important',
+              )
+
+              // Add class for reduced motion
+              document.documentElement.classList.add('reduced-motion')
+
+              // Override transition properties
+              const style = document.createElement('style')
+              style.textContent = `
+                .reduced-motion * {
+                  animation-duration: 0.01ms !important;
+                  animation-iteration-count: 1 !important;
+                  transition-duration: 0.01ms !important;
+                  transition-delay: 0ms !important;
+                }
+              `
+              document.head.appendChild(style)
+            }
+          },
+
+          setupHighContrast: function () {
+            // Enhanced high contrast support
+            if (window.matchMedia('(forced-colors: active)').matches) {
+              document.documentElement.style.setProperty(
+                '--accent-primary',
+                'Highlight',
+                'important',
+              )
+              document.documentElement.style.setProperty(
+                '--text-primary',
+                'CanvasText',
+                'important',
+              )
+              document.documentElement.style.setProperty(
+                '--bg-primary',
+                'Canvas',
+                'important',
+              )
+              document.documentElement.classList.add('high-contrast')
+            }
+          },
+
+          enhanceKeyboardNavigation: function () {
+            // Enhanced keyboard navigation shortcuts
+            document.addEventListener('keydown', function (e) {
+              // Alt + / = Focus search (if search exists)
+              if (e.altKey && e.key === '/') {
+                const searchInput = document.querySelector(
+                  'input[type="search"], input[placeholder*="search" i]',
+                )
+                if (searchInput) {
+                  searchInput.focus()
+                  e.preventDefault()
+                }
+              }
+
+              // Alt + 1 = Go to main content
+              if (e.altKey && e.key === '1') {
+                const mainContent = document.getElementById('main-content')
+                if (mainContent) {
+                  mainContent.scrollIntoView({ behavior: 'smooth' })
+                  e.preventDefault()
+                }
+              }
+            })
+          },
+
+          setupViewportFixes: function () {
+            // Enhanced viewport height fix for mobile browsers
+            const setViewportHeight = () => {
+              const vh = window.innerHeight * 0.01
+              document.documentElement.style.setProperty('--vh', `${vh}px`)
+            }
+
+            setViewportHeight()
+            window.addEventListener('resize', setViewportHeight)
+            window.addEventListener('orientationchange', setViewportHeight)
+
+            // Enhanced iOS viewport fixes
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+              document.documentElement.style.setProperty('min-height', '100vh')
+              document.documentElement.style.setProperty(
+                'min-height',
+                '-webkit-fill-available',
+              )
+              document.body.style.setProperty('min-height', '100vh')
+              document.body.style.setProperty(
+                'min-height',
+                '-webkit-fill-available',
+              )
+            }
+          },
+        }
+
+        // Initialize theme manager when DOM is ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            themeManager.init()
+          })
+        } else {
+          themeManager.init()
+        }
+
+        // Expose theme manager globally for debugging
+        window.__themeManager = themeManager
+      })()
+    </script>
   </body>
 </html>

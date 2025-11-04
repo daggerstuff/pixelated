@@ -7,22 +7,25 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
   description="Get in touch with our team. Schedule demos, discuss partnerships, or ask questions."
 >
   <!-- Section 01 / Contact -->
-  <section class="section-container section-spacing-lg" style="counter-reset: section-counter;">
+  <section
+    class="section-container section-spacing-lg"
+    style="counter-reset: section-counter;"
+  >
     <div class="container-refined">
-
       <!-- Numbered Section Header -->
       <div class="section-number">Contact</div>
 
-      <div class="grid grid-responsive gap-12 lg:grid-cols-2" style="gap: var(--space-12);">
-
+      <div
+        class="grid grid-responsive gap-12 lg:grid-cols-2"
+        style="gap: var(--space-12);"
+      >
         <!-- Left: Contact Info -->
         <div class="space-y-8">
           <div>
-            <h1 class="display-heading mb-6">
-              Get in Touch
-            </h1>
+            <h1 class="display-heading mb-6">Get in Touch</h1>
             <p class="lede-text">
-              Ready to transform your therapy training program? Let's discuss how we can customize our platform for your needs.
+              Ready to transform your therapy training program? Let's discuss
+              how we can customize our platform for your needs.
             </p>
           </div>
 
@@ -41,7 +44,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 
             <div class="card-elegant">
               <div class="eyebrow-text mb-2">Location</div>
-              <p style="color: var(--text-secondary); font-size: var(--text-base);">
+              <p
+                style="color: var(--text-secondary); font-size: var(--text-base);"
+              >
                 United States
               </p>
             </div>
@@ -81,15 +86,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
         <!-- Right: Contact Form -->
         <div>
           <div class="card-elegant">
-            <h2 class="brutalist-heading mb-6" style="font-size: var(--text-2xl);">
+            <h2
+              class="brutalist-heading mb-6"
+              style="font-size: var(--text-2xl);"
+            >
               Send a Message
             </h2>
 
-            <form
-              id="contact-form"
-              class="space-y-6"
-              novalidate
-            >
+            <form id="contact-form" class="space-y-6" novalidate>
               <!-- Error message -->
               <div
                 id="error-message"
@@ -103,10 +107,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
               <!-- Name & Email Row -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    for="name"
-                    class="eyebrow-text block mb-2"
-                  >
+                  <label for="name" class="eyebrow-text block mb-2">
                     Name <span style="color: var(--accent-primary);">*</span>
                   </label>
                   <input
@@ -118,13 +119,11 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                     class="brutalist-input"
                     placeholder="Your name"
                   />
-                  <div class="text-xs mt-1 hidden text-red-400" id="name-error"></div>
+                  <div class="text-xs mt-1 hidden text-red-400" id="name-error">
+                  </div>
                 </div>
                 <div>
-                  <label
-                    for="email"
-                    class="eyebrow-text block mb-2"
-                  >
+                  <label for="email" class="eyebrow-text block mb-2">
                     Email <span style="color: var(--accent-primary);">*</span>
                   </label>
                   <input
@@ -136,16 +135,17 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                     class="brutalist-input"
                     placeholder="you@example.com"
                   />
-                  <div class="text-xs mt-1 hidden text-red-400" id="email-error"></div>
+                  <div
+                    class="text-xs mt-1 hidden text-red-400"
+                    id="email-error"
+                  >
+                  </div>
                 </div>
               </div>
 
               <!-- Subject -->
               <div>
-                <label
-                  for="subject"
-                  class="eyebrow-text block mb-2"
-                >
+                <label for="subject" class="eyebrow-text block mb-2">
                   Subject <span style="color: var(--accent-primary);">*</span>
                 </label>
                 <input
@@ -157,15 +157,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                   class="brutalist-input"
                   placeholder="What is this about?"
                 />
-                <div class="text-xs mt-1 hidden text-red-400" id="subject-error"></div>
+                <div
+                  class="text-xs mt-1 hidden text-red-400"
+                  id="subject-error"
+                >
+                </div>
               </div>
 
               <!-- Message -->
               <div>
-                <label
-                  for="message"
-                  class="eyebrow-text block mb-2"
-                >
+                <label for="message" class="eyebrow-text block mb-2">
                   Message <span style="color: var(--accent-primary);">*</span>
                 </label>
                 <textarea
@@ -175,10 +176,10 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                   required
                   maxlength="2000"
                   class="brutalist-input resize-none"
-                  placeholder="Tell us more about your inquiry..."
-                ></textarea>
+                  placeholder="Tell us more about your inquiry..."></textarea>
                 <div class="flex justify-between items-center mt-1">
-                  <div class="text-xs hidden text-red-400" id="message-error"></div>
+                  <div class="text-xs hidden text-red-400" id="message-error">
+                  </div>
                   <div class="text-xs" style="color: var(--text-muted);">
                     <span id="message-count">0</span>/2000
                   </div>
@@ -206,8 +207,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                       cy="12"
                       r="10"
                       stroke="currentColor"
-                      stroke-width="4"
-                    ></circle>
+                      stroke-width="4"></circle>
                     <path
                       class="opacity-75"
                       fill="currentColor"
@@ -228,10 +228,18 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
               style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);"
               role="alert"
             >
-              <h3 class="font-semibold mb-2" style="color: var(--accent-primary);">
+              <h3
+                class="font-semibold mb-2"
+                style="color: var(--accent-primary);"
+              >
                 Message sent successfully!
               </h3>
-              <p class="text-sm" style="color: var(--text-secondary);" id="success-text"></p>
+              <p
+                class="text-sm"
+                style="color: var(--text-secondary);"
+                id="success-text"
+              >
+              </p>
             </div>
           </div>
         </div>
@@ -242,10 +250,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
   <script is:inline>
     // Form elements
     const form = document.getElementById('contact-form') as HTMLFormElement
-    const submitButton = document.getElementById('submit-button') as HTMLButtonElement
+    const submitButton = document.getElementById(
+      'submit-button',
+    ) as HTMLButtonElement
     const submitText = document.getElementById('submit-text') as HTMLSpanElement
-    const loadingSpinner = document.getElementById('loading-spinner') as HTMLElement
-    const successMessage = document.getElementById('success-message') as HTMLElement
+    const loadingSpinner = document.getElementById(
+      'loading-spinner',
+    ) as HTMLElement
+    const successMessage = document.getElementById(
+      'success-message',
+    ) as HTMLElement
     const errorMessage = document.getElementById('error-message') as HTMLElement
     const errorText = document.getElementById('error-text') as HTMLElement
 
@@ -253,7 +267,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
     const nameInput = document.getElementById('name') as HTMLInputElement
     const emailInput = document.getElementById('email') as HTMLInputElement
     const subjectInput = document.getElementById('subject') as HTMLInputElement
-    const messageInput = document.getElementById('message') as HTMLTextAreaElement
+    const messageInput = document.getElementById(
+      'message',
+    ) as HTMLTextAreaElement
     const messageCount = document.getElementById('message-count') as HTMLElement
 
     // Error displays
@@ -294,12 +310,17 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
     function validateMessage(message: string): string | null {
       if (!message.trim()) return 'Message is required'
       if (message.length < 10) return 'Message must be at least 10 characters'
-      if (message.length > 2000) return 'Message must not exceed 2000 characters'
+      if (message.length > 2000)
+        return 'Message must not exceed 2000 characters'
       return null
     }
 
     // Show field error
-    function showFieldError(input: HTMLElement, errorElement: HTMLElement, message: string) {
+    function showFieldError(
+      input: HTMLElement,
+      errorElement: HTMLElement,
+      message: string,
+    ) {
       input.style.borderColor = 'rgba(239, 68, 68, 0.5)'
       errorElement.textContent = message
       errorElement.classList.remove('hidden')
@@ -406,7 +427,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
           form.style.display = 'none'
           successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
         } else {
-          showError(result.message || 'An error occurred while sending your message.')
+          showError(
+            result.message || 'An error occurred while sending your message.',
+          )
         }
       } catch (error: unknown) {
         console.error('Contact form submission error:', String(error))

@@ -1,6 +1,6 @@
 /**
  * InterventionAnalysisService - Analyze effectiveness of therapeutic interventions
- * 
+ *
  * This service evaluates the effectiveness of interventions and provides
  * recommendations for treatment optimization.
  */
@@ -33,7 +33,13 @@ export interface InterventionEffectivenessResult {
 
 export interface InterventionContext {
   interventionId: string
-  type: 'cognitive' | 'behavioral' | 'mindfulness' | 'exposure' | 'acceptance' | 'other'
+  type:
+    | 'cognitive'
+    | 'behavioral'
+    | 'mindfulness'
+    | 'exposure'
+    | 'acceptance'
+    | 'other'
   description: string
   startTime: string
   duration: number // minutes
@@ -56,7 +62,8 @@ export interface PatientResponse {
  */
 export class InterventionAnalysisService {
   private static instance: InterventionAnalysisService
-  private analysisHistory: Map<string, InterventionEffectivenessResult[]> = new Map()
+  private analysisHistory: Map<string, InterventionEffectivenessResult[]> =
+    new Map()
 
   private constructor() {
     logger.info('InterventionAnalysisService initialized')
@@ -75,24 +82,24 @@ export class InterventionAnalysisService {
   async analyzeEffectiveness(
     context: InterventionContext,
     response: PatientResponse,
-    sessionHistory?: EmotionAnalysis[]
+    sessionHistory?: EmotionAnalysis[],
   ): Promise<InterventionEffectivenessResult> {
     try {
-      logger.info('Analyzing intervention effectiveness', { 
+      logger.info('Analyzing intervention effectiveness', {
         interventionId: context.interventionId,
-        type: context.type
+        type: context.type,
       })
 
       // Calculate emotional improvement
       const emotionalImprovement = this.calculateEmotionalImprovement(
         response.emotionBefore,
-        response.emotionAfter
+        response.emotionAfter,
       )
 
       // Calculate engagement level
       const engagementLevel = this.calculateEngagementLevel(
         response.engagementMetrics,
-        response.verbalFeedback
+        response.verbalFeedback,
       )
 
       // Calculate response quality
@@ -101,13 +108,13 @@ export class InterventionAnalysisService {
       // Calculate stability indicator
       const stabilityIndicator = this.calculateStabilityIndicator(
         response.emotionAfter,
-        sessionHistory
+        sessionHistory,
       )
 
       // Calculate dimensional trends
       const trends = this.calculateDimensionalTrends(
         response.emotionBefore.dimensions,
-        response.emotionAfter.dimensions
+        response.emotionAfter.dimensions,
       )
 
       // Calculate overall effectiveness score
@@ -115,7 +122,7 @@ export class InterventionAnalysisService {
         emotionalImprovement,
         engagementLevel,
         responseQuality,
-        stabilityIndicator
+        stabilityIndicator,
       })
 
       // Generate recommendations
@@ -125,16 +132,19 @@ export class InterventionAnalysisService {
           emotionalImprovement,
           engagementLevel,
           responseQuality,
-          stabilityIndicator
+          stabilityIndicator,
         },
-        trends
+        trends,
       )
 
       // Identify risk factors
       const riskFactors = this.identifyRiskFactors(response, trends)
 
       // Calculate confidence based on data quality
-      const confidence = this.calculateAnalysisConfidence(response, sessionHistory)
+      const confidence = this.calculateAnalysisConfidence(
+        response,
+        sessionHistory,
+      )
 
       const result: InterventionEffectivenessResult = {
         interventionId: context.interventionId,
@@ -144,19 +154,18 @@ export class InterventionAnalysisService {
           emotionalImprovement,
           engagementLevel,
           responseQuality,
-          stabilityIndicator
+          stabilityIndicator,
         },
         trends,
         recommendations,
         riskFactors,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       // Store in analysis history
       this.storeAnalysisResult(context.interventionId, result)
 
       return result
-
     } catch (error: unknown) {
       logger.error('Error analyzing intervention effectiveness', { error })
       throw new Error(`Failed to analyze intervention effectiveness: ${error}`)
@@ -168,27 +177,31 @@ export class InterventionAnalysisService {
    */
   private calculateEmotionalImprovement(
     before: EmotionAnalysis,
-    after: EmotionAnalysis
+    after: EmotionAnalysis,
   ): number {
     // Calculate improvement in valence (positive emotions)
-    const valenceImprovement = after.dimensions.valence - before.dimensions.valence
-    
+    const valenceImprovement =
+      after.dimensions.valence - before.dimensions.valence
+
     // Calculate reduction in negative emotions
-    const negativeEmotionsBefore = before.emotions.sadness + before.emotions.anger + before.emotions.fear
-    const negativeEmotionsAfter = after.emotions.sadness + after.emotions.anger + after.emotions.fear
+    const negativeEmotionsBefore =
+      before.emotions.sadness + before.emotions.anger + before.emotions.fear
+    const negativeEmotionsAfter =
+      after.emotions.sadness + after.emotions.anger + after.emotions.fear
     const negativeReduction = negativeEmotionsBefore - negativeEmotionsAfter
 
     // Calculate increase in positive emotions
-    const positiveEmotionsBefore = before.emotions.joy + before.emotions.trust + before.emotions.anticipation
-    const positiveEmotionsAfter = after.emotions.joy + after.emotions.trust + after.emotions.anticipation
+    const positiveEmotionsBefore =
+      before.emotions.joy + before.emotions.trust + before.emotions.anticipation
+    const positiveEmotionsAfter =
+      after.emotions.joy + after.emotions.trust + after.emotions.anticipation
     const positiveIncrease = positiveEmotionsAfter - positiveEmotionsBefore
 
     // Weighted combination
-    const improvementScore = (
+    const improvementScore =
       valenceImprovement * 0.4 +
       negativeReduction * 0.3 +
       positiveIncrease * 0.3
-    )
 
     // Normalize to 0-1 scale
     return Math.max(0, Math.min(1, (improvementScore + 1) / 2))
@@ -203,7 +216,7 @@ export class InterventionAnalysisService {
       responseLatency: number
       coherenceScore: number
     },
-    verbalFeedback?: string
+    verbalFeedback?: string,
   ): number {
     if (!metrics) {
       // Fallback to verbal feedback analysis
@@ -215,18 +228,14 @@ export class InterventionAnalysisService {
 
     // Calculate engagement from metrics
     const participationScore = metrics.participationLevel
-    
+
     // Lower latency indicates better engagement (normalize to 0-1)
-    const latencyScore = Math.max(0, 1 - (metrics.responseLatency / 10000)) // 10s max
-    
+    const latencyScore = Math.max(0, 1 - metrics.responseLatency / 10000) // 10s max
+
     const coherenceScore = metrics.coherenceScore
 
     // Weighted combination
-    return (
-      participationScore * 0.4 +
-      latencyScore * 0.3 +
-      coherenceScore * 0.3
-    )
+    return participationScore * 0.4 + latencyScore * 0.3 + coherenceScore * 0.3
   }
 
   /**
@@ -234,25 +243,41 @@ export class InterventionAnalysisService {
    */
   private analyzeVerbalEngagement(feedback: string): number {
     const engagementIndicators = [
-      'understand', 'helpful', 'better', 'clearer', 'makes sense',
-      'thank you', 'appreciate', 'good', 'yes', 'right'
+      'understand',
+      'helpful',
+      'better',
+      'clearer',
+      'makes sense',
+      'thank you',
+      'appreciate',
+      'good',
+      'yes',
+      'right',
     ]
-    
+
     const disengagementIndicators = [
-      'confused', 'don\'t understand', 'no', 'wrong', 'unhelpful',
-      'worse', 'difficult', 'hard', 'can\'t', 'won\'t'
+      'confused',
+      "don't understand",
+      'no',
+      'wrong',
+      'unhelpful',
+      'worse',
+      'difficult',
+      'hard',
+      "can't",
+      "won't",
     ]
 
     const text = feedback.toLowerCase()
     let engagementScore = 0.5 // Start neutral
 
-    engagementIndicators.forEach(indicator => {
+    engagementIndicators.forEach((indicator) => {
       if (text.includes(indicator)) {
         engagementScore += 0.1
       }
     })
 
-    disengagementIndicators.forEach(indicator => {
+    disengagementIndicators.forEach((indicator) => {
       if (text.includes(indicator)) {
         engagementScore -= 0.1
       }
@@ -267,20 +292,29 @@ export class InterventionAnalysisService {
   private calculateResponseQuality(response: PatientResponse): number {
     // Based on emotional coherence and stability
     const afterEmotion = response.emotionAfter
-    
+
     // Check for emotional coherence (not conflicting high emotions)
-    const totalEmotionIntensity = Object.values(afterEmotion.emotions).reduce((sum, val) => sum + val, 0)
-    const emotionCount = Object.values(afterEmotion.emotions).filter(val => val > 0.3).length
-    
+    const totalEmotionIntensity = Object.values(afterEmotion.emotions).reduce(
+      (sum, val) => sum + val,
+      0,
+    )
+    const emotionCount = Object.values(afterEmotion.emotions).filter(
+      (val) => val > 0.3,
+    ).length
+
     const coherenceScore = emotionCount > 0 ? 1 - (emotionCount - 1) * 0.2 : 0.8
-    
+
     // Check confidence level
     const confidenceScore = afterEmotion.confidence
-    
+
     // Check dimensional balance
-    const dimensionalBalance = 1 - Math.abs(afterEmotion.dimensions.valence) * 0.3 // Prefer moderate valence
-    
-    return Math.max(0, Math.min(1, (coherenceScore + confidenceScore + dimensionalBalance) / 3))
+    const dimensionalBalance =
+      1 - Math.abs(afterEmotion.dimensions.valence) * 0.3 // Prefer moderate valence
+
+    return Math.max(
+      0,
+      Math.min(1, (coherenceScore + confidenceScore + dimensionalBalance) / 3),
+    )
   }
 
   /**
@@ -288,7 +322,7 @@ export class InterventionAnalysisService {
    */
   private calculateStabilityIndicator(
     currentEmotion: EmotionAnalysis,
-    sessionHistory?: EmotionAnalysis[]
+    sessionHistory?: EmotionAnalysis[],
   ): number {
     if (!sessionHistory || sessionHistory.length < 2) {
       return 0.5 // Default when insufficient history
@@ -296,18 +330,18 @@ export class InterventionAnalysisService {
 
     // Calculate variance in recent emotions
     const recentEmotions = sessionHistory.slice(-5) // Last 5 entries
-    
+
     // Calculate valence stability
-    const valences = recentEmotions.map(e => e.dimensions.valence)
+    const valences = recentEmotions.map((e) => e.dimensions.valence)
     const valenceVariance = this.calculateVariance(valences)
-    
+
     // Calculate arousal stability
-    const arousals = recentEmotions.map(e => e.dimensions.arousal)
+    const arousals = recentEmotions.map((e) => e.dimensions.arousal)
     const arousalVariance = this.calculateVariance(arousals)
-    
+
     // Lower variance indicates higher stability
     const stabilityScore = 1 - (valenceVariance + arousalVariance) / 2
-    
+
     return Math.max(0, Math.min(1, stabilityScore))
   }
 
@@ -316,9 +350,9 @@ export class InterventionAnalysisService {
    */
   private calculateVariance(values: number[]): number {
     if (values.length === 0) return 0
-    
+
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length
-    const squaredDiffs = values.map(val => Math.pow(val - mean, 2))
+    const squaredDiffs = values.map((val) => Math.pow(val - mean, 2))
     return squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length
   }
 
@@ -327,12 +361,12 @@ export class InterventionAnalysisService {
    */
   private calculateDimensionalTrends(
     before: EmotionDimensions,
-    after: EmotionDimensions
+    after: EmotionDimensions,
   ): { valenceChange: number; arousalChange: number; dominanceChange: number } {
     return {
       valenceChange: after.valence - before.valence,
       arousalChange: after.arousal - before.arousal,
-      dominanceChange: after.dominance - before.dominance
+      dominanceChange: after.dominance - before.dominance,
     }
   }
 
@@ -365,46 +399,72 @@ export class InterventionAnalysisService {
       responseQuality: number
       stabilityIndicator: number
     },
-    trends: { valenceChange: number; arousalChange: number; dominanceChange: number }
+    trends: {
+      valenceChange: number
+      arousalChange: number
+      dominanceChange: number
+    },
   ): string[] {
     const recommendations: string[] = []
 
     // Emotional improvement recommendations
     if (metrics.emotionalImprovement < 0.3) {
-      recommendations.push('Consider alternative intervention approaches - current method showing limited emotional benefit')
-      recommendations.push('Assess for underlying factors that may be impeding progress')
+      recommendations.push(
+        'Consider alternative intervention approaches - current method showing limited emotional benefit',
+      )
+      recommendations.push(
+        'Assess for underlying factors that may be impeding progress',
+      )
     } else if (metrics.emotionalImprovement > 0.7) {
-      recommendations.push('Continue current intervention approach - showing strong positive results')
+      recommendations.push(
+        'Continue current intervention approach - showing strong positive results',
+      )
     }
 
     // Engagement recommendations
     if (metrics.engagementLevel < 0.4) {
-      recommendations.push('Focus on increasing patient engagement through more interactive techniques')
-      recommendations.push('Consider shorter, more frequent sessions to maintain attention')
+      recommendations.push(
+        'Focus on increasing patient engagement through more interactive techniques',
+      )
+      recommendations.push(
+        'Consider shorter, more frequent sessions to maintain attention',
+      )
     }
 
     // Valence trend recommendations
     if (trends.valenceChange < -0.2) {
-      recommendations.push('Monitor for signs of emotional deterioration - consider crisis protocols if needed')
+      recommendations.push(
+        'Monitor for signs of emotional deterioration - consider crisis protocols if needed',
+      )
     } else if (trends.valenceChange > 0.3) {
-      recommendations.push('Positive emotional trajectory - consider gradual increase in intervention intensity')
+      recommendations.push(
+        'Positive emotional trajectory - consider gradual increase in intervention intensity',
+      )
     }
 
     // Arousal trend recommendations
     if (trends.arousalChange > 0.4) {
-      recommendations.push('High arousal increase detected - implement calming techniques')
+      recommendations.push(
+        'High arousal increase detected - implement calming techniques',
+      )
     } else if (trends.arousalChange < -0.3) {
-      recommendations.push('Low arousal may indicate disengagement - consider more stimulating approaches')
+      recommendations.push(
+        'Low arousal may indicate disengagement - consider more stimulating approaches',
+      )
     }
 
     // Stability recommendations
     if (metrics.stabilityIndicator < 0.3) {
-      recommendations.push('Focus on emotional regulation techniques to improve stability')
+      recommendations.push(
+        'Focus on emotional regulation techniques to improve stability',
+      )
     }
 
     // Technique-specific recommendations
     if (context.type === 'cognitive' && metrics.emotionalImprovement < 0.4) {
-      recommendations.push('Consider supplementing cognitive techniques with behavioral interventions')
+      recommendations.push(
+        'Consider supplementing cognitive techniques with behavioral interventions',
+      )
     }
 
     return recommendations
@@ -415,14 +475,19 @@ export class InterventionAnalysisService {
    */
   private identifyRiskFactors(
     response: PatientResponse,
-    trends: { valenceChange: number; arousalChange: number; dominanceChange: number }
+    trends: {
+      valenceChange: number
+      arousalChange: number
+      dominanceChange: number
+    },
   ): string[] {
     const riskFactors: string[] = []
 
     // High negative emotions
-    const negativeEmotions = response.emotionAfter.emotions.sadness + 
-                           response.emotionAfter.emotions.anger + 
-                           response.emotionAfter.emotions.fear
+    const negativeEmotions =
+      response.emotionAfter.emotions.sadness +
+      response.emotionAfter.emotions.anger +
+      response.emotionAfter.emotions.fear
 
     if (negativeEmotions > 1.5) {
       riskFactors.push('Elevated negative emotional state')
@@ -439,7 +504,10 @@ export class InterventionAnalysisService {
     }
 
     // Low dominance with high negative emotions
-    if (response.emotionAfter.dimensions.dominance < -0.5 && negativeEmotions > 1.0) {
+    if (
+      response.emotionAfter.dimensions.dominance < -0.5 &&
+      negativeEmotions > 1.0
+    ) {
       riskFactors.push('Low sense of control combined with negative emotions')
     }
 
@@ -456,7 +524,7 @@ export class InterventionAnalysisService {
    */
   private calculateAnalysisConfidence(
     response: PatientResponse,
-    sessionHistory?: EmotionAnalysis[]
+    sessionHistory?: EmotionAnalysis[],
   ): number {
     let confidence = 0.5 // Base confidence
 
@@ -486,16 +554,16 @@ export class InterventionAnalysisService {
    * Store analysis result in history
    */
   private storeAnalysisResult(
-    interventionId: string, 
-    result: InterventionEffectivenessResult
+    interventionId: string,
+    result: InterventionEffectivenessResult,
   ): void {
     if (!this.analysisHistory.has(interventionId)) {
       this.analysisHistory.set(interventionId, [])
     }
-    
+
     const history = this.analysisHistory.get(interventionId)!
     history.push(result)
-    
+
     // Keep only last 50 results to prevent memory issues
     if (history.length > 50) {
       history.splice(0, history.length - 50)
@@ -505,7 +573,9 @@ export class InterventionAnalysisService {
   /**
    * Get analysis history for an intervention
    */
-  getAnalysisHistory(interventionId: string): InterventionEffectivenessResult[] {
+  getAnalysisHistory(
+    interventionId: string,
+  ): InterventionEffectivenessResult[] {
     return this.analysisHistory.get(interventionId) || []
   }
 
@@ -519,15 +589,16 @@ export class InterventionAnalysisService {
     engagementLevels: number[]
   } {
     const history = this.getAnalysisHistory(interventionId)
-    
+
     return {
-      timestamps: history.map(r => r.timestamp),
-      effectivenessScores: history.map(r => r.effectivenessScore),
-      emotionalImprovements: history.map(r => r.metrics.emotionalImprovement),
-      engagementLevels: history.map(r => r.metrics.engagementLevel)
+      timestamps: history.map((r) => r.timestamp),
+      effectivenessScores: history.map((r) => r.effectivenessScore),
+      emotionalImprovements: history.map((r) => r.metrics.emotionalImprovement),
+      engagementLevels: history.map((r) => r.metrics.engagementLevel),
     }
   }
 }
 
 // Export singleton instance
-export const interventionAnalysisService = InterventionAnalysisService.getInstance()
+export const interventionAnalysisService =
+  InterventionAnalysisService.getInstance()

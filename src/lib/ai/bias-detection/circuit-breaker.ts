@@ -80,7 +80,7 @@ export class CircuitBreaker {
     this.successCount++
     this.totalRequests++
     this.lastSuccessTime = new Date()
-    
+
     this.requestWindow.push({
       timestamp: new Date(),
       success: true,
@@ -108,7 +108,7 @@ export class CircuitBreaker {
     this.failureCount++
     this.totalRequests++
     this.lastFailureTime = new Date()
-    
+
     this.requestWindow.push({
       timestamp: new Date(),
       success: false,
@@ -121,12 +121,15 @@ export class CircuitBreaker {
       logger.warn('Circuit breaker OPENED from HALF_OPEN due to failure')
     } else if (this.state === 'CLOSED') {
       const recentRequests = this.getRecentRequests()
-      const recentFailures = recentRequests.filter(r => !r.success).length
-      const failureRate = recentRequests.length > 0 ? recentFailures / recentRequests.length : 0
+      const recentFailures = recentRequests.filter((r) => !r.success).length
+      const failureRate =
+        recentRequests.length > 0 ? recentFailures / recentRequests.length : 0
 
-    if (recentRequests.length >= this.config.volumeThreshold &&
-      recentFailures >= this.config.failureThreshold &&
-      failureRate > (this.config.failureRateThreshold ?? 0.5)) {
+      if (
+        recentRequests.length >= this.config.volumeThreshold &&
+        recentFailures >= this.config.failureThreshold &&
+        failureRate > (this.config.failureRateThreshold ?? 0.5)
+      ) {
         this.state = 'OPEN'
         this.stateChangedAt = new Date()
         logger.warn('Circuit breaker OPENED due to failure threshold', {
@@ -146,20 +149,24 @@ export class CircuitBreaker {
   }
 
   private shouldAttemptReset(): boolean {
-    if (!this.lastFailureTime) { return true }
-    
+    if (!this.lastFailureTime) {
+      return true
+    }
+
     const timeSinceLastFailure = Date.now() - this.lastFailureTime.getTime()
     return timeSinceLastFailure >= this.config.recoveryTimeout
   }
 
   private getRecentRequests(): Array<{ timestamp: Date; success: boolean }> {
     const cutoff = new Date(Date.now() - this.config.monitoringPeriod)
-    return this.requestWindow.filter(req => req.timestamp >= cutoff)
+    return this.requestWindow.filter((req) => req.timestamp >= cutoff)
   }
 
   private cleanupRequestWindow() {
     const cutoff = new Date(Date.now() - this.config.monitoringPeriod)
-    this.requestWindow = this.requestWindow.filter(req => req.timestamp >= cutoff)
+    this.requestWindow = this.requestWindow.filter(
+      (req) => req.timestamp >= cutoff,
+    )
   }
 
   private resetCounts() {
@@ -170,8 +177,9 @@ export class CircuitBreaker {
 
   getStats(): CircuitBreakerStats {
     const recentRequests = this.getRecentRequests()
-    const recentFailures = recentRequests.filter(r => !r.success).length
-    const failureRate = recentRequests.length > 0 ? recentFailures / recentRequests.length : 0
+    const recentFailures = recentRequests.filter((r) => !r.success).length
+    const failureRate =
+      recentRequests.length > 0 ? recentFailures / recentRequests.length : 0
 
     return {
       state: this.state,

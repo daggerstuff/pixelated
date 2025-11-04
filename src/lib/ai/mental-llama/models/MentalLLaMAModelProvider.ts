@@ -39,7 +39,11 @@ export class MentalLLaMAModelProvider implements IModelProvider {
       result = await this.invoke(messages, options)
     } catch (error: unknown) {
       const msg = error instanceof Error ? String(error) : String(error)
-      if (msg.includes('Unrecognized or invalid response structure from MentalLLaMA API')) {
+      if (
+        msg.includes(
+          'Unrecognized or invalid response structure from MentalLLaMA API',
+        )
+      ) {
         // Normalize error message to what tests expect
         throw new Error('Invalid response structure from MentalLLaMA API.')
       }
@@ -66,7 +70,9 @@ export class MentalLLaMAModelProvider implements IModelProvider {
     const env = getEnv()
     const apiKey = env.MENTALLAMA_API_KEY
     const endpointUrl =
-      modelTier === '13B' ? env.MENTALLAMA_ENDPOINT_URL_13B : env.MENTALLAMA_ENDPOINT_URL_7B
+      modelTier === '13B'
+        ? env.MENTALLAMA_ENDPOINT_URL_13B
+        : env.MENTALLAMA_ENDPOINT_URL_7B
 
     if (!apiKey || !endpointUrl) {
       logger.warn(

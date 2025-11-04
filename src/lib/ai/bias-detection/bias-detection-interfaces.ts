@@ -75,9 +75,9 @@ export interface PythonAnalysisResult {
 }
 
 export interface PythonHealthResponse {
-   status: string
-   message?: string
-   timestamp: string
+  status: string
+  message?: string
+  timestamp: string
 }
 
 export interface MetricData {

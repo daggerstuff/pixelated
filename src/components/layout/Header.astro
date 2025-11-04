@@ -1,85 +1,152 @@
 ---
-// Brutalist Dark Header - Mental Health Platform
+// Unified Dark Theme Header - Brutalist + Minimal + Corporate + Enterprise + Antfu Elegance
+import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+
 const navLinks = [
-  { name: 'Demos', href: '/demo-hub' },
+  { name: 'Demos', href: '/demo-hub', highlight: true },
   { name: 'Features', href: '/features' },
   { name: 'About', href: '/about' },
   { name: 'Contact', href: '/contact' },
 ]
 ---
 
+<style>
+  @import url('/src/styles/header-responsive.css');
+</style>
+
 <header
-  class="fixed top-0 z-50 w-full"
-  style="background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-primary);"
+  class="fixed top-0 z-50 w-full glass-surface elegant-surface corporate-header ios-safe-area unified-header"
+  style="background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-primary);"
 >
-  <div class="container-refined" style="max-width: 1280px; margin: 0 auto; padding: 0 var(--space-6);">
-    <div class="flex items-center justify-between" style="height: 3.5rem;">
-      <!-- Refined Branding -->
-      <div class="flex items-center">
+  <div class="container-refined header-container">
+    <div
+      class="flex items-center justify-between header-content"
+      style="height: var(--space-16);"
+      class:list={['md:height-20']}
+      <!--
+      Brutalist
+      Branding
+      with
+      Enterprise
+      Clarity
+      --
+    >
+      <div class="flex items-center flex-1 min-w-0">
         <a
-          class="flex items-center gap-3"
+          class="flex items-center gap-2 sm:gap-3 group touch-focus branding-link"
           href="/"
-          style="transition: opacity var(--transition-fast);"
-          onmouseover="this.style.opacity='0.85'"
-          onmouseout="this.style.opacity='1'"
+          style="transition: all var(--transition-normal); text-decoration: none;"
         >
-          <img
-            src="/apple-touch-icon.png"
-            alt="Pixelated Empathy Logo"
-            style="width: 2rem; height: 2rem; border-radius: var(--radius-md);"
-            width="64"
-            height="64"
-            fetchpriority="high"
-            loading="eager"
-            decoding="async"
-          />
-          <span style="font-size: var(--text-lg); font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">
-            PIXELATED EMPATHY
-          </span>
+          <div
+            class="relative touch-target logo-container"
+            style="width: 2rem; height: 2rem; background: var(--accent-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; transition: all var(--transition-spring); position: relative; overflow: hidden;"
+            class:list={['sm:width-2.5rem', 'sm:height-2.5rem']}
+          >
+            <img
+              src="/apple-touch-icon.png"
+              alt="PE"
+              style="width: 1.4rem; height: 1.4rem; border-radius: var(--radius-md); filter: brightness(0) invert(1);"
+              class:list={['sm:width-1.8rem', 'sm:height-1.8rem']}
+              width="64"
+              height="64"
+              fetchpriority="high"
+              loading="eager"
+              decoding="async"
+            />
+            <div
+              class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style="background: linear-gradient(135deg, var(--accent-primary-hover), var(--accent-blue));"
+            >
+            </div>
+          </div>
+          <div class="flex flex-col min-w-0 branding-text">
+            <span
+              class="heading-brutalist text-gradient branding-primary"
+              style="font-size: var(--text-base); font-weight: var(--weight-black); letter-spacing: -0.02em; line-height: 1; display: none; margin: 0;"
+              class:list={[
+                { 'display': 'block', 'sm:fontSize': 'var(--text-lg)' },
+              ]}
+            >
+              PIXELATED
+            </span>
+            <span
+              class="branding-secondary"
+              style="font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--text-tertiary); letter-spacing: 0.05em; line-height: 1; display: none; opacity: 0.8;"
+              class:list={[
+                { 'display': 'block', 'sm:fontSize': 'var(--text-sm)' },
+              ]}
+            >
+              EMPATHY
+            </span>
+          </div>
         </a>
       </div>
 
-      <!-- Desktop Navigation - Refined -->
-      <nav class="hidden md:flex items-center">
-        <ul class="nav-minimal">
+      <!-- Enterprise Navigation with Minimalist Approach -->
+      <nav class="nav-responsive items-center enterprise-nav">
+        <ul
+          class="nav-minimal"
+          style="gap: var(--space-8);"
+          class:list={['md:gap-6', 'lg:gap-8']}
+        >
           {
             navLinks.map((link) => (
               <li>
                 <a
                   href={link.href}
-                  class="nav-link-refined"
+                  class:list={[
+                    'nav-link-enterprise text-responsive--small',
+                    link.highlight ? 'nav-link--highlighted' : '',
+                    'touch-focus',
+                  ]}
+                  style="position: relative; display: flex; align-items: center; gap: var(--space-2); font-weight: var(--weight-medium); text-transform: uppercase; letter-spacing: 0.025em;"
                 >
-                  {link.name}
+                  {link.highlight && (
+                    <span class="corporate-badge text-responsive--caption">
+                      NEW
+                    </span>
+                  )}
+                  <span class="text-responsive--small">{link.name}</span>
                 </a>
               </li>
             ))
           }
         </ul>
 
-        <!-- Primary CTA -->
-        <div style="margin-left: var(--space-6);">
+        <!-- Enterprise CTA with Minimalist Approach -->
+        <div
+          class="flex items-center gap-2 md:gap-3 header-actions"
+          style="margin-left: var(--space-8);"
+          class:list={['lg:margin-left-12']}
+        >
+          <ThemeToggle />
+
           <a
             href="/contact"
-            class="btn-brutalist btn-brutalist--primary"
-            style="font-size: var(--text-sm); padding: var(--space-2) var(--space-5); border-radius: var(--radius-full);"
+            class="btn-brutalist btn-brutalist--primary btn-enterprise animate-pulse-glow btn-responsive"
+            style="font-size: var(--text-sm); padding: var(--space-3) var(--space-6); border-radius: var(--radius-full); font-weight: var(--weight-bold); display: none; letter-spacing: 0.05em; text-transform: uppercase;"
+            class:list={[{ 'display': 'flex', 'md:display': 'flex' }]}
           >
-            GET STARTED
+            <span class="text-responsive--small">GET STARTED</span>
           </a>
         </div>
       </nav>
 
-      <!-- Mobile Menu Button -->
-      <div class="md:hidden">
+      <!-- Minimalist Mobile Menu Button -->
+      <div class="nav-mobile items-center gap-2 md:gap-3 mobile-menu-trigger">
+        <ThemeToggle />
+
         <button
-          id="mobile-menu-button"
-          style="padding: var(--space-2); color: var(--text-primary); transition: color var(--transition-fast);"
+          id="mobile-menu-button-v2"
+          class="btn-brutalist btn-brutalist--ghost touch-target mobile-menu-btn"
+          style="padding: var(--space-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
           aria-label="Toggle mobile menu"
           aria-expanded="false"
-          onmouseover="this.style.color='var(--accent-primary)'"
-          onmouseout="this.style.color='var(--text-primary)'"
         >
           <svg
-            style="width: 1.5rem; height: 1.5rem;"
+            id="menu-icon"
+            style="width: 1.25rem; height: 1.25rem; transition: all var(--transition-fast);"
+            class:list={['md:width-1.5rem', 'md:height-1.5rem']}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -90,72 +157,780 @@ const navLinks = [
               stroke-width="2"
               d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
+          <svg
+            id="close-icon"
+            style="width: 1.25rem; height: 1.25rem; display: none; transition: all var(--transition-fast);"
+            class:list={['md:width-1.5rem', 'md:height-1.5rem']}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Mobile Menu -->
+  <!-- Unified Mobile Menu -->
   <div
-    id="mobile-menu"
-    class="hidden md:hidden fixed left-0 right-0 z-40"
-    style="top: 3.5rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-primary);"
+    id="mobile-menu-v2"
+    class="mobile-menu lg:hidden unified-mobile-menu"
+    style="background: var(--bg-glass); border-top: 1px solid var(--border-primary); border-bottom: 1px solid var(--border-primary); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);"
   >
-    <div class="container-refined" style="padding: var(--space-4) var(--space-6);">
-      <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+    <div class="mobile-menu__content elegant-surface">
+      <div class="mobile-menu__header">
+        <div class="flex items-center gap-3 mobile-branding">
+          <div
+            class="logo-container"
+            style="width: 2rem; height: 2rem; background: var(--accent-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;"
+          >
+            <img
+              src="/apple-touch-icon.png"
+              alt="PE"
+              style="width: 1.4rem; height: 1.4rem; border-radius: var(--radius-sm); filter: brightness(0) invert(1);"
+            />
+          </div>
+          <div class="text-gradient font-bold text-lg mobile-brand-title">
+            PIXELATED EMPATHY
+          </div>
+        </div>
+        <button
+          id="mobile-menu-close"
+          class="btn-brutalist btn-brutalist--ghost touch-target mobile-close-btn"
+          aria-label="Close mobile menu"
+          style="padding: var(--space-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
+        >
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="mobile-menu__nav">
         {
           navLinks.map((link) => (
-            <a
-              href={link.href}
-              style="display: block; padding: var(--space-3) var(--space-4); color: var(--text-secondary); transition: all var(--transition-fast); border-radius: var(--radius-md);"
-              onmouseover="this.style.color='var(--accent-primary)'; this.style.background='rgba(16, 185, 129, 0.08)'"
-              onmouseout="this.style.color='var(--text-secondary)'; this.style.background='transparent'"
-            >
-              {link.name}
-            </a>
+            <div class="mobile-menu__nav-item">
+              <a
+                href={link.href}
+                class="mobile-menu__nav-link touch-focus"
+                onclick="document.getElementById('mobile-menu-v2').classList.add('hidden'); document.getElementById('mobile-menu-button-v2').setAttribute('aria-expanded', 'false');"
+              >
+                <div class="flex items-center gap-3">
+                  {link.highlight && <span class="corporate-badge">NEW</span>}
+                  <span>{link.name}</span>
+                </div>
+              </a>
+            </div>
           ))
         }
-        <div style="padding-top: var(--space-2); border-top: 1px solid var(--border-primary); margin-top: var(--space-2);">
-          <a
-            href="/contact"
-            class="btn-brutalist btn-brutalist--primary"
-            style="display: block; text-align: center; padding: var(--space-3); border-radius: var(--radius-md);"
-          >
-            GET STARTED
-          </a>
-        </div>
+      </nav>
+
+      <!-- Mobile CTA -->
+      <div class="pt-6 border-t border-gray-800">
+        <a
+          href="/contact"
+          class="btn-brutalist btn-brutalist--primary w-full btn-responsive--large"
+          onclick="document.getElementById('mobile-menu-v2').classList.add('hidden'); document.getElementById('mobile-menu-button-v2').setAttribute('aria-expanded', 'false');"
+        >
+          GET STARTED
+        </a>
       </div>
     </div>
   </div>
 </header>
 
+<style>
+  /* === UNIFIED DARK THEME HEADER STYLES === */
+
+  /* Brutalist Design Elements */
+  .unified-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: var(--z-sticky);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-primary);
+    transition: all var(--transition-normal);
+  }
+
+  /* Logo Container with Brutalist Raw Edges */
+  .logo-container {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-spring);
+  }
+
+  .logo-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      var(--accent-primary),
+      var(--accent-blue)
+    );
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+  }
+
+  .logo-container:hover::before {
+    opacity: 0.1;
+  }
+
+  /* Branding Typography - Brutalist Bold Approach */
+  .branding-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .branding-primary {
+    font-family:
+      'Geist Sans',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    font-weight: var(--weight-black);
+    font-size: var(--text-lg);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    background: linear-gradient(
+      135deg,
+      var(--text-primary),
+      var(--accent-primary)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+
+  .branding-secondary {
+    font-family:
+      'Geist Sans',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    font-weight: var(--weight-medium);
+    font-size: var(--text-xs);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    opacity: 0.8;
+    text-transform: uppercase;
+  }
+
+  /* Enterprise Navigation - Minimalist with Clear Hierarchy */
+  .enterprise-nav {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .nav-link-enterprise {
+    position: relative;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: var(--weight-medium);
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .nav-link-enterprise::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    transform: translateX(-50%);
+    transition: width var(--transition-fast);
+  }
+
+  .nav-link-enterprise:hover {
+    color: var(--accent-primary);
+    background: var(--accent-primary-subtle);
+  }
+
+  .nav-link-enterprise:hover::after {
+    width: 60%;
+  }
+
+  .nav-link--highlighted {
+    background: var(--accent-primary-subtle);
+    border-radius: var(--radius-md);
+    color: var(--accent-primary);
+  }
+
+  .nav-link--highlighted:hover {
+    background: var(--accent-primary-muted);
+    color: var(--accent-primary-hover);
+  }
+
+  /* Enterprise CTA Button - Corporate Sleekness */
+  .btn-enterprise {
+    position: relative;
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+  }
+
+  .btn-enterprise::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transition: left var(--transition-slow);
+  }
+
+  .btn-enterprise:hover::before {
+    left: 100%;
+  }
+
+  .btn-enterprise:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Header Actions - Minimalist Approach */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: var(--space-8);
+  }
+
+  /* Responsive Design - Enterprise Brevity */
+  @media (max-width: 768px) {
+    .unified-header {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .branding-primary {
+      font-size: var(--text-base);
+    }
+
+    .branding-secondary {
+      font-size: var(--text-xs);
+    }
+
+    .header-actions {
+      margin-left: var(--space-4);
+    }
+  }
+
+  /* Animations - Antfu-inspired Elegance */
+  @keyframes headerFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes logoGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+  }
+
+  .unified-header {
+    animation: headerFadeIn 0.3s ease-out;
+  }
+
+  .logo-container:hover {
+    animation: logoGlow 2s ease-in-out infinite;
+  }
+
+  /* Smooth Scrolling Enhancement */
+  @media (prefers-reduced-motion: no-preference) {
+    .unified-header {
+      transition: all var(--transition-normal);
+    }
+
+    .nav-link-enterprise {
+      transition: all var(--transition-fast);
+    }
+
+    .btn-enterprise {
+      transition: all var(--transition-normal);
+    }
+  }
+
+  /* Enhanced Navigation Styles */
+  .nav-link--highlighted {
+    background: var(--accent-primary-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .nav-link--highlighted:hover {
+    background: var(--accent-primary-muted);
+  }
+
+  /* Mobile menu styles - Unified Dark Theme */
+  .mobile-menu {
+    position: fixed;
+    top: var(--space-16);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-modal);
+    transform: translateX(100%);
+    transition: transform var(--transition-normal);
+    overflow-y: auto;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .unified-mobile-menu {
+    background: var(--bg-glass);
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .mobile-menu--open {
+    transform: translateX(0);
+  }
+
+  .mobile-menu__content {
+    padding: var(--space-responsive-xl);
+    min-height: 100vh;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .mobile-menu__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-responsive-xl);
+    padding-bottom: var(--space-responsive-md);
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .mobile-branding {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .mobile-brand-title {
+    font-family:
+      'Geist Sans',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    background: linear-gradient(
+      135deg,
+      var(--text-primary),
+      var(--accent-primary)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .mobile-menu-btn {
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transition: left var(--transition-normal);
+  }
+
+  .mobile-menu-btn:hover::before {
+    left: 100%;
+  }
+
+  .mobile-close-btn {
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-close-btn:hover {
+    background: var(--accent-primary-subtle);
+    transform: rotate(90deg);
+  }
+
+  .mobile-menu__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-menu__nav-item {
+    margin-bottom: var(--space-responsive-md);
+  }
+
+  .mobile-menu__nav-link {
+    display: block;
+    padding: var(--space-responsive-md) var(--space-responsive-sm);
+    font-size: var(--text-responsive-lg);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-md);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .mobile-menu__nav-link:hover {
+    color: var(--accent-primary);
+    background: var(--accent-primary-subtle);
+    transform: translateX(4px);
+  }
+
+  /* Responsive Utilities - Enterprise Brevity */
+  @media (max-width: 768px) {
+    .md\:display-none {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md\:display-flex {
+      display: flex !important;
+    }
+  }
+
+  /* Touch Target Optimizations */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .touch-focus:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* Prevent scroll when mobile menu is open */
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+
+  /* iOS Safe Area Support */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .ios-safe-area {
+      padding-top: max(var(--space-4), env(safe-area-inset-top));
+    }
+  }
+
+  .mobile-menu__nav-link:hover {
+    color: var(--accent-primary);
+    background: var(--accent-primary-subtle);
+  }
+
+  /* Responsive height for header */
+  @media (min-width: 768px) {
+    .md\\:height-5rem {
+      height: 5rem !important;
+    }
+  }
+
+  /* Touch target optimizations */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .touch-focus:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* Responsive utilities */
+  @media (max-width: 768px) {
+    .md\\:display-none {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md\\:display-flex {
+      display: flex !important;
+    }
+  }
+
+  /* Icon size responsive utilities */
+  @media (min-width: 768px) {
+    .md\\:width-1\\.5rem {
+      width: 1.5rem !important;
+    }
+    .md\\:height-1\\.5rem {
+      height: 1.5rem !important;
+    }
+  }
+
+  /* Container responsive margin */
+  @media (min-width: 1024px) {
+    .lg\\:margin-left-8 {
+      margin-left: var(--space-8) !important;
+    }
+  }
+
+  /* Responsive text display */
+  @media (min-width: 640px) {
+    .sm\\:fontsize-var\\(--text-lg\\) {
+      font-size: var(--text-lg) !important;
+    }
+    .sm\\:fontsize-var\\(--text-sm\\) {
+      font-size: var(--text-sm) !important;
+    }
+  }
+
+  /* Responsive spacing */
+  @media (min-width: 640px) {
+    .sm\\:gap-3 {
+      gap: var(--space-3) !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md\\:gap-3 {
+      gap: var(--space-3) !important;
+    }
+  }
+
+  /* Responsive icon sizes */
+  @media (min-width: 640px) {
+    .sm\\:width-2\\.5rem {
+      width: 2.5rem !important;
+    }
+    .sm\\:height-2\\.5rem {
+      height: 2.5rem !important;
+    }
+    .sm\\:width-1\\.8rem {
+      width: 1.8rem !important;
+    }
+    .sm\\:height-1\\.8rem {
+      height: 1.8rem !important;
+    }
+  }
+
+  /* Prevent scroll when mobile menu is open */
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+
+  /* iOS Safe Area Support */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .ios-safe-area {
+      padding-top: max(var(--space-4), env(safe-area-inset-top));
+    }
+  }
+
+  /* Remove duplicate and malformed CSS rules */
+</style>
+
 <script is:inline>
-  // Mobile menu functionality
-  const mobileMenuButton = document.getElementById('mobile-menu-button')
-  const mobileMenu = document.getElementById('mobile-menu')
+  // Enhanced mobile menu functionality with responsive improvements
+  const mobileMenuButton = document.getElementById('mobile-menu-button-v2')
+  const mobileMenu = document.getElementById('mobile-menu-v2')
+  const mobileMenuClose = document.getElementById('mobile-menu-close')
+  const menuIcon = document.getElementById('menu-icon')
+  const closeIcon = document.getElementById('close-icon')
+  const body = document.body
 
-  if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', (_event) => {
-      const isOpen = !mobileMenu.classList.contains('hidden')
+  function openMobileMenu() {
+    mobileMenu.classList.remove('hidden')
+    mobileMenu.classList.add('mobile-menu--open')
+    mobileMenuButton.setAttribute('aria-expanded', 'true')
+    menuIcon.style.display = 'none'
+    closeIcon.style.display = 'block'
+    body.classList.add('mobile-menu-open')
 
-      if (isOpen) {
-        mobileMenu.classList.add('hidden')
-        mobileMenuButton.setAttribute('aria-expanded', 'false')
-      } else {
-        mobileMenu.classList.remove('hidden')
-        mobileMenuButton.setAttribute('aria-expanded', 'true')
-      }
+    // Focus management for accessibility
+    mobileMenuClose.focus()
+
+    // Prevent body scroll on iOS
+    body.style.position = 'fixed'
+    body.style.width = '100%'
+    body.style.overflow = 'hidden'
+  }
+
+  function closeMobileMenu() {
+    mobileMenu.classList.add('hidden')
+    mobileMenu.classList.remove('mobile-menu--open')
+    mobileMenuButton.setAttribute('aria-expanded', 'false')
+    menuIcon.style.display = 'block'
+    closeIcon.style.display = 'none'
+    body.classList.remove('mobile-menu-open')
+
+    // Restore body scroll
+    body.style.position = ''
+    body.style.width = ''
+    body.style.overflow = ''
+
+    // Return focus to menu button
+    mobileMenuButton.focus()
+  }
+
+  if (
+    mobileMenuButton &&
+    mobileMenu &&
+    mobileMenuClose &&
+    menuIcon &&
+    closeIcon
+  ) {
+    // Open menu
+    mobileMenuButton.addEventListener('click', (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      openMobileMenu()
+    })
+
+    // Close menu with close button
+    mobileMenuClose.addEventListener('click', (event) => {
+      event.preventDefault()
+      closeMobileMenu()
     })
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
       if (
         !mobileMenuButton.contains(e.target) &&
-        !mobileMenu.contains(e.target)
+        !mobileMenu.contains(e.target) &&
+        !mobileMenu.classList.contains('hidden')
       ) {
-        mobileMenu.classList.add('hidden')
-        mobileMenuButton.setAttribute('aria-expanded', 'false')
+        closeMobileMenu()
       }
     })
+
+    // Close mobile menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+        closeMobileMenu()
+      }
+    })
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (
+        window.innerWidth >= 1024 &&
+        !mobileMenu.classList.contains('hidden')
+      ) {
+        closeMobileMenu()
+      }
+    })
+
+    // Handle touch gestures for swipe to close
+    let touchStartX = 0
+    let touchEndX = 0
+
+    mobileMenu.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX
+    })
+
+    mobileMenu.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX
+      handleSwipeGesture()
+    })
+
+    function handleSwipeGesture() {
+      const swipeThreshold = 50
+      const diff = touchStartX - touchEndX
+
+      if (diff < -swipeThreshold) {
+        // Swipe right to close
+        closeMobileMenu()
+      }
+    }
   }
+
+  // Handle orientation changes
+  window.addEventListener('orientationchange', () => {
+    if (!mobileMenu.classList.contains('hidden')) {
+      // Re-calculate menu position after orientation change
+      setTimeout(() => {
+        mobileMenu.style.top = `${mobileMenuButton.offsetTop + mobileMenuButton.offsetHeight}px`
+      }, 100)
+    }
+  })
 </script>

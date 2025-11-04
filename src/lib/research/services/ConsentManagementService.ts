@@ -1,5 +1,9 @@
 import { getLogger } from '@/lib/logging/logger'
-import { ConsentRecord, ConsentLevel, ResearchConsent } from '@/lib/research/types/research-types'
+import {
+  ConsentRecord,
+  ConsentLevel,
+  ResearchConsent,
+} from '@/lib/research/types/research-types'
 
 const logger = getLogger('ConsentManagementService')
 
@@ -33,12 +37,14 @@ export class ConsentManagementService {
   private consentStore: Map<string, ConsentRecord> = new Map()
   private auditLog: ConsentAuditLog[] = []
 
-  constructor(config: ConsentConfig = {
-    defaultConsentLevel: 'minimal',
-    consentExpirationDays: 365,
-    withdrawalGracePeriodHours: 24,
-    auditRetentionDays: 2555 // 7 years for HIPAA compliance
-  }) {
+  constructor(
+    config: ConsentConfig = {
+      defaultConsentLevel: 'minimal',
+      consentExpirationDays: 365,
+      withdrawalGracePeriodHours: 24,
+      auditRetentionDays: 2555, // 7 years for HIPAA compliance
+    },
+  ) {
     this.config = config
   }
 
@@ -52,32 +58,34 @@ export class ConsentManagementService {
       ipAddress?: string
       userAgent?: string
       consentFormVersion?: string
-    }
+    },
   ): Promise<ConsentRecord> {
     logger.info('Initializing consent for client', { clientId, initialLevel })
 
     const consentRecord: ConsentRecord = {
       clientId,
       currentLevel: initialLevel,
-      consentHistory: [{
-        level: initialLevel,
-        timestamp: new Date().toISOString(),
-        reason: 'Initial consent',
-        ipAddress: metadata?.ipAddress,
-        userAgent: metadata?.userAgent,
-        consentFormVersion: metadata?.consentFormVersion || '1.0'
-      }],
+      consentHistory: [
+        {
+          level: initialLevel,
+          timestamp: new Date().toISOString(),
+          reason: 'Initial consent',
+          ipAddress: metadata?.ipAddress,
+          userAgent: metadata?.userAgent,
+          consentFormVersion: metadata?.consentFormVersion || '1.0',
+        },
+      ],
       lastUpdated: new Date().toISOString(),
       expirationDate: new Date(
-        Date.now() + this.config.consentExpirationDays * 24 * 60 * 60 * 1000
+        Date.now() + this.config.consentExpirationDays * 24 * 60 * 60 * 1000,
       ).toISOString(),
       withdrawalRequested: false,
       withdrawalDate: null,
-      dataPurged: false
+      dataPurged: false,
     }
 
     this.consentStore.set(clientId, consentRecord)
-    
+
     // Log the initialization
     this.logAudit({
       timestamp: new Date().toISOString(),
@@ -85,7 +93,7 @@ export class ConsentManagementService {
       operation: 'initialize',
       newLevel: initialLevel,
       ipAddress: metadata?.ipAddress,
-      userAgent: metadata?.userAgent
+      userAgent: metadata?.userAgent,
     })
 
     return consentRecord
@@ -96,7 +104,7 @@ export class ConsentManagementService {
    */
   async updateConsent(update: ConsentUpdate): Promise<ConsentRecord> {
     const { clientId, newLevel, reason, effectiveDate } = update
-    
+
     logger.info('Updating consent for client', { clientId, newLevel, reason })
 
     const existingConsent = this.consentStore.get(clientId)
@@ -105,7 +113,7 @@ export class ConsentManagementService {
     }
 
     const oldLevel = existingConsent.currentLevel
-    
+
     // Create new consent record
     const updatedConsent: ConsentRecord = {
       ...existingConsent,
@@ -119,13 +127,13 @@ export class ConsentManagementService {
           reason: reason || 'User requested change',
           ipAddress: undefined, // Would be populated from request context
           userAgent: undefined, // Would be populated from request context
-          consentFormVersion: '1.0'
-        }
-      ]
+          consentFormVersion: '1.0',
+        },
+      ],
     }
 
     this.consentStore.set(clientId, updatedConsent)
-    
+
     // Log the update
     this.logAudit({
       timestamp: new Date().toISOString(),
@@ -133,7 +141,7 @@ export class ConsentManagementService {
       operation: 'update',
       oldLevel,
       newLevel,
-      reason
+      reason,
     })
 
     return updatedConsent
@@ -145,13 +153,16 @@ export class ConsentManagementService {
   async requestWithdrawal(
     clientId: string,
     reason?: string,
-    immediate: boolean = false
+    immediate: boolean = false,
   ): Promise<{
     consentRecord: ConsentRecord
     dataPurgeScheduled: boolean
     gracePeriodEnd: Date
   }> {
-    logger.info('Processing consent withdrawal request', { clientId, immediate })
+    logger.info('Processing consent withdrawal request', {
+      clientId,
+      immediate,
+    })
 
     const consentRecord = this.consentStore.get(clientId)
     if (!consentRecord) {
@@ -160,14 +171,15 @@ export class ConsentManagementService {
 
     const withdrawalDate = new Date()
     const gracePeriodEnd = new Date(
-      withdrawalDate.getTime() + this.config.withdrawalGracePeriodHours * 60 * 60 * 1000
+      withdrawalDate.getTime() +
+        this.config.withdrawalGracePeriodHours * 60 * 60 * 1000,
     )
 
     const updatedConsent: ConsentRecord = {
       ...consentRecord,
       withdrawalRequested: true,
       withdrawalDate: withdrawalDate.toISOString(),
-      lastUpdated: withdrawalDate.toISOString()
+      lastUpdated: withdrawalDate.toISOString(),
     }
 
     this.consentStore.set(clientId, updatedConsent)
@@ -177,13 +189,13 @@ export class ConsentManagementService {
       timestamp: withdrawalDate.toISOString(),
       clientId,
       operation: 'withdrawal-request',
-      reason
+      reason,
     })
 
     return {
       consentRecord: updatedConsent,
       dataPurgeScheduled: !immediate,
-      gracePeriodEnd
+      gracePeriodEnd,
     }
   }
 
@@ -206,7 +218,7 @@ export class ConsentManagementService {
     const updatedConsent: ConsentRecord = {
       ...consentRecord,
       dataPurged: true,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     }
 
     this.consentStore.set(clientId, updatedConsent)
@@ -215,7 +227,7 @@ export class ConsentManagementService {
     this.logAudit({
       timestamp: new Date().toISOString(),
       clientId,
-      operation: 'withdrawal-complete'
+      operation: 'withdrawal-complete',
     })
 
     // In a real implementation, this would trigger actual data purging
@@ -230,12 +242,12 @@ export class ConsentManagementService {
     if (!consentRecord || consentRecord.withdrawalRequested) {
       return null
     }
-    
+
     // Check if consent has expired
     if (new Date(consentRecord.expirationDate) < new Date()) {
       return null
     }
-    
+
     return consentRecord.currentLevel
   }
 
@@ -251,7 +263,7 @@ export class ConsentManagementService {
    */
   async hasConsentFor(
     clientId: string,
-    researchUse: keyof ResearchConsent
+    researchUse: keyof ResearchConsent,
   ): Promise<boolean> {
     const consentLevel = await this.getConsentLevel(clientId)
     if (!consentLevel) return false
@@ -260,13 +272,13 @@ export class ConsentManagementService {
       none: {},
       minimal: {
         aggregateAnalytics: true,
-        anonymizedResearch: true
+        anonymizedResearch: true,
       },
       limited: {
         aggregateAnalytics: true,
         anonymizedResearch: true,
         techniqueEffectiveness: true,
-        outcomePrediction: true
+        outcomePrediction: true,
       },
       full: {
         aggregateAnalytics: true,
@@ -274,8 +286,8 @@ export class ConsentManagementService {
         techniqueEffectiveness: true,
         outcomePrediction: true,
         patternDiscovery: true,
-        predictiveModeling: true
-      }
+        predictiveModeling: true,
+      },
     }
 
     const permissions = consentMapping[consentLevel]
@@ -294,25 +306,28 @@ export class ConsentManagementService {
   }> {
     const records = Array.from(this.consentStore.values())
     const now = new Date()
-    
+
     const stats = {
       totalClients: records.length,
-      activeConsents: records.filter(r => 
-        !r.withdrawalRequested && 
-        new Date(r.expirationDate) > now
+      activeConsents: records.filter(
+        (r) => !r.withdrawalRequested && new Date(r.expirationDate) > now,
       ).length,
       consentLevels: {
         none: 0,
         minimal: 0,
         limited: 0,
-        full: 0
+        full: 0,
       },
-      withdrawalRequests: records.filter(r => r.withdrawalRequested).length,
-      expiredConsents: records.filter(r => new Date(r.expirationDate) <= now).length
+      withdrawalRequests: records.filter((r) => r.withdrawalRequested).length,
+      expiredConsents: records.filter((r) => new Date(r.expirationDate) <= now)
+        .length,
     }
 
-    records.forEach(record => {
-      if (!record.withdrawalRequested && new Date(record.expirationDate) > now) {
+    records.forEach((record) => {
+      if (
+        !record.withdrawalRequested &&
+        new Date(record.expirationDate) > now
+      ) {
         stats.consentLevels[record.currentLevel]++
       }
     })
@@ -325,7 +340,7 @@ export class ConsentManagementService {
    */
   async validateResearchAccess(
     clientIds: string[],
-    researchUse: keyof ResearchConsent
+    researchUse: keyof ResearchConsent,
   ): Promise<{
     validClients: string[]
     invalidClients: string[]
@@ -340,23 +355,26 @@ export class ConsentManagementService {
 
     for (const clientId of clientIds) {
       const hasConsent = await this.hasConsentFor(clientId, researchUse)
-      
+
       if (hasConsent) {
         validClients.push(clientId)
       } else {
         invalidClients.push(clientId)
-        
+
         const consentRecord = await this.getConsentRecord(clientId)
         if (!consentRecord) {
           consentIssues.push({ clientId, issue: 'No consent record found' })
         } else if (consentRecord.withdrawalRequested) {
-          consentIssues.push({ clientId, issue: 'Consent withdrawal requested' })
+          consentIssues.push({
+            clientId,
+            issue: 'Consent withdrawal requested',
+          })
         } else if (new Date(consentRecord.expirationDate) <= new Date()) {
           consentIssues.push({ clientId, issue: 'Consent has expired' })
         } else {
-          consentIssues.push({ 
-            clientId, 
-            issue: `Insufficient consent level: ${consentRecord.currentLevel}` 
+          consentIssues.push({
+            clientId,
+            issue: `Insufficient consent level: ${consentRecord.currentLevel}`,
           })
         }
       }
@@ -370,7 +388,7 @@ export class ConsentManagementService {
    */
   async getAuditTrail(clientId?: string): Promise<ConsentAuditLog[]> {
     if (clientId) {
-      return this.auditLog.filter(log => log.clientId === clientId)
+      return this.auditLog.filter((log) => log.clientId === clientId)
     }
     return [...this.auditLog]
   }
@@ -392,7 +410,7 @@ export class ConsentManagementService {
     return {
       consentRecords: Array.from(this.consentStore.values()),
       auditLog: this.auditLog,
-      statistics: await this.getConsentStatistics()
+      statistics: await this.getConsentStatistics(),
     }
   }
 
@@ -401,13 +419,13 @@ export class ConsentManagementService {
    */
   private logAudit(logEntry: ConsentAuditLog): void {
     this.auditLog.push(logEntry)
-    
+
     // Trim audit log to retention period
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - this.config.auditRetentionDays)
-    
+
     this.auditLog = this.auditLog.filter(
-      log => new Date(log.timestamp) >= cutoffDate
+      (log) => new Date(log.timestamp) >= cutoffDate,
     )
   }
 
@@ -417,7 +435,7 @@ export class ConsentManagementService {
     // 2. Update anonymization records
     // 3. Notify downstream systems
     // 4. Generate purge confirmation
-    
+
     logger.info('Client data purged', { clientId })
   }
 }

@@ -15,13 +15,10 @@ export interface Job<T = any, R = any> {
   progress?: number
 }
 
-
 export class JobQueue<T = any, R = any> {
   private jobs: Map<string, Job<T, R>> = new Map()
   private queue: string[] = []
   private processing = false
-
-  
 
   submit(data: T): string {
     const id = Math.random().toString(36).slice(2) + Date.now()
@@ -34,7 +31,10 @@ export class JobQueue<T = any, R = any> {
     }
     this.jobs.set(id, job)
     this.queue.push(id)
-    console.info(`[JobQueue] Job submitted`, { jobId: id, createdAt: job.createdAt })
+    console.info(`[JobQueue] Job submitted`, {
+      jobId: id,
+      createdAt: job.createdAt,
+    })
     this.processNext()
     return id
   }
@@ -53,16 +53,24 @@ export class JobQueue<T = any, R = any> {
    */
   getMetrics() {
     const jobs = Array.from(this.jobs.values())
-    const statusCounts = jobs.reduce<Record<JobStatus, number>>((acc, j) => {
-      acc[j.status] = (acc[j.status] ?? 0) + 1
-      return acc
-    }, { pending: 0, in_progress: 0, completed: 0, failed: 0 })
-    const completedJobs = jobs.filter(j => j.status === 'completed' && j.finishedAt && j.startedAt)
+    const statusCounts = jobs.reduce<Record<JobStatus, number>>(
+      (acc, j) => {
+        acc[j.status] = (acc[j.status] ?? 0) + 1
+        return acc
+      },
+      { pending: 0, in_progress: 0, completed: 0, failed: 0 },
+    )
+    const completedJobs = jobs.filter(
+      (j) => j.status === 'completed' && j.finishedAt && j.startedAt,
+    )
     const avgDuration =
       completedJobs.length > 0
-        ? completedJobs.reduce((sum, j) => sum + ((j.finishedAt! - j.startedAt!) || 0), 0) / completedJobs.length
+        ? completedJobs.reduce(
+            (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
+            0,
+          ) / completedJobs.length
         : 0
-    const errorCount = jobs.filter(j => j.status === 'failed').length
+    const errorCount = jobs.filter((j) => j.status === 'failed').length
     const total = jobs.length
     return {
       statusCounts,
@@ -81,14 +89,17 @@ export class JobQueue<T = any, R = any> {
     if (!job) {
       return
     }
-    
+
     try {
       // Job processing logic would go here
     } catch (_err: any) {
-      
-      console.error(`[JobQueue] Job failed`, { jobId: job.id, error: job.error, finishedAt: Date.now() })
+      console.error(`[JobQueue] Job failed`, {
+        jobId: job.id,
+        error: job.error,
+        finishedAt: Date.now(),
+      })
     }
-    
+
     // Process next job in queue
     if (this.queue.length > 0) {
       this.processNext()

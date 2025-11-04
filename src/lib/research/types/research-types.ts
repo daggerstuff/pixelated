@@ -57,16 +57,22 @@ export interface AnonymizedMetrics {
   }
   temporalTrends: {
     [period: string]: {
-      emotionTrends: Record<string, {
-        mean: number
-        trend: 'increasing' | 'decreasing' | 'stable'
-        slope: number
-      }>
-      techniqueTrends: Record<string, {
-        mean: number
-        trend: 'increasing' | 'decreasing' | 'stable'
-        slope: number
-      }>
+      emotionTrends: Record<
+        string,
+        {
+          mean: number
+          trend: 'increasing' | 'decreasing' | 'stable'
+          slope: number
+        }
+      >
+      techniqueTrends: Record<
+        string,
+        {
+          mean: number
+          trend: 'increasing' | 'decreasing' | 'stable'
+          slope: number
+        }
+      >
     }
   }
   privacyMetrics: {
@@ -109,7 +115,12 @@ export interface ConsentRecord {
 // Query system types
 export interface ResearchQuery {
   id: string
-  type: 'sql' | 'pattern-discovery' | 'longitudinal-analysis' | 'cohort-comparison' | 'aggregate-analysis'
+  type:
+    | 'sql'
+    | 'pattern-discovery'
+    | 'longitudinal-analysis'
+    | 'cohort-comparison'
+    | 'aggregate-analysis'
   sql?: string
   parameters: Record<string, unknown>
   description: string
@@ -240,11 +251,14 @@ export interface ClusterPattern {
   centroid: Record<string, number>
   members: string[]
   size: number
-  characteristics: Record<string, {
-    mean: number
-    stdDev: number
-    distribution: Record<string, number>
-  }>
+  characteristics: Record<
+    string,
+    {
+      mean: number
+      stdDev: number
+      distribution: Record<string, number>
+    }
+  >
 }
 
 // Evidence generation types
@@ -444,7 +458,7 @@ export class ResearchPlatformError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
   ) {
     super(message)
     this.name = 'ResearchPlatformError'

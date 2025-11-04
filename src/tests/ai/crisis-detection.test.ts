@@ -18,7 +18,7 @@ vi.mock('../../lib/logging/build-safe-logger', () => ({
 describe('crisisDetectionService', () => {
   let CrisisDetectionService: any
   let crisisService: any
-  
+
   const mockAIService = {
     createChatCompletion: vi.fn(),
     createStreamingChatCompletion: vi.fn(),
@@ -31,7 +31,7 @@ describe('crisisDetectionService', () => {
     // Dynamically import the service after mocks are set up
     const serviceModule = await import('../../lib/ai/services/crisis-detection')
     CrisisDetectionService = serviceModule.CrisisDetectionService
-    
+
     crisisService = new CrisisDetectionService({
       aiService: mockAIService,
       sensitivityLevel: 'high' as const,
@@ -59,7 +59,7 @@ describe('crisisDetectionService', () => {
         model: 'test-model',
         id: 'test-id',
         created: Date.now(),
-        choices: []
+        choices: [],
       } as AICompletion)
 
       const result: CrisisDetectionResult = await crisisService.detectCrisis(
@@ -82,18 +82,18 @@ describe('crisisDetectionService', () => {
       }
 
       mockAIService.createChatCompletion.mockResolvedValue({
-        content: JSON.stringify({ 
-          score: 0.6, 
+        content: JSON.stringify({
+          score: 0.6,
           category: 'severe_depression',
           severity: 'high',
           indicators: ['hopeless', 'worthless'],
-          recommendations: ['Professional counseling recommended']
+          recommendations: ['Professional counseling recommended'],
         }),
         usage: { promptTokens: 50, completionTokens: 100, totalTokens: 150 },
         model: 'test-model',
         id: 'test-id',
         created: Date.now(),
-        choices: []
+        choices: [],
       } as AICompletion)
 
       const result = await crisisService.detectCrisis(text, options)
@@ -135,7 +135,7 @@ describe('crisisDetectionService', () => {
         model: 'test-model',
         id: 'test-id',
         created: Date.now(),
-        choices: []
+        choices: [],
       } as AICompletion)
 
       const result = await crisisService.detectCrisis(text, options)
@@ -153,7 +153,9 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockRejectedValue(new Error('AI service error'))
+      mockAIService.createChatCompletion.mockRejectedValue(
+        new Error('AI service error'),
+      )
 
       const result = await crisisService.detectCrisis(text, options)
 
@@ -169,7 +171,7 @@ describe('crisisDetectionService', () => {
       const texts = [
         'I want to kill myself',
         'I had a good day',
-        'I feel hopeless'
+        'I feel hopeless',
       ]
       const options: CrisisDetectionOptions = {
         sensitivityLevel: 'medium',
@@ -183,13 +185,13 @@ describe('crisisDetectionService', () => {
           category: 'suicide_risk',
           severity: 'critical',
           indicators: ['kill myself'],
-          recommendations: ['Immediate intervention']
+          recommendations: ['Immediate intervention'],
         }),
         usage: { promptTokens: 50, completionTokens: 100, totalTokens: 150 },
         model: 'test-model',
         id: 'test-id',
         created: Date.now(),
-        choices: []
+        choices: [],
       } as AICompletion)
 
       const results = await crisisService.detectBatch(texts, options)
@@ -209,9 +211,13 @@ describe('crisisDetectionService', () => {
 
       // Mock the detectCrisis method to throw an error
       const originalDetectCrisis = crisisService.detectCrisis
-      crisisService.detectCrisis = vi.fn().mockRejectedValue(new Error('Detection failed'))
+      crisisService.detectCrisis = vi
+        .fn()
+        .mockRejectedValue(new Error('Detection failed'))
 
-      await expect(crisisService.detectBatch(texts, options)).rejects.toThrow('Batch crisis detection failed')
+      await expect(crisisService.detectBatch(texts, options)).rejects.toThrow(
+        'Batch crisis detection failed',
+      )
 
       // Restore original method
       crisisService.detectCrisis = originalDetectCrisis
@@ -224,7 +230,7 @@ describe('crisisDetectionService', () => {
         aiService: mockAIService,
         sensitivityLevel: 'medium' as const,
       })
-      
+
       expect(service).toBeDefined()
     })
 
@@ -235,7 +241,7 @@ describe('crisisDetectionService', () => {
         sensitivityLevel: 'medium' as const,
         defaultPrompt: customPrompt,
       })
-      
+
       expect(service).toBeDefined()
     })
   })

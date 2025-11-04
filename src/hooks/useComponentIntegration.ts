@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { componentIntegrationService, type ComponentIntegrationService } from '@/lib/services/ComponentIntegrationService'
+import {
+  componentIntegrationService,
+  type ComponentIntegrationService,
+} from '@/lib/services/ComponentIntegrationService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('component-integration-hooks')
@@ -13,7 +16,7 @@ export function useAsyncOperation<T>() {
   const execute = useCallback(async (operation: () => Promise<T>) => {
     setLoading(true)
     setError(null)
-    
+
     try {
       const result = await operation()
       setData(result)
@@ -93,40 +96,46 @@ export function use3DEmotionData(params: {
     return execute(() => componentIntegrationService.get3DEmotionData(params))
   }, [execute, params])
 
-  const addEmotionPoint = useCallback(async (emotionData: {
-    emotion: string
-    valence: number
-    arousal: number
-    dominance: number
-    intensity?: number
-    sessionId?: string
-  }) => {
-    try {
-      const result = await componentIntegrationService.addEmotionPoint(emotionData)
-      
-      // Add to real-time data if tracking
-      if (params.realTimeUpdates) {
-        setRealTimeData(prev => [...prev, result.emotionPoint])
+  const addEmotionPoint = useCallback(
+    async (emotionData: {
+      emotion: string
+      valence: number
+      arousal: number
+      dominance: number
+      intensity?: number
+      sessionId?: string
+    }) => {
+      try {
+        const result =
+          await componentIntegrationService.addEmotionPoint(emotionData)
+
+        // Add to real-time data if tracking
+        if (params.realTimeUpdates) {
+          setRealTimeData((prev) => [...prev, result.emotionPoint])
+        }
+
+        return result
+      } catch (error) {
+        logger.error('Error adding emotion point', { error, emotionData })
+        throw error
       }
-      
-      return result
-    } catch (error) {
-      logger.error('Error adding emotion point', { error, emotionData })
-      throw error
-    }
-  }, [params.realTimeUpdates])
+    },
+    [params.realTimeUpdates],
+  )
 
   useEffect(() => {
     load3DEmotionData()
   }, [load3DEmotionData])
 
   // Combine static and real-time data
-  const combinedEmotionPoints = data?.emotionPoints 
+  const combinedEmotionPoints = data?.emotionPoints
     ? [...data.emotionPoints, ...realTimeData]
     : realTimeData
 
   return {
-    emotionData: data ? { ...data, emotionPoints: combinedEmotionPoints } : null,
+    emotionData: data
+      ? { ...data, emotionPoints: combinedEmotionPoints }
+      : null,
     loading,
     error,
     addEmotionPoint,
@@ -150,40 +159,48 @@ export function useTreatmentPlans(params: {
     return execute(() => componentIntegrationService.getTreatmentPlans(params))
   }, [execute, params])
 
-  const saveTreatmentPlan = useCallback(async (planData: any) => {
-    try {
-      const result = await componentIntegrationService.saveTreatmentPlan(planData)
-      setIsDirty(false)
-      
-      // Refresh the plans list
-      await loadTreatmentPlans()
-      
-      return result
-    } catch (error) {
-      logger.error('Error saving treatment plan', { error, planData })
-      throw error
-    }
-  }, [loadTreatmentPlans])
+  const saveTreatmentPlan = useCallback(
+    async (planData: any) => {
+      try {
+        const result =
+          await componentIntegrationService.saveTreatmentPlan(planData)
+        setIsDirty(false)
 
-  const updateTreatmentPlan = useCallback(async (updates: {
-    planId: string
-    goalId?: string
-    milestoneId?: string
-    updates: Record<string, any>
-  }) => {
-    try {
-      const result = await componentIntegrationService.updateTreatmentPlan(updates)
-      setIsDirty(false)
-      
-      // Refresh the plans list
-      await loadTreatmentPlans()
-      
-      return result
-    } catch (error) {
-      logger.error('Error updating treatment plan', { error, updates })
-      throw error
-    }
-  }, [loadTreatmentPlans])
+        // Refresh the plans list
+        await loadTreatmentPlans()
+
+        return result
+      } catch (error) {
+        logger.error('Error saving treatment plan', { error, planData })
+        throw error
+      }
+    },
+    [loadTreatmentPlans],
+  )
+
+  const updateTreatmentPlan = useCallback(
+    async (updates: {
+      planId: string
+      goalId?: string
+      milestoneId?: string
+      updates: Record<string, any>
+    }) => {
+      try {
+        const result =
+          await componentIntegrationService.updateTreatmentPlan(updates)
+        setIsDirty(false)
+
+        // Refresh the plans list
+        await loadTreatmentPlans()
+
+        return result
+      } catch (error) {
+        logger.error('Error updating treatment plan', { error, updates })
+        throw error
+      }
+    },
+    [loadTreatmentPlans],
+  )
 
   const markDirty = useCallback(() => {
     setIsDirty(true)
@@ -228,42 +245,55 @@ export function useParticleSystem(params: {
   realTimeUpdates?: boolean
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
-  const [currentEmotion, setCurrentEmotion] = useState(params.emotion || 'neutral')
-  const [currentIntensity, setCurrentIntensity] = useState(params.intensity || 0.5)
+  const [currentEmotion, setCurrentEmotion] = useState(
+    params.emotion || 'neutral',
+  )
+  const [currentIntensity, setCurrentIntensity] = useState(
+    params.intensity || 0.5,
+  )
 
   const loadParticleSystem = useCallback(() => {
-    return execute(() => componentIntegrationService.getParticleSystem({
-      ...params,
-      emotion: currentEmotion,
-      intensity: currentIntensity,
-    }))
+    return execute(() =>
+      componentIntegrationService.getParticleSystem({
+        ...params,
+        emotion: currentEmotion,
+        intensity: currentIntensity,
+      }),
+    )
   }, [execute, params, currentEmotion, currentIntensity])
 
-  const updateParticleSystem = useCallback(async (updates: {
-    emotion?: string
-    intensity?: number
-    particleUpdates?: any[]
-  }) => {
-    try {
-      if (updates.emotion) setCurrentEmotion(updates.emotion)
-      if (updates.intensity !== undefined) setCurrentIntensity(updates.intensity)
+  const updateParticleSystem = useCallback(
+    async (updates: {
+      emotion?: string
+      intensity?: number
+      particleUpdates?: any[]
+    }) => {
+      try {
+        if (updates.emotion) setCurrentEmotion(updates.emotion)
+        if (updates.intensity !== undefined)
+          setCurrentIntensity(updates.intensity)
 
-      const result = await componentIntegrationService.updateParticleSystem({
-        emotion: updates.emotion || currentEmotion,
-        intensity: updates.intensity !== undefined ? updates.intensity : currentIntensity,
-        sessionId: params.sessionId,
-        particleUpdates: updates.particleUpdates,
-      })
+        const result = await componentIntegrationService.updateParticleSystem({
+          emotion: updates.emotion || currentEmotion,
+          intensity:
+            updates.intensity !== undefined
+              ? updates.intensity
+              : currentIntensity,
+          sessionId: params.sessionId,
+          particleUpdates: updates.particleUpdates,
+        })
 
-      // Reload particle system with new parameters
-      await loadParticleSystem()
-      
-      return result
-    } catch (error) {
-      logger.error('Error updating particle system', { error, updates })
-      throw error
-    }
-  }, [currentEmotion, currentIntensity, params.sessionId, loadParticleSystem])
+        // Reload particle system with new parameters
+        await loadParticleSystem()
+
+        return result
+      } catch (error) {
+        logger.error('Error updating particle system', { error, updates })
+        throw error
+      }
+    },
+    [currentEmotion, currentIntensity, params.sessionId, loadParticleSystem],
+  )
 
   useEffect(() => {
     loadParticleSystem()
@@ -293,19 +323,29 @@ export function useCarouselContent(params: {
     return execute(() => componentIntegrationService.getCarouselContent(params))
   }, [execute, params])
 
-  const saveCarouselConfiguration = useCallback(async (configData: any, action: 'create' | 'update' = 'create') => {
-    try {
-      const result = await componentIntegrationService.saveCarouselConfiguration(configData, action)
-      
-      // Refresh the content list
-      await loadCarouselContent()
-      
-      return result
-    } catch (error) {
-      logger.error('Error saving carousel configuration', { error, configData })
-      throw error
-    }
-  }, [loadCarouselContent])
+  const saveCarouselConfiguration = useCallback(
+    async (configData: any, action: 'create' | 'update' = 'create') => {
+      try {
+        const result =
+          await componentIntegrationService.saveCarouselConfiguration(
+            configData,
+            action,
+          )
+
+        // Refresh the content list
+        await loadCarouselContent()
+
+        return result
+      } catch (error) {
+        logger.error('Error saving carousel configuration', {
+          error,
+          configData,
+        })
+        throw error
+      }
+    },
+    [loadCarouselContent],
+  )
 
   useEffect(() => {
     loadCarouselContent()
@@ -333,7 +373,9 @@ export function useIntegratedDashboard(params: {
   const intervalRef = useRef<NodeJS.Timeout>()
 
   const loadDashboardData = useCallback(() => {
-    return execute(() => componentIntegrationService.getIntegratedDashboardData(params))
+    return execute(() =>
+      componentIntegrationService.getIntegratedDashboardData(params),
+    )
   }, [execute, params])
 
   useEffect(() => {
@@ -341,7 +383,10 @@ export function useIntegratedDashboard(params: {
 
     // Set up auto-refresh if enabled
     if (params.autoRefresh && params.refreshInterval) {
-      intervalRef.current = setInterval(loadDashboardData, params.refreshInterval)
+      intervalRef.current = setInterval(
+        loadDashboardData,
+        params.refreshInterval,
+      )
     }
 
     return () => {
@@ -376,7 +421,7 @@ export function useRealTimeUpdates(params: {
     if (!params.enabled || !params.sessionId) return
 
     const handleUpdate = (data: any) => {
-      setUpdates(prev => [...prev.slice(-99), data]) // Keep last 100 updates
+      setUpdates((prev) => [...prev.slice(-99), data]) // Keep last 100 updates
     }
 
     const handleError = (error: any) => {
@@ -392,7 +437,7 @@ export function useRealTimeUpdates(params: {
         onUpdate: handleUpdate,
         onError: handleError,
       })
-      .then(unsubscribe => {
+      .then((unsubscribe) => {
         unsubscribeRef.current = unsubscribe
         setConnected(true)
         setError(null)

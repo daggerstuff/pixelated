@@ -79,7 +79,7 @@ export class RedisConnectionPool {
   constructor(
     private name: string,
     private redisConfig: RedisServiceConfig,
-    config: Partial<RedisPoolConfig> = {}
+    config: Partial<RedisPoolConfig> = {},
   ) {
     this.config = {
       maxConnections: 10,
@@ -91,7 +91,7 @@ export class RedisConnectionPool {
       retryDelay: 1000,
       enableMetrics: true,
       metricsInterval: 60000, // 1 minute
-      ...config
+      ...config,
     }
 
     this.stats = {
@@ -104,7 +104,7 @@ export class RedisConnectionPool {
       errors: 0,
       avgResponseTime: 0,
       hitRate: 0,
-      missRate: 0
+      missRate: 0,
     }
 
     this.initialize()
@@ -116,7 +116,10 @@ export class RedisConnectionPool {
       try {
         await this.createConnection()
       } catch (error) {
-        logger.error(`Failed to create initial connection ${i}`, { pool: this.name, error })
+        logger.error(`Failed to create initial connection ${i}`, {
+          pool: this.name,
+          error,
+        })
       }
     }
 
@@ -131,7 +134,7 @@ export class RedisConnectionPool {
     logger.info('Redis connection pool initialized', {
       pool: this.name,
       minConnections: this.config.minConnections,
-      maxConnections: this.config.maxConnections
+      maxConnections: this.config.maxConnections,
     })
   }
 
@@ -145,7 +148,7 @@ export class RedisConnectionPool {
 
     // Try to find an available connection
     for (const connection of this.connections.values()) {
-      if (!connection.inUse && await this.isConnectionHealthy(connection)) {
+      if (!connection.inUse && (await this.isConnectionHealthy(connection))) {
         connection.inUse = true
         connection.lastUsed = new Date()
         connection.requestCount++
@@ -166,12 +169,18 @@ export class RedisConnectionPool {
     // Wait for available connection
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        const index = this.waitQueue.findIndex(item => item.resolve === resolve)
+        const index = this.waitQueue.findIndex(
+          (item) => item.resolve === resolve,
+        )
         if (index !== -1) {
           this.waitQueue.splice(index, 1)
           this.stats.waiting--
         }
-        reject(new Error(`Connection pool timeout after ${this.config.connectionTimeout}ms`))
+        reject(
+          new Error(
+            `Connection pool timeout after ${this.config.connectionTimeout}ms`,
+          ),
+        )
       }, this.config.connectionTimeout)
 
       this.waitQueue.push({ resolve, reject, timeout })
@@ -209,7 +218,7 @@ export class RedisConnectionPool {
    */
   async execute<T>(
     operation: (service: RedisService) => Promise<T>,
-    retries: number = this.config.maxRetries
+    retries: number = this.config.maxRetries,
   ): Promise<T> {
     let connection: RedisConnection | null = null
     let lastError: Error
@@ -226,7 +235,6 @@ export class RedisConnectionPool {
         this.updateResponseTime(responseTime)
 
         return result
-
       } catch (error) {
         lastError = error as Error
         this.stats.errors++
@@ -242,11 +250,10 @@ export class RedisConnectionPool {
         }
 
         if (attempt < retries) {
-          await new Promise(resolve =>
-            setTimeout(resolve, this.config.retryDelay * Math.pow(2, attempt))
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.config.retryDelay * Math.pow(2, attempt)),
           )
         }
-
       } finally {
         if (connection) {
           this.release(connection)
@@ -270,14 +277,17 @@ export class RedisConnectionPool {
       createdAt: new Date(),
       lastUsed: new Date(),
       requestCount: 0,
-      errorCount: 0
+      errorCount: 0,
     }
 
     this.connections.set(id, connection)
     this.stats.created++
     this.stats.total++
 
-    logger.debug('Created Redis connection', { pool: this.name, connectionId: id })
+    logger.debug('Created Redis connection', {
+      pool: this.name,
+      connectionId: id,
+    })
 
     return connection
   }
@@ -291,19 +301,20 @@ export class RedisConnectionPool {
 
       logger.debug('Destroyed Redis connection', {
         pool: this.name,
-        connectionId: connection.id
+        connectionId: connection.id,
       })
-
     } catch (error) {
       logger.error('Error destroying connection', {
         pool: this.name,
         connectionId: connection.id,
-        error
+        error,
       })
     }
   }
 
-  private async isConnectionHealthy(connection: RedisConnection): Promise<boolean> {
+  private async isConnectionHealthy(
+    connection: RedisConnection,
+  ): Promise<boolean> {
     try {
       return await connection.service.isHealthy()
     } catch {
@@ -318,14 +329,20 @@ export class RedisConnectionPool {
 
       for (const connection of this.connections.values()) {
         // Check for idle timeout
-        if (!connection.inUse &&
-            now.getTime() - connection.lastUsed.getTime() > this.config.idleTimeout) {
+        if (
+          !connection.inUse &&
+          now.getTime() - connection.lastUsed.getTime() >
+            this.config.idleTimeout
+        ) {
           connectionsToDestroy.push(connection)
           continue
         }
 
         // Check health for idle connections
-        if (!connection.inUse && !(await this.isConnectionHealthy(connection))) {
+        if (
+          !connection.inUse &&
+          !(await this.isConnectionHealthy(connection))
+        ) {
           connectionsToDestroy.push(connection)
         }
       }
@@ -342,14 +359,13 @@ export class RedisConnectionPool {
         } catch (error) {
           logger.error('Failed to create connection during health check', {
             pool: this.name,
-            error
+            error,
           })
           break
         }
       }
 
       this.updateStats()
-
     }, this.config.healthCheckInterval)
   }
 
@@ -357,15 +373,14 @@ export class RedisConnectionPool {
     this.metricsInterval = setInterval(() => {
       logger.debug('Redis pool metrics', {
         pool: this.name,
-        stats: this.stats
+        stats: this.stats,
       })
 
       // Emit metrics event (using console for now - could be replaced with EventEmitter)
       console.log('redis-pool-metrics', {
         pool: this.name,
-        stats: this.stats
+        stats: this.stats,
       })
-
     }, this.config.metricsInterval)
   }
 
@@ -373,13 +388,14 @@ export class RedisConnectionPool {
     const connections = Array.from(this.connections.values())
 
     this.stats.total = connections.length
-    this.stats.active = connections.filter(c => c.inUse).length
-    this.stats.idle = connections.filter(c => !c.inUse).length
+    this.stats.active = connections.filter((c) => c.inUse).length
+    this.stats.idle = connections.filter((c) => !c.inUse).length
   }
 
   private updateResponseTime(responseTime: number): void {
     // Simple moving average
-    this.stats.avgResponseTime = (this.stats.avgResponseTime * 0.9) + (responseTime * 0.1)
+    this.stats.avgResponseTime =
+      this.stats.avgResponseTime * 0.9 + responseTime * 0.1
   }
 
   /**
@@ -394,8 +410,10 @@ export class RedisConnectionPool {
    * Check if pool is healthy
    */
   isHealthy(): boolean {
-    return this.stats.total >= this.config.minConnections &&
-           this.stats.errors < this.stats.total * 0.1 // Less than 10% error rate
+    return (
+      this.stats.total >= this.config.minConnections &&
+      this.stats.errors < this.stats.total * 0.1
+    ) // Less than 10% error rate
   }
 
   /**
@@ -425,7 +443,9 @@ export class RedisConnectionPool {
 
     // Destroy all connections
     await Promise.all(
-      [...this.connections.values()].map(conn => this.destroyConnection(conn))
+      [...this.connections.values()].map((conn) =>
+        this.destroyConnection(conn),
+      ),
     )
 
     logger.info('Redis connection pool disposed', { pool: this.name })
@@ -449,7 +469,7 @@ export class RedisPoolManager {
   createPool(
     name: string,
     config?: Partial<RedisServiceConfig>,
-    poolConfig?: Partial<RedisPoolConfig>
+    poolConfig?: Partial<RedisPoolConfig>,
   ): RedisConnectionPool {
     if (this.pools.has(name)) {
       return this.pools.get(name)!
@@ -488,7 +508,10 @@ export class RedisPoolManager {
   /**
    * Health check for all pools
    */
-  async healthCheck(): Promise<{ healthy: boolean; pools: Record<string, boolean> }> {
+  async healthCheck(): Promise<{
+    healthy: boolean
+    pools: Record<string, boolean>
+  }> {
     const pools: Record<string, boolean> = {}
     let allHealthy = true
 
@@ -507,9 +530,7 @@ export class RedisPoolManager {
    * Dispose all pools
    */
   async dispose(): Promise<void> {
-    await Promise.all(
-      [...this.pools.values()].map(pool => pool.dispose())
-    )
+    await Promise.all([...this.pools.values()].map((pool) => pool.dispose()))
 
     this.pools.clear()
 
@@ -523,7 +544,9 @@ let redisPoolManager: RedisPoolManager | null = null
 /**
  * Get the global Redis pool manager
  */
-export function getRedisPoolManager(config?: RedisServiceConfig): RedisPoolManager {
+export function getRedisPoolManager(
+  config?: RedisServiceConfig,
+): RedisPoolManager {
   if (!redisPoolManager) {
     const defaultConfig = config || { url: process.env['REDIS_URL'] || '' }
     redisPoolManager = new RedisPoolManager(defaultConfig)
@@ -537,7 +560,7 @@ export function getRedisPoolManager(config?: RedisServiceConfig): RedisPoolManag
 export async function executeWithRedisPool<T>(
   poolName: string,
   operation: (service: RedisService) => Promise<T>,
-  poolConfig?: Partial<RedisPoolConfig>
+  poolConfig?: Partial<RedisPoolConfig>,
 ): Promise<T> {
   const manager = getRedisPoolManager()
   const pool = manager.createPool(poolName, undefined, poolConfig)

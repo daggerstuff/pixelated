@@ -103,14 +103,14 @@ export interface ThreatIndicator {
   id: string
   feed_id: string
   type:
-  | 'ip'
-  | 'domain'
-  | 'hash'
-  | 'url'
-  | 'email'
-  | 'file'
-  | 'behavior'
-  | 'vulnerability'
+    | 'ip'
+    | 'domain'
+    | 'hash'
+    | 'url'
+    | 'email'
+    | 'file'
+    | 'behavior'
+    | 'vulnerability'
   value: string
   confidence: number // 0-1
   severity: 'low' | 'medium' | 'high' | 'critical'
@@ -1201,21 +1201,21 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         threat_type: this.mapMISPToThreatType(attribute),
         description: String(
           this.getNestedValue(attribute, 'comment') ??
-          this.getNestedValue(event, 'info') ??
-          '',
+            this.getNestedValue(event, 'info') ??
+            '',
         ),
         first_seen: new Date(
           String(
             this.getNestedValue(attribute, 'first_seen') ??
-            this.getNestedValue(event, 'date') ??
-            Date.now(),
+              this.getNestedValue(event, 'date') ??
+              Date.now(),
           ),
         ),
         last_seen: new Date(
           String(
             this.getNestedValue(attribute, 'last_seen') ??
-            this.getNestedValue(event, 'date') ??
-            Date.now(),
+              this.getNestedValue(event, 'date') ??
+              Date.now(),
           ),
         ),
         expiration_date: this.getNestedValue(attribute, 'expiration')
@@ -1299,13 +1299,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     try {
       const type = String(
         this.getNestedValue(data, 'type') ??
-        this.getNestedValue(data, 'indicator') ??
-        'ip',
+          this.getNestedValue(data, 'indicator') ??
+          'ip',
       )
       const value = String(
         this.getNestedValue(data, 'value') ??
-        this.getNestedValue(data, 'indicator') ??
-        '',
+          this.getNestedValue(data, 'indicator') ??
+          '',
       )
       const confidence = Number(this.getNestedValue(data, 'confidence') ?? 0.5)
       const severity = String(
@@ -1997,6 +1997,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     // Safer domain regex to avoid catastrophic backtracking (ReDoS).
     // - Enforces label rules: each label 1-63 chars, cannot start/end with '-'
     // - Lookahead limits total length to 253 characters
-    const domainRegex = /^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)*[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]$/
-    return domainRegex.test(domain);
-  }}
+    const domainRegex =
+      /^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)*[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]$/
+    return domainRegex.test(domain)
+  }
+}

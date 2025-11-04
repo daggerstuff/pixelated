@@ -1,0 +1,320 @@
+/* ================================================
+   LOGIN FORM RESPONSIVE STYLES
+   Mobile-first responsive design for authentication
+   Compatible with Unified Dark Theme v2.0
+   ================================================ */
+
+/* Base mobile-first styles */
+.responsive-auth-container {
+  width: 100%;
+  max-width: 100%;
+  padding: var(--space-6);
+  margin: 0 auto;
+}
+
+.form-responsive {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-group-responsive {
+  margin-bottom: var(--space-6);
+}
+
+/* Mobile optimizations (320px - 639px) */
+@media (max-width: 639px) {
+  .responsive-auth-container {
+    padding: var(--space-4);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
+  }
+
+  .form-responsive {
+    max-width: 100%;
+  }
+
+  .form-group-responsive {
+    margin-bottom: var(--space-4);
+  }
+
+  /* Ensure form inputs are mobile-friendly */
+  .input-responsive {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: var(--space-3) var(--space-4);
+    min-height: 48px;
+  }
+
+  /* Touch-friendly buttons */
+  .btn-responsive {
+    min-height: 48px;
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+  }
+
+  /* Responsive typography for form elements */
+  .form-label.text-responsive--small {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
+  }
+
+  .error-message.text-responsive--caption {
+    font-size: var(--text-xs);
+    margin-top: var(--space-1);
+  }
+
+  /* Checkbox improvements for mobile */
+  .checkbox-container.touch-target {
+    min-height: 44px;
+    padding: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .remember-checkbox {
+    width: 20px;
+    height: 20px;
+  }
+
+  .checkbox-label.text-responsive--small {
+    font-size: var(--text-sm);
+  }
+
+  /* Auth links improvements */
+  .auth-links.space-y-2 {
+    margin-top: var(--space-6);
+  }
+
+  .auth-links button.touch-focus {
+    min-height: 44px;
+    padding: var(--space-2) 0;
+    font-size: var(--text-sm);
+  }
+}
+
+/* Tablet optimizations (640px - 1023px) */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .responsive-auth-container {
+    padding: var(--space-8);
+    max-width: 480px;
+  }
+
+  .form-responsive {
+    max-width: 100%;
+  }
+
+  .form-group-responsive {
+    margin-bottom: var(--space-5);
+  }
+
+  .input-responsive {
+    padding: var(--space-3) var(--space-5);
+    min-height: 44px;
+  }
+
+  .btn-responsive {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-8);
+  }
+}
+
+/* Desktop optimizations (1024px+) */
+@media (min-width: 1024px) {
+  .responsive-auth-container {
+    padding: var(--space-12);
+    max-width: 520px;
+  }
+
+  .form-responsive {
+    max-width: 100%;
+  }
+
+  .form-group-responsive {
+    margin-bottom: var(--space-6);
+  }
+
+  .input-responsive {
+    padding: var(--space-4) var(--space-5);
+    min-height: 48px;
+  }
+
+  .btn-responsive {
+    min-height: 48px;
+    padding: var(--space-4) var(--space-10);
+  }
+}
+
+/* Large desktop optimizations (1280px+) */
+@media (min-width: 1280px) {
+  .responsive-auth-container {
+    padding: var(--space-16);
+    max-width: 560px;
+  }
+
+  .input-responsive {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+  }
+
+  .btn-responsive {
+    padding: var(--space-4) var(--space-12);
+    font-size: var(--text-base);
+  }
+}
+
+/* Ultra-wide optimizations (1536px+) */
+@media (min-width: 1536px) {
+  .responsive-auth-container {
+    padding: var(--space-20);
+    max-width: 600px;
+  }
+
+  .input-responsive {
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--text-lg);
+  }
+
+  .btn-responsive {
+    padding: var(--space-5) var(--space-14);
+    font-size: var(--text-lg);
+  }
+}
+
+/* Portrait mobile optimizations */
+@media (max-width: 767px) and (orientation: portrait) {
+  .responsive-auth-container {
+    padding: var(--space-6) var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  /* Ensure forms are easily accessible in portrait mode */
+  .form-responsive {
+    margin-bottom: var(--space-8);
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 767px) and (orientation: landscape) {
+  .responsive-auth-container {
+    padding: var(--space-4);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .form-responsive {
+    max-width: 380px;
+  }
+
+  /* Adjust for smaller landscape height */
+  .form-group-responsive {
+    margin-bottom: var(--space-3);
+  }
+
+  .input-responsive {
+    padding: var(--space-2) var(--space-3);
+    min-height: 40px;
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .responsive-auth-container {
+    padding-top: env(safe-area-inset-top, var(--space-6));
+    padding-bottom: env(safe-area-inset-bottom, var(--space-6));
+    padding-left: env(safe-area-inset-left, var(--space-4));
+    padding-right: env(safe-area-inset-right, var(--space-4));
+  }
+
+  .input-responsive.ios-input-fix {
+    font-size: 16px !important;
+    transform: translateZ(0);
+  }
+}
+
+/* Android-specific fixes */
+@supports (not (-webkit-touch-callout: none)) and (not (-moz-appearance: none)) {
+  .responsive-auth-container .android-fix {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .responsive-auth-container {
+    border: 2px solid CanvasText;
+  }
+
+  .input-responsive {
+    border: 2px solid CanvasText;
+  }
+
+  .btn-responsive {
+    border: 2px solid CanvasText;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-auth-container *,
+  .responsive-auth-container *::before,
+  .responsive-auth-container *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .responsive-auth-container {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+
+  .btn-responsive {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+  }
+}
+
+/* Focus management for mobile */
+@media (max-width: 767px) {
+  .responsive-auth-container .touch-focus:focus-visible {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  .responsive-auth-container .touch-focus:focus {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Loading state responsive improvements */
+.responsive-auth-container .loading-spinner {
+  width: 16px;
+  height: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-auth-container .loading-spinner {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Error state responsive improvements */
+.responsive-auth-container .error-message {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 479px) {
+  .responsive-auth-container .error-message {
+    font-size: var(--text-xs);
+  }
+}

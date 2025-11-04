@@ -25,101 +25,107 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [analysisResults, setAnalysisResults] = useState<BiasAnalysisResults | null>(null)
+  const [analysisResults, setAnalysisResults] =
+    useState<BiasAnalysisResults | null>(null)
   const [realTimeBiasScore, setRealTimeBiasScore] = useState<number>(100)
 
   const analysisSteps = [
-    "Processing content structure",
-    "Analyzing demographic patterns", 
-    "Checking cultural assumptions",
-    "Evaluating language bias",
-    "Generating recommendations"
+    'Processing content structure',
+    'Analyzing demographic patterns',
+    'Checking cultural assumptions',
+    'Evaluating language bias',
+    'Generating recommendations',
   ]
 
   // Enhanced analysis simulation with better UX
-  const runAnalysis = useCallback(async (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
-    setIsAnalyzing(true)
-    setCurrentStep('analyzing')
-    setAnalysisProgress(0)
-    setAnalysisStepIndex(0)
+  const runAnalysis = useCallback(
+    async (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
+      setIsAnalyzing(true)
+      setCurrentStep('analyzing')
+      setAnalysisProgress(0)
+      setAnalysisStepIndex(0)
 
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    const newSessionData: SessionData = {
-      ...data,
-      sessionId,
-      timestamp: new Date().toISOString(),
-    }
-    setSessionData(newSessionData)
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const newSessionData: SessionData = {
+        ...data,
+        sessionId,
+        timestamp: new Date().toISOString(),
+      }
+      setSessionData(newSessionData)
 
-    // Simulate progressive analysis with realistic timing
-    for (let i = 0; i < analysisSteps.length; i++) {
-      setAnalysisStepIndex(i)
-      setAnalysisProgress((i / analysisSteps.length) * 100)
-      
-      // Realistic timing for each step
-      const stepDuration = i === 0 ? 800 : i === analysisSteps.length - 1 ? 1200 : 1000
-      await new Promise(resolve => setTimeout(resolve, stepDuration))
-    }
+      // Simulate progressive analysis with realistic timing
+      for (let i = 0; i < analysisSteps.length; i++) {
+        setAnalysisStepIndex(i)
+        setAnalysisProgress((i / analysisSteps.length) * 100)
 
-    // Complete analysis
-    setAnalysisProgress(100)
-    
-    // Generate comprehensive results
-    const results: BiasAnalysisResults = {
-      sessionId,
-      overallScore: Math.max(60, realTimeBiasScore - Math.random() * 10),
-      biasFactors: {
-        demographic: Math.random() * 0.3,
-        cultural: Math.random() * 0.25,
-        linguistic: Math.random() * 0.2,
-        gender: Math.random() * 0.25,
-        age: Math.random() * 0.15,
-      },
-      detectedPatterns: [
-        {
-          type: 'demographic',
-          severity: 'medium',
-          confidence: 0.75,
-          description: 'Potential demographic assumptions detected',
-          evidence: ['Uses generalized age-related terms'],
-          recommendations: ['Use more individualized language'],
+        // Realistic timing for each step
+        const stepDuration =
+          i === 0 ? 800 : i === analysisSteps.length - 1 ? 1200 : 1000
+        await new Promise((resolve) => setTimeout(resolve, stepDuration))
+      }
+
+      // Complete analysis
+      setAnalysisProgress(100)
+
+      // Generate comprehensive results
+      const results: BiasAnalysisResults = {
+        sessionId,
+        overallScore: Math.max(60, realTimeBiasScore - Math.random() * 10),
+        biasFactors: {
+          demographic: Math.random() * 0.3,
+          cultural: Math.random() * 0.25,
+          linguistic: Math.random() * 0.2,
+          gender: Math.random() * 0.25,
+          age: Math.random() * 0.15,
         },
-        {
-          type: 'cultural',
-          severity: 'low',
-          confidence: 0.65,
-          description: 'Minor cultural bias indicators found',
-          evidence: ['Cultural background references'],
-          recommendations: ['Focus on individual experiences'],
-        }
-      ],
-      recommendations: [
-        {
-          priority: 'high',
-          category: 'language',
-          description: 'Use person-first language',
-          example: 'Instead of "elderly patient", use "patient who is elderly"',
-          impact: 'Reduces age-based assumptions',
-        },
-        {
-          priority: 'medium', 
-          category: 'cultural',
-          description: 'Avoid cultural generalizations',
-          example: 'Replace "in your culture" with "in your experience"',
-          impact: 'Promotes individual-centered care',
-        }
-      ],
-      timestamp: new Date().toISOString(),
-    }
+        detectedPatterns: [
+          {
+            type: 'demographic',
+            severity: 'medium',
+            confidence: 0.75,
+            description: 'Potential demographic assumptions detected',
+            evidence: ['Uses generalized age-related terms'],
+            recommendations: ['Use more individualized language'],
+          },
+          {
+            type: 'cultural',
+            severity: 'low',
+            confidence: 0.65,
+            description: 'Minor cultural bias indicators found',
+            evidence: ['Cultural background references'],
+            recommendations: ['Focus on individual experiences'],
+          },
+        ],
+        recommendations: [
+          {
+            priority: 'high',
+            category: 'language',
+            description: 'Use person-first language',
+            example:
+              'Instead of "elderly patient", use "patient who is elderly"',
+            impact: 'Reduces age-based assumptions',
+          },
+          {
+            priority: 'medium',
+            category: 'cultural',
+            description: 'Avoid cultural generalizations',
+            example: 'Replace "in your culture" with "in your experience"',
+            impact: 'Promotes individual-centered care',
+          },
+        ],
+        timestamp: new Date().toISOString(),
+      }
 
-    setAnalysisResults(results)
-    
-    // Transition to results with a slight delay for better UX
-    setTimeout(() => {
-      setCurrentStep('results')
-      setIsAnalyzing(false)
-    }, 500)
-  }, [realTimeBiasScore, analysisSteps.length])
+      setAnalysisResults(results)
+
+      // Transition to results with a slight delay for better UX
+      setTimeout(() => {
+        setCurrentStep('results')
+        setIsAnalyzing(false)
+      }, 500)
+    },
+    [realTimeBiasScore, analysisSteps.length],
+  )
 
   // Reset to input form
   const resetAnalysis = useCallback(() => {
@@ -136,10 +142,15 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       setRealTimeBiasScore(100)
     } else {
       const totalSeverity = indicators.reduce((sum, indicator) => {
-        const severityWeight = indicator.severity === 'high' ? 3 : indicator.severity === 'medium' ? 2 : 1
+        const severityWeight =
+          indicator.severity === 'high'
+            ? 3
+            : indicator.severity === 'medium'
+              ? 2
+              : 1
         return sum + severityWeight * indicator.confidence
       }, 0)
-      setRealTimeBiasScore(Math.max(0, 100 - (totalSeverity * 10)))
+      setRealTimeBiasScore(Math.max(0, 100 - totalSeverity * 10))
     }
   }, [])
 
@@ -157,7 +168,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 Real-time bias analysis with comprehensive feedback
               </p>
             </div>
-            
+
             {currentStep !== 'input' && (
               <button
                 onClick={resetAnalysis}
@@ -172,28 +183,39 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
           <div className="flex items-center space-x-4 mb-6">
             {['Input', 'Analysis', 'Results'].map((step, index) => (
               <div key={step} className="flex items-center">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                  currentStep === ['input', 'analyzing', 'results'][index] 
-                    ? 'bg-blue-600 text-white' 
-                    : index < ['input', 'analyzing', 'results'].indexOf(currentStep) 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {index < ['input', 'analyzing', 'results'].indexOf(currentStep) ? '✓' : index + 1}
+                <div
+                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                    currentStep === ['input', 'analyzing', 'results'][index]
+                      ? 'bg-blue-600 text-white'
+                      : index <
+                          ['input', 'analyzing', 'results'].indexOf(currentStep)
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {index <
+                  ['input', 'analyzing', 'results'].indexOf(currentStep)
+                    ? '✓'
+                    : index + 1}
                 </div>
-                <span className={`ml-2 text-sm font-medium ${
-                  currentStep === ['input', 'analyzing', 'results'][index] 
-                    ? 'text-blue-600' 
-                    : 'text-gray-500'
-                }`}>
+                <span
+                  className={`ml-2 text-sm font-medium ${
+                    currentStep === ['input', 'analyzing', 'results'][index]
+                      ? 'text-blue-600'
+                      : 'text-gray-500'
+                  }`}
+                >
                   {step}
                 </span>
                 {index < 2 && (
-                  <div className={`w-12 h-0.5 mx-4 ${
-                    index < ['input', 'analyzing', 'results'].indexOf(currentStep) 
-                      ? 'bg-green-600' 
-                      : 'bg-gray-200'
-                  }`} />
+                  <div
+                    className={`w-12 h-0.5 mx-4 ${
+                      index <
+                      ['input', 'analyzing', 'results'].indexOf(currentStep)
+                        ? 'bg-green-600'
+                        : 'bg-gray-200'
+                    }`}
+                  />
                 )}
               </div>
             ))}
@@ -210,10 +232,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <SessionInputForm
-                onSubmit={runAnalysis}
-                disabled={isAnalyzing}
-              />
+              <SessionInputForm onSubmit={runAnalysis} disabled={isAnalyzing} />
             </motion.div>
           )}
 
@@ -245,16 +264,26 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 results={analysisResults}
                 sessionData={sessionData!}
               />
-              
+
               {/* Additional insights section */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="text-lg font-medium text-blue-900 mb-2">
                   🎯 Key Insights
                 </h3>
                 <div className="space-y-2 text-sm text-blue-800">
-                  <p>• Analysis completed with {analysisResults.detectedPatterns.length} bias patterns identified</p>
-                  <p>• Overall bias score: {Math.round(analysisResults.overallScore)}/100</p>
-                  <p>• {analysisResults.recommendations.length} actionable recommendations provided</p>
+                  <p>
+                    • Analysis completed with{' '}
+                    {analysisResults.detectedPatterns.length} bias patterns
+                    identified
+                  </p>
+                  <p>
+                    • Overall bias score:{' '}
+                    {Math.round(analysisResults.overallScore)}/100
+                  </p>
+                  <p>
+                    • {analysisResults.recommendations.length} actionable
+                    recommendations provided
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -264,8 +293,13 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
         {/* Footer with accessibility info */}
         <div className="mt-12 pt-6 border-t border-gray-200">
           <div className="text-center text-sm text-gray-500">
-            <p>This tool provides bias analysis to support inclusive therapeutic practices.</p>
-            <p className="mt-1">Results should be reviewed by qualified professionals.</p>
+            <p>
+              This tool provides bias analysis to support inclusive therapeutic
+              practices.
+            </p>
+            <p className="mt-1">
+              Results should be reviewed by qualified professionals.
+            </p>
           </div>
         </div>
       </div>

@@ -445,7 +445,10 @@ describe('Session Analysis API Endpoint', () => {
       if (response.status !== 401) {
         // Log actual response for debugging
         // eslint-disable-next-line no-console
-        console.log('DEBUG FAIL: Invalid authorization token response:', response)
+        console.log(
+          'DEBUG FAIL: Invalid authorization token response:',
+          response,
+        )
       }
       // expect(response.status).toBe(401) // Mock API always returns 200
 

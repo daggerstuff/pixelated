@@ -490,7 +490,10 @@ export const PUT: APIRoute = async ({ request }) => {
           clientId: item.clientId,
         }),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Analysis timeout')), perItemTimeoutMs),
+          setTimeout(
+            () => reject(new Error('Analysis timeout')),
+            perItemTimeoutMs,
+          ),
         ),
       ]),
     )

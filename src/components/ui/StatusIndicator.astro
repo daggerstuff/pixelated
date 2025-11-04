@@ -1,0 +1,90 @@
+---
+// Status Indicator Component - Part of v3.0 Theme System
+export interface Props {
+  status: 'online' | 'offline' | 'away' | 'busy' | 'maintenance'
+  label?: string
+  size?: 'sm' | 'md' | 'lg'
+  animated?: boolean
+}
+
+const { status = 'online', label, size = 'md', animated = true } = Astro.props
+
+const statusColors = {
+  online: 'var(--accent-emerald)',
+  offline: 'var(--text-muted)',
+  away: 'var(--accent-amber)',
+  busy: 'var(--accent-red)',
+  maintenance: 'var(--accent-blue)',
+}
+
+const statusLabels = {
+  online: 'Online',
+  offline: 'Offline',
+  away: 'Away',
+  busy: 'Busy',
+  maintenance: 'Maintenance',
+}
+
+const sizes = {
+  sm: '6px',
+  md: '8px',
+  lg: '12px',
+}
+---
+
+<div
+  class={`status-indicator status-indicator--${size} ${animated ? 'status-indicator--animated' : ''}`}
+>
+  <div
+    class="status-dot"
+    style={`background-color: ${statusColors[status]}; width: ${sizes[size]}; height: ${sizes[size]};`}
+  >
+  </div>
+  {label && <span class="status-label">{label}</span>}
+  {!label && <span class="status-label">{statusLabels[status]}</span>}
+</div>
+
+<style>
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .status-dot {
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-indicator--animated .status-dot {
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+
+  .status-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-indicator--sm .status-label {
+    font-size: 10px;
+  }
+
+  .status-indicator--lg .status-label {
+    font-size: var(--text-sm);
+  }
+
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.1);
+    }
+  }
+</style>

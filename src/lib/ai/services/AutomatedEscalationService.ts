@@ -11,7 +11,12 @@ export interface EscalationProtocol {
 }
 
 export interface EscalationAction {
-  type: 'notification' | 'intervention' | 'documentation' | 'escalation' | 'monitoring'
+  type:
+    | 'notification'
+    | 'intervention'
+    | 'documentation'
+    | 'escalation'
+    | 'monitoring'
   description: string
   priority: 'immediate' | 'urgent' | 'standard' | 'routine'
   assignedTo: string[]
@@ -50,7 +55,11 @@ export interface EscalationEvent {
 }
 
 export interface NotificationTemplate {
-  type: 'crisis_alert' | 'risk_warning' | 'status_update' | 'intervention_needed'
+  type:
+    | 'crisis_alert'
+    | 'risk_warning'
+    | 'status_update'
+    | 'intervention_needed'
   urgency: 'low' | 'medium' | 'high' | 'critical'
   channels: ('email' | 'sms' | 'push' | 'call')[]
   template: {
@@ -61,8 +70,10 @@ export interface NotificationTemplate {
 }
 
 export class AutomatedEscalationService {
-  private readonly escalationProtocols: Map<string, EscalationProtocol> = new Map()
-  private readonly notificationTemplates: Map<string, NotificationTemplate> = new Map()
+  private readonly escalationProtocols: Map<string, EscalationProtocol> =
+    new Map()
+  private readonly notificationTemplates: Map<string, NotificationTemplate> =
+    new Map()
   private readonly activeEscalations: Map<string, EscalationEvent> = new Map()
 
   constructor() {
@@ -81,15 +92,21 @@ export class AutomatedEscalationService {
       sessionId?: string
       therapistId?: string
       emergencyContacts?: string[]
-    }
+    },
   ): Promise<EscalationEvent> {
     try {
       // Determine appropriate escalation level
-      const escalationLevel = this.determineEscalationLevel(prediction, currentAssessment)
-      
+      const escalationLevel = this.determineEscalationLevel(
+        prediction,
+        currentAssessment,
+      )
+
       // Get escalation protocol
-      const protocol = this.getEscalationProtocol(escalationLevel, prediction.riskLevel)
-      
+      const protocol = this.getEscalationProtocol(
+        escalationLevel,
+        prediction.riskLevel,
+      )
+
       // Create escalation event
       const escalationEvent: EscalationEvent = {
         id: this.generateEscalationId(userId),
@@ -103,22 +120,26 @@ export class AutomatedEscalationService {
           contactsReached: [],
           interventionsImplemented: [],
           timeToResponse: '',
-          resolution: 'ongoing'
-        }
+          resolution: 'ongoing',
+        },
       }
 
       // Execute protocol actions
       await this.executeProtocolActions(escalationEvent, context)
-      
+
       // Store active escalation
       this.activeEscalations.set(escalationEvent.id, escalationEvent)
 
       return escalationEvent
     } catch (error) {
       console.error('Error triggering escalation:', error)
-      
+
       // Emergency fallback protocol
-      return this.triggerEmergencyFallback(userId, prediction, currentAssessment)
+      return this.triggerEmergencyFallback(
+        userId,
+        prediction,
+        currentAssessment,
+      )
     }
   }
 
@@ -131,7 +152,7 @@ export class AutomatedEscalationService {
       sessionId?: string
       therapistId?: string
       emergencyContacts?: string[]
-    }
+    },
   ): Promise<void> {
     const { protocolActivated } = escalationEvent
     const startTime = Date.now()
@@ -140,7 +161,7 @@ export class AutomatedEscalationService {
       try {
         if (action.automatable) {
           await this.executeAutomatedAction(action, escalationEvent, context)
-          
+
           action.completed = true
           action.timestamp = new Date().toISOString()
           escalationEvent.actionsExecuted.push(action)
@@ -150,12 +171,12 @@ export class AutomatedEscalationService {
         }
       } catch (error) {
         console.error(`Error executing action ${action.type}:`, error)
-        
+
         // Log failed action but continue with others
         escalationEvent.actionsExecuted.push({
           ...action,
           completed: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         })
       }
     }
@@ -170,29 +191,29 @@ export class AutomatedEscalationService {
   private async executeAutomatedAction(
     action: EscalationAction,
     escalationEvent: EscalationEvent,
-    context?: any
+    context?: any,
   ): Promise<void> {
     switch (action.type) {
       case 'notification':
         await this.sendNotifications(escalationEvent, context)
         break
-        
+
       case 'documentation':
         await this.createDocumentation(escalationEvent, action)
         break
-        
+
       case 'monitoring':
         await this.initiateMonitoring(escalationEvent, action)
         break
-        
+
       case 'intervention':
         await this.triggerIntervention(escalationEvent, action, context)
         break
-        
+
       case 'escalation':
         await this.escalateToHigherLevel(escalationEvent, action)
         break
-        
+
       default:
         console.warn(`Unknown action type: ${action.type}`)
     }
@@ -203,19 +224,24 @@ export class AutomatedEscalationService {
    */
   private async sendNotifications(
     escalationEvent: EscalationEvent,
-    context?: any
+    context?: any,
   ): Promise<void> {
     const { protocolActivated, riskLevel, userId } = escalationEvent
-    
+
     for (const contact of protocolActivated.contacts) {
       try {
         const template = this.getNotificationTemplate(
           this.getNotificationTypeForRisk(riskLevel),
-          contact.type
+          contact.type,
         )
-        
+
         if (template) {
-          await this.sendNotification(contact, template, escalationEvent, context)
+          await this.sendNotification(
+            contact,
+            template,
+            escalationEvent,
+            context,
+          )
           escalationEvent.outcomes.contactsReached.push(contact.contact)
         }
       } catch (error) {
@@ -231,31 +257,35 @@ export class AutomatedEscalationService {
     contact: ContactMethod,
     template: NotificationTemplate,
     escalationEvent: EscalationEvent,
-    context?: any
+    context?: any,
   ): Promise<void> {
     const message = this.populateTemplate(template, escalationEvent, context)
-    
+
     switch (contact.method) {
       case 'email':
         await this.sendEmail(contact.contact, message.subject, message.body)
         break
-        
+
       case 'sms':
         await this.sendSMS(contact.contact, message.body)
         break
-        
+
       case 'phone':
         await this.initiatePhoneCall(contact.contact, message.body)
         break
-        
+
       case 'app_notification':
-        await this.sendAppNotification(contact.contact, message.subject, message.body)
+        await this.sendAppNotification(
+          contact.contact,
+          message.subject,
+          message.body,
+        )
         break
-        
+
       case 'pager':
         await this.sendPagerAlert(contact.contact, message.body)
         break
-        
+
       default:
         console.warn(`Unknown contact method: ${contact.method}`)
     }
@@ -266,7 +296,7 @@ export class AutomatedEscalationService {
    */
   private async createDocumentation(
     escalationEvent: EscalationEvent,
-    action: EscalationAction
+    action: EscalationAction,
   ): Promise<void> {
     const documentation = {
       escalationId: escalationEvent.id,
@@ -274,13 +304,15 @@ export class AutomatedEscalationService {
       userId: escalationEvent.userId,
       riskLevel: escalationEvent.riskLevel,
       triggerType: escalationEvent.triggerType,
-      actionsPerformed: escalationEvent.actionsExecuted.map(a => a.description),
+      actionsPerformed: escalationEvent.actionsExecuted.map(
+        (a) => a.description,
+      ),
       clinicalNotes: this.generateClinicalNotes(escalationEvent),
       legalCompliance: {
         hipaaCompliant: true,
         consentObtained: true,
-        minimumNecessaryStandard: true
-      }
+        minimumNecessaryStandard: true,
+      },
     }
 
     // Store documentation (implementation would depend on storage system)
@@ -292,7 +324,7 @@ export class AutomatedEscalationService {
    */
   private async initiateMonitoring(
     escalationEvent: EscalationEvent,
-    action: EscalationAction
+    action: EscalationAction,
   ): Promise<void> {
     const monitoringConfig = {
       userId: escalationEvent.userId,
@@ -303,8 +335,8 @@ export class AutomatedEscalationService {
         'risk_level_increase',
         'communication_attempt',
         'session_attendance',
-        'emergency_contact_activation'
-      ]
+        'emergency_contact_activation',
+      ],
     }
 
     // Initialize monitoring (implementation would integrate with monitoring system)
@@ -317,20 +349,20 @@ export class AutomatedEscalationService {
   private async triggerIntervention(
     escalationEvent: EscalationEvent,
     action: EscalationAction,
-    context?: any
+    context?: any,
   ): Promise<void> {
     const interventionType = this.getInterventionType(escalationEvent.riskLevel)
-    
+
     const intervention = {
       type: interventionType,
       escalationId: escalationEvent.id,
       userId: escalationEvent.userId,
       timestamp: new Date().toISOString(),
-      details: this.generateInterventionDetails(escalationEvent, context)
+      details: this.generateInterventionDetails(escalationEvent, context),
     }
 
     escalationEvent.outcomes.interventionsImplemented.push(interventionType)
-    
+
     // Execute intervention (implementation would depend on intervention system)
     console.log('Intervention triggered:', intervention)
   }
@@ -340,19 +372,24 @@ export class AutomatedEscalationService {
    */
   private async escalateToHigherLevel(
     escalationEvent: EscalationEvent,
-    action: EscalationAction
+    action: EscalationAction,
   ): Promise<void> {
-    const higherLevel = this.getNextEscalationLevel(escalationEvent.protocolActivated.level)
-    
+    const higherLevel = this.getNextEscalationLevel(
+      escalationEvent.protocolActivated.level,
+    )
+
     if (higherLevel) {
-      const newProtocol = this.getEscalationProtocol(higherLevel, escalationEvent.riskLevel)
-      
+      const newProtocol = this.getEscalationProtocol(
+        higherLevel,
+        escalationEvent.riskLevel,
+      )
+
       // Create new escalation event for higher level
       const higherEscalation: EscalationEvent = {
         ...escalationEvent,
         id: this.generateEscalationId(escalationEvent.userId, higherLevel),
         protocolActivated: newProtocol,
-        triggerType: 'escalation'
+        triggerType: 'escalation',
       }
 
       await this.executeProtocolActions(higherEscalation)
@@ -374,7 +411,7 @@ export class AutomatedEscalationService {
           priority: 'standard',
           assignedTo: ['therapist'],
           timeframe: 'Within 24 hours',
-          automatable: true
+          automatable: true,
         },
         {
           type: 'documentation',
@@ -382,8 +419,8 @@ export class AutomatedEscalationService {
           priority: 'routine',
           assignedTo: ['system'],
           timeframe: 'Immediate',
-          automatable: true
-        }
+          automatable: true,
+        },
       ],
       timeline: '24-48 hours',
       contacts: [
@@ -391,11 +428,11 @@ export class AutomatedEscalationService {
           type: 'therapist',
           contact: 'primary_therapist',
           method: 'email',
-          priority: 1
-        }
+          priority: 1,
+        },
       ],
       requiredApprovals: [],
-      documentationRequired: true
+      documentationRequired: true,
     })
 
     // Medium-level protocol
@@ -408,7 +445,7 @@ export class AutomatedEscalationService {
           priority: 'urgent',
           assignedTo: ['therapist'],
           timeframe: 'Within 4 hours',
-          automatable: true
+          automatable: true,
         },
         {
           type: 'monitoring',
@@ -416,7 +453,7 @@ export class AutomatedEscalationService {
           priority: 'urgent',
           assignedTo: ['monitoring_system'],
           timeframe: 'Immediate',
-          automatable: true
+          automatable: true,
         },
         {
           type: 'intervention',
@@ -424,8 +461,8 @@ export class AutomatedEscalationService {
           priority: 'urgent',
           assignedTo: ['therapist'],
           timeframe: 'Within 24 hours',
-          automatable: false
-        }
+          automatable: false,
+        },
       ],
       timeline: '4-12 hours',
       contacts: [
@@ -433,17 +470,17 @@ export class AutomatedEscalationService {
           type: 'therapist',
           contact: 'primary_therapist',
           method: 'phone',
-          priority: 1
+          priority: 1,
         },
         {
           type: 'supervisor',
           contact: 'clinical_supervisor',
           method: 'email',
-          priority: 2
-        }
+          priority: 2,
+        },
       ],
       requiredApprovals: ['therapist'],
-      documentationRequired: true
+      documentationRequired: true,
     })
 
     // High-level protocol
@@ -456,7 +493,7 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['therapist', 'supervisor'],
           timeframe: 'Within 1 hour',
-          automatable: true
+          automatable: true,
         },
         {
           type: 'intervention',
@@ -464,7 +501,7 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['crisis_team'],
           timeframe: 'Immediate',
-          automatable: false
+          automatable: false,
         },
         {
           type: 'escalation',
@@ -472,8 +509,8 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['crisis_team'],
           timeframe: 'Immediate',
-          automatable: true
-        }
+          automatable: true,
+        },
       ],
       timeline: '1-2 hours',
       contacts: [
@@ -481,23 +518,23 @@ export class AutomatedEscalationService {
           type: 'therapist',
           contact: 'primary_therapist',
           method: 'phone',
-          priority: 1
+          priority: 1,
         },
         {
           type: 'supervisor',
           contact: 'clinical_supervisor',
           method: 'phone',
-          priority: 1
+          priority: 1,
         },
         {
           type: 'emergency',
           contact: 'crisis_team',
           method: 'pager',
-          priority: 1
-        }
+          priority: 1,
+        },
       ],
       requiredApprovals: ['supervisor'],
-      documentationRequired: true
+      documentationRequired: true,
     })
 
     // Critical/Emergency protocol
@@ -510,7 +547,7 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['emergency_team'],
           timeframe: 'Immediate',
-          automatable: true
+          automatable: true,
         },
         {
           type: 'intervention',
@@ -518,7 +555,7 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['emergency_services'],
           timeframe: 'Immediate',
-          automatable: false
+          automatable: false,
         },
         {
           type: 'escalation',
@@ -526,8 +563,8 @@ export class AutomatedEscalationService {
           priority: 'immediate',
           assignedTo: ['emergency_coordinator'],
           timeframe: 'Immediate',
-          automatable: false
-        }
+          automatable: false,
+        },
       ],
       timeline: 'Immediate',
       contacts: [
@@ -535,23 +572,23 @@ export class AutomatedEscalationService {
           type: 'emergency',
           contact: 'emergency_services',
           method: 'phone',
-          priority: 1
+          priority: 1,
         },
         {
           type: 'therapist',
           contact: 'primary_therapist',
           method: 'phone',
-          priority: 1
+          priority: 1,
         },
         {
           type: 'family',
           contact: 'emergency_contact',
           method: 'phone',
-          priority: 2
-        }
+          priority: 2,
+        },
       ],
       requiredApprovals: [],
-      documentationRequired: true
+      documentationRequired: true,
     })
   }
 
@@ -566,8 +603,8 @@ export class AutomatedEscalationService {
       template: {
         subject: 'URGENT: Crisis Risk Detected - {{userId}}',
         body: 'A high-risk crisis situation has been detected for patient {{userId}}. Risk level: {{riskLevel}}. Immediate intervention required within {{timeframe}}. Primary risk factors: {{riskFactors}}.',
-        variables: ['userId', 'riskLevel', 'timeframe', 'riskFactors']
-      }
+        variables: ['userId', 'riskLevel', 'timeframe', 'riskFactors'],
+      },
     })
 
     this.notificationTemplates.set('risk_warning_medium', {
@@ -577,24 +614,31 @@ export class AutomatedEscalationService {
       template: {
         subject: 'Risk Warning: Elevated Crisis Risk - {{userId}}',
         body: 'Patient {{userId}} has shown elevated crisis risk indicators. Risk level: {{riskLevel}}. Recommended action: {{recommendations}}. Please review within {{timeframe}}.',
-        variables: ['userId', 'riskLevel', 'recommendations', 'timeframe']
-      }
+        variables: ['userId', 'riskLevel', 'recommendations', 'timeframe'],
+      },
     })
   }
 
   // Helper methods for protocol execution
   private determineEscalationLevel(
     prediction: CrisisPrediction,
-    assessment: RiskAssessment
+    assessment: RiskAssessment,
   ): string {
-    if (prediction.riskLevel === 'imminent' || assessment.category === 'high') return 'critical'
+    if (prediction.riskLevel === 'imminent' || assessment.category === 'high')
+      return 'critical'
     if (prediction.riskLevel === 'high') return 'high'
     if (prediction.riskLevel === 'moderate') return 'medium'
     return 'low'
   }
 
-  private getEscalationProtocol(level: string, riskLevel: string): EscalationProtocol {
-    return this.escalationProtocols.get(level) || this.escalationProtocols.get('low')!
+  private getEscalationProtocol(
+    level: string,
+    riskLevel: string,
+  ): EscalationProtocol {
+    return (
+      this.escalationProtocols.get(level) ||
+      this.escalationProtocols.get('low')!
+    )
   }
 
   private generateEscalationId(userId: string, level?: string): string {
@@ -606,10 +650,10 @@ export class AutomatedEscalationService {
   private async triggerEmergencyFallback(
     userId: string,
     prediction: CrisisPrediction,
-    assessment: RiskAssessment
+    assessment: RiskAssessment,
   ): Promise<EscalationEvent> {
     console.error('Emergency fallback protocol activated')
-    
+
     return {
       id: this.generateEscalationId(userId, 'fallback'),
       timestamp: new Date().toISOString(),
@@ -622,13 +666,17 @@ export class AutomatedEscalationService {
         contactsReached: [],
         interventionsImplemented: ['emergency_fallback'],
         timeToResponse: '0ms',
-        resolution: 'ongoing'
-      }
+        resolution: 'ongoing',
+      },
     }
   }
 
   // Placeholder implementations for notification methods
-  private async sendEmail(to: string, subject: string, body: string): Promise<void> {
+  private async sendEmail(
+    to: string,
+    subject: string,
+    body: string,
+  ): Promise<void> {
     console.log(`EMAIL: ${to} - ${subject}: ${body}`)
   }
 
@@ -640,7 +688,11 @@ export class AutomatedEscalationService {
     console.log(`CALL: ${to} - ${message}`)
   }
 
-  private async sendAppNotification(to: string, title: string, body: string): Promise<void> {
+  private async sendAppNotification(
+    to: string,
+    title: string,
+    body: string,
+  ): Promise<void> {
     console.log(`APP: ${to} - ${title}: ${body}`)
   }
 
@@ -649,9 +701,15 @@ export class AutomatedEscalationService {
   }
 
   // Helper methods
-  private getNotificationTemplate(type: string, contactType: string): NotificationTemplate | undefined {
+  private getNotificationTemplate(
+    type: string,
+    contactType: string,
+  ): NotificationTemplate | undefined {
     const key = `${type}_${contactType}`
-    return this.notificationTemplates.get(key) || this.notificationTemplates.get('crisis_alert_high')
+    return (
+      this.notificationTemplates.get(key) ||
+      this.notificationTemplates.get('crisis_alert_high')
+    )
   }
 
   private getNotificationTypeForRisk(riskLevel: string): string {
@@ -663,7 +721,7 @@ export class AutomatedEscalationService {
   private populateTemplate(
     template: NotificationTemplate,
     escalationEvent: EscalationEvent,
-    context?: any
+    context?: any,
   ): { subject: string; body: string } {
     let subject = template.template.subject
     let body = template.template.body
@@ -673,11 +731,12 @@ export class AutomatedEscalationService {
       riskLevel: escalationEvent.riskLevel,
       timeframe: escalationEvent.protocolActivated.timeline,
       riskFactors: 'Risk factors identified', // Would be populated from actual data
-      recommendations: 'Immediate clinical review recommended'
+      recommendations: 'Immediate clinical review recommended',
     }
 
-    template.template.variables.forEach(variable => {
-      const value = variables[variable as keyof typeof variables] || `{{${variable}}}`
+    template.template.variables.forEach((variable) => {
+      const value =
+        variables[variable as keyof typeof variables] || `{{${variable}}}`
       subject = subject.replace(new RegExp(`{{${variable}}}`, 'g'), value)
       body = body.replace(new RegExp(`{{${variable}}}`, 'g'), value)
     })
@@ -685,8 +744,13 @@ export class AutomatedEscalationService {
     return { subject, body }
   }
 
-  private async queueManualAction(action: EscalationAction, escalationEvent: EscalationEvent): Promise<void> {
-    console.log(`MANUAL ACTION QUEUED: ${action.description} for escalation ${escalationEvent.id}`)
+  private async queueManualAction(
+    action: EscalationAction,
+    escalationEvent: EscalationEvent,
+  ): Promise<void> {
+    console.log(
+      `MANUAL ACTION QUEUED: ${action.description} for escalation ${escalationEvent.id}`,
+    )
   }
 
   private generateClinicalNotes(escalationEvent: EscalationEvent): string {
@@ -699,7 +763,7 @@ export class AutomatedEscalationService {
       high: 'Every hour',
       moderate: 'Every 4 hours',
       low: 'Every 12 hours',
-      minimal: 'Daily'
+      minimal: 'Daily',
     }
     return frequencies[riskLevel as keyof typeof frequencies] || 'Every 4 hours'
   }
@@ -710,7 +774,7 @@ export class AutomatedEscalationService {
       high: '1 week',
       moderate: '2 weeks',
       low: '1 month',
-      minimal: '1 month'
+      minimal: '1 month',
     }
     return durations[riskLevel as keyof typeof durations] || '2 weeks'
   }
@@ -721,17 +785,24 @@ export class AutomatedEscalationService {
       high: 'crisis_intervention',
       moderate: 'urgent_session',
       low: 'scheduled_check_in',
-      minimal: 'routine_follow_up'
+      minimal: 'routine_follow_up',
     }
-    return interventions[riskLevel as keyof typeof interventions] || 'urgent_session'
+    return (
+      interventions[riskLevel as keyof typeof interventions] || 'urgent_session'
+    )
   }
 
-  private generateInterventionDetails(escalationEvent: EscalationEvent, context?: any): any {
+  private generateInterventionDetails(
+    escalationEvent: EscalationEvent,
+    context?: any,
+  ): any {
     return {
       escalationId: escalationEvent.id,
       riskLevel: escalationEvent.riskLevel,
-      recommendedActions: escalationEvent.protocolActivated.actions.map(a => a.description),
-      context
+      recommendedActions: escalationEvent.protocolActivated.actions.map(
+        (a) => a.description,
+      ),
+      context,
     }
   }
 

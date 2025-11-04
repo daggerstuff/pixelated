@@ -32,7 +32,6 @@ export function useSkillProgress(
 
     setLoading(true)
     setError(null)
-
     ;(async () => {
       try {
         if (!session) {

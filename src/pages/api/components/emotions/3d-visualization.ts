@@ -11,12 +11,12 @@ const logger = createBuildSafeLogger('3d-emotion-visualization-api')
 
 interface EmotionPoint3D {
   id: string
-  valence: number    // -1 to 1 (negative to positive)
-  arousal: number    // -1 to 1 (calm to excited)
-  dominance: number  // -1 to 1 (submissive to dominant)
+  valence: number // -1 to 1 (negative to positive)
+  arousal: number // -1 to 1 (calm to excited)
+  dominance: number // -1 to 1 (submissive to dominant)
   emotion: string
   timestamp: string
-  intensity: number  // 0 to 1
+  intensity: number // 0 to 1
   sessionId?: string
   confidence?: number
 }
@@ -44,7 +44,7 @@ interface Emotion3DVisualizationResponse {
 /**
  * 3D Emotion Visualization API
  * GET /api/components/emotions/3d-visualization
- * 
+ *
  * Provides multidimensional emotion data for the MultidimensionalEmotionChart component
  * Maps emotions to Valence-Arousal-Dominance (VAD) space for 3D visualization
  */
@@ -69,7 +69,8 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     const sessionId = url.searchParams.get('sessionId')
     const timeRange = parseInt(url.searchParams.get('timeRange') || '7', 10) // days
     const maxPoints = parseInt(url.searchParams.get('maxPoints') || '100', 10)
-    const includeTrajectory = url.searchParams.get('includeTrajectory') === 'true'
+    const includeTrajectory =
+      url.searchParams.get('includeTrajectory') === 'true'
 
     if (!clientId && !sessionId) {
       return new Response(
@@ -107,8 +108,15 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
       for (const session of sessions) {
         if (session.sessionId) {
-          const sessionEmotions = await repository.getEmotionsForSession(session.sessionId)
-          emotionData.push(...sessionEmotions.map(e => ({ ...e, sessionId: session.sessionId })))
+          const sessionEmotions = await repository.getEmotionsForSession(
+            session.sessionId,
+          )
+          emotionData.push(
+            ...sessionEmotions.map((e) => ({
+              ...e,
+              sessionId: session.sessionId,
+            })),
+          )
         }
       }
     }
@@ -122,29 +130,44 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     }
 
     // Map emotions to 3D coordinates
-    const emotionPoints: EmotionPoint3D[] = emotionData.map((emotion, index) => {
-      const dimensions = emotionMapper.mapEmotionsToDimensions(emotion)
-      
-      return {
-        id: `emotion-${emotion.id || index}`,
-        valence: normalizeToRange(dimensions.valence || 0, -1, 1),
-        arousal: normalizeToRange(dimensions.arousal || 0, -1, 1),
-        dominance: normalizeToRange(dimensions.dominance || 0, -1, 1),
-        emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
-        timestamp: emotion.timestamp || new Date().toISOString(),
-        intensity: normalizeToRange(emotion.confidence || emotion.intensity || 0.5, 0, 1),
-        sessionId: emotion.sessionId,
-        confidence: emotion.confidence || 0.7,
-      }
-    })
+    const emotionPoints: EmotionPoint3D[] = emotionData.map(
+      (emotion, index) => {
+        const dimensions = emotionMapper.mapEmotionsToDimensions(emotion)
+
+        return {
+          id: `emotion-${emotion.id || index}`,
+          valence: normalizeToRange(dimensions.valence || 0, -1, 1),
+          arousal: normalizeToRange(dimensions.arousal || 0, -1, 1),
+          dominance: normalizeToRange(dimensions.dominance || 0, -1, 1),
+          emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
+          timestamp: emotion.timestamp || new Date().toISOString(),
+          intensity: normalizeToRange(
+            emotion.confidence || emotion.intensity || 0.5,
+            0,
+            1,
+          ),
+          sessionId: emotion.sessionId,
+          confidence: emotion.confidence || 0.7,
+        }
+      },
+    )
 
     // Sort by timestamp
-    emotionPoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    emotionPoints.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    )
 
     // Calculate dominant emotions
-    const emotionCounts = new Map<string, { count: number; totalIntensity: number }>()
-    emotionPoints.forEach(point => {
-      const current = emotionCounts.get(point.emotion) || { count: 0, totalIntensity: 0 }
+    const emotionCounts = new Map<
+      string,
+      { count: number; totalIntensity: number }
+    >()
+    emotionPoints.forEach((point) => {
+      const current = emotionCounts.get(point.emotion) || {
+        count: 0,
+        totalIntensity: 0,
+      }
       emotionCounts.set(point.emotion, {
         count: current.count + 1,
         totalIntensity: current.totalIntensity + point.intensity,
@@ -177,7 +200,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       metadata: {
         totalPoints: emotionPoints.length,
         timeRange: `${timeRange} days`,
-        sessionCount: new Set(emotionPoints.map(p => p.sessionId).filter(Boolean)).size,
+        sessionCount: new Set(
+          emotionPoints.map((p) => p.sessionId).filter(Boolean),
+        ).size,
         dominantEmotions,
         trajectoryAnalysis,
       },
@@ -192,12 +217,11 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'private, max-age=180', // 3-minute cache
       },
     })
-
   } catch (error: unknown) {
     logger.error('Error generating 3D emotion visualization data', { error })
 
@@ -218,7 +242,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
  * POST endpoint for real-time emotion updates
  * Allows adding new emotion points to the visualization
  */
-export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async (
+  context: AuthAPIContext,
+) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -237,7 +263,12 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
     const { emotion, valence, arousal, dominance, intensity, sessionId } = body
 
     // Validate input
-    if (!emotion || typeof valence !== 'number' || typeof arousal !== 'number' || typeof dominance !== 'number') {
+    if (
+      !emotion ||
+      typeof valence !== 'number' ||
+      typeof arousal !== 'number' ||
+      typeof dominance !== 'number'
+    ) {
       return new Response(
         JSON.stringify({ error: 'Invalid emotion data format' }),
         {
@@ -266,19 +297,25 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
 
     logger.info('Added new emotion point', {
       emotion: newEmotionPoint.emotion,
-      coordinates: [newEmotionPoint.valence, newEmotionPoint.arousal, newEmotionPoint.dominance],
+      coordinates: [
+        newEmotionPoint.valence,
+        newEmotionPoint.arousal,
+        newEmotionPoint.dominance,
+      ],
       sessionId: newEmotionPoint.sessionId,
       userId: user.id,
     })
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      emotionPoint: newEmotionPoint 
-    }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    })
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        emotionPoint: newEmotionPoint,
+      }),
+      {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   } catch (error: unknown) {
     logger.error('Error adding emotion point', { error })
 
@@ -312,20 +349,26 @@ function calculateEmotionalTrajectory(emotionPoints: EmotionPoint3D[]) {
 
   const first = emotionPoints[0]
   const last = emotionPoints[emotionPoints.length - 1]
-  const timeSpan = new Date(last.timestamp).getTime() - new Date(first.timestamp).getTime()
+  const timeSpan =
+    new Date(last.timestamp).getTime() - new Date(first.timestamp).getTime()
 
   // Calculate gradients (change over time)
-  const valenceGradient = (last.valence - first.valence) / (timeSpan / (1000 * 60 * 60)) // per hour
-  const arousalGradient = (last.arousal - first.arousal) / (timeSpan / (1000 * 60 * 60))
-  const dominanceGradient = (last.dominance - first.dominance) / (timeSpan / (1000 * 60 * 60))
+  const valenceGradient =
+    (last.valence - first.valence) / (timeSpan / (1000 * 60 * 60)) // per hour
+  const arousalGradient =
+    (last.arousal - first.arousal) / (timeSpan / (1000 * 60 * 60))
+  const dominanceGradient =
+    (last.dominance - first.dominance) / (timeSpan / (1000 * 60 * 60))
 
   // Calculate emotional stability (inverse of variance)
-  const valenceVariance = calculateVariance(emotionPoints.map(p => p.valence))
-  const arousalVariance = calculateVariance(emotionPoints.map(p => p.arousal))
-  const dominanceVariance = calculateVariance(emotionPoints.map(p => p.dominance))
-  
+  const valenceVariance = calculateVariance(emotionPoints.map((p) => p.valence))
+  const arousalVariance = calculateVariance(emotionPoints.map((p) => p.arousal))
+  const dominanceVariance = calculateVariance(
+    emotionPoints.map((p) => p.dominance),
+  )
+
   const totalVariance = valenceVariance + arousalVariance + dominanceVariance
-  const emotionalStability = Math.max(0, 1 - (totalVariance / 3)) // Normalize to 0-1
+  const emotionalStability = Math.max(0, 1 - totalVariance / 3) // Normalize to 0-1
 
   return {
     valenceGradient: Number(valenceGradient.toFixed(4)),
@@ -337,6 +380,6 @@ function calculateEmotionalTrajectory(emotionPoints: EmotionPoint3D[]) {
 
 function calculateVariance(values: number[]): number {
   const mean = values.reduce((sum, val) => sum + val, 0) / values.length
-  const squaredDiffs = values.map(val => Math.pow(val - mean, 2))
+  const squaredDiffs = values.map((val) => Math.pow(val - mean, 2))
   return squaredDiffs.reduce((sum, diff) => sum + diff, 0) / values.length
 }

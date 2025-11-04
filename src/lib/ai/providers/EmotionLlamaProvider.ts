@@ -1,12 +1,17 @@
 /**
  * EmotionLlamaProvider - LLaMA-based emotion analysis provider
- * 
+ *
  * This provider uses LLaMA models for sophisticated emotion detection and analysis,
  * with support for FHE encryption and multidimensional emotion mapping.
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { EmotionAnalysis, EmotionVector, EmotionDimensions, EmotionMetadata } from '../emotions/types'
+import type {
+  EmotionAnalysis,
+  EmotionVector,
+  EmotionDimensions,
+  EmotionMetadata,
+} from '../emotions/types'
 import type { FHESystem } from '../../fhe/index'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -36,10 +41,10 @@ export class EmotionLlamaProvider {
     this.baseUrl = baseUrl.replace(/\/$/, '') // Remove trailing slash
     this.apiKey = apiKey
     this.fheService = fheService
-    
-    logger.info('EmotionLlamaProvider initialized', { 
+
+    logger.info('EmotionLlamaProvider initialized', {
       baseUrl: this.baseUrl,
-      modelVersion: this.modelVersion
+      modelVersion: this.modelVersion,
     })
   }
 
@@ -48,7 +53,7 @@ export class EmotionLlamaProvider {
    */
   async analyzeEmotions(text: string): Promise<EmotionAnalysis> {
     const startTime = Date.now()
-    
+
     try {
       // Handle empty or whitespace-only inputs (optimization from roadmap)
       if (!text || text.trim().length === 0) {
@@ -60,14 +65,14 @@ export class EmotionLlamaProvider {
 
       // Encrypt the text using FHE
       const encryptedText = await this.fheService.encrypt(text)
-      
+
       // Prepare the request payload
       const payload = {
         text: encryptedText,
         model: this.modelVersion,
         analysis_type: 'multidimensional',
         return_confidence: true,
-        return_dimensions: true
+        return_dimensions: true,
       }
 
       // Make API request to LLaMA emotion analysis endpoint
@@ -76,27 +81,29 @@ export class EmotionLlamaProvider {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`,
-          'X-Model-Version': this.modelVersion
+          'X-Model-Version': this.modelVersion,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
-        logger.warn('LLaMA API request failed, falling back to local analysis', { 
-          status: response.status,
-          statusText: response.statusText 
-        })
+        logger.warn(
+          'LLaMA API request failed, falling back to local analysis',
+          {
+            status: response.status,
+            statusText: response.statusText,
+          },
+        )
         return this.fallbackAnalysis(text, startTime)
       }
 
-      const result = await response.json() as any
-      
+      const result = (await response.json()) as any
+
       // Decrypt and process the response
       const decryptedResult = await this.processEncryptedResponse(result)
-      
+
       // Convert to standardized format
       return this.convertToEmotionAnalysis(decryptedResult, text, startTime)
-      
     } catch (error: unknown) {
       logger.error('Error in emotion analysis', { error })
       // Fallback to local analysis
@@ -107,17 +114,23 @@ export class EmotionLlamaProvider {
   /**
    * Process encrypted response from LLaMA API
    */
-  private async processEncryptedResponse(encryptedResult: any): Promise<EmotionDetectionResult> {
+  private async processEncryptedResponse(
+    encryptedResult: any,
+  ): Promise<EmotionDetectionResult> {
     try {
       // Decrypt the emotion analysis result
-      const decryptedEmotions = await this.fheService.decrypt(encryptedResult.emotions)
-      const decryptedDimensions = await this.fheService.decrypt(encryptedResult.dimensions)
-      
+      const decryptedEmotions = await this.fheService.decrypt(
+        encryptedResult.emotions,
+      )
+      const decryptedDimensions = await this.fheService.decrypt(
+        encryptedResult.dimensions,
+      )
+
       return {
         emotions: JSON.parse(decryptedEmotions),
         dimensions: JSON.parse(decryptedDimensions),
         confidence: encryptedResult.confidence || 0.8,
-        metadata: encryptedResult.metadata || {}
+        metadata: encryptedResult.metadata || {},
       }
     } catch (error: unknown) {
       logger.error('Error processing encrypted response', { error })
@@ -128,15 +141,18 @@ export class EmotionLlamaProvider {
   /**
    * Fallback local emotion analysis when API is unavailable
    */
-  private async fallbackAnalysis(text: string, startTime: number): Promise<EmotionAnalysis> {
+  private async fallbackAnalysis(
+    text: string,
+    startTime: number,
+  ): Promise<EmotionAnalysis> {
     logger.info('Using fallback local emotion analysis')
-    
+
     // Simple keyword-based emotion detection for fallback
     const emotions = this.detectEmotionsLocally(text)
     const dimensions = this.calculateDimensions(emotions)
-    
+
     const processingTime = Date.now() - startTime
-    
+
     return {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
@@ -150,9 +166,9 @@ export class EmotionLlamaProvider {
         modelVersion: 'fallback-v1.0',
         confidence: {
           overall: 0.6,
-          perEmotion: this.calculatePerEmotionConfidence(emotions)
-        }
-      }
+          perEmotion: this.calculatePerEmotionConfidence(emotions),
+        },
+      },
     }
   }
 
@@ -161,7 +177,7 @@ export class EmotionLlamaProvider {
    */
   private createNeutralAnalysis(startTime: number): EmotionAnalysis {
     const processingTime = Date.now() - startTime
-    
+
     return {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
@@ -174,12 +190,12 @@ export class EmotionLlamaProvider {
         surprise: 0,
         disgust: 0,
         trust: 0.5, // Slight trust for neutral state
-        anticipation: 0
+        anticipation: 0,
       },
       dimensions: {
         valence: 0,
         arousal: 0,
-        dominance: 0
+        dominance: 0,
       },
       confidence: 1.0, // High confidence for neutral analysis
       metadata: {
@@ -196,10 +212,10 @@ export class EmotionLlamaProvider {
             surprise: 1.0,
             disgust: 1.0,
             trust: 1.0,
-            anticipation: 1.0
-          }
-        }
-      }
+            anticipation: 1.0,
+          },
+        },
+      },
     }
   }
 
@@ -207,12 +223,12 @@ export class EmotionLlamaProvider {
    * Convert API result to EmotionAnalysis format
    */
   private convertToEmotionAnalysis(
-    result: EmotionDetectionResult, 
-    originalText: string, 
-    startTime: number
+    result: EmotionDetectionResult,
+    originalText: string,
+    startTime: number,
   ): EmotionAnalysis {
     const processingTime = Date.now() - startTime
-    
+
     return {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
@@ -226,16 +242,18 @@ export class EmotionLlamaProvider {
         modelVersion: this.modelVersion,
         confidence: {
           overall: result.confidence,
-          perEmotion: this.calculatePerEmotionConfidence(result.emotions)
-        }
-      }
+          perEmotion: this.calculatePerEmotionConfidence(result.emotions),
+        },
+      },
     }
   }
 
   /**
    * Convert emotion array to EmotionVector format
    */
-  private convertEmotionArrayToVector(emotions: Array<{ type: string; intensity: number }>): EmotionVector {
+  private convertEmotionArrayToVector(
+    emotions: Array<{ type: string; intensity: number }>,
+  ): EmotionVector {
     const vector: EmotionVector = {
       joy: 0,
       sadness: 0,
@@ -244,21 +262,30 @@ export class EmotionLlamaProvider {
       surprise: 0,
       disgust: 0,
       trust: 0,
-      anticipation: 0
+      anticipation: 0,
     }
 
     // Map emotion types to vector properties
-    emotions.forEach(emotion => {
+    emotions.forEach((emotion) => {
       const normalizedType = emotion.type.toLowerCase()
-      
+
       // Handle various emotion type mappings
-      if (normalizedType.includes('joy') || normalizedType.includes('happiness')) {
+      if (
+        normalizedType.includes('joy') ||
+        normalizedType.includes('happiness')
+      ) {
         vector.joy = Math.max(vector.joy, emotion.intensity)
       } else if (normalizedType.includes('sad')) {
         vector.sadness = Math.max(vector.sadness, emotion.intensity)
-      } else if (normalizedType.includes('anger') || normalizedType.includes('mad')) {
+      } else if (
+        normalizedType.includes('anger') ||
+        normalizedType.includes('mad')
+      ) {
         vector.anger = Math.max(vector.anger, emotion.intensity)
-      } else if (normalizedType.includes('fear') || normalizedType.includes('afraid')) {
+      } else if (
+        normalizedType.includes('fear') ||
+        normalizedType.includes('afraid')
+      ) {
         vector.fear = Math.max(vector.fear, emotion.intensity)
       } else if (normalizedType.includes('surprise')) {
         vector.surprise = Math.max(vector.surprise, emotion.intensity)
@@ -266,7 +293,10 @@ export class EmotionLlamaProvider {
         vector.disgust = Math.max(vector.disgust, emotion.intensity)
       } else if (normalizedType.includes('trust')) {
         vector.trust = Math.max(vector.trust, emotion.intensity)
-      } else if (normalizedType.includes('anticipation') || normalizedType.includes('excitement')) {
+      } else if (
+        normalizedType.includes('anticipation') ||
+        normalizedType.includes('excitement')
+      ) {
         vector.anticipation = Math.max(vector.anticipation, emotion.intensity)
       }
     })
@@ -277,20 +307,64 @@ export class EmotionLlamaProvider {
   /**
    * Local emotion detection using keyword analysis
    */
-  private detectEmotionsLocally(text: string): Array<{ type: string; intensity: number; confidence: number }> {
+  private detectEmotionsLocally(
+    text: string,
+  ): Array<{ type: string; intensity: number; confidence: number }> {
     const lowercaseText = text.toLowerCase()
-    const emotions: Array<{ type: string; intensity: number; confidence: number }> = []
+    const emotions: Array<{
+      type: string
+      intensity: number
+      confidence: number
+    }> = []
 
     // Emotion keyword patterns
     const emotionPatterns = {
-      joy: ['happy', 'joy', 'pleased', 'delighted', 'excited', 'cheerful', 'glad'],
-      sadness: ['sad', 'depressed', 'down', 'unhappy', 'grief', 'sorrow', 'melancholy'],
-      anger: ['angry', 'mad', 'furious', 'irritated', 'frustrated', 'annoyed', 'rage'],
-      fear: ['afraid', 'scared', 'fearful', 'terrified', 'anxious', 'worried', 'nervous'],
+      joy: [
+        'happy',
+        'joy',
+        'pleased',
+        'delighted',
+        'excited',
+        'cheerful',
+        'glad',
+      ],
+      sadness: [
+        'sad',
+        'depressed',
+        'down',
+        'unhappy',
+        'grief',
+        'sorrow',
+        'melancholy',
+      ],
+      anger: [
+        'angry',
+        'mad',
+        'furious',
+        'irritated',
+        'frustrated',
+        'annoyed',
+        'rage',
+      ],
+      fear: [
+        'afraid',
+        'scared',
+        'fearful',
+        'terrified',
+        'anxious',
+        'worried',
+        'nervous',
+      ],
       surprise: ['surprised', 'amazed', 'shocked', 'astonished', 'unexpected'],
       disgust: ['disgusted', 'revolted', 'repulsed', 'sickened', 'appalled'],
       trust: ['trust', 'confident', 'secure', 'safe', 'reliable', 'believe'],
-      anticipation: ['excited', 'eager', 'anticipating', 'looking forward', 'hopeful']
+      anticipation: [
+        'excited',
+        'eager',
+        'anticipating',
+        'looking forward',
+        'hopeful',
+      ],
     }
 
     // Analyze text for emotion indicators
@@ -311,7 +385,7 @@ export class EmotionLlamaProvider {
         emotions.push({
           type: emotionType,
           intensity: Math.min(score, 1.0), // Cap at 1.0
-          confidence: Math.min(matches * 0.3, 1.0)
+          confidence: Math.min(matches * 0.3, 1.0),
         })
       }
     }
@@ -321,7 +395,7 @@ export class EmotionLlamaProvider {
       emotions.push({
         type: 'trust', // Use trust as neutral baseline
         intensity: 0.5,
-        confidence: 0.8
+        confidence: 0.8,
       })
     }
 
@@ -331,7 +405,9 @@ export class EmotionLlamaProvider {
   /**
    * Calculate dimensional values from emotions
    */
-  private calculateDimensions(emotions: Array<{ type: string; intensity: number }>): EmotionDimensions {
+  private calculateDimensions(
+    emotions: Array<{ type: string; intensity: number }>,
+  ): EmotionDimensions {
     // Emotion dimension mappings (Russell's Circumplex Model)
     const dimensionMappings = {
       joy: { valence: 0.8, arousal: 0.6, dominance: 0.6 },
@@ -341,7 +417,7 @@ export class EmotionLlamaProvider {
       surprise: { valence: 0.1, arousal: 0.9, dominance: 0.0 },
       disgust: { valence: -0.8, arousal: 0.4, dominance: 0.2 },
       trust: { valence: 0.6, arousal: 0.3, dominance: 0.4 },
-      anticipation: { valence: 0.4, arousal: 0.7, dominance: 0.3 }
+      anticipation: { valence: 0.4, arousal: 0.7, dominance: 0.3 },
     }
 
     let totalValence = 0
@@ -349,8 +425,9 @@ export class EmotionLlamaProvider {
     let totalDominance = 0
     let totalWeight = 0
 
-    emotions.forEach(emotion => {
-      const mapping = dimensionMappings[emotion.type as keyof typeof dimensionMappings]
+    emotions.forEach((emotion) => {
+      const mapping =
+        dimensionMappings[emotion.type as keyof typeof dimensionMappings]
       if (mapping) {
         const weight = emotion.intensity
         totalValence += mapping.valence * weight
@@ -365,7 +442,7 @@ export class EmotionLlamaProvider {
       return {
         valence: totalValence / totalWeight,
         arousal: totalArousal / totalWeight,
-        dominance: totalDominance / totalWeight
+        dominance: totalDominance / totalWeight,
       }
     }
 
@@ -377,7 +454,7 @@ export class EmotionLlamaProvider {
    * Calculate per-emotion confidence scores
    */
   private calculatePerEmotionConfidence(
-    emotions: Array<{ type: string; intensity: number; confidence?: number }>
+    emotions: Array<{ type: string; intensity: number; confidence?: number }>,
   ): Record<keyof EmotionVector, number> {
     const confidenceMap: Record<keyof EmotionVector, number> = {
       joy: 0.5,
@@ -387,14 +464,17 @@ export class EmotionLlamaProvider {
       surprise: 0.5,
       disgust: 0.5,
       trust: 0.5,
-      anticipation: 0.5
+      anticipation: 0.5,
     }
 
-    emotions.forEach(emotion => {
+    emotions.forEach((emotion) => {
       const normalizedType = emotion.type.toLowerCase()
       const confidence = emotion.confidence || 0.7
 
-      if (normalizedType.includes('joy') || normalizedType.includes('happiness')) {
+      if (
+        normalizedType.includes('joy') ||
+        normalizedType.includes('happiness')
+      ) {
         confidenceMap.joy = Math.max(confidenceMap.joy, confidence)
       } else if (normalizedType.includes('sad')) {
         confidenceMap.sadness = Math.max(confidenceMap.sadness, confidence)
@@ -409,7 +489,10 @@ export class EmotionLlamaProvider {
       } else if (normalizedType.includes('trust')) {
         confidenceMap.trust = Math.max(confidenceMap.trust, confidence)
       } else if (normalizedType.includes('anticipation')) {
-        confidenceMap.anticipation = Math.max(confidenceMap.anticipation, confidence)
+        confidenceMap.anticipation = Math.max(
+          confidenceMap.anticipation,
+          confidence,
+        )
       }
     })
 

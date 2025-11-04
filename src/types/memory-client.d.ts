@@ -53,9 +53,7 @@ declare module '@/lib/memory/memory-client' {
       projectId?: string,
     ) => Promise<void>
     searchByTags: (tags: string[], userId?: string) => Promise<MemoryEntry[]>
-    getMemoryHistory: (
-      userId?: string,
-    ) => Promise<
+    getMemoryHistory: (userId?: string) => Promise<
       Array<{
         id: string
         timestamp: string

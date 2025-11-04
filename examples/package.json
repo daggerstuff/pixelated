@@ -1,0 +1,47 @@
+{
+  "name": "unified-dark-theme-example",
+  "version": "1.0.0",
+  "description": "Example project demonstrating unified dark theme with pnpm",
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "pnpm run serve",
+    "serve": "python3 -m http.server 8080 --directory .",
+    "build": "pnpm run optimize",
+    "optimize": "echo 'Optimizing assets for production...'",
+    "test": "pnpm run validate",
+    "validate": "echo 'Validating theme integration...'",
+    "preview": "pnpm run serve"
+  },
+  "dependencies": {
+    "@fontsource/geist-sans": "^5.0.0",
+    "@fontsource/jetbrains-mono": "^5.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "postcss-import": "^16.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "caniuse-lite": "latest"
+    },
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "typescript"
+      ]
+    },
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

@@ -4,7 +4,7 @@ import {
   ResearchAPIResponse,
   ValidationResult,
   SystemMetrics,
-  Alert
+  Alert,
 } from '@/lib/research/types/research-types'
 import { AnonymizationService } from './services/AnonymizationService'
 import { ConsentManagementService } from './services/ConsentManagementService'
@@ -40,30 +40,32 @@ export class ResearchPlatform {
   private isInitialized = false
   private alerts: Alert[] = []
 
-  constructor(config: ResearchPlatformConfig = {
-    anonymization: {
-      kAnonymity: 5,
-      differentialPrivacyEpsilon: 0.1,
-      noiseInjection: true,
-      temporalObfuscation: true
+  constructor(
+    config: ResearchPlatformConfig = {
+      anonymization: {
+        kAnonymity: 5,
+        differentialPrivacyEpsilon: 0.1,
+        noiseInjection: true,
+        temporalObfuscation: true,
+      },
+      consent: {
+        defaultLevel: 'minimal',
+        expirationDays: 365,
+        withdrawalGracePeriodHours: 24,
+      },
+      queryEngine: {
+        maxComplexity: 1000,
+        maxResultSize: 10000,
+        approvalRequired: true,
+        cacheEnabled: true,
+      },
+      hipaa: {
+        encryptionAlgorithm: 'aes-256-gcm',
+        keyRotationDays: 90,
+        auditRetentionDays: 2555,
+      },
     },
-    consent: {
-      defaultLevel: 'minimal',
-      expirationDays: 365,
-      withdrawalGracePeriodHours: 24
-    },
-    queryEngine: {
-      maxComplexity: 1000,
-      maxResultSize: 10000,
-      approvalRequired: true,
-      cacheEnabled: true
-    },
-    hipaa: {
-      encryptionAlgorithm: 'aes-256-gcm',
-      keyRotationDays: 90,
-      auditRetentionDays: 2555
-    }
-  }) {
+  ) {
     this.config = config
 
     // Initialize services
@@ -73,14 +75,14 @@ export class ResearchPlatform {
       delta: 0.00001,
       temporalEpsilon: 0.05,
       fieldLevelEncryption: true,
-      noiseInjection: config.anonymization.noiseInjection
+      noiseInjection: config.anonymization.noiseInjection,
     })
 
     this.consentService = new ConsentManagementService({
       defaultConsentLevel: config.consent.defaultLevel,
       consentExpirationDays: config.consent.expirationDays,
       withdrawalGracePeriodHours: config.consent.withdrawalGracePeriodHours,
-      auditRetentionDays: 2555
+      auditRetentionDays: 2555,
     })
 
     this.hipaaService = new HIPAADataService({
@@ -89,46 +91,55 @@ export class ResearchPlatform {
       auditRetentionDays: config.hipaa.auditRetentionDays,
       accessControlMatrix: {
         roles: {
-          researcher: {
+          'researcher': {
             permissions: ['read-anonymized', 'aggregate-analysis'],
-            restrictions: ['no-identifiable', 'no-raw-phi']
+            restrictions: ['no-identifiable', 'no-raw-phi'],
           },
           'data-scientist': {
-            permissions: ['read-anonymized', 'read-pseudonymized', 'aggregate-analysis', 'pattern-discovery'],
-            restrictions: ['no-identifiable', 'audit-required']
+            permissions: [
+              'read-anonymized',
+              'read-pseudonymized',
+              'aggregate-analysis',
+              'pattern-discovery',
+            ],
+            restrictions: ['no-identifiable', 'audit-required'],
           },
-          therapist: {
-            permissions: ['read-own-clients', 'write-notes', 'clinical-analysis'],
-            restrictions: ['own-clients-only', 'no-research-export']
+          'therapist': {
+            permissions: [
+              'read-own-clients',
+              'write-notes',
+              'clinical-analysis',
+            ],
+            restrictions: ['own-clients-only', 'no-research-export'],
           },
-          admin: {
+          'admin': {
             permissions: ['full-access', 'user-management', 'audit-review'],
-            restrictions: ['audit-required', 'dual-authorization']
-          }
-        }
+            restrictions: ['audit-required', 'dual-authorization'],
+          },
+        },
       },
       dataRetentionPolicies: {
         'session-data': {
           retentionDays: 2555,
           anonymizationRequired: true,
-          deletionRequired: false
+          deletionRequired: false,
         },
         'clinical-notes': {
           retentionDays: 2555,
           anonymizationRequired: false,
-          deletionRequired: false
+          deletionRequired: false,
         },
         'research-data': {
           retentionDays: 2555,
           anonymizationRequired: true,
-          deletionRequired: false
+          deletionRequired: false,
         },
         'audit-logs': {
           retentionDays: 2555,
           anonymizationRequired: false,
-          deletionRequired: false
-        }
-      }
+          deletionRequired: false,
+        },
+      },
     })
 
     this.queryEngine = new ResearchQueryEngine(
@@ -137,11 +148,11 @@ export class ResearchPlatform {
         maxResultSize: config.queryEngine.maxResultSize,
         approvalRequired: config.queryEngine.approvalRequired,
         queryTimeout: 30000,
-        cacheEnabled: config.queryEngine.cacheEnabled
+        cacheEnabled: config.queryEngine.cacheEnabled,
       },
       this.anonymizationService,
       this.consentService,
-      this.hipaaService
+      this.hipaaService,
     )
 
     this.patternService = new PatternDiscoveryService(
@@ -151,9 +162,9 @@ export class ResearchPlatform {
         maxPatterns: 10,
         correlationThreshold: 0.3,
         anomalyThreshold: 2.0,
-        clusterCount: 5
+        clusterCount: 5,
       },
-      this.queryEngine
+      this.queryEngine,
     )
 
     this.evidenceService = new EvidenceGenerationService(
@@ -162,10 +173,10 @@ export class ResearchPlatform {
         minEffectSize: 0.3,
         minSampleSize: 30,
         confidenceLevel: 0.95,
-        maxHypotheses: 10
+        maxHypotheses: 10,
       },
       this.patternService,
-      this.queryEngine
+      this.queryEngine,
     )
   }
 
@@ -179,7 +190,9 @@ export class ResearchPlatform {
       // Validate configuration
       const validation = await this.validateConfiguration()
       if (!validation.valid) {
-        throw new Error(`Configuration validation failed: ${validation.errors.join(', ')}`)
+        throw new Error(
+          `Configuration validation failed: ${validation.errors.join(', ')}`,
+        )
       }
 
       // Initialize services
@@ -201,8 +214,8 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       logger.error('Research Platform initialization failed', { error })
@@ -211,13 +224,13 @@ export class ResearchPlatform {
         success: false,
         error: {
           code: 'INITIALIZATION_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
+          message: error instanceof Error ? error.message : 'Unknown error',
         },
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     }
   }
@@ -236,26 +249,26 @@ export class ResearchPlatform {
           healthy: healthCheck.healthy,
           services: healthCheck.services,
           metrics,
-          alerts: this.alerts
+          alerts: this.alerts,
         },
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'STATUS_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
+          message: error instanceof Error ? error.message : 'Unknown error',
         },
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     }
   }
@@ -266,46 +279,49 @@ export class ResearchPlatform {
   async submitResearchData(
     data: unknown[],
     consentLevel: string,
-    _userId: string
+    _userId: string,
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
     try {
       // Validate consent
-      const clientIds = (data as Array<Record<string, unknown>>).map(d => d.clientId).filter(Boolean)
-      const consentValidation = await this.consentService.validateResearchAccess(
-        clientIds as string[],
-        'anonymized-research' as never
-      )
+      const clientIds = (data as Array<Record<string, unknown>>)
+        .map((d) => d.clientId)
+        .filter(Boolean)
+      const consentValidation =
+        await this.consentService.validateResearchAccess(
+          clientIds as string[],
+          'anonymized-research' as never,
+        )
 
       if (consentValidation.invalidClients.length > 0) {
         return {
           success: false,
           error: {
             code: 'CONSENT_ERROR',
-            message: `Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`
-          }
+            message: `Consent validation failed for clients: ${consentValidation.invalidClients.join(', ')}`,
+          },
         }
       }
 
       // Anonymize data
       const anonymized = await this.anonymizationService.anonymizeResearchData(
         data as never,
-        consentLevel as never
+        consentLevel as never,
       )
 
       // Encrypt sensitive data
       const encrypted = await this.hipaaService.encryptData(
         anonymized.anonymizedData,
-        'research-data'
+        'research-data',
       )
 
       return {
@@ -313,21 +329,21 @@ export class ResearchPlatform {
         data: {
           anonymizedCount: anonymized.anonymizedData.length,
           privacyMetrics: anonymized.privacyMetrics,
-          encryptedData: encrypted.encryptedData
+          encryptedData: encrypted.encryptedData,
         },
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'SUBMISSION_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -338,15 +354,15 @@ export class ResearchPlatform {
   async executeResearchQuery(
     query: unknown,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -356,7 +372,7 @@ export class ResearchPlatform {
         userId,
         role: userRole,
         dataType: 'research-data',
-        purpose: 'research-analysis'
+        purpose: 'research-analysis',
       }
 
       const accessResult = await this.hipaaService.validateAccess(accessRequest)
@@ -365,13 +381,17 @@ export class ResearchPlatform {
           success: false,
           error: {
             code: 'ACCESS_DENIED',
-            message: 'Access denied for research query'
-          }
+            message: 'Access denied for research query',
+          },
         }
       }
 
       // Execute query
-      const result = await this.queryEngine.executeQuery(query as never, userId, userRole)
+      const result = await this.queryEngine.executeQuery(
+        query as never,
+        userId,
+        userRole,
+      )
 
       return {
         success: true,
@@ -379,16 +399,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: result.metadata?.executionTime || 0
-        }
+          processingTime: result.metadata?.executionTime || 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'QUERY_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -399,15 +419,15 @@ export class ResearchPlatform {
   async discoverPatterns(
     request: unknown,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -417,7 +437,7 @@ export class ResearchPlatform {
         userId,
         role: userRole,
         dataType: 'research-data',
-        purpose: 'pattern-discovery'
+        purpose: 'pattern-discovery',
       }
 
       const accessResult = await this.hipaaService.validateAccess(accessRequest)
@@ -426,13 +446,15 @@ export class ResearchPlatform {
           success: false,
           error: {
             code: 'ACCESS_DENIED',
-            message: 'Access denied for pattern discovery'
-          }
+            message: 'Access denied for pattern discovery',
+          },
         }
       }
 
       // Discover patterns
-      const patterns = await this.patternService.discoverPatterns(request as never)
+      const patterns = await this.patternService.discoverPatterns(
+        request as never,
+      )
 
       return {
         success: true,
@@ -440,16 +462,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: patterns.metadata.processingTime
-        }
+          processingTime: patterns.metadata.processingTime,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'PATTERN_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -460,15 +482,15 @@ export class ResearchPlatform {
   async generateEvidenceReport(
     request: unknown,
     userId: string,
-    userRole: string
+    userRole: string,
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -478,7 +500,7 @@ export class ResearchPlatform {
         userId,
         role: userRole,
         dataType: 'research-data',
-        purpose: 'evidence-generation'
+        purpose: 'evidence-generation',
       }
 
       const accessResult = await this.hipaaService.validateAccess(accessRequest)
@@ -487,13 +509,15 @@ export class ResearchPlatform {
           success: false,
           error: {
             code: 'ACCESS_DENIED',
-            message: 'Access denied for evidence generation'
-          }
+            message: 'Access denied for evidence generation',
+          },
         }
       }
 
       // Generate evidence
-      const report = await this.evidenceService.generateEvidence(request as never)
+      const report = await this.evidenceService.generateEvidence(
+        request as never,
+      )
 
       return {
         success: true,
@@ -501,16 +525,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'EVIDENCE_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -522,15 +546,15 @@ export class ResearchPlatform {
     action: 'initialize' | 'update' | 'withdraw',
     clientId: string,
     data: unknown,
-    _userId: string
+    _userId: string,
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -543,21 +567,21 @@ export class ResearchPlatform {
           result = await this.consentService.initializeConsent(
             clientId,
             consentData.level as never,
-            consentData.metadata as never
+            consentData.metadata as never,
           )
           break
         case 'update':
           result = await this.consentService.updateConsent({
             clientId,
             newLevel: consentData.level as never,
-            reason: consentData.reason as never
+            reason: consentData.reason as never,
           })
           break
         case 'withdraw':
           result = await this.consentService.requestWithdrawal(
             clientId,
             consentData.reason as never,
-            consentData.immediate as never
+            consentData.immediate as never,
           )
           break
         default:
@@ -570,16 +594,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'CONSENT_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -590,15 +614,15 @@ export class ResearchPlatform {
   async getAuditTrail(
     userId?: string,
     dataType?: string,
-    dateRange?: { start: Date; end: Date }
+    dateRange?: { start: Date; end: Date },
   ): Promise<ResearchAPIResponse> {
     if (!this.isInitialized) {
       return {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -608,7 +632,7 @@ export class ResearchPlatform {
       // Filter by date range if provided
       let filtered = auditTrail
       if (dateRange) {
-        filtered = auditTrail.filter(log => {
+        filtered = auditTrail.filter((log) => {
           const logDate = new Date(log.timestamp)
           return logDate >= dateRange.start && logDate <= dateRange.end
         })
@@ -620,16 +644,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'AUDIT_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -643,8 +667,8 @@ export class ResearchPlatform {
         success: false,
         error: {
           code: 'NOT_INITIALIZED',
-          message: 'Research platform not initialized'
-        }
+          message: 'Research platform not initialized',
+        },
       }
     }
 
@@ -657,16 +681,16 @@ export class ResearchPlatform {
         metadata: {
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID(),
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       }
     } catch (error) {
       return {
         success: false,
         error: {
           code: 'COMPLIANCE_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -702,7 +726,7 @@ export class ResearchPlatform {
       valid: errors.length === 0,
       errors,
       warnings,
-      recommendations
+      recommendations,
     }
   }
 
@@ -733,7 +757,7 @@ export class ResearchPlatform {
       hipaa: true,
       queryEngine: true,
       patternDiscovery: true,
-      evidenceGeneration: true
+      evidenceGeneration: true,
     }
 
     // Check each service
@@ -755,7 +779,7 @@ export class ResearchPlatform {
       services.hipaa = false
     }
 
-    const healthy = Object.values(services).every(status => status)
+    const healthy = Object.values(services).every((status) => status)
 
     return { healthy, services }
   }
@@ -775,9 +799,9 @@ export class ResearchPlatform {
       dataVolume: {
         totalRecords: 10000, // Mock value
         anonymizedRecords: 9500, // Mock value
-        encryptedRecords: 10000 // Mock value
+        encryptedRecords: 10000, // Mock value
       },
-      consentMetrics: consentStats
+      consentMetrics: consentStats,
     }
   }
 }

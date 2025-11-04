@@ -258,7 +258,9 @@ describe('BiasDetectionConfigManager', () => {
         },
       }
 
-      expect(() => configManager.updateConfig(invalidUpdates as unknown)).toThrow()
+      expect(() =>
+        configManager.updateConfig(invalidUpdates as unknown),
+      ).toThrow()
     })
 
     it('should preserve unchanged configuration sections', () => {

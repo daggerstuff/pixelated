@@ -1,9 +1,9 @@
-import { createBuildSafeLogger } from '@lib/logging/build-safe-logger';
-import { createAuditLog, AuditEventType } from '@lib/audit';
-import mongodb from '@lib/db/mongoClient';
-import { ObjectId } from 'mongodb';
+import { createBuildSafeLogger } from '@lib/logging/build-safe-logger'
+import { createAuditLog, AuditEventType } from '@lib/audit'
+import mongodb from '@lib/db/mongoClient'
+import { ObjectId } from 'mongodb'
 
-const logger = createBuildSafeLogger('crisis-session-flagging');
+const logger = createBuildSafeLogger('crisis-session-flagging')
 
 export interface FlagSessionRequest {
   userId: string
@@ -125,58 +125,84 @@ export class CrisisSessionFlaggingService {
         sessionId: request.sessionId,
         crisisId: request.crisisId,
         severity: request.severity,
-      });
+      })
 
       // Validate input
       if (!request.userId || !request.sessionId || !request.crisisId) {
-        throw new Error('Missing required fields: userId, sessionId, or crisisId');
+        throw new Error(
+          'Missing required fields: userId, sessionId, or crisisId',
+        )
       }
 
       if (request.confidence < 0 || request.confidence > 1) {
-        throw new Error('Confidence must be between 0 and 1');
+        throw new Error('Confidence must be between 0 and 1')
       }
 
       // Insert crisis session flag into MongoDB, ensuring a string 'id' field is created
-      const db = await mongodb.connect();
-      const now = new Date().toISOString();
-      const tempId = new ObjectId();
+      const db = await mongodb.connect()
+      const now = new Date().toISOString()
+      const tempId = new ObjectId()
       // Sanitize and validate all request fields before insert to prevent injection
-      if (typeof request.userId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.userId)) {
-        throw new Error('Invalid userId');
+      if (
+        typeof request.userId !== 'string' ||
+        !/^[a-zA-Z0-9-_]+$/.test(request.userId)
+      ) {
+        throw new Error('Invalid userId')
       }
-      if (typeof request.sessionId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.sessionId)) {
-        throw new Error('Invalid sessionId');
+      if (
+        typeof request.sessionId !== 'string' ||
+        !/^[a-zA-Z0-9-_]+$/.test(request.sessionId)
+      ) {
+        throw new Error('Invalid sessionId')
       }
-      if (typeof request.crisisId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(request.crisisId)) {
-        throw new Error('Invalid crisisId');
+      if (
+        typeof request.crisisId !== 'string' ||
+        !/^[a-zA-Z0-9-_]+$/.test(request.crisisId)
+      ) {
+        throw new Error('Invalid crisisId')
       }
-      if (!['low', 'medium', 'high', 'critical'].includes(String(request.severity))) {
-        throw new Error('Invalid severity');
+      if (
+        !['low', 'medium', 'high', 'critical'].includes(
+          String(request.severity),
+        )
+      ) {
+        throw new Error('Invalid severity')
       }
       if (typeof request.reason !== 'string') {
-        throw new Error('Invalid reason');
+        throw new Error('Invalid reason')
       }
-      if (typeof request.confidence !== 'number' || request.confidence < 0 || request.confidence > 1) {
-        throw new Error('Invalid confidence');
+      if (
+        typeof request.confidence !== 'number' ||
+        request.confidence < 0 ||
+        request.confidence > 1
+      ) {
+        throw new Error('Invalid confidence')
       }
 
       const safeDetectedRisks = Array.isArray(request.detectedRisks)
-        ? request.detectedRisks.filter(risk => typeof risk === 'string')
-        : [];
+        ? request.detectedRisks.filter((risk) => typeof risk === 'string')
+        : []
       const safeTextSample =
         request.textSample !== undefined
-          ? (typeof request.textSample === 'string' ? request.textSample : '')
-          : undefined;
+          ? typeof request.textSample === 'string'
+            ? request.textSample
+            : ''
+          : undefined
       const safeRoutingDecision =
-        request.routingDecision !== undefined && typeof request.routingDecision === 'object'
+        request.routingDecision !== undefined &&
+        typeof request.routingDecision === 'object'
           ? request.routingDecision
-          : undefined;
+          : undefined
       const safeMetadata =
-        request.metadata !== undefined && typeof request.metadata === 'object' && !Array.isArray(request.metadata)
+        request.metadata !== undefined &&
+        typeof request.metadata === 'object' &&
+        !Array.isArray(request.metadata)
           ? request.metadata
-          : {};
+          : {}
       const safeTimestamp =
-        typeof request.timestamp === 'string' && request.timestamp.length < 50 ? request.timestamp : now;
+        typeof request.timestamp === 'string' && request.timestamp.length < 50
+          ? request.timestamp
+          : now
 
       const insertDoc = {
         _id: tempId,
@@ -195,21 +221,23 @@ export class CrisisSessionFlaggingService {
         flagged_at: safeTimestamp,
         created_at: now,
         updated_at: now,
-      };
-      const insertResult = await db.collection('crisis_session_flags').insertOne(insertDoc);
+      }
+      const insertResult = await db
+        .collection('crisis_session_flags')
+        .insertOne(insertDoc)
 
       if (!insertResult.insertedId) {
-        throw new Error('Failed to insert crisis session flag');
+        throw new Error('Failed to insert crisis session flag')
       }
 
       // To prevent any potential NoSQL injection, we query using the ObjectId
       // generated in this function scope, rather than the result from the insert operation.
       const flagData = await db
         .collection('crisis_session_flags')
-        .findOne({ _id: tempId });
+        .findOne({ _id: tempId })
 
       if (!flagData) {
-        throw new Error('Failed to retrieve inserted crisis session flag');
+        throw new Error('Failed to retrieve inserted crisis session flag')
       }
 
       // Create audit log, including string ID
@@ -226,23 +254,23 @@ export class CrisisSessionFlaggingService {
           confidence: request.confidence,
           detectedRisks: request.detectedRisks,
         },
-      );
+      )
 
       logger.info('Session flagged successfully', {
         flagId: flagData['id'],
         userId: request.userId,
         sessionId: request.sessionId,
         crisisId: request.crisisId,
-      });
+      })
 
-      return this.mapFlagFromDb(flagData);
+      return this.mapFlagFromDb(flagData)
     } catch (error: unknown) {
       logger.error('Error flagging session for review', {
         error: error instanceof Error ? String(error) : String(error),
         userId: request.userId,
         sessionId: request.sessionId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -256,12 +284,12 @@ export class CrisisSessionFlaggingService {
       logger.info('Updating crisis flag status', {
         flagId: request.flagId,
         status: request.status,
-      });
+      })
 
       const updateData: CrisisSessionFlagUpdateData = {
         status: request.status,
         updated_at: new Date().toISOString(),
-      };
+      }
 
       // Set timestamps based on status
       if (request.status === 'under_review' && request.assignedTo) {
@@ -288,39 +316,41 @@ export class CrisisSessionFlaggingService {
         updateData.metadata = request.metadata
       }
 
-      const db = await mongodb.connect();
+      const db = await mongodb.connect()
       // Validate flagId as a sanitized string and attempt ObjectId construction
       if (
         typeof request.flagId !== 'string' ||
         !/^[a-f\d]{24}$/i.test(request.flagId)
       ) {
-        throw new Error('Invalid flagId provided.');
+        throw new Error('Invalid flagId provided.')
       }
-      let objectId: ObjectId;
+      let objectId: ObjectId
       try {
-        objectId = new ObjectId(request.flagId);
+        objectId = new ObjectId(request.flagId)
       } catch (_e) {
-        throw new Error('flagId is not a valid ObjectId.');
+        throw new Error('flagId is not a valid ObjectId.')
       }
-      const updateResult = await db.collection('crisis_session_flags').findOneAndUpdate(
-        { _id: objectId },
-        { $set: updateData },
-        { returnDocument: 'after' }
-      );
+      const updateResult = await db
+        .collection('crisis_session_flags')
+        .findOneAndUpdate(
+          { _id: objectId },
+          { $set: updateData },
+          { returnDocument: 'after' },
+        )
 
       if (!updateResult?.['value']) {
         logger.error('Failed to update crisis flag status', {
           flagId: request.flagId,
-        });
-        throw new Error(`Failed to update flag status: flag not found`);
+        })
+        throw new Error(`Failed to update flag status: flag not found`)
       }
 
       logger.info('Crisis flag status updated successfully', {
         flagId: request.flagId,
         status: request.status,
-      });
+      })
 
-      return this.mapFlagFromDb(updateResult['value']);
+      return this.mapFlagFromDb(updateResult['value'])
     } catch (error: unknown) {
       logger.error('Error updating flag status', {
         error: error instanceof Error ? String(error) : String(error),
@@ -338,29 +368,30 @@ export class CrisisSessionFlaggingService {
     includeResolved: boolean = false,
   ): Promise<CrisisSessionFlag[]> {
     try {
-      const db = await mongodb.connect();
+      const db = await mongodb.connect()
 
-      if (
-        typeof userId !== 'string' ||
-        !/^[a-zA-Z0-9-_]+$/.test(userId)
-      ) {
-        throw new Error('Invalid userId provided.');
+      if (typeof userId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(userId)) {
+        throw new Error('Invalid userId provided.')
       }
-      const query: Record<string, unknown> = { user_id: userId };
+      const query: Record<string, unknown> = { user_id: userId }
 
       if (!includeResolved) {
-        query.status = { $nin: ['resolved', 'dismissed'] };
+        query.status = { $nin: ['resolved', 'dismissed'] }
       }
 
-      const flags = await db.collection('crisis_session_flags').find(query).sort({ flagged_at: -1 }).toArray();
+      const flags = await db
+        .collection('crisis_session_flags')
+        .find(query)
+        .sort({ flagged_at: -1 })
+        .toArray()
 
-      return flags.map((flag) => this.mapFlagFromDb(flag));
+      return flags.map((flag) => this.mapFlagFromDb(flag))
     } catch (error: unknown) {
       logger.error('Error getting user crisis flags', {
         error: error instanceof Error ? String(error) : String(error),
         userId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -386,6 +417,6 @@ export class CrisisSessionFlaggingService {
       metadata: flagData.metadata,
       createdAt: flagData.created_at,
       updatedAt: flagData.updated_at,
-    };
+    }
   }
 }

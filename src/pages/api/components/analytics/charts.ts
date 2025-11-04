@@ -40,7 +40,7 @@ interface ChartDataResponse {
 /**
  * Analytics Charts API
  * GET /api/components/analytics/charts
- * 
+ *
  * Provides data for ChartComponent with various chart types and therapy-specific metrics
  */
 export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
@@ -60,12 +60,15 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     // Parse query parameters
     const url = new URL(request.url)
-    const type = (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
+    const type =
+      (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
     const timeRange = parseInt(url.searchParams.get('timeRange') || '30', 10)
     const clientId = url.searchParams.get('clientId')
     const sessionId = url.searchParams.get('sessionId')
     const dataPoints = parseInt(url.searchParams.get('dataPoints') || '50', 10)
-    const category = (url.searchParams.get('category') as ChartDataRequest['category']) || 'progress'
+    const category =
+      (url.searchParams.get('category') as ChartDataRequest['category']) ||
+      'progress'
 
     const repository = new AIRepository()
     const endDate = new Date()
@@ -140,12 +143,11 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     return new Response(JSON.stringify(chartData), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'private, max-age=300', // 5-minute cache
       },
     })
-
   } catch (error: unknown) {
     logger.error('Error generating chart data', { error })
 
@@ -171,16 +173,31 @@ async function generateProgressChartData(params: {
   endDate: Date
   dataPoints: number
 }): Promise<ChartDataResponse> {
-  const { type, repository, clientId, sessionId, startDate, endDate, dataPoints } = params
+  const {
+    type,
+    repository,
+    clientId,
+    sessionId,
+    startDate,
+    endDate,
+    dataPoints,
+  } = params
 
   // Mock progress data - replace with actual database queries
   const progressData = Array.from({ length: dataPoints }, (_, i) => {
     const date = new Date(startDate)
-    date.setDate(date.getDate() + (i * (endDate.getTime() - startDate.getTime())) / (dataPoints * 24 * 60 * 60 * 1000))
-    
+    date.setDate(
+      date.getDate() +
+        (i * (endDate.getTime() - startDate.getTime())) /
+          (dataPoints * 24 * 60 * 60 * 1000),
+    )
+
     return {
       date: date.toISOString().split('T')[0],
-      value: Math.max(0, Math.min(100, 50 + Math.sin(i * 0.3) * 20 + Math.random() * 10)),
+      value: Math.max(
+        0,
+        Math.min(100, 50 + Math.sin(i * 0.3) * 20 + Math.random() * 10),
+      ),
       sessions: Math.floor(Math.random() * 5) + 1,
     }
   })
@@ -189,15 +206,17 @@ async function generateProgressChartData(params: {
     case 'line':
       return {
         data: {
-          labels: progressData.map(d => d.date),
-          datasets: [{
-            label: 'Therapy Progress',
-            data: progressData.map(d => d.value),
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            fill: true,
-            tension: 0.4,
-          }],
+          labels: progressData.map((d) => d.date),
+          datasets: [
+            {
+              label: 'Therapy Progress',
+              data: progressData.map((d) => d.value),
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
         },
         metadata: {
           totalDataPoints: progressData.length,
@@ -211,16 +230,18 @@ async function generateProgressChartData(params: {
       return {
         data: {
           labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-          datasets: [{
-            label: 'Session Count',
-            data: [3, 4, 2, 5],
-            backgroundColor: [
-              'rgba(34, 197, 94, 0.8)',
-              'rgba(59, 130, 246, 0.8)',
-              'rgba(251, 191, 36, 0.8)',
-              'rgba(168, 85, 247, 0.8)',
-            ],
-          }],
+          datasets: [
+            {
+              label: 'Session Count',
+              data: [3, 4, 2, 5],
+              backgroundColor: [
+                'rgba(34, 197, 94, 0.8)',
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(251, 191, 36, 0.8)',
+                'rgba(168, 85, 247, 0.8)',
+              ],
+            },
+          ],
         },
         metadata: {
           totalDataPoints: 4,
@@ -251,15 +272,17 @@ async function generateEmotionChartData(params: {
       return {
         data: {
           labels: ['Positive', 'Neutral', 'Negative'],
-          datasets: [{
-            label: 'Emotion Distribution',
-            data: [45, 30, 25],
-            backgroundColor: [
-              'rgba(34, 197, 94, 0.8)',
-              'rgba(156, 163, 175, 0.8)',
-              'rgba(239, 68, 68, 0.8)',
-            ],
-          }],
+          datasets: [
+            {
+              label: 'Emotion Distribution',
+              data: [45, 30, 25],
+              backgroundColor: [
+                'rgba(34, 197, 94, 0.8)',
+                'rgba(156, 163, 175, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+              ],
+            },
+          ],
         },
         metadata: {
           totalDataPoints: 3,
@@ -278,11 +301,13 @@ async function generateEmotionChartData(params: {
       return {
         data: {
           labels: [],
-          datasets: [{
-            label: 'Valence vs Arousal',
-            data: scatterData,
-            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-          }],
+          datasets: [
+            {
+              label: 'Valence vs Arousal',
+              data: scatterData,
+              backgroundColor: 'rgba(59, 130, 246, 0.6)',
+            },
+          ],
         },
         metadata: {
           totalDataPoints: scatterData.length,
@@ -316,17 +341,19 @@ async function generateSessionChartData(params: {
 
   return {
     data: {
-      labels: sessionMetrics.map(m => m.metric),
-      datasets: [{
-        label: 'Session Metrics (%)',
-        data: sessionMetrics.map(m => m.value),
-        backgroundColor: [
-          'rgba(239, 68, 68, 0.8)',
-          'rgba(34, 197, 94, 0.8)',
-          'rgba(251, 191, 36, 0.8)',
-          'rgba(168, 85, 247, 0.8)',
-        ],
-      }],
+      labels: sessionMetrics.map((m) => m.metric),
+      datasets: [
+        {
+          label: 'Session Metrics (%)',
+          data: sessionMetrics.map((m) => m.value),
+          backgroundColor: [
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(34, 197, 94, 0.8)',
+            'rgba(251, 191, 36, 0.8)',
+            'rgba(168, 85, 247, 0.8)',
+          ],
+        },
+      ],
     },
     metadata: {
       totalDataPoints: sessionMetrics.length,
@@ -347,22 +374,29 @@ async function generateOutcomeChartData(params: {
 }): Promise<ChartDataResponse> {
   const { type, dataPoints } = params
 
-  const outcomeData = Array.from({ length: Math.min(dataPoints, 12) }, (_, i) => ({
-    month: new Date(2024, i, 1).toLocaleDateString('en-US', { month: 'short' }),
-    improvement: Math.max(10, Math.min(90, 30 + i * 5 + Math.random() * 10)),
-  }))
+  const outcomeData = Array.from(
+    { length: Math.min(dataPoints, 12) },
+    (_, i) => ({
+      month: new Date(2024, i, 1).toLocaleDateString('en-US', {
+        month: 'short',
+      }),
+      improvement: Math.max(10, Math.min(90, 30 + i * 5 + Math.random() * 10)),
+    }),
+  )
 
   return {
     data: {
-      labels: outcomeData.map(d => d.month),
-      datasets: [{
-        label: 'Treatment Outcomes (%)',
-        data: outcomeData.map(d => d.improvement),
-        borderColor: 'rgb(34, 197, 94)',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        fill: true,
-        tension: 0.3,
-      }],
+      labels: outcomeData.map((d) => d.month),
+      datasets: [
+        {
+          label: 'Treatment Outcomes (%)',
+          data: outcomeData.map((d) => d.improvement),
+          borderColor: 'rgb(34, 197, 94)',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          fill: true,
+          tension: 0.3,
+        },
+      ],
     },
     metadata: {
       totalDataPoints: outcomeData.length,

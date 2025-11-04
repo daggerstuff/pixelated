@@ -40,21 +40,25 @@ export async function POST({ request }: { request: any }): Promise<Response> {
     if (!isValidToken(auth)) {
       return new Response(
         JSON.stringify({ success: false, error: 'Unauthorized' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
     const body = await request.json()
     const session: TherapeuticSession = body.session
 
-    if (!session || typeof session.sessionId !== 'string' || !session.sessionId) {
+    if (
+      !session ||
+      typeof session.sessionId !== 'string' ||
+      !session.sessionId
+    ) {
       return new Response(
         JSON.stringify({
           success: false,
           error: 'Bad Request',
           message: 'Invalid request format: missing or invalid sessionId',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -74,23 +78,33 @@ export async function POST({ request }: { request: any }): Promise<Response> {
           'X-Cache': 'MISS',
           'X-Processing-Time': '100',
         },
-      }
+      },
     )
   } catch (err: any) {
     return new Response(
-      JSON.stringify({ success: false, error: 'Bad Request', message: err?.message ?? 'Unknown error' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        success: false,
+        error: 'Bad Request',
+        message: err?.message ?? 'Unknown error',
+      }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } },
     )
   }
 }
 
 // GET handler
-export async function GET({ request, url }: { request: any; url: URL }): Promise<Response> {
+export async function GET({
+  request,
+  url,
+}: {
+  request: any
+  url: URL
+}): Promise<Response> {
   const auth = request.headers?.get?.('authorization') ?? null
   if (!isValidToken(auth)) {
     return new Response(
       JSON.stringify({ success: false, error: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
+      { status: 401, headers: { 'Content-Type': 'application/json' } },
     )
   }
 
@@ -115,6 +129,6 @@ export async function GET({ request, url }: { request: any; url: URL }): Promise
       headers: {
         'Content-Type': 'application/json',
       },
-    }
+    },
   )
 }

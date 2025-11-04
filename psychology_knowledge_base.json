@@ -13318,11 +13318,7 @@
       "name": "Window of Tolerance",
       "modality": "Trauma-Informed",
       "description": "Optimal zone of arousal for processing trauma and daily functioning",
-      "application_context": [
-        "PTSD",
-        "Complex trauma",
-        "Emotional regulation"
-      ],
+      "application_context": ["PTSD", "Complex trauma", "Emotional regulation"],
       "contraindications": [],
       "expert_quotes": [
         "s learning thousands and thousands of little tools that each one is handling a problem.  Each one is creating a problem.  Each one is expanding their window of tolerance for problem situations.  What happens in complex trauma is nobody's coming along to teach them tools.  Nobody's coming along to support them.  So the"
@@ -13334,11 +13330,7 @@
       "name": "Exposure Therapy",
       "modality": "CBT",
       "description": "Gradual confrontation of feared situations or stimuli",
-      "application_context": [
-        "Anxiety",
-        "PTSD",
-        "Phobias"
-      ],
+      "application_context": ["Anxiety", "PTSD", "Phobias"],
       "contraindications": [],
       "expert_quotes": [
         "easy.  It feels like that cannot possibly be the right step to take.  Because it's hard.  Because it's uncomfortable.  What's that like, they call it exposure therapy.  It was Jordan Peterson that said to me, he was like dealing with a guy in there who would not leave his bedroom.  And instead of getting him to lik"
@@ -13414,11 +13406,7 @@
       "name": "Cognitive Restructuring",
       "modality": "CBT",
       "description": "Identifying and challenging distorted thought patterns",
-      "application_context": [
-        "Depression",
-        "Anxiety",
-        "PTSD"
-      ],
+      "application_context": ["Depression", "Anxiety", "PTSD"],
       "contraindications": [],
       "expert_quotes": [
         "speaking anxiety, and nothing in my clinical toolbox could fix it.  I tried everything, mindfulness meditation, and exposure, and beta blockers, and cognitive restructuring, nothing helped.  Until I learned loving-kindness meditation for myself.  In other words, just repeating phrases like, may I be safe, may I be peacef"
@@ -13510,11 +13498,7 @@
       "name": "Exposure Therapy",
       "modality": "CBT",
       "description": "Gradual confrontation of feared situations or stimuli",
-      "application_context": [
-        "Anxiety",
-        "PTSD",
-        "Phobias"
-      ],
+      "application_context": ["Anxiety", "PTSD", "Phobias"],
       "contraindications": [],
       "expert_quotes": [
         "rent.  And you see that across siblings.  There's something interesting you were saying a second ago about—we were talking about, like, gradual small exposure therapy to change your life for the better, moving the shoes closer to the bed.\n\nBut then you also just talked about the gradual exposure therapy of someone"
@@ -13526,11 +13510,7 @@
       "name": "Exposure Therapy",
       "modality": "CBT",
       "description": "Gradual confrontation of feared situations or stimuli",
-      "application_context": [
-        "Anxiety",
-        "PTSD",
-        "Phobias"
-      ],
+      "application_context": ["Anxiety", "PTSD", "Phobias"],
       "contraindications": [],
       "expert_quotes": [
         "like, gradual small exposure therapy to change your life for the better, moving the shoes closer to the bed.\n\nBut then you also just talked about the gradual exposure therapy of someone breaching your boundaries and becoming an abuser.  And how it's like—it's like a— It's like they just every day just move the shoe"
@@ -35081,12 +35061,8 @@
       "semantic_coping_mechanisms_9",
       "semantic_coping_mechanisms_0"
     ],
-    "colloquial_boundary_issues_0": [
-      "colloquial_boundary_issues_16"
-    ],
-    "colloquial_boundary_issues_16": [
-      "colloquial_boundary_issues_0"
-    ],
+    "colloquial_boundary_issues_0": ["colloquial_boundary_issues_16"],
+    "colloquial_boundary_issues_16": ["colloquial_boundary_issues_0"],
     "colloquial_boundary_issues_1": [
       "colloquial_boundary_issues_10",
       "colloquial_boundary_issues_19",
@@ -39923,9 +39899,7 @@
       "semantic_relationships_7",
       "semantic_relationships_43"
     ],
-    "dsm5_attachment_trauma_0": [
-      "dsm5_attachment_trauma_1"
-    ],
+    "dsm5_attachment_trauma_0": ["dsm5_attachment_trauma_1"],
     "dsm5_attachment_trauma_14": [
       "dsm5_complex_ptsd_10",
       "dsm5_complex_ptsd_15",
@@ -40057,21 +40031,11 @@
       "semantic_relationships_7",
       "semantic_relationships_43"
     ],
-    "dsm5_attachment_trauma_3": [
-      "dsm5_attachment_trauma_1"
-    ],
-    "dsm5_attachment_trauma_6": [
-      "dsm5_attachment_trauma_1"
-    ],
-    "dsm5_attachment_trauma_7": [
-      "dsm5_attachment_trauma_1"
-    ],
-    "dsm5_attachment_trauma_8": [
-      "dsm5_attachment_trauma_1"
-    ],
-    "dsm5_attachment_trauma_9": [
-      "dsm5_attachment_trauma_1"
-    ],
+    "dsm5_attachment_trauma_3": ["dsm5_attachment_trauma_1"],
+    "dsm5_attachment_trauma_6": ["dsm5_attachment_trauma_1"],
+    "dsm5_attachment_trauma_7": ["dsm5_attachment_trauma_1"],
+    "dsm5_attachment_trauma_8": ["dsm5_attachment_trauma_1"],
+    "dsm5_attachment_trauma_9": ["dsm5_attachment_trauma_1"],
     "dsm5_borderline_personality_disorder_4": [
       "colloquial_trauma_response_12",
       "colloquial_trauma_response_21",
@@ -60449,9 +60413,7 @@
       "modality_neurofeedback_9",
       "modality_art_therapy_10"
     ],
-    "semantic_emotional_regulation_0": [
-      "dsm5_complex_ptsd_8"
-    ],
+    "semantic_emotional_regulation_0": ["dsm5_complex_ptsd_8"],
     "modality_trauma-informed_care_3": [
       "modality_trauma-informed_care_2",
       "dsm5_complex_ptsd_13"
@@ -62402,12 +62364,8 @@
       "modality_psychoanalytic_therapy_4",
       "modality_psychoanalytic_therapy_0"
     ],
-    "modality_psychoanalytic_therapy_4": [
-      "modality_psychoanalytic_therapy_15"
-    ],
-    "modality_psychoanalytic_therapy_0": [
-      "modality_psychoanalytic_therapy_15"
-    ],
+    "modality_psychoanalytic_therapy_4": ["modality_psychoanalytic_therapy_15"],
+    "modality_psychoanalytic_therapy_0": ["modality_psychoanalytic_therapy_15"],
     "dsm5_substance_use_disorder_5": [
       "dsm5_addiction_78",
       "dsm5_addiction_7",
@@ -62541,12 +62499,8 @@
       "colloquial_inner_child_work_6",
       "colloquial_inner_child_work_38"
     ],
-    "colloquial_emotional_state_1": [
-      "colloquial_emotional_state_2"
-    ],
-    "colloquial_emotional_state_2": [
-      "colloquial_emotional_state_1"
-    ],
+    "colloquial_emotional_state_1": ["colloquial_emotional_state_2"],
+    "colloquial_emotional_state_2": ["colloquial_emotional_state_1"],
     "dsm5_grandiose_narcissism_12": [
       "dsm5_grandiose_narcissism_0",
       "dsm5_grandiose_narcissism_1",
@@ -62949,9 +62903,7 @@
       "dsm5_codependency_12",
       "dsm5_codependency_33"
     ],
-    "colloquial_relationship_abuse_11": [
-      "dsm5_adhd_51"
-    ],
+    "colloquial_relationship_abuse_11": ["dsm5_adhd_51"],
     "dsm5_executive_function_deficits_57": [
       "dsm5_adhd_51",
       "dsm5_adhd_14",
@@ -64181,9 +64133,7 @@
       "dsm5_codependency_12",
       "dsm5_codependency_33"
     ],
-    "semantic_self_worth_8": [
-      "dsm5_codependency_72"
-    ],
+    "semantic_self_worth_8": ["dsm5_codependency_72"],
     "modality_dialectical_behavior_therapy_3": [
       "modality_dialectical_behavior_therapy_4",
       "dsm5_borderline_personality_disorder_6"
@@ -64678,9 +64628,7 @@
       "dsm5_complex_ptsd_12",
       "dsm5_complex_ptsd_40"
     ],
-    "semantic_self_worth_0": [
-      "colloquial_self_worth_issues_71"
-    ]
+    "semantic_self_worth_0": ["colloquial_self_worth_issues_71"]
   },
   "statistics": {
     "total_concepts": 1101,

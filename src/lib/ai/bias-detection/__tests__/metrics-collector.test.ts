@@ -142,7 +142,7 @@ describe('BiasMetricsCollector', () => {
     // Create mock Python bridge
     mockPythonBridge = new PythonBiasDetectionBridge(
       mockConfig.pythonServiceUrl!,
-      mockConfig.pythonServiceTimeout!
+      mockConfig.pythonServiceTimeout!,
     )
 
     // Create metrics collector
@@ -162,7 +162,9 @@ describe('BiasMetricsCollector', () => {
 
   describe('metrics collection', () => {
     it('should store analysis results', async () => {
-      await expect(metricsCollector.storeAnalysisResult?.(mockAnalysisResult)).resolves.not.toThrow()
+      await expect(
+        metricsCollector.storeAnalysisResult?.(mockAnalysisResult),
+      ).resolves.not.toThrow()
     })
 
     it('should retrieve metrics', async () => {
@@ -184,9 +186,13 @@ describe('BiasMetricsCollector', () => {
     it('should handle metrics storage failures gracefully', async () => {
       // Mock a storage failure
       const originalStore = metricsCollector.storeAnalysisResult
-      metricsCollector.storeAnalysisResult = vi.fn().mockRejectedValue(new Error('Storage failed'))
+      metricsCollector.storeAnalysisResult = vi
+        .fn()
+        .mockRejectedValue(new Error('Storage failed'))
 
-      await expect(metricsCollector.storeAnalysisResult(mockAnalysisResult)).rejects.toThrow()
+      await expect(
+        metricsCollector.storeAnalysisResult(mockAnalysisResult),
+      ).rejects.toThrow()
 
       // Restore original method
       metricsCollector.storeAnalysisResult = originalStore
@@ -195,15 +201,20 @@ describe('BiasMetricsCollector', () => {
 
   describe('performance metrics', () => {
     it('should return current performance metrics', async () => {
-      const perfMetrics = await metricsCollector.getCurrentPerformanceMetrics?.()
+      const perfMetrics =
+        await metricsCollector.getCurrentPerformanceMetrics?.()
       expect(perfMetrics).toBeDefined()
     })
 
     it('should handle performance metrics retrieval failures', async () => {
       const originalPerf = metricsCollector.getCurrentPerformanceMetrics
-      metricsCollector.getCurrentPerformanceMetrics = vi.fn().mockRejectedValue(new Error('Performance metrics failed'))
+      metricsCollector.getCurrentPerformanceMetrics = vi
+        .fn()
+        .mockRejectedValue(new Error('Performance metrics failed'))
 
-      await expect(metricsCollector.getCurrentPerformanceMetrics()).rejects.toThrow()
+      await expect(
+        metricsCollector.getCurrentPerformanceMetrics(),
+      ).rejects.toThrow()
 
       // Restore original method
       metricsCollector.getCurrentPerformanceMetrics = originalPerf
@@ -252,21 +263,30 @@ describe('BiasMetricsCollector', () => {
     it('should handle initialization failures', async () => {
       const failingBridge = new PythonBiasDetectionBridge(
         mockConfig.pythonServiceUrl!,
-        mockConfig.pythonServiceTimeout!
+        mockConfig.pythonServiceTimeout!,
       )
 
-      failingBridge.initialize = vi.fn().mockRejectedValue(new Error('Init failed'))
+      failingBridge.initialize = vi
+        .fn()
+        .mockRejectedValue(new Error('Init failed'))
 
-      const failingCollector = new BiasMetricsCollector(mockConfig, failingBridge)
+      const failingCollector = new BiasMetricsCollector(
+        mockConfig,
+        failingBridge,
+      )
 
       await expect(failingCollector.initialize()).rejects.toThrow()
     })
 
     it('should handle network failures during metrics storage', async () => {
       const originalStore = metricsCollector.storeAnalysisResult
-      metricsCollector.storeAnalysisResult = vi.fn().mockRejectedValue(new Error('Network error'))
+      metricsCollector.storeAnalysisResult = vi
+        .fn()
+        .mockRejectedValue(new Error('Network error'))
 
-      await expect(metricsCollector.storeAnalysisResult(mockAnalysisResult)).rejects.toThrow()
+      await expect(
+        metricsCollector.storeAnalysisResult(mockAnalysisResult),
+      ).rejects.toThrow()
 
       // Restore original method
       metricsCollector.storeAnalysisResult = originalStore

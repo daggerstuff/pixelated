@@ -22,7 +22,6 @@ const TherapeuticSessionSchema = z.object({
     disabilityStatus: z.string().optional(),
   }),
 
-
   scenario: z.object({
     scenarioId: z.string(),
     type: z.enum([
@@ -104,14 +103,18 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
   if (!session || typeof session !== 'object') {
     throw new Error('Invalid therapeutic session data')
   }
-  const uuidV4 = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  const uuidV4 =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
   if (!uuidV4.test(String(session.sessionId))) {
     throw new Error('Invalid therapeutic session data')
   }
   // Convert timestamps if needed
   const normalizeDate = (d: any) => (typeof d === 'string' ? new Date(d) : d)
   const aiResponses = Array.isArray(session.aiResponses)
-    ? session.aiResponses.map((r: any) => ({ ...r, timestamp: normalizeDate(r.timestamp) }))
+    ? session.aiResponses.map((r: any) => ({
+        ...r,
+        timestamp: normalizeDate(r.timestamp),
+      }))
     : []
   const normalized: TherapeuticSession = {
     ...session,
@@ -127,7 +130,11 @@ export function validateBiasDetectionConfig(config: any): void {
     throw new Error('Invalid bias detection configuration')
   }
   const t = config.thresholds || {}
-  if (!(t.warningLevel ?? t.warning) || !(t.highLevel ?? t.high) || !(t.criticalLevel ?? t.critical)) {
+  if (
+    !(t.warningLevel ?? t.warning) ||
+    !(t.highLevel ?? t.high) ||
+    !(t.criticalLevel ?? t.critical)
+  ) {
     throw new Error('Invalid bias detection configuration')
   }
   const warning = Number(t.warningLevel ?? t.warning)
@@ -138,7 +145,7 @@ export function validateBiasDetectionConfig(config: any): void {
   }
   const w = config.layerWeights || {}
   const sum = ['preprocessing', 'modelLevel', 'interactive', 'evaluation']
-    .map(k => Number(w[k] ?? 0))
+    .map((k) => Number(w[k] ?? 0))
     .reduce((a, b) => a + b, 0)
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Invalid bias detection configuration')
@@ -147,17 +154,29 @@ export function validateBiasDetectionConfig(config: any): void {
 }
 
 // Data sanitization
-export function sanitizeTextContent(content: string, maskingEnabled = true): string {
+export function sanitizeTextContent(
+  content: string,
+  maskingEnabled = true,
+): string {
   if (!maskingEnabled) {
     return content
   }
   let result = content
   // Specific pattern: "Patient First Last" -> preserve prefix
-  result = result.replace(/\bPatient\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, 'Patient [NAME]')
+  result = result.replace(
+    /\bPatient\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g,
+    'Patient [NAME]',
+  )
   // Emails
-  result = result.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, '[EMAIL]')
+  result = result.replace(
+    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,
+    '[EMAIL]',
+  )
   // Phone numbers (simple patterns 123-456-7890 or 123.456.7890 or (123) 456-7890)
-  result = result.replace(/(?:\(\d{3}\)\s*|\b\d{3}[-.\s])\d{3}[-.\s]\d{4}\b/g, '[PHONE]')
+  result = result.replace(
+    /(?:\(\d{3}\)\s*|\b\d{3}[-.\s])\d{3}[-.\s]\d{4}\b/g,
+    '[PHONE]',
+  )
   // SSN
   result = result.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[SSN]')
   // Naive proper name (First Last) -> [NAME]
@@ -166,7 +185,9 @@ export function sanitizeTextContent(content: string, maskingEnabled = true): str
 }
 
 // Demographic helpers
-export function extractDemographicGroups(d: ParticipantDemographics): Array<{ type: string; value: string }> {
+export function extractDemographicGroups(
+  d: ParticipantDemographics,
+): Array<{ type: string; value: string }> {
   const groups: Array<{ type: string; value: string }> = []
   if (d.age) {
     groups.push({ type: 'age', value: d.age })
@@ -248,9 +269,7 @@ export function calculateOverallBiasScore(
 }
 
 export function calculateConfidenceScore(
-  scores:
-    | number[]
-    | Record<string, { biasScore: number }>,
+  scores: number[] | Record<string, { biasScore: number }>,
 ): number {
   let values: number[] = []
   if (Array.isArray(scores)) {
@@ -262,15 +281,20 @@ export function calculateConfidenceScore(
     return 0
   }
   const mean = values.reduce((a, b) => a + b, 0) / values.length
-  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length
+  const variance =
+    values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length
   const std = Math.sqrt(variance)
   // Normalize std by max possible (0.5 for values in [0,1]) so high variance -> low confidence
-  return Math.max(0, Math.min(1, 1 - 2 * std));
+  return Math.max(0, Math.min(1, 1 - 2 * std))
 }
 
 export function determineAlertLevel(
   score: number,
-  thresholds: { warningLevel: number; highLevel: number; criticalLevel: number },
+  thresholds: {
+    warningLevel: number
+    highLevel: number
+    criticalLevel: number
+  },
 ): AlertLevel {
   if (score < thresholds.warningLevel) {
     return 'low'
@@ -285,7 +309,10 @@ export function determineAlertLevel(
 }
 
 export function calculateFairnessMetrics(
-  groupMetrics: Record<string, { tp: number; fp: number; tn: number; fn: number }>,
+  groupMetrics: Record<
+    string,
+    { tp: number; fp: number; tn: number; fn: number }
+  >,
 ) {
   const groups = Object.keys(groupMetrics)
   if (groups.length < 2) {
@@ -331,7 +358,12 @@ export class BiasDetectionError extends Error {
   retryable: boolean
   recoverable: boolean
   sessionId?: string
-  constructor(code: string, message: string, data: Record<string, unknown> = {}, retryable = false) {
+  constructor(
+    code: string,
+    message: string,
+    data: Record<string, unknown> = {},
+    retryable = false,
+  ) {
     super(message)
     this.name = 'BiasDetectionError'
     this.code = code
@@ -358,12 +390,24 @@ export function createBiasDetectionError(
 }
 
 export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
-  return err instanceof BiasDetectionError || (typeof err === 'object' && err !== null && 'name' in err && (err as any).name === 'BiasDetectionError')
+  return (
+    err instanceof BiasDetectionError ||
+    (typeof err === 'object' &&
+      err !== null &&
+      'name' in err &&
+      (err as any).name === 'BiasDetectionError')
+  )
 }
 
-export function handleBiasDetectionError(error: unknown, _context?: Record<string, unknown>): { shouldRetry: boolean; alertLevel: AlertLevel } {
+export function handleBiasDetectionError(
+  error: unknown,
+  _context?: Record<string, unknown>,
+): { shouldRetry: boolean; alertLevel: AlertLevel } {
   if (isBiasDetectionError(error)) {
-    return { shouldRetry: !!error.retryable, alertLevel: 'medium' as AlertLevel }
+    return {
+      shouldRetry: !!error.retryable,
+      alertLevel: 'medium' as AlertLevel,
+    }
   }
   return { shouldRetry: false, alertLevel: 'critical' as AlertLevel }
 }
@@ -384,7 +428,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
     },
     scenario: session.scenario,
     content: session.content,
-    ai_responses: session.aiResponses.map(r => ({
+    ai_responses: session.aiResponses.map((r) => ({
       response_id: r.responseId,
       timestamp: r.timestamp.toISOString(),
       type: r.type,
@@ -393,7 +437,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
       model_used: r.modelUsed,
     })),
     expected_outcomes: session.expectedOutcomes,
-    transcripts: session.transcripts.map(t => ({
+    transcripts: session.transcripts.map((t) => ({
       speaker_id: t.speakerId,
       timestamp: t.timestamp.toISOString(),
       content: t.content,
@@ -417,7 +461,12 @@ export function transformPythonResponse(response: any): any {
 export function createAuditLogEntry(
   userId: string,
   userEmail: string,
-  action: { type: string; category: string; description: string; sensitivityLevel: string },
+  action: {
+    type: string
+    category: string
+    description: string
+    sensitivityLevel: string
+  },
   resource: string,
   details: Record<string, unknown>,
   reqInfo: { ipAddress: string; userAgent: string },
@@ -456,7 +505,10 @@ export function requiresAdditionalAuth(
 }
 
 export function generateAnonymizedId(input: string, salt: string): string {
-  const hash = crypto.createHash('sha256').update(`${salt}:${input}`).digest('hex')
+  const hash = crypto
+    .createHash('sha256')
+    .update(`${salt}:${input}`)
+    .digest('hex')
   return `anon_${hash.slice(0, 16)}`
 }
 
@@ -512,14 +564,22 @@ export function validateExampleSession() {
 /**
  * Check if a value is within a specified range
  */
-export function isWithinRange(value: number, min: number, max: number, inclusive: boolean): boolean {
+export function isWithinRange(
+  value: number,
+  min: number,
+  max: number,
+  inclusive: boolean,
+): boolean {
   return inclusive ? value >= min && value <= max : value > min && value < max
 }
 
 /**
  * Calculate percentage change between two values
  */
-export function calculatePercentageChange(oldValue: number, newValue: number): number {
+export function calculatePercentageChange(
+  oldValue: number,
+  newValue: number,
+): number {
   if (oldValue === 0) {
     return newValue === 0 ? 0 : 100
   }
@@ -536,11 +596,17 @@ export function generateAnalysisSummary(results: BiasAnalysisResult[]): {
   topRecommendations: string[]
 } {
   if (!Array.isArray(results) || results.length === 0) {
-    return { totalSessions: 0, averageBiasScore: 0, alertDistribution: {}, topRecommendations: [] }
+    return {
+      totalSessions: 0,
+      averageBiasScore: 0,
+      alertDistribution: {},
+      topRecommendations: [],
+    }
   }
   const totalSessions = results.length
   const averageBiasScore =
-    results.reduce((sum, r) => sum + (r.overallBiasScore ?? 0), 0) / totalSessions
+    results.reduce((sum, r) => sum + (r.overallBiasScore ?? 0), 0) /
+    totalSessions
   const alertDistribution: Record<string, number> = {}
   const recCounts: Record<string, number> = {}
   for (const r of results) {
@@ -552,7 +618,12 @@ export function generateAnalysisSummary(results: BiasAnalysisResult[]): {
   const topRecommendations = Object.entries(recCounts)
     .sort((a, b) => b[1] - a[1])
     .map(([k]) => k)
-  return { totalSessions, averageBiasScore, alertDistribution, topRecommendations }
+  return {
+    totalSessions,
+    averageBiasScore,
+    alertDistribution,
+    topRecommendations,
+  }
 }
 
 /**
@@ -562,22 +633,22 @@ export function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') {
     return obj
   }
-  
+
   if (obj instanceof Date) {
     return new Date(obj.getTime()) as unknown as T
   }
-  
+
   if (Array.isArray(obj)) {
-    return obj.map(item => deepClone(item)) as unknown as T
+    return obj.map((item) => deepClone(item)) as unknown as T
   }
-  
+
   const cloned = {} as T
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       cloned[key] = deepClone(obj[key])
     }
   }
-  
+
   return cloned
 }
 
@@ -586,15 +657,15 @@ export function deepClone<T>(obj: T): T {
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout)
     }
-    
+
     timeout = setTimeout(() => {
       func(...args)
     }, wait)
@@ -607,25 +678,25 @@ export function debounce<T extends (...args: any[]) => any>(
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  baseDelay: number = 1000,
 ): Promise<T> {
   let lastError: Error
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
     } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error(String(error))
-      
+
       if (attempt === maxRetries) {
         throw lastError
       }
-      
+
       const delay = baseDelay * Math.pow(2, attempt)
-      await new Promise(resolve => setTimeout(resolve, delay))
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
   }
-  
+
   throw lastError!
 }
 

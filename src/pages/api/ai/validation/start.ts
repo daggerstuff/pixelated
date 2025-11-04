@@ -1,13 +1,13 @@
 import { emotionValidationPipeline } from '@/lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
-import {
-  createAuditLog,
-  AuditEventType,
-  AuditEventStatus,
-} from '@/lib/audit'
+import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
-export const POST = async ({ cookies }: { cookies: { get(name: string): { value: string } | undefined } }): Promise<Response> => {
+export const POST = async ({
+  cookies,
+}: {
+  cookies: { get(name: string): { value: string } | undefined }
+}): Promise<Response> => {
   const logger = createBuildSafeLogger('validation-api')
 
   try {

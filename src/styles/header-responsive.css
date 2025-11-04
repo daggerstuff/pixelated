@@ -1,0 +1,635 @@
+/* ================================================
+   HEADER RESPONSIVE STYLES
+   Mobile-first responsive design for unified header
+   Compatible with Unified Dark Theme v2.0
+   ================================================ */
+
+/* Import responsive design system */
+@import url('./responsive-design-system.css');
+
+/* Base mobile-first styles */
+.corporate-header.unified-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.container-refined {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.nav-responsive {
+  display: none;
+}
+
+.nav-mobile {
+  display: flex;
+}
+
+/* Mobile optimizations (320px - 639px) */
+@media (max-width: 639px) {
+  .corporate-header.unified-header {
+    height: auto;
+    min-height: var(--space-16);
+  }
+
+  .container-refined {
+    padding: 0 var(--space-4);
+  }
+
+  /* Header content responsive layout */
+  .container-refined > div {
+    height: auto !important;
+    min-height: var(--space-16);
+    padding: var(--space-2) 0;
+  }
+
+  /* Brand/logo responsive sizing */
+  .brand-logo-wrapper {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+  }
+
+  /* Brand text responsive display */
+  .brand-text span {
+    font-size: var(--text-xs) !important;
+  }
+
+  .brand-text span:first-child {
+    display: block !important;
+    font-size: var(--text-sm) !important;
+  }
+
+  /* Mobile menu button responsive sizing */
+  #mobile-menu-button-v2 {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--space-2);
+  }
+
+  #mobile-menu-button-v2 svg {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+
+  /* Theme toggle responsive sizing */
+  .theme-toggle-unified {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    padding: var(--space-2) !important;
+  }
+
+  .theme-toggle-unified svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* CTA button responsive sizing */
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-xs) !important;
+    padding: var(--space-2) var(--space-4) !important;
+    min-height: 36px;
+  }
+
+  /* Mobile menu responsive design */
+  #mobile-menu-v2 {
+    top: var(--space-16);
+    padding: var(--space-4);
+  }
+
+  .mobile-menu__content {
+    padding: var(--space-4);
+    min-height: calc(100vh - var(--space-16));
+  }
+
+  .mobile-menu__header {
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+  }
+
+  .mobile-menu__nav-item {
+    margin-bottom: var(--space-3);
+  }
+
+  .mobile-menu__nav-link {
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--text-base);
+  }
+
+  /* Touch-friendly improvements */
+  .touch-target {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .touch-focus:focus-visible {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* Responsive typography for header elements */
+  .corporate-badge {
+    font-size: var(--text-xs) !important;
+    padding: var(--space-1) var(--space-2) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-2) var(--space-3) !important;
+  }
+}
+
+/* Small tablet optimizations (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  .corporate-header.unified-header {
+    height: auto;
+    min-height: var(--space-20);
+  }
+
+  .container-refined {
+    padding: 0 var(--space-6);
+  }
+
+  .container-refined > div {
+    height: auto !important;
+    min-height: var(--space-20);
+    padding: var(--space-3) 0;
+  }
+
+  .brand-logo-wrapper {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+  }
+
+  .brand-text span {
+    font-size: var(--text-sm) !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-base) !important;
+  }
+
+  #mobile-menu-button-v2 {
+    min-width: 48px;
+    min-height: 48px;
+    padding: var(--space-2);
+  }
+
+  #mobile-menu-button-v2 svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+
+  .theme-toggle-unified {
+    width: 3rem !important;
+    height: 3rem !important;
+    padding: var(--space-2) !important;
+  }
+
+  .theme-toggle-unified svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-3) var(--space-6) !important;
+    min-height: 42px;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-1) var(--space-3) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-base) !important;
+    padding: var(--space-2) var(--space-4) !important;
+  }
+}
+
+/* Tablet optimizations (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .corporate-header.unified-header {
+    height: var(--space-20);
+  }
+
+  .container-refined {
+    padding: 0 var(--space-8);
+  }
+
+  .container-refined > div {
+    height: var(--space-20) !important;
+  }
+
+  .nav-responsive {
+    display: flex !important;
+  }
+
+  .nav-mobile {
+    display: none !important;
+  }
+
+  .brand-logo-wrapper {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+  }
+
+  .brand-text span {
+    font-size: var(--text-sm) !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-lg) !important;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-xs) !important;
+    padding: var(--space-1) var(--space-2) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-2) var(--space-4) !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-3) var(--space-6) !important;
+  }
+}
+
+/* Desktop optimizations (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .container-refined {
+    padding: 0 var(--space-12);
+  }
+
+  .nav-responsive {
+    display: flex !important;
+  }
+
+  .nav-mobile {
+    display: none !important;
+  }
+
+  .brand-logo-wrapper {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 1.8rem !important;
+    height: 1.8rem !important;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-xs) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-sm) !important;
+    gap: var(--space-2) !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-sm) !important;
+    margin-left: var(--space-6) !important;
+  }
+}
+
+/* Large desktop optimizations (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+  .container-refined {
+    padding: 0 var(--space-16);
+  }
+
+  .brand-logo-wrapper {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-lg) !important;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-2) var(--space-3) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-2) var(--space-4) !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-3) var(--space-8) !important;
+    margin-left: var(--space-8) !important;
+  }
+}
+
+/* Ultra-wide optimizations (1536px+) */
+@media (min-width: 1536px) {
+  .container-refined {
+    padding: 0 var(--space-20);
+    max-width: 1536px;
+  }
+
+  .brand-logo-wrapper {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-xl) !important;
+  }
+
+  .brand-text span:last-child {
+    font-size: var(--text-sm) !important;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-sm) !important;
+    padding: var(--space-2) var(--space-4) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-base) !important;
+    padding: var(--space-3) var(--space-5) !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-base) !important;
+    padding: var(--space-4) var(--space-10) !important;
+    margin-left: var(--space-8) !important;
+  }
+
+  .nav-minimal {
+    gap: var(--space-6) !important;
+  }
+}
+
+/* Portrait mobile optimizations */
+@media (max-width: 767px) and (orientation: portrait) {
+  .corporate-header.unified-header {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .container-refined {
+    padding-left: max(var(--space-4), env(safe-area-inset-left, var(--space-4)));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, var(--space-4)));
+  }
+
+  .brand-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .nav-responsive {
+    display: none !important;
+  }
+
+  .nav-mobile {
+    display: flex !important;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 767px) and (orientation: landscape) {
+  .corporate-header.unified-header {
+    height: auto;
+    min-height: var(--space-16);
+  }
+
+  .container-refined > div {
+    height: auto !important;
+    min-height: var(--space-16);
+    padding: var(--space-2) 0;
+  }
+
+  .brand-logo-wrapper {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+  }
+
+  .brand-text span {
+    font-size: var(--text-xs) !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-sm) !important;
+  }
+
+  .nav-responsive {
+    display: none !important;
+  }
+
+  .nav-mobile {
+    display: flex !important;
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .corporate-header.unified-header {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .container-refined {
+    padding-left: max(var(--space-4), env(safe-area-inset-left, var(--space-4)));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, var(--space-4)));
+  }
+
+  .theme-toggle-unified {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-brutalist {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #mobile-menu-button-v2 {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Android-specific fixes */
+@supports (not (-webkit-touch-callout: none)) and (not (-moz-appearance: none)) {
+  .theme-toggle-unified,
+  .btn-brutalist,
+  #mobile-menu-button-v2 {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .corporate-header.unified-header {
+    border-bottom: 2px solid CanvasText;
+  }
+
+  .theme-toggle-unified {
+    border: 2px solid CanvasText;
+  }
+
+  .btn-brutalist.btn-responsive {
+    border: 2px solid CanvasText;
+  }
+
+  .corporate-badge {
+    border: 2px solid CanvasText;
+  }
+
+  .nav-link-refined:hover {
+    color: Highlight;
+  }
+
+  .btn-brutalist.btn-responsive:hover {
+    background: Highlight;
+    color: Canvas;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .corporate-header.unified-header * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .theme-toggle-unified,
+  .theme-toggle-unified svg,
+  .theme-toggle-unified:hover,
+  .theme-toggle-unified .theme-tooltip {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .btn-brutalist,
+  .btn-brutalist:hover {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .corporate-header.unified-header {
+    background: white !important;
+    color: black !important;
+    border-bottom: 1px solid black !important;
+  }
+
+  .theme-toggle-unified {
+    border: 1px solid black !important;
+    background: white !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+  }
+
+  .corporate-badge {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+}
+
+/* Focus management for mobile */
+@media (max-width: 767px) {
+  .touch-focus:focus-visible {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  .touch-focus:focus {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Ultra-wide displays (1920px+) */
+@media (min-width: 1920px) {
+  .container-refined {
+    max-width: 1800px;
+    padding: 0 var(--space-24);
+  }
+
+  .brand-logo-wrapper {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+
+  .brand-logo-wrapper img {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  .brand-text span:first-child {
+    font-size: var(--text-2xl) !important;
+  }
+
+  .brand-text span:last-child {
+    font-size: var(--text-base) !important;
+  }
+
+  .corporate-badge {
+    font-size: var(--text-base) !important;
+    padding: var(--space-2) var(--space-4) !important;
+  }
+
+  .nav-link-refined {
+    font-size: var(--text-lg) !important;
+    padding: var(--space-3) var(--space-6) !important;
+  }
+
+  .btn-brutalist.btn-responsive {
+    font-size: var(--text-lg) !important;
+    padding: var(--space-5) var(--space-12) !important;
+    margin-left: var(--space-12) !important;
+  }
+
+  .nav-minimal {
+    gap: var(--space-8) !important;
+  }
+}

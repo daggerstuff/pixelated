@@ -114,14 +114,7 @@ export default defineConfig({
         path.resolve('./public'),
         path.resolve('./.astro'),
       ],
-      deny: [
-        'ai',
-        '/ai',
-        '**/ai/**',
-        '.venv',
-        '/.venv',
-        '**/.venv/**',
-      ],
+      deny: ['ai', '/ai', '**/ai/**', '.venv', '/.venv', '**/.venv/**'],
     },
   },
   plugins: (() => {
@@ -136,7 +129,10 @@ export default defineConfig({
             console.log('[vite] resolved.root =', resolved.root)
             console.log('[vite] server.fs.allow =', resolved.server?.fs?.allow)
             console.log('[vite] server.fs.deny =', resolved.server?.fs?.deny)
-            console.log('[vite] server.watch.ignored =', resolved.server?.watch?.ignored)
+            console.log(
+              '[vite] server.watch.ignored =',
+              resolved.server?.watch?.ignored,
+            )
           } catch {}
         },
       },
@@ -168,7 +164,10 @@ export default defineConfig({
             // Unwatch all patterns
             server.watcher.unwatch(patternsToUnwatch)
           } catch (error) {
-            console.warn('[vite] force-unwatch-ai-venv: Failed to unwatch ai/.venv:', error.message)
+            console.warn(
+              '[vite] force-unwatch-ai-venv: Failed to unwatch ai/.venv:',
+              error.message,
+            )
           }
         },
       },
@@ -176,7 +175,13 @@ export default defineConfig({
         name: 'cdn-asset-replacer',
         transform(code, id) {
           try {
-            if (id.endsWith('.astro') || id.endsWith('.tsx') || id.endsWith('.jsx') || id.endsWith('.ts') || id.endsWith('.js')) {
+            if (
+              id.endsWith('.astro') ||
+              id.endsWith('.tsx') ||
+              id.endsWith('.jsx') ||
+              id.endsWith('.ts') ||
+              id.endsWith('.js')
+            ) {
               Object.entries(cdnAssetMap).forEach(([localPath, cdnUrl]) => {
                 const quotedLocalPath1 = `"${localPath}"`
                 const quotedLocalPath2 = `'${localPath}'`
@@ -186,7 +191,10 @@ export default defineConfig({
             }
             return code
           } catch (error) {
-            console.warn(`CDN asset replacement failed for ${id}:`, error.message)
+            console.warn(
+              `CDN asset replacement failed for ${id}:`,
+              error.message,
+            )
             return code
           }
         },
@@ -199,18 +207,25 @@ export default defineConfig({
       {
         name: 'exclude-server-only',
         resolveId(id) {
-          if (id.includes('/server-only/') || id.includes('MentalLLaMAPythonBridge') || id === 'mongodb' || id.includes('mongodb')) {
+          if (
+            id.includes('/server-only/') ||
+            id.includes('MentalLLaMAPythonBridge') ||
+            id === 'mongodb' ||
+            id.includes('mongodb')
+          ) {
             return false
           }
         },
       },
-      ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN ? [
-        sentryVitePlugin({
-          org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-          project: process.env.SENTRY_PROJECT || 'pixel-astro',
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-        }),
-      ] : []),
+      ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN
+        ? [
+            sentryVitePlugin({
+              org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+              project: process.env.SENTRY_PROJECT || 'pixel-astro',
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+            }),
+          ]
+        : []),
     ]
   })(),
   base:
@@ -412,10 +427,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    entries: [
-      'src/**/*.{ts,tsx,js,jsx,astro}',
-      'src/**/*.mjs',
-    ],
+    entries: ['src/**/*.{ts,tsx,js,jsx,astro}', 'src/**/*.mjs'],
     esbuildOptions: {
       platform: 'node',
       target: 'node24',

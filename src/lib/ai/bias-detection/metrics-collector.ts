@@ -58,7 +58,7 @@ export class BiasMetricsCollector {
       if (process.env.NODE_ENV === 'test' || this.config.strictMode) {
         throw error
       }
-      
+
       logger.warn('BiasMetricsCollector falling back to local-only mode', {
         error,
       })
@@ -242,7 +242,9 @@ export class BiasMetricsCollector {
     return distribution
   }
 
-  async recordReportGeneration(report: { metadata?: { executionTimeMs?: number } }): Promise<void> {
+  async recordReportGeneration(report: {
+    metadata?: { executionTimeMs?: number }
+  }): Promise<void> {
     try {
       await this.pythonBridge.recordReportMetric({
         timestamp: new Date().toISOString(),
@@ -259,7 +261,9 @@ export class BiasMetricsCollector {
     }
   }
 
-  async getDashboardData(_options?: DashboardOptions): Promise<DashboardMetrics> {
+  async getDashboardData(
+    _options?: DashboardOptions,
+  ): Promise<DashboardMetrics> {
     try {
       // Use GET method since Python service expects GET for /dashboard endpoint
       const response = await this.pythonBridge.getDashboardMetrics()
@@ -269,7 +273,12 @@ export class BiasMetricsCollector {
         overall_stats: {
           total_sessions: response.summary?.total_sessions_analyzed || 0,
           average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || { low: 0, medium: 0, high: 0, critical: 0 },
+          alert_distribution: response.summary?.alert_distribution || {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0,
+          },
         },
         trend_data: [],
         recent_alerts: [],
@@ -279,8 +288,14 @@ export class BiasMetricsCollector {
         summary: {
           total_sessions: response.summary?.total_sessions_analyzed || 0,
           average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || { low: 0, medium: 0, high: 0, critical: 0 },
-          total_sessions_analyzed: response.summary?.total_sessions_analyzed || 0,
+          alert_distribution: response.summary?.alert_distribution || {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0,
+          },
+          total_sessions_analyzed:
+            response.summary?.total_sessions_analyzed || 0,
           high_risk_sessions: response.summary?.high_risk_sessions || 0,
           critical_alerts: response.summary?.critical_alerts || 0,
         },
@@ -313,7 +328,8 @@ export class BiasMetricsCollector {
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
                 localMetrics.length
               : 0,
-          alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
+          alert_distribution:
+            this.calculateLocalAlertDistribution(localMetrics),
         },
         trend_data: [],
         recent_alerts: [],
@@ -327,7 +343,8 @@ export class BiasMetricsCollector {
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
                 localMetrics.length
               : 0,
-          alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
+          alert_distribution:
+            this.calculateLocalAlertDistribution(localMetrics),
           high_risk_sessions: localMetrics.filter(
             (m) => m.overall_bias_score > 0.6,
           ).length,
@@ -360,7 +377,9 @@ export class BiasMetricsCollector {
     }
   }
 
-  async getSummaryMetrics(options?: DashboardOptions): Promise<DashboardMetrics['summary'] | undefined> {
+  async getSummaryMetrics(
+    options?: DashboardOptions,
+  ): Promise<DashboardMetrics['summary'] | undefined> {
     try {
       const dashboardData = await this.getDashboardData(options)
       return dashboardData.summary
@@ -370,7 +389,9 @@ export class BiasMetricsCollector {
     }
   }
 
-  async getDemographicMetrics(options?: DashboardOptions): Promise<DashboardMetrics['demographics'] | undefined> {
+  async getDemographicMetrics(
+    options?: DashboardOptions,
+  ): Promise<DashboardMetrics['demographics'] | undefined> {
     try {
       const dashboardData = await this.getDashboardData(options)
       return dashboardData.demographics
@@ -440,7 +461,9 @@ export class BiasMetricsCollector {
     try {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
-  timestamp: (result as any)?.timestamp ? new Date((result as any).timestamp).toISOString() : new Date().toISOString(),
+        timestamp: (result as any)?.timestamp
+          ? new Date((result as any).timestamp).toISOString()
+          : new Date().toISOString(),
         session_id: result.sessionId,
         overall_bias_score: result.overallBiasScore,
         alert_level: result.alertLevel,
@@ -459,7 +482,9 @@ export class BiasMetricsCollector {
       try {
         await this.pythonBridge.storeMetrics([
           {
-            timestamp: (result as any)?.timestamp ? new Date((result as any).timestamp).toISOString() : new Date().toISOString(),
+            timestamp: (result as any)?.timestamp
+              ? new Date((result as any).timestamp).toISOString()
+              : new Date().toISOString(),
             session_id: result.sessionId,
             overall_bias_score: result.overallBiasScore,
             alert_level: result.alertLevel,

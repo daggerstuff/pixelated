@@ -61,19 +61,19 @@ export function useChat(options: ChatOptions): UseChatReturn {
 
     try {
       // Prepare the request - format for mental health API if needed
-      const requestBody = api.includes('mental-health') 
+      const requestBody = api.includes('mental-health')
         ? {
             message: content,
             sessionId: 'session_' + Date.now(),
             userContext: {
-              previousMessages: messages.map(m => ({
+              previousMessages: messages.map((m) => ({
                 role: m.role,
-                content: m.content
-              }))
+                content: m.content,
+              })),
             },
             options: {
               enableCrisisDetection: true,
-              responseStyle: 'therapeutic'
+              responseStyle: 'therapeutic',
             },
             ...body,
           }
@@ -105,15 +105,17 @@ export function useChat(options: ChatOptions): UseChatReturn {
       let responseContent: string
       if (api.includes('mental-health')) {
         // Mental health API returns { response: { content: "..." } }
-        responseContent = responseData.response?.content || 
-                         responseData.response?.message ||
-                         'No response from therapeutic AI'
+        responseContent =
+          responseData.response?.content ||
+          responseData.response?.message ||
+          'No response from therapeutic AI'
       } else {
         // Standard chat API format
-        responseContent = responseData.text ||
-                         responseData.content ||
-                         responseData.message ||
-                         'No response content'
+        responseContent =
+          responseData.text ||
+          responseData.content ||
+          responseData.message ||
+          'No response content'
       }
 
       // Add assistant message from response

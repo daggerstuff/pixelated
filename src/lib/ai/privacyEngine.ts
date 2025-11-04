@@ -65,7 +65,9 @@ class PrivacyEngine {
     clientAssignments: Map<string, string[]>
   }> {
     if (clients.length < this.federatedConfig.minClients) {
-      throw new Error(`Minimum ${this.federatedConfig.minClients} clients required for federated learning`)
+      throw new Error(
+        `Minimum ${this.federatedConfig.minClients} clients required for federated learning`,
+      )
     }
 
     const sessionId = `fl_session_${Date.now()}`
@@ -74,7 +76,9 @@ class PrivacyEngine {
     // Distribute clients across model shards for privacy
     const clientAssignments = this.distributeClientsToShards(clients)
 
-    console.log(`Federated learning session ${sessionId} initialized with ${clients.length} clients`)
+    console.log(
+      `Federated learning session ${sessionId} initialized with ${clients.length} clients`,
+    )
 
     return {
       sessionId,
@@ -116,7 +120,7 @@ class PrivacyEngine {
   async processClientUpdate(
     clientId: string,
     modelUpdate: ModelUpdate,
-    clientData: PatientData[]
+    clientData: PatientData[],
   ): Promise<{
     aggregatedUpdate: ModelUpdate
     privacyScore: number
@@ -126,7 +130,8 @@ class PrivacyEngine {
     const privateUpdate = await this.applyDifferentialPrivacy(modelUpdate)
 
     // Update client's privacy budget
-    const currentBudget = this.privacyBudgets.get(clientId) || this.federatedConfig.privacyBudget
+    const currentBudget =
+      this.privacyBudgets.get(clientId) || this.federatedConfig.privacyBudget
     const usedBudget = this.calculatePrivacyCost(modelUpdate, clientData)
     this.privacyBudgets.set(clientId, currentBudget - usedBudget)
 
@@ -151,14 +156,16 @@ class PrivacyEngine {
     }
   }
 
-  private async applyDifferentialPrivacy(update: ModelUpdate): Promise<ModelUpdate> {
+  private async applyDifferentialPrivacy(
+    update: ModelUpdate,
+  ): Promise<ModelUpdate> {
     const { epsilon, delta, sensitivity, mechanism } = this.dpConfig
 
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
 
-    const privateWeights = update.weights.map((weight, index) =>
-      weight + noise[index % noise.length]
+    const privateWeights = update.weights.map(
+      (weight, index) => weight + noise[index % noise.length],
     )
 
     return {
@@ -169,15 +176,21 @@ class PrivacyEngine {
     }
   }
 
-  private generateNoise(mechanism: string, sensitivity: number, epsilon: number): number[] {
+  private generateNoise(
+    mechanism: string,
+    sensitivity: number,
+    epsilon: number,
+  ): number[] {
     const noise: number[] = []
     const noiseScale = sensitivity / epsilon
 
-    for (let i = 0; i < 100; i++) { // Generate noise for model weights
+    for (let i = 0; i < 100; i++) {
+      // Generate noise for model weights
       switch (mechanism) {
         case 'gaussian':
           // Gaussian noise: N(0, σ²) where σ = sensitivity / epsilon
-          const sigma = noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
+          const sigma =
+            noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
           noise.push(this.gaussianRandom(0, sigma))
           break
         case 'laplace':
@@ -206,12 +219,20 @@ class PrivacyEngine {
     return scale * Math.sign(u) * Math.log(1 - 2 * Math.abs(u))
   }
 
-  private calculatePrivacyCost(update: ModelUpdate, data: PatientData[]): number {
+  private calculatePrivacyCost(
+    update: ModelUpdate,
+    data: PatientData[],
+  ): number {
     // Calculate privacy cost based on data sensitivity and update magnitude
     const dataSensitivity = data.length * 0.01 // Simple heuristic
-    const updateMagnitude = Math.sqrt(update.weights.reduce((sum, w) => sum + w * w, 0))
+    const updateMagnitude = Math.sqrt(
+      update.weights.reduce((sum, w) => sum + w * w, 0),
+    )
 
-    return Math.min(dataSensitivity * updateMagnitude, this.federatedConfig.privacyBudget)
+    return Math.min(
+      dataSensitivity * updateMagnitude,
+      this.federatedConfig.privacyBudget,
+    )
   }
 
   private async aggregateModelUpdates(): Promise<ModelUpdate> {
@@ -238,7 +259,7 @@ class PrivacyEngine {
     const averagedWeights = new Array(updates[0].weights.length).fill(0)
 
     // Simple averaging of model weights
-    updates.forEach(update => {
+    updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
         averagedWeights[index] += weight / totalWeight
       })
@@ -261,7 +282,7 @@ class PrivacyEngine {
 
     const proximalWeights = new Array(globalWeights.length).fill(0)
 
-    updates.forEach(update => {
+    updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
         const proximal = weight + mu * (weight - globalWeights[index])
         proximalWeights[index] += proximal / updates.length
@@ -287,18 +308,26 @@ class PrivacyEngine {
   private calculatePrivacyScore(): number {
     // Calculate overall privacy score based on budgets and mechanisms
     const remainingBudgets = Array.from(this.privacyBudgets.values())
-    const avgRemainingBudget = remainingBudgets.reduce((sum, budget) => sum + budget, 0) / remainingBudgets.length
+    const avgRemainingBudget =
+      remainingBudgets.reduce((sum, budget) => sum + budget, 0) /
+      remainingBudgets.length
 
     // Higher score for more remaining privacy budget and stronger mechanisms
-    const budgetScore = Math.min(avgRemainingBudget / this.federatedConfig.privacyBudget, 1)
-    const mechanismScore = this.dpConfig.epsilon < 1 ? 0.9 : this.dpConfig.epsilon < 2 ? 0.7 : 0.5
+    const budgetScore = Math.min(
+      avgRemainingBudget / this.federatedConfig.privacyBudget,
+      1,
+    )
+    const mechanismScore =
+      this.dpConfig.epsilon < 1 ? 0.9 : this.dpConfig.epsilon < 2 ? 0.7 : 0.5
 
-    return (budgetScore * 0.6) + (mechanismScore * 0.4)
+    return budgetScore * 0.6 + mechanismScore * 0.4
   }
 
   private calculateUtilityScore(update: ModelUpdate): number {
     // Calculate utility score based on model convergence and update quality
-    const weightMagnitude = Math.sqrt(update.weights.reduce((sum, w) => sum + w * w, 0))
+    const weightMagnitude = Math.sqrt(
+      update.weights.reduce((sum, w) => sum + w * w, 0),
+    )
     const convergenceScore = Math.min(weightMagnitude / 10, 1) // Normalize to 0-1
 
     return convergenceScore
@@ -308,7 +337,7 @@ class PrivacyEngine {
    * Sanitize patient data for analysis
    */
   async sanitizeData(data: PatientData[]): Promise<PrivacyEngineResult> {
-    const sanitizedData = data.map(patient => ({
+    const sanitizedData = data.map((patient) => ({
       ...patient,
       // Remove or obfuscate PII
       id: this.hashPatientId(patient.id),
@@ -317,7 +346,7 @@ class PrivacyEngine {
       address: null,
 
       // Add differential privacy to sensitive metrics
-      sessionData: patient.sessionData.map(session => ({
+      sessionData: patient.sessionData.map((session) => ({
         ...session,
         moodScore: this.addNoiseToValue(session.moodScore, 0.1),
         anxietyLevel: this.addNoiseToValue(session.anxietyLevel, 0.1),
@@ -354,7 +383,10 @@ class PrivacyEngine {
       sanitizedData,
       privacyMetrics,
       utilityScore,
-      recommendations: this.generatePrivacyRecommendations(privacyMetrics, utilityScore),
+      recommendations: this.generatePrivacyRecommendations(
+        privacyMetrics,
+        utilityScore,
+      ),
     }
   }
 
@@ -363,7 +395,7 @@ class PrivacyEngine {
     let hash = 0
     for (let i = 0; i < id.length; i++) {
       const char = id.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36)
@@ -375,7 +407,10 @@ class PrivacyEngine {
     return Math.max(0, Math.min(1, value + noise))
   }
 
-  private calculateDataUtility(sanitized: PatientData[], original: PatientData[]): number {
+  private calculateDataUtility(
+    sanitized: PatientData[],
+    original: PatientData[],
+  ): number {
     // Calculate how much utility is preserved after sanitization
     // Compare statistical properties
     const originalStats = this.calculateStats(original)
@@ -385,7 +420,7 @@ class PrivacyEngine {
     let preservationScore = 0
     let comparisons = 0
 
-    Object.keys(originalStats).forEach(key => {
+    Object.keys(originalStats).forEach((key) => {
       if (sanitizedStats[key] !== undefined) {
         const diff = Math.abs(originalStats[key] - sanitizedStats[key])
         preservationScore += Math.max(0, 1 - diff)
@@ -400,26 +435,39 @@ class PrivacyEngine {
     const stats: Record<string, number> = {}
 
     // Calculate basic statistics
-    const progressValues = data.map(p => p.progress).filter(p => p !== undefined)
+    const progressValues = data
+      .map((p) => p.progress)
+      .filter((p) => p !== undefined)
     if (progressValues.length > 0) {
-      stats.progressMean = progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
+      stats.progressMean =
+        progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
       stats.progressStd = Math.sqrt(
-        progressValues.reduce((sum, p) => sum + Math.pow(p - stats.progressMean, 2), 0) / progressValues.length
+        progressValues.reduce(
+          (sum, p) => sum + Math.pow(p - stats.progressMean, 2),
+          0,
+        ) / progressValues.length,
       )
     }
 
     return stats
   }
 
-  private generatePrivacyRecommendations(metrics: PrivacyMetrics, utilityScore: number): string[] {
+  private generatePrivacyRecommendations(
+    metrics: PrivacyMetrics,
+    utilityScore: number,
+  ): string[] {
     const recommendations: string[] = []
 
     if (metrics.differentialPrivacy.epsilon > 1) {
-      recommendations.push('Consider reducing epsilon for stronger privacy guarantees')
+      recommendations.push(
+        'Consider reducing epsilon for stronger privacy guarantees',
+      )
     }
 
     if (utilityScore < 0.7) {
-      recommendations.push('High privacy may be reducing data utility - consider adjusting noise levels')
+      recommendations.push(
+        'High privacy may be reducing data utility - consider adjusting noise levels',
+      )
     }
 
     if (this.privacyBudgets.size > 0) {
@@ -428,7 +476,9 @@ class PrivacyEngine {
         .map(([clientId]) => clientId)
 
       if (lowBudgetClients.length > 0) {
-        recommendations.push(`Clients ${lowBudgetClients.join(', ')} have low privacy budget - consider rotating them`)
+        recommendations.push(
+          `Clients ${lowBudgetClients.join(', ')} have low privacy budget - consider rotating them`,
+        )
       }
     }
 
@@ -438,7 +488,10 @@ class PrivacyEngine {
   /**
    * Zero-knowledge processing for sensitive computations
    */
-  async zeroKnowledgeProcess(computation: string, inputs: any[]): Promise<{
+  async zeroKnowledgeProcess(
+    computation: string,
+    inputs: any[],
+  ): Promise<{
     result: any
     proof: string
     verificationKey: string
@@ -462,15 +515,24 @@ class PrivacyEngine {
     }
   }
 
-  private async performComputation(computation: string, inputs: any[]): Promise<any> {
+  private async performComputation(
+    computation: string,
+    inputs: any[],
+  ): Promise<any> {
     // Simulate computation without revealing inputs
     switch (computation) {
       case 'average_mood':
-        return inputs.reduce((sum, input) => sum + input.moodScore, 0) / inputs.length
+        return (
+          inputs.reduce((sum, input) => sum + input.moodScore, 0) /
+          inputs.length
+        )
       case 'risk_assessment':
-        return Math.max(...inputs.map(input => input.riskScore))
+        return Math.max(...inputs.map((input) => input.riskScore))
       case 'treatment_effectiveness':
-        return inputs.reduce((sum, input) => sum + input.effectiveness, 0) / inputs.length
+        return (
+          inputs.reduce((sum, input) => sum + input.effectiveness, 0) /
+          inputs.length
+        )
       default:
         return null
     }
@@ -494,8 +556,11 @@ class PrivacyEngine {
   } {
     const activeClients = this.clientModels.size
     const totalUpdates = Array.from(this.clientModels.values()).length
-    const averagePrivacyBudget = Array.from(this.privacyBudgets.values())
-      .reduce((sum, budget) => sum + budget, 0) / Math.max(this.privacyBudgets.size, 1)
+    const averagePrivacyBudget =
+      Array.from(this.privacyBudgets.values()).reduce(
+        (sum, budget) => sum + budget,
+        0,
+      ) / Math.max(this.privacyBudgets.size, 1)
 
     return {
       federatedLearning: {
@@ -508,11 +573,22 @@ class PrivacyEngine {
         delta: this.dpConfig.delta,
         mechanism: this.dpConfig.mechanism,
       },
-      recommendations: this.generatePrivacyRecommendations({
-        differentialPrivacy: this.dpConfig,
-        dataSanitization: { piiRemoved: true, fieldsObfuscated: [], noiseAdded: true },
-        federatedLearning: { enabled: true, clientCount: activeClients, aggregationStrategy: this.federatedConfig.aggregationStrategy },
-      } as PrivacyMetrics, 0.8),
+      recommendations: this.generatePrivacyRecommendations(
+        {
+          differentialPrivacy: this.dpConfig,
+          dataSanitization: {
+            piiRemoved: true,
+            fieldsObfuscated: [],
+            noiseAdded: true,
+          },
+          federatedLearning: {
+            enabled: true,
+            clientCount: activeClients,
+            aggregationStrategy: this.federatedConfig.aggregationStrategy,
+          },
+        } as PrivacyMetrics,
+        0.8,
+      ),
     }
   }
 }

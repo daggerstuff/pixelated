@@ -443,15 +443,20 @@ describe('BiasAnalysisCache', () => {
       const retrieved = await analysisCache.getAnalysisResult('session-123')
       expect(retrieved).toBeTruthy()
       expect(retrieved!.sessionId).toBe(mockAnalysisResult.sessionId)
-      expect(retrieved!.overallBiasScore).toBe(mockAnalysisResult.overallBiasScore)
+      expect(retrieved!.overallBiasScore).toBe(
+        mockAnalysisResult.overallBiasScore,
+      )
       expect(retrieved!.alertLevel).toBe(mockAnalysisResult.alertLevel)
       expect(retrieved!.confidence).toBe(mockAnalysisResult.confidence)
-      
+
       // Handle timestamp comparison (might be serialized as string)
-      const retrievedTimestamp = typeof retrieved!.timestamp === 'string' 
-        ? new Date(retrieved!.timestamp) 
-        : retrieved!.timestamp
-      expect(retrievedTimestamp.getTime()).toBe(mockAnalysisResult.timestamp.getTime())
+      const retrievedTimestamp =
+        typeof retrieved!.timestamp === 'string'
+          ? new Date(retrieved!.timestamp)
+          : retrieved!.timestamp
+      expect(retrievedTimestamp.getTime()).toBe(
+        mockAnalysisResult.timestamp.getTime(),
+      )
     })
 
     it('should return null for non-existent analysis results', async () => {
@@ -467,13 +472,16 @@ describe('BiasAnalysisCache', () => {
       const retrieved = await analysisCache.getSession('session-123')
       expect(retrieved).toBeTruthy()
       expect(retrieved!.sessionId).toBe(mockSession.sessionId)
-      expect(retrieved!.participantDemographics).toEqual(mockSession.participantDemographics)
+      expect(retrieved!.participantDemographics).toEqual(
+        mockSession.participantDemographics,
+      )
       expect(retrieved!.scenario).toEqual(mockSession.scenario)
-      
+
       // Handle timestamp comparison (might be serialized as string)
-      const retrievedTimestamp = typeof retrieved!.timestamp === 'string' 
-        ? new Date(retrieved!.timestamp) 
-        : retrieved!.timestamp
+      const retrievedTimestamp =
+        typeof retrieved!.timestamp === 'string'
+          ? new Date(retrieved!.timestamp)
+          : retrieved!.timestamp
       expect(retrievedTimestamp.getTime()).toBe(mockSession.timestamp.getTime())
     })
 
@@ -699,22 +707,31 @@ describe('ReportCache', () => {
       const retrieved = await reportCache.getReport('report-123')
       expect(retrieved).toBeTruthy()
       expect(retrieved!.reportId).toBe(mockReport.reportId)
-      expect(retrieved!.overallFairnessScore).toBe(mockReport.overallFairnessScore)
-      
+      expect(retrieved!.overallFairnessScore).toBe(
+        mockReport.overallFairnessScore,
+      )
+
       // Handle Date field comparisons (might be serialized as strings)
-      const retrievedGeneratedAt = typeof retrieved!.generatedAt === 'string' 
-        ? new Date(retrieved!.generatedAt) 
-        : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(mockReport.generatedAt.getTime())
-      
-      const retrievedStart = typeof retrieved!.timeRange.start === 'string' 
-        ? new Date(retrieved!.timeRange.start) 
-        : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(mockReport.timeRange.start.getTime())
-      
-      const retrievedEnd = typeof retrieved!.timeRange.end === 'string' 
-        ? new Date(retrieved!.timeRange.end) 
-        : retrieved!.timeRange.end
+      const retrievedGeneratedAt =
+        typeof retrieved!.generatedAt === 'string'
+          ? new Date(retrieved!.generatedAt)
+          : retrieved!.generatedAt
+      expect(retrievedGeneratedAt.getTime()).toBe(
+        mockReport.generatedAt.getTime(),
+      )
+
+      const retrievedStart =
+        typeof retrieved!.timeRange.start === 'string'
+          ? new Date(retrieved!.timeRange.start)
+          : retrieved!.timeRange.start
+      expect(retrievedStart.getTime()).toBe(
+        mockReport.timeRange.start.getTime(),
+      )
+
+      const retrievedEnd =
+        typeof retrieved!.timeRange.end === 'string'
+          ? new Date(retrieved!.timeRange.end)
+          : retrieved!.timeRange.end
       expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
     })
 
@@ -841,11 +858,12 @@ describe('Convenience Functions', () => {
       expect(retrieved!.overallBiasScore).toBe(mockResult.overallBiasScore)
       expect(retrieved!.alertLevel).toBe(mockResult.alertLevel)
       expect(retrieved!.confidence).toBe(mockResult.confidence)
-      
+
       // Handle timestamp comparison (might be serialized as string)
-      const retrievedTimestamp = typeof retrieved!.timestamp === 'string' 
-        ? new Date(retrieved!.timestamp) 
-        : retrieved!.timestamp
+      const retrievedTimestamp =
+        typeof retrieved!.timestamp === 'string'
+          ? new Date(retrieved!.timestamp)
+          : retrieved!.timestamp
       expect(retrievedTimestamp.getTime()).toBe(mockResult.timestamp.getTime())
     })
 
@@ -912,22 +930,31 @@ describe('Convenience Functions', () => {
 
       expect(retrieved).toBeTruthy()
       expect(retrieved!.reportId).toBe(mockReport.reportId)
-      expect(retrieved!.overallFairnessScore).toBe(mockReport.overallFairnessScore)
-      
+      expect(retrieved!.overallFairnessScore).toBe(
+        mockReport.overallFairnessScore,
+      )
+
       // Handle Date field comparisons (might be serialized as strings)
-      const retrievedGeneratedAt = typeof retrieved!.generatedAt === 'string' 
-        ? new Date(retrieved!.generatedAt) 
-        : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(mockReport.generatedAt.getTime())
-      
-      const retrievedStart = typeof retrieved!.timeRange.start === 'string' 
-        ? new Date(retrieved!.timeRange.start) 
-        : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(mockReport.timeRange.start.getTime())
-      
-      const retrievedEnd = typeof retrieved!.timeRange.end === 'string' 
-        ? new Date(retrieved!.timeRange.end) 
-        : retrieved!.timeRange.end
+      const retrievedGeneratedAt =
+        typeof retrieved!.generatedAt === 'string'
+          ? new Date(retrieved!.generatedAt)
+          : retrieved!.generatedAt
+      expect(retrievedGeneratedAt.getTime()).toBe(
+        mockReport.generatedAt.getTime(),
+      )
+
+      const retrievedStart =
+        typeof retrieved!.timeRange.start === 'string'
+          ? new Date(retrieved!.timeRange.start)
+          : retrieved!.timeRange.start
+      expect(retrievedStart.getTime()).toBe(
+        mockReport.timeRange.start.getTime(),
+      )
+
+      const retrievedEnd =
+        typeof retrieved!.timeRange.end === 'string'
+          ? new Date(retrieved!.timeRange.end)
+          : retrieved!.timeRange.end
       expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
     })
 

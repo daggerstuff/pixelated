@@ -17,7 +17,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         method: event.httpMethod || event.method || 'GET',
         headers: event.headers || {},
         query: event.queryStringParameters || {},
-        body: event.body ? JSON.parse(event.body) as unknown : null,
+        body: event.body ? (JSON.parse(event.body) as unknown) : null,
         path: event.path || event.rawPath || '/',
       }
 
@@ -64,50 +64,55 @@ export function validateServerlessRequest(event: any): boolean {
  * Serverless handler for bias detection.
  * Receives session data in event.body, returns BiasDetectionEngine analysis.
  */
-export const detectBiasServerlessHandler = createServerlessHandler(async (req) => {
-  // CORS preflight and method guard
-  if (req.method === 'OPTIONS') {
-    return createCorsResponse()
-  }
-  if (req.method !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { Allow: 'POST, OPTIONS' },
-      body: JSON.stringify({ success: false, error: 'Method Not Allowed' }),
+export const detectBiasServerlessHandler = createServerlessHandler(
+  async (req) => {
+    // CORS preflight and method guard
+    if (req.method === 'OPTIONS') {
+      return createCorsResponse()
     }
-  }
+    if (req.method !== 'POST') {
+      return {
+        statusCode: 405,
+        headers: { Allow: 'POST, OPTIONS' },
+        body: JSON.stringify({ success: false, error: 'Method Not Allowed' }),
+      }
+    }
 
-  // Defensive body parsing + validation
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
-  if (!body || typeof body !== 'object' || !('session' in body)) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, error: 'Missing session data for bias detection.' }),
+    // Defensive body parsing + validation
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+    if (!body || typeof body !== 'object' || !('session' in body)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          success: false,
+          error: 'Missing session data for bias detection.',
+        }),
+      }
     }
-  }
 
-  // Initialize engine (ideally reuse a singleton in production)
-  const engine = new BiasDetectionEngine()
-  try {
-    await engine.initialize()
-    const analysis = await engine.analyzeSession(body.session)
-    return {
-      // ...rest of the original response
-      statusCode: 200,
-      body: JSON.stringify({ success: true, data: analysis }),
+    // Initialize engine (ideally reuse a singleton in production)
+    const engine = new BiasDetectionEngine()
+    try {
+      await engine.initialize()
+      const analysis = await engine.analyzeSession(body.session)
+      return {
+        // ...rest of the original response
+        statusCode: 200,
+        body: JSON.stringify({ success: true, data: analysis }),
+      }
+    } catch (error: unknown) {
+      console.error('Bias detection error:', error)
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          success: false,
+          error: 'Bias detection failed',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        }),
+      }
     }
-  } catch (error: unknown) {
-    console.error('Bias detection error:', error)
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        success: false,
-        error: 'Bias detection failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      }),
-    }
-  }
-})
+  },
+)
 
 /**
  * Creates CORS preflight response

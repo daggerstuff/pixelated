@@ -56,6 +56,10 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
+    {
+      name: 'msedge',
+      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    },
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
@@ -64,6 +68,20 @@ export default defineConfig({
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
+    },
+    {
+      name: 'Tablet Chrome',
+      use: { ...devices['iPad'] },
+    },
+    {
+      name: 'Tablet Safari',
+      use: { ...devices['iPad'] },
+    },
+    /* Theme-specific testing */
+    {
+      name: 'theme-compatibility',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: '**/theme-compatibility.spec.ts',
     },
   ],
 

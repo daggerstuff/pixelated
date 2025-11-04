@@ -1,6 +1,7 @@
 let bcrypt: typeof import('bcryptjs') | undefined
 let jwt: typeof import('jsonwebtoken') | undefined
 let mongodbLib: typeof import('mongodb') | undefined
+let crypto: typeof import('crypto') | undefined
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
 
 type MongoRuntime = {
@@ -210,6 +211,56 @@ if (typeof window === 'undefined') {
         { _id: new ObjectId(userId) },
         { $set: { password: hashedPassword, updatedAt: new Date() } },
       )
+    }
+
+    async signIn(email: string, password: string): Promise<AuthResult> {
+      await initializeDependencies()
+      if (!mongodb || !bcrypt)
+        throw new Error('MongoDB or bcrypt not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      // Find user by email
+      const user = await usersCollection.findOne({ email })
+      if (!user) throw new Error('Invalid credentials')
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(password, user.password)
+      if (!isValidPassword) throw new Error('Invalid credentials')
+
+      // Update last login
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { lastLogin: new Date(), updatedAt: new Date() } },
+      )
+
+      // Create session
+      const sessionsCollection = db.collection<Session>('sessions')
+      const sessionId = crypto.randomUUID()
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+      const session: Omit<Session, '_id'> = {
+        sessionId,
+        userId: user._id,
+        expiresAt,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      await sessionsCollection.insertOne(session as Session)
+
+      // Generate access token
+      const accessToken = this.generateToken({
+        userId: user._id.toString(),
+        email: user.email,
+        role: user.role,
+      })
+
+      return {
+        user,
+        session: { ...session, _id: (session as any)._id } as Session,
+        accessToken,
+      }
     }
 
     private generateToken(payload: AuthTokenPayload): string {

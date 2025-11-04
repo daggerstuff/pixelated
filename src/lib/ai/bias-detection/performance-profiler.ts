@@ -12,7 +12,7 @@ type ProfilerResult = {
 
 export async function profile<T>(
   label: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<{ result: T; profile: ProfilerResult }> {
   const memoryBefore = getMemoryUsage()
   const start = process.hrtime.bigint()
@@ -29,7 +29,7 @@ export async function profile<T>(
     memoryDelta,
     timestamp: new Date().toISOString(),
   }
-  
+
   return { result, profile }
 }
 

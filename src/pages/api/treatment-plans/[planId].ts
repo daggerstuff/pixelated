@@ -8,35 +8,32 @@ export const prerender = false
 const logger = createBuildSafeLogger('treatment-plans')
 
 // Zod schemas for update
-const updateTreatmentObjectiveSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    description: z.string().min(1).optional(),
-    targetDate: z.string().optional().nullable(),
-    status: z
-      .enum(['Not Started', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])
-      .optional(),
-    interventions: z.array(z.string().min(1)).min(1).optional(),
-    progressNotes: z.string().optional().nullable(),
-  })
+const updateTreatmentObjectiveSchema = z.object({
+  id: z.string().uuid().optional(),
+  description: z.string().min(1).optional(),
+  targetDate: z.string().optional().nullable(),
+  status: z
+    .enum(['Not Started', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])
+    .optional(),
+  interventions: z.array(z.string().min(1)).min(1).optional(),
+  progressNotes: z.string().optional().nullable(),
+})
 
-
-const updateTreatmentGoalSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    description: z.string().min(1).optional(),
-    targetDate: z.string().optional().nullable(),
-    status: z
-      .enum([
-        'Not Started',
-        'In Progress',
-        'Achieved',
-        'Partially Achieved',
-        'Not Achieved',
-      ])
-      .optional(),
-    objectives: z.array(updateTreatmentObjectiveSchema).optional(),
-  })
+const updateTreatmentGoalSchema = z.object({
+  id: z.string().uuid().optional(),
+  description: z.string().min(1).optional(),
+  targetDate: z.string().optional().nullable(),
+  status: z
+    .enum([
+      'Not Started',
+      'In Progress',
+      'Achieved',
+      'Partially Achieved',
+      'Not Achieved',
+    ])
+    .optional(),
+  objectives: z.array(updateTreatmentObjectiveSchema).optional(),
+})
 
 const updateTreatmentPlanClientSchema = z.object({
   title: z.string().min(1).optional(),
@@ -152,7 +149,7 @@ export const PUT: APIRoute = async ({
       generalNotes: updates.generalNotes || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      goals: updates.goals as any || [],
+      goals: (updates.goals as any) || [],
     }
 
     return new Response(JSON.stringify(updatedPlan), { status: 200 })

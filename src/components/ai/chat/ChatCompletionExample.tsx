@@ -71,8 +71,10 @@ export default function ChatCompletionExample() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4">Enhanced Chat Completion Demo</h2>
-        
+        <h2 className="text-2xl font-bold mb-4">
+          Enhanced Chat Completion Demo
+        </h2>
+
         {/* Controls */}
         <div className="flex flex-wrap gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
           <label className="flex items-center gap-2">
@@ -83,14 +85,14 @@ export default function ChatCompletionExample() {
             />
             Streaming Mode
           </label>
-          
+
           <button
             onClick={resetChat}
             className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
           >
             Reset Chat
           </button>
-          
+
           <button
             onClick={retryLastMessage}
             disabled={!error}
@@ -98,7 +100,7 @@ export default function ChatCompletionExample() {
           >
             Retry Last
           </button>
-          
+
           <button
             onClick={stopGeneration}
             disabled={!isLoading}
@@ -106,7 +108,7 @@ export default function ChatCompletionExample() {
           >
             Stop
           </button>
-          
+
           <button
             onClick={() => {
               const exported = exportConversation()
@@ -123,11 +125,15 @@ export default function ChatCompletionExample() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-blue-50 rounded-lg">
           <div>
             <div className="text-sm text-gray-600">Messages</div>
-            <div className="font-semibold">{conversationStats.messageCount}</div>
+            <div className="font-semibold">
+              {conversationStats.messageCount}
+            </div>
           </div>
           <div>
             <div className="text-sm text-gray-600">Avg Response Time</div>
-            <div className="font-semibold">{Math.round(conversationStats.avgResponseTime)}ms</div>
+            <div className="font-semibold">
+              {Math.round(conversationStats.avgResponseTime)}ms
+            </div>
           </div>
           <div>
             <div className="text-sm text-gray-600">Total Tokens</div>
@@ -135,7 +141,9 @@ export default function ChatCompletionExample() {
           </div>
           <div>
             <div className="text-sm text-gray-600">Est. Cost</div>
-            <div className="font-semibold">${tokenUsage.estimatedCost.toFixed(4)}</div>
+            <div className="font-semibold">
+              ${tokenUsage.estimatedCost.toFixed(4)}
+            </div>
           </div>
         </div>
 
@@ -147,7 +155,9 @@ export default function ChatCompletionExample() {
                 {isStreaming ? 'Streaming...' : 'Loading...'}
                 {isTyping && ' (AI is typing)'}
               </div>
-              <div className="text-sm text-blue-600">{progress.toFixed(1)}%</div>
+              <div className="text-sm text-blue-600">
+                {progress.toFixed(1)}%
+              </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
@@ -190,11 +200,14 @@ export default function ChatCompletionExample() {
                   </div>
                   <div className="whitespace-pre-wrap">{message.content}</div>
                 </div>
-                
+
                 <div className="flex gap-1 ml-2">
                   <button
                     onClick={() => {
-                      const newContent = prompt('Edit message:', message.content)
+                      const newContent = prompt(
+                        'Edit message:',
+                        message.content,
+                      )
                       if (newContent !== null) {
                         editMessage(index, newContent)
                       }

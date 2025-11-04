@@ -43,8 +43,11 @@ export class ConnectionPool {
       ...config,
     }
 
-  // Cleanup idle connections periodically
-  this.cleanupIntervalId = setInterval(() => this.cleanupIdleConnections(), 60000)
+    // Cleanup idle connections periodically
+    this.cleanupIntervalId = setInterval(
+      () => this.cleanupIdleConnections(),
+      60000,
+    )
   }
 
   async acquireConnection(): Promise<PooledConnection> {
@@ -58,7 +61,7 @@ export class ConnectionPool {
       if (!connection.inUse) {
         connection.inUse = true
         connection.lastUsed = new Date()
-          connection.requests++
+        connection.requests++
         return connection
       }
     }
@@ -66,7 +69,7 @@ export class ConnectionPool {
     // Create new connection if under limit
     if (this.connections.size < this.config.maxConnections) {
       const connection = this.createConnection()
-        connection.requests++
+      connection.requests++
       this.connections.set(connection.id, connection)
       return connection
     }
@@ -77,7 +80,7 @@ export class ConnectionPool {
 
       // Timeout if waiting too long
       setTimeout(() => {
-        const index = this.queue.findIndex(item => item.resolve === resolve)
+        const index = this.queue.findIndex((item) => item.resolve === resolve)
         if (index !== -1) {
           this.queue.splice(index, 1)
           reject(new Error('Connection pool timeout'))
@@ -98,7 +101,7 @@ export class ConnectionPool {
     if (this.queue.length > 0) {
       const { resolve } = this.queue.shift()!
       connection.inUse = true
-    connection.requests++
+      connection.requests++
       resolve(connection)
     }
   }
@@ -127,14 +130,16 @@ export class ConnectionPool {
     const toRemove: string[] = []
 
     for (const [id, connection] of this.connections) {
-      if (!connection.inUse &&
-          now.getTime() - connection.lastUsed.getTime() > this.config.idleTimeout) {
+      if (
+        !connection.inUse &&
+        now.getTime() - connection.lastUsed.getTime() > this.config.idleTimeout
+      ) {
         connection.controller.abort()
         toRemove.push(id)
       }
     }
 
-    toRemove.forEach(id => {
+    toRemove.forEach((id) => {
       this.connections.delete(id)
       logger.debug(`Cleaned up idle connection: ${id}`)
     })
@@ -143,9 +148,14 @@ export class ConnectionPool {
   getStats() {
     return {
       totalConnections: this.connections.size,
-      activeConnections: Array.from(this.connections.values()).filter(c => c.inUse).length,
+      activeConnections: Array.from(this.connections.values()).filter(
+        (c) => c.inUse,
+      ).length,
       queueLength: this.queue.length,
-      totalRequests: Array.from(this.connections.values()).reduce((sum, c) => sum + c.requests, 0),
+      totalRequests: Array.from(this.connections.values()).reduce(
+        (sum, c) => sum + c.requests,
+        0,
+      ),
       maxConnections: this.config.maxConnections,
       idleTimeout: this.config.idleTimeout,
       connectionTimeout: this.config.connectionTimeout,

@@ -82,7 +82,7 @@ class RealTimeProcessor {
   async startSession(
     sessionId: string,
     patientId: string,
-    config: Partial<ProcessingConfig> = {}
+    config: Partial<ProcessingConfig> = {},
   ): Promise<StreamingSession> {
     if (this.activeSessions.has(sessionId)) {
       throw new Error(`Session ${sessionId} already active`)
@@ -126,7 +126,9 @@ class RealTimeProcessor {
     return session
   }
 
-  private async createProcessingPipeline(config: Partial<ProcessingConfig>): Promise<ProcessingStage[]> {
+  private async createProcessingPipeline(
+    config: Partial<ProcessingConfig>,
+  ): Promise<ProcessingStage[]> {
     return [
       {
         name: 'audio_processor',
@@ -179,7 +181,7 @@ class RealTimeProcessor {
   }
 
   private routeDataToProcessors(session: StreamingSession, data: any): void {
-    session.processingPipeline.forEach(stage => {
+    session.processingPipeline.forEach((stage) => {
       if (this.shouldProcessStage(stage, data.type)) {
         stage.buffer.push({
           ...data,
@@ -197,7 +199,10 @@ class RealTimeProcessor {
     })
   }
 
-  private shouldProcessStage(stage: ProcessingStage, dataType: string): boolean {
+  private shouldProcessStage(
+    stage: ProcessingStage,
+    dataType: string,
+  ): boolean {
     // Route data based on type and stage capabilities
     const typeMapping: Record<string, string[]> = {
       audio: ['audio_processor'],
@@ -269,10 +274,12 @@ class RealTimeProcessor {
     }
   }
 
-  private groupTasksBySession(tasks: ProcessingTask[]): Map<string, ProcessingTask[]> {
+  private groupTasksBySession(
+    tasks: ProcessingTask[],
+  ): Map<string, ProcessingTask[]> {
     const grouped = new Map<string, ProcessingTask[]>()
 
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       if (!grouped.has(task.sessionId)) {
         grouped.set(task.sessionId, [])
       }
@@ -285,7 +292,7 @@ class RealTimeProcessor {
   private async processStage(
     session: StreamingSession,
     stage: ProcessingStage,
-    data: any[]
+    data: any[],
   ): Promise<void> {
     if (data.length === 0) return
 
@@ -313,28 +320,36 @@ class RealTimeProcessor {
           session,
           stage,
           processedData.processingTime,
-          this.getCurrentResourceUsage()
+          this.getCurrentResourceUsage(),
         )
       }
 
       // Clear processed data from buffer
       stage.buffer = []
-
     } catch (error) {
       console.error(`Processing error for stage ${stage.name}:`, error)
 
       // Update error metrics
       const metrics = stage.processor.getMetrics()
-      metrics.errorRate = (metrics.errorRate * metrics.processedCount + 1) / (metrics.processedCount + 1)
+      metrics.errorRate =
+        (metrics.errorRate * metrics.processedCount + 1) /
+        (metrics.processedCount + 1)
 
       // Adaptive error handling
-      if (metrics.errorRate > 0.1) { // 10% error rate
-        console.warn(`High error rate for ${stage.name}, considering stage reconfiguration`)
+      if (metrics.errorRate > 0.1) {
+        // 10% error rate
+        console.warn(
+          `High error rate for ${stage.name}, considering stage reconfiguration`,
+        )
       }
     }
   }
 
-  private emitRealTimeResults(sessionId: string, stageName: string, data: ProcessedData): void {
+  private emitRealTimeResults(
+    sessionId: string,
+    stageName: string,
+    data: ProcessedData,
+  ): void {
     // In real implementation, this would send data to connected clients
     const event = {
       type: 'real_time_update',
@@ -387,15 +402,21 @@ class RealTimeProcessor {
     return metrics
   }
 
-  private async calculateSessionMetrics(session: StreamingSession): Promise<RealTimeMetrics> {
+  private async calculateSessionMetrics(
+    session: StreamingSession,
+  ): Promise<RealTimeMetrics> {
     const duration = Date.now() - session.startTime.getTime()
     const totalProcessed = session.processingPipeline.reduce(
-      (sum, stage) => sum + stage.processor.getMetrics().processedCount, 0
+      (sum, stage) => sum + stage.processor.getMetrics().processedCount,
+      0,
     )
 
-    const avgProcessingTime = session.processingPipeline.reduce(
-      (sum, stage) => sum + stage.processor.getMetrics().averageProcessingTime, 0
-    ) / session.processingPipeline.length
+    const avgProcessingTime =
+      session.processingPipeline.reduce(
+        (sum, stage) =>
+          sum + stage.processor.getMetrics().averageProcessingTime,
+        0,
+      ) / session.processingPipeline.length
 
     return {
       sessionId: session.sessionId,
@@ -414,11 +435,12 @@ class RealTimeProcessor {
   private calculatePipelineEfficiency(session: StreamingSession): number {
     // Calculate how efficiently the pipeline processed data
     const totalBufferSize = session.processingPipeline.reduce(
-      (sum, stage) => sum + stage.buffer.length, 0
+      (sum, stage) => sum + stage.buffer.length,
+      0,
     )
 
     const maxBufferSize = 1000 // Arbitrary threshold
-    return Math.max(0, 1 - (totalBufferSize / maxBufferSize))
+    return Math.max(0, 1 - totalBufferSize / maxBufferSize)
   }
 
   /**
@@ -447,19 +469,30 @@ class RealTimeProcessor {
 
     const totalProcessingRate = Array.from(this.activeSessions.values()).reduce(
       (sum, session) => {
-        return sum + session.processingPipeline.reduce(
-          (stageSum, stage) => stageSum + stage.processor.getMetrics().processedCount, 0
+        return (
+          sum +
+          session.processingPipeline.reduce(
+            (stageSum, stage) =>
+              stageSum + stage.processor.getMetrics().processedCount,
+            0,
+          )
         )
-      }, 0
+      },
+      0,
     )
 
-    const averageLatency = Array.from(this.activeSessions.values()).reduce(
-      (sum, session) => {
-        return sum + session.processingPipeline.reduce(
-          (stageSum, stage) => stageSum + stage.processor.getMetrics().averageProcessingTime, 0
-        ) / session.processingPipeline.length
-      }, 0
-    ) / activeSessions
+    const averageLatency =
+      Array.from(this.activeSessions.values()).reduce((sum, session) => {
+        return (
+          sum +
+          session.processingPipeline.reduce(
+            (stageSum, stage) =>
+              stageSum + stage.processor.getMetrics().averageProcessingTime,
+            0,
+          ) /
+            session.processingPipeline.length
+        )
+      }, 0) / activeSessions
 
     return {
       activeSessions,
@@ -483,30 +516,48 @@ class AdaptiveController {
     session: StreamingSession,
     stage: ProcessingStage,
     processingTime: number,
-    resourceUsage: { memoryUsage: number; cpuUsage: number; networkUsage: number }
+    resourceUsage: {
+      memoryUsage: number
+      cpuUsage: number
+      networkUsage: number
+    },
   ): Promise<void> {
     // Adjust processing interval based on performance
-    if (processingTime > 200 && stage.processingInterval < session.adaptiveConfig.maxProcessingInterval) {
+    if (
+      processingTime > 200 &&
+      stage.processingInterval < session.adaptiveConfig.maxProcessingInterval
+    ) {
       // Slow processing - increase interval
       stage.processingInterval = Math.min(
         stage.processingInterval * 1.2,
-        session.adaptiveConfig.maxProcessingInterval
+        session.adaptiveConfig.maxProcessingInterval,
       )
-    } else if (processingTime < 50 && stage.processingInterval > session.adaptiveConfig.minProcessingInterval) {
+    } else if (
+      processingTime < 50 &&
+      stage.processingInterval > session.adaptiveConfig.minProcessingInterval
+    ) {
       // Fast processing - decrease interval for better responsiveness
       stage.processingInterval = Math.max(
         stage.processingInterval * 0.8,
-        session.adaptiveConfig.minProcessingInterval
+        session.adaptiveConfig.minProcessingInterval,
       )
     }
 
     // Adjust based on resource usage
-    if (resourceUsage.cpuUsage > session.adaptiveConfig.resourceLimits.maxCpuUsage) {
+    if (
+      resourceUsage.cpuUsage > session.adaptiveConfig.resourceLimits.maxCpuUsage
+    ) {
       // High CPU usage - reduce processing frequency
-      stage.processingInterval = Math.min(stage.processingInterval * 1.5, session.adaptiveConfig.maxProcessingInterval)
+      stage.processingInterval = Math.min(
+        stage.processingInterval * 1.5,
+        session.adaptiveConfig.maxProcessingInterval,
+      )
     }
 
-    if (resourceUsage.memoryUsage > session.adaptiveConfig.resourceLimits.maxMemoryUsage) {
+    if (
+      resourceUsage.memoryUsage >
+      session.adaptiveConfig.resourceLimits.maxMemoryUsage
+    ) {
       // High memory usage - optimize buffer sizes
       stage.buffer = stage.buffer.slice(-100) // Keep only recent data
     }
@@ -537,7 +588,9 @@ class AudioProcessor implements DataProcessor {
         processingTime: Date.now() - startTime,
         confidence: 0.85 + Math.random() * 0.1,
         data: {
-          emotion: ['calm', 'anxious', 'excited', 'sad'][Math.floor(Math.random() * 4)],
+          emotion: ['calm', 'anxious', 'excited', 'sad'][
+            Math.floor(Math.random() * 4)
+          ],
           stressLevel: Math.random() * 0.8 + 0.1,
           voiceQuality: Math.random() * 0.9 + 0.1,
           speakingRate: Math.random() * 150 + 120, // 120-270 words per minute
@@ -551,12 +604,16 @@ class AudioProcessor implements DataProcessor {
       // Update metrics
       this.metrics.processedCount++
       this.metrics.averageProcessingTime =
-        (this.metrics.averageProcessingTime * (this.metrics.processedCount - 1) + result.processingTime) / this.metrics.processedCount
+        (this.metrics.averageProcessingTime *
+          (this.metrics.processedCount - 1) +
+          result.processingTime) /
+        this.metrics.processedCount
 
       return result
-
     } catch (error) {
-      this.metrics.errorRate = (this.metrics.errorRate * this.metrics.processedCount + 1) / (this.metrics.processedCount + 1)
+      this.metrics.errorRate =
+        (this.metrics.errorRate * this.metrics.processedCount + 1) /
+        (this.metrics.processedCount + 1)
       throw error
     }
   }
@@ -595,10 +652,15 @@ class TextProcessor implements DataProcessor {
         timestamp: textData.receivedAt,
         processedAt: new Date(),
         processingTime: Date.now() - startTime,
-        confidence: 0.90 + Math.random() * 0.08,
+        confidence: 0.9 + Math.random() * 0.08,
         data: {
-          sentiment: ['positive', 'negative', 'neutral'][Math.floor(Math.random() * 3)],
-          topics: ['therapy', 'family', 'work', 'health'].slice(0, Math.floor(Math.random() * 3) + 1),
+          sentiment: ['positive', 'negative', 'neutral'][
+            Math.floor(Math.random() * 3)
+          ],
+          topics: ['therapy', 'family', 'work', 'health'].slice(
+            0,
+            Math.floor(Math.random() * 3) + 1,
+          ),
           keyPhrases: ['feeling better', 'still struggling', 'making progress'],
           linguisticComplexity: Math.random() * 0.7 + 0.3,
         },
@@ -611,12 +673,16 @@ class TextProcessor implements DataProcessor {
       // Update metrics
       this.metrics.processedCount++
       this.metrics.averageProcessingTime =
-        (this.metrics.averageProcessingTime * (this.metrics.processedCount - 1) + result.processingTime) / this.metrics.processedCount
+        (this.metrics.averageProcessingTime *
+          (this.metrics.processedCount - 1) +
+          result.processingTime) /
+        this.metrics.processedCount
 
       return result
-
     } catch (error) {
-      this.metrics.errorRate = (this.metrics.errorRate * this.metrics.processedCount + 1) / (this.metrics.processedCount + 1)
+      this.metrics.errorRate =
+        (this.metrics.errorRate * this.metrics.processedCount + 1) /
+        (this.metrics.processedCount + 1)
       throw error
     }
   }
@@ -655,9 +721,16 @@ class EmotionProcessor implements DataProcessor {
         timestamp: emotionData.receivedAt,
         processedAt: new Date(),
         processingTime: Date.now() - startTime,
-        confidence: 0.80 + Math.random() * 0.15,
+        confidence: 0.8 + Math.random() * 0.15,
         data: {
-          dominantEmotion: ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust'][Math.floor(Math.random() * 6)],
+          dominantEmotion: [
+            'joy',
+            'sadness',
+            'anger',
+            'fear',
+            'surprise',
+            'disgust',
+          ][Math.floor(Math.random() * 6)],
           emotionIntensity: Math.random() * 0.8 + 0.2,
           valence: (Math.random() - 0.5) * 2, // -1 to 1
           arousal: Math.random(),
@@ -676,12 +749,16 @@ class EmotionProcessor implements DataProcessor {
       // Update metrics
       this.metrics.processedCount++
       this.metrics.averageProcessingTime =
-        (this.metrics.averageProcessingTime * (this.metrics.processedCount - 1) + result.processingTime) / this.metrics.processedCount
+        (this.metrics.averageProcessingTime *
+          (this.metrics.processedCount - 1) +
+          result.processingTime) /
+        this.metrics.processedCount
 
       return result
-
     } catch (error) {
-      this.metrics.errorRate = (this.metrics.errorRate * this.metrics.processedCount + 1) / (this.metrics.processedCount + 1)
+      this.metrics.errorRate =
+        (this.metrics.errorRate * this.metrics.processedCount + 1) /
+        (this.metrics.processedCount + 1)
       throw error
     }
   }

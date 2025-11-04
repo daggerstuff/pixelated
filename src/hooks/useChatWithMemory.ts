@@ -24,9 +24,9 @@ export function useChatWithMemory(
   const { initialMessages = [], sessionId } = options
   const [isLoading, setIsLoading] = useState(false)
 
-  const chat = useChat({ 
+  const chat = useChat({
     initialMessages,
-    api: options.api || '/api/chat'
+    api: options.api || '/api/chat',
   })
   const memory = useMemory({
     userId: sessionId,

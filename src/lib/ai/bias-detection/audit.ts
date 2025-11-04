@@ -498,7 +498,7 @@ export class BiasDetectionAuditLogger {
     if (!demographics) {
       return {}
     }
-    
+
     const result: Partial<ParticipantDemographics> = {
       age: demographics.age,
       gender: demographics.gender,
@@ -509,7 +509,9 @@ export class BiasDetectionAuditLogger {
         socioeconomicStatus: demographics.socioeconomicStatus,
       }),
       // Explicitly redact region for privacy instead of omitting
-      ...(demographics && 'region' in demographics && demographics.region !== undefined
+      ...(demographics &&
+      'region' in demographics &&
+      demographics.region !== undefined
         ? { region: 'REDACTED' }
         : {}),
     }

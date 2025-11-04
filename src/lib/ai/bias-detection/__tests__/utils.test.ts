@@ -264,14 +264,22 @@ describe('Demographic Processing', () => {
 
       expect(groups).toHaveLength(7)
       expect(groups.find((g) => g['type'] === 'age')?.['value']).toBe('25-35')
-      expect(groups.find((g) => g['type'] === 'gender')?.['value']).toBe('female')
-      expect(groups.find((g) => g['type'] === 'ethnicity')?.['value']).toBe('hispanic')
+      expect(groups.find((g) => g['type'] === 'gender')?.['value']).toBe(
+        'female',
+      )
+      expect(groups.find((g) => g['type'] === 'ethnicity')?.['value']).toBe(
+        'hispanic',
+      )
       expect(groups.find((g) => g['type'] === 'language')?.['value']).toBe('en')
       expect(groups.find((g) => g['type'] === 'socioeconomic')?.['value']).toBe(
         'middle',
       )
-      expect(groups.find((g) => g['type'] === 'education')?.['value']).toBe('bachelor')
-      expect(groups.find((g) => g['type'] === 'region')?.['value']).toBe('west-coast')
+      expect(groups.find((g) => g['type'] === 'education')?.['value']).toBe(
+        'bachelor',
+      )
+      expect(groups.find((g) => g['type'] === 'region')?.['value']).toBe(
+        'west-coast',
+      )
     })
 
     it('should handle optional fields', () => {

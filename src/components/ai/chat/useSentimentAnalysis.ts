@@ -28,7 +28,13 @@ interface UseSentimentAnalysisResult {
   averageConfidence: number
   analyzeText: (text: string) => Promise<SentimentAnalysisResult | null>
   analyzeBatch: (texts: string[]) => Promise<SentimentAnalysisResult[] | null>
-  analyzeStream: (texts: string[]) => AsyncGenerator<SentimentAnalysisResult, SentimentAnalysisResult[], unknown>
+  analyzeStream: (
+    texts: string[],
+  ) => AsyncGenerator<
+    SentimentAnalysisResult,
+    SentimentAnalysisResult[],
+    unknown
+  >
   reanalyzeLastText: () => Promise<SentimentAnalysisResult | null>
   cancelAnalysis: () => void
   reset: () => void
@@ -62,11 +68,7 @@ function isRetryableError(error: unknown): boolean {
   }
 
   // Rate limit errors (429) are retryable with backoff
-  if (
-    error instanceof Error &&
-    'status' in error &&
-    error.status === 429
-  ) {
+  if (error instanceof Error && 'status' in error && error.status === 429) {
     return true
   }
 
@@ -76,7 +78,9 @@ function isRetryableError(error: unknown): boolean {
 /**
  * Generate insights from sentiment analysis results
  */
-function generateSentimentInsights(results: SentimentAnalysisResult[]): SentimentInsights {
+function generateSentimentInsights(
+  results: SentimentAnalysisResult[],
+): SentimentInsights {
   if (results.length === 0) {
     return {
       dominantSentiment: 'neutral',
@@ -88,20 +92,24 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
   }
 
   // Calculate sentiment distribution
-  const sentimentCounts = results.reduce((acc, result) => {
-    acc[result.sentiment] = (acc[result.sentiment] || 0) + 1
-    return acc
-  }, {} as { [key: string]: number })
+  const sentimentCounts = results.reduce(
+    (acc, result) => {
+      acc[result.sentiment] = (acc[result.sentiment] || 0) + 1
+      return acc
+    },
+    {} as { [key: string]: number },
+  )
 
-  const dominantSentiment = Object.entries(sentimentCounts)
-    .sort(([, a], [, b]) => b - a)[0]?.[0] || 'neutral'
+  const dominantSentiment =
+    Object.entries(sentimentCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+    'neutral'
 
   // Calculate confidence distribution
   const confidenceDistribution = Object.fromEntries(
     Object.entries(sentimentCounts).map(([sentiment, count]) => [
       sentiment,
       count / results.length,
-    ])
+    ]),
   )
 
   // Generate emotional trends
@@ -121,7 +129,8 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
 
   // Identify risk factors
   const riskFactors: string[] = []
-  const avgConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length
+  const avgConfidence =
+    results.reduce((sum, r) => sum + r.confidence, 0) / results.length
 
   if (negativeRatio > 0.7) {
     riskFactors.push('High negative sentiment concentration')
@@ -129,7 +138,7 @@ function generateSentimentInsights(results: SentimentAnalysisResult[]): Sentimen
   if (avgConfidence < 0.6) {
     riskFactors.push('Low confidence in sentiment analysis')
   }
-  if (results.some(r => r.sentiment === 'negative' && r.confidence > 0.8)) {
+  if (results.some((r) => r.sentiment === 'negative' && r.confidence > 0.8)) {
     riskFactors.push('Strong negative sentiment detected')
   }
 
@@ -186,9 +195,10 @@ export function useSentimentAnalysis({
   const abortControllerRef = useRef<AbortController | null>(null)
 
   // Calculate average confidence
-  const averageConfidence = results.length > 0
-    ? results.reduce((sum, r) => sum + r.confidence, 0) / results.length
-    : 0
+  const averageConfidence =
+    results.length > 0
+      ? results.reduce((sum, r) => sum + r.confidence, 0) / results.length
+      : 0
 
   // Reset all state
   const reset = useCallback(() => {
@@ -202,7 +212,7 @@ export function useSentimentAnalysis({
     setSuccessCount(0)
     setFailureCount(0)
     lastTextRef.current = null
-    
+
     // Abort any ongoing requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
@@ -225,7 +235,7 @@ export function useSentimentAnalysis({
     async (requestData: Record<string, unknown>): Promise<Response> => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController()
-      
+
       const timeoutId = setTimeout(() => {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort()
@@ -247,10 +257,12 @@ export function useSentimentAnalysis({
         })
 
         clearTimeout(timeoutId)
-        
+
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || `API request failed: ${response.status}`)
+          throw new Error(
+            errorData.error || `API request failed: ${response.status}`,
+          )
         }
 
         return response
@@ -259,7 +271,7 @@ export function useSentimentAnalysis({
         throw err
       }
     },
-    [apiEndpoint, model, temperature, timeout]
+    [apiEndpoint, model, temperature, timeout],
   )
 
   // Analyze a single text
@@ -278,17 +290,19 @@ export function useSentimentAnalysis({
       while (retries < maxRetries) {
         try {
           const response = await makeRequest({ text })
-          const data = await response.json() as SentimentAnalysisResult
+          const data = (await response.json()) as SentimentAnalysisResult
 
           // Validate confidence threshold
           if (data.confidence < confidenceThreshold) {
-            console.warn(`Low confidence sentiment analysis: ${data.confidence}`)
+            console.warn(
+              `Low confidence sentiment analysis: ${data.confidence}`,
+            )
           }
 
           setResult(data)
-          setResults(prev => [...prev, data])
-          setTotalAnalyzed(prev => prev + 1)
-          setSuccessCount(prev => prev + 1)
+          setResults((prev) => [...prev, data])
+          setTotalAnalyzed((prev) => prev + 1)
+          setSuccessCount((prev) => prev + 1)
           setProgress(100)
 
           if (onComplete) {
@@ -299,9 +313,11 @@ export function useSentimentAnalysis({
         } catch (err: unknown) {
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
-              err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to analyze sentiment'
+              err instanceof Error
+                ? (err as Error)?.message || String(err)
+                : 'Failed to analyze sentiment'
             setError(errorMessage)
-            setFailureCount(prev => prev + 1)
+            setFailureCount((prev) => prev + 1)
 
             if (onError && err instanceof Error) {
               onError(err)
@@ -311,7 +327,10 @@ export function useSentimentAnalysis({
 
           retries++
           // Exponential backoff with jitter
-          const delay = Math.min(1000 * Math.pow(2, retries) + Math.random() * 1000, 10000)
+          const delay = Math.min(
+            1000 * Math.pow(2, retries) + Math.random() * 1000,
+            10000,
+          )
           await new Promise((resolve) => setTimeout(resolve, delay))
         } finally {
           if (retries === maxRetries - 1) {
@@ -322,7 +341,14 @@ export function useSentimentAnalysis({
 
       return null
     },
-    [isLoading, maxRetries, confidenceThreshold, onComplete, onError, makeRequest]
+    [
+      isLoading,
+      maxRetries,
+      confidenceThreshold,
+      onComplete,
+      onError,
+      makeRequest,
+    ],
   )
 
   // Analyze a batch of texts
@@ -344,16 +370,20 @@ export function useSentimentAnalysis({
         // Process in chunks
         for (let i = 0; i < texts.length; i += batchSize) {
           const chunk = texts.slice(i, i + batchSize)
-          
+
           const response = await makeRequest({ batch: chunk })
-          const chunkResults = await response.json() as SentimentAnalysisResult[]
+          const chunkResults =
+            (await response.json()) as SentimentAnalysisResult[]
 
           batchResults.push(...chunkResults)
-          setResults(prev => [...prev, ...chunkResults])
-          setSuccessCount(prev => prev + chunkResults.length)
+          setResults((prev) => [...prev, ...chunkResults])
+          setSuccessCount((prev) => prev + chunkResults.length)
 
           // Update progress
-          const currentProgress = Math.min(((i + chunk.length) / texts.length) * 100, 100)
+          const currentProgress = Math.min(
+            ((i + chunk.length) / texts.length) * 100,
+            100,
+          )
           setProgress(currentProgress)
 
           if (onProgress) {
@@ -361,7 +391,7 @@ export function useSentimentAnalysis({
           }
         }
 
-        setTotalAnalyzed(prev => prev + batchResults.length)
+        setTotalAnalyzed((prev) => prev + batchResults.length)
 
         if (onBatchComplete) {
           onBatchComplete(batchResults, failedCount)
@@ -370,9 +400,11 @@ export function useSentimentAnalysis({
         return batchResults
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? (err as Error)?.message || String(err) : 'Failed to analyze sentiment batch'
+          err instanceof Error
+            ? (err as Error)?.message || String(err)
+            : 'Failed to analyze sentiment batch'
         setError(errorMessage)
-        setFailureCount(prev => prev + texts.length - batchResults.length)
+        setFailureCount((prev) => prev + texts.length - batchResults.length)
 
         if (onError && err instanceof Error) {
           onError(err)
@@ -383,14 +415,18 @@ export function useSentimentAnalysis({
         setIsAnalyzing(false)
       }
     },
-    [isLoading, batchSize, onProgress, onBatchComplete, onError, makeRequest]
+    [isLoading, batchSize, onProgress, onBatchComplete, onError, makeRequest],
   )
 
   // Analyze texts as a stream
   const analyzeStream = useCallback(
     async function* (
-      texts: string[]
-    ): AsyncGenerator<SentimentAnalysisResult, SentimentAnalysisResult[], unknown> {
+      texts: string[],
+    ): AsyncGenerator<
+      SentimentAnalysisResult,
+      SentimentAnalysisResult[],
+      unknown
+    > {
       if (texts.length === 0 || isLoading) {
         return []
       }
@@ -405,14 +441,14 @@ export function useSentimentAnalysis({
       try {
         for (let i = 0; i < texts.length; i++) {
           const text = texts[i]
-          
+
           try {
             const response = await makeRequest({ text })
-            const data = await response.json() as SentimentAnalysisResult
+            const data = (await response.json()) as SentimentAnalysisResult
 
             streamResults.push(data)
-            setResults(prev => [...prev, data])
-            setSuccessCount(prev => prev + 1)
+            setResults((prev) => [...prev, data])
+            setSuccessCount((prev) => prev + 1)
 
             // Update progress
             const currentProgress = ((i + 1) / texts.length) * 100
@@ -424,30 +460,31 @@ export function useSentimentAnalysis({
 
             yield data
           } catch (err: unknown) {
-            setFailureCount(prev => prev + 1)
+            setFailureCount((prev) => prev + 1)
             console.warn(`Failed to analyze text ${i + 1}:`, err)
           }
         }
 
-        setTotalAnalyzed(prev => prev + streamResults.length)
+        setTotalAnalyzed((prev) => prev + streamResults.length)
         return streamResults
       } finally {
         setIsLoading(false)
         setIsAnalyzing(false)
       }
     },
-    [isLoading, onProgress, makeRequest]
+    [isLoading, onProgress, makeRequest],
   )
 
   // Re-analyze the last text
-  const reanalyzeLastText = useCallback(async (): Promise<SentimentAnalysisResult | null> => {
-    if (!lastTextRef.current) {
-      setError('No previous text to re-analyze')
-      return null
-    }
+  const reanalyzeLastText =
+    useCallback(async (): Promise<SentimentAnalysisResult | null> => {
+      if (!lastTextRef.current) {
+        setError('No previous text to re-analyze')
+        return null
+      }
 
-    return analyzeText(lastTextRef.current)
-  }, [analyzeText])
+      return analyzeText(lastTextRef.current)
+    }, [analyzeText])
 
   // Generate insights from current results
   const getInsights = useCallback((): SentimentInsights => {

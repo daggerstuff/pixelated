@@ -218,9 +218,7 @@
               "mode": "thresholds"
             },
             "thresholds": {
-              "steps": [
-                { "color": "green", "value": 0 }
-              ]
+              "steps": [{ "color": "green", "value": 0 }]
             }
           }
         },

@@ -457,9 +457,7 @@ class ProductionManager {
     }
   }
 
-  private async checkEndpoint(
-    url: string,
-  ): Promise<{
+  private async checkEndpoint(url: string): Promise<{
     status: 'pass' | 'fail' | 'warn'
     responseTime: number
     lastChecked: Date
@@ -498,9 +496,7 @@ class ProductionManager {
     }
   }
 
-  private async checkDatabaseConnection(
-    environment: string,
-  ): Promise<{
+  private async checkDatabaseConnection(environment: string): Promise<{
     status: 'pass' | 'fail' | 'warn'
     responseTime: number
     lastChecked: Date
@@ -510,9 +506,7 @@ class ProductionManager {
     return { status: 'pass', responseTime: 12, lastChecked: new Date() }
   }
 
-  private async checkRealtimeService(
-    environment: string,
-  ): Promise<{
+  private async checkRealtimeService(environment: string): Promise<{
     status: 'pass' | 'fail' | 'warn'
     responseTime: number
     lastChecked: Date

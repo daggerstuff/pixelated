@@ -247,7 +247,10 @@ const image = frontmatter?.image || propImage
     </style>
   </head>
 
-  <body class="enhanced-dark-theme min-h-screen font-sans antialiased" style="background: var(--bg-primary); color: var(--text-primary);">
+  <body
+    class="enhanced-dark-theme min-h-screen font-sans antialiased"
+    style="background: var(--bg-primary); color: var(--text-primary);"
+  >
     <Header />
 
     <div class="container-refined py-12 flex flex-col md:flex-row gap-8">
@@ -255,7 +258,9 @@ const image = frontmatter?.image || propImage
       <aside class="md:w-64 shrink-0 glass-panel p-6" transition:persist>
         <div class="sticky top-24">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-lg" style="color: var(--text-primary);">Documentation</h3>
+            <h3 class="font-bold text-lg" style="color: var(--text-primary);">
+              Documentation
+            </h3>
             <ThemeToggle />
           </div>
 
@@ -288,11 +293,16 @@ const image = frontmatter?.image || propImage
           </nav>
 
           <!-- On this page navigation (generated from headings) -->
-          <div class="mt-8 pt-8 border-t" style="border-color: var(--border-primary);">
-            <h4 class="eyebrow-text mb-3">
-              ON THIS PAGE
-            </h4>
-            <div class="text-sm space-y-2" id="on-this-page" style="color: var(--text-muted);">
+          <div
+            class="mt-8 pt-8 border-t"
+            style="border-color: var(--border-primary);"
+          >
+            <h4 class="eyebrow-text mb-3">ON THIS PAGE</h4>
+            <div
+              class="text-sm space-y-2"
+              id="on-this-page"
+              style="color: var(--text-muted);"
+            >
               <!-- This will be populated by JS -->
             </div>
           </div>
@@ -310,7 +320,11 @@ const image = frontmatter?.image || propImage
             <h1 class="display-heading mb-6" transition:name="doc-title">
               {title}
             </h1>
-            <p class="lede-text" transition:name="doc-desc" style="color: var(--text-secondary);">
+            <p
+              class="lede-text"
+              transition:name="doc-desc"
+              style="color: var(--text-secondary);"
+            >
               {description}
             </p>
           </header>

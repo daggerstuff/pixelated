@@ -52,7 +52,7 @@ interface CarouselContentResponse {
 /**
  * Carousel Content API
  * GET /api/components/ui/carousel-content
- * 
+ *
  * Provides dynamic content and configurations for SwiperCarousel components
  */
 export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
@@ -78,17 +78,22 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     const includeExpired = url.searchParams.get('includeExpired') === 'true'
 
     // Generate carousel configurations based on therapy platform needs
-    const configurations = generateCarouselConfigurations(audience, includeExpired)
+    const configurations = generateCarouselConfigurations(
+      audience,
+      includeExpired,
+    )
 
     // Filter by specific configuration if requested
     let filteredConfigurations = configurations
     if (configId) {
-      filteredConfigurations = configurations.filter(config => config.id === configId)
+      filteredConfigurations = configurations.filter(
+        (config) => config.id === configId,
+      )
     }
 
     if (category) {
-      filteredConfigurations = filteredConfigurations.filter(config =>
-        config.items.some(item => item.metadata?.category === category)
+      filteredConfigurations = filteredConfigurations.filter((config) =>
+        config.items.some((item) => item.metadata?.category === category),
       )
     }
 
@@ -111,12 +116,11 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'private, max-age=1800', // 30-minute cache
       },
     })
-
   } catch (error: unknown) {
     logger.error('Error retrieving carousel content', { error })
 
@@ -136,7 +140,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for creating/updating carousel configurations
  */
-export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async (
+  context: AuthAPIContext,
+) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -165,7 +171,11 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
     }
 
     // Validate configuration structure
-    if (!configuration.name || !configuration.items || !Array.isArray(configuration.items)) {
+    if (
+      !configuration.name ||
+      !configuration.items ||
+      !Array.isArray(configuration.items)
+    ) {
       return new Response(
         JSON.stringify({ error: 'Invalid configuration format' }),
         {
@@ -221,16 +231,18 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
       userId: user.id,
     })
 
-    return new Response(JSON.stringify({
-      success: true,
-      configuration: processedConfiguration,
-      action,
-      timestamp,
-    }), {
-      status: action === 'create' ? 201 : 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        configuration: processedConfiguration,
+        action,
+        timestamp,
+      }),
+      {
+        status: action === 'create' ? 201 : 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   } catch (error: unknown) {
     logger.error('Error processing carousel configuration', { error })
 
@@ -248,7 +260,10 @@ export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => 
 })
 
 // Helper function to generate carousel configurations
-function generateCarouselConfigurations(audience: string, includeExpired: boolean): CarouselConfiguration[] {
+function generateCarouselConfigurations(
+  audience: string,
+  includeExpired: boolean,
+): CarouselConfiguration[] {
   const now = new Date()
   const currentTime = now.toISOString()
 
@@ -271,7 +286,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'onboard-1',
           title: 'Welcome to Your Healing Journey',
           description: 'Discover a safe space for growth and recovery',
-          content: 'Begin your personalized therapy experience with our AI-powered platform designed to support your mental health journey.',
+          content:
+            'Begin your personalized therapy experience with our AI-powered platform designed to support your mental health journey.',
           metadata: {
             priority: 1,
             category: 'onboarding',
@@ -284,7 +300,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'onboard-2',
           title: 'Your Privacy Comes First',
           description: 'Learn about our enterprise-grade security measures',
-          content: 'We use advanced encryption and privacy-preserving technologies to ensure your personal information remains completely confidential.',
+          content:
+            'We use advanced encryption and privacy-preserving technologies to ensure your personal information remains completely confidential.',
           metadata: {
             priority: 2,
             category: 'onboarding',
@@ -297,7 +314,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'onboard-3',
           title: 'Personalized Treatment Plans',
           description: 'AI-powered therapy tailored to your unique needs',
-          content: 'Our platform creates customized treatment plans based on your goals, preferences, and progress.',
+          content:
+            'Our platform creates customized treatment plans based on your goals, preferences, and progress.',
           metadata: {
             priority: 3,
             category: 'onboarding',
@@ -310,7 +328,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'onboard-4',
           title: 'Track Your Progress',
           description: 'Visualize your growth with advanced analytics',
-          content: 'Monitor your emotional well-being with our 3D visualization tools and comprehensive progress tracking.',
+          content:
+            'Monitor your emotional well-being with our 3D visualization tools and comprehensive progress tracking.',
           metadata: {
             priority: 4,
             category: 'onboarding',
@@ -414,7 +433,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'insight-1',
           title: 'Patient Progress Summary',
           description: 'Weekly overview of patient improvements',
-          content: 'This week: 15% improvement in anxiety scores, 23% increase in session engagement',
+          content:
+            'This week: 15% improvement in anxiety scores, 23% increase in session engagement',
           metadata: {
             priority: 1,
             category: 'insights',
@@ -427,7 +447,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'insight-2',
           title: 'AI Recommendations',
           description: 'Personalized treatment suggestions',
-          content: 'Recommended interventions based on recent patient interactions and progress patterns',
+          content:
+            'Recommended interventions based on recent patient interactions and progress patterns',
           metadata: {
             priority: 2,
             category: 'insights',
@@ -440,7 +461,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'insight-3',
           title: 'Research Updates',
           description: 'Latest findings in digital therapy',
-          content: 'New research shows 40% improvement in outcomes with AI-assisted therapy protocols',
+          content:
+            'New research shows 40% improvement in outcomes with AI-assisted therapy protocols',
           metadata: {
             priority: 3,
             category: 'insights',
@@ -470,7 +492,8 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
           id: 'story-1',
           title: 'Overcoming Anxiety',
           description: 'How Sarah reduced her anxiety by 70% in 8 weeks',
-          content: 'Using mindfulness techniques and cognitive restructuring, Sarah successfully managed her panic attacks and returned to normal activities.',
+          content:
+            'Using mindfulness techniques and cognitive restructuring, Sarah successfully managed her panic attacks and returned to normal activities.',
           metadata: {
             priority: 1,
             category: 'testimonials',
@@ -482,8 +505,9 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
         {
           id: 'story-2',
           title: 'Depression Recovery',
-          description: 'Michael\'s journey from isolation to connection',
-          content: 'Through our social skills training and peer support groups, Michael rebuilt his social network and found renewed purpose.',
+          description: "Michael's journey from isolation to connection",
+          content:
+            'Through our social skills training and peer support groups, Michael rebuilt his social network and found renewed purpose.',
           metadata: {
             priority: 2,
             category: 'testimonials',
@@ -495,8 +519,9 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
         {
           id: 'story-3',
           title: 'PTSD Healing',
-          description: 'Jessica\'s path to trauma recovery',
-          content: 'Using EMDR therapy and trauma-informed care, Jessica processed her experiences and reclaimed her sense of safety.',
+          description: "Jessica's path to trauma recovery",
+          content:
+            'Using EMDR therapy and trauma-informed care, Jessica processed her experiences and reclaimed her sense of safety.',
           metadata: {
             priority: 3,
             category: 'testimonials',
@@ -511,19 +536,22 @@ function generateCarouselConfigurations(audience: string, includeExpired: boolea
 
   // Filter by audience and expiry
   return configurations
-    .filter(config => 
-      audience === 'all' || 
-      config.items.some(item => 
-        item.metadata?.targetAudience.includes(audience) || 
-        item.metadata?.targetAudience.includes('all')
-      )
+    .filter(
+      (config) =>
+        audience === 'all' ||
+        config.items.some(
+          (item) =>
+            item.metadata?.targetAudience.includes(audience) ||
+            item.metadata?.targetAudience.includes('all'),
+        ),
     )
-    .map(config => ({
+    .map((config) => ({
       ...config,
-      items: config.items.filter(item => {
-        const isExpired = item.metadata?.expiryDate && new Date(item.metadata.expiryDate) < now
+      items: config.items.filter((item) => {
+        const isExpired =
+          item.metadata?.expiryDate && new Date(item.metadata.expiryDate) < now
         return includeExpired || !isExpired
       }),
     }))
-    .filter(config => config.items.length > 0)
+    .filter((config) => config.items.length > 0)
 }

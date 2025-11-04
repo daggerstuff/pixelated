@@ -44,10 +44,18 @@ export const getAllTestScenarios = () => {
  */
 export const getBiasTestScenarios = () => {
   return {
-    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['ageBiasYoungPatient'],
-    genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.['genderBiasFemalePatient'],
-    racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.['racialBiasMinorityPatient'],
-    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.['socioeconomicBiasLowIncomePatient'],
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.[
+      'ageBiasYoungPatient'
+    ],
+    genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.[
+      'genderBiasFemalePatient'
+    ],
+    racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.[
+      'racialBiasMinorityPatient'
+    ],
+    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.[
+      'socioeconomicBiasLowIncomePatient'
+    ],
     ageBiasElderlyPatient,
   }
 }
@@ -64,7 +72,9 @@ export const getBaselineTestScenarios = () => {
   } = {
     baselineAnxietyScenario: (baselineScenarios as unknown)?.['anxiety'],
     baselineDepressionScenario: (baselineScenarios as unknown)?.['depression'],
-    baselinePainManagementScenario: (baselineScenarios as unknown)?.['painManagement'],
+    baselinePainManagementScenario: (baselineScenarios as unknown)?.[
+      'painManagement'
+    ],
   }
 
   return [
@@ -81,12 +91,13 @@ export const getBaselineTestScenarios = () => {
  * but different demographic characteristics.
  */
 export const getComparativeBiasScenarios = () => {
-  const {
-    ageBiasYoungPatient,
-    ageBiasElderlyPatient,
-  } = {
-    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.['young'],
-    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.['elderly'],
+  const { ageBiasYoungPatient, ageBiasElderlyPatient } = {
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.[
+      'young'
+    ],
+    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.[
+      'elderly'
+    ],
   }
 
   return [
