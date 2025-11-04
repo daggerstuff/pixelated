@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { flushSync } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import '@/styles/login-form-responsive.css'
 
@@ -120,11 +121,12 @@ export function LoginForm({
       }
     }
 
-    // Set errors immediately - React will batch this but we ensure it's set
-    setErrors(newErrors)
+    // Set errors immediately using flushSync to ensure synchronous update
+    // This is critical for tests and ensures React processes the state update
+    flushSync(() => {
+      setErrors(newErrors)
+    })
 
-    // Force a synchronous state update check by using flushSync if available
-    // Otherwise rely on React's normal batching
     return Object.keys(newErrors).length === 0
   }
 
@@ -186,27 +188,16 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate form first - this will set errors state
-    // Ensure validation always runs and errors are set before checking validity
+    // Validate form first - this will set errors state using flushSync
+    // to ensure React processes the state update synchronously
     const isValid = validateForm()
 
     if (!isValid) {
-      // Errors have been set by validateForm()
-      // Force a re-render by updating state in a way that ensures React processes it
-      // Use a small delay to ensure React has processed the state update
-      await new Promise((resolve) => setTimeout(resolve, 0))
-      
-      // Notify user but let React render errors
+      // Errors have been set by validateForm() using flushSync
+      // Notify user about validation errors
       setToastMessage({
         type: 'error',
         message: 'Please correct the form errors',
-      })
-      
-      // Ensure errors are visible - trigger a state update to force render
-      // This helps with test timing issues
-      setErrors((prev) => {
-        // Return a new object to ensure React sees the change
-        return { ...prev }
       })
       return
     }
@@ -476,9 +467,13 @@ export function LoginForm({
         <button
           type="button"
           onClick={() => {
-            setMode('reset')
-            // Clear errors when switching modes
-            setErrors({})
+            // Use flushSync to ensure state update is processed synchronously
+            // This fixes timing issues in tests
+            flushSync(() => {
+              setMode('reset')
+              // Clear errors when switching modes
+              setErrors({})
+            })
           }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
           data-testid="forgot-password-button"
