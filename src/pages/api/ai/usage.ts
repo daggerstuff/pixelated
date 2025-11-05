@@ -20,7 +20,7 @@ const rateLimiter = new RateLimiter(30, 60 * 1000)
  * Rate limited to prevent abuse
  */
 export const GET: APIRoute = async ({ request }) => {
-  let session
+  let session: any
 
   try {
     // Verify session

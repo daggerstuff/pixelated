@@ -40,7 +40,7 @@ export const POST = async ({ request }) => {
     if (validationErrors.length > 0) {
       const error: AnalyticsError = {
         code: 'VALIDATION_ERROR',
-        message: 'Invalid analytics event data',
+        errorMessage: 'Invalid analytics event data',
         details: validationErrors,
       }
       return new Response(JSON.stringify(error), {
@@ -87,7 +87,7 @@ export const POST = async ({ request }) => {
     })
 
     // Only call analytics integrations if credentials are present
-    const analyticsPromises = []
+    const analyticsPromises: Promise<void>[] = []
     if (hasGA) {
       analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent))
     }
@@ -113,7 +113,7 @@ export const POST = async ({ request }) => {
 
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
-      message: 'Failed to process analytics event',
+      errorMessage: 'Failed to process analytics event',
       details: {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
@@ -171,7 +171,7 @@ export const GET = async ({ url }) => {
 
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
-      message: 'Failed to retrieve analytics data',
+      errorMessage: 'Failed to retrieve analytics data',
       details: {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
@@ -257,8 +257,6 @@ async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
       properties: {
         token: MIXPANEL_TOKEN,
         distinct_id: event.session_id,
-        ab_variant: event.ab_variant,
-        page: event.page,
         time: Math.floor(event.timestamp / 1000),
         ...event,
       },

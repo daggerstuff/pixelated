@@ -161,13 +161,17 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
   }
 }
 
-export const POST = async ({ request, locals }) => {
+import type { APIContext } from "astro";
+
+export const POST = async (context: APIContext) => {
+  const { request, locals } = context;
   // Apply admin middleware to check for admin status and required permission
-  const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)({
-    request,
-    locals,
-  })
-  if (middlewareResponse) {
+  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
+  const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)(
+    context,
+    next
+  )
+  if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
   try {
@@ -211,21 +215,22 @@ export const POST = async ({ request, locals }) => {
     }
 
     // Log the audit event for security purposes
+    const auditDetails = {
+      // Include relevant details from the result
+      success: result.success,
+      message: result.message,
+      resourcesProcessed: result.details?.resourcesProcessed,
+      warnings: result.details?.warnings?.join(', ') || 'None',
+      errors: result.details?.errors?.join(', ') || 'None',
+      durationMs: result.details?.durationMs,
+      note: 'Recovery test initiated.',
+    };
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_initiated',
       userId,
       'recovery-test',
-      {
-        // Include relevant details from the result
-        success: result.success,
-        message: result.message,
-        resourcesProcessed: result.details?.resourcesProcessed,
-        warnings: result.details?.warnings?.join(', ') || 'None',
-        errors: result.details?.errors?.join(', ') || 'None',
-        durationMs: result.details?.durationMs,
-        note: 'Recovery test initiated.',
-      },
+      auditDetails,
     )
 
     return new Response(JSON.stringify(result), {
@@ -242,15 +247,16 @@ export const POST = async ({ request, locals }) => {
     console.error(`[RecoveryTest] Error for user ${userId}:`, error)
 
     // Log to audit with sanitized error information
+    const auditDetails = {
+      error: errorMessage,
+      // Do not include stack trace in audit logs for security
+    };
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_failed',
       userId,
       'recovery-test',
-      {
-        error: errorMessage,
-        // Do not include stack trace in audit logs for security
-      },
+      auditDetails,
     )
 
     // Return generic error message to client

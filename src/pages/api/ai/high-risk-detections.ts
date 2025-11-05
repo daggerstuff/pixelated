@@ -8,7 +8,7 @@ import { getSession } from '../../../lib/auth/session.js'
 import { aiRepository } from '@/lib/db/ai'
 
 export const GET = async ({ request, url }) => {
-  let session
+  let session: any
 
   try {
     // Verify session

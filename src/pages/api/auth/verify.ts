@@ -1,5 +1,6 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AuditEventType, createAuditLog } from '@/lib/audit'
+import type { APIContext } from 'astro'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { AuditEventType, createAuditLog } from '../../../lib/audit'
 
 const logger = createBuildSafeLogger('auth-verify')
 
@@ -54,13 +55,14 @@ export const GET = async ({ request }: APIContext) => {
 
     // Log successful verification
     if (result.data.user) {
-      await createAuditLog({
-        userId: result.data.user.id,
-        action: AuditEventType.AUTH_VERIFY,
-        resourceType: 'auth',
-        resourceId: result.data.user.id,
-        metadata: { type },
-      })
+      const user = result.data.user as any
+      await createAuditLog(
+        AuditEventType.SECURITY,
+        'user_verified',
+        user.id,
+        'auth',
+        { type },
+      )
     }
 
     return new Response(

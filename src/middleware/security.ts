@@ -113,6 +113,15 @@ export const InputValidator = {
   validateSessionId,
 }
 
+export const RATE_LIMITS = {
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 100, // limit each IP to 100 requests per windowMs
+  keyGenerator: (request: Request): string => {
+    // Use x-forwarded-for header, or fallback to a default for local dev
+    return request.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1'
+  },
+};
+
 class RateLimiter {
   private requests = new Map<string, { count: number; resetTime: number }>()
 
@@ -173,9 +182,6 @@ export async function securityMiddleware(
   request: Request,
   context: Record<string, unknown>,
 ): Promise<Response | null> {
-  const _url = new URL(request.url)
-  const _method = request.method
-
   const clientIP = RATE_LIMITS.keyGenerator(request)
   const rateLimitResult = rateLimiter.checkLimit(clientIP)
 
@@ -315,4 +321,4 @@ export const HIPAACompliance = {
   generateAuditLog,
 }
 
-export { SECURITY_HEADERS, RATE_LIMITS, REQUEST_LIMITS, CORS_CONFIG }
+export { SECURITY_HEADERS, RATE_LIMITS }

@@ -18,7 +18,13 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     // Authenticate the request
-    const authResult = await isAuthenticated(request)
+    const authResult = await isAuthenticated(request as any)
+    if (!authResult) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     const userKey =
       authResult['authenticated'] && authResult['user']?.['id']
         ? `user:${authResult['user']['id']}`
@@ -47,7 +53,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (!authResult['user']?.['isAdmin']) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
-        AuditEventType.SECURITY_EVENT,
+        AuditEventType.SECURITY,
         'validation-pipeline-results-unauthorized',
         authResult['user']?.['id'] || 'unknown',
         'validation-api',
@@ -107,7 +113,7 @@ export const GET: APIRoute = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, private',
-        'ETag': `"validation-${validationResults.length}-${validationStats.runCount}"`,
+        'ETag': `"validation-${validationResults.length}-${validationStats.metrics.processed}"`,
       },
     })
   } catch (error: unknown) {

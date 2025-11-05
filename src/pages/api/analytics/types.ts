@@ -1,4 +1,4 @@
-import type { APIError } from '@/lib/types/api'
+import type { APIError } from '@/lib/api-client'
 
 // Base analytics event interface
 export interface BaseAnalyticsEvent {
@@ -95,6 +95,7 @@ export interface EngagementMetrics {
 // Error handling interfaces
 export interface AnalyticsValidationError extends APIError {
   code: 'VALIDATION_ERROR'
+  errorMessage: string
   details: {
     field: string
     message: string
@@ -103,6 +104,7 @@ export interface AnalyticsValidationError extends APIError {
 
 export interface AnalyticsProcessingError extends APIError {
   code: 'PROCESSING_ERROR'
+  errorMessage: string
   details: {
     source: string
     message: string

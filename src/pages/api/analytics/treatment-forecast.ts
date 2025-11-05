@@ -2,24 +2,22 @@
 import { z } from 'zod'
 import { recommend } from '@/lib/ai/services/OutcomeRecommendationEngine'
 import { collectContext } from '@/lib/ai/services/ContextualAwarenessService'
+import {
+  TherapySessionSchema,
+  ChatSessionSchema,
+  EmotionStateSchema,
+  MentalHealthAnalysisSchema
+} from '@/lib/ai/services/outcome-recommendation-types';
+
 
 // Input schema for validation
 const ForecastRequestSchema = z.object({
-  session: z.object({
-    sessionId: z.string(),
-    clientId: z.string(),
-    therapistId: z.string(),
-    startTime: z.string(),
-    endTime: z.string().optional(),
-    status: z.string(),
-    securityLevel: z.string(),
-    emotionAnalysisEnabled: z.boolean(),
-  }),
-  chatSession: z.object({}).passthrough(), // Accept any chat session structure
-  recentEmotionState: z.object({}).passthrough().nullable(),
+  session: TherapySessionSchema,
+  chatSession: ChatSessionSchema,
+  recentEmotionState: EmotionStateSchema.nullable(),
   recentInterventions: z.array(z.string()),
-  userPreferences: z.record(z.unknown()).optional(),
-  mentalHealthAnalysis: z.object({}).passthrough().optional(),
+  userPreferences: z.record(z.string(), z.unknown()).optional(),
+  mentalHealthAnalysis: MentalHealthAnalysisSchema.optional(),
   desiredOutcomes: z.array(z.string()).min(1),
   maxResults: z.number().min(1).max(10).optional(),
 })
@@ -33,7 +31,7 @@ export const post = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Invalid input',
-          details: parsed.error.errors,
+          details: parsed.error.flatten(),
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

@@ -41,18 +41,18 @@ export const GET = async ({ request }: { request: Request }) => {
 
     if (categoryFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique) => technique.data.category === categoryFilter,
+        (technique: any) => technique.data.category === categoryFilter,
       )
     }
 
     if (evidenceFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique) => technique.data.evidenceLevel === evidenceFilter,
+        (technique: any) => technique.data.evidenceLevel === evidenceFilter,
       )
     }
 
     // Transform for API response
-    const responseData = filteredTechniques.map((technique) => ({
+    const responseData = filteredTechniques.map((technique: any) => ({
       id: technique.id,
       slug: technique.slug,
       title: technique.data.title,

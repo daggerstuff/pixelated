@@ -50,6 +50,12 @@ export const GET = async ({ request }: APIContext) => {
         },
       )
     }
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const user = (await adapter.getUserById(userId)) as unknown as {
       _id?: { toString(): string }

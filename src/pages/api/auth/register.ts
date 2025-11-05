@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Apply rate limiting
     const rateLimitResult = await rateLimitMiddleware(
-      request,
+      request as any,
       'register',
       3, // 3 registrations per hour per IP
       60,
@@ -69,10 +69,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const result = await registerWithBetterAuth(sanitizedData, clientInfo)
 
     // Log successful registration
-    await logSecurityEvent('USER_REGISTERED', result.user.id, {
+    await logSecurityEvent('access', {
+      userId: result.user.id,
+      clientInfo,
       email: result.user.email,
       role: result.user.role,
-      clientInfo,
       timestamp: Date.now(),
     })
 
@@ -100,10 +101,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: any) {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      await logSecurityEvent('USER_REGISTRATION_FAILED', null, {
+      await logSecurityEvent('error', {
         error: error.message,
         clientInfo,
         timestamp: Date.now(),
@@ -126,7 +127,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle unexpected errors
     console.error('Registration error:', error)
 
-    await logSecurityEvent('USER_REGISTRATION_ERROR', null, {
+    await logSecurityEvent('error', {
       error: error.message,
       clientInfo,
       timestamp: Date.now(),

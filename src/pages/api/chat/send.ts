@@ -1,4 +1,5 @@
-// import type { APIRoute, APIContext } from 'astro'
+import type { APIContext } from 'astro'
+import { v4 as uuidv4 } from 'uuid'
 // Import the FHE chat library
 import { fheChat } from '../../../lib/chat/fheChat'
 
@@ -12,14 +13,14 @@ interface ChatMessageRequest {
 }
 
 // Define the message sending handler with FHE secure processing
-export const POST = async ({ request }) => {
+export const POST = async ({ request }: APIContext) => {
   const body = (await request.json()) as ChatMessageRequest
 
   // ... existing message validation logic
 
   // Create message data
   const messageData = {
-    id: `msg-${crypto.randomUUID()}`,
+    id: `msg-${uuidv4()}`,
     conversationId: body.conversationId,
     senderId: body.userId,
     content: body.message,
