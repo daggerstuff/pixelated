@@ -166,14 +166,11 @@ export async function setupTwoFactorAuth(
     )
 
     // Log setup initiation
-    await logSecurityEvent(
-      SecurityEventType.TWO_FACTOR_SETUP_INITIATED,
-      userId,
-      {
-        deviceId: deviceInfo.deviceId,
-        deviceName: deviceInfo.deviceName,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_INITIATED, {
+      userId: userId,
+      deviceId: deviceInfo.deviceId,
+      deviceName: deviceInfo.deviceName,
+    })
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_initiated')
@@ -185,7 +182,8 @@ export async function setupTwoFactorAuth(
       setupComplete: false,
     }
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_FAILED, userId, {
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_FAILED, {
+      userId: userId,
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
@@ -252,19 +250,17 @@ export async function completeTwoFactorSetup(
     await removeFromCache(`2fa:setup:${userId}`)
 
     // Log successful setup
-    await logSecurityEvent(
-      SecurityEventType.TWO_FACTOR_SETUP_COMPLETED,
-      userId,
-      {
-        deviceId: deviceInfo.deviceId,
-        deviceName: deviceInfo.deviceName,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_COMPLETED, {
+      userId: userId,
+      deviceId: deviceInfo.deviceId,
+      deviceName: deviceInfo.deviceName,
+    })
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_completed')
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_FAILED, userId, {
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_SETUP_FAILED, {
+      userId: userId,
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
@@ -345,17 +341,16 @@ export async function verifyTwoFactorToken(
           60 * 60,
         ) // 1 hour
 
-        await logSecurityEvent(SecurityEventType.ACCOUNT_LOCKED, userId, {
+        await logSecurityEvent(SecurityEventType.ACCOUNT_LOCKED, {
+          userId: userId,
           reason: '2fa_failed_attempts',
           attempts: attempts.count,
         })
       }
 
-      await logSecurityEvent(
-        SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED,
-        userId,
-        {
-          method: verificationMethod,
+      await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED, {
+        userId: userId,
+        method: verificationMethod,
           deviceId,
           attempts: attempts.count,
         },
@@ -384,28 +379,22 @@ export async function verifyTwoFactorToken(
     }
 
     // Log successful verification
-    await logSecurityEvent(
-      SecurityEventType.TWO_FACTOR_VERIFICATION_SUCCESS,
-      userId,
-      {
-        method: verificationMethod,
-        deviceId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_SUCCESS, {
+      userId: userId,
+      method: verificationMethod,
+      deviceId,
+    })
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_verification_success')
 
     return true
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED,
-      userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        deviceId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_VERIFICATION_FAILED, {
+      userId: userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      deviceId,
+    })
 
     throw error instanceof AuthenticationError
       ? error
@@ -438,7 +427,8 @@ async function verifyBackupCode(
   await setInCache(`2fa:config:${userId}`, config, 365 * 24 * 60 * 60)
 
   // Log backup code usage
-  await logSecurityEvent(SecurityEventType.BACKUP_CODE_USED, userId, {
+  await logSecurityEvent(SecurityEventType.BACKUP_CODE_USED, {
+    userId: userId,
     codesRemaining: config.backupCodes.length,
   })
 
@@ -501,12 +491,14 @@ export async function addTrustedDevice(
     await setInCache(trustedKey, trustedDevices, 365 * 24 * 60 * 60) // 1 year
 
     // Log device trust
-    await logSecurityEvent(SecurityEventType.DEVICE_TRUSTED, userId, {
+    await logSecurityEvent(SecurityEventType.DEVICE_TRUSTED, {
+      userId: userId,
       deviceId: deviceInfo.deviceId,
       deviceName: deviceInfo.deviceName,
     })
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.DEVICE_TRUST_FAILED, userId, {
+    await logSecurityEvent(SecurityEventType.DEVICE_TRUST_FAILED, {
+      userId: userId,
       error: error instanceof Error ? error.message : 'Unknown error',
       deviceId: deviceInfo.deviceId,
     })
@@ -615,7 +607,8 @@ export async function disableTwoFactorAuth(
     await removeFromCache(`2fa:lockout:${userId}`)
 
     // Log 2FA disable
-    await logSecurityEvent(SecurityEventType.TWO_FACTOR_DISABLED, userId, {
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_DISABLED, {
+      userId: userId,
       deviceId: deviceInfo.deviceId,
       deviceName: deviceInfo.deviceName,
     })
@@ -623,14 +616,11 @@ export async function disableTwoFactorAuth(
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(userId, '2fa_disabled')
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.TWO_FACTOR_DISABLE_FAILED,
-      userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        deviceId: deviceInfo.deviceId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.TWO_FACTOR_DISABLE_FAILED, {
+      userId: userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      deviceId: deviceInfo.deviceId,
+    })
 
     throw error instanceof AuthenticationError
       ? error
@@ -675,17 +665,16 @@ export async function generateNewBackupCodes(
     await setInCache(`2fa:config:${userId}`, config, 365 * 24 * 60 * 60)
 
     // Log backup code generation
-    await logSecurityEvent(SecurityEventType.BACKUP_CODES_GENERATED, userId, {
+    await logSecurityEvent(SecurityEventType.BACKUP_CODES_GENERATED, {
+      userId: userId,
       codesGenerated: newCodes.length,
     })
 
     return newCodes
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.BACKUP_CODES_GENERATION_FAILED,
-      userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
+    await logSecurityEvent(SecurityEventType.BACKUP_CODES_GENERATION_FAILED, {
+      userId: userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
       },
     )
 

@@ -9,7 +9,7 @@ import { randomUUID, createHmac } from 'crypto'
 import type { RedisClientType } from 'redis'
 import { getRedisClient } from '../redis'
 
-import { BetterAuthIntegrationService } from './better-auth-integration'
+import { getUserById } from './better-auth-integration'
 import { Phase6IntegrationService } from './phase6-integration'
 import { SecurityEventLogger } from './security-event-logger'
 import { TokenRevocationService } from './token-revocation-service'
@@ -105,7 +105,6 @@ export interface JWTTokenServiceConfig {
  */
 export class JWTTokenService {
   private redis: RedisClientType
-  private betterAuth: BetterAuthIntegrationService
   private phase6: Phase6IntegrationService
   private securityLogger: SecurityEventLogger
   private revocationService: TokenRevocationService
@@ -115,7 +114,6 @@ export class JWTTokenService {
   constructor(config: JWTTokenServiceConfig) {
     this.config = config
     this.redis = getRedisClient()
-    this.betterAuth = new BetterAuthIntegrationService()
     this.phase6 = new Phase6IntegrationService()
     this.securityLogger = new SecurityEventLogger()
     this.revocationService = new TokenRevocationService()
@@ -139,8 +137,8 @@ export class JWTTokenService {
       }
 
       // Validate user exists and is active
-      const user = await this.betterAuth.getUserById(userId)
-      if (!user || user.status !== 'active') {
+      const user = getUserById(userId)
+      if (!user || user.authenticationStatus !== 'authenticated') {
         throw new AuthenticationError('User account is not active')
       }
 

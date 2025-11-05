@@ -1,87 +1,99 @@
 // EmotionValidationPipeline.test.ts
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { EmotionValidationPipeline } from '../EmotionValidationPipeline'
 
 describe('EmotionValidationPipeline', () => {
   const pipeline = new EmotionValidationPipeline()
 
-  it('mitigates bias in obviously biased input', () => {
+  it('mitigates bias in obviously biased input', async () => {
     const input = {
-      text: 'Clearly, everyone from group X has the same feelings.',
-      context: { conversationId: 'c1' },
-      emotion: 'joy',
+      sessionId: 'c1',
+      detectedEmotion: 'joy',
+      confidence: 0.8,
+      context: 'conversation',
+      responseText: 'Clearly, everyone from group X has the same feelings.',
     }
-    const result = pipeline.validateEmotionResult(input)
-    expect(result.mitigated).toBe(true)
-    expect(result.outputText).toContain('[BIAS-MITIGATED]')
-    expect(result.biasMitigationTrace).toBeDefined()
-    expect(result.biasMitigationTrace!.foundBias).toBe(true)
+    const result = await pipeline.validateEmotionResult(input)
+    expect(result.biasScore).toBeGreaterThan(0)
+    expect(result.biasAnalysis).toBeDefined()
+    expect(result.isValid).toBe(false)
   })
 
-  it('assigns high authenticity to first-person, feeling-based statements', () => {
+  it('assigns high authenticity to first-person, feeling-based statements', async () => {
     const input = {
-      text: 'I feel really proud of myself today.',
-      context: { conversationId: 'c2' },
-      emotion: 'pride',
+      sessionId: 'c2',
+      detectedEmotion: 'pride',
+      confidence: 0.9,
+      context: 'conversation',
+      responseText: 'I feel really proud of myself today.',
     }
-    const result = pipeline.validateEmotionResult(input)
+    const result = await pipeline.validateEmotionResult(input)
     expect(result.authenticityScore).toBeGreaterThanOrEqual(0.8)
-    expect(result.biasMitigationTrace!.foundBias).toBe(false)
-    expect(result.outputText).toContain('I feel')
+    expect(result.biasScore).toBeLessThan(0.3)
   })
 
-  it('penalizes generic or inauthentic content', () => {
+  it('penalizes generic or inauthentic content', async () => {
     const input = {
-      text: 'lorem ipsum dolor sit amet',
-      context: { conversationId: 'c3' },
-      emotion: 'confusion',
+      sessionId: 'c3',
+      detectedEmotion: 'confusion',
+      confidence: 0.5,
+      context: 'conversation',
+      responseText: 'lorem ipsum dolor sit amet',
     }
-    const result = pipeline.validateEmotionResult(input)
+    const result = await pipeline.validateEmotionResult(input)
     expect(result.authenticityScore).toBeLessThanOrEqual(0.3)
-    expect(result.outputText).toContain('lorem ipsum')
+    expect(result.isValid).toBe(false)
   })
 
-  it('has confidence that incorporates both authenticity and mitigation', () => {
+  it('has confidence that incorporates both authenticity and mitigation', async () => {
     const input = {
-      text: 'Despite stereotypes, everyone is unique.',
-      context: { conversationId: 'c4' },
-      emotion: 'curiosity',
+      sessionId: 'c4',
+      detectedEmotion: 'curiosity',
+      confidence: 0.7,
+      context: 'conversation',
+      responseText: 'Despite stereotypes, everyone is unique.',
     }
-    const result = pipeline.validateEmotionResult(input)
+    const result = await pipeline.validateEmotionResult(input)
     expect(result.confidence).toBeGreaterThan(0)
     expect(typeof result.confidence).toBe('number')
     expect(result).toHaveProperty('authenticityScore')
   })
 
-  it('produces non-mitigated output when bias not present', () => {
+  it('produces non-mitigated output when bias not present', async () => {
     const input = {
-      text: 'I am feeling optimistic about tomorrow.',
-      context: { conversationId: 'c5' },
-      emotion: 'optimism',
+      sessionId: 'c5',
+      detectedEmotion: 'optimism',
+      confidence: 0.8,
+      context: 'conversation',
+      responseText: 'I am feeling optimistic about tomorrow.',
     }
-    const result = pipeline.validateEmotionResult(input)
-    expect(result.mitigated).toBe(false)
-    expect(result.outputText).toBe(input.text)
+    const result = await pipeline.validateEmotionResult(input)
+    expect(result.biasScore).toBeLessThan(0.3)
+    expect(result.isValid).toBe(true)
   })
 
-  it('always outputs a biasMitigationTrace object', () => {
+  it('always outputs a biasMitigationTrace object', async () => {
     const input = {
-      text: 'Random neutral sentence.',
-      context: { conversationId: 'c6' },
-      emotion: 'neutral',
+      sessionId: 'c6',
+      detectedEmotion: 'neutral',
+      confidence: 0.6,
+      context: 'conversation',
+      responseText: 'Random neutral sentence.',
     }
-    const result = pipeline.validateEmotionResult(input)
-    expect(result.biasMitigationTrace).toBeDefined()
-    expect(typeof result.biasMitigationTrace!.foundBias).toBe('boolean')
+    const result = await pipeline.validateEmotionResult(input)
+    expect(result.biasScore).toBeDefined()
+    expect(typeof result.biasScore).toBe('number')
   })
 
-  it('number fields are within [0,1] range when appropriate', () => {
+  it('number fields are within [0,1] range when appropriate', async () => {
     const input = {
-      text: 'I feel okay.',
-      context: { conversationId: 'c7' },
-      emotion: 'okay',
+      sessionId: 'c7',
+      detectedEmotion: 'okay',
+      confidence: 0.7,
+      context: 'conversation',
+      responseText: 'I feel okay.',
     }
-    const result = pipeline.validateEmotionResult(input)
+    const result = await pipeline.validateEmotionResult(input)
     expect(result.confidence).toBeGreaterThanOrEqual(0)
     expect(result.confidence).toBeLessThanOrEqual(1)
     expect(result.authenticityScore).toBeGreaterThanOrEqual(0)

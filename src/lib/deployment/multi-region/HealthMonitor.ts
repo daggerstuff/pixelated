@@ -6,7 +6,9 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('HealthMonitor')
 import { RegionConfig } from './MultiRegionDeploymentManager'
 
 export interface HealthCheckConfig {
@@ -295,7 +297,7 @@ export class HealthMonitor extends EventEmitter {
   /**
    * Simulate metric value with realistic patterns
    */
-  private simulateMetric(min: number, max: number, seed: string): number {
+  private simulateMetric(min: number, max: number, _seed: string): number {
     // Use region ID as seed for consistent but varying metrics
     const baseValue = min + (max - min) * 0.5
     const variation = (max - min) * 0.3
@@ -356,9 +358,9 @@ export class HealthMonitor extends EventEmitter {
     // Calculate overall score (weighted average)
     const overallScore = Math.round(
       performanceScore * 0.4 +
-        availabilityScore * 0.3 +
-        capacityScore * 0.2 +
-        securityScore * 0.1,
+      availabilityScore * 0.3 +
+      capacityScore * 0.2 +
+      securityScore * 0.1,
     )
 
     // Determine status
@@ -437,7 +439,7 @@ export class HealthMonitor extends EventEmitter {
    */
   private calculateAvailabilityScore(
     current: HealthMetrics,
-    history: HealthMetrics[],
+    _history: HealthMetrics[],
   ): number {
     let score = 100
 
@@ -486,7 +488,7 @@ export class HealthMonitor extends EventEmitter {
     const avgConnections =
       history.length > 0
         ? history.slice(-10).reduce((sum, m) => sum + m.activeConnections, 0) /
-          10
+        10
         : current.activeConnections
 
     if (current.activeConnections > avgConnections * 1.5) {
@@ -519,7 +521,7 @@ export class HealthMonitor extends EventEmitter {
     const avgConnections =
       history.length > 0
         ? history.slice(-10).reduce((sum, m) => sum + m.activeConnections, 0) /
-          10
+        10
         : current.activeConnections
 
     if (current.activeConnections > avgConnections * 3) {
@@ -853,7 +855,7 @@ export class HealthMonitor extends EventEmitter {
     if (healthScores.length > 0) {
       summary.averageHealthScore = Math.round(
         healthScores.reduce((sum, h) => sum + h.overallScore, 0) /
-          healthScores.length,
+        healthScores.length,
       )
     }
 

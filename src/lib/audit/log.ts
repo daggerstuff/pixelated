@@ -54,3 +54,29 @@ export async function logAuditEvent(
     logger.error('Error logging audit event:', error)
   }
 }
+
+/**
+ * Create an audit log entry (alias for logAuditEvent)
+ */
+export async function createAuditLog(
+  userId: string,
+  action: string,
+  resourceId: string,
+  resourceType?: string,
+  metadata?: Record<string, unknown>,
+): Promise<void> {
+  return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+}
+
+/**
+ * Create a resource audit log entry
+ */
+export async function createResourceAuditLog(
+  userId: string,
+  action: string,
+  resourceId: string,
+  resourceType: string,
+  metadata?: Record<string, unknown>,
+): Promise<void> {
+  return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+}

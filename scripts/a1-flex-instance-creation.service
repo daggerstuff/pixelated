@@ -1,0 +1,20 @@
+[Unit]
+Description=OCI A1.Flex Instance Creation with Multi-Region Retry
+After=network.target
+
+[Service]
+Type=simple
+User=%USER%
+WorkingDirectory=%h/pixelated
+ExecStart=%h/pixelated/scripts/create-a1-flex-instance-multi-region.sh
+Restart=on-failure
+RestartSec=60
+StandardOutput=append:%h/.oci/a1-flex-instance-creation.log
+StandardError=append:%h/.oci/a1-flex-instance-creation.log
+
+# Environment variables
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target
+

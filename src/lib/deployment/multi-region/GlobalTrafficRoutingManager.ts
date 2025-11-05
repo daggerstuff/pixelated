@@ -7,16 +7,18 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('GlobalTrafficRoutingManager')
 
 import { RegionConfig } from './MultiRegionDeploymentManager'
 
 export interface RoutingConfig {
   strategy:
-    | 'latency-based'
-    | 'health-based'
-    | 'compliance-based'
-    | 'weighted-round-robin'
+  | 'latency-based'
+  | 'health-based'
+  | 'compliance-based'
+  | 'weighted-round-robin'
   healthThreshold: number
   latencyThreshold: number
   complianceRequirements: string[]
@@ -660,14 +662,14 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     longitude: number
   } {
     const coordinates: Record<string, { latitude: number; longitude: number }> =
-      {
-        'us-east': { latitude: 39.0438, longitude: -77.4874 },
-        'us-west': { latitude: 45.8399, longitude: -119.7006 },
-        'eu-central': { latitude: 50.1109, longitude: 8.6821 },
-        'eu-west': { latitude: 53.3498, longitude: -6.2603 },
-        'apac-singapore': { latitude: 1.3521, longitude: 103.8198 },
-        'apac-tokyo': { latitude: 35.6762, longitude: 139.6503 },
-      }
+    {
+      'us-east': { latitude: 39.0438, longitude: -77.4874 },
+      'us-west': { latitude: 45.8399, longitude: -119.7006 },
+      'eu-central': { latitude: 50.1109, longitude: 8.6821 },
+      'eu-west': { latitude: 53.3498, longitude: -6.2603 },
+      'apac-singapore': { latitude: 1.3521, longitude: 103.8198 },
+      'apac-tokyo': { latitude: 35.6762, longitude: 139.6503 },
+    }
 
     return coordinates[location] || { latitude: 0, longitude: 0 }
   }
@@ -688,9 +690,9 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) *
-        Math.cos(this.toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
+      Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c

@@ -151,7 +151,8 @@ class EmotionValidationPipeline {
     } catch (error: unknown) {
       this.logger.error('Failed to initialize pipeline', { error })
       throw new Error(
-        `Pipeline initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+        `Pipeline initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
       )
     }
   }
@@ -548,7 +549,7 @@ class EmotionValidationPipeline {
       if (
         biasPattern.pattern.test(responseText) &&
         demographics.gender?.toLowerCase() ===
-          biasPattern.demographic.toLowerCase()
+        biasPattern.demographic.toLowerCase()
       ) {
         detectedPatterns.push(biasPattern.bias)
         severity += 0.3
@@ -854,6 +855,9 @@ class EmotionValidationPipeline {
     }
   }
 }
+
+// Export class for testing
+export { EmotionValidationPipeline }
 
 // Export singleton instance
 export const emotionValidationPipeline = new EmotionValidationPipeline()

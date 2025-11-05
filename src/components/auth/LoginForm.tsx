@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { flushSync } from 'react-dom'
-import { useAuth } from '../../hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { toast } from '@/components/ui/toast'
+import { Input } from '@/components/ui/input'
 import '@/styles/login-form-responsive.css'
 
 interface LoginFormProps {
@@ -19,24 +20,25 @@ export function LoginForm({
   showSignup = true,
   showResetPassword = true,
 }: LoginFormProps) {
-  const { signIn, signInWithOAuth, resetPassword } = useAuth()
+  // Better-auth hooks
+  const { data: session } = authClient.useSession()
+
+  // Form state
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [mode, setMode] = useState<'login' | 'reset'>('login')
   const [resetEmailSent, setResetEmailSent] = useState<boolean>(false)
   const [focusedInput, setFocusedInput] = useState<string | null>(null)
   const [rememberMe, setRememberMe] = useState<boolean>(false)
-  const [toastMessage, setToastMessage] = useState<{
-    type: 'success' | 'error' | 'loading' | 'info'
-    message: string
-  } | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
+  // Validation errors
   const [errors, setErrors] = useState<{
     email?: string
     password?: string
   }>({})
 
+  // Load remembered email from localStorage
   useEffect(() => {
     try {
       const rememberedEmail = localStorage.getItem(STORAGE_KEY_EMAIL)
@@ -52,35 +54,16 @@ export function LoginForm({
     }
   }, [])
 
+  // Redirect if already authenticated
   useEffect(() => {
-    if (!toastMessage) {
-      return
+    if (session?.user && redirectTo) {
+      window.location.href = redirectTo
+    } else if (session?.user) {
+      window.location.href = '/dashboard'
     }
+  }, [session, redirectTo])
 
-    let toastId: string
-    const { type, message } = toastMessage
-
-    import('../ui/toast').then(({ toast }) => {
-      if (type === 'loading') {
-        toastId = toast.loading(message)
-      } else if (type === 'success') {
-        toast.success(message)
-      } else if (type === 'error') {
-        toast.error(message)
-      } else if (type === 'info') {
-        toast.info(message)
-      }
-    })
-
-    return () => {
-      if (type === 'loading') {
-        import('../ui/toast').then(({ toast }) => {
-          toast.dismiss(toastId)
-        })
-      }
-    }
-  }, [toastMessage])
-
+  // Validation functions
   const validateEmail = (email: string): string | undefined => {
     if (!email) {
       return 'Email is required'
@@ -121,15 +104,11 @@ export function LoginForm({
       }
     }
 
-    // Set errors immediately using flushSync to ensure synchronous update
-    // This is critical for tests and ensures React processes the state update
-    flushSync(() => {
-      setErrors(newErrors)
-    })
-
+    setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  // Save remember me preferences
   const saveRememberMePreferences = (remember: boolean) => {
     try {
       if (remember) {
@@ -144,122 +123,121 @@ export function LoginForm({
     }
   }
 
+  // Handle email/password login
   const handleLoginSubmit = async () => {
-    saveRememberMePreferences(rememberMe)
-
-    setToastMessage({ type: 'loading', message: 'Signing in...' })
-
-    const response = await signIn(email, password)
-
-    setToastMessage(null)
-
-    if (response.error) {
-      setToastMessage({
-        type: 'error',
-        message:
-          typeof response.error === 'object' && response.error !== null
-            ? (response.error as { message?: string }).message || 'Login failed'
-            : 'Login failed',
-      })
+    if (!validateForm()) {
+      toast.error('Please correct the form errors')
       return
     }
 
-    setToastMessage({ type: 'success', message: 'Successfully signed in!' })
-  }
+    saveRememberMePreferences(rememberMe)
+    setIsLoading(true)
 
-  const handleResetSubmit = async () => {
-    setToastMessage({
-      type: 'loading',
-      message: 'Sending password reset email...',
-    })
-
-    await resetPassword(email, globalThis.location.origin + '/auth-callback')
-
-    setToastMessage(null)
-
-    setToastMessage({
-      type: 'success',
-      message: 'Password reset email sent!',
-    })
-
-    setResetEmailSent(true)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    // Validate form - this will set errors state using flushSync
-    // to ensure React processes the state update synchronously
-    let isValid: boolean
-    flushSync(() => {
-      isValid = validateForm()
-    })
-
-    if (!isValid!) {
-      // Errors have been set by validateForm() using flushSync
-      // Notify user about validation errors
-      setToastMessage({
-        type: 'error',
-        message: 'Please correct the form errors',
+    try {
+      const result = await authClient.signIn.email({
+        email,
+        password,
+        rememberMe,
       })
+
+      if (result.error) {
+        const errorMessage =
+          typeof result.error === 'object' && result.error !== null
+            ? (result.error as { message?: string }).message ||
+            'Login failed. Please check your credentials.'
+            : 'Login failed. Please check your credentials.'
+
+        toast.error(errorMessage)
+        return
+      }
+
+      toast.success('Successfully signed in!')
+
+      // Redirect will happen via useEffect when session updates
+      if (redirectTo) {
+        window.location.href = redirectTo
+      } else {
+        window.location.href = '/dashboard'
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred. Please try again.'
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Handle password reset
+  const handleResetSubmit = async () => {
+    const emailError = validateEmail(email)
+    if (emailError) {
+      setErrors({ email: emailError })
+      toast.error('Please enter a valid email address')
       return
     }
 
     setIsLoading(true)
 
     try {
-      if (mode === 'login') {
-        await handleLoginSubmit()
-      } else if (mode === 'reset') {
-        await handleResetSubmit()
-      }
-    } catch (error: unknown) {
-      setToastMessage({
-        type: 'error',
-        message:
-          error instanceof Error
-            ? `Authentication error: ${String(error)}`
-            : 'An unexpected error occurred. Please try again.',
+      const resetUrl = `${window.location.origin}/auth-callback`
+      await authClient.forgetPassword({
+        email,
+        redirectTo: resetUrl,
       })
 
-      console.error('Login error:', error)
+      toast.success('Password reset email sent! Check your inbox.')
+      setResetEmailSent(true)
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to send reset email. Please try again.'
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (mode === 'login') {
+      await handleLoginSubmit()
+    } else if (mode === 'reset') {
+      await handleResetSubmit()
+    }
+  }
+
+  // Handle Google OAuth sign in
   const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+
     try {
-      setIsLoading(true)
-
-      setToastMessage({ type: 'loading', message: 'Connecting to Google...' })
-
-      await signInWithOAuth('google', redirectTo)
-
-      setToastMessage(null)
-
-      setToastMessage({
-        type: 'info',
-        message: 'Redirecting to Google authentication...',
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: redirectTo || '/dashboard',
       })
+      // OAuth redirect will happen automatically
+      toast.info('Redirecting to Google authentication...')
     } catch (error: unknown) {
-      setToastMessage({
-        type: 'error',
-        message:
-          error instanceof Error
-            ? `Google sign-in error: ${String(error)}`
-            : 'Failed to connect to Google. Please try again.',
-      })
-
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to connect to Google. Please try again.'
+      toast.error(errorMessage)
       setIsLoading(false)
     }
   }
 
+  // Input change handlers
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     setEmail(value)
-
     if (errors.email) {
       setErrors((prev) => ({ ...prev, email: undefined }))
     }
@@ -277,6 +255,7 @@ export function LoginForm({
     setRememberMe(e.target.checked)
   }
 
+  // Blur handlers for validation
   const handleEmailBlur = () => {
     setFocusedInput(null)
     const error = validateEmail(email)
@@ -289,6 +268,8 @@ export function LoginForm({
     setErrors((prev) => ({ ...prev, password: error }))
   }
 
+
+  // Render reset success message
   const renderResetSuccess = () => (
     <div className="text-center space-y-4">
       <h2 className="text-gradient text-responsive--heading">
@@ -302,6 +283,7 @@ export function LoginForm({
         onClick={() => {
           setMode('login')
           setResetEmailSent(false)
+          setErrors({})
         }}
         className="btn btn-primary btn-responsive touch-focus"
       >
@@ -310,6 +292,7 @@ export function LoginForm({
     </div>
   )
 
+  // Render main form
   const renderMainForm = () => (
     <div className="auth-form-container text-center form-container responsive-auth-container">
       {mode === 'reset' && (
@@ -336,7 +319,7 @@ export function LoginForm({
           <div
             className={`input-wrapper ${focusedInput === 'email' ? 'focused' : ''} ${errors.email ? 'error' : ''}`}
           >
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
@@ -345,7 +328,7 @@ export function LoginForm({
               onBlur={handleEmailBlur}
               disabled={isLoading}
               placeholder="your@email.com"
-              className="form-input input-responsive"
+              className={`form-input input-responsive ${errors.email ? 'border-destructive' : ''}`}
               aria-invalid={errors.email ? 'true' : 'false'}
               aria-describedby="email-error"
               autoComplete="email"
@@ -360,7 +343,7 @@ export function LoginForm({
               display: errors.email ? ('block' as const) : ('none' as const),
             }}
           >
-            {errors.email || ''}
+            {errors.email ?? ''}
           </div>
         </div>
 
@@ -392,6 +375,7 @@ export function LoginForm({
     </div>
   )
 
+  // Render password field
   const renderPasswordField = () => (
     <div className="form-group form-group-responsive">
       <label htmlFor="password" className="form-label text-responsive--small">
@@ -400,7 +384,7 @@ export function LoginForm({
       <div
         className={`input-wrapper ${focusedInput === 'password' ? 'focused' : ''} ${errors.password ? 'error' : ''}`}
       >
-        <input
+        <Input
           id="password"
           type="password"
           value={password}
@@ -409,7 +393,7 @@ export function LoginForm({
           onBlur={handlePasswordBlur}
           disabled={isLoading}
           placeholder="••••••••"
-          className="form-input input-responsive"
+          className={`form-input input-responsive ${errors.password ? 'border-destructive' : ''}`}
           aria-invalid={errors.password ? 'true' : 'false'}
           aria-describedby="password-error"
           autoComplete="current-password"
@@ -424,11 +408,12 @@ export function LoginForm({
           display: errors.password ? ('block' as const) : ('none' as const),
         }}
       >
-        {errors.password || ''}
+        {errors.password ?? ''}
       </div>
     </div>
   )
 
+  // Render remember me checkbox
   const renderRememberMe = () => (
     <div className="form-group remember-me form-group-responsive">
       <label
@@ -451,6 +436,7 @@ export function LoginForm({
     </div>
   )
 
+  // Render OAuth section
   const renderOAuthSection = () => (
     <>
       <div className="auth-separator">
@@ -458,6 +444,7 @@ export function LoginForm({
       </div>
 
       <button
+        type="button"
         onClick={handleGoogleSignIn}
         className="btn btn-outline btn-responsive"
         disabled={isLoading}
@@ -468,19 +455,15 @@ export function LoginForm({
     </>
   )
 
+  // Render auth links
   const renderAuthLinks = () => (
     <div className="auth-links space-y-2">
       {mode === 'login' && showResetPassword && (
         <button
           type="button"
           onClick={() => {
-            // Use flushSync to ensure state update is processed synchronously
-            // This fixes timing issues in tests
-            flushSync(() => {
-              setMode('reset')
-              // Clear errors when switching modes
-              setErrors({})
-            })
+            setMode('reset')
+            setErrors({})
           }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
           data-testid="forgot-password-button"
@@ -492,7 +475,10 @@ export function LoginForm({
       {mode === 'reset' && (
         <button
           type="button"
-          onClick={() => setMode('login')}
+          onClick={() => {
+            setMode('login')
+            setErrors({})
+          }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
         >
           Back to Login
@@ -501,6 +487,7 @@ export function LoginForm({
 
       {mode === 'login' && showSignup && (
         <button
+          type="button"
           onClick={() => (globalThis.location.href = '/signup')}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline mt-2 touch-focus"
         >

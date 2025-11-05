@@ -80,6 +80,12 @@ export interface SessionListItem {
   currentSession: boolean
 }
 
+interface UserSessionInfo {
+  sessionId: string
+  expiresAt: number
+  lastActivity: number
+}
+
 /**
  * Generate secure session ID
  */
@@ -195,7 +201,8 @@ export async function createSession(
     }
 
     // Log session creation
-    await logSecurityEvent(SecurityEventType.SESSION_CREATED, userId, {
+    await logSecurityEvent(SecurityEventType.SESSION_CREATED, {
+      userId: userId,
       sessionId,
       deviceId: deviceInfo.deviceId,
       deviceType: deviceInfo.deviceType,
@@ -209,13 +216,11 @@ export async function createSession(
 
     return sessionData
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.SESSION_CREATION_FAILED,
-      options.userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        deviceId: options.deviceInfo.deviceId,
-      },
+    await logSecurityEvent(SecurityEventType.SESSION_CREATION_FAILED, {
+      userId: options.userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      deviceId: options.deviceInfo.deviceId,
+    },
     )
 
     throw error instanceof AuthenticationError
@@ -261,16 +266,13 @@ export async function validateSession(
           userAgent,
         )
         if (deviceData.fingerprint !== currentFingerprint) {
-          await logSecurityEvent(
-            SecurityEventType.SESSION_SECURITY_ALERT,
-            sessionData.userId,
-            {
-              sessionId,
-              alertType: 'device_mismatch',
-              expectedDevice: deviceData.fingerprint,
-              actualDevice: currentFingerprint,
-            },
-          )
+          await logSecurityEvent(SecurityEventType.SESSION_SECURITY_ALERT, {
+            userId: sessionData.userId,
+            sessionId,
+            alertType: 'device_mismatch',
+            expectedDevice: deviceData.fingerprint,
+            actualDevice: currentFingerprint,
+          })
 
           return {
             valid: false,
@@ -286,15 +288,13 @@ export async function validateSession(
       SESSION_CONFIG.ipValidationEnabled &&
       sessionData.ipAddress !== ipAddress
     ) {
-      await logSecurityEvent(
-        SecurityEventType.SESSION_SECURITY_ALERT,
-        sessionData.userId,
-        {
-          sessionId,
-          alertType: 'ip_change',
-          expectedIp: sessionData.ipAddress,
-          actualIp: ipAddress,
-        },
+      await logSecurityEvent(SecurityEventType.SESSION_SECURITY_ALERT, {
+        userId: sessionData.userId,
+        sessionId,
+        alertType: 'ip_change',
+        expectedIp: sessionData.ipAddress,
+        actualIp: ipAddress,
+      },
       )
 
       return {
@@ -314,14 +314,11 @@ export async function validateSession(
     )
 
     // Log successful validation
-    await logSecurityEvent(
-      SecurityEventType.SESSION_VALIDATED,
-      sessionData.userId,
-      {
-        sessionId,
-        deviceId: deviceInfo.deviceId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.SESSION_VALIDATED, {
+      userId: sessionData.userId,
+      sessionId,
+      deviceId: deviceInfo.deviceId,
+    })
 
     return {
       valid: true,
@@ -368,14 +365,11 @@ export async function refreshSession(
     )
 
     // Log session refresh
-    await logSecurityEvent(
-      SecurityEventType.SESSION_REFRESHED,
-      sessionData.userId,
-      {
-        sessionId,
-        newExpiry: sessionData.expiresAt,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.SESSION_REFRESHED, {
+      userId: sessionData.userId,
+      sessionId,
+      newExpiry: sessionData.expiresAt,
+    })
 
     return sessionData
   } catch (error) {
@@ -405,15 +399,12 @@ export async function destroySession(
     await removeUserSession(sessionData.userId, sessionId)
 
     // Log session destruction
-    await logSecurityEvent(
-      SecurityEventType.SESSION_DESTROYED,
-      sessionData.userId,
-      {
-        sessionId,
-        reason,
-        deviceId: sessionData.deviceId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.SESSION_DESTROYED, {
+      userId: sessionData.userId,
+      sessionId,
+      reason,
+      deviceId: sessionData.deviceId,
+    })
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(
@@ -474,7 +465,8 @@ export async function destroyAllUserSessions(
     }
 
     // Log mass session destruction
-    await logSecurityEvent(SecurityEventType.ALL_SESSIONS_DESTROYED, userId, {
+    await logSecurityEvent(SecurityEventType.ALL_SESSIONS_DESTROYED, {
+      userId: userId,
       reason,
       sessionCount: sessionList.length,
     })
@@ -496,7 +488,7 @@ async function enforceSessionLimit(userId: string): Promise<void> {
 
     if (sessionList.length >= SESSION_CONFIG.concurrentSessionLimit) {
       // Sort by last activity (oldest first)
-      sessionList.sort((a: any, b: any) => a.lastActivity - b.lastActivity)
+      sessionList.sort((a: UserSessionInfo, b: UserSessionInfo) => a.lastActivity - b.lastActivity)
 
       // Remove oldest sessions to make room
       const sessionsToRemove = sessionList.slice(
@@ -549,7 +541,7 @@ async function removeUserSession(
     const sessionsKey = `user:sessions:${userId}`
     let sessionList = (await getFromCache(sessionsKey)) || []
 
-    sessionList = sessionList.filter((s: any) => s.sessionId !== sessionId)
+    sessionList = sessionList.filter((s: UserSessionInfo) => s.sessionId !== sessionId)
 
     if (sessionList.length > 0) {
       await setInCache(sessionsKey, sessionList, 365 * 24 * 60 * 60)
@@ -573,7 +565,7 @@ async function updateUserSessionExpiry(
     const sessionsKey = `user:sessions:${userId}`
     const sessionList = (await getFromCache(sessionsKey)) || []
 
-    const sessionInfo = sessionList.find((s: any) => s.sessionId === sessionId)
+    const sessionInfo = sessionList.find((s: UserSessionInfo) => s.sessionId === sessionId)
     if (sessionInfo) {
       sessionInfo.expiresAt = newExpiry
       await setInCache(sessionsKey, sessionList, 365 * 24 * 60 * 60)

@@ -284,7 +284,8 @@ export async function generateTokenPair(
   })
 
   // Log authentication event for audit trail
-  await logSecurityEvent(SecurityEventType.TOKEN_CREATED, userId, {
+  await logSecurityEvent(SecurityEventType.TOKEN_CREATED, {
+    userId: userId,
     accessTokenId: accessTokenId,
     refreshTokenId: refreshTokenId,
     clientInfo: clientInfo,
@@ -346,7 +347,8 @@ export async function validateToken(
     validateTokenSecurity(payload, tokenMetadata)
 
     // Log successful validation
-    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, payload.sub, {
+    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, {
+      userId: payload.sub,
       tokenId: payload.jti,
       tokenType: tokenType,
     })
@@ -361,7 +363,8 @@ export async function validateToken(
     }
   } catch (error) {
     // Log validation failure
-    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
+    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
+      userId: null,
       error: error instanceof Error ? error.message : 'Unknown error',
       tokenType: tokenType,
     })
@@ -406,15 +409,12 @@ export async function refreshAccessToken(
   )
 
   // Log token refresh event
-  await logSecurityEvent(
-    SecurityEventType.TOKEN_REFRESHED,
-    validation.userId!,
-    {
-      oldTokenId: validation.tokenId!,
-      newAccessTokenId: extractTokenId(newTokenPair.accessToken),
-      newRefreshTokenId: extractTokenId(newTokenPair.refreshToken),
-    },
-  )
+  await logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, {
+    userId: validation.userId!,
+    oldTokenId: validation.tokenId!,
+    newAccessTokenId: extractTokenId(newTokenPair.accessToken),
+    newRefreshTokenId: extractTokenId(newTokenPair.refreshToken),
+  })
 
   // Update Phase 6 MCP server with refresh progress
   await updatePhase6AuthenticationProgress(
@@ -445,7 +445,8 @@ export async function revokeToken(
     }
 
     // Log revocation event
-    await logSecurityEvent(SecurityEventType.TOKEN_REVOKED, metadata.userId, {
+    await logSecurityEvent(SecurityEventType.TOKEN_REVOKED, {
+      userId: metadata.userId,
       tokenId: tokenId,
       reason: reason,
       tokenType: metadata.type,
@@ -479,14 +480,11 @@ export async function cleanupExpiredTokens(): Promise<{
       cleanedCount++
 
       // Log cleanup event
-      await logSecurityEvent(
-        SecurityEventType.TOKEN_CLEANED_UP,
-        metadata.userId,
-        {
-          tokenId: metadata.id || key.replace('token:', ''),
-          reason: 'expired_cleanup',
-        },
-      )
+      await logSecurityEvent(SecurityEventType.TOKEN_CLEANED_UP, {
+        userId: metadata.userId,
+        tokenId: metadata.id || key.replace('token:', ''),
+        reason: 'expired_cleanup',
+      })
     }
   }
 

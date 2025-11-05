@@ -6,7 +6,9 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('ConfigurationManager')
 
 import { DeploymentConfig, RegionConfig } from './MultiRegionDeploymentManager'
 import { EdgeDeploymentConfig } from './EdgeComputingManager'
@@ -128,7 +130,7 @@ export interface MonitoringConfig {
     enabled: boolean
     channels: string[]
     severityLevels: string[]
-    escalationRules: Record<string, any>
+    escalationRules: Record<string, unknown>
   }
   logging: {
     level: string
@@ -749,7 +751,7 @@ export class ConfigurationManager extends EventEmitter {
   getEnvironmentConfig(environment: string): EnvironmentConfig {
     return {
       ...this.config.environments[
-        environment as keyof typeof this.config.environments
+      environment as keyof typeof this.config.environments
       ],
     }
   }
@@ -980,8 +982,8 @@ export class ConfigurationManager extends EventEmitter {
   }
 
   private cacheEnvironmentVariable(
-    varName: string,
-    value: string | undefined,
+    _varName: string,
+    _value: string | undefined,
   ): void {
     // In a real implementation, this would use a proper cache
     // For now, we just use the process.env directly

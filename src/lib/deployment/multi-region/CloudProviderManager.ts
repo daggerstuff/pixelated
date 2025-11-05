@@ -11,7 +11,28 @@ import { RDSClient } from '@aws-sdk/client-rds'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Compute, DNS, Storage } from '@google-cloud/compute'
 import { RegionConfig } from './MultiRegionDeploymentManager'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('CloudProviderManager')
+
+// Type definitions for cloud provider clients
+interface AWSClients {
+  ec2: EC2Client
+  eks: EKSClient
+  rds: RDSClient
+  s3: S3Client
+}
+
+interface GCPClients {
+  compute: Compute
+  dns: DNS
+  storage: Storage
+}
+
+interface AzureClients {
+  // Azure clients would be defined here when Azure SDK is integrated
+  [key: string]: unknown
+}
 
 export interface CloudProviderConfig {
   aws?: {
@@ -46,13 +67,13 @@ export interface DeploymentResult {
     database: string
     cache: string
   }
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 export class CloudProviderManager {
-  private awsClients: Map<string, any> = new Map()
-  private gcpClients: Map<string, any> = new Map()
-  private azureClients: Map<string, any> = new Map()
+  private awsClients: Map<string, AWSClients> = new Map()
+  private gcpClients: Map<string, GCPClients> = new Map()
+  private azureClients: Map<string, AzureClients> = new Map()
   private config: CloudProviderConfig
 
   constructor() {
@@ -440,7 +461,7 @@ export class CloudProviderManager {
    */
   private async deployAWSVPC(
     region: RegionConfig,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<string> {
     // VPC deployment implementation
     logger.info(`Deploying AWS VPC for region: ${region.name}`)
@@ -452,7 +473,7 @@ export class CloudProviderManager {
    */
   private async deployAWSInstances(
     region: RegionConfig,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<string[]> {
     // EC2 instance deployment implementation
     logger.info(`Deploying AWS instances for region: ${region.name}`)
@@ -464,7 +485,7 @@ export class CloudProviderManager {
    */
   private async deployAWSDatabase(
     region: RegionConfig,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<string> {
     // RDS database deployment implementation
     logger.info(`Deploying AWS RDS for region: ${region.name}`)
@@ -476,7 +497,7 @@ export class CloudProviderManager {
    */
   private async deployAWSStorage(
     region: RegionConfig,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<string> {
     // S3 bucket deployment implementation
     logger.info(`Deploying AWS S3 for region: ${region.name}`)
@@ -488,7 +509,7 @@ export class CloudProviderManager {
    */
   private async deployAWSLoadBalancer(
     region: RegionConfig,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<string> {
     // Load balancer deployment implementation
     logger.info(`Deploying AWS load balancer for region: ${region.name}`)
@@ -500,7 +521,7 @@ export class CloudProviderManager {
    */
   private async deployGCPNetwork(
     region: RegionConfig,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<string> {
     // GCP network deployment implementation
     logger.info(`Deploying GCP network for region: ${region.name}`)
@@ -512,7 +533,7 @@ export class CloudProviderManager {
    */
   private async deployGCPInstances(
     region: RegionConfig,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<string[]> {
     // GCP instance deployment implementation
     logger.info(`Deploying GCP instances for region: ${region.name}`)
@@ -524,7 +545,7 @@ export class CloudProviderManager {
    */
   private async deployGCPDatabase(
     region: RegionConfig,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<string> {
     // GCP database deployment implementation
     logger.info(`Deploying GCP Cloud SQL for region: ${region.name}`)
@@ -536,7 +557,7 @@ export class CloudProviderManager {
    */
   private async deployGCPStorage(
     region: RegionConfig,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<string> {
     // GCP storage deployment implementation
     logger.info(`Deploying GCP Cloud Storage for region: ${region.name}`)
@@ -548,7 +569,7 @@ export class CloudProviderManager {
    */
   private async deployGCPLoadBalancer(
     region: RegionConfig,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<string> {
     // GCP load balancer deployment implementation
     logger.info(`Deploying GCP load balancer for region: ${region.name}`)
@@ -704,7 +725,7 @@ export class CloudProviderManager {
    */
   private async cleanupAWSRegion(
     regionId: string,
-    clients: any,
+    _clients: AWSClients,
   ): Promise<void> {
     logger.info(`Cleaning up AWS resources for region: ${regionId}`)
     // AWS cleanup implementation
@@ -715,7 +736,7 @@ export class CloudProviderManager {
    */
   private async cleanupGCPRegion(
     regionId: string,
-    clients: any,
+    _clients: GCPClients,
   ): Promise<void> {
     logger.info(`Cleaning up GCP resources for region: ${regionId}`)
     // GCP cleanup implementation
@@ -726,7 +747,7 @@ export class CloudProviderManager {
    */
   private async cleanupAzureRegion(
     regionId: string,
-    clients: any,
+    _clients: AzureClients,
   ): Promise<void> {
     logger.info(`Cleaning up Azure resources for region: ${regionId}`)
     // Azure cleanup implementation

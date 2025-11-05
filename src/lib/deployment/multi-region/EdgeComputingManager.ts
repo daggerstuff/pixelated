@@ -7,7 +7,9 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('EdgeComputingManager')
 
 export interface EdgeLocation {
   id: string
@@ -77,7 +79,7 @@ export interface EdgeNodeStatus {
     inferenceTime: number
     accuracy: number
   }[]
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 export class EdgeComputingManager extends EventEmitter {
@@ -2260,7 +2262,7 @@ export class EdgeComputingManager extends EventEmitter {
       })
 
       // Deploy based on provider
-      let deploymentResult: any
+      let deploymentResult: unknown
 
       switch (location.provider) {
         case 'cloudflare':
@@ -2298,7 +2300,7 @@ export class EdgeComputingManager extends EventEmitter {
         metadata: {
           deploymentTime: Date.now() - startTime,
           provider: location.provider,
-          ...deploymentResult,
+          ...(deploymentResult as Record<string, unknown>),
         },
       }
 
@@ -2348,7 +2350,9 @@ export class EdgeComputingManager extends EventEmitter {
   /**
    * Deploy Cloudflare Worker
    */
-  private async deployCloudflareWorker(location: EdgeLocation): Promise<any> {
+  private async deployCloudflareWorker(
+    location: EdgeLocation,
+  ): Promise<{ workerId: string; scriptSize: number }> {
     try {
       logger.info(`Deploying Cloudflare Worker for location: ${location.name}`)
 
@@ -2376,7 +2380,9 @@ export class EdgeComputingManager extends EventEmitter {
   /**
    * Deploy AWS Lambda@Edge
    */
-  private async deployAWSLambdaEdge(location: EdgeLocation): Promise<any> {
+  private async deployAWSLambdaEdge(
+    location: EdgeLocation,
+  ): Promise<{ functionArn: string; version: string }> {
     try {
       logger.info(`Deploying AWS Lambda@Edge for location: ${location.name}`)
 
@@ -2404,7 +2410,9 @@ export class EdgeComputingManager extends EventEmitter {
   /**
    * Deploy Azure Edge
    */
-  private async deployAzureEdge(location: EdgeLocation): Promise<any> {
+  private async deployAzureEdge(
+    location: EdgeLocation,
+  ): Promise<{ functionId: string; region: string }> {
     try {
       logger.info(`Deploying Azure Edge for location: ${location.name}`)
 
@@ -2427,7 +2435,9 @@ export class EdgeComputingManager extends EventEmitter {
   /**
    * Deploy GCP Edge
    */
-  private async deployGCPEdge(location: EdgeLocation): Promise<any> {
+  private async deployGCPEdge(
+    location: EdgeLocation,
+  ): Promise<{ functionName: string; region: string }> {
     try {
       logger.info(`Deploying GCP Edge for location: ${location.name}`)
 
@@ -2918,7 +2928,7 @@ async function processRequest(req, threatCheck, biasCheck) {
    */
   private async simulateCloudflareDeployment(
     location: EdgeLocation,
-    script: string,
+    _script: string,
   ): Promise<void> {
     // Simulate API delay
     await new Promise((resolve) =>
@@ -2938,7 +2948,7 @@ async function processRequest(req, threatCheck, biasCheck) {
    */
   private async simulateAWSLambdaDeployment(
     location: EdgeLocation,
-    functionCode: string,
+    _functionCode: string,
   ): Promise<void> {
     // Simulate API delay
     await new Promise((resolve) =>
@@ -2958,7 +2968,7 @@ async function processRequest(req, threatCheck, biasCheck) {
    */
   private async simulateAzureDeployment(
     location: EdgeLocation,
-    functionCode: string,
+    _functionCode: string,
   ): Promise<void> {
     // Simulate API delay
     await new Promise((resolve) =>
@@ -2978,7 +2988,7 @@ async function processRequest(req, threatCheck, biasCheck) {
    */
   private async simulateGCPDeployment(
     location: EdgeLocation,
-    functionCode: string,
+    _functionCode: string,
   ): Promise<void> {
     // Simulate API delay
     await new Promise((resolve) =>
@@ -3149,9 +3159,9 @@ async function processRequest(req, threatCheck, biasCheck) {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) *
-        Math.cos(this.toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
+      Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c

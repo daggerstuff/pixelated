@@ -252,19 +252,65 @@ spec:
         app.kubernetes.io/name: memory-monitoring
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "9100"
         prometheus.io/path: "/metrics"
     spec:
+      # Security context at pod level
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534  # nobody user (node-exporter default)
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      # Disable automount of service account token if not needed
+      automountServiceAccountToken: false
       containers:
         - name: memory-monitor
-          image: prom/node-exporter:latest
+          # Use specific version tag instead of latest
+          image: prom/node-exporter:v1.7.0
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 9100
               name: metrics
+              protocol: TCP
           args:
             - --path.procfs=/host/proc
             - --path.sysfs=/host/sys
             - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
+          # Security context at container level
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop:
+                - ALL
+              # No additional capabilities needed for node-exporter
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9100
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9100
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
           volumeMounts:
             - name: proc
               mountPath: /host/proc
@@ -272,6 +318,9 @@ spec:
             - name: sys
               mountPath: /host/sys
               readOnly: true
+            # Temporary directory for writable filesystem
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               memory: "64Mi"
@@ -283,9 +332,14 @@ spec:
         - name: proc
           hostPath:
             path: /proc
+            type: ""
         - name: sys
           hostPath:
             path: /sys
+            type: ""
+        # Temporary volume for writable filesystem
+        - name: tmp
+          emptyDir: {}
 
 ---
 # Service for memory monitor
@@ -300,7 +354,8 @@ spec:
   selector:
     app.kubernetes.io/name: memory-monitoring
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 9100
+      targetPort: 9100
       name: metrics
+      protocol: TCP
   type: ClusterIP

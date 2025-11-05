@@ -64,12 +64,12 @@ export interface RoleTransitionAuditLog {
   requestId: string
   userId: string
   action:
-    | 'requested'
-    | 'approved'
-    | 'rejected'
-    | 'cancelled'
-    | 'expired'
-    | 'completed'
+  | 'requested'
+  | 'approved'
+  | 'rejected'
+  | 'cancelled'
+  | 'expired'
+  | 'completed'
   roleFrom: UserRole
   roleTo: UserRole
   actorId: string
@@ -212,14 +212,12 @@ export async function requestRoleTransition(
 
     return transitionRequest
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED,
-      userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        requestedRole,
-        requestedBy,
-      },
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, {
+      userId: userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requestedRole,
+      requestedBy,
+    },
     )
 
     throw error instanceof AuthenticationError
@@ -347,15 +345,12 @@ export async function processRoleTransitionApproval(
 
     return request
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED,
-      approverId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        requestId,
-        decision,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, {
+      userId: approverId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requestId,
+      decision,
+    })
 
     throw error instanceof AuthenticationError
       ? error
@@ -419,14 +414,11 @@ async function executeRoleTransition(
       'role_transition_completed',
     )
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED,
-      request.userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        requestId: request.id,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, {
+      userId: request.userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requestId: request.id,
+    })
 
     throw new AuthenticationError('Failed to execute role transition')
   }
@@ -507,14 +499,11 @@ export async function cancelRoleTransitionRequest(
       'role_transition_cancelled',
     )
   } catch (error) {
-    await logSecurityEvent(
-      SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
-      userId,
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        requestId,
-      },
-    )
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED, {
+      userId: userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requestId,
+    })
 
     throw error instanceof AuthenticationError
       ? error
@@ -760,16 +749,14 @@ async function logRoleTransitionAudit(
     )
 
     // Log security event
-    await logSecurityEvent(
-      SecurityEventType.ROLE_TRANSITION_AUDIT,
-      auditLog.userId,
-      {
-        action: auditLog.action,
-        roleFrom: auditLog.roleFrom,
-        roleTo: auditLog.roleTo,
-        actorId: auditLog.actorId,
-        actorRole: auditLog.actorRole,
-      },
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, {
+      userId: auditLog.userId,
+      action: auditLog.action,
+      roleFrom: auditLog.roleFrom,
+      roleTo: auditLog.roleTo,
+      actorId: auditLog.actorId,
+      actorRole: auditLog.actorRole,
+    },
     )
   } catch (error) {
     console.error('Error logging role transition audit:', error)
@@ -809,7 +796,7 @@ async function notifyRoleTransitionSuccess(
 async function notifyRoleTransitionCancellation(
   request: RoleTransitionRequest,
   cancellerId: string,
-  reason: string,
+  _reason: string,
 ): Promise<void> {
   // Implement notification logic
   console.log(`Role transition cancelled: ${request.userId} by ${cancellerId}`)
@@ -936,7 +923,7 @@ export async function validateRoleAssignment(
         if (transitionValidation.requiresApproval) {
           validation.requiresApproval = true
         }
-      } catch (error) {
+      } catch (_error) {
         validation.restrictions.push('Invalid role transition')
         return validation
       }

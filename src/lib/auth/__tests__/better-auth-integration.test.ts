@@ -13,9 +13,9 @@ import {
   changePassword,
   validateUserRole,
   AuthenticationError,
-  type User,
-  type UserRole,
+  type UserAuthentication,
 } from '../better-auth-integration'
+import type { UserRole } from '../jwt-service'
 
 vi.mock('../../redis', () => ({
   redis: {
@@ -102,9 +102,9 @@ describe('Better-Auth Integration', () => {
       expect(result.user).toHaveProperty('lastName', mockUserData.lastName)
       expect(result.user).toHaveProperty('role', mockUserData.role)
       expect(result.user).not.toHaveProperty('password')
-      expect(result).toHaveProperty('tokenPair')
-      expect(result.tokenPair).toHaveProperty('accessToken')
-      expect(result.tokenPair).toHaveProperty('refreshToken')
+      expect(result).toHaveProperty('tokens')
+      expect(result.tokens).toHaveProperty('accessToken')
+      expect(result.tokens).toHaveProperty('refreshToken')
     })
 
     it('should hash password securely', async () => {
@@ -222,7 +222,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -254,9 +254,9 @@ describe('Better-Auth Integration', () => {
 
       expect(result).toHaveProperty('user')
       expect(result.user).toHaveProperty('id', mockUser.id)
-      expect(result).toHaveProperty('tokenPair')
-      expect(result.tokenPair).toHaveProperty('accessToken')
-      expect(result.tokenPair).toHaveProperty('refreshToken')
+      expect(result).toHaveProperty('tokens')
+      expect(result.tokens).toHaveProperty('accessToken')
+      expect(result.tokens).toHaveProperty('refreshToken')
     })
 
     it('should reject invalid email', async () => {
@@ -273,7 +273,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -332,7 +332,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache, setInCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -371,7 +371,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -491,7 +491,7 @@ describe('Better-Auth Integration', () => {
     it('should retrieve user by ID', async () => {
       const { getFromCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -560,7 +560,7 @@ describe('Better-Auth Integration', () => {
     it('should update user profile with valid data', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -611,7 +611,7 @@ describe('Better-Auth Integration', () => {
     it('should not allow role updates through profile update', async () => {
       const { getFromCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -643,7 +643,7 @@ describe('Better-Auth Integration', () => {
       const { logSecurityEvent } = await import('../../security')
       const { getFromCache, setInCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -839,7 +839,7 @@ describe('Better-Auth Integration', () => {
     it('should validate user role successfully', async () => {
       const { getFromCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -866,7 +866,7 @@ describe('Better-Auth Integration', () => {
     it('should reject user with invalid role', async () => {
       const { getFromCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -921,7 +921,7 @@ describe('Better-Auth Integration', () => {
       const { logSecurityEvent } = await import('../../security')
       const { getFromCache } = await import('../../redis')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -976,7 +976,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -1102,7 +1102,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,
@@ -1140,7 +1140,7 @@ describe('Better-Auth Integration', () => {
       const { getFromCache } = await import('../../redis')
       const bcrypt = await import('bcryptjs')
 
-      const mockUser: User = {
+      const mockUser: UserAuthentication = {
         id: 'user123',
         email: mockUserData.email,
         firstName: mockUserData.firstName,

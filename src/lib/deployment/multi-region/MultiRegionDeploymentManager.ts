@@ -6,9 +6,14 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('MultiRegionDeploymentManager')
 import { ConfigurationManager } from './ConfigurationManager'
-import { CloudProviderManager } from './CloudProviderManager'
+import {
+  CloudProviderManager,
+  type DeploymentResult,
+} from './CloudProviderManager'
 import { HealthMonitor } from './HealthMonitor'
 import { DeploymentOrchestrator } from './DeploymentOrchestrator'
 
@@ -268,7 +273,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    */
   private async configureRegionalServices(
     region: RegionConfig,
-    deploymentResult: any,
+    deploymentResult: DeploymentResult,
   ): Promise<void> {
     try {
       // Configure load balancers
@@ -300,7 +305,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    */
   private async configureLoadBalancers(
     region: RegionConfig,
-    deploymentResult: any,
+    _deploymentResult: DeploymentResult,
   ): Promise<void> {
     // Implementation for load balancer configuration
     logger.info(`Configuring load balancers for region: ${region.name}`)
@@ -311,7 +316,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    */
   private async configureAutoScaling(
     region: RegionConfig,
-    deploymentResult: any,
+    _deploymentResult: DeploymentResult,
   ): Promise<void> {
     // Implementation for auto-scaling configuration
     logger.info(`Configuring auto-scaling for region: ${region.name}`)
@@ -322,7 +327,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    */
   private async configureMonitoring(
     region: RegionConfig,
-    deploymentResult: any,
+    _deploymentResult: DeploymentResult,
   ): Promise<void> {
     // Implementation for monitoring configuration
     logger.info(`Configuring monitoring for region: ${region.name}`)
@@ -333,7 +338,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    */
   private async configureSecurityPolicies(
     region: RegionConfig,
-    deploymentResult: any,
+    _deploymentResult: DeploymentResult,
   ): Promise<void> {
     // Implementation for security policy configuration
     logger.info(`Configuring security policies for region: ${region.name}`)
@@ -391,32 +396,49 @@ export class MultiRegionDeploymentManager extends EventEmitter {
   /**
    * Handle health check failure
    */
-  private async handleHealthCheckFailure(data: any): Promise<void> {
-    const { regionId, failureReason } = data
+  private async handleHealthCheckFailure(data: unknown): Promise<void> {
+    if (
+      typeof data === 'object' &&
+      data !== null &&
+      'regionId' in data &&
+      'failureReason' in data
+    ) {
+      const { regionId, failureReason } = data as {
+        regionId: string
+        failureReason: string
+      }
 
-    const status = this.deploymentStatuses.get(regionId)
-    if (status) {
-      status.status = 'degraded'
-      status.errors.push(`Health check failed: ${failureReason}`)
+      const status = this.deploymentStatuses.get(regionId)
+      if (status) {
+        status.status = 'degraded'
+        status.errors.push(`Health check failed: ${failureReason}`)
 
-      this.emit('region-degraded', { regionId, reason: failureReason })
+        this.emit('region-degraded', { regionId, reason: failureReason })
+      }
     }
   }
 
   /**
    * Handle health check recovery
    */
-  private async handleHealthCheckRecovery(data: any): Promise<void> {
-    const { regionId } = data
+  private async handleHealthCheckRecovery(data: unknown): Promise<void> {
+    if (
+      typeof data === 'object' &&
+      data !== null &&
+      'regionId' in data &&
+      typeof (data as { regionId: unknown }).regionId === 'string'
+    ) {
+      const { regionId } = data as { regionId: string }
 
-    const status = this.deploymentStatuses.get(regionId)
-    if (status) {
-      status.status = 'healthy'
-      status.errors = status.errors.filter(
-        (e) => !e.includes('Health check failed'),
-      )
+      const status = this.deploymentStatuses.get(regionId)
+      if (status) {
+        status.status = 'healthy'
+        status.errors = status.errors.filter(
+          (e) => !e.includes('Health check failed'),
+        )
 
-      this.emit('region-recovered', { regionId })
+        this.emit('region-recovered', { regionId })
+      }
     }
   }
 

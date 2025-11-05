@@ -6,7 +6,9 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logging'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('DeploymentOrchestrator')
 import { RegionConfig } from './MultiRegionDeploymentManager'
 import { CloudProviderManager, DeploymentResult } from './CloudProviderManager'
 
@@ -48,7 +50,7 @@ export interface RollbackPoint {
   id: string
   name: string
   phaseId: string
-  snapshot: any
+  snapshot: Record<string, unknown>
   createdAt: Date
 }
 
@@ -56,13 +58,13 @@ export interface ValidationStep {
   id: string
   name: string
   type:
-    | 'health-check'
-    | 'performance-test'
-    | 'security-scan'
-    | 'compliance-check'
+  | 'health-check'
+  | 'performance-test'
+  | 'security-scan'
+  | 'compliance-check'
   target: string
   timeout: number
-  successCriteria: any
+  successCriteria: Record<string, unknown>
 }
 
 export interface DeploymentExecution {
@@ -82,7 +84,7 @@ export interface DeploymentPhaseResult {
   status: 'success' | 'failed' | 'skipped' | 'rolled-back'
   startedAt: Date
   completedAt: Date
-  results: any[]
+  results: (DeploymentResult | Record<string, unknown>)[]
   errors: string[]
 }
 
@@ -378,7 +380,7 @@ export class DeploymentOrchestrator extends EventEmitter {
    */
   private createExecution(
     planId: string,
-    regions: RegionConfig[],
+    _regions: RegionConfig[],
   ): DeploymentExecution {
     return {
       id: `exec-${planId}-${Date.now()}`,
@@ -483,12 +485,12 @@ export class DeploymentOrchestrator extends EventEmitter {
   private async executePhase(
     phase: DeploymentPhase,
     regions: RegionConfig[],
-    execution: DeploymentExecution,
+    _execution: DeploymentExecution,
   ): Promise<DeploymentPhaseResult> {
     const startTime = new Date()
 
     try {
-      let phaseResults: any[] = []
+      let phaseResults: (DeploymentResult | Record<string, unknown>)[] = []
       let phaseErrors: string[] = []
 
       switch (phase.type) {
@@ -540,7 +542,7 @@ export class DeploymentOrchestrator extends EventEmitter {
   private async deployInfrastructure(
     phase: DeploymentPhase,
     regions: RegionConfig[],
-  ): Promise<any[]> {
+  ): Promise<DeploymentResult[]> {
     try {
       logger.info(`Deploying infrastructure for phase: ${phase.id}`, {
         regions: regions.length,
@@ -583,7 +585,7 @@ export class DeploymentOrchestrator extends EventEmitter {
   private async deployServices(
     phase: DeploymentPhase,
     regions: RegionConfig[],
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     try {
       logger.info(`Deploying services for phase: ${phase.id}`, {
         regions: regions.length,
@@ -611,7 +613,7 @@ export class DeploymentOrchestrator extends EventEmitter {
 
       return results
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<any>).value)
+        .map((result) => (result as PromiseFulfilledResult<Record<string, unknown>>).value)
     } catch (error) {
       logger.error('Service deployment failed', { error })
       throw error
@@ -624,7 +626,7 @@ export class DeploymentOrchestrator extends EventEmitter {
   private async setupMonitoring(
     phase: DeploymentPhase,
     regions: RegionConfig[],
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     try {
       logger.info(`Setting up monitoring for phase: ${phase.id}`, {
         regions: regions.length,
@@ -654,7 +656,7 @@ export class DeploymentOrchestrator extends EventEmitter {
 
       return results
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<any>).value)
+        .map((result) => (result as PromiseFulfilledResult<Record<string, unknown>>).value)
     } catch (error) {
       logger.error('Monitoring setup failed', { error })
       throw error
@@ -667,7 +669,7 @@ export class DeploymentOrchestrator extends EventEmitter {
   private async performPhaseValidation(
     phase: DeploymentPhase,
     regions: RegionConfig[],
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     try {
       logger.info(`Performing phase validation for: ${phase.id}`, {
         regions: regions.length,
@@ -928,11 +930,14 @@ export class DeploymentOrchestrator extends EventEmitter {
    */
   private async validateHealthCheck(
     step: ValidationStep,
-    execution: DeploymentExecution,
+    _execution: DeploymentExecution,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // In a real implementation, this would check health scores from HealthMonitor
-      const minHealthScore = step.successCriteria.minHealthScore || 80
+      const minHealthScore =
+        (typeof step.successCriteria.minHealthScore === 'number'
+          ? step.successCriteria.minHealthScore
+          : undefined) || 80
 
       // Simulate health check validation
       const simulatedHealthScore = 85 + Math.random() * 10 // 85-95 range
@@ -955,12 +960,18 @@ export class DeploymentOrchestrator extends EventEmitter {
    */
   private async validatePerformanceTest(
     step: ValidationStep,
-    execution: DeploymentExecution,
+    _execution: DeploymentExecution,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // In a real implementation, this would run actual performance tests
-      const maxResponseTime = step.successCriteria.maxResponseTime || 200
-      const minThroughput = step.successCriteria.minThroughput || 100
+      const maxResponseTime =
+        (typeof step.successCriteria.maxResponseTime === 'number'
+          ? step.successCriteria.maxResponseTime
+          : undefined) || 200
+      const minThroughput =
+        (typeof step.successCriteria.minThroughput === 'number'
+          ? step.successCriteria.minThroughput
+          : undefined) || 100
 
       // Simulate performance test results
       const responseTime = 150 + Math.random() * 50 // 150-200ms range
@@ -991,8 +1002,8 @@ export class DeploymentOrchestrator extends EventEmitter {
    * Validate security scan
    */
   private async validateSecurityScan(
-    step: ValidationStep,
-    execution: DeploymentExecution,
+    _step: ValidationStep,
+    _execution: DeploymentExecution,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // In a real implementation, this would run security scanning tools
@@ -1017,8 +1028,8 @@ export class DeploymentOrchestrator extends EventEmitter {
    * Validate compliance check
    */
   private async validateComplianceCheck(
-    step: ValidationStep,
-    execution: DeploymentExecution,
+    _step: ValidationStep,
+    _execution: DeploymentExecution,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // In a real implementation, this would run compliance checks
@@ -1038,7 +1049,7 @@ export class DeploymentOrchestrator extends EventEmitter {
   /**
    * Handle deployment failure
    */
-  private handleDeploymentFailure(data: any): void {
+  private handleDeploymentFailure(data: unknown): void {
     logger.error('Handling deployment failure', data)
 
     // Find affected executions

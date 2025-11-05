@@ -119,9 +119,9 @@ export async function verifyAdmin(
  */
 export async function rateLimitMiddleware(
   request: Request,
-  endpoint: string,
-  limit: number,
-  windowMinutes: number,
+  _endpoint: string,
+  _limit: number,
+  _windowMinutes: number,
 ): Promise<{
   success: boolean
   request?: Request
@@ -200,7 +200,7 @@ export async function securityHeaders(
   headers.set('Expires', '0')
 
   // Add CORS headers for API requests
-  const origin = request.headers.origin
+  const { origin } = request.headers
   if (origin) {
     headers.set('Access-Control-Allow-Origin', 'https://app.example.com')
     headers.set(
@@ -252,7 +252,7 @@ export async function authenticateRequest(request: Request): Promise<{
   error?: string
 }> {
   // Basic implementation - would integrate with JWT service
-  const token = extractTokenFromRequest(request as any)
+  const token = extractTokenFromRequest(request as unknown as Request)
 
   if (!token) {
     return {
@@ -321,13 +321,11 @@ export async function requireRole(
   if (!hasAccess) {
     // Log authorization failure
     try {
-      const { logSecurityEvent } = await import('../security')
-      const { SecurityEventType } = await import('../security')
-      logSecurityEvent(
-        SecurityEventType.AUTHORIZATION_FAILED,
-        request.user.id,
-        `User ${request.user.id} with role ${request.user.role} attempted to access resource requiring roles: ${roles.join(', ')}`,
-      )
+      const { logSecurityEvent, SecurityEventType } = await import('../security')
+      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, {
+        userId: request.user.id,
+        message: `User ${request.user.id} with role ${request.user.role} attempted to access resource requiring roles: ${roles.join(', ')}`,
+      })
     } catch {
       // Security module not available in test environment
     }

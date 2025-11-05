@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: docker.io/pixelatedempathy/pixelated-empathy:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
+        image: ghcr.io/pixelatedempathy/pixelated:latest # {"$imagepolicy": "flux-system:pixelated-empathy"}
         imagePullPolicy: Always
         env:
         - name: NODE_ENV

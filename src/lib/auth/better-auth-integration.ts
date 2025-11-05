@@ -11,6 +11,9 @@ import {
   validateToken,
   AuthenticationError,
 } from './jwt-service'
+
+// Re-export AuthenticationError for convenience
+export { AuthenticationError }
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
@@ -107,9 +110,18 @@ export interface RegisterCredentials {
 const userAuthStore = new Map<string, UserAuthentication>()
 
 /**
+ * Better-Auth user shape used for mapping
+ */
+interface BetterAuthUserShape {
+  id: string
+  email: string
+  role?: string
+}
+
+/**
  * Map Better-Auth user to local user authentication
  */
-function mapBetterAuthUserToLocal(betterAuthUser: any): UserAuthentication {
+function mapBetterAuthUserToLocal(betterAuthUser: BetterAuthUserShape): UserAuthentication {
   const existingUser = Array.from(userAuthStore.values()).find(
     (user) => user.betterAuthUserId === betterAuthUser.id,
   )
@@ -188,7 +200,8 @@ export async function registerWithBetterAuth(
     )
 
     // Log successful registration
-    await logSecurityEvent(SecurityEventType.USER_CREATED, userAuth.id, {
+    await logSecurityEvent(SecurityEventType.USER_CREATED, {
+      userId: userAuth.id,
       email: credentials.email,
       role: userAuth.role,
       clientInfo: clientInfo,
@@ -205,7 +218,8 @@ export async function registerWithBetterAuth(
     }
   } catch (error) {
     // Log registration failure
-    await logSecurityEvent(SecurityEventType.REGISTRATION_FAILURE, null, {
+    await logSecurityEvent(SecurityEventType.REGISTRATION_FAILURE, {
+      userId: null,
       error: error instanceof Error ? error.message : 'Unknown error',
       email: credentials.email,
       clientInfo: clientInfo,
@@ -283,7 +297,8 @@ export async function authenticateWithBetterAuth(
     )
 
     // Log successful authentication
-    await logSecurityEvent(SecurityEventType.LOGIN_SUCCESS, userAuth.id, {
+    await logSecurityEvent(SecurityEventType.LOGIN_SUCCESS, {
+      userId: userAuth.id,
       email: credentials.email,
       clientInfo: clientInfo,
     })
@@ -299,7 +314,8 @@ export async function authenticateWithBetterAuth(
     }
   } catch (error) {
     // Log authentication failure
-    await logSecurityEvent(SecurityEventType.LOGIN_FAILURE, null, {
+    await logSecurityEvent(SecurityEventType.LOGIN_FAILURE, {
+      userId: null,
       error: error instanceof Error ? error.message : 'Unknown error',
       email: credentials.email,
       clientInfo: clientInfo,
@@ -357,7 +373,8 @@ export async function logoutFromBetterAuth(
     // This would integrate with the JWT token revocation system
 
     // Log logout event
-    await logSecurityEvent(SecurityEventType.LOGOUT, userId, {
+    await logSecurityEvent(SecurityEventType.LOGOUT, {
+      userId: userId,
       clientInfo: clientInfo,
     })
 
@@ -482,3 +499,84 @@ export function getBetterAuthInstance() {
  */
 export type { BetterAuthOptions, User } from 'better-auth'
 export { betterAuth, drizzleAdapter }
+
+/**
+ * Legacy wrapper functions for backward compatibility with tests
+ * These map to the actual better-auth integration functions
+ */
+
+/**
+ * Register a new user (wrapper for registerWithBetterAuth)
+ */
+export async function registerUser(
+  userData: RegisterCredentials,
+  clientInfo: ClientInfo,
+): Promise<AuthenticationResult> {
+  return registerWithBetterAuth(userData, clientInfo)
+}
+
+/**
+ * Login user (wrapper for authenticateWithBetterAuth)
+ */
+export async function loginUser(
+  email: string,
+  password: string,
+  clientInfo: ClientInfo,
+): Promise<AuthenticationResult> {
+  return authenticateWithBetterAuth({ email, password }, clientInfo)
+}
+
+/**
+ * Logout user (wrapper for logoutFromBetterAuth)
+ */
+export async function logoutUser(
+  userId: string,
+  sessionId: string,
+  clientInfo: ClientInfo,
+): Promise<void> {
+  return logoutFromBetterAuth(userId, clientInfo)
+}
+
+/**
+ * Get user by ID (wrapper for getUserAuthentication)
+ */
+export function getUserById(userId: string): UserAuthentication | null {
+  return getUserAuthentication(userId)
+}
+
+/**
+ * Update user profile (wrapper for updateUserAuthentication)
+ */
+export async function updateUserProfile(
+  userId: string,
+  updates: Partial<Pick<UserAuthentication, 'email'>> & Record<string, unknown>,
+): Promise<UserAuthentication> {
+  return updateUserAuthentication(userId, updates as Partial<UserAuthentication>)
+}
+
+/**
+ * Change user password (stub - needs implementation)
+ */
+export async function changePassword(
+  _userId: string,
+  _currentPassword: string,
+  _newPassword: string,
+  _clientInfo: ClientInfo,
+): Promise<void> {
+  // TODO: Implement password change functionality
+  throw new AuthenticationError('Password change not implemented yet')
+}
+
+/**
+ * Validate user role (wrapper for hasRequiredRole)
+ */
+export function validateUserRole(
+  userId: string,
+  requiredRoles: UserRole[],
+): boolean {
+  const user = getUserAuthentication(userId)
+  if (!user) {
+    return false
+  }
+  return requiredRoles.some((role) => hasRequiredRole(user.role, role))
+}

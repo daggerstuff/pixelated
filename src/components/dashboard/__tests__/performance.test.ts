@@ -340,7 +340,9 @@ describe('Dashboard Performance Tests', () => {
     expect(firstActiveSession).toBeDefined()
 
     // Extract the ID safely after confirming it exists
-    // @ts-expect-error - firstActiveSession is guaranteed to be defined after the assertion above
+    if (!firstActiveSession) {
+      throw new Error('No active session found in mock data')
+    }
     expect(mockOnSessionControl).toHaveBeenCalledWith(
       firstActiveSession.id,
       'pause',
@@ -449,42 +451,42 @@ describe('Dashboard Performance Tests', () => {
   })
 
   it('handles concurrent operations efficiently', async () => {
-    const promises = []
+    const promises: Promise<unknown>[] = []
 
     const startTime = performance.now()
 
     // Render multiple components concurrently
     promises.push(
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         render(
           React.createElement(SessionControls, {
             sessions: mockSessions,
             onSessionControl: mockOnSessionControl,
           }),
         )
-        resolve(true)
+        resolve()
       }),
     )
 
     promises.push(
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         render(
           React.createElement(TherapistProgressTracker, {
             session: mockSessions[0]!,
           }),
         )
-        resolve(true)
+        resolve()
       }),
     )
 
     promises.push(
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         render(
           React.createElement(TherapyProgressCharts, {
             data: mockAnalyticsData,
           }),
         )
-        resolve(true)
+        resolve()
       }),
     )
 
