@@ -966,5 +966,3 @@ interface SystemMetrics {
   activeConnections: number
   queueSize: number
 }
-
-export { GlobalThreatIntelligenceNetworkCore }

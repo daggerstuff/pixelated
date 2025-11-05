@@ -1216,5 +1216,3 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 }
-
-export { ThreatIntelligenceDatabaseCore }

@@ -185,7 +185,7 @@ export function TherapistProgressTracker({
                   {effectiveSkills.map(
                     (skill: SkillProgress, index: number) => (
                       <div
-                        key={index}
+                        key={`${skill.skill}-${index}`}
                         className="flex items-center justify-between p-2 rounded hover:bg-background focus-within:bg-background focus-within:ring-1 focus-within:ring-primary"
                         tabIndex={0}
                         role="listitem"

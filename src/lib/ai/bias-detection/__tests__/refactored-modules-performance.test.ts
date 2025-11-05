@@ -6,9 +6,9 @@ import type { BiasAnalysisResult } from '../types'
 
 // Mock the Python bridge to avoid network calls
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    analyzeSession: vi.fn().mockImplementation(async () => {
+  PythonBiasDetectionBridge: class {
+    initialize = vi.fn().mockResolvedValue(undefined)
+    analyzeSession = vi.fn().mockImplementation(async () => {
       // Simulate realistic API response time (50-150ms)
       const delay = 50 + Math.random() * 100
       await new Promise((resolve) => setTimeout(resolve, delay))
@@ -23,30 +23,30 @@ vi.mock('../python-bridge', () => ({
           evaluation: { biasScore: 0.3 + Math.random() * 0.3 },
         },
       }
-    }),
-    runPreprocessingAnalysis: vi.fn().mockImplementation(async () => {
+    })
+    runPreprocessingAnalysis = vi.fn().mockImplementation(async () => {
       const delay = 30 + Math.random() * 50
       await new Promise((resolve) => setTimeout(resolve, delay))
       return { biasScore: 0.2 + Math.random() * 0.3 }
-    }),
-    runModelLevelAnalysis: vi.fn().mockImplementation(async () => {
+    })
+    runModelLevelAnalysis = vi.fn().mockImplementation(async () => {
       const delay = 40 + Math.random() * 60
       await new Promise((resolve) => setTimeout(resolve, delay))
       return { biasScore: 0.3 + Math.random() * 0.3 }
-    }),
-    runInteractiveAnalysis: vi.fn().mockImplementation(async () => {
+    })
+    runInteractiveAnalysis = vi.fn().mockImplementation(async () => {
       const delay = 35 + Math.random() * 55
       await new Promise((resolve) => setTimeout(resolve, delay))
       return { biasScore: 0.4 + Math.random() * 0.3 }
-    }),
-    runEvaluationAnalysis: vi.fn().mockImplementation(async () => {
+    })
+    runEvaluationAnalysis = vi.fn().mockImplementation(async () => {
       const delay = 45 + Math.random() * 65
       await new Promise((resolve) => setTimeout(resolve, delay))
       return { biasScore: 0.3 + Math.random() * 0.3 }
-    }),
-    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
-    dispose: vi.fn().mockResolvedValue(undefined),
-  })),
+    })
+    checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
+    dispose = vi.fn().mockResolvedValue(undefined)
+  },
 }))
 
 // Mock the metrics collector

@@ -113,14 +113,7 @@ export const DEFAULT_PRODUCTION_CONFIG: ProductionConfig = {
     enableHealthChecks: true,
     enablePerformanceTracking: true,
     metricsCollectionIntervalMs: 60000,
-    enableDetailedLogging: (() => {
-      import { config as envConfig } from '@/config/env.config'
-
-      try {
-        return !envConfig.isProduction()
-      } catch {
-        return true // Default to detailed logging if config unavailable
-      }
-    })(),
+    enableDetailedLogging:
+      typeof process !== 'undefined' && process.env.NODE_ENV !== 'production',
   },
 }

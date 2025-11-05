@@ -187,12 +187,16 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
 
-    // Validate form first - this will set errors state using flushSync
+    // Validate form - this will set errors state using flushSync
     // to ensure React processes the state update synchronously
-    const isValid = validateForm()
+    let isValid: boolean
+    flushSync(() => {
+      isValid = validateForm()
+    })
 
-    if (!isValid) {
+    if (!isValid!) {
       // Errors have been set by validateForm() using flushSync
       // Notify user about validation errors
       setToastMessage({
@@ -309,7 +313,10 @@ export function LoginForm({
   const renderMainForm = () => (
     <div className="auth-form-container text-center form-container responsive-auth-container">
       {mode === 'reset' && (
-        <h2 className="text-gradient text-responsive--heading">
+        <h2
+          className="text-gradient text-responsive--heading"
+          data-testid="reset-password-heading"
+        >
           Reset Password
         </h2>
       )}

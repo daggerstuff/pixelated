@@ -1523,5 +1523,3 @@ export class ThreatIntelligenceConfigManager {
     }
   }
 }
-
-export { ThreatIntelligenceConfigManager }

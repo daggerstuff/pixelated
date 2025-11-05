@@ -1577,5 +1577,3 @@ export class ThreatValidationSystemCore
     }
   }
 }
-
-export { ThreatValidationSystemCore }

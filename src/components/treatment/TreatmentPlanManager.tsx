@@ -52,7 +52,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   const [activeTab, setActiveTab] = useState<
     'overview' | 'goals' | 'progress' | 'notes'
   >('overview')
-  const [editingGoal, setEditingGoal] = useState<string | null>(null)
+  const [_editingGoal, _setEditingGoal] = useState<string | null>(null)
   const [newGoal, setNewGoal] = useState<Partial<TreatmentGoal>>({})
   const [showAddGoal, setShowAddGoal] = useState(false)
 
@@ -137,7 +137,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
 
   useEffect(() => {
     setCurrentPlan(plan || defaultPlan)
-  }, [plan])
+  }, [plan, defaultPlan])
 
   const getPriorityColor = (priority: TreatmentGoal['priority']) => {
     switch (priority) {

@@ -194,6 +194,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Free disk space for security scan
+        uses: easimon/maximize-build-space@v10
+        with:
+          root-reserve-mb: 25600
+          swap-size-mb: 1
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+          remove-docker-images: true
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -298,6 +309,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/.cache/trivy"
           echo "✅ Trivy will use $RUNNER_TEMP for temp and cache"
 
+      - name: Aggressive Docker cleanup before scan
+        run: |
+          echo "🧹 Pruning Docker to reclaim space..."
+          docker system prune -af || true
+          docker builder prune -af || true
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.33.1
         continue-on-error: true
@@ -307,7 +324,7 @@ jobs:
           output: "trivy-results.sarif"
           cache-dir: ${{ env.TRIVY_CACHE_DIR }}
           # Limit scanning to vulnerabilities to reduce temp usage and speed
-          security-checks: vuln
+          scanners: vuln
           # Keep SARIF focused and smaller
           severity: CRITICAL,HIGH
           limit-severities-for-sarif: true
@@ -420,11 +437,12 @@ jobs:
           echo "✅ Sentry release created"
 
   # GKE Deployment with multiple strategies
+  # DISABLED: Cluster migrated to Civo - do not deploy to GKE
   deploy-gke:
-    name: Deploy to GKE
+    name: Deploy to GKE (DISABLED)
     runs-on: ubuntu-latest
     needs: [build, security-scan, sentry-release]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: false # Disabled - cluster migrated to Civo
     environment: production
     outputs:
       deployment-status: ${{ steps.deploy.outputs.status }}
@@ -720,11 +738,12 @@ jobs:
           echo "strategy=$DEPLOYMENT_STRATEGY" >> $GITHUB_OUTPUT
 
   # GKE Health Check
+  # DISABLED: Cluster migrated to Civo
   health-check-gke:
-    name: GKE Health Check
+    name: GKE Health Check (DISABLED)
     runs-on: ubuntu-latest
     needs: [deploy-gke]
-    if: always() && needs.deploy-gke.result == 'success'
+    if: false # Disabled - cluster migrated to Civo
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -835,11 +854,12 @@ jobs:
           echo "✅ GKE health check completed"
 
   # Cleanup job - runs after deployments
+  # DISABLED: Cluster migrated to Civo
   cleanup:
-    name: Cleanup
+    name: Cleanup (DISABLED)
     runs-on: ubuntu-latest
     needs: [deploy-gke, health-check-gke]
-    if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: false # Disabled - cluster migrated to Civo
     steps:
       - name: Checkout code
         uses: actions/checkout@v5

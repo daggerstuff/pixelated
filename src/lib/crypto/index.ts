@@ -327,9 +327,7 @@ export function decrypt(data: string, key: string): string {
     logger.error('Decryption failed', {
       error: error instanceof Error ? String(error) : String(error),
     })
-    throw new Error(
-      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
-    )
+    throw new Error(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error as unknown as Error })
   }
 }
 

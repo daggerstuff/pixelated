@@ -744,5 +744,3 @@ interface ValidationRule {
   type: 'required' | 'range' | 'format'
   parameters?: unknown
 }
-
-export { ModelServingServer }

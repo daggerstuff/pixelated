@@ -187,12 +187,13 @@ class PrivacyEngine {
     for (let i = 0; i < 100; i++) {
       // Generate noise for model weights
       switch (mechanism) {
-        case 'gaussian':
-          // Gaussian noise: N(0, σ²) where σ = sensitivity / epsilon
-          const sigma =
-            noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
-          noise.push(this.gaussianRandom(0, sigma))
-          break
+        case 'gaussian': {
+  // Gaussian noise: N(0, σ²) where σ = sensitivity / epsilon
+  const sigma =
+    noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
+  noise.push(this.gaussianRandom(0, sigma))
+  break
+}
         case 'laplace':
           // Laplace noise with scale b = sensitivity / epsilon
           noise.push(this.laplaceRandom(noiseScale))

@@ -621,18 +621,14 @@ export async function optimizedQuery<T = any>(
   // Use provided client or acquire from pool
   if (options.client) {
     const startTime = Date.now()
-    try {
-      const result = await options.client.query(text, params)
-      const duration = Date.now() - startTime
+const result = await options.client.query(text, params)
+const duration = Date.now() - startTime
 
-      return {
-        rows: result.rows,
-        rowCount: result.rowCount || 0,
-        duration,
-      }
-    } catch (error) {
-      throw error
-    }
+return {
+  rows: result.rows,
+  rowCount: result.rowCount || 0,
+  duration,
+}
   }
 
   return pool.query(text, params)

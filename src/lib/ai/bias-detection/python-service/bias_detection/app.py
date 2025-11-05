@@ -278,9 +278,7 @@ def create_app() -> FastAPI:
                 status="success", bias_types=len(result.bias_scores)
             ).inc()
 
-            analysis_duration.labels(model_framework="ensemble").observe(
-                analysis_time
-            )
+            analysis_duration.labels(model_framework="ensemble").observe(analysis_time)
 
             # Update rate limiting
             if request.user_id:

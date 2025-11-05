@@ -42,9 +42,9 @@ const OPTIMIZED_INDEXES = {
 /**
  * Execute query with timeout and performance monitoring
  */
-export async function executeQuery<T = any>(
+export async function executeQuery<T = unknown>(
   text: string,
-  params?: any[],
+  params?: unknown[],
   options: {
     timeout?: number
     retries?: number
@@ -193,7 +193,7 @@ export class OptimizedBiasQueries {
       orderDirection?: 'ASC' | 'DESC'
     } = {},
   ): Promise<{
-    analyses: any[]
+    analyses: unknown[]
     total: number
     page: number
     pageSize: number
@@ -212,7 +212,7 @@ export class OptimizedBiasQueries {
 
     // Build WHERE conditions
     const conditions: string[] = []
-    const params: any[] = []
+    const params: unknown[] = []
     let paramIndex = 1
 
     if (therapistId) {
@@ -297,7 +297,7 @@ export class OptimizedBiasQueries {
   /**
    * Get cached analysis by content hash (optimized)
    */
-  async getCachedAnalysis(contentHash: string): Promise<any | null> {
+  async getCachedAnalysis(contentHash: string): Promise<unknown | null> {
     const query = `
       SELECT 
         ba.id,
@@ -395,7 +395,7 @@ export class OptimizedBiasQueries {
   /**
    * Get high-risk analyses for monitoring
    */
-  async getHighRiskAnalyses(limit: number = 50): Promise<any[]> {
+  async getHighRiskAnalyses(limit: number = 50): Promise<unknown[]> {
     const query = `
       SELECT 
         ba.id,

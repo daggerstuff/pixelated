@@ -1651,5 +1651,3 @@ class BehavioralGraphAnalyzer extends GraphAnalyzer {
     return []
   }
 }
-
-export { AdvancedBehavioralAnalysisService }

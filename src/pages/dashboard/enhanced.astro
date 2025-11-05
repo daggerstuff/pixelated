@@ -25,7 +25,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
   description="Comprehensive therapy dashboard with advanced analytics and visualization tools"
 >
   <div class="container mx-auto py-6 space-y-6">
-    <!-- Dashboard Header with Mode Selector -->
+    {/* $1 */}
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="text-4xl font-bold tracking-tight mb-2">
@@ -38,7 +38,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
       </div>
       
       <div class="flex items-center gap-4">
-        <!-- Dashboard Mode Toggle -->
+        {/* $1 */}
         <div class="flex items-center gap-2 bg-card border rounded-lg p-1">
           <a 
             href="/dashboard/enhanced?mode=standard" 
@@ -72,7 +72,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
           </a>
         </div>
 
-        <!-- Advanced Features Toggle -->
+        {/* $1 */}
         <a 
           href={`/dashboard/enhanced?mode=${dashboardMode}&advanced=${!showAdvanced}`}
           class="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
@@ -87,7 +87,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
       </div>
     </div>
 
-    <!-- Real-time Status Bar -->
+    {/* $1 */}
     <Card class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
       <div class="p-4">
         <div class="flex items-center justify-between">
@@ -272,7 +272,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
 
     {dashboardMode === 'therapist' && (
       <div class="space-y-6">
-        <!-- Treatment Plan Manager -->
+        {/* $1 */}
         <Card>
           <div class="p-6">
             <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
@@ -287,7 +287,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
           </div>
         </Card>
 
-        <!-- Therapist Analytics Row -->
+        {/* $1 */}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <div class="p-6">
@@ -349,7 +349,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
 
     {dashboardMode === 'analytics' && (
       <div class="space-y-6">
-        <!-- Analytics Header -->
+        {/* $1 */}
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20">
             <div class="p-4">
@@ -400,7 +400,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
           </Card>
         </div>
 
-        <!-- Advanced Visualizations -->
+        {/* $1 */}
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <Card>
             <div class="p-6">
@@ -431,7 +431,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
           </Card>
         </div>
 
-        <!-- Comprehensive Analytics Grid -->
+        {/* $1 */}
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           <Card>
             <div class="p-6">
@@ -491,7 +491,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
       </div>
     )}
 
-    <!-- Footer Actions -->
+    {/* $1 */}
     <div class="flex items-center justify-between pt-6 border-t border-border">
       <div class="flex items-center gap-4 text-sm text-muted-foreground">
         <span>Dashboard Mode: <span class="font-medium capitalize">{dashboardMode}</span></span>
@@ -518,7 +518,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
     </div>
   </div>
 
-  <!-- Auto-update timestamp script -->
+  {/* $1 */}
   <script>
     function updateTimestamp() {
       const element = document.getElementById('last-update');

@@ -72,7 +72,11 @@ class CacheService:
 
     async def get(self, key: str) -> Optional[Any]:
         """Get value from cache"""
-        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
+        if (
+            not self.is_connected
+            or not settings.enable_caching
+            or self.redis_client is None
+        ):
             return None
 
         try:
@@ -94,7 +98,11 @@ class CacheService:
         self, key: str, value: Any, ttl: Optional[int] = None, serialize: bool = True
     ) -> bool:
         """Set value in cache"""
-        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
+        if (
+            not self.is_connected
+            or not settings.enable_caching
+            or self.redis_client is None
+        ):
             return False
 
         try:

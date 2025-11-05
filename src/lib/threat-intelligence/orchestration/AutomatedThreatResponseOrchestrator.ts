@@ -1628,5 +1628,3 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 }
-
-export { AutomatedThreatResponseOrchestratorCore }

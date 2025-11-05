@@ -49,12 +49,12 @@ const isSupervisor = userRole === 'admin';
   title={`Training Session - ${sessionData.clientProfile.name}`}
   description="Immersive therapeutic training session with AI client simulation"
 >
-  <!-- Load required scripts for real-time functionality -->
+  {/* $1 */}
   <script is:inline src="/js/socket.io.min.js"></script>
   <script is:inline src="/js/training-session.js" type="module"></script>
 
   <main class="h-screen flex flex-col bg-gray-50">
-    <!-- Session Header -->
+    {/* $1 */}
     <header class="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
@@ -81,7 +81,7 @@ const isSupervisor = userRole === 'admin';
         </div>
         
         <div class="flex items-center space-x-4">
-          <!-- Session Timer -->
+          {/* $1 */}
           <div class="flex items-center space-x-2 text-sm text-gray-600">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -89,7 +89,7 @@ const isSupervisor = userRole === 'admin';
             <span id="session-timer">00:00</span>
           </div>
           
-          <!-- Emergency Button -->
+          {/* $1 */}
           <button 
             id="emergency-button"
             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -97,7 +97,7 @@ const isSupervisor = userRole === 'admin';
             🚨 Emergency
           </button>
           
-          <!-- Session Controls -->
+          {/* $1 */}
           <div class="flex items-center space-x-2">
             <button 
               id="pause-session"
@@ -116,14 +116,14 @@ const isSupervisor = userRole === 'admin';
       </div>
     </header>
 
-    <!-- Main Training Interface -->
+    {/* $1 */}
     <div class="flex-1 flex overflow-hidden">
 
       {isTrainee && (
         <div class="flex-1 flex">
-          <!-- Left Sidebar: Client Info & Avatar -->
+          {/* $1 */}
           <aside class="w-80 bg-white border-r border-gray-200 flex flex-col">
-            <!-- Client Information Panel -->
+            {/* $1 */}
             <div class="p-6 border-b border-gray-200">
               <h2 class="text-lg font-semibold text-gray-900 mb-4">Client Information</h2>
               
@@ -166,7 +166,7 @@ const isSupervisor = userRole === 'admin';
               </div>
             </div>
             
-            <!-- Emotional Avatar -->
+            {/* $1 */}
             <div class="p-6 border-b border-gray-200">
               <h3 class="text-md font-semibold text-gray-900 mb-4">Client State</h3>
               
@@ -183,7 +183,7 @@ const isSupervisor = userRole === 'admin';
                 </div>
               </div>
               
-              <!-- State Meters -->
+              {/* $1 */}
               <div class="space-y-3">
                 <div>
                   <div class="flex justify-between text-xs text-gray-600 mb-1">
@@ -229,7 +229,7 @@ const isSupervisor = userRole === 'admin';
               </div>
             </div>
             
-            <!-- Nonverbal Cues -->
+            {/* $1 */}
             <div class="p-6 flex-1">
               <h3 class="text-md font-semibold text-gray-900 mb-4">Nonverbal Cues</h3>
               
@@ -250,22 +250,22 @@ const isSupervisor = userRole === 'admin';
             </div>
           </aside>
           
-          <!-- Center: Conversation Interface -->
+          {/* $1 */}
           <div class="flex-1 flex flex-col">
-            <!-- Conversation Area -->
+            {/* $1 */}
             <div class="flex-1 flex flex-col bg-white">
-              <!-- Messages Container -->
+              {/* $1 */}
               <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
-                <!-- Messages will be populated by JavaScript -->
+                {/* $1 */}
                 <div class="text-center text-gray-500 py-8">
                   <p>Session starting... The client will begin speaking shortly.</p>
                 </div>
               </div>
               
-              <!-- Message Composer -->
+              {/* $1 */}
               <div class="border-t border-gray-200 p-4 bg-gray-50">
                 <div class="flex flex-col space-y-3">
-                  <!-- Intervention Type Selector -->
+                  {/* $1 */}
                   <div class="flex items-center space-x-4">
                     <label class="text-sm font-medium text-gray-700">Response Type:</label>
                     <select 
@@ -288,7 +288,7 @@ const isSupervisor = userRole === 'admin';
                     </button>
                   </div>
                   
-                  <!-- Message Input -->
+                  {/* $1 */}
                   <div class="flex space-x-3">
                     <div class="flex-1">
                       <textarea
@@ -298,7 +298,7 @@ const isSupervisor = userRole === 'admin';
                         rows="3"
                       ></textarea>
                       
-                      <!-- Input Assistance -->
+                      {/* $1 */}
                       <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
                         <span>
                           Quality: <span id="response-quality" class="font-medium">Good</span>
@@ -322,13 +322,13 @@ const isSupervisor = userRole === 'admin';
             </div>
           </div>
           
-          <!-- Right Sidebar: Feedback Panel -->
+          {/* $1 */}
           <aside class="w-80 bg-white border-l border-gray-200 flex flex-col">
-            <!-- Real-time Feedback -->
+            {/* $1 */}
             <div class="p-6 border-b border-gray-200">
               <h2 class="text-lg font-semibold text-gray-900 mb-4">Real-time Guidance</h2>
               
-              <!-- Skill Meters -->
+              {/* $1 */}
               <div class="space-y-4">
                 <div>
                   <div class="flex justify-between text-sm text-gray-600 mb-1">
@@ -374,7 +374,7 @@ const isSupervisor = userRole === 'admin';
               </div>
             </div>
             
-            <!-- Live Feedback -->
+            {/* $1 */}
             <div class="p-6 border-b border-gray-200">
               <h3 class="text-md font-semibold text-gray-900 mb-4">Live Feedback</h3>
               <div id="feedback-messages" class="space-y-2 text-sm">
@@ -382,13 +382,13 @@ const isSupervisor = userRole === 'admin';
               </div>
             </div>
             
-            <!-- Crisis Alerts -->
+            {/* $1 */}
             <div id="crisis-alerts" class="hidden p-6 bg-red-50 border-b border-red-200">
               <h3 class="text-md font-semibold text-red-900 mb-2">⚠️ Crisis Alert</h3>
               <div id="crisis-message" class="text-sm text-red-800"></div>
             </div>
             
-            <!-- Session Notes -->
+            {/* $1 */}
             <div class="flex-1 p-6">
               <h3 class="text-md font-semibold text-gray-900 mb-4">Session Notes</h3>
               <textarea
@@ -401,17 +401,17 @@ const isSupervisor = userRole === 'admin';
         </div>
       )}
       
-      {/* Supervisor Interface */}
+      {/* $1 */}
       {isSupervisor && (
         <div class="flex-1">
-          <!-- Supervisor dashboard will be loaded here -->
+          {/* $1 */}
           <div id="supervisor-dashboard"></div>
         </div>
       )}
     </div>
   </main>
 
-  <!-- Hidden data for JavaScript -->
+  {/* $1 */}
   <script type="application/json" id="session-data">
     {JSON.stringify(sessionData)}
   </script>

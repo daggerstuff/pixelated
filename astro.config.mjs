@@ -67,6 +67,25 @@ export default defineConfig({
     }
   },
   vite: {
+    server: {
+      watch: {
+        ignored: [
+          // Aggressive node_modules exclusion at Vite level
+          (p) => typeof p === 'string' && (
+            p.includes('/node_modules/') ||
+            p.includes('\\node_modules\\') ||
+            p.includes('/.venv/') ||
+            p.includes('\\.venv\\') ||
+            p.includes('/ai/') ||
+            p.includes('\\ai\\')
+          ),
+          '**/node_modules/**',
+          '/node_modules/**',
+          'node_modules/**',
+          './node_modules/**',
+        ],
+      },
+    },
     build: {
       sourcemap: process.env.NODE_ENV === 'production' ? false : 'hidden',
       target: 'node24',
@@ -236,9 +255,11 @@ export default defineConfig({
       ...base,
       UnoCSS({ injectReset: true }),
       icon({
-        include: { lucide: [
-          'calendar','user','settings','heart','brain','shield-check','info','arrow-left','shield','user-plus'
-        ]},
+        include: {
+          lucide: [
+            'calendar', 'user', 'settings', 'heart', 'brain', 'shield-check', 'info', 'arrow-left', 'shield', 'user-plus'
+          ]
+        },
         svgdir: './src/icons',
       }),
       ...(process.env.SENTRY_DSN ? [
@@ -274,8 +295,15 @@ export default defineConfig({
     watch: {
       followSymlinks: false,
       ignored: [
-        // Hard guard first: function ignore for .venv anywhere
-        (p) => typeof p === 'string' && (p.includes('/.venv/') || p.includes('\\.venv\\') || p.includes('/ai/') || p.includes('\\ai\\')),
+        // Hard guard first: function ignore for node_modules and .venv anywhere
+        (p) => typeof p === 'string' && (
+          p.includes('/node_modules/') ||
+          p.includes('\\node_modules\\') ||
+          p.includes('/.venv/') ||
+          p.includes('\\.venv\\') ||
+          p.includes('/ai/') ||
+          p.includes('\\ai\\')
+        ),
         // Python virtual environments and cache
         '**/.venv/**',
         '.venv/**',
@@ -348,22 +376,27 @@ export default defineConfig({
       ],
       usePolling: false,
     },
-      fs: {
-        strict: true,
-        allow: [
-          path.resolve('./src'),
-          path.resolve('./public'),
-          path.resolve('./.astro'),
-        ],
-        deny: [
-          'ai',
-          '/ai',
-          '**/ai/**',
-          '.venv',
-          '/.venv',
-          '**/.venv/**',
-        ],
-      },
+    fs: {
+      strict: true,
+      allow: [
+        path.resolve('./src'),
+        path.resolve('./public'),
+        path.resolve('./.astro'),
+      ],
+      deny: [
+        'node_modules',
+        '/node_modules',
+        '**/node_modules/**',
+        './node_modules',
+        './node_modules/**',
+        'ai',
+        '/ai',
+        '**/ai/**',
+        '.venv',
+        '/.venv',
+        '**/.venv/**',
+      ],
+    },
   },
 
   preview: {

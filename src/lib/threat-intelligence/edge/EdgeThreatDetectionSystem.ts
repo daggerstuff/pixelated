@@ -1173,5 +1173,3 @@ interface RegionStatus {
   activeNodes: number
   healthScore: number
 }
-
-export { EdgeThreatDetectionSystemCore }

@@ -2753,5 +2753,3 @@ export class ThreatHuntingSystemCore
     }
   }
 }
-
-export { ThreatHuntingSystemCore }

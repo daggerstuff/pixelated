@@ -46,6 +46,15 @@ export default defineConfig({
         pollInterval: 100,
       },
       ignored: [
+        // Hard guard first: function ignore for node_modules anywhere (prevents file watcher limit issues)
+        (p) =>
+          typeof p === 'string' &&
+          (p.includes('/node_modules/') ||
+            p.includes('\\node_modules\\') ||
+            p.includes('/.venv/') ||
+            p.includes('\\.venv\\') ||
+            p.includes('/ai/') ||
+            p.includes('\\ai\\')),
         // Ensure AI workspace and its virtualenv are fully ignored
         'ai/**',
         '**/ai/**',
@@ -141,11 +150,24 @@ export default defineConfig({
     return [
       ...minimal,
       {
-        name: 'force-unwatch-ai-venv',
+        name: 'force-unwatch-node-modules',
         apply: 'serve',
         configureServer(server) {
           try {
+            const path = require('path')
+            const rootPath = path.resolve(process.cwd())
+            const nodeModulesPath = path.join(rootPath, 'node_modules')
+
+            // Unwatch node_modules immediately and aggressively
             const patternsToUnwatch = [
+              'node_modules',
+              'node_modules/',
+              'node_modules/**',
+              '**/node_modules/**',
+              '/node_modules/**',
+              './node_modules/**',
+              nodeModulesPath,
+              path.join(nodeModulesPath, '**'),
               'ai/',
               'ai/**',
               '**/ai/**',
@@ -163,9 +185,27 @@ export default defineConfig({
 
             // Unwatch all patterns
             server.watcher.unwatch(patternsToUnwatch)
+
+            // Also try to close any existing watchers on node_modules
+            if (server.watcher && server.watcher.getWatched) {
+              const watched = server.watcher.getWatched()
+              Object.keys(watched).forEach((dir) => {
+                if (dir.includes('node_modules')) {
+                  try {
+                    server.watcher.unwatch(dir)
+                  } catch {
+                    // Ignore errors - node_modules may already be unwatched
+                  }
+                }
+              })
+            }
+
+            console.log(
+              '[vite] Aggressively unwatched node_modules to prevent file watcher limit issues',
+            )
           } catch (error) {
             console.warn(
-              '[vite] force-unwatch-ai-venv: Failed to unwatch ai/.venv:',
+              '[vite] force-unwatch-node-modules: Failed to unwatch node_modules:',
               error.message,
             )
           }

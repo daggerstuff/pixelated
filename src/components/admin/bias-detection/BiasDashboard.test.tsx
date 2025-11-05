@@ -165,6 +165,14 @@ afterAll(() => {
 describe('BiasDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Re-stub global WebSocket after clearing mocks so constructor remains usable
+    vi.stubGlobal('WebSocket', MockWebSocketConstructor)
+    // Ensure the constructor has a default implementation after reset
+    MockWebSocketConstructor.mockImplementation(createMockWebSocket)
+    ;(MockWebSocketConstructor as any).CONNECTING = 0
+    ;(MockWebSocketConstructor as any).OPEN = 1
+    ;(MockWebSocketConstructor as any).CLOSING = 2
+    ;(MockWebSocketConstructor as any).CLOSED = 3
     // Default fetch mock for initial dashboard load unless a test overrides it
     global.fetch = vi
       .fn()

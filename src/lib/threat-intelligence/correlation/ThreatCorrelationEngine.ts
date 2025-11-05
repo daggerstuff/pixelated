@@ -1586,5 +1586,3 @@ interface PatternInfo {
   regions: string[]
   indicators: string[]
 }
-
-export { ThreatCorrelationEngineCore }

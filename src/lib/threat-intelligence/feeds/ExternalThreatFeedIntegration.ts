@@ -1931,5 +1931,3 @@ class GenericFeedProcessor implements FeedProcessor {
     return typeMap[indicatorType] || 'general'
   }
 }
-
-export { ExternalThreatFeedIntegrationCore }
