@@ -4,6 +4,7 @@ import {
   AuditEventType,
   AuditEventStatus,
 } from '../../../lib/audit'
+import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { aiRepository } from '@/lib/db/ai'
 
@@ -75,7 +76,7 @@ export const GET: APIRoute = async ({ request }) => {
 /**
  * API route for therapeutic response generation
  */
-export const POST: (context: APIContext) => Promise<Response> = async ({
+export const POST: APIRoute = async ({
   request,
 }) => {
   let session: Awaited<ReturnType<typeof getSession>> | null = null

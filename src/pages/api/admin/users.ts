@@ -7,16 +7,20 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 
+import type { APIContext } from "astro";
+
 /**
  * API endpoint for fetching users (admin only)
  * GET /api/admin/users
  */
-export const GET = async (context) => {
+export const GET = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
+  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
     context,
+    next
   )
-  if (middlewareResponse) {
+  if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
 
@@ -36,7 +40,7 @@ export const GET = async (context) => {
     // Get users with pagination and filtering
     const usersResult = await adminService.getAllAdmins()
     const filteredUsers = role
-      ? usersResult.filter((user) => user.role === role)
+      ? usersResult.filter((user: any) => user.role === role)
       : usersResult
     const total = filteredUsers.length
     const paginatedUsers = filteredUsers.slice(offset, offset + limit)
@@ -76,12 +80,14 @@ export const GET = async (context) => {
  * API endpoint for updating a user (admin only)
  * PATCH /api/admin/users
  */
-export const PATCH = async (context) => {
+export const PATCH = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
+  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
     context,
+    next
   )
-  if (middlewareResponse) {
+  if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
 

@@ -10,18 +10,19 @@ import { logSecurityEvent } from '../../../lib/security'
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
+  let clientInfo;
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const deviceId = request.headers.get('x-device-id') || 'unknown'
-    const clientInfo = {
+    clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent,
       deviceId,
     }
 
     // Authenticate the request first
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request as any)
     if (!authResult.success) {
       return authResult.response!
     }
@@ -57,7 +58,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     await logoutFromBetterAuth(userId, clientInfo)
 
     // Log successful logout
-    await logSecurityEvent('USER_LOGOUT', userId, {
+    await logSecurityEvent('logout', {
+      userId,
       sessionId,
       clientInfo,
       timestamp: Date.now(),
@@ -79,10 +81,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: any) {
     // Handle unexpected errors
     console.error('Logout error:', error)
-    await logSecurityEvent('USER_LOGOUT_ERROR', null, {
+    await logSecurityEvent('error', {
       error: error.message,
       clientInfo,
       timestamp: Date.now(),

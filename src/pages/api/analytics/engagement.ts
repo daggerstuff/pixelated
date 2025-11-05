@@ -14,7 +14,7 @@ export const prerender = false
 export const GET = async ({ request, cookies }) => {
   try {
     // Enforce authentication (throws if not authenticated)
-    await requirePageAuth({ request, cookies })
+    await requirePageAuth({ request, cookies, requestIp: request.headers.get('x-forwarded-for') })
 
     // TODO: Replace with real data fetching logic
     // For now, return static/mock data
@@ -127,7 +127,7 @@ export const GET = async ({ request, cookies }) => {
 
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
-      message: 'Failed to fetch engagement metrics',
+      errorMessage: 'Failed to fetch engagement metrics',
       details: {
         source: 'engagement',
         message: error instanceof Error ? String(error) : String(error),

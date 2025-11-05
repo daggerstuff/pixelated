@@ -1,5 +1,6 @@
 import { getSession } from '../../../lib/auth/session'
 import mongodb from '../../../config/mongodb.config'
+import type { APIContext } from 'astro';
 
 export const GET = async ({ request }: APIContext) => {
   try {

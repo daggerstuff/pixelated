@@ -6,16 +6,20 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 
+import type { APIContext } from "astro";
+
 /**
  * API endpoint for fetching therapy sessions (admin only)
  * GET /api/admin/sessions
  */
-export const GET = async (context) => {
+export const GET = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
+  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
     context,
+    next
   )
-  if (middlewareResponse) {
+  if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
 
@@ -78,12 +82,14 @@ export const GET = async (context) => {
  * API endpoint for managing a specific session (admin only)
  * POST /api/admin/sessions
  */
-export const POST = async (context) => {
+export const POST = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
+  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
     context,
+    next
   )
-  if (middlewareResponse) {
+  if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
 

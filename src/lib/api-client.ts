@@ -164,6 +164,7 @@ export class EnterpriseAPIClient {
 }
 
 export class APIError extends Error {
+  errorMessage: string;
   constructor(
     message: string,
     public status: number,
@@ -171,6 +172,7 @@ export class APIError extends Error {
   ) {
     super(message)
     this.name = 'APIError'
+    this.errorMessage = message
   }
 }
 

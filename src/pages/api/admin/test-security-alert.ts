@@ -19,6 +19,18 @@ async function testSecurityAlert(
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Authenticate request
+    if (!cookies) {
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'You must be authenticated to access this endpoint',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
     const user = await getCurrentUser(cookies)
     if (!user) {
       return new Response(

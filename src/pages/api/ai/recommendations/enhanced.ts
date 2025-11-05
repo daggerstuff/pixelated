@@ -5,6 +5,7 @@ import { createProductionEnhancedRecommendationService } from '../../../../lib/a
 import { validateRequestBody } from '../../../../lib/validation'
 import type { ValidationErrorDetails } from '../../../../lib/validation'
 import { getSession } from '../../../../lib/auth/session'
+import type { APIContext } from 'astro';
 
 const logger = createBuildSafeLogger('enhanced-recommendation-api')
 
@@ -39,7 +40,7 @@ function createErrorResponse({
 
 // Validation schema for the request body
 const enhancedRecommendationRequestSchema = z.object({
-  clientId: z.string().uuid({ message: 'Valid client ID is required' }),
+  clientId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, { message: 'Valid client ID is required' }),
   indications: z
     .array(z.string())
     .min(1, { message: 'At least one indication is required' }),

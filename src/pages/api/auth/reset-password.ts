@@ -1,5 +1,6 @@
+import type { APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { logAuditEvent } from '@/lib/audit/log'
+import { AuditEventType, logAuditEvent } from '../../../lib/audit'
 import { z } from 'zod'
 
 const logger = createBuildSafeLogger('reset-password')
@@ -37,9 +38,13 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Log the password reset attempt
-    await logAuditEvent('anonymous', 'password_reset_request', email, 'auth', {
-      email,
-    })
+    await logAuditEvent(
+      AuditEventType.SECURITY,
+      'password_reset_request',
+      'anonymous',
+      'auth',
+      { email },
+    )
 
     return new Response(
       JSON.stringify({

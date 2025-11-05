@@ -25,6 +25,12 @@ function getClientIP(request: Request): string {
 export const GET: APIRoute = async ({ request, cookies }) => {
   try {
     // Authentication check
+    if (!cookies) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
     const user = await getCurrentUser(cookies)
     if (!user) {
       return new Response(
@@ -97,7 +103,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       const result = await client.query(query, [sessionId])
 
       // Map/normalize DB rows to documented evaluation shape
-      const evaluations = result.rows.map((row) => ({
+      const evaluations = result.rows.map((row: any) => ({
         id: row.id,
         sessionId: row.session_id,
         feedback: row.feedback,
@@ -128,6 +134,12 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // Authentication check
+  if (!cookies) {
+    return new Response(JSON.stringify({ error: 'Authentication required' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
   const user = await getCurrentUser(cookies)
   if (!user) {
     return new Response(JSON.stringify({ error: 'Authentication required' }), {
@@ -166,7 +178,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       z.string().min(1, 'feedback must be a non-empty string'),
       z
         .object({})
-        .passthrough()
+        .catchall(z.any())
         .refine((obj) => Object.keys(obj).length > 0, {
           message: 'feedback object must not be empty',
         }),

@@ -202,7 +202,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     if (data?.stream) {
       // Create a readable stream for the response
       const readableStream = new ReadableStream({
-        async start(controller): void {
+        async start(controller) {
           try {
             const stream = await aiService.createStreamingChatCompletion(
               formattedMessages,

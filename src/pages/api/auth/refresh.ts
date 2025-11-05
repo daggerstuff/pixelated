@@ -21,7 +21,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     // Apply rate limiting
     const rateLimitResult = await rateLimitMiddleware(
-      request,
+      request as any,
       'refresh',
       20,
       60,
@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const tokenPair = await refreshAccessToken(refreshToken, clientInfo)
 
     // Log successful token refresh
-    await logSecurityEvent('TOKEN_REFRESHED', null, {
+    await logSecurityEvent('token_refreshed', {
       clientInfo,
       timestamp: Date.now(),
     })
@@ -74,7 +74,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      await logSecurityEvent('TOKEN_REFRESH_FAILED', null, {
+      await logSecurityEvent('token_validation_failed', {
         error: error.message,
         clientInfo,
         timestamp: Date.now(),
@@ -92,7 +92,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle unexpected errors
     console.error('Token refresh error:', err)
 
-    await logSecurityEvent('TOKEN_REFRESH_ERROR', null, {
+    await logSecurityEvent('error', {
       error: error.message || String(err),
       clientInfo,
       timestamp: Date.now(),

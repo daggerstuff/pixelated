@@ -13,18 +13,19 @@ import { sanitizeInput } from '../../../lib/auth/utils'
 import { logSecurityEvent } from '../../../lib/security'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
+  let clientInfo;
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const deviceId = request.headers.get('x-device-id') || 'unknown'
-    const clientInfo = {
+    clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent,
       deviceId,
     }
 
     // Apply CSRF protection for POST requests
-    const csrfResult = await csrfProtection(request)
+    const csrfResult = await csrfProtection(request as any)
     if (!csrfResult.success) {
       return csrfResult.response!
     }
@@ -65,13 +66,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const password = body.password // Don't sanitize password
 
     // Attempt login
-    const result = await authenticateWithBetterAuth(
+    const result: any = await authenticateWithBetterAuth(
       { email, password },
       clientInfo,
     )
 
     // Log successful login
-    await logSecurityEvent('USER_LOGIN_SUCCESS', result.user.id, {
+    await logSecurityEvent('login', {
+      userId: result.user.id,
       email: result.user.email,
       role: result.user.role,
       clientInfo,
@@ -99,10 +101,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: any) {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      await logSecurityEvent('USER_LOGIN_FAILED', null, {
+      await logSecurityEvent('login', {
         error: error.message,
         clientInfo,
         timestamp: Date.now(),
@@ -125,7 +127,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle unexpected errors
     console.error('Login error:', error)
 
-    await logSecurityEvent('USER_LOGIN_ERROR', null, {
+    await logSecurityEvent('error', {
       error: error.message,
       clientInfo,
       timestamp: Date.now(),
