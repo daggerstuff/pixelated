@@ -163,11 +163,11 @@
   --radius-full: 9999px;    /* Full circle */
 
   /* === TRANSITIONS - ENTERPRISE GRADE === */
-  --transition-fast: 150ms ease-out;
-  --transition-normal: 250ms ease-out;
-  --transition-slow: 350ms ease-out;
-  --transition-spring: 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --transition-bounce: 400ms cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 400ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* === Z-INDEX LAYERS === */
@@ -671,19 +671,19 @@ h6 {
 
 /* Utility Classes */
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
+  animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* === ACCESSIBILITY === */
@@ -796,6 +796,116 @@ select:focus-visible {
 
   .card {
     padding: var(--space-4);
+  }
+
+  /* Optimize for mobile performance */
+  .card--tilt,
+  .mobile-nav-menu,
+  .mobile-nav-toggle {
+    will-change: transform;
+  }
+}
+
+/* Cross-browser compatibility for older browsers */
+@media (max-width: 1024px) {
+  /* Add vendor prefixes for older WebKit browsers */
+  .glass-card,
+  .mobile-nav-menu,
+  .mobile-nav-toggle {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .gradient-text {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Ensure CSS grid works in older browsers */
+@supports not (display: grid) {
+  .grid--2,
+  .grid--3,
+  .grid--4 {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grid--2 > * {
+    margin-bottom: var(--space-6);
+  }
+
+  .grid--2 > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Ensure flexbox works in older browsers */
+@supports not (display: flex) {
+  .nav {
+    display: block;
+  }
+
+  .nav__link {
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .nav__link:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Ensure border-radius works in older browsers */
+@supports not (border-radius: 1px) {
+  .btn,
+  .card,
+  .input,
+  .badge,
+  .mobile-nav-toggle,
+  .mobile-nav-menu {
+    border-radius: 0 !important;
+  }
+}
+
+/* Ensure box-shadow works in older browsers */
+@supports not (box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1)) {
+  .btn,
+  .card,
+  .mobile-nav-toggle,
+  .mobile-nav-menu {
+    border: 1px solid var(--border-primary) !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Ensure transform works in older browsers */
+@supports not (transform: translateX(0)) {
+  .card--tilt:hover .card {
+    transform: none !important;
+  }
+
+  .btn:hover {
+    transform: none !important;
+  }
+
+  .mobile-nav-menu {
+    transform: none !important;
+  }
+}
+
+/* Ensure animation works in older browsers */
+@supports not (animation: test 1s) {
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-pulse,
+  .animate-pulse-glow,
+  .loading-shimmer,
+  .status-dot--warning {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
   }
 }
 
@@ -995,7 +1105,7 @@ select:focus-visible {
 .status-dot--warning {
   background: var(--status-warning);
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-  animation: pulse 2s infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .status-dot--error {
@@ -1007,7 +1117,7 @@ select:focus-visible {
 .loading-shimmer {
   background: linear-gradient(90deg, var(--color-secondary) 25%, var(--color-tertiary) 50%, var(--color-secondary) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* === ADVANCED COMPONENTS === */
