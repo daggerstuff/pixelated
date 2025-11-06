@@ -13,7 +13,7 @@ textblob
 # Data processing and ML
 pandas
 numpy
-scikit-learn
+scikit-learn>=1.5.0
 scipy
 
 # Visualization and monitoring

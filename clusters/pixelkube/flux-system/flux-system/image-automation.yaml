@@ -5,7 +5,7 @@ metadata:
   name: pixelated-empathy
   namespace: flux-system
 spec:
-  image: ghcr.io/pixelatedempathy/pixelated
+  image: docker.io/pixelatedempathy/pixelated-empathy
   interval: 5m0s
   # Exclude all tags except 'latest' by excluding SHA tags and branch tags
   # This ensures ImagePolicy alphabetical desc selects 'latest'
