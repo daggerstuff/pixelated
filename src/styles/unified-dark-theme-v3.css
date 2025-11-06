@@ -704,10 +704,11 @@ h6 {
 
 /* Focus styles - Enhanced for accessibility */
 *:focus-visible {
-  outline: 3px solid var(--accent-emerald);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+  outline: 4px solid var(--accent-emerald);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 6px rgba(16, 185, 129, 0.4);
   z-index: 10;
+  border-radius: var(--radius-md);
 }
 
 /* Focus styles for buttons */
@@ -814,14 +815,17 @@ select:focus-visible {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-spring);
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .mobile-nav-toggle:hover {
   background: var(--color-elevated);
-  transform: scale(1.05);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: var(--shadow-lg);
 }
 
 .mobile-nav-toggle:focus {
@@ -836,7 +840,7 @@ select:focus-visible {
   width: 24px;
   height: 2px;
   background: currentColor;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .mobile-nav-toggle::before {
@@ -866,10 +870,13 @@ select:focus-visible {
   z-index: var(--z-dropdown);
   padding: var(--space-8) var(--space-6);
   overflow-y: auto;
-  transition: left 0.3s var(--transition-smooth);
-  box-shadow: var(--shadow-xl);
+  transition: left 0.3s var(--transition-spring);
+  box-shadow: var(--shadow-2xl);
   will-change: left;
   backface-visibility: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border-primary);
 }
 
 .mobile-nav-menu.open {
@@ -883,7 +890,7 @@ select:focus-visible {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--mesh-5);
+  background: var(--mesh-6);
   z-index: -1;
 }
 
@@ -900,16 +907,19 @@ select:focus-visible {
   padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-md);
   margin: 0;
+  transition: all var(--transition-normal);
 }
 
 .mobile-nav-menu .nav__link:hover {
   background: var(--accent-emerald-subtle);
   color: var(--accent-emerald);
+  transform: translateX(5px);
 }
 
 .mobile-nav-menu .nav__link--active {
   background: var(--accent-emerald-muted);
   color: var(--accent-emerald);
+  font-weight: var(--weight-bold);
 }
 
 .mobile-nav-backdrop {
@@ -918,11 +928,13 @@ select:focus-visible {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   z-index: var(--z-overlay);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s var(--transition-smooth), visibility 0.3s;
+  transition: opacity 0.3s var(--transition-spring), visibility 0.3s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .mobile-nav-backdrop.open {
