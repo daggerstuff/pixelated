@@ -12,7 +12,7 @@ NC='\033[0m'
 # Configuration
 # Set your rclone remote name here (e.g., "gdrive:", "s3:", "dropbox:", etc.)
 # Check for positional argument first, then fall back to environment variable
-if [ -n "$1" ] && [[ ! "$1" =~ ^-- ]]; then
+if [ -n "$1" ] && [[ ! "$1" =~ ^- ]]; then
     REMOTE_NAME="$1"
 elif [ -n "$RCLONE_REMOTE" ]; then
     REMOTE_NAME="$RCLONE_REMOTE"
@@ -23,6 +23,7 @@ LOCAL_DIR="/home/vivi/pixelated"
 REMOTE_DIR="${REMOTE_NAME}pixelated"  # Adjust path on remote as needed
 PARTIAL_DIR="/tmp/rclone-partial-$$"  # Temporary directory for partial uploads
 INVENTORY_FILE="/tmp/rclone-inventory-$$.txt"  # Temporary file for inventory
+ERROR_LOG="/tmp/rclone-errors-$$.log"  # Temporary file for error output
 
 # Track if we're interrupted
 INTERRUPTED=false
@@ -51,6 +52,7 @@ cleanup() {
     
     # Clean up temporary files
     rm -f "${INVENTORY_FILE}" 2>/dev/null || true
+    rm -f "${ERROR_LOG}" 2>/dev/null || true
 }
 
 # Graceful shutdown handler
@@ -71,24 +73,7 @@ if ! command -v rclone &> /dev/null; then
     exit 1
 fi
 
-# Check if remote name is set
-if [ -z "$REMOTE_NAME" ]; then
-    print_error "Remote name not provided."
-    print_status "Please provide it as an argument: $0 <remote_name>:"
-    print_status "Or set it as an environment variable: export RCLONE_REMOTE='gdrive:'"
-    print_status ""
-    print_status "Available remotes:"
-    rclone listremotes 2>/dev/null || print_warning "No remotes configured. Run 'rclone config' first."
-    exit 1
-fi
-
-# Verify remote exists
-if ! rclone listremotes | grep -q "^${REMOTE_NAME}"; then
-    print_error "Remote '${REMOTE_NAME}' not found in rclone configuration."
-    print_status "Available remotes:"
-    rclone listremotes
-    exit 1
-fi
+# Remote presence and existence checks are performed later in main() after parsing options
 
 # Create log directory for tracking
 setup_partial_dir() {
@@ -113,33 +98,49 @@ run_inventory() {
     
     # Use timeout to prevent hanging (5 minute max)
     # Show progress during check
-    local check_output=""
     local check_exit=0
     
-    # Run check with timeout and progress
+    # Run check with timeout and show a heartbeat so users see activity
     # Note: rclone check exits with code 1 if differences are found, which is normal
+    # Suppress verbose "file not in Local file system" errors to keep output clean
     if command -v timeout &> /dev/null; then
-        check_output=$(timeout 300 rclone check "${LOCAL_DIR}" "${REMOTE_DIR}" \
+        timeout 300 rclone check "${LOCAL_DIR}" "${REMOTE_DIR}" \
             --size-only \
-            --exclude "ai/**" \
-            --exclude "ai/" \
+            --exclude "/ai/**" \
+            --exclude "/ai/" \
+            --exclude "/node_modules/**" \
+            --exclude "/.venv/**" \
             --fast-list \
             --max-backlog=100000 \
             --combined="${INVENTORY_FILE}" \
             --stats=10s \
-            --stats-one-line 2>&1) || check_exit=$?
+            --stats-one-line-date \
+            --stats-log-level=NOTICE \
+            --log-level=NOTICE 2> >(grep -v "file not in Local file system" > "${ERROR_LOG}" 2>/dev/null || true) &
     else
         # Fallback if timeout command not available
-        check_output=$(rclone check "${LOCAL_DIR}" "${REMOTE_DIR}" \
+        rclone check "${LOCAL_DIR}" "${REMOTE_DIR}" \
             --size-only \
-            --exclude "ai/**" \
-            --exclude "ai/" \
+            --exclude "/ai/**" \
+            --exclude "/ai/" \
+            --exclude "/node_modules/**" \
+            --exclude "/.venv/**" \
             --fast-list \
             --max-backlog=100000 \
             --combined="${INVENTORY_FILE}" \
             --stats=10s \
-            --stats-one-line 2>&1) || check_exit=$?
+            --stats-one-line-date \
+            --stats-log-level=NOTICE \
+            --log-level=NOTICE 2> >(grep -v "file not in Local file system" > "${ERROR_LOG}" 2>/dev/null || true) &
     fi
+    local rclone_check_pid=$!
+    local elapsed=0
+    while kill -0 "$rclone_check_pid" 2>/dev/null; do
+        print_status "Inventory running... elapsed ${elapsed}s"
+        sleep 10
+        elapsed=$((elapsed + 10))
+    done
+    wait "$rclone_check_pid" || check_exit=$?
     
     # Handle timeout or interruption
     if [ $check_exit -eq 124 ] || [ $check_exit -eq 130 ]; then
@@ -149,22 +150,10 @@ run_inventory() {
         return 0
     fi
     
-    # Extract actual counts from the check output (rclone reports "X files missing" in the output)
-    local missing_from_output=$(echo "$check_output" | grep -oE '[0-9]+ files missing' | grep -oE '[0-9]+' | head -1 || echo "0")
-    local differ_from_output=$(echo "$check_output" | grep -oE '[0-9]+ differences found' | grep -oE '[0-9]+' | head -1 || echo "0")
-    
-    # Count differences - use output stats first (more reliable), then fall back to combined file
+    # Count differences using the combined file (preferred for structured results)
     local missing_count=0
     local differ_count=0
     local match_count=0
-    
-    # Use the counts from rclone's output (most reliable)
-    if [ -n "$missing_from_output" ] && [ "$missing_from_output" != "0" ]; then
-        missing_count=$missing_from_output
-    fi
-    if [ -n "$differ_from_output" ] && [ "$differ_from_output" != "0" ]; then
-        differ_count=$differ_from_output
-    fi
     
     # Also try to count from combined file if available (for detailed breakdown)
     if [ -f "${INVENTORY_FILE}" ] && [ -s "${INVENTORY_FILE}" ]; then
@@ -197,31 +186,50 @@ run_inventory() {
     if [ "$match_count" -gt 0 ]; then
         print_status "  ✅ Files already synced: ${match_count}"
     fi
-    if [ "$total_to_sync" -gt 0 ]; then
-        print_warning "  ⚠️  Files to sync: ${total_to_sync}"
-        if [ "$missing_count" -gt 0 ]; then
-            print_warning "     - Missing on remote: ${missing_count}"
-        fi
-        if [ "$differ_count" -gt 0 ]; then
-            print_warning "     - Size differs: ${differ_count}"
-        fi
+
+    # Compute extra (present only on remote)
+    local extra_count=0
+    if [ -f "${INVENTORY_FILE}" ] && [ -s "${INVENTORY_FILE}" ]; then
+        extra_count=$(grep -c "^-" "${INVENTORY_FILE}" 2>/dev/null || echo "0")
+        extra_count=$(echo "$extra_count" | tr -d '[:space:]' | grep -E '^[0-9]+$' || echo "0")
+    fi
+
+    # Show detailed breakdown
+    if [ "$missing_count" -gt 0 ]; then
+        print_warning "  ➕ Missing on remote: ${missing_count}"
+    fi
+    if [ "$differ_count" -gt 0 ]; then
+        print_warning "  ❗ Size differs: ${differ_count}"
+    fi
+    if [ "$extra_count" -gt 0 ]; then
+        print_warning "  ➖ Extra on remote: ${extra_count}"
+    fi
+
+    # Decide if we should proceed to sync
+    if [ $check_exit -ne 0 ] || [ "$missing_count" -gt 0 ] || [ "$differ_count" -gt 0 ] || [ "$extra_count" -gt 0 ]; then
         echo ""
-        return 0  # Files need syncing
+        return 0
     else
         print_status "  ✅ All files are already synced!"
         echo ""
-        return 1  # Nothing to sync
+        return 1
     fi
 }
+
 
 # Main sync function with safe resume and progress
 sync_files() {
     local skip_inventory="${1:-false}"
+    local mirror_mode="${2:-false}"
     
-    print_header "📁 Syncing files to remote (size-only mode with safe resume)"
+    if [ "$mirror_mode" = "true" ]; then
+        print_header "🪞 Mirroring files to remote (will delete extra files on remote)"
+    else
+        print_header "📁 Syncing files to remote (size-only mode with safe resume)"
+    fi
     print_status "Source: ${LOCAL_DIR}"
     print_status "Destination: ${REMOTE_DIR}"
-    print_status "Excluding: ai/"
+    print_status "Excluding: ai/, node_modules/, .venv/"
     print_status ""
     print_status "💡 Performance Tips:"
     print_status "  - Use --skip-inventory to start syncing immediately"
@@ -275,13 +283,23 @@ sync_files() {
         print_status "Detected Google Drive - applying performance optimizations..."
     fi
     
+    # Choose copy (additive) or sync (mirror) based on mode
+    local rclone_cmd="copy"
+    if [ "$mirror_mode" = "true" ]; then
+        rclone_cmd="sync"
+        print_warning "⚠️  Mirror mode: Files on remote not present locally will be DELETED"
+        print_status ""
+    fi
+    
     if [ "$is_gdrive" = "true" ]; then
         # Google Drive optimized settings for large transfers
         # More aggressive settings for better throughput while staying within API limits
-        rclone copy "${LOCAL_DIR}" "${REMOTE_DIR}" \
+        rclone ${rclone_cmd} "${LOCAL_DIR}" "${REMOTE_DIR}" \
             --size-only \
-            --exclude "ai/**" \
-            --exclude "ai/" \
+            --exclude "/ai/**" \
+            --exclude "/ai/" \
+            --exclude "/node_modules/**" \
+            --exclude "/.venv/**" \
             --fast-list \
             --progress \
             --stats=5s \
@@ -303,10 +321,12 @@ sync_files() {
             --log-file="${PARTIAL_DIR}/rclone.log" &
     else
         # Generic settings for other remotes
-        rclone copy "${LOCAL_DIR}" "${REMOTE_DIR}" \
+        rclone ${rclone_cmd} "${LOCAL_DIR}" "${REMOTE_DIR}" \
             --size-only \
-            --exclude "ai/**" \
-            --exclude "ai/" \
+            --exclude "/ai/**" \
+            --exclude "/ai/" \
+            --exclude "/node_modules/**" \
+            --exclude "/.venv/**" \
             --fast-list \
             --progress \
             --stats=5s \
@@ -360,8 +380,10 @@ dry_run() {
     print_header "📋 Files that would be transferred (dry run):"
     rclone copy "${LOCAL_DIR}" "${REMOTE_DIR}" \
         --size-only \
-        --exclude "ai/**" \
-        --exclude "ai/" \
+        --exclude "/ai/**" \
+        --exclude "/ai/" \
+        --exclude "/node_modules/**" \
+        --exclude "/.venv/**" \
         --dry-run \
         --fast-list \
         --progress \
@@ -383,6 +405,8 @@ show_help() {
     echo "  --dry-run, -n       Show what would be transferred without actually transferring"
     echo "  --inventory, -i     Only run inventory check, don't transfer"
     echo "  --skip-inventory   Skip inventory check and proceed directly to sync"
+    echo "  --mirror            Mirror mode: delete files on remote that don't exist locally"
+    echo "                      (default: copy mode, only adds/updates files)"
     echo "  --help, -h          Show this help message"
     echo ""
     echo "Environment Variables:"
@@ -395,6 +419,7 @@ show_help() {
     echo "  - Progress tracking: Shows upload speed and transfer progress"
     echo "  - Graceful shutdown: Press Ctrl+C to safely stop (can resume later)"
     echo "  - Optional inventory check (can skip if slow)"
+    echo "  - Mirror mode: Use --mirror to make remote exactly match local (deletes extras)"
     echo ""
     echo "Note: If inventory check is slow, use --skip-inventory to bypass it"
     echo ""
@@ -409,13 +434,58 @@ main() {
     # Parse arguments
     # Skip the first argument if it's a remote name (already processed above)
     local skip_inventory=false
+    local mirror_mode=false
     local arg=""
     
-    # If first arg is a remote name (not a flag), skip it for argument parsing
-    if [ -n "$1" ] && [[ ! "$1" =~ ^-- ]]; then
-        arg="${2:-}"
+    # Collect all flags (handle multiple flags)
+    local args=()
+    if [ -n "$1" ] && [[ ! "$1" =~ ^- ]]; then
+        # First arg is remote name, collect remaining args
+        shift
+        args=("$@")
     else
-        arg="${1:-}"
+        # All args are flags
+        args=("$@")
+    fi
+    
+    # Process flags
+    for flag in "${args[@]}"; do
+        case "$flag" in
+            --skip-inventory)
+                skip_inventory=true
+                ;;
+            --mirror)
+                mirror_mode=true
+                ;;
+        esac
+    done
+    
+    # Get the main action flag (last one, or first if only one)
+    if [ ${#args[@]} -gt 0 ]; then
+        arg="${args[-1]}"
+    else
+        arg=""
+    fi
+    
+    # Require remote name for all operations except help
+    if [ -z "$REMOTE_NAME" ] && [[ ! "$arg" =~ ^(--help|-h)$ ]]; then
+        print_error "Remote name not provided."
+        print_status "Please provide it as an argument: $0 <remote_name>:"
+        print_status "Or set it as an environment variable: export RCLONE_REMOTE='gdrive:'"
+        print_status ""
+        print_status "Available remotes:"
+        rclone listremotes 2>/dev/null || print_warning "No remotes configured. Run 'rclone config' first."
+        exit 1
+    fi
+    
+    # Verify remote exists unless showing help
+    if [[ ! "$arg" =~ ^(--help|-h)$ ]] && [ -n "$REMOTE_NAME" ]; then
+        if ! rclone listremotes | grep -q "^${REMOTE_NAME}"; then
+            print_error "Remote '${REMOTE_NAME}' not found in rclone configuration."
+            print_status "Available remotes:"
+            rclone listremotes
+            exit 1
+        fi
     fi
     
     case "$arg" in
@@ -425,15 +495,12 @@ main() {
         --inventory|-i)
             run_inventory
             ;;
-        --skip-inventory)
-            skip_inventory=true
-            sync_files "$skip_inventory"
+        --skip-inventory|--mirror|"")
+            # These trigger sync, mirror mode handled via variable
+            sync_files "$skip_inventory" "$mirror_mode"
             ;;
         --help|-h)
             show_help
-            ;;
-        "")
-            sync_files "$skip_inventory"
             ;;
         *)
             # Only show error if it's actually a flag/option (starts with --)
@@ -443,7 +510,7 @@ main() {
                 exit 1
             else
                 # If it's not a flag, just run sync (might be a second positional arg we ignore)
-                sync_files "$skip_inventory"
+                sync_files "$skip_inventory" "$mirror_mode"
             fi
             ;;
     esac
@@ -451,4 +518,3 @@ main() {
 
 # Run main function
 main "$@"
-

@@ -314,7 +314,7 @@ export function createCompleteThreatDetectionSystem(
 ) {
   // Create main threat detection service
   const threatDetectionService = createThreatDetectionService(orchestrator, rateLimiter, options?.threatDetection)
-  
+
   // Create AI-enhanced monitoring
   const monitoringService = createAIEnhancedMonitoring({
     enabled: true,
@@ -355,7 +355,7 @@ export function createCompleteThreatDetectionSystem(
     },
     ...options?.monitoring
   })
-  
+
   // Create threat hunting service
   const huntingService = createThreatHuntingService({
     enabled: true,
@@ -484,7 +484,7 @@ export function createCompleteThreatDetectionSystem(
     ],
     ...options?.hunting
   })
-  
+
   // Create external threat intelligence service
   const intelligenceService = createExternalThreatIntelligence({
     enabled: true,
@@ -528,7 +528,7 @@ export function createCompleteThreatDetectionSystem(
     },
     ...options?.intelligence
   })
-  
+
   return {
     threatDetectionService,
     monitoringService,

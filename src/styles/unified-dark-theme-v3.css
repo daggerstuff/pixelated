@@ -103,17 +103,29 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
   --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Fluid Type Scale (Antfu elegance) */
-  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
-  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
-  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --text-2xl: clamp(1.5rem, 1.4rem + 0.5vw, 1.875rem);
-  --text-3xl: clamp(1.875rem, 1.7rem + 0.875vw, 2.25rem);
-  --text-4xl: clamp(2.25rem, 2rem + 1.25vw, 3rem);
-  --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 4.5rem);
-  --text-6xl: clamp(3.75rem, 3rem + 3.75vw, 6rem);
+  /* Fluid Type Scale - Refined for Elegance (Mizu-inspired) */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.4rem + 0.4vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.7rem + 0.6vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 2rem + 0.8vw, 3rem);
+  --text-5xl: clamp(3rem, 2.5rem + 1.2vw, 4.5rem);
+  --text-6xl: clamp(3.75rem, 3rem + 1.8vw, 6rem);
+
+  /* Enhanced fluid scale with optimized clamp values for better readability */
+  --text-xs-opt: clamp(0.75rem, 0.72rem + 0.18vw, 0.875rem);
+  --text-sm-opt: clamp(0.875rem, 0.82rem + 0.28vw, 1rem);
+  --text-base-opt: clamp(1rem, 0.97rem + 0.18vw, 1.125rem);
+  --text-lg-opt: clamp(1.125rem, 1.07rem + 0.28vw, 1.25rem);
+  --text-xl-opt: clamp(1.25rem, 1.17rem + 0.38vw, 1.5rem);
+  --text-2xl-opt: clamp(1.5rem, 1.42rem + 0.38vw, 1.875rem);
+  --text-3xl-opt: clamp(1.875rem, 1.72rem + 0.58vw, 2.25rem);
+  --text-4xl-opt: clamp(2.25rem, 2.02rem + 0.78vw, 3rem);
+  --text-5xl-opt: clamp(3rem, 2.52rem + 1.18vw, 4.5rem);
+  --text-6xl-opt: clamp(3.75rem, 3.02rem + 1.78vw, 6rem);
 
   /* Font Weights */
   --weight-light: 300;
@@ -124,13 +136,13 @@
   --weight-extrabold: 800;
   --weight-black: 900;
 
-  /* Line Heights */
+  /* Line Heights - Refined for Typographic Rhythm (Mizu-inspired) */
   --leading-none: 1;
-  --leading-tight: 1.1;
-  --leading-snug: 1.25;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.75;
-  --leading-loose: 2;
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.8;
+  --leading-loose: 2.2;
 
   /* Letter Spacing */
   --tracking-tighter: -0.05em;
@@ -187,6 +199,28 @@
   --mesh-2: radial-gradient(circle at 60% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
             radial-gradient(circle at 20% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
             radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+
+  /* Subtle, refined mesh gradients for enhanced elegance */
+  --mesh-3: radial-gradient(circle at 30% 70%, rgba(16, 185, 129, 0.05) 0%, transparent 60%),
+            radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+            radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.02) 0%, transparent 70%);
+
+  --mesh-4: radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.04) 0%, transparent 65%),
+            radial-gradient(circle at 75% 25%, rgba(59, 130, 246, 0.04) 0%, transparent 65%),
+            radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 75%);
+
+  --mesh-5: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+            radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.01) 0%, transparent 60%),
+            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.005) 0%, transparent 70%);
+
+  /* New subtle mesh gradients for enhanced visual depth (Mizu-inspired) */
+  --mesh-6: radial-gradient(circle at 40% 60%, rgba(16, 185, 129, 0.03) 0%, transparent 70%),
+            radial-gradient(circle at 60% 40%, rgba(59, 130, 246, 0.03) 0%, transparent 70%),
+            radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.01) 0%, transparent 80%);
+
+  --mesh-7: radial-gradient(circle at 35% 65%, rgba(139, 92, 246, 0.025) 0%, transparent 75%),
+            radial-gradient(circle at 65% 35%, rgba(16, 185, 129, 0.025) 0%, transparent 75%),
+            radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.015) 0%, transparent 85%);
 }
 
 /* === DARK THEME CONTEXT === */
@@ -219,21 +253,50 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* === HEADING SYSTEM === */
+/* === HEADING SYSTEM - Refined for Elegance (Mizu-inspired) === */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
 }
 
-h1 { font-size: var(--text-5xl); }
-h2 { font-size: var(--text-4xl); }
-h3 { font-size: var(--text-3xl); }
-h4 { font-size: var(--text-2xl); }
-h5 { font-size: var(--text-xl); }
-h6 { font-size: var(--text-lg); }
+h1 {
+  font-size: var(--text-6xl);
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-tighter);
+  text-shadow: 0 3px 12px rgba(16, 185, 129, 0.15);
+}
+h2 {
+  font-size: var(--text-5xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-tight);
+  text-shadow: 0 2.5px 10px rgba(16, 185, 129, 0.12);
+}
+h3 {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  text-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+h4 {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  text-shadow: 0 1.5px 6px rgba(16, 185, 129, 0.08);
+}
+h5 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-normal);
+  text-shadow: 0 1px 4px rgba(16, 185, 129, 0.06);
+}
+h6 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  text-shadow: 0 0.5px 2px rgba(16, 185, 129, 0.04);
+}
 
 /* === BRUTALIST BUTTON SYSTEM === */
 .btn {
@@ -273,8 +336,9 @@ h6 { font-size: var(--text-lg); }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-emerald-light);
   border-color: var(--accent-emerald-light);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-glow), 0 0 40px rgba(16, 185, 129, 0.3);
+  transition: all var(--transition-spring);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -342,13 +406,56 @@ h6 { font-size: var(--text-lg); }
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .card:hover {
   background: var(--color-secondary);
   border-color: var(--border-secondary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Parallax Tilt Effect for Cards */
+.card--tilt {
+  perspective: 1000px;
+}
+
+.card--tilt .card {
+  transition: transform 0.1s ease-out;
+  transform-style: preserve-3d;
+}
+
+.card--tilt:hover .card {
+  transform: rotateX(5deg) rotateY(5deg) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* For touch devices - reduced sensitivity */
+@media (hover: none) {
+  .card--tilt:hover .card {
+    transform: rotateX(2deg) rotateY(2deg) scale(1.01);
+    box-shadow: var(--shadow-xl);
+  }
+}
+
+/* Enhanced card hover with subtle scale increase */
+.card:hover {
+  background: var(--color-secondary);
+  border-color: var(--border-secondary);
+  box-shadow: var(--shadow-xl);
+  transform: scale(1.01);
+}
+
+/* Card hover with enhanced depth */
+.card--elevated:hover {
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Card hover with enhanced glass effect */
+.card--glass:hover {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .card--elevated {
@@ -595,10 +702,77 @@ h6 { font-size: var(--text-lg); }
   }
 }
 
-/* Focus styles */
+/* Focus styles - Enhanced for accessibility */
 *:focus-visible {
-  outline: 2px solid var(--accent-emerald);
-  outline-offset: 2px;
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+  z-index: 10;
+}
+
+/* Focus styles for buttons */
+.btn:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for navigation links */
+.nav__link:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for form inputs */
+.input:focus-visible {
+  outline: none;
+  border-color: var(--accent-emerald);
+  background: var(--color-tertiary);
+  box-shadow: 0 0 0 3px var(--accent-emerald-subtle), 0 0 0 6px rgba(16, 185, 129, 0.2);
+}
+
+/* Focus styles for mobile navigation toggle */
+.mobile-nav-toggle:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for mobile navigation menu */
+.mobile-nav-menu .nav__link:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for badges */
+.badge:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for links */
+a:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for checkboxes and radio buttons */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus styles for select elements */
+select:focus-visible {
+  outline: 3px solid var(--accent-emerald);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 4px rgba(16, 185, 129, 0.3);
 }
 
 /* Selection styles */
@@ -622,6 +796,156 @@ h6 { font-size: var(--text-lg); }
   .card {
     padding: var(--space-4);
   }
+}
+
+/* Mobile Navigation Enhancements */
+.mobile-nav-toggle {
+  display: none;
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-dropdown);
+  width: 44px;
+  height: 44px;
+  background: var(--color-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-nav-toggle:hover {
+  background: var(--color-elevated);
+  transform: scale(1.05);
+}
+
+.mobile-nav-toggle:focus {
+  outline: 2px solid var(--accent-emerald);
+  outline-offset: 2px;
+}
+
+.mobile-nav-toggle::before,
+.mobile-nav-toggle::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: currentColor;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle::before {
+  transform: translateY(-6px);
+}
+
+.mobile-nav-toggle::after {
+  transform: translateY(6px);
+}
+
+.mobile-nav-toggle.menu-open::before {
+  transform: rotate(45deg) translateY(0);
+}
+
+.mobile-nav-toggle.menu-open::after {
+  transform: rotate(-45deg) translateY(0);
+}
+
+.mobile-nav-menu {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh;
+  background: var(--color-primary);
+  z-index: var(--z-dropdown);
+  padding: var(--space-8) var(--space-6);
+  overflow-y: auto;
+  transition: left 0.3s var(--transition-smooth);
+  box-shadow: var(--shadow-xl);
+  will-change: left;
+  backface-visibility: hidden;
+}
+
+.mobile-nav-menu.open {
+  left: 0;
+}
+
+.mobile-nav-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--mesh-5);
+  z-index: -1;
+}
+
+.mobile-nav-menu .nav {
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.mobile-nav-menu .nav__link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  margin: 0;
+}
+
+.mobile-nav-menu .nav__link:hover {
+  background: var(--accent-emerald-subtle);
+  color: var(--accent-emerald);
+}
+
+.mobile-nav-menu .nav__link--active {
+  background: var(--accent-emerald-muted);
+  color: var(--accent-emerald);
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--transition-smooth), visibility 0.3s;
+}
+
+.mobile-nav-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Ensure mobile nav works with reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-toggle,
+  .mobile-nav-menu,
+  .mobile-nav-backdrop {
+    transition: none !important;
+  }
+}
+
+/* Make mobile nav accessible */
+.mobile-nav-menu[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.mobile-nav-menu[aria-hidden="false"] {
+  pointer-events: all;
 }
 
 /* === ENTERPRISE ENHANCEMENTS === */
@@ -695,6 +1019,69 @@ h6 { font-size: var(--text-lg); }
 .mesh-background {
   background: var(--mesh-1);
   position: relative;
+}
+
+/* Utility classes for applying mesh gradients */
+.mesh-1 {
+  background: var(--mesh-1);
+}
+
+.mesh-2 {
+  background: var(--mesh-2);
+}
+
+.mesh-3 {
+  background: var(--mesh-3);
+}
+
+.mesh-4 {
+  background: var(--mesh-4);
+}
+
+.mesh-5 {
+  background: var(--mesh-5);
+}
+
+/* Combined mesh gradients with other backgrounds */
+.mesh-bg-1 {
+  background: var(--mesh-1), var(--color-surface);
+}
+
+.mesh-bg-2 {
+  background: var(--mesh-2), var(--color-surface);
+}
+
+.mesh-bg-3 {
+  background: var(--mesh-3), var(--color-surface);
+}
+
+.mesh-bg-4 {
+  background: var(--mesh-4), var(--color-surface);
+}
+
+.mesh-bg-5 {
+  background: var(--mesh-5), var(--color-surface);
+}
+
+/* Mesh gradients for elevated surfaces */
+.mesh-elevated-1 {
+  background: var(--mesh-1), var(--color-elevated);
+}
+
+.mesh-elevated-2 {
+  background: var(--mesh-2), var(--color-elevated);
+}
+
+.mesh-elevated-3 {
+  background: var(--mesh-3), var(--color-elevated);
+}
+
+.mesh-elevated-4 {
+  background: var(--mesh-4), var(--color-elevated);
+}
+
+.mesh-elevated-5 {
+  background: var(--mesh-5), var(--color-elevated);
 }
 
 .elegant-surface {

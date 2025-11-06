@@ -118,6 +118,8 @@ class MockPatternRecognitionAdapter implements PatternRecognitionOps {
 /**
  * Create and configure a pattern recognition FHE service
  */
+export { SealPatternRecognitionService } from './seal-pattern-recognition'
+
 export async function createPatternRecognitionFHEService(
   config?: Record<string, unknown>,
 ) {

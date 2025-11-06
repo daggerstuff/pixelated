@@ -321,4 +321,4 @@ export const HIPAACompliance = {
   generateAuditLog,
 }
 
-export { SECURITY_HEADERS, RATE_LIMITS }
+export { SECURITY_HEADERS }
