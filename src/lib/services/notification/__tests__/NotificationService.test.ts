@@ -1,5 +1,5 @@
 import { config } from '@/config/env.config'
-import { redis } from '@/lib/services/redis'
+import { redis } from '@/lib/redis'
 import { WebSocket } from 'ws'
 import {
   NotificationChannel,
@@ -18,10 +18,31 @@ interface NotificationServiceTestInterface {
 }
 
 // Mock dependencies
-vi.mock('@/lib/services/redis', () => ({
+vi.mock('@/lib/redis', () => ({
   redis: {
-    lpush: vi.fn().mockResolvedValue(1),
-    rpoplpush: vi.fn().mockResolvedValue(null),
+    lpush: vi.fn((key, value) => {
+      if (key === 'notification_queue') {
+        return Promise.resolve(1)
+      }
+      return Promise.resolve(0)
+    }),
+    rpoplpush: vi.fn()
+      .mockResolvedValueOnce(JSON.stringify({
+        id: 'test-id',
+        userId: 'test-user',
+        templateId: 'test-template',
+        title: 'Test',
+        body: 'Test',
+        data: {},
+        channels: ['in_app', 'email'],
+        priority: 'normal',
+        status: 'pending',
+        createdAt: Date.now(),
+        deliveredAt: null,
+        readAt: null,
+        error: null,
+      }))
+      .mockResolvedValue(null),
     lrem: vi.fn().mockResolvedValue(1),
     llen: vi.fn().mockResolvedValue(0),
     lrange: vi.fn().mockResolvedValue([]),
@@ -102,6 +123,7 @@ describe('notificationService', () => {
       'get',
     ).mockReturnValue({
       upsertTemplate: vi.fn(),
+      queueEmail: vi.fn(),
     })
 
     vi.spyOn(
@@ -151,7 +173,7 @@ describe('notificationService', () => {
 
       expect(id).toBeDefined()
       expect(redis.lpush).toHaveBeenCalledWith(
-        'notification:queue',
+        'notification_queue',
         expect.stringContaining(mockNotification.userId),
       )
     })
@@ -213,8 +235,8 @@ describe('notificationService', () => {
       await notificationService.processQueue()
 
       expect(redis.rpoplpush).toHaveBeenCalledWith(
-        'notification:queue',
-        'notification:processing',
+        'notification_queue',
+        'notification_processing',
       )
       expect(redis.hset).toHaveBeenCalledWith(
         `notifications:${queueItem.userId}`,

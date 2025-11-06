@@ -1,8 +1,8 @@
-import {
-  PatternRecognitionService,
-  type ExtendedFHEService,
-} from '@/lib/ai/services/PatternRecognitionService'
-import type { EmotionAnalysis, TherapySession } from '@/lib/ai/AIService'
+import { PatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
+import type {
+  EmotionAnalysis,
+  TherapySession,
+} from '@/lib/ai/emotions/types'
 import type { IRedisService } from '../types'
 
 // Mock FHE service for testing
@@ -90,10 +90,70 @@ const mockRedisService: IRedisService = {
   keys: function (_pattern: string): Promise<string[]> {
     throw new Error('Function not implemented.')
   },
+  deletePattern: function (_pattern: string): Promise<void> {
+    throw new Error('Function not implemented.')
+  },
+  hset: function (_key: string, _field: string, _value: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  hget: function (_key: string, _field: string): Promise<string | null> {
+    throw new Error('Function not implemented.')
+  },
+  hgetall: function (_key: string): Promise<Record<string, string>> {
+    throw new Error('Function not implemented.')
+  },
+  hdel: function (_key: string, _field: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  hlen: function (_key: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  zadd: function (_key: string, _score: number, _member: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  zrem: function (_key: string, _member: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  zrange: function (
+    _key: string,
+    _start: number,
+    _stop: number,
+    _withScores?: string | undefined,
+  ): Promise<string[] | import('../redis-operation-types').RedisZSetMember[]> {
+    throw new Error('Function not implemented.')
+  },
+  zpopmin: function (
+    _key: string,
+  ): Promise<import('../redis-operation-types').RedisZSetMember[]> {
+    throw new Error('Function not implemented.')
+  },
+  zcard: function (_key: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  lpush: function (_key: string, ..._elements: string[]): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  rpoplpush: function (
+    _source: string,
+    _destination: string,
+  ): Promise<string | null> {
+    throw new Error('Function not implemented.')
+  },
+  lrem: function (
+    _key: string,
+    _count: number,
+    _value: string,
+  ): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
+  llen: function (_key: string): Promise<number> {
+    throw new Error('Function not implemented.')
+  },
 }
 
 describe('patternRecognition Integration', () => {
   let patternService: PatternRecognitionService
+  const testId = 'test-id'
 
   beforeEach(() => {
     patternService = new PatternRecognitionService(
@@ -140,7 +200,6 @@ describe('patternRecognition Integration', () => {
           therapistId: 'therapist1',
           startTime: new Date(),
           status: 'completed',
-          securityLevel: 'fhe',
           emotionAnalysisEnabled: true,
         },
         {
@@ -149,7 +208,6 @@ describe('patternRecognition Integration', () => {
           therapistId: 'therapist1',
           startTime: new Date(),
           status: 'completed',
-          securityLevel: 'fhe',
           emotionAnalysisEnabled: true,
         },
       ]

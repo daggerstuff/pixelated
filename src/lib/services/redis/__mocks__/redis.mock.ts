@@ -93,7 +93,7 @@ export const mockRedisService = {
 }
 
 // Define custom matchers for arrays
-const arrayContaining = (received, expected) => {
+const arrayContaining = (received: unknown[], expected: unknown[]) => {
   const pass = expected.every((item) => received.includes(item))
   return {
     pass,
@@ -103,7 +103,7 @@ const arrayContaining = (received, expected) => {
 }
 
 // Expose arrayContaining for tests
-expect.arrayContaining = arrayContaining
+expect.arrayContaining = arrayContaining as any
 
 // Extend expect with custom matchers
 expect.extend({

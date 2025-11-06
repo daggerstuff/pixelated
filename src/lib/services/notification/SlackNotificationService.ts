@@ -18,6 +18,10 @@ interface SlackBlock {
     type: string
     text: string
   }>
+  elements?: Array<{
+    type: string
+    text?: string
+  }>
   accessory?: {
     type: string
     image_url: string

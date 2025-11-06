@@ -139,18 +139,15 @@ describe('AIChat.astro', () => {
   })
 
   it.skip('renders with custom props', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const customProps = {
-      availableModels: [
-        { id: 'openai/gpt-4', name: 'GPT-4' },
-        { id: 'anthropic/claude-3', name: 'Claude 3' },
-      ],
-      showModelSelector: false,
-      title: 'Custom AI Assistant',
-      description: 'Specialized AI chat for technical support',
-    }
-
-    // const { container } = await renderAstroComponent(AIChat, customProps)
+    // const { container } = await renderAstroComponent(AIChat, {
+    //   availableModels: [
+    //     { id: 'openai/gpt-4', name: 'GPT-4' },
+    //     { id: 'anthropic/claude-3', name: 'Claude 3' },
+    //   ],
+    //   showModelSelector: false,
+    //   title: 'Custom AI Assistant',
+    //   description: 'Specialized AI chat for technical support',
+    // })
 
     // Check if the custom title and description are rendered
     // const h2Element = container.querySelector('h2')

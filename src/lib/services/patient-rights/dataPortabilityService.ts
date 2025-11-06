@@ -32,7 +32,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 // Replace missing permissions module with a stub
 // Setup logging
-const logger = createBuildSafeLogger({ context: 'data-portability-service' })
+const logger = createBuildSafeLogger('data-portability-service')
 const auditLogger = getAuditLogger('data-transfer')
 
 // Types for data portability and export

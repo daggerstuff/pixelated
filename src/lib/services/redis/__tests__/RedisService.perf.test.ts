@@ -161,7 +161,7 @@ describeFn('RedisService Performance', () => {
 
   describe('memory usage', () => {
     it('should maintain reasonable memory usage under load', async () => {
-      const _initialStats = await redis.getPoolStats()
+      await redis.getPoolStats()
 
       // Generate significant load with varied data sizes
       const operations = Array.from({ length: 1000 }, (_, i) => {
