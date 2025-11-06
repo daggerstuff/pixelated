@@ -190,7 +190,10 @@ export async function verifyDataIntegrity(
  * Custom test matchers
  */
 export const customMatchers = {
-  toBeRedisError(received: unknown, expectedCode: RedisErrorCode): void {
+  toBeRedisError(
+    received: unknown,
+    expectedCode: RedisErrorCode,
+  ): jest.CustomMatcherResult {
     const pass =
       received instanceof RedisServiceError && received.code === expectedCode
 
@@ -201,7 +204,10 @@ export const customMatchers = {
     }
   },
 
-  async toBeInRedis(key: string, expectedValue: unknown): void {
+  async toBeInRedis(
+    key: string,
+    expectedValue: unknown,
+  ): Promise<jest.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -227,7 +233,7 @@ export const customMatchers = {
     }
   },
 
-  async toExistInRedis(key: string): void {
+  async toExistInRedis(key: string): Promise<jest.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -253,7 +259,10 @@ export const customMatchers = {
     }
   },
 
-  async toHaveTTL(key: string, expectedTTL: number): void {
+  async toHaveTTL(
+    key: string,
+    expectedTTL: number,
+  ): Promise<jest.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {

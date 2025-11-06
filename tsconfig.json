@@ -63,6 +63,7 @@
     "src/**/*.tsx",
     "src/**/*.astro",
     "src/types/**/*.d.ts",
+    "src/lib/services/redis/__tests__/jest.d.ts",
     "*.config.js",
     "*.config.ts",
     "vitest.setup.ts",

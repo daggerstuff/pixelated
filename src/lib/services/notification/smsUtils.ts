@@ -1,5 +1,4 @@
-// import { Twilio } from 'twilio'
-import twilio from 'twilio'
+import twilio, { type Twilio } from 'twilio'
 import { config } from '@/config/env.config'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 

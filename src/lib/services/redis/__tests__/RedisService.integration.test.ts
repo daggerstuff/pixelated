@@ -4,7 +4,10 @@ import { RedisErrorCode } from '../types'
 import { generateTestKey, sleep } from './test-utils'
 
 expect.extend({
-  toBeRedisError(received: unknown, code: RedisErrorCode): void {
+  toBeRedisError(
+    received: unknown,
+    code: RedisErrorCode,
+  ): jest.CustomMatcherResult {
     const error = received as { code?: RedisErrorCode }
     const pass = error?.code === code
     return {
@@ -121,7 +124,7 @@ describeFn('RedisService Integration Tests', () => {
         const updatedSession = await redis.get(
           `integration:session:${sessionId}`,
         )
-        expect(JSON.parse(updatedSession!) as unknown.roles).toContain('admin')
+        expect((JSON.parse(updatedSession!) as any).roles).toContain('admin')
 
         // Delete session
         await redis.del(`integration:session:${sessionId}`)
@@ -221,7 +224,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         successEvents.forEach((event) => {
-          const parsed = JSON.parse(event!) as unknown
+          const parsed = JSON.parse(event!) as any
           expect(parsed.type).toBe('success')
         })
       })
@@ -269,7 +272,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         highConfidencePatterns.forEach((pattern) => {
-          const parsed = JSON.parse(pattern!) as unknown
+          const parsed = JSON.parse(pattern!) as any
           expect(parsed.confidence).toBeGreaterThanOrEqual(0.8)
         })
       })

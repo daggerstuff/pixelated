@@ -33,7 +33,7 @@ describe('cacheInvalidation Integration', () => {
     })
     await redis.connect()
 
-    cacheInvalidation = new CacheInvalidation({ redis: redis.getClient() })
+    cacheInvalidation = new CacheInvalidation({ redis: redis.getClient() as Redis })
   })
 
   afterEach(async () => {
@@ -58,7 +58,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys exist
       for (const key of keys) {
-        await (expect(key) as unknown)['toExistInRedis']()
+        await expect(key)['toExistInRedis']()
       }
 
       // Invalidate keys matching pattern
@@ -96,7 +96,7 @@ describe('cacheInvalidation Integration', () => {
       await runConcurrentOperations(operations, {
         description: 'Concurrent pattern invalidations',
         expectedDuration: 1000,
-      } as unknown)
+      })
 
       await sleep(100) // Allow time for invalidation to propagate
 

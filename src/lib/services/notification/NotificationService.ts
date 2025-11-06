@@ -2,6 +2,7 @@ import type { WebSocket } from 'ws'
 import { config } from '@/config/env.config'
 import { EmailService, type EmailConfig } from '@/lib/email'
 import { redis } from '@/lib/redis'
+import type { IRedisService } from '../redis/types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
 import { z } from 'zod'
@@ -10,7 +11,7 @@ import type { PushSubscription } from './pushUtils'
 import { sendSMS, isValidPhoneNumber } from './smsUtils'
 
 // Create a logger instance
-const logger = createBuildSafeLogger({ prefix: 'NotificationService' })
+const logger = createBuildSafeLogger('NotificationService')
 
 // Crisis Alert Template ID
 const CRISIS_ALERT_TEMPLATE_ID = 'crisis_alert_v1'
@@ -58,7 +59,7 @@ const NotificationTemplateSchema = z.object({
     NotificationPriority.HIGH,
     NotificationPriority.URGENT,
   ]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 })
 
 type NotificationTemplate = z.infer<typeof NotificationTemplateSchema>
@@ -67,7 +68,7 @@ type NotificationTemplate = z.infer<typeof NotificationTemplateSchema>
 const NotificationDataSchema = z.object({
   userId: z.string(),
   templateId: z.string(),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
   channels: z
     .array(
       z.enum([
@@ -97,7 +98,7 @@ const NotificationItemSchema = z.object({
   templateId: z.string(),
   title: z.string(),
   body: z.string(),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
   channels: z.array(
     z.enum([
       NotificationChannel.IN_APP,
@@ -165,11 +166,14 @@ export class NotificationService {
   private wsClients: Map<string, WebSocket>
   private templates: Map<string, NotificationTemplate>
   private vapidKeys: { publicKey: string; privateKey: string } | null = null
+  private readonly queueKey = 'notification_queue'
+  private readonly processingKey = 'notification_processing'
+  private readonly subscriptionKey = 'push_subscriptions'
 
   constructor() {
     const emailConfig: EmailConfig = {
       provider: 'smtp',
-      fromEmail: config.email.from(),
+      fromEmail: config.email.from() || 'noreply@example.com',
       fromName: 'Pixelated Empathy',
       smtpHost: process.env['SMTP_HOST'],
       smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
@@ -317,7 +321,7 @@ export class NotificationService {
     }
 
     // Add to queue
-    await (redis as unknown as RedisCommands).lpush(
+    await (redis as unknown as IRedisService).lpush(
       this.queueKey,
       JSON.stringify(notification),
     )
@@ -338,7 +342,7 @@ export class NotificationService {
   async processQueue(): Promise<void> {
     while (true) {
       // Move item from queue to processing
-      const item = await (redis as unknown as RedisCommands).rpoplpush(
+      const item = await (redis as unknown as IRedisService).rpoplpush(
         this.queueKey,
         this.processingKey,
       )
@@ -374,14 +378,14 @@ export class NotificationService {
         notification.deliveredAt = Date.now()
 
         // Store delivered notification
-        await (redis as unknown as RedisCommands).hset(
+        await (redis as unknown as IRedisService).hset(
           `notifications:${notification.userId}`,
           notification.id,
           JSON.stringify(notification),
         )
 
         // Remove from processing queue
-        await (redis as unknown as RedisCommands).lrem(
+        await (redis as unknown as IRedisService).lrem(
           this.processingKey,
           1,
           item,
@@ -400,14 +404,14 @@ export class NotificationService {
           error instanceof Error ? String(error) : String(error)
 
         // Store failed notification
-        await (redis as unknown as RedisCommands).hset(
+        await (redis as unknown as IRedisService).hset(
           `notifications:${notification.userId}`,
           notification.id,
           JSON.stringify(notification),
         )
 
         // Remove from processing queue
-        await (redis as unknown as RedisCommands).lrem(
+        await (redis as unknown as IRedisService).lrem(
           this.processingKey,
           1,
           item,
@@ -428,7 +432,7 @@ export class NotificationService {
    * Mark a notification as read
    */
   async markAsRead(userId: string, notificationId: string): Promise<void> {
-    const notification = await (redis as unknown as RedisCommands).hget(
+    const notification = await (redis as unknown as IRedisService).hget(
       `notifications:${userId}`,
       notificationId,
     )
@@ -457,7 +461,7 @@ export class NotificationService {
     limit = 50,
     offset = 0,
   ): Promise<NotificationItem[]> {
-    const notifications = await (redis as unknown as RedisCommands).hgetall(
+    const notifications = await (redis as unknown as IRedisService).hgetall(
       `notifications:${userId}`,
     )
     if (!notifications) {
@@ -478,7 +482,7 @@ export class NotificationService {
    * Get unread notification count for a user
    */
   async getUnreadCount(userId: string): Promise<number> {
-    const notifications = await (redis as unknown as RedisCommands).hgetall(
+    const notifications = await (redis as unknown as IRedisService).hgetall(
       `notifications:${userId}`,
     )
     if (!notifications) {
@@ -518,7 +522,7 @@ export class NotificationService {
     userId: string,
     subscription: PushSubscription,
   ): Promise<void> {
-    await (redis as unknown as RedisCommands).hset(
+    await (redis as unknown as IRedisService).hset(
       this.subscriptionKey,
       userId,
       JSON.stringify(subscription),
@@ -530,7 +534,7 @@ export class NotificationService {
    * Remove a push subscription for a user
    */
   async removePushSubscription(userId: string): Promise<void> {
-    await (redis as unknown as RedisCommands).hdel(this.subscriptionKey, userId)
+    await (redis as unknown as IRedisService).hdel(this.subscriptionKey, userId)
     logger.info('Push subscription removed', { userId })
   }
 
@@ -540,7 +544,7 @@ export class NotificationService {
   private async getPushSubscription(
     userId: string,
   ): Promise<PushSubscription | null> {
-    const subscription = await (redis as unknown as RedisCommands).hget(
+    const subscription = await (redis as unknown as IRedisService).hget(
       this.subscriptionKey,
       userId,
     )

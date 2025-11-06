@@ -196,12 +196,12 @@ describeFn('analytics Integration', () => {
 
       // Group metrics by interval
       const metricsByInterval = metrics.reduce(
-        (acc, metric) => {
+        (acc: Record<string, number>, metric) => {
           const key = metric.tags?.['interval'] ?? 'unknown'
           acc[key] = (acc[key] || 0) + 1
           return acc
         },
-        {} as Record<string, number>,
+        {},
       )
 
       // Verify each interval has the correct number of metrics
