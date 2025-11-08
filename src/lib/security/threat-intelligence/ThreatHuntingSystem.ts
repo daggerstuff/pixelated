@@ -932,7 +932,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Data collection methods (simulated)
    */
-  private async collectNetworkData(scope: HuntScope): Promise<any[]> {
+  private async collectNetworkData(_scope: HuntScope): Promise<any[]> {
     // Simulate network data collection
     return [
       {
@@ -946,7 +946,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectEndpointData(scope: HuntScope): Promise<any[]> {
+  private async collectEndpointData(_scope: HuntScope): Promise<any[]> {
     // Simulate endpoint data collection
     return [
       {
@@ -960,7 +960,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectUserActivityData(scope: HuntScope): Promise<any[]> {
+  private async collectUserActivityData(_scope: HuntScope): Promise<any[]> {
     // Simulate user activity data collection
     return [
       {
@@ -973,7 +973,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectFileData(scope: HuntScope): Promise<any[]> {
+  private async collectFileData(_scope: HuntScope): Promise<any[]> {
     // Simulate file data collection
     return [
       {
@@ -986,7 +986,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectAuthenticationData(scope: HuntScope): Promise<any[]> {
+  private async collectAuthenticationData(_scope: HuntScope): Promise<any[]> {
     // Simulate authentication data collection
     return [
       {
@@ -1002,27 +1002,27 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Analysis methods
    */
-  private analyzeNetworkConnections(data: any[], query: HuntQuery): any[] {
+  private analyzeNetworkConnections(data: any[], _query: HuntQuery): any[] {
     // Simulate network connection analysis
     return data.filter((connection) => connection.confidence > 0.5)
   }
 
-  private analyzeProcesses(data: any[], query: HuntQuery): any[] {
+  private analyzeProcesses(data: any[], _query: HuntQuery): any[] {
     // Simulate process analysis
     return data.filter((process) => process.confidence > 0.7)
   }
 
-  private analyzeUserBehavior(data: any[], query: HuntQuery): any[] {
+  private analyzeUserBehavior(data: any[], _query: HuntQuery): any[] {
     // Simulate user behavior analysis
     return data.filter((behavior) => behavior.confidence > 0.6)
   }
 
-  private analyzeMalwareIndicators(data: any[], query: HuntQuery): any[] {
+  private analyzeMalwareIndicators(data: any[], _query: HuntQuery): any[] {
     // Simulate malware indicator analysis
     return data.filter((indicator) => indicator.confidence > 0.8)
   }
 
-  private analyzeLateralMovement(data: any[], query: HuntQuery): any[] {
+  private analyzeLateralMovement(data: any[], _query: HuntQuery): any[] {
     // Simulate lateral movement analysis
     return data.filter((movement) => movement.confidence > 0.7)
   }
@@ -1116,7 +1116,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Simulate AI analysis (replace with actual AI integration)
    */
-  private async simulateAIAnalysis(finding: HuntFinding): Promise<any> {
+  private async simulateAIAnalysis(_finding: HuntFinding): Promise<any> {
     // Simulate AI processing delay
     await new Promise((resolve) => setTimeout(resolve, 100))
 

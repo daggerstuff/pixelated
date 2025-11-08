@@ -139,7 +139,7 @@ export class MentalArenaPythonBridge {
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize MentalArena Python bridge', error)
-      throw new Error(`Python bridge initialization failed: ${error}`)
+      throw new Error(`Python bridge initialization failed: ${error}`, { cause: error })
     }
   }
 
@@ -973,7 +973,7 @@ export class MentalArenaPythonBridge {
         throw error
       }
       logger.error('Failed to validate requirements.txt', error)
-      throw new Error(`Requirements validation failed: ${error}`)
+      throw new Error(`Requirements validation failed: ${error}`, { cause: error })
     }
   }
 

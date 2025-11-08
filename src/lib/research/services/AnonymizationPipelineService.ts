@@ -144,7 +144,7 @@ export class AnonymizationPipelineService {
       }
     } catch (error) {
       console.error('Anonymization pipeline error:', error)
-      throw new Error(`Anonymization failed: ${error.message}`)
+      throw new Error(`Anonymization failed: ${error.message}`, { cause: error })
     }
   }
 
@@ -479,7 +479,7 @@ export class AnonymizationPipelineService {
   private findSimilarGroups(
     targetGroup: any[],
     allGroups: Map<string, any[]>,
-    quasiIdentifiers: string[],
+    _quasiIdentifiers: string[],
   ): any[][] {
     // Simplified similarity calculation - would be more sophisticated in practice
     return Array.from(allGroups.values())
@@ -503,7 +503,7 @@ export class AnonymizationPipelineService {
       : value
   }
 
-  private getRandomCategory(originalValue: string): string {
+  private getRandomCategory(_originalValue: string): string {
     // Simplified random category selection
     const categories = ['happy', 'sad', 'anxious', 'calm', 'angry', 'neutral']
     return categories[Math.floor(Math.random() * categories.length)]

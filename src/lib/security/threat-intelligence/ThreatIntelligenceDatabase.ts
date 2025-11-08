@@ -749,7 +749,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       )
       const offset = options.offset || 0
 
-      const [objects, total] = await Promise.all([
+      const [objects, _total] = await Promise.all([
         this.stixCollection
           .find(filter)
           .sort({ created_at: -1 })

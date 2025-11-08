@@ -18,7 +18,7 @@ export interface ResearchQuery {
   id: string
   naturalLanguageQuery: string
   translatedSQL: string
-  parameters: any[]
+  parameters: unknown[]
   requiredPermissions: string[]
   estimatedExecutionTime: number
   dataClassification: 'public' | 'internal' | 'confidential' | 'restricted'
@@ -161,7 +161,8 @@ export class ResearchQueryEngineService {
     } catch (error) {
       console.error('Error translating natural language query:', error)
       throw new Error(
-        `Query translation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Query translation failed: ${error?.message ?? 'Unknown error'}`,
+        { cause: error },
       )
     }
   }
@@ -276,6 +277,7 @@ export class ResearchQueryEngineService {
       console.error('Error executing research query:', error)
       throw new Error(
         `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error },
       )
     }
   }
@@ -378,7 +380,7 @@ export class ResearchQueryEngineService {
   private async parseQueryIntent(naturalLanguageQuery: string): Promise<{
     intent: string
     entities: Array<{ type: string; value: string }>
-    parameters: Record<string, any>
+    parameters: Record<string, unknown>
     confidence: number
   }> {
     // Simplified NLP parsing - in production would use advanced NLP models
@@ -419,9 +421,18 @@ export class ResearchQueryEngineService {
   }
 
   private async generateSQLFromIntent(
-    parsedIntent: any,
-    researchContext: any,
-  ): Promise<{ sql: string; params: any[] }> {
+    parsedIntent: {
+      intent: string
+      entities: Array<{ type: string; value: string }>
+      parameters: Record<string, unknown>
+      confidence: number
+    },
+    researchContext: {
+      studyTitle: string
+      dataScope: string[]
+      timeRange?: { start: string; end: string }
+    },
+  ): Promise<{ sql: string; params: unknown[] }> {
     // Simplified SQL generation - in production would use sophisticated query builders
     const { intent, entities } = parsedIntent
 
@@ -433,7 +444,7 @@ export class ResearchQueryEngineService {
       'emotional_metrics',
     ]
     let conditions = []
-    let params: any[] = []
+    let params: unknown[] = []
     let paramIndex = 1
 
     // Add fields based on intent
@@ -477,9 +488,9 @@ export class ResearchQueryEngineService {
   }
 
   private async executeSQLQuery(
-    sql: string,
-    parameters: any[],
-  ): Promise<any[]> {
+    _sql: string,
+    _parameters: unknown[],
+  ): Promise<unknown[]> {
     // Simulated database execution
     await new Promise((resolve) =>
       setTimeout(resolve, Math.random() * 1000 + 500),
@@ -507,9 +518,9 @@ export class ResearchQueryEngineService {
   }
 
   private async anonymizeQueryResults(
-    rawResults: any[],
+    rawResults: unknown[],
     anonymizationLevel: 'basic' | 'enhanced' | 'maximum',
-    userId: string,
+    _userId: string,
   ): Promise<AnonymizedRecord[]> {
     const config = {
       kAnonymity:
@@ -543,12 +554,14 @@ export class ResearchQueryEngineService {
     const anonymizedRecords: AnonymizedRecord[] = []
 
     for (const record of rawResults) {
-      const result = await anonymizationPipelineService.anonymizeSessionData(
-        record,
-        config,
-        'research_query',
-      )
-      anonymizedRecords.push(result.anonymizedRecord)
+      if (record && typeof record === 'object') {
+        const result = await anonymizationPipelineService.anonymizeSessionData(
+          record as Record<string, unknown>,
+          config,
+          'research_query',
+        )
+        anonymizedRecords.push(result.anonymizedRecord)
+      }
     }
 
     return anonymizedRecords
@@ -590,8 +603,8 @@ export class ResearchQueryEngineService {
   }
 
   private async validateUserPermissions(
-    userId: string,
-    requiredPermissions: string[],
+    _userId: string,
+    _requiredPermissions: string[],
   ): Promise<boolean> {
     // Simplified permission check - in production would check actual user roles
     return true // Assuming valid for demo
@@ -599,7 +612,7 @@ export class ResearchQueryEngineService {
 
   private async analyzeRequiredPermissions(
     sql: string,
-    dataScope: string[],
+    _dataScope: string[],
   ): Promise<string[]> {
     const permissions = []
 
@@ -614,7 +627,7 @@ export class ResearchQueryEngineService {
 
   private async classifyDataSensitivity(
     sql: string,
-    dataScope: string[],
+    _dataScope: string[],
   ): Promise<'public' | 'internal' | 'confidential' | 'restricted'> {
     if (sql.includes('user_id') && !sql.includes('anonymized'))
       return 'restricted'

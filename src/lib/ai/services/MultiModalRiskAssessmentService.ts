@@ -1,9 +1,4 @@
 import type { EmotionAnalysis } from '@/hooks/useEmotionDetection'
-import type { RiskAssessment } from '@/hooks/useRiskAssessment'
-import type {
-  CrisisRiskFactors,
-  CrisisPrediction,
-} from './PredictiveCrisisModelingService'
 
 export interface BiometricData {
   heartRate?: number[]
@@ -380,8 +375,6 @@ export class MultiModalRiskAssessmentService {
    * Assess behavioral risk patterns
    */
   private assessBehavioralRisk(behavioralData: BehavioralPatterns): number {
-    let riskScore = 0
-
     // Session engagement decline
     const engagementRisk =
       Math.max(0, 1 - behavioralData.sessionEngagement.interactionQuality) *
@@ -392,7 +385,7 @@ export class MultiModalRiskAssessmentService {
       (Math.max(0, 1 - behavioralData.communicationChanges.sentimentScore) *
         0.4 +
         Math.max(0, 1 - behavioralData.communicationChanges.topicCoherence) *
-          0.3 +
+        0.3 +
         (behavioralData.communicationChanges.wordCount < 50 ? 0.3 : 0)) *
       0.25
 
@@ -403,9 +396,9 @@ export class MultiModalRiskAssessmentService {
           0,
           1 - behavioralData.socialIndicators.supportSystemEngagement,
         ) *
-          0.3 +
+        0.3 +
         Math.min(behavioralData.digitalFootprint.missedAppointments / 5, 1.0) *
-          0.2) *
+        0.2) *
       0.25
 
     // App usage pattern disruption
@@ -473,8 +466,6 @@ export class MultiModalRiskAssessmentService {
    * Assess contextual risk factors
    */
   private assessContextualRisk(contextualData: ContextualFactors): number {
-    let riskScore = 0
-
     // Environmental factors
     const environmentalRisk =
       (contextualData.environmental.seasonalFactors * 0.4 +
@@ -493,13 +484,13 @@ export class MultiModalRiskAssessmentService {
     const lifeEventsRisk =
       (Math.min(contextualData.life_events.recentLosses.length / 3, 1.0) * 0.4 +
         Math.min(contextualData.life_events.traumaticEvents.length / 2, 1.0) *
-          0.6) *
+        0.6) *
       0.2
 
     // Temporal factors (higher risk during vulnerable times)
     const temporalRisk =
       ((contextualData.temporal.timeOfDay >= 22 ||
-      contextualData.temporal.timeOfDay <= 6
+        contextualData.temporal.timeOfDay <= 6
         ? 0.3
         : 0) +
         contextualData.temporal.circadianPattern * 0.2) *
@@ -562,14 +553,14 @@ export class MultiModalRiskAssessmentService {
    */
   private identifyPrimaryContributors(
     scores: Record<string, number>,
-    data: any,
+    data: unknown,
   ): IntegratedRiskProfile['primaryContributors'] {
     const contributors = Object.entries(scores)
       .filter(([_, score]) => score > 0.4)
       .sort(([_, a], [__, b]) => b - a)
       .slice(0, 3)
       .map(([source, weight]) => ({
-        source: source as any,
+        source: source as 'emotional' | 'biometric' | 'behavioral' | 'clinical' | 'contextual',
         factor: this.getTopFactorForSource(source, data),
         weight,
         trend: this.calculateTrendForSource(source, data),
@@ -584,7 +575,7 @@ export class MultiModalRiskAssessmentService {
   private generateRecommendations(
     riskLevel: string,
     contributors: IntegratedRiskProfile['primaryContributors'],
-    data: any,
+    _data: unknown,
   ): IntegratedRiskProfile['recommendations'] {
     const recommendations = {
       immediate: [] as string[],
@@ -626,7 +617,7 @@ export class MultiModalRiskAssessmentService {
   private prioritizeInterventions(
     riskLevel: string,
     contributors: IntegratedRiskProfile['primaryContributors'],
-    clinicalData?: ClinicalData,
+    _clinicalData: ClinicalData | undefined,
   ): IntegratedRiskProfile['interventionPriority'] {
     const interventions: IntegratedRiskProfile['interventionPriority'] = []
 
@@ -724,7 +715,7 @@ export class MultiModalRiskAssessmentService {
     return (secondAvg - firstAvg) / 100 // Normalized change
   }
 
-  private getTopFactorForSource(source: string, data: any): string {
+  private getTopFactorForSource(source: string, _data: unknown): string {
     // Simplified factor identification - would be more sophisticated in practice
     const factors = {
       emotional: 'High emotional intensity',
@@ -737,8 +728,8 @@ export class MultiModalRiskAssessmentService {
   }
 
   private calculateTrendForSource(
-    source: string,
-    data: any,
+    _source: string,
+    _data: unknown,
   ): 'improving' | 'stable' | 'deteriorating' {
     // Simplified trend calculation - would analyze historical data in practice
     return Math.random() > 0.5 ? 'stable' : 'deteriorating'

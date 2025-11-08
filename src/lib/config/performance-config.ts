@@ -574,9 +574,9 @@ export class PerformanceOptimizer {
    * Optimize database query with connection pooling and caching
    */
   async optimizeDatabaseQuery<T>(
-    query: string,
-    params: any[] = [],
-    options: {
+    _query: string,
+    _params: any[] = [],
+    _options: {
       enableCache?: boolean
       cacheKey?: string
       cacheTTL?: number
@@ -633,11 +633,11 @@ export class PerformanceOptimizer {
    * Process batches with concurrency control
    */
   private processBatchesConcurrently(
-    batches: any[],
-    maxConcurrent: number,
+    _batches: any[],
+    _maxConcurrent: number,
   ): any[] {
     // Implementation would handle concurrent processing
-    return batches
+    return _batches
   }
 
   /**

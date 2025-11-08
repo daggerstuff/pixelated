@@ -119,7 +119,7 @@ export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
 
 export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   children,
-  scale = 0.98,
+  scale: _scale = 0.98,
 }) => (
   <div className="transition-transform duration-75 ease-out active:scale-98">
     {children}

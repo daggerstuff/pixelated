@@ -20,7 +20,7 @@ interface NotificationServiceTestInterface {
 // Mock dependencies
 vi.mock('@/lib/redis', () => ({
   redis: {
-    lpush: vi.fn((key, value) => {
+    lpush: vi.fn((key, _value) => {
       if (key === 'notification_queue') {
         return Promise.resolve(1)
       }

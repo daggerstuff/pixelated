@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react'
 import { Canvas, useFrame, extend } from '@react-three/fiber'
-import { OrbitControls, Text, Sphere, Line } from '@react-three/drei'
+import { OrbitControls, Text, Line } from '@react-three/drei'
 import * as THREE from 'three'
 
 // Extend Three.js objects for react-three-fiber

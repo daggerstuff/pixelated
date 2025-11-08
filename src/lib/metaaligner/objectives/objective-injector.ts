@@ -42,14 +42,14 @@ export class ObjectiveInjector implements IObjectiveInjector {
     }
   }
 
-  private validateObjectives(objectives: ObjectiveDefinition[]): boolean {
+  private validateObjectives(_objectives: ObjectiveDefinition[]): boolean {
     // Placeholder for objective validation logic.
     // This could involve checking for required fields, valid values, or other constraints.
     return true
   }
 
   private loadObjectives(
-    request: UnifiedProcessingRequest,
+    _request: UnifiedProcessingRequest,
   ): ObjectiveDefinition[] {
     // Placeholder for dynamic objective loading logic.
     // This could involve loading objectives based on the user query, context, or other factors.

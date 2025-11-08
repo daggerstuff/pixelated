@@ -256,7 +256,7 @@ export class PerformanceBenchmarkRunner {
   }
 
   private async makeTestRequest(
-    scenario: any,
+    _scenario: any,
   ): Promise<{ success: boolean; responseTime: number }> {
     const startTime = performance.now()
 

@@ -7,22 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Alert from '@/components/ui/alert'
 import {
   AlertTriangle,
-  Shield,
   Clock,
   TrendingUp,
-  TrendingDown,
   Activity,
   Users,
   Bell,
   CheckCircle,
-  XCircle,
   Phone,
-  AlertCircle,
   Eye,
   BarChart3,
-  Calendar,
-  MessageSquare,
-  Settings,
 } from 'lucide-react'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 import type { EscalationEvent } from '@/lib/ai/services/AutomatedEscalationService'
@@ -688,7 +681,7 @@ async function fetchPatientRiskData(
   ]
 }
 
-async function fetchAlerts(therapistId: string): Promise<AlertItem[]> {
+async function fetchAlerts(_therapistId: string): Promise<AlertItem[]> {
   return [
     {
       id: 'alert_001',
@@ -705,7 +698,7 @@ async function fetchAlerts(therapistId: string): Promise<AlertItem[]> {
   ]
 }
 
-async function fetchMetrics(therapistId: string): Promise<DashboardMetrics> {
+async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
   return {
     totalPatients: 25,
     highRiskPatients: 3,

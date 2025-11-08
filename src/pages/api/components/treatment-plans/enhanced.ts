@@ -374,7 +374,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       filteredPlans = filteredPlans.map((plan) => ({
         ...plan,
         goals: plan.goals.map((goal) => {
-          const { metrics, ...goalWithoutMetrics } = goal
+          const { _metrics, ...goalWithoutMetrics } = goal
           return goalWithoutMetrics
         }),
         metadata: plan.metadata

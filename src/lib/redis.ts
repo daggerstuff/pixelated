@@ -53,7 +53,7 @@ function createMockRedisClient() {
       return existed ? 1 : 0
     },
     exists: async (key: string) => (mockStore.has(key) ? 1 : 0),
-    expire: async (key: string, seconds: number) =>
+    expire: async (key: string, _seconds: number) =>
       mockStore.has(key) ? 1 : 0,
 
     // Advanced operations needed by rate limiter

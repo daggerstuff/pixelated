@@ -8,18 +8,18 @@ interface Root {
   children: Node[]
 }
 
-interface Paragraph {
-  type: 'paragraph'
-  children: PhrasingContent[]
-}
+// interface Paragraph {
+//   type: 'paragraph'
+//   children: PhrasingContent[]
+// }
 
-interface PhrasingContent {
-  type: string
-  url?: string
-  alt?: string
-  value?: string
-  children?: Node[]
-}
+// interface PhrasingContent {
+//   type: string
+//   url?: string
+//   alt?: string
+//   value?: string
+//   children?: Node[]
+// }
 
 // Simple type definitions for mdast
 interface Node {
@@ -31,11 +31,11 @@ interface Node {
   data?: any
 }
 
-interface ImageNode extends Node {
-  type: 'image'
-  url: string
-  alt?: string
-}
+// interface ImageNode extends Node {
+//   type: 'image'
+//   url: string
+//   alt?: string
+// }
 
 interface ParagraphNode extends Node {
   type: 'paragraph'

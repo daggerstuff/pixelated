@@ -17,52 +17,105 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
 
-# Pixelated Empathy - Development Guide
+# Pixelated Empathy - AI Agent Guide
 
-## IMPORTANT FIRST NOTES
-- **All** python commands and calls are to use uv. Not anaconda or venv. Use uv for everything.
-    - `uv install` to install dependencies from pyproject.toml
-    - `uv run <command>` to run commands like `python script.py` or `pytest tests/`
-    - `uv shell` to spawn a shell with the virtual environment activated
-- **All** node commands and calls are to use pnpm. Not npm or yarn. Use pnpm for everything.
-- **Always** start every new chat or task by referring to your mcp tool, openmemory.
-    - It has the full context of the project, and will help you avoid mistakes.
-    - Always log a new memory at the end of your work, summarizing what you did. To help further grow the memory base.
-    - Always update your memory if you encounter issues that you can't solve on your own.
-- **All** research must be reviewed by the end of the day. Any deviation from the project's goals will result in a review.
+> **Mission**: Build empathy-driven technology that prioritizes human connection, psychological safety, and ethical AI.
 
-## Build/Lint/Test Commands
-- **Development**: `pnpm dev` (or `pnpm dev:all-services` for full stack)
-- **Single Test**: `pnpm vitest run src/path/to/test.spec.ts`
-- **All Tests**: `pnpm test:all` or `pnpm check:all` (lint+format+typecheck)
-- **Type Check**: `pnpm typecheck` (strict) or `pnpm check` (basic)
-- **Lint**: `pnpm lint:fix` (auto-fix) or `pnpm lint` (check only)
-- **Format**: `pnpm format:check` or `pnpm format`
+## 🚀 Start Every Session
 
-## Code Style & Conventions
+1. **Retrieve memory first**: `brv retrieve --query "context for task"`
+2. **Check status**: `brv status`
+3. **For major changes**: Consult `@/openspec/AGENTS.md`
 
-### TypeScript/JavaScript
-- **Imports**: Use type-first imports, absolute `@/` aliases preferred
-- **Formatting**: 2 spaces, no semicolons, single quotes, trailing commas
-- **Types**: Strict mode enabled, branded types for critical values
-- **Naming**: PascalCase for components/interfaces, camelCase for vars/functions
-- **Error Handling**: Use `try/catch` with proper typing for errors
+## 📦 Package Managers (Critical)
 
-### Project Structure
-- **Components**: Astro/React in `src/components/`, PascalCase
-- **Utilities**: Helpers in `src/utils/`, camelCase
-- **Types**: Centralized in `src/types/`, strict branded types
-- **Services**: API/AI services in `src/lib/`
+**Node.js**: `pnpm` ONLY (never npm/yarn)
+**Python**: `uv` ONLY (never pip/conda/venv)
 
-### Best Practices
-- **Testing**: Vitest with coverage, use `vi.mock()` for dependencies
-- **Logging**: Use `getLogger('prefix')` with proper levels
-- **Accessibility**: Strict ARIA props, semantic HTML5
-- **Performance**: Code splitting, lazy loading, debounced handlers
-- **Security**: Input validation, sanitize user data, proper CORS
+```bash
+# Node
+pnpm dev                    # Start dev server
+pnpm test:all              # Run all tests
+pnpm check:all             # Lint + format + typecheck
 
-### Special Notes
-- Node.js 24+ required with pnpm package manager
-- Python 3.11+ for AI services with uv package manager
-- Docker available for full stack development 
-- Multi-environment support with proper dotenv configuration
+# Python
+uv install                 # Install dependencies
+uv run python script.py    # Run scripts
+uv run pytest tests/       # Run tests
+```
+
+## 📝 Code Conventions
+
+**TypeScript/JavaScript**:
+- Type-first imports with `@/` aliases
+- 2 spaces, no semicolons, single quotes, trailing commas
+- PascalCase: Components/interfaces, camelCase: vars/functions
+- Strict types, branded types for critical values
+
+**Project Structure**:
+```
+src/
+├── components/  # Astro/React (PascalCase)
+├── lib/        # Services (API, AI)
+├── types/      # Type definitions
+├── utils/      # Helpers (camelCase)
+└── pages/      # Astro pages
+```
+
+**Requirements**: Node.js 24+, Python 3.11+, Docker
+
+## 🧠 Memory Management
+
+**Add learnings**: `brv add --section "Best Practices" --content "..."`
+**Push updates**: `brv push` (prompt user first unless auto-approved)
+
+**Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
+
+## 🔒 Security & Ethics
+
+1. Never expose sensitive data (redact API keys, tokens, PII)
+2. Validate all input (especially emotion scores, conversation data)
+3. This handles mental health data—respect privacy
+4. Ensure AI personas don't perpetuate stereotypes
+5. Features must not cause psychological harm
+
+## 🎭 Domain Guidelines
+
+**Emotional Intelligence**:
+- Normalize emotion scores (0-1 range)
+- Use established frameworks (Plutchik, Big Five)
+- Validate psychological constructs
+
+**Conversation Analysis**:
+- Respect context and history
+- Handle edge cases (silence, crisis signals)
+- Consider cultural/linguistic variations
+
+## 🚫 Don't
+
+1. Skip memory retrieval
+2. Use wrong package managers
+3. Ignore type errors
+4. Commit without testing (`pnpm check:all`)
+5. Over-engineer (start minimal)
+6. Bypass security validation
+
+## 📚 Resources
+
+**Core Guides**:
+- **#[[file:.kiro/steering/code-style.md]]**: Detailed style guide
+- **#[[file:.kiro/steering/security-ethics.md]]**: Security & ethics deep-dive
+- **#[[file:.kiro/steering/clean-code-principles.md]]**: Clean code patterns
+
+**Domain-Specific**:
+- **#[[file:.kiro/steering/domain-emotional-ai.md]]**: Emotional AI guidelines
+- **#[[file:.kiro/steering/testing-strategy.md]]**: Testing best practices
+
+**Workflows**:
+- **#[[file:.kiro/steering/spec-workflow.md]]**: Spec-driven development
+- **openspec/AGENTS.md**: OpenSpec process
+- **Playbook**: `.brv/playbook.json`
+
+---
+
+*Building technology that helps humans connect more deeply.*

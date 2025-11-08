@@ -1042,7 +1042,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
   /**
    * Simulate response actions (replace with actual API calls)
    */
-  private async simulateBlockAction(action: ResponseAction): Promise<void> {
+  private async simulateBlockAction(_action: ResponseAction): Promise<void> {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 100))
 
@@ -1052,7 +1052,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateIsolateAction(action: ResponseAction): Promise<void> {
+  private async simulateIsolateAction(_action: ResponseAction): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 150))
 
     if (Math.random() < 0.05) {
@@ -1060,7 +1060,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateNotifyAction(action: ResponseAction): Promise<void> {
+  private async simulateNotifyAction(_action: ResponseAction): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 50))
 
     if (Math.random() < 0.02) {
@@ -1068,7 +1068,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateEscalateAction(action: ResponseAction): Promise<void> {
+  private async simulateEscalateAction(_action: ResponseAction): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 200))
 
     if (Math.random() < 0.15) {
@@ -1076,7 +1076,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateRemediateAction(action: ResponseAction): Promise<void> {
+  private async simulateRemediateAction(_action: ResponseAction): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
     if (Math.random() < 0.08) {
@@ -1084,7 +1084,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateCollectAction(action: ResponseAction): Promise<void> {
+  private async simulateCollectAction(_action: ResponseAction): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 250))
 
     if (Math.random() < 0.03) {
@@ -1287,7 +1287,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
    * Simulate rollback action
    */
   private async simulateRollbackAction(
-    rollbackAction: ResponseAction,
+    _rollbackAction: ResponseAction,
   ): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 100))
 

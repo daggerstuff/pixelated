@@ -3,7 +3,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('bias-detection-api')
 
 export const GET = async ({
-  request,
+  request: _request,
 }: {
   request: Request
 }): Promise<Response> => {

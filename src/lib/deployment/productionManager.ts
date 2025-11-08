@@ -284,14 +284,14 @@ class ProductionManager {
   }
 
   private async validateDatabaseMigrations(
-    artifact: DeploymentArtifact,
+    _artifact: DeploymentArtifact,
   ): Promise<void> {
     // Validate that database migrations are compatible
     console.log('Database migrations validated')
   }
 
   private async validateDependencies(
-    artifact: DeploymentArtifact,
+    _artifact: DeploymentArtifact,
   ): Promise<void> {
     // Validate dependency versions and compatibility
     console.log('Dependencies validated')
@@ -364,13 +364,13 @@ class ProductionManager {
     // In real implementation, would update load balancer configuration
   }
 
-  private async deployToCanary(artifact: DeploymentArtifact): Promise<void> {
+  private async deployToCanary(_artifact: DeploymentArtifact): Promise<void> {
     console.log('Deploying to canary environment')
     // Mock canary deployment
   }
 
   private async monitorCanaryDeployment(
-    environment: string,
+    _environment: string,
   ): Promise<DeploymentHealth> {
     // Monitor canary deployment performance
     return {
@@ -396,7 +396,7 @@ class ProductionManager {
   }
 
   private async getEnvironmentInstances(
-    environment: string,
+    _environment: string,
   ): Promise<string[]> {
     // Mock instance discovery
     return [
@@ -410,7 +410,7 @@ class ProductionManager {
 
   private async deployToInstances(
     instances: string[],
-    artifact: DeploymentArtifact,
+    _artifact: DeploymentArtifact,
   ): Promise<void> {
     console.log(`Deploying to instances: ${instances.join(', ')}`)
     // Mock instance deployment
@@ -496,7 +496,7 @@ class ProductionManager {
     }
   }
 
-  private async checkDatabaseConnection(environment: string): Promise<{
+  private async checkDatabaseConnection(_environment: string): Promise<{
     status: 'pass' | 'fail' | 'warn'
     responseTime: number
     lastChecked: Date
@@ -506,7 +506,7 @@ class ProductionManager {
     return { status: 'pass', responseTime: 12, lastChecked: new Date() }
   }
 
-  private async checkRealtimeService(environment: string): Promise<{
+  private async checkRealtimeService(_environment: string): Promise<{
     status: 'pass' | 'fail' | 'warn'
     responseTime: number
     lastChecked: Date
@@ -548,7 +548,7 @@ class ProductionManager {
   }
 
   private findPreviousDeployment(
-    environment: string,
+    _environment: string,
   ): DeploymentArtifact | null {
     // Find most recent successful deployment
     const deployments = Array.from(this.deployments.values())
@@ -596,8 +596,8 @@ class ProductionManager {
   }
 
   private async executeRollbackStep(
-    step: string,
-    environment: string,
+    _step: string,
+    _environment: string,
   ): Promise<void> {
     // Mock rollback step execution
     const delay = Math.random() * 2000 + 1000 // 1-3 seconds
@@ -631,7 +631,7 @@ class ProductionManager {
   }
 
   private findCurrentDeployment(
-    environment: string,
+    _environment: string,
   ): DeploymentArtifact | undefined {
     // Find deployment marked as current for this environment
     return Array.from(this.deployments.values()).find(

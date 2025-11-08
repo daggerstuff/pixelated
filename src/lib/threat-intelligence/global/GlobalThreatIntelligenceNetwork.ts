@@ -493,7 +493,7 @@ export class GlobalThreatIntelligenceNetworkCore
   }
 
   private async generateAttribution(
-    threatData: RealTimeThreatData,
+    _threatData: RealTimeThreatData,
   ): Promise<ThreatAttribution | undefined> {
     // This would use ML models to analyze threat patterns and generate attribution
     // For now, return undefined as attribution requires sophisticated analysis

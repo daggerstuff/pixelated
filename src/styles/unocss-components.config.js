@@ -161,7 +161,7 @@ export default defineConfig({
   // Custom rules for our components
   rules: [
     // Gradient backgrounds
-    [/^bg-gradient-(\w+)-(\w+)$/, ([, direction, gradient]) => {
+    [/^bg-gradient-(\w+)-(\w+)$/, ([, _direction, gradient]) => {
       const gradients = {
         primary: 'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
         secondary: 'linear-gradient(135deg, var(--color-secondary-600), var(--color-accent-500))',
@@ -170,7 +170,7 @@ export default defineConfig({
         light: 'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
       };
 
-      const directions = {
+// const directions = { // Unused variable - commented out by automation
         to: 'to right',
         'to-br': 'to bottom right',
         'to-tl': 'to top left',

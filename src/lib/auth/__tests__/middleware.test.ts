@@ -386,7 +386,7 @@ describe('Authentication Middleware', () => {
 
       // Mock no previous requests
       vi.mocked(getFromCache).mockResolvedValue(null)
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
@@ -421,7 +421,7 @@ describe('Authentication Middleware', () => {
         resetTime: Date.now() - 1000, // Expired
       })
 
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
@@ -441,7 +441,7 @@ describe('Authentication Middleware', () => {
       const { getFromCache, setInCache } = await import('../../redis')
 
       vi.mocked(getFromCache).mockResolvedValue(null)
-      vi.mocked(setInCache).mockImplementation(async (key, data, ttl) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data, _ttl) => {
         return true
       })
 
@@ -832,8 +832,6 @@ describe('Authentication Middleware', () => {
 
   describe('Security Requirements', () => {
     it('should prevent timing attacks in authentication', async () => {
-      const { getFromCache } = await import('../../redis')
-
       // Test with valid token but no user
       vi.mocked(validateToken).mockResolvedValue({
         valid: true,

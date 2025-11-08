@@ -107,7 +107,7 @@ export interface SecurityEventLoggerConfig {
  * Security Event Logger for comprehensive audit trail
  */
 export class SecurityEventLogger {
-  private redis: any
+  private redis: unknown
   private config: SecurityEventLoggerConfig
   private eventBuffer: SecurityEvent[]
   private flushTimer?: NodeJS.Timeout
@@ -200,7 +200,7 @@ export class SecurityEventLogger {
     userId: string,
     accessTokenId: string,
     refreshTokenId: string,
-    clientInfo: any,
+    clientInfo: Record<string, unknown>,
   ): Promise<void> {
     await this.logSecurityEvent(
       SecurityEventType.TOKEN_CREATED,
@@ -270,7 +270,7 @@ export class SecurityEventLogger {
   async logTokenRefresh(
     userId: string,
     oldTokenId: string,
-    newTokenPair: any,
+    newTokenPair: { accessToken: string; refreshToken: string },
   ): Promise<void> {
     await this.logSecurityEvent(
       SecurityEventType.TOKEN_REFRESHED,
@@ -878,11 +878,57 @@ export class SecurityEventLogger {
     startDate: Date,
     endDate: Date,
   ): Promise<SecurityEvent[]> {
-    // TODO: Implement date range query
-    return []
+    try {
+      const startTimestamp = startDate.getTime()
+      const endTimestamp = endDate.getTime()
+
+      // Get event IDs from Redis sorted set by timestamp range
+      const eventIds = await this.redis.zrangebyscore(
+        'security:events:timeline',
+        startTimestamp,
+        endTimestamp,
+      )
+
+      if (eventIds.length === 0) {
+        return []
+      }
+
+      // Get event details using pipeline for efficiency
+      const pipeline = this.redis.pipeline()
+      for (const eventId of eventIds) {
+        pipeline.hgetall(`security:event:${eventId}`)
+      }
+
+      const results = await pipeline.exec()
+      const events: SecurityEvent[] = []
+
+      for (const [error, data] of results) {
+        if (!error && data) {
+          try {
+            const event = this.deserializeEvent(data as Record<string, string>)
+            events.push(event)
+          } catch (parseError) {
+            logger.error('Error deserializing security event', parseError)
+          }
+        }
+      }
+
+      // Sort by timestamp descending
+      return events.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      )
+    } catch (error) {
+      logger.error('Error getting events in date range', {
+        error,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      })
+      return []
+    }
   }
 
-  private async checkComplianceStatus(events: SecurityEvent[]): Promise<{
+  private async checkComplianceStatus(_events: SecurityEvent[]): Promise<{
     hipaaCompliant: boolean
     violations: string[]
     recommendations: string[]
@@ -899,26 +945,176 @@ export class SecurityEventLogger {
     events: SecurityEvent[],
     violations: string[],
   ): string[] {
-    // TODO: Implement recommendation generation
-    return []
+    const recommendations: string[] = []
+
+    // Analyze events for patterns and generate recommendations
+    const eventCounts = this.countEventsByType(events)
+    const highRiskEvents = events.filter(e => e.riskScore >= this.config.alertThreshold)
+    const failureEvents = events.filter(e =>
+      e.eventType === SecurityEventType.LOGIN_FAILURE ||
+      e.eventType === SecurityEventType.TOKEN_VALIDATION_FAILED ||
+      e.eventType === SecurityEventType.MFA_VERIFICATION_FAILED
+    )
+
+    // Authentication-related recommendations
+    if (failureEvents.length > 10) {
+      recommendations.push('Consider implementing account lockout after multiple failed authentication attempts')
+    }
+
+    if (eventCounts[SecurityEventType.MFA_VERIFICATION_FAILED] > 5) {
+      recommendations.push('Review MFA configuration and user training for multi-factor authentication')
+    }
+
+    // Rate limiting recommendations
+    if (eventCounts[SecurityEventType.RATE_LIMIT_EXCEEDED] > 0) {
+      recommendations.push('Review and potentially tighten rate limiting policies')
+    }
+
+    // High-risk event recommendations
+    if (highRiskEvents.length > events.length * 0.1) {
+      recommendations.push('High percentage of risky events detected - consider enhanced monitoring')
+    }
+
+    // Session security recommendations
+    if (eventCounts[SecurityEventType.SESSION_HIJACKING_DETECTED] > 0) {
+      recommendations.push('Implement additional session security measures and user education')
+    }
+
+    // Token management recommendations
+    const tokenEvents = eventCounts[SecurityEventType.TOKEN_VALIDATION_FAILED] || 0
+    if (tokenEvents > 20) {
+      recommendations.push('Review token validation logic and consider shorter token lifespans')
+    }
+
+    // Compliance-based recommendations
+    if (violations.length > 0) {
+      recommendations.push('Address identified compliance violations immediately')
+      recommendations.push('Implement additional HIPAA compliance monitoring')
+    }
+
+    // Permission-related recommendations
+    if (eventCounts[SecurityEventType.PERMISSION_DENIED] > 15) {
+      recommendations.push('Review user permissions and role assignments for proper access control')
+    }
+
+    // General security recommendations
+    if (events.length > 1000) {
+      recommendations.push('Consider implementing automated threat detection and response')
+    }
+
+    return recommendations
   }
 
   private calculateMetricsFromEvents(events: SecurityEvent[]): SecurityMetrics {
-    // TODO: Implement metrics calculation from events
-    return this.initializeMetrics()
+    if (events.length === 0) {
+      return this.initializeMetrics()
+    }
+
+    const metrics: SecurityMetrics = {
+      totalEvents: events.length,
+      highRiskEvents: 0,
+      authenticationFailures: 0,
+      authorizationFailures: 0,
+      tokenRevocations: 0,
+      rateLimitViolations: 0,
+      suspiciousActivities: 0,
+      averageRiskScore: 0,
+    }
+
+    let totalRiskScore = 0
+
+    for (const event of events) {
+      totalRiskScore += event.riskScore
+
+      // Count high-risk events
+      if (event.riskScore >= this.config.alertThreshold) {
+        metrics.highRiskEvents++
+      }
+
+      // Count specific event types
+      switch (event.eventType) {
+        case SecurityEventType.LOGIN_FAILURE:
+        case SecurityEventType.TOKEN_VALIDATION_FAILED:
+        case SecurityEventType.MFA_VERIFICATION_FAILED:
+          metrics.authenticationFailures++
+          break
+
+        case SecurityEventType.PERMISSION_DENIED:
+          metrics.authorizationFailures++
+          break
+
+        case SecurityEventType.TOKEN_REVOKED:
+          metrics.tokenRevocations++
+          break
+
+        case SecurityEventType.RATE_LIMIT_EXCEEDED:
+          metrics.rateLimitViolations++
+          break
+
+        case SecurityEventType.SUSPICIOUS_ACTIVITY:
+        case SecurityEventType.SECURITY_BREACH:
+        case SecurityEventType.SESSION_HIJACKING_DETECTED:
+        case SecurityEventType.HIPAA_VIOLATION_DETECTED:
+          metrics.suspiciousActivities++
+          break
+      }
+    }
+
+    // Calculate average risk score
+    metrics.averageRiskScore = totalRiskScore / events.length
+
+    return metrics
+  }
+
+  private countEventsByType(events: SecurityEvent[]): Record<SecurityEventType, number> {
+    const counts: Record<SecurityEventType, number> = {} as Record<SecurityEventType, number>
+
+    for (const event of events) {
+      counts[event.eventType] = (counts[event.eventType] || 0) + 1
+    }
+
+    return counts
   }
 
   private serializeEvent(event: SecurityEvent): Record<string, string> {
-    // TODO: Implement event serialization
-    return {}
+    return {
+      id: event.id,
+      eventType: event.eventType,
+      userId: event.userId || '',
+      ipAddress: event.ipAddress,
+      userAgent: event.userAgent,
+      endpoint: event.endpoint,
+      method: event.method,
+      statusCode: String(event.statusCode),
+      details: JSON.stringify(event.details),
+      riskScore: String(event.riskScore),
+      encrypted: String(event.encrypted),
+      timestamp: event.timestamp,
+      sessionId: event.sessionId || '',
+      correlationId: event.correlationId || '',
+    }
   }
 
   private deserializeEvent(data: Record<string, string>): SecurityEvent {
-    // TODO: Implement event deserialization
-    return {} as SecurityEvent
+    return {
+      id: data.id,
+      eventType: data.eventType as SecurityEventType,
+      userId: data.userId || null,
+      ipAddress: data.ipAddress,
+      userAgent: data.userAgent,
+      endpoint: data.endpoint,
+      method: data.method,
+      statusCode: Number(data.statusCode),
+      details: JSON.parse(data.details || '{}'),
+      riskScore: Number(data.riskScore),
+      encrypted: data.encrypted === 'true',
+      timestamp: data.timestamp,
+      sessionId: data.sessionId || undefined,
+      correlationId: data.correlationId || undefined,
+    }
   }
 
-  private extractTokenId(token: string): string {
+  private extractTokenId(_token: string): string {
     // TODO: Implement token ID extraction
     return 'unknown'
   }

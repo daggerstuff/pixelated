@@ -157,7 +157,7 @@ export class PromptOptimizerService {
       return conversationSummary
     } catch (error: unknown) {
       logger.error('Error creating conversation summary', { error })
-      throw new Error(`Failed to create conversation summary: ${error}`)
+      throw new Error(`Failed to create conversation summary: ${error}`, { cause: error })
     }
   }
 
@@ -215,7 +215,7 @@ export class PromptOptimizerService {
       return optimization
     } catch (error: unknown) {
       logger.error('Error optimizing prompt', { error })
-      throw new Error(`Failed to optimize prompt: ${error}`)
+      throw new Error(`Failed to optimize prompt: ${error}`, { cause: error })
     }
   }
 
@@ -663,7 +663,7 @@ export class PromptOptimizerService {
   private selectOptimizationStrategy(
     context: PromptOptimization['therapeuticContext'],
   ): string {
-    const { sessionPhase, patientState, primaryConcern } = context
+    const { sessionPhase, patientState, _primaryConcern } = context
 
     // Strategy selection logic
     if (patientState === 'distressed') {

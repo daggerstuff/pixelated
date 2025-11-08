@@ -1,10 +1,10 @@
 # Foundation Model Training Requirements for H100 GPU
 # Python 3.11+ compatible packages
 
-# Core ML Framework
-torch==2.9.0
-torchvision==0.24.0
-torchaudio==2.9.0
+# Core ML Framework - Updated for security fixes
+torch>=2.6.0,<3.0.0
+torchvision>=0.20.0,<1.0.0
+torchaudio>=2.5.0,<3.0.0
 
 # Lightning.ai Framework
 lightning==2.5.5

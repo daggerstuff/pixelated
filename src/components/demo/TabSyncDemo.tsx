@@ -9,11 +9,7 @@ import {
 } from '@/components/layout/ResponsiveUtils'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
-interface SyncedCounter {
-  value: number
-  lastUpdated: number
-  updatedBy: string
-}
+
 
 interface SyncedPreferences {
   theme: 'light' | 'dark'
@@ -82,7 +78,7 @@ export const TabSyncDemo: FC = () => {
 
   // Track active tabs
   React.useEffect(() => {
-    const handleTabJoin = (data: any) => {
+    const handleTabJoin = (data: { tabId: string }) => {
       setActiveTabs((prev) => {
         if (!prev.includes(data.tabId)) {
           return [...prev, data.tabId]
@@ -91,7 +87,7 @@ export const TabSyncDemo: FC = () => {
       })
     }
 
-    const handleTabLeave = (data: any) => {
+    const handleTabLeave = (data: { tabId: string }) => {
       setActiveTabs((prev) => prev.filter((id) => id !== data.tabId))
     }
 
@@ -192,15 +188,14 @@ export const TabSyncDemo: FC = () => {
                     <div className="text-sm text-gray-500 mb-4">
                       Sync Status:{' '}
                       <span
-                        className={`font-medium ${
-                          counterSyncStatus === 'synced'
-                            ? 'text-green-600'
-                            : counterSyncStatus === 'syncing'
-                              ? 'text-yellow-600'
-                              : counterSyncStatus === 'conflict'
-                                ? 'text-red-600'
-                                : 'text-gray-600'
-                        }`}
+                        className={`font-medium ${counterSyncStatus === 'synced'
+                          ? 'text-green-600'
+                          : counterSyncStatus === 'syncing'
+                            ? 'text-yellow-600'
+                            : counterSyncStatus === 'conflict'
+                              ? 'text-red-600'
+                              : 'text-gray-600'
+                          }`}
                       >
                         {counterSyncStatus}
                       </span>
@@ -249,10 +244,14 @@ export const TabSyncDemo: FC = () => {
 
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="theme-select"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Theme
                           </label>
                           <select
+                            id="theme-select"
                             value={preferences.theme}
                             onChange={(e) =>
                               updatePreference(
@@ -268,10 +267,14 @@ export const TabSyncDemo: FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="font-size-select"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Font Size
                           </label>
                           <select
+                            id="font-size-select"
                             value={preferences.fontSize}
                             onChange={(e) =>
                               updatePreference(
@@ -288,10 +291,14 @@ export const TabSyncDemo: FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="language-select"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Language
                           </label>
                           <select
+                            id="language-select"
                             value={preferences.language}
                             onChange={(e) =>
                               updatePreference('language', e.target.value)
@@ -306,26 +313,29 @@ export const TabSyncDemo: FC = () => {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium">
+                          <label
+                            htmlFor="notifications-toggle"
+                            className="text-sm font-medium"
+                          >
                             Notifications
                           </label>
                           <button
+                            id="notifications-toggle"
                             onClick={() =>
                               updatePreference(
                                 'notifications',
                                 !preferences.notifications,
                               )
                             }
-                            className={`relative w-12 h-6 rounded-full transition-colors ${
-                              preferences.notifications
-                                ? 'bg-green-500'
-                                : 'bg-gray-300 dark:bg-gray-600'
-                            }`}
+                            aria-label="Toggle notifications"
+                            className={`relative w-12 h-6 rounded-full transition-colors ${preferences.notifications
+                              ? 'bg-green-500'
+                              : 'bg-gray-300 dark:bg-gray-600'
+                              }`}
                           >
                             <div
-                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                                preferences.notifications ? 'left-7' : 'left-1'
-                              }`}
+                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${preferences.notifications ? 'left-7' : 'left-1'
+                                }`}
                             />
                           </button>
                         </div>
@@ -359,15 +369,14 @@ export const TabSyncDemo: FC = () => {
                           Sync Status:
                         </div>
                         <div
-                          className={`text-sm font-medium ${
-                            prefsSyncStatus === 'synced'
-                              ? 'text-green-600'
-                              : prefsSyncStatus === 'syncing'
-                                ? 'text-yellow-600'
-                                : prefsSyncStatus === 'conflict'
-                                  ? 'text-red-600'
-                                  : 'text-gray-600'
-                          }`}
+                          className={`text-sm font-medium ${prefsSyncStatus === 'synced'
+                            ? 'text-green-600'
+                            : prefsSyncStatus === 'syncing'
+                              ? 'text-yellow-600'
+                              : prefsSyncStatus === 'conflict'
+                                ? 'text-red-600'
+                                : 'text-gray-600'
+                            }`}
                         >
                           {prefsSyncStatus}
                         </div>

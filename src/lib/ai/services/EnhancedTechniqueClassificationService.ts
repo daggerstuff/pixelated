@@ -270,7 +270,7 @@ export class EnhancedTechniqueClassificationService {
       return tracking
     } catch (error: unknown) {
       logger.error('Error tracking session progress', { error })
-      throw new Error(`Failed to track session progress: ${error}`)
+      throw new Error(`Failed to track session progress: ${error}`, { cause: error })
     }
   }
 
@@ -288,7 +288,7 @@ export class EnhancedTechniqueClassificationService {
     technique: TherapeuticTechnique,
     effectiveness: number,
     context: string,
-    sessionData: EmotionAnalysis,
+    _sessionData: EmotionAnalysis,
   ): Promise<void> {
     try {
       const data = this.effectivenessDatabase.get(technique)
@@ -472,9 +472,9 @@ export class EnhancedTechniqueClassificationService {
 
   private async applyAdvancedClassification(
     emotion: EmotionAnalysis,
-    context: any,
-    emotionalContext: any,
-    historicalData: any,
+    _context: any,
+    _emotionalContext: any,
+    _historicalData: any,
   ): Promise<{
     technique: TherapeuticTechnique
     confidence: number
@@ -545,7 +545,7 @@ export class EnhancedTechniqueClassificationService {
   private assessContraindications(
     primary: any,
     emotion: EmotionAnalysis,
-    context: any,
+    _context: any,
   ): string[] {
     const contraindications: string[] = []
 
@@ -565,8 +565,8 @@ export class EnhancedTechniqueClassificationService {
 
   private async predictExpectedOutcome(
     primary: any,
-    emotion: EmotionAnalysis,
-    historicalData: any,
+    _emotion: EmotionAnalysis,
+    _historicalData: any,
   ): Promise<TechniqueClassificationResult['expectedOutcome']> {
     const effectiveness =
       this.effectivenessDatabase.get(primary.technique)?.overallEffectiveness ||
@@ -682,18 +682,18 @@ export class EnhancedTechniqueClassificationService {
   }
 
   private getContextualEffectiveness(
-    technique: TherapeuticTechnique,
-    context: string,
+    _technique: TherapeuticTechnique,
+    _context: string,
   ): number {
     // Return context-specific effectiveness (simplified)
     return Math.random() * 0.4 + 0.5 // 0.5 to 0.9
   }
 
-  private getSuccessRate(technique: TherapeuticTechnique): number {
+  private getSuccessRate(_technique: TherapeuticTechnique): number {
     return Math.random() * 0.3 + 0.6 // 0.6 to 0.9
   }
 
-  private getAverageSessionsRequired(technique: TherapeuticTechnique): number {
+  private getAverageSessionsRequired(_technique: TherapeuticTechnique): number {
     return Math.floor(Math.random() * 8) + 4 // 4 to 12 sessions
   }
 
@@ -714,21 +714,21 @@ export class EnhancedTechniqueClassificationService {
   }
 
   private getDemographicEffectiveness(
-    technique: TherapeuticTechnique,
-    demographic: string,
+    _technique: TherapeuticTechnique,
+    _demographic: string,
   ): number {
     return Math.random() * 0.3 + 0.6
   }
 
   private getConditionEffectiveness(
-    technique: TherapeuticTechnique,
-    condition: string,
+    _technique: TherapeuticTechnique,
+    _condition: string,
   ): number {
     return Math.random() * 0.4 + 0.5
   }
 
   private getTherapistRequirements(
-    technique: TherapeuticTechnique,
+    _technique: TherapeuticTechnique,
   ): TechniqueEffectivenessDatabase['therapistRequirements'] {
     return {
       minimumExperience: '2 years',
@@ -738,7 +738,7 @@ export class EnhancedTechniqueClassificationService {
   }
 
   private generateTechniqueMetrics(
-    metricType: string,
+    _metricType: string,
   ): Record<TherapeuticTechnique, number> {
     const metrics: Record<TherapeuticTechnique, number> = {} as any
     Object.values(TherapeuticTechnique).forEach((technique) => {

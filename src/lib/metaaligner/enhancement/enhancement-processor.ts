@@ -60,7 +60,7 @@ export class EnhancementProcessor implements IEnhancementProcessor {
     return content
   }
 
-  private scoreResponse(content: string): number {
+  private scoreResponse(_content: string): number {
     // Placeholder for response scoring logic.
     // This could involve using a separate model to score the response based on various metrics.
     return 0

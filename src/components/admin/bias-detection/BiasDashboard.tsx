@@ -139,14 +139,15 @@ interface AlertItem extends BaseFilterableItem {
   status?: string
 }
 
-type WebSocketMessage =
-  | { type: 'bias_alert'; alert: AlertItem }
-  | { type: 'session_update'; session: BiasAnalysisResult }
-  | { type: 'metrics_update'; metrics: Partial<BiasDashboardData['summary']> }
-  | { type: 'trends_update'; trends: TrendItem[] }
-  | { type: 'connection_status'; status: string; error?: string }
-  | { type: 'heartbeat' }
-  | { type: 'heartbeat_response' }
+// WebSocket message types (currently unused - defined for future real-time features)
+// type WebSocketMessage =
+//   | { type: 'bias_alert'; alert: AlertItem }
+//   | { type: 'session_update'; session: BiasAnalysisResult }
+//   | { type: 'metrics_update'; metrics: Partial<BiasDashboardData['summary']> }
+//   | { type: 'trends_update'; trends: TrendItem[] }
+//   | { type: 'connection_status'; status: string; error?: string }
+//   | { type: 'heartbeat' }
+//   | { type: 'heartbeat_response' }
 
 interface TrendItem extends BaseFilterableItem {
   biasScore: number

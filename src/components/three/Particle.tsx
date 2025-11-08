@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect, useState } from 'react'
+import React, { useRef, useMemo, useState } from 'react'
 import { Canvas, useFrame, extend } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
@@ -197,7 +197,7 @@ const ParticleSystem: React.FC<{
   )
 }
 
-const getEmotionMovementFactor = (emotion: string, time: number) => {
+const getEmotionMovementFactor = (emotion: string, _time: number) => {
   switch (emotion) {
     case 'joy':
       return { speed: 1.2, rotation: 2, pulse: 3 }

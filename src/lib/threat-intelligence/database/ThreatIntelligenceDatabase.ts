@@ -912,7 +912,7 @@ export class ThreatIntelligenceDatabaseCore
       const searchQuery = this.buildSearchQuery(query)
 
       // Get total count
-      const totalCount = await threatsCollection.countDocuments(searchQuery)
+      const _totalCount = await threatsCollection.countDocuments(searchQuery)
 
       // Get paginated results
       const threats = await threatsCollection

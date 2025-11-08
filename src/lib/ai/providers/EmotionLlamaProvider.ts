@@ -134,7 +134,7 @@ export class EmotionLlamaProvider {
       }
     } catch (error: unknown) {
       logger.error('Error processing encrypted response', { error })
-      throw new Error('Failed to decrypt emotion analysis response', { cause: error as unknown as Error })
+      throw new Error('Failed to decrypt emotion analysis response', { cause: error })
     }
   }
 

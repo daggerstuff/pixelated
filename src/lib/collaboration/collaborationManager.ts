@@ -285,7 +285,7 @@ class CollaborationManager {
     sessionId: string,
   ): Promise<string> {
     // Use session-specific encryption key
-    const sessionKey = await this.getSessionEncryptionKey(sessionId)
+    const _sessionKey = await this.getSessionEncryptionKey(sessionId)
     return `encrypted_${btoa(content)}` // Mock encryption
   }
 
@@ -522,7 +522,7 @@ class CollaborationManager {
     return session
   }
 
-  private getUserRoleInSession(sessionId: string, userId: string): string {
+  private getUserRoleInSession(_sessionId: string, _userId: string): string {
     // In real implementation, check against session role assignments
     return 'viewer' // Mock default role
   }

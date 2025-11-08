@@ -382,7 +382,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
           {expandedSections.has('layers') && (
             <div className="p-6">
               <div className="space-y-4">
-                {layerResults.map((layer, index) => (
+                {layerResults.map((layer, _index) => (
                   <div
                     key={layer.name}
                     className="border border-gray-200 rounded-lg p-4"

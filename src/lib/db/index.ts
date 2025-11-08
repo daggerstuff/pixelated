@@ -54,7 +54,7 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     process.exit(-1)
   })
 
-  pool.on('connect', (client: PoolClient) => {
+  pool.on('connect', (_client: PoolClient) => {
     console.log('New client connected to database')
   })
 

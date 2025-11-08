@@ -193,7 +193,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         displayColors: true,
         callbacks: {
           // Add custom tooltip content for therapy context
-          afterBody: function (context: any) {
+          afterBody: function (_context: any) {
             if (useBackend && backendData?.metadata) {
               return [
                 '',

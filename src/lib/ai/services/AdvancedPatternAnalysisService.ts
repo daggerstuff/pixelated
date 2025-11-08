@@ -466,7 +466,7 @@ export class AdvancedPatternAnalysisService {
       return model
     } catch (error: unknown) {
       logger.error('Error creating pattern evolution model', { error })
-      throw new Error(`Failed to create pattern evolution model: ${error}`)
+      throw new Error(`Failed to create pattern evolution model: ${error}`, { cause: error })
     }
   }
 
@@ -518,7 +518,7 @@ export class AdvancedPatternAnalysisService {
     technique2: string,
     group1: InterventionEffectivenessResult[],
     group2: InterventionEffectivenessResult[],
-    sessions: EmotionAnalysis[],
+    _sessions: EmotionAnalysis[],
   ): Promise<EffectivenessCorrelationMetrics | null> {
     if (group1.length < 3 || group2.length < 3) {
       return null // Need minimum sample size
@@ -713,16 +713,16 @@ export class AdvancedPatternAnalysisService {
   }
 
   private async generatePredictionInsights(
-    sessions: EmotionAnalysis[],
-    interventions: InterventionEffectivenessResult[],
+    _sessions: EmotionAnalysis[],
+    _interventions: InterventionEffectivenessResult[],
   ): Promise<TherapeuticInsight[]> {
     // Placeholder implementation
     return []
   }
 
   private async detectAnomalyInsights(
-    sessions: EmotionAnalysis[],
-    interventions: InterventionEffectivenessResult[],
+    _sessions: EmotionAnalysis[],
+    _interventions: InterventionEffectivenessResult[],
   ): Promise<TherapeuticInsight[]> {
     // Placeholder implementation
     return []
@@ -797,7 +797,7 @@ export class AdvancedPatternAnalysisService {
 
   // Pattern evolution helper methods
   private identifyEvolutionStages(
-    data: EmotionAnalysis[],
+    _data: EmotionAnalysis[],
   ): PatternEvolutionModel['evolutionStages'] {
     // Simplified implementation
     return [
@@ -835,24 +835,24 @@ export class AdvancedPatternAnalysisService {
   }
 
   private calculatePredictiveAccuracy(
-    data: EmotionAnalysis[],
-    stages: PatternEvolutionModel['evolutionStages'],
+    _data: EmotionAnalysis[],
+    _stages: PatternEvolutionModel['evolutionStages'],
   ): number {
     // Simplified implementation - would use cross-validation in production
     return 0.78
   }
 
-  private calculateAdaptationRate(data: EmotionAnalysis[]): number {
+  private calculateAdaptationRate(_data: EmotionAnalysis[]): number {
     // Measure how quickly patterns change over time
     return 0.15
   }
 
-  private calculateStabilityIndex(data: EmotionAnalysis[]): number {
+  private calculateStabilityIndex(_data: EmotionAnalysis[]): number {
     // Measure pattern stability
     return 0.82
   }
 
-  private calculateContextualSensitivity(data: EmotionAnalysis[]): number {
+  private calculateContextualSensitivity(_data: EmotionAnalysis[]): number {
     // Measure how much context affects patterns
     return 0.65
   }

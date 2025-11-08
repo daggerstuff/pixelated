@@ -151,7 +151,7 @@ describe('JWT Service', () => {
       )
 
       // Mock Redis to return valid metadata
-      vi.mocked(setInCache).mockImplementation(async (key, data) => {
+      vi.mocked(setInCache).mockImplementation(async (key, _data) => {
         if (key.startsWith('token:')) {
           // Simulate storing in Redis
           return true
@@ -272,7 +272,7 @@ describe('JWT Service', () => {
       )
 
       // Mock Redis responses for refresh flow
-      vi.mocked(setInCache).mockImplementation(async (key, data) => {
+      vi.mocked(setInCache).mockImplementation(async (key, _data) => {
         if (key.startsWith('token:')) {
           return true
         }
@@ -300,14 +300,14 @@ describe('JWT Service', () => {
       )
 
       // Mock Redis responses
-      vi.mocked(setInCache).mockImplementation(async (key, data) => {
+      vi.mocked(setInCache).mockImplementation(async (key, _data) => {
         if (key.startsWith('token:')) {
           return true
         }
         return true
       })
 
-      vi.mocked(removeFromCache).mockImplementation(async (key) => {
+      vi.mocked(removeFromCache).mockImplementation(async (_key) => {
         return true
       })
 
@@ -342,11 +342,11 @@ describe('JWT Service', () => {
       const decoded = jwt.decode(tokenPair.accessToken) as any
 
       // Mock Redis responses
-      vi.mocked(setInCache).mockImplementation(async (key, data) => {
+      vi.mocked(setInCache).mockImplementation(async (_key, _data) => {
         return true
       })
 
-      vi.mocked(removeFromCache).mockImplementation(async (key) => {
+      vi.mocked(removeFromCache).mockImplementation(async (_key) => {
         return true
       })
 
@@ -422,7 +422,7 @@ describe('JWT Service', () => {
         return null
       })
 
-      vi.mocked(removeFromCache).mockImplementation(async (key) => {
+      vi.mocked(removeFromCache).mockImplementation(async (_key) => {
         return true
       })
 
@@ -556,7 +556,7 @@ describe('JWT Service', () => {
       )
 
       // Mock different device ID in metadata
-      vi.mocked(setInCache).mockImplementation(async (key, data) => {
+      vi.mocked(setInCache).mockImplementation(async (key, _data) => {
         if (key.startsWith('token:')) {
           // Store metadata with different device ID
 

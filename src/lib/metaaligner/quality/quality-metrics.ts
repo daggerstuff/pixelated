@@ -20,7 +20,7 @@ export interface IQualityMetrics {
  * The QualityMetrics class.
  */
 export class QualityMetrics implements IQualityMetrics {
-  public async calculate(response: string): Promise<Record<string, number>> {
+  public async calculate(_response: string): Promise<Record<string, number>> {
     // Placeholder for quality metrics calculation logic.
     // This could involve using a separate model to calculate metrics like fluency, coherence, and relevance.
     return {

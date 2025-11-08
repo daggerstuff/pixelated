@@ -623,7 +623,7 @@ const TherapistsTab: FC<{
  */
 const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
-}> = ({ metrics }) => {
+}> = ({ _metrics }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

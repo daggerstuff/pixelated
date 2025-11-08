@@ -53,7 +53,7 @@ class InterventionEngine {
         id: 'crisis_detection',
         name: 'Crisis Detection',
         description: 'Immediate intervention for crisis situations',
-        condition: (session, patient) => {
+        condition: (session, _patient) => {
           const crisisKeywords = [
             'suicide',
             'kill myself',

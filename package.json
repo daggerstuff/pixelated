@@ -149,7 +149,10 @@
     "@aws-sdk/client-s3": "^3.921.0",
     "@aws-sdk/lib-dynamodb": "^3.921.0",
     "@azure/storage-blob": "^12.29.1",
+    "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.38.0",
+    "@eslint/json": "^0.14.0",
+    "@eslint/markdown": "^7.5.1",
     "@google-cloud/storage": "^7.17.2",
     "@iconify-json/lucide": "^1.2.71",
     "@microsoft/clarity": "^1.0.0",
@@ -346,7 +349,11 @@
   },
   "pnpm": {
     "overrides": {
-      "tmp": ">=0.2.4"
+      "@opentelemetry/api": "^1.9.0",
+      "tmp": ">=0.2.4",
+      "glob": "^11.0.3",
+      "inflight": "^2.0.0",
+      "sitemap": "^9.0.0"
     },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",
@@ -357,7 +364,7 @@
       "gauge": "5.0.2",
       "node-domexception": "2.0.2",
       "npmlog": "7.0.1",
-      "querystring": "0.2.1"
+      "querystring": "*"
     },
     "peerDependencyRules": {
       "allowAny": [
@@ -365,7 +372,8 @@
         "unocss"
       ],
       "ignoreMissing": [
-        "typescript"
+        "typescript",
+        "@opentelemetry/api"
       ],
       "allowedVersions": {
         "@vercel/kv": ">=1.0.1",
