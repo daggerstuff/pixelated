@@ -1,0 +1,341 @@
+---
+export interface Props {
+  items: Array<{
+    label: string;
+    href: string;
+    external?: boolean;
+    dropdown?: Array<{
+      label: string;
+      href: string;
+      description?: string;
+      icon?: string;
+    }>;
+  }>;
+  logo?: {
+    src: string;
+    alt: string;
+    href: string;
+  };
+  cta?: {
+    label: string;
+    href: string;
+    variant: 'primary' | 'secondary' | 'outline';
+  };
+  variant?: 'default' | 'transparent' | 'glass';
+  position?: 'fixed' | 'sticky' | 'static';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+  className?: string;
+}
+
+const {
+  items,
+  logo,
+  cta,
+  variant = 'default',
+  position = 'sticky',
+  maxWidth = 'xl',
+  className = ''
+} = Astro.props;
+
+// Navigation variant styles
+const variantClasses = {
+  default: 'bg-secondary/95 backdrop-blur-sm border-b border-border-secondary',
+  transparent: 'bg-transparent',
+  glass: 'bg-secondary/20 backdrop-blur-xl border-b border-white/10'
+};
+
+// Position styles
+const positionClasses = {
+  fixed: 'fixed top-0 left-0 right-0 z-50',
+  sticky: 'sticky top-0 z-50',
+  static: 'relative'
+};
+
+// Max width styles
+const maxWidthClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  full: 'max-w-full'
+};
+
+const navClasses = `
+  ${positionClasses[position]}
+  ${variantClasses[variant]}
+  ${className}
+`;
+
+const containerClasses = `
+  ${maxWidthClasses[maxWidth]}
+  mx-auto px-6
+`;
+---
+
+<nav class={navClasses} role="navigation" aria-label="Main navigation">
+  <div class={containerClasses}>
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      {logo && (
+        <a href={logo.href} class="flex items-center space-x-2" aria-label="Home">
+          {logo.src && <img src={logo.src} alt={logo.alt} class="h-8 w-auto" />}
+          <span class="text-xl font-semibold text-primary">{logo.alt}</span>
+        </a>
+      )}
+
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex items-center space-x-8">
+        {items.map((item) => (
+          <div class="relative group">
+            {item.dropdown ? (
+              <button
+                class="flex items-center space-x-1 text-secondary-foreground hover:text-primary transition-colors duration-200"
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                <span>{item.label}</span>
+                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            ) : (
+              <a
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                class="text-secondary-foreground hover:text-primary transition-colors duration-200"
+              >
+                {item.label}
+              </a>
+            )}
+
+            <!-- Dropdown Menu -->
+            {item.dropdown && (
+              <div class="absolute top-full left-0 mt-2 w-64 bg-secondary border border-border-primary rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+                <div class="py-2">
+                  {item.dropdown.map((dropdownItem) => (
+                    <a
+                      href={dropdownItem.href}
+                      class="flex items-center space-x-3 px-4 py-3 text-secondary-foreground hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                    >
+                      {dropdownItem.icon && (
+                        <span class="text-lg">{dropdownItem.icon}</span>
+                      )}
+                      <div class="flex-1">
+                        <div class="font-medium">{dropdownItem.label}</div>
+                        {dropdownItem.description && (
+                          <div class="text-sm text-muted-foreground">{dropdownItem.description}</div>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <!-- CTA Button -->
+      {cta && (
+        <div class="hidden lg:block">
+          <a
+            href={cta.href}
+            class:list={[
+              "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200",
+              cta.variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+              cta.variant === 'secondary' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+              cta.variant === 'outline' && 'border border-primary text-primary hover:bg-primary hover:text-primary-foreground'
+            ]}
+          >
+            {cta.label}
+          </a>
+        </div>
+      )}
+
+      <!-- Mobile Menu Button -->
+      <button
+        class="lg:hidden p-2 rounded-md text-secondary-foreground hover:text-primary hover:bg-secondary/50 transition-colors duration-200"
+        id="mobile-menu-button"
+        aria-expanded="false"
+        aria-label="Toggle mobile menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="lg:hidden hidden border-t border-border-secondary mt-4 pt-4 pb-6">
+      <div class="space-y-4">
+        {items.map((item) => (
+          <div>
+            {item.dropdown ? (
+              <div class="space-y-2">
+                <div class="font-medium text-secondary-foreground">{item.label}</div>
+                <div class="space-y-1 pl-4">
+                  {item.dropdown.map((dropdownItem) => (
+                    <a
+                      href={dropdownItem.href}
+                      class="block py-2 text-sm text-secondary-foreground hover:text-primary transition-colors duration-200"
+                    >
+                      {dropdownItem.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                class="block py-2 text-secondary-foreground hover:text-primary transition-colors duration-200"
+              >
+                {item.label}
+              </a>
+            )}
+          </div>
+        ))}
+
+        {cta && (
+          <div class="pt-4 border-t border-border-secondary">
+            <a
+              href={cta.href}
+              class:list={[
+                "block w-full text-center px-4 py-2 rounded-md font-medium transition-colors duration-200",
+                cta.variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+                cta.variant === 'secondary' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                cta.variant === 'outline' && 'border border-primary text-primary hover:bg-primary hover:text-primary-foreground'
+              ]}
+            >
+              {cta.label}
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const isClickInsideNav = mobileMenu.contains(event.target as Node) || mobileMenuButton.contains(event.target as Node);
+      if (!isClickInsideNav && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Enhanced dropdown accessibility
+  const dropdownButtons = document.querySelectorAll('[aria-haspopup="true"]');
+  dropdownButtons.forEach(button => {
+    const dropdown = button.nextElementSibling as HTMLElement;
+
+    button.addEventListener('keydown', (event) => {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          toggleDropdown(button, dropdown);
+          break;
+        case 'Escape':
+          closeDropdown(button, dropdown);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          if (dropdown.classList.contains('opacity-100')) {
+            focusFirstItem(dropdown);
+          } else {
+            openDropdown(button, dropdown);
+          }
+          break;
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (event) => {
+      if (!button.contains(event.target as Node) && !dropdown.contains(event.target as Node)) {
+        closeDropdown(button, dropdown);
+      }
+    });
+  });
+
+  function toggleDropdown(button: HTMLElement, dropdown: HTMLElement) {
+    const isOpen = dropdown.classList.contains('opacity-100');
+    if (isOpen) {
+      closeDropdown(button, dropdown);
+    } else {
+      openDropdown(button, dropdown);
+    }
+  }
+
+  function openDropdown(button: HTMLElement, dropdown: HTMLElement) {
+    dropdown.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+    dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
+    button.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown(button: HTMLElement, dropdown: HTMLElement) {
+    dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0');
+    dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2');
+    button.setAttribute('aria-expanded', 'false');
+  }
+
+  function focusFirstItem(dropdown: HTMLElement) {
+    const firstLink = dropdown.querySelector('a') as HTMLElement;
+    if (firstLink) {
+      firstLink.focus();
+    }
+  }
+</script>
+
+<style>
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .nav-glass {
+      background: rgba(15, 23, 42, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Smooth transitions for dropdown */
+  .group-hover\:opacity-100 {
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+
+  /* Focus styles for accessibility */
+  nav a:focus-visible,
+  nav button:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Mobile menu animation */
+  #mobile-menu {
+    transition: all 300ms ease-out;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+</style>

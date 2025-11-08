@@ -1,0 +1,130 @@
+---
+// Enterprise Hero Component - Astro + UnoCSS
+// Incorporates premium theme patterns from Mizu, Antfu, Lexington, and Astro Max
+---
+
+<div class="enterprise-hero min-h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
+  <!-- Background Gradient Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 opacity-95"></div>
+
+  <!-- Animated Background Pattern -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1)_0%,transparent_50%)]"></div>
+
+  <!-- Floating Elements -->
+  <div class="absolute top-20 left-10 w-20 h-20 bg-primary-600/10 rounded-full blur-xl animate-float"></div>
+  <div class="absolute bottom-20 right-10 w-32 h-32 bg-secondary-600/10 rounded-full blur-xl animate-float-delayed"></div>
+
+  <!-- Main Content -->
+  <div class="relative z-10 max-w-6xl mx-auto px-6 lg:px-8">
+
+    <!-- Pre-title -->
+    <div class="mb-8 animate-fade-in-up">
+      <span class="inline-flex items-center px-4 py-2 rounded-full bg-primary-600/20 text-primary-400 text-sm font-medium border border-primary-600/30">
+        <span class="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
+        Next-Generation AI Training Platform
+      </span>
+    </div>
+
+    <!-- Main Title -->
+    <h1 class="text-7xl lg:text-8xl font-bold text-balance mb-6 animate-fade-in-up [animation-delay:200ms]">
+      <span class="text-gradient bg-gradient-to-r from-primary-400 via-primary-500 to-secondary-500 bg-clip-text text-transparent">
+        Pixelated Empathy
+      </span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-2xl lg:text-3xl text-neutral-300 leading-relaxed text-balance mb-12 max-w-4xl mx-auto animate-fade-in-up [animation-delay:400ms]">
+      Master mental health training with AI-powered simulations that deliver
+      <span class="text-neutral-100 font-semibold">95% accuracy</span> through
+      <span class="text-primary-400">10,000+ sessions</span>
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up [animation-delay:600ms]">
+      <button class="group relative px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-primary-600/25">
+        <span class="relative z-10">Start Training Now</span>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      </button>
+
+      <button class="group px-8 py-4 bg-neutral-800/50 hover:bg-neutral-700/70 text-neutral-100 font-semibold rounded-xl border border-neutral-700 hover:border-neutral-600 transition-all duration-300 ease-out">
+        <span>Watch Demo</span>
+        <span class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+      </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto animate-fade-in-up [animation-delay:800ms]">
+      <div class="text-center group">
+        <div class="text-4xl font-bold text-primary-400 mb-2 group-hover:text-primary-300 transition-colors">10K+</div>
+        <div class="text-neutral-400 text-sm">Training Sessions</div>
+      </div>
+      <div class="text-center group">
+        <div class="text-4xl font-bold text-secondary-400 mb-2 group-hover:text-secondary-300 transition-colors">95%</div>
+        <div class="text-neutral-400 text-sm">Accuracy Rate</div>
+      </div>
+      <div class="text-center group">
+        <div class="text-4xl font-bold text-accent-400 mb-2 group-hover:text-accent-300 transition-colors">24/7</div>
+        <div class="text-neutral-400 text-sm">AI Support</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <div class="w-6 h-10 border-2 border-neutral-600 rounded-full flex justify-center">
+      <div class="w-1 h-3 bg-neutral-600 rounded-full mt-2 animate-pulse"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-30px); }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    opacity: 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .enterprise-hero {
+      padding: 8rem 1rem;
+    }
+
+    .enterprise-hero h1 {
+      font-size: 3rem;
+    }
+
+    .enterprise-hero p {
+      font-size: 1.125rem;
+    }
+  }
+</style>

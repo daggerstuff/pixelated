@@ -8,7 +8,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import fetch from 'node-fetch'
+// Native fetch is available in Node.js 18+ (project requires Node.js 24+)
 
 interface HealthCheckResponse {
   status: string

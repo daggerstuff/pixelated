@@ -1,0 +1,42 @@
+# NVIDIA NeMo Data Designer Docker Compose Configuration
+# Based on: https://docs.nvidia.com/nemo/microservices/latest/design-synthetic-data-from-scratch-or-seeds/index.html
+
+version: '3.8'
+
+services:
+  nemo-data-designer:
+    image: nvcr.io/nemo/nemo-data-designer:latest
+    container_name: nemo-data-designer
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # API port
+    environment:
+      # NVIDIA API Key for accessing models
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+      # Data Designer configuration
+      - DATA_DESIGNER_LOG_LEVEL=INFO
+      - DATA_DESIGNER_HOST=0.0.0.0
+      - DATA_DESIGNER_PORT=8000
+    volumes:
+      # Persist data and configurations
+      - nemo_data_designer_data:/data
+      - nemo_data_designer_config:/config
+    networks:
+      - nemo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  nemo_data_designer_data:
+    driver: local
+  nemo_data_designer_config:
+    driver: local
+
+networks:
+  nemo-network:
+    driver: bridge
+

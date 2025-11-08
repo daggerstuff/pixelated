@@ -1,0 +1,357 @@
+---
+// Responsive Layout Fixes and Animations
+// Addresses mobile layout issues and adds premium micro-interactions
+---
+
+<!-- Global Animation Styles -->
+<style is:global>
+  /* Fade In Animations */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .fade-in-down {
+    animation: fadeInDown 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  .fade-in-left {
+    animation: fadeInLeft 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  .fade-in-right {
+    animation: fadeInRight 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  /* Staggered Animations */
+  .staggered-animation > * {
+    opacity: 0;
+  }
+
+  .staggered-animation.animate > *:nth-child(1) {
+    animation: fadeInUp 0.5s ease-out 0.1s forwards;
+  }
+
+  .staggered-animation.animate > *:nth-child(2) {
+    animation: fadeInUp 0.5s ease-out 0.2s forwards;
+  }
+
+  .staggered-animation.animate > *:nth-child(3) {
+    animation: fadeInUp 0.5s ease-out 0.3s forwards;
+  }
+
+  .staggered-animation.animate > *:nth-child(4) {
+    animation: fadeInUp 0.5s ease-out 0.4s forwards;
+  }
+
+  /* Keyframes */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Intersection Observer for Scroll Animations */
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .scroll-animate.animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Parallax Effects */
+  .parallax-element {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Smooth Scrolling Enhancements */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+  }
+
+  /* Responsive Typography */
+  .responsive-heading {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.1;
+  }
+
+  .responsive-subheading {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    line-height: 1.4;
+  }
+
+  /* Mobile-specific fixes */
+  @media (max-width: 768px) {
+    /* Fix oversized hero section on mobile */
+    .hero-section {
+      min-height: auto;
+      padding: 6rem 1rem 3rem;
+    }
+
+    /* Prevent text overflow */
+    .text-balance {
+      text-wrap: balance;
+    }
+
+    /* Adjust button sizes for touch targets */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Fix footer positioning */
+    footer {
+      position: relative;
+      margin-top: 0;
+    }
+
+    /* Improve spacing on mobile */
+    .section-spacing {
+      padding: 3rem 0;
+    }
+
+    /* Stack elements vertically on small screens */
+    .mobile-stack {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Full-width cards on mobile */
+    .mobile-card-full {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  /* Tablet-specific adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .tablet-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+
+  /* Large screen optimizations */
+  @media (min-width: 1280px) {
+    .container {
+      max-width: 1400px;
+    }
+  }
+
+  /* High DPI display enhancements */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .high-dpi-enhanced {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Focus visible improvements */
+  .focus-ring {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  /* Loading skeleton animations */
+  .skeleton-loading {
+    background: linear-gradient(90deg, var(--color-neutral-800) 25%, var(--color-neutral-700) 50%, var(--color-neutral-800) 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.5s infinite;
+  }
+
+  @keyframes skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Smooth transitions for interactive elements */
+  .smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover effects for cards and buttons */
+  .interactive-element {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .interactive-element:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Dark mode specific adjustments */
+  @media (prefers-color-scheme: dark) {
+    .dark\:bg-contrast {
+      background: linear-gradient(135deg, var(--color-neutral-950) 0%, var(--color-neutral-900) 100%);
+    }
+
+    .dark\:border-contrast {
+      border-color: var(--color-neutral-800);
+    }
+  }
+</style>
+
+<!-- Intersection Observer Script for Scroll Animations -->
+<script>
+  // Initialize intersection observer for scroll animations
+  const initScrollAnimations = () => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all elements with scroll-animate class
+    document.querySelectorAll('.scroll-animate').forEach(el => {
+      observer.observe(el);
+    });
+  };
+
+  // Initialize staggered animations
+  const initStaggeredAnimations = () => {
+    const staggeredContainers = document.querySelectorAll('.staggered-animation');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    staggeredContainers.forEach(container => {
+      observer.observe(container);
+    });
+  };
+
+  // Initialize parallax effects
+  const initParallax = () => {
+    const parallaxElements = document.querySelectorAll('.parallax-element');
+
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+
+      parallaxElements.forEach(element => {
+        const speed = parseFloat(element.dataset.parallaxSpeed) || 0.5;
+        const yPos = -(scrolled * speed);
+        element.style.transform = `translate3d(0, ${yPos}px, 0)`;
+      });
+    });
+  };
+
+  // Initialize all animations when DOM is loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initScrollAnimations();
+      initStaggeredAnimations();
+      initParallax();
+    });
+  } else {
+    initScrollAnimations();
+    initStaggeredAnimations();
+    initParallax();
+  }
+
+  // Add smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href !== '#' && href.length > 1) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+    });
+  });
+</script>

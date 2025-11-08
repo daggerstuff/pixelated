@@ -1,0 +1,308 @@
+/* Pixelated Empathy - Premium Hybrid Design System
+ * Incorporating 60% from premium themes (15% each):
+ * - Mizu Theme: OKLCH color system, sophisticated spacing
+ * - Antfu Astro: Minimalist typography, UnoCSS patterns
+ * - Lexington Flabbergasted: Professional layouts, smooth transitions
+ * - Astro Max: Enterprise aesthetics, modern patterns
+ */
+
+:root {
+  /* === COLOR SYSTEM (Mizu + Antfu blend) === */
+  /* Dark Mode Palette using OKLCH for precision */
+  --color-neutral-950: oklch(14.7% 0.004 49.25);
+  --color-neutral-900: oklch(19.8% 0.005 56.04);
+  --color-neutral-800: oklch(27.8% 0.007 58.21);
+  --color-neutral-700: oklch(37.4% 0.01 67.558);
+  --color-neutral-600: oklch(47.8% 0.012 73.34);
+  --color-neutral-500: oklch(58.2% 0.015 79.12);
+  --color-neutral-400: oklch(70.5% 0.015 83.42);
+  --color-neutral-300: oklch(82.1% 0.01 87.72);
+  --color-neutral-200: oklch(90.5% 0.007 91.03);
+  --color-neutral-100: oklch(95.1% 0.004 94.33);
+
+  /* Primary Accent Colors (Antfu + Mizu) */
+  --color-primary-600: oklch(64.6% 0.222 41.116);
+  --color-primary-500: oklch(70.5% 0.213 47.604);
+  --color-primary-400: oklch(76.3% 0.204 54.09);
+  --color-secondary-600: oklch(58.2% 0.158 276.42);
+  --color-secondary-500: oklch(64.6% 0.149 282.9);
+  --color-accent-500: oklch(72.1% 0.182 101.93);
+  --color-accent-400: oklch(78.9% 0.173 108.41);
+
+  /* Semantic Colors */
+  --bg-primary: var(--color-neutral-950);
+  --bg-secondary: var(--color-neutral-900);
+  --bg-tertiary: var(--color-neutral-800);
+  --text-primary: var(--color-neutral-100);
+  --text-secondary: var(--color-neutral-400);
+  --text-tertiary: var(--color-neutral-500);
+  --border-primary: var(--color-neutral-700);
+  --border-secondary: var(--color-neutral-800);
+
+  /* === TYPOGRAPHY SYSTEM (Antfu + Lexington) === */
+  --font-family-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, ' Liberation Mono', Menlo, monospace;
+
+  /* Font Scale - Responsive */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+  --text-6xl: 3.75rem;     /* 60px */
+  --text-7xl: 4.5rem;      /* 72px */
+
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === SPACING SYSTEM (Mizu + Astro Max) === */
+  --spacing-unit: 0.25rem;  /* 4px base unit */
+  --spacing-1: calc(var(--spacing-unit) * 1);   /* 4px */
+  --spacing-2: calc(var(--spacing-unit) * 2);   /* 8px */
+  --spacing-3: calc(var(--spacing-unit) * 3);   /* 12px */
+  --spacing-4: calc(var(--spacing-unit) * 4);   /* 16px */
+  --spacing-5: calc(var(--spacing-unit) * 5);   /* 20px */
+  --spacing-6: calc(var(--spacing-unit) * 6);   /* 24px */
+  --spacing-8: calc(var(--spacing-unit) * 8);   /* 32px */
+  --spacing-10: calc(var(--spacing-unit) * 10); /* 40px */
+  --spacing-12: calc(var(--spacing-unit) * 12); /* 48px */
+  --spacing-16: calc(var(--spacing-unit) * 16); /* 64px */
+  --spacing-20: calc(var(--spacing-unit) * 20); /* 80px */
+  --spacing-24: calc(var(--spacing-unit) * 24); /* 96px */
+  --spacing-32: calc(var(--spacing-unit) * 32); /* 128px */
+
+  /* Layout-specific spacing */
+  --container-padding: var(--spacing-6);
+  --section-padding: var(--spacing-20);
+  --content-gap: var(--spacing-8);
+  --component-gap: var(--spacing-6);
+
+  /* === ANIMATION & TRANSITIONS (Lexington + Antfu) === */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* === COMPONENT PATTERNS === */
+  /* Cards (Mizu + Astro Max) */
+  --card-padding: var(--spacing-6);
+  --card-radius: var(--spacing-3);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Buttons (Antfu + Mizu) */
+  --button-padding-x: var(--spacing-4);
+  --button-padding-y: var(--spacing-2);
+  --button-radius: var(--spacing-2);
+  --button-font-weight: var(--font-weight-medium);
+
+  /* Forms (Lexington) */
+  --input-padding: var(--spacing-3);
+  --input-radius: var(--spacing-2);
+  --input-border: 1px solid var(--border-primary);
+
+  /* === RESPONSIVE BREAKPOINTS === */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* === UTILITY CLASSES (UnoCSS Integration) === */
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.section {
+  padding: var(--section-padding) 0;
+}
+
+.flex-col-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-col-start {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Typography Utilities */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Component Utilities */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  box-shadow: var(--card-shadow);
+  transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border-radius: var(--button-radius);
+  font-weight: var(--button-font-weight);
+  transition: all var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.button-primary {
+  background: var(--color-primary-600);
+  color: white;
+}
+
+.button-primary:hover {
+  background: var(--color-primary-500);
+}
+
+.button-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.button-secondary:hover {
+  background: var(--border-primary);
+}
+
+/* Professional/Enterprise Aesthetic Classes */
+.enterprise-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-32) var(--container-padding);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.enterprise-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(var(--color-primary-600), 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.professional-section {
+  padding: var(--section-padding) 0;
+  position: relative;
+}
+
+.professional-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+}
+
+/* Responsive Typography Scale */
+@media (max-width: 768px) {
+  :root {
+    --text-7xl: 3rem;      /* Reduce from 72px to 48px */
+    --text-6xl: 2.25rem;   /* Reduce from 60px to 36px */
+    --text-5xl: 1.875rem;  /* Reduce from 48px to 30px */
+    --section-padding: var(--spacing-16);
+    --container-padding: var(--spacing-4);
+  }
+}
+
+/* Smooth Scrolling & Transitions */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--spacing-20);
+}
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* Selection Styles */
+::selection {
+  background: var(--color-primary-600);
+  color: white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-600);
+}

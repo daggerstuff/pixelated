@@ -9,7 +9,7 @@
 
 import { spawnSync } from 'node:child_process'
 import { parseArgs } from 'node:util'
-import fetch from 'node-fetch'
+// Native fetch is available in Node.js 18+ (project requires Node.js 24+)
 
 interface RollbackOptions {
   environment: string
@@ -35,13 +35,16 @@ async function sendNotification(message: string, environment: string): void {
     console.log(`Sending notification for ${environment} rollback...`)
 
     // Send to Slack
-    await fetch(process.env['SLACK_WEBHOOK'] ?? '', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        text: `🚨 *ROLLBACK ALERT* 🚨\n${message}\nEnvironment: ${environment}`,
-      }),
-    })
+    const slackWebhook = process.env['SLACK_WEBHOOK']
+    if (slackWebhook) {
+      await fetch(slackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `🚨 *ROLLBACK ALERT* 🚨\n${message}\nEnvironment: ${environment}`,
+        }),
+      })
+    }
 
     // Send to email
     if (process.env['EMAIL_API_KEY']) {

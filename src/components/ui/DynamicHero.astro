@@ -1,0 +1,432 @@
+---
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  primaryCTA?: {
+    label: string;
+    href: string;
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  };
+  secondaryCTA?: {
+    label: string;
+    href: string;
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  };
+  features?: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }>;
+  layout?: 'centered' | 'split' | 'asymmetric' | 'minimal';
+  background?: 'gradient' | 'particles' | 'waves' | 'solid' | 'image';
+  variant?: 'default' | 'compact' | 'full' | 'video';
+  showStats?: boolean;
+  stats?: Array<{
+    value: string;
+    label: string;
+    suffix?: string;
+  }>;
+  className?: string;
+  particles?: boolean;
+  animatedElements?: boolean;
+}
+
+const {
+  title = "Build Something Amazing",
+  subtitle,
+  description = "Transform your ideas into reality with our cutting-edge platform designed for modern creators and innovators.",
+  primaryCTA,
+  secondaryCTA,
+  features = [],
+  layout = 'centered',
+  background = 'gradient',
+  variant = 'default',
+  showStats = false,
+  stats = [],
+  className = '',
+  particles = true,
+  animatedElements = true
+} = Astro.props;
+
+// Layout configurations inspired by Mizu
+const layoutClasses = {
+  centered: 'flex-col-center text-center',
+  split: 'lg:grid lg:grid-cols-2 lg:items-center lg:gap-16',
+  asymmetric: 'lg:grid lg:grid-cols-3 lg:items-center lg:gap-8',
+  minimal: 'flex-col-center text-center max-w-2xl mx-auto'
+};
+
+// Background configurations
+const backgroundClasses = {
+  gradient: 'bg-gradient-to-br from-primary-950 via-secondary-900 to-accent-900',
+  particles: 'bg-primary-950',
+  waves: 'bg-gradient-to-b from-primary-950 to-secondary-900',
+  solid: 'bg-secondary-950',
+  image: 'bg-secondary-950'
+};
+
+// Variant configurations (height and spacing)
+const variantClasses = {
+  default: 'min-h-screen py-20 lg:py-32',
+  compact: 'min-h-[70vh] py-16 lg:py-24',
+  full: 'min-h-screen py-32 lg:py-48',
+  video: 'min-h-screen py-20 lg:py-32'
+};
+
+// CTA variant styles
+const ctaVariantClasses = {
+  primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+  outline: 'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
+  ghost: 'text-primary hover:bg-primary/10'
+};
+
+const heroClasses = `
+  relative overflow-hidden
+  ${backgroundClasses[background]}
+  ${variantClasses[variant]}
+  ${className}
+`;
+
+const contentClasses = `
+  container mx-auto px-6
+  ${layoutClasses[layout]}
+`;
+
+const titleClasses = `
+  text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold
+  text-gradient text-balance
+  ${animatedElements ? 'animate-fade-in-up' : ''}
+`;
+
+const subtitleClasses = `
+  text-xl sm:text-2xl lg:text-3xl
+  text-secondary-foreground text-balance mt-4
+  ${animatedElements ? 'animate-fade-in-up animation-delay-200' : ''}
+`;
+
+const descriptionClasses = `
+  text-lg text-muted-foreground text-balance mt-6 max-w-2xl
+  ${animatedElements ? 'animate-fade-in-up animation-delay-400' : ''}
+`;
+---
+
+<section class={heroClasses}>
+  <!-- Background Elements -->
+  {background === 'gradient' && (
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1)_0%,transparent_50%)]"></div>
+  )}
+
+  {background === 'particles' && particles && (
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="particles-container">
+        {Array.from({ length: 50 }).map(() => (
+          <div class="particle"></div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {background === 'waves' && (
+    <div class="absolute inset-0">
+      <svg class="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path fill="rgba(59, 130, 246, 0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+    </div>
+  )}
+
+  <!-- Animated Elements -->
+  {animatedElements && (
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="floating-element element-1"></div>
+      <div class="floating-element element-2"></div>
+      <div class="floating-element element-3"></div>
+      <div class="floating-element element-4"></div>
+    </div>
+  )}
+
+  <div class={contentClasses}>
+    <!-- Main Content -->
+    <div class="relative z-10">
+      {subtitle && (
+        <p class={subtitleClasses}>
+          {subtitle}
+        </p>
+      )}
+
+      <h1 class={titleClasses}>
+        {title}
+      </h1>
+
+      <p class={descriptionClasses}>
+        {description}
+      </p>
+
+      <!-- CTA Buttons -->
+      {(primaryCTA || secondaryCTA) && (
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {primaryCTA && (
+            <a
+              href={primaryCTA.href}
+              class:list={[
+                "inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300",
+                ctaVariantClasses[primaryCTA.variant || 'primary'],
+                animatedElements ? 'animate-fade-in-up animation-delay-600' : '',
+                "hover:scale-105 hover:shadow-xl"
+              ]}
+            >
+              {primaryCTA.label}
+            </a>
+          )}
+
+          {secondaryCTA && (
+            <a
+              href={secondaryCTA.href}
+              class:list={[
+                "inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300",
+                ctaVariantClasses[secondaryCTA.variant || 'outline'],
+                animatedElements ? 'animate-fade-in-up animation-delay-700' : '',
+                "hover:scale-105"
+              ]}
+            >
+              {secondaryCTA.label}
+            </a>
+          )}
+        </div>
+      )}
+
+      <!-- Stats -->
+      {showStats && stats.length > 0 && (
+        <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {stats.map((stat, index) => (
+            <div class="text-center" key={index}>
+              <div class="text-3xl sm:text-4xl font-bold text-primary">
+                {stat.value}
+                {stat.suffix && <span class="text-xl">{stat.suffix}</span>}
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Features (for split layout) -->
+    {layout === 'split' && features.length > 0 && (
+      <div class="mt-16 lg:mt-0">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {features.map((feature, index) => (
+            <div
+              class:list={[
+                "bg-secondary/50 backdrop-blur-sm rounded-xl p-6 border border-border-primary/50",
+                animatedElements ? 'animate-fade-in-right' : '',
+                `animation-delay-${index * 200}`
+              ]}
+            >
+              <div class="text-3xl mb-4">{feature.icon}</div>
+              <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+              <p class="text-muted-foreground">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Features (for centered layout) -->
+    {layout === 'centered' && features.length > 0 && (
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {features.map((feature, index) => (
+          <div
+            class:list={[
+              "text-center",
+              animatedElements ? 'animate-fade-in-up' : '',
+              `animation-delay-${600 + index * 150}`
+            ]}
+          >
+            <div class="text-4xl mb-4">{feature.icon}</div>
+            <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+            <p class="text-muted-foreground">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* Animation keyframes inspired by Antfustyle */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+      transform: translateY(-20px) rotate(5deg);
+    }
+    66% {
+      transform: translateY(-10px) rotate(-3deg);
+    }
+  }
+
+  @keyframes particle-float {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-40px) translateX(20px);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-20px) translateX(-10px);
+      opacity: 0.8;
+    }
+    75% {
+      transform: translateY(-30px) translateX(15px);
+      opacity: 0.9;
+    }
+  }
+
+  /* Animation classes */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in-right {
+    animation: fade-in-right 0.8s ease-out forwards;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+
+  .animation-delay-800 {
+    animation-delay: 800ms;
+  }
+
+  .animation-delay-900 {
+    animation-delay: 900ms;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  /* Floating elements */
+  .floating-element {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .element-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .element-2 {
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+  }
+
+  .element-3 {
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
+  }
+
+  .element-4 {
+    top: 40%;
+    right: 30%;
+    animation-delay: 1s;
+  }
+
+  /* Particles */
+  .particles-container {
+    position: absolute;
+    inset: 0;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 50%;
+    animation: particle-float 8s ease-in-out infinite;
+  }
+
+  .particle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+  .particle:nth-child(2) { top: 20%; left: 80%; animation-delay: 1s; }
+  .particle:nth-child(3) { top: 30%; left: 40%; animation-delay: 2s; }
+  .particle:nth-child(4) { top: 40%; left: 60%; animation-delay: 3s; }
+  .particle:nth-child(5) { top: 50%; left: 30%; animation-delay: 4s; }
+  .particle:nth-child(6) { top: 60%; left: 70%; animation-delay: 5s; }
+  .particle:nth-child(7) { top: 70%; left: 50%; animation-delay: 6s; }
+  .particle:nth-child(8) { top: 80%; left: 25%; animation-delay: 7s; }
+  .particle:nth-child(9) { top: 90%; left: 75%; animation-delay: 0.5s; }
+  .particle:nth-child(10) { top: 15%; left: 45%; animation-delay: 1.5s; }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .floating-element {
+      width: 40px;
+      height: 40px;
+    }
+
+    .element-1 { top: 10%; left: 5%; }
+    .element-2 { top: 70%; right: 10%; }
+    .element-3 { bottom: 10%; left: 15%; }
+    .element-4 { top: 50%; right: 20%; }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .floating-element {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+    }
+
+    .particle {
+      background: rgba(59, 130, 246, 0.8);
+    }
+  }
+</style>

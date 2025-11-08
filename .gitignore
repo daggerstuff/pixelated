@@ -319,3 +319,7 @@ hive-mind-prompt-*.txt
 docs/deployment-issue-resolution.md
 scripts/create-a1-flex-instance-simple.sh
 scripts/create-a1-flex-instance.sh
+.ci
+.br
+ngc-cli/
+tmp/

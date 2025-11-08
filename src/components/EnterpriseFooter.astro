@@ -1,0 +1,273 @@
+---
+// Enterprise Footer Component
+// Professional footer design inspired by premium themes with improved layout
+export interface Props {
+  companyName?: string;
+  year?: number;
+}
+
+const { companyName = "Pixelated Empathy", year = new Date().getFullYear() } = Astro.props;
+
+// Footer navigation sections
+const footerSections = [
+  {
+    title: "Training",
+    links: [
+      { name: "AI Simulations", href: "#simulations" },
+      { name: "Mental Health Training", href: "#training" },
+      { name: "Assessment Tools", href: "#assessment" },
+      { name: "Certification", href: "#certification" }
+    ]
+  },
+  {
+    title: "Platform",
+    links: [
+      { name: "Features", href: "#features" },
+      { name: "Technology", href: "#technology" },
+      { name: "Security", href: "#security" },
+      { name: "Integrations", href: "#integrations" }
+    ]
+  },
+  {
+    title: "Company",
+    links: [
+      { name: "About Us", href: "#about" },
+      { name: "Testimonials", href: "#testimonials" },
+      { name: "Case Studies", href: "#case-studies" },
+      { name: "Careers", href: "#careers" }
+    ]
+  },
+  {
+    title: "Support",
+    links: [
+      { name: "Help Center", href: "#help" },
+      { name: "Documentation", href: "#docs" },
+      { name: "Contact Us", href: "#contact" },
+      { name: "System Status", href: "#status" }
+    ]
+  }
+];
+
+// Social media links
+const socialLinks = [
+  { name: "Twitter", href: "https://twitter.com", icon: "twitter" },
+  { name: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
+  { name: "GitHub", href: "https://github.com", icon: "github" },
+  { name: "YouTube", href: "https://youtube.com", icon: "youtube" }
+];
+---
+
+<footer class="bg-gradient-to-t from-neutral-950 to-neutral-900 border-t border-neutral-800/50 relative overflow-hidden">
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.05)_0%,transparent_50%)]"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.05)_0%,transparent_50%)]"></div>
+
+  <!-- Main Footer Content -->
+  <div class="container mx-auto px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+      <!-- Brand Section -->
+      <div class="lg:col-span-4 space-y-6">
+        <div class="flex items-center space-x-4 group">
+          <img src="/logo.svg" alt={companyName} class="h-10 w-auto transition-transform duration-300 group-hover:scale-110" />
+          <div>
+            <h3 class="text-xl font-bold text-neutral-100 group-hover:text-primary-400 transition-colors">{companyName}</h3>
+            <p class="text-sm text-neutral-400">AI-Powered Mental Health Training</p>
+          </div>
+        </div>
+
+        <p class="text-neutral-300 leading-relaxed max-w-md">
+          Revolutionizing mental health training with AI-powered simulations and evidence-based learning methodologies for healthcare professionals worldwide.
+        </p>
+
+        <!-- Newsletter Signup -->
+        <div class="space-y-4">
+          <h4 class="text-neutral-100 font-semibold">Stay Updated</h4>
+          <div class="flex gap-2">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              class="flex-1 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20 transition-colors"
+            />
+            <button class="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105">
+              Subscribe
+            </button>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="flex space-x-4">
+          {socialLinks.map(link => (
+            <a
+              href={link.href}
+              class="group p-2 bg-neutral-800 hover:bg-primary-600 text-neutral-400 hover:text-white rounded-lg transition-all duration-300 hover:scale-110"
+              aria-label={link.name}
+            >
+              <span class="text-xl">{link.icon}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Navigation Sections -->
+      <div class="lg:col-span-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {footerSections.map(section => (
+            <div class="space-y-4">
+              <h4 class="text-neutral-100 font-semibold text-lg">{section.title}</h4>
+              <ul class="space-y-3">
+                {section.links.map(link => (
+                  <li>
+                    <a
+                      href={link.href}
+                      class="text-neutral-400 hover:text-primary-400 transition-colors group flex items-center"
+                    >
+                      <span class="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
+                      <span class="opacity-0 group-hover:opacity-100 ml-2 transition-opacity">→</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-neutral-800/50 my-12"></div>
+
+    <!-- Bottom Section -->
+    <div class="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+
+      <!-- Copyright -->
+      <div class="text-neutral-400 text-sm space-y-2 lg:space-y-0 lg:space-x-8 lg:flex">
+        <p>© {year} {companyName}. All rights reserved.</p>
+        <div class="flex space-x-6">
+          <a href="#privacy" class="hover:text-primary-400 transition-colors">Privacy Policy</a>
+          <a href="#terms" class="hover:text-primary-400 transition-colors">Terms of Service</a>
+          <a href="#cookies" class="hover:text-primary-400 transition-colors">Cookie Policy</a>
+        </div>
+      </div>
+
+      <!-- Trust Indicators -->
+      <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-2 text-neutral-400">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="text-sm">System Online</span>
+        </div>
+        <div class="flex items-center space-x-2 text-neutral-400">
+          <span class="text-sm">SSL Secured</span>
+          <span class="text-green-500">🔒</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button
+    id="scroll-to-top"
+    class="fixed bottom-8 right-8 p-3 bg-primary-600 hover:bg-primary-500 text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110 opacity-0 pointer-events-none"
+    aria-label="Scroll to top"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+</footer>
+
+<script>
+  // Scroll to top functionality
+  const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+      scrollToTopBtn.classList.add('opacity-100');
+    } else {
+      scrollToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+      scrollToTopBtn.classList.remove('opacity-100');
+    }
+  });
+
+  scrollToTopBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Newsletter form handling
+  const newsletterForm = document.querySelector('input[type="email"]')?.parentElement;
+  if (newsletterForm) {
+    const emailInput = newsletterForm.querySelector('input[type="email"]');
+    const submitButton = newsletterForm.querySelector('button');
+
+    submitButton?.addEventListener('click', async () => {
+      const email = emailInput.value;
+      if (!email || !email.includes('@')) {
+        emailInput.style.borderColor = 'rgb(239 68 68)';
+        emailInput.placeholder = 'Please enter a valid email';
+        return;
+      }
+
+      // Simulate form submission
+      submitButton.textContent = 'Subscribing...';
+      submitButton.disabled = true;
+
+      setTimeout(() => {
+        submitButton.textContent = 'Subscribed!';
+        submitButton.classList.add('bg-green-600');
+        emailInput.value = '';
+        emailInput.placeholder = 'Thank you for subscribing!';
+        emailInput.style.borderColor = 'rgb(34 197 94)';
+      }, 1500);
+    });
+  }
+
+  // Smooth scroll for footer links
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.length > 1) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Footer animation styles */
+  footer {
+    position: relative;
+  }
+
+  /* Newsletter input focus animation */
+  input[type="email"]:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Social link hover effects */
+  .group:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+  }
+
+  /* Link hover animations */
+  .group:hover .group-hover\:translate-x-1 {
+    transform: translateX(4px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    footer .grid-cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    footer .grid-cols-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

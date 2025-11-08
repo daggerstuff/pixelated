@@ -1,0 +1,180 @@
+---
+// Enterprise Navigation Header Component
+// Combines premium header patterns from Mizu, Antfu, and Lexington themes
+export interface Props {
+  title?: string;
+  logo?: string;
+}
+
+const { title = "Pixelated Empathy", logo = "/logo.svg" } = Astro.props;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-neutral-950/90 backdrop-blur-xl border-b border-neutral-800/50 transition-all duration-300" id="main-header">
+  <div class="container mx-auto px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+
+      <!-- Logo Section -->
+      <div class="flex items-center space-x-4 group">
+        <div class="relative">
+          <img src={logo} alt={title} class="h-10 w-auto transition-transform duration-300 group-hover:scale-110" />
+          <div class="absolute inset-0 bg-primary-500/20 rounded-lg blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+        <div class="hidden lg:block">
+          <h1 class="text-xl font-bold text-neutral-100 group-hover:text-primary-400 transition-colors">{title}</h1>
+          <p class="text-sm text-neutral-400">AI-Powered Mental Health Training</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden lg:flex items-center space-x-8">
+        <a href="#home" class="nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium">Home</a>
+        <a href="#training" class="nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium">Training</a>
+        <a href="#features" class="nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium">Features</a>
+        <a href="#testimonials" class="nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium">Testimonials</a>
+        <a href="#contact" class="nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium">Contact</a>
+      </nav>
+
+      <!-- CTA Buttons -->
+      <div class="hidden lg:flex items-center space-x-4">
+        <button class="px-4 py-2 text-neutral-300 hover:text-primary-400 transition-colors font-medium">
+          Sign In
+        </button>
+        <button class="px-6 py-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105">
+          Start Training
+        </button>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="lg:hidden p-2 text-neutral-300 hover:text-primary-400 transition-colors" id="mobile-menu-toggle">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="lg:hidden hidden bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-800/50" id="mobile-menu">
+    <div class="container mx-auto px-6 py-6 space-y-6">
+      <nav class="flex flex-col space-y-4">
+        <a href="#home" class="mobile-nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium py-2">Home</a>
+        <a href="#training" class="mobile-nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium py-2">Training</a>
+        <a href="#features" class="mobile-nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium py-2">Features</a>
+        <a href="#testimonials" class="mobile-nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium py-2">Testimonials</a>
+        <a href="#contact" class="mobile-nav-link text-neutral-300 hover:text-primary-400 transition-colors font-medium py-2">Contact</a>
+      </nav>
+      <div class="flex flex-col space-y-4 pt-4 border-t border-neutral-800">
+        <button class="w-full px-4 py-3 text-neutral-300 hover:text-primary-400 transition-colors font-medium text-left">
+          Sign In
+        </button>
+        <button class="w-full px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-all duration-300">
+          Start Training
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Header Scroll Behavior Script -->
+<script>
+  const header = document.getElementById('main-header');
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  let lastScrollY = window.scrollY;
+
+  // Scroll behavior
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      // Scrolling down - hide header
+      header.style.transform = 'translateY(-100%)';
+    } else {
+      // Scrolling up - show header
+      header.style.transform = 'translateY(0)';
+    }
+
+    // Add background opacity based on scroll
+    if (currentScrollY > 50) {
+      header.style.backgroundColor = 'rgba(10, 10, 10, 0.95)';
+    } else {
+      header.style.backgroundColor = 'rgba(10, 10, 10, 0.9)';
+    }
+
+    lastScrollY = currentScrollY;
+  });
+
+  // Mobile menu toggle
+  mobileMenuToggle?.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.contains('hidden');
+
+    if (isOpen) {
+      mobileMenu.classList.remove('hidden');
+      mobileMenu.style.maxHeight = '0px';
+      mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+    } else {
+      mobileMenu.style.maxHeight = '0px';
+      setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+    }
+  });
+
+  // Smooth scroll for navigation links
+  document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          // Close mobile menu if open
+          mobileMenu?.classList.add('hidden');
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Header animation styles */
+  #main-header {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+
+  #mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  /* Navigation link hover effects */
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-secondary-500));
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* Logo glow effect */
+  .group:hover .bg-primary-500\/20 {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.4; }
+  }
+</style>
