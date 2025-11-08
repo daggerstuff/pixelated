@@ -22,7 +22,7 @@ export interface ThreatCorrelation {
   patterns: ThreatPattern[]
   analysis: CorrelationAnalysis
   recommendations: string[]
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 export interface CorrelatedThreat {
@@ -100,8 +100,109 @@ export interface CorrelationEngineConfig {
 export interface AlgorithmConfig {
   name: string
   enabled: boolean
-  parameters: Record<string, any>
+  parameters: Record<string, unknown>
   weight: number
+}
+
+// Add new interfaces for threat data structures
+export interface ThreatData {
+  id: string
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  region: string
+  location?: {
+    name?: string
+    coordinates?: {
+      latitude: number
+      longitude: number
+    }
+  }
+  indicators?: ThreatIndicator[]
+  timestamp: string | Date
+  tactics?: string
+  tools?: string
+  attribution?: {
+    actor?: string
+    campaign?: string
+    motivation?: string
+    sophistication?: string
+    region?: string
+  }
+}
+
+export interface TimeGroup {
+  start_time: string | Date
+  end_time: string | Date
+  threats: ThreatData[]
+}
+
+export interface SpatialGroup {
+  threats: ThreatData[]
+  distance: number
+  center: {
+    latitude: number
+    longitude: number
+  }
+}
+
+export interface BehavioralGroup {
+  threats: ThreatData[]
+  pattern: string
+}
+
+export interface AttributionGroup {
+  threats: ThreatData[]
+  attribution: Record<string, string>
+}
+
+export interface CorrelationResult {
+  confidence: number
+  patterns: ThreatPattern[]
+  analysis: CorrelationAnalysis
+  time_span?: number
+  geographic_span?: number
+  similarity_metrics?: Record<string, number>
+  confidence_factors?: Record<string, number>
+}
+
+export interface SpatialCorrelationResult extends CorrelationResult {
+  geographic_span: number
+}
+
+export interface TemporalCorrelationResult extends CorrelationResult {
+  time_span: number
+}
+
+export interface BehavioralCorrelationResult extends CorrelationResult {
+  similarity_metrics: Record<string, number>
+}
+
+export interface AttributionCorrelationResult extends CorrelationResult {
+  confidence_factors: Record<string, number>
+}
+
+export interface Recommendation {
+  id: string
+  type: string
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  action: string
+  context: Record<string, unknown>
+}
+
+export interface CorrelationMetrics {
+  confidence: number
+  similarity_score: number
+  relationship_strength: number
+  threat_count: number
+  patterns: ThreatPattern[]
+  span_value?: number
+}
+
+export interface DistanceCoordinates {
+  latitude: number
+  longitude: number
 }
 
 export class ThreatCorrelationEngine extends EventEmitter {
@@ -427,14 +528,14 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by time windows
    */
-  private groupThreatsByTimeWindow(threats: any[], windowSize: number): any[] {
-    const groups: any[] = []
+  private groupThreatsByTimeWindow(threats: ThreatData[], windowSize: number): TimeGroup[] {
+    const groups: TimeGroup[] = []
     const sortedThreats = [...threats].sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     )
 
-    let currentGroup: any = null
+    let currentGroup: TimeGroup | null = null
 
     for (const threat of sortedThreats) {
       const threatTime = new Date(threat.timestamp).getTime()
@@ -442,7 +543,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       if (
         !currentGroup ||
         threatTime - new Date(currentGroup.end_time).getTime() >
-          windowSize * 1000
+        windowSize * 1000
       ) {
         // Start new group
         if (currentGroup) {
@@ -502,7 +603,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
       // Check for similar indicators
       const allIndicators = threats.flatMap(
-        (t) => t.indicators?.map((i: any) => i.value) || [],
+        (t) => t.indicators?.map((i: ThreatIndicator) => i.value) || [],
       )
       const indicatorCounts = this.countOccurrences(allIndicators)
 
@@ -555,7 +656,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Analyze spatial correlations
    */
   private async analyzeSpatialCorrelations(
-    threats: any[],
+    threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
     const correlations: ThreatCorrelation[] = []
 
@@ -605,14 +706,14 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by geographic proximity
    */
-  private groupThreatsByProximity(threats: any[]): any[] {
-    const groups: any[] = []
+  private groupThreatsByProximity(threats: ThreatData[]): SpatialGroup[] {
+    const groups: SpatialGroup[] = []
     const processed = new Set<string>()
 
     for (const threat of threats) {
       if (processed.has(threat.id)) continue
 
-      const group = {
+      const group: SpatialGroup = {
         threats: [threat],
         distance: 0,
         center: threat.location?.coordinates || { latitude: 0, longitude: 0 },
@@ -658,9 +759,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(coord1.latitude)) *
-        Math.cos(this.toRadians(coord2.latitude)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
+      Math.cos(this.toRadians(coord2.latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
@@ -678,90 +779,33 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Calculate spatial correlation
    */
   private calculateSpatialCorrelation(
-    threats: any[],
-    _maxDistance: number,
-  ): any {
+    threats: ThreatData[],
+    maxDistance: number,
+  ): SpatialCorrelationResult {
     try {
-      // Calculate geographic span
-      const coordinates = threats
-        .map((t) => t.location?.coordinates)
-        .filter((coord) => coord && coord.latitude && coord.longitude)
+      const geographicSpan = this.computeGeographicSpan(threats)
 
-      let geographicSpan = 0
-      if (coordinates.length > 1) {
-        for (let i = 0; i < coordinates.length; i++) {
-          for (let j = i + 1; j < coordinates.length; j++) {
-            const distance = this.calculateDistance(
-              coordinates[i],
-              coordinates[j],
-            )
-            geographicSpan = Math.max(geographicSpan, distance)
-          }
-        }
+      // Validate threats are within max distance threshold
+      if (geographicSpan > maxDistance) {
+        logger.warn('Geographic span exceeds max distance threshold', {
+          geographicSpan,
+          maxDistance,
+        })
       }
 
-      // Calculate similarity score
-      let similarityScore = 0
-      let patterns: ThreatPattern[] = []
-
-      // Check for coordinated attacks (similar types in close proximity)
-      const typeGroups = this.groupBy(threats, 'type')
-      for (const [type, typeThreats] of Object.entries(typeGroups)) {
-        if (typeThreats.length > 1) {
-          similarityScore += 0.4
-          patterns.push({
-            pattern_id: `spatial_type_${type}`,
-            pattern_type: 'coordinated_attack',
-            description: `Multiple ${type} threats in geographic proximity`,
-            confidence: 0.9,
-            frequency: typeThreats.length,
-            temporal_span: this.calculateTemporalSpan(typeThreats),
-            spatial_span: geographicSpan,
-            indicators: [type],
-          })
-        }
-      }
-
-      // Check for indicator sharing across locations
-      const allIndicators = threats.flatMap(
-        (t) => t.indicators?.map((i: any) => i.value) || [],
-      )
-      const indicatorCounts = this.countOccurrences(allIndicators)
-
-      for (const [indicator, count] of Object.entries(indicatorCounts)) {
-        if (count > 1) {
-          similarityScore += 0.3
-          patterns.push({
-            pattern_id: `spatial_indicator_${indicator}`,
-            pattern_type: 'indicator_propagation',
-            description: `Indicator ${indicator} spans multiple geographic locations`,
-            confidence: 0.8,
-            frequency: count,
-            temporal_span: this.calculateTemporalSpan(threats),
-            spatial_span: geographicSpan,
-            indicators: [indicator],
-          })
-        }
-      }
-
+      const patterns = this.detectSpatialPatterns(threats, geographicSpan)
+      const similarityScore = this.scoreSpatialSimilarity(threats, patterns)
       const confidence = Math.min(similarityScore, 1.0)
 
       return {
         confidence,
         patterns,
-        analysis: {
-          similarity_score: similarityScore,
-          relationship_strength: confidence,
-          common_attributes: Object.keys(typeGroups).filter(
-            (type) => typeGroups[type].length > 1,
-          ),
-          unique_attributes: [],
-          statistical_significance: this.calculateStatisticalSignificance(
-            threats.length,
-            geographicSpan,
-          ),
-          machine_learning_insights: [],
-        },
+        analysis: this.buildSpatialAnalysis(
+          threats,
+          similarityScore,
+          confidence,
+          geographicSpan,
+        ),
         geographic_span: geographicSpan,
       }
     } catch (error) {
@@ -773,10 +817,131 @@ export class ThreatCorrelationEngine extends EventEmitter {
   }
 
   /**
+   * Compute geographic span of threats
+   */
+  private computeGeographicSpan(threats: ThreatData[]): number {
+    const coordinates = threats
+      .map((t) => t.location?.coordinates)
+      .filter((coord) => coord && coord.latitude && coord.longitude)
+
+    if (coordinates.length < 2) return 0
+
+    let maxDistance = 0
+    for (let i = 0; i < coordinates.length; i++) {
+      for (let j = i + 1; j < coordinates.length; j++) {
+        const distance = this.calculateDistance(coordinates[i], coordinates[j])
+        maxDistance = Math.max(maxDistance, distance)
+      }
+    }
+
+    return maxDistance
+  }
+
+  /**
+   * Detect spatial patterns in threats
+   */
+  private detectSpatialPatterns(
+    threats: ThreatData[],
+    geographicSpan: number,
+  ): ThreatPattern[] {
+    const patterns: ThreatPattern[] = []
+
+    // Check for coordinated attacks (similar types in close proximity)
+    const typeGroups = this.groupBy(threats, 'type')
+    for (const [type, typeThreats] of Object.entries(typeGroups)) {
+      if (typeThreats.length > 1) {
+        patterns.push({
+          pattern_id: `spatial_type_${type}`,
+          pattern_type: 'coordinated_attack',
+          description: `Multiple ${type} threats in geographic proximity`,
+          confidence: 0.9,
+          frequency: typeThreats.length,
+          temporal_span: this.calculateTemporalSpan(typeThreats),
+          spatial_span: geographicSpan,
+          indicators: [type],
+        })
+      }
+    }
+
+    // Check for indicator sharing across locations
+    const allIndicators = threats.flatMap(
+      (t) => t.indicators?.map((i) => i.value) || [],
+    )
+    const indicatorCounts = this.countOccurrences(allIndicators)
+
+    for (const [indicator, count] of Object.entries(indicatorCounts)) {
+      if (count > 1) {
+        patterns.push({
+          pattern_id: `spatial_indicator_${indicator}`,
+          pattern_type: 'indicator_propagation',
+          description: `Indicator ${indicator} spans multiple geographic locations`,
+          confidence: 0.8,
+          frequency: count,
+          temporal_span: this.calculateTemporalSpan(threats),
+          spatial_span: geographicSpan,
+          indicators: [indicator],
+        })
+      }
+    }
+
+    return patterns
+  }
+
+  /**
+   * Score spatial similarity
+   */
+  private scoreSpatialSimilarity(
+    threats: ThreatData[],
+    patterns: ThreatPattern[],
+  ): number {
+    let score = 0
+
+    // Score based on coordinated attack patterns
+    const coordinatedPatterns = patterns.filter(
+      (p) => p.pattern_type === 'coordinated_attack',
+    )
+    score += coordinatedPatterns.length * 0.4
+
+    // Score based on indicator propagation
+    const propagationPatterns = patterns.filter(
+      (p) => p.pattern_type === 'indicator_propagation',
+    )
+    score += propagationPatterns.length * 0.3
+
+    return Math.min(score, 1.0)
+  }
+
+  /**
+   * Build spatial analysis
+   */
+  private buildSpatialAnalysis(
+    threats: ThreatData[],
+    similarityScore: number,
+    confidence: number,
+    geographicSpan: number,
+  ): CorrelationAnalysis {
+    const typeGroups = this.groupBy(threats, 'type')
+
+    return {
+      similarity_score: similarityScore,
+      relationship_strength: confidence,
+      common_attributes: Object.keys(typeGroups).filter(
+        (type) => typeGroups[type].length > 1,
+      ),
+      unique_attributes: [],
+      statistical_significance: this.calculateStatisticalSignificance(
+        threats.length,
+        geographicSpan,
+      ),
+      machine_learning_insights: [],
+    }
+  }
+
+  /**
    * Analyze behavioral correlations
    */
   private async analyzeBehavioralCorrelations(
-    threats: any[],
+    threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
     const correlations: ThreatCorrelation[] = []
 
@@ -827,8 +992,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by behavioral patterns
    */
-  private groupThreatsByBehavior(threats: any[]): any[] {
-    const groups: any[] = []
+  private groupThreatsByBehavior(threats: ThreatData[]): BehavioralGroup[] {
+    const groups: BehavioralGroup[] = []
 
     // Define behavioral patterns to look for
     const behavioralPatterns = [
@@ -850,8 +1015,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by specific pattern
    */
-  private groupThreatsByPattern(threats: any[], pattern: string): any[] {
-    const groups: any[] = []
+  private groupThreatsByPattern(threats: ThreatData[], pattern: string): BehavioralGroup[] {
+    const groups: BehavioralGroup[] = []
 
     switch (pattern) {
       case 'similar_tactics': {
@@ -910,13 +1075,13 @@ export class ThreatCorrelationEngine extends EventEmitter {
       const sequence = [sortedThreats[i]]
       let currentSeverity =
         severityOrder[
-          sortedThreats[i].severity as keyof typeof severityOrder
+        sortedThreats[i].severity as keyof typeof severityOrder
         ] || 0
 
       for (let j = i + 1; j < sortedThreats.length; j++) {
         const nextSeverity =
           severityOrder[
-            sortedThreats[j].severity as keyof typeof severityOrder
+          sortedThreats[j].severity as keyof typeof severityOrder
           ] || 0
 
         if (nextSeverity > currentSeverity) {
@@ -1095,9 +1260,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Calculate attribution correlation
    */
   private calculateAttributionCorrelation(
-    threats: any[],
-    attribution: any,
-  ): any {
+    threats: ThreatData[],
+    attribution: Record<string, string>,
+  ): CorrelationResult {
     try {
       let similarityScore = 0
       let patterns: ThreatPattern[] = []
@@ -1152,7 +1317,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Utility functions
    */
-  private groupBy(array: any[], key: string): Record<string, any[]> {
+  private groupBy<T>(array: T[], key: string): Record<string, T[]> {
     return array.reduce(
       (groups, item) => {
         const value = this.getNestedValue(item, key) || 'unknown'
@@ -1164,7 +1329,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     )
   }
 
-  private getNestedValue(obj: any, path: string): any {
+  private getNestedValue(obj: unknown, path: string): unknown {
     return path.split('.').reduce((current, key) => current?.[key], obj)
   }
 
@@ -1178,14 +1343,14 @@ export class ThreatCorrelationEngine extends EventEmitter {
     )
   }
 
-  private calculateTemporalSpan(threats: any[]): number {
+  private calculateTemporalSpan(threats: ThreatData[]): number {
     const timestamps = threats.map((t) => new Date(t.timestamp).getTime())
     const minTime = Math.min(...timestamps)
     const maxTime = Math.max(...timestamps)
     return (maxTime - minTime) / 1000 // seconds
   }
 
-  private calculateSpatialSpan(threats: any[]): number {
+  private calculateSpatialSpan(threats: ThreatData[]): number {
     const coordinates = threats
       .map((t) => t.location?.coordinates)
       .filter((coord) => coord && coord.latitude && coord.longitude)
@@ -1260,40 +1425,160 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Generate recommendations for different correlation types
    */
-  private generateTemporalRecommendations(_correlation: any): string[] {
-    return [
-      'Monitor for similar threats in the same time window',
-      'Review security logs for the affected time period',
-      'Consider temporal-based blocking rules',
-      'Investigate potential coordinated attack campaigns',
-    ]
+  private generateTemporalRecommendations(
+    correlation: TemporalCorrelationResult,
+  ): string[] {
+    const recommendations: string[] = []
+    const metrics: CorrelationMetrics = {
+      confidence: correlation.confidence,
+      similarity_score: correlation.analysis.similarity_score,
+      relationship_strength: correlation.analysis.relationship_strength,
+      threat_count: correlation.patterns.length,
+      patterns: correlation.patterns,
+      span_value: correlation.time_span,
+    }
+
+    recommendations.push(
+      `Monitor for similar threats within ${Math.round(metrics.span_value || 0)}s time windows (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+    )
+
+    if (metrics.confidence > 0.8) {
+      recommendations.push(
+        'HIGH PRIORITY: Review security logs for coordinated attack patterns',
+      )
+    }
+
+    if (metrics.threat_count > 3) {
+      recommendations.push(
+        `Implement temporal-based blocking rules for ${metrics.threat_count} detected patterns`,
+      )
+    }
+
+    recommendations.push(
+      'Investigate potential coordinated attack campaigns across time periods',
+    )
+
+    return recommendations
   }
 
-  private generateSpatialRecommendations(_correlation: any): string[] {
-    return [
-      'Implement geographic-based access controls',
-      'Monitor network traffic from affected regions',
-      'Coordinate with regional security teams',
-      'Consider location-based threat intelligence sharing',
-    ]
+  private generateSpatialRecommendations(
+    correlation: SpatialCorrelationResult,
+  ): string[] {
+    const recommendations: string[] = []
+    const metrics: CorrelationMetrics = {
+      confidence: correlation.confidence,
+      similarity_score: correlation.analysis.similarity_score,
+      relationship_strength: correlation.analysis.relationship_strength,
+      threat_count: correlation.patterns.length,
+      patterns: correlation.patterns,
+      span_value: correlation.geographic_span,
+    }
+
+    recommendations.push(
+      `Implement geographic-based access controls for ${Math.round(metrics.span_value || 0)}km radius (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+    )
+
+    if (metrics.confidence > 0.8) {
+      recommendations.push(
+        'HIGH PRIORITY: Coordinate with regional security teams immediately',
+      )
+    }
+
+    const regions = new Set(
+      correlation.patterns.flatMap((p) => p.indicators || []),
+    )
+    if (regions.size > 1) {
+      recommendations.push(
+        `Monitor network traffic from ${regions.size} affected regions`,
+      )
+    }
+
+    recommendations.push(
+      'Consider location-based threat intelligence sharing with partners',
+    )
+
+    return recommendations
   }
 
-  private generateBehavioralRecommendations(_correlation: any): string[] {
-    return [
-      'Update behavioral detection rules',
-      'Monitor for similar attack patterns',
-      'Implement user behavior analytics',
-      'Review and update security policies',
-    ]
+  private generateBehavioralRecommendations(
+    correlation: BehavioralCorrelationResult,
+  ): string[] {
+    const recommendations: string[] = []
+    const metrics: CorrelationMetrics = {
+      confidence: correlation.confidence,
+      similarity_score: correlation.analysis.similarity_score,
+      relationship_strength: correlation.analysis.relationship_strength,
+      threat_count: correlation.patterns.length,
+      patterns: correlation.patterns,
+    }
+
+    const behaviorTypes = new Set(
+      correlation.patterns.map((p) => p.pattern_type),
+    )
+
+    recommendations.push(
+      `Update behavioral detection rules for ${behaviorTypes.size} pattern types (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+    )
+
+    if (metrics.similarity_score > 0.9) {
+      recommendations.push(
+        'HIGH PRIORITY: Implement immediate user behavior analytics',
+      )
+    }
+
+    if (correlation.similarity_metrics?.severity_increase_rate) {
+      recommendations.push(
+        `Monitor for escalation patterns (rate: ${correlation.similarity_metrics.severity_increase_rate.toFixed(2)})`,
+      )
+    }
+
+    recommendations.push(
+      `Review and update security policies based on ${metrics.threat_count} detected patterns`,
+    )
+
+    return recommendations
   }
 
-  private generateAttributionRecommendations(_correlation: any): string[] {
-    return [
-      'Investigate attributed threat actor activities',
-      'Share attribution intelligence with partners',
-      'Implement actor-specific countermeasures',
-      'Monitor for related campaign indicators',
-    ]
+  private generateAttributionRecommendations(
+    correlation: AttributionCorrelationResult,
+  ): string[] {
+    const recommendations: string[] = []
+    const metrics: CorrelationMetrics = {
+      confidence: correlation.confidence,
+      similarity_score: correlation.analysis.similarity_score,
+      relationship_strength: correlation.analysis.relationship_strength,
+      threat_count: correlation.patterns.length,
+      patterns: correlation.patterns,
+    }
+
+    const attributionFactors = Object.keys(
+      correlation.confidence_factors || {},
+    ).length
+
+    recommendations.push(
+      `Investigate attributed threat actor activities (${attributionFactors} attribution factors, confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+    )
+
+    if (metrics.confidence > 0.85) {
+      recommendations.push(
+        'HIGH PRIORITY: Share attribution intelligence with security partners',
+      )
+    }
+
+    const actors = new Set(
+      correlation.patterns.flatMap((p) => p.indicators || []),
+    )
+    if (actors.size > 0) {
+      recommendations.push(
+        `Implement actor-specific countermeasures for ${actors.size} identified actors`,
+      )
+    }
+
+    recommendations.push(
+      `Monitor for related campaign indicators across ${metrics.threat_count} patterns`,
+    )
+
+    return recommendations
   }
 
   /**

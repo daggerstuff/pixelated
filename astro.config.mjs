@@ -22,7 +22,6 @@ const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1'
 
 // Helper function to determine chunk names for better code splitting
 function getChunkName(id) {
-  // React ecosystem
   if (id.includes('react') || id.includes('react-dom')) {
     return 'react-vendor';
   }

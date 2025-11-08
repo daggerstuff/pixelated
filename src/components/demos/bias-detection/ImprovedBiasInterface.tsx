@@ -1,5 +1,5 @@
 // Enhanced Bias Detection Interface with improved UX
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
 import { SessionInputForm } from './SessionInputForm'
@@ -26,7 +26,6 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [analysisResults, setAnalysisResults] =
     useState<BiasAnalysisResults | null>(null)
-  const [realTimeBiasScore, setRealTimeBiasScore] = useState<number>(100)
 
   const analysisSteps = [
     'Processing content structure',
@@ -69,7 +68,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       // Generate comprehensive results
       const results: BiasAnalysisResults = {
         sessionId,
-        overallScore: Math.max(60, realTimeBiasScore - Math.random() * 10),
+        overallScore: Math.max(60, 100 - Math.random() * 10),
         biasFactors: {
           demographic: Math.random() * 0.3,
           cultural: Math.random() * 0.25,
@@ -123,7 +122,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
         setIsAnalyzing(false)
       }, 500)
     },
-    [realTimeBiasScore, analysisSteps.length],
+    [analysisSteps.length],
   )
 
   // Reset to input form
@@ -134,25 +133,6 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
     setAnalysisProgress(0)
     setAnalysisStepIndex(0)
   }, [])
-
-  // Handle real-time bias score updates
-  // Commented out - unused variable
-  // const handleBiasUpdate = useCallback((indicators: any[]) => {
-  //   if (indicators.length === 0) {
-  //     setRealTimeBiasScore(100)
-  //   } else {
-  //     const totalSeverity = indicators.reduce((sum, indicator) => {
-  //       const severityWeight =
-  //         indicator.severity === 'high'
-  //           ? 3
-  //           : indicator.severity === 'medium'
-  //             ? 2
-  //             : 1
-  //       return sum + severityWeight * indicator.confidence
-  //     }, 0)
-  //     setRealTimeBiasScore(Math.max(0, 100 - totalSeverity * 10))
-  //   }
-  // }, [])
 
   return (
     <div className={`improved-bias-interface ${className}`}>
@@ -185,11 +165,11 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
               <div key={step} className="flex items-center">
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'bg-blue-600 text-white'
-                      : index <
-                        ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
+                    ? 'bg-blue-600 text-white'
+                    : index <
+                      ['input', 'analyzing', 'results'].indexOf(currentStep)
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200 text-gray-600'
                     }`}
                 >
                   {index <
@@ -199,8 +179,8 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 </div>
                 <span
                   className={`ml-2 text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'text-blue-600'
-                      : 'text-gray-500'
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
                     }`}
                 >
                   {step}
@@ -208,9 +188,9 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 {index < 2 && (
                   <div
                     className={`w-12 h-0.5 mx-4 ${index <
-                        ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600'
-                        : 'bg-gray-200'
+                      ['input', 'analyzing', 'results'].indexOf(currentStep)
+                      ? 'bg-green-600'
+                      : 'bg-gray-200'
                       }`}
                   />
                 )}

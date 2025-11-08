@@ -832,8 +832,6 @@ describe('Authentication Middleware', () => {
 
   describe('Security Requirements', () => {
     it('should prevent timing attacks in authentication', async () => {
-      const { _getFromCache } = await import('../../redis')
-
       // Test with valid token but no user
       vi.mocked(validateToken).mockResolvedValue({
         valid: true,

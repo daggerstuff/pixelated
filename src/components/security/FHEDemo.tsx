@@ -135,7 +135,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       if (enableBenchmarks) {
         runBenchmark(operation)
       }
-    } catch (error) {
+    } catch (_error) {
       setOperations((prev) =>
         prev.map((op) =>
           op.id === operation.id ? { ...op, status: 'error' as const } : op,
@@ -151,21 +151,17 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     // Perform operation (result not needed, just timing)
     switch (operation.operation) {
       case 'add':
-        void (operation.input1 + (operation.input2 || 0))
+        operation.input1 + (operation.input2 || 0)
         break
       case 'multiply':
-        void (operation.input1 * (operation.input2 || 1))
+        operation.input1 * (operation.input2 || 1)
         break
       case 'compare':
-        void (operation.input1 > (operation.input2 || 0) ? 1 : 0)
+        operation.input1 > (operation.input2 || 0) ? 1 : 0
         break
       case 'aggregate':
-        void Math.round(
-          (operation.input1 + (operation.input2 || 0)) / 2,
-        )
+        Math.round((operation.input1 + (operation.input2 || 0)) / 2)
         break
-      default:
-        void 0
     }
 
     const plaintextEnd = performance.now()
@@ -258,10 +254,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="operation-type" className="block text-sm font-medium text-gray-700 mb-1">
               Operation Type
             </label>
             <select
+              id="operation-type"
               value={currentOperation.operation}
               onChange={(e) =>
                 setCurrentOperation({
@@ -279,10 +276,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="input-1" className="block text-sm font-medium text-gray-700 mb-1">
               Input 1 (Patient Score)
             </label>
             <input
+              id="input-1"
               type="number"
               value={currentOperation.input1}
               onChange={(e) =>
@@ -299,10 +297,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
           {currentOperation.operation !== 'aggregate' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="input-2" className="block text-sm font-medium text-gray-700 mb-1">
                 Input 2 (Baseline)
               </label>
               <input
+                id="input-2"
                 type="number"
                 value={currentOperation.input2}
                 onChange={(e) =>
@@ -439,9 +438,9 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
               </div>
             ) : (
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {benchmarkResults.map((result, index) => (
+                {benchmarkResults.map((result) => (
                   <div
-                    key={index}
+                    key={`${result.operation}-${result.fheTime}-${result.plaintextTime}`}
                     className="border rounded-lg p-4 bg-white shadow-sm"
                   >
                     <div className="flex justify-between items-center mb-2">

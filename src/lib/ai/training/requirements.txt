@@ -2,7 +2,7 @@
 # Python 3.11+ compatible packages
 
 # Core ML Framework - Updated for security fixes
-torch>=2.5.0,<3.0.0
+torch>=2.6.0,<3.0.0
 torchvision>=0.20.0,<1.0.0
 torchaudio>=2.5.0,<3.0.0
 

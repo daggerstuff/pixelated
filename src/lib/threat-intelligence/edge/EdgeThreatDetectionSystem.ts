@@ -61,8 +61,7 @@ export interface ModelPerformance {
 
 export class EdgeThreatDetectionSystemCore
   extends EventEmitter
-  implements EdgeThreatDetectionSystem
-{
+  implements EdgeThreatDetectionSystem {
   private redis: Redis
   private models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
   private nodeStatus: Map<string, EdgeNodeStatus> = new Map()
@@ -741,7 +740,7 @@ export class EdgeThreatDetectionSystemCore
       const severityScore =
         anomalyScore * weights.anomaly +
         this.mapThreatTypeToScore(classificationResult.threatType) *
-          weights.classification +
+        weights.classification +
         predictionScore * weights.prediction
 
       // Determine final threat type based on combined score
@@ -1141,7 +1140,7 @@ interface ProcessedThreatData {
   severity: number
   confidence: number
   indicators: ThreatIndicator[]
-  context: any
+  context: ThreatContext
   normalizedSeverity: number
   featureVector: number[]
 }
@@ -1164,12 +1163,3 @@ interface CombinedResult {
     combined: number
   }
 }
-
-// interface RegionStatus {
-//   regionId: string
-//   status: 'healthy' | 'degraded' | 'unhealthy' | 'initializing'
-//   lastUpdate: Date
-//   threatCount: number
-//   activeNodes: number
-//   healthScore: number
-// }

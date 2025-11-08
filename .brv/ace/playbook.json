@@ -1,5 +1,173 @@
 {
-  "bullets": {},
-  "nextId": 1,
-  "sections": {}
+  "bullets": {
+    "security-00001": {
+      "id": "security-00001",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T19:39:27.492Z"
+      },
+      "section": "Security"
+    },
+    "best-00002": {
+      "id": "best-00002",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T19:39:39.887Z"
+      },
+      "section": "Best Practices"
+    },
+    "common-00003": {
+      "id": "common-00003",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T19:39:50.568Z"
+      },
+      "section": "Common Errors"
+    },
+    "best-00004": {
+      "id": "best-00004",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T19:40:02.869Z"
+      },
+      "section": "Best Practices"
+    },
+    "best-00005": {
+      "id": "best-00005",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T19:40:16.612Z"
+      },
+      "section": "Best Practices"
+    },
+    "security-00006": {
+      "id": "security-00006",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:05:04.038Z"
+      },
+      "section": "Security"
+    },
+    "testing-00007": {
+      "id": "testing-00007",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:05:19.508Z"
+      },
+      "section": "Testing"
+    },
+    "best-00008": {
+      "id": "best-00008",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:05:39.892Z"
+      },
+      "section": "Best Practices"
+    },
+    "architecture-00009": {
+      "id": "architecture-00009",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:05:58.248Z"
+      },
+      "section": "Architecture"
+    },
+    "security-00010": {
+      "id": "security-00010",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:06:16.205Z"
+      },
+      "section": "Security"
+    },
+    "best-00011": {
+      "id": "best-00011",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:06:32.080Z"
+      },
+      "section": "Best Practices"
+    },
+    "testing-00012": {
+      "id": "testing-00012",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:06:49.142Z"
+      },
+      "section": "Testing"
+    },
+    "common-00013": {
+      "id": "common-00013",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-08T20:07:09.126Z"
+      },
+      "section": "Common Errors"
+    }
+  },
+  "nextId": 14,
+  "sections": {
+    "Security": [
+      "security-00001",
+      "security-00006",
+      "security-00010"
+    ],
+    "Best Practices": [
+      "best-00002",
+      "best-00004",
+      "best-00005",
+      "best-00008",
+      "best-00011"
+    ],
+    "Common Errors": [
+      "common-00003",
+      "common-00013"
+    ],
+    "Testing": [
+      "testing-00007",
+      "testing-00012"
+    ],
+    "Architecture": [
+      "architecture-00009"
+    ]
+  }
 }

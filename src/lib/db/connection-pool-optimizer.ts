@@ -7,7 +7,9 @@ import { Pool, PoolClient, PoolConfig } from 'pg'
 import { EventEmitter } from 'events'
 import { getLogger } from '@/lib/logging'
 
-const logger = getLogger('connection-pool') as any
+// Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
+
+const logger = getLogger('connection-pool')
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -52,21 +54,6 @@ interface PoolMetrics {
 
   healthScore: number // 0-100
 }
-
-// Pool events (currently unused - defined for future event system)
-// interface PoolEvents {
-//   'connection-acquired': [client: PoolClient]
-//   'connection-released': [client: PoolClient]
-//   'connection-error': [error: Error, client?: PoolClient]
-//   'pool-exhausted': []
-//   'slow-query': [query: string, duration: number]
-//   'health-changed': [
-//     score: number,
-//     status: 'healthy' | 'degraded' | 'unhealthy',
-//   ]
-//   'failover-activated': [host: string]
-//   'metrics-updated': [metrics: PoolMetrics]
-// }
 
 /**
  * Enhanced connection pool with monitoring and optimization
@@ -223,15 +210,10 @@ export class OptimizedConnectionPool extends EventEmitter {
     }
 
     try {
-      // Check connection age
-      const connectionAge = Date.now() - (client as any).connectionStartTime
-      if (connectionAge > this.config.maxConnectionAge) {
-        logger.info('Releasing old connection', { age: connectionAge })
-        client.release()
-        this.metrics.totalConnections--
-      } else {
-        client.release()
-      }
+      // Check connection age - skip age check as PoolClient doesn't expose connection start time
+      // This is a limitation of the pg library - connection age tracking would require
+      // wrapping the client acquisition to track this metadata separately
+      client.release()
 
       this.metrics.activeConnections = Math.max(
         0,
@@ -248,9 +230,9 @@ export class OptimizedConnectionPool extends EventEmitter {
   /**
    * Execute a query with enhanced monitoring
    */
-  async query<T = any>(
+  async query<T = unknown>(
     text: string,
-    params?: any[],
+    params?: unknown[],
   ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
     const startTime = Date.now()
     let client: PoolClient | null = null
@@ -607,9 +589,9 @@ export function initializeConnectionPool(
 /**
  * Enhanced query function with pool optimization
  */
-export async function optimizedQuery<T = any>(
+export async function optimizedQuery<T = unknown>(
   text: string,
-  params?: any[],
+  params?: unknown[],
   options: {
     timeout?: number
     retries?: number
@@ -621,14 +603,14 @@ export async function optimizedQuery<T = any>(
   // Use provided client or acquire from pool
   if (options.client) {
     const startTime = Date.now()
-const result = await options.client.query(text, params)
-const duration = Date.now() - startTime
+    const result = await options.client.query(text, params)
+    const duration = Date.now() - startTime
 
-return {
-  rows: result.rows,
-  rowCount: result.rowCount || 0,
-  duration,
-}
+    return {
+      rows: result.rows,
+      rowCount: result.rowCount || 0,
+      duration,
+    }
   }
 
   return pool.query(text, params)
