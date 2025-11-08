@@ -200,6 +200,16 @@ export interface CorrelationMetrics {
   span_value?: number
 }
 
+export interface CorrelationStats {
+  total_correlations: number
+  type_distribution: Record<string, number>
+  confidence_distribution: Array<{
+    _id: string
+    count: number
+  }>
+  recent_correlations_24h: number
+}
+
 export interface DistanceCoordinates {
   latitude: number
   longitude: number
@@ -209,7 +219,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private config: CorrelationEngineConfig
   private mongoClient: MongoClient
   private db: Db
-  private threatsCollection: Collection<any>
+  private threatsCollection: Collection<ThreatData>
   private correlationsCollection: Collection<ThreatCorrelation>
   private redis: Redis
   private isInitialized = false
@@ -406,7 +416,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Get threats by IDs
    */
-  private async getThreatsByIds(threatIds: string[]): Promise<any[]> {
+  private async getThreatsByIds(threatIds: string[]): Promise<ThreatData[]> {
     try {
       return await this.threatsCollection
         .find({ id: { $in: threatIds } })
@@ -421,7 +431,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Analyze correlations between threats
    */
   private async analyzeCorrelations(
-    threats: any[],
+    threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
     const correlations: ThreatCorrelation[] = []
 
@@ -479,7 +489,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Analyze temporal correlations
    */
   private async analyzeTemporalCorrelations(
-    threats: any[],
+    threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
     const correlations: ThreatCorrelation[] = []
 
@@ -571,7 +581,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate temporal correlation
    */
-  private calculateTemporalCorrelation(threats: any[]): any {
+  private calculateTemporalCorrelation(threats: ThreatData[]): TemporalCorrelationResult {
     try {
       // Calculate time span
       const timestamps = threats.map((t) => new Date(t.timestamp).getTime())
@@ -749,7 +759,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate distance between two coordinates
    */
-  private calculateDistance(coord1: any, coord2: any): number {
+  private calculateDistance(coord1: DistanceCoordinates, coord2: DistanceCoordinates): number {
     if (!coord1 || !coord2) return Infinity
 
     const R = 6371 // Earth's radius in kilometers
@@ -1061,8 +1071,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Identify escalation patterns
    */
-  private identifyEscalationPatterns(threats: any[]): any[] {
-    const groups: any[] = []
+  private identifyEscalationPatterns(threats: ThreatData[]): BehavioralGroup[] {
+    const groups: BehavioralGroup[] = []
     const sortedThreats = [...threats].sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
@@ -1085,7 +1095,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           ] || 0
 
         if (nextSeverity > currentSeverity) {
-          sequence.push(sortedThreats[j])
+          sequence.push(sortedThreats[j] as ThreatData)
           currentSeverity = nextSeverity
         } else {
           break
@@ -1106,7 +1116,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate behavioral correlation
    */
-  private calculateBehavioralCorrelation(threats: any[], pattern: string): any {
+  private calculateBehavioralCorrelation(threats: ThreatData[], pattern: string): BehavioralCorrelationResult {
     try {
       let similarityScore = 0
       let patterns: ThreatPattern[] = []
@@ -1178,7 +1188,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Analyze attribution correlations
    */
   private async analyzeAttributionCorrelations(
-    threats: any[],
+    threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
     const correlations: ThreatCorrelation[] = []
 
@@ -1229,8 +1239,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by attribution
    */
-  private groupThreatsByAttribution(threats: any[]): any[] {
-    const groups: any[] = []
+  private groupThreatsByAttribution(threats: ThreatData[]): AttributionGroup[] {
+    const groups: AttributionGroup[] = []
 
     // Group by attribution attributes
     const attributionFields = [
@@ -1246,7 +1256,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       for (const [value, valueThreats] of Object.entries(fieldGroups)) {
         if (value && valueThreats.length > 1) {
           groups.push({
-            threats: valueThreats,
+            threats: valueThreats as ThreatData[],
             attribution: { [field]: value },
           })
         }
@@ -1325,7 +1335,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
         groups[value].push(item)
         return groups
       },
-      {} as Record<string, any[]>,
+      {} as Record<string, T[]>,
     )
   }
 
@@ -1379,7 +1389,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     return Math.min(baseSignificance * (1 + spanFactor), 1.0)
   }
 
-  private calculateSeverityIncreaseRate(threats: any[]): number {
+  private calculateSeverityIncreaseRate(threats: ThreatData[]): number {
     const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
     let totalIncrease = 0
 
@@ -1395,7 +1405,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     return threats.length > 1 ? totalIncrease / (threats.length - 1) : 0
   }
 
-  private calculateAverageTimeBetweenThreats(threats: any[]): number {
+  private calculateAverageTimeBetweenThreats(threats: ThreatData[]): number {
     if (threats.length < 2) return 0
 
     const timestamps = threats
@@ -1410,7 +1420,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     return totalTime / (timestamps.length - 1) / 1000 // seconds
   }
 
-  private mapToCorrelatedThreat(threat: any): CorrelatedThreat {
+  private mapToCorrelatedThreat(threat: ThreatData): CorrelatedThreat {
     return {
       threat_id: threat.id,
       region: threat.region,
@@ -1677,7 +1687,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     limit?: number
   }): Promise<ThreatCorrelation[]> {
     try {
-      const filter: any = {}
+      const filter: Record<string, unknown> = {}
 
       if (query.types && query.types.length > 0) {
         filter.correlation_type = { $in: query.types }
@@ -1714,7 +1724,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Get correlation statistics
    */
-  async getCorrelationStats(): Promise<any> {
+  async getCorrelationStats(): Promise<CorrelationStats> {
     try {
       const [
         totalCorrelations,

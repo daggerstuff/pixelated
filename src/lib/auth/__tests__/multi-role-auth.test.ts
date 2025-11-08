@@ -189,8 +189,8 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
   describe('Two-Factor Authentication (2FA)', () => {
     it('should setup 2FA successfully', async () => {
-      const { setInCache } = await import('../../redis')
-      vi.mocked(setInCache).mockResolvedValue(true)
+      const { setInCache: _setInCache } = await import('../../redis')
+      vi.mocked(_setInCache).mockResolvedValue(true)
 
       const result = await setupTwoFactorAuth(mockUserId, 'test@example.com', {
         deviceId: mockDeviceId,
@@ -265,7 +265,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
     })
 
     it('should handle 2FA lockout after failed attempts', async () => {
-      const { getFromCache, setInCache } = await import('../../redis')
+      const { getFromCache } = await import('../../redis')
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
