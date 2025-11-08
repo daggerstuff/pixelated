@@ -5,13 +5,14 @@ Migrate memories from Mem0 Platform and OpenMemory to ByteRover CLI
 Usage:
     # From Mem0 Platform
     python scripts/migrate_mem0_to_byterover.py --source mem0 --api-key YOUR_MEM0_API_KEY
-    
+
     # From OpenMemory
     python scripts/migrate_mem0_to_byterover.py --source openmemory --api-key YOUR_KEY
-    
+
     # Dry run
     python scripts/migrate_mem0_to_byterover.py --source mem0 --api-key KEY --dry-run
 """
+# ruff: noqa: T201
 
 import argparse
 import json
@@ -24,7 +25,9 @@ import requests
 
 
 class Mem0Migrator:
-    def __init__(self, source: str, api_key: str = None, url: str = None, dry_run: bool = False):
+    def __init__(
+        self, source: str, api_key: str | None = None, url: str | None = None, dry_run: bool = False
+    ):
         self.source = source
         self.api_key = api_key
         self.url = url or "http://localhost:8765"
@@ -38,16 +41,17 @@ class Mem0Migrator:
             "Content-Type": "application/json",
         }
 
-        payload = {
-            "filters": {},  # Add filters if needed
-            "page": page,
-            "page_size": page_size,
-        }
+        # Use v2 endpoint with pagination in query params and filters in body
+        # Based on official SDK: client.post("/v2/memories/", json=params, params=query_params)
+        # Filters are required - use wildcard to match all
+        payload = {"filters": {"user_id": "*"}}  # Wildcard to match all users
+        query_params = {"page": page, "page_size": page_size}
 
         response = requests.post(
             f"{self.mem0_base_url}/memories/",
             headers=headers,
             json=payload,
+            params=query_params,
         )
         response.raise_for_status()
         return response.json()
@@ -64,20 +68,24 @@ class Mem0Migrator:
 
     def categorize_memory(self, memory: dict[str, Any]) -> str:
         """Map Mem0 categories to ByteRover sections"""
-        categories = memory.get("categories", [])
+        categories = memory.get("categories")
+        if not categories or not isinstance(categories, list):
+            return "Lessons Learned"
+
+        # Map categories to sections
+        category_map = {
+            ("error", "bug"): "Common Errors",
+            ("best", "practice"): "Best Practices",
+            ("architecture", "design"): "Architecture",
+            ("test",): "Testing",
+            ("strategy", "approach"): "Strategies",
+        }
 
         for cat in categories:
             cat_lower = cat.lower()
-            if "error" in cat_lower or "bug" in cat_lower:
-                return "Common Errors"
-            if "best" in cat_lower or "practice" in cat_lower:
-                return "Best Practices"
-            if "architecture" in cat_lower or "design" in cat_lower:
-                return "Architecture"
-            if "test" in cat_lower:
-                return "Testing"
-            if "strategy" in cat_lower or "approach" in cat_lower:
-                return "Strategies"
+            for keywords, section in category_map.items():
+                if any(keyword in cat_lower for keyword in keywords):
+                    return section
 
         return "Lessons Learned"
 
@@ -97,20 +105,27 @@ class Mem0Migrator:
                     break
 
                 for mem in memories:
-                    all_memories.append({
-                        "content": mem["memory"],
-                        "section": self.categorize_memory(mem),
-                        "metadata": {
-                            "originalId": mem["id"],
-                            "source": "mem0",
-                            "createdAt": mem.get("created_at"),
-                            "updatedAt": mem.get("updated_at"),
-                            "userId": mem.get("user_id"),
-                            "agentId": mem.get("agent_id"),
-                            "categories": mem.get("categories", []),
-                            "tags": ["migrated-from-mem0"] + mem.get("categories", []),
-                        },
-                    })
+                    categories = mem.get("categories")
+                    categories_list = (
+                        categories if categories and isinstance(categories, list) else []
+                    )
+
+                    all_memories.append(
+                        {
+                            "content": mem["memory"],
+                            "section": self.categorize_memory(mem),
+                            "metadata": {
+                                "originalId": mem["id"],
+                                "source": "mem0",
+                                "createdAt": mem.get("created_at"),
+                                "updatedAt": mem.get("updated_at"),
+                                "userId": mem.get("user_id"),
+                                "agentId": mem.get("agent_id"),
+                                "categories": categories_list,
+                                "tags": ["migrated-from-mem0", *categories_list],
+                            },
+                        }
+                    )
 
                 # Check if there are more pages
                 if len(memories) < 100:
@@ -121,16 +136,18 @@ class Mem0Migrator:
             items = self.fetch_openmemory_items()
 
             for item in items:
-                all_memories.append({
-                    "content": item.get("content", item.get("memory", "")),
-                    "section": "Lessons Learned",
-                    "metadata": {
-                        "originalId": item.get("id"),
-                        "source": "openmemory",
-                        "timestamp": item.get("timestamp", item.get("created_at")),
-                        "tags": ["migrated-from-openmemory"],
-                    },
-                })
+                all_memories.append(
+                    {
+                        "content": item.get("content", item.get("memory", "")),
+                        "section": "Lessons Learned",
+                        "metadata": {
+                            "originalId": item.get("id"),
+                            "source": "openmemory",
+                            "timestamp": item.get("timestamp", item.get("created_at")),
+                            "tags": ["migrated-from-openmemory"],
+                        },
+                    }
+                )
 
         print(f"✅ Exported {len(all_memories)} memories")
         return all_memories
@@ -185,8 +202,21 @@ class Mem0Migrator:
         try:
             memories = self.export_all_memories()
             self.import_to_byterover(memories)
+        except requests.exceptions.HTTPError as e:
+            print(f"❌ Migration failed: HTTP {e.response.status_code}", file=sys.stderr)
+            print(f"Response: {e.response.text}", file=sys.stderr)
+            print("\nTroubleshooting:")
+            print("  1. Verify your API key is correct")
+            print("  2. Check if you have access to the Mem0 API")
+            print(
+                f"  3. Try the check script first: python scripts/check-mem0-memories.py --source {self.source} --api-key YOUR_KEY"
+            )
+            sys.exit(1)
         except Exception as e:
+            import traceback  # noqa: PLC0415
+
             print(f"❌ Migration failed: {e}", file=sys.stderr)
+            traceback.print_exc()
             sys.exit(1)
 
 
@@ -206,9 +236,7 @@ def main():
         default="http://localhost:8765",
         help="Custom URL for local OpenMemory",
     )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Preview without importing"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Preview without importing")
 
     args = parser.parse_args()
 

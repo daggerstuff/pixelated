@@ -168,7 +168,7 @@ export class InterventionAnalysisService {
       return result
     } catch (error: unknown) {
       logger.error('Error analyzing intervention effectiveness', { error })
-      throw new Error(`Failed to analyze intervention effectiveness: ${error}`)
+      throw new Error(`Failed to analyze intervention effectiveness: ${error}`, { cause: error })
     }
   }
 
@@ -294,7 +294,7 @@ export class InterventionAnalysisService {
     const afterEmotion = response.emotionAfter
 
     // Check for emotional coherence (not conflicting high emotions)
-    const totalEmotionIntensity = Object.values(afterEmotion.emotions).reduce(
+    const _totalEmotionIntensity = Object.values(afterEmotion.emotions).reduce(
       (sum, val) => sum + val,
       0,
     )

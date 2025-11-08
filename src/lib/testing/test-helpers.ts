@@ -1,25 +1,25 @@
 import { vi } from 'vitest'
 
-// Type definitions for better TypeScript support
-interface TestResult {
-  success: boolean
-  responseTime: number
-  error?: any
-}
+// Type definitions for better TypeScript support (currently unused - defined for future testing features)
+// interface TestResult {
+//   success: boolean
+//   responseTime: number
+//   error?: any
+// }
 
-interface PerformanceResults {
-  totalTime: number
-  averageResponseTime: number
-  requestsPerSecond: number
-  successRate: number
-  errors: number
-}
+// interface PerformanceResults {
+//   totalTime: number
+//   averageResponseTime: number
+//   requestsPerSecond: number
+//   successRate: number
+//   errors: number
+// }
 
-interface SecurityTestResults {
-  vulnerable: boolean
-  vulnerabilities: string[]
-  recommendations: string[]
-}
+// interface SecurityTestResults {
+//   vulnerable: boolean
+//   vulnerabilities: string[]
+//   recommendations: string[]
+// }
 
 // Test Database Configuration
 export const testDbConfig = {

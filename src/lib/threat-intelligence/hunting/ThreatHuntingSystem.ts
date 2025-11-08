@@ -462,7 +462,7 @@ export class ThreatHuntingSystemCore
 
   private async executeNetworkHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing network hunt', {
@@ -496,7 +496,7 @@ export class ThreatHuntingSystemCore
 
   private async executeEndpointHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing endpoint hunt', {
@@ -530,7 +530,7 @@ export class ThreatHuntingSystemCore
 
   private async executeUserBehaviorHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing user behavior hunt', {
@@ -564,7 +564,7 @@ export class ThreatHuntingSystemCore
 
   private async executeMalwareHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing malware hunt', {
@@ -599,7 +599,7 @@ export class ThreatHuntingSystemCore
 
   private async executeLateralMovementHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing lateral movement hunt', {
@@ -652,7 +652,7 @@ export class ThreatHuntingSystemCore
 
   private async executeDefaultHunt(
     execution: HuntExecution,
-    pattern: HuntPattern,
+    _pattern: HuntPattern,
   ): Promise<any[]> {
     try {
       logger.info('Executing default hunt', {

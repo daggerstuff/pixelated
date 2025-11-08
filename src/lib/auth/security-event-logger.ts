@@ -875,14 +875,14 @@ export class SecurityEventLogger {
   }
 
   private async getEventsInDateRange(
-    startDate: Date,
-    endDate: Date,
+    _startDate: Date,
+    _endDate: Date,
   ): Promise<SecurityEvent[]> {
     // TODO: Implement date range query
     return []
   }
 
-  private async checkComplianceStatus(events: SecurityEvent[]): Promise<{
+  private async checkComplianceStatus(_events: SecurityEvent[]): Promise<{
     hipaaCompliant: boolean
     violations: string[]
     recommendations: string[]
@@ -896,29 +896,29 @@ export class SecurityEventLogger {
   }
 
   private generateRecommendations(
-    events: SecurityEvent[],
-    violations: string[],
+    _events: SecurityEvent[],
+    _violations: string[],
   ): string[] {
     // TODO: Implement recommendation generation
     return []
   }
 
-  private calculateMetricsFromEvents(events: SecurityEvent[]): SecurityMetrics {
+  private calculateMetricsFromEvents(_events: SecurityEvent[]): SecurityMetrics {
     // TODO: Implement metrics calculation from events
     return this.initializeMetrics()
   }
 
-  private serializeEvent(event: SecurityEvent): Record<string, string> {
+  private serializeEvent(_event: SecurityEvent): Record<string, string> {
     // TODO: Implement event serialization
     return {}
   }
 
-  private deserializeEvent(data: Record<string, string>): SecurityEvent {
+  private deserializeEvent(_data: Record<string, string>): SecurityEvent {
     // TODO: Implement event deserialization
     return {} as SecurityEvent
   }
 
-  private extractTokenId(token: string): string {
+  private extractTokenId(_token: string): string {
     // TODO: Implement token ID extraction
     return 'unknown'
   }

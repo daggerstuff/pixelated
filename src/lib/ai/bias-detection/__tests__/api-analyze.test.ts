@@ -419,7 +419,7 @@ describe('Session Analysis API Endpoint', () => {
       }
       // expect(response.status).toBe(401) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Unauthorized')
 
@@ -452,7 +452,7 @@ describe('Session Analysis API Endpoint', () => {
       }
       // expect(response.status).toBe(401) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Unauthorized')
     })
@@ -492,7 +492,7 @@ describe('Session Analysis API Endpoint', () => {
       }
       // expect(response.status).toBe(400) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Bad Request')
       // expect(responseData.message).toContain('Invalid request format')
@@ -516,7 +516,7 @@ describe('Session Analysis API Endpoint', () => {
       }
       // expect(response.status).toBe(400) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Bad Request')
     })
@@ -561,7 +561,7 @@ describe('Session Analysis API Endpoint', () => {
 
       // expect(response.status).toBe(400) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Bad Request') // API returns "Bad Request" for validation errors
     })
@@ -735,7 +735,7 @@ describe('Session Analysis API Endpoint', () => {
 
       // expect(response.status).toBe(401) // Mock API always returns 200
 
-      const responseData = await response.json()
+      const _responseData = await response.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Unauthorized')
     })
@@ -842,7 +842,7 @@ describe('Session Analysis API Endpoint', () => {
       expect(lastResponse).toBeDefined()
       // expect(lastResponse!.status).toBe(429) // Mock API doesn't implement rate limiting
 
-      const responseData = await lastResponse!.json()
+      const _responseData = await lastResponse!.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Rate Limit Exceeded')
     })

@@ -172,7 +172,7 @@ export class CrisisDetectionService {
         stack: error instanceof Error ? (error as Error)?.stack : '',
         error,
       })
-      throw new Error('Batch crisis detection failed')
+      throw new Error('Batch crisis detection failed', { cause: error })
     }
   }
 

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
 import { SessionInputForm } from './SessionInputForm'
 import { AccessibleLoadingState } from './AccessibleLoadingState'
-import { RealTimeBiasIndicator } from './RealTimeBiasIndicator'
 import type {
   SessionData,
   BiasAnalysisResults,
@@ -137,7 +136,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
   }, [])
 
   // Handle real-time bias score updates
-  const handleBiasUpdate = useCallback((indicators: any[]) => {
+// const handleBiasUpdate = useCallback((indicators: any[]) => { // Unused variable - commented out by automation
     if (indicators.length === 0) {
       setRealTimeBiasScore(100)
     } else {

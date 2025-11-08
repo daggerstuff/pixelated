@@ -328,7 +328,7 @@ export class CrisisSessionFlaggingService {
       try {
         objectId = new ObjectId(request.flagId)
       } catch (_e) {
-        throw new Error('flagId is not a valid ObjectId.')
+        throw new Error('flagId is not a valid ObjectId.', { cause: _e })
       }
       const updateResult = await db
         .collection('crisis_session_flags')

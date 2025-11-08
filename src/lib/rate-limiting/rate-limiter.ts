@@ -242,7 +242,7 @@ export class DistributedRateLimiter {
   private async recordAnalytics(
     identifier: string,
     rule: RateLimitRule,
-    currentCount: number,
+    _currentCount: number,
   ): Promise<void> {
     const date = new Date().toISOString().slice(0, 10)
     const analyticsKey = `${this.analyticsPrefix}usage:${rule.name}:${date}`

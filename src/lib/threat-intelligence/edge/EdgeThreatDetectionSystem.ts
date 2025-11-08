@@ -203,7 +203,7 @@ export class EdgeThreatDetectionSystemCore
 
   private buildAnomalyDetectionModel(
     model: tf.Sequential,
-    modelConfig: AIModelConfig,
+    _modelConfig: AIModelConfig,
   ): void {
     // Autoencoder architecture for anomaly detection
     model.add(
@@ -267,7 +267,7 @@ export class EdgeThreatDetectionSystemCore
 
   private buildClassificationModel(
     model: tf.Sequential,
-    modelConfig: AIModelConfig,
+    _modelConfig: AIModelConfig,
   ): void {
     // Classification model for threat categorization
     model.add(
@@ -306,7 +306,7 @@ export class EdgeThreatDetectionSystemCore
 
   private buildClusteringModel(
     model: tf.Sequential,
-    modelConfig: AIModelConfig,
+    _modelConfig: AIModelConfig,
   ): void {
     // Clustering model for threat grouping
     model.add(
@@ -341,7 +341,7 @@ export class EdgeThreatDetectionSystemCore
 
   private buildPredictionModel(
     model: tf.Sequential,
-    modelConfig: AIModelConfig,
+    _modelConfig: AIModelConfig,
   ): void {
     // Prediction model for threat forecasting
     model.add(
@@ -727,7 +727,7 @@ export class EdgeThreatDetectionSystemCore
     anomalyScore: number,
     classificationResult: ClassificationResult,
     predictionScore: number,
-    features: number[],
+    _features: number[],
   ): Promise<CombinedResult> {
     try {
       // Weighted combination of results
@@ -794,7 +794,7 @@ export class EdgeThreatDetectionSystemCore
 
   private determineFinalThreatType(
     severityScore: number,
-    classificationResult: ClassificationResult,
+    _classificationResult: ClassificationResult,
   ): string {
     // Use classification result as primary, but adjust based on combined score
     if (severityScore > 0.8) return 'critical'
@@ -1165,11 +1165,11 @@ interface CombinedResult {
   }
 }
 
-interface RegionStatus {
-  regionId: string
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'initializing'
-  lastUpdate: Date
-  threatCount: number
-  activeNodes: number
-  healthScore: number
-}
+// interface RegionStatus {
+//   regionId: string
+//   status: 'healthy' | 'degraded' | 'unhealthy' | 'initializing'
+//   lastUpdate: Date
+//   threatCount: number
+//   activeNodes: number
+//   healthScore: number
+// }

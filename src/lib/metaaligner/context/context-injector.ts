@@ -49,7 +49,7 @@ export class ContextInjector implements IContextInjector {
     }
   }
 
-  private validateContext(context: ContextType): boolean {
+  private validateContext(_context: ContextType): boolean {
     // Placeholder for context validation logic.
     // This could involve checking for valid context types or other constraints.
     return true

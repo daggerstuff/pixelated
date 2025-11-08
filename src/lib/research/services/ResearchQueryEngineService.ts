@@ -161,7 +161,7 @@ export class ResearchQueryEngineService {
     } catch (error) {
       console.error('Error translating natural language query:', error)
       throw new Error(
-        `Query translation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Query translation failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { cause: error },
       )
     }
   }
@@ -275,7 +275,7 @@ export class ResearchQueryEngineService {
     } catch (error) {
       console.error('Error executing research query:', error)
       throw new Error(
-        `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { cause: error },
       )
     }
   }
@@ -477,8 +477,8 @@ export class ResearchQueryEngineService {
   }
 
   private async executeSQLQuery(
-    sql: string,
-    parameters: any[],
+    _sql: string,
+    _parameters: any[],
   ): Promise<any[]> {
     // Simulated database execution
     await new Promise((resolve) =>
@@ -509,7 +509,7 @@ export class ResearchQueryEngineService {
   private async anonymizeQueryResults(
     rawResults: any[],
     anonymizationLevel: 'basic' | 'enhanced' | 'maximum',
-    userId: string,
+    _userId: string,
   ): Promise<AnonymizedRecord[]> {
     const config = {
       kAnonymity:
@@ -590,8 +590,8 @@ export class ResearchQueryEngineService {
   }
 
   private async validateUserPermissions(
-    userId: string,
-    requiredPermissions: string[],
+    _userId: string,
+    _requiredPermissions: string[],
   ): Promise<boolean> {
     // Simplified permission check - in production would check actual user roles
     return true // Assuming valid for demo
@@ -599,7 +599,7 @@ export class ResearchQueryEngineService {
 
   private async analyzeRequiredPermissions(
     sql: string,
-    dataScope: string[],
+    _dataScope: string[],
   ): Promise<string[]> {
     const permissions = []
 
@@ -614,7 +614,7 @@ export class ResearchQueryEngineService {
 
   private async classifyDataSensitivity(
     sql: string,
-    dataScope: string[],
+    _dataScope: string[],
   ): Promise<'public' | 'internal' | 'confidential' | 'restricted'> {
     if (sql.includes('user_id') && !sql.includes('anonymized'))
       return 'restricted'

@@ -77,7 +77,7 @@ export const TherapistDashboard: FC = () => {
     patientSatisfaction: 4.2, // out of 5
   }
 
-  const analyticsData = patients.map((patient, index) => ({
+  const analyticsData = patients.map((patient, _index) => ({
     patientId: patient.id,
     patientName: patient.name,
     sessionsCompleted: Math.floor(Math.random() * 20) + 5,

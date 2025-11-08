@@ -226,7 +226,7 @@ export class AutomatedEscalationService {
     escalationEvent: EscalationEvent,
     context?: any,
   ): Promise<void> {
-    const { protocolActivated, riskLevel, userId } = escalationEvent
+    const { protocolActivated, riskLevel, _userId } = escalationEvent
 
     for (const contact of protocolActivated.contacts) {
       try {
@@ -296,7 +296,7 @@ export class AutomatedEscalationService {
    */
   private async createDocumentation(
     escalationEvent: EscalationEvent,
-    action: EscalationAction,
+    _action: EscalationAction,
   ): Promise<void> {
     const documentation = {
       escalationId: escalationEvent.id,
@@ -324,7 +324,7 @@ export class AutomatedEscalationService {
    */
   private async initiateMonitoring(
     escalationEvent: EscalationEvent,
-    action: EscalationAction,
+    _action: EscalationAction,
   ): Promise<void> {
     const monitoringConfig = {
       userId: escalationEvent.userId,
@@ -372,7 +372,7 @@ export class AutomatedEscalationService {
    */
   private async escalateToHigherLevel(
     escalationEvent: EscalationEvent,
-    action: EscalationAction,
+    _action: EscalationAction,
   ): Promise<void> {
     const higherLevel = this.getNextEscalationLevel(
       escalationEvent.protocolActivated.level,
@@ -633,7 +633,7 @@ export class AutomatedEscalationService {
 
   private getEscalationProtocol(
     level: string,
-    riskLevel: string,
+    _riskLevel: string,
   ): EscalationProtocol {
     return (
       this.escalationProtocols.get(level) ||
@@ -649,8 +649,8 @@ export class AutomatedEscalationService {
 
   private async triggerEmergencyFallback(
     userId: string,
-    prediction: CrisisPrediction,
-    assessment: RiskAssessment,
+    _prediction: CrisisPrediction,
+    _assessment: RiskAssessment,
   ): Promise<EscalationEvent> {
     console.error('Emergency fallback protocol activated')
 
@@ -721,7 +721,7 @@ export class AutomatedEscalationService {
   private populateTemplate(
     template: NotificationTemplate,
     escalationEvent: EscalationEvent,
-    context?: any,
+    _context?: any,
   ): { subject: string; body: string } {
     let subject = template.template.subject
     let body = template.template.body

@@ -53,20 +53,20 @@ interface PoolMetrics {
   healthScore: number // 0-100
 }
 
-// Pool events
-interface PoolEvents {
-  'connection-acquired': [client: PoolClient]
-  'connection-released': [client: PoolClient]
-  'connection-error': [error: Error, client?: PoolClient]
-  'pool-exhausted': []
-  'slow-query': [query: string, duration: number]
-  'health-changed': [
-    score: number,
-    status: 'healthy' | 'degraded' | 'unhealthy',
-  ]
-  'failover-activated': [host: string]
-  'metrics-updated': [metrics: PoolMetrics]
-}
+// Pool events (currently unused - defined for future event system)
+// interface PoolEvents {
+//   'connection-acquired': [client: PoolClient]
+//   'connection-released': [client: PoolClient]
+//   'connection-error': [error: Error, client?: PoolClient]
+//   'pool-exhausted': []
+//   'slow-query': [query: string, duration: number]
+//   'health-changed': [
+//     score: number,
+//     status: 'healthy' | 'degraded' | 'unhealthy',
+//   ]
+//   'failover-activated': [host: string]
+//   'metrics-updated': [metrics: PoolMetrics]
+// }
 
 /**
  * Enhanced connection pool with monitoring and optimization
@@ -639,7 +639,7 @@ return {
  */
 export async function optimizedTransaction<T>(
   callback: (client: PoolClient) => Promise<T>,
-  options: {
+  _options: {
     timeout?: number
     retries?: number
   } = {},

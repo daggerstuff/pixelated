@@ -254,7 +254,7 @@ class ModelOptimizer {
    */
   async applyOptimization(
     strategy: OptimizationStrategy,
-    config?: Partial<TrainingConfig>,
+    _config?: Partial<TrainingConfig>,
   ): Promise<OptimizationResult> {
     if (!this.currentMetrics) {
       throw new Error('Baseline metrics not set')
@@ -504,7 +504,7 @@ class ModelOptimizer {
     estimatedTime: number
     riskLevel: 'low' | 'medium' | 'high'
   }> {
-    const analysis = await this.analyzePerformance()
+    const _analysis = await this.analyzePerformance()
     const pipeline: OptimizationStrategy[] = []
 
     // Select strategies based on targets

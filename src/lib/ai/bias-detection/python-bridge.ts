@@ -135,7 +135,7 @@ export class PythonBiasDetectionBridge {
     } catch (error: unknown) {
       logger.error('Failed to initialize PythonBiasDetectionBridge', { error })
       throw new Error(
-        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
     }
   }

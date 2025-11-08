@@ -83,7 +83,7 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
       logger.error('Failed to initialize TensorFlow.js compatibility layer', {
         error,
       })
-      throw new Error('TensorFlow.js initialization failed')
+      throw new Error('TensorFlow.js initialization failed', { cause: error })
     }
   }
 
@@ -99,7 +99,7 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
       logger.error('Failed to load TensorFlow.js browser version', {
         error: browserError,
       })
-      throw new Error('TensorFlow.js browser version failed to load')
+      throw new Error('TensorFlow.js browser version failed to load', { cause: browserError })
     }
   }
 

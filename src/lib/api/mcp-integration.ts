@@ -209,7 +209,7 @@ export async function POST(context: APIContext) {
   }
 }
 
-export async function GET(context: APIContext) {
+export async function GET(_context: APIContext) {
   try {
     const mcp = getMCPIntegration()
     const isHealthy = await mcp.healthCheck()

@@ -175,9 +175,9 @@ async function generateProgressChartData(params: {
 }): Promise<ChartDataResponse> {
   const {
     type,
-    repository,
-    clientId,
-    sessionId,
+    repository: _repository,
+    clientId: _clientId,
+    sessionId: _sessionId,
     startDate,
     endDate,
     dataPoints,
@@ -330,7 +330,7 @@ async function generateSessionChartData(params: {
   endDate: Date
   dataPoints: number
 }): Promise<ChartDataResponse> {
-  const { type } = params
+  const { _type } = params
 
   const sessionMetrics = [
     { metric: 'Engagement', value: 85 },
@@ -372,7 +372,7 @@ async function generateOutcomeChartData(params: {
   endDate: Date
   dataPoints: number
 }): Promise<ChartDataResponse> {
-  const { type, dataPoints } = params
+  const { _type, dataPoints } = params
 
   const outcomeData = Array.from(
     { length: Math.min(dataPoints, 12) },

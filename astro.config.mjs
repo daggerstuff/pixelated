@@ -9,9 +9,45 @@ import icon from 'astro-icon';
 import sentry from '@sentry/astro';
 import spotlightjs from '@spotlightjs/astro';
 
-import node from '@astrojs/node'
+import node from '@astrojs/node';
 
 import { visualizer } from 'rollup-plugin-visualizer';
+
+// Environment variables for cleaner code
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
+const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
+const hasSentryDSN = !!process.env.SENTRY_DSN;
+const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+// Helper function to determine chunk names for better code splitting
+function getChunkName(id) {
+  // React ecosystem
+  if (id.includes('react') || id.includes('react-dom')) {
+    return 'react-vendor';
+  }
+  // UI libraries
+  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+    return 'ui-vendor';
+  }
+  // Utility libraries
+  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+    return 'utils-vendor';
+  }
+  // Chart libraries
+  if (id.includes('recharts') || id.includes('chart.js')) {
+    return 'charts-vendor';
+  }
+  // 3D libraries
+  if (id.includes('three') || id.includes('@react-three')) {
+    return 'three-vendor';
+  }
+  // Node modules (keep separate for better caching)
+  if (id.includes('node_modules')) {
+    return 'vendor';
+  }
+  return undefined;
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,7 +59,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-    sourcemap: process.env.NODE_ENV !== 'production',
+    sourcemap: !isProduction,
     copy: [
       {
         from: 'templates/email',
@@ -33,32 +69,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching
-        manualChunks: (id) => {
-          // React ecosystem
-          if (id.includes('react') || id.includes('react-dom')) {
-            return 'react-vendor';
-          }
-          // UI libraries
-          if (id.includes('framer-motion') || id.includes('lucide-react')) {
-            return 'ui-vendor';
-          }
-          // Utility libraries
-          if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
-            return 'utils-vendor';
-          }
-          // Chart libraries
-          if (id.includes('recharts') || id.includes('chart.js')) {
-            return 'charts-vendor';
-          }
-          // 3D libraries
-          if (id.includes('three') || id.includes('@react-three')) {
-            return 'three-vendor';
-          }
-          // Node modules (keep separate for better caching)
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-        },
+        manualChunks: getChunkName,
         // Optimized chunk naming for better caching
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
@@ -87,12 +98,12 @@ export default defineConfig({
       },
     },
     build: {
-      sourcemap: process.env.NODE_ENV === 'production' ? false : 'hidden',
+      sourcemap: isProduction ? false : 'hidden',
       target: 'node24',
-      chunkSizeWarningLimit: process.env.NODE_ENV === 'production' ? 500 : 1500,
+      chunkSizeWarningLimit: isProduction ? 500 : 1500,
       // Enable minification in production
-      minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
-      terserOptions: process.env.NODE_ENV === 'production' ? {
+      minify: isProduction ? 'terser' : false,
+      terserOptions: isProduction ? {
         compress: {
           drop_console: true,
           drop_debugger: true,
@@ -152,7 +163,7 @@ export default defineConfig({
     },
     plugins: [
       // Bundle analyzer for production builds
-      ...(process.env.ANALYZE_BUNDLE === '1' ? [visualizer({
+      ...(shouldAnalyzeBundle ? [visualizer({
         filename: 'dist/bundle-analysis.html',
         open: true,
         gzipSize: true,
@@ -262,7 +273,7 @@ export default defineConfig({
         },
         svgdir: './src/icons',
       }),
-      ...(process.env.SENTRY_DSN ? [
+      ...(hasSentryDSN ? [
         sentry({
           sourceMapsUploadOptions: {
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
@@ -276,7 +287,7 @@ export default defineConfig({
             },
           },
         }),
-        ...(process.env.NODE_ENV === 'development' && process.env.SENTRY_SPOTLIGHT === '1' ? [spotlightjs()] : [])
+        ...(shouldUseSpotlight ? [spotlightjs()] : [])
       ] : []),
     ]
   })(),
@@ -412,6 +423,6 @@ export default defineConfig({
     '/docs': '/docs/getting-started',
   },
   devToolbar: {
-    enabled: process.env.NODE_ENV === 'development',
+    enabled: isDevelopment,
   },
 });

@@ -241,7 +241,7 @@ export class MentalArenaAdapter {
       return result.conversations
     } catch (error: unknown) {
       logger.error('Failed to generate synthetic data', { error, options })
-      throw new Error(`Synthetic data generation failed: ${error}`)
+      throw new Error(`Synthetic data generation failed: ${error}`, { cause: error })
     } finally {
       const processingTime = Date.now() - startTime
       this.performanceMetrics.recordGeneration(

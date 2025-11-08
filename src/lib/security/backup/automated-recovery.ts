@@ -73,17 +73,7 @@ export class AutomatedRecoverySystem {
    * @param recoveryManager Reference to the recovery testing manager
    * @param backupProvider Function that returns available backups
    */
-  constructor(
-    config: AutomatedRecoveryConfig,
-    recoveryManager: RecoveryTestingManager,
-    backupProvider: () => Promise<BackupMetadata[]>,
-  ) {
-    /*
-    this._config = config
-    this._recoveryManager = recoveryManager
-    this._backupProvider = backupProvider
-    */
-  }
+  
 }
 
 // Export the automated recovery system

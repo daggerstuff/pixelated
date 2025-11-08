@@ -401,7 +401,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
   private evaluateTimeCondition(
     condition: ResponseCondition,
-    threat: GlobalThreatIntelligence,
+    _threat: GlobalThreatIntelligence,
   ): boolean {
     const currentTime = new Date()
     const conditionTime = new Date(condition.value as string)
@@ -1097,7 +1097,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
   private async sendToIntegrationEndpoint(
     endpoint: IntegrationEndpoint,
-    response: ThreatResponse,
+    _response: ThreatResponse,
   ): Promise<void> {
     try {
       logger.info('Sending to integration endpoint', {

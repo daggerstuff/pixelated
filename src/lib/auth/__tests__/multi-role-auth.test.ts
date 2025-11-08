@@ -265,7 +265,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
     })
 
     it('should handle 2FA lockout after failed attempts', async () => {
-      const { getFromCache, setInCache } = await import('../../redis')
+      const { getFromCache, _setInCache } = await import('../../redis')
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {

@@ -428,7 +428,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             message: 'CockroachDB client not initialized',
           }
 
-        const result = await this.cockroachClient.query('SELECT 1')
+        const _result = await this.cockroachClient.query('SELECT 1')
         return { status: 'healthy', message: 'CockroachDB connection active' }
       } catch (error) {
         return {

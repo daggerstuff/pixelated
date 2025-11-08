@@ -97,7 +97,7 @@ export class EnhancedCacheService implements CacheClient {
       // Convert wildcard pattern (with '*') into a safe RegExp.
       // Escape regex special chars except '*' then replace '*' with '.*'
       const escapeExceptStar = (s: string) =>
-        s.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&')
+        s.replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&')
       const regex = new RegExp(
         '^' + escapeExceptStar(pattern).replace(/\*/g, '.*') + '$',
       )

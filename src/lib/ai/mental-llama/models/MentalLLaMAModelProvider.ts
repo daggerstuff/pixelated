@@ -45,7 +45,7 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         )
       ) {
         // Normalize error message to what tests expect
-        throw new Error('Invalid response structure from MentalLLaMA API.')
+        throw new Error('Invalid response structure from MentalLLaMA API.', { cause: error })
       }
       throw error
     }

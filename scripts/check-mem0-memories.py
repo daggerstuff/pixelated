@@ -27,14 +27,18 @@ def check_mem0(api_key: str):
 
     while True:
         try:
+            # Use v2 endpoint with wildcard filter to match all memories
+            # According to docs: "*" wildcard character matches everything
             response = requests.post(
                 "https://api.mem0.ai/v2/memories/",
                 headers=headers,
-                json={"filters": {}, "page": page, "page_size": 100},
+                json={"filters": {"user_id": "*"}},  # Wildcard to match all users
+                params={"page": page, "page_size": 100},
             )
+
             response.raise_for_status()
             data = response.json()
-            memories = data.get("results", [])
+            memories = data.get("results", data) if isinstance(data, dict) else data
 
             if not memories:
                 break
@@ -48,6 +52,8 @@ def check_mem0(api_key: str):
 
         except requests.exceptions.RequestException as e:
             print(f"❌ Error: {e}")
+            if hasattr(e, "response") and e.response is not None:
+                print(f"Response body: {e.response.text}")
             sys.exit(1)
 
     print(f"\n📊 Total Memories: {len(all_memories)}")
@@ -55,7 +61,9 @@ def check_mem0(api_key: str):
     # Analyze categories
     categories = []
     for mem in all_memories:
-        categories.extend(mem.get("categories", []))
+        cats = mem.get("categories")
+        if cats and isinstance(cats, list):
+            categories.extend(cats)
 
     if categories:
         print("\n📁 Categories:")
@@ -84,7 +92,11 @@ def check_mem0(api_key: str):
     print("\n📝 Sample Memories (first 5):")
     for idx, mem in enumerate(all_memories[:5], 1):
         content = mem.get("memory", "")[:100]
-        cats = ", ".join(mem.get("categories", [])[:3])
+        cats_list = mem.get("categories")
+        if cats_list and isinstance(cats_list, list):
+            cats = ", ".join(cats_list[:3])
+        else:
+            cats = ""
         print(f"\n  {idx}. {content}...")
         if cats:
             print(f"     Categories: {cats}")
@@ -100,7 +112,8 @@ def check_mem0(api_key: str):
     }
 
     for mem in all_memories:
-        cats = [c.lower() for c in mem.get("categories", [])]
+        cats_raw = mem.get("categories")
+        cats = [c.lower() for c in cats_raw] if cats_raw and isinstance(cats_raw, list) else []
 
         if any("error" in c or "bug" in c for c in cats):
             section_mapping["Common Errors"] += 1

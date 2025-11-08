@@ -82,7 +82,7 @@ export class PredictiveCrisisModelingService {
     currentAssessment: RiskAssessment,
     emotionHistory: EmotionAnalysis[],
     riskFactors: CrisisRiskFactors,
-    userId?: string,
+    _userId?: string,
   ): Promise<CrisisPrediction> {
     try {
       // Calculate weighted risk scores
@@ -373,8 +373,8 @@ export class PredictiveCrisisModelingService {
   }
 
   private identifyPrimaryRiskFactors(
-    riskFactors: CrisisRiskFactors,
-    compositeRisk: number,
+    _riskFactors: CrisisRiskFactors,
+    _compositeRisk: number,
   ): string[] {
     const factors: string[] = []
 
@@ -412,7 +412,7 @@ export class PredictiveCrisisModelingService {
 
   private calculateInterventionWindow(
     riskLevel: CrisisPrediction['riskLevel'],
-    timeframe: CrisisPrediction['timeframe'],
+    _timeframe: CrisisPrediction['timeframe'],
   ): CrisisPrediction['interventionWindow'] {
     const windows = {
       imminent: { optimal: 'Immediate', critical: 'Within 1 hour' },

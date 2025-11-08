@@ -534,7 +534,7 @@ export class OptimizedBiasDetectionService {
    */
   async batchAnalyzeBias(
     texts: string[],
-    options: {
+    _options: {
       demographics?: any[]
       context?: string[]
     } = {},
@@ -560,7 +560,7 @@ export class OptimizedBiasDetectionService {
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize)
 
-      const batchPromises = batch.map(async (text, index) => {
+      const batchPromises = batch.map(async (text, _index) => {
         const startTime = performance.now()
         const analysisId = randomUUID()
 

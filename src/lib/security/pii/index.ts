@@ -69,29 +69,29 @@ const DEFAULT_CONFIG: PIIDetectionConfig = {
 /**
  * Interface for FHE Service
  */
-interface FHEService {
-  isInitialized(): boolean
-  processEncrypted(
-    text: string,
-    operation: FHEOperation,
-    options: {
-      operation: string
-      threshold: number
-      patterns: string[]
-    },
-  ): Promise<{
-    data: {
-      hasPII: string
-      confidence: string
-      types: string
-      redacted?: string
-    }
-    metadata: {
-      operation: FHEOperation
-      timestamp: number
-    }
-  }>
-}
+// interface FHEService {
+//   isInitialized(): boolean
+//   processEncrypted(
+//     text: string,
+//     operation: FHEOperation,
+//     options: {
+//       operation: string
+//       threshold: number
+//       patterns: string[]
+//     },
+//   ): Promise<{
+//     data: {
+//       hasPII: string
+//       confidence: string
+//       types: string
+//       redacted?: string
+//     }
+//     metadata: {
+//       operation: FHEOperation
+//       timestamp: number
+//     }
+//   }>
+// }
 
 /**
  * PII Detection Service class

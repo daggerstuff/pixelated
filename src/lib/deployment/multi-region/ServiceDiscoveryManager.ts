@@ -756,7 +756,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private async discoverFromConsul(
     consul: Consul,
     serviceName: string,
-    options: DiscoveryOptions,
+    _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const services = await consul.health.service(serviceName)
 
@@ -787,7 +787,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private async discoverFromEtcd(
     etcd: Etcd3,
     serviceName: string,
-    options: DiscoveryOptions,
+    _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const keyPrefix = `/services/${serviceName}/`
     const response = await etcd.getAll().prefix(keyPrefix)
@@ -829,7 +829,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private async discoverFromZookeeper(
     zk: ZooKeeperClient,
     serviceName: string,
-    options: DiscoveryOptions,
+    _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const basePath = `/services/${serviceName}`
     const instances: ServiceInstance[] = []

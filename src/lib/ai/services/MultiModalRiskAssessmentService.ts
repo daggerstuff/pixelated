@@ -380,7 +380,7 @@ export class MultiModalRiskAssessmentService {
    * Assess behavioral risk patterns
    */
   private assessBehavioralRisk(behavioralData: BehavioralPatterns): number {
-    let riskScore = 0
+    let _riskScore = 0
 
     // Session engagement decline
     const engagementRisk =
@@ -473,7 +473,7 @@ export class MultiModalRiskAssessmentService {
    * Assess contextual risk factors
    */
   private assessContextualRisk(contextualData: ContextualFactors): number {
-    let riskScore = 0
+// let riskScore = 0 // Unused variable - commented out by automation
 
     // Environmental factors
     const environmentalRisk =
@@ -584,7 +584,7 @@ export class MultiModalRiskAssessmentService {
   private generateRecommendations(
     riskLevel: string,
     contributors: IntegratedRiskProfile['primaryContributors'],
-    data: any,
+    _data: any,
   ): IntegratedRiskProfile['recommendations'] {
     const recommendations = {
       immediate: [] as string[],
@@ -626,7 +626,7 @@ export class MultiModalRiskAssessmentService {
   private prioritizeInterventions(
     riskLevel: string,
     contributors: IntegratedRiskProfile['primaryContributors'],
-    clinicalData?: ClinicalData,
+    _clinicalData?: ClinicalData,
   ): IntegratedRiskProfile['interventionPriority'] {
     const interventions: IntegratedRiskProfile['interventionPriority'] = []
 
@@ -724,7 +724,7 @@ export class MultiModalRiskAssessmentService {
     return (secondAvg - firstAvg) / 100 // Normalized change
   }
 
-  private getTopFactorForSource(source: string, data: any): string {
+  private getTopFactorForSource(source: string, _data: any): string {
     // Simplified factor identification - would be more sophisticated in practice
     const factors = {
       emotional: 'High emotional intensity',
@@ -737,8 +737,8 @@ export class MultiModalRiskAssessmentService {
   }
 
   private calculateTrendForSource(
-    source: string,
-    data: any,
+    _source: string,
+    _data: any,
   ): 'improving' | 'stable' | 'deteriorating' {
     // Simplified trend calculation - would analyze historical data in practice
     return Math.random() > 0.5 ? 'stable' : 'deteriorating'

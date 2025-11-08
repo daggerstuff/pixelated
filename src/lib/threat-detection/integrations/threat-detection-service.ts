@@ -296,7 +296,7 @@ export class ThreatDetectionService {
    * Analyze behavioral threats
    */
   private async analyzeBehavioralThreat(
-    threatData: ThreatData,
+    _threatData: ThreatData,
   ): Promise<number> {
     // This would integrate with the behavioral analysis service
     // For now, return a placeholder confidence score
@@ -307,7 +307,7 @@ export class ThreatDetectionService {
    * Detect behavioral patterns
    */
   private async detectBehavioralPatterns(
-    threatData: ThreatData,
+    _threatData: ThreatData,
   ): Promise<string[]> {
     // This would integrate with the behavioral analysis service
     // For now, return empty array
@@ -318,7 +318,7 @@ export class ThreatDetectionService {
    * Analyze predictive threats
    */
   private async analyzePredictiveThreat(
-    threatData: ThreatData,
+    _threatData: ThreatData,
   ): Promise<number> {
     // This would integrate with the predictive threat intelligence service
     // For now, return a placeholder confidence score
@@ -329,7 +329,7 @@ export class ThreatDetectionService {
    * Detect predictive patterns
    */
   private async detectPredictivePatterns(
-    threatData: ThreatData,
+    _threatData: ThreatData,
   ): Promise<string[]> {
     // This would integrate with the predictive threat intelligence service
     // For now, return empty array

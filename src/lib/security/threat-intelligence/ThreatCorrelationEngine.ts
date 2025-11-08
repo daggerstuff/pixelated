@@ -679,7 +679,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   private calculateSpatialCorrelation(
     threats: any[],
-    maxDistance: number,
+    _maxDistance: number,
   ): any {
     try {
       // Calculate geographic span
@@ -1260,7 +1260,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Generate recommendations for different correlation types
    */
-  private generateTemporalRecommendations(correlation: any): string[] {
+  private generateTemporalRecommendations(_correlation: any): string[] {
     return [
       'Monitor for similar threats in the same time window',
       'Review security logs for the affected time period',
@@ -1269,7 +1269,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     ]
   }
 
-  private generateSpatialRecommendations(correlation: any): string[] {
+  private generateSpatialRecommendations(_correlation: any): string[] {
     return [
       'Implement geographic-based access controls',
       'Monitor network traffic from affected regions',
@@ -1278,7 +1278,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     ]
   }
 
-  private generateBehavioralRecommendations(correlation: any): string[] {
+  private generateBehavioralRecommendations(_correlation: any): string[] {
     return [
       'Update behavioral detection rules',
       'Monitor for similar attack patterns',
@@ -1287,7 +1287,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     ]
   }
 
-  private generateAttributionRecommendations(correlation: any): string[] {
+  private generateAttributionRecommendations(_correlation: any): string[] {
     return [
       'Investigate attributed threat actor activities',
       'Share attribution intelligence with partners',

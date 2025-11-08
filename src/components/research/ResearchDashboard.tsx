@@ -127,7 +127,7 @@ export const ResearchDashboard: FC = () => {
     },
   ]
 
-  const analyticsData = studies.map((study, index) => ({
+  const analyticsData = studies.map((study, _index) => ({
     studyId: study.id,
     studyName: study.title,
     participants: study.participants,

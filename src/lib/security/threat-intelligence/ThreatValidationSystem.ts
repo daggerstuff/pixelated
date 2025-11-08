@@ -625,7 +625,7 @@ export class ThreatValidationSystem extends EventEmitter {
   /**
    * Get validation criteria for validation types
    */
-  private getValidationCriteria(validationTypes: string[]): ValidationCriteria {
+  private getValidationCriteria(_validationTypes: string[]): ValidationCriteria {
     return {
       accuracy_threshold: 0.8,
       completeness_requirements: ['value', 'type', 'source', 'timestamp'],
@@ -752,8 +752,8 @@ export class ThreatValidationSystem extends EventEmitter {
    * Validate accuracy of threat data
    */
   private async validateAccuracy(
-    threatData: ThreatData,
-    criteria: ValidationCriteria,
+    _threatData: ThreatData,
+    _criteria: ValidationCriteria,
   ): Promise<{
     score: number
     findings: ValidationFinding[]
@@ -1069,7 +1069,7 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async validateReliability(
     threatData: ThreatData,
-    criteria: ValidationCriteria,
+    _criteria: ValidationCriteria,
   ): Promise<{
     score: number
     findings: ValidationFinding[]
@@ -1238,7 +1238,7 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async applyAIAssistance(
     threatData: ThreatData,
-    existingFindings: ValidationFinding[],
+    _existingFindings: ValidationFinding[],
   ): Promise<{
     findings: ValidationFinding[]
     evidence: ValidationEvidence[]
@@ -1295,7 +1295,7 @@ export class ThreatValidationSystem extends EventEmitter {
   /**
    * Simulate AI analysis (placeholder for actual AI integration)
    */
-  private async simulateAIAnalysis(threatData: ThreatData): Promise<any> {
+  private async simulateAIAnalysis(_threatData: ThreatData): Promise<any> {
     // Simulate AI processing delay
     await new Promise((resolve) => setTimeout(resolve, 100))
 
@@ -1322,7 +1322,7 @@ export class ThreatValidationSystem extends EventEmitter {
     return path.split('.').reduce((current, key) => current?.[key], obj)
   }
 
-  private async checkDataConsistency(threatData: ThreatData): Promise<{
+  private async checkDataConsistency(_threatData: ThreatData): Promise<{
     is_consistent: boolean
     evidence: ValidationEvidence[]
   }> {
@@ -1333,7 +1333,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async crossReferenceExternalSources(threatData: ThreatData): Promise<{
+  private async crossReferenceExternalSources(_threatData: ThreatData): Promise<{
     is_verified: boolean
     evidence: ValidationEvidence[]
   }> {
@@ -1344,7 +1344,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async validateAgainstPatterns(threatData: ThreatData): Promise<{
+  private async validateAgainstPatterns(_threatData: ThreatData): Promise<{
     is_valid: boolean
     evidence: ValidationEvidence[]
   }> {
@@ -1355,7 +1355,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async checkForRecentData(threatData: ThreatData): Promise<{
+  private async checkForRecentData(_threatData: ThreatData): Promise<{
     has_recent_updates: boolean
     evidence: ValidationEvidence[]
   }> {
@@ -1366,7 +1366,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async assessSourceReliability(source: string): Promise<{
+  private async assessSourceReliability(_source: string): Promise<{
     score: number
     evidence: ValidationEvidence[]
   }> {
@@ -1377,7 +1377,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async checkCorroboratingSources(threatData: ThreatData): Promise<{
+  private async checkCorroboratingSources(_threatData: ThreatData): Promise<{
     corroborating_sources: number
     evidence: ValidationEvidence[]
   }> {
@@ -1388,7 +1388,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async checkHistoricalAccuracy(source: string): Promise<{
+  private async checkHistoricalAccuracy(_source: string): Promise<{
     score: number
     evidence: ValidationEvidence[]
   }> {
@@ -1400,8 +1400,8 @@ export class ThreatValidationSystem extends EventEmitter {
   }
 
   private async checkComplianceStandard(
-    threatData: ThreatData,
-    standard: string,
+    _threatData: ThreatData,
+    _standard: string,
   ): Promise<{
     is_compliant: boolean
     violation?: string
@@ -1574,7 +1574,7 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private meetsQualityGateCriteria(
     validation: ThreatValidation,
-    gate: QualityGate,
+    _gate: QualityGate,
   ): boolean {
     // Implement quality gate criteria checking
     return validation.validation_result.overall_score >= 0.7

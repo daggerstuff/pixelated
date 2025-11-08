@@ -6,7 +6,6 @@ import { CounterfactualAnalysis } from './CounterfactualAnalysis'
 import { HistoricalProgressTracker } from './HistoricalProgressTracker'
 import { SessionInputForm } from './SessionInputForm'
 import { ExportControls } from './ExportControls'
-import { AccessibleLoadingState } from './AccessibleLoadingState'
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
@@ -565,7 +564,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   Recent Sessions
                 </h3>
                 <div className="space-y-2">
-                  {savedSessions.slice(0, 5).map((session, index) => (
+                  {savedSessions.slice(0, 5).map((session, _index) => (
                     <div
                       key={session.sessionId}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"

@@ -9,11 +9,11 @@ import {
 } from '@/components/layout/ResponsiveUtils'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
-interface SyncedCounter {
-  value: number
-  lastUpdated: number
-  updatedBy: string
-}
+// interface SyncedCounter {
+//   value: number
+//   lastUpdated: number
+//   updatedBy: string
+// }
 
 interface SyncedPreferences {
   theme: 'light' | 'dark'

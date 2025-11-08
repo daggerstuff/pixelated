@@ -48,7 +48,7 @@ export class ResponseGenerationService {
       }
     } catch (error: unknown) {
       appLogger.error('Error in response generation:', error)
-      throw new Error('Failed to generate therapeutic response')
+      throw new Error('Failed to generate therapeutic response', { cause: error })
     }
   }
 
@@ -76,7 +76,7 @@ export class ResponseGenerationService {
     } catch (error: unknown) {
       appLogger.error('Error in response generation with instructions:', error)
       throw new Error(
-        'Failed to generate therapeutic response with instructions',
+        'Failed to generate therapeutic response with instructions', { cause: error },
       )
     }
   }

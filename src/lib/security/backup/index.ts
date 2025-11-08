@@ -14,7 +14,6 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { logAuditEvent, AuditEventType } from '../../audit'
 import { dlpService } from '../dlp'
-import { RecoveryTestingManager } from './recovery-testing'
 import {
   type BackupMetadata as BaseBackupMetadata,
   type StorageProvider,
