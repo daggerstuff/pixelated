@@ -181,6 +181,11 @@ class Mem0Migrator:
                 if success_count % 10 == 0:
                     print(f"  Imported {success_count}/{len(memories)}...")
 
+            except OSError as e:
+                print(
+                    f"  ❌ Error: Failed to execute 'brv' CLI. Is it installed and in your PATH? Details: {e}"
+                )
+                error_count += 1
             except subprocess.CalledProcessError as e:
                 print(f"  ❌ Failed to import: {mem['content'][:50]}...")
                 print(f"     Error: {e.stderr}")
@@ -190,8 +195,11 @@ class Mem0Migrator:
         print(f"   Success: {success_count}")
         print(f"   Errors: {error_count}")
 
-        # Save backup
-        backup_path = Path.cwd() / ".brv" / "migration-backup.json"
+        # Save backup with timestamp to avoid overwriting previous backups
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_path = Path.cwd() / ".brv" / f"migration-backup_{timestamp}.json"
         backup_path.parent.mkdir(parents=True, exist_ok=True)
         with open(backup_path, "w") as f:
             json.dump(memories, f, indent=2)

@@ -46,7 +46,8 @@ function getChunkName(id) {
   if (id.includes('node_modules')) {
     return 'vendor';
   }
-  return undefined;
+  // Return null for non-vendor modules to let Rollup handle them automatically
+  return null;
 }
 
 // https://astro.build/config

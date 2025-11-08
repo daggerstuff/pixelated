@@ -136,22 +136,23 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
   }, [])
 
   // Handle real-time bias score updates
-// const handleBiasUpdate = useCallback((indicators: any[]) => { // Unused variable - commented out by automation
-    if (indicators.length === 0) {
-      setRealTimeBiasScore(100)
-    } else {
-      const totalSeverity = indicators.reduce((sum, indicator) => {
-        const severityWeight =
-          indicator.severity === 'high'
-            ? 3
-            : indicator.severity === 'medium'
-              ? 2
-              : 1
-        return sum + severityWeight * indicator.confidence
-      }, 0)
-      setRealTimeBiasScore(Math.max(0, 100 - totalSeverity * 10))
-    }
-  }, [])
+  // Commented out - unused variable
+  // const handleBiasUpdate = useCallback((indicators: any[]) => {
+  //   if (indicators.length === 0) {
+  //     setRealTimeBiasScore(100)
+  //   } else {
+  //     const totalSeverity = indicators.reduce((sum, indicator) => {
+  //       const severityWeight =
+  //         indicator.severity === 'high'
+  //           ? 3
+  //           : indicator.severity === 'medium'
+  //             ? 2
+  //             : 1
+  //       return sum + severityWeight * indicator.confidence
+  //     }, 0)
+  //     setRealTimeBiasScore(Math.max(0, 100 - totalSeverity * 10))
+  //   }
+  // }, [])
 
   return (
     <div className={`improved-bias-interface ${className}`}>
@@ -183,37 +184,34 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
             {['Input', 'Analysis', 'Results'].map((step, index) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
+                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
                       ? 'bg-blue-600 text-white'
                       : index <
-                          ['input', 'analyzing', 'results'].indexOf(currentStep)
+                        ['input', 'analyzing', 'results'].indexOf(currentStep)
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-200 text-gray-600'
-                  }`}
+                    }`}
                 >
                   {index <
-                  ['input', 'analyzing', 'results'].indexOf(currentStep)
+                    ['input', 'analyzing', 'results'].indexOf(currentStep)
                     ? '✓'
                     : index + 1}
                 </div>
                 <span
-                  className={`ml-2 text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
+                  className={`ml-2 text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
                       ? 'text-blue-600'
                       : 'text-gray-500'
-                  }`}
+                    }`}
                 >
                   {step}
                 </span>
                 {index < 2 && (
                   <div
-                    className={`w-12 h-0.5 mx-4 ${
-                      index <
-                      ['input', 'analyzing', 'results'].indexOf(currentStep)
+                    className={`w-12 h-0.5 mx-4 ${index <
+                        ['input', 'analyzing', 'results'].indexOf(currentStep)
                         ? 'bg-green-600'
                         : 'bg-gray-200'
-                    }`}
+                      }`}
                   />
                 )}
               </div>

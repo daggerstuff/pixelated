@@ -8,6 +8,13 @@ echo "🔧 Fixing Kiro Agent Schema Issue..."
 echo "📁 Creating system directory structure..."
 sudo mkdir -p /usr/share/kiro/resources/app/extensions/kiro.kiro-agent/packages/continuedev/extension/
 
+# Check if the source schema file exists
+if [ ! -f "packages/continuedev/extension/config_schema.json" ]; then
+    echo "❌ Source schema file 'packages/continuedev/extension/config_schema.json' not found!"
+    echo "   Please ensure the file exists before running this script."
+    exit 1
+fi
+
 # Copy the schema file to system location
 echo "📋 Installing schema file to system location..."
 sudo cp packages/continuedev/extension/config_schema.json /usr/share/kiro/resources/app/extensions/kiro.kiro-agent/packages/continuedev/extension/

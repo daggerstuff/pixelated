@@ -16,9 +16,9 @@
  *   tsx scripts/migrate-mem0-to-byterover.ts --source mem0 --api-key KEY --dry-run
  */
 
-import { execSync } from 'child_process';
-import { writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { spawnSync } from 'child_process';
+import { writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
 
 interface Mem0Memory {
     id: string;
@@ -192,9 +192,14 @@ class Mem0Migrator {
 
         for (const mem of memories) {
             try {
-                // Use brv add command
-                const cmd = `brv add --section "${mem.section}" --content "${mem.content.replace(/"/g, '\\"')}"`;
-                execSync(cmd, { stdio: 'pipe' });
+                // Use brv add command with safe argument passing (prevents command injection)
+                const args = ['add', '--section', mem.section, '--content', mem.content];
+                const result = spawnSync('brv', args, { stdio: 'pipe' });
+
+                if (result.status !== 0) {
+                    throw new Error(`brv add failed: ${result.stderr?.toString()}`);
+                }
+
                 successCount++;
 
                 if (successCount % 10 === 0) {
@@ -210,8 +215,11 @@ class Mem0Migrator {
         console.log(`   Success: ${successCount}`);
         console.log(`   Errors: ${errorCount}`);
 
-        // Save backup
-        const backupPath = join(process.cwd(), '.brv', 'migration-backup.json');
+        // Save backup with timestamp to avoid overwriting previous backups
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const backupFilename = `migration-backup-${timestamp}.json`;
+        const backupPath = join(process.cwd(), '.brv', backupFilename);
+        mkdirSync(dirname(backupPath), { recursive: true });
         writeFileSync(backupPath, JSON.stringify(memories, null, 2));
         console.log(`\n💾 Backup saved to: ${backupPath}`);
     }

@@ -24,8 +24,9 @@ def check_mem0(api_key: str):
 
     all_memories = []
     page = 1
+    max_pages = 1000  # Safety limit to prevent infinite loop
 
-    while True:
+    while page <= max_pages:
         try:
             # Use v2 endpoint with wildcard filter to match all memories
             # According to docs: "*" wildcard character matches everything
