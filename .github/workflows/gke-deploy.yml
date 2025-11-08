@@ -423,7 +423,7 @@ jobs:
           fi
 
       - name: Create Sentry release
-        if: ${{ env.SENTRY_AUTH_TOKEN != '' && env.SENTRY_DSN != '' }}
+        if: env.SENTRY_AUTH_TOKEN != '' && env.SENTRY_DSN != ''
         env:
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN || secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ env.SENTRY_ORG || secrets.SENTRY_ORG }}

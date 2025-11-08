@@ -408,6 +408,12 @@ jobs:
             echo "uv already installed"
           fi
 
+      - name: Prepare uv venv
+        id: prepare-uv
+        uses: ./.github/actions/prepare-uv-venv
+        with:
+          service-dir: src/lib/ai/bias-detection/python-service
+
       - name: Install Python ML dependencies
         run: |
           cd src/lib/ai/bias-detection/python-service
@@ -605,7 +611,7 @@ jobs:
       - name: Run post-deployment health checks
         if: github.ref == 'refs/heads/master'
         env:
-          PRODUCTION_HEALTH_CHECK_URL: ${{ secrets.PRODUCTION_HEALTH_CHECK_URL }}
+          PRODUCTION_HEALTH_CHECK_URL: ${{ secrets.PRODUCTION_HEALTH_CHECK_URL || '' }}
         run: |
           # Wait for deployment to be ready
           sleep 60
@@ -631,19 +637,21 @@ jobs:
       - name: Notify on success
         if: needs.build-and-deploy.result == 'success'
         uses: 8398a7/action-slack@v3
+        continue-on-error: true
         with:
           status: success
           channel: "#deployments"
           text: ✅ Bias Detection Engine deployment successful!
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
 
       - name: Notify on failure
         if: needs.build-and-deploy.result == 'failure'
         uses: 8398a7/action-slack@v3
+        continue-on-error: true
         with:
           status: failure
           channel: "#deployments"
           text: ❌ Bias Detection Engine deployment failed!
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
