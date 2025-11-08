@@ -15,30 +15,6 @@ def test_relevance_scorer_structure():
         Path(__file__).parent / "ai" / "pixel" / "data" / "test_knowledge_relevance_scorer.py"
     )
 
-    if scorer_file.exists():
-
-        # Check file size (should be substantial)
-        file_size = scorer_file.stat().st_size
-
-        if file_size > 25000:  # Should be > 25KB for comprehensive implementation
-            pass
-        else:
-            pass
-    else:
-        pass
-
-    if test_file.exists():
-
-        # Check test file size
-        test_size = test_file.stat().st_size
-
-        if test_size > 20000:  # Should be > 20KB for comprehensive tests
-            pass
-        else:
-            pass
-    else:
-        pass
-
     # Test basic structure and components
     try:
         # Read the file content to check for key components
@@ -65,11 +41,6 @@ def test_relevance_scorer_structure():
             if component not in content:
                 missing_components.append(component)
 
-        if not missing_components:
-            pass
-        else:
-            pass
-
         # Check for advanced features
         advanced_features = [
             "TF_IDF",
@@ -86,17 +57,12 @@ def test_relevance_scorer_structure():
 
         found_features = [feature for feature in advanced_features if feature in content]
 
-        if len(found_features) >= len(advanced_features) * 0.8:
-            pass
-        else:
-            pass
-
     except Exception as e:
+        # Silently handle file reading errors
         pass
 
     # Test core scoring concepts
     try:
-
         # Test TF-IDF concept
         import math
 
@@ -201,7 +167,6 @@ def test_relevance_scorer_structure():
         # Rankings should be different
         assert relevance_ranked[0].relevance_score == 0.9  # Highest relevance first
 
-
         # Test score combination
         def combine_scores(clinical, semantic, recency, authority, diversity, weights):
             return (
@@ -224,11 +189,11 @@ def test_relevance_scorer_structure():
         assert 0 <= combined_score <= 1
 
     except Exception as e:
+        # Silently handle test errors
         pass
 
     # Test advanced scoring features
     try:
-
         # Test confidence calculation
         def calculate_confidence(algorithm_scores, total_score):
             if not algorithm_scores:
@@ -308,8 +273,8 @@ def test_relevance_scorer_structure():
         assert dsm5_count <= 2  # Should limit DSM-5 results
 
     except Exception as e:
+        # Silently handle advanced feature test errors
         pass
-
 
 
 if __name__ == "__main__":

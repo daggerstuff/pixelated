@@ -70,8 +70,7 @@ try:
 
     def _print_stats(stats):
         """Print embedding statistics."""
-        for key, value in stats.items():
-            pass
+        # Intentionally left blank for standalone test
 
     def _verify_loaded_embeddings(success, embedder):
         """Verify loaded embeddings are correct."""
@@ -94,13 +93,6 @@ except ImportError as e:
         Path(__file__).parent / "ai" / "pixel" / "data" / "test_clinical_knowledge_embedder.py"
     )
 
-    if embedder_file.exists():
-        pass")
-    else:
-        pass")
-
-    if test_file.exists():
-        pass")
-    else:
-        pass")
-
+    # File existence is checked but not used in this standalone test
+    embedder_file.exists()
+    test_file.exists()

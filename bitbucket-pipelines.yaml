@@ -4,15 +4,21 @@ clone:
   depth: full
 
 definitions:
+  services:
+    docker:
+      memory: 4096  # Increase memory for SonarCloud analysis
   caches:
     sonar: ~/.sonar/cache
     pnpm: ~/.pnpm-store
   steps:
   - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
+      size: 2x  # Use 2x build environment for more resources
       caches:
       - pnpm
       - sonar
+      services:
+      - docker
       script:
       - echo "Installing dependencies"
       - corepack enable

@@ -323,3 +323,6 @@ scripts/create-a1-flex-instance.sh
 .br
 ngc-cli/
 tmp/
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
