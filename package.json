@@ -25,16 +25,18 @@
     "build": "astro build",
     "build:analyze": "astro build && pnpm run analyze:bundle",
     "analyze:bundle": "npx astro-bundle-analyzer dist",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx,astro,json}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,md,mdx,astro,json}\"",
-    "lint": "oxlint src",
-    "lint:ci": "oxlint src || exit 0",
-    "lint:fix": "oxlint --fix src",
+    "format": "biome format --write . && prettier --write \"**/*.{astro,mdx}\"",
+    "format:check": "biome format --check . && prettier --check \"**/*.{astro,mdx}\"",
+    "lint": "biome lint .",
+    "lint:ci": "biome lint . || exit 0",
+    "lint:fix": "biome lint --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "typecheck": "astro check && tsc --noEmit",
     "typecheck:strict": "tsx scripts/validate-typescript.ts",
     "type-check": "pnpm run typecheck",
     "check": "astro check",
-    "check:all": "pnpm run format:check && pnpm run lint && pnpm run typecheck",
+    "check:all": "pnpm run check && pnpm run typecheck",
     "test": "node ./scripts/local-test-runner.cjs",
     "test:unit": "vitest run --coverage",
     "test:integration": "vitest run tests/integration/",
@@ -217,7 +219,6 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "resend": "^6.3.0",
-    "ruv-swarm": "^1.0.20",
     "simple-git": "^3.29.0",
     "sonner": "^2.0.7",
     "swiper": "^12.0.3",
@@ -236,6 +237,7 @@
   "devDependencies": {
     "@astrojs/markdoc": "^0.15.8",
     "@astrojs/rss": "^4.0.13",
+    "@biomejs/biome": "^2.3.4",
     "@fontsource/inter": "^5.2.8",
     "@iconify-json/ri": "^1.2.6",
     "@iconify-json/uil": "^1.2.3",
@@ -277,6 +279,8 @@
     "esbuild": "^0.25.11",
     "eslint": "^9.39.0",
     "eslint-plugin-astro": "^1.4.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-vitest": "^0.5.4",
@@ -298,8 +302,6 @@
     "medium-zoom": "^1.1.0",
     "micromatch": "^4.0.8",
     "msw": "^2.11.6",
-    "oxc-parser": "^0.96.0",
-    "oxlint": "^1.25.0",
     "papaparse": "^5.5.3",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "8.3.0",
@@ -350,14 +352,18 @@
   "pnpm": {
     "overrides": {
       "@opentelemetry/api": "^1.9.0",
+      "@opentelemetry/otlp-proto-exporter-base": "^0.51.1",
+      "@azure/openai": "^2.0.0",
       "tmp": ">=0.2.4",
       "glob": "^11.0.3",
-      "inflight": "^2.0.0",
+      "node-domexception": "^2.0.2",
       "sitemap": "^9.0.0"
     },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",
+      "boolean": "3.2.0",
       "domexception": "4.0.0",
+      "inflight": "1.0.6",
       "lodash.get": "4.4.2",
       "@npmcli/move-file": "3.0.0",
       "are-we-there-yet": "4.0.2",
@@ -372,10 +378,10 @@
         "unocss"
       ],
       "ignoreMissing": [
-        "typescript",
-        "@opentelemetry/api"
+        "typescript"
       ],
       "allowedVersions": {
+        "@opentelemetry/api": "1.9.0",
         "@vercel/kv": ">=1.0.1",
         "@unocss/reset": ">=0.63.2"
       }
@@ -392,7 +398,6 @@
       "aws-sdk",
       "better-sqlite3",
       "bufferutil",
-      "claude-flow",
       "core-js",
       "deno",
       "esbuild",

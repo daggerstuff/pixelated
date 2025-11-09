@@ -237,6 +237,77 @@ class RealFairlearnAnalyzer:
         logger.info(".3f")
         self.is_trained = True
 
+    def _should_use_model_predictions(self) -> bool:
+        """Check if model predictions should be used"""
+        return (
+            self.is_trained
+            and self.model != "rule_based"
+            and self.model is not None
+        )
+
+    def _generate_model_predictions(
+        self,
+        X_scaled: np.ndarray,
+        X: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Generate predictions from model or rule-based fallback"""
+        if self._should_use_model_predictions():
+            predictions = self.model.predict(X_scaled)
+            probabilities = self.model.predict_proba(X_scaled)
+        else:
+            # Rule-based prediction for untrained model
+            predictions = np.array([1 if np.mean(X[0]) > 0.5 else 0])
+            probabilities = np.array([[0.5, 0.5]])
+        return predictions, probabilities
+
+    def _can_use_fairlearn(
+        self,
+        predictions: np.ndarray,
+        sensitive_features: Optional[np.ndarray]
+    ) -> bool:
+        """Check if Fairlearn can be used"""
+        return (
+            FAIRLEARN_AVAILABLE
+            and len(predictions) > 1
+            and sensitive_features is not None
+        )
+
+    def _calculate_fairlearn_metrics(
+        self,
+        predictions: np.ndarray,
+        sensitive_features: np.ndarray
+    ) -> tuple[float, float, float]:
+        """Calculate Fairlearn fairness metrics"""
+        try:
+            # Demographic parity difference
+            dp_diff = demographic_parity_difference(
+                y_true=np.array([0, 1]),  # Dummy for single prediction
+                y_pred=predictions,
+                sensitive_features=sensitive_features.flatten()[: len(predictions)],
+            )
+
+            # Equalized odds difference
+            eo_diff = equalized_odds_difference(
+                y_true=np.array([0, 1]),  # Dummy for single prediction
+                y_pred=predictions,
+                sensitive_features=sensitive_features.flatten()[: len(predictions)],
+            )
+
+            bias_score = float(max(abs(dp_diff), abs(eo_diff)))
+            return bias_score, float(dp_diff), float(eo_diff)
+        except Exception as e:
+            logger.warning(f"Fairlearn metrics calculation failed: {e}")
+            return 0.1, 0.0, 0.0  # Conservative fallback
+
+    def _calculate_fallback_bias_score(
+        self,
+        sensitive_features: Optional[np.ndarray]
+    ) -> float:
+        """Calculate fallback bias score"""
+        if sensitive_features is not None:
+            return float(np.std(sensitive_features.flatten()) * 0.1)
+        return 0.0
+
     async def analyze_fairness(
         self,
         session_data: Dict[str, Any],
@@ -251,65 +322,26 @@ class RealFairlearnAnalyzer:
             X_scaled = self.scaler.transform(X) if self.is_trained else X
 
             # Generate predictions
-            if (
-                self.is_trained
-                and self.model != "rule_based"
-                and self.model is not None
-            ):
-                predictions = self.model.predict(X_scaled)
-                probabilities = self.model.predict_proba(X_scaled)
-            else:
-                # Rule-based prediction for untrained model
-                predictions = np.array([1 if np.mean(X[0]) > 0.5 else 0])
-                probabilities = np.array([[0.5, 0.5]])
+            predictions, probabilities = self._generate_model_predictions(X_scaled, X)
 
             # Use provided sensitive features or extract from data
             if sensitive_features is None:
                 sensitive_features = sensitive_attrs
 
-            # Calculate fairness metrics using Fairlearn
-            if (
-                FAIRLEARN_AVAILABLE
-                and len(predictions) > 1
-                and sensitive_features is not None
-            ):
-                try:
-                    # Demographic parity difference
-                    dp_diff = demographic_parity_difference(
-                        y_true=np.array([0, 1]),  # Dummy for single prediction
-                        y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[
-                            : len(predictions)
-                        ],
-                    )
-
-                    # Equalized odds difference
-                    eo_diff = equalized_odds_difference(
-                        y_true=np.array([0, 1]),  # Dummy for single prediction
-                        y_pred=predictions,
-                        sensitive_features=sensitive_features.flatten()[
-                            : len(predictions)
-                        ],
-                    )
-
-                    bias_score = float(max(abs(dp_diff), abs(eo_diff)))
-
-                except Exception as e:
-                    logger.warning(f"Fairlearn metrics calculation failed: {e}")
-                    bias_score = 0.1  # Conservative fallback
+            # Calculate fairness metrics
+            dp_diff = 0.0
+            eo_diff = 0.0
+            if self._can_use_fairlearn(predictions, sensitive_features):
+                bias_score, dp_diff, eo_diff = self._calculate_fairlearn_metrics(
+                    predictions, sensitive_features
+                )
             else:
-                # Fallback calculation
-                if sensitive_features is not None:
-                    bias_score = float(np.std(sensitive_features.flatten()) * 0.1)
-                else:
-                    bias_score = 0.0
+                bias_score = self._calculate_fallback_bias_score(sensitive_features)
 
             return {
                 "bias_score": min(bias_score, 1.0),
-                "demographic_parity_difference": (
-                    dp_diff if "dp_diff" in locals() else 0.0
-                ),
-                "equalized_odds_difference": eo_diff if "eo_diff" in locals() else 0.0,
+                "demographic_parity_difference": dp_diff,
+                "equalized_odds_difference": eo_diff,
                 "dataset_size": len(X),
                 "predictions_generated": True,
                 "model_type": "RandomForest" if self.is_trained else "rule_based",
@@ -358,6 +390,104 @@ class RealInterpretabilityAnalyzer:
             except Exception as e:
                 logger.warning(f"LIME initialization failed: {e}")
 
+    def _extract_shap_feature_importance(
+        self,
+        shap_values,
+        feature_names: List[str]
+    ) -> Dict[str, float]:
+        """Extract feature importance from SHAP values"""
+        feature_importance = {}
+        if not hasattr(shap_values, "values"):
+            return feature_importance
+
+        # Calculate mean absolute SHAP values
+        if len(shap_values.values.shape) > 1:
+            mean_shap = np.mean(np.abs(shap_values.values), axis=0)
+        else:
+            mean_shap = np.abs(shap_values.values)
+
+        for i, feature_name in enumerate(feature_names):
+            if i < len(mean_shap):
+                feature_importance[feature_name] = float(mean_shap[i])
+
+        return feature_importance
+
+    def _perform_shap_analysis(
+        self,
+        input_data: np.ndarray,
+        feature_names: List[str],
+        results: Dict[str, Any]
+    ) -> None:
+        """Perform SHAP analysis"""
+        if not (SHAP_AVAILABLE and self.shap_explainer):
+            return
+
+        try:
+            shap_values = self.shap_explainer(input_data)
+            feature_importance = self._extract_shap_feature_importance(
+                shap_values, feature_names
+            )
+
+            if feature_importance:
+                results["feature_importance"] = feature_importance
+                results["methods_used"].append("shap")
+                results["explanation_quality"] = 0.85
+                results["bias_score"] = float(
+                    np.mean(list(feature_importance.values()))
+                )
+        except Exception as e:
+            logger.warning(f"SHAP analysis failed: {e}")
+
+    def _get_model_predict_function(self, model):
+        """Get the appropriate predict function from model"""
+        if hasattr(model, "predict_proba"):
+            return model.predict_proba
+        return model.predict
+
+    def _perform_lime_analysis(
+        self,
+        model,
+        input_data: np.ndarray,
+        feature_names: List[str],
+        results: Dict[str, Any]
+    ) -> None:
+        """Perform LIME analysis"""
+        if not (LIME_AVAILABLE and self.lime_explainer):
+            return
+
+        try:
+            predict_fn = self._get_model_predict_function(model)
+            lime_exp = self.lime_explainer.explain_instance(
+                input_data[0],
+                predict_fn,
+                num_features=min(5, len(feature_names)),
+            )
+
+            # Extract feature importance from LIME
+            lime_features = {}
+            for feature, importance in lime_exp.as_list():
+                lime_features[feature] = abs(importance)
+
+            # Merge with existing feature importance or use LIME results
+            if results.get("feature_importance"):
+                # Merge SHAP and LIME results
+                for feature, importance in lime_features.items():
+                    if feature in results["feature_importance"]:
+                        results["feature_importance"][feature] = (
+                            results["feature_importance"][feature] + importance
+                        ) / 2
+                    else:
+                        results["feature_importance"][feature] = importance
+            else:
+                results["feature_importance"] = lime_features
+
+            results["methods_used"].append("lime")
+            if results.get("explanation_quality", 0) < 0.75:
+                results["explanation_quality"] = 0.75
+
+        except Exception as e:
+            logger.warning(f"LIME analysis failed: {e}")
+
     async def analyze_interpretability(
         self, model, input_data: np.ndarray, feature_names: List[str]
     ) -> Dict[str, Any]:
@@ -371,61 +501,11 @@ class RealInterpretabilityAnalyzer:
                 "methods_used": [],
             }
 
-            # SHAP analysis
-            if SHAP_AVAILABLE and self.shap_explainer:
-                try:
-                    shap_values = self.shap_explainer(input_data)
-                    feature_importance = {}
+            # Perform SHAP analysis
+            self._perform_shap_analysis(input_data, feature_names, results)
 
-                    # Calculate mean absolute SHAP values for feature importance
-                    if hasattr(shap_values, "values"):
-                        if len(shap_values.values.shape) > 1:
-                            mean_shap = np.mean(np.abs(shap_values.values), axis=0)
-                        else:
-                            mean_shap = np.abs(shap_values.values)
-
-                        for i, feature_name in enumerate(feature_names):
-                            if i < len(mean_shap):
-                                feature_importance[feature_name] = float(mean_shap[i])
-
-                    results["feature_importance"] = feature_importance
-                    results["methods_used"].append("shap")
-                    results["explanation_quality"] = 0.85
-                    results["bias_score"] = float(
-                        np.mean(list(feature_importance.values()))
-                    )
-
-                except Exception as e:
-                    logger.warning(f"SHAP analysis failed: {e}")
-
-            # LIME analysis as fallback/supplement
-            if LIME_AVAILABLE and self.lime_explainer:
-                try:
-                    lime_exp = self.lime_explainer.explain_instance(
-                        input_data[0],
-                        (
-                            model.predict_proba
-                            if hasattr(model, "predict_proba")
-                            else model.predict
-                        ),
-                        num_features=min(5, len(feature_names)),
-                    )
-
-                    # Extract feature importance from LIME
-                    lime_features = {}
-                    for feature, importance in lime_exp.as_list():
-                        lime_features[feature] = abs(importance)
-
-                    if not results["feature_importance"]:
-                        results["feature_importance"] = lime_features
-
-                    results["methods_used"].append("lime")
-                    results["explanation_quality"] = max(
-                        results["explanation_quality"], 0.75
-                    )
-
-                except Exception as e:
-                    logger.warning(f"LIME analysis failed: {e}")
+            # Perform LIME analysis as fallback/supplement
+            self._perform_lime_analysis(model, input_data, feature_names, results)
 
             # Calculate confidence based on explanation quality
             results["confidence"] = results["explanation_quality"]
@@ -457,6 +537,79 @@ class RealHuggingFaceAnalyzer:
             except Exception as e:
                 logger.warning(f"Hugging Face evaluator initialization failed: {e}")
 
+    def _calculate_toxicity_score(self, text: str) -> float:
+        """Calculate toxicity score from text"""
+        toxic_words = [
+            "hate",
+            "stupid",
+            "idiot",
+            "awful",
+            "terrible",
+            "worst",
+        ]
+        text_lower = text.lower()
+        text_words = text.split()
+
+        if not text_words:
+            return 0.0
+
+        toxic_count = sum(1 for word in toxic_words if word in text_lower)
+        toxicity_ratio = toxic_count / len(text_words)
+        return min(toxicity_ratio * 5, 1.0)
+
+    def _calculate_regard_score(self, text: str) -> float:
+        """Calculate regard score from text"""
+        positive_indicators = ["good", "great", "excellent", "amazing"]
+        negative_indicators = ["bad", "terrible", "awful", "horrible"]
+        text_lower = text.lower()
+
+        positive_count = sum(
+            1 for word in positive_indicators if word in text_lower
+        )
+        negative_count = sum(
+            1 for word in negative_indicators if word in text_lower
+        )
+
+        if positive_count > negative_count:
+            return 0.7
+        if negative_count > positive_count:
+            return 0.3
+        return 0.5  # Neutral
+
+    def _calculate_honest_score(self) -> float:
+        """Calculate honesty score (placeholder)"""
+        return 0.8  # Assume mostly honest
+
+    def _process_metric(
+        self,
+        metric_name: str,
+        text: str,
+        results: Dict[str, Any]
+    ) -> None:
+        """Process a single metric"""
+        try:
+            if metric_name == "toxicity":
+                results["toxicity_score"] = self._calculate_toxicity_score(text)
+            elif metric_name == "regard":
+                results["fairness_metrics"]["regard"] = self._calculate_regard_score(text)
+            elif metric_name == "honest":
+                results["fairness_metrics"]["honest"] = self._calculate_honest_score()
+        except Exception as e:
+            logger.warning(f"Failed to compute {metric_name} metric: {e}")
+
+    def _calculate_overall_bias_score(self, results: Dict[str, Any]) -> float:
+        """Calculate overall bias score from metrics"""
+        toxicity = results.get("toxicity_score", 0.0)
+        fairness_metrics = results.get("fairness_metrics", {})
+        regard = fairness_metrics.get("regard", 0.5)
+
+        # Convert regard to bias score (lower regard = higher bias)
+        regard_bias = abs(regard - 0.5) * 2
+
+        # Combine scores
+        bias_score = (toxicity * 0.6 + regard_bias * 0.4)
+        return min(bias_score, 1.0)
+
     async def analyze_text_bias(self, text: str) -> Dict[str, Any]:
         """Analyze text for bias using Hugging Face models"""
         try:
@@ -475,70 +628,17 @@ class RealHuggingFaceAnalyzer:
 
             # Use evaluate library for bias detection
             for metric_name in self.metrics:
-                try:
-                    if metric_name == "toxicity":
-                        # Use a simple heuristic for toxicity (placeholder for real model)
-                        toxic_words = [
-                            "hate",
-                            "stupid",
-                            "idiot",
-                            "awful",
-                            "terrible",
-                            "worst",
-                        ]
-                        toxicity_score = (
-                            sum(1 for word in toxic_words if word in text.lower())
-                            / len(text.split())
-                            if text.split()
-                            else 0
-                        )
-                        results["toxicity_score"] = min(toxicity_score * 5, 1.0)
-
-                    elif metric_name == "regard":
-                        # Simple regard analysis (placeholder)
-                        positive_indicators = ["good", "great", "excellent", "amazing"]
-                        negative_indicators = ["bad", "terrible", "awful", "horrible"]
-
-                        positive_count = sum(
-                            1 for word in positive_indicators if word in text.lower()
-                        )
-                        negative_count = sum(
-                            1 for word in negative_indicators if word in text.lower()
-                        )
-
-                        regard_score = 0.5  # Neutral
-                        if positive_count > negative_count:
-                            regard_score = 0.7
-                        elif negative_count > positive_count:
-                            regard_score = 0.3
-
-                        results["fairness_metrics"]["regard"] = regard_score
-
-                    elif metric_name == "honest":
-                        # Simple honesty assessment (placeholder)
-                        honest_score = 0.8  # Assume mostly honest
-                        results["fairness_metrics"]["honest"] = honest_score
-
-                except Exception as e:
-                    logger.warning(f"Failed to compute {metric_name} metric: {e}")
+                self._process_metric(metric_name, text, results)
 
             # Calculate overall bias score
-            bias_indicators = [
-                results["toxicity_score"],
-                1.0
-                - (
-                    results["fairness_metrics"].get("regard", 0.5) * 2
-                ),  # Convert to bias score
-                1.0
-                - results["fairness_metrics"].get(
-                    "honest", 0.8
-                ),  # Convert to bias score
-            ]
+            results["bias_score"] = self._calculate_overall_bias_score(results)
 
-            results["bias_score"] = float(np.mean(bias_indicators))
-            results["confidence"] = (
-                0.7  # Moderate confidence for heuristic-based analysis
-            )
+            # Calculate confidence based on metrics computed
+            metrics_computed = len([
+                m for m in self.metrics
+                if m == "toxicity" or m in results.get("fairness_metrics", {})
+            ])
+            results["confidence"] = min(metrics_computed / len(self.metrics), 1.0)
 
             return results
 

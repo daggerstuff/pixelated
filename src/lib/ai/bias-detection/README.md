@@ -541,7 +541,7 @@ export CACHE_MODELS=true
 tail -f logs/bias-detection-audit.log
 
 # Check data masking
-python -c "from python.bias_detection_service import mask_sensitive_data; print('Masking works')"
+python -c "from python_service.bias_detection_service import mask_sensitive_data; print('Masking works')"
 ```
 
 ### Performance Optimization

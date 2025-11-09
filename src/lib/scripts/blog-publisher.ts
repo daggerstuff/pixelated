@@ -7,6 +7,7 @@ import {
 import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publisher')
 
@@ -133,9 +134,9 @@ async function generateReport(): Promise<void> {
   console.log(report)
 
   // Save to file
-  const reportDir = path.join(process.cwd(), 'reports')
-  const filename = `blog-pipeline-${new Date().toISOString().split('T')[0]}.md`
-  const reportPath = path.join(reportDir, filename)
+  const reportDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'reports')
+  const filename = sanitizeFilename(`blog-pipeline-${new Date().toISOString().split('T')[0]}.md`)
+  const reportPath = safeJoin(reportDir, filename)
 
   try {
     // Ensure reports directory exists
@@ -283,24 +284,24 @@ async function generatePost(
   }
 
   // Determine the target directory
-  let targetDir = path.join(process.cwd(), 'src/content/blog')
+  let targetDir = safeJoin(ALLOWED_DIRECTORIES.CONTENT, 'blog')
 
   if (seriesName) {
     // Convert series name to kebab-case directory name
-    const seriesDirName = seriesName.toLowerCase().replace(/\s+/g, '-')
-    targetDir = path.join(targetDir, seriesDirName)
+    const seriesDirName = sanitizeFilename(seriesName.toLowerCase().replace(/\s+/g, '-'))
+    targetDir = safeJoin(targetDir, seriesDirName)
 
     // Ensure series directory exists
     await fs.mkdir(targetDir, { recursive: true })
   }
 
   // Create a slug from the title
-  const slug = postTitle
+  const slug = sanitizeFilename(postTitle
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
+    .replace(/\s+/g, '-'))
 
-  const filePath = path.join(targetDir, `${slug}.mdx`)
+  const filePath = safeJoin(targetDir, `${slug}.mdx`)
 
   // Check if file already exists
   try {

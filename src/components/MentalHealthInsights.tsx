@@ -22,31 +22,38 @@ interface MentalHealthInsightsProps {
   analysis: EnhancedMentalHealthAnalysis
 }
 
+const RISK_BADGE_VARIANT_MAP: Record<
+  'low' | 'medium' | 'high',
+  'destructive' | 'outline' | 'secondary'
+> = {
+  high: 'destructive',
+  medium: 'outline',
+  low: 'secondary',
+} as const
+
+const getRiskIconComponent = (
+  riskLevel: 'low' | 'medium' | 'high',
+): React.ReactElement => {
+  switch (riskLevel) {
+    case 'high':
+      return <AlertTriangle className="h-4 w-4 text-red-500" />
+    case 'medium':
+      return <Shield className="h-4 w-4 text-yellow-500" />
+    case 'low':
+    default:
+      return <Heart className="h-4 w-4 text-green-500" />
+  }
+}
+
 export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
   analysis,
 }) => {
   const getRiskIcon = () => {
-    switch (analysis.riskLevel) {
-      case 'high':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />
-      case 'medium':
-        return <Shield className="h-4 w-4 text-yellow-500" />
-      case 'low':
-      default:
-        return <Heart className="h-4 w-4 text-green-500" />
-    }
+    return getRiskIconComponent(analysis.riskLevel)
   }
 
   const getRiskBadgeVariant = () => {
-    switch (analysis.riskLevel) {
-      case 'high':
-        return 'destructive'
-      case 'medium':
-        return 'outline'
-      case 'low':
-      default:
-        return 'secondary'
-    }
+    return RISK_BADGE_VARIANT_MAP[analysis.riskLevel] || 'secondary'
   }
 
   return (

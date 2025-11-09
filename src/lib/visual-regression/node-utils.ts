@@ -5,6 +5,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
+import { safeJoin, ALLOWED_DIRECTORIES, validatePath, sanitizeFilename } from '../../utils/path-security'
 
 export interface Screenshot {
   name: string
@@ -33,7 +34,7 @@ export const getVisualRegressionData =
   async (): Promise<VisualRegressionData> => {
     try {
       // Path to visual test results directory
-      const testResultsDir = path.join(process.cwd(), 'test-results')
+      const testResultsDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'test-results')
 
       if (!fs.existsSync(testResultsDir)) {
         return {
@@ -54,7 +55,8 @@ export const getVisualRegressionData =
           const items = fs.readdirSync(dir)
 
           for (const item of items) {
-            const itemPath = path.join(dir, item)
+            const sanitizedItem = sanitizeFilename(item)
+            const itemPath = validatePath(sanitizedItem, dir)
             const stats = fs.statSync(itemPath)
 
             if (stats.isDirectory()) {
@@ -68,9 +70,10 @@ export const getVisualRegressionData =
                 path.relative(testResultsDir, dir).replace(/[/\\]/g, '/') ||
                 'root'
 
-              const expectedPath = path.join(dir, `${baseName}-expected.png`)
-              const actualPath = path.join(dir, `${baseName}-actual.png`)
-              const diffPath = path.join(dir, `${baseName}-diff.png`)
+              const sanitizedBaseName = sanitizeFilename(baseName)
+              const expectedPath = safeJoin(dir, `${sanitizedBaseName}-expected.png`)
+              const actualPath = safeJoin(dir, `${sanitizedBaseName}-actual.png`)
+              const diffPath = safeJoin(dir, `${sanitizedBaseName}-diff.png`)
 
               const hasExpected = fs.existsSync(expectedPath)
               const hasActual = fs.existsSync(actualPath)

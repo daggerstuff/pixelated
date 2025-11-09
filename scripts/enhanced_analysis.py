@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Style Analyzer for Reorganized Transcripts
-Processes all therapeutic transcripts and extracts training segments by communication style.
+Enhanced Style Analyzer - Improved pattern matching and quality assessment
 """
 
 import json
@@ -10,7 +9,6 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("enhanced_analysis")
 
@@ -20,92 +18,116 @@ class EnhancedStyleAnalyzer:
         self.output_dir = Path("/root/pixelated/data/training_segments")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Style patterns for therapeutic communication
+        # Improved style patterns
         self.style_patterns = {
             "therapeutic": [
-                r"\b(?:trauma|healing|recovery|therapy|therapeutic|mental health|emotional|psychological)\b",
-                r"\b(?:cope|coping|process|processing|work through|heal from)\b",
-                r"\b(?:boundaries|self-care|validation|support|understanding)\b",
-                r"\b(?:anxiety|depression|ptsd|complex trauma|attachment|shame)\b"
+                r"\b(?:trauma|healing|recovery|therapy|therapeutic|counseling|treatment)\b",
+                r"\b(?:emotional|psychological|mental health|wellbeing|wellness)\b",
+                r"\b(?:cope|coping|process|heal|recover|work through)\b",
+                r"\b(?:boundaries|self-care|validation|support|understanding|compassion)\b",
+                r"\b(?:anxiety|depression|ptsd|complex trauma|attachment|shame|guilt)\b",
+                r"\b(?:narcissist|abuse|toxic|codependent|dysfunctional)\b"
             ],
             "educational": [
-                r"\b(?:understand|learn|explain|research|study|evidence|science)\b",
-                r"\b(?:important to know|need to understand|let me explain|research shows)\b",
-                r"\b(?:definition|concept|theory|framework|approach|method)\b",
-                r"\b(?:psychology|neuroscience|brain|cognitive|behavioral)\b"
+                r"\b(?:understand|learn|explain|teach|educate|inform|clarify)\b",
+                r"\b(?:research|study|evidence|science|scientific|data|findings)\b",
+                r"\b(?:definition|concept|theory|framework|approach|method|technique)\b",
+                r"\b(?:psychology|neuroscience|brain|cognitive|behavioral|clinical)\b",
+                r"\b(?:important to|need to understand|let me explain|studies show)\b"
             ],
             "empathetic": [
-                r"\b(?:feel|feeling|feelings|emotion|emotional|hurt|pain|difficult)\b",
-                r"\b(?:understand|compassion|empathy|support|care|love)\b",
-                r"\b(?:I hear you|I see you|that must be|I can imagine)\b",
-                r"\b(?:valid|normal|okay to feel|makes sense|understandable)\b"
+                r"\b(?:feel|feeling|feelings|emotion|emotional|hurt|pain|suffering)\b",
+                r"\b(?:understand|compassion|empathy|support|care|love|kindness)\b",
+                r"\b(?:I hear you|I see you|that must be|I can imagine|I know)\b",
+                r"\b(?:valid|normal|okay|natural|understandable|makes sense)\b",
+                r"\b(?:difficult|hard|challenging|tough|struggle|struggling)\b"
             ],
             "practical": [
-                r"\b(?:do|try|practice|step|action|strategy|technique|tool)\b",
-                r"\b(?:here\'s what|you can|start by|first step|next time)\b",
-                r"\b(?:exercise|activity|homework|assignment|goal|plan)\b",
-                r"\b(?:daily|routine|habit|schedule|structure|organize)\b"
+                r"\b(?:do|try|practice|step|action|strategy|technique|tool|method)\b",
+                r"\b(?:here\'s what|you can|start by|first step|next time|begin)\b",
+                r"\b(?:exercise|activity|homework|assignment|goal|plan|routine)\b",
+                r"\b(?:daily|habit|schedule|structure|organize|implement)\b",
+                r"\b(?:tip|advice|suggestion|recommendation|guideline)\b"
             ]
         }
 
     def analyze_segment_style(self, text: str) -> tuple[str, float]:
         """Analyze text segment and return dominant style with confidence score."""
         style_scores = {}
+        text_lower = text.lower()
 
         for style, patterns in self.style_patterns.items():
             score = 0
             for pattern in patterns:
-                matches = len(re.findall(pattern, text, re.IGNORECASE))
+                matches = len(re.findall(pattern, text_lower))
                 score += matches
 
-            # Normalize by text length
+            # Normalize by text length (per 100 words)
             words = len(text.split())
-            style_scores[style] = score / max(words, 1) * 100
+            style_scores[style] = (score / max(words, 1)) * 100
 
         # Find dominant style
-        dominant_style = max(style_scores, key=style_scores.get)
+        dominant_style = max(style_scores, key=lambda k: style_scores[k])
         confidence = style_scores[dominant_style]
 
         return dominant_style, confidence
 
+    def _calculate_length_score(self, word_count: int) -> float:
+        """Calculate length score based on word count"""
+        if word_count < 30:
+            return 0.2
+        if word_count > 400:
+            return 0.6
+        return 1.0
+
+    def _calculate_content_score(self, text: str) -> float:
+        """Calculate content score based on therapeutic indicators"""
+        therapeutic_indicators = [
+            "trauma", "healing", "therapy", "emotional", "mental", "psychological",
+            "boundaries", "self-care", "coping", "recovery", "support", "anxiety",
+            "depression", "relationship", "narcissist", "abuse", "toxic", "healthy"
+        ]
+        text_lower = text.lower()
+        content_score = sum(
+            0.08 for indicator in therapeutic_indicators
+            if indicator in text_lower
+        )
+        return min(content_score, 1.0)
+
+    def _calculate_readability_score(self, text: str) -> float:
+        """Calculate readability score based on sentence length"""
+        sentences = [s.strip() for s in re.split(r"[.!?]+", text) if s.strip()]
+        if not sentences:
+            return 0.5
+
+        avg_sentence_length = sum(len(s.split()) for s in sentences) / len(sentences)
+        return 1.0 if 5 <= avg_sentence_length <= 30 else 0.7
+
     def assess_quality(self, text: str) -> float:
-        """Assess segment quality based on multiple criteria."""
+        """Assess segment quality - more lenient scoring."""
         words = text.split()
         word_count = len(words)
 
-        # Length criteria (50-300 words optimal)
-        if word_count < 50:
-            length_score = 0.3
-        elif word_count > 300:
-            length_score = 0.7
-        else:
-            length_score = 1.0
+        length_score = self._calculate_length_score(word_count)
+        content_score = self._calculate_content_score(text)
+        readability_score = self._calculate_readability_score(text)
 
-        # Content quality (therapeutic concepts)
-        therapeutic_terms = [
-            "trauma", "healing", "therapy", "emotional", "mental health",
-            "boundaries", "self-care", "coping", "recovery", "support"
-        ]
-
-        content_score = 0
-        for term in therapeutic_terms:
-            if term.lower() in text.lower():
-                content_score += 0.1
-        content_score = min(content_score, 1.0)
-
-        # Coherence (sentence structure)
-        sentences = text.split(".")
-        avg_sentence_length = sum(len(s.split()) for s in sentences) / max(len(sentences), 1)
-        coherence_score = 1.0 if 8 <= avg_sentence_length <= 25 else 0.7
-
-        # Overall quality score
-        quality = (length_score * 0.4 + content_score * 0.4 + coherence_score * 0.2)
+        # Overall quality (more lenient thresholds)
+        quality = (length_score * 0.3 + content_score * 0.5 + readability_score * 0.2)
         return quality
 
-    def extract_segments(self, text: str, min_words: int = 50) -> list[str]:
-        """Extract meaningful segments from text."""
-        # Split by sentences and group into segments
-        sentences = re.split(r"[.!?]+", text)
+    def _process_paragraph(self, paragraph: str, min_words: int) -> list[str]:
+        """Process a single paragraph into segments"""
+        word_count = len(paragraph.split())
+        if min_words <= word_count <= 400:
+            return [paragraph]
+        if word_count > 400:
+            return self._split_long_paragraph(paragraph, min_words)
+        return []
+
+    def _split_long_paragraph(self, paragraph: str, min_words: int) -> list[str]:
+        """Split long paragraph into smaller segments"""
+        sentences = re.split(r"[.!?]+", paragraph)
         segments = []
         current_segment = []
         current_words = 0
@@ -115,25 +137,31 @@ class EnhancedStyleAnalyzer:
             if not sentence:
                 continue
 
-            words = len(sentence.split())
+            sentence_words = len(sentence.split())
 
-            if current_words + words > 300:  # Max segment size
-                if current_segment:
-                    segments.append(" ".join(current_segment))
+            if current_words + sentence_words > 400:
+                if current_segment and current_words >= min_words:
+                    segments.append(". ".join(current_segment) + ".")
                 current_segment = [sentence]
-                current_words = words
+                current_words = sentence_words
             else:
                 current_segment.append(sentence)
-                current_words += words
+                current_words += sentence_words
 
-                if current_words >= min_words:
-                    segments.append(" ".join(current_segment))
-                    current_segment = []
-                    current_words = 0
-
-        # Add remaining segment if substantial
+        # Add remaining segment
         if current_segment and current_words >= min_words:
-            segments.append(" ".join(current_segment))
+            segments.append(". ".join(current_segment) + ".")
+
+        return segments
+
+    def extract_segments(self, text: str, min_words: int = 30) -> list[str]:
+        """Extract segments with more flexible approach."""
+        paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
+        segments = []
+
+        for paragraph in paragraphs:
+            paragraph_segments = self._process_paragraph(paragraph, min_words)
+            segments.extend(paragraph_segments)
 
         return segments
 
@@ -150,8 +178,8 @@ class EnhancedStyleAnalyzer:
                 style, confidence = self.analyze_segment_style(segment)
                 quality = self.assess_quality(segment)
 
-                # Only include high-quality segments
-                if quality >= 0.7 and confidence >= 0.1:
+                # More lenient thresholds
+                if quality >= 0.4 and len(segment.split()) >= 30:
                     results.append({
                         "text": segment,
                         "style": style,
@@ -180,19 +208,22 @@ class EnhancedStyleAnalyzer:
             txt_files = list(directory.glob("*.txt"))
             total_files += len(txt_files)
 
-            logger.info(f"Processing {len(txt_files)} files in {directory.name}")
+        logger.info(f"Processing {total_files} total files across {len(directories)} directories")
+
+        for directory in directories:
+            txt_files = list(directory.glob("*.txt"))
 
             for file_path in txt_files:
                 segments = self.process_file(file_path)
 
                 for segment in segments:
                     style = segment["style"]
-                    quality_tier = "high_quality" if segment["quality"] >= 0.85 else "medium_quality"
+                    quality_tier = "high_quality" if segment["quality"] >= 0.7 else "medium_quality"
                     all_segments[f"{style}_{quality_tier}"].append(segment)
 
                 processed_files += 1
 
-                if processed_files % 50 == 0:
+                if processed_files % 25 == 0:
                     logger.info(f"Processed {processed_files}/{total_files} files")
 
         return dict(all_segments)
@@ -202,13 +233,13 @@ class EnhancedStyleAnalyzer:
         summary = {}
 
         for category, segment_list in segments.items():
-            # Save segments to file
-            output_file = self.output_dir / f"{category}.json"
-            with open(output_file, "w", encoding="utf-8") as f:
-                json.dump(segment_list, f, indent=2, ensure_ascii=False)
+            if segment_list:  # Only save non-empty categories
+                output_file = self.output_dir / f"{category}.json"
+                with open(output_file, "w", encoding="utf-8") as f:
+                    json.dump(segment_list, f, indent=2, ensure_ascii=False)
 
-            logger.info(f"Exported {len(segment_list)} {category} examples")
-            summary[category] = len(segment_list)
+                logger.info(f"Exported {len(segment_list)} {category} examples")
+                summary[category] = len(segment_list)
 
         # Create summary
         total_segments = sum(summary.values())
@@ -237,7 +268,6 @@ class EnhancedStyleAnalyzer:
         logger.info(f"Summary: {final_summary}")
 
 def main():
-    """Main function to run enhanced analysis."""
     base_path = "/root/pixelated/.notes/transcripts2"
 
     logger.info("Starting enhanced style analysis on reorganized transcripts")
@@ -250,3 +280,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

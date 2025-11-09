@@ -29,7 +29,7 @@ import warnings
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 # Third-party libraries
 import jwt
@@ -1409,33 +1409,42 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _extract_text_content(self, session_data: SessionData) -> str:
-        """Extract all text content from session data"""
-        text_parts = [
+    def _extract_ai_response_text(self, ai_responses: Optional[List[Dict]]) -> List[str]:
+        """Extract text from AI responses"""
+        if not ai_responses:
+            return []
+        return [
             response["content"]
-            for response in session_data.ai_responses or []
+            for response in ai_responses
             if "content" in response
         ]
 
-        # Extract from transcripts
-        text_parts.extend(
-            [
-                transcript["text"]
-                for transcript in session_data.transcripts or []
-                if "text" in transcript
-            ]
-        )
+    def _extract_transcript_text(self, transcripts: Optional[List[Dict]]) -> List[str]:
+        """Extract text from transcripts"""
+        if not transcripts:
+            return []
+        return [
+            transcript["text"]
+            for transcript in transcripts
+            if "text" in transcript
+        ]
 
-        # Extract from content
-        if session_data.content:
-            text_parts.extend(
-                [
-                    value
-                    for value in session_data.content.values()
-                    if isinstance(value, str)
-                ]
-            )
+    def _extract_content_text(self, content: Optional[Dict]) -> List[str]:
+        """Extract text from content dictionary"""
+        if not content:
+            return []
+        return [
+            value
+            for value in content.values()
+            if isinstance(value, str)
+        ]
 
+    def _extract_text_content(self, session_data: SessionData) -> str:
+        """Extract all text content from session data"""
+        text_parts = []
+        text_parts.extend(self._extract_ai_response_text(session_data.ai_responses))
+        text_parts.extend(self._extract_transcript_text(session_data.transcripts))
+        text_parts.extend(self._extract_content_text(session_data.content))
         return " ".join(text_parts)
 
     def _calculate_overall_bias_score(
@@ -1744,6 +1753,26 @@ def analyze_session_async_endpoint():
         )
 
 
+def _validate_batch_request(data: Optional[Dict]) -> tuple[Optional[List], Optional[tuple]]:
+    """Validate batch analysis request"""
+    if not data or "sessions" not in data:
+        return None, (jsonify({"error": "No sessions data provided"}), 400)
+
+    sessions_data = data["sessions"]
+    if not isinstance(sessions_data, list) or len(sessions_data) == 0:
+        return None, (jsonify({"error": "Sessions must be a non-empty list"}), 400)
+
+    return sessions_data, None
+
+def _setup_development_user():
+    """Setup development user if needed"""
+    if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
+        g.user_id = "development-user"
+
+def _calculate_estimated_workers(sessions_count: int, batch_size: int) -> int:
+    """Calculate estimated number of workers needed"""
+    return min(sessions_count // batch_size + 1, 10)
+
 @app.route("/batch/analyze", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def batch_analyze_sessions_endpoint():
@@ -1752,34 +1781,34 @@ def batch_analyze_sessions_endpoint():
         return jsonify({"error": "Distributed processing not available"}), 503
 
     try:
-        # Set default user_id only in development
-        if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
-            g.user_id = "development-user"
-
+        _setup_development_user()
         data = request.get_json()
-        if not data or "sessions" not in data:
-            return jsonify({"error": "No sessions data provided"}), 400
+        sessions_data, error_response = _validate_batch_request(data)
 
-        sessions_data = data["sessions"]
+        if error_response is not None:
+            error_json, status_code = error_response
+            return error_json, status_code
+
+        # Type narrowing: sessions_data is guaranteed to be a list here
+        if sessions_data is None:
+            return jsonify({"error": "Invalid request: sessions data is missing"}), 400
+
+        sessions_count = len(sessions_data)
+
         batch_size = data.get("batch_size", 10)
-
-        if not isinstance(sessions_data, list) or len(sessions_data) == 0:
-            return jsonify({"error": "Sessions must be a non-empty list"}), 400
+        user_id = getattr(g, "user_id", "unknown")
 
         # Submit batch task to Celery
-        task = batch_analyze_sessions.delay(
-            sessions_data, getattr(g, "user_id", "unknown"), batch_size
-        )
+        task = batch_analyze_sessions.delay(sessions_data, user_id, batch_size)
+        estimated_workers = _calculate_estimated_workers(sessions_count, batch_size)
 
         return jsonify(
             {
                 "task_id": task.id,
                 "status": "submitted",
-                "message": f"Batch analysis of {len(sessions_data)} sessions submitted for distributed processing",
+                "message": f"Batch analysis of {sessions_count} sessions submitted for distributed processing",
                 "check_status_url": f"/task/{task.id}",
-                "estimated_workers_needed": min(
-                    len(sessions_data) // batch_size + 1, 10
-                ),
+                "estimated_workers_needed": estimated_workers,
             }
         )
 
@@ -1830,34 +1859,49 @@ def validate_dataset_quality_endpoint():
         )
 
 
+def _check_celery_available() -> bool:
+    """Check if Celery is available"""
+    return CELERY_AVAILABLE and celery_app is not None
+
+def _get_task_result(task_id: str):
+    """Get task result from Celery"""
+    if not _check_celery_available():
+        return None
+    return celery_app.AsyncResult(task_id) if celery_app else None
+
+def _build_task_response(result) -> Dict[str, Any]:
+    """Build response based on task state"""
+    if not result:
+        return {"error": "Task result is None"}
+
+    response = {
+        "status": result.status,
+        "current": result.info or None,
+    }
+
+    state_handlers = {
+        "PENDING": lambda: {"state": "PENDING"},
+        "PROGRESS": lambda: {"progress": result.info},
+        "SUCCESS": lambda: {"result": result.result},
+        "FAILURE": lambda: {"error": str(result.info)}
+    }
+
+    handler = state_handlers.get(result.state)
+    if handler:
+        response.update(handler())
+
+    return response
+
 @app.route("/task/<task_id>", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def get_task_status(task_id):
     """Get the status and result of a distributed task"""
-    if not CELERY_AVAILABLE or celery_app is None:
+    if not _check_celery_available():
         return jsonify({"error": "Distributed processing not available"}), 503
 
     try:
-        # Get task result
-        result = celery_app.AsyncResult(task_id) if celery_app else None
-
-        # Added a check to ensure `result` is not None before accessing attributes
-        if result:
-            response = {
-                "status": result.status,
-                "current": result.info or None,
-            }
-            if result.state == "PENDING":
-                response["state"] = "PENDING"
-            elif result.state == "PROGRESS":
-                response["progress"] = result.info
-            elif result.state == "SUCCESS":
-                response["result"] = result.result
-            elif result.state == "FAILURE":
-                response["error"] = str(result.info)
-        else:
-            response = {"error": "Task result is None"}
-
+        result = _get_task_result(task_id)
+        response = _build_task_response(result)
         return jsonify(response)
 
     except Exception as e:
@@ -1868,39 +1912,51 @@ def get_task_status(task_id):
         )
 
 
+def _get_worker_task_counts(inspect_obj) -> tuple[Dict, Dict, Dict]:
+    """Get task counts for each worker"""
+    if inspect_obj is None:
+        return {}, {}, {}
+
+    active_tasks = inspect_obj.active() or {}
+    scheduled_tasks = inspect_obj.scheduled() or {}
+    reserved_tasks = inspect_obj.reserved() or {}
+
+    return active_tasks, scheduled_tasks, reserved_tasks
+
+def _build_worker_status(
+    active_tasks: Dict,
+    scheduled_tasks: Dict,
+    reserved_tasks: Dict
+) -> Dict[str, Dict[str, Any]]:
+    """Build worker status dictionary"""
+    workers_status = {}
+    all_worker_names = (
+        set(active_tasks.keys())
+        | set(scheduled_tasks.keys())
+        | set(reserved_tasks.keys())
+    )
+
+    for worker_name in all_worker_names:
+        workers_status[worker_name] = {
+            "active_tasks": len(active_tasks.get(worker_name, [])),
+            "scheduled_tasks": len(scheduled_tasks.get(worker_name, [])),
+            "reserved_tasks": len(reserved_tasks.get(worker_name, [])),
+            "status": "active",
+        }
+
+    return workers_status
+
 @app.route("/workers/status", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def get_workers_status():
     """Get status of distributed workers"""
-    if not CELERY_AVAILABLE or celery_app is None:
+    if not _check_celery_available():
         return jsonify({"error": "Distributed processing not available"}), 503
 
     try:
-        # Get active workers (simplified - in production you'd use flower or custom monitoring)
         inspect = celery_app.control.inspect() if celery_app else None
-
-        # Add None checks before calling methods on inspect
-        if inspect is not None:
-            active_tasks = inspect.active() or {}
-            scheduled_tasks = inspect.scheduled() or {}
-            reserved_tasks = inspect.reserved() or {}
-        else:
-            active_tasks = {}
-            scheduled_tasks = {}
-            reserved_tasks = {}
-
-        workers_status = {}
-        for worker_name in (
-            set(active_tasks.keys())
-            | set(scheduled_tasks.keys())
-            | set(reserved_tasks.keys())
-        ):
-            workers_status[worker_name] = {
-                "active_tasks": len(active_tasks.get(worker_name, [])),
-                "scheduled_tasks": len(scheduled_tasks.get(worker_name, [])),
-                "reserved_tasks": len(reserved_tasks.get(worker_name, [])),
-                "status": "active",
-            }
+        active_tasks, scheduled_tasks, reserved_tasks = _get_worker_task_counts(inspect)
+        workers_status = _build_worker_status(active_tasks, scheduled_tasks, reserved_tasks)
 
         return jsonify(
             {

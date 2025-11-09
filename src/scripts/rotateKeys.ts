@@ -19,6 +19,7 @@ import path from 'node:path'
 import process from 'node:process'
 
 import { createCryptoSystem } from '../lib/crypto/index'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../utils/path-security'
 
 // Parse command line arguments
 const args = process.argv.slice(2)
@@ -27,11 +28,11 @@ const purposeArg = args.find((arg) => arg.startsWith('--purpose='))
 const purpose = purposeArg ? purposeArg.split('=')[1] : undefined
 
 // Configuration
-const LOG_DIR = path.join(process.cwd(), 'logs')
-const LOG_FILE = path.join(
-  LOG_DIR,
+const LOG_DIR = ALLOWED_DIRECTORIES.LOGS
+const logFilename = sanitizeFilename(
   `key-rotation-${new Date().toISOString().split('T')[0]}.log`,
 )
+const LOG_FILE = safeJoin(LOG_DIR, logFilename)
 
 /**
  * Logs a message to both console and log file

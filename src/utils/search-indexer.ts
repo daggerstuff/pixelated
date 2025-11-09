@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from './path-security'
 
 interface CollectionEntry {
   id: string
@@ -17,10 +18,8 @@ async function getCollection(
   collectionName: string,
 ): Promise<CollectionEntry[]> {
   try {
-    const contentDir = path.join(
-      process.cwd(),
-      'src',
-      'content',
+    const contentDir = safeJoin(
+      ALLOWED_DIRECTORIES.CONTENT,
       collectionName,
     )
 
@@ -45,7 +44,8 @@ async function getCollection(
       }
 
       try {
-        const filePath = path.join(contentDir, file.name)
+        const sanitizedFilename = sanitizeFilename(file.name)
+        const filePath = safeJoin(contentDir, sanitizedFilename)
         const content = await fs.readFile(filePath, 'utf-8')
 
         // Simple frontmatter extraction

@@ -4,6 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { securePathJoin } from '../utils/index'
+import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publishing')
 
@@ -168,14 +169,15 @@ export class BlogPublishingService {
 
       logger.info(`Publishing post: ${post.metadata.title}`)
 
-      // Read the file
-      const content = await fs.readFile(post.filePath, 'utf8')
+      // Read the file (validate path first)
+      const validatedPath = validatePath(post.filePath, ALLOWED_DIRECTORIES.CONTENT)
+      const content = await fs.readFile(validatedPath, 'utf8')
 
       // Update the draft status in frontmatter
       const updatedContent = content.replace(/draft:\s*true/i, 'draft: false')
 
       // Write back to the file
-      await fs.writeFile(post.filePath, updatedContent, 'utf8')
+      await fs.writeFile(validatedPath, updatedContent, 'utf8')
 
       // Update post status
       post.status = PostStatus.PUBLISHED
@@ -216,7 +218,9 @@ export class BlogPublishingService {
    */
   private async walkDirectory(dirPath: string): Promise<void> {
     try {
-      const entries = await fs.readdir(dirPath, { withFileTypes: true })
+      // Validate directory path
+      const validatedDirPath = validatePath(dirPath, ALLOWED_DIRECTORIES.CONTENT)
+      const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
       for (const entry of entries) {
         // Validate entry name for security - prevent path traversal
@@ -252,7 +256,9 @@ export class BlogPublishingService {
    */
   private async processFile(filePath: string): Promise<void> {
     try {
-      const content = await fs.readFile(filePath, 'utf8')
+      // Validate file path
+      const validatedPath = validatePath(filePath, ALLOWED_DIRECTORIES.CONTENT)
+      const content = await fs.readFile(validatedPath, 'utf8')
 
       // Extract frontmatter between --- markers
       const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)

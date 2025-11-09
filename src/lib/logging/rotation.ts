@@ -2,6 +2,7 @@ import { exec } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
+import { safeJoin, ALLOWED_DIRECTORIES, validatePath } from '../../utils/path-security'
 
 const execAsync = promisify(exec)
 
@@ -29,7 +30,7 @@ export interface LogRotationConfig {
  * Default configuration
  */
 const defaultConfig: LogRotationConfig = {
-  logDir: path.join(process.cwd(), 'logs'),
+  logDir: safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'logs'),
   maxSize: 10 * 1024 * 1024, // 10MB
   maxFiles: 5,
   compress: true,
@@ -79,7 +80,8 @@ export class LogRotationService {
         dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     }
 
-    return path.join(this.config.logDir, `${prefix}-${dateStr}.log`)
+    const filename = `${prefix}-${dateStr}.log`
+    return validatePath(filename, this.config.logDir)
   }
 
   /**
@@ -169,7 +171,10 @@ export class LogRotationService {
         .filter(
           (file) => prefix && file.startsWith(prefix) && file !== baseFile,
         )
-        .map((file) => ({ name: file, path: path.join(dirname, file) }))
+        .map((file) => {
+          const filePath = validatePath(file, dirname)
+          return { name: file, path: filePath }
+        })
 
       // Sort by modification time (newest first)
       const filesWithStats = await Promise.all(
@@ -246,7 +251,7 @@ export class LogRotationService {
 
       // Aggregate log content
       for (const file of filteredFiles) {
-        const filePath = path.join(logDir, file)
+        const filePath = validatePath(file, logDir)
 
         // Handle compressed files
         if (file.endsWith('.gz')) {

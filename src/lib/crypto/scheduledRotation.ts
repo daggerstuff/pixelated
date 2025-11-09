@@ -79,6 +79,45 @@ export class ScheduledKeyRotation {
   }
 
   /**
+   * Check if a key needs rotation
+   */
+  private shouldRotateKey(keyData: { expiresAt?: number }): boolean {
+    if (!keyData.expiresAt) {
+      return false
+    }
+    const now = Date.now()
+    const isExpired = keyData.expiresAt <= now
+    const expiresWithin24Hours =
+      keyData.expiresAt > now &&
+      keyData.expiresAt <= now + 24 * 60 * 60 * 1000
+    return isExpired || expiresWithin24Hours
+  }
+
+  /**
+   * Rotate a single key and handle notifications
+   */
+  private async rotateKeyWithNotification(keyId: string): Promise<string | null> {
+    try {
+      const rotatedKey = await this.keyStorage.rotateKey(keyId)
+      if (!rotatedKey) {
+        return null
+      }
+      if (this.onRotation) {
+        this.onRotation(keyId, rotatedKey.keyId)
+      }
+      return rotatedKey.keyId
+    } catch (error: unknown) {
+      const errorObj = error instanceof Error ? error : new Error(String(error))
+      if (this.onError) {
+        this.onError(errorObj)
+      } else {
+        console.error(`Error rotating key ${keyId}:`, error)
+      }
+      return null
+    }
+  }
+
+  /**
    * Checks for keys that need rotation and rotates them
    * @returns Array of rotated key IDs
    */
@@ -88,41 +127,13 @@ export class ScheduledKeyRotation {
 
     for (const keyId of allKeys) {
       const keyData = await this.keyStorage.getKey(keyId)
-
       if (!keyData) {
         continue
       }
-
-      // Check if key needs rotation (expired or about to expire)
-      const now = Date.now()
-      const isExpired = keyData.expiresAt && keyData.expiresAt <= now
-
-      // Also rotate keys that will expire in the next 24 hours
-      const expiresWithin24Hours =
-        keyData.expiresAt &&
-        keyData.expiresAt > now &&
-        keyData.expiresAt <= now + 24 * 60 * 60 * 1000
-
-      if (isExpired || expiresWithin24Hours) {
-        try {
-          const rotatedKey = await this.keyStorage.rotateKey(keyId)
-
-          if (rotatedKey) {
-            rotatedKeys.push(rotatedKey.keyId)
-
-            // Notify about rotation
-            if (this.onRotation) {
-              this.onRotation(keyId, rotatedKey.keyId)
-            }
-          }
-        } catch (error: unknown) {
-          if (this.onError) {
-            this.onError(
-              error instanceof Error ? error : new Error(String(error)),
-            )
-          } else {
-            console.error(`Error rotating key ${keyId}:`, error)
-          }
+      if (this.shouldRotateKey(keyData)) {
+        const rotatedKeyId = await this.rotateKeyWithNotification(keyId)
+        if (rotatedKeyId) {
+          rotatedKeys.push(rotatedKeyId)
         }
       }
     }

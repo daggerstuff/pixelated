@@ -559,32 +559,65 @@ export function determineAlertLevel(
 }
 
 /**
+ * Check if browser crypto API is available
+ */
+const hasBrowserCrypto = (): boolean => {
+  return (
+    typeof window !== 'undefined' &&
+    window.crypto &&
+    window.crypto.getRandomValues !== undefined
+  )
+}
+
+/**
+ * Check if Node.js crypto is available
+ */
+const hasNodeCrypto = (): boolean => {
+  return (
+    typeof process !== 'undefined' &&
+    process.versions !== undefined &&
+    process.versions.node !== undefined
+  )
+}
+
+/**
+ * Generate random values using browser crypto API
+ */
+const generateBrowserRandomValues = (array: Uint32Array): void => {
+  if (hasBrowserCrypto()) {
+    window.crypto.getRandomValues(array)
+  }
+}
+
+/**
+ * Generate random values using Node.js crypto
+ */
+const generateNodeRandomValues = (array: Uint32Array): void => {
+  if (!hasNodeCrypto()) {
+    return
+  }
+  // Node.js fallback - use guarded runtime require to avoid bundler issues
+  // Use tryRequireNode from utils to avoid bundlers including `crypto` in frontend bundles
+  // Import dynamically to prevent circular import at module-eval time
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { tryRequireNode } =
+    require('@/lib/utils') as typeof import('@/lib/utils')
+  const crypto = tryRequireNode('crypto') || require('crypto')
+  const buf = crypto.randomBytes(8)
+  array[0] = buf.readUInt32LE(0)
+  array[1] = buf.readUInt32LE(4)
+}
+
+/**
  * Generate session ID
  */
 export function generateSessionId(): string {
   // Use cryptographically secure random values for session ID
   const array = new Uint32Array(2)
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto &&
-    window.crypto.getRandomValues
-  ) {
-    window.crypto.getRandomValues(array)
-  } else if (
-    typeof process !== 'undefined' &&
-    process.versions &&
-    process.versions.node
-  ) {
-    // Node.js fallback - use guarded runtime require to avoid bundler issues
-    // Use tryRequireNode from utils to avoid bundlers including `crypto` in frontend bundles
-    // Import dynamically to prevent circular import at module-eval time
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { tryRequireNode } =
-      require('@/lib/utils') as typeof import('@/lib/utils')
-    const crypto = tryRequireNode('crypto') || require('crypto')
-    const buf = crypto.randomBytes(8)
-    array[0] = buf.readUInt32LE(0)
-    array[1] = buf.readUInt32LE(4)
+  if (hasBrowserCrypto()) {
+    generateBrowserRandomValues(array)
+  } else if (hasNodeCrypto()) {
+    generateNodeRandomValues(array)
   } else {
     // Fallback to Math.random (should not happen)
     array[0] = Math.floor(Math.random() * 0xffffffff)

@@ -13,14 +13,12 @@ import node from '@astrojs/node';
 
 import { visualizer } from 'rollup-plugin-visualizer';
 
-// Environment variables for cleaner code
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
 const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
-// Helper function to determine chunk names for better code splitting
 function getChunkName(id) {
   if (id.includes('react') || id.includes('react-dom')) {
     return 'react-vendor';

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "maxSize": 1048576,
+    "includes": [
+      "src/**",
+      "tests/**",
+      "*.{js,jsx,ts,tsx,json}",
+      "!!**/dist/**",
+      "!!**/node_modules/**",
+      "!!**/public/**",
+      "!!**/coverage/**",
+      "!!**/playwright-report/**",
+      "!!**/test-results/**",
+      "!!**/storybook-static/**",
+      "!!**/docs/**",
+      "!!**/tmp/**",
+      "!!**/.vscode/**",
+      "!!**/.git/**",
+      "!!**/.github/**",
+      "!!**/.husky/**",
+      "!!**/.next/**",
+      "!!**/.swc/**",
+      "!!**/.turbo/**",
+      "!!**/.yarn/**",
+      "!!**/out/**",
+      "!!**/build/**",
+      "!!**/scripts/**/*.js",
+      "!!**/scripts/**/*.cjs",
+      "!!**/tests/security/node_modules/**",
+      "!!**/*.generated.*",
+      "!!**/.amazonq/**",
+      "!!**/.brv/**",
+      "!!byterover_mcp_export.json",
+      "!!**/*.astro",
+      "!!**/*.mdx"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80,
+    "attributePosition": "auto"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "warn"
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "useImportType": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "complexity": {
+        "noForEach": "off",
+        "useSimplifiedLogicExpression": "off"
+      },
+      "performance": {
+        "noDelete": "warn"
+      },
+      "a11y": {
+        "recommended": true
+      },
+      "nursery": {
+        "useSortedClasses": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "attributePosition": "auto"
+    },
+    "globals": [
+      "process",
+      "Buffer",
+      "globalThis",
+      "describe",
+      "it",
+      "test",
+      "expect",
+      "vi",
+      "beforeEach",
+      "afterEach",
+      "beforeAll",
+      "afterAll",
+      "suite"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "tests/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "correctness": {
+            "useExhaustiveDependencies": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/lib/ai/bias-detection/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -242,32 +242,20 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
     return this
   }
 
-  validate(): ValidationResult {
-    const errors: ValidationError[] = []
-    const warnings: ValidationWarning[] = []
+  private validateRequiredFields(errors: ValidationError[]): void {
+    const requiredFields = [
+      { field: 'id', value: this.objective.id, code: 'MISSING_ID', message: 'Objective ID is required' },
+      { field: 'name', value: this.objective.name, code: 'MISSING_NAME', message: 'Objective name is required' },
+      { field: 'description', value: this.objective.description, code: 'MISSING_DESCRIPTION', message: 'Objective description is required' },
+      { field: 'evaluationFunction', value: this.objective.evaluationFunction, code: 'MISSING_EVALUATION_FUNCTION', message: 'Evaluation function is required' },
+    ]
 
-    // Required field validation
-    if (!this.objective.id) {
-      errors.push({
-        field: 'id',
-        message: 'Objective ID is required',
-        code: 'MISSING_ID',
-      })
+    for (const { field, value, code, message } of requiredFields) {
+      if (!value) {
+        errors.push({ field, message, code })
+      }
     }
-    if (!this.objective.name) {
-      errors.push({
-        field: 'name',
-        message: 'Objective name is required',
-        code: 'MISSING_NAME',
-      })
-    }
-    if (!this.objective.description) {
-      errors.push({
-        field: 'description',
-        message: 'Objective description is required',
-        code: 'MISSING_DESCRIPTION',
-      })
-    }
+
     if (this.objective.weight === undefined) {
       errors.push({
         field: 'weight',
@@ -275,15 +263,9 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
         code: 'MISSING_WEIGHT',
       })
     }
-    if (!this.objective.evaluationFunction) {
-      errors.push({
-        field: 'evaluationFunction',
-        message: 'Evaluation function is required',
-        code: 'MISSING_EVALUATION_FUNCTION',
-      })
-    }
+  }
 
-    // Weight validation
+  private validateWeight(errors: ValidationError[]): void {
     if (
       this.objective.weight !== undefined &&
       (this.objective.weight <= 0 || this.objective.weight > 1)
@@ -294,25 +276,23 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
         code: 'INVALID_WEIGHT_RANGE',
       })
     }
+  }
 
-    // Criteria validation
+  private validateCriteria(errors: ValidationError[], warnings: ValidationWarning[]): void {
     if (this.criteria.length === 0) {
       warnings.push({
         field: 'criteria',
         message: 'No criteria defined for objective',
         code: 'NO_CRITERIA',
       })
+      return
     }
 
-    // Validate criteria weights sum
     const totalCriteriaWeight = this.criteria.reduce(
       (sum, criterion) => sum + criterion.weight,
       0,
     )
-    if (
-      this.criteria.length > 0 &&
-      Math.abs(totalCriteriaWeight - 1.0) > 0.001
-    ) {
+    if (Math.abs(totalCriteriaWeight - 1.0) > 0.001) {
       errors.push({
         field: 'criteria',
         message: `Criteria weights sum to ${totalCriteriaWeight}, should sum to 1.0`,
@@ -344,8 +324,9 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
         })
       }
     }
+  }
 
-    // ID format validation
+  private validateIdFormat(errors: ValidationError[]): void {
     if (
       this.objective.id &&
       !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(this.objective.id)
@@ -357,6 +338,16 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
         code: 'INVALID_ID_FORMAT',
       })
     }
+  }
+
+  validate(): ValidationResult {
+    const errors: ValidationError[] = []
+    const warnings: ValidationWarning[] = []
+
+    this.validateRequiredFields(errors)
+    this.validateWeight(errors)
+    this.validateCriteria(errors, warnings)
+    this.validateIdFormat(errors)
 
     return {
       isValid: errors.length === 0,

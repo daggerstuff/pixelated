@@ -36,6 +36,7 @@ class BiasType(str, Enum):
     LANGUAGE_BIAS = "language_bias"
     TECHNOLOGY_BIAS = "technology_bias"
     ENVIRONMENTAL_BIAS = "environmental_bias"
+    EMOTIONAL_MANIPULATION = "emotional_manipulation"
 
 
 class AnalysisStatus(str, Enum):
@@ -59,7 +60,7 @@ class ConfidenceLevel(str, Enum):
 
 class ImageAnalysisRequest(BaseModel):
     """Request model for image bias analysis"""
-    
+
     image_url: Optional[str] = Field(
         default=None,
         description="URL of the image to analyze"
@@ -100,7 +101,7 @@ class ImageAnalysisRequest(BaseModel):
         default=None,
         description="Session ID for request correlation"
     )
-    
+
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
@@ -108,7 +109,7 @@ class ImageAnalysisRequest(BaseModel):
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
-    
+
     @validator("analysis_type")
     def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
@@ -116,7 +117,7 @@ class ImageAnalysisRequest(BaseModel):
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
-    
+
     class Config:
         """Pydantic configuration"""
         use_enum_values = True
@@ -125,7 +126,7 @@ class ImageAnalysisRequest(BaseModel):
 
 class AudioAnalysisRequest(BaseModel):
     """Request model for audio bias analysis"""
-    
+
     audio_url: Optional[str] = Field(
         default=None,
         description="URL of the audio file to analyze"
@@ -170,7 +171,7 @@ class AudioAnalysisRequest(BaseModel):
         default=None,
         description="Session ID for request correlation"
     )
-    
+
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
@@ -178,7 +179,7 @@ class AudioAnalysisRequest(BaseModel):
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
-    
+
     @validator("analysis_type")
     def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
@@ -186,14 +187,14 @@ class AudioAnalysisRequest(BaseModel):
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
-    
+
     @validator("language")
     def validate_language(cls, v: str) -> str:
         """Validate language code"""
         if len(v) != 2 and v != "auto":
             raise ValueError("Language must be a 2-letter ISO 639-1 code or 'auto'")
         return v.lower()
-    
+
     class Config:
         """Pydantic configuration"""
         use_enum_values = True
@@ -201,7 +202,7 @@ class AudioAnalysisRequest(BaseModel):
 
 class VideoAnalysisRequest(BaseModel):
     """Request model for video bias analysis"""
-    
+
     video_url: Optional[str] = Field(
         default=None,
         description="URL of the video file to analyze"
@@ -246,7 +247,7 @@ class VideoAnalysisRequest(BaseModel):
         default=None,
         description="Session ID for request correlation"
     )
-    
+
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
@@ -254,7 +255,7 @@ class VideoAnalysisRequest(BaseModel):
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
-    
+
     @validator("analysis_type")
     def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
@@ -262,14 +263,14 @@ class VideoAnalysisRequest(BaseModel):
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
-    
+
     @validator("frame_extraction_rate")
     def validate_frame_rate(cls, v: int) -> int:
         """Validate frame extraction rate"""
         if v < 1 or v > 10:
             raise ValueError("Frame extraction rate must be between 1 and 10")
         return v
-    
+
     class Config:
         """Pydantic configuration"""
         use_enum_values = True
@@ -277,7 +278,7 @@ class VideoAnalysisRequest(BaseModel):
 
 class MultimodalAnalysisRequest(BaseModel):
     """Request model for combined multi-modal bias analysis"""
-    
+
     text_content: Optional[str] = Field(
         default=None,
         description="Text content to analyze alongside media"
@@ -334,7 +335,7 @@ class MultimodalAnalysisRequest(BaseModel):
         default=None,
         description="Session ID for request correlation"
     )
-    
+
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
@@ -342,7 +343,7 @@ class MultimodalAnalysisRequest(BaseModel):
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
-    
+
     @validator("analysis_priority")
     def validate_priority(cls, v: str) -> str:
         """Validate analysis priority"""
@@ -350,14 +351,14 @@ class MultimodalAnalysisRequest(BaseModel):
         if v.lower() not in valid_priorities:
             raise ValueError(f"Analysis priority must be one of: {valid_priorities}")
         return v.lower()
-    
+
     @validator("text_content")
     def validate_text_content(cls, v: Optional[str]) -> Optional[str]:
         """Validate text content if provided"""
         if v and len(v.strip()) == 0:
             raise ValueError("Text content cannot be empty or whitespace only")
         return v.strip() if v else v
-    
+
     class Config:
         """Pydantic configuration"""
         use_enum_values = True
@@ -365,7 +366,7 @@ class MultimodalAnalysisRequest(BaseModel):
 
 class DetectedObject(BaseModel):
     """Detected object in image/video"""
-    
+
     object_class: str = Field(description="Object class/type")
     confidence: float = Field(ge=0.0, le=1.0, description="Detection confidence")
     bbox: List[float] = Field(description="Bounding box coordinates [x1, y1, x2, y2]")
@@ -377,7 +378,7 @@ class DetectedObject(BaseModel):
 
 class FaceDetection(BaseModel):
     """Face detection result"""
-    
+
     face_id: str = Field(description="Unique face identifier")
     bbox: List[float] = Field(description="Bounding box coordinates [x1, y1, x2, y2]")
     confidence: float = Field(ge=0.0, le=1.0, description="Detection confidence")
@@ -396,7 +397,7 @@ class FaceDetection(BaseModel):
 
 class TextExtraction(BaseModel):
     """Extracted text from image/video"""
-    
+
     text: str = Field(description="Extracted text content")
     bbox: List[float] = Field(description="Bounding box coordinates [x1, y1, x2, y2]")
     confidence: float = Field(ge=0.0, le=1.0, description="OCR confidence")
@@ -405,7 +406,7 @@ class TextExtraction(BaseModel):
 
 class AudioSegment(BaseModel):
     """Audio segment analysis"""
-    
+
     start_time: float = Field(description="Start time in seconds")
     end_time: float = Field(description="End time in seconds")
     transcript: str = Field(description="Speech-to-text transcript")
@@ -423,7 +424,7 @@ class AudioSegment(BaseModel):
 
 class VisualBiasScore(BaseModel):
     """Visual bias score for image/video analysis"""
-    
+
     bias_type: BiasType
     score: float = Field(
         ge=0.0,
@@ -454,7 +455,7 @@ class VisualBiasScore(BaseModel):
 
 class AudioBiasScore(BaseModel):
     """Audio bias score for audio analysis"""
-    
+
     bias_type: BiasType
     score: float = Field(
         ge=0.0,
@@ -485,7 +486,7 @@ class AudioBiasScore(BaseModel):
 
 class MultimodalBiasScore(BaseModel):
     """Combined multi-modal bias score"""
-    
+
     bias_type: BiasType
     overall_score: float = Field(
         ge=0.0,
@@ -511,7 +512,7 @@ class MultimodalBiasScore(BaseModel):
 
 class VisualRecommendation(BaseModel):
     """Visual bias mitigation recommendation"""
-    
+
     type: str = Field(description="Type of visual recommendation")
     description: str = Field(description="Detailed recommendation description")
     visual_examples: List[str] = Field(
@@ -528,7 +529,7 @@ class VisualRecommendation(BaseModel):
 
 class MultimodalRecommendation(BaseModel):
     """Multi-modal bias mitigation recommendation"""
-    
+
     type: str = Field(description="Type of multi-modal recommendation")
     description: str = Field(description="Detailed recommendation description")
     affected_modalities: List[str] = Field(
@@ -549,13 +550,13 @@ class MultimodalRecommendation(BaseModel):
 
 class MultimodalAnalysisResponse(BaseModel):
     """Response model for multi-modal bias analysis"""
-    
+
     id: UUID = Field(default_factory=uuid4, description="Unique analysis ID")
     request_id: str = Field(description="Request ID for correlation")
     status: AnalysisStatus
     media_type: MediaType
     content_hash: str = Field(description="SHA256 hash of the analyzed content")
-    
+
     # Analysis results
     overall_bias_score: float = Field(
         ge=0.0,
@@ -568,7 +569,7 @@ class MultimodalAnalysisResponse(BaseModel):
     dominant_bias_types: List[BiasType] = Field(
         description="Most significant bias types detected"
     )
-    
+
     # Modality-specific results
     visual_analysis: Optional[Dict[str, Any]] = Field(
         default=None,
@@ -582,7 +583,7 @@ class MultimodalAnalysisResponse(BaseModel):
         default=None,
         description="Text analysis results"
     )
-    
+
     # Cross-modal analysis
     cross_modal_patterns: List[Dict[str, Any]] = Field(
         default_factory=list,
@@ -592,7 +593,7 @@ class MultimodalAnalysisResponse(BaseModel):
         default_factory=dict,
         description="Correlation scores between modalities"
     )
-    
+
     # Recommendations and insights
     recommendations: List[MultimodalRecommendation] = Field(
         default_factory=list,
@@ -602,7 +603,7 @@ class MultimodalAnalysisResponse(BaseModel):
         default_factory=list,
         description="Alternative bias-neutral representations"
     )
-    
+
     # Technical details
     processing_time_ms: int = Field(
         description="Processing time in milliseconds"
@@ -617,11 +618,11 @@ class MultimodalAnalysisResponse(BaseModel):
         default_factory=dict,
         description="Original file metadata"
     )
-    
+
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = Field(default=None)
-    
+
     class Config:
         """Pydantic configuration"""
         use_enum_values = True
@@ -633,7 +634,7 @@ class MultimodalAnalysisResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     """Health check response for multi-modal service"""
-    
+
     status: str = Field(description="Service status: healthy, degraded, unhealthy")
     version: str = Field(description="Service version")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
@@ -657,7 +658,7 @@ class HealthResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response model for multi-modal service"""
-    
+
     error: str = Field(description="Error type")
     message: str = Field(description="Error message")
     details: Optional[Dict[str, Any]] = Field(default=None, description="Error details")

@@ -1,0 +1,1826 @@
+{
+    "categories": [
+        {
+            "name": "documentation correction",
+            "updated_at": "2025-08-24T18:32:26.481382",
+            "created_at": "2025-08-24T17:23:49.364317",
+            "id": "994f5340-f070-4cec-9319-ff84f4697cf2",
+            "description": "Automatically created category for documentation correction"
+        },
+        {
+            "name": "audit management",
+            "updated_at": "2025-06-20T23:43:34.564618",
+            "created_at": "2025-06-20T20:08:59.173278",
+            "id": "da230af5-9eee-4d31-ba8b-583a01fc1c34",
+            "description": "Automatically created category for audit management"
+        },
+        {
+            "name": "security compliance",
+            "updated_at": "2025-06-14T13:13:04.403165",
+            "created_at": "2025-06-14T11:55:57.770869",
+            "id": "fc171f61-0f67-433b-9f4e-265ee8b7cd63",
+            "description": "Automatically created category for security compliance"
+        },
+        {
+            "name": "quality improvement",
+            "updated_at": "2025-06-25T14:41:14.082358",
+            "created_at": "2025-06-25T12:11:36.959224",
+            "id": "88e76870-8709-4a60-af4b-ec2dcba9fa6e",
+            "description": "Automatically created category for quality improvement"
+        },
+        {
+            "name": "natural language processing",
+            "updated_at": "2025-06-12T12:11:20.054358",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "38d664e8-920e-4565-a5d9-b35c058b5885",
+            "description": "Automatically created category for natural language processing"
+        },
+        {
+            "name": "ethics",
+            "updated_at": "2025-06-12T21:49:07.902648",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "f86c555f-400a-4c7f-b3c0-31a64f33bda8",
+            "description": "Automatically created category for ethics"
+        },
+        {
+            "name": "web design",
+            "updated_at": "2025-06-15T23:17:04.954598",
+            "created_at": "2025-06-15T22:49:53.707632",
+            "id": "15b0de0b-9230-4016-a854-c0d8663bc27b",
+            "description": "Automatically created category for web design"
+        },
+        {
+            "name": "work",
+            "updated_at": "2025-06-09T07:38:48.692944",
+            "created_at": "2025-06-08T23:44:46.196122",
+            "id": "1d1763db-869c-4830-96f7-0cbb615cc355",
+            "description": "Automatically created category for work"
+        },
+        {
+            "name": "user experience",
+            "updated_at": "2025-06-11T21:06:13.301989",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "25678f74-40b9-4d44-a717-7eb75104ee79",
+            "description": "Automatically created category for user experience"
+        },
+        {
+            "name": "code issues",
+            "updated_at": "2025-06-19T19:22:36.069209",
+            "created_at": "2025-06-19T16:09:31.046370",
+            "id": "51596409-175f-4482-8e5f-1ba4e1c9ff1c",
+            "description": "Automatically created category for code issues"
+        },
+        {
+            "name": "preferences",
+            "updated_at": "2025-06-06T00:06:21.841141",
+            "created_at": "2025-06-06T00:04:04.184640",
+            "id": "c2402512-aa76-4520-9607-6852073c12cc",
+            "description": "Automatically created category for preferences"
+        },
+        {
+            "name": "code quality issues",
+            "updated_at": "2025-07-12T13:44:42.229544",
+            "created_at": "2025-07-12T13:16:58.355513",
+            "id": "e80c71da-4b8d-4ac1-93b6-d1aa710150b4",
+            "description": "Automatically created category for code quality issues"
+        },
+        {
+            "name": "cloud services",
+            "updated_at": "2025-06-15T13:24:29.008700",
+            "created_at": "2025-06-15T12:36:52.818678",
+            "id": "2b1efa69-3cf4-4ff5-bc0d-7fca13a3c305",
+            "description": "Automatically created category for cloud services"
+        },
+        {
+            "name": "knowledge management",
+            "updated_at": "2025-06-12T12:25:15.030236",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "bec6a483-ba8a-49ae-ae7a-acf3887f9b10",
+            "description": "Automatically created category for knowledge management"
+        },
+        {
+            "name": "risk management",
+            "updated_at": "2025-06-11T20:09:12.648935",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "4eccdddd-9e87-4c40-8e56-ff0f4fa67be8",
+            "description": "Automatically created category for risk management"
+        },
+        {
+            "name": "frustration with communication",
+            "updated_at": "2025-08-16T23:23:28.340402",
+            "created_at": "2025-08-16T23:11:38.459385",
+            "id": "0a1e22d7-5d36-47a7-a1a2-b7a4691d6a19",
+            "description": "Automatically created category for frustration with communication"
+        },
+        {
+            "name": "computer science",
+            "updated_at": "2025-06-14T20:39:41.174262",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "efb7dc24-57dc-4078-85ee-6c10d53111bd",
+            "description": "Automatically created category for computer science"
+        },
+        {
+            "name": "frustration management",
+            "updated_at": "2025-06-19T05:36:32.579242",
+            "created_at": "2025-06-19T04:13:38.829488",
+            "id": "48373e89-23cd-4ae3-b816-9c7c60bce9cd",
+            "description": "Automatically created category for frustration management"
+        },
+        {
+            "name": "configuration management",
+            "updated_at": "2025-06-14T18:51:30.505457",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "0c79cecd-3c40-4a88-b606-caa7a1463847",
+            "description": "Automatically created category for configuration management"
+        },
+        {
+            "name": "wellness components",
+            "updated_at": "2025-08-26T18:55:36.626434",
+            "created_at": "2025-08-26T18:37:45.675198",
+            "id": "04d0b4c3-832f-4716-99e0-7475b45a539b",
+            "description": "Automatically created category for wellness components"
+        },
+        {
+            "name": "news",
+            "updated_at": "2025-06-09T07:38:51.453261",
+            "created_at": "2025-06-08T23:44:46.196122",
+            "id": "7fd1f21c-bd43-4833-8805-c4dd062c6947",
+            "description": "Automatically created category for news"
+        },
+        {
+            "name": "testing standards",
+            "updated_at": "2025-06-23T03:42:47.949816",
+            "created_at": "2025-06-23T00:22:02.915664",
+            "id": "45e3dcb0-3fa2-49f2-b71d-230b57a4ed2a",
+            "description": "Automatically created category for testing standards"
+        },
+        {
+            "name": "data analysis",
+            "updated_at": "2025-06-12T12:25:29.529053",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "ddabbfc6-bc54-4e93-aa2c-35417a707745",
+            "description": "Automatically created category for data analysis"
+        },
+        {
+            "name": "project analysis",
+            "updated_at": "2025-07-22T08:33:16.917885",
+            "created_at": "2025-07-22T08:14:32.147427",
+            "id": "ee250f2b-7be9-465c-a450-2a6caeb7a888",
+            "description": "Automatically created category for project analysis"
+        },
+        {
+            "name": "memory tracking",
+            "updated_at": "2025-07-08T01:21:15.878100",
+            "created_at": "2025-07-08T00:21:36.241472",
+            "id": "369d27ef-e4e2-47f4-a0d9-c658b350d14e",
+            "description": "Automatically created category for memory tracking"
+        },
+        {
+            "name": "product feedback",
+            "updated_at": "2025-06-09T06:12:41.058710",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "74511b59-7fd1-495c-a0e4-f578da5bb5a9",
+            "description": "Automatically created category for product feedback"
+        },
+        {
+            "name": "psychiatric conditions",
+            "updated_at": "2025-06-12T22:43:43.590949",
+            "created_at": "2025-06-12T22:37:02.126275",
+            "id": "7fbf3bf5-9c9c-40ab-b442-e0eaecf63cd6",
+            "description": "Automatically created category for psychiatric conditions"
+        },
+        {
+            "name": "design components",
+            "updated_at": "2025-06-20T08:01:04.862931",
+            "created_at": "2025-06-20T04:12:54.597981",
+            "id": "7022bfde-5095-430d-b3bc-cc05f379d3ff",
+            "description": "Automatically created category for design components"
+        },
+        {
+            "name": "mental health diagnoses",
+            "updated_at": "2025-06-12T22:43:43.587461",
+            "created_at": "2025-06-12T22:37:02.126275",
+            "id": "84239c34-3bf3-4121-be08-d1b3bbd7d60c",
+            "description": "Automatically created category for mental health diagnoses"
+        },
+        {
+            "name": "visual effects",
+            "updated_at": "2025-06-19T05:06:29.722523",
+            "created_at": "2025-06-19T04:13:38.829488",
+            "id": "b37b4cea-6e50-47f1-bc10-504422f06e43",
+            "description": "Automatically created category for visual effects"
+        },
+        {
+            "name": "user statistics",
+            "updated_at": "2025-07-08T01:21:15.873530",
+            "created_at": "2025-07-08T00:21:36.241472",
+            "id": "5900b82c-6239-46fc-9264-744d839631eb",
+            "description": "Automatically created category for user statistics"
+        },
+        {
+            "name": "user engagement",
+            "updated_at": "2025-06-12T14:56:30.186106",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "b6c301ce-9a59-4d52-b808-69cf00d09377",
+            "description": "Automatically created category for user engagement"
+        },
+        {
+            "name": "sustainability",
+            "updated_at": "2025-06-14T19:43:31.622340",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "4a9cd594-d7d4-4600-807d-ac3c7c57ba73",
+            "description": "Automatically created category for sustainability"
+        },
+        {
+            "name": "emotional well-being",
+            "updated_at": "2025-06-13T15:13:13.176520",
+            "created_at": "2025-06-13T14:41:26.676432",
+            "id": "1eadbdef-540e-4ae2-a1fe-c87e0547802d",
+            "description": "Automatically created category for emotional well-being"
+        },
+        {
+            "name": "audits",
+            "updated_at": "2025-07-14T19:11:55.451246",
+            "created_at": "2025-07-14T19:10:27.130850",
+            "id": "4e681d30-02bb-4c88-9b88-881a9d294efc",
+            "description": "Automatically created category for audits"
+        },
+        {
+            "name": "clinical standards",
+            "updated_at": "2025-08-20T17:36:27.428840",
+            "created_at": "2025-08-20T17:25:47.194785",
+            "id": "d2db6ea6-04ef-4518-8afe-f5c0140bb4f1",
+            "description": "Automatically created category for clinical standards"
+        },
+        {
+            "name": "reports",
+            "updated_at": "2025-06-16T13:29:47.800796",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "6b859f26-4ac3-45a7-b9ac-fc82b15507d6",
+            "description": "Automatically created category for reports"
+        },
+        {
+            "name": "security and compliance",
+            "updated_at": "2025-07-16T18:27:23.136762",
+            "created_at": "2025-07-16T18:13:49.496522",
+            "id": "6f19f1df-0466-4830-b892-fd76d0cf6613",
+            "description": "Automatically created category for security and compliance"
+        },
+        {
+            "name": "datasets",
+            "updated_at": "2025-06-24T04:29:02.556218",
+            "created_at": "2025-06-24T04:15:08.504435",
+            "id": "236ab788-1c67-4f73-9b00-9473d4595aac",
+            "description": "Automatically created category for datasets"
+        },
+        {
+            "name": "corrective actions",
+            "updated_at": "2025-08-24T18:56:53.796348",
+            "created_at": "2025-08-24T18:34:03.592604",
+            "id": "99cc3a67-6d8c-43ed-b491-339ac9ba4beb",
+            "description": "Automatically created category for corrective actions"
+        },
+        {
+            "name": "tools and integrations",
+            "updated_at": "2025-07-23T23:53:03.364977",
+            "created_at": "2025-07-23T23:11:45.588938",
+            "id": "a07a325f-d5f1-4fc2-9b64-9d44cb12c057",
+            "description": "Automatically created category for tools and integrations"
+        },
+        {
+            "name": "compliance",
+            "updated_at": "2025-06-13T19:17:37.351035",
+            "created_at": "2025-06-13T17:29:34.915091",
+            "id": "0c76c7f0-cebd-4550-a8f6-23e22fdef638",
+            "description": "Automatically created category for compliance"
+        },
+        {
+            "name": "system administration",
+            "updated_at": "2025-06-18T13:13:55.968764",
+            "created_at": "2025-06-18T12:11:47.056827",
+            "id": "a5ef28d5-41e0-4257-859c-21e5975dc076",
+            "description": "Automatically created category for system administration"
+        },
+        {
+            "name": "aesthetics",
+            "updated_at": "2025-06-15T15:32:35.739036",
+            "created_at": "2025-06-15T12:36:52.818678",
+            "id": "6ccecce2-61b1-4188-a4a9-881d29e0cba3",
+            "description": "Automatically created category for aesthetics"
+        },
+        {
+            "name": "monitoring",
+            "updated_at": "2025-06-19T03:44:12.459552",
+            "created_at": "2025-06-19T00:21:38.556841",
+            "id": "ac62bde5-7464-4539-b2c6-b4fb66c4991a",
+            "description": "Automatically created category for monitoring"
+        },
+        {
+            "name": "neurodiversity",
+            "updated_at": "2025-06-17T21:27:13.894983",
+            "created_at": "2025-06-17T20:10:03.187896",
+            "id": "6e1109b0-6388-4a8f-9489-6a38aea3f50f",
+            "description": "Automatically created category for neurodiversity"
+        },
+        {
+            "name": "system configuration",
+            "updated_at": "2025-06-14T21:04:20.282032",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "c021a65d-78a0-48fb-a045-54f293be81d0",
+            "description": "Automatically created category for system configuration"
+        },
+        {
+            "name": "clinical reasoning",
+            "updated_at": "2025-07-06T10:53:44.437366",
+            "created_at": "2025-07-06T08:08:43.816543",
+            "id": "aeecaf49-9da1-4d7a-9f73-71ce3060d3e1",
+            "description": "Automatically created category for clinical reasoning"
+        },
+        {
+            "name": "entertainment",
+            "updated_at": "2025-06-09T03:07:40.526341",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "bc4d8537-0900-4429-b1c9-98f03b87e27d",
+            "description": "Automatically created category for entertainment"
+        },
+        {
+            "name": "security practices",
+            "updated_at": "2025-06-12T15:32:43.284284",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "254b9a97-1a08-48a8-bc76-5aab0a5a2fb9",
+            "description": "Automatically created category for security practices"
+        },
+        {
+            "name": "cultural competency",
+            "updated_at": "2025-08-26T18:55:38.767234",
+            "created_at": "2025-08-26T18:37:45.675198",
+            "id": "b2c327bd-c7f4-4d01-bb57-9553e27af75b",
+            "description": "Automatically created category for cultural competency"
+        },
+        {
+            "name": "therapeutic approaches",
+            "updated_at": "2025-06-27T05:32:08.335793",
+            "created_at": "2025-06-27T04:14:03.467185",
+            "id": "bb2cc459-dd77-4dce-bbad-f1bbf22e9f78",
+            "description": "Automatically created category for therapeutic approaches"
+        },
+        {
+            "name": "usability",
+            "updated_at": "2025-06-17T02:41:35.419626",
+            "created_at": "2025-06-17T00:18:12.850149",
+            "id": "198c4f4b-05a7-443a-99f5-13df170eaeeb",
+            "description": "Automatically created category for usability"
+        },
+        {
+            "name": "data security",
+            "updated_at": "2025-06-14T13:12:44.530087",
+            "created_at": "2025-06-14T11:54:52.469409",
+            "id": "1e511429-dc40-4c5b-a481-5ceb8d394a34",
+            "description": "Automatically created category for data security"
+        },
+        {
+            "name": "content management",
+            "updated_at": "2025-06-15T15:31:51.749612",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "01bce323-5097-40d4-b3bc-65cc7144b6ea",
+            "description": "Automatically created category for content management"
+        },
+        {
+            "name": "data privacy",
+            "updated_at": "2025-06-14T13:13:06.476874",
+            "created_at": "2025-06-14T11:55:57.770869",
+            "id": "3c67c157-20e5-4b37-955c-48ee7314c420",
+            "description": "Automatically created category for data privacy"
+        },
+        {
+            "name": "clinical validation",
+            "updated_at": "2025-08-10T02:15:16.413874",
+            "created_at": "2025-08-10T01:39:56.529157",
+            "id": "14271a0a-ed2d-4682-b89e-c8c8f17a13d0",
+            "description": "Automatically created category for clinical validation"
+        },
+        {
+            "name": "task management",
+            "updated_at": "2025-06-19T21:20:14.858593",
+            "created_at": "2025-06-19T20:08:10.905320",
+            "id": "b2347637-f6c3-4b8b-9a38-ba86c1b8ea31",
+            "description": "Automatically created category for task management"
+        },
+        {
+            "name": "mental health",
+            "updated_at": "2025-06-12T15:19:29.183175",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "304f2720-8786-4a1b-8bd4-6257170e986f",
+            "description": "Automatically created category for mental health"
+        },
+        {
+            "name": "bug reports",
+            "updated_at": "2025-06-11T20:45:27.263084",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "9a06a2f7-0499-4e5a-ba5e-a62ca844bb59",
+            "description": "Automatically created category for bug reports"
+        },
+        {
+            "name": "infrastructure management",
+            "updated_at": "2025-06-13T03:04:39.823795",
+            "created_at": "2025-06-13T01:39:30.850562",
+            "id": "e364dfe1-8e9e-4fab-836f-0d23391f753e",
+            "description": "Automatically created category for infrastructure management"
+        },
+        {
+            "name": "file management",
+            "updated_at": "2025-06-12T08:32:44.713288",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "e14b3c4b-4d3b-427a-bbca-c3adf8e313bb",
+            "description": "Automatically created category for file management"
+        },
+        {
+            "name": "therapy",
+            "updated_at": "2025-06-12T21:51:53.440437",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "7092a60e-645d-4c87-86aa-25b01023f3f1",
+            "description": "Automatically created category for therapy"
+        },
+        {
+            "name": "healthcare standards",
+            "updated_at": "2025-08-10T02:15:16.409696",
+            "created_at": "2025-08-10T01:39:56.529157",
+            "id": "6de909c3-94f0-4b48-a896-d4a7a1e37342",
+            "description": "Automatically created category for healthcare standards"
+        },
+        {
+            "name": "health",
+            "updated_at": "2025-06-06T00:06:21.844719",
+            "created_at": "2025-06-06T00:04:04.184640",
+            "id": "a5dda2b4-d148-4d55-9b08-5ddabcd62af5",
+            "description": "Automatically created category for health"
+        },
+        {
+            "name": "system performance",
+            "updated_at": "2025-06-16T12:55:00.353515",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "3033c065-3ffe-48bc-87e6-daba5a87d3c9",
+            "description": "Automatically created category for system performance"
+        },
+        {
+            "name": "security best practices",
+            "updated_at": "2025-06-14T20:55:42.142547",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "eb7dff2f-0288-4597-8422-0c6e9093c9aa",
+            "description": "Automatically created category for security best practices"
+        },
+        {
+            "name": "health monitoring",
+            "updated_at": "2025-06-14T00:45:00.196243",
+            "created_at": "2025-06-13T19:46:47.999399",
+            "id": "e3237502-0527-4b76-90df-11e2e3ae05c3",
+            "description": "Automatically created category for health monitoring"
+        },
+        {
+            "name": "user interface design",
+            "updated_at": "2025-06-11T21:06:08.271263",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "de471b55-c5fa-479e-a081-2a0724700c1e",
+            "description": "Automatically created category for user interface design"
+        },
+        {
+            "name": "efficiency optimization",
+            "updated_at": "2025-06-16T11:31:47.962780",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "3c060615-50e1-4f6f-947f-f0d64b884812",
+            "description": "Automatically created category for efficiency optimization"
+        },
+        {
+            "name": "visual design",
+            "updated_at": "2025-06-18T16:14:36.021997",
+            "created_at": "2025-06-18T16:10:05.576497",
+            "id": "f72ba874-fdfc-45bc-a33f-4278f6912dba",
+            "description": "Automatically created category for visual design"
+        },
+        {
+            "name": "modules dependencies",
+            "updated_at": "2025-07-16T20:02:50.458887",
+            "created_at": "2025-07-16T19:11:47.485969",
+            "id": "da31ea93-d546-4994-8cf6-b9c59503d19a",
+            "description": "Automatically created category for modules dependencies"
+        },
+        {
+            "name": "standards compliance",
+            "updated_at": "2025-06-15T12:56:48.288608",
+            "created_at": "2025-06-15T12:36:52.818678",
+            "id": "d4239b0a-0d10-44da-837a-9d937fbd89d0",
+            "description": "Automatically created category for standards compliance"
+        },
+        {
+            "name": "emotional response",
+            "updated_at": "2025-06-13T16:12:31.801316",
+            "created_at": "2025-06-13T14:41:26.676432",
+            "id": "ab1ab082-8260-4ebe-af6b-df8933c9de61",
+            "description": "Automatically created category for emotional response"
+        },
+        {
+            "name": "communication issues",
+            "updated_at": "2025-06-19T13:26:24.909334",
+            "created_at": "2025-06-19T12:10:10.081284",
+            "id": "b500b3a4-8c79-4273-a6bb-7d9ffc4b3e68",
+            "description": "Automatically created category for communication issues"
+        },
+        {
+            "name": "resource management",
+            "updated_at": "2025-06-14T21:06:18.352791",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "83a51c69-659d-4916-9845-f972dc7736ff",
+            "description": "Automatically created category for resource management"
+        },
+        {
+            "name": "messages",
+            "updated_at": "2025-06-12T09:15:17.379258",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "65659386-b74f-4e5f-b0c9-42c4358b4082",
+            "description": "Automatically created category for messages"
+        },
+        {
+            "name": "security",
+            "updated_at": "2025-06-11T20:02:09.727943",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "36786ff8-56cd-416b-8cbe-13f4ffb72a22",
+            "description": "Automatically created category for security"
+        },
+        {
+            "name": "product development",
+            "updated_at": "2025-06-14T21:12:58.074912",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "5a74c3b0-f1e1-427a-82a7-e0662c9953af",
+            "description": "Automatically created category for product development"
+        },
+        {
+            "name": "security management",
+            "updated_at": "2025-06-17T02:06:56.192677",
+            "created_at": "2025-06-17T00:18:12.850149",
+            "id": "1df976f9-96b0-4311-aad6-df5149bb67f1",
+            "description": "Automatically created category for security management"
+        },
+        {
+            "name": "programming",
+            "updated_at": "2025-06-13T21:54:20.220578",
+            "created_at": "2025-06-13T19:46:18.974713",
+            "id": "8548fbae-f44b-42eb-87fe-8fbffb15d9a5",
+            "description": "Automatically created category for programming"
+        },
+        {
+            "name": "testing",
+            "updated_at": "2025-06-13T19:09:22.434650",
+            "created_at": "2025-06-13T17:29:34.915091",
+            "id": "32e3d7db-53bd-4a5a-ac40-124094ef3747",
+            "description": "Automatically created category for testing"
+        },
+        {
+            "name": "system features",
+            "updated_at": "2025-06-27T09:13:44.724640",
+            "created_at": "2025-06-27T08:30:43.731899",
+            "id": "c0226f3d-0530-4a25-b7a5-8c16e60a33e5",
+            "description": "Automatically created category for system features"
+        },
+        {
+            "name": "software development",
+            "updated_at": "2025-06-11T16:25:53.515272",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "a30dba1a-5f3e-489c-9ae7-04cd5c405c88",
+            "description": "Automatically created category for software development"
+        },
+        {
+            "name": "alerts",
+            "updated_at": "2025-06-17T04:13:19.602236",
+            "created_at": "2025-06-17T00:16:10.097236",
+            "id": "b30b9ec5-2033-4efa-96d3-3e17e2c85136",
+            "description": "Automatically created category for alerts"
+        },
+        {
+            "name": "automation",
+            "updated_at": "2025-06-12T20:41:56.109113",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "cd2cb5dd-44e7-47f0-851e-648563348120",
+            "description": "Automatically created category for automation"
+        },
+        {
+            "name": "system monitoring",
+            "updated_at": "2025-06-19T02:46:44.910555",
+            "created_at": "2025-06-19T00:21:38.556841",
+            "id": "d3e03d06-953c-43e5-a7f1-523ce637dc02",
+            "description": "Automatically created category for system monitoring"
+        },
+        {
+            "name": "linux administration",
+            "updated_at": "2025-06-29T06:13:36.396292",
+            "created_at": "2025-06-29T04:19:09.601843",
+            "id": "cb4426f2-d56b-4e3b-9fb0-480e62b3eb67",
+            "description": "Automatically created category for linux administration"
+        },
+        {
+            "name": "cloud management",
+            "updated_at": "2025-07-14T06:05:02.388790",
+            "created_at": "2025-07-14T05:16:56.915625",
+            "id": "baeb98b1-1e9b-4b9f-a590-389767f99d79",
+            "description": "Automatically created category for cloud management"
+        },
+        {
+            "name": "security enhancements",
+            "updated_at": "2025-07-18T23:55:34.967196",
+            "created_at": "2025-07-18T23:11:58.418901",
+            "id": "9969cd8f-f0c8-4d07-b0b5-7dfbc9e5272b",
+            "description": "Automatically created category for security enhancements"
+        },
+        {
+            "name": "devops",
+            "updated_at": "2025-06-17T09:14:11.170089",
+            "created_at": "2025-06-17T05:47:02.757678",
+            "id": "d4444593-6347-4c50-a35a-010e717ced4c",
+            "description": "Automatically created category for devops"
+        },
+        {
+            "name": "project status update",
+            "updated_at": "2025-09-03T20:30:46.538253",
+            "created_at": "2025-09-03T20:28:48.167031",
+            "id": "3fd4537b-a622-4b4e-ad56-768d1e90e903",
+            "description": "Automatically created category for project status update"
+        },
+        {
+            "name": "status updates",
+            "updated_at": "2025-06-12T19:15:59.636970",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "0573c576-bd7b-41ba-b176-1a342b45dd3f",
+            "description": "Automatically created category for status updates"
+        },
+        {
+            "name": "bug resolution",
+            "updated_at": "2025-06-28T14:16:49.071723",
+            "created_at": "2025-06-28T12:10:26.323552",
+            "id": "9c897b73-b0ba-4586-b4fd-cb5376e777e9",
+            "description": "Automatically created category for bug resolution"
+        },
+        {
+            "name": "local development",
+            "updated_at": "2025-06-25T18:20:00.097481",
+            "created_at": "2025-06-25T16:09:06.849086",
+            "id": "ea8da657-0e58-481b-88b3-8f490664a395",
+            "description": "Automatically created category for local development"
+        },
+        {
+            "name": "design enhancement",
+            "updated_at": "2025-08-10T06:42:56.827454",
+            "created_at": "2025-08-10T06:13:59.258250",
+            "id": "79f5c1d1-af74-493f-a5f9-e24e1c1d9b8f",
+            "description": "Automatically created category for design enhancement"
+        },
+        {
+            "name": "engineering standards",
+            "updated_at": "2025-06-25T01:29:50.602266",
+            "created_at": "2025-06-25T00:22:45.320082",
+            "id": "77972776-0da4-4e65-8358-b2fd916bb68e",
+            "description": "Automatically created category for engineering standards"
+        },
+        {
+            "name": "infrastructure setup",
+            "updated_at": "2025-08-20T20:07:30.318946",
+            "created_at": "2025-08-20T19:23:08.823543",
+            "id": "6f75e400-dded-41e3-924b-8981f7117b42",
+            "description": "Automatically created category for infrastructure setup"
+        },
+        {
+            "name": "performance testing",
+            "updated_at": "2025-06-25T01:29:50.598903",
+            "created_at": "2025-06-25T00:22:45.320082",
+            "id": "823a83a0-3418-442b-9ac3-211190c74f5e",
+            "description": "Automatically created category for performance testing"
+        },
+        {
+            "name": "communication style",
+            "updated_at": "2025-06-11T20:08:39.925842",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "eec92024-93ea-4b2b-ae23-cd6390a4d8da",
+            "description": "Automatically created category for communication style"
+        },
+        {
+            "name": "error reporting",
+            "updated_at": "2025-06-23T21:40:36.001002",
+            "created_at": "2025-06-23T20:08:56.723786",
+            "id": "8e2158f7-e2de-46a0-848e-f1205955658a",
+            "description": "Automatically created category for error reporting"
+        },
+        {
+            "name": "code maintenance",
+            "updated_at": "2025-06-17T11:57:48.414859",
+            "created_at": "2025-06-17T10:28:49.361121",
+            "id": "34ad7a9a-46e2-435b-9364-0f42bd73e8d9",
+            "description": "Automatically created category for code maintenance"
+        },
+        {
+            "name": "code optimization",
+            "updated_at": "2025-06-14T19:29:00.514067",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "9bbfd41b-fd4b-4886-8f83-d02ee73c1a9b",
+            "description": "Automatically created category for code optimization"
+        },
+        {
+            "name": "frustration with quality assurance",
+            "updated_at": "2025-08-16T22:43:37.775584",
+            "created_at": "2025-08-16T22:10:32.332751",
+            "id": "c48443a5-0b98-4985-b037-72fa57e4ecbb",
+            "description": "Automatically created category for frustration with quality assurance"
+        },
+        {
+            "name": "best practices",
+            "updated_at": "2025-06-11T18:00:27.481951",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "8023eb0e-3bec-4e87-88a7-669493d2cd3d",
+            "description": "Automatically created category for best practices"
+        },
+        {
+            "name": "programming best practices",
+            "updated_at": "2025-06-14T21:39:58.022183",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "4191daf6-30b9-4124-a5ae-95ad2b61bbc9",
+            "description": "Automatically created category for programming best practices"
+        },
+        {
+            "name": "efficiency improvement",
+            "updated_at": "2025-06-12T12:16:33.427790",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "f8fab6de-f1d3-4f34-909f-70d205019ac1",
+            "description": "Automatically created category for efficiency improvement"
+        },
+        {
+            "name": "creativity",
+            "updated_at": "2025-06-12T20:20:15.915426",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "4df76326-308c-4033-b0ee-677d6e456af1",
+            "description": "Automatically created category for creativity"
+        },
+        {
+            "name": "updates",
+            "updated_at": "2025-06-18T04:07:34.750486",
+            "created_at": "2025-06-18T00:21:43.876116",
+            "id": "64c8ce9f-a1f5-4202-9826-5eb9d494d9ac",
+            "description": "Automatically created category for updates"
+        },
+        {
+            "name": "seo",
+            "updated_at": "2025-06-12T13:47:28.561397",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "18e93d29-25f7-4c09-bc39-038a1de17781",
+            "description": "Automatically created category for seo"
+        },
+        {
+            "name": "digital marketing",
+            "updated_at": "2025-06-14T01:18:24.615913",
+            "created_at": "2025-06-13T19:46:47.999399",
+            "id": "cd76139d-8a9e-413c-aae3-0f5037077246",
+            "description": "Automatically created category for digital marketing"
+        },
+        {
+            "name": "error logs",
+            "updated_at": "2025-06-12T08:32:50.967490",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "1a962c93-a65c-4af7-8386-2f03c346f324",
+            "description": "Automatically created category for error logs"
+        },
+        {
+            "name": "ethics in ai",
+            "updated_at": "2025-06-12T12:16:35.248077",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "936a2aa3-ba91-4ca9-a1de-6df536115c04",
+            "description": "Automatically created category for ethics in ai"
+        },
+        {
+            "name": "milestones",
+            "updated_at": "2025-06-20T04:18:40.536370",
+            "created_at": "2025-06-20T04:12:54.597981",
+            "id": "6bbe66fa-cf7f-4f9d-8a2e-5c1799bdf7c9",
+            "description": "Automatically created category for milestones"
+        },
+        {
+            "name": "documentation",
+            "updated_at": "2025-06-11T20:07:45.455909",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "7d490a8d-3d8c-46c0-8237-ae2fbfe2aa49",
+            "description": "Automatically created category for documentation"
+        },
+        {
+            "name": "code quality",
+            "updated_at": "2025-06-12T10:52:37.041350",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "8ce555d1-0090-46a2-8c77-28d83b8d40dc",
+            "description": "Automatically created category for code quality"
+        },
+        {
+            "name": "color theory",
+            "updated_at": "2025-06-14T21:42:55.874843",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "fdd069ca-4f85-4682-b44a-bd73b5e1c085",
+            "description": "Automatically created category for color theory"
+        },
+        {
+            "name": "project status updates",
+            "updated_at": "2025-06-23T10:18:18.442282",
+            "created_at": "2025-06-23T08:09:33.280709",
+            "id": "a568e69f-adc0-47a8-b166-143c12ceef8b",
+            "description": "Automatically created category for project status updates"
+        },
+        {
+            "name": "problem solving",
+            "updated_at": "2025-06-13T22:05:42.958409",
+            "created_at": "2025-06-13T19:46:18.974713",
+            "id": "13a6d314-c9d5-490d-884e-7a07d0dd5f01",
+            "description": "Automatically created category for problem solving"
+        },
+        {
+            "name": "design aesthetics",
+            "updated_at": "2025-06-15T15:31:11.881522",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "bf846b20-25ae-407a-b56f-e85908032c22",
+            "description": "Automatically created category for design aesthetics"
+        },
+        {
+            "name": "metrics",
+            "updated_at": "2025-06-14T18:58:18.822591",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "a00d7a97-4832-4442-ac88-88a5a291fecd",
+            "description": "Automatically created category for metrics"
+        },
+        {
+            "name": "privacy control",
+            "updated_at": "2025-06-30T19:02:59.187412",
+            "created_at": "2025-06-30T16:08:31.025567",
+            "id": "529ad5f5-9dcf-482b-a881-d8f6d1520210",
+            "description": "Automatically created category for privacy control"
+        },
+        {
+            "name": "accessibility improvements",
+            "updated_at": "2025-06-22T17:51:59.309873",
+            "created_at": "2025-06-22T16:08:31.523454",
+            "id": "9a0f2d40-1cd9-40a0-ae7a-5c717b6cfda8",
+            "description": "Automatically created category for accessibility improvements"
+        },
+        {
+            "name": "operational excellence",
+            "updated_at": "2025-08-21T23:27:47.963157",
+            "created_at": "2025-08-21T23:26:14.766074",
+            "id": "781918f1-d39e-4511-ac98-b37b1eda46c8",
+            "description": "Automatically created category for operational excellence"
+        },
+        {
+            "name": "customer support",
+            "updated_at": "2025-06-12T08:32:48.984957",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "a1d28fb1-244b-435e-be06-794d0df6f140",
+            "description": "Automatically created category for customer support"
+        },
+        {
+            "name": "data storage",
+            "updated_at": "2025-06-16T11:07:10.212635",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "71c53faf-fe52-454e-bcda-a31892d75f4b",
+            "description": "Automatically created category for data storage"
+        },
+        {
+            "name": "cloud infrastructure",
+            "updated_at": "2025-06-16T07:39:13.537776",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "aa81f483-035a-4505-9234-d2acceac8dd6",
+            "description": "Automatically created category for cloud infrastructure"
+        },
+        {
+            "name": "data recovery",
+            "updated_at": "2025-06-22T23:50:35.346955",
+            "created_at": "2025-06-22T20:09:03.492411",
+            "id": "5a62c6b9-c635-42d4-b140-2b65b4b4fa78",
+            "description": "Automatically created category for data recovery"
+        },
+        {
+            "name": "coding practices",
+            "updated_at": "2025-06-12T10:52:38.820318",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "235ee1f6-28c3-4103-9fc9-4478c918be25",
+            "description": "Automatically created category for coding practices"
+        },
+        {
+            "name": "technical specifications",
+            "updated_at": "2025-06-13T22:53:52.033370",
+            "created_at": "2025-06-13T19:46:18.974713",
+            "id": "d8d34a7a-240c-44d0-92d5-cc3a7cbdebbb",
+            "description": "Automatically created category for technical specifications"
+        },
+        {
+            "name": "asset management",
+            "updated_at": "2025-06-13T20:25:30.915832",
+            "created_at": "2025-06-13T19:46:47.999399",
+            "id": "f8103d1c-64ea-4d7c-ba65-fa68a29aa00d",
+            "description": "Automatically created category for asset management"
+        },
+        {
+            "name": "design",
+            "updated_at": "2025-06-12T14:10:56.245111",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "e5943d84-b0c9-4ed4-8abd-4bae7be5acba",
+            "description": "Automatically created category for design"
+        },
+        {
+            "name": "programming standards",
+            "updated_at": "2025-06-14T21:04:11.876779",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "a0b8f93a-a61b-46e0-a971-7ea1a4647f94",
+            "description": "Automatically created category for programming standards"
+        },
+        {
+            "name": "professional development",
+            "updated_at": "2025-06-09T07:38:48.699527",
+            "created_at": "2025-06-08T23:44:46.196122",
+            "id": "e718614a-1add-431f-a0e7-1a40ab34208c",
+            "description": "Automatically created category for professional development"
+        },
+        {
+            "name": "web security",
+            "updated_at": "2025-06-14T19:12:56.531280",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "172520af-53c7-49bc-ae1a-2f233496e3cd",
+            "description": "Automatically created category for web security"
+        },
+        {
+            "name": "crisis management",
+            "updated_at": "2025-06-23T12:41:32.947232",
+            "created_at": "2025-06-23T12:11:13.827785",
+            "id": "905745c9-5e45-414f-bd63-401503720686",
+            "description": "Automatically created category for crisis management"
+        },
+        {
+            "name": "testing metrics",
+            "updated_at": "2025-08-21T23:27:47.116801",
+            "created_at": "2025-08-21T23:26:14.766074",
+            "id": "77162596-d3aa-4a45-af87-dcb824458224",
+            "description": "Automatically created category for testing metrics"
+        },
+        {
+            "name": "documentation practices",
+            "updated_at": "2025-06-26T07:07:37.778310",
+            "created_at": "2025-06-26T04:13:52.106781",
+            "id": "0d7e0bda-0e58-45ae-947b-b7b7e7aee533",
+            "description": "Automatically created category for documentation practices"
+        },
+        {
+            "name": "achievements",
+            "updated_at": "2025-06-12T08:45:27.265570",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "bf1d7f8e-66f1-4085-8015-c885b0e5a85e",
+            "description": "Automatically created category for achievements"
+        },
+        {
+            "name": "system architecture",
+            "updated_at": "2025-06-16T12:28:57.833050",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "278e193a-ae85-4978-93f2-41b192d86453",
+            "description": "Automatically created category for system architecture"
+        },
+        {
+            "name": "error management",
+            "updated_at": "2025-06-16T13:29:38.196627",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "6a38aca6-870c-4f76-8236-8e1570035f01",
+            "description": "Automatically created category for error management"
+        },
+        {
+            "name": "project feedback",
+            "updated_at": "2025-07-23T06:18:41.848511",
+            "created_at": "2025-07-23T06:16:12.105932",
+            "id": "41941887-c8fa-48d8-9ad5-3f91ab8903e6",
+            "description": "Automatically created category for project feedback"
+        },
+        {
+            "name": "email management",
+            "updated_at": "2025-06-15T12:51:41.391579",
+            "created_at": "2025-06-15T12:36:52.818678",
+            "id": "5683acf2-6070-4395-a3e6-d96386e87b6f",
+            "description": "Automatically created category for email management"
+        },
+        {
+            "name": "website management",
+            "updated_at": "2025-07-02T07:39:33.850030",
+            "created_at": "2025-07-02T04:14:54.742666",
+            "id": "7ac534a9-9a83-4ce3-a833-afca70dc1ed0",
+            "description": "Automatically created category for website management"
+        },
+        {
+            "name": "data processing",
+            "updated_at": "2025-06-12T21:45:00.269624",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "1aa64b15-5d7a-4fc5-926b-a6a47e054aea",
+            "description": "Automatically created category for data processing"
+        },
+        {
+            "name": "accessibility",
+            "updated_at": "2025-06-13T22:05:43.594262",
+            "created_at": "2025-06-13T19:46:18.974713",
+            "id": "9dcfe525-c6ad-48e4-b048-e6c8db5e58a3",
+            "description": "Automatically created category for accessibility"
+        },
+        {
+            "name": "quality control",
+            "updated_at": "2025-06-12T12:21:29.266100",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "dee19d36-ed61-45f8-94af-52ba3ee06ca9",
+            "description": "Automatically created category for quality control"
+        },
+        {
+            "name": "domain management",
+            "updated_at": "2025-06-16T11:04:14.215963",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "79f1e8cd-657d-4e4c-b071-b253a3fbc759",
+            "description": "Automatically created category for domain management"
+        },
+        {
+            "name": "javascript",
+            "updated_at": "2025-06-14T19:13:49.561806",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "84f09a04-2586-4d7f-920f-d705fd9b9c9d",
+            "description": "Automatically created category for javascript"
+        },
+        {
+            "name": "metadata tracking",
+            "updated_at": "2025-06-24T02:22:55.941593",
+            "created_at": "2025-06-24T00:24:50.123829",
+            "id": "3d32627f-381c-473c-b1bb-8704efde162c",
+            "description": "Automatically created category for metadata tracking"
+        },
+        {
+            "name": "data handling",
+            "updated_at": "2025-06-21T03:09:29.429059",
+            "created_at": "2025-06-21T00:21:33.664247",
+            "id": "b17d0770-5885-4015-9464-41657f2c8a86",
+            "description": "Automatically created category for data handling"
+        },
+        {
+            "name": "business comparison",
+            "updated_at": "2025-08-10T12:41:49.284889",
+            "created_at": "2025-08-10T12:15:41.976982",
+            "id": "2cabce83-2b7e-483a-b786-aaacdec8ad93",
+            "description": "Automatically created category for business comparison"
+        },
+        {
+            "name": "database administration",
+            "updated_at": "2025-06-24T02:22:55.937048",
+            "created_at": "2025-06-24T00:24:50.123829",
+            "id": "cda39821-b2a5-450c-8885-dc5a76fac8cd",
+            "description": "Automatically created category for database administration"
+        },
+        {
+            "name": "design guidelines",
+            "updated_at": "2025-06-18T03:33:54.504970",
+            "created_at": "2025-06-18T00:21:43.876116",
+            "id": "62e05521-9d6e-408a-bdbc-6ff740a18396",
+            "description": "Automatically created category for design guidelines"
+        },
+        {
+            "name": "design consistency",
+            "updated_at": "2025-06-21T13:57:16.317026",
+            "created_at": "2025-06-21T12:10:42.188727",
+            "id": "492d2e25-554f-40ac-9b43-fec05938a059",
+            "description": "Automatically created category for design consistency"
+        },
+        {
+            "name": "ethics and compliance",
+            "updated_at": "2025-06-12T21:53:09.789200",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "efa2ab82-f3be-42be-b769-37d2a7efd1cc",
+            "description": "Automatically created category for ethics and compliance"
+        },
+        {
+            "name": "expiration policies",
+            "updated_at": "2025-06-24T02:22:55.946373",
+            "created_at": "2025-06-24T00:24:50.123829",
+            "id": "ec71771d-21b1-4880-94de-5cca4256feda",
+            "description": "Automatically created category for expiration policies"
+        },
+        {
+            "name": "statistics",
+            "updated_at": "2025-06-12T14:31:12.914429",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "f36c1b82-4da0-4ef9-9188-2b13a6d9d70e",
+            "description": "Automatically created category for statistics"
+        },
+        {
+            "name": "legal",
+            "updated_at": "2025-06-12T21:53:09.780179",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "ff9626fa-50f9-4e55-a971-b4c33d372668",
+            "description": "Automatically created category for legal"
+        },
+        {
+            "name": "company size",
+            "updated_at": "2025-06-16T07:39:00.042835",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "b98ed491-7dfd-488a-9c9c-223d746cc9dc",
+            "description": "Automatically created category for company size"
+        },
+        {
+            "name": "market positioning",
+            "updated_at": "2025-06-15T13:35:00.354384",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "e937600c-a137-40be-bf15-815311b86d4a",
+            "description": "Automatically created category for market positioning"
+        },
+        {
+            "name": "algorithms",
+            "updated_at": "2025-06-12T12:12:07.748757",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "4103a1c1-e6da-45ad-b30a-7f8f8066f0e6",
+            "description": "Automatically created category for algorithms"
+        },
+        {
+            "name": "project status",
+            "updated_at": "2025-06-16T11:15:02.726027",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "72fa5571-bba8-45cf-8bd9-d4b73f3adf3f",
+            "description": "Automatically created category for project status"
+        },
+        {
+            "name": "networking",
+            "updated_at": "2025-06-13T11:32:08.155812",
+            "created_at": "2025-06-13T08:59:56.768103",
+            "id": "92999a01-0633-4d0c-854c-a7d484a2453e",
+            "description": "Automatically created category for networking"
+        },
+        {
+            "name": "ethics in technology",
+            "updated_at": "2025-06-12T11:28:57.723808",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "499d64e0-6b5c-4248-b3db-1096f46d82d2",
+            "description": "Automatically created category for ethics in technology"
+        },
+        {
+            "name": "usability metrics",
+            "updated_at": "2025-08-21T17:14:33.285948",
+            "created_at": "2025-08-21T16:44:08.781582",
+            "id": "f97234ff-04ec-49e5-b113-88ba8a80f7b8",
+            "description": "Automatically created category for usability metrics"
+        },
+        {
+            "name": "safety standards",
+            "updated_at": "2025-06-17T01:40:52.497967",
+            "created_at": "2025-06-17T00:16:10.097236",
+            "id": "e47a68c3-b00e-4488-ad8a-affe24f7bf45",
+            "description": "Automatically created category for safety standards"
+        },
+        {
+            "name": "monitoring tools",
+            "updated_at": "2025-06-26T06:30:34.434491",
+            "created_at": "2025-06-26T04:13:52.106781",
+            "id": "fd35c228-14f5-48db-8680-62a18c37aece",
+            "description": "Automatically created category for monitoring tools"
+        },
+        {
+            "name": "design standards",
+            "updated_at": "2025-06-23T07:47:00.491520",
+            "created_at": "2025-06-23T04:18:14.219099",
+            "id": "c5ca5012-4cae-4767-8add-1b1241773ba1",
+            "description": "Automatically created category for design standards"
+        },
+        {
+            "name": "data management",
+            "updated_at": "2025-06-12T12:21:27.274582",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "2f52d189-d7f4-4292-9ee6-497bd556961b",
+            "description": "Automatically created category for data management"
+        },
+        {
+            "name": "project management",
+            "updated_at": "2025-06-11T20:08:31.462101",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "27c0c83a-0ca1-4f62-8226-0e3817da58ee",
+            "description": "Automatically created category for project management"
+        },
+        {
+            "name": "product features",
+            "updated_at": "2025-06-12T20:41:56.879761",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "823b4a95-fb72-4e34-af79-8fa1a226f2ca",
+            "description": "Automatically created category for product features"
+        },
+        {
+            "name": "issues",
+            "updated_at": "2025-07-08T09:22:19.481384",
+            "created_at": "2025-07-08T08:09:52.480166",
+            "id": "fddae9f5-e046-4d3b-b67a-33052a22bf1e",
+            "description": "Automatically created category for issues"
+        },
+        {
+            "name": "research and development",
+            "updated_at": "2025-06-12T09:15:14.044773",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "8ceebc42-10a9-4749-ab14-4bdbcd49f663",
+            "description": "Automatically created category for research and development"
+        },
+        {
+            "name": "bug fixes",
+            "updated_at": "2025-06-11T20:45:25.818554",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "f6a140f6-4e49-4377-a2bb-6c96a9530af4",
+            "description": "Automatically created category for bug fixes"
+        },
+        {
+            "name": "psychological conditions",
+            "updated_at": "2025-07-15T06:39:06.360911",
+            "created_at": "2025-07-15T06:14:59.381728",
+            "id": "f4cb7c8f-e325-4e33-b7c8-dd772faf1a0f",
+            "description": "Automatically created category for psychological conditions"
+        },
+        {
+            "name": "content organization",
+            "updated_at": "2025-06-13T09:27:44.021967",
+            "created_at": "2025-06-13T08:59:56.768103",
+            "id": "869fb355-41d8-420a-a1ab-2f83d725277b",
+            "description": "Automatically created category for content organization"
+        },
+        {
+            "name": "finance",
+            "updated_at": "2025-06-09T06:12:42.798924",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "b47a1c75-2be8-4065-9787-ff9e78f5277b",
+            "description": "Automatically created category for finance"
+        },
+        {
+            "name": "education",
+            "updated_at": "2025-06-11T16:00:53.397028",
+            "created_at": "2025-06-11T15:28:35.272938",
+            "id": "e2dab3cb-8107-4f1d-b855-1362b14a855d",
+            "description": "Automatically created category for education"
+        },
+        {
+            "name": "infrastructure",
+            "updated_at": "2025-06-12T08:32:43.987245",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "16684fe6-ff32-486a-86ff-d89d76427ba2",
+            "description": "Automatically created category for infrastructure"
+        },
+        {
+            "name": "safety management",
+            "updated_at": "2025-06-21T03:43:40.617008",
+            "created_at": "2025-06-21T00:21:12.435203",
+            "id": "84ad2428-a122-428e-b7f2-23446ce77191",
+            "description": "Automatically created category for safety management"
+        },
+        {
+            "name": "subscriptions",
+            "updated_at": "2025-06-15T14:21:45.684848",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "33d850f3-a346-4639-be1c-5d11cb6214f8",
+            "description": "Automatically created category for subscriptions"
+        },
+        {
+            "name": "habits",
+            "updated_at": "2025-06-12T08:31:12.254700",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "40b2fca0-c1a5-4359-b527-a3e740042db4",
+            "description": "Automatically created category for habits"
+        },
+        {
+            "name": "privacy",
+            "updated_at": "2025-06-13T07:14:20.295051",
+            "created_at": "2025-06-13T01:39:30.850562",
+            "id": "197a8a63-12a7-47fa-b5e4-f578b4ff5c5e",
+            "description": "Automatically created category for privacy"
+        },
+        {
+            "name": "processes",
+            "updated_at": "2025-06-13T04:21:06.331886",
+            "created_at": "2025-06-12T22:37:30.711619",
+            "id": "21b10088-fded-4cf7-bec7-6c90f00a0e78",
+            "description": "Automatically created category for processes"
+        },
+        {
+            "name": "ethical practices",
+            "updated_at": "2025-06-25T11:33:04.773355",
+            "created_at": "2025-06-25T08:10:11.523958",
+            "id": "c94a589b-adc0-4d61-8b46-fe538adf1e31",
+            "description": "Automatically created category for ethical practices"
+        },
+        {
+            "name": "visual communication",
+            "updated_at": "2025-06-23T13:45:39.809734",
+            "created_at": "2025-06-23T12:11:13.827785",
+            "id": "1fa91460-a5c7-4d17-8662-d40a2b7bd07a",
+            "description": "Automatically created category for visual communication"
+        },
+        {
+            "name": "transparency",
+            "updated_at": "2025-06-12T12:27:33.683005",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "ce5a3500-613d-410a-9bdc-05be0850428e",
+            "description": "Automatically created category for transparency"
+        },
+        {
+            "name": "branding",
+            "updated_at": "2025-06-13T04:01:02.343164",
+            "created_at": "2025-06-13T01:39:30.850562",
+            "id": "4462d84b-2386-4836-bbaa-c4472fb3596d",
+            "description": "Automatically created category for branding"
+        },
+        {
+            "name": "marketing",
+            "updated_at": "2025-06-15T12:56:40.304896",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "ff9bad8e-bd2a-4abe-ab5e-7c6067ec587d",
+            "description": "Automatically created category for marketing"
+        },
+        {
+            "name": "kubernetes",
+            "updated_at": "2025-06-16T07:39:13.541103",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "3ea42c3d-9ca6-45bb-bdf8-6281c44928d9",
+            "description": "Automatically created category for kubernetes"
+        },
+        {
+            "name": "performance evaluation",
+            "updated_at": "2025-06-12T12:15:44.455649",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "163098e4-fa12-444f-bc5f-5befa65541ea",
+            "description": "Automatically created category for performance evaluation"
+        },
+        {
+            "name": "quality enhancement",
+            "updated_at": "2025-08-01T10:26:42.980229",
+            "created_at": "2025-08-01T10:12:51.979915",
+            "id": "d6cf1f66-eb50-4d50-bd98-799b8c963c09",
+            "description": "Automatically created category for quality enhancement"
+        },
+        {
+            "name": "access control",
+            "updated_at": "2025-06-14T21:35:54.860015",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "5b5b134d-5dc9-4392-a41e-0be21fd0afb1",
+            "description": "Automatically created category for access control"
+        },
+        {
+            "name": "roles and permissions",
+            "updated_at": "2025-06-15T17:25:44.927869",
+            "created_at": "2025-06-15T12:36:23.703619",
+            "id": "62ddf442-f9d7-4443-8285-22db463f1112",
+            "description": "Automatically created category for roles and permissions"
+        },
+        {
+            "name": "web development",
+            "updated_at": "2025-06-11T21:06:08.274486",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "99dc23a8-c96c-42cc-ab06-e55d2806bd64",
+            "description": "Automatically created category for web development"
+        },
+        {
+            "name": "linguistics",
+            "updated_at": "2025-06-12T21:48:02.563571",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "af06a8ab-cea6-46a6-bb52-67d605b8873e",
+            "description": "Automatically created category for linguistics"
+        },
+        {
+            "name": "software development practices",
+            "updated_at": "2025-06-14T20:33:48.241758",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "d2813171-6a54-4329-9cca-7d616565ae9e",
+            "description": "Automatically created category for software development practices"
+        },
+        {
+            "name": "research",
+            "updated_at": "2025-06-11T18:00:27.478909",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "cd32e994-7743-49d5-8202-048abda619aa",
+            "description": "Automatically created category for research"
+        },
+        {
+            "name": "compliance standards",
+            "updated_at": "2025-06-16T11:06:42.518827",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "e4942cbe-26ab-49de-9c32-5a5e8276eb16",
+            "description": "Automatically created category for compliance standards"
+        },
+        {
+            "name": "sentiment analysis",
+            "updated_at": "2025-06-12T21:48:02.566733",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "d44f3a75-697b-49e4-bf1d-46a81e558448",
+            "description": "Automatically created category for sentiment analysis"
+        },
+        {
+            "name": "public resources",
+            "updated_at": "2025-08-01T10:26:43.870683",
+            "created_at": "2025-08-01T10:12:51.979915",
+            "id": "6d3545c3-41f0-41e6-8219-1c73d806e037",
+            "description": "Automatically created category for public resources"
+        },
+        {
+            "name": "data accessibility",
+            "updated_at": "2025-08-01T10:26:43.865352",
+            "created_at": "2025-08-01T10:12:51.979915",
+            "id": "a4bfc943-58f9-41cc-8242-511f3b4caadc",
+            "description": "Automatically created category for data accessibility"
+        },
+        {
+            "name": "user concerns",
+            "updated_at": "2025-08-16T22:43:38.517840",
+            "created_at": "2025-08-16T22:10:32.332751",
+            "id": "3b86625f-70a3-4137-95f7-6a79bde55873",
+            "description": "Automatically created category for user concerns"
+        },
+        {
+            "name": "ui/ux",
+            "updated_at": "2025-06-19T14:07:32.956556",
+            "created_at": "2025-06-19T12:11:12.503953",
+            "id": "26043d9a-045d-4141-b2c9-101ee59e9dca",
+            "description": "Automatically created category for ui/ux"
+        },
+        {
+            "name": "development practices",
+            "updated_at": "2025-06-17T04:00:47.002607",
+            "created_at": "2025-06-17T00:16:10.097236",
+            "id": "c9f5c854-35f9-464e-a62a-5a83cfdea9af",
+            "description": "Automatically created category for development practices"
+        },
+        {
+            "name": "organization",
+            "updated_at": "2025-06-11T20:08:38.220594",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "1df44c1d-08ee-4aee-8749-baa97869f402",
+            "description": "Automatically created category for organization"
+        },
+        {
+            "name": "psychology",
+            "updated_at": "2025-06-12T21:57:25.505101",
+            "created_at": "2025-06-12T16:59:05.692650",
+            "id": "80f82c46-3b34-439c-8f07-c787de74c509",
+            "description": "Automatically created category for psychology"
+        },
+        {
+            "name": "goals",
+            "updated_at": "2025-06-09T03:07:40.519603",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "2d6774ba-20b6-49f1-bfa0-1eb78186a816",
+            "description": "Automatically created category for goals"
+        },
+        {
+            "name": "projects",
+            "updated_at": "2025-06-09T03:07:39.766559",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "6d5f1cde-fc0a-4d12-b2f5-584249e53faf",
+            "description": "Automatically created category for projects"
+        },
+        {
+            "name": "technical support",
+            "updated_at": "2025-06-09T07:39:05.196049",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "aeb98ad4-4b91-4893-879d-693a370d6376",
+            "description": "Automatically created category for technical support"
+        },
+        {
+            "name": "technical skills",
+            "updated_at": "2025-06-12T12:13:31.031471",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "76c06bad-1e78-417a-8a44-184060b576eb",
+            "description": "Automatically created category for technical skills"
+        },
+        {
+            "name": "security monitoring",
+            "updated_at": "2025-06-26T12:07:01.274447",
+            "created_at": "2025-06-26T08:10:18.184308",
+            "id": "d27e8d92-1561-481d-b8a5-7c6d42cdb084",
+            "description": "Automatically created category for security monitoring"
+        },
+        {
+            "name": "ai, ml & technology",
+            "updated_at": "2025-06-09T06:12:39.587383",
+            "created_at": "2025-06-08T23:45:27.817893",
+            "id": "edc7a0d8-2821-48ca-8dc7-b9d602a11a65",
+            "description": "Automatically created category for ai, ml & technology"
+        },
+        {
+            "name": "code safety",
+            "updated_at": "2025-07-24T19:50:18.067184",
+            "created_at": "2025-07-24T19:11:22.960827",
+            "id": "56e0274f-f6e2-4caf-ae6b-b1eb8a3f7b0b",
+            "description": "Automatically created category for code safety"
+        },
+        {
+            "name": "collaboration",
+            "updated_at": "2025-06-11T20:08:37.153025",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "cbbe55ff-8920-4627-bfe0-0436e5c9c336",
+            "description": "Automatically created category for collaboration"
+        },
+        {
+            "name": "performance monitoring",
+            "updated_at": "2025-06-12T08:32:51.650424",
+            "created_at": "2025-06-11T16:24:43.570583",
+            "id": "7c3af585-4a6f-4d0d-8db0-a7a770219052",
+            "description": "Automatically created category for performance monitoring"
+        },
+        {
+            "name": "personal development",
+            "updated_at": "2025-06-11T16:49:20.318450",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "fb4b69a1-aa97-4798-97c7-51effa964372",
+            "description": "Automatically created category for personal development"
+        },
+        {
+            "name": "productivity tools",
+            "updated_at": "2025-06-13T11:32:12.777155",
+            "created_at": "2025-06-13T08:59:56.768103",
+            "id": "33e5920b-117a-4634-b84d-1396f1863326",
+            "description": "Automatically created category for productivity tools"
+        },
+        {
+            "name": "warnings",
+            "updated_at": "2025-06-14T21:30:14.876461",
+            "created_at": "2025-06-14T16:26:40.573796",
+            "id": "64fbe92f-9b61-42d8-b106-6fa0aed26060",
+            "description": "Automatically created category for warnings"
+        },
+        {
+            "name": "ui/ux design",
+            "updated_at": "2025-06-11T21:06:09.287878",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "52b08cc8-a549-4425-b318-3d0bd5288f5f",
+            "description": "Automatically created category for ui/ux design"
+        },
+        {
+            "name": "data analytics",
+            "updated_at": "2025-06-25T12:45:22.771605",
+            "created_at": "2025-06-25T12:11:07.575992",
+            "id": "4ec280eb-29fd-4111-ba21-85a4773d2750",
+            "description": "Automatically created category for data analytics"
+        },
+        {
+            "name": "fixes",
+            "updated_at": "2025-06-19T03:20:38.904693",
+            "created_at": "2025-06-19T00:21:38.556841",
+            "id": "f1c0dc6e-8621-4f83-be9b-ea0af9957e22",
+            "description": "Automatically created category for fixes"
+        },
+        {
+            "name": "performance metrics",
+            "updated_at": "2025-06-12T08:33:01.535619",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "5f171adb-99d7-4cad-ab79-46915960fc2d",
+            "description": "Automatically created category for performance metrics"
+        },
+        {
+            "name": "information management",
+            "updated_at": "2025-06-16T11:49:53.546941",
+            "created_at": "2025-06-16T04:56:13.966108",
+            "id": "0df978ec-dab8-4b3e-938d-89000a8fa983",
+            "description": "Automatically created category for information management"
+        },
+        {
+            "name": "user support",
+            "updated_at": "2025-07-17T02:05:56.800368",
+            "created_at": "2025-07-17T01:39:43.972124",
+            "id": "305728c9-7111-4061-ab2b-d3cbd7a6950e",
+            "description": "Automatically created category for user support"
+        },
+        {
+            "name": "data retrieval",
+            "updated_at": "2025-06-12T12:22:07.536438",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "57905ac1-99f7-47d3-8643-043f316acf97",
+            "description": "Automatically created category for data retrieval"
+        },
+        {
+            "name": "ui/ux issues",
+            "updated_at": "2025-06-16T11:00:39.823807",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "d055be51-4f91-4702-90d9-f231bab38232",
+            "description": "Automatically created category for ui/ux issues"
+        },
+        {
+            "name": "wellness practices",
+            "updated_at": "2025-06-24T01:49:59.634150",
+            "created_at": "2025-06-24T00:22:58.551960",
+            "id": "9e2a12e0-7138-439f-88c5-31456871a2a9",
+            "description": "Automatically created category for wellness practices"
+        },
+        {
+            "name": "assessment",
+            "updated_at": "2025-07-05T12:31:30.634651",
+            "created_at": "2025-07-05T12:11:04.607219",
+            "id": "ed8359da-4add-4145-a191-eae7f05b233d",
+            "description": "Automatically created category for assessment"
+        },
+        {
+            "name": "mobile compatibility",
+            "updated_at": "2025-10-05T04:14:31.369287",
+            "created_at": "2025-10-05T03:13:13.437163",
+            "id": "21edb31e-5196-4f77-9c34-bc5aa99ee457",
+            "description": "Automatically created category for mobile compatibility"
+        },
+        {
+            "name": "quality assurance",
+            "updated_at": "2025-06-12T12:27:30.727280",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "8327be78-aca7-429d-994f-24f4d1d3d907",
+            "description": "Automatically created category for quality assurance"
+        },
+        {
+            "name": "research datasets",
+            "updated_at": "2025-08-02T07:50:16.710145",
+            "created_at": "2025-08-02T07:12:09.521623",
+            "id": "45d1d95f-36c9-440a-8f5d-3c7139f2d1f0",
+            "description": "Automatically created category for research datasets"
+        },
+        {
+            "name": "security alerts",
+            "updated_at": "2025-10-10T15:40:21.717787",
+            "created_at": "2025-10-10T15:28:37.293864",
+            "id": "3d8d93d8-4a22-4381-9cdd-8f6299be6d54",
+            "description": "Automatically created category for security alerts"
+        },
+        {
+            "name": "performance measurement",
+            "updated_at": "2025-06-13T20:33:25.211566",
+            "created_at": "2025-06-13T19:46:47.999399",
+            "id": "00c0e3de-1413-4cef-a863-62ceef0843f1",
+            "description": "Automatically created category for performance measurement"
+        },
+        {
+            "name": "error handling",
+            "updated_at": "2025-06-11T16:25:53.518948",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "cc09e09f-49b0-4306-8ddc-31c08788d068",
+            "description": "Automatically created category for error handling"
+        },
+        {
+            "name": "security vulnerabilities",
+            "updated_at": "2025-07-05T17:22:31.895960",
+            "created_at": "2025-07-05T16:08:47.006190",
+            "id": "8dac3638-cf80-4335-b50a-67e228322a8e",
+            "description": "Automatically created category for security vulnerabilities"
+        },
+        {
+            "name": "conflict resolution",
+            "updated_at": "2025-06-13T15:13:24.257434",
+            "created_at": "2025-06-13T14:41:26.676432",
+            "id": "10f043cf-a344-4b59-a9c7-3f4212696f67",
+            "description": "Automatically created category for conflict resolution"
+        },
+        {
+            "name": "performance optimization",
+            "updated_at": "2025-06-12T08:32:53.934468",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "6d23b446-8d7a-4ceb-ba46-7ce161d2e9a3",
+            "description": "Automatically created category for performance optimization"
+        },
+        {
+            "name": "preferred methods",
+            "updated_at": "2025-06-16T04:57:47.862467",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "5ae7b58a-8526-462c-9400-0d48a80f7ad2",
+            "description": "Automatically created category for preferred methods"
+        },
+        {
+            "name": "safety concerns",
+            "updated_at": "2025-06-13T16:12:17.411043",
+            "created_at": "2025-06-13T14:41:26.676432",
+            "id": "cbc051c8-b3b9-4c6d-bc61-c257ad64ee86",
+            "description": "Automatically created category for safety concerns"
+        },
+        {
+            "name": "python major updates",
+            "updated_at": "2025-10-05T13:17:11.402165",
+            "created_at": "2025-10-05T12:45:16.940939",
+            "id": "ac4902e0-28c9-4103-a79a-8c7dfae6678e",
+            "description": "Automatically created category for python major updates"
+        },
+        {
+            "name": "animation techniques",
+            "updated_at": "2025-06-19T03:17:13.724605",
+            "created_at": "2025-06-19T00:22:07.844432",
+            "id": "0b5cff38-33de-4995-bd3d-3b7a597b9701",
+            "description": "Automatically created category for animation techniques"
+        },
+        {
+            "name": "mental health issues",
+            "updated_at": "2025-08-10T15:49:54.479727",
+            "created_at": "2025-08-10T15:11:16.413177",
+            "id": "ee7041ab-8542-4d16-9de5-e50847ce290f",
+            "description": "Automatically created category for mental health issues"
+        },
+        {
+            "name": "python dependencies",
+            "updated_at": "2025-10-05T13:17:11.397638",
+            "created_at": "2025-10-05T12:45:16.940939",
+            "id": "fc9fe2e2-c144-4152-bbe5-51fc5d121390",
+            "description": "Automatically created category for python dependencies"
+        },
+        {
+            "name": "design elements",
+            "updated_at": "2025-06-19T17:52:34.020624",
+            "created_at": "2025-06-19T16:09:02.473519",
+            "id": "2b3585d8-55dd-4d2d-a8b9-bad5dbc791da",
+            "description": "Automatically created category for design elements"
+        },
+        {
+            "name": "documentation management",
+            "updated_at": "2025-06-21T10:47:37.738660",
+            "created_at": "2025-06-21T08:08:56.731985",
+            "id": "498dd72f-74ee-48c0-a6c0-9372d5570c6f",
+            "description": "Automatically created category for documentation management"
+        },
+        {
+            "name": "infrastructure reliability",
+            "updated_at": "2025-07-30T14:28:04.756094",
+            "created_at": "2025-07-30T14:13:29.918057",
+            "id": "dbc985ff-e6d7-475b-b752-83819f57dafb",
+            "description": "Automatically created category for infrastructure reliability"
+        },
+        {
+            "name": "user interface",
+            "updated_at": "2025-06-12T19:14:59.861076",
+            "created_at": "2025-06-12T16:59:36.012460",
+            "id": "846d532b-96f4-4e8f-96a0-6b25e9099e19",
+            "description": "Automatically created category for user interface"
+        },
+        {
+            "name": "response optimization",
+            "updated_at": "2025-07-14T14:52:29.091723",
+            "created_at": "2025-07-14T14:12:55.511887",
+            "id": "29560c65-55f2-4338-9ef0-111723b20c98",
+            "description": "Automatically created category for response optimization"
+        },
+        {
+            "name": "color palette",
+            "updated_at": "2025-06-16T13:54:50.183185",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "9d304d2c-849a-40bf-bfec-14aa54d4e089",
+            "description": "Automatically created category for color palette"
+        },
+        {
+            "name": "support systems",
+            "updated_at": "2025-06-12T15:19:37.392846",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "cfb0bd4a-e7e9-4ba5-8101-ad0952386b06",
+            "description": "Automatically created category for support systems"
+        },
+        {
+            "name": "production readiness",
+            "updated_at": "2025-08-12T06:20:11.210840",
+            "created_at": "2025-08-12T06:12:11.892773",
+            "id": "119bb78c-b779-4590-bcce-206e3ee3cb35",
+            "description": "Automatically created category for production readiness"
+        },
+        {
+            "name": "visual aesthetics",
+            "updated_at": "2025-06-15T15:32:12.193891",
+            "created_at": "2025-06-15T12:36:52.818678",
+            "id": "b064d46d-fca2-4d5e-9c48-d7bc31ad770e",
+            "description": "Automatically created category for visual aesthetics"
+        },
+        {
+            "name": "frustration",
+            "updated_at": "2025-06-20T16:37:55.355625",
+            "created_at": "2025-06-20T16:08:28.121723",
+            "id": "85b95506-61db-49c3-a935-271b95588bf8",
+            "description": "Automatically created category for frustration"
+        },
+        {
+            "name": "deadlines",
+            "updated_at": "2025-06-16T11:53:55.925532",
+            "created_at": "2025-06-16T04:55:42.826816",
+            "id": "6c9dbdf0-b6ab-4af2-b13d-c1483883d01b",
+            "description": "Automatically created category for deadlines"
+        },
+        {
+            "name": "animation",
+            "updated_at": "2025-06-14T21:37:07.349784",
+            "created_at": "2025-06-14T16:27:09.853568",
+            "id": "c378637c-91bc-4727-8938-93222893814b",
+            "description": "Automatically created category for animation"
+        },
+        {
+            "name": "quality assessment",
+            "updated_at": "2025-06-12T12:27:35.771474",
+            "created_at": "2025-06-11T16:22:51.997425",
+            "id": "6b6c0994-2a73-4386-874a-8ebec3fbca54",
+            "description": "Automatically created category for quality assessment"
+        },
+        {
+            "name": "serverless architecture",
+            "updated_at": "2025-07-20T00:32:56.390781",
+            "created_at": "2025-07-19T23:11:15.110065",
+            "id": "c3a4806a-89d8-4982-9f88-38c9c840973b",
+            "description": "Automatically created category for serverless architecture"
+        },
+        {
+            "name": "success metrics",
+            "updated_at": "2025-06-23T04:50:20.157237",
+            "created_at": "2025-06-23T04:18:14.219099",
+            "id": "9af17d4a-a0bc-4ba7-b722-29c31a1c79e8",
+            "description": "Automatically created category for success metrics"
+        }
+    ],
+    "total": 260,
+    "user_id": "chad864"
+}

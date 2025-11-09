@@ -1,6 +1,6 @@
-# Mem0 → ByteRover Migration Guide
+# Memory Migration Guide: Mem0, OpenMemory, and ByteRover MCP → ByteRover CLI
 
-This guide helps you migrate your memories from Mem0 Platform and OpenMemory to ByteRover CLI.
+This guide helps you migrate your memories from Mem0 Platform, OpenMemory, and ByteRover MCP to ByteRover CLI (3.0).
 
 ## 🎯 What Gets Migrated
 
@@ -8,6 +8,7 @@ This guide helps you migrate your memories from Mem0 Platform and OpenMemory to 
 - ✅ Categories → ByteRover sections mapping
 - ✅ Metadata (timestamps, user IDs, tags)
 - ✅ Original IDs (preserved in metadata)
+- ✅ Related files (if available)
 
 ## 📋 Prerequisites
 
@@ -16,115 +17,144 @@ This guide helps you migrate your memories from Mem0 Platform and OpenMemory to 
    brv status  # Should show "Logged in"
    ```
 
-2. **API Keys** from your source:
+2. **API Keys** from your sources:
    - **Mem0 Platform**: Get from [app.mem0.ai/settings/api-keys](https://app.mem0.ai/settings/api-keys)
    - **OpenMemory Hosted**: Get from [app.openmemory.dev](https://app.openmemory.dev/)
    - **OpenMemory Local**: No key needed if running locally
+   - **ByteRover MCP**: Uses MCP URL from `.cursor/mcp.json`
 
 3. **Dependencies**:
    ```bash
-   # For TypeScript version
-   pnpm install
-   
-   # For Python version
+   # Install Python dependencies
    pip install requests
+   
+   # Or use uv (recommended)
+   uv pip install requests
    ```
 
 ## 🚀 Migration Methods
 
-### Method 1: Using TypeScript Script (Recommended)
+### Method 1: Unified Migration Script (Recommended)
+
+Migrate from all sources at once:
 
 ```bash
 # Dry run first (preview without importing)
-tsx scripts/migrate-mem0-to-byterover.ts \
-  --source mem0 \
-  --api-key YOUR_MEM0_API_KEY \
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
   --dry-run
 
-# Actual migration
-tsx scripts/migrate-mem0-to-byterover.ts \
-  --source mem0 \
-  --api-key YOUR_MEM0_API_KEY
+# Migrate from all sources
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
+  --openmemory-api-key YOUR_OPENMEMORY_API_KEY
+
+# Migrate from specific sources
+python scripts/migrate_all_to_byterover.py \
+  --sources openmemory-hosted byterover-mcp \
+  --openmemory-api-key YOUR_OPENMEMORY_API_KEY
 ```
 
-### Method 2: Using Python Script
+### Method 2: Individual Migration Scripts
 
+#### OpenMemory Migration
+
+**Hosted OpenMemory:**
 ```bash
 # Dry run
-python scripts/migrate_mem0_to_byterover.py \
-  --source mem0 \
-  --api-key YOUR_MEM0_API_KEY \
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --api-key YOUR_OPENMEMORY_API_KEY \
   --dry-run
 
 # Actual migration
-python scripts/migrate_mem0_to_byterover.py \
-  --source mem0 \
-  --api-key YOUR_MEM0_API_KEY
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --api-key YOUR_OPENMEMORY_API_KEY
 ```
 
-### Method 3: Manual Export + Import
+**Local OpenMemory:**
+```bash
+# Make sure OpenMemory is running locally
+docker ps | grep openmemory
 
-If the scripts don't work, you can manually export and import:
+# Migrate
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-local \
+  --url http://localhost:8765
+```
 
-#### Step 1: Export from Mem0 Platform
+#### ByteRover MCP Migration
 
-```python
-# export_mem0.py
-import requests
-import json
+**Option 1: Direct MCP Extraction (if supported)**
+```bash
+python scripts/migrate_byterover_mcp_to_cli.py \
+  --dry-run
+```
 
-API_KEY = "your-mem0-api-key"
-headers = {"Authorization": f"Token {API_KEY}"}
+**Option 2: Manual Extraction + Import**
 
-all_memories = []
-page = 1
+1. **Extract memories using MCP tools in Cursor:**
+   - Open Cursor
+   - Use the `byterover-retrieve-knowledge` tool with an empty query to get all memories
+   - Export the results to a JSON file
 
-while True:
-    response = requests.post(
-        "https://api.mem0.ai/v2/memories/",
-        headers=headers,
-        json={"filters": {}, "page": page, "page_size": 100}
-    )
-    data = response.json()
-    memories = data.get("results", [])
-    
-    if not memories:
-        break
-    
-    all_memories.extend(memories)
-    page += 1
+2. **Import the exported file:**
+   ```bash
+   python scripts/migrate_byterover_mcp_to_cli.py \
+     --import-file byterover_mcp_export.json \
+     --dry-run
+   ```
 
-with open("mem0_export.json", "w") as f:
-    json.dump(all_memories, f, indent=2)
+### Method 3: Export + Manual Import
 
-print(f"Exported {len(all_memories)} memories")
+#### Step 1: Export Memories
+
+**OpenMemory:**
+```bash
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --api-key YOUR_KEY \
+  --export-only \
+  --output openmemory_export.json
+```
+
+**ByteRover MCP:**
+```bash
+python scripts/migrate_byterover_mcp_to_cli.py \
+  --import-file byterover_mcp_export.json \
+  --export-only \
+  --output byterover_mcp_export.json
 ```
 
 #### Step 2: Import to ByteRover
 
 ```bash
-# import_to_byterover.sh
-#!/bin/bash
+# Import OpenMemory memories
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --import-file openmemory_export.json
 
-while IFS= read -r line; do
-  memory=$(echo "$line" | jq -r '.memory')
-  section="Lessons Learned"  # Or map based on categories
-  
-  brv add --section "$section" --content "$memory"
-done < <(jq -c '.[]' mem0_export.json)
+# Import ByteRover MCP memories
+python scripts/migrate_byterover_mcp_to_cli.py \
+  --import-file byterover_mcp_export.json
 ```
 
 ## 📊 Category Mapping
 
-Mem0 categories are automatically mapped to ByteRover sections:
+Memories are automatically mapped to ByteRover sections based on categories and tags:
 
-| Mem0 Category | ByteRover Section |
-|---------------|-------------------|
+| Source Category/Tag | ByteRover Section |
+|---------------------|-------------------|
 | error, bug | Common Errors |
-| best practice | Best Practices |
+| best practice, best-practice | Best Practices |
 | architecture, design | Architecture |
 | test, testing | Testing |
 | strategy, approach | Strategies |
+| security | Security |
+| performance | Best Practices |
+| code style, code-quality | Code Style and Quality |
+| styling, design | Styling and Design |
 | *default* | Lessons Learned |
 
 ## 🔧 Advanced Options
@@ -132,40 +162,42 @@ Mem0 categories are automatically mapped to ByteRover sections:
 ### Filter by User/Agent
 
 ```bash
-# Modify the script to add filters
-tsx scripts/migrate-mem0-to-byterover.ts \
-  --source mem0 \
-  --api-key YOUR_KEY \
-  --filters '{"user_id": "user123"}'
+# Modify the scripts to add filters (requires code changes)
+# Or filter the exported JSON file before importing
 ```
 
 ### Custom Batch Size
 
+The scripts automatically handle batching with rate limiting. For large datasets, you can modify the `page_size` parameter in the scripts.
+
+### Migrate from Multiple Sources
+
 ```bash
-tsx scripts/migrate-mem0-to-byterover.ts \
-  --source mem0 \
-  --api-key YOUR_KEY \
-  --batch-size 50
+# Migrate from all sources and combine
+python scripts/migrate_all_to_byterover.py \
+  --sources openmemory-hosted byterover-mcp \
+  --openmemory-api-key YOUR_KEY \
+  --combine
 ```
 
-### Migrate from Local OpenMemory
+### Export Only (No Import)
 
 ```bash
-# Make sure OpenMemory is running locally
-docker ps | grep openmemory
-
-# Migrate
-tsx scripts/migrate-mem0-to-byterover.ts \
-  --source openmemory-local \
-  --url http://localhost:8765
+# Export all memories to JSON
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
+  --openmemory-api-key YOUR_KEY \
+  --export-only \
+  --output all_memories.json
 ```
 
 ## 🛡️ Safety Features
 
 1. **Dry Run**: Always test with `--dry-run` first
-2. **Backup**: Automatic backup saved to `.brv/migration-backup.json`
+2. **Backup**: Export memories before importing
 3. **Error Handling**: Failed imports are logged, successful ones continue
 4. **Metadata Preservation**: Original IDs and timestamps preserved
+5. **Rate Limiting**: Automatic delays between requests
 
 ## 🔍 Verification
 
@@ -179,7 +211,7 @@ brv status
 cat .brv/ace/playbook.json | jq
 
 # Search for migrated memories
-brv retrieve --query "your search term"
+brv retrieve --query "test query"
 ```
 
 ## 🐛 Troubleshooting
@@ -199,14 +231,47 @@ npx @byterover/cli status
 ```
 
 ### "Rate limit exceeded"
-- Add delays between requests
-- Reduce batch size: `--batch-size 10`
-- Contact Mem0 support for rate limit increase
+- Scripts automatically add delays
+- Reduce batch size if needed
+- Contact support for rate limit increase
 
 ### "Memory content too long"
 - ByteRover has content limits
-- Split long memories into multiple bullets
-- Summarize before importing
+- Scripts automatically skip empty memories
+- Split long memories manually if needed
+
+### "OpenMemory connection failed" (Local)
+```bash
+# Check if OpenMemory is running
+docker ps | grep openmemory
+
+# Start OpenMemory if not running
+curl -sL https://raw.githubusercontent.com/mem0ai/mem0/main/openmemory/run.sh | bash
+
+# Or start manually
+docker run -d -p 8765:8765 -e OPENAI_API_KEY=your_key openmemory
+```
+
+### "ByteRover MCP extraction failed"
+- **This is expected**: ByteRover MCP doesn't support direct HTTP access
+- **Solution**: Use MCP tools from Cursor to extract memories
+- **Steps**:
+  1. Open Cursor
+  2. Ask AI assistant to retrieve all memories using `byterover-retrieve-knowledge` tool
+  3. Use multiple queries: "memory", "best practices", "error", "testing", etc.
+  4. Format results as JSON array
+  5. Save to `byterover_mcp_export.json`
+  6. Import using: `python scripts/migrate_byterover_mcp_to_cli.py --import-file byterover_mcp_export.json`
+- See [EXTRACTION_GUIDE.md](./EXTRACTION_GUIDE.md) for detailed instructions
+
+### "OpenMemory connection failed" (Hosted)
+- The script tries multiple API endpoints automatically
+- If all fail, check:
+  1. Your API key is correct
+  2. Your API key has the right permissions
+  3. The API endpoint is accessible
+- **Alternative**: Use OpenMemory MCP tools in Cursor to export memories
+- See [EXTRACTION_GUIDE.md](./EXTRACTION_GUIDE.md) for detailed instructions
 
 ## 📝 Post-Migration
 
@@ -217,7 +282,7 @@ npx @byterover/cli status
 
 2. **Clean up old MCP config** (optional):
    ```bash
-   # Remove Mem0/OpenMemory from .kiro/settings/mcp.json
+   # Remove Mem0/OpenMemory from .cursor/mcp.json if no longer needed
    ```
 
 3. **Test retrieval**:
@@ -225,22 +290,105 @@ npx @byterover/cli status
    brv retrieve --query "test query"
    ```
 
+4. **Verify all memories**:
+   ```bash
+   # Count memories in playbook
+   cat .brv/ace/playbook.json | jq '.bullets | length'
+   ```
+
 ## 💡 Tips
 
 - **Start with dry run**: Always preview first
 - **Migrate in batches**: If you have thousands of memories, migrate in chunks
 - **Review categories**: Check if category mapping makes sense for your use case
-- **Keep backup**: Don't delete Mem0 data until you verify ByteRover migration
-- **Update workflows**: Update any scripts/tools that reference Mem0 APIs
+- **Keep backup**: Don't delete source data until you verify ByteRover migration
+- **Update workflows**: Update any scripts/tools that reference old memory APIs
+- **Test retrieval**: Verify that migrated memories can be retrieved correctly
+
+## 🔄 Migration Workflow
+
+### Recommended Workflow
+
+1. **Backup existing memories** (export to JSON)
+2. **Dry run migration** to preview changes
+3. **Migrate in stages** (one source at a time)
+4. **Verify migration** (check playbook and test retrieval)
+5. **Push to cloud** (sync with ByteRover Cloud)
+6. **Clean up** (remove old MCP configs if desired)
+
+### Example Complete Workflow
+
+```bash
+# 1. Backup
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --api-key YOUR_KEY \
+  --export-only \
+  --output backup_openmemory.json
+
+# 2. Dry run
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
+  --openmemory-api-key YOUR_KEY \
+  --dry-run
+
+# 3. Migrate
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
+  --openmemory-api-key YOUR_KEY
+
+# 4. Verify
+brv status
+brv retrieve --query "test"
+
+# 5. Push
+brv push
+```
 
 ## 🆘 Need Help?
 
-- ByteRover Docs: Check ByteRover documentation
-- Mem0 API Docs: [docs.mem0.ai/api-reference](https://docs.mem0.ai/api-reference)
-- OpenMemory Docs: [docs.mem0.ai/openmemory](https://docs.mem0.ai/openmemory)
+- **ByteRover Docs**: [docs.byterover.dev](https://docs.byterover.dev/)
+- **ByteRover Beta Docs**: [docs.byterover.dev/beta](https://docs.byterover.dev/beta)
+- **Mem0 API Docs**: [docs.mem0.ai/api-reference](https://docs.mem0.ai/api-reference)
+- **OpenMemory Docs**: [docs.mem0.ai/openmemory](https://docs.mem0.ai/openmemory)
 
 ## 📚 Additional Resources
 
 - [ByteRover CLI Reference](.kiro/steering/agent-context-engineering.md)
 - [Mem0 Platform API](https://docs.mem0.ai/api-reference/memory/v2-get-memories)
 - [OpenMemory MCP](https://docs.mem0.ai/openmemory/overview)
+- [ByteRover MCP](https://docs.byterover.dev/)
+
+## 🎯 Quick Reference
+
+### OpenMemory Hosted
+```bash
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-hosted \
+  --api-key $OPENMEMORY_API_KEY
+```
+
+### OpenMemory Local
+```bash
+python scripts/migrate_openmemory_to_byterover.py \
+  --source openmemory-local \
+  --url http://localhost:8765
+```
+
+### ByteRover MCP
+```bash
+python scripts/migrate_byterover_mcp_to_cli.py \
+  --import-file byterover_mcp_export.json
+```
+
+### All Sources
+```bash
+python scripts/migrate_all_to_byterover.py \
+  --sources all \
+  --openmemory-api-key $OPENMEMORY_API_KEY
+```
+
+---
+
+*Last updated: 2025-01-22*
+

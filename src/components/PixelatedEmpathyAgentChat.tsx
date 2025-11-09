@@ -77,6 +77,62 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  const getAgentResponse = async (
+    userInput: string,
+    currentContext: AgentContext,
+  ): Promise<AgentResponse> => {
+    if (!agent.current) {
+      throw new Error('Agent not initialized')
+    }
+
+    switch (currentContext) {
+      case 'scenario_generation': {
+        const lowerInput = userInput.toLowerCase()
+        const shouldGenerateScenario =
+          lowerInput.includes('scenario') || lowerInput.includes('generate')
+        if (shouldGenerateScenario) {
+          return await agent.current.generateScenario({
+            condition: extractCondition(userInput),
+            difficulty: extractDifficulty(userInput),
+            population: extractPopulation(userInput),
+          })
+        }
+        return await agent.current.sendMessage(userInput, currentContext)
+      }
+      case 'bias_detection':
+        return await agent.current.analyzeBias(userInput)
+      case 'training_recommendation':
+        return await agent.current.recommendTraining({
+          experience: extractExperience(userInput),
+          specializations: extractSpecializations(userInput),
+        })
+      default:
+        return await agent.current.sendMessage(userInput, currentContext)
+    }
+  }
+
+  const createErrorMessage = (errorText: string): Message => ({
+    id: `error-${Date.now()}`,
+    content: errorText,
+    role: 'agent',
+    timestamp: new Date(),
+    context: 'error',
+  })
+
+  const handleResponseMetadata = (
+    response: AgentResponse,
+    currentContext: AgentContext,
+  ): void => {
+    if (currentContext === 'scenario_generation' && response.metadata?.['scenario']) {
+      onScenarioGenerated?.(
+        response.metadata['scenario'] as TherapeuticScenario,
+      )
+    }
+    if (currentContext === 'bias_detection' && response.metadata?.['bias_analysis']) {
+      onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis)
+    }
+  }
+
   const handleSend = async () => {
     if (!input.trim() || !agent.current || isLoading) {
       return
@@ -91,43 +147,12 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const userInput = input
     setInput('')
     setIsLoading(true)
 
     try {
-      let response: AgentResponse
-
-      // Use specialized methods for specific contexts
-      switch (context) {
-        case 'scenario_generation':
-          if (
-            input.toLowerCase().includes('scenario') ||
-            input.toLowerCase().includes('generate')
-          ) {
-            response = await agent.current.generateScenario({
-              condition: extractCondition(input),
-              difficulty: extractDifficulty(input),
-              population: extractPopulation(input),
-            })
-          } else {
-            response = await agent.current.sendMessage(input, context)
-          }
-          break
-
-        case 'bias_detection':
-          response = await agent.current.analyzeBias(input)
-          break
-
-        case 'training_recommendation':
-          response = await agent.current.recommendTraining({
-            experience: extractExperience(input),
-            specializations: extractSpecializations(input),
-          })
-          break
-
-        default:
-          response = await agent.current.sendMessage(input, context)
-      }
+      const response = await getAgentResponse(userInput, context)
 
       if (response.success && response.response) {
         const agentMessage: Message = {
@@ -137,47 +162,19 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           timestamp: new Date(),
           context,
         }
-
         setMessages((prev) => [...prev, agentMessage])
-
-        // Handle specific response types
-        if (
-          context === 'scenario_generation' &&
-          response.metadata?.['scenario']
-        ) {
-          onScenarioGenerated?.(
-            response.metadata['scenario'] as TherapeuticScenario,
-          )
-        }
-        if (
-          context === 'bias_detection' &&
-          response.metadata?.['bias_analysis']
-        ) {
-          onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis)
-        }
+        handleResponseMetadata(response, context)
       } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `error-${Date.now()}`,
-            content: `Sorry, I encountered an error: ${response.error}`,
-            role: 'agent',
-            timestamp: new Date(),
-            context: 'error',
-          },
-        ])
+        const errorMessage = createErrorMessage(
+          `Sorry, I encountered an error: ${response.error}`,
+        )
+        setMessages((prev) => [...prev, errorMessage])
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          content: `Sorry, I encountered an unexpected error. Please try again.`,
-          role: 'agent',
-          timestamp: new Date(),
-          context: 'error',
-        },
-      ])
+      const errorMessage = createErrorMessage(
+        'Sorry, I encountered an unexpected error. Please try again.',
+      )
+      setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -263,19 +260,17 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-3xl p-3 rounded-lg ${
-                message.role === 'user'
+              className={`max-w-3xl p-3 rounded-lg ${message.role === 'user'
                   ? 'bg-blue-600 text-white'
                   : message.context === 'error'
                     ? 'bg-red-100 text-red-800 border border-red-200'
                     : 'bg-gray-100 text-gray-800'
-              }`}
+                }`}
             >
               <div className="whitespace-pre-wrap">{message.content}</div>
               <div
-                className={`text-xs mt-2 ${
-                  message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                }`}
+                className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                  }`}
               >
                 {message.timestamp.toLocaleTimeString()}
                 {message.context && ` • ${message.context}`}
@@ -322,27 +317,35 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
 }
 
 // Helper functions to extract information from user input
-function extractCondition(
-  input: string,
-):
+type ConditionType =
   | 'depression'
   | 'anxiety'
   | 'ptsd'
   | 'bipolar'
   | 'substance_use'
   | 'personality_disorder'
-  | 'crisis' {
+  | 'crisis'
+
+const CONDITION_KEYWORDS: Record<
+  ConditionType,
+  readonly string[]
+> = {
+  depression: ['depression', 'depressed'],
+  anxiety: ['anxiety', 'anxious'],
+  ptsd: ['ptsd', 'trauma'],
+  bipolar: ['bipolar', 'manic'],
+  substance_use: ['substance', 'addiction'],
+  personality_disorder: ['personality', 'borderline'],
+  crisis: ['crisis', 'suicidal'],
+} as const
+
+function extractCondition(input: string): ConditionType {
   const lower = input.toLowerCase()
-  if (lower.includes('depression') || lower.includes('depressed'))
-    return 'depression'
-  if (lower.includes('anxiety') || lower.includes('anxious')) return 'anxiety'
-  if (lower.includes('ptsd') || lower.includes('trauma')) return 'ptsd'
-  if (lower.includes('bipolar') || lower.includes('manic')) return 'bipolar'
-  if (lower.includes('substance') || lower.includes('addiction'))
-    return 'substance_use'
-  if (lower.includes('personality') || lower.includes('borderline'))
-    return 'personality_disorder'
-  if (lower.includes('crisis') || lower.includes('suicidal')) return 'crisis'
+  for (const [condition, keywords] of Object.entries(CONDITION_KEYWORDS)) {
+    if (keywords.some((keyword) => lower.includes(keyword))) {
+      return condition as ConditionType
+    }
+  }
   return 'depression' // default
 }
 

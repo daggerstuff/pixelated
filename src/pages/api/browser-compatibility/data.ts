@@ -1,6 +1,7 @@
 // import type { APIRoute } from 'astro'
 import fs from 'node:fs'
 import path from 'node:path'
+import { safeJoin, ALLOWED_DIRECTORIES, validatePath, sanitizeFilename } from '../../../utils/path-security'
 
 /**
  * API endpoint to fetch browser compatibility data from reports
@@ -23,8 +24,8 @@ export const GET = async ({ request }) => {
     const since = url.searchParams.get('since') || null
 
     // Get report files
-    const reportsDir = path.join(
-      process.cwd(),
+    const reportsDir = safeJoin(
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
       'browser-compatibility',
       'reports',
     )
@@ -77,7 +78,8 @@ export const GET = async ({ request }) => {
     const filesToProcess = latestOnly ? [reportFiles[0]] : reportFiles
 
     for (const file of filesToProcess) {
-      const reportPath = path.join(reportsDir, file)
+      const sanitizedFile = sanitizeFilename(file)
+      const reportPath = validatePath(sanitizedFile, reportsDir)
       const fileContent = fs.readFileSync(reportPath, 'utf8')
       const report = JSON.parse(fileContent) as unknown
 
