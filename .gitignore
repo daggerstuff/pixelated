@@ -243,6 +243,9 @@ verbose/coverage/
 *.aac
 
 /ai/
+# Allow journal dataset research module
+!/ai/journal_dataset_research/
+!/ai/journal_dataset_research/**/*.py
 .clinerules/
 .kilocode/
 .roo/
