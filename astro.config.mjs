@@ -97,7 +97,7 @@ export default defineConfig({
     },
     build: {
       sourcemap: isProduction ? false : 'hidden',
-      target: 'node24',
+      target: 'node22',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
       // Enable minification in production
       minify: isProduction ? 'terser' : false,

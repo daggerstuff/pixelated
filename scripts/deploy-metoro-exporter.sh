@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Deploy Metoro Exporter to GKE Cluster
+# Deploy Metoro Exporter to Kubernetes Cluster
 # This script installs the Metoro exporter using Helm
+# Works with any Kubernetes cluster (Civo, GKE, EKS, etc.)
 
 set -euo pipefail
 
@@ -34,11 +35,35 @@ error() {
     exit 1
 }
 
+# Load environment variables from .env if it exists (handles regular files and named pipes)
+# This must be done after logging functions are defined
+load_env_file() {
+    # Check if .env exists as a readable file or named pipe
+    if [ -r "${PROJECT_ROOT}/.env" ] || [ -p "${PROJECT_ROOT}/.env" ] || [ -f "${PROJECT_ROOT}/.env" ]; then
+        log "Loading environment variables from .env file..."
+        set -a
+        # Use source with error handling
+        if source "${PROJECT_ROOT}/.env" 2>/dev/null; then
+            set +a
+            log "Environment variables loaded from .env"
+            return 0
+        else
+            set +a
+            warning "Failed to load .env file, continuing without it"
+            return 1
+        fi
+    fi
+    return 1
+}
+
+# Load environment file early
+load_env_file
+
 # Check if required tools are installed
 check_dependencies() {
     log "Checking dependencies..."
     
-    local required_tools=("helm" "kubectl" "gcloud")
+    local required_tools=("helm" "kubectl")
     for tool in "${required_tools[@]}"; do
         if ! command -v "${tool}" &> /dev/null; then
             error "Required tool not found: ${tool}"
@@ -48,16 +73,26 @@ check_dependencies() {
     success "All dependencies found"
 }
 
-# Authenticate with GKE cluster
-authenticate_cluster() {
-    log "Authenticating with GKE cluster..."
+# Verify Kubernetes cluster access
+verify_cluster_access() {
+    log "Verifying Kubernetes cluster access..."
     
-    # Get cluster credentials
-    if ! gcloud container clusters get-credentials pixelated-empathy-prod --location=us-central1-c; then
-        error "Failed to get cluster credentials"
+    # Check if kubectl can connect to the cluster
+    if ! kubectl cluster-info &> /dev/null; then
+        error "Cannot access Kubernetes cluster. Please ensure kubectl is configured with the correct context."
     fi
     
-    success "Successfully authenticated with GKE cluster"
+    # Get current context
+    local current_context
+    current_context=$(kubectl config current-context 2>/dev/null || echo "unknown")
+    log "Current Kubernetes context: ${current_context}"
+    
+    # Verify we can list nodes
+    if ! kubectl get nodes &> /dev/null; then
+        error "Cannot list cluster nodes. Please check your cluster access permissions."
+    fi
+    
+    success "Successfully connected to Kubernetes cluster"
 }
 
 # Add Metoro Helm repository
@@ -100,11 +135,43 @@ deploy_metoro_exporter() {
     fi
     
     # Install/upgrade Metoro exporter
-    # Note: The bearer token is provided in the task, but in practice this should come from a secret management system
+    # IMPORTANT: The exporter code tries to parse the token as a JWT to extract environment info
+    # However, Metoro API keys are in the format: metoro_secret_<token>
+    # The recommended way is to use the installation command from the Metoro webapp
+    # which generates the proper authentication token with environment information.
+    #
+    # For manual Helm deployment, we'll use the API key, but the exporter may fail
+    # if it cannot parse it as a JWT. The webapp installation command is the recommended approach.
+    local bearer_token="${METORO_JWT_TOKEN:-${METORO_API_KEY:-}}"
+    
+    if [ -z "${bearer_token}" ]; then
+        error "No bearer token found. Set METORO_API_KEY in your .env file."
+        error ""
+        error "NOTE: The exporter may require a JWT token (not just an API key)."
+        error "      The recommended installation method is to use the command from the Metoro webapp:"
+        error "      https://us-east.metoro.io/"
+        error "      The webapp will provide a properly configured installation command."
+    fi
+    
+    # Check if token looks like a JWT (starts with eyJ) or API key (starts with metoro_secret_)
+    if [[ "${bearer_token}" =~ ^eyJ ]]; then
+        log "Using JWT token (length: ${#bearer_token} characters)"
+    elif [[ "${bearer_token}" =~ ^metoro_secret_ ]]; then
+        warning "⚠️  Using API key format (metoro_secret_...)"
+        warning "The exporter code tries to parse this as a JWT to extract environment information."
+        warning "If deployment fails with 'Failed to parse jwt token', you may need to:"
+        warning "  1. Use the installation command from the Metoro webapp instead"
+        warning "  2. Contact Metoro support for the correct token format for manual Helm deployment"
+        log "Proceeding with API key deployment..."
+    else
+        warning "⚠️  Token format unrecognized (expected JWT starting with 'eyJ' or API key starting with 'metoro_secret_')"
+        log "Proceeding with deployment..."
+    fi
+    
     log "Installing Metoro exporter via Helm..."
     
     if ! helm upgrade --install --create-namespace --namespace metoro metoro-exporter metoro-exporter/metoro-exporter \
-        --set exporter.secret.bearerToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcklkIjoib3JnXzM0WkVQYXdPSngzRk5VNDlsM2pJdW00dVBndiIsImVudmlyb25tZW50IjoicGl4ZWxjbHVzdGVyIiwiZXhwIjoyMDc2NzcyODQ5fQ.4r_2a41BsoOY31e2q6YFhm-hhytObYngAyaR1bTE0O0; then
+        --set exporter.secret.bearerToken="${bearer_token}"; then
         error "Failed to install Metoro exporter"
     fi
     
@@ -134,10 +201,10 @@ verify_deployment() {
 
 # Main function
 main() {
-    log "🚀 Starting Metoro Exporter deployment to GKE cluster"
+    log "🚀 Starting Metoro Exporter deployment to Kubernetes cluster"
     
     check_dependencies
-    authenticate_cluster
+    verify_cluster_access
     add_metoro_repo
     deploy_metoro_exporter
     verify_deployment
@@ -150,13 +217,29 @@ main() {
 case "${1:-}" in
     "help"|"-h"|"--help")
         echo "Usage: $0"
-        echo "Deploys Metoro exporter to the GKE cluster"
+        echo "Deploys Metoro exporter to the Kubernetes cluster"
         echo ""
         echo "This script will:"
-        echo "1. Authenticate with the GKE cluster"
+        echo "1. Verify access to the Kubernetes cluster (kubectl must be configured)"
         echo "2. Add the Metoro Helm repository"
         echo "3. Deploy the Metoro exporter to the 'metoro' namespace"
         echo "4. Verify the deployment"
+        echo ""
+        echo "Requirements:"
+        echo "  - kubectl configured with cluster access"
+        echo "  - helm installed"
+        echo "  - METORO_API_KEY set in .env file"
+        echo ""
+        echo "IMPORTANT: The exporter code expects a JWT token to extract environment information."
+        echo "           However, Metoro API keys are in format: metoro_secret_<token>"
+        echo ""
+        echo "Recommended: Use the installation command from the Metoro webapp:"
+        echo "            https://us-east.metoro.io/"
+        echo "            The webapp provides a properly configured installation command."
+        echo ""
+        echo "Manual Deployment: This script uses METORO_API_KEY, but the exporter may fail"
+        echo "                  if it cannot parse the token as a JWT. If deployment fails,"
+        echo "                  use the webapp installation command instead."
         exit 0
         ;;
     *)

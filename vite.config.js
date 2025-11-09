@@ -320,7 +320,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   build: {
-    target: 'node24',
+    target: 'node22',
     minify: false,
     emptyOutDir: false,
     sourcemap: true,
@@ -470,7 +470,7 @@ export default defineConfig({
     entries: ['src/**/*.{ts,tsx,js,jsx,astro}', 'src/**/*.mjs'],
     esbuildOptions: {
       platform: 'node',
-      target: 'node24',
+      target: 'node22',
       define: {
         'process.env.BUILDING_FOR_AWS': JSON.stringify('1'),
         'process.env.NODE_ENV': JSON.stringify(

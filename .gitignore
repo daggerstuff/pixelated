@@ -329,3 +329,6 @@ tmp/
 
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
+
+# MCP server binaries
+bin/
