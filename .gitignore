@@ -326,3 +326,4 @@ tmp/
 
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
+bin/metoro-mcp-server
