@@ -1,6 +1,6 @@
-import fs from 'fs'
+import fs from 'node:fs'
+import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { logAudit } from '../audit-logger'
-import { safeJoin, ALLOWED_DIRECTORIES } from '../../../utils/path-security'
 
 describe('auditLogger', () => {
     const logPath = safeJoin(ALLOWED_DIRECTORIES.LOGS, 'audit.log')

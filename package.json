@@ -30,8 +30,6 @@
     "lint": "biome lint .",
     "lint:ci": "biome lint . || exit 0",
     "lint:fix": "biome lint --write .",
-    "check": "biome check .",
-    "check:fix": "biome check --write .",
     "typecheck": "astro check && tsc --noEmit",
     "typecheck:strict": "tsx scripts/validate-typescript.ts",
     "type-check": "pnpm run typecheck",
