@@ -11,8 +11,7 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 # Top-level imports for tests (avoid import-inside-function warnings)
 import jwt
@@ -225,7 +224,7 @@ class TestAuditLogger(unittest.TestCase):
             )
         )
 
-        log_entry = self._extracted_from_test_log_event_sensitive_18(
+        self._extracted_from_test_log_event_sensitive_18(
             "details", "ENCRYPTED", "encrypted_details", "encrypted_data"
         )
         self.security_manager.encrypt_data.assert_called_once()

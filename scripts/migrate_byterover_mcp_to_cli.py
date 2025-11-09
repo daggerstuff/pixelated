@@ -41,7 +41,6 @@ def map_category_to_section(category: Optional[str], tags: Optional[List[str]] =
         "code style": "Code Style and Quality",
         "code-quality": "Code Style and Quality",
         "styling": "Styling and Design",
-        "design": "Styling and Design",
     }
 
     # Check tags

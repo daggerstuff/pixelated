@@ -2,21 +2,16 @@
 Audio bias detection service using speech recognition and audio analysis
 """
 
-import asyncio
 import base64
-import hashlib
 import io
 import tempfile
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import librosa
 import numpy as np
-import soundfile as sf
 import structlog
 import torch
-import torch.nn.functional as F
 from transformers import (
     WhisperProcessor,
     WhisperForConditionalGeneration,
@@ -24,7 +19,7 @@ from transformers import (
     Wav2Vec2ForSequenceClassification,
     pipeline
 )
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import stop_after_attempt, wait_exponential, retry
 
 from ..config import settings
 from ..models import (

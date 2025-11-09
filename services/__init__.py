@@ -9,7 +9,6 @@ find the modules.
 import importlib.util
 import os
 import sys
-import types
 from importlib import import_module
 
 

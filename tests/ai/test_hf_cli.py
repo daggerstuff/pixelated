@@ -2,8 +2,6 @@ import sys
 import types
 from pathlib import Path
 
-import pytest
-
 from ai.examples import download_model
 
 

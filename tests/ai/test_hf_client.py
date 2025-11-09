@@ -1,8 +1,6 @@
 import sys
 import types
 
-import pytest
-
 from ai.hf_client import HuggingFaceClient
 
 

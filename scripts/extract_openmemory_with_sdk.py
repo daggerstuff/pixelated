@@ -21,7 +21,7 @@ except ImportError:
 
 def extract_from_openmemory_sdk(api_key: str) -> List[Dict[str, Any]]:
     """Extract all memories from OpenMemory using Mem0 SDK."""
-    print(f"📥 Extracting memories from OpenMemory using Mem0 SDK...")
+    print("📥 Extracting memories from OpenMemory using Mem0 SDK...")
 
     try:
         # Initialize Mem0 client
@@ -31,7 +31,6 @@ def extract_from_openmemory_sdk(api_key: str) -> List[Dict[str, Any]]:
         # The SDK should handle pagination automatically
         all_memories = []
         page = 1
-        page_size = 100
 
         print("  Fetching memories...")
 
@@ -122,7 +121,7 @@ def main():
         json.dump(memories, f, indent=2, default=str)
 
     print(f"✓ Exported to {args.output}")
-    print(f"\nNext step: Import to ByteRover CLI")
+    print("\nNext step: Import to ByteRover CLI")
     print(f"  python scripts/migrate_openmemory_to_byterover.py --import-file {args.output}")
 
 

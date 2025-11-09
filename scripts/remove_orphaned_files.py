@@ -6,12 +6,11 @@ Remove orphaned markdown files that don't have corresponding playbook entries.
 import json
 import os
 import sys
-from pathlib import Path
 
 
 def remove_orphaned_files(playbook_path: str, bullets_dir: str, dry_run: bool = False):
     """Remove markdown files that don't have playbook entries."""
-    print(f"🔍 Analyzing playbook and markdown files...")
+    print("🔍 Analyzing playbook and markdown files...")
 
     # Load playbook
     with open(playbook_path, 'r') as f:
@@ -63,7 +62,7 @@ def remove_orphaned_files(playbook_path: str, bullets_dir: str, dry_run: bool = 
         if removed_count > 0 and removed_count % 500 == 0:
             print(f"  Progress: {removed_count}/{len(orphaned_ids)} removed...")
 
-    print(f"\n✅ Cleanup complete!")
+    print("\n✅ Cleanup complete!")
     print(f"   Removed: {removed_count} orphaned files")
     if errors > 0:
         print(f"   Errors: {errors}")

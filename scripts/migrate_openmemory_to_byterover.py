@@ -131,7 +131,7 @@ def extract_from_openmemory_hosted(api_key: str, base_url: str = "https://api.op
                 elif response.status_code == 404:
                     continue  # Try next URL
 
-            except requests.exceptions.RequestException as e:
+            except requests.exceptions.RequestException:
                 continue  # Try next combination
 
         if all_memories:

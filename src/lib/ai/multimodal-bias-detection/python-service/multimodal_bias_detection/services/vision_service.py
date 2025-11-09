@@ -2,19 +2,14 @@
 Vision bias detection service using CLIP and computer vision models
 """
 
-import asyncio
 import base64
-import hashlib
 import io
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
-import cv2
 import numpy as np
 import structlog
 import torch
-import torch.nn.functional as F
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel, pipeline
 from tenacity import retry, stop_after_attempt, wait_exponential

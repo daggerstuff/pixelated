@@ -10,7 +10,6 @@ Removes bullets with placeholder content like:
 import json
 import os
 import sys
-from pathlib import Path
 
 
 def cleanup_placeholders(playbook_path: str, bullets_dir: str, dry_run: bool = False, remove_files: bool = False):
@@ -91,11 +90,11 @@ def cleanup_placeholders(playbook_path: str, bullets_dir: str, dry_run: bool = F
         json.dump(playbook, f, indent=2)
 
     # Save cleaned playbook
-    print(f"💾 Saving cleaned playbook...")
+    print("💾 Saving cleaned playbook...")
     with open(playbook_path, 'w') as f:
         json.dump(playbook, f, indent=2)
 
-    print(f"\n✅ Cleanup complete!")
+    print("\n✅ Cleanup complete!")
     print(f"   Removed: {len(placeholder_ids)} placeholder bullets")
     print(f"   Remaining: {len(bullets)} bullets with real content")
     if remove_files:

@@ -10,10 +10,8 @@ This script can migrate memories from:
 
 import argparse
 import json
-import os
 import subprocess
 import sys
-import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -250,9 +248,9 @@ def main():
     print(f"  Total: {len(all_memories)} memories")
 
     if args.dry_run:
-        print(f"\n🔍 DRY RUN: No memories were imported")
+        print("\n🔍 DRY RUN: No memories were imported")
     else:
-        print(f"\n✓ Migration complete! Run 'brv push' to sync to ByteRover Cloud")
+        print("\n✓ Migration complete! Run 'brv push' to sync to ByteRover Cloud")
 
 
 if __name__ == "__main__":

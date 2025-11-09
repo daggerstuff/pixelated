@@ -7,6 +7,7 @@ Tests advanced similarity search functionality for clinical knowledge retrieval.
 import shutil
 import tempfile
 from pathlib import Path
+from typing import List
 from unittest.mock import Mock
 
 import pytest

@@ -13,7 +13,6 @@ try:
     from pixel.data.clinical_knowledge_embedder import (
         ClinicalKnowledgeEmbedder,
         EmbeddingConfig,
-        KnowledgeItem,
     )
 
     def test_basic_functionality():
@@ -41,7 +40,7 @@ try:
 
         # Test embeddings matrix creation
         embedder.knowledge_items = items_with_embeddings
-        matrix = embedder.create_embeddings_matrix()
+        embedder.create_embeddings_matrix()
 
         # Test statistics
         stats = embedder.get_embedding_stats()
@@ -50,7 +49,7 @@ try:
         # Test save/load functionality
         temp_path = Path("temp_embeddings.pkl")
         try:
-            saved_path = embedder.save_embeddings(temp_path)
+            embedder.save_embeddings(temp_path)
 
             # Test loading
             new_embedder = ClinicalKnowledgeEmbedder(config)
@@ -83,7 +82,7 @@ try:
     if __name__ == "__main__":
         test_basic_functionality()
 
-except ImportError as e:
+except ImportError:
 
     # Test that the file structure is correct
     embedder_file = (

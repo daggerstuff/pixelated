@@ -7,7 +7,6 @@ This fixes the issue where playbook.json has bullets without content fields.
 import json
 import os
 import re
-from pathlib import Path
 
 
 def extract_content_from_md(file_path: str) -> str:
@@ -74,7 +73,7 @@ def repair_playbook(playbook_path: str, bullets_dir: str):
                 if missing_files <= 10:
                     print(f"  ⚠️  Missing file: {bullet_id}.md - added placeholder")
 
-    print(f"\n📊 Repair Summary:")
+    print("\n📊 Repair Summary:")
     print(f"  Bullets needing repair: {needs_repair}")
     print(f"  Successfully repaired: {repaired}")
     print(f"  Missing files: {missing_files}")
@@ -87,7 +86,7 @@ def repair_playbook(playbook_path: str, bullets_dir: str):
             json.dump(playbook, f, indent=2)
 
         # Save repaired playbook
-        print(f"💾 Saving repaired playbook...")
+        print("💾 Saving repaired playbook...")
         with open(playbook_path, 'w') as f:
             json.dump(playbook, f, indent=2)
 

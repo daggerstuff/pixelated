@@ -37,7 +37,6 @@ except ImportError:
     logging.warning("SHAP not available, using fallback implementations")
 
 try:
-    import lime
     from lime.lime_tabular import LimeTabularExplainer
 
     LIME_AVAILABLE = True
@@ -230,11 +229,8 @@ class RealFairlearnAnalyzer:
         )
         self.model.fit(X_train_scaled, y_train)
 
-        # Calculate training accuracy
-        train_accuracy = self.model.score(X_train_scaled, y_train)
-        test_accuracy = self.model.score(X_test_scaled, y_test)
-
-        logger.info(".3f")
+        # Model training complete
+        logger.info("Model training completed successfully")
         self.is_trained = True
 
     def _should_use_model_predictions(self) -> bool:
@@ -718,14 +714,6 @@ async def get_real_engagement_levels_analysis(
     try:
         content = session_data.get("content", "")
         ai_responses = session_data.get("ai_responses", [])
-
-        # Analyze content depth and response quality
-        content_length = len(content)
-        avg_response_length = (
-            np.mean([len(r.get("content", "")) for r in ai_responses])
-            if ai_responses
-            else 0
-        )
 
         # Calculate engagement variance
         engagement_scores = []

@@ -5,16 +5,14 @@ This module implements comprehensive preprocessing pipelines for audio, vision, 
 used in bias detection analysis.
 """
 
-import asyncio
 import base64
+import io
 import logging
 import tempfile
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Union
 
 import librosa
 import numpy as np
-import soundfile as sf
 import torch
 from PIL import Image
 from transformers import (
@@ -25,7 +23,7 @@ from transformers import (
 )
 
 from .config import settings
-from .models import AudioSegment, PreprocessingResult
+from .models import PreprocessingResult
 
 logger = logging.getLogger(__name__)
 
@@ -650,10 +648,10 @@ class PreprocessingMetrics:
 
 async def main():
     """Example usage of the preprocessing pipeline"""
-    # Initialize pipelines
-    audio_pipeline = AudioPreprocessingPipeline()
-    vision_pipeline = VisionPreprocessingPipeline()
-    multimodal_pipeline = MultimodalPreprocessingPipeline()
+    # Initialize pipelines (example usage - pipelines can be used here)
+    # audio_pipeline = AudioPreprocessingPipeline()
+    # vision_pipeline = VisionPreprocessingPipeline()
+    # multimodal_pipeline = MultimodalPreprocessingPipeline()
 
     # Example audio preprocessing
     # audio_result = await audio_pipeline.preprocess_audio(audio_bytes)

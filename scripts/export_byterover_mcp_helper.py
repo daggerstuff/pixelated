@@ -9,7 +9,7 @@ It provides a template and instructions for extracting memories.
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List
 
 def create_mcp_extraction_instructions():
     """Print instructions for extracting memories via MCP tools."""
@@ -99,11 +99,11 @@ def validate_export_file(file_path: str) -> bool:
         elif isinstance(data, dict):
             memories = data.get("memories", data.get("results", []))
         else:
-            print(f"❌ Invalid format: Expected array or object with 'memories' key")
+            print("❌ Invalid format: Expected array or object with 'memories' key")
             return False
 
         if not memories:
-            print(f"⚠️  No memories found in file")
+            print("⚠️  No memories found in file")
             return False
 
         # Validate memory structure

@@ -125,7 +125,7 @@ def main():
         sys.exit(1)
 
     print(f"\n✅ Successfully extracted {len(memories)} memories")
-    print(f"\nNext step: Import to ByteRover CLI")
+    print("\nNext step: Import to ByteRover CLI")
     print(f"  uv run python scripts/migrate_openmemory_to_byterover.py --import-file {args.output}")
 
 

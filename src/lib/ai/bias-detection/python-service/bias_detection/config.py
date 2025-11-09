@@ -2,7 +2,6 @@
 Configuration management for bias detection service
 """
 
-import os
 from functools import lru_cache
 
 from pydantic import Field, field_validator

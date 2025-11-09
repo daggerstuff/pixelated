@@ -2,21 +2,14 @@
 Model service for TensorFlow and PyTorch integration
 """
 
-import asyncio
-import hashlib
-import json
-import os
-import time
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import structlog
 import tensorflow as tf
 import torch
-import torch.nn.functional as F
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoTokenizer
 
 from ..config import settings
 from ..models import BiasType, ConfidenceLevel

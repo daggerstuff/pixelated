@@ -2,7 +2,6 @@
 FastAPI application for bias detection service
 """
 
-import time
 from typing import Any, Dict, List, Optional, cast
 
 import structlog
@@ -17,7 +16,6 @@ from .config import settings
 from .models import (
     BiasAnalysisRequest,
     BiasAnalysisResponse,
-    ErrorResponse,
     HealthResponse,
 )
 from .services import BiasDetectionService, cache_service

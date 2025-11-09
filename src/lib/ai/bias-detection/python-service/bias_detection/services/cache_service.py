@@ -4,7 +4,7 @@ Cache service for Redis configuration and management
 
 import json
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import redis.asyncio as redis
 import structlog
