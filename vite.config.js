@@ -470,7 +470,7 @@ export default defineConfig({
     entries: ['src/**/*.{ts,tsx,js,jsx,astro}', 'src/**/*.mjs'],
     esbuildOptions: {
       platform: 'node',
-      target: 'node22',
+      target: 'node24',
       define: {
         'process.env.BUILDING_FOR_AWS': JSON.stringify('1'),
         'process.env.NODE_ENV': JSON.stringify(

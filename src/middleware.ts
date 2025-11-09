@@ -1,62 +1,68 @@
+import { generateCspNonce } from './lib/middleware/csp'
+import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence, defineMiddleware } from 'astro:middleware'
+import { getSession } from './lib/auth/session'
+import type { APIContext } from 'astro'
+
+// Simple route matcher for protected API routes
+const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
+
+function isProtectedRoute(request: Request) {
+  try {
+    const url = new URL(request.url)
+    return protectedRoutePatterns.some((r) => r.test(url.pathname))
+  } catch (_err) {
+    // If URL parsing fails, be conservative and treat as not protected
+    return false
+  }
+}
 
 /**
- * Edge-compatible CSP nonce generation
- * Uses Web Crypto API instead of Node.js crypto for Edge compatibility
+ * Auth middleware that uses the project's session system.
+ * If a request targets a protected route and there's no session, redirect to sign-in.
  */
-const generateCspNonce = defineMiddleware(async (context, next) => {
-  // Generate a random nonce using Web Crypto API (Edge-compatible)
-  const array = new Uint8Array(16)
-  crypto.getRandomValues(array)
-  const nonce = btoa(String.fromCharCode(...array))
+const projectAuthMiddleware = defineMiddleware(async (context, next) => {
+  const { request } = context
 
-  // Store the nonce in locals
-  context.locals.cspNonce = nonce
+  // Allow non-protected routes through quickly
+  if (!isProtectedRoute(request)) {
+    return next()
+  }
+
+  // Check session using existing auth/session utilities
+  try {
+    const session = await getSession(request)
+    if (!session) {
+      // Redirect to a local sign-in page; include original url so it can return after login
+      const signInUrl = new URL('/auth/sign-in', request.url)
+      signInUrl.searchParams.set('redirect', request.url)
+      return new Response(null, {
+        status: 302,
+        headers: { Location: signInUrl.toString() },
+      })
+    }
+
+    // Store session data in locals for use in routes
+    if (context.locals) {
+      ;(context.locals as any).user = session.user
+      ;(context.locals as any).session = session.session
+    }
+  } catch (_err) {
+    // If session check fails treat as unauthenticated for protected routes
+    const signInUrl = new URL('/auth/sign-in', request.url)
+    signInUrl.searchParams.set('redirect', request.url)
+    return new Response(null, {
+      status: 302,
+      headers: { Location: signInUrl.toString() },
+    })
+  }
 
   return next()
 })
 
-/**
- * Security headers middleware (Edge-compatible)
- */
-const securityHeaders = defineMiddleware(async (context, next) => {
-  const response = await next()
-
-  const nonce = context.locals.cspNonce || ''
-
-  // Add security headers
-  const headers = new Headers(response.headers)
-  headers.set('X-Content-Type-Options', 'nosniff')
-  headers.set('X-Frame-Options', 'DENY')
-  headers.set('X-XSS-Protection', '1; mode=block')
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-  // CSP header
-  const csp = [
-    "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://*.sentry.io`,
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "img-src 'self' data: https://*.sentry.io https://cdn.pixelatedempathy.com https://pixelatedempathy.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "object-src 'none'",
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "upgrade-insecure-requests",
-  ].join('; ')
-
-  headers.set('Content-Security-Policy', csp)
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  })
-})
-
-// Single, clean middleware sequence (Edge-compatible)
-// Note: Auth checks are handled in API routes (Node.js runtime) for MongoDB compatibility
+// Single, clean middleware sequence
 export const onRequest = sequence(
-  generateCspNonce,
-  securityHeaders,
+  generateCspNonce as any,
+  securityHeaders as any,
+  projectAuthMiddleware as any,
 )
