@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/astro'
 import {
   browserTracingIntegration,
-  replayIntegration,
   feedbackIntegration,
+  replayIntegration,
 } from '@sentry/browser'
 
 Sentry.init({
@@ -15,15 +15,15 @@ Sentry.init({
 
   tracesSampleRate: Number(
     process.env.SENTRY_TRACES_SAMPLE_RATE ??
-      (process.env.NODE_ENV === 'development' ? 1.0 : 0.1),
+    (process.env.NODE_ENV === 'development' ? 1.0 : 0.1),
   ),
   profilesSampleRate: Number(
     process.env.SENTRY_PROFILES_SAMPLE_RATE ??
-      (process.env.NODE_ENV === 'development' ? 0.2 : 0.05),
+    (process.env.NODE_ENV === 'development' ? 0.2 : 0.05),
   ),
 
-  integrations: function (defaultIntegrations) {
-    var withoutSpotlight = defaultIntegrations.filter(function (integration) {
+  integrations: (defaultIntegrations) => {
+    const withoutSpotlight = defaultIntegrations.filter((integration) => {
       return integration && integration.name !== 'Spotlight'
     })
     return [

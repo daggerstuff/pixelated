@@ -13,6 +13,7 @@ Transformations:
 
 import re
 import unicodedata
+from pathlib import Path
 from typing import Tuple
 
 def normalize_filename(filename: str) -> str:

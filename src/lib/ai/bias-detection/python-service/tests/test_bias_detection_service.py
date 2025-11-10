@@ -11,7 +11,7 @@ import json
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 # Top-level imports for tests (avoid import-inside-function warnings)
 import jwt
@@ -587,14 +587,6 @@ class TestFlaskEndpoints(unittest.TestCase):
         response = self.client.get(arg0)
         assert response.status_code == arg1
         return response.get_json()
-
-
-# Helper class for async mocking
-class AsyncMock(MagicMock):
-    async def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
-
-
 if __name__ == "__main__":
     # Set environment variables for testing
     os.environ["FLASK_SECRET_KEY"] = "test-flask-secret-key"

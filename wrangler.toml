@@ -1,7 +1,7 @@
 # Wrangler Configuration for Pixelated Empathy
 # https://developers.cloudflare.com/workers/wrangler/configuration/
 
-name = "pixelated-empathy"
+name = "pixelated"
 main = "dist/server/entry.mjs"
 compatibility_date = "2024-10-31"
 compatibility_flags = ["nodejs_compat"]

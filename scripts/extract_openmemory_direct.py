@@ -20,7 +20,7 @@ def extract_all_memories(access_token: str, output_file: str = "openmemory_memor
     page_size = 10  # API seems to limit to 10 per page
     total_pages = None
 
-    print(f"📥 Extracting memories from OpenMemory API...")
+    print("📥 Extracting memories from OpenMemory API...")
     print(f"   Using access token: {access_token[:20]}...")
 
     headers = {

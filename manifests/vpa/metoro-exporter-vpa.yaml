@@ -1,0 +1,21 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: metoro-exporter-vpa
+  namespace: metoro
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: metoro-exporter
+  updatePolicy:
+    updateMode: "Off"  # Only recommendations, no auto-updates
+  resourcePolicy:
+    containerPolicies:
+    - containerName: metoro-exporter
+      minAllowed:
+        cpu: 50m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 500m
+        memory: 1Gi

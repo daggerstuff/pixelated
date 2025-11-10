@@ -3,7 +3,8 @@ Unit tests for AI dataset pipeline
 """
 
 import json
-from unittest.mock import patch, MagicMock
+
+import pytest
 
 class TestDatasetPipeline:
     """Test dataset pipeline functionality"""

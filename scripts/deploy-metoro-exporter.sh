@@ -135,45 +135,42 @@ deploy_metoro_exporter() {
     fi
     
     # Install/upgrade Metoro exporter
-    # IMPORTANT: The exporter code tries to parse the token as a JWT to extract environment info
-    # However, Metoro API keys are in the format: metoro_secret_<token>
-    # The recommended way is to use the installation command from the Metoro webapp
-    # which generates the proper authentication token with environment information.
-    #
-    # For manual Helm deployment, we'll use the API key, but the exporter may fail
-    # if it cannot parse it as a JWT. The webapp installation command is the recommended approach.
-    local bearer_token="${METORO_JWT_TOKEN:-${METORO_API_KEY:-}}"
+    # JWT token obtained from Metoro webapp - contains environment "pixelcluster"
+    # This JWT token is required by the exporter to authenticate and identify the environment
+    # Token can be overridden by setting METORO_JWT_TOKEN environment variable
+    local jwt_token="${METORO_JWT_TOKEN:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcklkIjoib3JnXzM0WkVQYXdPSngzRk5VNDlsM2pJdW00dVBndiIsImVudmlyb25tZW50IjoicGl4ZWxjbHVzdGVyIiwiZXhwIjoyMDc2NzcyODQ5fQ.4r_2a41BsoOY31e2q6YFhm-hhytObYngAyaR1bTE0O0}"
     
-    if [ -z "${bearer_token}" ]; then
-        error "No bearer token found. Set METORO_API_KEY in your .env file."
-        error ""
-        error "NOTE: The exporter may require a JWT token (not just an API key)."
-        error "      The recommended installation method is to use the command from the Metoro webapp:"
-        error "      https://us-east.metoro.io/"
-        error "      The webapp will provide a properly configured installation command."
+    if [ -z "${jwt_token}" ]; then
+        error "No JWT token found. Set METORO_JWT_TOKEN environment variable or update the script."
     fi
     
-    # Check if token looks like a JWT (starts with eyJ) or API key (starts with metoro_secret_)
-    if [[ "${bearer_token}" =~ ^eyJ ]]; then
-        log "Using JWT token (length: ${#bearer_token} characters)"
-    elif [[ "${bearer_token}" =~ ^metoro_secret_ ]]; then
-        warning "⚠️  Using API key format (metoro_secret_...)"
-        warning "The exporter code tries to parse this as a JWT to extract environment information."
-        warning "If deployment fails with 'Failed to parse jwt token', you may need to:"
-        warning "  1. Use the installation command from the Metoro webapp instead"
-        warning "  2. Contact Metoro support for the correct token format for manual Helm deployment"
-        log "Proceeding with API key deployment..."
-    else
-        warning "⚠️  Token format unrecognized (expected JWT starting with 'eyJ' or API key starting with 'metoro_secret_')"
-        log "Proceeding with deployment..."
+    # Verify token looks like a JWT (starts with eyJ)
+    if [[ ! "${jwt_token}" =~ ^eyJ ]]; then
+        error "Token does not appear to be a JWT (should start with 'eyJ'). The exporter requires a JWT token."
     fi
+    
+    log "Using JWT token (length: ${#jwt_token} characters)"
+    log "Environment: pixelcluster"
     
     log "Installing Metoro exporter via Helm..."
     
+    # Optimize resource requests based on actual usage analysis:
+    # - Current usage: 12m CPU, 52Mi memory
+    # - Default requests: 1000m CPU, 2Gi memory (massive over-provisioning)
+    # - Optimized: 50m CPU, 128Mi memory (still 4x headroom for spikes)
+    # Set replicas to 1 and disable HPA to work with limited cluster resources
     if ! helm upgrade --install --create-namespace --namespace metoro metoro-exporter metoro-exporter/metoro-exporter \
-        --set exporter.secret.bearerToken="${bearer_token}"; then
+        --set exporter.secret.bearerToken="${jwt_token}" \
+        --set exporter.replicas=1 \
+        --set exporter.autoscaling.horizontalPodAutoscaler.enabled=false \
+        --set exporter.resources.requests.cpu=50m \
+        --set exporter.resources.requests.memory=128Mi \
+        --set exporter.resources.limits.cpu=200m \
+        --set exporter.resources.limits.memory=512Mi; then
         error "Failed to install Metoro exporter"
     fi
+    
+    log "Metoro exporter configured with optimized resources (50m CPU, 128Mi memory)"
     
     success "Metoro exporter deployed successfully"
 }
@@ -228,18 +225,10 @@ case "${1:-}" in
         echo "Requirements:"
         echo "  - kubectl configured with cluster access"
         echo "  - helm installed"
-        echo "  - METORO_API_KEY set in .env file"
+        echo "  - JWT token configured in script (obtained from Metoro webapp)"
         echo ""
-        echo "IMPORTANT: The exporter code expects a JWT token to extract environment information."
-        echo "           However, Metoro API keys are in format: metoro_secret_<token>"
-        echo ""
-        echo "Recommended: Use the installation command from the Metoro webapp:"
-        echo "            https://us-east.metoro.io/"
-        echo "            The webapp provides a properly configured installation command."
-        echo ""
-        echo "Manual Deployment: This script uses METORO_API_KEY, but the exporter may fail"
-        echo "                  if it cannot parse the token as a JWT. If deployment fails,"
-        echo "                  use the webapp installation command instead."
+        echo "Note: The script uses a JWT token with environment 'pixelcluster'."
+        echo "      To use a different token, set METORO_JWT_TOKEN environment variable."
         exit 0
         ;;
     *)

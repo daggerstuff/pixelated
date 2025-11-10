@@ -5,25 +5,26 @@ This module implements comprehensive preprocessing pipelines for audio, vision, 
 used in bias detection analysis.
 """
 
+import asyncio
 import base64
 import io
 import logging
 import tempfile
-from typing import Any, Dict, List, Union
+from pathlib import Path
+from typing import Any, Dict, List, Tuple, Union
 
 import librosa
 import numpy as np
 import torch
 from PIL import Image
 from transformers import (
-    WhisperProcessor,
-    Wav2Vec2Processor,
     ViTImageProcessor,
-    VideoMAEImageProcessor
+    VideoMAEImageProcessor,
+    Wav2Vec2Processor,
+    WhisperProcessor,
 )
 
 from .config import settings
-from .models import PreprocessingResult
 
 logger = logging.getLogger(__name__)
 

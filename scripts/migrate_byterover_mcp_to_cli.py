@@ -8,7 +8,6 @@ into the local ByteRover CLI playbook.
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import time
@@ -400,7 +399,7 @@ def main():
             print(f"  ... and {len(stats['errors']) - 5} more errors")
 
     if stats['success'] > 0:
-        print(f"\n✓ Migration complete! Run 'brv push' to sync to ByteRover Cloud")
+        print("\n✓ Migration complete! Run 'brv push' to sync to ByteRover Cloud")
 
 
 if __name__ == "__main__":

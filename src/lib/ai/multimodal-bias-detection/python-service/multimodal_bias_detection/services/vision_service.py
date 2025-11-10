@@ -12,8 +12,6 @@ import structlog
 import torch
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel, pipeline
-from tenacity import retry, stop_after_attempt, wait_exponential
-
 from ..config import settings
 from ..models import (
     BiasType,

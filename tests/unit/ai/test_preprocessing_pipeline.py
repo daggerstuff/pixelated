@@ -2,24 +2,37 @@
 Tests for the multimodal preprocessing pipeline.
 """
 
-import base64
-import json
-from unittest.mock import AsyncMock, patch
+import importlib.util
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
 
 import numpy as np
 import pytest
 from PIL import Image
 
-# Updated imports for the correct module structure
-from src.lib.ai.multimodal-bias-detection.python-service.preprocessing_pipeline import (
-    AudioPreprocessingPipeline,
-    VisionPreprocessingPipeline,
-    VideoPreprocessingPipeline,
-    MultimodalPreprocessingPipeline,
-    validate_audio_format,
-    validate_image_format,
-    validate_video_format
+MODULE_PATH = (
+    Path(__file__)
+    .resolve()
+    .parents[3]
+    / "src/lib/ai/multimodal-bias-detection/python-service/preprocessing_pipeline.py"
 )
+
+SPEC = importlib.util.spec_from_file_location(
+    "multimodal_preprocessing_pipeline", MODULE_PATH
+)
+if SPEC is None or SPEC.loader is None:
+    raise ImportError(f"Unable to load preprocessing pipeline module from {MODULE_PATH}")
+
+preprocessing_pipeline = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(preprocessing_pipeline)
+
+AudioPreprocessingPipeline = preprocessing_pipeline.AudioPreprocessingPipeline
+VisionPreprocessingPipeline = preprocessing_pipeline.VisionPreprocessingPipeline
+VideoPreprocessingPipeline = preprocessing_pipeline.VideoPreprocessingPipeline
+MultimodalPreprocessingPipeline = preprocessing_pipeline.MultimodalPreprocessingPipeline
+validate_audio_format = preprocessing_pipeline.validate_audio_format
+validate_image_format = preprocessing_pipeline.validate_image_format
+validate_video_format = preprocessing_pipeline.validate_video_format
 
 
 class TestAudioPreprocessingPipeline:

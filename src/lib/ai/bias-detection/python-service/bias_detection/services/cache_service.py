@@ -4,11 +4,15 @@ Cache service for Redis configuration and management
 
 import json
 import time
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 import redis.asyncio as redis
 import structlog
-from redis.asyncio.exceptions import ConnectionError, RedisError, TimeoutError
+from redis.asyncio.exceptions import (
+    ConnectionError as RedisConnectionError,
+    RedisError,
+    TimeoutError as RedisTimeoutError,
+)
 
 from ..config import settings
 
@@ -38,7 +42,7 @@ class CacheService:
                 socket_connect_timeout=5,
                 socket_timeout=5,
                 retry_on_timeout=True,
-                retry_on_error=[ConnectionError, TimeoutError],
+                retry_on_error=[RedisConnectionError, RedisTimeoutError],
                 max_connections=50,
             )
 

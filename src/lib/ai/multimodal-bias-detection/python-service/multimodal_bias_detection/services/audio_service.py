@@ -3,13 +3,14 @@ Audio bias detection service using speech recognition and audio analysis
 """
 
 import base64
-import io
 import tempfile
 import time
-from typing import Any, Dict, List, Optional, Union
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import librosa
 import numpy as np
+import soundfile as sf
 import structlog
 import torch
 from transformers import (
@@ -17,10 +18,8 @@ from transformers import (
     WhisperForConditionalGeneration,
     Wav2Vec2Processor,
     Wav2Vec2ForSequenceClassification,
-    pipeline
+    pipeline,
 )
-from tenacity import stop_after_attempt, wait_exponential, retry
-
 from ..config import settings
 from ..models import (
     BiasType,

@@ -17,7 +17,6 @@ from ..models import (
     BiasAnalysisResponse,
     BiasScore,
     BiasType,
-    ConfidenceLevel,
     CounterfactualScenario,
     Recommendation,
 )
