@@ -1,33 +1,5 @@
 {
-  "bullets": {
-    "best-00001": {
-      "id": "best-00001",
-      "metadata": {
-        "relatedFiles": [],
-        "tags": [
-          "manual"
-        ],
-        "timestamp": "2025-11-10T17:10:42.431Z"
-      },
-      "section": "Best Practices"
-    },
-    "best-00002": {
-      "id": "best-00002",
-      "metadata": {
-        "relatedFiles": [],
-        "tags": [
-          "manual"
-        ],
-        "timestamp": "2025-11-10T17:38:43.414Z"
-      },
-      "section": "Best Practices"
-    }
-  },
-  "nextId": 3,
-  "sections": {
-    "Best Practices": [
-      "best-00001",
-      "best-00002"
-    ]
-  }
+  "bullets": {},
+  "nextId": 1,
+  "sections": {}
 }
