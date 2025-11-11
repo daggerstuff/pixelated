@@ -1,5 +1,61 @@
 {
-  "bullets": {},
-  "nextId": 1,
-  "sections": {}
+  "bullets": {
+    "audit-00001": {
+      "id": "audit-00001",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-11T00:50:42.948Z"
+      },
+      "section": "Audit Findings"
+    },
+    "implementation-00002": {
+      "id": "implementation-00002",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-11T01:16:02.490Z"
+      },
+      "section": "Implementation"
+    },
+    "audit-00003": {
+      "id": "audit-00003",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-11T01:27:29.518Z"
+      },
+      "section": "Audit Findings"
+    },
+    "bug-00004": {
+      "id": "bug-00004",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-11T03:07:40.977Z"
+      },
+      "section": "Bug Fixes"
+    }
+  },
+  "nextId": 5,
+  "sections": {
+    "Audit Findings": [
+      "audit-00001",
+      "audit-00003"
+    ],
+    "Implementation": [
+      "implementation-00002"
+    ],
+    "Bug Fixes": [
+      "bug-00004"
+    ]
+  }
 }

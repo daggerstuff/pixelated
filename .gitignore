@@ -338,3 +338,4 @@ tmp/
 # MCP server binaries
 bin/
 .specstory
+scripts/claude-flow-removal.sh
