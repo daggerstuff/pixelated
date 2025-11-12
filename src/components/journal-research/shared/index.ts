@@ -12,4 +12,6 @@ export type {
   Notification,
   NotificationType,
 } from './NotificationCenter'
+export { ErrorMessage, FieldError } from './ErrorMessage'
+export type { ErrorMessageProps, FieldErrorProps } from './ErrorMessage'
 

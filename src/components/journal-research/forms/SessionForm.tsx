@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/c
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
+import { normalizeError, getFieldErrors } from '@/lib/error'
+import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface SessionFormProps {
   session?: Session
@@ -40,6 +42,8 @@ export function SessionForm({
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [submitError, setSubmitError] = useState<unknown>(null)
   const [keywordInput, setKeywordInput] = useState('')
   const [keywordCategory, setKeywordCategory] = useState('default')
 
@@ -54,21 +58,43 @@ export function SessionForm({
     }
   }, [session])
 
+  const validateField = (fieldName: string, value: unknown) => {
+    try {
+      const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape]
+      if (fieldSchema) {
+        fieldSchema.parse(value)
+        setErrors((prev) => {
+          const next = { ...prev }
+          delete next[fieldName]
+          return next
+        })
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldError = error.errors[0]?.message
+        if (fieldError) {
+          setErrors((prev) => ({ ...prev, [fieldName]: fieldError }))
+        }
+      }
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
+    setSubmitError(null)
 
     try {
       const validated = schema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {}
-        error.errors.forEach((err) => {
-          const path = err.path.join('.')
-          fieldErrors[path] = err.message
-        })
-        setErrors(fieldErrors)
+      const normalized = normalizeError(error)
+      const fieldErrs = getFieldErrors(error) ?? {}
+      
+      if (fieldErrs && Object.keys(fieldErrs).length > 0) {
+        setErrors(fieldErrs)
+      } else {
+        setSubmitError(error)
       }
     }
   }
@@ -139,15 +165,27 @@ export function SessionForm({
                 id="sessionId"
                 type="text"
                 value={(formData as CreateSessionPayload).sessionId ?? ''}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({ ...formData, sessionId: e.target.value })
-                }
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  if (touched.sessionId) {
+                    validateField('sessionId', e.target.value)
+                  }
+                }}
+                onBlur={() => {
+                  setTouched((prev) => ({ ...prev, sessionId: true }))
+                  validateField('sessionId', (formData as CreateSessionPayload).sessionId)
+                }}
+                className={cn(
+                  'w-full rounded-md border bg-background px-3 py-2 text-sm',
+                  errors.sessionId && touched.sessionId
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-input',
+                )}
                 placeholder="Leave empty for auto-generated ID"
+                aria-invalid={!!errors.sessionId && touched.sessionId}
+                aria-describedby={errors.sessionId && touched.sessionId ? 'sessionId-error' : undefined}
               />
-              {errors.sessionId && (
-                <p className="text-sm text-red-500">{errors.sessionId}</p>
-              )}
+              <FieldError error={errors.sessionId && touched.sessionId ? errors.sessionId : undefined} />
             </div>
           )}
 
@@ -169,9 +207,7 @@ export function SessionForm({
                 </label>
               ))}
             </div>
-            {errors.targetSources && (
-              <p className="text-sm text-red-500">{errors.targetSources}</p>
-            )}
+            <FieldError error={errors.targetSources} />
           </div>
 
           <div className="space-y-2">
@@ -282,6 +318,8 @@ export function SessionForm({
               </select>
             </div>
           )}
+
+          <ErrorMessage error={submitError} fieldErrors={errors} />
 
           <div className="flex justify-end gap-2">
             {onCancel && (

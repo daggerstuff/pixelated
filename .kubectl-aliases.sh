@@ -40,7 +40,9 @@ function kgp() {
             local friendly
             friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels.cluster\.pixelated\.io/friendly-name}' 2>/dev/null)
             if [ -z "${friendly}" ]; then
-                friendly="${node: -5}"
+                # POSIX-compatible substring extraction: get last 5 characters
+                # Using sed is portable across sh/bash/zsh
+                friendly=$(printf '%s' "$node" | sed 's/.*\(.\{5\}\)$/\1/')
             fi
             printf "%-15s %-40s %-10s %s\n" "${ns}" "${name}" "${pod_status}" "${friendly}"
         done
@@ -53,7 +55,9 @@ function kgp() {
             local friendly
             friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels.cluster\.pixelated\.io/friendly-name}' 2>/dev/null)
             if [ -z "${friendly}" ]; then
-                friendly="${node: -5}"
+                # POSIX-compatible substring extraction: get last 5 characters
+                # Using sed is portable across sh/bash/zsh
+                friendly=$(printf '%s' "$node" | sed 's/.*\(.\{5\}\)$/\1/')
             fi
             printf "%-40s %-10s %s\n" "${name}" "${pod_status}" "${friendly}"
         done

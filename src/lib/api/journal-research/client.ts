@@ -1,6 +1,8 @@
 import { config } from '@/lib/config/env'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { z } from 'zod'
+import { normalizeError, NetworkError, ValidationError } from '@/lib/error'
+import { validateApiResponse } from '@/lib/validation/api'
 
 const logger = createBuildSafeLogger('journal-research-api-client')
 
@@ -188,15 +190,20 @@ export class JournalResearchApiClient {
         data = undefined
       } else if (validator) {
         const json = await response.json().catch(() => ({}))
-        const result = validator.safeParse(json)
-        if (!result.success) {
-          throw new JournalResearchApiError(
-            'Response validation failed',
-            422,
-            result.error.flatten(),
-          )
+        try {
+          data = await validateApiResponse(validator, json, {
+            endpoint: path,
+          })
+        } catch (validationError) {
+          if (validationError instanceof ValidationError) {
+            throw new JournalResearchApiError(
+              validationError.message,
+              422,
+              validationError.fieldErrors,
+            )
+          }
+          throw validationError
         }
-        data = result.data
       } else {
         data = await response.json().catch(() => undefined)
       }
@@ -204,11 +211,31 @@ export class JournalResearchApiClient {
       responseContext.data = data
 
       if (!response.ok) {
-        const error = new JournalResearchApiError(
-          `HTTP ${response.status}: ${response.statusText}`,
-          response.status,
-          data,
+        const normalizedError = normalizeError(
+          new Error(`HTTP ${response.status}: ${response.statusText}`),
+          {
+            action: `${method} ${path}`,
+            metadata: {
+              statusCode: response.status,
+              statusText: response.statusText,
+            },
+          },
         )
+
+        let error: JournalResearchApiError
+        if (normalizedError instanceof NetworkError) {
+          error = new JournalResearchApiError(
+            normalizedError.message,
+            normalizedError.statusCode ?? response.status,
+            data,
+          )
+        } else {
+          error = new JournalResearchApiError(
+            normalizedError.message,
+            response.status,
+            data,
+          )
+        }
 
         if (response.status === 401 || response.status === 403) {
           await this.onUnauthorized?.(responseContext)
@@ -226,6 +253,13 @@ export class JournalResearchApiClient {
     } catch (error: unknown) {
       clearTimeout(timer)
 
+      const normalizedError = normalizeError(error, {
+        action: `${method} ${path}`,
+        metadata: {
+          url: url.toString(),
+        },
+      })
+
       if (error instanceof DOMException && error.name === 'AbortError') {
         const timeoutError = new JournalResearchApiError(
           `Request timed out after ${requestTimeout}ms`,
@@ -235,12 +269,12 @@ export class JournalResearchApiClient {
         throw timeoutError
       }
 
-      await this.invokeErrorInterceptors(error, { url, init })
+      await this.invokeErrorInterceptors(normalizedError, { url, init })
       logger.error('JournalResearchApiClient request failed', {
-        error,
+        error: normalizedError,
         path,
       })
-      throw error
+      throw normalizedError
     }
   }
 

@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/c
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
+import { normalizeError, getFieldErrors } from '@/lib/error'
+import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface EvaluationFormProps {
   evaluation?: Evaluation
@@ -36,6 +38,8 @@ export function EvaluationForm({
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [submitError, setSubmitError] = useState<unknown>(null)
 
   useEffect(() => {
     if (evaluation) {
@@ -52,18 +56,19 @@ export function EvaluationForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
+    setSubmitError(null)
 
     try {
       const validated = EvaluationUpdatePayloadSchema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {}
-        error.errors.forEach((err) => {
-          const path = err.path.join('.')
-          fieldErrors[path] = err.message
-        })
-        setErrors(fieldErrors)
+      const normalized = normalizeError(error)
+      const fieldErrs = getFieldErrors(error) ?? {}
+      
+      if (fieldErrs && Object.keys(fieldErrs).length > 0) {
+        setErrors(fieldErrs)
+      } else {
+        setSubmitError(error)
       }
     }
   }
@@ -124,10 +129,27 @@ export function EvaluationForm({
                     max="10"
                     step="0.1"
                     value={formData[metric.key]?.toString() ?? ''}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       handleScoreChange(metric.key, e.target.value)
-                    }
-                    className="w-20 rounded-md border border-input bg-background px-2 py-1 text-right text-sm"
+                      if (touched[metric.key]) {
+                        setErrors((prev) => {
+                          const next = { ...prev }
+                          delete next[metric.key]
+                          return next
+                        })
+                      }
+                    }}
+                    onBlur={() => {
+                      setTouched((prev) => ({ ...prev, [metric.key]: true }))
+                    }}
+                    className={cn(
+                      'w-20 rounded-md border bg-background px-2 py-1 text-right text-sm',
+                      errors[metric.key] && touched[metric.key]
+                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                        : 'border-input',
+                    )}
+                    aria-invalid={!!errors[metric.key] && touched[metric.key]}
+                    aria-describedby={errors[metric.key] && touched[metric.key] ? `${metric.key}-error` : undefined}
                   />
                   <span className="text-sm text-muted-foreground">/ 10</span>
                 </div>
@@ -138,14 +160,22 @@ export function EvaluationForm({
                 max="10"
                 step="0.1"
                 value={formData[metric.key] ?? 5}
-                onChange={(e) =>
+                onChange={(e) => {
                   handleScoreChange(metric.key, e.target.value)
-                }
+                  if (touched[metric.key]) {
+                    setErrors((prev) => {
+                      const next = { ...prev }
+                      delete next[metric.key]
+                      return next
+                    })
+                  }
+                }}
+                onBlur={() => {
+                  setTouched((prev) => ({ ...prev, [metric.key]: true }))
+                }}
                 className="w-full"
               />
-              {errors[metric.key] && (
-                <p className="text-sm text-red-500">{errors[metric.key]}</p>
-              )}
+              <FieldError error={errors[metric.key] && touched[metric.key] ? errors[metric.key] : undefined} />
             </div>
           ))}
 
@@ -166,10 +196,10 @@ export function EvaluationForm({
                 </option>
               ))}
             </select>
-            {errors.priorityTier && (
-              <p className="text-sm text-red-500">{errors.priorityTier}</p>
-            )}
+            <FieldError error={errors.priorityTier} />
           </div>
+
+          <ErrorMessage error={submitError} fieldErrors={errors} />
 
           <div className="flex justify-end gap-2">
             {onCancel && (

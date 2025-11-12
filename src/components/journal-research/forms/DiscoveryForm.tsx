@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/c
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
+import { normalizeError, getFieldErrors } from '@/lib/error'
+import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface DiscoveryFormProps {
   onSubmit: (data: DiscoveryInitiatePayload) => void | Promise<void>
@@ -32,10 +34,12 @@ export function DiscoveryForm({
   const [keywords, setKeywords] = useState<string[]>(defaultKeywords)
   const [keywordInput, setKeywordInput] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitError, setSubmitError] = useState<unknown>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
+    setSubmitError(null)
 
     try {
       const payload: DiscoveryInitiatePayload = {
@@ -45,13 +49,13 @@ export function DiscoveryForm({
       const validated = DiscoveryInitiatePayloadSchema.parse(payload)
       await onSubmit(validated)
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {}
-        error.errors.forEach((err) => {
-          const path = err.path.join('.')
-          fieldErrors[path] = err.message
-        })
-        setErrors(fieldErrors)
+      const normalized = normalizeError(error)
+      const fieldErrs = getFieldErrors(error) ?? {}
+      
+      if (fieldErrs && Object.keys(fieldErrs).length > 0) {
+        setErrors(fieldErrs)
+      } else {
+        setSubmitError(error)
       }
     }
   }
@@ -99,9 +103,7 @@ export function DiscoveryForm({
                 </label>
               ))}
             </div>
-            {errors.sources && (
-              <p className="text-sm text-red-500">{errors.sources}</p>
-            )}
+            <FieldError error={errors.sources} />
             {sources.length === 0 && (
               <p className="text-sm text-yellow-500">
                 Please select at least one source
@@ -155,10 +157,10 @@ export function DiscoveryForm({
                 ))}
               </div>
             )}
-            {errors.keywords && (
-              <p className="text-sm text-red-500">{errors.keywords}</p>
-            )}
+            <FieldError error={errors.keywords} />
           </div>
+
+          <ErrorMessage error={submitError} fieldErrors={errors} />
 
           <div className="flex justify-end gap-2">
             {onCancel && (
