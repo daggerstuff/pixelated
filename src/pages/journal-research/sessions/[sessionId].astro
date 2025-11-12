@@ -1,0 +1,37 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { SessionDetailPage } from '@/components/journal-research/pages'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+
+const { sessionId } = Astro.params
+---
+
+<DashboardLayout
+  title={`Session ${sessionId} | Pixelated Empathy`}
+  description={`Details for research session ${sessionId}`}
+>
+  <div class="container mx-auto py-6">
+    <div class="mb-6">
+      <a
+        href="/journal-research/sessions"
+        class="text-sm text-primary hover:text-primary/90 flex items-center gap-2"
+      >
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Back to Sessions
+      </a>
+    </div>
+
+    {sessionId ? (
+      <SessionDetailPage client:load sessionId={sessionId} />
+    ) : (
+      <div class="text-center py-8 text-muted-foreground">
+        <p>Session ID is required</p>
+      </div>
+    )}
+  </div>
+</DashboardLayout>
+

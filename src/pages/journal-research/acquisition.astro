@@ -1,0 +1,30 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { AcquisitionPage } from '@/components/journal-research/pages'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+
+const sessionId = Astro.url.searchParams.get('sessionId')
+---
+
+<DashboardLayout
+  title="Data Acquisition | Pixelated Empathy"
+  description="Acquire evaluated journal data sources"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">Data Acquisition</h1>
+        <p class="text-muted-foreground mt-1">
+          Acquire and download evaluated journal data sources
+        </p>
+      </div>
+    </div>
+
+    <AcquisitionPage client:load sessionId={sessionId} />
+  </div>
+</DashboardLayout>
+

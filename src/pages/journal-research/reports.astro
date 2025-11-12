@@ -1,0 +1,31 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { ReportsPage } from '@/components/journal-research/pages'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+
+const sessionId = Astro.url.searchParams.get('sessionId')
+const reportId = Astro.url.searchParams.get('reportId')
+---
+
+<DashboardLayout
+  title="Research Reports | Pixelated Empathy"
+  description="Generate and view research session reports"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">Research Reports</h1>
+        <p class="text-muted-foreground mt-1">
+          Generate and view comprehensive reports for your research sessions
+        </p>
+      </div>
+    </div>
+
+    <ReportsPage client:load sessionId={sessionId} reportId={reportId} />
+  </div>
+</DashboardLayout>
+

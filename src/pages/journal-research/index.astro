@@ -1,0 +1,17 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { DashboardPage } from '@/components/journal-research/pages'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+---
+
+<DashboardLayout
+  title="Journal Research Dashboard | Pixelated Empathy"
+  description="Monitor and manage journal dataset research sessions"
+>
+  <DashboardPage client:load />
+</DashboardLayout>
+

@@ -1,0 +1,28 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { SessionsListPage } from '@/components/journal-research/pages'
+
+// @ts-expect-error Astro.props is injected at runtime
+const { user } = Astro.props as { user: any }
+---
+
+<DashboardLayout
+  title="Research Sessions | Pixelated Empathy"
+  description="Manage your journal dataset research sessions"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">Research Sessions</h1>
+        <p class="text-muted-foreground mt-1">
+          View and manage all your research sessions
+        </p>
+      </div>
+    </div>
+
+    <SessionsListPage client:load />
+  </div>
+</DashboardLayout>
+
