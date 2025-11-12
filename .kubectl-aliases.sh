@@ -23,7 +23,7 @@ function kgn() {
     echo "FRIENDLY   SHORT-ID  STATUS    CPU       MEMORY"
     echo "------------------------------------------------------------"
     kubectl get nodes -o json 2>/dev/null | jq -r '.items[] | 
-        "\(.metadata.labels."cluster.pixelated.io/friendly-name" // "unknown")|\(.metadata.labels."cluster.pixelated.io/short-id" // "unknown")|\(.status.conditions[] | select(.type=="Ready") | .status)|\(.status.allocatable.cpu)|\(.status.allocatable.memory)"' 2>/dev/null | \
+        "\(.metadata.labels."cluster.pixelated.io/friendly-name" // "unknown")|\(.metadata.labels."cluster.pixelated.io/short-id" // "unknown")|\(([.status.conditions[] | select(.type=="Ready")] | first | .status) // "Unknown")|\(.status.allocatable.cpu // "unknown")|\(.status.allocatable.memory // "unknown")"' 2>/dev/null | \
     while IFS='|' read -r friendly short node_status cpu mem; do
         printf "%-10s %-8s %-8s %-9s %s\n" "${friendly}" "${short}" "${node_status}" "${cpu}" "${mem}"
     done
