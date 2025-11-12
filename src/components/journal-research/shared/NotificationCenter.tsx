@@ -8,26 +8,14 @@ import {
 } from '@/components/ui/card/card'
 import { X, Bell, CheckCircle, AlertCircle, Info, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-export type NotificationType = 'success' | 'error' | 'warning' | 'info'
-
-export interface Notification {
-  id: string
-  type: NotificationType
-  title: string
-  message?: string
-  timestamp: Date
-  read?: boolean
-  action?: {
-    label: string
-    onClick: () => void
-  }
-}
+import {
+  useNotificationStore,
+  useFilteredNotifications,
+  type Notification,
+} from '@/lib/stores/journal-research/notificationStore'
 
 export interface NotificationCenterProps {
-  notifications: Notification[]
-  onDismiss?: (id: string) => void
-  onMarkAsRead?: (id: string) => void
+  sessionId?: string | null
   maxVisible?: number
   className?: string
 }
@@ -46,26 +34,64 @@ const typeColors = {
   info: 'text-blue-600 dark:text-blue-400',
 }
 
+const mapNotificationLevelToType = (
+  level: Notification['level'],
+): 'success' | 'error' | 'warning' | 'info' => {
+  switch (level) {
+    case 'success':
+      return 'success'
+    case 'error':
+      return 'error'
+    case 'warning':
+      return 'warning'
+    case 'info':
+    default:
+      return 'info'
+  }
+}
+
 export function NotificationCenter({
-  notifications,
-  onDismiss,
-  onMarkAsRead,
+  sessionId,
   maxVisible = 10,
   className,
 }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = useNotificationStore((state) => state.unreadCount)
+  const markAsRead = useNotificationStore((state) => state.markAsRead)
+  const dismiss = useNotificationStore((state) => state.dismiss)
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead)
+  const dismissAll = useNotificationStore((state) => state.dismissAll)
+  const setFilters = useNotificationStore((state) => state.setFilters)
+
+  // Apply session filter if provided
+  useEffect(() => {
+    if (sessionId) {
+      setFilters({ sessionId })
+    } else {
+      setFilters({ sessionId: undefined })
+    }
+  }, [sessionId, setFilters])
+
+  const notifications = useFilteredNotifications()
   const visibleNotifications = notifications.slice(0, maxVisible)
 
   const handleDismiss = (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    onDismiss?.(id)
+    dismiss(id)
   }
 
   const handleClick = (notification: Notification) => {
     if (!notification.read) {
-      onMarkAsRead?.(notification.id)
+      markAsRead(notification.id)
     }
+  }
+
+  const handleMarkAllAsRead = () => {
+    markAllAsRead()
+  }
+
+  const handleDismissAll = () => {
+    dismissAll()
   }
 
   return (
@@ -112,6 +138,25 @@ export function NotificationCenter({
                   {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
                 </CardDescription>
               )}
+              {visibleNotifications.length > 0 && (
+                <div className="flex gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={handleMarkAllAsRead}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Mark all as read
+                  </button>
+                  <span className="text-xs text-muted-foreground">•</span>
+                  <button
+                    type="button"
+                    onClick={handleDismissAll}
+                    className="text-xs text-destructive hover:underline"
+                  >
+                    Dismiss all
+                  </button>
+                </div>
+              )}
             </CardHeader>
 
             <CardContent className="p-0">
@@ -125,7 +170,10 @@ export function NotificationCenter({
               ) : (
                 <div className="max-h-[500px] overflow-y-auto">
                   {visibleNotifications.map((notification) => {
-                    const Icon = typeIcons[notification.type]
+                    const notificationType = mapNotificationLevelToType(
+                      notification.level,
+                    )
+                    const Icon = typeIcons[notificationType]
                     return (
                       <div
                         key={notification.id}
@@ -142,7 +190,7 @@ export function NotificationCenter({
                           <Icon
                             className={cn(
                               'mt-0.5 h-5 w-5 flex-shrink-0',
-                              typeColors[notification.type],
+                              typeColors[notificationType],
                             )}
                           />
                           <div className="flex-1 min-w-0">
@@ -173,17 +221,14 @@ export function NotificationCenter({
                                 <X className="h-4 w-4" />
                               </button>
                             </div>
-                            {notification.action && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  notification.action?.onClick()
-                                }}
-                                className="mt-2 text-sm font-medium text-primary hover:underline"
+                            {notification.actionUrl && (
+                              <a
+                                href={notification.actionUrl}
+                                onClick={(e) => e.stopPropagation()}
+                                className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
                               >
-                                {notification.action.label}
-                              </button>
+                                View details
+                              </a>
                             )}
                           </div>
                         </div>
