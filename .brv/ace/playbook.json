@@ -1,5 +1,21 @@
 {
-  "bullets": {},
-  "nextId": 1,
-  "sections": {}
+  "bullets": {
+    "journal-00001": {
+      "id": "journal-00001",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-12T15:01:08.348Z"
+      },
+      "section": "Journal Research Web Frontend"
+    }
+  },
+  "nextId": 2,
+  "sections": {
+    "Journal Research Web Frontend": [
+      "journal-00001"
+    ]
+  }
 }
