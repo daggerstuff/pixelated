@@ -1,21 +1,5 @@
 {
-  "bullets": {
-    "best-00001": {
-      "id": "best-00001",
-      "metadata": {
-        "relatedFiles": [],
-        "tags": [
-          "manual"
-        ],
-        "timestamp": "2025-11-12T15:50:15.532Z"
-      },
-      "section": "Best Practices"
-    }
-  },
-  "nextId": 2,
-  "sections": {
-    "Best Practices": [
-      "best-00001"
-    ]
-  }
+  "bullets": {},
+  "nextId": 1,
+  "sections": {}
 }
