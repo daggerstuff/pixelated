@@ -260,22 +260,71 @@ export class JournalResearchApiClient {
   }
 }
 
-export const journalResearchApiClient = new JournalResearchApiClient({
-  getAuthToken: () => {
-    if (typeof window === 'undefined') return null
+/**
+ * Get authentication token from Better Auth session
+ * Falls back to localStorage for backward compatibility
+ */
+async function getAuthTokenFromBetterAuth(): Promise<string | null> {
+  if (typeof window === 'undefined') return null
+  
+  try {
+    // Try to get session from Better Auth client
+    const { authClient } = await import('@/lib/auth-client')
+    const session = await authClient.getSession()
+    
+    if (session?.data?.session?.token) {
+      return session.data.session.token
+    }
+    
+    // Fallback to localStorage for backward compatibility
+    return (
+      window.localStorage.getItem('auth_token') ??
+      window.localStorage.getItem('authToken') ??
+      null
+    )
+  } catch (error) {
+    logger.warn('Failed to get auth token from Better Auth', { error })
+    
+    // Fallback to localStorage
     try {
       return (
         window.localStorage.getItem('auth_token') ??
-        window.localStorage.getItem('authToken')
+        window.localStorage.getItem('authToken') ??
+        null
       )
-    } catch (error) {
-      logger.warn('Failed to read auth token from localStorage', { error })
+    } catch (localStorageError) {
+      logger.warn('Failed to read auth token from localStorage', {
+        error: localStorageError,
+      })
       return null
     }
-  },
-  onUnauthorized: async () => {
-    logger.warn('Unauthorized response received from Journal Research API')
-  },
+  }
+}
+
+/**
+ * Handle unauthorized responses by redirecting to login
+ */
+async function handleUnauthorized(context: {
+  url: URL
+  init: RequestInit
+  response: Response
+  data?: unknown
+}): Promise<void> {
+  logger.warn('Unauthorized response received from Journal Research API', {
+    url: context.url.toString(),
+    status: context.response.status,
+  })
+  
+  // Redirect to login if we're in the browser
+  if (typeof window !== 'undefined') {
+    const currentPath = window.location.pathname
+    window.location.href = `/auth/sign-in?redirect=${encodeURIComponent(currentPath)}`
+  }
+}
+
+export const journalResearchApiClient = new JournalResearchApiClient({
+  getAuthToken: getAuthTokenFromBetterAuth,
+  onUnauthorized: handleUnauthorized,
 })
 
 
