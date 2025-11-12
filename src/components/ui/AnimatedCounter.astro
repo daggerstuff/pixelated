@@ -21,21 +21,29 @@ const {
   ariaLabel,
 }: Props = Astro.props
 
+// Ensure value is always converted to a string safely
 const rawValue =
   value === undefined || value === null
     ? ''
     : typeof value === 'string'
     ? value
-    : Number.isFinite(Number(value))
+    : typeof value === 'number' && Number.isFinite(value)
+    ? String(value)
+    : typeof value === 'object' && value !== null
     ? String(value)
     : `${value}`
 
-const normalizedValue = rawValue.trim()
+// Ensure rawValue is always a string before calling string methods
+const safeStringValue = typeof rawValue === 'string' ? rawValue : String(rawValue || '')
+const normalizedValue = safeStringValue.trim()
 const hasDigits = /\d/.test(normalizedValue)
 const isPlaceholder =
   normalizedValue === '' || normalizedValue === '--' || !hasDigits
 
-const numericOnly = normalizedValue.replace(/[^\d]/g, '')
+// Only call replace if normalizedValue is a string (defensive check)
+const numericOnly = typeof normalizedValue === 'string' 
+  ? normalizedValue.replace(/[^\d]/g, '') 
+  : ''
 const numericValue =
   !hasDigits || numericOnly === '' ? 0 : Number.parseInt(numericOnly, 10)
 

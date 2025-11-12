@@ -250,7 +250,7 @@ verbose/coverage/
 # Exclude all AI files except journal dataset research module
 ai/**
 !ai/journal_dataset_research/
-!ai/journal_dataset_research/**/*.py
+!ai/journal_dataset_research/**
 .clinerules/
 .kilocode/
 .roo/

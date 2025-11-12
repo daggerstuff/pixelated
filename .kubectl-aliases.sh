@@ -18,8 +18,8 @@ else
     unset -f kgn kgp kgs 2>/dev/null || true
 fi
 
-# Define functions - using 'function' keyword works in both bash and zsh
-function kgn() {
+# Define functions - using POSIX-compliant syntax for compatibility with sh, bash, and zsh
+kgn() {
     echo "FRIENDLY   SHORT-ID  STATUS    CPU       MEMORY"
     echo "------------------------------------------------------------"
     kubectl get nodes -o json 2>/dev/null | jq -r '.items[] | 
@@ -29,7 +29,7 @@ function kgn() {
     done
 }
 
-function kgp() {
+kgp() {
     local namespace="${1:-}"
     if [ -z "${namespace}" ]; then
         echo "NAMESPACE       NAME                                     STATUS     NODE"
@@ -64,7 +64,7 @@ function kgp() {
     fi
 }
 
-function kgs() {
+kgs() {
     local namespace="${1:-}"
     if [ -z "${namespace}" ]; then
         kubectl get services --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,TYPE:.spec.type,CLUSTER-IP:.spec.clusterIP 2>/dev/null

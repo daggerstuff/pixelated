@@ -85,10 +85,25 @@ const candidateSocialLinks =
     ? providedSocialLinks
     : defaultSocialLinks
 
-const socialLinks = candidateSocialLinks.filter(
-  (link): link is SocialLink =>
-    Boolean(link && link.name.trim() && link.href.trim() && link.icon.trim()),
-)
+// Ensure socialLinks is always defined, even if empty
+const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
+  ? candidateSocialLinks.filter(
+      (link): link is SocialLink =>
+        Boolean(
+          link &&
+          typeof link === 'object' &&
+          'name' in link &&
+          'href' in link &&
+          'icon' in link &&
+          typeof link.name === 'string' &&
+          typeof link.href === 'string' &&
+          typeof link.icon === 'string' &&
+          link.name.trim() &&
+          link.href.trim() &&
+          link.icon.trim(),
+        ),
+    )
+  : []
 ---
 
 <footer

@@ -164,25 +164,47 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
   const onError = (err) => {
     if (err && err.code === 'EADDRINUSE') {
       console.error(`Port ${port} is already in use.`)
-      try {
-        if (Sentry) {
-          Sentry.captureException(err)
-        }
-      } catch (e) {
-        console.error('Failed to capture EADDRINUSE to Sentry:', e)
-      }
+      
       if (isPortFallbackDisabled) {
         console.error('Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.')
+        // Only report to Sentry when port fallback is disabled (fatal error)
+        try {
+          if (Sentry) {
+            Sentry.captureException(err, {
+              tags: {
+                fatal: true,
+                port_fallback_disabled: true,
+              },
+            })
+          }
+        } catch (e) {
+          console.error('Failed to capture EADDRINUSE to Sentry:', e)
+        }
         closeSentry().finally(() => process.exit(1))
         return
       }
 
       if (retriesLeft <= 0) {
         console.error('No retries left for port fallback. Exiting.')
+        // Only report to Sentry when retries are exhausted (fatal error)
+        try {
+          if (Sentry) {
+            Sentry.captureException(err, {
+              tags: {
+                fatal: true,
+                retries_exhausted: true,
+              },
+            })
+          }
+        } catch (e) {
+          console.error('Failed to capture EADDRINUSE to Sentry:', e)
+        }
         closeSentry().finally(() => process.exit(1))
         return
       }
 
+      // Port fallback is enabled and retries are available - don't report to Sentry
+      // This is expected behavior and will be handled gracefully
       const nextPort = port + 1
       const nextDelay = Math.min(delay * 2, maxDelay)
       console.warn(`Attempting fallback to port ${nextPort} (${retriesLeft - 1} retries left, delay ${delay}ms)`)
@@ -191,6 +213,14 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
     }
 
     console.error('Listen error:', err)
+    // Report non-EADDRINUSE errors to Sentry as they are unexpected
+    try {
+      if (Sentry) {
+        Sentry.captureException(err)
+      }
+    } catch (e) {
+      console.error('Failed to capture listen error to Sentry:', e)
+    }
   }
 
   retryServer.once('error', onError)
