@@ -6,5 +6,7 @@ export * from './useIntegration'
 export * from './useProgress'
 export * from './useReports'
 export * from './useWebSocket'
+export * from './usePagination'
+export * from './usePrefetch'
 
 

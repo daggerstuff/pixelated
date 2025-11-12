@@ -2,7 +2,7 @@
 export const prerender = false
 
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import { SessionDetailPage } from '@/components/journal-research/pages'
+import { LazySessionDetailPage } from '@/components/journal-research/lazy'
 
 // @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
@@ -26,7 +26,7 @@ const { sessionId } = Astro.params
     </div>
 
     {sessionId ? (
-      <SessionDetailPage client:load sessionId={sessionId} />
+      <LazySessionDetailPage client:load sessionId={sessionId} />
     ) : (
       <div class="text-center py-8 text-muted-foreground">
         <p>Session ID is required</p>

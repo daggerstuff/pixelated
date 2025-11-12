@@ -2,7 +2,7 @@
 export const prerender = false
 
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import { SessionsListPage } from '@/components/journal-research/pages'
+import { LazySessionsListPage } from '@/components/journal-research/lazy'
 
 // @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
@@ -22,7 +22,7 @@ const { user } = Astro.props as { user: any }
       </div>
     </div>
 
-    <SessionsListPage client:load />
+    <LazySessionsListPage client:load />
   </div>
 </DashboardLayout>
 

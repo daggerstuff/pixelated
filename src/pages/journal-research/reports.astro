@@ -2,7 +2,7 @@
 export const prerender = false
 
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import { ReportsPage } from '@/components/journal-research/pages'
+import { LazyReportsPage } from '@/components/journal-research/lazy'
 
 // @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
@@ -25,7 +25,7 @@ const reportId = Astro.url.searchParams.get('reportId')
       </div>
     </div>
 
-    <ReportsPage client:load sessionId={sessionId} reportId={reportId} />
+    <LazyReportsPage client:load sessionId={sessionId} reportId={reportId} />
   </div>
 </DashboardLayout>
 
