@@ -1,0 +1,84 @@
+---
+type CounterValue = string | number | null | undefined
+
+export interface Props {
+  value?: CounterValue
+  label?: string
+  duration?: number
+  prefix?: string
+  suffix?: string
+  class?: string
+  ariaLabel?: string
+}
+
+const {
+  value,
+  label,
+  duration = 2000,
+  prefix = '',
+  suffix = '',
+  class: className = '',
+  ariaLabel,
+}: Props = Astro.props
+
+const rawValue =
+  value === undefined || value === null
+    ? ''
+    : typeof value === 'string'
+    ? value
+    : Number.isFinite(Number(value))
+    ? String(value)
+    : `${value}`
+
+const normalizedValue = rawValue.trim()
+const hasDigits = /\d/.test(normalizedValue)
+const isPlaceholder =
+  normalizedValue === '' || normalizedValue === '--' || !hasDigits
+
+const numericOnly = normalizedValue.replace(/[^\d]/g, '')
+const numericValue =
+  !hasDigits || numericOnly === '' ? 0 : Number.parseInt(numericOnly, 10)
+
+const displayValue = isPlaceholder
+  ? normalizedValue || '--'
+  : normalizedValue
+
+const finalDisplay = `${prefix ?? ''}${displayValue}${suffix ?? ''}`
+const accessibleLabel = ariaLabel ?? finalDisplay.trim()
+---
+
+<div
+  class:list={['animated-counter', className].filter(Boolean)}
+  data-duration={duration}
+  data-value={numericValue}
+  aria-label={accessibleLabel}
+  role="group"
+>
+  <span class="animated-counter__value">{finalDisplay}</span>
+  {label && <span class="animated-counter__label">{label}</span>}
+</div>
+
+<style>
+  .animated-counter {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .animated-counter__value {
+    font-family: var(--font-display, inherit);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--weight-black, 800);
+    color: var(--accent-primary, currentColor);
+    line-height: 1;
+  }
+
+  .animated-counter__label {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.75));
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>
+

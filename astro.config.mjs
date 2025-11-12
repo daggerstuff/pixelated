@@ -18,6 +18,22 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
 const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+const preferredPort = (() => {
+  const candidates = [
+    process.env.PORT,
+    process.env.HTTP_PORT,
+    process.env.WEBSITES_PORT,
+    process.env.ASTRO_PORT,
+  ];
+  for (const value of candidates) {
+    if (!value) continue;
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isInteger(parsed) && parsed > 0 && parsed < 65536) {
+      return parsed;
+    }
+  }
+  return 4321;
+})();
 
 function getChunkName(id) {
   if (id.includes('react') || id.includes('react-dom')) {
@@ -299,8 +315,9 @@ export default defineConfig({
     checkOrigin: true,
   },
   server: {
-    port: 4321,
+    port: preferredPort,
     host: '0.0.0.0',
+    strictPort: false,
     watch: {
       followSymlinks: false,
       ignored: [

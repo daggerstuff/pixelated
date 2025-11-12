@@ -339,3 +339,4 @@ tmp/
 bin/
 .specstory
 scripts/claude-flow-removal.sh
+.notes/cloudflare-patch

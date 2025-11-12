@@ -1,3 +1,8 @@
 .venv/
 node_modules/
 # Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+
+# Ignore MCP OAuth callback URLs that Cursor tries to save as files
+**/cursor:/**/oauth/**
+**/anysphere.cursor-mcp/oauth/**
+**/*oauth*callback*
