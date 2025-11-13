@@ -6,3 +6,5 @@ node_modules/
 **/cursor:/**/oauth/**
 **/anysphere.cursor-mcp/oauth/**
 **/*oauth*callback*
+# SpecStory derived-cursor-rules.mdc backup files
+.specstory/ai_rules_backups/*
