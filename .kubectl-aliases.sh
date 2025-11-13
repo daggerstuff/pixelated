@@ -38,7 +38,7 @@ kgp() {
             "\(.metadata.namespace)|\(.metadata.name)|\(.status.phase)|\(.spec.nodeName)"' 2>/dev/null | \
         while IFS='|' read -r ns name pod_status node; do
             local friendly
-            friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels.cluster\.pixelated\.io/friendly-name}' 2>/dev/null)
+            friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels['\''cluster.pixelated.io/friendly-name'\'']}' 2>/dev/null)
             if [ -z "${friendly}" ]; then
                 # POSIX-compatible substring extraction: get last 5 characters
                 # Using sed is portable across sh/bash/zsh
@@ -53,7 +53,7 @@ kgp() {
             "\(.metadata.name)|\(.status.phase)|\(.spec.nodeName)"' 2>/dev/null | \
         while IFS='|' read -r name pod_status node; do
             local friendly
-            friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels.cluster\.pixelated\.io/friendly-name}' 2>/dev/null)
+            friendly=$(kubectl get node "${node}" -o jsonpath='{.metadata.labels['\''cluster.pixelated.io/friendly-name'\'']}' 2>/dev/null)
             if [ -z "${friendly}" ]; then
                 # POSIX-compatible substring extraction: get last 5 characters
                 # Using sed is portable across sh/bash/zsh
