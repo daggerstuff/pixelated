@@ -258,6 +258,8 @@
     "@vitejs/plugin-react": "^5.1.0",
     "@vitest/coverage-v8": "^4.0.5",
     "archiver": "^7.0.1",
+    "artillery": "2.0.26",
+    "artillery-plugin-publish-metrics": "2.31.0",
     "astro": "^5.15.3",
     "astro-eslint-parser": "^1.2.2",
     "astro-expressive-code": "^0.41.3",

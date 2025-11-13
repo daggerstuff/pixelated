@@ -4,16 +4,16 @@ After=network.target
 
 [Service]
 Type=simple
-User=%USER%
-WorkingDirectory=%h/pixelated
-ExecStart=%h/pixelated/scripts/create-a1-flex-instance-multi-region.sh
+User=vivi
+WorkingDirectory=/home/vivi/pixelated
+ExecStart=/home/vivi/pixelated/scripts/infrastructure/create-a1-flex-instance-multi-region.sh
 Restart=on-failure
 RestartSec=60
-StandardOutput=append:%h/.oci/a1-flex-instance-creation.log
-StandardError=append:%h/.oci/a1-flex-instance-creation.log
+StandardOutput=append:/home/vivi/.oci/a1-flex-instance-creation.log
+StandardError=append:/home/vivi/.oci/a1-flex-instance-creation.log
 
 # Environment variables
-Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PATH=/home/vivi/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 [Install]
 WantedBy=default.target

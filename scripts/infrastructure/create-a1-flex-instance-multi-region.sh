@@ -165,8 +165,12 @@ get_or_create_subnet() {
         --output json 2>&1)
     
     if echo "$SUBNET_RESULT" | grep -q "ServiceError"; then
-        ERROR_MSG=$(echo "$SUBNET_RESULT" | jq -r '.message' 2>/dev/null || echo 'Error')
-        log "❌ Failed to create subnet: $ERROR_MSG"
+        ERROR_MSG=$(echo "$SUBNET_RESULT" | jq -r '.message // .code // "Unknown error"' 2>/dev/null | head -1)
+        ERROR_CODE=$(echo "$SUBNET_RESULT" | jq -r '.code // ""' 2>/dev/null | head -1)
+        if [ -z "$ERROR_MSG" ] || [ "$ERROR_MSG" = "null" ]; then
+            ERROR_MSG="ServiceError - ${SUBNET_RESULT:0:200}"
+        fi
+        log "❌ Failed to create subnet: $ERROR_CODE - $ERROR_MSG"
         echo ""
         return 1
     fi
@@ -215,14 +219,22 @@ try_region() {
     log "🌍 Trying region: $region"
     log "=========================================="
     
-    # Set region context
+    # Set region context and profile
+    export OCI_CLI_PROFILE="DEFAULT"
     export OCI_CLI_REGION="$region"
     
     # Get availability domains for this region
-    ADS=$(oci iam availability-domain list --query 'data[*].name' --raw-output 2>/dev/null | jq -r '.[]' 2>/dev/null || echo "")
+    AD_RESULT=$(oci iam availability-domain list --query 'data[*].name' --raw-output 2>&1)
+    if echo "$AD_RESULT" | grep -q "ServiceError\|NotAuthenticated\|Unauthorized"; then
+        ERROR_MSG=$(echo "$AD_RESULT" | jq -r '.message // .' 2>/dev/null | head -3)
+        log "❌ Authentication/API error for region $region: $ERROR_MSG"
+        return 1
+    fi
+    ADS=$(echo "$AD_RESULT" | jq -r '.[]' 2>/dev/null || echo "")
     
     if [ -z "$ADS" ]; then
         log "❌ Could not get availability domains for region: $region"
+        log "   Response: ${AD_RESULT:0:200}"
         return 1
     fi
     
@@ -337,8 +349,21 @@ try_region() {
         elif echo "$RESULT" | grep -q "Out of host capacity"; then
             log "   ❌ $AD: Out of capacity"
         else
-            ERROR_MSG=$(echo "$RESULT" | jq -r '.message // .' 2>/dev/null | head -1)
-            log "   ❌ $AD: $ERROR_MSG"
+            # Extract error message - try multiple ways
+            if echo "$RESULT" | grep -q "ServiceError"; then
+                ERROR_MSG=$(echo "$RESULT" | jq -r '.message // .code // .' 2>/dev/null | head -1)
+                ERROR_CODE=$(echo "$RESULT" | jq -r '.code // ""' 2>/dev/null | head -1)
+                if [ -n "$ERROR_MSG" ] && [ "$ERROR_MSG" != "null" ]; then
+                    log "   ❌ $AD: $ERROR_CODE - $ERROR_MSG"
+                else
+                    log "   ❌ $AD: ServiceError (check full response below)"
+                    log "   Full response: ${RESULT:0:500}"
+                fi
+            else
+                # Not a ServiceError, log the raw response
+                ERROR_PREVIEW=$(echo "$RESULT" | head -5 | tr '\n' ' ' | cut -c1-200)
+                log "   ❌ $AD: Unexpected error - $ERROR_PREVIEW"
+            fi
         fi
     done
     
@@ -348,9 +373,13 @@ try_region() {
 
 # Main retry loop
 main() {
+    # Set OCI profile globally
+    export OCI_CLI_PROFILE="DEFAULT"
+    
     log "🚀 Starting A1.Flex instance creation with multi-region retry"
     log "Retry interval: $RETRY_INTERVAL_HOURS hours"
     log "Log file: $LOG_FILE"
+    log "OCI Profile: $OCI_CLI_PROFILE"
     log ""
     
     while true; do
@@ -361,7 +390,7 @@ main() {
         
         # Get all available regions
         log "🔍 Getting all available regions..."
-        REGIONS=$(oci iam region list --query 'data[*].name' --raw-output 2>/dev/null | jq -r '.[]' 2>/dev/null || echo "")
+        REGIONS=$(oci iam region list --query 'data[*].name' --raw-output 2>&1 | jq -r '.[]' 2>/dev/null || echo "")
         
         if [ -z "$REGIONS" ]; then
             log "❌ Could not get region list. Trying default region..."
