@@ -37,28 +37,28 @@ export function EvaluationList({
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
-        (eval) =>
-          eval.evaluationId.toLowerCase().includes(term) ||
-          eval.sourceId.toLowerCase().includes(term) ||
-          eval.priorityTier.toLowerCase().includes(term) ||
-          eval.evaluator.toLowerCase().includes(term),
+        (evaluation) =>
+          evaluation.evaluationId.toLowerCase().includes(term) ||
+          evaluation.sourceId.toLowerCase().includes(term) ||
+          evaluation.priorityTier.toLowerCase().includes(term) ||
+          evaluation.evaluator.toLowerCase().includes(term),
       )
     }
 
     // Apply tier filter
     if (tierFilter !== 'all') {
-      filtered = filtered.filter((eval) => eval.priorityTier === tierFilter)
+      filtered = filtered.filter((evaluation) => evaluation.priorityTier === tierFilter)
     }
 
     // Apply score filter
     if (scoreFilter === 'high') {
-      filtered = filtered.filter((eval) => eval.overallScore >= 8)
+      filtered = filtered.filter((evaluation) => evaluation.overallScore >= 8)
     } else if (scoreFilter === 'medium') {
       filtered = filtered.filter(
-        (eval) => eval.overallScore >= 6 && eval.overallScore < 8,
+        (evaluation) => evaluation.overallScore >= 6 && evaluation.overallScore < 8,
       )
     } else if (scoreFilter === 'low') {
-      filtered = filtered.filter((eval) => eval.overallScore < 6)
+      filtered = filtered.filter((evaluation) => evaluation.overallScore < 6)
     }
 
     // Apply sorting
