@@ -1,0 +1,60 @@
+# Dockerfile for Journal Dataset Research MCP Server
+# Multi-stage build for optimized production image
+
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast Python package management
+RUN pip install --no-cache-dir uv
+
+# Copy dependency files
+COPY pyproject.toml uv.lock* ./
+
+# Install dependencies
+RUN uv sync --frozen --no-dev
+
+# Runtime stage
+FROM python:3.11-slim AS runtime
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN pip install --no-cache-dir uv
+
+# Copy installed packages from builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy application code
+COPY ai/journal_dataset_research ./ai/journal_dataset_research
+
+# Create directories for logs and sessions
+RUN mkdir -p /app/logs /app/sessions
+
+# Create non-root user
+RUN groupadd -r mcp && useradd -r -g mcp mcp
+RUN chown -R mcp:mcp /app
+
+USER mcp
+
+# Expose MCP server port (if using HTTP transport)
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import sys; sys.exit(0)" || exit 1
+
+# Run the MCP server
+# Note: MCP servers typically run via stdio, but this can be adapted for HTTP
+CMD ["/app/.venv/bin/python", "-m", "ai.journal_dataset_research.mcp.server"]
+
