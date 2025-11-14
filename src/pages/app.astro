@@ -26,9 +26,14 @@ if (import.meta.env.SSR) {
     safeLog('info', 'Application started successfully')
 
     // Register shutdown handlers for the Node.js process
-    // Note: This will only work in SSR mode
-    process.on('SIGTERM', handleShutdown)
-    process.on('SIGINT', handleShutdown)
+    // Note: Only works in Node.js runtime (not Cloudflare Workers)
+    // Cloudflare Workers runtime doesn't have process.on()
+    if (typeof process !== 'undefined' && process.on) {
+      process.on('SIGTERM', handleShutdown)
+      process.on('SIGINT', handleShutdown)
+    } else {
+      safeLog('info', 'Running in Cloudflare Workers runtime - process handlers not available')
+    }
   } catch (error) {
     safeLog(
       'error',
@@ -44,6 +49,7 @@ if (import.meta.env.SSR) {
 
 /**
  * Handle graceful shutdown
+ * Note: Only works in Node.js runtime, not Cloudflare Workers
  */
 async function handleShutdown() {
   safeLog('info', 'Shutdown signal received, gracefully shutting down...')
@@ -51,7 +57,9 @@ async function handleShutdown() {
   try {
     await shutdownApplication()
     safeLog('info', 'Application shutdown complete')
-    process.exit(0)
+    if (typeof process !== 'undefined' && process.exit) {
+      process.exit(0)
+    }
   } catch (error) {
     safeLog(
       'error',
@@ -60,7 +68,9 @@ async function handleShutdown() {
         ? { message: error.message, stack: error.stack }
         : undefined,
     )
-    process.exit(1)
+    if (typeof process !== 'undefined' && process.exit) {
+      process.exit(1)
+    }
   }
 }
 ---

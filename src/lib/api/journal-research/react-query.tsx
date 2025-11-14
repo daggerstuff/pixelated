@@ -215,6 +215,20 @@ export const journalResearchQueryKeys = {
       reportId,
     ] as const,
   },
+  training: {
+    root: ['journal-research', 'training'] as const,
+    status: (sessionId: string) => [
+      'journal-research',
+      'training',
+      'status',
+      sessionId,
+    ] as const,
+    pipelineStatus: () => [
+      'journal-research',
+      'training',
+      'pipeline-status',
+    ] as const,
+  },
 } as const
 
 export const journalResearchMutationKeys = {
@@ -240,6 +254,10 @@ export const journalResearchMutationKeys = {
   },
   reports: {
     generate: buildMutationKey('journal-research', 'reports', 'generate'),
+  },
+  training: {
+    integrate: buildMutationKey('journal-research', 'training', 'integrate'),
+    integrateAll: buildMutationKey('journal-research', 'training', 'integrate-all'),
   },
 } as const
 

@@ -6,7 +6,10 @@ import {
   useAcquisitionInitiateMutation,
   useAcquisitionUpdateMutation,
 } from '@/lib/hooks/journal-research'
+import { useIntegrateAllDatasets, usePipelineStatus } from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button/button'
+import { Play, CheckCircle2, Loader2 } from 'lucide-react'
 
 export interface AcquisitionPanelProps {
   sessionId: string | null
@@ -21,6 +24,8 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
   })
   const initiateMutation = useAcquisitionInitiateMutation(sessionId)
   const updateMutation = useAcquisitionUpdateMutation(sessionId)
+  const integrateAllMutation = useIntegrateAllDatasets(sessionId ?? '')
+  const { data: pipelineStatus } = usePipelineStatus(true)
 
   if (!sessionId) {
     return (
@@ -41,14 +46,41 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
           <p className="text-muted-foreground mt-1">
             Acquire and download evaluated datasets
           </p>
+          {pipelineStatus?.available && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Pipeline: {pipelineStatus.total_datasets ?? 0} datasets,{' '}
+              {pipelineStatus.total_conversations ?? 0} conversations
+            </p>
+          )}
         </div>
-        <button
-          onClick={() => setIsInitiating(true)}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          disabled={initiateMutation.isPending}
-        >
-          {initiateMutation.isPending ? 'Acquiring...' : 'Start Acquisition'}
-        </button>
+        <div className="flex items-center gap-2">
+          {acquisitions && acquisitions.items.length > 0 && acquisitions.items.some(a => a.status === 'completed') && (
+            <Button
+              onClick={() => integrateAllMutation.mutate(true)}
+              disabled={integrateAllMutation.isPending}
+              variant="outline"
+            >
+              {integrateAllMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Integrating All...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Integrate All to Pipeline
+                </>
+              )}
+            </Button>
+          )}
+          <button
+            onClick={() => setIsInitiating(true)}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            disabled={initiateMutation.isPending}
+          >
+            {initiateMutation.isPending ? 'Acquiring...' : 'Start Acquisition'}
+          </button>
+        </div>
       </div>
 
       {/* Initiate Acquisition */}
@@ -102,6 +134,7 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
             <AcquisitionList
               acquisitions={acquisitions ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
               isLoading={isLoading}
+              sessionId={sessionId}
               onAcquisitionClick={(acquisition) => {
                 // Navigate to acquisition detail
               }}

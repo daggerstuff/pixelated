@@ -83,7 +83,9 @@ const adapter = (() => {
   if (isCloudflareDeploy && cloudflareAdapter) {
     console.log('🔵 Using Cloudflare adapter for Pages deployment');
     return cloudflareAdapter({
-      mode: 'advanced',
+      // Use 'directory' mode for Cloudflare Pages (creates functions/ directory)
+      // 'advanced' mode is for Workers and creates _worker.js
+      mode: 'directory',
       platformProxy: {
         enabled: true,
       },

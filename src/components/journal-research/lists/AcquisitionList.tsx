@@ -7,12 +7,16 @@ import { Table } from '@/components/ui/table'
 import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
+import { Button } from '@/components/ui/button/button'
+import { CheckCircle2, Loader2, XCircle, Play } from 'lucide-react'
 
 export interface AcquisitionListProps {
   acquisitions: AcquisitionListType
   onAcquisitionClick?: (acquisition: Acquisition) => void
   isLoading?: boolean
   className?: string
+  sessionId?: string | null
 }
 
 export function AcquisitionList({
@@ -20,7 +24,21 @@ export function AcquisitionList({
   onAcquisitionClick,
   isLoading = false,
   className,
+  sessionId,
 }: AcquisitionListProps) {
+  const integrateMutation = useIntegrateDataset(sessionId ?? '')
+  const { data: trainingStatus } = useTrainingStatus(sessionId ?? '', !!sessionId)
+  
+  // Create a map of integration statuses
+  const integrationStatusMap = useMemo(() => {
+    const map = new Map<string, boolean>()
+    if (trainingStatus?.datasets) {
+      trainingStatus.datasets.forEach((ds) => {
+        map.set(ds.source_id, ds.integrated)
+      })
+    }
+    return map
+  }, [trainingStatus])
   const [tableState, setTableState] = useState<TableState>({
     currentPage: acquisitions.page ?? 1,
     pageSize: acquisitions.pageSize ?? 10,
@@ -184,6 +202,53 @@ export function AcquisitionList({
         ),
       sortable: true,
       hideMobile: true,
+    },
+    {
+      id: 'trainingIntegration',
+      header: 'Training Pipeline',
+      accessor: (row) => {
+        const isIntegrated = integrationStatusMap.get(row.sourceId) ?? false
+        const isIntegrating = integrateMutation.isPending
+        
+        if (isIntegrated) {
+          return (
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span className="text-xs text-green-600">Integrated</span>
+            </div>
+          )
+        }
+        
+        if (isIntegrating) {
+          return (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+              <span className="text-xs text-blue-600">Integrating...</span>
+            </div>
+          )
+        }
+        
+        if (row.status === 'completed' && sessionId) {
+          return (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation()
+                integrateMutation.mutate({ sourceId: row.sourceId })
+              }}
+              className="h-7 text-xs"
+            >
+              <Play className="h-3 w-3 mr-1" />
+              Integrate
+            </Button>
+          )
+        }
+        
+        return <span className="text-xs text-muted-foreground">-</span>
+      },
+      sortable: false,
+      align: 'center',
     },
   ]
 

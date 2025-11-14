@@ -3,9 +3,11 @@ import {
   useAcquisitionQuery,
   useAcquisitionUpdateMutation,
 } from '@/lib/hooks/journal-research'
+import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { Download, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Download, CheckCircle, XCircle, Clock, Play, CheckCircle2, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button/button'
 
 export interface AcquisitionDetailProps {
   sessionId: string
@@ -23,6 +25,13 @@ export function AcquisitionDetail({
     acquisitionId,
   )
   const updateMutation = useAcquisitionUpdateMutation(sessionId)
+  const integrateMutation = useIntegrateDataset(sessionId)
+  const { data: trainingStatus } = useTrainingStatus(sessionId, true)
+  
+  // Check if this acquisition is integrated
+  const isIntegrated = trainingStatus?.datasets?.find(
+    (ds) => ds.source_id === acquisition?.sourceId
+  )?.integrated ?? false
 
   if (isLoading) {
     return (
@@ -72,9 +81,47 @@ export function AcquisitionDetail({
               ` • Acquired ${format(acquisition.acquiredDate, 'MMM d, yyyy')}`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <StatusIcon className={cn('h-5 w-5', statusColor)} />
-          <span className="capitalize font-medium">{acquisition.status}</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <StatusIcon className={cn('h-5 w-5', statusColor)} />
+            <span className="capitalize font-medium">{acquisition.status}</span>
+          </div>
+          
+          {/* Training Pipeline Integration */}
+          {acquisition.status === 'completed' && (
+            <div className="flex items-center gap-2">
+              {isIntegrated ? (
+                <div className="flex items-center gap-2 rounded-md bg-green-50 dark:bg-green-900/20 px-3 py-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                    Integrated
+                  </span>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (acquisition.sourceId) {
+                      integrateMutation.mutate({ sourceId: acquisition.sourceId })
+                    }
+                  }}
+                  disabled={integrateMutation.isPending}
+                >
+                  {integrateMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Integrating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Integrate with Training Pipeline
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
