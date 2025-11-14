@@ -185,7 +185,6 @@ crons = [
   # "*/15 * * * *" # Every 15 minutes
 ]
 
-# Compatibility settings
-[compatibility_flags]
-# nodejs_compat_v2 = true
-# streams_enable_constructors = true
+# Note: compatibility_flags is already defined inline at the top of the file (line 7)
+# Additional compatibility flags can be added to the array on line 7 if needed
+# Example: compatibility_flags = ["nodejs_compat", "nodejs_compat_v2"]
