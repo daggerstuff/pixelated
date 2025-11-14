@@ -341,3 +341,4 @@ bin/
 scripts/claude-flow-removal.sh
 .notes/cloudflare-patch
 .sonarlint
+.brv

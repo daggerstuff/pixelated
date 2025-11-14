@@ -23,6 +23,7 @@
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\"",
     "setup:dev": "./scripts/setup-dev.sh",
     "build": "astro build",
+    "build:cloudflare": "DEPLOY_TARGET=cloudflare astro build",
     "build:analyze": "astro build && pnpm run analyze:bundle",
     "analyze:bundle": "npx astro-bundle-analyzer dist",
     "format": "biome format --write . && prettier --write \"**/*.{astro,mdx}\"",
@@ -236,6 +237,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@astrojs/cloudflare": "^12.6.10",
     "@astrojs/markdoc": "^0.15.8",
     "@astrojs/rss": "^4.0.13",
     "@biomejs/biome": "^2.3.4",

@@ -10,8 +10,21 @@ import sentry from '@sentry/astro';
 import spotlightjs from '@spotlightjs/astro';
 
 import node from '@astrojs/node';
-
 import { visualizer } from 'rollup-plugin-visualizer';
+
+// Conditionally import Cloudflare adapter (only when needed for Pages deployment)
+// Default remains Node adapter for Kubernetes deployments
+const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
+let cloudflareAdapter;
+if (isCloudflareDeploy) {
+  try {
+    // Dynamic import at build time - this is safe in Astro config
+    const cloudflareModule = await import('@astrojs/cloudflare');
+    cloudflareAdapter = cloudflareModule.default;
+  } catch (e) {
+    console.warn('Cloudflare adapter not available, falling back to Node adapter:', e.message);
+  }
+}
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -63,13 +76,32 @@ function getChunkName(id) {
   return null;
 }
 
+// Determine adapter based on deployment target
+// Default: Node adapter for Kubernetes/standalone deployments
+// Cloudflare: When DEPLOY_TARGET=cloudflare or CF_PAGES=1
+const adapter = (() => {
+  if (isCloudflareDeploy && cloudflareAdapter) {
+    console.log('🔵 Using Cloudflare adapter for Pages deployment');
+    return cloudflareAdapter({
+      mode: 'advanced',
+      platformProxy: {
+        enabled: true,
+      },
+      functionPerRoute: false,
+    });
+  }
+  // Default: Node adapter for Kubernetes/standard deployments
+  console.log('🟢 Using Node adapter for standard deployment');
+  return node({
+    mode: 'standalone',
+  });
+})();
+
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
   output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter,
   trailingSlash: 'ignore',
   build: {
     format: 'directory',

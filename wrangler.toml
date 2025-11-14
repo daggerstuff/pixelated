@@ -161,6 +161,11 @@ routes = [
 ]
 
 # Site configuration (for Pages)
+# Note: For Cloudflare Pages SSR deployment:
+# 1. Use build command: DEPLOY_TARGET=cloudflare pnpm build (or pnpm build:cloudflare)
+# 2. Set Build output directory: dist/client
+# 3. Set Build command: DEPLOY_TARGET=cloudflare pnpm build
+# 4. The Cloudflare adapter will create functions/ directory automatically
 [site]
 bucket = "./dist/client"
 
