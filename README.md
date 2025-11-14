@@ -60,6 +60,17 @@ We partner with forward-thinking platforms that refuse to accept "engagement" as
 ### Our Partners Build:
 
 
+## Journal Dataset Research Pipeline
+
+The platform includes a comprehensive **Journal Dataset Research Pipeline** for discovering, evaluating, acquiring, and integrating therapeutic datasets from academic sources. This integrated system consists of:
+
+- **Web Frontend**: User-friendly interface for managing research operations (`/journal-research`)
+- **MCP Server**: AI agent interface via Model Context Protocol
+- **CLI Interface**: Command-line access for automation
+- **Backend Engine**: Core research automation with discovery, evaluation, acquisition, and integration planning
+
+All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/journal-research-pipeline.md) for complete details.
+
 ## Enterprise-Grade. Enterprise-Focused.
 
 Built with the same technologies that power the world's most demanding applications.

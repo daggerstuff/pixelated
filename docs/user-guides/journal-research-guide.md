@@ -2,7 +2,13 @@
 
 ## Overview
 
-The Journal Research system is a comprehensive web-based platform for managing journal dataset research operations. This guide will help you get started, understand the features, and troubleshoot common issues.
+The Journal Research system is a comprehensive, integrated platform for managing journal dataset research operations. The system consists of three interfaces that work together:
+
+- **Web Frontend**: User-friendly web interface (this guide focuses on this)
+- **MCP Server**: AI agent interface via Model Context Protocol
+- **CLI Interface**: Command-line access for automation
+
+All three interfaces access the same backend research engine and share the same session data. This guide focuses on the web interface. For information about the complete system architecture, see the [Journal Research Pipeline Documentation](../journal-research-pipeline.md).
 
 ## Table of Contents
 

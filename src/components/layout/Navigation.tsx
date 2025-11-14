@@ -30,6 +30,7 @@ const defaultItems: NavigationItem[] = [
   { label: 'Dashboard', href: '/dashboard', requiresAuth: true },
   { label: 'Chat', href: '/chat', requiresAuth: true },
   { label: 'Simulator', href: '/simulator', requiresAuth: true },
+  { label: 'Journal Research', href: '/journal-research', requiresAuth: true },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Login', href: '/login', requiresGuest: true },
