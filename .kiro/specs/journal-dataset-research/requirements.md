@@ -152,5 +152,5 @@ This document specifies the requirements for systematic research and acquisition
 ---
 
 **Document Version**: 1.0  
-**Last Updated**: January 2025  
+**Last Updated**: November 2025  
 **Status**: Initial Requirements - Ready for Design Phase
