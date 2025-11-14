@@ -121,10 +121,25 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
+    const userBasePath = (config['basePath'] as string) || path.join(process.cwd(), 'data', 'backups')
+    
+    // Validate basePath to prevent path traversal
+    // Ensure basePath is within project root or a safe data directory
+    const projectRoot = path.resolve(process.cwd())
+    const resolvedBasePath = path.resolve(userBasePath)
+    
+    // Reject absolute paths that escape project root
+    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
+      throw new Error('Base path must be within project directory')
+    }
+    
+    // Reject paths with directory traversal sequences
+    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
+      throw new Error('Base path contains directory traversal sequences')
+    }
+    
     this.config = {
-      basePath:
-        (config['basePath'] as string) ||
-        path.join(process.cwd(), 'data', 'backups'),
+      basePath: resolvedBasePath,
     }
   }
 
@@ -284,12 +299,27 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
+    const userBasePath = (config['basePath'] as string) || path.join(process.cwd(), 'data', 'mock-cloud')
+    
+    // Validate basePath to prevent path traversal
+    // Ensure basePath is within project root or a safe data directory
+    const projectRoot = path.resolve(process.cwd())
+    const resolvedBasePath = path.resolve(userBasePath)
+    
+    // Reject absolute paths that escape project root
+    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
+      throw new Error('Base path must be within project directory')
+    }
+    
+    // Reject paths with directory traversal sequences
+    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
+      throw new Error('Base path contains directory traversal sequences')
+    }
+    
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
       bucket: (config['bucket'] as string) || 'mock-bucket',
-      basePath:
-        (config['basePath'] as string) ||
-        path.join(process.cwd(), 'data', 'mock-cloud'),
+      basePath: resolvedBasePath,
     }
   }
 
@@ -336,7 +366,11 @@ export class MockCloudStorageProvider implements StorageProvider {
     }
 
     await fs.writeFile(filePath, data)
-    await fs.writeFile(`${filePath}.meta`, JSON.stringify(metadata, null, 2))
+    // Validate meta file path to prevent path traversal
+    const metaFilePath = securePathJoin(path.dirname(filePath), path.basename(filePath) + '.meta', {
+      allowedExtensions: ['.meta'],
+    })
+    await fs.writeFile(metaFilePath, JSON.stringify(metadata, null, 2))
 
     logger.debug(`Stored file at ${key} in mock cloud storage`)
   }

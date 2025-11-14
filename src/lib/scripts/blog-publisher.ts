@@ -7,7 +7,7 @@ import {
 import fs from 'fs/promises'
 import path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../../utils/path-security'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename, validatePath } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publisher')
 
@@ -394,13 +394,15 @@ async function publishPost(postPath?: string): Promise<void> {
   }
 
   try {
-    const content = await fs.readFile(targetPost.filePath, 'utf8')
+    // Validate file path to prevent path traversal
+    const validatedFilePath = validatePath(targetPost.filePath, ALLOWED_DIRECTORIES.CONTENT)
+    const content = await fs.readFile(validatedFilePath, 'utf8')
 
     // Update the draft status in frontmatter
     const updatedContent = content.replace(/draft:\s*true/i, 'draft: false')
 
     // Write back to the file
-    await fs.writeFile(targetPost.filePath, updatedContent, 'utf8')
+    await fs.writeFile(validatedFilePath, updatedContent, 'utf8')
 
     console.log(`Published post: ${targetPost.metadata.title}`)
   } catch (error: unknown) {
