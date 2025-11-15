@@ -1,4 +1,4 @@
-# VPA Installation Summary
+## VPA Installation Summary
 
 **Date:** 2025-11-09  
 **Cluster:** pixelated-empathy-civo  

@@ -321,7 +321,7 @@ class TransformationSpec:
 **Key Functions**:
 - Log all research activities with timestamps
 - Update progress tracking documents automatically
-- Generate structured reports in markdown format
+- Generate structured reports in Markdown format
 - Maintain version history of all documents
 - Create visualizations of progress metrics
 

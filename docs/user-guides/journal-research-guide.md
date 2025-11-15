@@ -1,4 +1,4 @@
-# Journal Research User Guide
+## Journal Research User Guide
 
 ## Overview
 

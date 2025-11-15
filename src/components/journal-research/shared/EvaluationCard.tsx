@@ -1,4 +1,4 @@
-import type { Evaluation } from '@/lib/api/journal-research/types'
+import { format } from 'date-fns'
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/card'
-import { format } from 'date-fns'
+import type { Evaluation } from '@/lib/api/journal-research/types'
 
 export interface EvaluationCardProps {
   evaluation: Evaluation
@@ -63,11 +63,11 @@ export function EvaluationCard({
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onClick()
-              }
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onClick()
             }
+          }
           : undefined
       }
     >

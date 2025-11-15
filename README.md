@@ -1,6 +1,6 @@
 ![Pixelated Empathy Logo](public/android-chrome-512x512.png)
 
-# Pixelated Empathy
+## Pixelated Empathy
 
 *Beyond the screen, lies a deeper connection.*
 

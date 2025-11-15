@@ -1,4 +1,4 @@
-# Cluster Optimization & Cost-Saving Report
+## Cluster Optimization & Cost-Saving Report
 **Generated:** 2025-11-09  
 **Cluster:** pixelated-empathy-civo  
 **Environment:** pixelcluster

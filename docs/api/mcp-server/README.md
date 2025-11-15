@@ -1,4 +1,4 @@
-# Journal Dataset Research MCP Server API Documentation
+## Journal Dataset Research MCP Server API Documentation
 
 ## Overview
 

@@ -41,7 +41,7 @@ cd "$PROJECT_ROOT"
 docker build \
   -f docker/journal-research-api/Dockerfile \
   -t journal-research-api:latest \
-  -t journal-research-api:$ENVIRONMENT \
+  -t "journal-research-api:${ENVIRONMENT}" \
   .
 
 # Stop existing container if running
@@ -59,21 +59,21 @@ docker run -d \
   -p 8000:8000 \
   -e HOST=0.0.0.0 \
   -e PORT=8000 \
-  -e ENVIRONMENT=$ENVIRONMENT \
+  -e "ENVIRONMENT=${ENVIRONMENT}" \
   -e API_VERSION=1.0.0 \
-  -e DEBUG=${DEBUG:-false} \
-  -e CORS_ORIGINS="${CORS_ORIGINS:-http://localhost:4321,http://localhost:3000}" \
-  -e AUTH_ENABLED=${AUTH_ENABLED:-true} \
-  -e JWT_SECRET="$JWT_SECRET" \
-  -e JWT_ALGORITHM=${JWT_ALGORITHM:-HS256} \
-  -e JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES:-1440} \
-  -e RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true} \
-  -e RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60} \
-  -e RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-1000} \
-  -e LOG_LEVEL=${LOG_LEVEL:-INFO} \
+  -e "DEBUG=${DEBUG:-false}" \
+  -e "CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:4321,http://localhost:3000}" \
+  -e "AUTH_ENABLED=${AUTH_ENABLED:-true}" \
+  -e "JWT_SECRET=${JWT_SECRET}" \
+  -e "JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}" \
+  -e "JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES:-1440}" \
+  -e "RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}" \
+  -e "RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60}" \
+  -e "RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-1000}" \
+  -e "LOG_LEVEL=${LOG_LEVEL:-INFO}" \
   -e SESSION_STORAGE_PATH=/app/sessions \
   -v journal-research-sessions:/app/sessions \
-  journal-research-api:$ENVIRONMENT
+  "journal-research-api:${ENVIRONMENT}"
 
 # Wait for health check
 echo "⏳ Waiting for service to be healthy..."
@@ -82,7 +82,7 @@ for i in {1..30}; do
     echo "✅ Service is healthy!"
     break
   fi
-  if [ $i -eq 30 ]; then
+  if [ "$i" -eq 30 ]; then
     echo "❌ Service health check failed after 30 attempts"
     docker logs journal-research-api
     exit 1

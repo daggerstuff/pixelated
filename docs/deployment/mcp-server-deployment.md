@@ -1,4 +1,4 @@
-# Journal Dataset Research MCP Server Deployment Guide
+## Journal Dataset Research MCP Server Deployment Guide
 
 This guide provides comprehensive instructions for deploying the Journal Dataset Research MCP Server.
 

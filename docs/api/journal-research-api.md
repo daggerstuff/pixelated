@@ -1,4 +1,4 @@
-# Journal Research API Documentation
+## Journal Research API Documentation
 
 ## Overview
 

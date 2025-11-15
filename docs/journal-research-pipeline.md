@@ -1,4 +1,4 @@
-# Journal Dataset Research Pipeline - Unified System Documentation
+## Journal Dataset Research Pipeline - Unified System Documentation
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# MCP Server Prompts Documentation
+## MCP Server Prompts Documentation
 
 This document provides comprehensive documentation for all prompts available in the Journal Dataset Research MCP Server.
 

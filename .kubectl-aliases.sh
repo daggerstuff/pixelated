@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 # kubectl aliases for prettier cluster names
-# Compatible with bash, zsh, and sh
+# Compatible with bash and zsh (uses bash-specific features like 'local')
 # This script safely overrides any existing kubectl aliases
 
 # Remove any existing aliases/functions

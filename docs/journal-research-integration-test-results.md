@@ -1,4 +1,4 @@
-# Journal Research Pipeline - Integration Test Results
+## Journal Research Pipeline - Integration Test Results
 
 ## Test Date
 January 2025

@@ -1,4 +1,4 @@
-# MCP Server Tools Documentation
+## MCP Server Tools Documentation
 
 This document provides comprehensive documentation for all tools available in the Journal Dataset Research MCP Server.
 

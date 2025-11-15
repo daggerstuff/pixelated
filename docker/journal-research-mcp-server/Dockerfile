@@ -7,8 +7,8 @@ WORKDIR /app
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+  build-essential \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install uv for fast Python package management
 RUN pip install --no-cache-dir uv
@@ -26,8 +26,8 @@ WORKDIR /app
 
 # Install runtime dependencies only
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+  curl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 RUN pip install --no-cache-dir uv
@@ -50,9 +50,9 @@ USER mcp
 # Expose MCP server port (if using HTTP transport)
 EXPOSE 8001
 
-# Health check
+# Health check - verify MCP server module can be imported and server class exists
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD python -c "import sys; sys.exit(0)" || exit 1
+  CMD python -c "from ai.journal_dataset_research.mcp.server import MCPServer; import sys; sys.exit(0)" || exit 1
 
 # Run the MCP server
 # Note: MCP servers typically run via stdio, but this can be adapted for HTTP

@@ -1,4 +1,4 @@
-# Sentry Code Mappings & Stack Trace Linking Configuration
+## Sentry Code Mappings & Stack Trace Linking Configuration
 
 This document explains how to configure Sentry code mappings and stack trace linking for proper error tracking with source code references.
 

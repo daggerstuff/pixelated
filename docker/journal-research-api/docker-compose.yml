@@ -22,7 +22,7 @@ services:
       
       # Authentication
       - AUTH_ENABLED=${AUTH_ENABLED:-true}
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=${JWT_SECRET:-}
       - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
       - JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES:-1440}
       
@@ -41,11 +41,19 @@ services:
     networks:
       - journal-research-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health', timeout=5).raise_for_status()"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
 volumes:
   journal-research-sessions:

@@ -1,4 +1,4 @@
-# Journal Research Deployment Guide
+## Journal Research Deployment Guide
 
 ## Overview
 

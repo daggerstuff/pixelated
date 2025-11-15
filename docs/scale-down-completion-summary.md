@@ -1,4 +1,4 @@
-# Cluster Scale-Down Completion Summary
+## Cluster Scale-Down Completion Summary
 
 **Date:** 2025-11-09  
 **Cluster:** pixelated-empathy-civo  

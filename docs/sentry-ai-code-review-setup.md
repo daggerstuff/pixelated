@@ -1,4 +1,4 @@
-# Sentry AI Code Review Setup Checklist
+## Sentry AI Code Review Setup Checklist
 
 This document provides a step-by-step checklist to ensure Sentry AI Code Review is fully configured and working.
 
