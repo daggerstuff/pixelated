@@ -26,6 +26,12 @@ if (isCloudflareDeploy) {
   }
 }
 
+// Platform detection for Railway, Heroku, and Fly.io
+// These platforms use Node adapter but may have specific requirements
+const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || process.env.RAILWAY_ENVIRONMENT === 'production';
+const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
+const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
+
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
@@ -79,6 +85,7 @@ function getChunkName(id) {
 // Determine adapter based on deployment target
 // Default: Node adapter for Kubernetes/standalone deployments
 // Cloudflare: When DEPLOY_TARGET=cloudflare or CF_PAGES=1
+// Railway/Heroku/Fly.io: Node adapter with standalone mode
 const adapter = (() => {
   if (isCloudflareDeploy && cloudflareAdapter) {
     console.log('🔵 Using Cloudflare adapter for Pages deployment');
@@ -92,6 +99,31 @@ const adapter = (() => {
       functionPerRoute: false,
     });
   }
+  
+  // Railway deployment
+  if (isRailwayDeploy) {
+    console.log('🚂 Using Node adapter for Railway deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+  
+  // Heroku deployment
+  if (isHerokuDeploy) {
+    console.log('🟣 Using Node adapter for Heroku deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+  
+  // Fly.io deployment
+  if (isFlyioDeploy) {
+    console.log('✈️ Using Node adapter for Fly.io deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+  
   // Default: Node adapter for Kubernetes/standard deployments
   console.log('🟢 Using Node adapter for standard deployment');
   return node({
