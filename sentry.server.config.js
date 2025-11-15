@@ -23,7 +23,11 @@ Sentry.init({
 
   environment: process.env.NODE_ENV || 'production',
 
-  release: process.env.npm_package_version || '0.0.1',
+  // Prioritize SENTRY_RELEASE (set in CI/CD) over package version for proper release tracking
+  release:
+    process.env.SENTRY_RELEASE ||
+    process.env.npm_package_version ||
+    '0.0.1',
 
   beforeSend(event) {
     if (event.request?.url?.includes('/api/health')) {
