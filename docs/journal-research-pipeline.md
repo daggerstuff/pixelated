@@ -51,6 +51,7 @@ The Journal Dataset Research Pipeline is a comprehensive, integrated system for 
 │  └──────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+```text
 
 ## Component Overview
 

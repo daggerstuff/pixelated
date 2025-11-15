@@ -1,4 +1,4 @@
-# Journal Research Component Documentation
+## Journal Research Component Documentation
 
 ## Overview
 

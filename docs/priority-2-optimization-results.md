@@ -155,21 +155,21 @@ All pods verified to have resource requests/limits:
 
 ### VPA Installation Options
 
-**Method 1: Official VPA Repository (Recommended)**
+#### Method 1: Official VPA Repository (Recommended)
 ```bash
 git clone https://github.com/kubernetes/autoscaler.git
 cd autoscaler/vertical-pod-autoscaler
 ./hack/vpa-up.sh
 ```
 
-**Method 2: Helm (Easier Management)**
+#### Method 2: Helm (Easier Management)
 ```bash
 helm repo add fairwinds-stable https://charts.fairwinds.com/stable
 helm repo update
 helm install vpa fairwinds-stable/vpa --namespace vpa-system --create-namespace
 ```
 
-**Method 3: Manual Installation**
+#### Method 3: Manual Installation
 ```bash
 kubectl apply -f https://github.com/kubernetes/autoscaler/releases/download/vertical-pod-autoscaler-0.14.0/vpa-release.yaml
 ```

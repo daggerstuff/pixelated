@@ -50,18 +50,18 @@ All three interfaces access the same backend research engine and share the same 
 
 ### Session Management
 
-**Creating Sessions**
+#### Creating Sessions
 - Sessions organize your research work
 - Each session tracks progress through discovery, evaluation, acquisition, and integration phases
 - Sessions can be edited or deleted (with appropriate permissions)
 
-**Session List**
+#### Session List
 - View all your sessions in a paginated list
 - Filter by phase (discovery, evaluation, acquisition, integration)
 - Search by session ID, sources, or keywords
 - Sort by date or progress
 
-**Session Details**
+#### Session Details
 - View comprehensive session information
 - Monitor progress metrics
 - Navigate between phases
@@ -69,7 +69,7 @@ All three interfaces access the same backend research engine and share the same 
 
 ### Source Discovery
 
-**Initiating Discovery**
+#### Initiating Discovery
 1. Navigate to the Discovery page
 2. Select a session (or create a new one)
 3. Configure discovery parameters:
@@ -78,7 +78,7 @@ All three interfaces access the same backend research engine and share the same 
    - **Max Results**: Set maximum number of results
 4. Click "Start Discovery"
 
-**Monitoring Discovery**
+#### Monitoring Discovery
 - View discovered sources in real-time
 - Filter sources by:
   - Source type (journal article, dataset, etc.)
@@ -87,7 +87,7 @@ All three interfaces access the same backend research engine and share the same 
 - Sort by relevance, date, or title
 - Click on a source to view details
 
-**Source Details**
+#### Source Details
 - View full source information:
   - Title, authors, publication date
   - Abstract and keywords
@@ -97,7 +97,7 @@ All three interfaces access the same backend research engine and share the same 
 
 ### Source Evaluation
 
-**Initiating Evaluation**
+#### Initiating Evaluation
 1. Navigate to the Evaluation page
 2. Select sources to evaluate (from discovered sources)
 3. Configure evaluation criteria:
@@ -105,7 +105,7 @@ All three interfaces access the same backend research engine and share the same 
    - Relevance threshold (0-1)
 4. Click "Start Evaluation"
 
-**Viewing Evaluations**
+#### Viewing Evaluations
 - See evaluation results with quality and relevance scores
 - Filter by:
   - Priority tier
@@ -113,14 +113,14 @@ All three interfaces access the same backend research engine and share the same 
 - Sort by overall score, quality, or relevance
 - View evaluation details and recommendations
 
-**Manual Evaluation Override**
+#### Manual Evaluation Override
 - Edit evaluations manually if needed
 - Update scores and recommendations
 - Add notes and comments
 
 ### Dataset Acquisition
 
-**Initiating Acquisition**
+#### Initiating Acquisition
 1. Navigate to the Acquisition page
 2. Select evaluated sources to acquire
 3. Configure acquisition:
@@ -128,20 +128,20 @@ All three interfaces access the same backend research engine and share the same 
    - **Storage Location**: Where to store acquired datasets
 4. Click "Start Acquisition"
 
-**Monitoring Acquisition**
+#### Monitoring Acquisition
 - Track acquisition progress in real-time
 - View status: pending, in_progress, completed, failed
 - See storage location and file size
 - Filter by status
 
-**Approval Workflow**
+#### Approval Workflow
 - Review acquisitions before finalizing
 - Approve or reject acquisitions
 - Update acquisition status manually if needed
 
 ### Integration Planning
 
-**Creating Integration Plans**
+#### Creating Integration Plans
 1. Navigate to the Integration page
 2. Select acquisitions to include in the plan
 3. Configure integration:
@@ -149,7 +149,7 @@ All three interfaces access the same backend research engine and share the same 
    - **Target Schema**: Select target schema
 4. Click "Create Integration Plan"
 
-**Viewing Integration Plans**
+#### Viewing Integration Plans
 - See preprocessing steps and scripts
 - View schema mappings
 - Monitor plan execution status
@@ -157,13 +157,13 @@ All three interfaces access the same backend research engine and share the same 
 
 ### Progress Tracking
 
-**Dashboard Progress**
+#### Dashboard Progress
 - View overall progress for selected session
 - See phase-by-phase progress breakdown
 - Compare actual metrics vs targets
 - Real-time updates via WebSocket
 
-**Progress Charts**
+#### Progress Charts
 - Visualize progress over time
 - See metrics trends
 - Identify bottlenecks
@@ -171,7 +171,7 @@ All three interfaces access the same backend research engine and share the same 
 
 ### Report Generation
 
-**Generating Reports**
+#### Generating Reports
 1. Navigate to the Reports page
 2. Select a session
 3. Configure report:
@@ -181,7 +181,7 @@ All three interfaces access the same backend research engine and share the same 
    - **Charts**: Include/exclude charts
 4. Click "Generate Report"
 
-**Viewing Reports**
+#### Viewing Reports
 - View generated reports in the browser
 - Download reports in selected format
 - Print reports

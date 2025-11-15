@@ -111,7 +111,7 @@ export function EvaluationCard({
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full ${getScoreColor(metric.value).replace('text-', 'bg-').replace('-600', '-500').replace('-400', '-400')}`}
+                    className={`h-full ${getScoreColor(metric.value).replace('text-', 'bg-').replace('-600', '-500').replace('-400', '-300')}`}
                     style={{ width: `${(metric.value / 10) * 100}%` }}
                     role="progressbar"
                     aria-valuenow={metric.value}

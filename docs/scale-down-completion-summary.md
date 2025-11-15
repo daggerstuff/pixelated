@@ -94,13 +94,13 @@
 ### 1. Delete Node from Civo (IMPORTANT)
 The node has been removed from Kubernetes but is still running in Civo. **Delete it to save costs:**
 
-**Option A: Via Civo Dashboard**
+#### Option A: Via Civo Dashboard
 1. Log into Civo dashboard
 2. Navigate to Kubernetes → Clusters → pixelated-empathy-civo
 3. Find node: `k3s-pixelated-empathy-civo-cefd-5cd7ce-node-pool-5582-e7rjo`
 4. Delete the node
 
-**Option B: Via Civo CLI**
+#### Option B: Via Civo CLI
 ```bash
 # List nodes
 civo kubernetes node list pixelated-empathy-civo

@@ -103,7 +103,7 @@ All VPA configurations are stored in: `manifests/vpa/`
 
 ### VPA Components
 
-```
+```text
 NAME                                       READY   STATUS    RESTARTS   AGE
 vpa-admission-controller-bcc9d9c77-rhkrw   1/1     Running   0          <1m
 vpa-recommender-754d7df577-cv9wf           1/1     Running   0          <1m
@@ -112,7 +112,7 @@ vpa-updater-8546c4f7d6-gqvvf               1/1     Running   0          <1m
 
 ### VPA Resources
 
-```
+```text
 NAMESPACE      NAME                          MODE   CPU   MEM   PROVIDED   AGE
 cert-manager   cert-manager-cainjector-vpa   Off                           2s
 cert-manager   cert-manager-vpa              Off                           2s
@@ -386,9 +386,9 @@ spec:
 
 ## References
 
-- **VPA Documentation:** https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-- **Fairwinds VPA Chart:** https://github.com/FairwindsOps/charts/tree/master/stable/vpa
-- **VPA Best Practices:** https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/README.md
+- **VPA Documentation:** [Kubernetes Autoscaler VPA](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
+- **Fairwinds VPA Chart:** [FairwindsOps VPA Chart](https://github.com/FairwindsOps/charts/tree/master/stable/vpa)
+- **VPA Best Practices:** [VPA README](https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/README.md)
 
 ---
 
