@@ -4,14 +4,13 @@
 
 <div
   id="backdrop"
-  class="hidden z-75 fixed inset-0
-    backdrop-blur-[2px] bg-[#000000cc]"
+  class="hidden z-75 fixed inset-0 bg-[#ffffffcc] dark:bg-[#000000cc]"
   aria-hidden="true"
 >
 </div>
 
 <script>
-  import { toggleFadeEffect } from '~/utils/animation'
+  import { toggleFadeEffect } from '@/utils/misc'
 
   const PANELS = [
     { id: 'nav-panel', button: 'nav-open-button', hiddenClass: 'hidden!' },
@@ -20,7 +19,7 @@
   ]
 
   /* Close panel when user click on backdrop */
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  document.addEventListener('astro:page-load', () => {
     const handleClick = () => {
       for (const { id, hiddenClass } of PANELS) {
         const panel = document.getElementById(id)
@@ -58,7 +57,5 @@
       }
     })
   }
-  document.addEventListener('keyup', (event: KeyboardEvent) =>
-    handleKeyUp(event),
-  )
+  document.addEventListener('keyup', handleKeyUp)
 </script>

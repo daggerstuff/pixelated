@@ -1,6 +1,4 @@
 ---
-// Enhanced Dark Footer - Unified Theme v2.0
-// Brutalist + Minimalist + Corporate + Enterprise + Antfu Elegance
 type FooterLink = {
   name: string
   href: string
@@ -113,6 +111,23 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
   aria-label="Site footer"
 >
   <div class="footer-container">
+    <!-- Footer CTA Section -->
+    <div class="footer-cta-section">
+      <h2 class="footer-cta-title">Kick off your 14-day free journey with Pixelated Empathy.</h2>
+      <div class="footer-cta-buttons">
+        <a href="/contact" class="btn-brutalist btn-brutalist--primary">
+          Try for free
+        </a>
+        <a href="/demo-hub" class="btn-brutalist btn-brutalist--secondary">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: var(--space-2);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Watch demo
+        </a>
+      </div>
+    </div>
+
     <!-- Main Footer Content -->
     <div class="footer-grid">
       <!-- Brand Section - Brutalist Bold -->
@@ -255,15 +270,63 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
   .footer-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: var(--space-16) var(--space-6) var(--space-8);
+    padding: var(--space-20) var(--space-8) var(--space-10);
+  }
+
+  /* Footer CTA Section */
+  .footer-cta-section {
+    text-align: center;
+    padding: var(--space-16) 0;
+    margin-bottom: var(--space-16);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .footer-cta-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-8) 0;
+    line-height: 1.3;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .footer-cta-buttons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .footer-cta-section {
+      padding: var(--space-12) 0;
+      margin-bottom: var(--space-12);
+    }
+
+    .footer-cta-title {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      margin-bottom: var(--space-6);
+    }
+
+    .footer-cta-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .footer-cta-buttons .btn-brutalist {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   /* Main Grid - Enterprise Layout */
   .footer-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-12);
-    margin-bottom: var(--space-12);
+    gap: var(--space-16);
+    margin-bottom: var(--space-16);
   }
 
   @media (min-width: 768px) {
@@ -282,7 +345,7 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
   .footer-brand {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-8);
   }
 
   .brand-header {
@@ -366,21 +429,22 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     color: var(--text-secondary);
     background: var(--bg-level-1);
     border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
     text-decoration: none;
   }
 
   .social-link:hover {
     color: var(--accent-primary);
-    background: var(--accent-primary-subtle);
+    background: rgba(16, 185, 129, 0.08);
     border-color: var(--accent-primary);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
   }
 
   /* Navigation Grid - Enterprise Brevity */
@@ -421,19 +485,21 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
   .nav-link {
     color: var(--text-tertiary);
     text-decoration: none;
-    transition: color var(--transition-fast);
+    transition: all var(--transition-base);
     display: block;
-    padding: var(--space-1) 0;
-    font-size: var(--text-sm);
+    padding: var(--space-2) 0;
+    font-size: var(--text-base);
+    letter-spacing: 0.01em;
   }
 
   .nav-link:hover {
     color: var(--accent-primary);
+    transform: translateX(2px);
   }
 
   /* Bottom Bar - Corporate Sleekness */
   .footer-bottom {
-    padding-top: var(--space-6);
+    padding-top: var(--space-8);
     border-top: 1px solid var(--border-subtle);
   }
 

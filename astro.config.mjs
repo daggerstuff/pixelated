@@ -301,8 +301,10 @@ export default defineConfig({
     },
     optimizeDeps: {
       entries: [
-        'src/**/*.{ts,tsx,js,jsx,astro}',
-        'src/**/*.mjs',
+        'src/pages/**/*.{ts,tsx,js,jsx,astro}',
+        'src/layouts/**/*.{ts,tsx,js,jsx,astro}',
+        'src/components/**/*.{ts,tsx,js,jsx,astro}',
+        'src/middleware.ts',
       ],
       exclude: [
         '@aws-sdk/client-s3',

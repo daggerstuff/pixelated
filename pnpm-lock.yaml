@@ -349,6 +349,9 @@ importers:
       '@types/node':
         specifier: ^24.9.2
         version: 24.10.0
+      '@types/nprogress':
+        specifier: ^0.2.3
+        version: 0.2.3
       '@types/react':
         specifier: ^19.2.2
         version: 19.2.2
@@ -511,6 +514,9 @@ importers:
       msw:
         specifier: ^2.11.6
         version: 2.11.6(@types/node@24.10.0)(typescript@5.9.3)
+      nprogress:
+        specifier: ^0.2.0
+        version: 0.2.0
       papaparse:
         specifier: ^5.5.3
         version: 5.5.3
@@ -4886,6 +4892,9 @@ packages:
 
   '@types/node@24.10.0':
     resolution: {integrity: sha512-qzQZRBqkFsYyaSWXuEHc2WR9c0a0CXwiE5FWUvn7ZM+vdy1uZLfCunD38UzhuB7YN/J11ndbDBcTmOdxJo9Q7A==}
+
+  '@types/nprogress@0.2.3':
+    resolution: {integrity: sha512-k7kRA033QNtC+gLc4VPlfnue58CM1iQLgn1IMAU8VPHGOj7oIHPp9UlhedEnD/Gl8evoCjwkZjlBORtZ3JByUA==}
 
   '@types/offscreencanvas@2019.3.0':
     resolution: {integrity: sha512-esIJx9bQg+QYF0ra8GnvfianIY8qWB0GBx54PK5Eps6m+xTj86KLavHv6qDhzKcu5UUOgNfJ2pWaIIV7TRUd9Q==}
@@ -17827,6 +17836,8 @@ snapshots:
   '@types/node@24.10.0':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/nprogress@0.2.3': {}
 
   '@types/offscreencanvas@2019.3.0': {}
 

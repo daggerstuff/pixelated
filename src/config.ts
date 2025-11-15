@@ -5,7 +5,6 @@ import { createBuildSafeLogger } from './lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('phi-audit')
 
 export const SITE: Site = {
-  name: 'Pixelated Empathy',
   website: 'https://pixelatedempathy.com',
   base: '/',
   title: 'Pixelated Empathy',
@@ -14,12 +13,6 @@ export const SITE: Site = {
   lang: 'en',
   ogLocale: 'en_US',
   imageDomains: ['cdn.bsky.app'],
-  menu: {
-    home: 'Home',
-    blog: 'Blog',
-    about: 'About',
-    contact: 'Contact',
-  },
 }
 
 // Log config access for HIPAA compliance
@@ -102,9 +95,7 @@ export const UI: Ui = {
     cursorType: '',
     showNewTabIcon: false,
   },
-  theme: {
-    toggleIcon: true,
-  },
+  postMetaStyle: 'minimal',
 }
 
 /**
@@ -113,17 +104,13 @@ export const UI: Ui = {
  *  - Set to `[true, {...}]` to enable and configure the feature.
  */
 export const FEATURES: Features = {
-  share: [
-    true,
+  slideEnterAnim: [true, { enterStep: 60 }],
+  ogImage: [
+    false,
     {
-      twitter: [true, '@empathypixel'],
-      mastodon: false,
-      facebook: false,
-      pinterest: false,
-      reddit: false,
-      telegram: false,
-      whatsapp: false,
-      email: true,
+      authorOrBrand: `${SITE.title}`,
+      fallbackTitle: `${SITE.description}`,
+      fallbackBgType: 'plum',
     },
   ],
   toc: [
@@ -135,13 +122,43 @@ export const FEATURES: Features = {
       displayMode: 'always',
     },
   ],
-  ogImage: [
-    false,
+  share: [
+    true,
     {
-      authorOrBrand: `${SITE.title}`,
-      fallbackTitle: `${SITE.description}`,
-      fallbackBgType: 'plum',
+      twitter: [true, '@empathypixel'],
+      bluesky: false,
+      mastodon: false,
+      facebook: false,
+      pinterest: false,
+      reddit: false,
+      telegram: false,
+      whatsapp: false,
+      email: true,
     },
   ],
-  slideEnterAnim: [true, { enterStep: 60 }],
+  giscus: [
+    false,
+    {
+      'data-repo': 'nochadisfaction/pixelated',
+      'data-repo-id': '',
+      'data-category': 'Giscus',
+      'data-category-id': '',
+      'data-mapping': 'title',
+      'data-strict': '0',
+      'data-reactions-enabled': '1',
+      'data-emit-metadata': '0',
+      'data-input-position': 'bottom',
+      'data-lang': 'en',
+    },
+  ],
+  search: [
+    true,
+    {
+      includes: ['blog', 'changelog'],
+      filter: true,
+      navHighlight: true,
+      batchLoadSize: [true, 5],
+      maxItemsPerPage: [true, 3],
+    },
+  ],
 }
