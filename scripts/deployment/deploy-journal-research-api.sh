@@ -16,9 +16,26 @@ echo "Project Root: $PROJECT_ROOT"
 ENV_FILE="$PROJECT_ROOT/.env.$ENVIRONMENT"
 if [ -f "$ENV_FILE" ]; then
   echo "📋 Loading environment configuration from $ENV_FILE"
+  # Save GitHub CLI tokens to prevent interference with gh auth
+  SAVED_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+  SAVED_GH_TOKEN="${GH_TOKEN:-}"
+  
   set -a
   source "$ENV_FILE"
   set +a
+  
+  # Restore GitHub CLI tokens (don't let env file override them)
+  # GitHub CLI should manage its own authentication
+  if [ -n "$SAVED_GITHUB_TOKEN" ]; then
+    export GITHUB_TOKEN="$SAVED_GITHUB_TOKEN"
+  else
+    unset GITHUB_TOKEN
+  fi
+  if [ -n "$SAVED_GH_TOKEN" ]; then
+    export GH_TOKEN="$SAVED_GH_TOKEN"
+  else
+    unset GH_TOKEN
+  fi
 else
   echo "⚠️  Warning: Environment file $ENV_FILE not found, using defaults"
 fi
