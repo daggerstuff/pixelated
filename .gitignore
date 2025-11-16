@@ -257,6 +257,7 @@ verbose/coverage/
 /ai/**/*.egg-info/
 /ai/**/dist/
 /ai/**/build/
+/ai/.coverage
 /ai/**/.coverage
 /ai/**/htmlcov/
 /ai/**/.tox/

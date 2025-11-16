@@ -53,9 +53,6 @@ This technology is exclusively designed for organizations that understand: **you
 
 We partner with forward-thinking platforms that refuse to accept "engagement" as a substitute for genuine connection.
 
-### Our Partners Build:
-
-
 ## Journal Dataset Research Pipeline
 
 The platform includes a comprehensive **Journal Dataset Research Pipeline** for discovering, evaluating, acquiring, and integrating therapeutic datasets from academic sources. This integrated system consists of:
