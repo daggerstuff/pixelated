@@ -11,7 +11,6 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 # Top-level imports for tests (avoid import-inside-function warnings)
@@ -225,7 +224,7 @@ class TestAuditLogger(unittest.TestCase):
             )
         )
 
-        log_entry = self._extracted_from_test_log_event_sensitive_18(
+        self._extracted_from_test_log_event_sensitive_18(
             "details", "ENCRYPTED", "encrypted_details", "encrypted_data"
         )
         self.security_manager.encrypt_data.assert_called_once()
@@ -588,14 +587,6 @@ class TestFlaskEndpoints(unittest.TestCase):
         response = self.client.get(arg0)
         assert response.status_code == arg1
         return response.get_json()
-
-
-# Helper class for async mocking
-class AsyncMock(MagicMock):
-    async def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
-
-
 if __name__ == "__main__":
     # Set environment variables for testing
     os.environ["FLASK_SECRET_KEY"] = "test-flask-secret-key"

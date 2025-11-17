@@ -1,144 +1,26 @@
 ---
+import Link from '@/components/base/Link.astro'
+import { SITE } from '@/config'
+
 const currentYear = new Date().getFullYear()
-
-const footerLinks = [
-  { name: 'About Us', href: '/about' },
-  { name: 'Privacy Policy', href: '/privacy' },
-  { name: 'Terms of Service', href: '/terms' },
-  { name: 'Security', href: '/security' },
-  { name: 'Contact', href: '/contact' },
-]
-
-const socialLinks = [
-  { name: 'GitHub', href: '#', icon: 'github' },
-  { name: 'LinkedIn', href: '#', icon: 'linkedin' },
-  { name: 'Twitter', href: '#', icon: 'twitter' },
-]
+const copyrightText = `© ${currentYear} ${SITE.author}`
 ---
 
-<footer
-  class="mt-auto"
-  style="background: var(--bg-secondary); border-top: 1px solid var(--border-primary);"
->
-  <div class="container-refined">
-    <!-- Main Footer Content -->
-    <div
-      class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8 items-start justify-items-center md:justify-items-start"
-    >
-      <!-- Brand Section -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-3">
-          <img
-            src="/apple-touch-icon.png"
-            alt="Pixelated Empathy Logo"
-            class="w-8 h-8 rounded-lg"
-            style="border-radius: var(--radius-md);"
-          />
-          <span
-            class="text-lg font-bold"
-            style="color: var(--text-primary); font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.01em;"
-            >PIXELATED EMPATHY</span
-          >
-        </div>
-        <p class="text-sm max-w-xs mb-4" style="color: var(--text-secondary);">
-          AI-powered therapy training platform for mental health professionals.
-          Safe, secure, effective.
-        </p>
-        <div class="text-center">
-          <div class="inline-flex items-center gap-2">
-            <span class="status-dot status-dot--online"></span>
-            <span class="text-xs" style="color: var(--text-muted);"
-              >Platform Online</span
-            >
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="space-y-4 text-center md:text-left">
-        <h3 class="eyebrow-text mb-4">Quick Links</h3>
-        <ul class="space-y-2">
-          {
-            footerLinks.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  class="nav-link-refined text-sm"
-                  style="color: var(--text-secondary);"
-                >
-                  {link.name}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <!-- Contact Info -->
-      <div class="space-y-4">
-        <h3 class="eyebrow-text mb-4">Get in Touch</h3>
-        <div class="space-y-2 text-sm">
-          <p style="color: var(--text-secondary);">
-            <span class="font-medium" style="color: var(--text-primary);"
-              >Email:</span
-            > hello@pixelatedempathy.com
-          </p>
-          <p style="color: var(--text-secondary);">
-            <span class="font-medium" style="color: var(--text-primary);"
-              >Support:</span
-            > Available 24/7
-          </p>
-        </div>
-        <!-- Social Links -->
-        <div class="flex gap-3 pt-2">
-          {
-            socialLinks.map((social) => (
-              <a
-                href={social.href}
-                class="w-8 h-8 flex items-center justify-center transition-all rounded-md"
-                style="background: var(--bg-elevated); border: 1px solid var(--border-primary); color: var(--text-muted);"
-                onmouseover="this.style.borderColor='var(--accent-primary)'; this.style.color='var(--accent-primary)'; this.style.background='rgba(16, 185, 129, 0.08)'"
-                onmouseout="this.style.borderColor='var(--border-primary)'; this.style.color='var(--text-muted)'; this.style.background='var(--bg-elevated)'"
-                aria-label={social.name}
-              >
-                <span class="text-xs font-bold">
-                  {social.icon.charAt(0).toUpperCase()}
-                </span>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Bar -->
-    <div
-      class="py-6 flex flex-col md:flex-row justify-between items-center gap-4"
-      style="border-top: 1px solid var(--border-primary);"
-    >
-      <p class="text-sm" style="color: var(--text-muted);">
-        &copy; {currentYear} Pixelated Empathy. All rights reserved.
-      </p>
-      <div class="flex items-center gap-4 flex-wrap justify-center">
-        <span
-          class="eyebrow-text px-3 py-1 rounded-md"
-          style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-primary);"
+<footer class="slide-enter animate-delay-1600! px-7 mt-auto mb-8">
+  <div class="prose mx-auto op-50">
+    <div class="flex lt-sm:flex-col items-center text-sm whitespace-nowrap">
+      <span>{copyrightText}</span>
+      <span class="lt-sm:hidden">&nbsp;|&nbsp;</span>
+      <span>
+        Powered by
+        <Link
+          class="op-100! color-[--fg]!"
+          href="https://github.com/lin-stephanie/astro-antfustyle-theme"
+          external={true}
         >
-          HIPAA Compliant
-        </span>
-        <span
-          class="eyebrow-text px-3 py-1 rounded-md"
-          style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--accent-secondary);"
-        >
-          SOC 2 Certified
-        </span>
-        <span
-          class="eyebrow-text px-3 py-1 rounded-md"
-          style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-primary);"
-        >
-          Zero Knowledge
-        </span>
-      </div>
+          Astro AntfuStyle Theme
+        </Link>
+      </span>
     </div>
   </div>
 </footer>

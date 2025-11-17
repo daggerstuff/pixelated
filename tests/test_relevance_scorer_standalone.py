@@ -11,9 +11,6 @@ def test_relevance_scorer_structure():
 
     # Check file existence
     scorer_file = Path(__file__).parent / "ai" / "pixel" / "data" / "knowledge_relevance_scorer.py"
-    test_file = (
-        Path(__file__).parent / "ai" / "pixel" / "data" / "test_knowledge_relevance_scorer.py"
-    )
 
     # Test basic structure and components
     try:
@@ -55,9 +52,7 @@ def test_relevance_scorer_structure():
             "confidence",
         ]
 
-        found_features = [feature for feature in advanced_features if feature in content]
-
-    except Exception as e:
+    except Exception:
         # Silently handle file reading errors
         pass
 

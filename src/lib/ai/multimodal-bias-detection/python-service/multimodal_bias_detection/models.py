@@ -8,7 +8,6 @@ from typing import List, Optional, Dict, Any, Union
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, validator
-from pydantic.networks import AnyUrl
 
 
 class MediaType(str, Enum):

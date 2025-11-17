@@ -1,5 +1,6 @@
 {
     "sonarCloudOrganization": "pixelatedempathy",
     "projectKey": "pixelatedempathy_pixelated",
-    "region": "EU"
+    "region": "US",
+    "serverUrl": "https://sonarcloud.io"
 }

@@ -263,6 +263,11 @@ export default defineConfig({
               org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
               project: process.env.SENTRY_PROJECT || 'pixel-astro',
               authToken: process.env.SENTRY_AUTH_TOKEN,
+              // Include release for proper stack trace linking and code mapping
+              release:
+                process.env.SENTRY_RELEASE ||
+                process.env.npm_package_version ||
+                undefined,
             }),
           ]
         : []),

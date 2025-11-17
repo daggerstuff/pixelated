@@ -1,3 +1,0 @@
-# Requirements for memory migration scripts
-requests>=2.31.0
-

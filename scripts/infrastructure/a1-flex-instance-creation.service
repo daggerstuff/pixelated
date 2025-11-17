@@ -1,0 +1,20 @@
+[Unit]
+Description=OCI A1.Flex Instance Creation with Multi-Region Retry
+After=network.target
+
+[Service]
+Type=simple
+User=vivi
+WorkingDirectory=/home/vivi/pixelated
+ExecStart=/home/vivi/pixelated/scripts/infrastructure/create-a1-flex-instance-multi-region.sh
+Restart=on-failure
+RestartSec=60
+StandardOutput=append:/home/vivi/.oci/a1-flex-instance-creation.log
+StandardError=append:/home/vivi/.oci/a1-flex-instance-creation.log
+
+# Environment variables
+Environment="PATH=/home/vivi/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+[Install]
+WantedBy=default.target
+

@@ -5,6 +5,7 @@ Phased processing pipeline - separates datasets for different training applicati
 
 import json
 from pathlib import Path
+from typing import Optional
 
 from process_pipeline import ChatMLProcessor
 

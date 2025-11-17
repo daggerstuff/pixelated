@@ -2,7 +2,6 @@
 Main bias detection service integrating all components
 """
 
-import asyncio
 import hashlib
 import time
 from datetime import datetime, timezone
@@ -18,7 +17,6 @@ from ..models import (
     BiasAnalysisResponse,
     BiasScore,
     BiasType,
-    ConfidenceLevel,
     CounterfactualScenario,
     Recommendation,
 )

@@ -2,17 +2,14 @@
 Database service for PostgreSQL and MongoDB integration
 """
 
-import asyncio
-import time
-from datetime import datetime
+import json
 from typing import Any, Dict, List, Optional
 
 import asyncpg
 import structlog
-from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import stop_after_attempt, wait_exponential, retry
 
 from ..config import settings
 from ..models import BiasAnalysisResponse

@@ -1,4 +1,3 @@
-import pytest
 import torch
 from ai.pixel.research.refactored_neuroplasticity_layer import RefactoredNeuroplasticityLayer
 
