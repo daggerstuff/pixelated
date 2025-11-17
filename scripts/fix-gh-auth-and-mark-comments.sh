@@ -7,9 +7,15 @@ set -e
 echo "🔧 Fixing GitHub CLI authentication..."
 echo ""
 
-# Step 1: Clear any GITHUB_TOKEN from environment
+# Step 1: Clear any GITHUB_TOKEN from environment and remove problematic aliases
 unset GITHUB_TOKEN GH_TOKEN G_TOKEN
 export -n GITHUB_TOKEN GH_TOKEN G_TOKEN 2>/dev/null || true
+
+# Remove 1Password plugin alias if it exists (it sets invalid GITHUB_TOKEN)
+if alias gh 2>/dev/null | grep -q "op plugin run"; then
+  echo "⚠️  Removing 1Password plugin alias for 'gh' (it sets invalid GITHUB_TOKEN)"
+  unalias gh 2>/dev/null || true
+fi
 
 echo "✅ Environment variables cleared"
 echo ""

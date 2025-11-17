@@ -59,7 +59,7 @@ The platform includes a comprehensive **Journal Dataset Research Pipeline** for 
 
 - **Web Frontend**: User-friendly interface for managing research operations (`/journal-research`)
 - **MCP Server**: AI agent interface via Model Context Protocol
-- **CLI Interface**: Command-line access for automation
+- **CLI**: Command-line access for automation
 - **Backend Engine**: Core research automation with discovery, evaluation, acquisition, and integration planning
 
 All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/journal-research-pipeline.md) for complete details.

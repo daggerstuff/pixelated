@@ -26,6 +26,12 @@ export function EvaluationCard({
     return 'text-red-600 dark:text-red-400'
   }
 
+  const getScoreBarColor = (score: number) => {
+    if (score >= 8) return 'bg-green-500 dark:bg-green-300'
+    if (score >= 6) return 'bg-yellow-500 dark:bg-yellow-300'
+    return 'bg-red-500 dark:bg-red-300'
+  }
+
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
       high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
@@ -111,7 +117,7 @@ export function EvaluationCard({
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full ${getScoreColor(metric.value).replace('text-', 'bg-').replace('-600', '-500').replace('-400', '-300')}`}
+                    className={`h-full ${getScoreBarColor(metric.value)}`}
                     style={{ width: `${(metric.value / 10) * 100}%` }}
                     role="progressbar"
                     aria-valuenow={metric.value}

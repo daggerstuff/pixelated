@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react'
+import { format } from 'date-fns'
+import { useMemo, useState } from 'react'
+import { Table } from '@/components/ui/table'
+import type { TableColumn, TableDataSource, TableState } from '@/components/ui/table-types'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,
 } from '@/lib/api/journal-research/types'
-import { Table } from '@/components/ui/table'
-import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
-import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 export interface EvaluationListProps {
@@ -122,6 +122,7 @@ export function EvaluationList({
       header: 'Evaluation ID',
       accessor: (row) => (
         <button
+          type="button"
           onClick={() => onEvaluationClick?.(row)}
           className="text-left font-medium text-primary hover:underline font-mono text-sm"
         >

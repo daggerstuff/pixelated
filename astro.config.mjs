@@ -22,13 +22,18 @@ if (isCloudflareDeploy) {
     const cloudflareModule = await import('@astrojs/cloudflare');
     cloudflareAdapter = cloudflareModule.default;
   } catch (e) {
-    console.warn('Cloudflare adapter not available, falling back to Node adapter:', e.message);
+    console.warn('⚠️  Cloudflare adapter not available, will use Node adapter:', e.message);
+    cloudflareAdapter = undefined;
   }
+}
+
+if (isCloudflareDeploy && !cloudflareAdapter) {
+  console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
 }
 
 // Platform detection for Railway, Heroku, and Fly.io
 // These platforms use Node adapter but may have specific requirements
-const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || process.env.RAILWAY_ENVIRONMENT === 'production';
+const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
 const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
 const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
 

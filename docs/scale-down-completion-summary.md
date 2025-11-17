@@ -1,3 +1,16 @@
+---
+post_title: Cluster Scale-Down Completion Summary
+author1: System
+post_slug: cluster-scale-down-completion-summary
+microsoft_alias: ""
+featured_image: ""
+categories: ["infrastructure", "kubernetes"]
+tags: ["cluster", "scale-down", "optimization", "civo"]
+ai_note: "Documentation of successful cluster scale-down from 3 to 2 nodes"
+summary: "Successfully scaled Kubernetes cluster from 3 nodes to 2 nodes with zero downtime, achieving 33% cost reduction while maintaining all service health."
+post_date: 2025-11-09
+---
+
 ## Cluster Scale-Down Completion Summary
 
 **Date:** 2025-11-09  
@@ -92,7 +105,8 @@
 ## Next Steps
 
 ### 1. Delete Node from Civo (IMPORTANT)
-The node has been removed from Kubernetes but is still running in Civo. **Delete it to save costs:**
+The node has been removed from Kubernetes but is still running in Civo.
+**Delete it to save costs:**
 
 #### Option A: Via Civo Dashboard
 1. Log into Civo dashboard

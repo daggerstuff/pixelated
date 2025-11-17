@@ -51,6 +51,8 @@ USER mcp
 EXPOSE 8001
 
 # Health check - verify MCP server module can be imported and server class exists
+# Note: HTTP transport is not currently implemented, so we verify module availability
+# If HTTP transport is added in the future, consider using: curl -f http://localhost:8001/health
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD python -c "from ai.journal_dataset_research.mcp.server import MCPServer; import sys; sys.exit(0)" || exit 1
 

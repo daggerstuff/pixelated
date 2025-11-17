@@ -246,46 +246,7 @@ verbose/coverage/
 *.flac
 *.aac
 
-# Exclude specific AI build artifacts and cache files
-# Note: Most ai/ files should be tracked. Only exclude build artifacts, caches, and large data files.
-/ai/**/__pycache__/
-/ai/**/*.pyc
-/ai/**/*.pyo
-/ai/**/*.pyd
-/ai/**/.pytest_cache/
-/ai/**/.mypy_cache/
-/ai/**/*.egg-info/
-/ai/**/dist/
-/ai/**/build/
-/ai/.coverage
-/ai/**/.coverage
-/ai/**/htmlcov/
-/ai/**/.tox/
-/ai/**/.nox/
-/ai/**/venv/
-/ai/**/.venv/
-/ai/**/env/
-/ai/**/node_modules/
 # Large data files and model files in ai/
-/ai/**/*.tar.gz
-/ai/**/*.jsonl
-/ai/**/*.pkl
-/ai/**/*.pickle
-/ai/**/*.h5
-/ai/**/*.hdf5
-/ai/**/*.model
-/ai/**/*.bin
-/ai/**/*.safetensors
-/ai/**/*.onnx
-/ai/**/*.pt
-/ai/**/*.pth
-/ai/**/*.db
-/ai/**/*.db-journal
-/ai/**/*.db-wal
-/ai/**/*.sqlite
-/ai/**/*.sqlite-journal
-/ai/**/*.sqlite-wal
-# Training data directories
 /ai/training_data_consolidated/
 /ai/therapeutic_ai_training_package_*/
 /ai/pixelated_empathy_FINAL_training_data.tar.gz
@@ -375,9 +336,11 @@ tmp/
 .cursor/rules/codacy.mdc
 
 # MCP server binaries
-bin/
+/bin/
 .specstory
 scripts/claude-flow-removal.sh
 .notes/cloudflare-patch
 .sonarlint
 .brv
+
+/ai/

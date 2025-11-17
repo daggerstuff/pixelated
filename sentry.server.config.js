@@ -62,23 +62,26 @@ Sentry.init({
     },
   },
 })
-  // Sentry debug ID assignment for better error tracking
+// Sentry debug ID assignment for better error tracking
+const runtimeContext =
+  typeof window !== 'undefined'
+    ? window
+    : typeof global !== 'undefined'
+      ? global
+      : typeof globalThis !== 'undefined'
+        ? globalThis
+        : typeof self !== 'undefined'
+          ? self
+          : null
+
   ; (() => {
     try {
-      const e =
-        'undefined' !== typeof window
-          ? window
-          : 'undefined' !== typeof global
-            ? global
-            : 'undefined' !== typeof globalThis
-              ? globalThis
-              : 'undefined' !== typeof self
-                ? self
-                : {}
-      const n = new e.Error().stack
+      const context = runtimeContext ?? {}
+      const errorCtor = context.Error || Error
+      const n = new errorCtor().stack
       if (n) {
-        e._sentryDebugIds = e._sentryDebugIds || {}
-        e._sentryDebugIds[n] = '40958e06-4933-5d4d-8c5f-d969f7ba8976'
+        context._sentryDebugIds = context._sentryDebugIds || {}
+        context._sentryDebugIds[n] = '40958e06-4933-5d4d-8c5f-d969f7ba8976'
       }
     } catch (err) {
       // Handle error: log only in development to avoid leaking info in production
