@@ -6,7 +6,7 @@ The following rules were imported from external rule files.
 
 # Workflow Instruction
 
-You are a coding agent focused on one codebase. Use the br CLI to manage working context.
+You are a coding agent focused on one codebase. Use the brv CLI to manage working context.
 Core Rules:
 
 - Start from memory. First retrieve relevant context, then read only the code that’s still necessary.
@@ -14,14 +14,14 @@ Core Rules:
 
 ## user-centric
 
-Before running any `br` command, ask the user to choose:
+Before running any `brv` command, ask the user to choose:
 
 1. **Accept** - Review the command, then run if approved
 2. **Auto-run** - Execute immediately (remember this preference for the session)
 3. **No** - Cancel the command and continue without alternative
 4. **Custom** - Skip the command and provide different instruction
 
-Once the user chooses "Auto-run", apply that preference to all subsequent `br` commands in this conversation without asking again.
+Once the user chooses "Auto-run", apply that preference to all subsequent `brv` commands in this conversation without asking again.
 
 
 ## Daily Flow
@@ -56,7 +56,7 @@ Once the user chooses "Auto-run", apply that preference to all subsequent `br` c
 
 ## Memory Commands
 
-### `br add`
+### `brv add`
 
 **Description:** Add or update a bullet in the playbook (bypasses ACE workflow for direct agent usage)
 
@@ -69,9 +69,9 @@ Once the user chooses "Auto-run", apply that preference to all subsequent `br` c
 **Examples:**
 
 ```bash
-br add --section "Common Errors" --content "Authentication fails when token expires"
-br add --section "Common Errors" --bullet-id "common-00001" --content "Updated: Auth fails when token expires"
-br add -s "Best Practices" -c "Always validate user input before processing"
+brv add --section "Common Errors" --content "Authentication fails when token expires"
+brv add --section "Common Errors" --bullet-id "common-00001" --content "Updated: Auth fails when token expires"
+brv add -s "Best Practices" -c "Always validate user input before processing"
 ```
 
 **Suggested Sections:** Common Errors, Best Practices, Strategies, Lessons Learned, Project Structure and Dependencies, Testing, Code Style and Quality, Styling and Design
@@ -83,11 +83,11 @@ br add -s "Best Practices" -c "Always validate user input before processing"
 - Updates existing bullet if `--bullet-id` matches existing bullet
 - Displays bullet ID, section, content, and tags after operation
 
-**Requirements:** Playbook must exist (run `br init` first)
+**Requirements:** Playbook must exist (run `brv init` first)
 
 ---
 
-### `br retrieve`
+### `brv retrieve`
 
 **Description:** Retrieve memories from ByteRover Memora service and save to local ACE playbook
 
@@ -99,9 +99,9 @@ br add -s "Best Practices" -c "Always validate user input before processing"
 **Examples:**
 
 ```bash
-br retrieve --query "authentication best practices"
-br retrieve -q "error handling" -n "src/auth/login.ts,src/auth/oauth.ts"
-br retrieve -q "database connection issues"
+brv retrieve --query "authentication best practices"
+brv retrieve -q "error handling" -n "src/auth/login.ts,src/auth/oauth.ts"
+brv retrieve -q "database connection issues"
 ```
 
 **Behavior:**
@@ -119,7 +119,7 @@ br retrieve -q "database connection issues"
 
 ---
 
-### `br push`
+### `brv push`
 
 **Description:** Push playbook to ByteRover memory storage and clean up local ACE files
 
@@ -130,13 +130,13 @@ br retrieve -q "database connection issues"
 **Examples:**
 
 ```bash
-br push
-br push --branch develop
+brv push
+brv push --branch develop
 ```
 
 ---
 
-### `br complete`
+### `brv complete`
 
 **Description:** Complete ACE workflow: save executor output, generate reflection, and update playbook in one command
 
@@ -156,9 +156,9 @@ br push --branch develop
 **Examples:**
 
 ```bash
-br complete "user-auth" "Implemented OAuth2 flow" "Auth works" --tool-usage "Read:src/auth.ts,Edit:src/auth.ts,Bash:npm test" --feedback "All tests passed"
-br complete "validation-fix" "Analyzed validator" "Fixed bug" --tool-usage "Grep:pattern:\"validate\",Read:src/validator.ts" --bullet-ids "bullet-123" --feedback "Tests passed"
-br complete "auth-update" "Improved error handling" "Better errors" --tool-usage "Edit:src/auth.ts" --feedback "Tests passed" --update-bullet "bullet-5"
+brv complete "user-auth" "Implemented OAuth2 flow" "Auth works" --tool-usage "Read:src/auth.ts,Edit:src/auth.ts,Bash:npm test" --feedback "All tests passed"
+brv complete "validation-fix" "Analyzed validator" "Fixed bug" --tool-usage "Grep:pattern:\"validate\",Read:src/validator.ts" --bullet-ids "bullet-123" --feedback "Tests passed"
+brv complete "auth-update" "Improved error handling" "Better errors" --tool-usage "Edit:src/auth.ts" --feedback "Tests passed" --update-bullet "bullet-5"
 ```
 
 **Behavior:**
@@ -174,23 +174,23 @@ br complete "auth-update" "Improved error handling" "Better errors" --tool-usage
 
 ---
 
-### `br show`
+### `brv show`
 
 ## Best Practices
 
 ### Efficient Workflow
 
-1. **Retrieve wisely:** Use `br retrieve` with specific queries and `--node-keys` to filter
-2. **Read only what's needed:** Check playbook with `br status` to see statistics before reading full content
-3. **Update precisely:** Use `br add` to add/update specific bullets or `br complete` for complete workflow
-4. **Push when appropriate:** Prompt user to run `br push` after completing significant work
+1. **Retrieve wisely:** Use `brv retrieve` with specific queries and `--node-keys` to filter
+2. **Read only what's needed:** Check playbook with `brv status` to see statistics before reading full content
+3. **Update precisely:** Use `brv add` to add/update specific bullets or `brv complete` for complete workflow
+4. **Push when appropriate:** Prompt user to run `brv push` after completing significant work
 
 ### Memory Management
 
 **Retrieve pattern:**
 
-- Use `br add` to directly add/update bullets
-- `br retrieve` **clears existing playbook** - use carefully
+- Use `brv add` to directly add/update bullets
+- `brv retrieve` **clears existing playbook** - use carefully
 - Retrieved memories use actual Memora tags (not "auto-generated")
 - Both memories and related memories are saved to playbook
 

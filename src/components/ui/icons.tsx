@@ -1,4 +1,4 @@
-import { RefreshCw, Download, Filter, X } from 'lucide-react'
+import { Download, Filter, RefreshCw, X } from 'lucide-react'
 
 // Icon props interface
 interface IconProps {

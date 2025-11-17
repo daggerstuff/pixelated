@@ -1,7 +1,7 @@
 # Wrangler Configuration for Pixelated Empathy
 # https://developers.cloudflare.com/workers/wrangler/configuration/
 
-name = "pixelated-empathy"
+name = "pixelated"
 main = "dist/server/entry.mjs"
 compatibility_date = "2024-10-31"
 compatibility_flags = ["nodejs_compat"]
@@ -161,6 +161,11 @@ routes = [
 ]
 
 # Site configuration (for Pages)
+# Note: For Cloudflare Pages SSR deployment:
+# 1. Use build command: DEPLOY_TARGET=cloudflare pnpm build (or pnpm build:cloudflare)
+# 2. Set Build output directory: dist/client
+# 3. Set Build command: DEPLOY_TARGET=cloudflare pnpm build
+# 4. The Cloudflare adapter will create functions/ directory automatically
 [site]
 bucket = "./dist/client"
 
@@ -180,7 +185,6 @@ crons = [
   # "*/15 * * * *" # Every 15 minutes
 ]
 
-# Compatibility settings
-[compatibility_flags]
-# nodejs_compat_v2 = true
-# streams_enable_constructors = true
+# Note: compatibility_flags is already defined inline at the top of the file (line 7)
+# Additional compatibility flags can be added to the array on line 7 if needed
+# Example: compatibility_flags = ["nodejs_compat", "nodejs_compat_v2"]

@@ -218,7 +218,7 @@ export class BlogPublishingService {
    */
   private async walkDirectory(dirPath: string): Promise<void> {
     try {
-      // Validate directory path
+      // Validate directory path to prevent path traversal
       const validatedDirPath = validatePath(dirPath, ALLOWED_DIRECTORIES.CONTENT)
       const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
@@ -234,8 +234,8 @@ export class BlogPublishingService {
           continue
         }
 
-        // Use securePathJoin to prevent path traversal
-        const fullPath = securePathJoin(dirPath, entry.name)
+        // Use securePathJoin with validated path to prevent path traversal
+        const fullPath = securePathJoin(validatedDirPath, entry.name)
 
         if (entry.isDirectory()) {
           await this.walkDirectory(fullPath)

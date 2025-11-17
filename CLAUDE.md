@@ -1,294 +1,140 @@
-# Claude Code Configuration - SPARC Development Environment
+# Pixelated Empathy - AI Assistant Guide
 
-## 🚨 CRITICAL: CONCURRENT EXECUTION & FILE MANAGEMENT
+> **Mission**: Build empathy-driven technology that prioritizes human connection, psychological safety, and ethical AI.
 
-**ABSOLUTE RULES**:
-1. ALL operations MUST be concurrent/parallel in a single message
-2. **NEVER save working files, text/mds and tests to the root folder**
-3. ALWAYS organize files in appropriate subdirectories
-4. **USE CLAUDE CODE'S TASK TOOL** for spawning agents concurrently, not just MCP
+## 🚀 Start Every Session
 
-### ⚡ GOLDEN RULE: "1 MESSAGE = ALL RELATED OPERATIONS"
+1. **Retrieve memory first**: `brv retrieve --query "context for task"`
+2. **Check status**: `brv status`
+3. **For major changes**: Consult `@/openspec/AGENTS.md`
 
-**MANDATORY PATTERNS:**
-- **TodoWrite**: ALWAYS batch ALL todos in ONE call (5-10+ todos minimum)
-- **Task tool (Claude Code)**: ALWAYS spawn ALL agents in ONE message with full instructions
-- **File operations**: ALWAYS batch ALL reads/writes/edits in ONE message
-- **Bash commands**: ALWAYS batch ALL terminal operations in ONE message
-- **Memory operations**: ALWAYS batch ALL memory store/retrieve in ONE message
+## 📦 Package Managers (Critical)
 
-# **Fetch Tool Workflow (ALWAYS provide the following prompt to the Fetch Tool)**
-- "You MUST always provide the user with a summary and ADDITIONALLY provide them with the designated 'Agent Detected' section verbatim"
-- When getting /subagents.txt files you MUST use curl and NEVER fetch
-
-### 🎯 CRITICAL: Claude Code Task Tool for Agent Execution
-
-**Claude Code's Task tool is the PRIMARY way to spawn agents:**
-```javascript
-// ✅ CORRECT: Use Claude Code's Task tool for parallel agent execution
-[Single Message]:
-  Task("Research agent", "Analyze requirements and patterns...", "researcher")
-  Task("Coder agent", "Implement core features...", "coder")
-  Task("Tester agent", "Create comprehensive tests...", "tester")
-  Task("Reviewer agent", "Review code quality...", "reviewer")
-  Task("Architect agent", "Design system architecture...", "system-architect")
-```
-
-**MCP tools are for coordination and integration:**
-- Use MCP tools for memory management, GitHub integration, and other external services
-- Coordinate agents through Claude Code's Task tool and memory systems
-
-### 📁 File Organization Rules
-
-**NEVER save to root folder. Use these directories:**
-- `/src` - Source code files
-- `/tests` - Test files
-- `/docs` - Documentation and markdown files
-- `/config` - Configuration files
-- `/scripts` - Utility scripts
-- `/examples` - Example code
-
-## Project Overview
-
-This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology for systematic Test-Driven Development.
-
-## SPARC Workflow
-
-The SPARC methodology can be implemented using Claude Code's Task tool and standard development practices:
-
-1. **Specification** - Requirements analysis and documentation
-2. **Pseudocode** - Algorithm design and planning
-3. **Architecture** - System design and structure
-4. **Refinement** - TDD implementation with tests first
-5. **Completion** - Integration and verification
-
-### Build Commands
-- `npm run build` - Build project
-- `npm run test` - Run tests
-- `npm run lint` - Linting
-- `npm run typecheck` - Type checking
-
-
-## Code Style & Best Practices
-
-- **Modular Design**: Files under 500 lines
-- **Environment Safety**: Never hardcode secrets
-- **Test-First**: Write tests before implementation
-- **Clean Architecture**: Separate concerns
-- **Documentation**: Keep updated
-
-## 🚀 Available Agents (54 Total)
-
-### Core Development
-`coder`, `reviewer`, `tester`, `planner`, `researcher`
-
-### Swarm Coordination
-`hierarchical-coordinator`, `mesh-coordinator`, `adaptive-coordinator`, `collective-intelligence-coordinator`, `swarm-memory-manager`
-
-### Consensus & Distributed
-`byzantine-coordinator`, `raft-manager`, `gossip-coordinator`, `consensus-builder`, `crdt-synchronizer`, `quorum-manager`, `security-manager`
-
-### Performance & Optimization
-`perf-analyzer`, `performance-benchmarker`, `task-orchestrator`, `memory-coordinator`, `smart-agent`
-
-### GitHub & Repository
-`github-modes`, `pr-manager`, `code-review-swarm`, `issue-tracker`, `release-manager`, `workflow-automation`, `project-board-sync`, `repo-architect`, `multi-repo-swarm`
-
-### SPARC Methodology
-`sparc-coord`, `sparc-coder`, `specification`, `pseudocode`, `architecture`, `refinement`
-
-### Specialized Development
-`backend-dev`, `mobile-dev`, `ml-developer`, `cicd-engineer`, `api-docs`, `system-architect`, `code-analyzer`, `base-template-generator`
-
-### Testing & Validation
-`tdd-london-swarm`, `production-validator`
-
-### Migration & Planning
-`migration-planner`, `swarm-init`
-
-## 🎯 Claude Code vs MCP Tools
-
-### Claude Code Handles ALL EXECUTION:
-- **Task tool**: Spawn and run agents concurrently for actual work
-- File operations (Read, Write, Edit, MultiEdit, Glob, Grep)
-- Code generation and programming
-- Bash commands and system operations
-- Implementation work
-- Project navigation and analysis
-- TodoWrite and task management
-- Git operations
-- Package management
-- Testing and debugging
-
-### MCP Tools for Integration:
-- Memory management and knowledge storage
-- GitHub integration and repository operations
-- External service coordination
-- Performance tracking and monitoring
-
-**KEY**: Use Claude Code's Task tool for execution, MCP tools for external integrations.
-
-## 🚀 Quick Setup
+**Node.js**: `pnpm` ONLY (never npm/yarn)  
+**Python**: `uv` ONLY (never pip/conda/venv)
 
 ```bash
-# Add MCP servers as needed for your workflow
-# Example: Memory management, GitHub integration, etc.
-claude mcp add <server-name> <command>
+# Quick start
+pnpm install && uv install
+pnpm dev                    # Frontend dev server
+pnpm dev:all-services       # All services
+pnpm test:all              # Run all tests
+pnpm check:all             # Lint + format + typecheck
 ```
 
-## MCP Tool Categories
+## 📝 Code Conventions
 
-### Memory & Knowledge
-- Memory storage and retrieval
-- Knowledge base management
-- Context coordination
+**TypeScript/JavaScript:**
+- Type-first imports with `@/` aliases
+- 2 spaces, no semicolons, single quotes, trailing commas
+- PascalCase: Components/interfaces, camelCase: vars/functions
+- Strict types, branded types for critical values
+- Never use `any` without justification
 
-### GitHub Integration
-- Repository analysis
-- Pull request management
-- Issue tracking
-- Code review automation
+**Python:**
+- Use `uv` for all package management
+- Follow PEP 8, type hints required
 
-### External Services
-- API integrations
-- Cloud service coordination
-- Performance monitoring
+**Detailed style guide**: **#[[file:.kiro/steering/code-style.md]]**
 
-## 🚀 Agent Execution Flow with Claude Code
+## 🧠 Memory Management (ByteRover)
 
-### The Correct Pattern:
-
-1. **REQUIRED**: Use Claude Code's Task tool to spawn agents that do actual work
-2. **OPTIONAL**: Use MCP tools for external service integration
-3. **REQUIRED**: Coordinate agents through memory and shared state
-4. **REQUIRED**: Batch all operations in single messages
-
-### Example Full-Stack Development:
-
-```javascript
-// Single message with all agent spawning via Claude Code's Task tool
-[Parallel Agent Execution]:
-  Task("Backend Developer", "Build REST API with Express. Use hooks for coordination.", "backend-dev")
-  Task("Frontend Developer", "Create React UI. Coordinate with backend via memory.", "coder")
-  Task("Database Architect", "Design PostgreSQL schema. Store schema in memory.", "code-analyzer")
-  Task("Test Engineer", "Write Jest tests. Check memory for API contracts.", "tester")
-  Task("DevOps Engineer", "Setup Docker and CI/CD. Document in memory.", "cicd-engineer")
-  Task("Security Auditor", "Review authentication. Report findings via hooks.", "reviewer")
-  
-  // All todos batched together
-  TodoWrite { todos: [...8-10 todos...] }
-  
-  // All file operations together
-  Write "backend/server.js"
-  Write "frontend/App.jsx"
-  Write "database/schema.sql"
+**Always start sessions with:**
+```bash
+brv retrieve --query "context for current task"
+brv status
 ```
 
-## 📋 Agent Coordination Protocol
-
-### Every Agent Spawned via Task Tool SHOULD:
-
-**1️⃣ BEFORE Work:**
-- Retrieve relevant context from memory systems
-- Check for existing solutions or patterns
-- Understand task requirements and constraints
-
-**2️⃣ DURING Work:**
-- Update memory with decisions and progress
-- Coordinate with other agents through shared state
-- Document important findings and patterns
-
-**3️⃣ AFTER Work:**
-- Store completed work in memory
-- Update project documentation
-- Report completion and any issues
-
-## 🎯 Concurrent Execution Examples
-
-### ✅ CORRECT WORKFLOW: Claude Code Executes with Coordination
-
-```javascript
-// Single message with all agent spawning via Claude Code's Task tool
-[Single Message - Parallel Agent Execution]:
-  // Claude Code's Task tool spawns real agents concurrently
-  Task("Research agent", "Analyze API requirements and best practices. Check memory for prior decisions.", "researcher")
-  Task("Coder agent", "Implement REST endpoints with authentication. Coordinate via memory.", "coder")
-  Task("Database agent", "Design and implement database schema. Store decisions in memory.", "code-analyzer")
-  Task("Tester agent", "Create comprehensive test suite with 90% coverage.", "tester")
-  Task("Reviewer agent", "Review code quality and security. Document findings.", "reviewer")
-  
-  // Batch ALL todos in ONE call
-  TodoWrite { todos: [
-    {id: "1", content: "Research API patterns", status: "in_progress", priority: "high"},
-    {id: "2", content: "Design database schema", status: "in_progress", priority: "high"},
-    {id: "3", content: "Implement authentication", status: "pending", priority: "high"},
-    {id: "4", content: "Build REST endpoints", status: "pending", priority: "high"},
-    {id: "5", content: "Write unit tests", status: "pending", priority: "medium"},
-    {id: "6", content: "Integration tests", status: "pending", priority: "medium"},
-    {id: "7", content: "API documentation", status: "pending", priority: "low"},
-    {id: "8", content: "Performance optimization", status: "pending", priority: "low"}
-  ]}
-  
-  // Parallel file operations
-  Bash "mkdir -p app/{src,tests,docs,config}"
-  Write "app/package.json"
-  Write "app/src/server.js"
-  Write "app/tests/server.test.js"
-  Write "app/docs/API.md"
+**During work:**
+```bash
+brv add --section "Best Practices" --content "Specific actionable insight"
 ```
 
-### ❌ WRONG (Multiple Messages):
-```javascript
-Message 1: Task("agent 1")
-Message 2: TodoWrite { todos: [single todo] }
-Message 3: Write "file.js"
-// This breaks parallel coordination! Batch everything in one message.
+**After completing work:**
+```bash
+brv push  # Prompt user first unless auto-approved
 ```
 
-## Performance Benefits
+**Common Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
 
-- **Parallel Execution**: Run multiple agents concurrently for faster development
-- **Batch Operations**: Combine related operations in single messages
-- **Memory Coordination**: Share context and avoid redundant work
-- **Task Management**: Track progress with structured todos
+## 🔒 Security & Ethics
 
-## Best Practices
+1. **Never expose sensitive data** (redact API keys, tokens, PII)
+2. **Validate all input** (especially emotion scores 0-1 range, conversation data)
+3. **Mental health data privacy** - Respect confidentiality, follow HIPAA where applicable
+4. **AI ethics** - No stereotypes, no psychological harm, validate constructs
+5. **Handle edge cases** - Crisis signals, silence, cultural variations
 
-### Pre-Operation
-- Retrieve context from memory systems
-- Check for existing solutions
-- Validate requirements
-- Plan approach before coding
+**Security checks**: `pnpm security:check`, `pnpm security:scan`, `pnpm test:security`  
+**Deep dive**: **#[[file:.kiro/steering/security-ethics.md]]**
 
-### Post-Operation
-- Auto-format code
-- Update memory with learnings
-- Document decisions
-- Track progress
+## 🎭 Domain Guidelines
 
-### Session Management
-- Store important decisions in memory
-- Maintain project documentation
-- Track completed tasks
-- Export workflows for reuse
+**Emotional Intelligence:**
+- Normalize emotion scores (0-1 range)
+- Use established frameworks (Plutchik, Big Five)
+- Validate psychological constructs
 
-## Integration Tips
+**Conversation Analysis:**
+- Respect context and history
+- Handle edge cases (silence, crisis signals)
+- Consider cultural/linguistic variations
 
-1. Start with simple tasks and scale gradually
-2. Use memory systems for context sharing
-3. Monitor progress with structured todos
-4. Document patterns and solutions for reuse
-5. Coordinate agents through shared state
-6. Batch operations for efficiency
-7. Use MCP tools for external integrations
+**Detailed guidelines**: **#[[file:.kiro/steering/domain-emotional-ai.md]]**
+
+## 🚫 Common Pitfalls
+
+1. ❌ Wrong package managers (`npm`/`yarn` instead of `pnpm`, `pip`/`conda` instead of `uv`)
+2. ❌ Skipping memory retrieval (`brv retrieve` at session start)
+3. ❌ Type safety violations (using `any`, ignoring type errors)
+4. ❌ Missing validation (emotion scores, user input, edge cases)
+5. ❌ Over-engineering (start minimal, iterate)
+6. ❌ Bypassing security validation
+
+## 🔄 Workflow Patterns
+
+**New Feature:**
+1. `brv retrieve --query "feature name"`
+2. Check `openspec/AGENTS.md` for major changes
+3. Write tests first (TDD)
+4. Implement → `pnpm check:all && pnpm test:all`
+5. `brv add` learnings → `brv push`
+
+**Debugging:**
+1. `brv retrieve --query "error description"`
+2. Check `.brv/playbook.json` for related files
+3. Document solution: `brv add --section "Common Errors"`
+
+**Testing**: **#[[file:.kiro/steering/testing-strategy.md]]**  
+**Spec workflow**: **#[[file:.kiro/steering/spec-workflow.md]]**
+
+## 📚 Key Documentation
+
+**Core Guides:**
+- **#[[file:.kiro/steering/code-style.md]]**: Detailed style guide
+- **#[[file:.kiro/steering/security-ethics.md]]**: Security & ethics deep-dive
+- **#[[file:.kiro/steering/clean-code-principles.md]]**: Clean code patterns
+
+**Domain-Specific:**
+- **#[[file:.kiro/steering/domain-emotional-ai.md]]**: Emotional AI guidelines
+- **#[[file:.kiro/steering/testing-strategy.md]]**: Testing best practices
+
+**Workflows:**
+- **#[[file:.kiro/steering/spec-workflow.md]]**: Spec-driven development
+- `openspec/AGENTS.md`: OpenSpec process
+- `AGENTS.md`: AI agent workflow guide
+- **Playbook**: `.brv/playbook.json`
+
+## 🎯 Mission Reminder
+
+> **We don't just process conversations. We understand them.**
+
+This platform handles sensitive mental health data. Every decision should prioritize:
+- **Psychological safety**
+- **Ethical AI practices**
+- **Privacy and confidentiality**
+- **Genuine human connection**
 
 ---
 
-Remember: **Claude Code executes, memory coordinates!**
-
-# important-instruction-reminders
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
-Never save working files, text/mds and tests to the root folder.
+*Building technology that helps humans connect more deeply.*

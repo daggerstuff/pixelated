@@ -51,13 +51,17 @@ export async function mergeAllDatasets(
 }
 
 export function mergedDatasetExists(outputPath?: string): boolean {
-  const defaultPath = join(
-    process.cwd(),
-    'data',
-    'merged',
-    'mental_health_dataset.jsonl',
-  )
-  const checkPath = outputPath || defaultPath
+  const basePath = join(process.cwd(), 'data', 'merged')
+  const defaultFilename = 'mental_health_dataset.jsonl'
+
+  // Validate and resolve path to prevent path traversal
+  const checkPath = outputPath
+    ? securePathJoin(basePath, outputPath, {
+        allowedExtensions: ['.jsonl', '.json', '.csv'],
+      })
+    : securePathJoin(basePath, defaultFilename, {
+        allowedExtensions: ['.jsonl', '.json', '.csv'],
+      })
 
   const exists = existsSync(checkPath)
   logger.info('Checking merged dataset existence', { path: checkPath, exists })
@@ -68,26 +72,23 @@ export function mergedDatasetExists(outputPath?: string): boolean {
 export function getMergedDatasetPath(
   format: 'jsonl' | 'json' | 'csv' = 'jsonl',
 ): string {
+  // Validate format parameter to prevent path traversal
+  if (format !== 'jsonl' && format !== 'json' && format !== 'csv') {
+    throw new Error('Invalid format parameter')
+  }
+
   const extension = format === 'jsonl' ? 'jsonl' : format
   const filename = `mental_health_dataset.${extension}`
 
-  // Validate filename to prevent path traversal
-  if (
-    filename.includes('..') ||
-    filename.includes('/') ||
-    filename.includes('\\') ||
-    filename.length > 255
-  ) {
-    throw new Error('Invalid filename for dataset path')
-  }
-
-  const path = securePathJoin(join(process.cwd(), 'data', 'merged'), filename, {
+  // Use securePathJoin which validates the filename internally
+  const basePath = join(process.cwd(), 'data', 'merged')
+  const validatedPath = securePathJoin(basePath, filename, {
     allowedExtensions: ['.jsonl', '.json', '.csv'],
   })
 
-  logger.debug('Generated merged dataset path', { format, path })
+  logger.debug('Generated merged dataset path', { format, path: validatedPath })
 
-  return path
+  return validatedPath
 }
 
 export async function validateMergedDataset(filePath: string): Promise<{
@@ -97,6 +98,12 @@ export async function validateMergedDataset(filePath: string): Promise<{
 }> {
   logger.info('Validating merged dataset', { filePath })
 
+  // Validate filePath to prevent path traversal
+  const basePath = join(process.cwd(), 'data', 'merged')
+  const validatedPath = securePathJoin(basePath, filePath, {
+    allowedExtensions: ['.jsonl', '.json', '.csv'],
+  })
+
   // Mock validation for now
   const validation = {
     isValid: true,
@@ -104,13 +111,13 @@ export async function validateMergedDataset(filePath: string): Promise<{
     sampleCount: 9500,
   }
 
-  if (!existsSync(filePath)) {
+  if (!existsSync(validatedPath)) {
     validation.isValid = false
     validation.errors.push('Dataset file does not exist')
     validation.sampleCount = 0
   }
 
-  logger.info('Dataset validation completed', { filePath, validation })
+  logger.info('Dataset validation completed', { filePath: validatedPath, validation })
 
   return validation
 }

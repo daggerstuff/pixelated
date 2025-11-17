@@ -4,11 +4,11 @@
 
 <button
   id="theme-switch"
-  class="text-gray-400 hover:text-white transition-colors"
-  title="Toggle dark/light mode"
-  aria-label="Toggle dark/light mode"
+  class="op-60 hover:op-100 op-transition"
+  title="Toggles light & dark"
+  aria-label="Toggles light & dark"
 >
-  <i class="i-uil:moon dark:i-uil:sun text-lg"></i>
+  <div u-i-ri-sun-line u-dark:i-ri-moon-line></div>
 </button>
 
 <!-- Initialize as inline scripts for faster response, avoiding FOUC  -->
@@ -18,11 +18,9 @@
     if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
       theme = localStorage.theme
     } else {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        theme = 'dark'
-      } else {
-        theme = 'light'
-      }
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
       window.localStorage.setItem('theme', theme)
     }
 
@@ -48,11 +46,45 @@
 </script>
 
 <script>
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  // related to #45
+  const chooseFill = (): FillMode => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const uach = (navigator as any).userAgentData
+
+    if (uach?.brands?.length) {
+      const brands: { brand: string; version: string }[] = uach.brands
+      const isChromiumBrand = brands.some((b) => /Chrom(e|ium)/i.test(b.brand))
+      if (isChromiumBrand) return 'both'
+      return 'none'
+    }
+
+    return 'none'
+  }
+  const fill = chooseFill()
+
+  document.addEventListener('astro:page-load', () => {
     let isDark: boolean
 
-    const saveTheme = () => {
-      window.localStorage.setItem('theme', isDark ? 'dark' : 'light')
+    const changeGiscusTheme = (isDark: boolean) => {
+      const newTheme = isDark
+        ? `${location.origin}/giscus/dark.css`
+        : `${location.origin}/giscus/light.css`
+
+      const giscusScript = document.getElementById('giscus-script')
+      if (giscusScript) {
+        giscusScript.setAttribute('data-theme', newTheme)
+        const iframe = document.querySelector('iframe.giscus-frame')
+        if (
+          iframe &&
+          iframe instanceof HTMLIFrameElement &&
+          iframe.contentWindow
+        ) {
+          iframe.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: newTheme } } },
+            'https://giscus.app'
+          )
+        }
+      }
     }
 
     const updateAria = (buttonElement: HTMLElement) => {
@@ -62,10 +94,14 @@
 
     const setColorTheme = () => {
       const colorThemeMetaTag = document.querySelector(
-        "meta[name='theme-color']",
+        "meta[name='theme-color']"
       )
       const bgColor = getComputedStyle(document.body).getPropertyValue('--c-bg')
       colorThemeMetaTag?.setAttribute('content', bgColor)
+    }
+
+    const saveTheme = () => {
+      window.localStorage.setItem('theme', isDark ? 'dark' : 'light')
     }
 
     /* Handle user toggle button */
@@ -75,13 +111,15 @@
       const toggle = () => {
         document.documentElement.classList.toggle('dark')
         isDark = document.documentElement.classList.contains('dark')
+        changeGiscusTheme(isDark)
         updateAria(currentTarget as HTMLElement)
-        saveTheme()
         setColorTheme()
+        saveTheme()
       }
 
       const isAppearanceTransition =
-        typeof document.startViewTransition === 'function' &&
+        // @ts-expect-error (View Transitions API)
+        document.startViewTransition &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
       if (!isAppearanceTransition) {
@@ -93,7 +131,7 @@
       const y = event.clientY
       const endRadius = Math.hypot(
         Math.max(x, innerWidth - x),
-        Math.max(y, innerHeight - y),
+        Math.max(y, innerHeight - y)
       )
 
       const transition = document.startViewTransition(() => toggle())
@@ -111,28 +149,27 @@
           {
             duration: 400,
             easing: 'ease-out',
+            fill,
             pseudoElement: isDark
               ? '::view-transition-old(root)'
               : '::view-transition-new(root)',
-          },
+          }
         )
       })
     }
 
     const toggleThemeButton = document.getElementById('theme-switch')
-    toggleThemeButton?.addEventListener('click', (event: Event) =>
-      handleToggle(event as MouseEvent),
-    )
+    toggleThemeButton?.addEventListener('click', handleToggle)
 
     /* Listening system changes */
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (event: Event) => {
-        const { matches } = event as MediaQueryListEvent
+      .addEventListener('change', ({ matches }) => {
         isDark = matches
         document.documentElement.classList.toggle('dark', isDark)
-        saveTheme()
+        changeGiscusTheme(isDark)
         if (toggleThemeButton) updateAria(toggleThemeButton)
+        saveTheme()
       })
   })
 </script>

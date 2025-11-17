@@ -1,0 +1,5 @@
+# Cloudflare Pages _redirects file
+# Note: For SSR deployments using Functions, routing is handled by the SSR function
+# This file is for static fallback only if needed
+# For SSR, the Cloudflare adapter creates functions that handle all routes automatically
+

@@ -121,10 +121,26 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
+    const defaultPath = securePathJoin(process.cwd(), 'data', 'backups')
+    const userBasePath = (config['basePath'] as string) || defaultPath
+    
+    // Validate basePath to prevent path traversal
+    // Ensure basePath is within project root or a safe data directory
+    const projectRoot = path.resolve(process.cwd())
+    const resolvedBasePath = path.resolve(userBasePath)
+    
+    // Reject absolute paths that escape project root
+    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
+      throw new Error('Base path must be within project directory')
+    }
+    
+    // Reject paths with directory traversal sequences
+    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
+      throw new Error('Base path contains directory traversal sequences')
+    }
+    
     this.config = {
-      basePath:
-        (config['basePath'] as string) ||
-        path.join(process.cwd(), 'data', 'backups'),
+      basePath: resolvedBasePath,
     }
   }
 
@@ -158,8 +174,19 @@ export class FileSystemStorageProvider implements StorageProvider {
     try {
       const results: string[] = []
       const { basePath } = this.config
+      const resolvedBasePath = path.resolve(basePath)
 
       const scanDir = async (dirPath: string, relativePath = '') => {
+        // Validate dirPath is within basePath to prevent path traversal
+        const resolvedDirPath = path.resolve(dirPath)
+        if (
+          !resolvedDirPath.startsWith(resolvedBasePath + path.sep) &&
+          resolvedDirPath !== resolvedBasePath
+        ) {
+          logger.warn(`Skipping directory outside base path: ${dirPath}`)
+          return
+        }
+
         const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
         for (const entry of entries) {
@@ -273,19 +300,47 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
+    const defaultPath = securePathJoin(process.cwd(), 'data', 'mock-cloud')
+    const userBasePath = (config['basePath'] as string) || defaultPath
+    
+    // Validate basePath to prevent path traversal
+    // Ensure basePath is within project root or a safe data directory
+    const projectRoot = path.resolve(process.cwd())
+    const resolvedBasePath = path.resolve(userBasePath)
+    
+    // Reject absolute paths that escape project root
+    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
+      throw new Error('Base path must be within project directory')
+    }
+    
+    // Reject paths with directory traversal sequences
+    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
+      throw new Error('Base path contains directory traversal sequences')
+    }
+    
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
       bucket: (config['bucket'] as string) || 'mock-bucket',
-      basePath:
-        (config['basePath'] as string) ||
-        path.join(process.cwd(), 'data', 'mock-cloud'),
+      basePath: resolvedBasePath,
     }
   }
 
   async initialize(): Promise<void> {
-    // Create the base directory for the mock cloud storage
-    const providerPath = path.join(this.config.basePath, this.config.provider)
-    const bucketPath = path.join(providerPath, this.config.bucket)
+    // Validate config values to prevent path traversal
+    if (
+      this.config.provider.includes('..') ||
+      this.config.provider.includes('/') ||
+      this.config.provider.includes('\\') ||
+      this.config.bucket.includes('..') ||
+      this.config.bucket.includes('/') ||
+      this.config.bucket.includes('\\')
+    ) {
+      throw new Error('Invalid provider or bucket name: contains path traversal sequences')
+    }
+
+    // Create the base directory for the mock cloud storage using securePathJoin
+    const providerPath = securePathJoin(this.config.basePath, this.config.provider)
+    const bucketPath = securePathJoin(providerPath, this.config.bucket)
     await fs.mkdir(bucketPath, { recursive: true })
 
     logger.info(
@@ -313,7 +368,11 @@ export class MockCloudStorageProvider implements StorageProvider {
     }
 
     await fs.writeFile(filePath, data)
-    await fs.writeFile(`${filePath}.meta`, JSON.stringify(metadata, null, 2))
+    // Validate meta file path to prevent path traversal
+    const metaFilePath = securePathJoin(path.dirname(filePath), path.basename(filePath) + '.meta', {
+      allowedExtensions: ['.meta'],
+    })
+    await fs.writeFile(metaFilePath, JSON.stringify(metadata, null, 2))
 
     logger.debug(`Stored file at ${key} in mock cloud storage`)
   }
@@ -338,11 +397,22 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   async listFiles(pattern?: string): Promise<string[]> {
-    const bucketPath = path.join(
-      this.config.basePath,
-      this.config.provider,
-      this.config.bucket,
-    )
+    // Validate config values to prevent path traversal
+    if (
+      this.config.provider.includes('..') ||
+      this.config.provider.includes('/') ||
+      this.config.provider.includes('\\') ||
+      this.config.bucket.includes('..') ||
+      this.config.bucket.includes('/') ||
+      this.config.bucket.includes('\\')
+    ) {
+      throw new Error('Invalid provider or bucket name: contains path traversal sequences')
+    }
+
+    // Build bucket path using securePathJoin to prevent path traversal
+    const providerPath = securePathJoin(this.config.basePath, this.config.provider)
+    const bucketPath = securePathJoin(providerPath, this.config.bucket)
+    const resolvedBasePath = path.resolve(this.config.basePath)
 
     // Simulate network delay
     await new Promise((resolve) =>
@@ -353,6 +423,16 @@ export class MockCloudStorageProvider implements StorageProvider {
       const results: string[] = []
 
       const scanDir = async (dirPath: string, relativePath = '') => {
+        // Validate dirPath is within basePath to prevent path traversal
+        const resolvedDirPath = path.resolve(dirPath)
+        if (
+          !resolvedDirPath.startsWith(resolvedBasePath + path.sep) &&
+          resolvedDirPath !== resolvedBasePath
+        ) {
+          logger.warn(`Skipping directory outside base path: ${dirPath}`)
+          return
+        }
+
         const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
         for (const entry of entries) {
