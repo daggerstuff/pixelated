@@ -11,7 +11,7 @@ import io
 import logging
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 import librosa
 import numpy as np
@@ -66,7 +66,7 @@ class AudioPreprocessingPipeline:
         audio_data: Union[str, bytes],
         extract_features: bool = True,
         normalize: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Preprocess audio data for bias detection"""
         if not self.is_loaded:
             await self.load_processors()
@@ -117,7 +117,7 @@ class AudioPreprocessingPipeline:
             logger.error(f"Audio preprocessing failed: {str(e)}")
             raise
 
-    async def _load_audio(self, audio_data: Union[str, bytes]) -> Tuple[np.ndarray, int]:
+    async def _load_audio(self, audio_data: Union[str, bytes]) -> tuple[np.ndarray, int]:
         """Load audio from various input formats"""
         if isinstance(audio_data, str):
             # Base64 encoded audio
@@ -167,7 +167,7 @@ class AudioPreprocessingPipeline:
         self,
         audio_array: np.ndarray,
         sample_rate: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Extract audio features for analysis"""
         try:
             features = {
@@ -207,7 +207,7 @@ class AudioPreprocessingPipeline:
         self,
         audio_array: np.ndarray,
         sample_rate: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare audio data for model input"""
         try:
             # Prepare for Whisper (speech-to-text)
@@ -265,7 +265,7 @@ class VisionPreprocessingPipeline:
         image_data: Union[str, bytes],
         resize: bool = True,
         normalize: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Preprocess image data for bias detection"""
         if not self.is_loaded:
             await self.load_processor()
@@ -395,7 +395,7 @@ class VideoPreprocessingPipeline:
         video_data: Union[str, bytes],
         extract_frames: bool = True,
         normalize: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Preprocess video data for bias detection"""
         if not self.is_loaded:
             await self.load_processor()
@@ -456,7 +456,7 @@ class VideoPreprocessingPipeline:
 
         return tmp_path
 
-    async def _extract_frames(self, video_path: str) -> List[Image.Image]:
+    async def _extract_frames(self, video_path: str) -> list[Image.Image]:
         """Extract key frames from video"""
         try:
             import cv2
@@ -495,7 +495,7 @@ class VideoPreprocessingPipeline:
             Path(video_path).unlink()
             return []
 
-    async def _prepare_model_inputs(self, frames: List[Image.Image]) -> Dict[str, Any]:
+    async def _prepare_model_inputs(self, frames: list[Image.Image]) -> dict[str, Any]:
         """Prepare video frames for model input"""
         try:
             if not frames:
@@ -527,7 +527,7 @@ class MultimodalPreprocessingPipeline:
     async def preprocess_multimodal_data(
         self,
         data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Preprocess multimodal data (audio, vision, video)"""
         try:
             results = {}

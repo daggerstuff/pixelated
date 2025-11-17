@@ -121,7 +121,8 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const userBasePath = (config['basePath'] as string) || path.join(process.cwd(), 'data', 'backups')
+    const defaultPath = securePathJoin(process.cwd(), 'data', 'backups')
+    const userBasePath = (config['basePath'] as string) || defaultPath
     
     // Validate basePath to prevent path traversal
     // Ensure basePath is within project root or a safe data directory
@@ -299,7 +300,8 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const userBasePath = (config['basePath'] as string) || path.join(process.cwd(), 'data', 'mock-cloud')
+    const defaultPath = securePathJoin(process.cwd(), 'data', 'mock-cloud')
+    const userBasePath = (config['basePath'] as string) || defaultPath
     
     // Validate basePath to prevent path traversal
     // Ensure basePath is within project root or a safe data directory

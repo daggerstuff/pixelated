@@ -5,7 +5,7 @@ Vision bias detection service using CLIP and computer vision models
 import base64
 import io
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import structlog
@@ -90,9 +90,9 @@ class VisionBiasDetector:
         self,
         image_data: Union[str, bytes, Image.Image],
         analysis_type: str = "comprehensive",
-        bias_types: Optional[List[BiasType]] = None,
+        bias_types: Optional[list[BiasType]] = None,
         sensitivity: str = "medium"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze image for bias"""
         if not self.is_loaded:
             await self.load_models()
@@ -174,7 +174,7 @@ class VisionBiasDetector:
         else:
             raise ValueError(f"Unsupported image data type: {type(image_data)}")
 
-    async def _analyze_faces(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_faces(self, image: Image.Image) -> dict[str, Any]:
         """Analyze faces in the image for bias"""
         if self.face_detector is None:
             raise RuntimeError("Face detector model not loaded. Call load_models() first.")
@@ -213,7 +213,7 @@ class VisionBiasDetector:
             logger.warning(f"Face analysis failed: {str(e)}", error=str(e))
             return {"faces": [], "bias_indicators": [], "total_faces": 0}
 
-    async def _analyze_objects(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_objects(self, image: Image.Image) -> dict[str, Any]:
         """Analyze objects in the image for bias"""
         if self.object_detector is None:
             raise RuntimeError("Object detector model not loaded. Call load_models() first.")

@@ -7,7 +7,6 @@ Tests advanced similarity search functionality for clinical knowledge retrieval.
 import shutil
 import tempfile
 from pathlib import Path
-from typing import List
 from unittest.mock import Mock
 
 import pytest
@@ -148,7 +147,7 @@ class TestClinicalSimilaritySearch:
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir)
 
-    def _create_mock_search_results(self) -> List[SearchResult]:
+    def _create_mock_search_results(self) -> list[SearchResult]:
         """Create mock search results for testing."""
         knowledge_items = [
             KnowledgeItem(

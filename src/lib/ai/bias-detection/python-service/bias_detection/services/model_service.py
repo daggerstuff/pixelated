@@ -6,7 +6,7 @@ import hashlib
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import structlog
@@ -37,12 +37,12 @@ class ModelService(ABC):
         pass
 
     @abstractmethod
-    async def predict(self, text: str) -> Dict[str, Any]:
+    async def predict(self, text: str) -> dict[str, Any]:
         """Make prediction on text"""
         pass
 
     @abstractmethod
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """Get model information"""
         pass
 
@@ -149,7 +149,7 @@ class TensorFlowModelService(ModelService):
 
             def encode_plus(
                 self, text: str, max_length: int = 512, **kwargs
-            ) -> Dict[str, Any]:
+            ) -> dict[str, Any]:
                 words = text.lower().split()
                 tokens = []
                 for word in words:
@@ -171,7 +171,7 @@ class TensorFlowModelService(ModelService):
 
         return BasicTokenizer()
 
-    async def predict(self, text: str) -> Dict[str, Any]:
+    async def predict(self, text: str) -> dict[str, Any]:
         """Make prediction using TensorFlow model"""
         await self.ensure_model_loaded()
 
@@ -410,7 +410,7 @@ class PyTorchModelService(ModelService):
 
         return BiasDetectionModel()
 
-    async def predict(self, text: str) -> Dict[str, Any]:
+    async def predict(self, text: str) -> dict[str, Any]:
         """Make prediction using PyTorch model"""
         await self.ensure_model_loaded()
 

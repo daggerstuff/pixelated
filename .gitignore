@@ -246,11 +246,6 @@ verbose/coverage/
 *.flac
 *.aac
 
-# Large data files and model files in ai/
-/ai/training_data_consolidated/
-/ai/therapeutic_ai_training_package_*/
-/ai/pixelated_empathy_FINAL_training_data.tar.gz
-/ai/lightning/
 .clinerules/
 .kilocode/
 .roo/

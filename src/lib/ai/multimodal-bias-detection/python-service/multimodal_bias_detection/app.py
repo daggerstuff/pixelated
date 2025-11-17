@@ -3,7 +3,7 @@ FastAPI application for multi-modal bias detection service
 """
 
 import time
-from typing import List, Optional
+from typing import Optional
 
 import structlog
 from fastapi import FastAPI, HTTPException, Request, Response, status, UploadFile, File, Form
