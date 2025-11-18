@@ -8,7 +8,9 @@ echo "Deployment: $GKE_DEPLOYMENT_NAME"
 echo "Namespace: $GKE_NAMESPACE"
 
 # Get current deployment color
-CURRENT_COLOR=$(kubectl get service "$GKE_SERVICE_NAME" -n "$GKE_NAMESPACE" -o jsonpath='{.spec.selector.color}' 2>/dev/null || echo "blue")
+CURRENT_COLOR=$(kubectl get service "$GKE_SERVICE_NAME" -n "$GKE_NAMESPACE" -o jsonpath='{.spec.selector.color}' 2>/dev/null || echo "")
+# Use bash parameter expansion to default to "blue" if empty or unset
+: ${CURRENT_COLOR:=blue}
 NEW_COLOR="green"
 if [ "$CURRENT_COLOR" = "green" ]; then
     NEW_COLOR="blue"
