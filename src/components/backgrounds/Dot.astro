@@ -8,8 +8,8 @@
 </bg-dot>
 
 <script>
-  import p5 from 'p5'
   import type { default as P5Instance } from 'p5'
+  import p5 from 'p5'
 
   class BgDotElement extends HTMLElement {
     p5Instance: P5Instance | null = null
@@ -68,7 +68,7 @@
               color,
               color,
               color,
-              (Math.abs(p.cos(rad)) * 0.8 + 0.2) * point.opacity * 255
+              (Math.abs(p.cos(rad)) * 0.8 + 0.2) * point.opacity * 255,
             )
             p.strokeWeight(2)
             p.point(nx, ny)

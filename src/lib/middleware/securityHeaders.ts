@@ -10,16 +10,18 @@ export const securityHeaders = async (
 ) => {
   const response = await next()
 
-  const nonce = context.locals['cspNonce']
+  const nonce = context.locals['cspNonce'] as string | undefined
 
   let csp = [
     // Core restrictions
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://*.sentry.io`,
+    nonce
+      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io`
+      : "script-src 'self' https://*.sentry.io",
     // Keep inline styles only if necessary; replace with nonce/hashes when possible
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Images from self, data URIs, and specific trusted domains
-    "img-src 'self' data: https://*.sentry.io https://cdn.pixelatedempathy.com https://pixelatedempathy.com",
+    "img-src 'self' data: https: https://*.sentry.io https://cdn.pixelatedempathy.com https://pixelatedempathy.com",
     // Fonts from self and Google Fonts
     "font-src 'self' https://fonts.gstatic.com",
     // Disallow legacy plugin content
@@ -30,13 +32,15 @@ export const securityHeaders = async (
     "base-uri 'self'",
     "form-action 'self'",
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
-    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com",
+    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io",
     // Mixed content protections
     'upgrade-insecure-requests',
     'block-all-mixed-content',
     // Additional CSP3 hardening (widely supported)
     "script-src-attr 'none'",
-    "script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io",
+    nonce
+      ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io`
+      : "script-src-elem 'self' https://*.sentry.io",
     "style-src-attr 'none'",
     // Reasonable defaults for less common types
     "worker-src 'self' blob:",
@@ -47,12 +51,14 @@ export const securityHeaders = async (
   if (process.env.NODE_ENV === 'development') {
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'",
+      nonce
+        ? `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'`
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data:",
+      "img-src 'self' data: https:",
       "font-src 'self' https://fonts.gstatic.com",
       // Allow ws: and wss: in dev for local websocket debugging
-      "connect-src 'self' ws: wss:",
+      "connect-src 'self' ws: wss: http://localhost:* https://localhost:*",
     ]
   }
 

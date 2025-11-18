@@ -2,7 +2,6 @@
 import { ClientRouter } from 'astro:transitions'
 import { basename } from 'node:path'
 
-import { checkFileExistsInDir } from '../../../plugins/remark-generate-og-image'
 import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
 
@@ -25,19 +24,12 @@ const pageDescription = description || SITE.description
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
-const generatedOgImage = checkFileExistsInDir(
-  'public/og-images',
-  `${basename(Astro.url.pathname)}.png`
-)
-  ? withBasePath('og-images', `${basename(Astro.url.pathname)}.png`)
+// Simplified OG image handling - just use fallback or provided image
+// File existence checks removed to avoid build issues
+const generatedOgImage = withBasePath('og-images', `${basename(Astro.url.pathname)}.png`)
+const assignedOgImage = ogImage && ogImage !== true
+  ? withBasePath('og-images', ogImage as string)
   : undefined
-
-const assignedOgImage =
-  ogImage &&
-  ogImage !== true &&
-  checkFileExistsInDir('public/og-images', ogImage)
-    ? withBasePath('og-images', ogImage)
-    : undefined
 
 const ogImageURL = new URL(
   assignedOgImage ||

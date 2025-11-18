@@ -149,3 +149,25 @@ export function getCardData(): ExampleCardData[] {
     },
   ]
 }
+
+/**
+ * Parses a tuple value and returns the numeric value.
+ * Expects a tuple like [boolean, number] and returns the number.
+ */
+export function parseTuple(
+  value: [boolean, number] | undefined,
+  name: string,
+): number {
+  if (!value || !Array.isArray(value) || value.length < 2) {
+    throw new Error(
+      `Invalid ${name}: expected a tuple [boolean, number], got ${JSON.stringify(value)}`,
+    )
+  }
+  const num = value[1]
+  if (typeof num !== 'number' || isNaN(num)) {
+    throw new Error(
+      `Invalid ${name}: expected a number, got ${typeof num} (${JSON.stringify(num)})`,
+    )
+  }
+  return num
+}

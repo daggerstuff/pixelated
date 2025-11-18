@@ -41,11 +41,11 @@ The build job performs the following tasks:
 build:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v3
+    - uses: actions/checkout@v5
+    - uses: pnpm/action-setup@v4
       with:
         version: 10
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 22
         cache: pnpm
@@ -81,11 +81,11 @@ deploy:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v3
+    - uses: actions/checkout@v5
+    - uses: pnpm/action-setup@v4
       with:
         version: 10
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 22
         cache: pnpm
@@ -156,11 +156,11 @@ rollback:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v3
+    - uses: actions/checkout@v5
+    - uses: pnpm/action-setup@v4
       with:
         version: 10
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 22
         cache: pnpm

@@ -339,3 +339,7 @@ scripts/claude-flow-removal.sh
 .brv
 
 /ai/
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor/rules/openmemory.mdc
+AGENTS.md

@@ -7,7 +7,6 @@ import { defineConfig, passthroughImageService } from 'astro/config';
 
 import icon from 'astro-icon';
 import sentry from '@sentry/astro';
-import spotlightjs from '@spotlightjs/astro';
 
 import node from '@astrojs/node';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -41,7 +40,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
-const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+// Temporarily disabled - SpotlightJS integration
+// const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 const preferredPort = (() => {
   const candidates = [
     process.env.PORT,
@@ -104,7 +104,7 @@ const adapter = (() => {
       functionPerRoute: false,
     });
   }
-  
+
   // Railway deployment
   if (isRailwayDeploy) {
     console.log('🚂 Using Node adapter for Railway deployment');
@@ -112,7 +112,7 @@ const adapter = (() => {
       mode: 'standalone',
     });
   }
-  
+
   // Heroku deployment
   if (isHerokuDeploy) {
     console.log('🟣 Using Node adapter for Heroku deployment');
@@ -120,7 +120,7 @@ const adapter = (() => {
       mode: 'standalone',
     });
   }
-  
+
   // Fly.io deployment
   if (isFlyioDeploy) {
     console.log('✈️ Using Node adapter for Fly.io deployment');
@@ -128,7 +128,7 @@ const adapter = (() => {
       mode: 'standalone',
     });
   }
-  
+
   // Default: Node adapter for Kubernetes/standard deployments
   console.log('🟢 Using Node adapter for standard deployment');
   return node({
@@ -186,8 +186,9 @@ export default defineConfig({
       sourcemap: isProduction ? false : 'hidden',
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
-      // Enable minification in production
-      minify: isProduction ? 'terser' : false,
+      // Temporarily disabled minification to debug build hang
+      minify: false,
+      // minify: isProduction ? 'terser' : false,
       terserOptions: isProduction ? {
         compress: {
           drop_console: true,
@@ -199,6 +200,8 @@ export default defineConfig({
         }
       } : {},
       rollupOptions: {
+        // Limit parallel file operations to prevent resource exhaustion
+        maxParallelFileOps: 2,
         external: [
           '@google-cloud/storage',
           '@aws-sdk/client-s3',
@@ -248,13 +251,13 @@ export default defineConfig({
     },
     plugins: [
       // Bundle analyzer for production builds
-      ...(shouldAnalyzeBundle ? [visualizer({
+      shouldAnalyzeBundle && visualizer({
         filename: 'dist/bundle-analysis.html',
         open: true,
         gzipSize: true,
         brotliSize: true
-      })] : [])
-    ],
+      })
+    ].filter(Boolean),
     resolve: {
       alias: {
         '~': path.resolve('./src'),
@@ -337,6 +340,11 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js',
+        '@spotlightjs/astro',
+        'framer-motion',
+        'zustand',
+        'jotai',
+        '@tanstack/react-query',
       ],
     },
   },
@@ -379,7 +387,8 @@ export default defineConfig({
             },
           },
         }),
-        ...(shouldUseSpotlight ? [spotlightjs()] : [])
+        // Temporarily disable SpotlightJS due to build issues
+        // ...(shouldUseSpotlight ? [spotlightjs()] : [])
       ] : []),
     ]
   })(),

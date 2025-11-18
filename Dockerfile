@@ -83,4 +83,8 @@ RUN chown -R astro:astro /app && chmod -R g+rX /app
 USER astro
 
 EXPOSE 4321
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:4321,path:'/',timeout:5000};const req=http.request(opts,res=>{if(res.statusCode>=200&&res.statusCode<500){process.exit(0);}process.exit(1);});req.on('error',()=>process.exit(1));req.end();"
+
 CMD ["node", "start-server.mjs"]

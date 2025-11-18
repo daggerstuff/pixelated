@@ -5,6 +5,11 @@
 
 name: Kubesec
 
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
 on:
   push:
     branches: [ "master" ]

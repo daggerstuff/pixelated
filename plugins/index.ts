@@ -14,10 +14,8 @@ import remarkDirective from 'remark-directive'
 import remarkImgattr from 'remark-imgattr'
 import remarkMath from 'remark-math'
 import { visit } from 'unist-util-visit'
-import { FEATURES, UI } from '../src/config'
+import { UI } from '../src/config'
 import remarkDirectiveSugar from './remark-directive-sugar'
-
-import remarkGenerateOgImage from './remark-generate-og-image'
 
 import remarkImageContainer from './remark-image-container'
 import remarkReadingTime from './remark-reading-time'
@@ -32,9 +30,10 @@ export const remarkPlugins: RemarkPlugins = [
   // https://github.com/remarkjs/remark-math/tree/main/packages/remark-math
   remarkMath,
   remarkReadingTime,
-  ...(Array.isArray(FEATURES.ogImage) && FEATURES.ogImage[0]
-    ? [remarkGenerateOgImage()].filter(Boolean)
-    : []),
+  // Temporarily disabled OG image generation plugin - causing build hangs
+  // ...(Array.isArray(FEATURES.ogImage) && FEATURES.ogImage[0]
+  //   ? [remarkGenerateOgImage()].filter(Boolean)
+  //   : []),
 ]
 
 export const rehypePlugins: RehypePlugins = [
@@ -116,9 +115,9 @@ export const rehypePlugins: RehypePlugins = [
           ) {
             props['className'] = Array.isArray(el.properties?.['className'])
               ? [
-                  ...(el.properties!['className'] as string[]),
-                  'external-link-cursor',
-                ]
+                ...(el.properties!['className'] as string[]),
+                'external-link-cursor',
+              ]
               : ['external-link-cursor']
           }
         }

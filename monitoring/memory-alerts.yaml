@@ -267,9 +267,9 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: memory-monitor
-          # Use specific version tag instead of latest
-          image: prom/node-exporter:v1.7.0
-          imagePullPolicy: IfNotPresent
+          # Use immutable digest to pin artifact
+          image: prom/node-exporter@sha256:52a6f10ff10238979c365c06dbed8ad5cd1645c41780dc08ff813adacfb2341e
+          imagePullPolicy: Always
           ports:
             - containerPort: 9100
               name: metrics
@@ -359,3 +359,42 @@ spec:
       name: metrics
       protocol: TCP
   type: ClusterIP
+
+---
+# Restrict network access for memory monitor pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: memory-monitor-allow-scrape
+  namespace: gitlab-runner
+  labels:
+    app.kubernetes.io/name: memory-monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: memory-monitoring
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: gitlab-runner
+      ports:
+        - protocol: TCP
+          port: 9100
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
