@@ -3,6 +3,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('default')
 import path from 'node:path'
 import fs from 'node:fs'
+import { safeJoin, ALLOWED_DIRECTORIES, validateAndCreateDir } from '../../../utils/path-security'
 
 export interface DatasetPaths {
   openai: string | null
@@ -18,18 +19,9 @@ export interface PreparedDatasetStatus {
  * Check if prepared datasets exist
  */
 export function preparedDatasetsExist(): PreparedDatasetStatus {
-  const openaiPath = path.join(
-    process.cwd(),
-    'data',
-    'prepared',
-    'openai_dataset.jsonl',
-  )
-  const huggingfacePath = path.join(
-    process.cwd(),
-    'data',
-    'prepared',
-    'huggingface_dataset.json',
-  )
+  const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'prepared')
+  const openaiPath = safeJoin(dataDir, 'openai_dataset.jsonl')
+  const huggingfacePath = safeJoin(dataDir, 'huggingface_dataset.json')
 
   return {
     openai: fs.existsSync(openaiPath),
@@ -45,17 +37,13 @@ export async function prepareForOpenAI(): Promise<string | null> {
     logger.info('Preparing dataset for OpenAI format')
 
     // TODO: Implement actual OpenAI dataset preparation
-    const outputPath = path.join(
-      process.cwd(),
-      'data',
-      'prepared',
-      'openai_dataset.jsonl',
-    )
+    const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'prepared')
+    const outputPath = safeJoin(dataDir, 'openai_dataset.jsonl')
 
     // Ensure directory exists
-    const dir = path.dirname(outputPath)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
+    validateAndCreateDir(dataDir, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true })
     }
 
     // Placeholder implementation
@@ -80,17 +68,13 @@ export async function prepareForHuggingFace(): Promise<string | null> {
     logger.info('Preparing dataset for HuggingFace format')
 
     // TODO: Implement actual HuggingFace dataset preparation
-    const outputPath = path.join(
-      process.cwd(),
-      'data',
-      'prepared',
-      'huggingface_dataset.json',
-    )
+    const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'prepared')
+    const outputPath = safeJoin(dataDir, 'huggingface_dataset.json')
 
     // Ensure directory exists
-    const dir = path.dirname(outputPath)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
+    validateAndCreateDir(dataDir, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true })
     }
 
     // Placeholder implementation

@@ -558,7 +558,7 @@ export interface Ui {
 }
 
 /* FEATURES */
-export type BgType = 'plum' | 'dot' | 'rose' | 'particle'
+export type BgType = 'plum' | 'dot' | 'rose' | 'particle' | 'default' | 'gradient' | 'pulse' | 'light' | 'dark' | 'stars' | 'animated'
 type Mentioned = `@${string}` | `@${string}@${string}` | ''
 type FeatureConfig<T> = false | [boolean, T]
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6

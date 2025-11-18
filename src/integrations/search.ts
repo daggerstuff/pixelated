@@ -2,6 +2,7 @@ import type { AstroIntegration } from 'astro'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createSearchIndexFile } from '../utils/search-indexer'
+import { safeJoin, validatePath, sanitizeFilename, ALLOWED_DIRECTORIES } from '../utils/path-security'
 
 interface SearchIntegrationOptions {
   // Collections to index
@@ -84,10 +85,8 @@ export default function flexsearchIntegration(
 
           // Write the file to the output directory
           const outDir = path.resolve(dir.pathname)
-          const indexPath = path.join(
-            outDir,
-            resolvedOptions.indexPath || 'search-index.js',
-          )
+          const indexFilename = sanitizeFilename(resolvedOptions.indexPath || 'search-index.js')
+          const indexPath = validatePath(indexFilename, outDir)
 
           await fs.writeFile(indexPath, searchIndexJs, 'utf-8')
 
@@ -149,10 +148,13 @@ async function scanDirectory(
   const files: string[] = []
 
   try {
-    const entries = await fs.readdir(dir, { withFileTypes: true })
+    // Validate directory path
+    const validatedDir = validatePath(dir, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+    const entries = await fs.readdir(validatedDir, { withFileTypes: true })
 
     for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name)
+      const sanitizedName = sanitizeFilename(entry.name)
+      const fullPath = validatePath(sanitizedName, validatedDir)
 
       if (entry.isDirectory()) {
         const subDirFiles = await scanDirectory(fullPath, extension)

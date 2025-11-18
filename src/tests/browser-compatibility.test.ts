@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import fs from 'node:fs/promises'
 import { join } from 'node:path'
 import { FEATURES } from '../lib/browser/feature-detection'
+import { safeJoin, ALLOWED_DIRECTORIES } from '../utils/path-security'
 
 // Define types for compatibility results
 interface PageResult {
@@ -59,8 +60,8 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
       }
 
       // Save results
-      const resultsPath = join(
-        process.cwd(),
+      const resultsPath = safeJoin(
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
         'browser-compatibility-results.json',
       )
       await fs.writeFile(

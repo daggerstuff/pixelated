@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Languages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 8px 12px;
+            display: inline-block;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Programming Languages</h1>
+    <ul>
+        {% for language in languages %}
+            <li><a href="/language/{{ language.name }}">{{ language.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+

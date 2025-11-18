@@ -47,7 +47,7 @@ jobs:
       artifact_path: ${{ steps.package_app.outputs.path }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -87,7 +87,7 @@ jobs:
 ### **3. Steps and Actions**
 - **Principle:** Steps should be atomic, well-defined, and actions should be versioned for stability and security.
 - **Deeper Dive:**
-    - **`uses`:** Referencing marketplace actions (e.g., `actions/checkout@v4`, `actions/setup-node@v3`) or custom actions. Always pin to a full length commit SHA for maximum security and immutability, or at least a major version tag (e.g., `@v4`). Avoid pinning to `main` or `latest`.
+    - **`uses`:** Referencing marketplace actions (e.g., `actions/checkout@v5`, `actions/setup-node@v3`) or custom actions. Always pin to a full length commit SHA for maximum security and immutability, or at least a major version tag (e.g., `@v4`). Avoid pinning to `main` or `latest`.
     - **`name`:** Essential for clear logging and debugging. Make step names descriptive.
     - **`run`:** For executing shell commands. Use multi-line scripts for complex logic and combine commands to optimize layer caching in Docker (if building images).
     - **`env`:** Define environment variables at the step or job level. Do not hardcode sensitive data here.
@@ -162,7 +162,7 @@ jobs:
     permissions:
       contents: read # This job only needs to read code, override workflow default
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: npm run lint
 ```
 
@@ -259,7 +259,7 @@ jobs:
         node-version: [16.x, 18.x, 20.x]
         browser: [chromium, firefox]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -289,7 +289,7 @@ jobs:
     - **`lfs`:** Manage Git LFS (Large File Storage) files efficiently. If not needed, set `lfs: false`.
     - **Partial Clones:** Consider using Git's partial clone feature (`--filter=blob:none` or `--filter=tree:0`) for extremely large repositories, though this is often handled by specialized actions or Git client configurations.
 - **Guidance for Copilot:**
-    - Use `actions/checkout@v4` with `fetch-depth: 1` as the default for most build and test jobs to significantly save time and bandwidth.
+    - Use `actions/checkout@v5` with `fetch-depth: 1` as the default for most build and test jobs to significantly save time and bandwidth.
     - Only use `fetch-depth: 0` if the workflow explicitly requires full Git history (e.g., for release tagging, deep commit analysis, or `git blame` operations).
     - Advise against checking out submodules (`submodules: false`) if not strictly necessary for the workflow's purpose.
     - Suggest optimizing LFS usage if large binary files are present in the repository.

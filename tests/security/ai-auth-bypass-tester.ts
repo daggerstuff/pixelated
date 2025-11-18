@@ -17,6 +17,7 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 import { performance } from 'perf_hooks'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../../src/utils/path-security'
 
 // Configuration
 interface Config {
@@ -51,7 +52,7 @@ interface TestResult {
 // Default configuration
 const config: Config = {
   baseUrl: 'http://localhost:3000',
-  outputDir: path.join(process.cwd(), 'security-reports'),
+  outputDir: safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'security-reports'),
   requestDelay: 500,
   testTimeout: 10000,
   verbose: true,
@@ -99,10 +100,10 @@ if (!fs.existsSync(config.outputDir)) {
 }
 
 // Create report file
-const reportFile = path.join(
-  config.outputDir,
+const reportFilename = sanitizeFilename(
   `ai-auth-bypass-${new Date().toISOString().split('T')[0]}.json`,
 )
+const reportFile = safeJoin(config.outputDir, reportFilename)
 const reportStream = fs.createWriteStream(reportFile)
 
 /**

@@ -56,28 +56,53 @@ interface ResponseGenerationRequest {
 }
 
 /**
- * Checks if an error is retryable for response generation
+ * Checks if an error is a network error
  */
-function isRetryableError(error: unknown): boolean {
-  // Network errors are retryable
-  if (error instanceof TypeError && String(error).includes('network')) {
-    return true
-  }
+const isNetworkError = (error: unknown): boolean => {
+  return error instanceof TypeError && String(error).includes('network')
+}
 
-  // Server errors (5xx) are retryable
-  if (
+/**
+ * Checks if an error has a status code
+ */
+const hasStatusCode = (error: unknown): error is Error & { status: number } => {
+  return (
     error instanceof Error &&
     'status' in error &&
     typeof error.status === 'number'
-  ) {
-    return error.status >= 500 && error.status < 600
-  }
+  )
+}
 
-  // Rate limit errors (429) are retryable with backoff
-  if (error instanceof Error && 'status' in error && error.status === 429) {
+/**
+ * Checks if an error is a server error (5xx)
+ */
+const isServerError = (error: unknown): boolean => {
+  if (!hasStatusCode(error)) {
+    return false
+  }
+  return error.status >= 500 && error.status < 600
+}
+
+/**
+ * Checks if an error is a rate limit error (429)
+ */
+const isRateLimitError = (error: unknown): boolean => {
+  return hasStatusCode(error) && error.status === 429
+}
+
+/**
+ * Checks if an error is retryable for response generation
+ */
+function isRetryableError(error: unknown): boolean {
+  if (isNetworkError(error)) {
     return true
   }
-
+  if (isServerError(error)) {
+    return true
+  }
+  if (isRateLimitError(error)) {
+    return true
+  }
   return false
 }
 
@@ -203,6 +228,75 @@ export function useResponseGeneration({
     [apiEndpoint],
   )
 
+  const processResponseData = (
+    data: unknown,
+    generatedResponse: string,
+  ): void => {
+    const responseData = data as {
+      therapeuticInsights?: unknown
+      [key: string]: unknown
+    }
+    if (responseData.therapeuticInsights && responseType === 'therapeutic') {
+      setTherapeuticInsights(responseData.therapeuticInsights)
+      if (onTherapeuticInsights) {
+        onTherapeuticInsights(responseData.therapeuticInsights)
+      }
+    }
+    if (onComplete) {
+      onComplete(generatedResponse)
+    }
+  }
+
+  const handleRetryError = (err: unknown, retries: number): void => {
+    const errorMessage =
+      err instanceof Error
+        ? (err as Error)?.message || String(err)
+        : 'Failed to generate response'
+    setError(errorMessage)
+    if (onError && err instanceof Error) {
+      onError(err)
+    }
+  }
+
+  const calculateBackoffDelay = (retries: number): number => {
+    return Math.min(
+      1000 * Math.pow(2, retries) + Math.random() * 1000,
+      10000,
+    )
+  }
+
+  const executeRequestWithRetry = async (
+    requestData: ResponseGenerationRequest,
+  ): Promise<string | null> => {
+    const MAX_RETRIES = 3
+    let retries = 0
+
+    while (retries < MAX_RETRIES) {
+      try {
+        const response = await makeRequest(requestData)
+        const data = await response.json()
+        const generatedResponse = (data.response || data.content || '') as string
+        setResponse(generatedResponse)
+        setProgress(100)
+        processResponseData(data, generatedResponse)
+        return generatedResponse
+      } catch (err: unknown) {
+        if (retries === MAX_RETRIES - 1 || !isRetryableError(err)) {
+          handleRetryError(err, retries)
+          return null
+        }
+        retries++
+        const delay = calculateBackoffDelay(retries)
+        await new Promise((resolve) => setTimeout(resolve, delay))
+      } finally {
+        if (retries === MAX_RETRIES - 1) {
+          setIsLoading(false)
+        }
+      }
+    }
+    return null
+  }
+
   // Generate a standard response
   const generateResponse = useCallback(
     async (prompt: string, context?: AIMessage[]): Promise<string | null> => {
@@ -226,61 +320,11 @@ export function useResponseGeneration({
       setError(null)
       setProgress(0)
 
-      // Implement retry logic with exponential backoff
-      const MAX_RETRIES = 3
-      let retries = 0
-
-      while (retries < MAX_RETRIES) {
-        try {
-          const response = await makeRequest(requestData)
-          const data = await response.json()
-
-          const generatedResponse = data.response || data.content || ''
-          setResponse(generatedResponse)
-          setProgress(100)
-
-          // Handle therapeutic insights if available
-          if (data.therapeuticInsights && responseType === 'therapeutic') {
-            setTherapeuticInsights(data.therapeuticInsights)
-            if (onTherapeuticInsights) {
-              onTherapeuticInsights(data.therapeuticInsights)
-            }
-          }
-
-          if (onComplete) {
-            onComplete(generatedResponse)
-          }
-
-          return generatedResponse
-        } catch (err: unknown) {
-          if (retries === MAX_RETRIES - 1 || !isRetryableError(err)) {
-            const errorMessage =
-              err instanceof Error
-                ? (err as Error)?.message || String(err)
-                : 'Failed to generate response'
-            setError(errorMessage)
-
-            if (onError && err instanceof Error) {
-              onError(err)
-            }
-            return null
-          }
-
-          retries++
-          // Exponential backoff with jitter
-          const delay = Math.min(
-            1000 * Math.pow(2, retries) + Math.random() * 1000,
-            10000,
-          )
-          await new Promise((resolve) => setTimeout(resolve, delay))
-        } finally {
-          if (retries === MAX_RETRIES - 1) {
-            setIsLoading(false)
-          }
-        }
+      try {
+        return await executeRequestWithRetry(requestData)
+      } finally {
+        setIsLoading(false)
       }
-
-      return null
     },
     [
       isLoading,
@@ -375,7 +419,7 @@ export function useResponseGeneration({
 
   // Generate streaming response
   const generateStreamingResponse = useCallback(
-    async function* (
+    async function*(
       prompt: string,
       context?: AIMessage[],
     ): AsyncGenerator<string, string, unknown> {

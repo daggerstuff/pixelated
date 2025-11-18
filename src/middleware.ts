@@ -4,13 +4,24 @@ import { sequence, defineMiddleware } from 'astro:middleware'
 import { getSession } from './lib/auth/session'
 import type { APIContext } from 'astro'
 
-// Simple route matcher for protected API routes
-const protectedRoutePatterns: RegExp[] = [/\/api\/protected(.*)/]
+// Simple route matcher for protected API routes and journal-research pages
+const protectedRoutePatterns: RegExp[] = [
+  /\/api\/protected(.*)/,
+  /\/api\/journal-research(.*)/, // Protect journal-research API endpoints
+  /\/journal-research(.*)/, // Protect journal-research pages
+]
 
 function isProtectedRoute(request: Request) {
   try {
     const url = new URL(request.url)
-    return protectedRoutePatterns.some((r) => r.test(url.pathname))
+    const pathname = url.pathname
+    
+    // Allow public API routes (auth endpoints, etc.)
+    if (pathname.startsWith('/api/auth/')) {
+      return false
+    }
+    
+    return protectedRoutePatterns.some((r) => r.test(pathname))
   } catch (_err) {
     // If URL parsing fails, be conservative and treat as not protected
     return false

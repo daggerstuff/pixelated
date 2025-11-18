@@ -1,31 +1,21 @@
 ---
-import PageTransitions from '../transitions/PageTransitions.astro'
-import { getUrl } from '../../utils/common'
-import { SITE } from '../../config'
+import { ClientRouter } from 'astro:transitions'
+import { basename } from 'node:path'
+
+import { withBasePath } from '@/utils/path'
+import { SITE } from '@/config'
 
 interface Props {
-  title?: string | undefined
-  description?: string | undefined
-  ogImage?: string | boolean | undefined
-  pubDate?: string | undefined
-  lastModDate?: string | undefined
-  transitionMode?:
-    | 'default'
-    | 'fade'
-    | 'slide'
-    | 'slide-up'
-    | 'slide-down'
-    | 'zoom'
-    | undefined
+  title?: string
+  description?: string
+  ogImage?: string | boolean
+  pubDate?: string
+  lastModDate?: string
 }
 
-const {
-  title,
-  description,
-  pubDate,
-  lastModDate,
-  transitionMode = 'slide',
-} = Astro.props
+const { title, description, ogImage, pubDate, lastModDate } = Astro.props
+
+const siteName = new URL(SITE.website).hostname
 
 const pageTitle =
   title && title !== SITE.title ? `${title} - ${SITE.title}` : SITE.title
@@ -34,8 +24,19 @@ const pageDescription = description || SITE.description
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
-// OG image generation disabled
-const ogImageURL = getUrl('og-images', 'og-image.png')
+// Simplified OG image handling - just use fallback or provided image
+// File existence checks removed to avoid build issues
+const generatedOgImage = withBasePath('og-images', `${basename(Astro.url.pathname)}.png`)
+const assignedOgImage = ogImage && ogImage !== true
+  ? withBasePath('og-images', ogImage as string)
+  : undefined
+
+const ogImageURL = new URL(
+  assignedOgImage ||
+    generatedOgImage ||
+    withBasePath('og-images', 'og-image.png'),
+  Astro.url
+).href
 
 // https://jsonld.com/blog-post/
 const blogPostingData = {
@@ -80,21 +81,16 @@ const webPageData = {
 <meta name="author" content={SITE.author} />
 
 <!-- Color -->
-<meta name="theme-color" content="#4a9a95" />
+<meta name="theme-color" content="" />
 <meta name="color-scheme" content="light dark" />
 
-<!-- Fonts and Styles -->
-<link rel="stylesheet" href={getUrl('/css/fonts.css')} />
-
-<!-- Three.js is imported dynamically in components that need it -->
-
-<!-- Open Graph / Facebook -->
+<!-- Open Graph & Facebook -->
 <meta property="og:type" content={pubDate ? 'article' : 'website'} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={pageDescription} />
 <meta property="og:image" content={ogImageURL} />
-<meta property="og:site_name" content={SITE.title} />
+<meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content={SITE.ogLocale} />
 {
   pubDate && (
@@ -117,26 +113,21 @@ const webPageData = {
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Icon -->
-<link rel="icon" sizes="any" href={getUrl('/favicon.ico')} />
-<link rel="icon" type="image/svg+xml" href={getUrl('/favicon.svg')} />
-<link rel="apple-touch-icon" href={getUrl('/apple-touch-icon.png')} />
+<link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
+<link rel="icon" sizes="32x32" href={withBasePath('/favicon.ico')} />
+<link rel="apple-touch-icon" href={withBasePath('/apple-touch-icon.png')} />
 
 <!-- Manifest -->
-<link rel="manifest" href={getUrl('/manifest.webmanifest')} />
-<link
-  rel="alternate"
-  type="application/manifest+json"
-  href={getUrl('/manifest.json')}
-/>
+<link rel="manifest" href={withBasePath('/app.webmanifest')} />
 
 <!-- Sitemap -->
-<link rel="sitemap" href={getUrl('/sitemap-index.xml')} />
+<link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
 
 <!-- RSS -->
 <link
   rel="alternate"
   type="application/rss+xml"
-  title={getUrl('/rss.xml')}
+  title={withBasePath('/rss.xml')}
   href="/rss.xml"
 />
 
@@ -157,8 +148,4 @@ const webPageData = {
   )
 }
 
-<!-- Page Transitions Component -->
-<PageTransitions mode={transitionMode} duration={350} />
-
-<!-- Replace external polyfill.io with local polyfills -->
-<script is:inline src="/js/feature-detector.js"></script>
+<ClientRouter />

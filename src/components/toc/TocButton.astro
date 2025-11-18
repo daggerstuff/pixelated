@@ -11,28 +11,27 @@
     hover:op-100 print:hidden"
   title="Open table of contents"
 >
-  <div u-i-lucide-table-of-contents></div>
+  <div u-i-lucide-table-of-contents class="text-gray-700 dark:text-gray-200">
+  </div>
 </button>
 
 <nav
   id="toc-panel"
-  class="z-200 fixed top-20 left-5% right-5%
-    flex flex-col
-    w-90% max-h-82vh py-6 px-8 rounded-lg
-    bg-[var(--c-bg)]"
+  class="hidden! z-200 fixed top-10% left-50% translate-x--50%
+    overflow-y-auto flex flex-col
+    w-90% max-h-80vh py-4 px-6 rounded-lg
+    bg-[var(--c-bg)] shadow-custom_0_0_10_0 text-[var(--c-text)]"
 >
-  <div class="pb-1 b-b b-[var(--c-scrollbar)] op-80 text-4.4 font-600">
-    Table of Contents
-  </div>
-  <ul>
+  <div class="pb-1 b-b b-[var(--c-text)]">Table of Contents</div>
+  <ul class="text-sm">
     <slot />
   </ul>
 </nav>
 
 <script>
-  import { toggleFadeEffect } from '~/utils/animation'
+  import { toggleFadeEffect } from '@/utils/misc'
 
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  document.addEventListener('astro:page-load', () => {
     /* Open toc panel when user click on button */
     const handleBtnClickToOpen = () => {
       toggleFadeEffect('backdrop', true, 'hidden')
@@ -44,7 +43,7 @@
 
     /* Close toc panel when user click on link */
     const handleClickToClose = (event: MouseEvent) => {
-      const target = event.targe
+      const target = event.target
       const isClickedOnLink =
         target instanceof HTMLElement && target.closest('a')
 
@@ -55,8 +54,6 @@
     }
 
     const tocPanel = document.getElementById('toc-panel')
-    tocPanel?.addEventListener('click', (event: Event) =>
-      handleClickToClose(event),
-    )
+    tocPanel?.addEventListener('click', handleClickToClose)
   })
 </script>

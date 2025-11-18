@@ -107,51 +107,22 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
     return '65+'
   }
 
+  const OCCUPATION_CATEGORIES: Record<string, readonly string[]> = {
+    Healthcare: ['doctor', 'nurse', 'therapist', 'medical'],
+    Education: ['teacher', 'professor', 'education'],
+    Technology: ['engineer', 'developer', 'tech', 'software'],
+    'Business/Finance': ['manager', 'analyst', 'finance', 'business'],
+    'Service Industry': ['service', 'retail', 'restaurant'],
+    Student: ['student'],
+    Retired: ['retired'],
+  } as const
+
   const getOccupationCategory = (occupation: string): string => {
     const occ = occupation.toLowerCase()
-    if (
-      occ.includes('doctor') ||
-      occ.includes('nurse') ||
-      occ.includes('therapist') ||
-      occ.includes('medical')
-    ) {
-      return 'Healthcare'
-    }
-    if (
-      occ.includes('teacher') ||
-      occ.includes('professor') ||
-      occ.includes('education')
-    ) {
-      return 'Education'
-    }
-    if (
-      occ.includes('engineer') ||
-      occ.includes('developer') ||
-      occ.includes('tech') ||
-      occ.includes('software')
-    ) {
-      return 'Technology'
-    }
-    if (
-      occ.includes('manager') ||
-      occ.includes('analyst') ||
-      occ.includes('finance') ||
-      occ.includes('business')
-    ) {
-      return 'Business/Finance'
-    }
-    if (
-      occ.includes('service') ||
-      occ.includes('retail') ||
-      occ.includes('restaurant')
-    ) {
-      return 'Service Industry'
-    }
-    if (occ.includes('student')) {
-      return 'Student'
-    }
-    if (occ.includes('retired')) {
-      return 'Retired'
+    for (const [category, keywords] of Object.entries(OCCUPATION_CATEGORIES)) {
+      if (keywords.some((keyword) => occ.includes(keyword))) {
+        return category
+      }
     }
     return 'Other'
   }
@@ -204,7 +175,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           subcategory: category,
           current:
             currentStats.occupation[
-              category as keyof typeof currentStats.occupation
+            category as keyof typeof currentStats.occupation
             ],
           target,
           percentage:
@@ -222,7 +193,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           subcategory: category,
           current:
             currentStats.background[
-              category as keyof typeof currentStats.background
+            category as keyof typeof currentStats.background
             ],
           target,
           percentage:
@@ -272,24 +243,14 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
     category: string,
     subcategory: string,
   ) => {
-    const ageCategory = getAgeCategory(currentProfile.age)
-    const genderCategory = currentProfile.gender
-    const occupationCategory = getOccupationCategory(currentProfile.occupation)
-    const backgroundCategory = getBackgroundCategory(currentProfile.background)
+    const categoryMap: Record<string, string> = {
+      Age: getAgeCategory(currentProfile.age),
+      Gender: currentProfile.gender,
+      Occupation: getOccupationCategory(currentProfile.occupation),
+      Background: getBackgroundCategory(currentProfile.background),
+    }
 
-    if (category === 'Age' && subcategory === ageCategory) {
-      return true
-    }
-    if (category === 'Gender' && subcategory === genderCategory) {
-      return true
-    }
-    if (category === 'Occupation' && subcategory === occupationCategory) {
-      return true
-    }
-    if (category === 'Background' && subcategory === backgroundCategory) {
-      return true
-    }
-    return false
+    return categoryMap[category] === subcategory
   }
 
   const groupedStats = demographicStats.reduce(
@@ -298,7 +259,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       if (!acc[category]) {
         acc[category] = []
       }
-      ;(acc[category] as DemographicData[]).push(stat)
+      ; (acc[category] as DemographicData[]).push(stat)
       return acc
     },
     {} as Record<string, DemographicData[]>,
@@ -315,13 +276,12 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             Overall Balance:
           </span>
           <span
-            className={`text-lg font-bold px-3 py-1 rounded-full ${
-              overallBalance > 85
+            className={`text-lg font-bold px-3 py-1 rounded-full ${overallBalance > 85
                 ? 'bg-green-100 text-green-800'
                 : overallBalance > 70
                   ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
-            }`}
+              }`}
           >
             {overallBalance.toFixed(1)}%
           </span>
@@ -439,10 +399,10 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           {demographicStats.filter(
             (stat) => stat.percentage < 75 || stat.percentage > 125,
           ).length === 0 && (
-            <p className="text-indigo-600">
-              ✓ All demographic categories are well-balanced
-            </p>
-          )}
+              <p className="text-indigo-600">
+                ✓ All demographic categories are well-balanced
+              </p>
+            )}
         </div>
       </div>
 

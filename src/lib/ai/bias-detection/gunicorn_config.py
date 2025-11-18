@@ -33,4 +33,5 @@ daemon = os.getenv("GUNICORN_DAEMON", "False").lower() == "true"
 preload_app = os.getenv("GUNICORN_PRELOAD_APP", "False").lower() == "true"
 
 # WSGI application path
+# Note: start-python-service.py imports the app from python-service/bias_detection_service.py
 wsgi_app = "start-python-service:app"

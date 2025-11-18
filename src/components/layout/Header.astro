@@ -352,6 +352,7 @@ const navLinks = [
     display: flex;
     align-items: center;
     height: 100%;
+    gap: var(--space-2);
   }
 
   .nav-link-enterprise {
@@ -359,58 +360,38 @@ const navLinks = [
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: var(--weight-medium);
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-md);
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    transition: all var(--transition-fast);
+    text-transform: none;
+    letter-spacing: 0.01em;
+    transition: color var(--transition-base);
     display: flex;
     align-items: center;
     gap: var(--space-2);
   }
 
-  .nav-link-enterprise::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--accent-primary);
-    transform: translateX(-50%);
-    transition: width var(--transition-fast);
-  }
-
   .nav-link-enterprise:hover {
-    color: var(--accent-primary);
-    background: var(--accent-primary-subtle);
-  }
-
-  .nav-link-enterprise:hover::after {
-    width: 60%;
+    color: var(--text-primary);
   }
 
   .nav-link--highlighted {
-    background: var(--accent-primary-subtle);
-    border-radius: var(--radius-md);
     color: var(--accent-primary);
   }
 
   .nav-link--highlighted:hover {
-    background: var(--accent-primary-muted);
     color: var(--accent-primary-hover);
   }
 
   /* Enterprise CTA Button - Corporate Sleekness */
   .btn-enterprise {
     position: relative;
-    font-weight: var(--weight-bold);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-radius: var(--radius-full);
+    font-weight: var(--weight-semibold);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    transition: all var(--transition-normal);
+    transition: all var(--transition-base);
   }
 
   .btn-enterprise::before {
@@ -648,16 +629,16 @@ const navLinks = [
     font-weight: var(--weight-medium);
     color: var(--text-primary);
     text-decoration: none;
-    transition: all var(--transition-fast);
-    border-radius: var(--radius-md);
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
+    transition: all var(--transition-base);
+    border-radius: var(--radius-lg);
+    text-transform: none;
+    letter-spacing: 0.01em;
   }
 
   .mobile-menu__nav-link:hover {
     color: var(--accent-primary);
-    background: var(--accent-primary-subtle);
-    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.03);
+    transform: translateX(2px);
   }
 
   /* Responsive Utilities - Enterprise Brevity */

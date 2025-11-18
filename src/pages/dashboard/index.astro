@@ -193,10 +193,52 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
             </div>
           </div>
         </Card>
+
+        <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-4 justify-center">
+              <span class="text-indigo-600 dark:text-indigo-400 material-symbols-outlined">
+                science
+              </span>
+              <h3 class="text-lg font-medium text-indigo-900 dark:text-indigo-100">Journal Research</h3>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4 text-center">
+              Manage journal dataset research, discovery, evaluation, and training pipeline integration
+            </p>
+            <div class="text-center">
+              <a
+                href="/journal-research"
+                class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+              >
+                Open Journal Research →
+              </a>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* $1 */}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
+          <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">science</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-sm">Dataset Pipeline</h4>
+                <p class="text-xs text-muted-foreground">Journal research & training</p>
+              </div>
+            </div>
+            <a 
+              href="/journal-research" 
+              class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+            >
+              Manage →
+            </a>
+          </div>
+        </Card>
+
         <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
           <div class="p-4">
             <div class="flex items-center gap-3 mb-3">

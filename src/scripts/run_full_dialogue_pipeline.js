@@ -5,6 +5,7 @@ import { spawn } from 'child_process'
 import readline from 'readline'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { safeJoin, ALLOWED_DIRECTORIES } from '../utils/path-security.js'
 
 // Get current file and directory path for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -18,8 +19,8 @@ const BATCH_GENERATE_SCRIPT = path.join(
   'batch_generate_dialogues.js',
 )
 const VALIDATE_SCRIPT = path.join(SCRIPTS_DIR, 'validate_dialogues.js')
-const OUTPUT_DIR = path.join(
-  path.resolve(),
+const OUTPUT_DIR = safeJoin(
+  ALLOWED_DIRECTORIES.PROJECT_ROOT,
   'ai/data/processed/generated_dialogues',
 )
 

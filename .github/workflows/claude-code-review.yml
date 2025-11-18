@@ -1,5 +1,10 @@
 name: Claude Code Review
 
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
 on:
   pull_request:
     types: [opened, synchronize]
@@ -27,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
@@ -68,7 +73,7 @@ jobs:
 
       - name: Setup Bun
         if: steps.auth-check.outputs.has_nvidia == 'true'
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.2.11"
 

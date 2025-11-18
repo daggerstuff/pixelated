@@ -56,51 +56,78 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
   const [characterCount, setCharacterCount] = useState(0)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
+  const validateText = useCallback(
+    (text: string): string | undefined => {
+      if (!text.trim()) {
+        return 'Therapy session text is required'
+      }
+      if (text.length < 50) {
+        return 'Please provide at least 50 characters of session text'
+      }
+      if (text.length > maxLength) {
+        return `Text exceeds maximum length of ${maxLength} characters`
+      }
+      const sanitizedText = InputValidator.sanitizeString(text)
+      if (sanitizedText !== text) {
+        return 'Text contains potentially harmful content that has been sanitized'
+      }
+      return undefined
+    },
+    [maxLength],
+  )
+
+  const validateContext = useCallback((context: string): string | undefined => {
+    if (!context.trim()) {
+      return 'Session context is required'
+    }
+    return undefined
+  }, [])
+
+  const validateDemographics = useCallback(
+    (
+      demographics: BiasAnalysisRequest['demographics'],
+    ): DemographicsErrors | undefined => {
+      const demographicsErrors: DemographicsErrors = {}
+      if (!demographics.gender) {
+        demographicsErrors.gender = 'Gender selection is required'
+      }
+      if (!demographics.ethnicity) {
+        demographicsErrors.ethnicity = 'Ethnicity selection is required'
+      }
+      if (!demographics.age) {
+        demographicsErrors.age = 'Age group selection is required'
+      }
+      if (!demographics.primaryLanguage) {
+        demographicsErrors.primaryLanguage = 'Primary language is required'
+      }
+      return Object.keys(demographicsErrors).length > 0
+        ? demographicsErrors
+        : undefined
+    },
+    [],
+  )
+
   const validateForm = useCallback((): boolean => {
     const newErrors: FormErrors = {}
 
-    // Required field validation
-    if (!formData.text.trim()) {
-      newErrors.text = 'Therapy session text is required'
-    } else if (formData.text.length < 50) {
-      newErrors.text = 'Please provide at least 50 characters of session text'
-    } else if (formData.text.length > maxLength) {
-      newErrors.text = `Text exceeds maximum length of ${maxLength} characters`
+    const textError = validateText(formData.text)
+    if (textError) {
+      newErrors.text = textError
     }
 
-    if (!formData.context.trim()) {
-      newErrors.context = 'Session context is required'
+    const contextError = validateContext(formData.context)
+    if (contextError) {
+      newErrors.context = contextError
     }
 
-    // Demographics validation
-    const demographicsErrors: DemographicsErrors = {}
-    if (!formData.demographics.gender) {
-      demographicsErrors.gender = 'Gender selection is required'
-    }
-    if (!formData.demographics.ethnicity) {
-      demographicsErrors.ethnicity = 'Ethnicity selection is required'
-    }
-    if (!formData.demographics.age) {
-      demographicsErrors.age = 'Age group selection is required'
-    }
-    if (!formData.demographics.primaryLanguage) {
-      demographicsErrors.primaryLanguage = 'Primary language is required'
-    }
-
-    if (Object.keys(demographicsErrors).length > 0) {
+    const demographicsErrors = validateDemographics(formData.demographics)
+    if (demographicsErrors) {
       newErrors.demographics = demographicsErrors
-    }
-
-    const sanitizedText = InputValidator.sanitizeString(formData.text)
-
-    if (sanitizedText !== formData.text) {
-      newErrors.text =
-        'Text contains potentially harmful content that has been sanitized'
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }, [formData, maxLength])
+  }, [formData, validateText, validateContext, validateDemographics])
 
   const handleTextChange = useCallback(
     (value: string) => {

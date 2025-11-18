@@ -2,10 +2,8 @@
 FastAPI application for bias detection service
 """
 
-import time
-from typing import Any, Dict, List, Optional, cast
-
 import structlog
+import time
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -17,7 +15,6 @@ from .config import settings
 from .models import (
     BiasAnalysisRequest,
     BiasAnalysisResponse,
-    ErrorResponse,
     HealthResponse,
 )
 from .services import BiasDetectionService, cache_service

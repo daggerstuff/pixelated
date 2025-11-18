@@ -1,5 +1,9 @@
 name: "Copilot Code Review"
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]

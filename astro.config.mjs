@@ -7,20 +7,58 @@ import { defineConfig, passthroughImageService } from 'astro/config';
 
 import icon from 'astro-icon';
 import sentry from '@sentry/astro';
-import spotlightjs from '@spotlightjs/astro';
 
 import node from '@astrojs/node';
-
 import { visualizer } from 'rollup-plugin-visualizer';
 
-// Environment variables for cleaner code
+// Conditionally import Cloudflare adapter (only when needed for Pages deployment)
+// Default remains Node adapter for Kubernetes deployments
+const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
+let cloudflareAdapter;
+if (isCloudflareDeploy) {
+  try {
+    // Dynamic import at build time - this is safe in Astro config
+    const cloudflareModule = await import('@astrojs/cloudflare');
+    cloudflareAdapter = cloudflareModule.default;
+  } catch (e) {
+    console.warn('⚠️  Cloudflare adapter not available, will use Node adapter:', e.message);
+    cloudflareAdapter = undefined;
+  }
+}
+
+if (isCloudflareDeploy && !cloudflareAdapter) {
+  console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
+}
+
+// Platform detection for Railway, Heroku, and Fly.io
+// These platforms use Node adapter but may have specific requirements
+const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
+const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
+const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
+
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
-const shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+// Temporarily disabled - SpotlightJS integration
+// const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+const preferredPort = (() => {
+  const candidates = [
+    process.env.PORT,
+    process.env.HTTP_PORT,
+    process.env.WEBSITES_PORT,
+    process.env.ASTRO_PORT,
+  ];
+  for (const value of candidates) {
+    if (!value) continue;
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isInteger(parsed) && parsed > 0 && parsed < 65536) {
+      return parsed;
+    }
+  }
+  return 4321;
+})();
 
-// Helper function to determine chunk names for better code splitting
 function getChunkName(id) {
   if (id.includes('react') || id.includes('react-dom')) {
     return 'react-vendor';
@@ -49,13 +87,60 @@ function getChunkName(id) {
   return null;
 }
 
+// Determine adapter based on deployment target
+// Default: Node adapter for Kubernetes/standalone deployments
+// Cloudflare: When DEPLOY_TARGET=cloudflare or CF_PAGES=1
+// Railway/Heroku/Fly.io: Node adapter with standalone mode
+const adapter = (() => {
+  if (isCloudflareDeploy && cloudflareAdapter) {
+    console.log('🔵 Using Cloudflare adapter for Pages deployment');
+    return cloudflareAdapter({
+      // Use 'directory' mode for Cloudflare Pages (creates functions/ directory)
+      // 'advanced' mode is for Workers and creates _worker.js
+      mode: 'directory',
+      platformProxy: {
+        enabled: true,
+      },
+      functionPerRoute: false,
+    });
+  }
+
+  // Railway deployment
+  if (isRailwayDeploy) {
+    console.log('🚂 Using Node adapter for Railway deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+
+  // Heroku deployment
+  if (isHerokuDeploy) {
+    console.log('🟣 Using Node adapter for Heroku deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+
+  // Fly.io deployment
+  if (isFlyioDeploy) {
+    console.log('✈️ Using Node adapter for Fly.io deployment');
+    return node({
+      mode: 'standalone',
+    });
+  }
+
+  // Default: Node adapter for Kubernetes/standard deployments
+  console.log('🟢 Using Node adapter for standard deployment');
+  return node({
+    mode: 'standalone',
+  });
+})();
+
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
   output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter,
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
@@ -101,8 +186,9 @@ export default defineConfig({
       sourcemap: isProduction ? false : 'hidden',
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
-      // Enable minification in production
-      minify: isProduction ? 'terser' : false,
+      // Temporarily disabled minification to debug build hang
+      minify: false,
+      // minify: isProduction ? 'terser' : false,
       terserOptions: isProduction ? {
         compress: {
           drop_console: true,
@@ -114,6 +200,8 @@ export default defineConfig({
         }
       } : {},
       rollupOptions: {
+        // Limit parallel file operations to prevent resource exhaustion
+        maxParallelFileOps: 2,
         external: [
           '@google-cloud/storage',
           '@aws-sdk/client-s3',
@@ -163,13 +251,13 @@ export default defineConfig({
     },
     plugins: [
       // Bundle analyzer for production builds
-      ...(shouldAnalyzeBundle ? [visualizer({
+      shouldAnalyzeBundle && visualizer({
         filename: 'dist/bundle-analysis.html',
         open: true,
         gzipSize: true,
         brotliSize: true
-      })] : [])
-    ],
+      })
+    ].filter(Boolean),
     resolve: {
       alias: {
         '~': path.resolve('./src'),
@@ -221,8 +309,10 @@ export default defineConfig({
     },
     optimizeDeps: {
       entries: [
-        'src/**/*.{ts,tsx,js,jsx,astro}',
-        'src/**/*.mjs',
+        'src/pages/**/*.{ts,tsx,js,jsx,astro}',
+        'src/layouts/**/*.{ts,tsx,js,jsx,astro}',
+        'src/components/**/*.{ts,tsx,js,jsx,astro}',
+        'src/middleware.ts',
       ],
       exclude: [
         '@aws-sdk/client-s3',
@@ -250,6 +340,11 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js',
+        '@spotlightjs/astro',
+        'framer-motion',
+        'zustand',
+        'jotai',
+        '@tanstack/react-query',
       ],
     },
   },
@@ -279,6 +374,11 @@ export default defineConfig({
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
             project: process.env.SENTRY_PROJECT || 'pixel-astro',
             authToken: process.env.SENTRY_AUTH_TOKEN,
+            // Include release for proper stack trace linking and code mapping
+            release:
+              process.env.SENTRY_RELEASE ||
+              process.env.npm_package_version ||
+              undefined,
             telemetry: false,
             sourcemaps: {
               assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
@@ -287,7 +387,8 @@ export default defineConfig({
             },
           },
         }),
-        ...(shouldUseSpotlight ? [spotlightjs()] : [])
+        // Temporarily disable SpotlightJS due to build issues
+        // ...(shouldUseSpotlight ? [spotlightjs()] : [])
       ] : []),
     ]
   })(),
@@ -301,8 +402,9 @@ export default defineConfig({
     checkOrigin: true,
   },
   server: {
-    port: 4321,
+    port: preferredPort,
     host: '0.0.0.0',
+    strictPort: false,
     watch: {
       followSymlinks: false,
       ignored: [

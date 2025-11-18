@@ -1,16 +1,12 @@
-<div style="text-align: center">
+![Pixelated Empathy Logo](public/android-chrome-512x512.png)
 
-  <img src="public/android-chrome-512x512.png" alt="Pixelated Empathy Logo" width="512">
+## Pixelated Empathy
 
-  <br/>
-  <h1>Pixelated Empathy</h1>
-  <p><i>Beyond the screen, lies a deeper connection.</i></p>
- <br/>
+*Beyond the screen, lies a deeper connection.*
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg?style=flat-square)](LICENSE)
 [![Enterprise](https://img.shields.io/badge/enterprise-ready-blue.svg?style=flat-square)](https://pixelatedempathy.com)
 [![AI](https://img.shields.io/badge/AI-Powered-9cf.svg?style=flat-square)](https://pixelatedempathy.com)
-
 
 > **We don't just process conversations. We understand them.**  
 > Most platforms see *what* you say. We see *why* you said it, *how* you felt when you said it, and *what* you really needed when you said it.
@@ -57,8 +53,16 @@ This technology is exclusively designed for organizations that understand: **you
 
 We partner with forward-thinking platforms that refuse to accept "engagement" as a substitute for genuine connection.
 
-### Our Partners Build:
+## Journal Dataset Research Pipeline
 
+The platform includes a comprehensive **Journal Dataset Research Pipeline** for discovering, evaluating, acquiring, and integrating therapeutic datasets from academic sources. This integrated system consists of:
+
+- **Web Frontend**: User-friendly interface for managing research operations (`/journal-research`)
+- **MCP Server**: AI agent interface via Model Context Protocol
+- **CLI**: Command-line access for automation
+- **Backend Engine**: Core research automation with discovery, evaluation, acquisition, and integration planning
+
+All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/journal-research-pipeline.md) for complete details.
 
 ## Enterprise-Grade. Enterprise-Focused.
 
@@ -86,10 +90,8 @@ If you're building a platform where connection matters more than clicks, where e
 Because while others are building better algorithms, we're building better humans.
 
 
-**[Request Enterprise Access](https://pixelatedempathy.com/contact)** • **[View Case Studies](https://pixelatedempathy.com/case-studies)** • **[Meet Our Team](https://pixelatedempathy.com/team)**
+**Links:** [Request Enterprise Access](https://pixelatedempathy.com/contact) • [View Case Studies](https://pixelatedempathy.com/case-studies) • [Meet Our Team](https://pixelatedempathy.com/team)
 
-<br/>
+---
 
 *© 2025 Pixelated Empathy. Engineered with purpose.*
-
-</div>
