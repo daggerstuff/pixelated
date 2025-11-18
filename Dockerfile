@@ -34,7 +34,7 @@ FROM node:24-slim AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
-ARG PNPM_VERSION=10.20.0
+ARG PNPM_VERSION=10.22.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libstdc++6 \
     python3 \

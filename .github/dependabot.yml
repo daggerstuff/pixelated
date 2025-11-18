@@ -10,7 +10,6 @@ updates:
   schedule:
     interval: "weekly"
   ignore:
-  # This action is not publicly accessible and causes Dependabot to fail
   - dependency-name: "github/copilot-review-action"
   groups:
     github-actions:
