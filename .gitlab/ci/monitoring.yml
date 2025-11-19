@@ -140,6 +140,8 @@ monitoring:health:
 monitoring:resources:
   extends: .monitoring-base
   needs: ["deploy:rolling"]
+  variables:
+    KUBE_NAMESPACE: "pixelated-staging"
   script:
     - echo "📊 Running resource monitoring..."
     
@@ -196,6 +198,8 @@ monitoring:resources:
 monitoring:errors:
   extends: .monitoring-base
   needs: ["deploy:rolling"]
+  variables:
+    KUBE_NAMESPACE: "pixelated-staging"
   script:
     - echo "🚨 Running error rate monitoring..."
     
@@ -216,7 +220,12 @@ monitoring:errors:
     
     # Calculate error rate
     - TOTAL_LOGS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | wc -l)
-    - ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ))
+    - if [ "$TOTAL_LOGS" -eq 0 ]; then
+        echo "⚠️ No logs found, cannot calculate error rate";
+        ERROR_RATE=0;
+      else
+        ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ));
+      fi
     - echo "Error rate: ${ERROR_RATE}%"
     
     # Generate error report

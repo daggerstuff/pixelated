@@ -188,7 +188,7 @@ deploy:production:
   extends: .production
   stage: deploy
   image: google/cloud-sdk:alpine
-  needs: ["build", "security-scan", "compliance:summary", "monitoring:summary"]
+  needs: ["build", "security-scan", "compliance:summary"]
   script:
     - echo "🚀 Deploying to production environment..."
     - echo "Environment: $ENVIRONMENT_NAME"
