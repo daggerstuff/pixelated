@@ -381,25 +381,27 @@ health-check:
     - TOTAL_PODS=$(kubectl get pods -l app=pixelated -o json | jq '.items | length')
     - echo "📈 Health summary: $READY_PODS/$TOTAL_PODS pods ready"
     
-    - if [ "$READY_PODS" -eq 0 ]; then
-        echo "❌ No healthy pods found";
-        kubectl describe pods -l app=pixelated;
-        exit 1;
+    - |
+      if [ "$READY_PODS" -eq 0 ]; then
+        echo "❌ No healthy pods found"
+        kubectl describe pods -l app=pixelated
+        exit 1
       elif [ "$READY_PODS" -lt "$TOTAL_PODS" ]; then
-        echo "⚠️ Some pods are not ready";
-        kubectl describe pods -l app=pixelated | grep -A 10 -B 5 "Warning\|Error" || true;
+        echo "⚠️ Some pods are not ready"
+        kubectl describe pods -l app=pixelated | grep -A 10 -B 5 "Warning\|Error" || true
       else
-        echo "✅ All pods are healthy";
+        echo "✅ All pods are healthy"
       fi
     
     # Test internal connectivity if possible
-    - if [ -n "$STAGING_URL" ]; then
-        echo "🌐 Testing external connectivity...";
+    - |
+      if [ -n "$STAGING_URL" ]; then
+        echo "🌐 Testing external connectivity..."
         if curl -f --connect-timeout 10 --max-time 30 "$STAGING_URL/api/health" >/dev/null 2>&1; then
-          echo "✅ External health check passed";
+          echo "✅ External health check passed"
         else
-          echo "⚠️ External health check failed";
-        fi;
+          echo "⚠️ External health check failed"
+        fi
       fi
     
     - echo "✅ Health check completed"
@@ -434,7 +436,8 @@ cleanup-deployment:
     - IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
     - echo "📊 Found $IMAGE_COUNT images for ${IMAGE_NAME}"
     
-    - if [ $IMAGE_COUNT -gt 3 ]; then
+    - |
+      if [ $IMAGE_COUNT -gt 3 ]; then
         # Remove images beyond the keep threshold
         IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +4 | awk '{print $1}')
         echo "$IMAGES_TO_REMOVE" | while read -r image; do
