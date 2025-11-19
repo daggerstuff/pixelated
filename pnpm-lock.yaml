@@ -80,10 +80,10 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.6))(@types/react@19.2.6)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@react-three/drei':
         specifier: ^10.7.7
-        version: 10.7.7(@react-three/fiber@9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0))(@types/react@19.2.6)(@types/three@0.180.0)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0)
+        version: 10.7.7(@react-three/fiber@9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1))(@types/react@19.2.6)(@types/three@0.180.0)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)
       '@react-three/fiber':
         specifier: ^9.4.0
-        version: 9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0)
+        version: 9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)
       '@sentry/astro':
         specifier: ^10.25.0
         version: 10.25.0(astro@5.15.9(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.2)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))
@@ -14751,12 +14751,12 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-three/drei@10.7.7(@react-three/fiber@9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0))(@types/react@19.2.6)(@types/three@0.180.0)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0)':
+  '@react-three/drei@10.7.7(@react-three/fiber@9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1))(@types/react@19.2.6)(@types/three@0.180.0)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@mediapipe/tasks-vision': 0.10.17
-      '@monogrid/gainmap-js': 3.2.0(three@0.180.0)
-      '@react-three/fiber': 9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.180.0)
+      '@monogrid/gainmap-js': 3.2.0(three@0.181.1)
+      '@react-three/fiber': 9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)
       '@use-gesture/react': 10.3.1(react@19.2.0)
       camera-controls: 3.1.2(three@0.181.1)
       cross-env: 7.0.3
@@ -14773,7 +14773,7 @@ snapshots:
       three-mesh-bvh: 0.8.3(three@0.181.1)
       three-stdlib: 2.36.1(three@0.181.1)
       troika-three-text: 0.52.4(three@0.181.1)
-      tunnel-rat: 0.1.2(@types/react@19.2.5)(immer@10.2.0)(react@19.2.0)
+      tunnel-rat: 0.1.2(@types/react@19.2.6)(immer@10.2.0)(react@19.2.0)
       use-sync-external-store: 1.6.0(react@19.2.0)
       utility-types: 3.11.0
       zustand: 5.0.8(@types/react@19.2.6)(immer@10.2.0)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
@@ -14784,7 +14784,7 @@ snapshots:
       - '@types/three'
       - immer
 
-  '@react-three/fiber@9.4.0(@types/react@19.2.5)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)':
+  '@react-three/fiber@9.4.0(@types/react@19.2.6)(immer@10.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.181.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@types/react-reconciler': 0.32.3(@types/react@19.2.6)

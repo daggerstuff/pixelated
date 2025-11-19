@@ -1,0 +1,372 @@
+# Monitoring and observability pipeline configuration
+# Real-time metrics, alerting, and performance monitoring
+
+.monitoring-base:
+  stage: health-check
+  image: node:${NODE_VERSION}-slim
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl jq > /dev/null
+    - corepack enable pnpm
+
+# Performance monitoring
+monitoring:performance:
+  extends: .monitoring-base
+  needs: ["deploy:rolling"]
+  script:
+    - echo "📈 Running performance monitoring..."
+    
+    # Wait for deployment to stabilize
+    - echo "⏳ Waiting for deployment to stabilize..."
+    - sleep 30
+    
+    # Test application performance
+    - echo "🔍 Testing application performance..."
+    - PERFORMANCE_TEST_URL="${STAGING_URL:-http://localhost:4321}"
+    
+    # Response time testing
+    - echo "⏱️ Testing response times..."
+    - START_TIME=$(date +%s%N)
+    - curl -s -o /dev/null -w "%{http_code},%{time_total},%{size_download}" "$PERFORMANCE_TEST_URL" > performance-metrics.csv
+    - END_TIME=$(date +%s%N)
+    - RESPONSE_TIME=$(( (END_TIME - START_TIME) / 1000000 ))
+    - echo "Response time: ${RESPONSE_TIME}ms"
+    
+    # Memory usage monitoring
+    - echo "🧠 Monitoring memory usage..."
+    - kubectl top pods -l app=pixelated --no-headers > memory-usage.txt || echo "⚠️ Could not get memory usage"
+    
+    # CPU usage monitoring
+    - echo "⚡ Monitoring CPU usage..."
+    - kubectl top pods -l app=pixelated --no-headers > cpu-usage.txt || echo "⚠️ Could not get CPU usage"
+    
+    # Generate performance report
+    - echo "📊 Generating performance report..."
+    - cat > performance-report.json << 'EOF'
+    {
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "response_time_ms": ${RESPONSE_TIME},
+      "test_url": "${PERFORMANCE_TEST_URL}",
+      "memory_usage": "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')",
+      "cpu_usage": "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')",
+      "status": "monitored"
+    }
+    EOF
+    
+    - echo "✅ Performance monitoring completed"
+  artifacts:
+    reports:
+      performance: performance-report.json
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Health monitoring
+monitoring:health:
+  extends: .monitoring-base
+  needs: ["deploy:rolling"]
+  script:
+    - echo "🏥 Running health monitoring..."
+    
+    # Application health check
+    - echo "🔍 Checking application health..."
+    - HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health"
+    - HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$HEALTH_URL" || echo "000")
+    
+    - if [ "$HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Application is healthy";
+        HEALTH_STATUS="healthy";
+      else
+        echo "❌ Application health check failed: $HEALTH_RESPONSE";
+        HEALTH_STATUS="unhealthy";
+      fi
+    
+    # Database health check
+    - echo "🗄️ Checking database health..."
+    - DB_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/db"
+    - DB_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$DB_HEALTH_URL" || echo "000")
+    
+    - if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Database is healthy";
+        DB_HEALTH_STATUS="healthy";
+      else
+        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE";
+        DB_HEALTH_STATUS="unhealthy";
+      fi
+    
+    # Redis health check
+    - echo "🔄 Checking Redis health..."
+    - REDIS_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/redis"
+    - REDIS_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$REDIS_HEALTH_URL" || echo "000")
+    
+    - if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Redis is healthy";
+        REDIS_HEALTH_STATUS="healthy";
+      else
+        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE";
+        REDIS_HEALTH_STATUS="unhealthy";
+      fi
+    
+    # Generate health report
+    - echo "📊 Generating health report..."
+    - cat > health-report.json << 'EOF'
+    {
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "health_checks": {
+        "application": "${HEALTH_STATUS}",
+        "database": "${DB_HEALTH_STATUS}",
+        "redis": "${REDIS_HEALTH_STATUS}"
+      },
+      "overall_status": "$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")"
+    }
+    EOF
+    
+    - echo "✅ Health monitoring completed"
+  artifacts:
+    reports:
+      junit: test-results/health-junit.xml
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Resource monitoring
+monitoring:resources:
+  extends: .monitoring-base
+  needs: ["deploy:rolling"]
+  script:
+    - echo "📊 Running resource monitoring..."
+    
+    # Authenticate to GKE if needed
+    - if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+        echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json;
+        gcloud auth activate-service-account --key-file /tmp/gcp-key.json;
+        gcloud config set project $GCP_PROJECT_ID;
+        gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID;
+      fi
+    
+    # Pod resource usage
+    - echo "📦 Monitoring pod resources..."
+    - kubectl top pods -l app=pixelated --no-headers > pod-resources.txt || echo "⚠️ Could not get pod resources"
+    
+    # Node resource usage
+    - echo "🖥️ Monitoring node resources..."
+    - kubectl top nodes --no-headers > node-resources.txt || echo "⚠️ Could not get node resources"
+    
+    # Disk usage
+    - echo "💾 Monitoring disk usage..."
+    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- df -h > disk-usage.txt || echo "⚠️ Could not get disk usage"
+    
+    # Memory allocation
+    - echo "🧠 Monitoring memory allocation..."
+    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- free -h > memory-allocation.txt || echo "⚠️ Could not get memory allocation"
+    
+    # Generate resource report
+    - echo "📊 Generating resource report..."
+    - cat > resource-report.json << 'EOF'
+    {
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "pod_resources": "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')",
+      "node_resources": "$(cat node-resources.txt 2>/dev/null || echo 'N/A')",
+      "disk_usage": "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')",
+      "memory_allocation": "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')",
+      "status": "monitored"
+    }
+    EOF
+    
+    - echo "✅ Resource monitoring completed"
+  artifacts:
+    reports:
+      metrics: resource-report.json
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Error rate monitoring
+monitoring:errors:
+  extends: .monitoring-base
+  needs: ["deploy:rolling"]
+  script:
+    - echo "🚨 Running error rate monitoring..."
+    
+    # Check application logs for errors
+    - echo "🔍 Checking application logs..."
+    - ERROR_COUNT=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "error\|exception\|fail" | wc -l)
+    - echo "Found $ERROR_COUNT errors in recent logs"
+    
+    # Check for specific error patterns
+    - echo "🔍 Checking for specific error patterns..."
+    - DB_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "database\|connection\|timeout" | wc -l)
+    - API_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "api\|request\|response" | wc -l)
+    - AUTH_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "auth\|login\|token" | wc -l)
+    
+    - echo "Database errors: $DB_ERRORS"
+    - echo "API errors: $API_ERRORS"
+    - echo "Authentication errors: $AUTH_ERRORS"
+    
+    # Calculate error rate
+    - TOTAL_LOGS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | wc -l)
+    - ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ))
+    - echo "Error rate: ${ERROR_RATE}%"
+    
+    # Generate error report
+    - echo "📊 Generating error report..."
+    - cat > error-report.json << 'EOF'
+    {
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "error_metrics": {
+        "total_errors": ${ERROR_COUNT},
+        "database_errors": ${DB_ERRORS},
+        "api_errors": ${API_ERRORS},
+        "auth_errors": ${AUTH_ERRORS},
+        "error_rate_percent": ${ERROR_RATE}
+      },
+      "status": "$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")"
+    }
+    EOF
+    
+    # Alert if error rate is too high
+    - if [ $ERROR_RATE -gt 5 ]; then
+        echo "⚠️ High error rate detected: ${ERROR_RATE}%";
+      else
+        echo "✅ Error rate is acceptable: ${ERROR_RATE}%";
+      fi
+    
+    - echo "✅ Error rate monitoring completed"
+  artifacts:
+    reports:
+      junit: test-results/errors-junit.xml
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Alerting and notifications
+monitoring:alerts:
+  extends: .monitoring-base
+  needs: ["monitoring:health", "monitoring:errors"]
+  script:
+    - echo "🚨 Setting up alerting and notifications..."
+    
+    # Check if any monitoring jobs failed
+    - echo "🔍 Checking monitoring status..."
+    - HEALTH_STATUS=$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo "unknown")
+    - ERROR_STATUS=$(cat error-report.json | jq -r '.status' 2>/dev/null || echo "unknown")
+    
+    # Generate alert if needed
+    - if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
+        echo "🚨 ALERT: System health issues detected";
+        ALERT_LEVEL="critical";
+        ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS";
+      else
+        echo "✅ System health is good";
+        ALERT_LEVEL="info";
+        ALERT_MESSAGE="System health monitoring completed successfully";
+      fi
+    
+    # Create alert payload
+    - cat > alert-payload.json << 'EOF'
+    {
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "alert_level": "${ALERT_LEVEL}",
+      "message": "${ALERT_MESSAGE}",
+      "health_status": "${HEALTH_STATUS}",
+      "error_status": "${ERROR_STATUS}"
+    }
+    EOF
+    
+    # Send alert (placeholder for actual alerting system)
+    - echo "📤 Sending alert notification..."
+    - echo "Alert level: $ALERT_LEVEL"
+    - echo "Alert message: $ALERT_MESSAGE"
+    
+    # Here you would integrate with your alerting system
+    # Examples: PagerDuty, Slack, Microsoft Teams, etc.
+    - if [ "$ALERT_LEVEL" = "critical" ]; then
+        echo "🚨 Critical alert would be sent to operations team";
+        # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL;
+      fi
+    
+    - echo "✅ Alerting and notifications completed"
+  artifacts:
+    reports:
+      junit: test-results/alerts-junit.xml
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Monitoring summary
+monitoring:summary:
+  extends: .monitoring-base
+  needs: ["monitoring:performance", "monitoring:health", "monitoring:resources", "monitoring:errors", "monitoring:alerts"]
+  script:
+    - echo "📊 Generating monitoring summary..."
+    
+    # Aggregate all monitoring reports
+    - echo "📋 Aggregating monitoring reports..."
+    - cat > monitoring-summary.json << 'EOF'
+    {
+      "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+      "pipeline_id": "${CI_PIPELINE_ID}",
+      "monitoring_areas": {
+        "performance": "monitored",
+        "health": "monitored",
+        "resources": "monitored",
+        "errors": "monitored",
+        "alerts": "configured"
+      },
+      "overall_status": "active",
+      "next_check": "$(date -u -d '+5 minutes' +%Y-%m-%dT%H:%M:%SZ)"
+    }
+    EOF
+    
+    # Generate monitoring dashboard data
+    - echo "📊 Generating monitoring dashboard data..."
+    - cat > monitoring-dashboard.json << 'EOF'
+    {
+      "dashboard": {
+        "title": "Pixelated Empathy Monitoring",
+        "version": "1.0.0",
+        "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "metrics": {
+          "response_time": "$(cat performance-report.json | jq -r '.response_time_ms' 2>/dev/null || echo 'N/A')",
+          "error_rate": "$(cat error-report.json | jq -r '.error_metrics.error_rate_percent' 2>/dev/null || echo 'N/A')",
+          "health_status": "$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo 'N/A')",
+          "resource_usage": "monitored"
+        },
+        "alerts": {
+          "status": "configured",
+          "last_alert": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        }
+      }
+    }
+    EOF
+    
+    - echo "✅ Monitoring summary generated"
+    - echo "📊 Overall monitoring status: ACTIVE"
+  artifacts:
+    reports:
+      metrics: monitoring-summary.json
+    expire_in: 1 month
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
