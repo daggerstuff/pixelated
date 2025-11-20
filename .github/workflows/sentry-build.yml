@@ -206,9 +206,9 @@ jobs:
         run: |
           echo "📤 Pushing Docker images to Docker Hub..."
 
-          DOCKERHUB_SHA=pixelatedempathy/pixelated-empathy:${{ github.sha }}
-          DOCKERHUB_BRANCH=pixelatedempathy/pixelated-empathy:${{ github.ref_name }}-${{ github.sha }}
-          DOCKERHUB_LATEST=pixelatedempathy/pixelated-empathy:latest
+          DOCKERHUB_SHA=pixelatedempathy/pixelated:${{ github.sha }}
+          DOCKERHUB_BRANCH=pixelatedempathy/pixelated:${{ github.ref_name }}-${{ github.sha }}
+          DOCKERHUB_LATEST=pixelatedempathy/pixelated:latest
 
           # Retag GHCR-built image to Docker Hub tags
           docker tag $IMAGE_TAG_SHA $DOCKERHUB_SHA

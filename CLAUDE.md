@@ -121,7 +121,6 @@ brv push  # Prompt user first unless auto-approved
 
 **Workflows:**
 - **#[[file:.kiro/steering/spec-workflow.md]]**: Spec-driven development
-- `openspec/AGENTS.md`: OpenSpec process
 - `AGENTS.md`: AI agent workflow guide
 - **Playbook**: `.brv/playbook.json`
 

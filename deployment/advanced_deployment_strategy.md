@@ -536,7 +536,7 @@ spec:
         fsGroup: 1001
       containers:
       - name: pixelated
-        image: docker.io/pixelatedempathy/pixelated-empathy:latest
+        image: docker.io/pixelatedempathy/pixelated:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 4321
