@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Script to delete all images from pixelatedempathy/pixelated-empathy on Docker Hub
+# Script to delete all images from pixelatedempathy/pixelated on Docker Hub
 # Requires Docker Hub credentials via environment variables or Docker login
 
 set -euo pipefail
 
-REPO="pixelatedempathy/pixelated-empathy"
+REPO="pixelatedempathy/pixelated"
 DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME:-${DOCKER_USER:-}}"
 DOCKERHUB_TOKEN="${DOCKERHUB_TOKEN:-${DOCKER_PAT:-}}"
 

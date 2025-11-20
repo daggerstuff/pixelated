@@ -343,3 +343,17 @@ scripts/claude-flow-removal.sh
 # OpenMemory - IDE/Assistant specific rules
 .cursor/rules/openmemory.mdc
 AGENTS.md
+sp-cert.pem
+sp-key.pem
+
+# Kubernetes credentials and kubeconfig files
+*kubeconfig*.yaml
+*kubeconfig*.yml
+*kubeconfig*
+azure-devops-kubeconfig.yaml
+
+# Azure service connection files with credentials
+k8s/azure/service-connection.json
+k8s/azure/aks-service-connection.json
+k8s/azure/azure-rm-service-connection.json
+*service-connection*.json
