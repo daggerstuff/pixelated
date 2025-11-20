@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pixelated-test
-  namespace: staging
+  namespace: pixelated-staging
   labels:
     app: pixelated-test
     environment: staging
@@ -51,7 +51,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pixelated-test-service
-  namespace: staging
+  namespace: pixelated-staging
 spec:
   selector:
     app: pixelated-test

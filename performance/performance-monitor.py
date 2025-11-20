@@ -252,7 +252,9 @@ if __name__ == "__main__":
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_file = Path(f'/tmp/performance-monitoring-{timestamp}.json')
 
-    with suppress(Exception):
+    try:
         with report_file.open("w") as f:
             json.dump(report, f, indent=2)
         print("✅ Performance monitoring completed")
+    except Exception:
+        print("⚠️  Performance monitoring completed but failed to save report")
