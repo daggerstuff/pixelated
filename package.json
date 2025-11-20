@@ -137,7 +137,7 @@
     "toolbar:off": "astro preferences disable devToolbar",
     "blog-publisher": "tsx src/lib/scripts/blog-publisher.ts",
     "blog": "node scripts/blog-web.js",
-    "schedule-posts": "node scripts/schedule-posts.js",
+    "schedule-posts": "node scripts/content/schedule-posts.js",
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",

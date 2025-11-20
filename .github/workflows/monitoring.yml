@@ -107,11 +107,13 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -121,6 +123,19 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  The site is blocking the health check request."
+                echo "   ℹ️  Possible causes:"
+                echo "      - Cloudflare/WAF security rules blocking automated requests"
+                echo "      - GitHub Actions IPs are blocked or rate-limited"
+                echo "      - Site requires authentication or authorization"
+                echo "      - IP allowlisting/blocklisting configured"
+                echo "   ℹ️  Solutions:"
+                echo "      1. Check Cloudflare Security settings and allow GitHub Actions IPs"
+                echo "      2. Verify rate limiting rules allow health check User-Agent"
+                echo "      3. Add GitHub Actions IP ranges to allowlist if using IP filtering"
+                echo "      4. Check if site requires specific headers or tokens for health checks"
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -149,6 +164,10 @@ jobs:
             echo ""
             echo "::error::PRODUCTION site is down or returning errors after ${{ env.HEALTH_CHECK_RETRIES_PROD }} attempts"
             echo "::error::URL tested: $BASE_URL"
+            echo "::error::If you see HTTP 403 (Forbidden), check if:"
+            echo "::error::  1. Cloudflare/WAF security rules allow health check User-Agent"
+            echo "::error::  2. GitHub Actions IPs are whitelisted in your security settings"
+            echo "::error::  3. Rate limiting rules bypass requests with 'health' or 'monitor' in User-Agent"
             echo "::error::If you see HTTP 522, check if:"
             echo "::error::  1. The site is actually deployed to a server"
             echo "::error::  2. DNS is correctly configured to point to your server"
@@ -336,11 +355,13 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -350,6 +371,10 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  The site is blocking the health check request."
+                echo "   ℹ️  Check Cloudflare/WAF settings and rate limiting rules."
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -539,11 +564,13 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -553,6 +580,9 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  Preview site may be blocking automated requests (this is acceptable for preview)"
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -714,7 +744,7 @@ jobs:
             ATTEMPTS=0
             code=000
             until [ "$code" = "200" ] || [ "$ATTEMPTS" -ge "$MAX_PROBE_ATTEMPTS" ]; do
-              code=$(curl -s -o /dev/null -w "%{http_code}" "$u" || echo "000")
+              code=$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" "$u" || echo "000")
               if [ "$code" != "200" ]; then
                 echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/$MAX_PROBE_ATTEMPTS"
                 sleep "$PROBE_SLEEP_SECONDS"

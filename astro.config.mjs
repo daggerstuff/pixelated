@@ -11,13 +11,10 @@ import sentry from '@sentry/astro';
 import node from '@astrojs/node';
 import { visualizer } from 'rollup-plugin-visualizer';
 
-// Conditionally import Cloudflare adapter (only when needed for Pages deployment)
-// Default remains Node adapter for Kubernetes deployments
 const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
 let cloudflareAdapter;
 if (isCloudflareDeploy) {
   try {
-    // Dynamic import at build time - this is safe in Astro config
     const cloudflareModule = await import('@astrojs/cloudflare');
     cloudflareAdapter = cloudflareModule.default;
   } catch (e) {
@@ -30,8 +27,6 @@ if (isCloudflareDeploy && !cloudflareAdapter) {
   console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
 }
 
-// Platform detection for Railway, Heroku, and Fly.io
-// These platforms use Node adapter but may have specific requirements
 const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
 const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
 const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
@@ -40,7 +35,6 @@ const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
-// Temporarily disabled - SpotlightJS integration
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 const preferredPort = (() => {
   const candidates = [
@@ -63,40 +57,28 @@ function getChunkName(id) {
   if (id.includes('react') || id.includes('react-dom')) {
     return 'react-vendor';
   }
-  // UI libraries
   if (id.includes('framer-motion') || id.includes('lucide-react')) {
     return 'ui-vendor';
   }
-  // Utility libraries
   if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
     return 'utils-vendor';
   }
-  // Chart libraries
   if (id.includes('recharts') || id.includes('chart.js')) {
     return 'charts-vendor';
   }
-  // 3D libraries
   if (id.includes('three') || id.includes('@react-three')) {
     return 'three-vendor';
   }
-  // Node modules (keep separate for better caching)
   if (id.includes('node_modules')) {
     return 'vendor';
   }
-  // Return null for non-vendor modules to let Rollup handle them automatically
   return null;
 }
 
-// Determine adapter based on deployment target
-// Default: Node adapter for Kubernetes/standalone deployments
-// Cloudflare: When DEPLOY_TARGET=cloudflare or CF_PAGES=1
-// Railway/Heroku/Fly.io: Node adapter with standalone mode
 const adapter = (() => {
   if (isCloudflareDeploy && cloudflareAdapter) {
     console.log('🔵 Using Cloudflare adapter for Pages deployment');
     return cloudflareAdapter({
-      // Use 'directory' mode for Cloudflare Pages (creates functions/ directory)
-      // 'advanced' mode is for Workers and creates _worker.js
       mode: 'directory',
       platformProxy: {
         enabled: true,
@@ -105,7 +87,6 @@ const adapter = (() => {
     });
   }
 
-  // Railway deployment
   if (isRailwayDeploy) {
     console.log('🚂 Using Node adapter for Railway deployment');
     return node({
@@ -113,7 +94,6 @@ const adapter = (() => {
     });
   }
 
-  // Heroku deployment
   if (isHerokuDeploy) {
     console.log('🟣 Using Node adapter for Heroku deployment');
     return node({
@@ -144,7 +124,8 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
-    sourcemap: !isProduction,
+    // Enable source maps in production for Sentry (hidden, not served to users)
+    sourcemap: hasSentryDSN || !isProduction,
     copy: [
       {
         from: 'templates/email',
@@ -167,7 +148,7 @@ export default defineConfig({
       watch: {
         ignored: [
           // Aggressive node_modules exclusion at Vite level
-          (p) => typeof p === 'string' && (
+          (p) => (
             p.includes('/node_modules/') ||
             p.includes('\\node_modules\\') ||
             p.includes('/.venv/') ||
@@ -183,7 +164,8 @@ export default defineConfig({
       },
     },
     build: {
-      sourcemap: isProduction ? false : 'hidden',
+      // Enable hidden source maps in production for Sentry upload (not served to users)
+      sourcemap: (!isProduction || hasSentryDSN) ? 'hidden' : false,
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
       // Temporarily disabled minification to debug build hang
@@ -409,7 +391,7 @@ export default defineConfig({
       followSymlinks: false,
       ignored: [
         // Hard guard first: function ignore for node_modules and .venv anywhere
-        (p) => typeof p === 'string' && (
+        (p) => (
           p.includes('/node_modules/') ||
           p.includes('\\node_modules\\') ||
           p.includes('/.venv/') ||

@@ -11,7 +11,7 @@ const optionalIsoDateSchema = z
   .transform((value) => new Date(value))
   .optional()
   .nullable()
-  .transform((value) => (value ? value : null))
+  .transform((value) => (value || null))
 
 export const SearchKeywordMapSchema = z.record(z.array(z.string()))
 export type SearchKeywordMap = z.infer<typeof SearchKeywordMapSchema>
@@ -241,20 +241,17 @@ export interface Paginated<T> {
 }
 
 const createPaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
-  z
-    .intersect(
-      PaginationEnvelopeSchema,
-      z.object({
-        items: z.array(itemSchema),
-      }),
-    )
-    .transform((data) => ({
-      items: data.items as Array<z.infer<T>>,
-      total: data.total,
-      page: data.page,
-      pageSize: data.page_size,
-      totalPages: data.total_pages,
-    }))
+  PaginationEnvelopeSchema.and(
+    z.object({
+      items: z.array(itemSchema),
+    }),
+  ).transform((data) => ({
+    items: data.items as Array<z.infer<T>>,
+    total: data.total,
+    page: data.page,
+    pageSize: data.page_size,
+    totalPages: data.total_pages,
+  }))
 
 export const SessionListSchema = createPaginatedSchema(SessionSchema)
 export type SessionList = z.infer<typeof SessionListSchema>
@@ -459,15 +456,15 @@ export const serializeReportGeneratePayload = (
     format: parsed.format,
     date_range: parsed.dateRange
       ? {
-          start_date:
-            parsed.dateRange.startDate instanceof Date
-              ? parsed.dateRange.startDate.toISOString()
-              : parsed.dateRange.startDate,
-          end_date:
-            parsed.dateRange.endDate instanceof Date
-              ? parsed.dateRange.endDate.toISOString()
-              : parsed.dateRange.endDate,
-        }
+        start_date:
+          parsed.dateRange.startDate instanceof Date
+            ? parsed.dateRange.startDate.toISOString()
+            : parsed.dateRange.startDate,
+        end_date:
+          parsed.dateRange.endDate instanceof Date
+            ? parsed.dateRange.endDate.toISOString()
+            : parsed.dateRange.endDate,
+      }
       : undefined,
   }
 }

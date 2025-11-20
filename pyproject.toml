@@ -17,7 +17,7 @@ dependencies = [
   "fairlearn",
   "shap>=0.41.0",
   "lime",
-  "spacy",
+  "spacy>=3.8.0",
   "nltk",
   "evaluate",
   "cryptography",

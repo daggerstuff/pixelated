@@ -20,35 +20,12 @@ pr:
       - develop
 
 variables:
-  # Build configuration
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.22.0'
-  PYTHON_VERSION: '3.11'
-  BUILD_POOL: 'azure-pipelines'
+  # Reference Variable Group (configured in Azure DevOps web UI)
+  - group: pixelated-pipeline-variables
 
-  # Azure configuration
-  AZURE_SUBSCRIPTION: 'azure-startups-connection'
-  AZURE_RESOURCE_GROUP: 'pixelated-azure-resources'
-  AZURE_LOCATION: 'eastus'
-  AZURE_CONTAINER_REGISTRY: 'pixelatedregistry'
-
-  # Kubernetes configuration
-  AKS_CLUSTER_NAME: 'pixelated-aks-cluster'
-  KUBE_NAMESPACE: 'pixelated-staging'
-  KUBE_NAMESPACE_PROD: 'pixelated-production'
-
-  # Application configuration
-  IMAGE_REPOSITORY: 'pixelatedempathy'
+  # Derived variables (computed from variable group values)
   DOCKER_REGISTRY: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
   IMAGE_NAME: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
-
-  # Deployment timeouts
-  DEPLOYMENT_TIMEOUT: 600
-  HEALTH_CHECK_TIMEOUT: 300
-
-  # Environment URLs
-  STAGING_URL: 'https://staging-azure.pixelatedempathy.tech'
-  PRODUCTION_URL: 'https://azure.pixelatedempathy.tech'
 
 stages:
 - stage: Validate
@@ -351,3 +328,46 @@ stages:
       artifact: e2e-test-results
       displayName: 'Publish Test Results'
       condition: always()
+
+- stage: SchedulePosts
+  displayName: 'Schedule Blog Posts'
+  condition: or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual'))
+  jobs:
+  - job: ScheduleBlogPosts
+    displayName: 'Schedule and Publish Blog Posts'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+      persistCredentials: true
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '$(NODE_VERSION)'
+      displayName: 'Install Node.js'
+
+    - script: |
+        corepack enable pnpm
+        pnpm --version
+      displayName: 'Enable pnpm'
+
+    - script: |
+        pnpm store prune || true
+        pnpm install --no-frozen-lockfile
+      displayName: 'Install Dependencies'
+
+    - task: Bash@3
+      displayName: 'Configure Git'
+      inputs:
+        targetType: 'inline'
+        script: |
+          git config --global user.name "Azure DevOps"
+          git config --global user.email "azure-pipelines@devops.com"
+
+    - script: |
+        pnpm run schedule-posts
+      displayName: 'Run Post Scheduler'
+      env:
+        GITHUB_ACTIONS: '$(GITHUB_ACTIONS)'
+        NODE_ENV: '$(NODE_ENV)'
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)

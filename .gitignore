@@ -357,6 +357,10 @@ k8s/azure/service-connection.json
 k8s/azure/aks-service-connection.json
 k8s/azure/azure-rm-service-connection.json
 *service-connection*.json
+filled-azure-connection.json
+*azure-connection*.json
+filled-k8s-connection.json
+*k8s-connection*.json
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
