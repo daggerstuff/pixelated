@@ -6,7 +6,9 @@ Performance Monitoring System
 
 import json
 import time
+from contextlib import suppress
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import psutil
@@ -246,8 +248,11 @@ if __name__ == "__main__":
     # Run monitoring for 10 minutes with 30-second intervals
     report = monitor.monitor_continuously(duration_minutes=10, interval_seconds=30)
 
-    # Save report
-    with open(f'/tmp/performance-monitoring-{datetime.now().strftime("%Y%m%d_%H%M%S")}.json', "w") as f:
-        json.dump(report, f, indent=2)
+    # Save report using pathlib and contextlib.suppress for cleaner error handling
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_file = Path(f'/tmp/performance-monitoring-{timestamp}.json')
 
-    print("✅ Performance monitoring completed")
+    with suppress(Exception):
+        with report_file.open("w") as f:
+            json.dump(report, f, indent=2)
+        print("✅ Performance monitoring completed")
