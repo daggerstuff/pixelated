@@ -61,9 +61,9 @@ jobs:
           context: .
           push: ${{ steps.docker_login.outcome == 'success' }}
           tags: |
-            pixelatedempathy/pixelated-empathy:latest
-            pixelatedempathy/pixelated-empathy:${{ github.sha }}
-            pixelatedempathy/pixelated-empathy:build-${{ env.BUILD_TS }}
+            pixelatedempathy/pixelated:latest
+            pixelatedempathy/pixelated:${{ github.sha }}
+            pixelatedempathy/pixelated:build-${{ env.BUILD_TS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

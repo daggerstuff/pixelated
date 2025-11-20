@@ -2,10 +2,10 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
-  name: pixelated-empathy
+  name: pixelated
   namespace: flux-system
 spec:
-  image: docker.io/pixelatedempathy/pixelated-empathy
+  image: docker.io/pixelatedempathy/pixelated
   interval: 5m0s
   # Exclude all tags except 'latest' by excluding SHA tags and branch tags
   # This ensures ImagePolicy alphabetical desc selects 'latest'
@@ -21,11 +21,11 @@ spec:
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
-  name: pixelated-empathy
+  name: pixelated
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: pixelated-empathy
+    name: pixelated
   policy:
     # Use alphabetical descending to select 'latest' tag
     # 'latest' comes after most tags alphabetically, so desc order will select it
@@ -35,7 +35,7 @@ spec:
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
 metadata:
-  name: pixelated-empathy
+  name: pixelated
   namespace: flux-system
 spec:
   interval: 5m0s
@@ -51,7 +51,7 @@ spec:
         name: fluxcdbot
         email: fluxcdbot@users.noreply.github.com
       messageTemplate: |
-        chore(image-automation): update pixelated-empathy image
+        chore(image-automation): update pixelated image
 
         Automated image update by Flux.
         Image: {{range .Updated.Images}}{{.}}{{end}}
