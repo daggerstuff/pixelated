@@ -1,0 +1,26 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@10.22.0
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies with retries and fallback
+RUN pnpm install --frozen-lockfile || \
+    (echo "Retrying with npm..." && npm install)
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN pnpm build || \
+    (echo "Build failed, trying npm..." && npm run build)
+
+# Expose port
+EXPOSE 4321
+
+# Start the application
+CMD ["pnpm", "start"]
