@@ -29,4 +29,3 @@ with open("filled-k8s-connection.json", "w") as f:
     json.dump(data, f, indent=2)
 
 print("Successfully created filled-k8s-connection.json")
-

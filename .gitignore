@@ -353,14 +353,17 @@ sp-key.pem
 azure-devops-kubeconfig.yaml
 
 # Azure service connection files with credentials
+# NOTE: Template files (*.template.json) are safe to commit - they contain no real credentials
 k8s/azure/service-connection.json
 k8s/azure/aks-service-connection.json
 k8s/azure/azure-rm-service-connection.json
 *service-connection*.json
 filled-azure-connection.json
 *azure-connection*.json
+!azure-connection.template.json
 filled-k8s-connection.json
 *k8s-connection*.json
+!k8s-connection.template.json
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
