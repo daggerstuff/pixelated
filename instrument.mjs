@@ -106,9 +106,25 @@ export const setUserContext = (user) => {
   });
 };
 
-// Custom metrics and monitoring
-export const recordMetric = (name, value, tags = {}) => {
-  Sentry.metrics.increment(name, value, { tags });
+// Custom metrics and monitoring using Sentry Metrics
+// See: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+export const recordMetric = (name, value = 1, tags = {}) => {
+  // Use counter metrics for incrementing values (button clicks, jobs processed, etc.)
+  if (Sentry.metrics && typeof Sentry.metrics.count === 'function') {
+    Sentry.metrics.count(name, value, {
+      attributes: tags,
+    });
+  }
+};
+
+// Record a duration metric (for example, API response time in milliseconds)
+export const recordDurationMetric = (name, durationMs, tags = {}) => {
+  if (Sentry.metrics && typeof Sentry.metrics.distribution === 'function') {
+    Sentry.metrics.distribution(name, durationMs, {
+      unit: 'millisecond',
+      attributes: tags,
+    });
+  }
 };
 
 // Health check function for monitoring
