@@ -1,0 +1,74 @@
+---
+const features = [
+  {
+    title: 'AI-Powered Scenarios',
+    description: 'Experience realistic patient interactions through advanced AI simulation that adapts to your responses in real-time.',
+    image: 'bg-gradient-to-br from-purple-500/20 to-blue-500/20',
+  },
+  {
+    title: 'Real-Time Analytics',
+    description: 'Track your progress with detailed analytics on empathy scores, response quality, and therapeutic effectiveness.',
+    image: 'bg-gradient-to-bl from-emerald-500/20 to-teal-500/20',
+  },
+  {
+    title: 'Evidence-Based Training',
+    description: 'Built on proven therapeutic methodologies and continuously updated with the latest research findings.',
+    image: 'bg-gradient-to-tr from-orange-500/20 to-red-500/20',
+  },
+  {
+    title: 'Collaborative Learning',
+    description: 'Share insights with peers, participate in group sessions, and learn from expert-led discussions.',
+    image: 'bg-gradient-to-tl from-cyan-500/20 to-blue-500/20',
+  }
+]
+---
+
+<section id="features" class="py-24 bg-slate-950 relative overflow-hidden">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-20">
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 text-white">Platform Features</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto text-lg">Everything you need to master your therapeutic skills.</p>
+        </div>
+
+        <div class="space-y-24 md:space-y-32">
+            {features.map((feature, index) => (
+                <div class={`flex flex-col md:flex-row items-center gap-12 md:gap-20 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+                    <div class="flex-1">
+                        <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-primary-400 text-xs font-semibold uppercase tracking-wider mb-6">
+                            Feature {index + 1}
+                        </div>
+                        <h3 class="text-3xl md:text-4xl font-bold mb-6 text-white">{feature.title}</h3>
+                        <p class="text-lg text-slate-400 leading-relaxed mb-8">{feature.description}</p>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Advanced AI Modeling</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Interactive Feedback</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="text-primary-400 font-semibold hover:text-primary-300 inline-flex items-center gap-2 group transition-colors">
+                            Learn more
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                    </div>
+                    <div class="flex-1 w-full">
+                        <div class={`aspect-square md:aspect-[4/3] rounded-3xl border border-white/10 ${feature.image} backdrop-blur-sm relative group overflow-hidden`}>
+                             <div class="absolute inset-0 bg-slate-900/50 mix-blend-overlay"></div>
+                             <!-- Decorative elements -->
+                             <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
+                                    <div class="w-16 h-16 rounded-full bg-primary-500/20 flex items-center justify-center">
+                                        <div class="w-8 h-8 rounded-full bg-primary-500"></div>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
