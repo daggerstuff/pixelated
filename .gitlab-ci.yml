@@ -15,6 +15,10 @@ variables:
   PYTHON_VERSION: "3.11"
   REGISTRY: $CI_REGISTRY
   IMAGE_NAME: $CI_REGISTRY_IMAGE
+  GCP_PROJECT_ID: "pixelated-463209-e5"
+  GCP_REGION: "us-east1"
+  AR_REPO: "pixel-front"
+  AR_IMAGE_NAME: "pixel-front-web"
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
   # GitLab-specific variables
@@ -348,6 +352,92 @@ deploy:canary:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
     - if: $CI_COMMIT_TAG
+      when: manual
+
+# Mirror primary GitLab image to Google Artifact Registry via Workload Identity Federation
+mirror-to-artifact-registry:
+  stage: deploy
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  identity: google_cloud
+  needs: ["build"]
+  script:
+    - echo "🚀 Mirroring image to Artifact Registry..."
+    - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
+    - gcloud config set project "$GCP_PROJECT_ID"
+    - gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+    # Pull from primary GitLab registry
+    - docker pull "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+    # Tag for Artifact Registry
+    - >
+      docker tag "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+    # Push to Artifact Registry mirror
+    - >
+      docker push
+      "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Optional Cloud Run test deployment using the mirrored Artifact Registry image
+cloud-run-test-deploy:
+  stage: deploy
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  identity: google_cloud
+  needs:
+    - job: mirror-to-artifact-registry
+  variables:
+    CLOUD_RUN_SERVICE: "pixel-front-test"
+  script:
+    - echo "🚀 Deploying test service to Cloud Run..."
+    - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
+    - gcloud config set project "$GCP_PROJECT_ID"
+    - gcloud config set run/region "$GCP_REGION"
+    - >
+      gcloud run deploy "$CLOUD_RUN_SERVICE"
+      --image="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      --platform=managed
+      --allow-unauthenticated
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+
+# Optional GKE test deployment using the mirrored Artifact Registry image
+gke-test-deploy:
+  stage: deploy
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  identity: google_cloud
+  needs:
+    - job: mirror-to-artifact-registry
+  variables:
+    GKE_TEST_CLUSTER_NAME: "pixelated-test"
+    GKE_TEST_LOCATION: "us-east1"
+    GKE_TEST_NAMESPACE: "pixelated-test"
+  script:
+    - echo "🚀 Deploying test workload to GKE..."
+    - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
+    - gcloud config set project "$GCP_PROJECT_ID"
+    - gcloud container clusters get-credentials "$GKE_TEST_CLUSTER_NAME" \
+        --region "$GKE_TEST_LOCATION" \
+        --project "$GCP_PROJECT_ID"
+
+    # Simple rollout to test namespace using Artifact Registry image
+    - |
+      if kubectl -n "$GKE_TEST_NAMESPACE" get deployment pixelated >/dev/null 2>&1; then
+        echo "🔄 Updating existing deployment image..."
+        kubectl -n "$GKE_TEST_NAMESPACE" set image deployment/pixelated \
+          app="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      else
+        echo "📦 Creating new deployment..."
+        kubectl -n "$GKE_TEST_NAMESPACE" create deployment pixelated \
+          --image="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      fi
+
+    - kubectl -n "$GKE_TEST_NAMESPACE" rollout status deployment/pixelated --timeout=300s
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
 
 # Health check stage

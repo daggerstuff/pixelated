@@ -18,14 +18,15 @@ pr:
       - master
       - main
       - develop
-
 variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
 
   # Derived variables (computed from variable group values)
-  DOCKER_REGISTRY: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
-  IMAGE_NAME: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
+  - name: DOCKER_REGISTRY
+    value: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
+  - name: IMAGE_NAME
+    value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
 
 stages:
 - stage: Validate
