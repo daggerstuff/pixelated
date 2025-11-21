@@ -89,7 +89,7 @@ stages:
     displayName: 'Build and Push Docker Image'
     pool:
       vmImage: 'ubuntu-latest'
-    timeoutInMinutes: 30
+    timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
       inputs:
@@ -187,25 +187,24 @@ stages:
               inlineScript: |
                 az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
 
-          - task: KubernetesManifest@0
+          # Use Kubernetes@1 (kubectl under the hood) instead of deprecated KubernetesManifest
+          - task: Kubernetes@1
             displayName: 'Deploy to Kubernetes'
             inputs:
-              action: 'deploy'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
+              connectionType: 'None'
               namespace: '$(KUBE_NAMESPACE)'
-              manifests: |
-                k8s/azure/
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: 'k8s/azure/'
 
-          - task: KubernetesManifest@0
-            displayName: 'Rollout Status'
+          # Use Kubernetes@1 task with kubectl under the hood instead of deprecated KubernetesManifest
+          - task: Kubernetes@1
+            displayName: 'Check Rollout Status'
             inputs:
-              action: 'rollbackStatus'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
+              connectionType: 'None'
               namespace: '$(KUBE_NAMESPACE)'
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+              command: 'rollout'
+              arguments: 'status deployment/pixelated --timeout=300s'
 
 - stage: DeployProduction
   displayName: 'Deploy to Production (AKS)'
@@ -232,18 +231,14 @@ stages:
               inlineScript: |
                 az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
 
-          - task: KubernetesManifest@0
-            displayName: 'Deploy to Production (Blue-Green)'
+          - task: Kubernetes@1
+            displayName: 'Deploy to Production'
             inputs:
-              action: 'deploy'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
+              connectionType: 'None'
               namespace: '$(KUBE_NAMESPACE_PROD)'
-              strategy: 'blueGreen'
-              trafficSplitMethod: 'pod'
-              manifests: |
-                k8s/azure/
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: 'k8s/azure/'
 
 - stage: HealthCheck
   displayName: 'Health Check'
@@ -340,7 +335,7 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
-      persistCredentials: true
+      persistCredentials: 'true'
 
     - task: NodeTool@0
       inputs:

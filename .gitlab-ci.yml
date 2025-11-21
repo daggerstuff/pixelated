@@ -47,7 +47,7 @@ cache:
     - .trivy-cache/
   policy: pull-push
 
-# Validation stage - fast parallel validation
+# Validation stage - fast parallel validation (template)
 .validate:
   stage: validate
   image: node:${NODE_VERSION}-slim
