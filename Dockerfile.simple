@@ -14,7 +14,7 @@ USER astro
 
 # Install pnpm with security best practices
 RUN npm config set registry https://registry.npmjs.org/ && \
-    npm install -g pnpm@10.22.0 && \
+    npm install -g pnpm@10.23.0 && \
     npm cache clean --force
 
 # Copy package files with proper ownership

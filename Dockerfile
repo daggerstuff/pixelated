@@ -1,7 +1,7 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
 # Builder stage: install deps and run the static build
-ARG PNPM_VERSION=10.22.0
+ARG PNPM_VERSION=10.23.0
 FROM node:24-slim AS builder
 ARG PNPM_VERSION
 WORKDIR /app

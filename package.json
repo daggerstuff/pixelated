@@ -367,7 +367,7 @@
       "@opentelemetry/otlp-proto-exporter-base": "^0.51.1",
       "@azure/openai": "^2.0.0",
       "tmp": ">=0.2.4",
-      "glob": "^11.0.3",
+      "glob": "^11.1.0",
       "node-domexception": "^2.0.2",
       "sitemap": "^9.0.0"
     },
