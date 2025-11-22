@@ -15,18 +15,17 @@ pages_build_output_dir = "dist"
 [build]
 command = "pnpm build"
 cwd = "."
-watch_dirs = ["src"]
 
-[build.upload]
-format = "modules"
-dir = "dist"
-main = "./server/entry.mjs"
+# [build.upload]
+# format = "modules"
+# dir = "dist"
+# main = "./server/entry.mjs"
 
 [assets]
 directory = "dist/client"
 
 # Node.js compatibility
-node_compat = true
+# node_compat = true
 
 # Environment Variables
 [vars]
@@ -34,15 +33,15 @@ NODE_ENV = "production"
 PUBLIC_SITE_URL = "https://pixelatedempathy.com"
 
 # KV Namespaces for caching and sessions
-[[kv_namespaces]]
-binding = "CACHE"
-id = "" # Set this after creating KV namespace
-preview_id = "" # Set this for preview environment
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "" # Set this after creating KV namespace
+# preview_id = "" # Set this for preview environment
 
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "" # Set this after creating KV namespace
-preview_id = "" # Set this for preview environment
+# [[kv_namespaces]]
+# binding = "SESSIONS"
+# id = "" # Set this after creating KV namespace
+# preview_id = "" # Set this for preview environment
 
 # Durable Objects (if needed for real-time features)
 # [[durable_objects.bindings]]
@@ -52,7 +51,7 @@ preview_id = "" # Set this for preview environment
 
 # R2 Buckets for file storage
 [[r2_buckets]]
-binding = "ASSETS"
+binding = "PIXELATED_ASSETS"
 bucket_name = "pixelated-assets"
 preview_bucket_name = "pixelated-assets-preview"
 
@@ -69,7 +68,7 @@ preview_bucket_name = "pixelated-uploads-preview"
 # preview_database_id = "" # Set for preview
 
 # Analytics Engine
-[analytics_engine_datasets]
+[[analytics_engine_datasets]]
 # binding = "ANALYTICS"
 
 # Observability
@@ -78,8 +77,9 @@ enabled = true
 head_sampling_rate = 1.0
 
 # Limits and Performance
-limits = { cpu_ms = 50000 }
-logpush = false
+# Limits and Performance
+# limits = { cpu_ms = 50000 }
+# logpush = false
 
 # Routes and Custom Domains
 # [[routes]]
@@ -137,11 +137,11 @@ binding = "AI"
 # ]
 
 # Miniflare configuration for local development
-[miniflare]
-kv_persist = true
-cache_persist = true
-d1_persist = true
-r2_persist = true
+# [miniflare]
+# kv_persist = true
+# cache_persist = true
+# d1_persist = true
+# r2_persist = true
 
 # Development environment
 [env.development]
