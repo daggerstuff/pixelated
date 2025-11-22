@@ -10,6 +10,8 @@ compatibility_flags = ["nodejs_compat"]
 # account_id = "" # Set via CLOUDFLARE_ACCOUNT_ID env var
 # workers_dev = true # Enable for development
 
+pages_build_output_dir = "dist"
+
 [build]
 command = "pnpm build"
 cwd = "."
@@ -167,7 +169,7 @@ routes = [
 # 3. Set Build command: DEPLOY_TARGET=cloudflare pnpm build
 # 4. The Cloudflare adapter will create functions/ directory automatically
 [site]
-bucket = "./dist/client"
+bucket = "./dist"
 
 # Placement (for regional deployment)
 # [placement]
