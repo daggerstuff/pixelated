@@ -68,7 +68,7 @@ preview_bucket_name = "pixelated-uploads-preview"
 # preview_database_id = "" # Set for preview
 
 # Analytics Engine
-[[analytics_engine_datasets]]
+# [[analytics_engine_datasets]]
 # binding = "ANALYTICS"
 
 # Observability
