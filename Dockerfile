@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
+    git \
     && rm -rf /var/lib/apt/lists/* && \
     npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version
@@ -69,7 +70,7 @@ RUN pnpm install --prod --frozen-lockfile && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
     # Remove build tools after native modules are built
-    apt-get purge -y python3 make g++ && \
+    apt-get purge -y python3 make g++ git && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
 
