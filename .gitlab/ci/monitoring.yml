@@ -41,18 +41,19 @@ monitoring:performance:
     
     # Generate performance report
     - echo "📊 Generating performance report..."
-    - cat > performance-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "response_time_ms": ${RESPONSE_TIME},
-      "test_url": "${PERFORMANCE_TEST_URL}",
-      "memory_usage": "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')",
-      "cpu_usage": "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')",
-      "status": "monitored"
-    }
-    EOF
+    - |
+      cat > performance-report.json << 'EOF'
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "response_time_ms": ${RESPONSE_TIME},
+        "test_url": "${PERFORMANCE_TEST_URL}",
+        "memory_usage": "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')",
+        "cpu_usage": "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')",
+        "status": "monitored"
+      }
+      EOF
     
     - echo "✅ Performance monitoring completed"
   artifacts:
@@ -112,19 +113,20 @@ monitoring:health:
     
     # Generate health report
     - echo "📊 Generating health report..."
-    - cat > health-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "health_checks": {
-        "application": "${HEALTH_STATUS}",
-        "database": "${DB_HEALTH_STATUS}",
-        "redis": "${REDIS_HEALTH_STATUS}"
-      },
-      "overall_status": "$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")"
-    }
-    EOF
+    - |
+      cat > health-report.json << 'EOF'
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "health_checks": {
+          "application": "${HEALTH_STATUS}",
+          "database": "${DB_HEALTH_STATUS}",
+          "redis": "${REDIS_HEALTH_STATUS}"
+        },
+        "overall_status": "$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")"
+      }
+      EOF
     
     - echo "✅ Health monitoring completed"
   artifacts:
@@ -171,18 +173,19 @@ monitoring:resources:
     
     # Generate resource report
     - echo "📊 Generating resource report..."
-    - cat > resource-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "pod_resources": "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')",
-      "node_resources": "$(cat node-resources.txt 2>/dev/null || echo 'N/A')",
-      "disk_usage": "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')",
-      "memory_allocation": "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')",
-      "status": "monitored"
-    }
-    EOF
+    - |
+      cat > resource-report.json << 'EOF'
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "pod_resources": "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')",
+        "node_resources": "$(cat node-resources.txt 2>/dev/null || echo 'N/A')",
+        "disk_usage": "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')",
+        "memory_allocation": "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')",
+        "status": "monitored"
+      }
+      EOF
     
     - echo "✅ Resource monitoring completed"
   artifacts:
@@ -230,21 +233,22 @@ monitoring:errors:
     
     # Generate error report
     - echo "📊 Generating error report..."
-    - cat > error-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "error_metrics": {
-        "total_errors": ${ERROR_COUNT},
-        "database_errors": ${DB_ERRORS},
-        "api_errors": ${API_ERRORS},
-        "auth_errors": ${AUTH_ERRORS},
-        "error_rate_percent": ${ERROR_RATE}
-      },
-      "status": "$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")"
-    }
-    EOF
+    - |
+      cat > error-report.json << 'EOF'
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "error_metrics": {
+          "total_errors": ${ERROR_COUNT},
+          "database_errors": ${DB_ERRORS},
+          "api_errors": ${API_ERRORS},
+          "auth_errors": ${AUTH_ERRORS},
+          "error_rate_percent": ${ERROR_RATE}
+        },
+        "status": "$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")"
+      }
+      EOF
     
     # Alert if error rate is too high
     - if [ $ERROR_RATE -gt 5 ]; then
@@ -287,17 +291,18 @@ monitoring:alerts:
       fi
     
     # Create alert payload
-    - cat > alert-payload.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "alert_level": "${ALERT_LEVEL}",
-      "message": "${ALERT_MESSAGE}",
-      "health_status": "${HEALTH_STATUS}",
-      "error_status": "${ERROR_STATUS}"
-    }
-    EOF
+    - |
+      cat > alert-payload.json << 'EOF'
+      {
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "alert_level": "${ALERT_LEVEL}",
+        "message": "${ALERT_MESSAGE}",
+        "health_status": "${HEALTH_STATUS}",
+        "error_status": "${ERROR_STATUS}"
+      }
+      EOF
     
     # Send alert (placeholder for actual alerting system)
     - echo "📤 Sending alert notification..."
@@ -330,44 +335,46 @@ monitoring:summary:
     
     # Aggregate all monitoring reports
     - echo "📋 Aggregating monitoring reports..."
-    - cat > monitoring-summary.json << 'EOF'
-    {
-      "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "monitoring_areas": {
-        "performance": "monitored",
-        "health": "monitored",
-        "resources": "monitored",
-        "errors": "monitored",
-        "alerts": "configured"
-      },
-      "overall_status": "active",
-      "next_check": "$(date -u -d '+5 minutes' +%Y-%m-%dT%H:%M:%SZ)"
-    }
-    EOF
+    - |
+      cat > monitoring-summary.json << 'EOF'
+      {
+        "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "commit_sha": "${CI_COMMIT_SHORT_SHA}",
+        "pipeline_id": "${CI_PIPELINE_ID}",
+        "monitoring_areas": {
+          "performance": "monitored",
+          "health": "monitored",
+          "resources": "monitored",
+          "errors": "monitored",
+          "alerts": "configured"
+        },
+        "overall_status": "active",
+        "next_check": "$(date -u -d '+5 minutes' +%Y-%m-%dT%H:%M:%SZ)"
+      }
+      EOF
     
     # Generate monitoring dashboard data
     - echo "📊 Generating monitoring dashboard data..."
-    - cat > monitoring-dashboard.json << 'EOF'
-    {
-      "dashboard": {
-        "title": "Pixelated Empathy Monitoring",
-        "version": "1.0.0",
-        "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-        "metrics": {
-          "response_time": "$(cat performance-report.json | jq -r '.response_time_ms' 2>/dev/null || echo 'N/A')",
-          "error_rate": "$(cat error-report.json | jq -r '.error_metrics.error_rate_percent' 2>/dev/null || echo 'N/A')",
-          "health_status": "$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo 'N/A')",
-          "resource_usage": "monitored"
-        },
-        "alerts": {
-          "status": "configured",
-          "last_alert": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    - |
+      cat > monitoring-dashboard.json << 'EOF'
+      {
+        "dashboard": {
+          "title": "Pixelated Empathy Monitoring",
+          "version": "1.0.0",
+          "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "metrics": {
+            "response_time": "$(cat performance-report.json | jq -r '.response_time_ms' 2>/dev/null || echo 'N/A')",
+            "error_rate": "$(cat error-report.json | jq -r '.error_metrics.error_rate_percent' 2>/dev/null || echo 'N/A')",
+            "health_status": "$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo 'N/A')",
+            "resource_usage": "monitored"
+          },
+          "alerts": {
+            "status": "configured",
+            "last_alert": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
         }
       }
-    }
-    EOF
+      EOF
     
     - echo "✅ Monitoring summary generated"
     - echo "📊 Overall monitoring status: ACTIVE"

@@ -55,6 +55,9 @@ export function TrainingSessionComponent() {
 
   // WebSocket Connection - only reconnect when sessionId or userId changes, not when role changes
   useEffect(() => {
+    // Clear deduplication set when reconnecting (new session or user)
+    locallyAddedMessages.current.clear()
+
     // Get WebSocket URL from environment variable, fallback to localhost for development
     const wsUrl = import.meta.env.VITE_TRAINING_WS_URL || 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
@@ -135,6 +138,10 @@ export function TrainingSessionComponent() {
 
   // Handle role changes by sending a new join_session message without reconnecting
   useEffect(() => {
+    // Clear the deduplication set when role changes to prevent false-positive filtering
+    // This ensures messages aren't incorrectly filtered after role switches
+    locallyAddedMessages.current.clear()
+
     if (ws.current?.readyState === WebSocket.OPEN) {
       const currentUserId = userIdRef.current
       ws.current.send(JSON.stringify({

@@ -200,8 +200,10 @@ security-scan:
       fi
     
     # Check exposed ports
-    - EXPOSED_PORTS=$(docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
-    - echo "ℹ️ Exposed ports: ${EXPOSED_PORTS:-none}"
+    - |
+      EXPOSED_PORTS=$(docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
+      if [ -z "$EXPOSED_PORTS" ]; then EXPOSED_PORTS="none"; fi
+      echo "ℹ️ Exposed ports: $EXPOSED_PORTS"
     
     - echo "✅ Security scanning completed"
   artifacts:
@@ -266,10 +268,11 @@ deploy:rolling:
     MAX_SURGE: "1"
     MAX_UNAVAILABLE: "0"
   script:
-    - echo "🚀 Starting rolling deployment to GKE..."
-    - echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
-    - echo "Deployment: pixelated"
-    - echo "Namespace: ${KUBE_NAMESPACE}"
+    - |
+      echo "🚀 Starting rolling deployment to GKE..."
+      echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      echo "Deployment: pixelated"
+      echo "Namespace: ${KUBE_NAMESPACE}"
     
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
@@ -303,8 +306,9 @@ deploy:blue-green:
     DEPLOYMENT_STRATEGY: blue-green
     REPLICAS: "3"
   script:
-    - echo "🚀 Starting blue-green deployment..."
-    - echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - |
+      echo "🚀 Starting blue-green deployment..."
+      echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
     
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
@@ -333,9 +337,10 @@ deploy:canary:
     CANARY_PERCENTAGE: "25"
     ROLLBACK_THRESHOLD: "5"
   script:
-    - echo "🚀 Starting canary deployment..."
-    - echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
-    - echo "Canary percentage: ${CANARY_PERCENTAGE}%"
+    - |
+      echo "🚀 Starting canary deployment..."
+      echo "Image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      echo "Canary percentage: ${CANARY_PERCENTAGE}%"
     
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
@@ -467,9 +472,10 @@ health-check:
     - kubectl get service pixelated-service
     
     # Detailed health check
-    - READY_PODS=$(kubectl get pods -l app=pixelated -o json | jq '[.items[] | select(.status.phase == "Running" and (.status.containerStatuses[]?.ready // false))] | length')
-    - TOTAL_PODS=$(kubectl get pods -l app=pixelated -o json | jq '.items | length')
-    - echo "📈 Health summary: $READY_PODS/$TOTAL_PODS pods ready"
+    - |
+      READY_PODS=$(kubectl get pods -l app=pixelated -o json | jq '[.items[] | select(.status.phase == "Running" and (.status.containerStatuses[]?.ready // false))] | length')
+      TOTAL_PODS=$(kubectl get pods -l app=pixelated -o json | jq '.items | length')
+      echo "📈 Health summary: $READY_PODS/$TOTAL_PODS pods ready"
     
     - |
       if [ "$READY_PODS" -eq 0 ]; then
