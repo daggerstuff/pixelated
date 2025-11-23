@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly SLACK_WEBHOOK: string
   readonly MONITORING_EMAIL_RECIPIENTS: string
   readonly APP_VERSION: string
+  readonly VITE_TRAINING_WS_URL?: string
 }
 
 interface ImportMeta {

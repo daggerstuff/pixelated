@@ -116,6 +116,7 @@ const envSchema = z.object({
   // Client-side variables (exposed to the browser)
   VITE_API_URL: z.string().url().optional(),
   VITE_MONGODB_CLUSTER: z.string().optional(),
+  VITE_TRAINING_WS_URL: z.string().url().optional(),
 
   // Notification configuration
   VAPID_PUBLIC_KEY: z.string().optional(),
@@ -336,6 +337,7 @@ export const config = {
   client: {
     apiUrl: (): string | undefined => env().VITE_API_URL,
     mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
+    trainingWsUrl: (): string | undefined => env().VITE_TRAINING_WS_URL,
   },
 
   notifications: {

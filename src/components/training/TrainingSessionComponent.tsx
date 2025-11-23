@@ -1,24 +1,41 @@
 import { useState, useEffect, useRef } from 'react'
 import { useConversationMemory } from '../../hooks/useMemory'
+import { useAuth } from '../../hooks/useAuth'
 
 // Basic UI scaffold for therapist training session
 const initialClientMessage =
   'Hello, I am your client. How can you help me today?'
 
 export function TrainingSessionComponent() {
-  // For demo, use static user/session
-  const userId = 'demo-therapist'
+  const { user } = useAuth()
+  // Use authenticated user ID, fallback to demo user for development/testing
+  const userId = user?.id || 'demo-therapist'
   const sessionId = 'session-1'
   const [therapistResponse, setTherapistResponse] = useState('')
   const [conversation, setConversation] = useState([
     { role: 'client', message: initialClientMessage },
   ])
   const [evaluation, setEvaluation] = useState<string | null>(null)
-  const [coachingNotes, setCoachingNotes] = useState<Array<{authorId: string, content: string, timestamp: string}>>([])
+  const [coachingNotes, setCoachingNotes] = useState<Array<{ authorId: string, content: string, timestamp: string }>>([])
 
   // Fishbowl Mode State
   const [role, setRole] = useState<'trainee' | 'observer'>('trainee')
   const ws = useRef<WebSocket | null>(null)
+  // Use refs to avoid stale closures in WebSocket handlers
+  const roleRef = useRef<'trainee' | 'observer'>(role)
+  const userIdRef = useRef<string>(userId)
+  // Track messages we've added locally to prevent duplicates from WebSocket echoes
+  // Key format: `${userId}:${role}:${content}` - tracks locally added messages
+  const locallyAddedMessages = useRef<Set<string>>(new Set())
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    roleRef.current = role
+  }, [role])
+
+  useEffect(() => {
+    userIdRef.current = userId
+  }, [userId])
 
   const memory = useConversationMemory(userId, sessionId)
 
@@ -36,29 +53,59 @@ export function TrainingSessionComponent() {
     })
   }, [memory])
 
-  // WebSocket Connection
+  // WebSocket Connection - only reconnect when sessionId or userId changes, not when role changes
   useEffect(() => {
-    // In production, this URL should be configurable
-    ws.current = new WebSocket('ws://localhost:8084')
+    // Get WebSocket URL from environment variable, fallback to localhost for development
+    const wsUrl = import.meta.env.VITE_TRAINING_WS_URL || 'ws://localhost:8084'
+    const websocket = new WebSocket(wsUrl)
+    ws.current = websocket
 
-    ws.current.onopen = () => {
+    websocket.onopen = () => {
       console.log('Connected to Training Server')
-      ws.current?.send(JSON.stringify({
+      // Use refs to get current values, avoiding stale closures
+      const currentRole = roleRef.current
+      const currentUserId = userIdRef.current
+      websocket.send(JSON.stringify({
         type: 'join_session',
-        payload: { sessionId, role, userId: role === 'observer' ? 'demo-observer' : userId }
+        payload: {
+          sessionId,
+          role: currentRole,
+          userId: currentRole === 'observer' ? 'demo-observer' : currentUserId
+        }
       }))
     }
 
-    ws.current.onmessage = (event) => {
+    websocket.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data)
 
         if (msg.type === 'session_message') {
-           // Only update if we don't have this message already (basic dedup)
-           // For now, rely on local update for sender, and WS for observer
-           if (role === 'observer' || msg.payload.userId !== userId) {
-             setConversation(prev => [...prev, { role: msg.payload.role, message: msg.payload.content }])
-           }
+          const messageContent = msg.payload.content
+          const messageRole = msg.payload.role
+          const messageUserId = msg.payload.userId
+
+          // Create a deduplication key: userId + role + content
+          // This identifies unique messages regardless of timestamp
+          const messageKey = `${messageUserId}:${messageRole}:${messageContent}`
+
+          // Skip if we've already added this message locally (prevents duplicate from echo)
+          if (locallyAddedMessages.current.has(messageKey)) {
+            return
+          }
+
+          // Use refs to get current values, avoiding stale closures
+          const currentRole = roleRef.current
+          const currentUserId = userIdRef.current
+
+          // For observers: always add messages (they don't update local state themselves)
+          // For trainees: only add messages that didn't come from themselves
+          // This filters out WebSocket echoes of messages the trainee already added locally
+          if (currentRole === 'observer') {
+            setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
+          } else if (messageUserId !== currentUserId) {
+            // Trainee: only add messages from other users (not echoes of own messages)
+            setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
+          }
         }
 
         if (msg.type === 'coaching_note') {
@@ -69,13 +116,44 @@ export function TrainingSessionComponent() {
       }
     }
 
-    return () => {
-      ws.current?.close()
+    websocket.onerror = (error) => {
+      console.error('WebSocket error:', error)
     }
-  }, [role, sessionId, userId])
+
+    websocket.onclose = () => {
+      console.log('WebSocket connection closed')
+    }
+
+    return () => {
+      // Cleanup: close the WebSocket connection when effect re-runs or component unmounts
+      if (websocket.readyState === WebSocket.OPEN || websocket.readyState === WebSocket.CONNECTING) {
+        websocket.close()
+      }
+      ws.current = null
+    }
+  }, [sessionId, userId]) // Removed 'role' from dependencies to prevent reconnection loops
+
+  // Handle role changes by sending a new join_session message without reconnecting
+  useEffect(() => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      const currentUserId = userIdRef.current
+      ws.current.send(JSON.stringify({
+        type: 'join_session',
+        payload: {
+          sessionId,
+          role: roleRef.current,
+          userId: roleRef.current === 'observer' ? 'demo-observer' : currentUserId
+        }
+      }))
+    }
+  }, [role, sessionId]) // Only send join_session when role changes, don't reconnect
 
   const handleResponse = async () => {
-    if (role === 'observer') {
+    // Use refs to get current values
+    const currentRole = roleRef.current
+    const currentUserId = userIdRef.current
+
+    if (currentRole === 'observer') {
       // Observers send coaching notes
       if (!therapistResponse.trim()) return
 
@@ -88,13 +166,19 @@ export function TrainingSessionComponent() {
     }
 
     // Trainee Logic
+    const therapistMessage = { role: 'therapist' as const, message: therapistResponse }
     setConversation([
       ...conversation,
-      { role: 'therapist', message: therapistResponse },
+      therapistMessage,
     ])
     await memory.addMessage(therapistResponse, 'user')
 
-    // Broadcast to WS
+    // Mark this message as locally added to prevent duplicate from WebSocket echo
+    // Key format matches what we check in the WebSocket message handler
+    const messageKey = `${currentUserId}:therapist:${therapistResponse}`
+    locallyAddedMessages.current.add(messageKey)
+
+    // Broadcast to WS (server will add its own timestamp)
     ws.current?.send(JSON.stringify({
       type: 'session_message',
       payload: { content: therapistResponse, role: 'therapist' }
@@ -105,7 +189,7 @@ export function TrainingSessionComponent() {
       session: {
         sessionId: sessionId,
         timestamp: new Date().toISOString(),
-        participantDemographics: { userId },
+        participantDemographics: { userId: currentUserId },
         scenario: 'therapist-training',
         content: [
           ...conversation,
@@ -136,6 +220,7 @@ export function TrainingSessionComponent() {
         }
       }
     } catch (err) {
+      console.error('Bias analysis failed:', err)
       // fallback: no bias result
     }
 
@@ -175,17 +260,26 @@ export function TrainingSessionComponent() {
         }
       }
     } catch (err) {
+      console.error('AI response generation failed:', err)
       // fallback to static reply
     }
 
     // Update local state
+    const clientMessage = { role: 'client' as const, message: nextClientMsg }
     setConversation((prev) => [
       ...prev,
-      { role: 'client', message: nextClientMsg },
+      clientMessage,
     ])
     await memory.addMessage(nextClientMsg, 'assistant')
 
-    // Broadcast AI response to WS
+    // Mark this message as locally added to prevent duplicate from WebSocket echo
+    // Key format matches what we check in the WebSocket message handler
+    // Note: AI messages are sent by the trainee, so they use the trainee's userId
+    // Reuse currentUserId from the top of the function
+    const clientMessageKey = `${currentUserId}:client:${nextClientMsg}`
+    locallyAddedMessages.current.add(clientMessageKey)
+
+    // Broadcast AI response to WS (server will add its own timestamp)
     ws.current?.send(JSON.stringify({
       type: 'session_message',
       payload: { content: nextClientMsg, role: 'client' }
@@ -221,11 +315,10 @@ export function TrainingSessionComponent() {
           {conversation.map((entry, idx) => (
             <div
               key={idx}
-              className={`p-4 rounded-lg ${
-                entry.role === 'client'
-                  ? 'bg-blue-500/20 border-l-4 border-blue-500'
-                  : 'bg-green-500/20 border-l-4 border-green-500'
-              }`}
+              className={`p-4 rounded-lg ${entry.role === 'client'
+                ? 'bg-blue-500/20 border-l-4 border-blue-500'
+                : 'bg-green-500/20 border-l-4 border-green-500'
+                }`}
             >
               <div className="font-semibold text-sm text-gray-300 mb-1">
                 {entry.role === 'client' ? 'Client' : 'Therapist'}
@@ -247,11 +340,10 @@ export function TrainingSessionComponent() {
           <button
             onClick={handleResponse}
             disabled={!therapistResponse.trim()}
-            className={`w-full py-3 px-6 font-medium rounded-lg transition-colors text-white ${
-              role === 'observer'
-                ? 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600'
-                : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600'
-            }`}
+            className={`w-full py-3 px-6 font-medium rounded-lg transition-colors text-white ${role === 'observer'
+              ? 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600'
+              : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600'
+              }`}
           >
             {role === 'observer' ? 'Send Note' : 'Send Response'}
           </button>
@@ -274,8 +366,8 @@ export function TrainingSessionComponent() {
           <div className="space-y-3 max-h-[500px] overflow-y-auto">
             {coachingNotes.map((note, i) => (
               <div key={i} className="bg-purple-900/30 border border-purple-500/30 p-3 rounded text-sm">
-                 <div className="text-purple-200 mb-1">{note.content}</div>
-                 <div className="text-purple-400/50 text-xs">{new Date(note.timestamp).toLocaleTimeString()}</div>
+                <div className="text-purple-200 mb-1">{note.content}</div>
+                <div className="text-purple-400/50 text-xs">{new Date(note.timestamp).toLocaleTimeString()}</div>
               </div>
             ))}
           </div>
