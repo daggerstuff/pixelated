@@ -28,12 +28,7 @@ variables:
   - name: IMAGE_NAME
     value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
   
-  # Pool selection: Uses self-hosted pool by default (required until Microsoft-hosted is approved)
-  # IMPORTANT: Set AGENT_POOL_NAME in variable group 'pixelated-pipeline-variables' to your self-hosted pool name
-  # When Microsoft-hosted is approved, we can switch to using vmImage: 'ubuntu-latest'
-  # For now, all jobs use: pool: name: $(AGENT_POOL_NAME)
-  - name: AGENT_POOL_NAME
-    value: ''  # MUST be set in variable group to your self-hosted pool name
+  # Pool selection: Uses Default agent pool (self-hosted agents)
 
 stages:
 - stage: Validate
@@ -42,7 +37,7 @@ stages:
   - job: ValidateDependencies
     displayName: 'Validate Dependencies'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     steps:
     - checkout: self
     
@@ -66,7 +61,7 @@ stages:
   - job: LintCode
     displayName: 'Lint Code'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     steps:
     - checkout: self
     
@@ -85,7 +80,7 @@ stages:
   - job: TypeCheck
     displayName: 'Type Check'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     steps:
     - checkout: self
     
@@ -108,7 +103,7 @@ stages:
   - job: BuildApplication
     displayName: 'Build and Push Docker Image'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -161,7 +156,7 @@ stages:
   - job: ContainerSecurity
     displayName: 'Container Security Scan'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     timeoutInMinutes: '20'
     steps:
     - task: Docker@2
@@ -212,7 +207,7 @@ stages:
   - deployment: DeployToStaging
     displayName: 'Deploy to Azure Kubernetes Service'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     environment: 'staging'
     strategy:
       runOnce:
@@ -256,7 +251,7 @@ stages:
   - deployment: DeployToProduction
     displayName: 'Deploy to Production'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     environment: 'production'
     strategy:
       runOnce:
@@ -290,7 +285,7 @@ stages:
   - job: HealthCheckStaging
     displayName: 'Staging Health Check'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     timeoutInMinutes: '10'
     steps:
     - task: AzureCLI@2
@@ -329,7 +324,7 @@ stages:
   - job: PerformanceTests
     displayName: 'Run Performance Tests'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -353,7 +348,7 @@ stages:
   - job: E2ETests
     displayName: 'Run E2E Tests'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -381,7 +376,7 @@ stages:
   - job: ScheduleBlogPosts
     displayName: 'Schedule and Publish Blog Posts'
     pool:
-      name: $(AGENT_POOL_NAME)
+      name: Default
     steps:
     - checkout: self
       persistCredentials: 'true'
