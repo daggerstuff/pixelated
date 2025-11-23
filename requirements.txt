@@ -1,0 +1,10 @@
+# Minimal requirements for Cloudflare Pages builds
+# This file prevents Cloudflare Pages from installing heavy ML dependencies
+# from pyproject.toml, which would exceed build time limits.
+#
+# For local development and other deployments, use pyproject.toml with:
+#   uv install  # or pip install -e .
+
+# No dependencies needed for frontend-only Cloudflare Pages builds
+# Python dependencies are only needed for backend services, not the frontend build
+

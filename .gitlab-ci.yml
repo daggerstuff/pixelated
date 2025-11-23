@@ -428,6 +428,7 @@ deploy:rolling:
     # Authenticate to GKE
     echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     chmod 600 /tmp/gcp-key.json
+    trap 'rm -f /tmp/gcp-key.json' EXIT
     gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     gcloud config set project "$GCP_PROJECT_ID"
     gcloud container clusters get-credentials "$GKE_CLUSTER_NAME" --zone "$GKE_ZONE" --project "$GCP_PROJECT_ID"
@@ -491,6 +492,7 @@ deploy:blue-green:
     # Authenticate to GKE
     echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     chmod 600 /tmp/gcp-key.json
+    trap 'rm -f /tmp/gcp-key.json' EXIT
     gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     gcloud config set project "$GCP_PROJECT_ID"
     gcloud container clusters get-credentials "$GKE_CLUSTER_NAME" --zone "$GKE_ZONE" --project "$GCP_PROJECT_ID"
@@ -550,6 +552,7 @@ deploy:canary:
     # Authenticate to GKE
     echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     chmod 600 /tmp/gcp-key.json
+    trap 'rm -f /tmp/gcp-key.json' EXIT
     gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     gcloud config set project "$GCP_PROJECT_ID"
     gcloud container clusters get-credentials "$GKE_CLUSTER_NAME" --zone "$GKE_ZONE" --project "$GCP_PROJECT_ID"
@@ -749,6 +752,7 @@ health-check:
     # Authenticate to GKE
     echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     chmod 600 /tmp/gcp-key.json
+    trap 'rm -f /tmp/gcp-key.json' EXIT
     gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     gcloud config set project "$GCP_PROJECT_ID"
     gcloud container clusters get-credentials "$GKE_CLUSTER_NAME" --zone "$GKE_ZONE" --project "$GCP_PROJECT_ID"

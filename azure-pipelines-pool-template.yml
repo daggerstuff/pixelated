@@ -1,0 +1,12 @@
+# Pool Selection Template
+# Supports Microsoft-hosted (default) and self-hosted agent pools
+parameters:
+  - name: poolName
+    type: string
+    default: ''
+
+# Returns pool configuration
+# Usage: Reference this template and pass poolName parameter
+# If poolName is empty, returns Microsoft-hosted pool config
+# If poolName is set, returns self-hosted pool config
+

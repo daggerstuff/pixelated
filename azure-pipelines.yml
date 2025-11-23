@@ -27,6 +27,14 @@ variables:
     value: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
   - name: IMAGE_NAME
     value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
+  
+  # Pool selection: Configured via AGENT_POOL_NAME variable in variable group
+  # Strategy: Try Microsoft-hosted first, fallback to self-hosted
+  # - If AGENT_POOL_NAME is NOT set in variable group: Uses Microsoft-hosted (ubuntu-latest)
+  # - If AGENT_POOL_NAME IS set in variable group: Uses self-hosted pool with that name
+  # Azure Pipelines automatically checks pool availability when pipeline starts
+  # To use self-hosted: Set AGENT_POOL_NAME in variable group to your pool name
+  # To use Microsoft-hosted: Leave AGENT_POOL_NAME unset or empty in variable group
 
 stages:
 - stage: Validate
@@ -35,7 +43,10 @@ stages:
   - job: ValidateDependencies
     displayName: 'Validate Dependencies'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
     
@@ -59,7 +70,10 @@ stages:
   - job: LintCode
     displayName: 'Lint Code'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
     
@@ -78,7 +92,10 @@ stages:
   - job: TypeCheck
     displayName: 'Type Check'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
     
@@ -101,7 +118,10 @@ stages:
   - job: BuildApplication
     displayName: 'Build and Push Docker Image'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -154,7 +174,10 @@ stages:
   - job: ContainerSecurity
     displayName: 'Container Security Scan'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     timeoutInMinutes: '20'
     steps:
     - task: Docker@2
@@ -205,7 +228,10 @@ stages:
   - deployment: DeployToStaging
     displayName: 'Deploy to Azure Kubernetes Service'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     environment: 'staging'
     strategy:
       runOnce:
@@ -249,7 +275,10 @@ stages:
   - deployment: DeployToProduction
     displayName: 'Deploy to Production'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     environment: 'production'
     strategy:
       runOnce:
@@ -283,7 +312,10 @@ stages:
   - job: HealthCheckStaging
     displayName: 'Staging Health Check'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     timeoutInMinutes: '10'
     steps:
     - task: AzureCLI@2
@@ -322,7 +354,10 @@ stages:
   - job: PerformanceTests
     displayName: 'Run Performance Tests'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -346,7 +381,10 @@ stages:
   - job: E2ETests
     displayName: 'Run E2E Tests'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     timeoutInMinutes: '30'
     steps:
     - task: NodeTool@0
@@ -374,7 +412,10 @@ stages:
   - job: ScheduleBlogPosts
     displayName: 'Schedule and Publish Blog Posts'
     pool:
-      vmImage: 'ubuntu-latest'
+      ${{ if variables['AGENT_POOL_NAME'] }}:
+        name: $(AGENT_POOL_NAME)
+      ${{ else }}:
+        vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
       persistCredentials: 'true'
