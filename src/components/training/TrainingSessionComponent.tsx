@@ -59,7 +59,7 @@ export function TrainingSessionComponent() {
     locallyAddedMessages.current.clear()
 
     // Get WebSocket URL from environment variable, fallback to localhost for development
-    const wsUrl = import.meta.env.VITE_TRAINING_WS_URL || 'ws://localhost:8084'
+    const wsUrl = import.meta.env.PUBLIC_TRAINING_WS_URL || 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 
@@ -73,7 +73,7 @@ export function TrainingSessionComponent() {
         payload: {
           sessionId,
           role: currentRole,
-          userId: currentRole === 'observer' ? 'demo-observer' : currentUserId
+          userId: currentUserId
         }
       }))
     }
@@ -98,20 +98,34 @@ export function TrainingSessionComponent() {
 
           // Use refs to get current values, avoiding stale closures
           const currentRole = roleRef.current
-          const currentUserId = userIdRef.current
 
           // For observers: always add messages (they don't update local state themselves)
-          // For trainees: only add messages that didn't come from themselves
-          // This filters out WebSocket echoes of messages the trainee already added locally
+          // For trainees: add all messages that pass the deduplication check
+          // The deduplication key (checked above) already prevents duplicates from own messages
+          // This allows multiple trainees with the same userId to see each other's messages
           if (currentRole === 'observer') {
             setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
-          } else if (messageUserId !== currentUserId) {
-            // Trainee: only add messages from other users (not echoes of own messages)
+          } else {
+            // Trainee: add message if it passed deduplication check (not a duplicate of own message)
             setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
           }
         }
 
         if (msg.type === 'coaching_note') {
+          const noteContent = msg.payload.content
+          const noteAuthorId = msg.payload.authorId
+
+          // Create a deduplication key: authorId + type + content
+          // This identifies unique coaching notes regardless of timestamp
+          const noteKey = `${noteAuthorId}:coaching_note:${noteContent}`
+
+          // Skip if we've already added this note locally (prevents duplicate from echo)
+          // This handles both our own notes (added before sending) and any network duplicates
+          if (locallyAddedMessages.current.has(noteKey)) {
+            return
+          }
+
+          // Add the note to state (it's either from another observer or a new note we haven't seen)
           setCoachingNotes(prev => [...prev, msg.payload])
         }
       } catch (e) {
@@ -142,6 +156,12 @@ export function TrainingSessionComponent() {
     // This ensures messages aren't incorrectly filtered after role switches
     locallyAddedMessages.current.clear()
 
+    // Reset conversation state when role changes to prevent mixing trainee and observer contexts
+    // Observers should see the live session conversation (populated by WebSocket)
+    // Trainees will rebuild their conversation through interaction
+    setConversation([{ role: 'client', message: initialClientMessage }])
+    setEvaluation(null) // Clear evaluation feedback when switching roles
+
     if (ws.current?.readyState === WebSocket.OPEN) {
       const currentUserId = userIdRef.current
       ws.current.send(JSON.stringify({
@@ -149,7 +169,7 @@ export function TrainingSessionComponent() {
         payload: {
           sessionId,
           role: roleRef.current,
-          userId: roleRef.current === 'observer' ? 'demo-observer' : currentUserId
+          userId: currentUserId
         }
       }))
     }
@@ -163,6 +183,19 @@ export function TrainingSessionComponent() {
     if (currentRole === 'observer') {
       // Observers send coaching notes
       if (!therapistResponse.trim()) return
+
+      // Mark this note as locally added to prevent duplicate from WebSocket echo
+      // Key format matches what we check in the WebSocket message handler
+      const noteKey = `${currentUserId}:coaching_note:${therapistResponse}`
+      locallyAddedMessages.current.add(noteKey)
+
+      // Add note to local state immediately so it appears in UI right away
+      // The WebSocket echo will be skipped due to the deduplication key
+      setCoachingNotes(prev => [...prev, {
+        authorId: currentUserId,
+        content: therapistResponse,
+        timestamp: new Date().toISOString()
+      }])
 
       ws.current?.send(JSON.stringify({
         type: 'coaching_note',

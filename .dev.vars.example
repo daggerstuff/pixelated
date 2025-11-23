@@ -69,4 +69,4 @@ PUBLIC_SITE_URL=http://localhost:8787
 
 # Training WebSocket Server
 TRAINING_WS_PORT=8084
-VITE_TRAINING_WS_URL=ws://localhost:8084
+PUBLIC_TRAINING_WS_URL=ws://localhost:8084

@@ -77,12 +77,13 @@ monitoring:health:
     - HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health"
     - HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$HEALTH_URL" || echo "000")
     
-    - if [ "$HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Application is healthy";
-        HEALTH_STATUS="healthy";
+    - |
+      if [ "$HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Application is healthy"
+        HEALTH_STATUS="healthy"
       else
-        echo "❌ Application health check failed: $HEALTH_RESPONSE";
-        HEALTH_STATUS="unhealthy";
+        echo "❌ Application health check failed: $HEALTH_RESPONSE"
+        HEALTH_STATUS="unhealthy"
       fi
     
     # Database health check
@@ -90,12 +91,13 @@ monitoring:health:
     - DB_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/db"
     - DB_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$DB_HEALTH_URL" || echo "000")
     
-    - if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Database is healthy";
-        DB_HEALTH_STATUS="healthy";
+    - |
+      if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Database is healthy"
+        DB_HEALTH_STATUS="healthy"
       else
-        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE";
-        DB_HEALTH_STATUS="unhealthy";
+        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE"
+        DB_HEALTH_STATUS="unhealthy"
       fi
     
     # Redis health check
@@ -103,12 +105,13 @@ monitoring:health:
     - REDIS_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/redis"
     - REDIS_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$REDIS_HEALTH_URL" || echo "000")
     
-    - if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Redis is healthy";
-        REDIS_HEALTH_STATUS="healthy";
+    - |
+      if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Redis is healthy"
+        REDIS_HEALTH_STATUS="healthy"
       else
-        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE";
-        REDIS_HEALTH_STATUS="unhealthy";
+        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE"
+        REDIS_HEALTH_STATUS="unhealthy"
       fi
     
     # Generate health report
@@ -251,10 +254,11 @@ monitoring:errors:
       EOF
     
     # Alert if error rate is too high
-    - if [ $ERROR_RATE -gt 5 ]; then
-        echo "⚠️ High error rate detected: ${ERROR_RATE}%";
+    - |
+      if [ $ERROR_RATE -gt 5 ]; then
+        echo "⚠️ High error rate detected: ${ERROR_RATE}%"
       else
-        echo "✅ Error rate is acceptable: ${ERROR_RATE}%";
+        echo "✅ Error rate is acceptable: ${ERROR_RATE}%"
       fi
     
     - echo "✅ Error rate monitoring completed"
@@ -280,14 +284,15 @@ monitoring:alerts:
     - ERROR_STATUS=$(cat error-report.json | jq -r '.status' 2>/dev/null || echo "unknown")
     
     # Generate alert if needed
-    - if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
-        echo "🚨 ALERT: System health issues detected";
-        ALERT_LEVEL="critical";
-        ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS";
+    - |
+      if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
+        echo "🚨 ALERT: System health issues detected"
+        ALERT_LEVEL="critical"
+        ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS"
       else
-        echo "✅ System health is good";
-        ALERT_LEVEL="info";
-        ALERT_MESSAGE="System health monitoring completed successfully";
+        echo "✅ System health is good"
+        ALERT_LEVEL="info"
+        ALERT_MESSAGE="System health monitoring completed successfully"
       fi
     
     # Create alert payload
@@ -311,9 +316,10 @@ monitoring:alerts:
     
     # Here you would integrate with your alerting system
     # Examples: PagerDuty, Slack, Microsoft Teams, etc.
-    - if [ "$ALERT_LEVEL" = "critical" ]; then
-        echo "🚨 Critical alert would be sent to operations team";
-        # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL;
+    - |
+      if [ "$ALERT_LEVEL" = "critical" ]; then
+        echo "🚨 Critical alert would be sent to operations team"
+        # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL
       fi
     
     - echo "✅ Alerting and notifications completed"
