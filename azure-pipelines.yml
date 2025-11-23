@@ -111,6 +111,68 @@ stages:
         versionSpec: '$(NODE_VERSION)'
       displayName: 'Install Node.js'
 
+    - task: Bash@3
+      displayName: 'Ensure Docker Access'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+          
+          # Check if Docker daemon is accessible
+          if ! docker info >/dev/null 2>&1; then
+            echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
+            
+            # Get current user
+            CURRENT_USER=$(whoami)
+            echo "Current user: ${CURRENT_USER}"
+            
+            # Ensure docker socket has correct permissions (most reliable fix)
+            if [ -S /var/run/docker.sock ]; then
+              echo "Fixing docker socket permissions..."
+              
+              # Try to set socket permissions to 666 (read/write for all)
+              if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
+                echo "✅ Set docker socket permissions to 666"
+              # Fallback: ensure docker group ownership
+              elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
+                   sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
+                echo "✅ Set docker socket to docker group ownership"
+                
+                # Check if user is in docker group
+                if ! groups | grep -q docker; then
+                  echo "⚠️ User not in docker group, adding..."
+                  sudo usermod -aG docker "${CURRENT_USER}" || {
+                    echo "⚠️ Could not add user to docker group"
+                  }
+                  echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
+                fi
+              else
+                echo "❌ Could not fix docker socket permissions"
+                echo "⚠️ Manual fix required on agent machine:"
+                echo "   sudo chmod 666 /var/run/docker.sock"
+                echo "   OR"
+                echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
+                exit 1
+              fi
+            else
+              echo "❌ Docker socket not found at /var/run/docker.sock"
+              exit 1
+            fi
+            
+            # Verify Docker access
+            if docker info >/dev/null 2>&1; then
+              echo "✅ Docker access verified"
+            else
+              echo "❌ Docker access still not available after permission fix"
+              exit 1
+            fi
+          else
+            echo "✅ Docker daemon is accessible"
+          fi
+          
+          # Display Docker info
+          docker info | head -n 5
+
     - task: Docker@2
       displayName: 'Build and Push Docker Image'
       inputs:
@@ -159,6 +221,68 @@ stages:
       name: Default
     timeoutInMinutes: '20'
     steps:
+    - task: Bash@3
+      displayName: 'Ensure Docker Access'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+          
+          # Check if Docker daemon is accessible
+          if ! docker info >/dev/null 2>&1; then
+            echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
+            
+            # Get current user
+            CURRENT_USER=$(whoami)
+            echo "Current user: ${CURRENT_USER}"
+            
+            # Ensure docker socket has correct permissions (most reliable fix)
+            if [ -S /var/run/docker.sock ]; then
+              echo "Fixing docker socket permissions..."
+              
+              # Try to set socket permissions to 666 (read/write for all)
+              if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
+                echo "✅ Set docker socket permissions to 666"
+              # Fallback: ensure docker group ownership
+              elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
+                   sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
+                echo "✅ Set docker socket to docker group ownership"
+                
+                # Check if user is in docker group
+                if ! groups | grep -q docker; then
+                  echo "⚠️ User not in docker group, adding..."
+                  sudo usermod -aG docker "${CURRENT_USER}" || {
+                    echo "⚠️ Could not add user to docker group"
+                  }
+                  echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
+                fi
+              else
+                echo "❌ Could not fix docker socket permissions"
+                echo "⚠️ Manual fix required on agent machine:"
+                echo "   sudo chmod 666 /var/run/docker.sock"
+                echo "   OR"
+                echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
+                exit 1
+              fi
+            else
+              echo "❌ Docker socket not found at /var/run/docker.sock"
+              exit 1
+            fi
+            
+            # Verify Docker access
+            if docker info >/dev/null 2>&1; then
+              echo "✅ Docker access verified"
+            else
+              echo "❌ Docker access still not available after permission fix"
+              exit 1
+            fi
+          else
+            echo "✅ Docker daemon is accessible"
+          fi
+          
+          # Display Docker info
+          docker info | head -n 5
+
     - task: Docker@2
       displayName: 'Login to ACR'
       inputs:

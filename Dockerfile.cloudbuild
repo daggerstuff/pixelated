@@ -127,8 +127,8 @@ RUN echo "🏗️ Starting optimized build process..." && \
 # Production cleanup - remove dev dependencies and unnecessary files
 RUN pnpm prune --prod && \
     rm -rf /app/.pnpm-store /tmp/.cache ~/.npm ~/.cache && \
-    find /app/node_modules -name "*.map" -delete && \
-    find /app/dist -name "*.map" -delete
+    find /app/node_modules -type f -name "*.map" -delete && \
+    find /app/dist -type f -name "*.map" -delete
 
 # Production stage - minimal runtime image
 FROM node:${NODE_VERSION}-alpine AS production

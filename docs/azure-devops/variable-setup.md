@@ -150,6 +150,70 @@ After configuring variables:
 - Verify repository permissions are granted to Build Service
 - Check that `persistCredentials: true` is set in checkout step
 
+### Docker daemon permission errors
+
+If you see errors like:
+```
+ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+```
+
+**Temporary fix (automatic in pipeline):**
+The pipeline includes an automatic fix step that attempts to resolve Docker permissions. However, for a permanent solution, configure the agent properly.
+
+**Permanent fix (recommended):**
+
+On your self-hosted Azure DevOps agent machine, run one of these solutions:
+
+**Option 1: Add agent user to docker group (recommended)**
+```bash
+# Find the agent user (usually the user running the agent service)
+AGENT_USER=$(ps aux | grep vsts-agent | grep -v grep | awk '{print $1}' | head -n 1)
+
+# Add user to docker group
+sudo usermod -aG docker "$AGENT_USER"
+
+# Restart the agent service to apply group membership
+sudo systemctl restart vsts.agent.*  # or the specific service name
+```
+
+**Option 2: Set docker socket permissions (less secure, but works)**
+```bash
+# Make docker socket accessible to all users (temporary until reboot)
+sudo chmod 666 /var/run/docker.sock
+
+# Or make it persistent by creating a systemd override
+sudo mkdir -p /etc/systemd/system/docker.socket.d
+sudo tee /etc/systemd/system/docker.socket.d/override.conf > /dev/null <<EOF
+[Socket]
+SocketMode=0666
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker.socket
+```
+
+**Option 3: Configure Docker daemon socket permissions (most secure)**
+```bash
+# Edit docker daemon configuration
+sudo nano /etc/docker/daemon.json
+
+# Add or update with:
+{
+  "hosts": ["unix:///var/run/docker.sock"],
+  "group": "docker"
+}
+
+# Restart docker
+sudo systemctl restart docker
+```
+
+**Verify the fix:**
+```bash
+# As the agent user, test Docker access
+docker info
+```
+
+**Note:** The pipeline includes an automatic permission fix step, but configuring the agent properly is the recommended long-term solution.
+
 ### Variables not found
 - Verify variable group is linked to the pipeline
 - Check variable names match exactly (case-sensitive)

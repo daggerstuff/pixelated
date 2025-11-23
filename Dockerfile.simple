@@ -32,8 +32,8 @@ COPY --chown=astro:astro . .
 RUN pnpm build
 
 # Clean up unnecessary files to reduce attack surface
-RUN find /app -name "*.map" -delete && \
-    find /app -name "*.test.*" -delete && \
+RUN find /app -type f -name "*.map" -delete && \
+    find /app -type f -name "*.test.*" -delete && \
     find /app -name "__tests__" -type d -exec rm -rf {} + 2>/dev/null || true
 
 # Health check for container monitoring
