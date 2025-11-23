@@ -80,8 +80,9 @@ const adapter = (() => {
     console.log('🔵 Using Cloudflare adapter for Pages deployment');
     return cloudflareAdapter({
       mode: 'directory',
+      // Disable platformProxy during build - it's only needed for local dev
       platformProxy: {
-        enabled: true,
+        enabled: isDevelopment,
       },
       functionPerRoute: false,
     });

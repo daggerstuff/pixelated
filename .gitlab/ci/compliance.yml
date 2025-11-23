@@ -48,22 +48,24 @@ compliance:hipaa:
     
     # Generate HIPAA compliance report
     - echo "📊 Generating HIPAA compliance report..."
-    - cat > hipaa-compliance-report.json << 'EOF'
-    {
-      "compliance_framework": "HIPAA",
-      "validation_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "checks": {
-        "encryption": "checked",
-        "access_control": "checked", 
-        "audit_controls": "checked",
-        "data_integrity": "checked",
-        "transmission_security": "checked",
-        "patient_rights": "checked"
-      },
-      "status": "validated"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg sha "${CI_COMMIT_SHORT_SHA}" \
+        '{
+          compliance_framework: "HIPAA",
+          validation_date: $date,
+          commit_sha: $sha,
+          checks: {
+            encryption: "checked",
+            access_control: "checked",
+            audit_controls: "checked",
+            data_integrity: "checked",
+            transmission_security: "checked",
+            patient_rights: "checked"
+          },
+          status: "validated"
+        }' > hipaa-compliance-report.json
     
     - echo "✅ HIPAA compliance validation completed"
   artifacts:
@@ -112,23 +114,25 @@ compliance:gdpr:
     
     # Generate GDPR compliance report
     - echo "📊 Generating GDPR compliance report..."
-    - cat > gdpr-compliance-report.json << 'EOF'
-    {
-      "compliance_framework": "GDPR",
-      "validation_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "checks": {
-        "data_protection_by_design": "checked",
-        "consent_management": "checked",
-        "data_minimization": "checked",
-        "right_to_access": "checked",
-        "right_to_erasure": "checked",
-        "data_portability": "checked",
-        "privacy_policy": "checked"
-      },
-      "status": "validated"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg sha "${CI_COMMIT_SHORT_SHA}" \
+        '{
+          compliance_framework: "GDPR",
+          validation_date: $date,
+          commit_sha: $sha,
+          checks: {
+            data_protection_by_design: "checked",
+            consent_management: "checked",
+            data_minimization: "checked",
+            right_to_access: "checked",
+            right_to_erasure: "checked",
+            data_portability: "checked",
+            privacy_policy: "checked"
+          },
+          status: "validated"
+        }' > gdpr-compliance-report.json
     
     - echo "✅ GDPR compliance validation completed"
   artifacts:
@@ -182,23 +186,25 @@ compliance:mental-health:
     
     # Generate mental health compliance report
     - echo "📊 Generating mental health compliance report..."
-    - cat > mental-health-compliance-report.json << 'EOF'
-    {
-      "compliance_framework": "Mental_Health_Data_Protection",
-      "validation_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "checks": {
-        "crisis_intervention_security": "checked",
-        "bias_detection_sanitization": "checked",
-        "fhe_implementation": "checked",
-        "data_anonymization": "checked",
-        "secure_communication": "checked",
-        "professional_liability": "checked",
-        "user_consent": "checked"
-      },
-      "status": "validated"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg sha "${CI_COMMIT_SHORT_SHA}" \
+        '{
+          compliance_framework: "Mental_Health_Data_Protection",
+          validation_date: $date,
+          commit_sha: $sha,
+          checks: {
+            crisis_intervention_security: "checked",
+            bias_detection_sanitization: "checked",
+            fhe_implementation: "checked",
+            data_anonymization: "checked",
+            secure_communication: "checked",
+            professional_liability: "checked",
+            user_consent: "checked"
+          },
+          status: "validated"
+        }' > mental-health-compliance-report.json
     
     - echo "✅ Mental health data protection validation completed"
   artifacts:
@@ -239,21 +245,23 @@ compliance:enterprise:
     
     # Generate enterprise compliance report
     - echo "📊 Generating enterprise compliance report..."
-    - cat > enterprise-compliance-report.json << 'EOF'
-    {
-      "compliance_framework": "Enterprise",
-      "validation_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "checks": {
-        "data_retention": "checked",
-        "access_logging": "checked",
-        "incident_response": "checked",
-        "business_continuity": "checked",
-        "regulatory_reporting": "checked"
-      },
-      "status": "validated"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg sha "${CI_COMMIT_SHORT_SHA}" \
+        '{
+          compliance_framework: "Enterprise",
+          validation_date: $date,
+          commit_sha: $sha,
+          checks: {
+            data_retention: "checked",
+            access_logging: "checked",
+            incident_response: "checked",
+            business_continuity: "checked",
+            regulatory_reporting: "checked"
+          },
+          status: "validated"
+        }' > enterprise-compliance-report.json
     
     - echo "✅ Enterprise compliance validation completed"
   artifacts:
@@ -274,42 +282,47 @@ compliance:summary:
     
     # Aggregate all compliance reports
     - echo "📋 Aggregating compliance reports..."
-    - cat > compliance-summary.json << 'EOF'
-    {
-      "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "compliance_frameworks": {
-        "hipaa": {
-          "status": "validated",
-          "report": "hipaa-compliance-report.json"
-        },
-        "gdpr": {
-          "status": "validated", 
-          "report": "gdpr-compliance-report.json"
-        },
-        "mental_health": {
-          "status": "validated",
-          "report": "mental-health-compliance-report.json"
-        },
-        "enterprise": {
-          "status": "validated",
-          "report": "enterprise-compliance-report.json"
-        }
-      },
-      "overall_status": "compliant",
-      "next_review": "$(date -u -d '+90 days' +%Y-%m-%dT%H:%M:%SZ)"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline "${CI_PIPELINE_ID}" \
+        --arg next_review "$(date -u -d '+90 days' +%Y-%m-%dT%H:%M:%SZ)" \
+        '{
+          summary_date: $date,
+          commit_sha: $sha,
+          pipeline_id: $pipeline,
+          compliance_frameworks: {
+            hipaa: {
+              status: "validated",
+              report: "hipaa-compliance-report.json"
+            },
+            gdpr: {
+              status: "validated",
+              report: "gdpr-compliance-report.json"
+            },
+            mental_health: {
+              status: "validated",
+              report: "mental-health-compliance-report.json"
+            },
+            enterprise: {
+              status: "validated",
+              report: "enterprise-compliance-report.json"
+            }
+          },
+          overall_status: "compliant",
+          next_review: $next_review
+        }' > compliance-summary.json
     
     # Generate compliance badge
     - echo "🏷️ Generating compliance badge..."
-    - cat > compliance-badge.svg << 'EOF'
-    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">
-      <rect width="120" height="20" fill="#4c1"/>
-      <text x="10" y="14" fill="#fff" font-family="Arial" font-size="11">COMPLIANT</text>
-    </svg>
-    EOF
+    - |
+      cat > compliance-badge.svg << 'EOFSVG'
+      <svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">
+        <rect width="120" height="20" fill="#4c1"/>
+        <text x="10" y="14" fill="#fff" font-family="Arial" font-size="11">COMPLIANT</text>
+      </svg>
+      EOFSVG
     
     - echo "✅ Compliance summary generated"
     - echo "📊 Overall compliance status: COMPLIANT"
