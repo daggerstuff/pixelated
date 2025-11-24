@@ -131,11 +131,35 @@ binding = "AI"
 [env.preview]
 name = "pixelated-empathy-preview"
 vars = { NODE_ENV = "preview", PUBLIC_SITE_URL = "https://preview.pixelatedempathy.com" }
+[[env.preview.r2_buckets]]
+binding = "PIXELATED_ASSETS"
+bucket_name = "pixelated-assets"
+preview_bucket_name = "pixelated-assets-preview"
+
+[[env.preview.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "pixelated-uploads"
+preview_bucket_name = "pixelated-uploads-preview"
+
+[env.preview.ai]
+binding = "AI"
 
 # Production environment
 [env.production]
 name = "pixelated-empathy"
 vars = { NODE_ENV = "production", PUBLIC_SITE_URL = "https://pixelatedempathy.com" }
+[[env.production.r2_buckets]]
+binding = "PIXELATED_ASSETS"
+bucket_name = "pixelated-assets"
+preview_bucket_name = "pixelated-assets-preview"
+
+[[env.production.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "pixelated-uploads"
+preview_bucket_name = "pixelated-uploads-preview"
+
+[env.production.ai]
+binding = "AI"
 
 # Placement (for regional deployment)
 # [placement]

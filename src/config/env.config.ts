@@ -116,6 +116,24 @@ const envSchema = z.object({
   // Client-side variables (exposed to the browser)
   VITE_API_URL: z.string().url().optional(),
   VITE_MONGODB_CLUSTER: z.string().optional(),
+  PUBLIC_TRAINING_WS_URL: z
+    .string()
+    .refine(
+      (val) => {
+        if (!val) return true // Optional, so empty is valid
+        try {
+          const url = new URL(val)
+          // Accept ws://, wss://, http://, and https:// schemes
+          return ['ws:', 'wss:', 'http:', 'https:'].includes(url.protocol)
+        } catch {
+          return false
+        }
+      },
+      {
+        message: 'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
+      }
+    )
+    .optional(),
 
   // Notification configuration
   VAPID_PUBLIC_KEY: z.string().optional(),
@@ -336,6 +354,7 @@ export const config = {
   client: {
     apiUrl: (): string | undefined => env().VITE_API_URL,
     mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
+    trainingWsUrl: (): string | undefined => env().PUBLIC_TRAINING_WS_URL,
   },
 
   notifications: {
