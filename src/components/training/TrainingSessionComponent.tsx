@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useConversationMemory } from '../../hooks/useMemory'
 import { useAuth } from '../../hooks/useAuth'
+import { getJournalResearchAuthToken } from '../../lib/api/journal-research/auth'
 
 // Basic UI scaffold for therapist training session
 const initialClientMessage =
@@ -335,13 +336,12 @@ export function TrainingSessionComponent() {
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 
-    websocket.onopen = () => {
+    websocket.onopen = async () => {
       console.log('Connected to Training Server')
 
       // First, authenticate with the server
-      // In development, we can send a simple token (or empty string)
-      // In production, this should be a real JWT/session token
-      const authToken = '' // TODO: Get actual auth token from auth context
+      // Get actual auth token from auth context
+      const authToken = await getJournalResearchAuthToken() || ''
       websocket.send(JSON.stringify({
         type: 'authenticate',
         payload: {
@@ -398,8 +398,8 @@ export function TrainingSessionComponent() {
   )
 
   // Helper function to send authentication
-  const sendAuthentication = useCallback((websocket: WebSocket) => {
-    const authToken = '' // TODO: Get actual auth token from auth context
+  const sendAuthentication = useCallback(async (websocket: WebSocket) => {
+    const authToken = await getJournalResearchAuthToken() || ''
     websocket.send(
       JSON.stringify({
         type: 'authenticate',
@@ -422,11 +422,11 @@ export function TrainingSessionComponent() {
 
     // If WebSocket is not open yet, wait for it to open before sending
     if (ws.current.readyState === WebSocket.CONNECTING) {
-      const handleOpen = () => {
+      const handleOpen = async () => {
         if (isAuthenticatedRef.current) {
           sendJoinSession(ws.current!, sessionId)
         } else {
-          sendAuthentication(ws.current!)
+          await sendAuthentication(ws.current!)
         }
         ws.current?.removeEventListener('open', handleOpen)
       }
@@ -446,7 +446,10 @@ export function TrainingSessionComponent() {
       if (isAuthenticatedRef.current) {
         sendJoinSession(ws.current, sessionId)
       } else {
-        sendAuthentication(ws.current)
+        // Fire and forget - authentication will complete asynchronously
+        sendAuthentication(ws.current).catch((error) => {
+          console.error('Failed to send authentication:', error)
+        })
       }
     }
   }, [role, sessionId, sendJoinSession, sendAuthentication])
@@ -508,6 +511,9 @@ export function TrainingSessionComponent() {
         message: response,
       }
 
+      // Create updated conversation that includes the therapist message
+      const updatedConversation = [...conversation, therapistMessage]
+
       setConversation((prev) => [...prev, therapistMessage])
       await memory.addMessage(response, 'user')
 
@@ -522,9 +528,10 @@ export function TrainingSessionComponent() {
       )
 
       // Analyze bias and generate AI response in parallel
+      // Pass updated conversation that includes the therapist message
       const [biasResult, nextClientMsg] = await Promise.all([
-        analyzeBias(sessionId, conversation, response, userId),
-        generateAIResponse(conversation, response),
+        analyzeBias(sessionId, updatedConversation, response, userId),
+        generateAIResponse(updatedConversation, response),
       ])
 
       setEvaluation(formatEvaluation(biasResult))
