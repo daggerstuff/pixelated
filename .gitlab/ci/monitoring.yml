@@ -117,6 +117,12 @@ monitoring:health:
     # Generate health report
     - echo "📊 Generating health report..."
     - |
+      if [ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ]; then
+        OVERALL_STATUS="healthy"
+      else
+        OVERALL_STATUS="degraded"
+      fi
+    - |
       cat > health-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -127,7 +133,7 @@ monitoring:health:
           "database": "${DB_HEALTH_STATUS}",
           "redis": "${REDIS_HEALTH_STATUS}"
         },
-        "overall_status": "$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")"
+        "overall_status": "${OVERALL_STATUS}"
       }
       EOF
     
@@ -236,6 +242,14 @@ monitoring:errors:
       fi
     - echo "Error rate: ${ERROR_RATE}%"
     
+    # Determine error status
+    - |
+      if [ $ERROR_RATE -lt 5 ]; then
+        ERROR_STATUS="acceptable"
+      else
+        ERROR_STATUS="high"
+      fi
+    
     # Generate error report
     - echo "📊 Generating error report..."
     - |
@@ -251,7 +265,7 @@ monitoring:errors:
           "auth_errors": ${AUTH_ERRORS},
           "error_rate_percent": ${ERROR_RATE}
         },
-        "status": "$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")"
+        "status": "${ERROR_STATUS}"
       }
       EOF
     
