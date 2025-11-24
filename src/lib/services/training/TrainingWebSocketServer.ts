@@ -2,7 +2,8 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { IncomingMessage } from 'http'
 import { randomUUID } from 'crypto'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { validateToken, type UserRole } from '../../auth/jwt-service'
+import { validateToken } from '../../auth/jwt-service'
+import type { UserRole } from '../../auth/roles'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
@@ -270,12 +271,12 @@ export class TrainingWebSocketServer {
       return 'supervisor'
     }
 
-    // Researchers can observe but not supervise
-    if (authRole === 'researcher') {
+    // Researchers and support staff can observe but not supervise
+    if (authRole === 'researcher' || authRole === 'support') {
       return 'observer'
     }
 
-    // Patients, support staff, and guests participate as trainees
+    // Patients and guests participate as trainees
     // Default to trainee for unknown roles
     return 'trainee'
   }

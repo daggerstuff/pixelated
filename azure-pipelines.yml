@@ -232,15 +232,18 @@ stages:
               targetType: 'inline'
               script: |
                 echo "📋 Applying Kubernetes manifests..."
-                kubectl apply -f k8s/azure/ -n $(KUBE_NAMESPACE) || true
+                kubectl apply -f k8s/azure/ -n "$KUBE_NAMESPACE" || true
                 
-                echo "🔄 Updating deployment image to $(IMAGE_NAME):$(Build.BuildNumber)..."
-                kubectl set image deployment/pixelated pixelated=$(IMAGE_NAME):$(Build.BuildNumber) -n $(KUBE_NAMESPACE)
+                echo "🔄 Updating deployment image to $IMAGE_NAME:$(Build.BuildNumber)..."
+                kubectl set image deployment/pixelated pixelated="$IMAGE_NAME:$(Build.BuildNumber)" -n "$KUBE_NAMESPACE"
                 
                 echo "⏳ Waiting for rollout to complete..."
-                kubectl rollout status deployment/pixelated -n $(KUBE_NAMESPACE) --timeout=300s
+                kubectl rollout status deployment/pixelated -n "$KUBE_NAMESPACE" --timeout=300s
                 
                 echo "✅ Deployment completed successfully"
+            env:
+              IMAGE_NAME: $(IMAGE_NAME)
+              KUBE_NAMESPACE: $(KUBE_NAMESPACE)
 
 - stage: DeployProduction
   displayName: 'Deploy to Production (AKS)'
@@ -273,15 +276,18 @@ stages:
               targetType: 'inline'
               script: |
                 echo "📋 Applying Kubernetes manifests..."
-                kubectl apply -f k8s/azure/ -n $(KUBE_NAMESPACE_PROD) || true
+                kubectl apply -f k8s/azure/ -n "$KUBE_NAMESPACE_PROD" || true
                 
-                echo "🔄 Updating deployment image to $(IMAGE_NAME):$(Build.BuildNumber)..."
-                kubectl set image deployment/pixelated pixelated=$(IMAGE_NAME):$(Build.BuildNumber) -n $(KUBE_NAMESPACE_PROD)
+                echo "🔄 Updating deployment image to $IMAGE_NAME:$(Build.BuildNumber)..."
+                kubectl set image deployment/pixelated pixelated="$IMAGE_NAME:$(Build.BuildNumber)" -n "$KUBE_NAMESPACE_PROD"
                 
                 echo "⏳ Waiting for blue-green rollout to complete..."
-                kubectl rollout status deployment/pixelated -n $(KUBE_NAMESPACE_PROD) --timeout=600s
+                kubectl rollout status deployment/pixelated -n "$KUBE_NAMESPACE_PROD" --timeout=600s
                 
                 echo "✅ Production deployment completed successfully"
+            env:
+              IMAGE_NAME: $(IMAGE_NAME)
+              KUBE_NAMESPACE_PROD: $(KUBE_NAMESPACE_PROD)
 
 - stage: HealthCheck
   displayName: 'Health Check'
