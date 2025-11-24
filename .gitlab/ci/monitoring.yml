@@ -52,7 +52,7 @@ monitoring:performance:
       else
         CPU_USAGE_JSON='"N/A"'
       fi
-    - |
+
       cat > performance-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -214,7 +214,7 @@ monitoring:resources:
       else
         MEMORY_ALLOCATION_JSON='"N/A"'
       fi
-    - |
+
       cat > resource-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
