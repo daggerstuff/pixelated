@@ -72,7 +72,7 @@ export function TrainingSessionComponent() {
           biasResult = data.data
         }
       }
-    } catch (err) {
+    } catch {
       // fallback: no bias result
     }
 
@@ -111,7 +111,7 @@ export function TrainingSessionComponent() {
           nextClientMsg = data.content
         }
       }
-    } catch (err) {
+    } catch {
       // fallback to static reply
     }
     setConversation((prev) => [
@@ -132,11 +132,10 @@ export function TrainingSessionComponent() {
         {conversation.map((entry, idx) => (
           <div
             key={idx}
-            className={`p-4 rounded-lg ${
-              entry.role === 'client'
-                ? 'bg-blue-500/20 border-l-4 border-blue-500'
-                : 'bg-green-500/20 border-l-4 border-green-500'
-            }`}
+            className={`p-4 rounded-lg ${entry.role === 'client'
+              ? 'bg-blue-500/20 border-l-4 border-blue-500'
+              : 'bg-green-500/20 border-l-4 border-green-500'
+              }`}
           >
             <div className="font-semibold text-sm text-gray-300 mb-1">
               {entry.role === 'client' ? 'Client' : 'Therapist'}

@@ -41,18 +41,16 @@ monitoring:performance:
     
     # Generate performance report
     - echo "📊 Generating performance report..."
-    - cat > performance-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "response_time_ms": ${RESPONSE_TIME},
-      "test_url": "${PERFORMANCE_TEST_URL}",
-      "memory_usage": "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')",
-      "cpu_usage": "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')",
-      "status": "monitored"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --argjson response_time_ms "${RESPONSE_TIME}" \
+        --arg test_url "${PERFORMANCE_TEST_URL}" \
+        --arg memory_usage "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')" \
+        --arg cpu_usage "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')" \
+        '{timestamp: $timestamp, commit_sha: $commit_sha, pipeline_id: $pipeline_id, response_time_ms: $response_time_ms, test_url: $test_url, memory_usage: $memory_usage, cpu_usage: $cpu_usage, status: "monitored"}' > performance-report.json
     
     - echo "✅ Performance monitoring completed"
   artifacts:
@@ -75,56 +73,54 @@ monitoring:health:
     - echo "🔍 Checking application health..."
     - HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health"
     - HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$HEALTH_URL" || echo "000")
-    
-    - if [ "$HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Application is healthy";
-        HEALTH_STATUS="healthy";
+    - |
+      if [ "$HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Application is healthy"
+        HEALTH_STATUS="healthy"
       else
-        echo "❌ Application health check failed: $HEALTH_RESPONSE";
-        HEALTH_STATUS="unhealthy";
+        echo "❌ Application health check failed: $HEALTH_RESPONSE"
+        HEALTH_STATUS="unhealthy"
       fi
     
     # Database health check
     - echo "🗄️ Checking database health..."
     - DB_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/db"
     - DB_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$DB_HEALTH_URL" || echo "000")
-    
-    - if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Database is healthy";
-        DB_HEALTH_STATUS="healthy";
+    - |
+      if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Database is healthy"
+        DB_HEALTH_STATUS="healthy"
       else
-        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE";
-        DB_HEALTH_STATUS="unhealthy";
+        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE"
+        DB_HEALTH_STATUS="unhealthy"
       fi
     
     # Redis health check
     - echo "🔄 Checking Redis health..."
     - REDIS_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/redis"
     - REDIS_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$REDIS_HEALTH_URL" || echo "000")
-    
-    - if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Redis is healthy";
-        REDIS_HEALTH_STATUS="healthy";
+    - |
+      if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
+        echo "✅ Redis is healthy"
+        REDIS_HEALTH_STATUS="healthy"
       else
-        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE";
-        REDIS_HEALTH_STATUS="unhealthy";
+        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE"
+        REDIS_HEALTH_STATUS="unhealthy"
       fi
     
     # Generate health report
     - echo "📊 Generating health report..."
-    - cat > health-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "health_checks": {
-        "application": "${HEALTH_STATUS}",
-        "database": "${DB_HEALTH_STATUS}",
-        "redis": "${REDIS_HEALTH_STATUS}"
-      },
-      "overall_status": "$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")"
-    }
-    EOF
+    - OVERALL_STATUS=$([ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ] && echo "healthy" || echo "degraded")
+    - |
+      jq -n \
+        --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --arg application "${HEALTH_STATUS}" \
+        --arg database "${DB_HEALTH_STATUS}" \
+        --arg redis "${REDIS_HEALTH_STATUS}" \
+        --arg overall_status "${OVERALL_STATUS}" \
+        '{timestamp: $timestamp, commit_sha: $commit_sha, pipeline_id: $pipeline_id, health_checks: {application: $application, database: $database, redis: $redis}, overall_status: $overall_status}' > health-report.json
     
     - echo "✅ Health monitoring completed"
   artifacts:
@@ -146,11 +142,12 @@ monitoring:resources:
     - echo "📊 Running resource monitoring..."
     
     # Authenticate to GKE if needed
-    - if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
-        echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json;
-        gcloud auth activate-service-account --key-file /tmp/gcp-key.json;
-        gcloud config set project $GCP_PROJECT_ID;
-        gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID;
+    - |
+      if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+        echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
+        gcloud auth activate-service-account --key-file /tmp/gcp-key.json
+        gcloud config set project $GCP_PROJECT_ID
+        gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
       fi
     
     # Pod resource usage
@@ -171,18 +168,16 @@ monitoring:resources:
     
     # Generate resource report
     - echo "📊 Generating resource report..."
-    - cat > resource-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "pod_resources": "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')",
-      "node_resources": "$(cat node-resources.txt 2>/dev/null || echo 'N/A')",
-      "disk_usage": "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')",
-      "memory_allocation": "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')",
-      "status": "monitored"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --arg pod_resources "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')" \
+        --arg node_resources "$(cat node-resources.txt 2>/dev/null || echo 'N/A')" \
+        --arg disk_usage "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')" \
+        --arg memory_allocation "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')" \
+        '{timestamp: $timestamp, commit_sha: $commit_sha, pipeline_id: $pipeline_id, pod_resources: $pod_resources, node_resources: $node_resources, disk_usage: $disk_usage, memory_allocation: $memory_allocation, status: "monitored"}' > resource-report.json
     
     - echo "✅ Resource monitoring completed"
   artifacts:
@@ -220,37 +215,37 @@ monitoring:errors:
     
     # Calculate error rate
     - TOTAL_LOGS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | wc -l)
-    - if [ "$TOTAL_LOGS" -eq 0 ]; then
-        echo "⚠️ No logs found, cannot calculate error rate";
-        ERROR_RATE=0;
+    - |
+      if [ "$TOTAL_LOGS" -eq 0 ]; then
+        echo "⚠️ No logs found, cannot calculate error rate"
+        ERROR_RATE=0
       else
-        ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ));
+        ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ))
       fi
     - echo "Error rate: ${ERROR_RATE}%"
     
     # Generate error report
     - echo "📊 Generating error report..."
-    - cat > error-report.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "error_metrics": {
-        "total_errors": ${ERROR_COUNT},
-        "database_errors": ${DB_ERRORS},
-        "api_errors": ${API_ERRORS},
-        "auth_errors": ${AUTH_ERRORS},
-        "error_rate_percent": ${ERROR_RATE}
-      },
-      "status": "$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")"
-    }
-    EOF
+    - ERROR_STATUS=$([ $ERROR_RATE -lt 5 ] && echo "acceptable" || echo "high")
+    - |
+      jq -n \
+        --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --argjson total_errors "${ERROR_COUNT}" \
+        --argjson database_errors "${DB_ERRORS}" \
+        --argjson api_errors "${API_ERRORS}" \
+        --argjson auth_errors "${AUTH_ERRORS}" \
+        --argjson error_rate_percent "${ERROR_RATE}" \
+        --arg status "${ERROR_STATUS}" \
+        '{timestamp: $timestamp, commit_sha: $commit_sha, pipeline_id: $pipeline_id, error_metrics: {total_errors: $total_errors, database_errors: $database_errors, api_errors: $api_errors, auth_errors: $auth_errors, error_rate_percent: $error_rate_percent}, status: $status}' > error-report.json
     
     # Alert if error rate is too high
-    - if [ $ERROR_RATE -gt 5 ]; then
-        echo "⚠️ High error rate detected: ${ERROR_RATE}%";
+    - |
+      if [ $ERROR_RATE -gt 5 ]; then
+        echo "⚠️ High error rate detected: ${ERROR_RATE}%"
       else
-        echo "✅ Error rate is acceptable: ${ERROR_RATE}%";
+        echo "✅ Error rate is acceptable: ${ERROR_RATE}%"
       fi
     
     - echo "✅ Error rate monitoring completed"
@@ -276,28 +271,28 @@ monitoring:alerts:
     - ERROR_STATUS=$(cat error-report.json | jq -r '.status' 2>/dev/null || echo "unknown")
     
     # Generate alert if needed
-    - if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
-        echo "🚨 ALERT: System health issues detected";
-        ALERT_LEVEL="critical";
-        ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS";
+    - |
+      if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
+        echo "🚨 ALERT: System health issues detected"
+        ALERT_LEVEL="critical"
+        ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS"
       else
-        echo "✅ System health is good";
-        ALERT_LEVEL="info";
-        ALERT_MESSAGE="System health monitoring completed successfully";
+        echo "✅ System health is good"
+        ALERT_LEVEL="info"
+        ALERT_MESSAGE="System health monitoring completed successfully"
       fi
     
     # Create alert payload
-    - cat > alert-payload.json << 'EOF'
-    {
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "alert_level": "${ALERT_LEVEL}",
-      "message": "${ALERT_MESSAGE}",
-      "health_status": "${HEALTH_STATUS}",
-      "error_status": "${ERROR_STATUS}"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --arg alert_level "${ALERT_LEVEL}" \
+        --arg message "${ALERT_MESSAGE}" \
+        --arg health_status "${HEALTH_STATUS}" \
+        --arg error_status "${ERROR_STATUS}" \
+        '{timestamp: $timestamp, commit_sha: $commit_sha, pipeline_id: $pipeline_id, alert_level: $alert_level, message: $message, health_status: $health_status, error_status: $error_status}' > alert-payload.json
     
     # Send alert (placeholder for actual alerting system)
     - echo "📤 Sending alert notification..."
@@ -306,9 +301,10 @@ monitoring:alerts:
     
     # Here you would integrate with your alerting system
     # Examples: PagerDuty, Slack, Microsoft Teams, etc.
-    - if [ "$ALERT_LEVEL" = "critical" ]; then
-        echo "🚨 Critical alert would be sent to operations team";
-        # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL;
+    - |
+      if [ "$ALERT_LEVEL" = "critical" ]; then
+        echo "🚨 Critical alert would be sent to operations team"
+        # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL
       fi
     
     - echo "✅ Alerting and notifications completed"
@@ -330,44 +326,27 @@ monitoring:summary:
     
     # Aggregate all monitoring reports
     - echo "📋 Aggregating monitoring reports..."
-    - cat > monitoring-summary.json << 'EOF'
-    {
-      "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-      "commit_sha": "${CI_COMMIT_SHORT_SHA}",
-      "pipeline_id": "${CI_PIPELINE_ID}",
-      "monitoring_areas": {
-        "performance": "monitored",
-        "health": "monitored",
-        "resources": "monitored",
-        "errors": "monitored",
-        "alerts": "configured"
-      },
-      "overall_status": "active",
-      "next_check": "$(date -u -d '+5 minutes' +%Y-%m-%dT%H:%M:%SZ)"
-    }
-    EOF
+    - |
+      jq -n \
+        --arg summary_date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg commit_sha "${CI_COMMIT_SHORT_SHA}" \
+        --arg pipeline_id "${CI_PIPELINE_ID}" \
+        --arg next_check "$(date -u -d '+5 minutes' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+5M +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo 'N/A')" \
+        '{summary_date: $summary_date, commit_sha: $commit_sha, pipeline_id: $pipeline_id, monitoring_areas: {performance: "monitored", health: "monitored", resources: "monitored", errors: "monitored", alerts: "configured"}, overall_status: "active", next_check: $next_check}' > monitoring-summary.json
     
     # Generate monitoring dashboard data
     - echo "📊 Generating monitoring dashboard data..."
-    - cat > monitoring-dashboard.json << 'EOF'
-    {
-      "dashboard": {
-        "title": "Pixelated Empathy Monitoring",
-        "version": "1.0.0",
-        "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-        "metrics": {
-          "response_time": "$(cat performance-report.json | jq -r '.response_time_ms' 2>/dev/null || echo 'N/A')",
-          "error_rate": "$(cat error-report.json | jq -r '.error_metrics.error_rate_percent' 2>/dev/null || echo 'N/A')",
-          "health_status": "$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo 'N/A')",
-          "resource_usage": "monitored"
-        },
-        "alerts": {
-          "status": "configured",
-          "last_alert": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        }
-      }
-    }
-    EOF
+    - RESPONSE_TIME_VAL=$(cat performance-report.json 2>/dev/null | jq -r '.response_time_ms // "N/A"' || echo 'N/A')
+    - ERROR_RATE_VAL=$(cat error-report.json 2>/dev/null | jq -r '.error_metrics.error_rate_percent // "N/A"' || echo 'N/A')
+    - HEALTH_STATUS_VAL=$(cat health-report.json 2>/dev/null | jq -r '.overall_status // "N/A"' || echo 'N/A')
+    - |
+      jq -n \
+        --arg updated "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --arg response_time "${RESPONSE_TIME_VAL}" \
+        --arg error_rate "${ERROR_RATE_VAL}" \
+        --arg health_status "${HEALTH_STATUS_VAL}" \
+        --arg last_alert "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        '{dashboard: {title: "Pixelated Empathy Monitoring", version: "1.0.0", updated: $updated, metrics: {response_time: $response_time, error_rate: $error_rate, health_status: $health_status, resource_usage: "monitored"}, alerts: {status: "configured", last_alert: $last_alert}}}' > monitoring-dashboard.json
     
     - echo "✅ Monitoring summary generated"
     - echo "📊 Overall monitoring status: ACTIVE"
