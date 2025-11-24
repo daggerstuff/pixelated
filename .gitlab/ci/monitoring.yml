@@ -43,12 +43,12 @@ monitoring:performance:
     - echo "📊 Generating performance report..."
     - |
       if [ -f memory-usage.txt ]; then
-        MEMORY_USAGE_JSON=$(jq -Rs . memory-usage.txt)
+        MEMORY_USAGE_JSON=$(jq -Rs . memory-usage.txt 2>/dev/null || echo '"N/A"')
       else
         MEMORY_USAGE_JSON='"N/A"'
       fi
       if [ -f cpu-usage.txt ]; then
-        CPU_USAGE_JSON=$(jq -Rs . cpu-usage.txt)
+        CPU_USAGE_JSON=$(jq -Rs . cpu-usage.txt 2>/dev/null || echo '"N/A"')
       else
         CPU_USAGE_JSON='"N/A"'
       fi
@@ -195,22 +195,22 @@ monitoring:resources:
     - echo "📊 Generating resource report..."
     - |
       if [ -f pod-resources.txt ]; then
-        POD_RESOURCES_JSON=$(jq -Rs . pod-resources.txt)
+        POD_RESOURCES_JSON=$(jq -Rs . pod-resources.txt 2>/dev/null || echo '"N/A"')
       else
         POD_RESOURCES_JSON='"N/A"'
       fi
       if [ -f node-resources.txt ]; then
-        NODE_RESOURCES_JSON=$(jq -Rs . node-resources.txt)
+        NODE_RESOURCES_JSON=$(jq -Rs . node-resources.txt 2>/dev/null || echo '"N/A"')
       else
         NODE_RESOURCES_JSON='"N/A"'
       fi
       if [ -f disk-usage.txt ]; then
-        DISK_USAGE_JSON=$(jq -Rs . disk-usage.txt)
+        DISK_USAGE_JSON=$(jq -Rs . disk-usage.txt 2>/dev/null || echo '"N/A"')
       else
         DISK_USAGE_JSON='"N/A"'
       fi
       if [ -f memory-allocation.txt ]; then
-        MEMORY_ALLOCATION_JSON=$(jq -Rs . memory-allocation.txt)
+        MEMORY_ALLOCATION_JSON=$(jq -Rs . memory-allocation.txt 2>/dev/null || echo '"N/A"')
       else
         MEMORY_ALLOCATION_JSON='"N/A"'
       fi
