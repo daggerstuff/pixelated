@@ -42,6 +42,17 @@ monitoring:performance:
     # Generate performance report
     - echo "📊 Generating performance report..."
     - |
+      if [ -f memory-usage.txt ]; then
+        MEMORY_USAGE_JSON=$(jq -Rs . memory-usage.txt)
+      else
+        MEMORY_USAGE_JSON='"N/A"'
+      fi
+      if [ -f cpu-usage.txt ]; then
+        CPU_USAGE_JSON=$(jq -Rs . cpu-usage.txt)
+      else
+        CPU_USAGE_JSON='"N/A"'
+      fi
+    - |
       cat > performance-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -49,8 +60,8 @@ monitoring:performance:
         "pipeline_id": "${CI_PIPELINE_ID}",
         "response_time_ms": ${RESPONSE_TIME},
         "test_url": "${PERFORMANCE_TEST_URL}",
-        "memory_usage": "$(cat memory-usage.txt 2>/dev/null || echo 'N/A')",
-        "cpu_usage": "$(cat cpu-usage.txt 2>/dev/null || echo 'N/A')",
+        "memory_usage": ${MEMORY_USAGE_JSON},
+        "cpu_usage": ${CPU_USAGE_JSON},
         "status": "monitored"
       }
       EOF
@@ -122,7 +133,6 @@ monitoring:health:
       else
         OVERALL_STATUS="degraded"
       fi
-    - |
       cat > health-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -184,15 +194,36 @@ monitoring:resources:
     # Generate resource report
     - echo "📊 Generating resource report..."
     - |
+      if [ -f pod-resources.txt ]; then
+        POD_RESOURCES_JSON=$(jq -Rs . pod-resources.txt)
+      else
+        POD_RESOURCES_JSON='"N/A"'
+      fi
+      if [ -f node-resources.txt ]; then
+        NODE_RESOURCES_JSON=$(jq -Rs . node-resources.txt)
+      else
+        NODE_RESOURCES_JSON='"N/A"'
+      fi
+      if [ -f disk-usage.txt ]; then
+        DISK_USAGE_JSON=$(jq -Rs . disk-usage.txt)
+      else
+        DISK_USAGE_JSON='"N/A"'
+      fi
+      if [ -f memory-allocation.txt ]; then
+        MEMORY_ALLOCATION_JSON=$(jq -Rs . memory-allocation.txt)
+      else
+        MEMORY_ALLOCATION_JSON='"N/A"'
+      fi
+    - |
       cat > resource-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
         "pipeline_id": "${CI_PIPELINE_ID}",
-        "pod_resources": "$(cat pod-resources.txt 2>/dev/null || echo 'N/A')",
-        "node_resources": "$(cat node-resources.txt 2>/dev/null || echo 'N/A')",
-        "disk_usage": "$(cat disk-usage.txt 2>/dev/null || echo 'N/A')",
-        "memory_allocation": "$(cat memory-allocation.txt 2>/dev/null || echo 'N/A')",
+        "pod_resources": ${POD_RESOURCES_JSON},
+        "node_resources": ${NODE_RESOURCES_JSON},
+        "disk_usage": ${DISK_USAGE_JSON},
+        "memory_allocation": ${MEMORY_ALLOCATION_JSON},
         "status": "monitored"
       }
       EOF
