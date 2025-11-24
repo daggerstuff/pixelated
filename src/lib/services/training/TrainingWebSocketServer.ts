@@ -209,8 +209,26 @@ export class TrainingWebSocketServer {
    * @returns ClientAuthResult if valid, null otherwise
    */
   private async validateClient(token: string): Promise<ClientAuthResult | null> {
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
+    // Development mode: Allow authentication with any token (or no token)
+    // This bypasses authentication for local development/testing
+    if (isDevelopment) {
+      logger.warn('Development mode: Authentication bypassed', {
+        tokenLength: token.length,
+        warning: 'This should NEVER be enabled in production'
+      })
+
+      // In development, extract userId from token if it looks like a JWT or use a default
+      // For now, use a simple default for development
+      return {
+        userId: token || 'dev-user',
+        role: 'trainee' // Default role, can be overridden by client in development
+      }
+    }
+
+    // Production mode: Implement actual token validation
     // TODO: Implement actual token validation
-    // For now, this is a stub that always returns null (rejects all)
     // 
     // Example implementation:
     // try {
@@ -279,9 +297,20 @@ export class TrainingWebSocketServer {
     // - Check if session exists and is active
     // - Enforce role-based access (e.g., only supervisors can join as 'supervisor')
 
+    // In development mode, allow role to be set from payload (for testing different roles)
+    // In production, role should come from authentication token only
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (isDevelopment && payload.role) {
+      client.role = payload.role
+    }
+
+    // Use authenticated user info, but allow userId from payload in development
+    if (isDevelopment && payload.userId) {
+      client.userId = payload.userId
+    }
+
     // Use authenticated user info, not payload (prevent role spoofing)
     client.sessionId = payload.sessionId
-    // Note: role and userId are already set from authentication
 
     logger.info('Client joined session', {
       clientId,
@@ -295,6 +324,16 @@ export class TrainingWebSocketServer {
       type: 'participant_joined',
       payload: { userId: client.userId, role: client.role }
     })
+
+    // Send confirmation to the client
+    ws.send(JSON.stringify({
+      type: 'session_joined',
+      payload: {
+        sessionId: payload.sessionId,
+        role: client.role,
+        userId: client.userId
+      }
+    }))
   }
 
   private handleSessionMessage(clientId: string, payload: { content: string, role: string }) {

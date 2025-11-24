@@ -24,6 +24,8 @@ export function TrainingSessionComponent() {
   // Use refs to avoid stale closures in WebSocket handlers
   const roleRef = useRef<'trainee' | 'observer'>(role)
   const userIdRef = useRef<string>(userId)
+  // Track authentication state
+  const isAuthenticatedRef = useRef<boolean>(false)
   // Track messages we've added locally to prevent duplicates from WebSocket echoes
   // Key format: `${userId}:${role}:${content}` - tracks locally added messages
   const locallyAddedMessages = useRef<Set<string>>(new Set())
@@ -57,6 +59,8 @@ export function TrainingSessionComponent() {
   useEffect(() => {
     // Clear deduplication set when reconnecting (new session or user)
     locallyAddedMessages.current.clear()
+    // Reset authentication state on reconnect
+    isAuthenticatedRef.current = false
 
     // Get WebSocket URL from environment variable, fallback to localhost for development
     const wsUrl = import.meta.env.PUBLIC_TRAINING_WS_URL || 'ws://localhost:8084'
@@ -65,15 +69,15 @@ export function TrainingSessionComponent() {
 
     websocket.onopen = () => {
       console.log('Connected to Training Server')
-      // Use refs to get current values, avoiding stale closures
-      const currentRole = roleRef.current
-      const currentUserId = userIdRef.current
+
+      // First, authenticate with the server
+      // In development, we can send a simple token (or empty string)
+      // In production, this should be a real JWT/session token
+      const authToken = '' // TODO: Get actual auth token from auth context
       websocket.send(JSON.stringify({
-        type: 'join_session',
+        type: 'authenticate',
         payload: {
-          sessionId,
-          role: currentRole,
-          userId: currentUserId
+          token: authToken
         }
       }))
     }
@@ -81,6 +85,36 @@ export function TrainingSessionComponent() {
     websocket.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data)
+
+        // Handle authentication response
+        if (msg.type === 'authenticated') {
+          console.log('Authenticated with Training Server', msg.payload)
+          isAuthenticatedRef.current = true
+          // After authentication, join the session
+          const currentRole = roleRef.current
+          const currentUserId = userIdRef.current
+          websocket.send(JSON.stringify({
+            type: 'join_session',
+            payload: {
+              sessionId,
+              role: currentRole,
+              userId: currentUserId
+            }
+          }))
+          return
+        }
+
+        // Handle session join confirmation
+        if (msg.type === 'session_joined') {
+          console.log('Joined session', msg.payload)
+          return
+        }
+
+        // Handle errors
+        if (msg.type === 'error') {
+          console.error('WebSocket error:', msg.payload.message)
+          return
+        }
 
         if (msg.type === 'session_message') {
           const messageContent = msg.payload.content
@@ -162,7 +196,9 @@ export function TrainingSessionComponent() {
     setConversation([{ role: 'client', message: initialClientMessage }])
     setEvaluation(null) // Clear evaluation feedback when switching roles
 
-    if (ws.current?.readyState === WebSocket.OPEN) {
+    // When role changes, rejoin the session with the new role
+    if (ws.current?.readyState === WebSocket.OPEN && isAuthenticatedRef.current) {
+      // If already authenticated, just send join_session with new role
       const currentUserId = userIdRef.current
       ws.current.send(JSON.stringify({
         type: 'join_session',
@@ -170,6 +206,15 @@ export function TrainingSessionComponent() {
           sessionId,
           role: roleRef.current,
           userId: currentUserId
+        }
+      }))
+    } else if (ws.current?.readyState === WebSocket.OPEN) {
+      // If not authenticated, authenticate first (join will happen in auth handler)
+      const authToken = '' // TODO: Get actual auth token from auth context
+      ws.current.send(JSON.stringify({
+        type: 'authenticate',
+        payload: {
+          token: authToken
         }
       }))
     }
