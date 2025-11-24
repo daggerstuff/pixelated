@@ -301,7 +301,7 @@ monitoring:alerts:
     
     # Generate alert if needed
     - |
-      if [ "$HEALTH_STATUS" = "unhealthy" ] || [ "$ERROR_STATUS" = "high" ]; then
+      if [ "$HEALTH_STATUS" = "degraded" ] || [ "$ERROR_STATUS" = "high" ]; then
         echo "🚨 ALERT: System health issues detected"
         ALERT_LEVEL="critical"
         ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS"
