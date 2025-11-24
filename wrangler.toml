@@ -11,7 +11,7 @@ compatibility_flags = ["nodejs_compat"]
 # workers_dev = true # Enable for development
 
 [build]
-command = "pnpm build"
+command = "pnpm build:cloudflare"
 cwd = "."
 watch_dirs = ["src"]
 
