@@ -244,7 +244,15 @@ export function TrainingSessionComponent() {
         return
       }
 
-      setCoachingNotes((prev) => [...prev, msg.payload as CoachingNote])
+      // Construct a proper CoachingNote object with all required fields
+      // Ensure timestamp exists (server should provide it, but handle missing case)
+      const coachingNote: CoachingNote = {
+        authorId: noteAuthorId,
+        content: noteContent,
+        timestamp: msg.payload?.timestamp || new Date().toISOString(),
+      }
+
+      setCoachingNotes((prev) => [...prev, coachingNote])
     },
     [],
   )
@@ -408,14 +416,38 @@ export function TrainingSessionComponent() {
     setConversation([{ role: 'client', message: initialClientMessage }])
     setEvaluation(null)
 
-    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+    if (!ws.current) {
       return
     }
 
-    if (isAuthenticatedRef.current) {
-      sendJoinSession(ws.current, sessionId)
-    } else {
-      sendAuthentication(ws.current)
+    // If WebSocket is not open yet, wait for it to open before sending
+    if (ws.current.readyState === WebSocket.CONNECTING) {
+      const handleOpen = () => {
+        if (isAuthenticatedRef.current) {
+          sendJoinSession(ws.current!, sessionId)
+        } else {
+          sendAuthentication(ws.current!)
+        }
+        ws.current?.removeEventListener('open', handleOpen)
+      }
+      ws.current.addEventListener('open', handleOpen)
+      return () => {
+        ws.current?.removeEventListener('open', handleOpen)
+      }
+    }
+
+    // If WebSocket is closed, don't attempt to send (connection will be re-established)
+    if (ws.current.readyState === WebSocket.CLOSED || ws.current.readyState === WebSocket.CLOSING) {
+      return
+    }
+
+    // WebSocket is OPEN, send immediately
+    if (ws.current.readyState === WebSocket.OPEN) {
+      if (isAuthenticatedRef.current) {
+        sendJoinSession(ws.current, sessionId)
+      } else {
+        sendAuthentication(ws.current)
+      }
     }
   }, [role, sessionId, sendJoinSession, sendAuthentication])
 
