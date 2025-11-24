@@ -1,10 +1,49 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useConversationMemory } from '../../hooks/useMemory'
 import { useAuth } from '../../hooks/useAuth'
 
 // Basic UI scaffold for therapist training session
 const initialClientMessage =
   'Hello, I am your client. How can you help me today?'
+
+// Types
+interface BiasAnalysisResult {
+  overallScore: number
+  riskLevel: string
+  recommendations?: string[]
+}
+
+interface WebSocketMessage {
+  type: string
+  payload?: {
+    content?: string
+    role?: string
+    userId?: string
+    authorId?: string
+    message?: string
+    [key: string]: unknown
+  }
+}
+
+interface ConversationEntry {
+  role: 'client' | 'therapist'
+  message: string
+}
+
+interface CoachingNote {
+  authorId: string
+  content: string
+  timestamp: string
+}
+
+// Helper function to create deduplication key
+function createMessageKey(userId: string, role: string, content: string): string {
+  return `${userId}:${role}:${content}`
+}
+
+function createNoteKey(authorId: string, content: string): string {
+  return `${authorId}:coaching_note:${content}`
+}
 
 export function TrainingSessionComponent() {
   const { user } = useAuth()
@@ -41,13 +80,234 @@ export function TrainingSessionComponent() {
 
   const memory = useConversationMemory(userId, sessionId)
 
+  // Helper function to analyze bias
+  const analyzeBias = async (
+    sessionId: string,
+    conversation: ConversationEntry[],
+    therapistResponse: string,
+    userId: string,
+  ): Promise<BiasAnalysisResult | null> => {
+    const sessionPayload = {
+      session: {
+        sessionId,
+        timestamp: new Date().toISOString(),
+        participantDemographics: { userId },
+        scenario: 'therapist-training',
+        content: [
+          ...conversation,
+          { role: 'therapist' as const, message: therapistResponse },
+        ],
+        metadata: {},
+      },
+    }
+
+    try {
+      const res = await fetch('/api/bias-detection/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionPayload),
+      })
+
+      if (!res.ok) {
+        return null
+      }
+
+      const data = await res.json()
+      if (data?.success && data?.data) {
+        return data.data as BiasAnalysisResult
+      }
+
+      return null
+    } catch (err) {
+      console.error('Bias analysis failed:', err)
+      return null
+    }
+  }
+
+  // Helper function to generate AI response
+  const generateAIResponse = async (
+    conversation: ConversationEntry[],
+    therapistResponse: string,
+  ): Promise<string> => {
+    const payload = {
+      messages: [
+        ...conversation.map((entry) => ({
+          role: entry.role,
+          content: entry.message,
+        })),
+        { role: 'user', content: therapistResponse },
+      ],
+      model: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      temperature: 0.7,
+      maxResponseTokens: 256,
+    }
+
+    try {
+      const res = await fetch('/api/ai/response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        return 'Thank you for your response.'
+      }
+
+      const data = await res.json()
+      if (data?.content) {
+        return data.content
+      }
+
+      return 'Thank you for your response.'
+    } catch (err) {
+      console.error('AI response generation failed:', err)
+      return 'Thank you for your response.'
+    }
+  }
+
+  // Helper function to format evaluation message
+  const formatEvaluation = (biasResult: BiasAnalysisResult | null): string => {
+    if (!biasResult) {
+      return 'Bias analysis unavailable.'
+    }
+
+    const recommendations = biasResult.recommendations?.join(', ') || 'None'
+    return `Bias Score: ${biasResult.overallScore} | Risk Level: ${biasResult.riskLevel}\nRecommendations: ${recommendations}`
+  }
+
+  // Helper function to handle authentication response
+  const handleAuthenticated = useCallback(
+    (websocket: WebSocket, sessionId: string) => {
+      const currentRole = roleRef.current
+      const currentUserId = userIdRef.current
+      websocket.send(
+        JSON.stringify({
+          type: 'join_session',
+          payload: {
+            sessionId,
+            role: currentRole,
+            userId: currentUserId,
+          },
+        }),
+      )
+    },
+    [],
+  )
+
+  // Helper function to handle session messages
+  const handleSessionMessage = useCallback(
+    (
+      msg: WebSocketMessage,
+      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      currentRole: 'trainee' | 'observer',
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
+    ) => {
+      const messageContent = msg.payload?.content
+      const messageRole = msg.payload?.role
+      const messageUserId = msg.payload?.userId
+
+      if (!messageContent || !messageRole || !messageUserId) {
+        return
+      }
+
+      const messageKey = createMessageKey(messageUserId, messageRole, messageContent)
+
+      if (locallyAddedMessages.current.has(messageKey)) {
+        return
+      }
+
+      setConversation((prev) => [
+        ...prev,
+        { role: messageRole as 'client' | 'therapist', message: messageContent },
+      ])
+    },
+    [],
+  )
+
+  // Helper function to handle coaching notes
+  const handleCoachingNote = useCallback(
+    (
+      msg: WebSocketMessage,
+      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
+    ) => {
+      const noteContent = msg.payload?.content
+      const noteAuthorId = msg.payload?.authorId
+
+      if (!noteContent || !noteAuthorId) {
+        return
+      }
+
+      const noteKey = createNoteKey(noteAuthorId, noteContent)
+
+      if (locallyAddedMessages.current.has(noteKey)) {
+        return
+      }
+
+      setCoachingNotes((prev) => [...prev, msg.payload as CoachingNote])
+    },
+    [],
+  )
+
+  // Helper function to handle WebSocket messages
+  const handleWebSocketMessage = useCallback(
+    (
+      event: MessageEvent,
+      sessionId: string,
+      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      isAuthenticatedRef: React.MutableRefObject<boolean>,
+      websocket: WebSocket,
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
+      setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
+    ) => {
+      try {
+        const msg = JSON.parse(event.data) as WebSocketMessage
+
+        if (msg.type === 'authenticated') {
+          console.log('Authenticated with Training Server', msg.payload)
+          isAuthenticatedRef.current = true
+          handleAuthenticated(websocket, sessionId)
+          return
+        }
+
+        if (msg.type === 'session_joined') {
+          console.log('Joined session', msg.payload)
+          return
+        }
+
+        if (msg.type === 'error') {
+          console.error('WebSocket error:', msg.payload?.message)
+          return
+        }
+
+        if (msg.type === 'session_message') {
+          handleSessionMessage(
+            msg,
+            locallyAddedMessages,
+            roleRef.current,
+            setConversation,
+          )
+          return
+        }
+
+        if (msg.type === 'coaching_note') {
+          handleCoachingNote(msg, locallyAddedMessages, setCoachingNotes)
+          return
+        }
+      } catch (e) {
+        console.error('Error parsing WS message', e)
+      }
+    },
+    [handleAuthenticated, handleSessionMessage, handleCoachingNote],
+  )
+
   useEffect(() => {
     // Load conversation history from memory
     memory.getConversationHistory().then((history) => {
       if (history && history.length > 0) {
         setConversation(
           history.map((m) => ({
-            role: m.metadata?.role || 'client',
+            role: (m.metadata?.role || 'client') as 'client' | 'therapist',
             message: m.content,
           })),
         )
@@ -83,88 +343,15 @@ export function TrainingSessionComponent() {
     }
 
     websocket.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data)
-
-        // Handle authentication response
-        if (msg.type === 'authenticated') {
-          console.log('Authenticated with Training Server', msg.payload)
-          isAuthenticatedRef.current = true
-          // After authentication, join the session
-          const currentRole = roleRef.current
-          const currentUserId = userIdRef.current
-          websocket.send(JSON.stringify({
-            type: 'join_session',
-            payload: {
-              sessionId,
-              role: currentRole,
-              userId: currentUserId
-            }
-          }))
-          return
-        }
-
-        // Handle session join confirmation
-        if (msg.type === 'session_joined') {
-          console.log('Joined session', msg.payload)
-          return
-        }
-
-        // Handle errors
-        if (msg.type === 'error') {
-          console.error('WebSocket error:', msg.payload.message)
-          return
-        }
-
-        if (msg.type === 'session_message') {
-          const messageContent = msg.payload.content
-          const messageRole = msg.payload.role
-          const messageUserId = msg.payload.userId
-
-          // Create a deduplication key: userId + role + content
-          // This identifies unique messages regardless of timestamp
-          const messageKey = `${messageUserId}:${messageRole}:${messageContent}`
-
-          // Skip if we've already added this message locally (prevents duplicate from echo)
-          if (locallyAddedMessages.current.has(messageKey)) {
-            return
-          }
-
-          // Use refs to get current values, avoiding stale closures
-          const currentRole = roleRef.current
-
-          // For observers: always add messages (they don't update local state themselves)
-          // For trainees: add all messages that pass the deduplication check
-          // The deduplication key (checked above) already prevents duplicates from own messages
-          // This allows multiple trainees with the same userId to see each other's messages
-          if (currentRole === 'observer') {
-            setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
-          } else {
-            // Trainee: add message if it passed deduplication check (not a duplicate of own message)
-            setConversation(prev => [...prev, { role: messageRole, message: messageContent }])
-          }
-        }
-
-        if (msg.type === 'coaching_note') {
-          const noteContent = msg.payload.content
-          const noteAuthorId = msg.payload.authorId
-
-          // Create a deduplication key: authorId + type + content
-          // This identifies unique coaching notes regardless of timestamp
-          const noteKey = `${noteAuthorId}:coaching_note:${noteContent}`
-
-          // Skip if we've already added this note locally (prevents duplicate from echo)
-          // This handles both our own notes (added before sending) and any network duplicates
-          if (locallyAddedMessages.current.has(noteKey)) {
-            return
-          }
-
-          // Add the note to state (it's either from another observer or a new note we haven't seen)
-          setCoachingNotes(prev => [...prev, msg.payload])
-        }
-      } catch (e) {
-        console.error('Error parsing WS message', e)
-      }
+      handleWebSocketMessage(
+        event,
+        sessionId,
+        locallyAddedMessages,
+        isAuthenticatedRef,
+        websocket,
+        setConversation,
+        setCoachingNotes,
+      )
     }
 
     websocket.onerror = (error) => {
@@ -182,196 +369,193 @@ export function TrainingSessionComponent() {
       }
       ws.current = null
     }
-  }, [sessionId, userId]) // Removed 'role' from dependencies to prevent reconnection loops
+  }, [sessionId, userId, handleWebSocketMessage]) // Removed 'role' from dependencies to prevent reconnection loops
+
+  // Helper function to send join session message
+  const sendJoinSession = useCallback(
+    (websocket: WebSocket, sessionId: string) => {
+      const currentUserId = userIdRef.current
+      websocket.send(
+        JSON.stringify({
+          type: 'join_session',
+          payload: {
+            sessionId,
+            role: roleRef.current,
+            userId: currentUserId,
+          },
+        }),
+      )
+    },
+    [],
+  )
+
+  // Helper function to send authentication
+  const sendAuthentication = useCallback((websocket: WebSocket) => {
+    const authToken = '' // TODO: Get actual auth token from auth context
+    websocket.send(
+      JSON.stringify({
+        type: 'authenticate',
+        payload: {
+          token: authToken,
+        },
+      }),
+    )
+  }, [])
 
   // Handle role changes by sending a new join_session message without reconnecting
   useEffect(() => {
-    // Clear the deduplication set when role changes to prevent false-positive filtering
-    // This ensures messages aren't incorrectly filtered after role switches
     locallyAddedMessages.current.clear()
-
-    // Reset conversation state when role changes to prevent mixing trainee and observer contexts
-    // Observers should see the live session conversation (populated by WebSocket)
-    // Trainees will rebuild their conversation through interaction
     setConversation([{ role: 'client', message: initialClientMessage }])
-    setEvaluation(null) // Clear evaluation feedback when switching roles
+    setEvaluation(null)
 
-    // When role changes, rejoin the session with the new role
-    if (ws.current?.readyState === WebSocket.OPEN && isAuthenticatedRef.current) {
-      // If already authenticated, just send join_session with new role
-      const currentUserId = userIdRef.current
-      ws.current.send(JSON.stringify({
-        type: 'join_session',
-        payload: {
-          sessionId,
-          role: roleRef.current,
-          userId: currentUserId
-        }
-      }))
-    } else if (ws.current?.readyState === WebSocket.OPEN) {
-      // If not authenticated, authenticate first (join will happen in auth handler)
-      const authToken = '' // TODO: Get actual auth token from auth context
-      ws.current.send(JSON.stringify({
-        type: 'authenticate',
-        payload: {
-          token: authToken
-        }
-      }))
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+      return
     }
-  }, [role, sessionId]) // Only send join_session when role changes, don't reconnect
 
-  const handleResponse = async () => {
-    // Use refs to get current values
+    if (isAuthenticatedRef.current) {
+      sendJoinSession(ws.current, sessionId)
+    } else {
+      sendAuthentication(ws.current)
+    }
+  }, [role, sessionId, sendJoinSession, sendAuthentication])
+
+  // Handle observer note submission
+  const handleObserverNote = useCallback(
+    (
+      noteContent: string,
+      userId: string,
+      ws: React.MutableRefObject<WebSocket | null>,
+      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
+      setTherapistResponse: React.Dispatch<React.SetStateAction<string>>,
+    ) => {
+      if (!noteContent.trim()) {
+        return
+      }
+
+      const noteKey = createNoteKey(userId, noteContent)
+      locallyAddedMessages.current.add(noteKey)
+
+      setCoachingNotes((prev) => [
+        ...prev,
+        {
+          authorId: userId,
+          content: noteContent,
+          timestamp: new Date().toISOString(),
+        },
+      ])
+
+      ws.current?.send(
+        JSON.stringify({
+          type: 'coaching_note',
+          payload: { content: noteContent },
+        }),
+      )
+
+      setTherapistResponse('')
+    },
+    [],
+  )
+
+  // Handle trainee response submission
+  const handleTraineeResponse = useCallback(
+    async (
+      response: string,
+      conversation: ConversationEntry[],
+      sessionId: string,
+      userId: string,
+      ws: React.MutableRefObject<WebSocket | null>,
+      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      memory: ReturnType<typeof useConversationMemory>,
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
+      setEvaluation: React.Dispatch<React.SetStateAction<string | null>>,
+      setTherapistResponse: React.Dispatch<React.SetStateAction<string>>,
+    ) => {
+      const therapistMessage: ConversationEntry = {
+        role: 'therapist',
+        message: response,
+      }
+
+      setConversation((prev) => [...prev, therapistMessage])
+      await memory.addMessage(response, 'user')
+
+      const messageKey = createMessageKey(userId, 'therapist', response)
+      locallyAddedMessages.current.add(messageKey)
+
+      ws.current?.send(
+        JSON.stringify({
+          type: 'session_message',
+          payload: { content: response, role: 'therapist' },
+        }),
+      )
+
+      // Analyze bias and generate AI response in parallel
+      const [biasResult, nextClientMsg] = await Promise.all([
+        analyzeBias(sessionId, conversation, response, userId),
+        generateAIResponse(conversation, response),
+      ])
+
+      setEvaluation(formatEvaluation(biasResult))
+
+      const clientMessage: ConversationEntry = {
+        role: 'client',
+        message: nextClientMsg,
+      }
+
+      setConversation((prev) => [...prev, clientMessage])
+      await memory.addMessage(nextClientMsg, 'assistant')
+
+      const clientMessageKey = createMessageKey(userId, 'client', nextClientMsg)
+      locallyAddedMessages.current.add(clientMessageKey)
+
+      ws.current?.send(
+        JSON.stringify({
+          type: 'session_message',
+          payload: { content: nextClientMsg, role: 'client' },
+        }),
+      )
+
+      setTherapistResponse('')
+    },
+    [],
+  )
+
+  const handleResponse = useCallback(async () => {
     const currentRole = roleRef.current
     const currentUserId = userIdRef.current
 
     if (currentRole === 'observer') {
-      // Observers send coaching notes
-      if (!therapistResponse.trim()) return
-
-      // Mark this note as locally added to prevent duplicate from WebSocket echo
-      // Key format matches what we check in the WebSocket message handler
-      const noteKey = `${currentUserId}:coaching_note:${therapistResponse}`
-      locallyAddedMessages.current.add(noteKey)
-
-      // Add note to local state immediately so it appears in UI right away
-      // The WebSocket echo will be skipped due to the deduplication key
-      setCoachingNotes(prev => [...prev, {
-        authorId: currentUserId,
-        content: therapistResponse,
-        timestamp: new Date().toISOString()
-      }])
-
-      ws.current?.send(JSON.stringify({
-        type: 'coaching_note',
-        payload: { content: therapistResponse }
-      }))
-      setTherapistResponse('')
+      handleObserverNote(
+        therapistResponse,
+        currentUserId,
+        ws,
+        locallyAddedMessages,
+        setCoachingNotes,
+        setTherapistResponse,
+      )
       return
     }
 
-    // Trainee Logic
-    const therapistMessage = { role: 'therapist' as const, message: therapistResponse }
-    setConversation([
-      ...conversation,
-      therapistMessage,
-    ])
-    await memory.addMessage(therapistResponse, 'user')
-
-    // Mark this message as locally added to prevent duplicate from WebSocket echo
-    // Key format matches what we check in the WebSocket message handler
-    const messageKey = `${currentUserId}:therapist:${therapistResponse}`
-    locallyAddedMessages.current.add(messageKey)
-
-    // Broadcast to WS (server will add its own timestamp)
-    ws.current?.send(JSON.stringify({
-      type: 'session_message',
-      payload: { content: therapistResponse, role: 'therapist' }
-    }))
-
-    // Prepare session object for bias detection
-    const sessionPayload = {
-      session: {
-        sessionId: sessionId,
-        timestamp: new Date().toISOString(),
-        participantDemographics: { userId: currentUserId },
-        scenario: 'therapist-training',
-        content: [
-          ...conversation,
-          { role: 'therapist', message: therapistResponse },
-        ],
-        metadata: {},
-      },
-    }
-
-    interface BiasAnalysisResult {
-      overallScore: number
-      riskLevel: string
-      recommendations?: string[]
-    }
-
-    // Call bias detection API
-    let biasResult: BiasAnalysisResult | null = null
-    try {
-      const res = await fetch('/api/bias-detection/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sessionPayload),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data && data.success && data.data) {
-          biasResult = data.data
-        }
-      }
-    } catch (err) {
-      console.error('Bias analysis failed:', err)
-      // fallback: no bias result
-    }
-
-    // Show bias analysis feedback
-    if (biasResult) {
-      setEvaluation(
-        `Bias Score: ${biasResult.overallScore} | Risk Level: ${biasResult.riskLevel}\nRecommendations: ${biasResult.recommendations?.join(', ')}`,
-      )
-    } else {
-      setEvaluation('Bias analysis unavailable.')
-    }
-
-    // Fetch next client message from real backend
-    let nextClientMsg = 'Thank you for your response.'
-    try {
-      const payload = {
-        messages: [
-          ...conversation.map((entry) => ({
-            role: entry.role,
-            content: entry.message,
-          })),
-          { role: 'user', content: therapistResponse },
-        ],
-        model: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-        temperature: 0.7,
-        maxResponseTokens: 256,
-      }
-      const res = await fetch('/api/ai/response', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data && data.content) {
-          nextClientMsg = data.content
-        }
-      }
-    } catch (err) {
-      console.error('AI response generation failed:', err)
-      // fallback to static reply
-    }
-
-    // Update local state
-    const clientMessage = { role: 'client' as const, message: nextClientMsg }
-    setConversation((prev) => [
-      ...prev,
-      clientMessage,
-    ])
-    await memory.addMessage(nextClientMsg, 'assistant')
-
-    // Mark this message as locally added to prevent duplicate from WebSocket echo
-    // Key format matches what we check in the WebSocket message handler
-    // Note: AI messages are sent by the trainee, so they use the trainee's userId
-    // Reuse currentUserId from the top of the function
-    const clientMessageKey = `${currentUserId}:client:${nextClientMsg}`
-    locallyAddedMessages.current.add(clientMessageKey)
-
-    // Broadcast AI response to WS (server will add its own timestamp)
-    ws.current?.send(JSON.stringify({
-      type: 'session_message',
-      payload: { content: nextClientMsg, role: 'client' }
-    }))
-
-    setTherapistResponse('')
-  }
+    await handleTraineeResponse(
+      therapistResponse,
+      conversation,
+      sessionId,
+      currentUserId,
+      ws,
+      locallyAddedMessages,
+      memory,
+      setConversation,
+      setEvaluation,
+      setTherapistResponse,
+    )
+  }, [
+    therapistResponse,
+    conversation,
+    sessionId,
+    memory,
+    handleObserverNote,
+    handleTraineeResponse,
+  ])
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl grid grid-cols-1 md:grid-cols-3 gap-6">

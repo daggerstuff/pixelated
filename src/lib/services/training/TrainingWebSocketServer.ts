@@ -2,29 +2,34 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { IncomingMessage } from 'http'
 import { randomUUID } from 'crypto'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { validateToken, type UserRole } from '../../auth/jwt-service'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
 /**
- * TODO: SECURITY CRITICAL - Authentication & Authorization
+ * Training WebSocket Server - Real-time collaboration for clinical training sessions
  *
- * This server currently has NO authentication or authorization.
- * Any client can:
- * - Join any sessionId with any role/userId
- * - Send coaching_note events
- * - Observe all messages in any session
+ * Authentication & Authorization:
+ * - Production: Validates JWT access tokens using the platform's auth system
+ * - Development: Bypasses authentication for local testing (use with caution)
+ * - Role mapping: Maps platform UserRole (admin, therapist, etc.) to training roles
+ *   - admin/therapist -> supervisor (can supervise and provide coaching notes)
+ *   - researcher -> observer (can observe sessions)
+ *   - patient/support/guest -> trainee (can participate in training)
  *
- * This is a significant security/privacy risk in a clinical training context.
+ * Security Features:
+ * - Token validation with expiration and revocation checks
+ * - Role-based access control for coaching notes (supervisor/observer only)
+ * - Authentication timeout (10 seconds) to prevent unauthenticated connections
+ * - Session-level message broadcasting with role filtering
  *
- * Required before production:
- * 1. Validate authentication tokens (JWT/session tokens) before allowing join_session
- * 2. Verify user has permission to access the requested sessionId
- * 3. Validate role claims (trainee/observer/supervisor) against user's actual permissions
- * 4. Implement session-level access control (e.g., only session owner + authorized supervisors)
- * 5. Rate limiting and abuse prevention
+ * TODO: Additional security enhancements:
+ * 1. Verify user has permission to access the requested sessionId
+ * 2. Implement session-level access control (e.g., only session owner + authorized supervisors)
+ * 3. Rate limiting and abuse prevention
+ * 4. Audit logging for all authentication and authorization events
  *
- * Current implementation: Authentication stub is in place but not enforced.
- * Clients can provide a token via:
+ * Clients authenticate via:
  * - Query string: ?token=<jwt>
  * - First message: { type: 'authenticate', token: '<jwt>' }
  */
@@ -197,15 +202,7 @@ export class TrainingWebSocketServer {
   /**
    * Validate client authentication token and return user info
    * 
-   * TODO: Implement actual token validation
-   * This should:
-   * 1. Verify JWT/session token signature
-   * 2. Check token expiration
-   * 3. Extract userId and role from token claims
-   * 4. Verify user has permission for training sessions
-   * 5. Return null if validation fails
-   * 
-   * @param token - Authentication token (JWT or session token)
+   * @param token - Authentication token (JWT access token)
    * @returns ClientAuthResult if valid, null otherwise
    */
   private async validateClient(token: string): Promise<ClientAuthResult | null> {
@@ -227,27 +224,60 @@ export class TrainingWebSocketServer {
       }
     }
 
-    // Production mode: Implement actual token validation
-    // TODO: Implement actual token validation
-    // 
-    // Example implementation:
-    // try {
-    //   const authInfo = await verifyAuthToken(token)
-    //   // Map auth role to training role
-    //   const trainingRole = this.mapAuthRoleToTrainingRole(authInfo.role)
-    //   return {
-    //     userId: authInfo.userId,
-    //     role: trainingRole
-    //   }
-    // } catch (err) {
-    //   logger.error('Token validation failed', { error: err })
-    //   return null
-    // }
+    // Production mode: Validate JWT token
+    try {
+      const validationResult = await validateToken(token, 'access')
 
-    logger.warn('Authentication validation not implemented - rejecting client', {
-      tokenLength: token.length
-    })
-    return null
+      if (!validationResult.valid || !validationResult.userId) {
+        logger.warn('Token validation failed', {
+          error: validationResult.error,
+          tokenLength: token.length
+        })
+        return null
+      }
+
+      // Map auth role to training role
+      const trainingRole = this.mapAuthRoleToTrainingRole(validationResult.role)
+
+      logger.info('Token validated successfully', {
+        userId: validationResult.userId,
+        authRole: validationResult.role,
+        trainingRole
+      })
+
+      return {
+        userId: validationResult.userId,
+        role: trainingRole
+      }
+    } catch (err) {
+      logger.error('Token validation error', {
+        error: err instanceof Error ? err.message : String(err),
+        tokenLength: token.length
+      })
+      return null
+    }
+  }
+
+  /**
+   * Map authentication UserRole to training session role
+   * 
+   * @param authRole - User role from authentication system
+   * @returns Training session role (trainee, observer, or supervisor)
+   */
+  private mapAuthRoleToTrainingRole(authRole?: UserRole): 'trainee' | 'observer' | 'supervisor' {
+    // Admin and therapist can supervise training sessions
+    if (authRole === 'admin' || authRole === 'therapist') {
+      return 'supervisor'
+    }
+
+    // Researchers can observe but not supervise
+    if (authRole === 'researcher') {
+      return 'observer'
+    }
+
+    // Patients, support staff, and guests participate as trainees
+    // Default to trainee for unknown roles
+    return 'trainee'
   }
 
   /**
