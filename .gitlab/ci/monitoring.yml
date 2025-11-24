@@ -42,7 +42,7 @@ monitoring:performance:
     # Generate performance report
     - echo "📊 Generating performance report..."
     - |
-      cat > performance-report.json << 'EOF'
+      cat > performance-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -117,7 +117,7 @@ monitoring:health:
     # Generate health report
     - echo "📊 Generating health report..."
     - |
-      cat > health-report.json << 'EOF'
+      cat > health-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -178,7 +178,7 @@ monitoring:resources:
     # Generate resource report
     - echo "📊 Generating resource report..."
     - |
-      cat > resource-report.json << 'EOF'
+      cat > resource-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -239,7 +239,7 @@ monitoring:errors:
     # Generate error report
     - echo "📊 Generating error report..."
     - |
-      cat > error-report.json << 'EOF'
+      cat > error-report.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -299,7 +299,7 @@ monitoring:alerts:
     
     # Create alert payload
     - |
-      cat > alert-payload.json << 'EOF'
+      cat > alert-payload.json << EOF
       {
         "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -344,7 +344,7 @@ monitoring:summary:
     # Aggregate all monitoring reports
     - echo "📋 Aggregating monitoring reports..."
     - |
-      cat > monitoring-summary.json << 'EOF'
+      cat > monitoring-summary.json << EOF
       {
         "summary_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
         "commit_sha": "${CI_COMMIT_SHORT_SHA}",
@@ -364,7 +364,7 @@ monitoring:summary:
     # Generate monitoring dashboard data
     - echo "📊 Generating monitoring dashboard data..."
     - |
-      cat > monitoring-dashboard.json << 'EOF'
+      cat > monitoring-dashboard.json << EOF
       {
         "dashboard": {
           "title": "Pixelated Empathy Monitoring",
