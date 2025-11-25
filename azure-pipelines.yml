@@ -1,5 +1,13 @@
 # Azure DevOps Pipeline for Pixelated Empathy
 # Enterprise-grade CI/CD with Azure Kubernetes Service deployment
+#
+# Deployment Info (Last Updated: 2025-11-25):
+# - AKS Cluster: pixelated-aks-cluster (East US)
+# - ACR: pixelatedregistry.azurecr.io
+# - External IP: 20.242.241.80 (NGINX Ingress Controller)
+# - Staging: staging-azure.pixelatedempathy.tech
+# - Production: azure.pixelatedempathy.tech
+# - Image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
 
 trigger:
   branches:
@@ -27,6 +35,14 @@ variables:
     value: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
   - name: IMAGE_NAME
     value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
+  
+  # Sentry Configuration
+  - name: SENTRY_DSN
+    value: 'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032'
+  - name: SENTRY_ORG
+    value: 'pixelated-empathy-dq'
+  - name: SENTRY_PROJECT
+    value: 'pixel-staging'
   
   # Pool selection: Uses Default agent pool (self-hosted agents)
 
@@ -364,7 +380,14 @@ stages:
               useConfigurationFile: true
               configuration: 'k8s/azure/'
 
-          # Use Kubernetes@1 task with kubectl under the hood instead of deprecated KubernetesManifest
+          - task: Kubernetes@1
+            displayName: 'Update Image Tag'
+            inputs:
+              connectionType: 'None'
+              namespace: '$(KUBE_NAMESPACE)'
+              command: 'set'
+              arguments: 'image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)'
+
           - task: Kubernetes@1
             displayName: 'Check Rollout Status'
             inputs:
@@ -372,6 +395,38 @@ stages:
               namespace: '$(KUBE_NAMESPACE)'
               command: 'rollout'
               arguments: 'status deployment/pixelated --timeout=300s'
+
+          - task: Bash@3
+            displayName: 'Create Sentry Release'
+            condition: succeededOrFailed()
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                
+                # Install Sentry CLI if not available
+                if ! command -v sentry-cli &> /dev/null; then
+                  curl -sL https://sentry.io/get-cli/ | bash || {
+                    echo "⚠️ Could not install sentry-cli, skipping release creation"
+                    exit 0
+                  }
+                fi
+                
+                # Create Sentry release
+                export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
+                export SENTRY_ORG="$(SENTRY_ORG)"
+                export SENTRY_PROJECT="$(SENTRY_PROJECT)"
+                
+                RELEASE_VERSION="$(Build.BuildNumber)"
+                
+                sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
+                sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
+                sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
+                sentry-cli releases deploys "$RELEASE_VERSION" new -e staging || echo "⚠️ Could not create deploy"
+                
+                echo "✅ Sentry release $RELEASE_VERSION created for staging"
+            env:
+              SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
 
 - stage: DeployProduction
   displayName: 'Deploy to Production (AKS)'
@@ -406,6 +461,49 @@ stages:
               command: 'apply'
               useConfigurationFile: true
               configuration: 'k8s/azure/'
+
+          - task: Kubernetes@1
+            displayName: 'Update Production Image Tag'
+            inputs:
+              connectionType: 'None'
+              namespace: '$(KUBE_NAMESPACE_PROD)'
+              command: 'set'
+              arguments: 'image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)'
+
+          - task: Kubernetes@1
+            displayName: 'Check Production Rollout Status'
+            inputs:
+              connectionType: 'None'
+              namespace: '$(KUBE_NAMESPACE_PROD)'
+              command: 'rollout'
+              arguments: 'status deployment/pixelated --timeout=300s'
+
+          - task: Bash@3
+            displayName: 'Create Sentry Production Release'
+            condition: succeededOrFailed()
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                
+                if ! command -v sentry-cli &> /dev/null; then
+                  curl -sL https://sentry.io/get-cli/ | bash || {
+                    echo "⚠️ Could not install sentry-cli, skipping release creation"
+                    exit 0
+                  }
+                fi
+                
+                export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
+                export SENTRY_ORG="$(SENTRY_ORG)"
+                export SENTRY_PROJECT="pixel-production"
+                
+                RELEASE_VERSION="$(Build.BuildNumber)"
+                
+                sentry-cli releases deploys "$RELEASE_VERSION" new -e production || echo "⚠️ Could not create deploy"
+                
+                echo "✅ Sentry production deploy recorded for $RELEASE_VERSION"
+            env:
+              SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
 
 - stage: HealthCheck
   displayName: 'Health Check'

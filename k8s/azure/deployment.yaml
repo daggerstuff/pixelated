@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: pixelatedregistry.azurecr.io/pixelatedempathy:latest
+        image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
         imagePullPolicy: Always
         env:
         - name: NODE_ENV
@@ -101,7 +101,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: pixelatedregistry.azurecr.io/pixelatedempathy:latest
+        image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
         imagePullPolicy: Always
         env:
         - name: NODE_ENV

@@ -4,10 +4,10 @@ metadata:
   name: pixelated-ingress
   namespace: pixelated-staging
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - staging-azure.pixelatedempathy.tech
@@ -30,10 +30,10 @@ metadata:
   name: pixelated-ingress
   namespace: pixelated-production
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - azure.pixelatedempathy.tech
