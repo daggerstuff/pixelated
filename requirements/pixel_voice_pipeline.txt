@@ -17,8 +17,8 @@ whisperx
 faster-whisper
 
 # Torch (GPU support)
-torch
-torchaudio
+torch>=2.8.0
+torchaudio>=2.8.0
 
 # Audio quality assessment
 librosa

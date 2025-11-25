@@ -48,7 +48,7 @@ mypy
 
 # Language models for bias detection - Security updated
 transformers>=4.36.0
-torch>=2.5.0,<3.0.0
+torch>=2.8.0,<3.0.0
 datasets>=2.19.0
 
 # Privacy and security

@@ -31,7 +31,7 @@ dependencies = [
     
     # AI/ML Dependencies
     "tensorflow>=2.13.0",
-    "torch>=2.0.0",
+    "torch>=2.8.0",
     "transformers>=4.30.0",
     "scikit-learn>=1.5.0",
     "fairlearn>=0.9.0",

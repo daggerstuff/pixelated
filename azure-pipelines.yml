@@ -186,8 +186,8 @@ stages:
             echo "✅ Docker daemon is accessible"
           fi
           
-          # Display Docker info
-          docker info | head -n 5
+          # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
+          docker info 2>&1 | { head -n 5; cat > /dev/null; }
 
     - task: Docker@2
       displayName: 'Build and Push Docker Image'
@@ -302,8 +302,8 @@ stages:
             echo "✅ Docker daemon is accessible"
           fi
           
-          # Display Docker info
-          docker info | head -n 5
+          # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
+          docker info 2>&1 | { head -n 5; cat > /dev/null; }
 
     - task: Docker@2
       displayName: 'Login to ACR'
@@ -499,9 +499,12 @@ stages:
                 
                 RELEASE_VERSION="$(Build.BuildNumber)"
                 
+                sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
+                sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
+                sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
                 sentry-cli releases deploys "$RELEASE_VERSION" new -e production || echo "⚠️ Could not create deploy"
                 
-                echo "✅ Sentry production deploy recorded for $RELEASE_VERSION"
+                echo "✅ Sentry release $RELEASE_VERSION created for production"
             env:
               SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
 
