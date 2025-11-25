@@ -1,20 +1,22 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
 # Builder stage: install deps and run the static build
+FROM node:25-alpine AS builder
 ARG PNPM_VERSION=10.23.0
-FROM node:24-slim AS builder
+
 ARG PNPM_VERSION
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Update all packages first to patch known vulnerabilities
+RUN apk update && apk upgrade && apk add --no-cache \
     bash \
     git \
     python3 \
     make \
     g++ \
-    libstdc++6 \
-    && rm -rf /var/lib/apt/lists/*
+    libstdc++ \
+    libc6-compat
 RUN npm install -g pnpm@$PNPM_VERSION && pnpm --version
 
 # Copy package manifests first for better layer caching
@@ -32,23 +34,24 @@ RUN find /app/node_modules -type f -name "*.map" -delete && \
     find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
-FROM node:24-slim AS runtime
+FROM node:25-alpine AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
+# Update all packages first to patch known vulnerabilities
 ARG PNPM_VERSION
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libstdc++6 \
+RUN apk update && apk upgrade && apk add --no-cache \
+    libstdc++ \
     python3 \
     make \
     g++ \
     git \
-    && rm -rf /var/lib/apt/lists/* && \
+    libc6-compat && \
     npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version
 
 # Create non-root user
-RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
+RUN addgroup -g 1001 astro && adduser -u 1001 -G astro -D astro
 
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
@@ -69,9 +72,8 @@ RUN pnpm install --prod --frozen-lockfile && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
     # Remove build tools after native modules are built
-    apt-get purge -y python3 make g++ git && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
+    apk del python3 make g++ git && \
+    rm -rf /tmp/* /root/.npm /root/.cache
 
 # Copy built output and public assets from builder
 COPY --from=builder /app/dist ./dist
