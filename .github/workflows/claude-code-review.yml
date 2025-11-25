@@ -102,10 +102,16 @@ jobs:
         run: |
           check_port() {
             if command -v nc >/dev/null 2>&1; then
-              nc -z localhost 3456 >/dev/null 2>&1
+              if nc -z localhost 3456 >/dev/null 2>&1; then
+                return 0
+              fi
             else
-              ss -tnl | grep -q ":3456 "
+              if ss -tnl | grep -q ":3456 "; then
+                return 0
+              fi
             fi
+
+            return 1
           }
 
           for i in {1..60}; do
