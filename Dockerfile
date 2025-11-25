@@ -56,7 +56,6 @@ COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
 # Install production dependencies and clean up in a single layer
 RUN pnpm install --prod --frozen-lockfile && \
-    pnpm add class-variance-authority && \
     pnpm store prune && \
     # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
