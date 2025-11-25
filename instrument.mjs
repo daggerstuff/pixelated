@@ -1,8 +1,58 @@
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
 
-import * as Sentry from '@sentry/node';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
-import { httpIntegration } from '@sentry/node';
+const createStubSpan = () => ({
+  end: () => {},
+})
+
+const createStubScope = () => ({
+  setTag: () => {},
+  setExtra: () => {},
+  setUser: () => {},
+})
+
+const createStubSentry = () => ({
+  init: () => {},
+  close: async () => {},
+  captureException: () => {},
+  setUser: () => {},
+  setContext: () => {},
+  withScope: (callback = () => {}) => {
+    try {
+      callback(createStubScope())
+    } catch {
+      // ignore — noop scope wrapper
+    }
+  },
+  startInactiveSpan: () => createStubSpan(),
+  startSpan: () => createStubSpan(),
+  metrics: {
+    count: () => {},
+    distribution: () => {},
+  },
+})
+
+let Sentry = null
+let nodeProfilingIntegration = () => null
+let httpIntegration = () => null
+
+try {
+  const sentryNode = await import('@sentry/node')
+  Sentry = sentryNode
+  httpIntegration = typeof sentryNode.httpIntegration === 'function'
+    ? sentryNode.httpIntegration
+    : () => null
+
+  const profiling = await import('@sentry/profiling-node')
+  nodeProfilingIntegration = profiling?.nodeProfilingIntegration ?? (() => null)
+} catch (error) {
+  const message = '[Sentry] Node SDK not available — disabling instrumentation. Install @sentry/node to enable full telemetry.'
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(message)
+  } else {
+    console.warn(message, error)
+  }
+  Sentry = createStubSentry()
+}
 
 // Enhanced Sentry configuration with comprehensive instrumentation
 Sentry.init({
@@ -17,11 +67,11 @@ Sentry.init({
   // Integrations for comprehensive monitoring
   integrations: [
     // HTTP integration for outgoing requests
-    httpIntegration({ tracing: true }),
+    typeof httpIntegration === 'function' ? httpIntegration({ tracing: true }) : null,
 
     // Profiling integration for performance monitoring
-    nodeProfilingIntegration(),
-  ],
+    typeof nodeProfilingIntegration === 'function' ? nodeProfilingIntegration() : null,
+  ].filter(Boolean),
 
   // Tracing configuration
   tracePropagationTargets: [

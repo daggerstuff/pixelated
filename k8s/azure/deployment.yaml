@@ -48,6 +48,11 @@ spec:
             secretKeyRef:
               name: sentry-config
               key: sentry-auth-token
+        envFrom:
+        - configMapRef:
+            name: pixelated-config
+        - secretRef:
+            name: pixelated-secrets
         ports:
         - containerPort: 4321
           name: http
@@ -125,6 +130,11 @@ spec:
             secretKeyRef:
               name: sentry-config
               key: sentry-auth-token
+        envFrom:
+        - configMapRef:
+            name: pixelated-config
+        - secretRef:
+            name: pixelated-secrets
         ports:
         - containerPort: 4321
           name: http
