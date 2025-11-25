@@ -66,7 +66,7 @@ RUN pnpm install --prod --frozen-lockfile && \
     find node_modules -type d -name "*.spec.*" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type f -name "*.map" -delete && \
     find node_modules -type f -name "*.ts" ! -path "*/types/*" -delete && \
-    find node_modules -name "*.tsx" ! -path "*/types/*" -delete && \
+    find node_modules -type f -name "*.tsx" ! -path "*/types/*" -delete && \
     find node_modules -name "README.md" -delete && \
     find node_modules -name "CHANGELOG*" -delete && \
     find node_modules -name "LICENSE*" -delete && \
