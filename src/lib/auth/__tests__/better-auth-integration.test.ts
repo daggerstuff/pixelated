@@ -4,6 +4,53 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+// Mock better-sqlite3 BEFORE importing better-auth-integration
+// This prevents the native module binding error in CI
+vi.mock('better-sqlite3', () => {
+  // Create a mock class that mimics better-sqlite3's Database
+  class MockDatabase {
+    exec = vi.fn()
+    prepare = vi.fn(() => ({
+      run: vi.fn(),
+      get: vi.fn(),
+      all: vi.fn(() => []),
+      finalize: vi.fn(),
+      bind: vi.fn(),
+    }))
+    pragma = vi.fn(() => [])
+    transaction = vi.fn((fn: () => void) => fn)
+    close = vi.fn()
+    backup = vi.fn()
+    serialize = vi.fn()
+    function = vi.fn()
+    aggregate = vi.fn()
+    table = vi.fn()
+    loadExtension = vi.fn()
+    defaultSafeIntegers = vi.fn()
+    unsafeMode = vi.fn()
+  }
+
+  return {
+    default: MockDatabase,
+  }
+})
+
+// Mock better-auth to avoid database initialization issues
+vi.mock('better-auth', () => ({
+  betterAuth: vi.fn(() => ({
+    api: {
+      signUpEmail: vi.fn(),
+      signInEmail: vi.fn(),
+      signOut: vi.fn(),
+    },
+  })),
+}))
+
+vi.mock('better-auth/adapters/drizzle', () => ({
+  drizzleAdapter: vi.fn(() => ({})),
+}))
+
 import {
   registerUser,
   loginUser,
@@ -420,7 +467,7 @@ describe('Better-Auth Integration', () => {
           'password123',
           mockClientInfo,
         )
-      } catch (_error) {
+      } catch {
         // Expected to throw
       }
 

@@ -94,7 +94,7 @@ jobs:
       - name: Start Claude Code Router
         if: steps.auth-check.outputs.has_nvidia == 'true'
         run: |
-          nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.8 start > $HOME/ccr.log 2>&1 &
+          nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.71 start > $HOME/ccr.log 2>&1 &
         shell: bash
 
       - name: Wait for CCR to become healthy

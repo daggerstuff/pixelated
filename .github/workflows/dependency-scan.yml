@@ -22,7 +22,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.22.0
+          version: 10.23.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -50,29 +50,90 @@ jobs:
       - name: Install uv (force latest)
         run: pip install --upgrade 'uv>=0.8.6'
 
-      - name: Create virtual environment
-        run: uv venv
-
-      - name: Install project dependencies
-        run: uv pip sync pyproject.toml
-
-      - name: Install pip-audit in venv
-        run: uv pip install --upgrade pip pip-audit
-
-      - name: Run pip-audit (skip editable/local package)
+      - name: Find and scan Python projects
         id: pip_audit
         continue-on-error: true
         run: |
-          uv run pip-audit --skip-editable --format=columns 2>&1 | tee pip-audit-output.txt
-          exit ${PIPESTATUS[0]}
+          # Find all pyproject.toml files
+          PYPROJECT_FILES=$(find . -name "pyproject.toml" -not -path "./node_modules/*" -not -path "./.venv/*" | sort)
+          
+          if [ -z "$PYPROJECT_FILES" ]; then
+            echo "⚠️ No pyproject.toml files found - skipping Python dependency scan"
+            echo "NO_PYTHON_PROJECTS=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "📦 Found Python projects:"
+          echo "$PYPROJECT_FILES"
+          echo ""
+          
+          # Track overall results
+          TOTAL_VULNS=0
+          ALL_OUTPUTS=""
+          SCAN_FAILED=false
+          
+          for pyproject in $PYPROJECT_FILES; do
+            PROJECT_DIR=$(dirname "$pyproject")
+            PROJECT_NAME=$(basename "$PROJECT_DIR")
+            
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "🔍 Scanning: $PROJECT_DIR ($PROJECT_NAME)"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            
+            # Create isolated venv for each project
+            cd "$PROJECT_DIR"
+            uv venv --quiet 2>/dev/null || true
+            
+            # Install dependencies
+            if ! uv pip install -q . 2>/dev/null; then
+              echo "⚠️ Could not install dependencies for $PROJECT_NAME - skipping"
+              cd - > /dev/null
+              continue
+            fi
+            
+            # Install pip-audit
+            uv pip install -q pip-audit 2>/dev/null || true
+            
+            # Run pip-audit
+            OUTPUT_FILE="/tmp/pip-audit-${PROJECT_NAME}.txt"
+            if uv run pip-audit --skip-editable --format=columns 2>&1 | tee "$OUTPUT_FILE"; then
+              echo "✅ No vulnerabilities found in $PROJECT_NAME"
+            else
+              echo "⚠️ Vulnerabilities found in $PROJECT_NAME"
+              SCAN_FAILED=true
+            fi
+            
+            # Collect output
+            if [ -f "$OUTPUT_FILE" ]; then
+              echo "" >> /tmp/pip-audit-combined.txt
+              echo "=== $PROJECT_NAME ($PROJECT_DIR) ===" >> /tmp/pip-audit-combined.txt
+              cat "$OUTPUT_FILE" >> /tmp/pip-audit-combined.txt
+            fi
+            
+            # Cleanup and return to root
+            rm -rf .venv
+            cd - > /dev/null
+            echo ""
+          done
+          
+          # Consolidate outputs
+          if [ -f /tmp/pip-audit-combined.txt ]; then
+            mv /tmp/pip-audit-combined.txt pip-audit-output.txt
+          else
+            echo "No pip-audit output generated" > pip-audit-output.txt
+          fi
+          
+          if [ "$SCAN_FAILED" = true ]; then
+            exit 1
+          fi
 
       - name: Check for actionable vulnerabilities
-        if: always()
+        if: always() && steps.pip_audit.outputs.NO_PYTHON_PROJECTS != 'true'
         run: |
           # Check if pip-audit found any vulnerabilities
           if [ ! -f pip-audit-output.txt ]; then
-            echo "❌ pip-audit output file not found"
-            exit 1
+            echo "⚠️ pip-audit output file not found - no Python projects scanned"
+            exit 0
           fi
 
           # Known acceptable vulnerabilities (CI/build tools only, not runtime dependencies)

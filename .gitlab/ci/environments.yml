@@ -4,7 +4,7 @@
 .variables:
   # Global variables
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.22.0"
+  PNPM_VERSION: "10.23.0"
   PYTHON_VERSION: "3.11"
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
@@ -103,17 +103,17 @@ deploy:development:
     - echo "Namespace: $KUBE_NAMESPACE"
     - echo "Strategy: $DEPLOYMENT_STRATEGY"
     - echo "Replicas: $REPLICAS"
-    
+
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
-    
+
     # Apply development-specific configurations
     - echo "📋 Applying development configurations..."
     - kubectl apply -f k8s/development/ -n ${KUBE_NAMESPACE} || true
-    
+
     # Deploy with development settings
     - echo "🔄 Deploying with development settings..."
     - helm upgrade --install pixelated-dev ./helm/pixelated \
@@ -128,7 +128,7 @@ deploy:development:
       --set environment=${ENVIRONMENT_NAME} \
       --set logLevel=${LOG_LEVEL} \
       --set monitoring.enabled=${MONITORING_ENABLED}
-    
+
     - echo "✅ Development deployment completed"
   environment:
     name: development
@@ -148,17 +148,17 @@ deploy:staging:
     - echo "Namespace: $KUBE_NAMESPACE"
     - echo "Strategy: $DEPLOYMENT_STRATEGY"
     - echo "Replicas: $REPLICAS"
-    
+
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
-    
+
     # Apply staging-specific configurations
     - echo "📋 Applying staging configurations..."
     - kubectl apply -f k8s/staging/ -n ${KUBE_NAMESPACE} || true
-    
+
     # Deploy with staging settings
     - echo "🔄 Deploying with staging settings..."
     - helm upgrade --install pixelated-staging ./helm/pixelated \
@@ -176,7 +176,7 @@ deploy:staging:
       --set autoscaling.enabled=true \
       --set autoscaling.minReplicas=2 \
       --set autoscaling.maxReplicas=5
-    
+
     - echo "✅ Staging deployment completed"
   environment:
     name: staging
@@ -195,24 +195,25 @@ deploy:production:
     - echo "Namespace: $KUBE_NAMESPACE"
     - echo "Strategy: $DEPLOYMENT_STRATEGY"
     - echo "Replicas: $REPLICAS"
-    
+
     # Pre-deployment validation
     - echo "🔍 Running pre-deployment validation..."
     - . ./scripts/pre-deployment-checks.sh
-    
+
     # Authenticate to GKE
     - echo $GCP_SERVICE_ACCOUNT_KEY > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
-    
+
     # Apply production-specific configurations
     - echo "📋 Applying production configurations..."
     - kubectl apply -f k8s/production/ -n ${KUBE_NAMESPACE} || true
-    
+
     # Deploy with production settings using canary strategy
     - echo "🔄 Deploying with production settings..."
-    - case $DEPLOYMENT_STRATEGY in
+    - |
+      case $DEPLOYMENT_STRATEGY in
         canary)
           echo "🐤 Using canary deployment strategy";
           . ./scripts/deploy-canary.sh;
@@ -230,7 +231,7 @@ deploy:production:
           exit 1;
           ;;
       esac
-    
+
     - echo "✅ Production deployment completed"
   environment:
     name: production
@@ -249,16 +250,17 @@ health-check:development:
     - echo "🏥 Running development health checks..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "URL: $ENVIRONMENT_URL"
-    
+
     # Basic health check
     - HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$ENVIRONMENT_URL/api/health" || echo "000")
-    - if [ "$HEALTH_RESPONSE" = "200" ]; then
+    - |
+      if [ "$HEALTH_RESPONSE" = "200" ]; then
         echo "✅ Development environment is healthy";
       else
         echo "❌ Development health check failed: $HEALTH_RESPONSE";
         exit 1;
       fi
-    
+
     - echo "✅ Development health checks completed"
 
 health-check:staging:
@@ -269,10 +271,10 @@ health-check:staging:
     - echo "🏥 Running staging health checks..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "URL: $ENVIRONMENT_URL"
-    
+
     # Comprehensive health checks
     - . ./scripts/health-check-comprehensive.sh
-    
+
     - echo "✅ Staging health checks completed"
 
 health-check:production:
@@ -283,13 +285,13 @@ health-check:production:
     - echo "🏥 Running production health checks..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "URL: $ENVIRONMENT_URL"
-    
+
     # Production-grade health checks
     - . ./scripts/health-check-comprehensive.sh
-    
+
     # Performance validation
     - . ./scripts/validate-canary-performance.sh
-    
+
     - echo "✅ Production health checks completed"
 
 # Environment cleanup
@@ -301,13 +303,13 @@ cleanup:development:
     - echo "🧹 Cleaning up development environment..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "Namespace: $KUBE_NAMESPACE"
-    
+
     # Cleanup old deployments
     - kubectl delete deployment -n ${KUBE_NAMESPACE} -l app=pixelated,version!=${CI_COMMIT_SHORT_SHA}
-    
+
     # Cleanup old services
     - kubectl delete service -n ${KUBE_NAMESPACE} -l app=pixelated,version!=${CI_COMMIT_SHORT_SHA}
-    
+
     - echo "✅ Development cleanup completed"
   environment:
     name: development
@@ -321,13 +323,13 @@ cleanup:staging:
     - echo "🧹 Cleaning up staging environment..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "Namespace: $KUBE_NAMESPACE"
-    
+
     # Cleanup old deployments
     - kubectl delete deployment -n ${KUBE_NAMESPACE} -l app=pixelated,version!=${CI_COMMIT_SHORT_SHA}
-    
+
     # Cleanup old services
     - kubectl delete service -n ${KUBE_NAMESPACE} -l app=pixelated,version!=${CI_COMMIT_SHORT_SHA}
-    
+
     - echo "✅ Staging cleanup completed"
   environment:
     name: staging
@@ -341,15 +343,15 @@ cleanup:production:
     - echo "🧹 Cleaning up production environment..."
     - echo "Environment: $ENVIRONMENT_NAME"
     - echo "Namespace: $KUBE_NAMESPACE"
-    
+
     # Production cleanup with extra caution
     - echo "⚠️ Production cleanup requires manual approval"
     - echo "This will remove old deployments and services"
-    
+
     # Cleanup old deployments (keep last 2)
     - kubectl get deployments -n ${KUBE_NAMESPACE} -l app=pixelated --sort-by=.metadata.creationTimestamp
     - echo "Review deployments above before cleanup"
-    
+
     - echo "✅ Production cleanup review completed"
   environment:
     name: production

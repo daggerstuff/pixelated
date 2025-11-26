@@ -51,13 +51,13 @@ vi.mock('../python-bridge', () => ({
 
 // Mock the metrics collector
 vi.mock('../metrics-collector', () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    storeAnalysisResult: vi.fn().mockImplementation(async () => {
+  BiasMetricsCollector: class {
+    initialize = vi.fn().mockResolvedValue(undefined)
+    storeAnalysisResult = vi.fn().mockImplementation(async () => {
       const delay = 10 + Math.random() * 20
       await new Promise((resolve) => setTimeout(resolve, delay))
-    }),
-    getMetrics: vi.fn().mockImplementation(async () => {
+    })
+    getMetrics = vi.fn().mockImplementation(async () => {
       const delay = 20 + Math.random() * 30
       await new Promise((resolve) => setTimeout(resolve, delay))
       return {
@@ -72,8 +72,8 @@ vi.mock('../metrics-collector', () => ({
           },
         },
       }
-    }),
-    getDashboardData: vi.fn().mockImplementation(async () => {
+    })
+    getDashboardData = vi.fn().mockImplementation(async () => {
       const delay = 30 + Math.random() * 40
       await new Promise((resolve) => setTimeout(resolve, delay))
       return {
@@ -81,20 +81,20 @@ vi.mock('../metrics-collector', () => ({
         recentSessions: [],
         alerts: [],
       }
-    }),
-    dispose: vi.fn().mockResolvedValue(undefined),
-  })),
+    })
+    dispose = vi.fn().mockResolvedValue(undefined)
+  },
 }))
 
 // Mock the alert system
 vi.mock('../alerts-system', () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    processAlert: vi.fn().mockImplementation(async () => {
+  BiasAlertSystem: class {
+    initialize = vi.fn().mockResolvedValue(undefined)
+    processAlert = vi.fn().mockImplementation(async () => {
       const delay = 15 + Math.random() * 25
       await new Promise((resolve) => setTimeout(resolve, delay))
-    }),
-    getAlertStatistics: vi.fn().mockImplementation(async () => {
+    })
+    getAlertStatistics = vi.fn().mockImplementation(async () => {
       const delay = 25 + Math.random() * 35
       await new Promise((resolve) => setTimeout(resolve, delay))
       return {
@@ -102,20 +102,20 @@ vi.mock('../alerts-system', () => ({
         activeAlerts: 5,
         resolvedAlerts: 45,
       }
-    }),
-    getAlertHistory: vi.fn().mockImplementation(async () => {
+    })
+    getAlertHistory = vi.fn().mockImplementation(async () => {
       const delay = 40 + Math.random() * 60
       await new Promise((resolve) => setTimeout(resolve, delay))
       return []
-    }),
-    dispose: vi.fn().mockResolvedValue(undefined),
-  })),
+    })
+    dispose = vi.fn().mockResolvedValue(undefined)
+  },
 }))
 
 // Mock the connection pool for performance testing
 vi.mock('../connection-pool', () => ({
-  ConnectionPool: vi.fn().mockImplementation(() => ({
-    getConnection: vi.fn().mockResolvedValue({
+  ConnectionPool: class {
+    getConnection = vi.fn().mockResolvedValue({
       request: vi.fn().mockImplementation(async () => {
         // Simulate realistic API response time (50-150ms)
         const delay = 50 + Math.random() * 100
@@ -131,9 +131,9 @@ vi.mock('../connection-pool', () => ({
         }
       }),
       release: vi.fn(),
-    }),
-    close: vi.fn(),
-  })),
+    })
+    close = vi.fn()
+  },
 }))
 
 vi.mock('../performance-monitor', () => ({
