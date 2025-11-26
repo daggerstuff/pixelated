@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         // Define type for handler function
-        type AlertHandler = (alert: unknown) => void
+        type AlertHandler = (alert: unknown) => void | Promise<void>
 
         // Define a registry of safe, predefined handler functions
         const safeHandlerRegistry: Record<string, AlertHandler> = {
@@ -127,23 +127,17 @@ export const POST: APIRoute = async ({ request }) => {
           // Send alert to Sentry for error tracking
           'send-sentry-alert': (alert) => {
             // Import Sentry client if available
-            try {
-              // Use ES6 import syntax instead of CommonJS require
-              // This assumes Sentry is properly configured in the application
-              // We're using a safe approach that won't break if Sentry isn't available
-              import('@sentry/node')
-                .then(({ captureMessage }) => {
-                  captureMessage(
-                    `Rate limit alert triggered: ${JSON.stringify(alert)}`,
-                    'warning',
-                  )
-                })
-                .catch((error) => {
-                  logger.error('Failed to load Sentry module', { error })
-                })
-            } catch (error) {
-              logger.error('Failed to send alert to Sentry', { error })
-            }
+            // Using dynamic import with .catch() for graceful degradation if Sentry isn't available
+            import('@sentry/node')
+              .then(({ captureMessage }) => {
+                captureMessage(
+                  `Rate limit alert triggered: ${JSON.stringify(alert)}`,
+                  'warning',
+                )
+              })
+              .catch((error) => {
+                logger.error('Failed to load Sentry module', { error })
+              })
           },
 
           // Trigger webhook to external monitoring system
