@@ -104,7 +104,7 @@ This document outlines all variables and secrets that must be configured in Azur
 |--------------|-------|---------|-------------|
 | `SENTRY_DSN` | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No | Sentry DSN for error tracking |
 | `SENTRY_ORG` | `pixelated-empathy-dq` | ❌ No | Sentry organization slug |
-| `SENTRY_PROJECT` | `pixel-staging` | ❌ No | Sentry project slug (staging) |
+| `SENTRY_PROJECT` | `pixel-astro` | ❌ No | Sentry project slug |
 | `SENTRY_AUTH_TOKEN` | `sntrys_eyJ...` | ✅ Yes | Sentry authentication token for releases |
 
 ### Deployment Configuration Variables
@@ -113,6 +113,31 @@ This document outlines all variables and secrets that must be configured in Azur
 |--------------|-------|---------|-------------|
 | `DEPLOYMENT_TIMEOUT` | `600` | ❌ No | Deployment timeout in seconds |
 | `HEALTH_CHECK_TIMEOUT` | `300` | ❌ No | Health check timeout in seconds |
+
+### OVH AI Training Variables (Optional)
+
+These variables are required for the OVH AI Training stage. Add them if using OVH for model training.
+
+| Variable Name | Value | Secret? | Description |
+|--------------|-------|---------|-------------|
+| `OVH_AI_TOKEN` | `<your-ovh-token>` | ✅ Yes | OVH AI Platform authentication token |
+| `WANDB_API_KEY` | `<your-wandb-key>` | ✅ Yes | Weights & Biases API key for experiment tracking |
+| `TRIGGER_AI_TRAINING` | `false` | ❌ No | Set to `true` to trigger AI training stage |
+
+**To trigger AI training:**
+```bash
+az pipelines run --name "your-pipeline" --parameters TRIGGER_AI_TRAINING=true
+```
+
+**OVH Setup:**
+1. Create an OVH AI Platform user at [OVH Control Panel](https://us.ovhcloud.com/)
+2. Assign roles: `AI Training Operator` and `ObjectStore operator`
+3. Generate an application token
+4. Add the token to Azure DevOps variable group as `OVH_AI_TOKEN`
+
+**Object Storage Setup:**
+- Create containers: `pixelated-training-data` and `pixelated-checkpoints`
+- Region: US-EAST-VA
 
 ## Pipeline Permissions Setup
 

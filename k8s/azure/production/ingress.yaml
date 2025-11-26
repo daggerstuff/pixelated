@@ -2,33 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pixelated-ingress
-  namespace: pixelated-staging
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    # Cloudflare handles SSL - disable redirect to avoid loops
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-spec:
-  ingressClassName: nginx
-  tls:
-  - hosts:
-    - staging-azure.pixelatedempathy.tech
-    secretName: pixelated-staging-tls
-  rules:
-  - host: staging-azure.pixelatedempathy.tech
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: pixelated-ingress
   namespace: pixelated-production
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -73,3 +46,4 @@ spec:
             name: pixelated-service
             port:
               number: 80
+

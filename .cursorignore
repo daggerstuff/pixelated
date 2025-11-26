@@ -1,10 +1,83 @@
+# ============================================
+# Explicitly INCLUDE (override defaults)
+# ============================================
+# Only include the template - actual .env files stay ignored for security
+!.env.example
+
+# ============================================
+# Core build/dependency directories
+# ============================================
 .venv/
 node_modules/
-# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+dist/
+.next/
+.nuxt/
+.cache/
+__pycache__/
+*.egg-info/
 
+# ============================================
+# Large data directories (not useful for semantic search)
+# ============================================
+# YouTube transcripts - 900+ files, not code-relevant
+.notes/transcripts/
+
+# Log files and temporary outputs
+logs/
+tmp/
+.tmp/
+*.log
+
+# Test artifacts (screenshots, reports)
+test-results/
+playwright-report/
+reports/
+coverage/
+
+# ============================================
+# Binary/generated assets
+# ============================================
+public/polyfills/
+public/fonts/
+*.woff2
+*.woff
+*.ttf
+*.eot
+
+# ============================================
+# Configuration that doesn't need semantic search
+# ============================================
+# Docker configs (reference manually when needed)
+docker/
+
+# Helm charts (reference manually)
+helm/
+
+# Monitoring configs (reference manually)
+monitoring/
+
+# ============================================
+# Cursor/IDE internals
+# ============================================
 # Ignore MCP OAuth callback URLs that Cursor tries to save as files
 **/cursor:/**/oauth/**
 **/anysphere.cursor-mcp/oauth/**
 **/*oauth*callback*
-# SpecStory derived-cursor-rules.mdc backup files
+
+# SpecStory backup files
 .specstory/ai_rules_backups/*
+
+# ============================================
+# Lock files (large, not useful for search)
+# ============================================
+pnpm-lock.yaml
+uv.lock
+package-lock.json
+yarn.lock
+
+# ============================================
+# Memory bank files (use brv retrieve instead)
+# ============================================
+memory-bank/
+memory/
+.brv/

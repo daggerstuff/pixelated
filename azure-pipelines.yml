@@ -42,7 +42,7 @@ variables:
   - name: SENTRY_ORG
     value: "pixelated-empathy-dq"
   - name: SENTRY_PROJECT
-    value: "pixel-staging"
+    value: "pixel-astro"
 
   # Pool selection: Uses Default agent pool (self-hosted agents)
 
@@ -190,7 +190,6 @@ stages:
                 $(Build.SourceBranchName)
               addPipelineData: false
               addBaseImageData: false
-            name: dockerBuild
 
           - script: |
               echo "IMAGE_DIGEST=$(docker inspect $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) --format='{{.Id}}')" >> $(Build.ArtifactStagingDirectory)/build.env
@@ -343,10 +342,10 @@ stages:
                     kubernetesServiceConnection: "pixelated-aks-connection"
                     namespace: "$(KUBE_NAMESPACE)"
                     manifests: |
-                      k8s/azure/deployment.yaml
-                      k8s/azure/configmap.yaml
-                      k8s/azure/secrets.yaml
-                      k8s/azure/ingress.yaml
+                      k8s/azure/staging/deployment.yaml
+                      k8s/azure/staging/configmap.yaml
+                      k8s/azure/staging/secrets.yaml
+                      k8s/azure/staging/ingress.yaml
 
                 - task: Kubernetes@1
                   displayName: "Update Image Tag"
@@ -372,7 +371,8 @@ stages:
                   inputs:
                     targetType: "inline"
                     script: |
-                      set -euo pipefail
+                      # Don't use set -e so we can handle errors gracefully
+                      set -uo pipefail
 
                       # Install Sentry CLI if not available
                       if ! command -v sentry-cli &> /dev/null; then
@@ -382,19 +382,70 @@ stages:
                         }
                       fi
 
-                      # Create Sentry release
+                      # Export Sentry configuration
                       export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
                       export SENTRY_ORG="$(SENTRY_ORG)"
                       export SENTRY_PROJECT="$(SENTRY_PROJECT)"
 
                       RELEASE_VERSION="$(Build.BuildNumber)"
 
-                      sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
-                      sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
-                      sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
-                      sentry-cli releases deploys "$RELEASE_VERSION" new -e staging || echo "⚠️ Could not create deploy"
+                      # Debug: Show configuration (without exposing token)
+                      echo "📋 Sentry Configuration:"
+                      echo "   Organization: $SENTRY_ORG"
+                      echo "   Project: $SENTRY_PROJECT"
+                      echo "   Release: $RELEASE_VERSION"
+                      echo "   Auth Token: ${SENTRY_AUTH_TOKEN:0:10}... (truncated)"
 
-                      echo "✅ Sentry release $RELEASE_VERSION created for staging"
+                      # Verify token has access to the organization
+                      echo ""
+                      echo "🔍 Verifying Sentry access..."
+                      if ! sentry-cli info --log-level=info 2>&1; then
+                        echo "❌ Failed to verify Sentry authentication. Check that:"
+                        echo "   1. SENTRY_AUTH_TOKEN is set correctly in Azure DevOps"
+                        echo "   2. The token has 'org:read' and 'project:releases' scopes"
+                        echo "   3. Organization slug '$SENTRY_ORG' is correct"
+                        echo ""
+                        echo "⚠️ Skipping release creation due to authentication issues"
+                        exit 0
+                      fi
+
+                      # List available projects to help debug
+                      echo ""
+                      echo "📦 Available projects in organization '$SENTRY_ORG':"
+                      sentry-cli projects list 2>&1 || echo "   (Could not list projects)"
+
+                      # Create Sentry release
+                      echo ""
+                      echo "🚀 Creating Sentry release..."
+                      if sentry-cli releases new "$RELEASE_VERSION" 2>&1; then
+                        echo "✅ Release created: $RELEASE_VERSION"
+                      else
+                        echo "⚠️ Release may already exist or project '$SENTRY_PROJECT' not found"
+                      fi
+
+                      # Set commits
+                      if sentry-cli releases set-commits "$RELEASE_VERSION" --auto 2>&1; then
+                        echo "✅ Commits associated with release"
+                      else
+                        echo "⚠️ Could not set commits (may need GitHub integration)"
+                      fi
+
+                      # Finalize release
+                      if sentry-cli releases finalize "$RELEASE_VERSION" 2>&1; then
+                        echo "✅ Release finalized"
+                      else
+                        echo "⚠️ Could not finalize release"
+                      fi
+
+                      # Create deploy
+                      if sentry-cli releases deploys "$RELEASE_VERSION" new -e staging 2>&1; then
+                        echo "✅ Deploy recorded for staging environment"
+                      else
+                        echo "⚠️ Could not create deploy record"
+                      fi
+
+                      echo ""
+                      echo "✅ Sentry release process completed for $RELEASE_VERSION"
                   env:
                     SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
 
@@ -431,10 +482,10 @@ stages:
                     kubernetesServiceConnection: "pixelated-aks-connection"
                     namespace: "$(KUBE_NAMESPACE_PROD)"
                     manifests: |
-                      k8s/azure/deployment.yaml
-                      k8s/azure/configmap.yaml
-                      k8s/azure/secrets.yaml
-                      k8s/azure/ingress.yaml
+                      k8s/azure/production/deployment.yaml
+                      k8s/azure/production/configmap.yaml
+                      k8s/azure/production/secrets.yaml
+                      k8s/azure/production/ingress.yaml
 
                 - task: Kubernetes@1
                   displayName: "Update Production Image Tag"
@@ -460,7 +511,8 @@ stages:
                   inputs:
                     targetType: "inline"
                     script: |
-                      set -euo pipefail
+                      # Don't use set -e so we can handle errors gracefully
+                      set -uo pipefail
 
                       if ! command -v sentry-cli &> /dev/null; then
                         curl -sL https://sentry.io/get-cli/ | bash || {
@@ -471,16 +523,60 @@ stages:
 
                       export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
                       export SENTRY_ORG="$(SENTRY_ORG)"
-                      export SENTRY_PROJECT="pixel-production"
+                      export SENTRY_PROJECT="$(SENTRY_PROJECT)"
 
                       RELEASE_VERSION="$(Build.BuildNumber)"
 
-                      sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
-                      sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
-                      sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
-                      sentry-cli releases deploys "$RELEASE_VERSION" new -e production || echo "⚠️ Could not create deploy"
+                      # Debug: Show configuration (without exposing token)
+                      echo "📋 Sentry Configuration (Production):"
+                      echo "   Organization: $SENTRY_ORG"
+                      echo "   Project: $SENTRY_PROJECT"
+                      echo "   Release: $RELEASE_VERSION"
+                      echo "   Auth Token: ${SENTRY_AUTH_TOKEN:0:10}... (truncated)"
 
-                      echo "✅ Sentry release $RELEASE_VERSION created for production"
+                      # Verify token has access
+                      echo ""
+                      echo "🔍 Verifying Sentry access..."
+                      if ! sentry-cli info --log-level=info 2>&1; then
+                        echo "❌ Failed to verify Sentry authentication"
+                        echo "⚠️ Skipping release creation due to authentication issues"
+                        exit 0
+                      fi
+
+                      # List available projects
+                      echo ""
+                      echo "📦 Available projects in organization '$SENTRY_ORG':"
+                      sentry-cli projects list 2>&1 || echo "   (Could not list projects)"
+
+                      # Create Sentry release
+                      echo ""
+                      echo "🚀 Creating Sentry production release..."
+                      if sentry-cli releases new "$RELEASE_VERSION" 2>&1; then
+                        echo "✅ Release created: $RELEASE_VERSION"
+                      else
+                        echo "⚠️ Release may already exist or project '$SENTRY_PROJECT' not found"
+                      fi
+
+                      if sentry-cli releases set-commits "$RELEASE_VERSION" --auto 2>&1; then
+                        echo "✅ Commits associated with release"
+                      else
+                        echo "⚠️ Could not set commits"
+                      fi
+
+                      if sentry-cli releases finalize "$RELEASE_VERSION" 2>&1; then
+                        echo "✅ Release finalized"
+                      else
+                        echo "⚠️ Could not finalize release"
+                      fi
+
+                      if sentry-cli releases deploys "$RELEASE_VERSION" new -e production 2>&1; then
+                        echo "✅ Deploy recorded for production environment"
+                      else
+                        echo "⚠️ Could not create deploy record"
+                      fi
+
+                      echo ""
+                      echo "✅ Sentry release process completed for $RELEASE_VERSION (production)"
                   env:
                     SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
 
@@ -568,6 +664,144 @@ stages:
             artifact: e2e-test-results
             displayName: "Publish Test Results"
             condition: always()
+
+  # ============================================
+  # OVH AI Training Stage (Manual Trigger)
+  # ============================================
+  - stage: OVHAITraining
+    displayName: "OVH AI Training"
+    # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
+    condition: and(succeeded(), eq(variables['TRIGGER_AI_TRAINING'], 'true'))
+    jobs:
+      - job: PrepareTrainingData
+        displayName: "Prepare Training Data"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+
+          - task: Bash@3
+            displayName: "Install ovhai CLI"
+            inputs:
+              targetType: "inline"
+              script: |
+                curl -sSL https://cli.us-east-va.ai.cloud.ovh.us/install.sh | bash
+                export PATH="$HOME/bin:$PATH"
+                ovhai --version || echo "CLI installed"
+
+          - task: Bash@3
+            displayName: "Sync Training Data to OVH"
+            inputs:
+              targetType: "inline"
+              script: |
+                export PATH="$HOME/bin:$PATH"
+
+                # Authenticate using token
+                ovhai login --token "$OVH_AI_TOKEN" || {
+                  echo "⚠️ Token auth failed, manual login required"
+                  exit 0
+                }
+
+                # Sync datasets
+                cd ai/ovh
+                ./sync-datasets.sh upload || echo "⚠️ Dataset sync may require manual intervention"
+            env:
+              OVH_AI_TOKEN: $(OVH_AI_TOKEN)
+
+      - job: LaunchTrainingJob
+        displayName: "Launch Training Job"
+        dependsOn: PrepareTrainingData
+        condition: succeeded()
+        pool:
+          vmImage: "ubuntu-latest"
+        variables:
+          OVH_GPU_MODEL: "L40S"
+          OVH_MAX_HOURS: "12"
+        steps:
+          - checkout: self
+
+          - task: Bash@3
+            displayName: "Install ovhai CLI"
+            inputs:
+              targetType: "inline"
+              script: |
+                curl -sSL https://cli.us-east-va.ai.cloud.ovh.us/install.sh | bash
+                export PATH="$HOME/bin:$PATH"
+
+          - task: Bash@3
+            displayName: "Build and Push Training Image"
+            inputs:
+              targetType: "inline"
+              script: |
+                export PATH="$HOME/bin:$PATH"
+
+                # Authenticate
+                ovhai login --token "$OVH_AI_TOKEN" || exit 1
+
+                # Login to registry
+                ovhai registry login
+
+                # Build image
+                cd ai
+                docker build -f ovh/Dockerfile.training -t pixelated-training:$(Build.BuildNumber) .
+
+                # Get registry URL and push
+                REGISTRY=$(ovhai registry list --json | jq -r '.[0].url' || echo "")
+                if [ -n "$REGISTRY" ]; then
+                  docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
+                  docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:latest"
+                  docker push "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
+                  docker push "$REGISTRY/pixelated-training:latest"
+                  echo "##vso[task.setvariable variable=OVH_IMAGE]$REGISTRY/pixelated-training:$(Build.BuildNumber)"
+                else
+                  echo "##vso[task.logissue type=warning]No OVH registry found"
+                fi
+            env:
+              OVH_AI_TOKEN: $(OVH_AI_TOKEN)
+
+          - task: Bash@3
+            displayName: "Launch OVH Training Job"
+            inputs:
+              targetType: "inline"
+              script: |
+                set -euo pipefail
+                export PATH="$HOME/bin:$PATH"
+
+                # Authenticate
+                ovhai login --token "$OVH_AI_TOKEN" || exit 1
+
+                JOB_NAME="pixelated-training-$(Build.BuildNumber)"
+
+                echo "🚀 Launching training job: $JOB_NAME"
+                echo "   GPU: $(OVH_GPU_MODEL)"
+                echo "   Max hours: $(OVH_MAX_HOURS)"
+
+                # Launch job
+                ovhai job run \
+                  --name "$JOB_NAME" \
+                  --gpu 1 \
+                  --gpu-model "$(OVH_GPU_MODEL)" \
+                  --cpu 8 \
+                  --memory 64Gi \
+                  --volume "pixelated-training-data@US-EAST-VA:/data:ro" \
+                  --volume "pixelated-checkpoints@US-EAST-VA:/checkpoints:rw" \
+                  --env DATA_DIR=/data \
+                  --env CHECKPOINT_DIR=/checkpoints \
+                  --env CONFIG_PATH=/app/config/moe_training_config.json \
+                  --env MAX_TRAINING_HOURS="$(OVH_MAX_HOURS)" \
+                  --env WANDB_API_KEY="$WANDB_API_KEY" \
+                  "$OVH_IMAGE" \
+                  -- python /app/train_ovh.py --config /app/config/moe_training_config.json --max-hours "$(OVH_MAX_HOURS)" || {
+                    echo "##vso[task.logissue type=warning]Failed to launch training job"
+                    exit 1
+                  }
+
+                echo "✅ Training job launched: $JOB_NAME"
+                echo "📊 Monitor with: ovhai job logs $JOB_NAME -f"
+            env:
+              OVH_AI_TOKEN: $(OVH_AI_TOKEN)
+              WANDB_API_KEY: $(WANDB_API_KEY)
+              OVH_IMAGE: $(OVH_IMAGE)
 
   - stage: SchedulePosts
     displayName: "Schedule Blog Posts"

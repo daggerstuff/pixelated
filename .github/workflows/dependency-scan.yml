@@ -95,11 +95,14 @@ jobs:
             uv pip install -q pip-audit 2>/dev/null || true
             
             # Run pip-audit
+            # Note: Using PIPESTATUS to capture pip-audit exit code, not tee's
             OUTPUT_FILE="/tmp/pip-audit-${PROJECT_NAME}.txt"
-            if uv run pip-audit --skip-editable --format=columns 2>&1 | tee "$OUTPUT_FILE"; then
+            uv run pip-audit --skip-editable --format=columns 2>&1 | tee "$OUTPUT_FILE"
+            AUDIT_EXIT_CODE="${PIPESTATUS[0]}"
+            if [ "$AUDIT_EXIT_CODE" -eq 0 ]; then
               echo "✅ No vulnerabilities found in $PROJECT_NAME"
             else
-              echo "⚠️ Vulnerabilities found in $PROJECT_NAME"
+              echo "⚠️ Vulnerabilities found in $PROJECT_NAME (exit code: $AUDIT_EXIT_CODE)"
               SCAN_FAILED=true
             fi
             
