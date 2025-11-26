@@ -84,9 +84,8 @@ const adapter = (() => {
     // During Cloudflare Pages builds, platformProxy requires Wrangler auth which isn't available
     const adapterConfig = {
       mode: 'directory',
-      // Disable platformProxy during build - it's only needed for local dev
       platformProxy: {
-        enabled: isDevelopment,
+        enabled: true,
       },
       functionPerRoute: false,
     };

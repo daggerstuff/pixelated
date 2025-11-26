@@ -1,0 +1,180 @@
+---
+const stats = [
+  {
+    value: '500+',
+    label: 'Healthcare Institutions',
+    description: 'hospitals & clinics',
+    icon: '🏥',
+    color: 'from-emerald-500/20 to-teal-500/20',
+    iconBg: 'bg-emerald-500/10',
+    iconColor: 'text-emerald-400',
+  },
+  {
+    value: '15K+',
+    label: 'Trained Professionals',
+    description: 'therapists & counselors',
+    icon: '👨‍⚕️',
+    color: 'from-blue-500/20 to-cyan-500/20',
+    iconBg: 'bg-blue-500/10',
+    iconColor: 'text-blue-400',
+  },
+  {
+    value: '98%',
+    label: 'Satisfaction Rate',
+    description: 'user satisfaction',
+    icon: '⭐',
+    color: 'from-amber-500/20 to-orange-500/20',
+    iconBg: 'bg-amber-500/10',
+    iconColor: 'text-amber-400',
+  },
+  {
+    value: '24/7',
+    label: 'Platform Availability',
+    description: 'always online',
+    icon: '🕐',
+    color: 'from-purple-500/20 to-pink-500/20',
+    iconBg: 'bg-purple-500/10',
+    iconColor: 'text-purple-400',
+  },
+]
+
+const metrics = [
+  {
+    value: '40%',
+    label: 'Faster Training',
+    sublabel: 'vs traditional methods',
+    icon: '↗',
+    color: 'text-emerald-400',
+    iconBg: 'bg-emerald-500/10',
+  },
+  {
+    value: '85%',
+    label: 'Patient Outcomes',
+    sublabel: 'clinical effectiveness',
+    icon: '🎯',
+    color: 'text-blue-400',
+    iconBg: 'bg-blue-500/10',
+  },
+  {
+    value: '92%',
+    label: 'Therapist Confidence',
+    sublabel: 'skill development',
+    icon: '💪',
+    color: 'text-violet-400',
+    iconBg: 'bg-violet-500/10',
+  },
+  {
+    value: '60%',
+    label: 'Cost Reduction',
+    sublabel: 'operational efficiency',
+    icon: '💰',
+    color: 'text-amber-400',
+    iconBg: 'bg-amber-500/10',
+  },
+]
+---
+
+<section id="stats" class="py-24 bg-slate-950 relative overflow-hidden">
+  <!-- Subtle gradient background -->
+  <div class="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-950 to-slate-950 pointer-events-none"></div>
+  
+  <!-- Grid pattern overlay -->
+  <div class="absolute inset-0 opacity-[0.02]" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+  <div class="container mx-auto px-4 relative z-10">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-semibold uppercase tracking-widest mb-6">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        <span>Enterprise Trust</span>
+      </div>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white tracking-tight">
+        Trusted by Professionals
+      </h2>
+      <p class="text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
+        Leading healthcare institutions rely on our unified AI training platform to develop their mental health professionals.
+      </p>
+    </div>
+
+    <!-- Main Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+      {stats.map((stat) => (
+        <div class="group relative bg-slate-900/50 border border-white/5 rounded-2xl p-6 backdrop-blur-sm hover:bg-slate-800/50 hover:border-white/10 transition-all duration-300">
+          <!-- Background gradient on hover -->
+          <div class={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+          
+          <div class="relative z-10">
+            <div class={`w-12 h-12 ${stat.iconBg} rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
+              {stat.icon}
+            </div>
+            <div class={`text-2xl md:text-3xl font-bold ${stat.iconColor} mb-2 tracking-tight`}>
+              {stat.value}
+            </div>
+            <div class="text-white font-semibold mb-1">{stat.label}</div>
+            <div class="text-sm text-slate-500">{stat.description}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Impact Metrics Section -->
+    <div class="bg-slate-900/50 border border-white/5 rounded-3xl p-8 md:p-12 backdrop-blur-sm">
+      <div class="flex flex-col lg:flex-row gap-12 items-center">
+        <!-- Left Content -->
+        <div class="lg:w-1/2">
+          <h3 class="text-xl md:text-2xl font-bold text-white mb-4">
+            Measurable Impact
+          </h3>
+          <p class="text-slate-400 mb-8 leading-relaxed">
+            Quantifiable results from our enterprise training platform. Real data from thousands of training sessions across hundreds of institutions.
+          </p>
+          
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
+              Live Performance Data
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="/case-studies" class="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-full font-semibold text-sm transition-all hover:-translate-y-0.5 text-center">
+              View Case Studies
+            </a>
+            <a href="/demo-hub" class="px-6 py-3 bg-transparent hover:bg-white/5 border border-white/10 text-white rounded-full font-semibold text-sm transition-all text-center">
+              Schedule Demo
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Metrics Grid -->
+        <div class="lg:w-1/2 w-full">
+          <div class="grid grid-cols-2 gap-4">
+            {metrics.map((metric) => (
+              <div class="group bg-slate-800/50 border border-white/5 rounded-xl p-5 hover:border-white/10 hover:bg-slate-700/50 transition-all duration-300">
+                <div class="flex items-start gap-3">
+                  <div class={`w-10 h-10 ${metric.iconBg} rounded-lg flex items-center justify-center text-lg ${metric.color} font-bold group-hover:scale-110 transition-transform duration-300`}>
+                    {metric.icon}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class={`text-xl font-bold ${metric.color} mb-1`}>
+                      {metric.value}
+                    </div>
+                    <div class="text-sm text-white font-medium mb-0.5 truncate">
+                      {metric.label}
+                    </div>
+                    <div class="text-xs text-slate-500 truncate">
+                      {metric.sublabel}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

@@ -30,8 +30,8 @@ COPY . .
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
-RUN find /app/node_modules -type f -name "*.map" -delete && \
-    find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
+RUN find /app/node_modules -name "*.map" -delete && \
+    find /app/dist -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
 FROM node:25-alpine AS runtime

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example project demonstrating unified dark theme with pnpm",
   "type": "module",
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.22.0",
   "license": "MIT",
   "engines": {
     "node": ">=18"

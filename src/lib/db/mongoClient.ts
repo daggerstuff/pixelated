@@ -2,6 +2,7 @@
 // Purpose: provide a consistent export for the shared MongoDB client and related auth service.
 
 import mongodb from '../../config/mongodb.config'
+import { mongoAuthService } from '../../services/mongoAuth.service'
 
 // MongoDB client type (re-export for convenience)
 export type MongoDBClient = typeof mongodb
@@ -77,6 +78,7 @@ export async function getDatabaseHealth() {
 export const mongoClient = mongodb
 // Prefer adapter-based auth exports for application code
 export { default as authAdapter } from '@/adapters/betterAuthMongoAdapter'
-export { mongodb as default }
+export const authService = mongoAuthService // legacy export; prefer `authAdapter`
+export { mongodb as default, mongoAuthService }
 
 console.log('📦 MongoDB library initialized (src/lib/db/mongoClient.ts)')
