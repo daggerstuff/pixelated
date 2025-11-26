@@ -1,45 +1,69 @@
 ---
 const faqs = [
   {
-    question: "How realistic are the AI scenarios?",
-    answer: "Our AI scenarios are built on advanced language models trained on clinical data. They react dynamically to your inputs, simulating realistic patient behaviors, resistance, and breakthroughs."
+    question: 'How realistic are the AI scenarios?',
+    answer:
+      'Our AI scenarios are built on advanced language models trained on clinical data. They react dynamically to your inputs, simulating realistic patient behaviors, resistance, and breakthroughs.',
   },
   {
-    question: "Is the platform HIPAA compliant?",
-    answer: "Yes, we prioritize security and privacy. Our platform is designed to be HIPAA compliant, ensuring that all training data and interactions are secure."
+    question: 'Is the platform HIPAA compliant?',
+    answer:
+      'Yes, we prioritize security and privacy. Our platform is designed to be HIPAA compliant, ensuring that all training data and interactions are secure.',
   },
   {
-    question: "Can I customize the scenarios?",
-    answer: "Absolutely. You can adjust the difficulty, patient background, and presenting problems to tailor the training to your specific needs."
+    question: 'Can I customize the scenarios?',
+    answer:
+      'Absolutely. You can adjust the difficulty, patient background, and presenting problems to tailor the training to your specific needs.',
   },
   {
-    question: "Do you offer enterprise solutions?",
-    answer: "Yes, we work with universities, hospitals, and clinics to provide scalable training solutions. Contact our sales team for more information."
-  }
+    question: 'Do you offer enterprise solutions?',
+    answer:
+      'Yes, we work with universities, hospitals, and clinics to provide scalable training solutions. Contact our sales team for more information.',
+  },
 ]
 ---
 
 <section id="faq" class="py-24 bg-slate-950 border-t border-white/5">
-    <div class="container mx-auto px-4 max-w-4xl">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-5xl font-bold mb-6 text-white">Frequently Asked Questions</h2>
-            <p class="text-slate-400 text-lg">Everything you need to know about the platform.</p>
-        </div>
-
-        <div class="space-y-4">
-            {faqs.map((faq) => (
-                <details class="group bg-slate-900/50 border border-white/5 rounded-2xl open:bg-slate-800/50 transition-all duration-300">
-                    <summary class="flex justify-between items-center p-6 cursor-pointer list-none">
-                        <span class="text-lg font-medium text-white">{faq.question}</span>
-                        <span class="transition-transform group-open:rotate-180">
-                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-400 leading-relaxed">
-                        {faq.answer}
-                    </div>
-                </details>
-            ))}
-        </div>
+  <div class="container mx-auto px-4 max-w-4xl">
+    <div class="text-center mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white">
+        Frequently Asked Questions
+      </h2>
+      <p class="text-slate-400 text-base">
+        Everything you need to know about the platform.
+      </p>
     </div>
+
+    <div class="space-y-4">
+      {
+        faqs.map((faq) => (
+          <details class="group bg-slate-900/50 border border-white/5 rounded-2xl open:bg-slate-800/50 transition-all duration-300">
+            <summary class="flex justify-between items-center p-6 cursor-pointer list-none">
+              <span class="text-base font-medium text-white">
+                {faq.question}
+              </span>
+              <span class="transition-transform group-open:rotate-180">
+                <svg
+                  class="w-6 h-6 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <div class="px-6 pb-6 text-slate-400 leading-relaxed">
+              {faq.answer}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
 </section>

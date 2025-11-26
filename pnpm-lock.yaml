@@ -186,9 +186,6 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
-      launchdarkly-js-client-sdk:
-        specifier: ^3.9.0
-        version: 3.9.0
       lucide-react:
         specifier: ^0.554.0
         version: 0.554.0(react@19.2.0)
@@ -470,7 +467,7 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
       glob:
-        specifier: ^11.0.3
+        specifier: ^11.1.0
         version: 11.1.0
       glob-parent:
         specifier: ^6.0.2

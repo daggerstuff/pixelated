@@ -193,7 +193,6 @@
     "ioredis": "^5.8.2",
     "jotai": "^2.15.1",
     "jsonwebtoken": "^9.0.2",
-    "launchdarkly-js-client-sdk": "^3.9.0",
     "lucide-react": "^0.554.0",
     "mongodb": "^7.0.0",
     "nanoid": "^5.1.6",
