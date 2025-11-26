@@ -107,32 +107,32 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - echo "🏗️ Building application with progressive memory optimization..."
-    
+
     # Build Node.js application in container
     - docker build --target builder -t ${IMAGE_NAME}:builder-${CI_COMMIT_SHORT_SHA} .
-    
+
     # Build final runtime image
-    - docker build 
+    - docker build
       --build-arg SENTRY_RELEASE=${CI_COMMIT_SHORT_SHA}
       --build-arg SENTRY_DSN=${SENTRY_DSN}
       --build-arg SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
       --build-arg PUBLIC_SENTRY_DSN=${PUBLIC_SENTRY_DSN}
       -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
-    
+
     # Tag with additional labels
     - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:latest
     - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
-    
+
     # Push all tags
     - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     - docker push ${IMAGE_NAME}:latest
     - docker push ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
-    
+
     # Save image digest for security scanning
     - docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{.Id}}' > image-digest.txt
     - echo "IMAGE_DIGEST=$(cat image-digest.txt)" >> build.env
     - echo "IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}" >> build.env
-    
+
     - echo "✅ Build completed successfully"
   artifacts:
     reports:
@@ -204,7 +204,7 @@ security-scan:
       EXPOSED_PORTS=$(docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
       if [ -z "$EXPOSED_PORTS" ]; then EXPOSED_PORTS="none"; fi
       echo "ℹ️ Exposed ports: $EXPOSED_PORTS"
-    
+
     - echo "✅ Security scanning completed"
   artifacts:
     reports:
@@ -226,15 +226,15 @@ sentry-release:
     - corepack enable pnpm
   script:
     - echo "📊 Creating Sentry release..."
-    
+
     # Install Sentry CLI
     - curl -sL https://sentry.io/get-cli/ | sh
-    
+
     # Create release
     - sentry-cli releases new "${CI_COMMIT_SHORT_SHA}" || true
     - sentry-cli releases files "${CI_COMMIT_SHORT_SHA}" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
     - sentry-cli releases finalize "${CI_COMMIT_SHORT_SHA}" || true
-    
+
     - echo "✅ Sentry release created"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -422,8 +422,8 @@ gke-test-deploy:
     - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
     - gcloud config set project "$GCP_PROJECT_ID"
     - gcloud container clusters get-credentials "$GKE_TEST_CLUSTER_NAME" \
-        --region "$GKE_TEST_LOCATION" \
-        --project "$GCP_PROJECT_ID"
+      --region "$GKE_TEST_LOCATION" \
+      --project "$GCP_PROJECT_ID"
 
     # Simple rollout to test namespace using Artifact Registry image
     - |
@@ -521,9 +521,9 @@ cleanup-deployment:
 
     # Get list of images sorted by creation date (newest first)
     - IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
-        grep ${IMAGE_NAME} | \
-        head -20 | \
-        sort -k2 -r)
+      grep ${IMAGE_NAME} | \
+      head -20 | \
+      sort -k2 -r)
 
     - IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
     - echo "📊 Found $IMAGE_COUNT images for ${IMAGE_NAME}"
