@@ -19,7 +19,7 @@ spacy
 nltk
 textblob
 transformers
-torch
+torch>=2.8.0
 datasets
 
 # Data processing and ML

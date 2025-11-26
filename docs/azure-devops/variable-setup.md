@@ -1,5 +1,24 @@
 # Azure DevOps Variable Groups and Secrets Configuration
 
+## Current Deployment Info (Updated: 2025-11-25)
+
+| Resource | Value |
+|----------|-------|
+| **AKS Cluster** | `pixelated-aks-cluster` |
+| **Resource Group** | `pixelated-azure-resources` |
+| **Region** | East US |
+| **ACR** | `pixelatedregistry.azurecr.io` |
+| **External IP** | `20.242.241.80` (NGINX Ingress) |
+| **Staging URL** | `https://staging-azure.pixelatedempathy.tech` |
+| **Production URL** | `https://azure.pixelatedempathy.tech` |
+| **Current Image** | `pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25` |
+
+### DNS Configuration
+
+Point these A records to `20.242.241.80`:
+- `staging-azure.pixelatedempathy.tech`
+- `azure.pixelatedempathy.tech`
+
 ## Overview
 
 This document outlines all variables and secrets that must be configured in Azure DevOps **Variable Groups** (accessible via Pipelines → Library → Variable Groups) or **Pipeline Variables** (Pipelines → Edit Pipeline → Variables).
@@ -77,6 +96,16 @@ This document outlines all variables and secrets that must be configured in Azur
 | `IMAGE_REPOSITORY` | `pixelatedempathy` | ❌ No | Docker image repository name |
 | `STAGING_URL` | `https://staging-azure.pixelatedempathy.tech` | ❌ No | Staging environment URL |
 | `PRODUCTION_URL` | `https://azure.pixelatedempathy.tech` | ❌ No | Production environment URL |
+| `EXTERNAL_IP` | `20.242.241.80` | ❌ No | NGINX Ingress Controller external IP |
+
+### Sentry Configuration Variables
+
+| Variable Name | Value | Secret? | Description |
+|--------------|-------|---------|-------------|
+| `SENTRY_DSN` | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No | Sentry DSN for error tracking |
+| `SENTRY_ORG` | `pixelated-empathy-dq` | ❌ No | Sentry organization slug |
+| `SENTRY_PROJECT` | `pixel-staging` | ❌ No | Sentry project slug (staging) |
+| `SENTRY_AUTH_TOKEN` | `sntrys_eyJ...` | ✅ Yes | Sentry authentication token for releases |
 
 ### Deployment Configuration Variables
 
@@ -134,7 +163,9 @@ Create a variable group named `pixelated-pipeline-variables` with:
 - `HEALTH_CHECK_TIMEOUT`: `300`
 
 **Secret variables:**
-- None required for schedule-posts specifically (System.AccessToken is auto-provided)
+- `SENTRY_AUTH_TOKEN`: Your Sentry authentication token (for release tracking)
+
+**Note:** System.AccessToken is auto-provided for git operations.
 
 ## Testing Variables
 

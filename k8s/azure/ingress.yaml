@@ -4,10 +4,11 @@ metadata:
   name: pixelated-ingress
   namespace: pixelated-staging
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Cloudflare handles SSL - disable redirect to avoid loops
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - staging-azure.pixelatedempathy.tech
@@ -30,16 +31,39 @@ metadata:
   name: pixelated-ingress
   namespace: pixelated-production
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Cloudflare handles SSL - disable redirect to avoid loops
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - azure.pixelatedempathy.tech
+    - pixelatedempathy.com
+    - www.pixelatedempathy.com
     secretName: pixelated-production-tls
   rules:
   - host: azure.pixelatedempathy.tech
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pixelated-service
+            port:
+              number: 80
+  - host: pixelatedempathy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pixelated-service
+            port:
+              number: 80
+  - host: www.pixelatedempathy.com
     http:
       paths:
       - path: /

@@ -21,48 +21,46 @@ test('login page has correct form elements', async ({ page }) => {
 test('login form shows validation errors', async ({ page }) => {
   await page.goto('/login')
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000) // Wait for React hydration
 
-  // Wait for form to be ready
-  await expect(page.locator('form')).toBeVisible()
-  await expect(page.locator('button[type="submit"]')).toBeVisible()
+  // Wait for React component to hydrate (LoginForm uses client:load)
+  // Wait for form to be visible and interactive
+  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('button[type="submit"]')).toBeVisible({ timeout: 10000 })
+  
+  // Wait for form inputs to be ready
+  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 10000 })
+  
+  // Additional wait to ensure React hydration is complete
+  await page.waitForTimeout(1000)
 
   // Wait for error elements to exist (they should be in DOM even if hidden)
   const emailError = page.locator('#email-error')
   const passwordError = page.locator('#password-error')
 
   // Ensure elements exist in DOM - they're always rendered, just hidden initially
-  await expect(emailError).toBeAttached({ timeout: 5000 })
-  await expect(passwordError).toBeAttached({ timeout: 5000 })
+  await expect(emailError).toBeAttached({ timeout: 10000 })
+  await expect(passwordError).toBeAttached({ timeout: 10000 })
 
   // Submit empty form to trigger validation
   // Use force: true on mobile to bypass header interception
   const submitButton = page.locator('button[type="submit"]')
   await submitButton.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300) // Brief pause before interaction
 
   // Click the submit button - this should trigger form validation
   await submitButton.click({ force: true, timeout: 10000 })
 
-  // Wait a moment for React to process the state update
-  await page.waitForTimeout(100)
-
-  // Wait for React to update and error messages to become visible
-  // Check that error elements have content first, then check visibility
-  // This ensures React has updated the DOM
-  await expect(emailError).toHaveText(/.+/, { timeout: 5000 })
-  await expect(passwordError).toHaveText(/.+/, { timeout: 5000 })
+  // Wait for React to process the state update and show errors
+  // First wait for error text to appear, then check visibility
+  await expect(emailError).toHaveText(/.+/, { timeout: 10000 })
+  await expect(passwordError).toHaveText(/.+/, { timeout: 10000 })
 
   // Now check visibility - errors should be visible when they have content
   await expect(emailError).toBeVisible({ timeout: 10000 })
   await expect(passwordError).toBeVisible({ timeout: 10000 })
 
-  // Also verify they have text content
-  await expect(emailError).not.toHaveText('', { timeout: 5000 })
-  await expect(passwordError).not.toHaveText('', { timeout: 5000 })
-
-  // Now verify they're visible and contain error text
-  await expect(emailError).toBeVisible({ timeout: 10000 })
-  await expect(passwordError).toBeVisible({ timeout: 10000 })
+  // Verify they contain error text
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
   await expect(passwordError).toContainText(/required|password/i, {
     timeout: 5000,
@@ -108,31 +106,39 @@ test('login page has proper transitions', async ({ page }) => {
   await page.goto('/login')
   await page.waitForLoadState('networkidle')
 
-  // Wait for React components to hydrate
-  await page.waitForTimeout(3000)
+  // Wait for React components to hydrate (LoginForm uses client:load)
+  // Wait for form to be visible and interactive
+  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  
+  // Additional wait to ensure React hydration is complete
+  await page.waitForTimeout(1000)
 
-  // Wait for form to be ready
-  await expect(page.locator('form')).toBeVisible()
-
-  // Look for the forgot password link/button
+  // Look for the forgot password button using data-testid or text matching
+  // The button has data-testid="forgot-password-button" according to LoginForm.tsx
   const passwordResetButton = page
-    .locator('button')
+    .locator('[data-testid="forgot-password-button"], button')
     .filter({ hasText: /forgot.*password/i })
+    .first()
 
   // Check if the forgot password element exists and is visible
-  await expect(passwordResetButton).toBeVisible({ timeout: 5000 })
+  await expect(passwordResetButton).toBeVisible({ timeout: 10000 })
 
   // Click to switch to reset mode
   // Scroll into view and use force click to bypass header interception
   await passwordResetButton.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300) // Brief pause before interaction
   await passwordResetButton.click({ force: true, timeout: 10000 })
 
-  // Wait for React state update - wait for the h2 to appear instead of fixed timeout
+  // Wait for React state update - wait for the h2 to appear
+  // The h2 has data-testid="reset-password-heading" according to LoginForm.tsx
   const resetPasswordHeading = page
-    .locator('h2')
+    .locator('[data-testid="reset-password-heading"], h2')
     .filter({ hasText: /reset.*password/i })
+    .first()
+  
   await expect(resetPasswordHeading).toBeVisible({
-    timeout: 30000,
+    timeout: 15000,
   })
 
   // Also wait for the submit button text to change as confirmation
@@ -155,10 +161,13 @@ test('login page visual comparison', async ({ page }) => {
 
   // Wait for any animations to complete and page to be fully loaded
   await page.waitForLoadState('networkidle')
+  
+  // Wait for React component to hydrate
+  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  
+  // Additional wait to ensure React hydration is complete and any animations settle
   await page.waitForTimeout(2000)
-
-  // Wait for form to be visible
-  await expect(page.locator('form')).toBeVisible()
 
   // Take screenshot for visual comparison
   // Increased tolerance for browser differences, especially WebKit

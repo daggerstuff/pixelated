@@ -33,6 +33,8 @@ const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
+// Detect if we're running a build command (not dev server)
+const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES;
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN;
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
@@ -78,13 +80,22 @@ function getChunkName(id) {
 const adapter = (() => {
   if (isCloudflareDeploy && cloudflareAdapter) {
     console.log('🔵 Using Cloudflare adapter for Pages deployment');
-    return cloudflareAdapter({
+    // Only enable platformProxy for local dev (not during builds)
+    // During Cloudflare Pages builds, platformProxy requires Wrangler auth which isn't available
+    const adapterConfig = {
       mode: 'directory',
       platformProxy: {
         enabled: true,
       },
       functionPerRoute: false,
-    });
+    };
+    // Only include platformProxy when running dev server locally (not during builds)
+    if (isDevelopment && !isBuildCommand) {
+      adapterConfig.platformProxy = {
+        enabled: true,
+      };
+    }
+    return cloudflareAdapter(adapterConfig);
   }
 
   if (isRailwayDeploy) {

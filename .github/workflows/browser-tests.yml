@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -68,6 +68,9 @@ jobs:
           export BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
+          # Better-auth SSR requires absolute base URL for login forms to render
+          export PUBLIC_AUTH_URL=http://localhost:4321/api/auth
+          export SITE_URL=http://localhost:4321
 
           # Run tests with built-in web server, only essential tests
           pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts tests/browser/mobile-compatibility.spec.ts --config=playwright.config.ci.ts --max-failures=10 --workers=1
@@ -94,7 +97,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download all test artifacts
         uses: actions/download-artifact@v6

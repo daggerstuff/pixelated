@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: pixelatedregistry.azurecr.io/pixelatedempathy:latest
+        image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
         imagePullPolicy: Always
         env:
         - name: NODE_ENV
@@ -48,6 +48,11 @@ spec:
             secretKeyRef:
               name: sentry-config
               key: sentry-auth-token
+        envFrom:
+        - configMapRef:
+            name: pixelated-config
+        - secretRef:
+            name: pixelated-secrets
         ports:
         - containerPort: 4321
           name: http
@@ -96,7 +101,7 @@ spec:
     spec:
       containers:
       - name: pixelated
-        image: pixelatedregistry.azurecr.io/pixelatedempathy:latest
+        image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
         imagePullPolicy: Always
         env:
         - name: NODE_ENV
@@ -125,6 +130,11 @@ spec:
             secretKeyRef:
               name: sentry-config
               key: sentry-auth-token
+        envFrom:
+        - configMapRef:
+            name: pixelated-config
+        - secretRef:
+            name: pixelated-secrets
         ports:
         - containerPort: 4321
           name: http

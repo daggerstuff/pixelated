@@ -35,7 +35,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
         with:
           fetch-depth: 1
 
@@ -64,7 +64,56 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          # Enhanced retry logic for pnpm install with comprehensive error handling
+          for i in {1..3}; do
+            echo "📦 Attempt $i of 3: Installing dependencies..."
+            ERROR_LOG=$(mktemp)
+            
+            if pnpm install --no-frozen-lockfile 2>&1 | tee "$ERROR_LOG"; then
+              echo "✅ Dependencies installed successfully"
+              rm -f "$ERROR_LOG"
+              break
+            else
+              EXIT_CODE=$?
+              echo "❌ Install failed with exit code: $EXIT_CODE"
+              echo "📝 Error output:"
+              cat "$ERROR_LOG"
+              
+              # Check for network errors
+              if grep -qE "ENOTFOUND|ETIMEDOUT|ECONNRESET|fetch failed|network" "$ERROR_LOG"; then
+                echo "⚠️ Network error detected"
+                if [ $i -eq 3 ]; then
+                  echo "❌ All install attempts failed due to network issues"
+                  rm -f "$ERROR_LOG"
+                  exit 1
+                fi
+              fi
+              
+              # Check for peer dependency issues
+              if grep -qE "WARN.*peer dep|unmet peer" "$ERROR_LOG"; then
+                echo "⚠️ Peer dependency warnings detected, trying with --no-strict-peer-dependencies..."
+                if pnpm install --no-frozen-lockfile --no-strict-peer-dependencies 2>&1; then
+                  echo "✅ Dependencies installed with relaxed peer dependencies"
+                  rm -f "$ERROR_LOG"
+                  break
+                fi
+              fi
+              
+              rm -f "$ERROR_LOG"
+              
+              if [ $i -lt 3 ]; then
+                DELAY=$((5 * i))
+                echo "⏳ Retrying in $DELAY seconds..."
+                sleep $DELAY
+                pnpm store prune || true
+              else
+                echo "❌ All install attempts failed"
+                echo "💡 Debug: Node $(node --version), pnpm $(pnpm --version)"
+                exit 1
+              fi
+            fi
+          done
 
       - name: Resolve APP_URL (Production)
         id: resolve-app-url-prod
@@ -289,7 +338,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
         with:
           fetch-depth: 1
 
@@ -496,7 +545,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
         with:
           fetch-depth: 1
 
@@ -705,7 +754,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
         with:
           fetch-depth: 1
 

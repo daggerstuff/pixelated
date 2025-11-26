@@ -1,5 +1,13 @@
 # Azure DevOps Pipeline for Pixelated Empathy
 # Enterprise-grade CI/CD with Azure Kubernetes Service deployment
+#
+# Deployment Info (Last Updated: 2025-11-25):
+# - AKS Cluster: pixelated-aks-cluster (East US)
+# - ACR: pixelatedregistry.azurecr.io
+# - External IP: 20.242.241.80 (NGINX Ingress Controller)
+# - Staging: staging-azure.pixelatedempathy.tech
+# - Production: azure.pixelatedempathy.tech
+# - Image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
 
 trigger:
   branches:
@@ -24,351 +32,582 @@ variables:
 
   # Derived variables (computed from variable group values)
   - name: DOCKER_REGISTRY
-    value: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
+    value: "$(AZURE_CONTAINER_REGISTRY).azurecr.io"
   - name: IMAGE_NAME
-    value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
+    value: "$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)"
+
+  # Sentry Configuration
+  - name: SENTRY_DSN
+    value: "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032"
+  - name: SENTRY_ORG
+    value: "pixelated-empathy-dq"
+  - name: SENTRY_PROJECT
+    value: "pixel-staging"
+
+  # Pool selection: Uses Default agent pool (self-hosted agents)
 
 stages:
-- stage: Validate
-  displayName: 'Validate Code'
-  jobs:
-  - job: ValidateDependencies
-    displayName: 'Validate Dependencies'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm --version
-      displayName: 'Enable pnpm'
-
-    - script: |
-        pnpm audit --audit-level moderate || echo "⚠️ Audit warnings found but continuing"
-      displayName: 'Audit Dependencies'
-
-  - job: LintCode
-    displayName: 'Lint Code'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm lint:ci || echo "⚠️ Linting completed with warnings"
-      displayName: 'Run Linting'
-
-  - job: TypeCheck
-    displayName: 'Type Check'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm typecheck || echo "⚠️ Type checking completed with warnings"
-      displayName: 'Run Type Check'
-
-- stage: Build
-  displayName: 'Build Application'
-  dependsOn: Validate
-  jobs:
-  - job: BuildApplication
-    displayName: 'Build and Push Docker Image'
-    pool:
-      vmImage: 'ubuntu-latest'
-    timeoutInMinutes: 30
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - task: Docker@2
-      displayName: 'Build and Push Docker Image'
-      inputs:
-        containerRegistry: '$(AZURE_CONTAINER_REGISTRY)'
-        repository: '$(IMAGE_REPOSITORY)'
-        command: 'buildAndPush'
-        Dockerfile: 'Dockerfile'
-        buildContext: '.'
-        tags: |
-          $(Build.BuildNumber)
-          latest
-          $(Build.SourceBranchName)
-        addPipelineData: false
-        addBaseImageData: false
-
-    - script: |
-        echo "IMAGE_DIGEST=$(docker inspect $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) --format='{{.Id}}')" >> $(Build.ArtifactStagingDirectory)/build.env
-        echo "IMAGE_TAG=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
-        echo "BUILD_NUMBER=$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
-      displayName: 'Capture Build Metadata'
-
-    - publish: $(Build.ArtifactStagingDirectory)/build.env
-      artifact: build-metadata
-      displayName: 'Publish Build Metadata'
-
-- stage: Security
-  displayName: 'Security Scanning'
-  dependsOn: Build
-  jobs:
-  - job: ContainerSecurity
-    displayName: 'Container Security Scan'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Docker@2
-      displayName: 'Login to ACR'
-      inputs:
-        containerRegistry: '$(AZURE_CONTAINER_REGISTRY)'
-        command: 'login'
-
-    - task: Bash@3
-      displayName: 'Install Trivy'
-      inputs:
-        targetType: 'inline'
-        script: |
-          sudo apt-get update
-          sudo apt-get install wget apt-transport-https gnupg lsb-release
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy
-
-    - task: Bash@3
-      displayName: 'Run Security Scan'
-      inputs:
-        targetType: 'inline'
-        script: |
-          trivy image --severity CRITICAL,HIGH --format sarif --output trivy-results.sarif $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)
-
-          # Fail on critical vulnerabilities
-          trivy image --severity CRITICAL --exit-code 1 $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) || echo "⚠️ Critical vulnerabilities found"
-
-    - publish: trivy-results.sarif
-      artifact: security-scan-results
-      displayName: 'Publish Security Scan Results'
-
-- stage: DeployStaging
-  displayName: 'Deploy to Staging (AKS)'
-  dependsOn: Security
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: DeployToStaging
-    displayName: 'Deploy to Azure Kubernetes Service'
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'staging'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - checkout: self
-
-          - task: AzureCLI@2
-            displayName: 'Configure AKS Credentials'
+  - stage: Validate
+    displayName: "Validate Code"
+    jobs:
+      - job: ValidateDependencies
+        displayName: "Validate Dependencies"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
             inputs:
-              azureSubscription: '$(AZURE_SUBSCRIPTION)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - script: |
+              corepack enable pnpm
+              pnpm --version
+            displayName: "Enable pnpm"
+
+          - script: |
+              pnpm audit --audit-level moderate || echo "⚠️ Audit warnings found but continuing"
+            displayName: "Audit Dependencies"
+
+      - job: LintCode
+        displayName: "Lint Code"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - script: |
+              corepack enable pnpm
+              pnpm lint:ci || echo "⚠️ Linting completed with warnings"
+            displayName: "Run Linting"
+
+      - job: TypeCheck
+        displayName: "Type Check"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - script: |
+              corepack enable pnpm
+              pnpm typecheck || echo "⚠️ Type checking completed with warnings"
+            displayName: "Run Type Check"
+
+  - stage: Build
+    displayName: "Build Application"
+    dependsOn: Validate
+    jobs:
+      - job: BuildApplication
+        displayName: "Build and Push Docker Image"
+        pool:
+          vmImage: "ubuntu-latest"
+        timeoutInMinutes: "30"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - task: Bash@3
+            displayName: "Ensure Docker Access"
+            inputs:
+              targetType: "inline"
+              script: |
+                set -euo pipefail
+
+                # Check if Docker daemon is accessible
+                if ! docker info >/dev/null 2>&1; then
+                  echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
+                  
+                  # Get current user
+                  CURRENT_USER=$(whoami)
+                  echo "Current user: ${CURRENT_USER}"
+                  
+                  # Ensure docker socket has correct permissions (most reliable fix)
+                  if [ -S /var/run/docker.sock ]; then
+                    echo "Fixing docker socket permissions..."
+                    
+                    # Try to set socket permissions to 666 (read/write for all)
+                    if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
+                      echo "✅ Set docker socket permissions to 666"
+                    # Fallback: ensure docker group ownership
+                    elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
+                         sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
+                      echo "✅ Set docker socket to docker group ownership"
+                      
+                      # Check if user is in docker group
+                      if ! groups | grep -q docker; then
+                        echo "⚠️ User not in docker group, adding..."
+                        sudo usermod -aG docker "${CURRENT_USER}" || {
+                          echo "⚠️ Could not add user to docker group"
+                        }
+                        echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
+                      fi
+                    else
+                      echo "❌ Could not fix docker socket permissions"
+                      echo "⚠️ Manual fix required on agent machine:"
+                      echo "   sudo chmod 666 /var/run/docker.sock"
+                      echo "   OR"
+                      echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
+                      exit 1
+                    fi
+                  else
+                    echo "❌ Docker socket not found at /var/run/docker.sock"
+                    exit 1
+                  fi
+                  
+                  # Verify Docker access
+                  if docker info >/dev/null 2>&1; then
+                    echo "✅ Docker access verified"
+                  else
+                    echo "❌ Docker access still not available after permission fix"
+                    exit 1
+                  fi
+                else
+                  echo "✅ Docker daemon is accessible"
+                fi
+
+                # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
+                docker info 2>&1 | { head -n 5; cat > /dev/null; }
+
+          - task: Docker@2
+            displayName: "Build and Push Docker Image"
+            inputs:
+              containerRegistry: "$(AZURE_CONTAINER_REGISTRY)"
+              repository: "$(IMAGE_REPOSITORY)"
+              command: "buildAndPush"
+              Dockerfile: "Dockerfile"
+              buildContext: "."
+              tags: |
+                $(Build.BuildNumber)
+                latest
+                $(Build.SourceBranchName)
+              addPipelineData: false
+              addBaseImageData: false
+            name: dockerBuild
+
+          - script: |
+              echo "IMAGE_DIGEST=$(docker inspect $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) --format='{{.Id}}')" >> $(Build.ArtifactStagingDirectory)/build.env
+              echo "IMAGE_TAG=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
+              echo "BUILD_NUMBER=$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
+
+              # Display what we captured
+              echo "📦 Build metadata captured:"
+              cat $(Build.ArtifactStagingDirectory)/build.env
+            displayName: "Capture Build Metadata"
+            continueOnError: "true"
+
+          - publish: $(Build.ArtifactStagingDirectory)/build.env
+            artifact: build-metadata
+            displayName: "Publish Build Metadata"
+
+  - stage: Security
+    displayName: "Security Scanning"
+    dependsOn: Build
+    jobs:
+      - job: ContainerSecurity
+        displayName: "Container Security Scan"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: Bash@3
+            displayName: "Ensure Docker Access"
+            inputs:
+              targetType: "inline"
+              script: |
+                set -euo pipefail
+
+                # Check if Docker daemon is accessible
+                if ! docker info >/dev/null 2>&1; then
+                  echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
+                  
+                  # Get current user
+                  CURRENT_USER=$(whoami)
+                  echo "Current user: ${CURRENT_USER}"
+                  
+                  # Ensure docker socket has correct permissions (most reliable fix)
+                  if [ -S /var/run/docker.sock ]; then
+                    echo "Fixing docker socket permissions..."
+                    
+                    # Try to set socket permissions to 666 (read/write for all)
+                    if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
+                      echo "✅ Set docker socket permissions to 666"
+                    # Fallback: ensure docker group ownership
+                    elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
+                         sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
+                      echo "✅ Set docker socket to docker group ownership"
+                      
+                      # Check if user is in docker group
+                      if ! groups | grep -q docker; then
+                        echo "⚠️ User not in docker group, adding..."
+                        sudo usermod -aG docker "${CURRENT_USER}" || {
+                          echo "⚠️ Could not add user to docker group"
+                        }
+                        echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
+                      fi
+                    else
+                      echo "❌ Could not fix docker socket permissions"
+                      echo "⚠️ Manual fix required on agent machine:"
+                      echo "   sudo chmod 666 /var/run/docker.sock"
+                      echo "   OR"
+                      echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
+                      exit 1
+                    fi
+                  else
+                    echo "❌ Docker socket not found at /var/run/docker.sock"
+                    exit 1
+                  fi
+                  
+                  # Verify Docker access
+                  if docker info >/dev/null 2>&1; then
+                    echo "✅ Docker access verified"
+                  else
+                    echo "❌ Docker access still not available after permission fix"
+                    exit 1
+                  fi
+                else
+                  echo "✅ Docker daemon is accessible"
+                fi
+
+                # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
+                docker info 2>&1 | { head -n 5; cat > /dev/null; }
+
+          - task: Docker@2
+            displayName: "Login to ACR"
+            inputs:
+              containerRegistry: "$(AZURE_CONTAINER_REGISTRY)"
+              command: "login"
+
+          - task: Bash@3
+            displayName: "Install Trivy"
+            inputs:
+              targetType: "inline"
+              script: |
+                sudo apt-get update
+                sudo apt-get install wget apt-transport-https gnupg lsb-release
+                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+                echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+                sudo apt-get update
+                sudo apt-get install trivy
+
+          - task: Bash@3
+            displayName: "Run Security Scan"
+            inputs:
+              targetType: "inline"
+              script: |
+                trivy image --severity CRITICAL,HIGH --format sarif --output trivy-results.sarif $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)
+
+                # Fail on critical vulnerabilities
+                trivy image --severity CRITICAL --exit-code 1 $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) || echo "⚠️ Critical vulnerabilities found"
+
+          - publish: trivy-results.sarif
+            artifact: security-scan-results
+            displayName: "Publish Security Scan Results"
+
+  - stage: DeployStaging
+    displayName: "Deploy to Staging (AKS)"
+    dependsOn: Security
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: DeployToStaging
+        displayName: "Deploy to Azure Kubernetes Service"
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: "staging"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: "Configure AKS Credentials"
+                  inputs:
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
+
+                - task: KubernetesManifest@1
+                  displayName: "Deploy to Kubernetes"
+                  inputs:
+                    action: "deploy"
+                    connectionType: "kubernetesServiceConnection"
+                    kubernetesServiceConnection: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE)"
+                    manifests: |
+                      k8s/azure/deployment.yaml
+                      k8s/azure/configmap.yaml
+                      k8s/azure/secrets.yaml
+                      k8s/azure/ingress.yaml
+
+                - task: Kubernetes@1
+                  displayName: "Update Image Tag"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE)"
+                    command: "set"
+                    arguments: "image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
+
+                - task: Kubernetes@1
+                  displayName: "Check Rollout Status"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE)"
+                    command: "rollout"
+                    arguments: "status deployment/pixelated --timeout=300s"
+
+                - task: Bash@3
+                  displayName: "Create Sentry Release"
+                  condition: succeededOrFailed()
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+
+                      # Install Sentry CLI if not available
+                      if ! command -v sentry-cli &> /dev/null; then
+                        curl -sL https://sentry.io/get-cli/ | bash || {
+                          echo "⚠️ Could not install sentry-cli, skipping release creation"
+                          exit 0
+                        }
+                      fi
+
+                      # Create Sentry release
+                      export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
+                      export SENTRY_ORG="$(SENTRY_ORG)"
+                      export SENTRY_PROJECT="$(SENTRY_PROJECT)"
+
+                      RELEASE_VERSION="$(Build.BuildNumber)"
+
+                      sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
+                      sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
+                      sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
+                      sentry-cli releases deploys "$RELEASE_VERSION" new -e staging || echo "⚠️ Could not create deploy"
+
+                      echo "✅ Sentry release $RELEASE_VERSION created for staging"
+                  env:
+                    SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
+
+  - stage: DeployProduction
+    displayName: "Deploy to Production (AKS)"
+    dependsOn: DeployStaging
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: DeployToProduction
+        displayName: "Deploy to Production"
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: "production"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: "Configure AKS Credentials"
+                  inputs:
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
+
+                - task: KubernetesManifest@1
+                  displayName: "Deploy to Production"
+                  inputs:
+                    action: "deploy"
+                    connectionType: "kubernetesServiceConnection"
+                    kubernetesServiceConnection: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE_PROD)"
+                    manifests: |
+                      k8s/azure/deployment.yaml
+                      k8s/azure/configmap.yaml
+                      k8s/azure/secrets.yaml
+                      k8s/azure/ingress.yaml
+
+                - task: Kubernetes@1
+                  displayName: "Update Production Image Tag"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE_PROD)"
+                    command: "set"
+                    arguments: "image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
+
+                - task: Kubernetes@1
+                  displayName: "Check Production Rollout Status"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: "pixelated-aks-connection"
+                    namespace: "$(KUBE_NAMESPACE_PROD)"
+                    command: "rollout"
+                    arguments: "status deployment/pixelated --timeout=300s"
+
+                - task: Bash@3
+                  displayName: "Create Sentry Production Release"
+                  condition: succeededOrFailed()
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+
+                      if ! command -v sentry-cli &> /dev/null; then
+                        curl -sL https://sentry.io/get-cli/ | bash || {
+                          echo "⚠️ Could not install sentry-cli, skipping release creation"
+                          exit 0
+                        }
+                      fi
+
+                      export SENTRY_AUTH_TOKEN="$(SENTRY_AUTH_TOKEN)"
+                      export SENTRY_ORG="$(SENTRY_ORG)"
+                      export SENTRY_PROJECT="pixel-production"
+
+                      RELEASE_VERSION="$(Build.BuildNumber)"
+
+                      sentry-cli releases new "$RELEASE_VERSION" || echo "⚠️ Release may already exist"
+                      sentry-cli releases set-commits "$RELEASE_VERSION" --auto || echo "⚠️ Could not set commits"
+                      sentry-cli releases finalize "$RELEASE_VERSION" || echo "⚠️ Could not finalize release"
+                      sentry-cli releases deploys "$RELEASE_VERSION" new -e production || echo "⚠️ Could not create deploy"
+
+                      echo "✅ Sentry release $RELEASE_VERSION created for production"
+                  env:
+                    SENTRY_AUTH_TOKEN: $(SENTRY_AUTH_TOKEN)
+
+  - stage: HealthCheck
+    displayName: "Health Check"
+    dependsOn: DeployStaging
+    condition: succeeded()
+    jobs:
+      - job: HealthCheckStaging
+        displayName: "Staging Health Check"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: AzureCLI@2
+            displayName: "Check Deployment Health"
+            inputs:
+              azureSubscription: "$(AZURE_SUBSCRIPTION)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
               inlineScript: |
                 az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
 
-          - task: KubernetesManifest@0
-            displayName: 'Deploy to Kubernetes'
-            inputs:
-              action: 'deploy'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
-              namespace: '$(KUBE_NAMESPACE)'
-              manifests: |
-                k8s/azure/
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+                # Check deployment status
+                kubectl get deployment -n $(KUBE_NAMESPACE)
+                kubectl get pods -n $(KUBE_NAMESPACE)
 
-          - task: KubernetesManifest@0
-            displayName: 'Rollout Status'
-            inputs:
-              action: 'rollbackStatus'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
-              namespace: '$(KUBE_NAMESPACE)'
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+                # Wait for pods to be ready
+                kubectl wait --for=condition=available --timeout=300s deployment/pixelated -n $(KUBE_NAMESPACE)
 
-- stage: DeployProduction
-  displayName: 'Deploy to Production (AKS)'
-  dependsOn: DeployStaging
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: DeployToProduction
-    displayName: 'Deploy to Production'
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
+                # Test external connectivity
+                if curl -f --connect-timeout 10 --max-time 30 "$(STAGING_URL)/api/health"; then
+                  echo "✅ Health check passed"
+                else
+                  echo "❌ Health check failed"
+                  exit 1
+                fi
+
+  - stage: PerformanceTest
+    displayName: "Performance Testing"
+    dependsOn: DeployStaging
+    condition: succeeded()
+    jobs:
+      - job: PerformanceTests
+        displayName: "Run Performance Tests"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - script: |
+              corepack enable pnpm
+              pnpm install --frozen-lockfile
+              pnpm run performance:test
+            displayName: "Run Performance Tests"
+            env:
+              TEST_URL: $(STAGING_URL)
+
+  - stage: E2ETest
+    displayName: "E2E Testing"
+    dependsOn: DeployStaging
+    condition: succeeded()
+    jobs:
+      - job: E2ETests
+        displayName: "Run E2E Tests"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+
+          - script: |
+              corepack enable pnpm
+              pnpm install --frozen-lockfile
+              pnpm run e2e:smoke
+            displayName: "Run E2E Smoke Tests"
+            env:
+              BASE_URL: $(STAGING_URL)
+
+          - publish: test-results/
+            artifact: e2e-test-results
+            displayName: "Publish Test Results"
+            condition: always()
+
+  - stage: SchedulePosts
+    displayName: "Schedule Blog Posts"
+    condition: or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual'))
+    jobs:
+      - job: ScheduleBlogPosts
+        displayName: "Schedule and Publish Blog Posts"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
           - checkout: self
+            persistCredentials: "true"
 
-          - task: AzureCLI@2
-            displayName: 'Configure AKS Credentials'
+          - task: NodeTool@0
             inputs:
-              azureSubscription: '$(AZURE_SUBSCRIPTION)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
 
-          - task: KubernetesManifest@0
-            displayName: 'Deploy to Production (Blue-Green)'
+          - script: |
+              corepack enable pnpm
+              pnpm --version
+            displayName: "Enable pnpm"
+
+          - script: |
+              pnpm store prune || true
+              pnpm install --no-frozen-lockfile
+            displayName: "Install Dependencies"
+
+          - task: Bash@3
+            displayName: "Configure Git"
             inputs:
-              action: 'deploy'
-              kubernetesServiceConnection: 'pixelated-aks-connection'
-              namespace: '$(KUBE_NAMESPACE_PROD)'
-              strategy: 'blueGreen'
-              trafficSplitMethod: 'pod'
-              manifests: |
-                k8s/azure/
-              containers: |
-                $(IMAGE_NAME):$(Build.BuildNumber)
+              targetType: "inline"
+              script: |
+                git config --global user.name "Azure DevOps"
+                git config --global user.email "azure-pipelines@devops.com"
 
-- stage: HealthCheck
-  displayName: 'Health Check'
-  dependsOn: DeployStaging
-  condition: succeeded()
-  jobs:
-  - job: HealthCheckStaging
-    displayName: 'Staging Health Check'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: AzureCLI@2
-      displayName: 'Check Deployment Health'
-      inputs:
-        azureSubscription: '$(AZURE_SUBSCRIPTION)'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
-
-          # Check deployment status
-          kubectl get deployment -n $(KUBE_NAMESPACE)
-          kubectl get pods -n $(KUBE_NAMESPACE)
-
-          # Wait for pods to be ready
-          kubectl wait --for=condition=available --timeout=300s deployment/pixelated -n $(KUBE_NAMESPACE)
-
-          # Test external connectivity
-          if curl -f --connect-timeout 10 --max-time 30 "$(STAGING_URL)/api/health"; then
-            echo "✅ Health check passed"
-          else
-            echo "❌ Health check failed"
-            exit 1
-          fi
-
-- stage: PerformanceTest
-  displayName: 'Performance Testing'
-  dependsOn: DeployStaging
-  condition: succeeded()
-  jobs:
-  - job: PerformanceTests
-    displayName: 'Run Performance Tests'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm install --frozen-lockfile
-        pnpm run performance:test
-      displayName: 'Run Performance Tests'
-      env:
-        TEST_URL: $(STAGING_URL)
-
-- stage: E2ETest
-  displayName: 'E2E Testing'
-  dependsOn: DeployStaging
-  condition: succeeded()
-  jobs:
-  - job: E2ETests
-    displayName: 'Run E2E Tests'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm install --frozen-lockfile
-        pnpm run e2e:smoke
-      displayName: 'Run E2E Smoke Tests'
-      env:
-        BASE_URL: $(STAGING_URL)
-
-    - publish: test-results/
-      artifact: e2e-test-results
-      displayName: 'Publish Test Results'
-      condition: always()
-
-- stage: SchedulePosts
-  displayName: 'Schedule Blog Posts'
-  condition: or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual'))
-  jobs:
-  - job: ScheduleBlogPosts
-    displayName: 'Schedule and Publish Blog Posts'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - checkout: self
-      persistCredentials: true
-
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '$(NODE_VERSION)'
-      displayName: 'Install Node.js'
-
-    - script: |
-        corepack enable pnpm
-        pnpm --version
-      displayName: 'Enable pnpm'
-
-    - script: |
-        pnpm store prune || true
-        pnpm install --no-frozen-lockfile
-      displayName: 'Install Dependencies'
-
-    - task: Bash@3
-      displayName: 'Configure Git'
-      inputs:
-        targetType: 'inline'
-        script: |
-          git config --global user.name "Azure DevOps"
-          git config --global user.email "azure-pipelines@devops.com"
-
-    - script: |
-        pnpm run schedule-posts
-      displayName: 'Run Post Scheduler'
-      env:
-        GITHUB_ACTIONS: '$(GITHUB_ACTIONS)'
-        NODE_ENV: '$(NODE_ENV)'
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+          - script: |
+              pnpm run schedule-posts
+            displayName: "Run Post Scheduler"
+            env:
+              GITHUB_ACTIONS: "$(GITHUB_ACTIONS)"
+              NODE_ENV: "$(NODE_ENV)"
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
