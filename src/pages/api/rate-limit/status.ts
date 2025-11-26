@@ -125,12 +125,25 @@ export const POST: APIRoute = async ({ request }) => {
           },
 
           // Send alert to Sentry for error tracking
-          // Send alert to Sentry for error tracking
           'send-sentry-alert': (alert) => {
-            logger.warn('Sentry alert requested but Sentry is disabled/removed', {
-              alert,
-              timestamp: new Date().toISOString(),
-            })
+            // Import Sentry client if available
+            try {
+              // Use ES6 import syntax instead of CommonJS require
+              // This assumes Sentry is properly configured in the application
+              // We're using a safe approach that won't break if Sentry isn't available
+              import('@sentry/node')
+                .then(({ captureMessage }) => {
+                  captureMessage(
+                    `Rate limit alert triggered: ${JSON.stringify(alert)}`,
+                    'warning',
+                  )
+                })
+                .catch((error) => {
+                  logger.error('Failed to load Sentry module', { error })
+                })
+            } catch (error) {
+              logger.error('Failed to send alert to Sentry', { error })
+            }
           },
 
           // Trigger webhook to external monitoring system

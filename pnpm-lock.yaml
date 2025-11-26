@@ -10,7 +10,7 @@ overrides:
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
   '@azure/openai': ^2.0.0
   tmp: '>=0.2.4'
-  glob: ^11.1.0
+  glob: ^11.0.3
   node-domexception: ^2.0.2
   sitemap: ^9.0.0
 
@@ -21,9 +21,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.5
         version: 0.9.5(prettier-plugin-astro@0.14.1)(prettier@3.6.2)(typescript@5.9.3)
-      '@astrojs/cloudflare':
-        specifier: ^12.6.11
-        version: 12.6.11(@types/node@24.10.1)(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1)
+      '@astrojs/mdx':
+        specifier: ^4.3.12
+        version: 4.3.12(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))
       '@astrojs/node':
         specifier: ^9.5.1
         version: 9.5.1(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))
@@ -87,6 +87,15 @@ importers:
       '@sentry/astro':
         specifier: ^10.26.0
         version: 10.26.0(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))
+      '@sentry/browser':
+        specifier: ^10.26.0
+        version: 10.26.0
+      '@sentry/node':
+        specifier: ^10.26.0
+        version: 10.26.0
+      '@sentry/profiling-node':
+        specifier: ^10.26.0
+        version: 10.26.0
       '@sentry/toolbar':
         specifier: 1.0.0-beta.11
         version: 1.0.0-beta.11(react@19.2.0)
@@ -114,15 +123,9 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
-      '@unocss/astro':
-        specifier: ^66.5.9
-        version: 66.5.9(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1))
       agentdb:
         specifier: 1.6.1
         version: 1.6.1
-      astro:
-        specifier: ^5.16.0
-        version: 5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1)
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
@@ -282,9 +285,6 @@ importers:
       twilio:
         specifier: ^5.10.6
         version: 5.10.6
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
       ultrahtml:
         specifier: ^1.6.0
         version: 1.6.0
@@ -294,9 +294,6 @@ importers:
       viewerjs:
         specifier: ^1.11.7
         version: 1.11.7
-      vite:
-        specifier: ^7.2.4
-        version: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1)
       wrangler:
         specifier: ^4.50.0
         version: 4.50.0(@cloudflare/workers-types@4.20251121.0)
@@ -310,6 +307,9 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8(@types/react@19.2.6)(immer@10.2.0)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
     devDependencies:
+      '@astrojs/cloudflare':
+        specifier: ^12.6.11
+        version: 12.6.11(@types/node@24.10.1)(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1)
       '@astrojs/markdoc':
         specifier: ^0.15.9
         version: 0.15.9(@types/react@19.2.6)(astro@5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1))(react@19.2.0)
@@ -364,6 +364,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.6)
+      '@unocss/astro':
+        specifier: ^66.5.9
+        version: 66.5.9(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1))
       '@unocss/core':
         specifier: ^66.5.9
         version: 66.5.9
@@ -385,6 +388,9 @@ importers:
       artillery-plugin-publish-metrics:
         specifier: 2.32.0
         version: 2.32.0
+      astro:
+        specifier: ^5.16.0
+        version: 5.16.0(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1)
       astro-eslint-parser:
         specifier: ^1.2.2
         version: 1.2.2
@@ -622,6 +628,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
       typescript-eslint:
         specifier: ^8.47.0
         version: 8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
@@ -637,6 +646,9 @@ importers:
       vfile:
         specifier: ^6.0.3
         version: 6.0.3
+      vite:
+        specifier: ^7.2.4
+        version: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1)
       vite-tsconfig-paths:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.1))
@@ -3882,6 +3894,10 @@ packages:
     resolution: {integrity: sha512-0vk9eQP0CXD7Y2WkcCIWHaAqnXOAi18/GupgWLnbB2kuQVYVtStWxtW+OWRe8W/XwSnZ5m6JBTVeokuk/O16DQ==}
     engines: {node: '>=18'}
 
+  '@sentry-internal/node-cpu-profiler@2.2.0':
+    resolution: {integrity: sha512-oLHVYurqZfADPh5hvmQYS5qx8t0UZzT2u6+/68VXsFruQEOnYJTODKgU3BVLmemRs3WE6kCJjPeFdHVYOQGSzQ==}
+    engines: {node: '>=18'}
+
   '@sentry-internal/replay-canvas@10.26.0':
     resolution: {integrity: sha512-vs7d/P+8M1L1JVAhhJx2wo15QDhqAipnEQvuRZ6PV7LUcS1un9/Vx49FMxpIkx6JcKADJVwtXrS1sX2hoNT/kw==}
     engines: {node: '>=18'}
@@ -4012,6 +4028,11 @@ packages:
       '@opentelemetry/instrumentation': ^0.57.1
       '@opentelemetry/sdk-trace-base': ^1.30.1
       '@opentelemetry/semantic-conventions': ^1.28.0
+
+  '@sentry/profiling-node@10.26.0':
+    resolution: {integrity: sha512-NgfKgrJc39q/khkWZFph1tiZ1uUadtL8VrBTe+7eB/vogPAuEJa+eH/oCS3/M+Pu2fal61MoCw+2qHDH5JDxQQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@sentry/toolbar@1.0.0-beta.11':
     resolution: {integrity: sha512-7xImSt+R2v/rkWQfvjQEi7EBC/UfogmAVnGfb2iTs9IjvGlF1iQn/aRQZhU64Ve09aswRiFfUUJIbLIG05yG7A==}
@@ -15324,6 +15345,11 @@ snapshots:
     dependencies:
       '@sentry/core': 10.26.0
 
+  '@sentry-internal/node-cpu-profiler@2.2.0':
+    dependencies:
+      detect-libc: 2.1.2
+      node-abi: 3.85.0
+
   '@sentry-internal/replay-canvas@10.26.0':
     dependencies:
       '@sentry-internal/replay': 10.26.0
@@ -15533,6 +15559,14 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 1.30.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.38.0
       '@sentry/core': 8.55.0
+
+  '@sentry/profiling-node@10.26.0':
+    dependencies:
+      '@sentry-internal/node-cpu-profiler': 2.2.0
+      '@sentry/core': 10.26.0
+      '@sentry/node': 10.26.0
+    transitivePeerDependencies:
+      - supports-color
 
   '@sentry/toolbar@1.0.0-beta.11(react@19.2.0)':
     dependencies:
