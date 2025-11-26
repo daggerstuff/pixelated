@@ -1,7 +1,7 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
 # Builder stage: install deps and run the static build
-ARG PNPM_VERSION=10.23.0
+ARG PNPM_VERSION=10.22.0
 FROM node:24-slim AS builder
 ARG PNPM_VERSION
 WORKDIR /app
@@ -28,8 +28,8 @@ COPY . .
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
-RUN find /app/node_modules -type f -name "*.map" -delete && \
-    find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
+RUN find /app/node_modules -name "*.map" -delete && \
+    find /app/dist -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
 FROM node:24-slim AS runtime
@@ -42,7 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
-    git \
     && rm -rf /var/lib/apt/lists/* && \
     npm install -g pnpm@$PNPM_VERSION && \
     pnpm --version
@@ -62,15 +61,15 @@ RUN pnpm install --prod --frozen-lockfile && \
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.test.*" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.spec.*" -exec rm -rf {} + 2>/dev/null || true && \
-    find node_modules -type f -name "*.map" -delete && \
-    find node_modules -type f -name "*.ts" ! -path "*/types/*" -delete && \
+    find node_modules -name "*.map" -delete && \
+    find node_modules -name "*.ts" ! -path "*/types/*" -delete && \
     find node_modules -name "*.tsx" ! -path "*/types/*" -delete && \
     find node_modules -name "README.md" -delete && \
     find node_modules -name "CHANGELOG*" -delete && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
     # Remove build tools after native modules are built
-    apt-get purge -y python3 make g++ git && \
+    apt-get purge -y python3 make g++ && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
 

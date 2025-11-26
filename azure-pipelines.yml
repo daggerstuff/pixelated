@@ -27,8 +27,6 @@ variables:
     value: '$(AZURE_CONTAINER_REGISTRY).azurecr.io'
   - name: IMAGE_NAME
     value: '$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY)'
-  
-  # Pool selection: Uses Default agent pool (self-hosted agents)
 
 stages:
 - stage: Validate
@@ -37,62 +35,49 @@ stages:
   - job: ValidateDependencies
     displayName: 'Validate Dependencies'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     steps:
-    - checkout: self
-    
     - task: NodeTool@0
       inputs:
         versionSpec: '$(NODE_VERSION)'
       displayName: 'Install Node.js'
 
     - script: |
-        set -euo pipefail
         corepack enable pnpm
         pnpm --version
       displayName: 'Enable pnpm'
 
     - script: |
-        set -euo pipefail
-        pnpm install --frozen-lockfile || echo "⚠️ Dependencies already installed"
         pnpm audit --audit-level moderate || echo "⚠️ Audit warnings found but continuing"
       displayName: 'Audit Dependencies'
 
   - job: LintCode
     displayName: 'Lint Code'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     steps:
-    - checkout: self
-    
     - task: NodeTool@0
       inputs:
         versionSpec: '$(NODE_VERSION)'
       displayName: 'Install Node.js'
 
     - script: |
-        set -euo pipefail
         corepack enable pnpm
-        pnpm install --frozen-lockfile || echo "⚠️ Dependencies already installed"
         pnpm lint:ci || echo "⚠️ Linting completed with warnings"
       displayName: 'Run Linting'
 
   - job: TypeCheck
     displayName: 'Type Check'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     steps:
-    - checkout: self
-    
     - task: NodeTool@0
       inputs:
         versionSpec: '$(NODE_VERSION)'
       displayName: 'Install Node.js'
 
     - script: |
-        set -euo pipefail
         corepack enable pnpm
-        pnpm install --frozen-lockfile || echo "⚠️ Dependencies already installed"
         pnpm typecheck || echo "⚠️ Type checking completed with warnings"
       displayName: 'Run Type Check'
 
@@ -103,75 +88,13 @@ stages:
   - job: BuildApplication
     displayName: 'Build and Push Docker Image'
     pool:
-      name: Default
-    timeoutInMinutes: '30'
+      vmImage: 'ubuntu-latest'
+    timeoutInMinutes: 30
     steps:
     - task: NodeTool@0
       inputs:
         versionSpec: '$(NODE_VERSION)'
       displayName: 'Install Node.js'
-
-    - task: Bash@3
-      displayName: 'Ensure Docker Access'
-      inputs:
-        targetType: 'inline'
-        script: |
-          set -euo pipefail
-          
-          # Check if Docker daemon is accessible
-          if ! docker info >/dev/null 2>&1; then
-            echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
-            
-            # Get current user
-            CURRENT_USER=$(whoami)
-            echo "Current user: ${CURRENT_USER}"
-            
-            # Ensure docker socket has correct permissions (most reliable fix)
-            if [ -S /var/run/docker.sock ]; then
-              echo "Fixing docker socket permissions..."
-              
-              # Try to set socket permissions to 666 (read/write for all)
-              if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
-                echo "✅ Set docker socket permissions to 666"
-              # Fallback: ensure docker group ownership
-              elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
-                   sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
-                echo "✅ Set docker socket to docker group ownership"
-                
-                # Check if user is in docker group
-                if ! groups | grep -q docker; then
-                  echo "⚠️ User not in docker group, adding..."
-                  sudo usermod -aG docker "${CURRENT_USER}" || {
-                    echo "⚠️ Could not add user to docker group"
-                  }
-                  echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
-                fi
-              else
-                echo "❌ Could not fix docker socket permissions"
-                echo "⚠️ Manual fix required on agent machine:"
-                echo "   sudo chmod 666 /var/run/docker.sock"
-                echo "   OR"
-                echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
-                exit 1
-              fi
-            else
-              echo "❌ Docker socket not found at /var/run/docker.sock"
-              exit 1
-            fi
-            
-            # Verify Docker access
-            if docker info >/dev/null 2>&1; then
-              echo "✅ Docker access verified"
-            else
-              echo "❌ Docker access still not available after permission fix"
-              exit 1
-            fi
-          else
-            echo "✅ Docker daemon is accessible"
-          fi
-          
-          # Display Docker info
-          docker info | head -n 5
 
     - task: Docker@2
       displayName: 'Build and Push Docker Image'
@@ -189,21 +112,8 @@ stages:
         addBaseImageData: false
 
     - script: |
-        set -euo pipefail
-        IMAGE_TAG="$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
-        mkdir -p $(Build.ArtifactStagingDirectory)
-        
-        # Wait a moment for image to be available
-        sleep 2
-        
-        IMAGE_DIGEST=$(docker inspect "${IMAGE_TAG}" --format='{{.Id}}' 2>/dev/null || echo "")
-        if [ -z "$IMAGE_DIGEST" ]; then
-          echo "⚠️ Could not retrieve image digest, using tag instead"
-          IMAGE_DIGEST="${IMAGE_TAG}"
-        fi
-        
-        echo "IMAGE_DIGEST=${IMAGE_DIGEST}" >> $(Build.ArtifactStagingDirectory)/build.env
-        echo "IMAGE_TAG=${IMAGE_TAG}" >> $(Build.ArtifactStagingDirectory)/build.env
+        echo "IMAGE_DIGEST=$(docker inspect $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) --format='{{.Id}}')" >> $(Build.ArtifactStagingDirectory)/build.env
+        echo "IMAGE_TAG=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
         echo "BUILD_NUMBER=$(Build.BuildNumber)" >> $(Build.ArtifactStagingDirectory)/build.env
       displayName: 'Capture Build Metadata'
 
@@ -218,71 +128,8 @@ stages:
   - job: ContainerSecurity
     displayName: 'Container Security Scan'
     pool:
-      name: Default
-    timeoutInMinutes: '20'
+      vmImage: 'ubuntu-latest'
     steps:
-    - task: Bash@3
-      displayName: 'Ensure Docker Access'
-      inputs:
-        targetType: 'inline'
-        script: |
-          set -euo pipefail
-          
-          # Check if Docker daemon is accessible
-          if ! docker info >/dev/null 2>&1; then
-            echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
-            
-            # Get current user
-            CURRENT_USER=$(whoami)
-            echo "Current user: ${CURRENT_USER}"
-            
-            # Ensure docker socket has correct permissions (most reliable fix)
-            if [ -S /var/run/docker.sock ]; then
-              echo "Fixing docker socket permissions..."
-              
-              # Try to set socket permissions to 666 (read/write for all)
-              if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
-                echo "✅ Set docker socket permissions to 666"
-              # Fallback: ensure docker group ownership
-              elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
-                   sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
-                echo "✅ Set docker socket to docker group ownership"
-                
-                # Check if user is in docker group
-                if ! groups | grep -q docker; then
-                  echo "⚠️ User not in docker group, adding..."
-                  sudo usermod -aG docker "${CURRENT_USER}" || {
-                    echo "⚠️ Could not add user to docker group"
-                  }
-                  echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
-                fi
-              else
-                echo "❌ Could not fix docker socket permissions"
-                echo "⚠️ Manual fix required on agent machine:"
-                echo "   sudo chmod 666 /var/run/docker.sock"
-                echo "   OR"
-                echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
-                exit 1
-              fi
-            else
-              echo "❌ Docker socket not found at /var/run/docker.sock"
-              exit 1
-            fi
-            
-            # Verify Docker access
-            if docker info >/dev/null 2>&1; then
-              echo "✅ Docker access verified"
-            else
-              echo "❌ Docker access still not available after permission fix"
-              exit 1
-            fi
-          else
-            echo "✅ Docker daemon is accessible"
-          fi
-          
-          # Display Docker info
-          docker info | head -n 5
-
     - task: Docker@2
       displayName: 'Login to ACR'
       inputs:
@@ -294,30 +141,22 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-          # Use modern GPG key installation (apt-key is deprecated)
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
-          sudo apt-get install -y trivy
+          sudo apt-get install trivy
 
     - task: Bash@3
       displayName: 'Run Security Scan'
       inputs:
         targetType: 'inline'
         script: |
-          set -euo pipefail
-          IMAGE_TAG="$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
-          
-          # Run Trivy vulnerability scan
-          trivy image --severity CRITICAL,HIGH --format sarif --output trivy-results.sarif --timeout 10m "${IMAGE_TAG}" || {
-            echo "⚠️ Trivy scan completed with warnings"
-          }
+          trivy image --severity CRITICAL,HIGH --format sarif --output trivy-results.sarif $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)
 
-          # Check for critical vulnerabilities (non-blocking for now)
-          trivy image --severity CRITICAL --exit-code 0 --timeout 10m "${IMAGE_TAG}" || echo "⚠️ Critical vulnerabilities found (non-blocking)"
+          # Fail on critical vulnerabilities
+          trivy image --severity CRITICAL --exit-code 1 $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) || echo "⚠️ Critical vulnerabilities found"
 
     - publish: trivy-results.sarif
       artifact: security-scan-results
@@ -331,7 +170,7 @@ stages:
   - deployment: DeployToStaging
     displayName: 'Deploy to Azure Kubernetes Service'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     environment: 'staging'
     strategy:
       runOnce:
@@ -348,24 +187,25 @@ stages:
               inlineScript: |
                 az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
 
-          # Use Kubernetes@1 (kubectl under the hood) instead of deprecated KubernetesManifest
-          - task: Kubernetes@1
+          - task: KubernetesManifest@0
             displayName: 'Deploy to Kubernetes'
             inputs:
-              connectionType: 'None'
+              action: 'deploy'
+              kubernetesServiceConnection: 'pixelated-aks-connection'
               namespace: '$(KUBE_NAMESPACE)'
-              command: 'apply'
-              useConfigurationFile: true
-              configuration: 'k8s/azure/'
+              manifests: |
+                k8s/azure/
+              containers: |
+                $(IMAGE_NAME):$(Build.BuildNumber)
 
-          # Use Kubernetes@1 task with kubectl under the hood instead of deprecated KubernetesManifest
-          - task: Kubernetes@1
-            displayName: 'Check Rollout Status'
+          - task: KubernetesManifest@0
+            displayName: 'Rollout Status'
             inputs:
-              connectionType: 'None'
+              action: 'rollbackStatus'
+              kubernetesServiceConnection: 'pixelated-aks-connection'
               namespace: '$(KUBE_NAMESPACE)'
-              command: 'rollout'
-              arguments: 'status deployment/pixelated --timeout=300s'
+              containers: |
+                $(IMAGE_NAME):$(Build.BuildNumber)
 
 - stage: DeployProduction
   displayName: 'Deploy to Production (AKS)'
@@ -375,7 +215,7 @@ stages:
   - deployment: DeployToProduction
     displayName: 'Deploy to Production'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     environment: 'production'
     strategy:
       runOnce:
@@ -392,14 +232,18 @@ stages:
               inlineScript: |
                 az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
 
-          - task: Kubernetes@1
-            displayName: 'Deploy to Production'
+          - task: KubernetesManifest@0
+            displayName: 'Deploy to Production (Blue-Green)'
             inputs:
-              connectionType: 'None'
+              action: 'deploy'
+              kubernetesServiceConnection: 'pixelated-aks-connection'
               namespace: '$(KUBE_NAMESPACE_PROD)'
-              command: 'apply'
-              useConfigurationFile: true
-              configuration: 'k8s/azure/'
+              strategy: 'blueGreen'
+              trafficSplitMethod: 'pod'
+              manifests: |
+                k8s/azure/
+              containers: |
+                $(IMAGE_NAME):$(Build.BuildNumber)
 
 - stage: HealthCheck
   displayName: 'Health Check'
@@ -409,8 +253,7 @@ stages:
   - job: HealthCheckStaging
     displayName: 'Staging Health Check'
     pool:
-      name: Default
-    timeoutInMinutes: '10'
+      vmImage: 'ubuntu-latest'
     steps:
     - task: AzureCLI@2
       displayName: 'Check Deployment Health'
@@ -429,15 +272,11 @@ stages:
           kubectl wait --for=condition=available --timeout=300s deployment/pixelated -n $(KUBE_NAMESPACE)
 
           # Test external connectivity
-          if [ -n "$(STAGING_URL)" ]; then
-            if curl -f --connect-timeout 10 --max-time 30 "$(STAGING_URL)/api/health"; then
-              echo "✅ Health check passed"
-            else
-              echo "❌ Health check failed"
-              exit 1
-            fi
+          if curl -f --connect-timeout 10 --max-time 30 "$(STAGING_URL)/api/health"; then
+            echo "✅ Health check passed"
           else
-            echo "⚠️ STAGING_URL not set, skipping external health check"
+            echo "❌ Health check failed"
+            exit 1
           fi
 
 - stage: PerformanceTest
@@ -448,8 +287,7 @@ stages:
   - job: PerformanceTests
     displayName: 'Run Performance Tests'
     pool:
-      name: Default
-    timeoutInMinutes: '30'
+      vmImage: 'ubuntu-latest'
     steps:
     - task: NodeTool@0
       inputs:
@@ -472,8 +310,7 @@ stages:
   - job: E2ETests
     displayName: 'Run E2E Tests'
     pool:
-      name: Default
-    timeoutInMinutes: '30'
+      vmImage: 'ubuntu-latest'
     steps:
     - task: NodeTool@0
       inputs:
@@ -500,10 +337,10 @@ stages:
   - job: ScheduleBlogPosts
     displayName: 'Schedule and Publish Blog Posts'
     pool:
-      name: Default
+      vmImage: 'ubuntu-latest'
     steps:
     - checkout: self
-      persistCredentials: 'true'
+      persistCredentials: true
 
     - task: NodeTool@0
       inputs:

@@ -4,28 +4,32 @@ const steps = [
         number: '01',
         title: 'Create Account',
         description: 'Start your journey with a simple signup process. Access our library of scenarios immediately.',
-        link: 'Get Started',
+        linkText: 'Get Started',
+        href: '/auth/signup',
         image: 'bg-indigo-500/10'
     },
     {
         number: '02',
         title: 'Select Scenario',
         description: 'Browse through our diverse catalog of clinical cases. Filter by condition, difficulty, or therapeutic modality.',
-        link: 'Browse Library',
+        linkText: 'Browse Library',
+        href: '/training',
         image: 'bg-pink-500/10'
     },
     {
         number: '03',
         title: 'Engage AI',
         description: 'Interact with the AI patient in real-time. Use your voice or text to conduct the therapy session.',
-        link: 'View Demo',
+        linkText: 'View Demo',
+        href: '/demo-hub',
         image: 'bg-emerald-500/10'
     },
     {
         number: '04',
         title: 'Analyze Results',
         description: 'Receive instant, data-driven feedback on your performance. Identify strengths and areas for growth.',
-        link: 'See Analytics',
+        linkText: 'See Analytics',
+        href: '/analytics',
         image: 'bg-orange-500/10'
     }
 ]
@@ -45,8 +49,8 @@ const steps = [
                         <div class="text-primary-500 font-mono mb-4 text-sm tracking-widest uppercase">Step {step.number}</div>
                         <h3 class="text-3xl md:text-4xl font-bold mb-6 text-white">{step.title}</h3>
                         <p class="text-lg text-slate-400 leading-relaxed mb-8">{step.description}</p>
-                         <a href="#" class="inline-flex items-center gap-2 text-white font-semibold border-b border-primary-500 pb-1 hover:text-primary-400 transition-colors">
-                            {step.link}
+                         <a href={step.href} class="inline-flex items-center gap-2 text-white font-semibold border-b border-primary-500 pb-1 hover:text-primary-400 transition-colors">
+                            {step.linkText}
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </a>
                     </div>
