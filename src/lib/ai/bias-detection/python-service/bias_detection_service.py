@@ -11,6 +11,8 @@ This Flask service provides a comprehensive bias detection API that integrates:
 - SHAP and LIME for model interpretability
 
 HIPAA Compliant with encryption, audit logging, and secure data handling.
+
+Sentry Metrics: https://docs.sentry.io/platforms/python/metrics/
 """
 
 # Standard library imports
@@ -30,6 +32,33 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
 from typing import Any, Dict, List, Optional
+
+# Sentry SDK for error tracking and metrics
+# Initialize early to capture startup errors
+try:
+    from bias_detection.sentry_metrics import (
+        init_sentry,
+        bias_metrics,
+        api_metrics,
+        service_metrics,
+        track_latency,
+    )
+    SENTRY_AVAILABLE = True
+    # Initialize Sentry at module load
+    init_sentry()
+except ImportError:
+    SENTRY_AVAILABLE = False
+    # Create no-op stubs if sentry module isn't available
+    class NoOpMetrics:
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
+    bias_metrics = NoOpMetrics()
+    api_metrics = NoOpMetrics()
+    service_metrics = NoOpMetrics()
+    def track_latency(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
 
 # Third-party libraries
 import jwt
@@ -461,6 +490,9 @@ class BiasDetectionService:
         """Perform comprehensive bias analysis on a therapeutic session"""
         start_time = time.time()
 
+        # Emit Sentry metric for analysis start
+        bias_metrics.analysis_started(session_data.session_id, "comprehensive")
+
         try:
             # Log analysis start
             await self.audit_logger.log_event(
@@ -534,12 +566,35 @@ class BiasDetectionService:
                 sensitive_data=True,
             )
 
+            # Emit Sentry metrics for completion
+            duration_ms = (time.time() - start_time) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id,
+                "comprehensive",
+                duration_ms,
+                success=True,
+            )
+            bias_metrics.score_recorded("comprehensive", overall_score)
+
+            # Track alert level if triggered
+            if alert_level in ("warning", "high", "critical"):
+                bias_metrics.alert_triggered(alert_level, "comprehensive", overall_score)
+
             logger.info(
                 f"Bias analysis completed for session {session_data.session_id} in {time.time() - start_time:.2f}s"
             )
             return result
 
         except Exception as e:
+            # Emit Sentry metric for failure
+            duration_ms = (time.time() - start_time) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id,
+                "comprehensive",
+                duration_ms,
+                success=False,
+            )
+
             # Log error
             await self.audit_logger.log_event(
                 "analysis_error",
@@ -556,6 +611,9 @@ class BiasDetectionService:
         self, session_data: SessionData
     ) -> dict[str, Any]:
         """Run preprocessing layer bias analysis using AIF360 and demographic analysis"""
+        layer_start = time.time()
+        bias_metrics.analysis_started(session_data.session_id, "preprocessing")
+
         try:
             result = {
                 "layer": "preprocessing",
@@ -597,9 +655,20 @@ class BiasDetectionService:
                     ]
                 )
 
+            # Emit completion metrics
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "preprocessing", duration_ms, success=True
+            )
+            bias_metrics.score_recorded("preprocessing", result["bias_score"])
+
             return result
 
         except Exception as e:
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "preprocessing", duration_ms, success=False
+            )
             logger.error(f"Preprocessing analysis failed: {e}")
             return {
                 "layer": "preprocessing",
@@ -614,6 +683,9 @@ class BiasDetectionService:
         self, session_data: SessionData
     ) -> dict[str, Any]:
         """Run model-level bias analysis using Fairlearn and interpretability tools"""
+        layer_start = time.time()
+        bias_metrics.analysis_started(session_data.session_id, "model_level")
+
         try:
             result = {
                 "layer": "model_level",
@@ -657,9 +729,20 @@ class BiasDetectionService:
                     ]
                 )
 
+            # Emit completion metrics
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "model_level", duration_ms, success=True
+            )
+            bias_metrics.score_recorded("model_level", result["bias_score"])
+
             return result
 
         except Exception as e:
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "model_level", duration_ms, success=False
+            )
             logger.error(f"Model-level analysis failed: {e}")
             return {
                 "layer": "model_level",
@@ -674,6 +757,9 @@ class BiasDetectionService:
         self, session_data: SessionData
     ) -> dict[str, Any]:
         """Run interactive analysis using What-If Tool concepts and user interaction patterns"""
+        layer_start = time.time()
+        bias_metrics.analysis_started(session_data.session_id, "interactive")
+
         try:
             result = {
                 "layer": "interactive",
@@ -711,9 +797,20 @@ class BiasDetectionService:
                     ]
                 )
 
+            # Emit completion metrics
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "interactive", duration_ms, success=True
+            )
+            bias_metrics.score_recorded("interactive", result["bias_score"])
+
             return result
 
         except Exception as e:
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "interactive", duration_ms, success=False
+            )
             logger.error(f"Interactive analysis failed: {e}")
             return {
                 "layer": "interactive",
@@ -728,6 +825,9 @@ class BiasDetectionService:
         self, session_data: SessionData
     ) -> dict[str, Any]:
         """Run evaluation analysis using Hugging Face evaluate and custom metrics"""
+        layer_start = time.time()
+        bias_metrics.analysis_started(session_data.session_id, "evaluation")
+
         try:
             result = {
                 "layer": "evaluation",
@@ -766,9 +866,20 @@ class BiasDetectionService:
                     ]
                 )
 
+            # Emit completion metrics
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "evaluation", duration_ms, success=True
+            )
+            bias_metrics.score_recorded("evaluation", result["bias_score"])
+
             return result
 
         except Exception as e:
+            duration_ms = (time.time() - layer_start) * 1000
+            bias_metrics.analysis_completed(
+                session_data.session_id, "evaluation", duration_ms, success=False
+            )
             logger.error(f"Evaluation analysis failed: {e}")
             return {
                 "layer": "evaluation",
@@ -1588,6 +1699,9 @@ def health_check():
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def analyze_session():
     """Analyze session for bias"""
+    request_start = time.time()
+    api_metrics.request_received("/analyze", "POST")
+
     try:
         # Set default user_id only in development
         if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
@@ -1597,15 +1711,18 @@ def analyze_session():
         try:
             data = request.get_json()
         except Exception:
+            api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
             return jsonify({"error": "No data provided"}), 400
 
         if not data:
+            api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
             return jsonify({"error": "No data provided"}), 400
 
         # Validate required fields
         required_fields = ["session_id", "participant_demographics", "content"]
         for field in required_fields:
             if field not in data:
+                api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
         # Create SessionData object
@@ -1625,9 +1742,13 @@ def analyze_session():
             bias_service.analyze_session(session_data, getattr(g, "user_id", "unknown"))
         )
 
+        api_metrics.request_completed("/analyze", "POST", 200, (time.time() - request_start) * 1000)
         return jsonify(result)
 
     except Exception as e:
+        duration_ms = (time.time() - request_start) * 1000
+        api_metrics.request_completed("/analyze", "POST", 500, duration_ms)
+        api_metrics.error("/analyze", type(e).__name__)
         logger.error(f"Analysis endpoint error: {e}", exc_info=True)
         return (
             jsonify({"error": "An internal error occurred. Please contact support."}),

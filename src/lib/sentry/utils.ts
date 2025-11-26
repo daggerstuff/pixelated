@@ -1,8 +1,11 @@
 /**
- * Sentry Utilities for Manual Error Reporting
+ * Sentry Utilities for Manual Error Reporting and Metrics
  *
  * This file provides utilities for manually capturing errors,
- * messages, and performance data in the Pixelated Empathy application.
+ * messages, metrics, and performance data in the Pixelated Empathy application.
+ *
+ * Metrics API: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+ * Requires Sentry JS SDK ≥ 10.25.0 (current: 10.27.0)
  */
 
 import * as Sentry from '@sentry/astro'
@@ -168,6 +171,295 @@ export const performance = {
       finish: () => {},
     }
   },
+}
+
+// ============================================
+// Sentry Metrics API
+// ============================================
+// Reference: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+
+/**
+ * Sentry metrics attributes for adding context to metrics
+ */
+export interface MetricAttributes {
+  [key: string]: string | number | boolean
+}
+
+/**
+ * Counter metric - track incrementing values
+ * Use for: button clicks, API calls, feature usage, error counts
+ *
+ * @example
+ * ```ts
+ * // Track button clicks
+ * countMetric('button_click', 1, { button: 'submit', page: 'login' })
+ *
+ * // Track API calls
+ * countMetric('api_call', 1, { endpoint: '/api/analyze', method: 'POST' })
+ *
+ * // Track emotional analysis completions
+ * countMetric('emotion_analysis_completed', 1, {
+ *   session_type: 'therapy',
+ *   model: 'mental-llama'
+ * })
+ * ```
+ */
+export function countMetric(
+  name: string,
+  value: number = 1,
+  attributes?: MetricAttributes,
+): void {
+  try {
+    Sentry.metrics.count(name, value, { attributes })
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry Metrics] Failed to emit count metric:', error)
+    }
+  }
+}
+
+/**
+ * Gauge metric - track values that can go up and down
+ * Use for: queue depths, memory usage, active sessions, concurrent users
+ *
+ * @example
+ * ```ts
+ * // Track active sessions
+ * gaugeMetric('active_sessions', 42, { region: 'us-west' })
+ *
+ * // Track queue depth
+ * gaugeMetric('bias_analysis_queue', 15, { priority: 'high' })
+ *
+ * // Track memory usage in MB
+ * gaugeMetric('memory_usage', 512, { unit: 'megabyte', service: 'main' })
+ * ```
+ */
+export function gaugeMetric(
+  name: string,
+  value: number,
+  attributes?: MetricAttributes,
+  unit?: string,
+): void {
+  try {
+    Sentry.metrics.gauge(name, value, { attributes, unit })
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
+    }
+  }
+}
+
+/**
+ * Distribution metric - track value distributions (percentiles: p50, p90, p99)
+ * Use for: response times, request sizes, processing durations
+ *
+ * @example
+ * ```ts
+ * // Track API response time
+ * distributionMetric('api_response_time', 187.5, {
+ *   attributes: { endpoint: '/api/analyze' },
+ *   unit: 'millisecond'
+ * })
+ *
+ * // Track bias score distribution
+ * distributionMetric('bias_score', 0.45, {
+ *   attributes: { analysis_type: 'preprocessing' }
+ * })
+ *
+ * // Track emotion analysis latency
+ * distributionMetric('emotion_analysis_latency', 234, {
+ *   attributes: { model: 'emotion-llama' },
+ *   unit: 'millisecond'
+ * })
+ * ```
+ */
+export function distributionMetric(
+  name: string,
+  value: number,
+  options?: {
+    attributes?: MetricAttributes
+    unit?: string
+  },
+): void {
+  try {
+    Sentry.metrics.distribution(name, value, {
+      attributes: options?.attributes,
+      unit: options?.unit,
+    })
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry Metrics] Failed to emit distribution metric:', error)
+    }
+  }
+}
+
+// ============================================
+// Domain-specific Metric Helpers
+// ============================================
+
+/**
+ * Track emotion analysis metrics
+ */
+export const emotionMetrics = {
+  /**
+   * Track when an emotion analysis is performed
+   */
+  analysisPerformed(attributes: {
+    model: string
+    sessionType?: string
+    success?: boolean
+  }): void {
+    countMetric('emotion.analysis_performed', 1, {
+      model: attributes.model,
+      session_type: attributes.sessionType ?? 'unknown',
+      success: attributes.success ?? true,
+    })
+  },
+
+  /**
+   * Track emotion analysis latency
+   */
+  analysisLatency(durationMs: number, model: string): void {
+    distributionMetric('emotion.analysis_latency', durationMs, {
+      attributes: { model },
+      unit: 'millisecond',
+    })
+  },
+
+  /**
+   * Track emotion score distribution
+   */
+  scoreDistribution(
+    emotionType: string,
+    score: number,
+    model: string,
+  ): void {
+    distributionMetric('emotion.score', score, {
+      attributes: { emotion_type: emotionType, model },
+    })
+  },
+}
+
+/**
+ * Track bias detection metrics
+ */
+export const biasMetrics = {
+  /**
+   * Track when a bias analysis is performed
+   */
+  analysisPerformed(attributes: {
+    layer: string
+    sessionId?: string
+    success?: boolean
+  }): void {
+    countMetric('bias.analysis_performed', 1, {
+      layer: attributes.layer,
+      success: attributes.success ?? true,
+    })
+  },
+
+  /**
+   * Track bias analysis latency
+   */
+  analysisLatency(durationMs: number, layer: string): void {
+    distributionMetric('bias.analysis_latency', durationMs, {
+      attributes: { layer },
+      unit: 'millisecond',
+    })
+  },
+
+  /**
+   * Track bias score distribution
+   */
+  scoreDistribution(biasType: string, score: number): void {
+    distributionMetric('bias.score', score, {
+      attributes: { bias_type: biasType },
+    })
+  },
+
+  /**
+   * Track bias alert levels
+   */
+  alertTriggered(level: 'low' | 'warning' | 'high' | 'critical'): void {
+    countMetric('bias.alert_triggered', 1, { alert_level: level })
+  },
+}
+
+/**
+ * Track API performance metrics
+ */
+export const apiMetrics = {
+  /**
+   * Track API request
+   */
+  request(endpoint: string, method: string, statusCode?: number): void {
+    countMetric('api.request', 1, {
+      endpoint,
+      method,
+      status_code: statusCode ?? 0,
+    })
+  },
+
+  /**
+   * Track API response time
+   */
+  responseTime(endpoint: string, durationMs: number, method: string = 'GET'): void {
+    distributionMetric('api.response_time', durationMs, {
+      attributes: { endpoint, method },
+      unit: 'millisecond',
+    })
+  },
+
+  /**
+   * Track API errors
+   */
+  error(endpoint: string, errorType: string): void {
+    countMetric('api.error', 1, { endpoint, error_type: errorType })
+  },
+}
+
+/**
+ * Track therapeutic session metrics
+ */
+export const sessionMetrics = {
+  /**
+   * Track session started
+   */
+  started(sessionType: string): void {
+    countMetric('session.started', 1, { session_type: sessionType })
+  },
+
+  /**
+   * Track session completed
+   */
+  completed(sessionType: string, durationMinutes: number): void {
+    countMetric('session.completed', 1, { session_type: sessionType })
+    distributionMetric('session.duration', durationMinutes, {
+      attributes: { session_type: sessionType },
+      unit: 'minute',
+    })
+  },
+
+  /**
+   * Track active sessions gauge
+   */
+  activeSessions(count: number): void {
+    gaugeMetric('session.active_count', count)
+  },
+}
+
+/**
+ * Flush all pending metrics to Sentry
+ * Call this before process exit or page unload if needed
+ */
+export async function flushMetrics(): Promise<void> {
+  try {
+    await Sentry.flush()
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry Metrics] Failed to flush metrics:', error)
+    }
+  }
 }
 
 // Export commonly used Sentry functions for convenience

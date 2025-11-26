@@ -396,6 +396,21 @@ stages:
                       echo "   Release: $RELEASE_VERSION"
                       echo "   Auth Token: ${SENTRY_AUTH_TOKEN:0:10}... (truncated)"
 
+                      # Check if variables are set
+                      if [[ -z "$SENTRY_ORG" ]]; then
+                        echo "❌ SENTRY_ORG is not set. Add it to Azure DevOps variable group."
+                        exit 0
+                      fi
+                      if [[ -z "$SENTRY_PROJECT" ]]; then
+                        echo "❌ SENTRY_PROJECT is not set. Add it to Azure DevOps variable group."
+                        echo "   Expected value: pixel-astro"
+                        exit 0
+                      fi
+                      if [[ -z "$SENTRY_AUTH_TOKEN" ]]; then
+                        echo "❌ SENTRY_AUTH_TOKEN is not set. Add it to Azure DevOps variable group."
+                        exit 0
+                      fi
+
                       # Verify token has access to the organization
                       echo ""
                       echo "🔍 Verifying Sentry access..."
@@ -412,7 +427,22 @@ stages:
                       # List available projects to help debug
                       echo ""
                       echo "📦 Available projects in organization '$SENTRY_ORG':"
-                      sentry-cli projects list 2>&1 || echo "   (Could not list projects)"
+                      AVAILABLE_PROJECTS=$(sentry-cli projects list 2>&1) || true
+                      echo "$AVAILABLE_PROJECTS"
+
+                      # Check if the configured project exists
+                      if ! echo "$AVAILABLE_PROJECTS" | grep -q "$SENTRY_PROJECT"; then
+                        echo ""
+                        echo "❌ Project '$SENTRY_PROJECT' not found in organization '$SENTRY_ORG'"
+                        echo ""
+                        echo "   Possible fixes:"
+                        echo "   1. Update SENTRY_PROJECT in Azure DevOps to match one of the projects above"
+                        echo "   2. Create project '$SENTRY_PROJECT' in Sentry: https://sentry.io/settings/$SENTRY_ORG/projects/"
+                        echo "   3. Ensure the auth token has access to the project"
+                        echo ""
+                        echo "⚠️ Skipping release creation due to project mismatch"
+                        exit 0
+                      fi
 
                       # Create Sentry release
                       echo ""
@@ -420,7 +450,7 @@ stages:
                       if sentry-cli releases new "$RELEASE_VERSION" 2>&1; then
                         echo "✅ Release created: $RELEASE_VERSION"
                       else
-                        echo "⚠️ Release may already exist or project '$SENTRY_PROJECT' not found"
+                        echo "⚠️ Release may already exist"
                       fi
 
                       # Set commits

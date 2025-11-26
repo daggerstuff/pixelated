@@ -104,7 +104,7 @@ This document outlines all variables and secrets that must be configured in Azur
 |--------------|-------|---------|-------------|
 | `SENTRY_DSN` | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No | Sentry DSN for error tracking |
 | `SENTRY_ORG` | `pixelated-empathy-dq` | ❌ No | Sentry organization slug |
-| `SENTRY_PROJECT` | `pixel-astro` | ❌ No | Sentry project slug |
+| `SENTRY_PROJECT` | `pixel-astro` | ❌ No | Sentry project slug (environments separated via `-e staging`/`-e production` flags) |
 | `SENTRY_AUTH_TOKEN` | `sntrys_eyJ...` | ✅ Yes | Sentry authentication token for releases |
 
 ### Deployment Configuration Variables

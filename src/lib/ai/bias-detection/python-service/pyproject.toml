@@ -29,6 +29,10 @@ dependencies = [
     "structlog>=25.4.0",
     "prometheus-client>=0.19.0",
     
+    # Sentry SDK for error tracking and metrics
+    # Reference: https://docs.sentry.io/platforms/python/metrics/
+    "sentry-sdk[flask]>=2.44.0",
+    
     # AI/ML Dependencies
     "tensorflow>=2.13.0",
     "torch>=2.8.0",
