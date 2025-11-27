@@ -2,11 +2,7 @@
 // Grouped imports for better organization
 // Style imports
 import '@unocss/reset/tailwind.css'
-import '@/styles/unified-dark-theme-v3.css'
-import '@/styles/design-system.css'
 import '@/styles/main.css'
-import '@/styles/enhanced-theme.css'
-import '@/styles/pixelated-theme.css'
 import '@/styles/prose.css'
 import '@/styles/markdown.css'
 import '@/styles/page.css'
@@ -17,7 +13,7 @@ import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
 
 // Layout components
 import Header from '@/components/layout/Header.astro'
-import Footer from '@/components/layout/Footer.astro'
+import Footer from '@/components/mizu/Footer.astro'
 import Sidebar from '@/components/layout/Sidebar.astro'
 
 // Define a more robust props interface with JSDoc comments
@@ -55,30 +51,35 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="dark enhanced-dark-theme h-full scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
   <Head {title} {description} ogImage={metaImage} />
   <style is:global>
-    /* Override main.css white background with Mizu theme dark colors */
+    /* Mizu theme dark colors - default for all pages */
     :root {
-      --c-bg: var(--color-primary, #0a0a0a);
-      --c-text: var(--text-primary, #ffffff);
-      --c-scrollbar: var(--color-tertiary, #181818);
-      --c-scrollbar-hover: var(--color-elevated, #1f1f1f);
+      --c-bg: #0f172a;
+      --c-text: #f8fafc;
+      --c-scrollbar: #181818;
+      --c-scrollbar-hover: #1f1f1f;
     }
     
     html {
-      background-color: var(--color-primary, #0a0a0a);
-      color: var(--text-primary, #ffffff);
+      background-color: #0f172a;
+      color: #f8fafc;
     }
     
     body {
-      background-color: var(--color-primary, #0a0a0a);
-      color: var(--text-primary, #ffffff);
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    
+    /* Ensure dark mode is applied */
+    html.dark {
+      --c-bg: #0f172a;
+      --c-text: #f8fafc;
     }
   </style>
   <body
-    class="dark enhanced-dark-theme relative font-sans flex flex-col min-h-screen"
-    style="background: var(--color-primary, #0a0a0a); color: var(--text-primary, #ffffff);"
+    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
   >
     <!-- Skip to content link for accessibility -->
     <a
