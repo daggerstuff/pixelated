@@ -1,7 +1,5 @@
 ---
 import '@unocss/reset/tailwind.css'
-import '@/styles/unified-dark-theme-v3.css'
-import '@/styles/design-system.css'
 import '@/styles/main.css'
 import '@/styles/prose.css'
 import '@/styles/markdown.css'
@@ -10,9 +8,9 @@ import '@/styles/page.css'
 import Head from '@/components/base/Head.astro'
 import Background from '@/components/backgrounds/Background.astro'
 import Link from '@/components/base/Link.astro'
-import NavBar from '@/components/nav/NavBar.astro'
+import Navbar from '@/components/mizu/Navbar.astro'
 import BackLink from '@/components/widgets/BackLink.astro'
-import Footer from '@/components/base/Footer.astro'
+import Footer from '@/components/mizu/Footer.astro'
 import ToTopButton from '@/components/widgets/ToTopButton.astro'
 import Backdrop from '@/components/base/Backdrop.astro'
 
@@ -53,29 +51,34 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
   <head>
     <Head {title} {description} {ogImage} {pubDate} {lastModDate} />
     <style is:global>
-      /* Override main.css white background with Mizu theme dark colors */
+      /* Mizu theme dark colors - default for all pages */
       :root {
-        --c-bg: var(--color-primary, #0a0a0a);
-        --c-text: var(--text-primary, #ffffff);
-        --c-scrollbar: var(--color-tertiary, #181818);
-        --c-scrollbar-hover: var(--color-elevated, #1f1f1f);
+        --c-bg: #0f172a;
+        --c-text: #f8fafc;
+        --c-scrollbar: #181818;
+        --c-scrollbar-hover: #1f1f1f;
       }
       
       html {
-        background-color: var(--color-primary, #0a0a0a);
-        color: var(--text-primary, #ffffff);
+        background-color: #0f172a;
+        color: #f8fafc;
       }
       
       body {
-        background-color: var(--color-primary, #0a0a0a);
-        color: var(--text-primary, #ffffff);
+        background-color: #0f172a;
+        color: #f8fafc;
+      }
+      
+      /* Ensure dark mode is applied */
+      html.dark {
+        --c-bg: #0f172a;
+        --c-text: #f8fafc;
       }
     </style>
   </head>
 
   <body
-    class="relative flex flex-col min-h-screen
-      font-sans"
+    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
     style={Object.keys(style).length !== 0 ? style : undefined}
     data-no-sliding={enableSlideEnterAnim ? undefined : ''}
   >
@@ -91,10 +94,10 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     </Link>
 
     <!-- Nav Bar -->
-    <NavBar />
+    <Navbar />
 
     <!-- Main -->
-    <main id="main" class="px-7 py-10">
+    <main id="main" class="flex-grow w-full px-7 py-10 pt-24">
       <!-- Content -->
       <slot />
       <!-- Share -->
