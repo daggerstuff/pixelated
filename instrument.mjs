@@ -35,6 +35,18 @@ let Sentry = null
 let nodeProfilingIntegration = () => null
 let httpIntegration = () => null
 
+const SUPPORTED_PROFILING_NODE_MAJORS = new Set([16, 18, 20, 22, 24])
+
+const getNodeMajorVersion = () => {
+  try {
+    const [major = ''] = (process.versions?.node ?? '').split('.')
+    const parsed = Number.parseInt(major, 10)
+    return Number.isFinite(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
 try {
   const sentryNode = await import('@sentry/node')
   Sentry = sentryNode
@@ -42,8 +54,26 @@ try {
     ? sentryNode.httpIntegration
     : () => null
 
-  const profiling = await import('@sentry/profiling-node')
-  nodeProfilingIntegration = profiling?.nodeProfilingIntegration ?? (() => null)
+  const nodeMajor = getNodeMajorVersion()
+  const profilingSupported = nodeMajor !== null && SUPPORTED_PROFILING_NODE_MAJORS.has(nodeMajor)
+
+  if (profilingSupported) {
+    try {
+      const profiling = await import('@sentry/profiling-node')
+      nodeProfilingIntegration = profiling?.nodeProfilingIntegration ?? (() => null)
+    } catch (profilingError) {
+      console.warn(
+        `[Sentry Profiling] Failed to load profiling addon on Node.js ${process.version}. ` +
+          'Ensure build tools are available to compile @sentry/profiling-node from source.',
+        profilingError
+      )
+    }
+  } else {
+    console.warn(
+      `[Sentry Profiling] Node.js ${process.version} is not in the supported LTS list ` +
+        '(16, 18, 20, 22, 24). Profiling integration will be disabled.'
+    )
+  }
 } catch (error) {
   const message = '[Sentry] Node SDK not available — disabling instrumentation. Install @sentry/node to enable full telemetry.'
   if (process.env.NODE_ENV === 'production') {
