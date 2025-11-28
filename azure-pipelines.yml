@@ -47,12 +47,6 @@ variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
 
-  # Convert parameters to variables for runtime conditions
-  - name: TRIGGER_OVH_OLLAMA_BUILD
-    value: ${{ parameters.TRIGGER_OVH_OLLAMA_BUILD }}
-  - name: TRIGGER_AI_TRAINING
-    value: ${{ parameters.TRIGGER_AI_TRAINING }}
-
   # Derived variables (computed from variable group values)
   - name: DOCKER_REGISTRY
     value: "$(AZURE_CONTAINER_REGISTRY).azurecr.io"
@@ -788,7 +782,7 @@ stages:
   - stage: OVHAITraining
     displayName: "OVH AI Training"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
-    condition: and(succeeded(), eq(variables['TRIGGER_AI_TRAINING'], 'true'))
+    condition: ${{ and(succeeded(), eq(parameters.TRIGGER_AI_TRAINING, 'true')) }}
     jobs:
       - job: PrepareTrainingData
         displayName: "Prepare Training Data"
@@ -926,7 +920,7 @@ stages:
   - stage: OVHOllamaBuild
     displayName: "OVH Ollama Image Build"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_OVH_OLLAMA_BUILD=true
-    condition: eq(variables['TRIGGER_OVH_OLLAMA_BUILD'], 'true')
+    condition: ${{ eq(parameters.TRIGGER_OVH_OLLAMA_BUILD, 'true') }}
     jobs:
       - job: BuildOllamaImage
         displayName: "Build and Push Ollama Image"
