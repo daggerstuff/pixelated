@@ -26,6 +26,23 @@ pr:
       - master
       - main
       - develop
+
+parameters:
+  - name: TRIGGER_OVH_OLLAMA_BUILD
+    displayName: "Trigger OVH Ollama Build"
+    type: string
+    default: "false"
+    values:
+      - "true"
+      - "false"
+  - name: TRIGGER_AI_TRAINING
+    displayName: "Trigger OVH AI Training"
+    type: string
+    default: "false"
+    values:
+      - "true"
+      - "false"
+
 variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
@@ -765,7 +782,7 @@ stages:
   - stage: OVHAITraining
     displayName: "OVH AI Training"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
-    condition: and(succeeded(), eq(variables['TRIGGER_AI_TRAINING'], 'true'))
+    condition: and(succeeded(), eq(parameters.TRIGGER_AI_TRAINING, 'true'))
     jobs:
       - job: PrepareTrainingData
         displayName: "Prepare Training Data"
@@ -896,6 +913,63 @@ stages:
               OVH_AI_TOKEN: $(OVH_AI_TOKEN)
               WANDB_API_KEY: $(WANDB_API_KEY)
               OVH_IMAGE: $(OVH_IMAGE)
+
+  # ============================================
+  # OVH Ollama Image Build Stage (Manual Trigger)
+  # ============================================
+  - stage: OVHOllamaBuild
+    displayName: "OVH Ollama Image Build"
+    # Manual trigger only - run with: az pipelines run --parameters TRIGGER_OVH_OLLAMA_BUILD=true
+    condition: eq(parameters.TRIGGER_OVH_OLLAMA_BUILD, 'true')
+    jobs:
+      - job: BuildOllamaImage
+        displayName: "Build and Push Ollama Image"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+
+          - task: Bash@3
+            displayName: "Install ovhai CLI"
+            inputs:
+              targetType: "inline"
+              script: |
+                curl -sSL https://cli.us-east-va.ai.cloud.ovh.us/install.sh | bash
+                export PATH="$HOME/bin:$PATH"
+                ovhai --version || echo "CLI installed"
+
+          - task: Bash@3
+            displayName: "Build and Push Ollama Image"
+            inputs:
+              targetType: "inline"
+              script: |
+                export PATH="$HOME/bin:$PATH"
+
+                # Authenticate
+                ovhai login --token "$OVH_AI_TOKEN" || exit 1
+
+                # Login to registry
+                ovhai registry login
+
+                # Build image
+                cd ai
+                docker build -f ovh/Dockerfile.ollama -t pixelated-ollama:$(Build.BuildNumber) .
+
+                # Get registry URL and push
+                REGISTRY=$(ovhai registry list | tail -n +2 | awk '{print $NF}' || echo "")
+                if [ -n "$REGISTRY" ]; then
+                  docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                  docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:latest"
+                  docker push "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                  docker push "$REGISTRY/pixelated-ollama:latest"
+                  echo "##vso[task.setvariable variable=OVH_OLLAMA_IMAGE]$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                  echo "✅ Image pushed: $REGISTRY/pixelated-ollama:latest"
+                else
+                  echo "##vso[task.logissue type=warning]No OVH registry found"
+                  exit 1
+                fi
+            env:
+              OVH_AI_TOKEN: $(OVH_AI_TOKEN)
 
   - stage: SchedulePosts
     displayName: "Schedule Blog Posts"
