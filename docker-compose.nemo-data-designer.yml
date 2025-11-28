@@ -11,16 +11,19 @@ services:
     ports:
       - "8000:8000"  # API port
     environment:
-      # NVIDIA API Key for accessing models
-      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
-      # Data Designer configuration
-      - DATA_DESIGNER_LOG_LEVEL=INFO
-      - DATA_DESIGNER_HOST=0.0.0.0
-      - DATA_DESIGNER_PORT=8000
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
+      DATA_DESIGNER_LOG_LEVEL: INFO
+      DATA_DESIGNER_HOST: 0.0.0.0
+      DATA_DESIGNER_PORT: 8000
+      PIPELINE_PROMPT_ROOT: /workspace/prompt_corpus
+      PIPELINE_EDGE_OUTPUT: /workspace/edge_cases
+      PIPELINE_STAGE_EXPORT: /workspace/stage_exports
     volumes:
-      # Persist data and configurations
       - nemo_data_designer_data:/data
       - nemo_data_designer_config:/config
+      - ./ai/dataset_pipeline/prompt_corpus:/workspace/prompt_corpus:ro
+      - ./ai/pipelines/edge_case_pipeline_standalone/output:/workspace/edge_cases
+      - ./ai/training_data_consolidated/final:/workspace/stage_exports
     networks:
       - nemo-network
     healthcheck:

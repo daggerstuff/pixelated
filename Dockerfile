@@ -1,7 +1,7 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
 # Builder stage: install deps and run the static build
-FROM node:25-alpine AS builder
+FROM node:24-alpine AS builder
 ARG PNPM_VERSION=10.23.0
 
 ARG PNPM_VERSION
@@ -34,7 +34,7 @@ RUN find /app/node_modules -name "*.map" -delete && \
     find /app/dist -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
-FROM node:25-alpine AS runtime
+FROM node:24-alpine AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
@@ -89,6 +89,6 @@ USER astro
 EXPOSE 4321
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:4321,path:'/',timeout:5000};const req=http.request(opts,res=>{if(res.statusCode>=200&&res.statusCode<500){process.exit(0);}process.exit(1);});req.on('error',()=>process.exit(1));req.end();"
+    CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:4321,path:'/',timeout:5000};const req=http.request(opts,res=>{if(res.statusCode>=200&&res.statusCode<500){process.exit(0);}process.exit(1);});req.on('error',()=>process.exit(1));req.end();"
 
 CMD ["node", "start-server.mjs"]
