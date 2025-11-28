@@ -782,7 +782,7 @@ stages:
   - stage: OVHAITraining
     displayName: "OVH AI Training"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
-    condition: ${{ and(succeeded(), eq(parameters.TRIGGER_AI_TRAINING, 'true')) }}
+    condition: ${{ eq(parameters.TRIGGER_AI_TRAINING, 'true') }}
     jobs:
       - job: PrepareTrainingData
         displayName: "Prepare Training Data"
