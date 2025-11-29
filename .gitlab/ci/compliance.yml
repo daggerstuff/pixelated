@@ -324,7 +324,7 @@ compliance:summary:
         '</svg>' > compliance-badge.svg
     
     - echo "✅ Compliance summary generated"
-    - echo "📊 Overall compliance status: COMPLIANT"
+    - 'echo "📊 Overall compliance status: COMPLIANT"'
   artifacts:
     reports:
       junit: test-results/compliance-junit.xml
