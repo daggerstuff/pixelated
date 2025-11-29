@@ -27,10 +27,18 @@ try {
 
   // If localhost, extract port for webServer configuration
   if (!isRemoteUrl) {
-    webServerUrl = baseURL
-    // Use explicit port if provided, otherwise keep undefined to use defaults
+    // Use explicit port if provided, otherwise use default based on CI context
     // (3000 for dev, 4321 for preview/CI)
-    webServerPort = explicitPort !== null ? explicitPort : undefined
+    webServerPort = explicitPort !== null ? explicitPort : (isCi ? 4321 : 3000)
+
+    // Construct webServerUrl with the correct port
+    // If the original URL had a port, use it; otherwise construct with the determined port
+    if (explicitPort !== null) {
+      webServerUrl = baseURL // URL already has the correct port
+    } else {
+      // Construct URL with the default port for the context
+      webServerUrl = `${url.protocol}//${url.hostname}:${webServerPort}`
+    }
   } else {
     webServerUrl = undefined
     webServerPort = undefined
