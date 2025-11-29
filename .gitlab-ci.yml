@@ -14,6 +14,12 @@ variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   STAGING_URL: "https://staging.pixelatedempathy.tech"
   PRODUCTION_URL: "https://pixelatedempathy.tech"
+  # GCP/GKE configuration - must be set as GitLab CI/CD project variables
+  # Required for deployment and health-check jobs
+  GCP_PROJECT_ID: $GCP_PROJECT_ID
+  GKE_CLUSTER_NAME: $GKE_CLUSTER_NAME
+  GKE_ZONE: $GKE_ZONE
+  GCP_SERVICE_ACCOUNT_KEY: $GCP_SERVICE_ACCOUNT_KEY
 
 # Validation jobs
 validate:dependencies:
