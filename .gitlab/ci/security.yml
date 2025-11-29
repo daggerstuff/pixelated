@@ -14,31 +14,31 @@ security:advanced:
   extends: .security-base
   needs: ["build"]
   script:
-    - echo "🔒 Running advanced security scanning..."
+    - echo " Running advanced security scanning..."
 
     # Install security tools
     - npm install -g @cyclonedx/cyclonedx-npm
     - npm install -g retire
 
     # Generate SBOM (Software Bill of Materials)
-    - echo "📋 Generating SBOM..."
+    - echo " Generating SBOM..."
     - cyclonedx-npm --output-format json --output-file sbom.json
-    - echo "✅ SBOM generated"
+    - echo " SBOM generated"
 
     # Dependency vulnerability scanning
-    - echo "🔍 Scanning dependencies for vulnerabilities..."
+    - echo " Scanning dependencies for vulnerabilities..."
     - retire --outputformat json --outputpath retire-report.json || true
 
     # Secrets detection
-    - echo "🔍 Detecting secrets..."
+    - echo " Detecting secrets..."
     - pnpm install --no-save detect-secrets
     - npx detect-secrets scan --all-files --baseline .secrets.baseline
 
     # License compliance check
-    - echo "📋 Checking license compliance..."
+    - echo " Checking license compliance..."
     - npx license-checker --json --out license-report.json
 
-    - echo "✅ Advanced security scanning completed"
+    - echo " Advanced security scanning completed"
   artifacts:
     reports:
       dependency_scanning: sbom.json
@@ -54,45 +54,45 @@ security:hipaa:
   extends: .security-base
   needs: ["build"]
   script:
-    - echo "🏥 Running HIPAA compliance validation..."
+    - echo " Running HIPAA compliance validation..."
 
     # Check for HIPAA-specific security requirements
-    - echo "🔍 Validating encryption requirements..."
+    - echo " Validating encryption requirements..."
     - |
       grep -r "aes-256-gcm" \
         src/ \
-        || echo "⚠️ AES-256-GCM encryption not found"
+        || echo 'WARNING: AES-256-GCM encryption not found'
 
-    - echo "🔍 Checking access controls..."
+    - echo " Checking access controls..."
     - |
       grep -r "authentication" \
         src/ \
-        || echo "⚠️ Authentication controls not found"
+        || echo 'WARNING: Authentication controls not found'
 
-    - echo "🔍 Validating audit controls..."
+    - echo " Validating audit controls..."
     - |
       grep -r "audit" \
         src/ \
-        || echo "⚠️ Audit controls not found"
+        || echo 'WARNING: Audit controls not found'
 
-    - echo "🔍 Checking data integrity..."
+    - echo " Checking data integrity..."
     - |
       grep -r "integrity" \
         src/ \
-        || echo "⚠️ Data integrity controls not found"
+        || echo 'WARNING: Data integrity controls not found'
 
-    - echo "🔍 Validating transmission security..."
+    - echo " Validating transmission security..."
     - |
       grep -r "tls\|ssl" \
         src/ \
-        || echo "⚠️ Transmission security not found"
+        || echo 'WARNING: Transmission security not found'
 
     # Run specialized HIPAA compliance tests
-    - echo "🏃 Running HIPAA compliance tests..."
+    - echo " Running HIPAA compliance tests..."
     - |
-      pnpm run test:hipaa || echo "⚠️ HIPAA tests failed"
+      pnpm run test:hipaa || echo 'WARNING: HIPAA tests failed'
 
-    - echo "✅ HIPAA compliance validation completed"
+    - echo " HIPAA compliance validation completed"
   artifacts:
     reports:
       junit: test-results/hipaa-junit.xml
@@ -107,44 +107,44 @@ security:mental-health:
   extends: .security-base
   needs: ["build"]
   script:
-    - echo "🧠 Running mental health data protection validation..."
+    - echo " Running mental health data protection validation..."
 
     # Crisis intervention data security
-    - echo "🔍 Validating crisis intervention data security..."
+    - echo " Validating crisis intervention data security..."
     - |
       grep -r "crisis" \
         src/ \
-        || echo "⚠️ Crisis intervention handling not found"
+        || echo 'WARNING: Crisis intervention handling not found'
 
     # Bias detection input sanitization
-    - echo "🔍 Checking bias detection input sanitization..."
+    - echo " Checking bias detection input sanitization..."
     - |
       grep -r "sanitize\|validate" \
         src/lib/ai/bias-detection/ \
-        || echo "⚠️ Input sanitization not found"
+        || echo 'WARNING: Input sanitization not found'
 
     # FHE implementation validation
-    - echo "🔍 Validating FHE implementation..."
+    - echo " Validating FHE implementation..."
     - |
       grep -r "fhe\|homomorphic" \
         src/ \
-        || echo "⚠️ FHE implementation not found"
+        || echo 'WARNING: FHE implementation not found'
 
     # Data anonymization capabilities
-    - echo "🔍 Checking data anonymization..."
+    - echo " Checking data anonymization..."
     - |
       grep -r "anonymize\|pseudonymize" \
         src/ \
-        || echo "⚠️ Data anonymization not found"
+        || echo 'WARNING: Data anonymization not found'
 
     # Secure communication channels
-    - echo "🔍 Validating secure communication..."
+    - echo " Validating secure communication..."
     - |
       grep -r "secure\|encrypted" \
         src/ \
-        || echo "⚠️ Secure communication not found"
+        || echo 'WARNING: Secure communication not found'
 
-    - echo "✅ Mental health data protection validation completed"
+    - echo " Mental health data protection validation completed"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
@@ -154,31 +154,31 @@ security:static-analysis:
   extends: .security-base
   needs: ["build"]
   script:
-    - echo "🔍 Running static code analysis..."
+    - echo " Running static code analysis..."
 
     # ESLint security rules
-    - echo "🔍 Running ESLint security analysis..."
-    - pnpm run lint:ci || echo "⚠️ ESLint security issues found"
+    - echo " Running ESLint security analysis..."
+    - pnpm run lint:ci || echo 'WARNING: ESLint security issues found'
 
     # TypeScript security checks
-    - echo "🔍 Running TypeScript security checks..."
-    - pnpm run typecheck:strict || echo "⚠️ TypeScript security issues found"
+    - echo " Running TypeScript security checks..."
+    - pnpm run typecheck:strict || echo 'WARNING: TypeScript security issues found'
 
     # Custom security patterns
-    - echo "🔍 Checking for security patterns..."
+    - echo " Checking for security patterns..."
     - |
       grep -r "eval\|Function\|setTimeout\|setInterval" \
         src/ \
-        || echo "✅ No dangerous patterns found"
+        || echo " No dangerous patterns found"
 
     # Input validation checks
-    - echo "🔍 Validating input handling..."
+    - echo " Validating input handling..."
     - |
       grep -r "validate\|sanitize" \
         src/ \
-        || echo "⚠️ Input validation not comprehensive"
+        || echo 'WARNING: Input validation not comprehensive'
 
-    - echo "✅ Static code analysis completed"
+    - echo " Static code analysis completed"
   artifacts:
     reports:
       codequality: eslint-report.json
@@ -196,46 +196,46 @@ security:container:
   services:
     - docker:dind
   script:
-    - echo "🔍 Running container security validation..."
+    - echo " Running container security validation..."
 
     # Container image analysis
-    - echo "🔍 Analyzing container image..."
+    - echo " Analyzing container image..."
     - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
 
     # Check for known vulnerabilities
-    - echo "🔍 Checking for known vulnerabilities..."
+    - echo " Checking for known vulnerabilities..."
     - |
       docker run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         aquasec/trivy image \
         --severity HIGH,CRITICAL \
-        ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || echo "⚠️ Vulnerabilities found"
+        ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || echo 'WARNING: Vulnerabilities found'
 
     # Container configuration validation
-    - echo "🔍 Validating container configuration..."
+    - echo " Validating container configuration..."
     - |
       docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} \
         > container-inspect.json
 
     # Check security configurations
-    - echo "🔍 Checking security configurations..."
+    - echo " Checking security configurations..."
     - USER=$(jq -r '.[0].Config.User' container-inspect.json)
     - |
       if [ "$USER" = "root" ] || [ "$USER" = "0" ]; then
-        echo "❌ Container runs as root user"
+        echo 'ERROR: Container runs as root user'
         exit 1
       else
-        echo "✅ Container runs as non-root user: $USER"
+        echo ' Container runs as non-root user: $USER'
       fi
 
     # Check for unnecessary capabilities
     - CAPABILITIES=$(jq -r '.[0].HostConfig.CapAdd' container-inspect.json)
     - |
       if [ "$CAPABILITIES" != "null" ]; then
-        echo "⚠️ Container has added capabilities: $CAPABILITIES"
+        echo 'WARNING: Container has added capabilities: $CAPABILITIES'
       fi
 
-    - echo "✅ Container security validation completed"
+    - echo " Container security validation completed"
   artifacts:
     reports:
       container_scanning: container-inspect.json
@@ -250,33 +250,33 @@ security:policy:
   extends: .security-base
   needs: ["build"]
   script:
-    - echo "📋 Enforcing security policies..."
+    - echo " Enforcing security policies..."
 
     # Check security policy compliance
-    - echo "🔍 Checking security policy compliance..."
+    - echo " Checking security policy compliance..."
     - |
       test -f security/security-policy.yaml \
-        || echo "⚠️ Security policy file not found"
+        || echo 'WARNING: Security policy file not found'
 
     # Validate security configurations
-    - echo "🔍 Validating security configurations..."
+    - echo " Validating security configurations..."
     - |
       test -f .checkov.yaml \
-        || echo "⚠️ Checkov configuration not found"
+        || echo 'WARNING: Checkov configuration not found'
 
     # Check for security documentation
-    - echo "🔍 Checking security documentation..."
+    - echo " Checking security documentation..."
     - |
       test -f security/pipeline-security.md \
-        || echo "⚠️ Security documentation not found"
+        || echo 'WARNING: Security documentation not found'
 
     # Validate incident response procedures
-    - echo "🔍 Validating incident response procedures..."
+    - echo " Validating incident response procedures..."
     - |
       test -f security/incident-response-procedures.md \
-        || echo "⚠️ Incident response procedures not found"
+        || echo 'WARNING: Incident response procedures not found'
 
-    - echo "✅ Security policy enforcement completed"
+    - echo " Security policy enforcement completed"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG

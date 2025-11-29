@@ -13,41 +13,41 @@ compliance:hipaa:
   extends: .compliance-base
   needs: ["build"]
   script:
-    - echo "🏥 Running HIPAA compliance validation..."
+    - echo " Running HIPAA compliance validation..."
     
     # HIPAA §164.312(a)(2)(iv) - Encryption
-    - echo "🔐 Validating encryption requirements (§164.312(a)(2)(iv))..."
-    - grep -r "aes-256-gcm\|encryption" config/ || echo "⚠️ Encryption not configured"
-    - test -f config/emotional_pipeline.yaml || echo "⚠️ Emotional pipeline config not found"
+    - echo " Validating encryption requirements (§164.312(a)(2)(iv))..."
+    - grep -r "aes-256-gcm\|encryption" config/ || echo "WARNING: Encryption not configured"
+    - test -f config/emotional_pipeline.yaml || echo "WARNING: Emotional pipeline config not found"
     
     # HIPAA §164.312(a)(1) - Access control
-    - echo "🔑 Validating access control (§164.312(a)(1))..."
-    - grep -r "authentication\|authorization" src/lib/auth/ || echo "⚠️ Access controls not found"
-    - test -f src/lib/auth/middleware.ts || echo "⚠️ Auth middleware not found"
+    - echo " Validating access control (§164.312(a)(1))..."
+    - grep -r "authentication\|authorization" src/lib/auth/ || echo "WARNING: Access controls not found"
+    - test -f src/lib/auth/middleware.ts || echo "WARNING: Auth middleware not found"
     
     # HIPAA §164.312(b) - Audit controls
-    - echo "📋 Validating audit controls (§164.312(b))..."
-    - grep -r "audit\|log" src/lib/audit/ || echo "⚠️ Audit controls not found"
-    - test -f src/lib/audit/audit-logger.ts || echo "⚠️ Audit logger not found"
+    - echo " Validating audit controls (§164.312(b))..."
+    - grep -r "audit\|log" src/lib/audit/ || echo "WARNING: Audit controls not found"
+    - test -f src/lib/audit/audit-logger.ts || echo "WARNING: Audit logger not found"
     
     # HIPAA §164.312(c)(1) - Data integrity
-    - echo "🔍 Validating data integrity (§164.312(c)(1))..."
-    - grep -r "integrity\|checksum" src/ || echo "⚠️ Data integrity not found"
+    - echo " Validating data integrity (§164.312(c)(1))..."
+    - grep -r "integrity\|checksum" src/ || echo "WARNING: Data integrity not found"
     
     # HIPAA §164.312(e)(1) - Transmission security
-    - echo "🌐 Validating transmission security (§164.312(e)(1))..."
-    - grep -r "tls\|ssl\|https" src/ || echo "⚠️ Transmission security not found"
+    - echo " Validating transmission security (§164.312(e)(1))..."
+    - grep -r "tls\|ssl\|https" src/ || echo "WARNING: Transmission security not found"
     
     # HIPAA §164.524 - Patient rights
-    - echo "👤 Validating patient rights management (§164.524)..."
-    - grep -r "patient\|rights\|consent" src/ || echo "⚠️ Patient rights not found"
+    - echo " Validating patient rights management (§164.524)..."
+    - grep -r "patient\|rights\|consent" src/ || echo "WARNING: Patient rights not found"
     
     # Run HIPAA-specific tests
-    - echo "🏃 Running HIPAA compliance tests..."
-    - pnpm run test:hipaa || echo "⚠️ HIPAA tests failed"
+    - echo " Running HIPAA compliance tests..."
+    - pnpm run test:hipaa || echo "WARNING: HIPAA tests failed"
     
     # Generate HIPAA compliance report
-    - echo "📊 Generating HIPAA compliance report..."
+    - echo " Generating HIPAA compliance report..."
     - |
       jq -n \
         --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -67,7 +67,7 @@ compliance:hipaa:
           status: "validated"
         }' > hipaa-compliance-report.json
     
-    - echo "✅ HIPAA compliance validation completed"
+    - echo " HIPAA compliance validation completed"
   artifacts:
     reports:
       junit: test-results/hipaa-junit.xml
@@ -82,38 +82,38 @@ compliance:gdpr:
   extends: .compliance-base
   needs: ["build"]
   script:
-    - echo "🇪🇺 Running GDPR compliance validation..."
+    - echo " Running GDPR compliance validation..."
     
     # Data protection by design
-    - echo "🔍 Validating data protection by design..."
-    - grep -r "privacy\|data_protection" src/ || echo "⚠️ Data protection not found"
+    - echo " Validating data protection by design..."
+    - grep -r "privacy\|data_protection" src/ || echo "WARNING: Data protection not found"
     
     # Consent management
-    - echo "✅ Validating consent management..."
-    - grep -r "consent\|permission" src/ || echo "⚠️ Consent management not found"
+    - echo " Validating consent management..."
+    - grep -r "consent\|permission" src/ || echo "WARNING: Consent management not found"
     
     # Data minimization
-    - echo "📊 Validating data minimization..."
-    - grep -r "minimize\|minimal" src/ || echo "⚠️ Data minimization not found"
+    - echo " Validating data minimization..."
+    - grep -r "minimize\|minimal" src/ || echo "WARNING: Data minimization not found"
     
     # Right to access
-    - echo "🔍 Validating right to access..."
-    - grep -r "access\|export" src/ || echo "⚠️ Access rights not found"
+    - echo " Validating right to access..."
+    - grep -r "access\|export" src/ || echo "WARNING: Access rights not found"
     
     # Right to erasure
-    - echo "🗑️ Validating right to erasure..."
-    - grep -r "delete\|erase\|remove" src/ || echo "⚠️ Erasure rights not found"
+    - echo " Validating right to erasure..."
+    - grep -r "delete\|erase\|remove" src/ || echo "WARNING: Erasure rights not found"
     
     # Data portability
-    - echo "📤 Validating data portability..."
-    - grep -r "portability\|export" src/ || echo "⚠️ Data portability not found"
+    - echo " Validating data portability..."
+    - grep -r "portability\|export" src/ || echo "WARNING: Data portability not found"
     
     # Privacy policy compliance
-    - echo "📋 Validating privacy policy compliance..."
-    - test -f docs/compliance/data-privacy-policy.md || echo "⚠️ Privacy policy not found"
+    - echo " Validating privacy policy compliance..."
+    - test -f docs/compliance/data-privacy-policy.md || echo "WARNING: Privacy policy not found"
     
     # Generate GDPR compliance report
-    - echo "📊 Generating GDPR compliance report..."
+    - echo " Generating GDPR compliance report..."
     - |
       jq -n \
         --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -134,7 +134,7 @@ compliance:gdpr:
           status: "validated"
         }' > gdpr-compliance-report.json
     
-    - echo "✅ GDPR compliance validation completed"
+    - echo " GDPR compliance validation completed"
   artifacts:
     reports:
       junit: test-results/gdpr-junit.xml
@@ -149,43 +149,43 @@ compliance:mental-health:
   extends: .compliance-base
   needs: ["build"]
   script:
-    - echo "🧠 Running mental health data protection validation..."
+    - echo " Running mental health data protection validation..."
     
     # Crisis intervention data security
-    - echo "🚨 Validating crisis intervention data security..."
-    - grep -r "crisis\|emergency" src/ || echo "⚠️ Crisis intervention handling not found"
-    - test -f src/lib/ai/crisis-detection/ || echo "⚠️ Crisis detection not found"
+    - echo " Validating crisis intervention data security..."
+    - grep -r "crisis\|emergency" src/ || echo "WARNING: Crisis intervention handling not found"
+    - test -f src/lib/ai/crisis-detection/ || echo "WARNING: Crisis detection not found"
     
     # Bias detection input sanitization
-    - echo "🔍 Validating bias detection input sanitization..."
-    - grep -r "sanitize.*input\|validate.*input" src/lib/ai/bias-detection/ || echo "⚠️ Input sanitization not found"
-    - test -f src/lib/ai/bias-detection/sanitizer.ts || echo "⚠️ Bias detection sanitizer not found"
+    - echo " Validating bias detection input sanitization..."
+    - grep -r "sanitize.*input\|validate.*input" src/lib/ai/bias-detection/ || echo "WARNING: Input sanitization not found"
+    - test -f src/lib/ai/bias-detection/sanitizer.ts || echo "WARNING: Bias detection sanitizer not found"
     
     # FHE (Fully Homomorphic Encryption) implementation
-    - echo "🔐 Validating FHE implementation..."
-    - grep -r "fhe\|homomorphic" src/ || echo "⚠️ FHE implementation not found"
-    - test -f src/lib/fhe/ || echo "⚠️ FHE library not found"
+    - echo " Validating FHE implementation..."
+    - grep -r "fhe\|homomorphic" src/ || echo "WARNING: FHE implementation not found"
+    - test -f src/lib/fhe/ || echo "WARNING: FHE library not found"
     
     # Data anonymization capabilities
-    - echo "🎭 Validating data anonymization..."
-    - grep -r "anonymize\|pseudonymize\|de-identify" src/ || echo "⚠️ Data anonymization not found"
-    - test -f src/lib/privacy/anonymizer.ts || echo "⚠️ Anonymizer not found"
+    - echo " Validating data anonymization..."
+    - grep -r "anonymize\|pseudonymize\|de-identify" src/ || echo "WARNING: Data anonymization not found"
+    - test -f src/lib/privacy/anonymizer.ts || echo "WARNING: Anonymizer not found"
     
     # Secure communication channels
-    - echo "🔒 Validating secure communication..."
-    - grep -r "secure.*channel\|encrypted.*communication" src/ || echo "⚠️ Secure communication not found"
-    - test -f src/lib/security/secure-messaging.ts || echo "⚠️ Secure messaging not found"
+    - echo " Validating secure communication..."
+    - grep -r "secure.*channel\|encrypted.*communication" src/ || echo "WARNING: Secure communication not found"
+    - test -f src/lib/security/secure-messaging.ts || echo "WARNING: Secure messaging not found"
     
     # Professional liability compliance
-    - echo "⚖️ Validating professional liability compliance..."
-    - test -f docs/compliance/professional-liability-review.md || echo "⚠️ Professional liability review not found"
+    - echo " Validating professional liability compliance..."
+    - test -f docs/compliance/professional-liability-review.md || echo "WARNING: Professional liability review not found"
     
     # User consent framework
-    - echo "✅ Validating user consent framework..."
-    - test -f docs/compliance/user-consent-framework.md || echo "⚠️ User consent framework not found"
+    - echo " Validating user consent framework..."
+    - test -f docs/compliance/user-consent-framework.md || echo "WARNING: User consent framework not found"
     
     # Generate mental health compliance report
-    - echo "📊 Generating mental health compliance report..."
+    - echo " Generating mental health compliance report..."
     - |
       jq -n \
         --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -206,7 +206,7 @@ compliance:mental-health:
           status: "validated"
         }' > mental-health-compliance-report.json
     
-    - echo "✅ Mental health data protection validation completed"
+    - echo " Mental health data protection validation completed"
   artifacts:
     reports:
       junit: test-results/mental-health-junit.xml
@@ -221,30 +221,30 @@ compliance:enterprise:
   extends: .compliance-base
   needs: ["build"]
   script:
-    - echo "🏢 Running enterprise compliance validation..."
+    - echo " Running enterprise compliance validation..."
     
     # Data retention policies
-    - echo "📅 Validating data retention policies..."
-    - grep -r "retention\|expire" config/ || echo "⚠️ Data retention not configured"
+    - echo " Validating data retention policies..."
+    - grep -r "retention\|expire" config/ || echo "WARNING: Data retention not configured"
     
     # Access logging
-    - echo "📝 Validating access logging..."
-    - grep -r "access.*log\|audit.*log" src/ || echo "⚠️ Access logging not found"
+    - echo " Validating access logging..."
+    - grep -r "access.*log\|audit.*log" src/ || echo "WARNING: Access logging not found"
     
     # Incident response procedures
-    - echo "🚨 Validating incident response procedures..."
-    - test -f security/incident-response-procedures.md || echo "⚠️ Incident response procedures not found"
+    - echo " Validating incident response procedures..."
+    - test -f security/incident-response-procedures.md || echo "WARNING: Incident response procedures not found"
     
     # Business continuity planning
-    - echo "🔄 Validating business continuity..."
-    - test -f docs/support/rollback-procedures.md || echo "⚠️ Rollback procedures not found"
+    - echo " Validating business continuity..."
+    - test -f docs/support/rollback-procedures.md || echo "WARNING: Rollback procedures not found"
     
     # Regulatory reporting
-    - echo "📊 Validating regulatory reporting capabilities..."
-    - grep -r "report\|compliance" docs/ || echo "⚠️ Regulatory reporting not found"
+    - echo " Validating regulatory reporting capabilities..."
+    - grep -r "report\|compliance" docs/ || echo "WARNING: Regulatory reporting not found"
     
     # Generate enterprise compliance report
-    - echo "📊 Generating enterprise compliance report..."
+    - echo " Generating enterprise compliance report..."
     - |
       jq -n \
         --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -263,7 +263,7 @@ compliance:enterprise:
           status: "validated"
         }' > enterprise-compliance-report.json
     
-    - echo "✅ Enterprise compliance validation completed"
+    - echo " Enterprise compliance validation completed"
   artifacts:
     reports:
       junit: test-results/enterprise-junit.xml
@@ -278,10 +278,10 @@ compliance:summary:
   extends: .compliance-base
   needs: ["compliance:hipaa", "compliance:gdpr", "compliance:mental-health", "compliance:enterprise"]
   script:
-    - echo "📊 Generating compliance summary report..."
+    - echo " Generating compliance summary report..."
     
     # Aggregate all compliance reports
-    - echo "📋 Aggregating compliance reports..."
+    - echo " Aggregating compliance reports..."
     - |
       jq -n \
         --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -315,7 +315,7 @@ compliance:summary:
         }' > compliance-summary.json
     
     # Generate compliance badge
-    - echo "🏷️ Generating compliance badge..."
+    - echo " Generating compliance badge..."
     - |
       printf '%s\n' \
         '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">' \
@@ -323,8 +323,8 @@ compliance:summary:
         '  <text x="10" y="14" fill="#fff" font-family="Arial" font-size="11">COMPLIANT</text>' \
         '</svg>' > compliance-badge.svg
     
-    - echo "✅ Compliance summary generated"
-    - 'echo "📊 Overall compliance status: COMPLIANT"'
+    - echo " Compliance summary generated"
+    - 'echo " Overall compliance status: COMPLIANT"'
   artifacts:
     reports:
       junit: test-results/compliance-junit.xml

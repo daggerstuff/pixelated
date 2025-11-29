@@ -13,34 +13,34 @@ monitoring:performance:
   extends: .monitoring-base
   needs: ["deploy:rolling"]
   script:
-    - echo "📈 Running performance monitoring..."
+    - echo " Running performance monitoring..."
     
     # Wait for deployment to stabilize
-    - echo "⏳ Waiting for deployment to stabilize..."
+    - echo " Waiting for deployment to stabilize..."
     - sleep 30
     
     # Test application performance
-    - echo "🔍 Testing application performance..."
+    - echo " Testing application performance..."
     - PERFORMANCE_TEST_URL="${STAGING_URL:-http://localhost:4321}"
     
     # Response time testing
-    - echo "⏱️ Testing response times..."
+    - echo " Testing response times..."
     - START_TIME=$(date +%s%N)
     - curl -s -o /dev/null -w "%{http_code},%{time_total},%{size_download}" "$PERFORMANCE_TEST_URL" > performance-metrics.csv
     - END_TIME=$(date +%s%N)
     - RESPONSE_TIME=$(( (END_TIME - START_TIME) / 1000000 ))
-    - echo "Response time: ${RESPONSE_TIME}ms"
+    - echo 'Response time: ${RESPONSE_TIME}ms'
     
     # Memory usage monitoring
-    - echo "🧠 Monitoring memory usage..."
-    - kubectl top pods -l app=pixelated --no-headers > memory-usage.txt || echo "⚠️ Could not get memory usage"
+    - echo " Monitoring memory usage..."
+    - kubectl top pods -l app=pixelated --no-headers > memory-usage.txt || echo 'WARNING: Could not get memory usage'
     
     # CPU usage monitoring
-    - echo "⚡ Monitoring CPU usage..."
-    - kubectl top pods -l app=pixelated --no-headers > cpu-usage.txt || echo "⚠️ Could not get CPU usage"
+    - echo " Monitoring CPU usage..."
+    - kubectl top pods -l app=pixelated --no-headers > cpu-usage.txt || echo 'WARNING: Could not get CPU usage'
     
     # Generate performance report
-    - echo "📊 Generating performance report..."
+    - echo " Generating performance report..."
     - |
       if [ -f memory-usage.txt ]; then
         MEMORY_USAGE_JSON=$(jq -Rs . memory-usage.txt 2>/dev/null || echo '"N/A"')
@@ -66,7 +66,7 @@ monitoring:performance:
       }
       EOF
     
-    - echo "✅ Performance monitoring completed"
+    - echo " Performance monitoring completed"
   artifacts:
     reports:
       performance: performance-report.json
@@ -81,52 +81,52 @@ monitoring:health:
   extends: .monitoring-base
   needs: ["deploy:rolling"]
   script:
-    - echo "🏥 Running health monitoring..."
+    - echo " Running health monitoring..."
     
     # Application health check
-    - echo "🔍 Checking application health..."
+    - echo " Checking application health..."
     - HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health"
     - HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$HEALTH_URL" || echo "000")
     
     - |
       if [ "$HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Application is healthy"
+        echo " Application is healthy"
         HEALTH_STATUS="healthy"
       else
-        echo "❌ Application health check failed: $HEALTH_RESPONSE"
+        echo 'ERROR: Application health check failed: $HEALTH_RESPONSE'
         HEALTH_STATUS="unhealthy"
       fi
     
     # Database health check
-    - echo "🗄️ Checking database health..."
+    - echo " Checking database health..."
     - DB_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/db"
     - DB_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$DB_HEALTH_URL" || echo "000")
     
     - |
       if [ "$DB_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Database is healthy"
+        echo " Database is healthy"
         DB_HEALTH_STATUS="healthy"
       else
-        echo "❌ Database health check failed: $DB_HEALTH_RESPONSE"
+        echo 'ERROR: Database health check failed: $DB_HEALTH_RESPONSE'
         DB_HEALTH_STATUS="unhealthy"
       fi
     
     # Redis health check
-    - echo "🔄 Checking Redis health..."
+    - echo " Checking Redis health..."
     - REDIS_HEALTH_URL="${STAGING_URL:-http://localhost:4321}/api/health/redis"
     - REDIS_HEALTH_RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null "$REDIS_HEALTH_URL" || echo "000")
     
     - |
       if [ "$REDIS_HEALTH_RESPONSE" = "200" ]; then
-        echo "✅ Redis is healthy"
+        echo " Redis is healthy"
         REDIS_HEALTH_STATUS="healthy"
       else
-        echo "❌ Redis health check failed: $REDIS_HEALTH_RESPONSE"
+        echo 'ERROR: Redis health check failed: $REDIS_HEALTH_RESPONSE'
         REDIS_HEALTH_STATUS="unhealthy"
       fi
     
     # Generate health report
-    - echo "📊 Generating health report..."
+    - echo " Generating health report..."
     - |
       if [ "$HEALTH_STATUS" = "healthy" ] && [ "$DB_HEALTH_STATUS" = "healthy" ] && [ "$REDIS_HEALTH_STATUS" = "healthy" ]; then
         OVERALL_STATUS="healthy"
@@ -147,7 +147,7 @@ monitoring:health:
       }
       EOF
     
-    - echo "✅ Health monitoring completed"
+    - echo " Health monitoring completed"
   artifacts:
     reports:
       junit: test-results/health-junit.xml
@@ -164,7 +164,7 @@ monitoring:resources:
   variables:
     KUBE_NAMESPACE: "pixelated-staging"
   script:
-    - echo "📊 Running resource monitoring..."
+    - echo " Running resource monitoring..."
     
     # Authenticate to GKE if needed
     - |
@@ -176,23 +176,23 @@ monitoring:resources:
       fi
     
     # Pod resource usage
-    - echo "📦 Monitoring pod resources..."
-    - kubectl top pods -l app=pixelated --no-headers > pod-resources.txt || echo "⚠️ Could not get pod resources"
+    - echo " Monitoring pod resources..."
+    - kubectl top pods -l app=pixelated --no-headers > pod-resources.txt || echo 'WARNING: Could not get pod resources'
     
     # Node resource usage
-    - echo "🖥️ Monitoring node resources..."
-    - kubectl top nodes --no-headers > node-resources.txt || echo "⚠️ Could not get node resources"
+    - echo " Monitoring node resources..."
+    - kubectl top nodes --no-headers > node-resources.txt || echo 'WARNING: Could not get node resources'
     
     # Disk usage
-    - echo "💾 Monitoring disk usage..."
-    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- df -h > disk-usage.txt || echo "⚠️ Could not get disk usage"
+    - echo " Monitoring disk usage..."
+    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- df -h > disk-usage.txt || echo 'WARNING: Could not get disk usage'
     
     # Memory allocation
-    - echo "🧠 Monitoring memory allocation..."
-    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- free -h > memory-allocation.txt || echo "⚠️ Could not get memory allocation"
+    - echo " Monitoring memory allocation..."
+    - kubectl exec -n ${KUBE_NAMESPACE} $(kubectl get pods -n ${KUBE_NAMESPACE} -l app=pixelated -o jsonpath='{.items[0].metadata.name}') -- free -h > memory-allocation.txt || echo 'WARNING: Could not get memory allocation'
     
     # Generate resource report
-    - echo "📊 Generating resource report..."
+    - echo " Generating resource report..."
     - |
       if [ -f pod-resources.txt ]; then
         POD_RESOURCES_JSON=$(jq -Rs . pod-resources.txt 2>/dev/null || echo '"N/A"')
@@ -228,7 +228,7 @@ monitoring:resources:
       }
       EOF
     
-    - echo "✅ Resource monitoring completed"
+    - echo " Resource monitoring completed"
   artifacts:
     reports:
       metrics: resource-report.json
@@ -245,33 +245,33 @@ monitoring:errors:
   variables:
     KUBE_NAMESPACE: "pixelated-staging"
   script:
-    - echo "🚨 Running error rate monitoring..."
+    - echo " Running error rate monitoring..."
     
     # Check application logs for errors
-    - echo "🔍 Checking application logs..."
+    - echo " Checking application logs..."
     - ERROR_COUNT=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "error\|exception\|fail" | wc -l)
     - echo "Found $ERROR_COUNT errors in recent logs"
     
     # Check for specific error patterns
-    - echo "🔍 Checking for specific error patterns..."
+    - echo " Checking for specific error patterns..."
     - DB_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "database\|connection\|timeout" | wc -l)
     - API_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "api\|request\|response" | wc -l)
     - AUTH_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "auth\|login\|token" | wc -l)
     
-    - echo "Database errors: $DB_ERRORS"
-    - echo "API errors: $API_ERRORS"
-    - echo "Authentication errors: $AUTH_ERRORS"
+    - echo 'Database errors: $DB_ERRORS'
+    - echo 'API errors: $API_ERRORS'
+    - echo 'Authentication errors: $AUTH_ERRORS'
     
     # Calculate error rate
     - TOTAL_LOGS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | wc -l)
     - |
       if [ "$TOTAL_LOGS" -eq 0 ]; then
-        echo "⚠️ No logs found, cannot calculate error rate"
+        echo 'WARNING: No logs found, cannot calculate error rate'
         ERROR_RATE=0
       else
         ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ))
       fi
-    - echo "Error rate: ${ERROR_RATE}%"
+    - echo 'Error rate: ${ERROR_RATE}%'
     
     # Determine error status
     - |
@@ -282,7 +282,7 @@ monitoring:errors:
       fi
     
     # Generate error report
-    - echo "📊 Generating error report..."
+    - echo " Generating error report..."
     - |
       cat > error-report.json << EOF
       {
@@ -303,12 +303,12 @@ monitoring:errors:
     # Alert if error rate is too high
     - |
       if [ $ERROR_RATE -gt 5 ]; then
-        echo "⚠️ High error rate detected: ${ERROR_RATE}%"
+        echo 'WARNING: High error rate detected: ${ERROR_RATE}%'
       else
-        echo "✅ Error rate is acceptable: ${ERROR_RATE}%"
+        echo ' Error rate is acceptable: ${ERROR_RATE}%'
       fi
     
-    - echo "✅ Error rate monitoring completed"
+    - echo " Error rate monitoring completed"
   artifacts:
     reports:
       junit: test-results/errors-junit.xml
@@ -323,21 +323,21 @@ monitoring:alerts:
   extends: .monitoring-base
   needs: ["monitoring:health", "monitoring:errors"]
   script:
-    - echo "🚨 Setting up alerting and notifications..."
+    - echo " Setting up alerting and notifications..."
     
     # Check if any monitoring jobs failed
-    - echo "🔍 Checking monitoring status..."
+    - echo " Checking monitoring status..."
     - HEALTH_STATUS=$(cat health-report.json | jq -r '.overall_status' 2>/dev/null || echo "unknown")
     - ERROR_STATUS=$(cat error-report.json | jq -r '.status' 2>/dev/null || echo "unknown")
     
     # Generate alert if needed
     - |
       if [ "$HEALTH_STATUS" = "degraded" ] || [ "$ERROR_STATUS" = "high" ]; then
-        echo "🚨 ALERT: System health issues detected"
+        echo ' ALERT: System health issues detected'
         ALERT_LEVEL="critical"
         ALERT_MESSAGE="System health issues detected: Health=$HEALTH_STATUS, Error status=$ERROR_STATUS"
       else
-        echo "✅ System health is good"
+        echo " System health is good"
         ALERT_LEVEL="info"
         ALERT_MESSAGE="System health monitoring completed successfully"
       fi
@@ -357,19 +357,19 @@ monitoring:alerts:
       EOF
     
     # Send alert (placeholder for actual alerting system)
-    - echo "📤 Sending alert notification..."
-    - echo "Alert level: $ALERT_LEVEL"
-    - echo "Alert message: $ALERT_MESSAGE"
+    - echo " Sending alert notification..."
+    - echo 'Alert level: $ALERT_LEVEL'
+    - echo 'Alert message: $ALERT_MESSAGE'
     
     # Here you would integrate with your alerting system
     # Examples: PagerDuty, Slack, Microsoft Teams, etc.
     - |
       if [ "$ALERT_LEVEL" = "critical" ]; then
-        echo "🚨 Critical alert would be sent to operations team"
+        echo " Critical alert would be sent to operations team"
         # curl -X POST -H "Content-Type: application/json" -d @alert-payload.json $ALERT_WEBHOOK_URL
       fi
     
-    - echo "✅ Alerting and notifications completed"
+    - echo " Alerting and notifications completed"
   artifacts:
     reports:
       junit: test-results/alerts-junit.xml
@@ -384,10 +384,10 @@ monitoring:summary:
   extends: .monitoring-base
   needs: ["monitoring:performance", "monitoring:health", "monitoring:resources", "monitoring:errors", "monitoring:alerts"]
   script:
-    - echo "📊 Generating monitoring summary..."
+    - echo " Generating monitoring summary..."
     
     # Aggregate all monitoring reports
-    - echo "📋 Aggregating monitoring reports..."
+    - echo " Aggregating monitoring reports..."
     - |
       cat > monitoring-summary.json << EOF
       {
@@ -407,7 +407,7 @@ monitoring:summary:
       EOF
     
     # Generate monitoring dashboard data
-    - echo "📊 Generating monitoring dashboard data..."
+    - echo " Generating monitoring dashboard data..."
     - |
       cat > monitoring-dashboard.json << EOF
       {
@@ -429,8 +429,8 @@ monitoring:summary:
       }
       EOF
     
-    - echo "✅ Monitoring summary generated"
-    - echo "📊 Overall monitoring status: ACTIVE"
+    - echo " Monitoring summary generated"
+    - echo ' Overall monitoring status: ACTIVE'
   artifacts:
     reports:
       metrics: monitoring-summary.json
