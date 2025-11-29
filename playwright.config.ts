@@ -3,7 +3,8 @@ import { defineConfig, devices } from '@playwright/test'
 const isCi = !!process.env['CI']
 
 // Get base URL from environment or default to localhost
-const baseURL = process.env['BASE_URL'] || 'http://localhost:4321'
+// Default to port 3000 for local dev, 4321 for CI (preview server)
+const baseURL = process.env['BASE_URL'] || (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
 
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
