@@ -1,6 +1,7 @@
 ---
 import '@unocss/reset/tailwind.css'
 import '@/styles/main.css'
+// Theme CSS files are linked directly from public folder for SSR compatibility
 import Head from '@/components/base/Head.astro'
 import Navbar from '@/components/mizu/Navbar.astro'
 import Footer from '@/components/mizu/Footer.astro'
@@ -17,6 +18,30 @@ const { title, description } = Astro.props
 <html lang="en" class="dark scroll-smooth">
   <head>
     <Head {title} {description} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0f172a" />
+    
+    <!-- Theme stylesheets (Mizu theme) -->
+    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+    
+    <!-- Font stylesheets -->
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/font-fix.css" />
+    
+    <!-- Background and UI fixes -->
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+    
+    <!-- Polyfill detection script -->
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    
+    <!-- Module preloader -->
+    <script src="/js/module-loader.js" defer is:inline></script>
+    
+    <!-- Background and font loader -->
+    <script src="/js/background-loader.js" defer is:inline></script>
+    
     <style is:global>
       /* Ensure dark mode styles are applied */
       body {
