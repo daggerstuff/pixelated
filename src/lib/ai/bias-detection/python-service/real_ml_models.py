@@ -235,16 +235,10 @@ class RealFairlearnAnalyzer:
 
     def _should_use_model_predictions(self) -> bool:
         """Check if model predictions should be used"""
-        return (
-            self.is_trained
-            and self.model != "rule_based"
-            and self.model is not None
-        )
+        return self.is_trained and self.model != "rule_based" and self.model is not None
 
     def _generate_model_predictions(
-        self,
-        X_scaled: np.ndarray,
-        X: np.ndarray
+        self, X_scaled: np.ndarray, X: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         """Generate predictions from model or rule-based fallback"""
         if self._should_use_model_predictions():
@@ -257,9 +251,7 @@ class RealFairlearnAnalyzer:
         return predictions, probabilities
 
     def _can_use_fairlearn(
-        self,
-        predictions: np.ndarray,
-        sensitive_features: Optional[np.ndarray]
+        self, predictions: np.ndarray, sensitive_features: Optional[np.ndarray]
     ) -> bool:
         """Check if Fairlearn can be used"""
         return (
@@ -269,9 +261,7 @@ class RealFairlearnAnalyzer:
         )
 
     def _calculate_fairlearn_metrics(
-        self,
-        predictions: np.ndarray,
-        sensitive_features: np.ndarray
+        self, predictions: np.ndarray, sensitive_features: np.ndarray
     ) -> tuple[float, float, float]:
         """Calculate Fairlearn fairness metrics"""
         try:
@@ -296,8 +286,7 @@ class RealFairlearnAnalyzer:
             return 0.1, 0.0, 0.0  # Conservative fallback
 
     def _calculate_fallback_bias_score(
-        self,
-        sensitive_features: Optional[np.ndarray]
+        self, sensitive_features: Optional[np.ndarray]
     ) -> float:
         """Calculate fallback bias score"""
         if sensitive_features is not None:
@@ -387,9 +376,7 @@ class RealInterpretabilityAnalyzer:
                 logger.warning(f"LIME initialization failed: {e}")
 
     def _extract_shap_feature_importance(
-        self,
-        shap_values,
-        feature_names: List[str]
+        self, shap_values, feature_names: List[str]
     ) -> Dict[str, float]:
         """Extract feature importance from SHAP values"""
         feature_importance = {}
@@ -409,10 +396,7 @@ class RealInterpretabilityAnalyzer:
         return feature_importance
 
     def _perform_shap_analysis(
-        self,
-        input_data: np.ndarray,
-        feature_names: List[str],
-        results: Dict[str, Any]
+        self, input_data: np.ndarray, feature_names: List[str], results: Dict[str, Any]
     ) -> None:
         """Perform SHAP analysis"""
         if not (SHAP_AVAILABLE and self.shap_explainer):
@@ -445,7 +429,7 @@ class RealInterpretabilityAnalyzer:
         model,
         input_data: np.ndarray,
         feature_names: List[str],
-        results: Dict[str, Any]
+        results: Dict[str, Any],
     ) -> None:
         """Perform LIME analysis"""
         if not (LIME_AVAILABLE and self.lime_explainer):
@@ -577,17 +561,16 @@ class RealHuggingFaceAnalyzer:
         return 0.8  # Assume mostly honest
 
     def _process_metric(
-        self,
-        metric_name: str,
-        text: str,
-        results: Dict[str, Any]
+        self, metric_name: str, text: str, results: Dict[str, Any]
     ) -> None:
         """Process a single metric"""
         try:
             if metric_name == "toxicity":
                 results["toxicity_score"] = self._calculate_toxicity_score(text)
             elif metric_name == "regard":
-                results["fairness_metrics"]["regard"] = self._calculate_regard_score(text)
+                results["fairness_metrics"]["regard"] = self._calculate_regard_score(
+                    text
+                )
             elif metric_name == "honest":
                 results["fairness_metrics"]["honest"] = self._calculate_honest_score()
         except Exception as e:
@@ -630,10 +613,13 @@ class RealHuggingFaceAnalyzer:
             results["bias_score"] = self._calculate_overall_bias_score(results)
 
             # Calculate confidence based on metrics computed
-            metrics_computed = len([
-                m for m in self.metrics
-                if m == "toxicity" or m in results.get("fairness_metrics", {})
-            ])
+            metrics_computed = len(
+                [
+                    m
+                    for m in self.metrics
+                    if m == "toxicity" or m in results.get("fairness_metrics", {})
+                ]
+            )
             results["confidence"] = min(metrics_computed / len(self.metrics), 1.0)
 
             return results

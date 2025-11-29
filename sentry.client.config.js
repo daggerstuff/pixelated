@@ -3,7 +3,7 @@ import {
   browserTracingIntegration,
   feedbackIntegration,
   replayIntegration,
-} from '@sentry/browser'
+} from '@sentry/astro'
 
 Sentry.init({
   dsn:

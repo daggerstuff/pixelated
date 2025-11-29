@@ -53,18 +53,12 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Wait for React to process the state update and show errors
   // First wait for error text to appear, then check visibility
-  await expect(emailError).toHaveText(/.+/, { timeout: 10000 })
-  await expect(passwordError).toHaveText(/.+/, { timeout: 10000 })
+  await expect(emailError).toContainText(/required|email/i, { timeout: 10000 })
+  await expect(passwordError).toContainText(/required|password/i, { timeout: 10000 })
 
   // Now check visibility - errors should be visible when they have content
   await expect(emailError).toBeVisible({ timeout: 10000 })
   await expect(passwordError).toBeVisible({ timeout: 10000 })
-
-  // Verify they contain error text
-  await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
-  await expect(passwordError).toContainText(/required|password/i, {
-    timeout: 5000,
-  })
 
   // Fill email but not password
   await page.fill('input[type="email"]', 'test@example.com')
@@ -117,8 +111,7 @@ test('login page has proper transitions', async ({ page }) => {
   // Look for the forgot password button using data-testid or text matching
   // The button has data-testid="forgot-password-button" according to LoginForm.tsx
   const passwordResetButton = page
-    .locator('[data-testid="forgot-password-button"], button')
-    .filter({ hasText: /forgot.*password/i })
+    .locator('[data-testid="forgot-password-button"]')
     .first()
 
   // Check if the forgot password element exists and is visible
@@ -133,8 +126,7 @@ test('login page has proper transitions', async ({ page }) => {
   // Wait for React state update - wait for the h2 to appear
   // The h2 has data-testid="reset-password-heading" according to LoginForm.tsx
   const resetPasswordHeading = page
-    .locator('[data-testid="reset-password-heading"], h2')
-    .filter({ hasText: /reset.*password/i })
+    .locator('[data-testid="reset-password-heading"]')
     .first()
   
   await expect(resetPasswordHeading).toBeVisible({

@@ -5,7 +5,7 @@
  * across both client and server environments.
  */
 
-import type { Event } from '@sentry/browser'
+import type { Event } from '@sentry/astro'
 
 export const SENTRY_CONFIG = {
   dsn:
