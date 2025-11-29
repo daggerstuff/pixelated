@@ -2,6 +2,12 @@ import { defineConfig, devices } from '@playwright/test'
 // Detect CI environment to avoid running dev server with file watchers in CI (which can fail under low inotify limits).
 const isCi = !!process.env['CI']
 
+// Get base URL from environment or default to localhost
+const baseURL = process.env['BASE_URL'] || 'http://localhost:4321'
+
+// Check if BASE_URL is a remote URL (not localhost)
+const isRemoteUrl = baseURL && !baseURL.includes('localhost') && !baseURL.includes('127.0.0.1')
+
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests
  * @see https://playwright.dev/docs/test-configuration
@@ -26,7 +32,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env['BASE_URL'] || 'http://localhost:4321',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -86,21 +92,25 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: isCi
-    ? {
-        // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
-        command: 'pnpm run build && pnpm run preview -- --port 4321',
-        url: 'http://localhost:4321',
-        reuseExistingServer: false,
-        timeout: 10 * 60 * 1000, // allow time for build + preview start
-      }
-    : {
-        // Local/dev flow should keep the fast dev server with HMR.
-        command: 'pnpm dev',
-        url: 'http://localhost:4321',
-        reuseExistingServer: true,
-        timeout: 180 * 1000,
-      },
+  // Only start webServer if BASE_URL is localhost (not a remote URL)
+  // When BASE_URL points to staging/production, skip webServer to avoid timeout
+  webServer: isRemoteUrl
+    ? undefined
+    : isCi
+      ? {
+          // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
+          command: 'pnpm run build && pnpm run preview -- --port 4321',
+          url: 'http://localhost:4321',
+          reuseExistingServer: false,
+          timeout: 10 * 60 * 1000, // allow time for build + preview start
+        }
+      : {
+          // Local/dev flow should keep the fast dev server with HMR.
+          command: 'pnpm dev',
+          url: 'http://localhost:4321',
+          reuseExistingServer: true,
+          timeout: 180 * 1000,
+        },
 
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',

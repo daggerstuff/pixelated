@@ -52,12 +52,15 @@ except ImportError:
     class NoOpMetrics:
         def __getattr__(self, name):
             return lambda *args, **kwargs: None
+
     bias_metrics = NoOpMetrics()
     api_metrics = NoOpMetrics()
     service_metrics = NoOpMetrics()
+
     def track_latency(*args, **kwargs):
         def decorator(func):
             return func
+
         return decorator
 
 # Third-party libraries
@@ -578,7 +581,9 @@ class BiasDetectionService:
 
             # Track alert level if triggered
             if alert_level in ("warning", "high", "critical"):
-                bias_metrics.alert_triggered(alert_level, "comprehensive", overall_score)
+                bias_metrics.alert_triggered(
+                    alert_level, "comprehensive", overall_score
+                )
 
             logger.info(
                 f"Bias analysis completed for session {session_data.session_id} in {time.time() - start_time:.2f}s"
@@ -1520,14 +1525,14 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _extract_ai_response_text(self, ai_responses: Optional[List[Dict]]) -> List[str]:
+    def _extract_ai_response_text(
+        self, ai_responses: Optional[List[Dict]]
+    ) -> List[str]:
         """Extract text from AI responses"""
         if not ai_responses:
             return []
         return [
-            response["content"]
-            for response in ai_responses
-            if "content" in response
+            response["content"] for response in ai_responses if "content" in response
         ]
 
     def _extract_transcript_text(self, transcripts: Optional[List[Dict]]) -> List[str]:
@@ -1535,20 +1540,14 @@ class BiasDetectionService:
         if not transcripts:
             return []
         return [
-            transcript["text"]
-            for transcript in transcripts
-            if "text" in transcript
+            transcript["text"] for transcript in transcripts if "text" in transcript
         ]
 
     def _extract_content_text(self, content: Optional[Dict]) -> List[str]:
         """Extract text from content dictionary"""
         if not content:
             return []
-        return [
-            value
-            for value in content.values()
-            if isinstance(value, str)
-        ]
+        return [value for value in content.values() if isinstance(value, str)]
 
     def _extract_text_content(self, session_data: SessionData) -> str:
         """Extract all text content from session data"""
@@ -1711,18 +1710,24 @@ def analyze_session():
         try:
             data = request.get_json()
         except Exception:
-            api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
+            api_metrics.request_completed(
+                "/analyze", "POST", 400, (time.time() - request_start) * 1000
+            )
             return jsonify({"error": "No data provided"}), 400
 
         if not data:
-            api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
+            api_metrics.request_completed(
+                "/analyze", "POST", 400, (time.time() - request_start) * 1000
+            )
             return jsonify({"error": "No data provided"}), 400
 
         # Validate required fields
         required_fields = ["session_id", "participant_demographics", "content"]
         for field in required_fields:
             if field not in data:
-                api_metrics.request_completed("/analyze", "POST", 400, (time.time() - request_start) * 1000)
+                api_metrics.request_completed(
+                    "/analyze", "POST", 400, (time.time() - request_start) * 1000
+                )
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
         # Create SessionData object
@@ -1742,7 +1747,9 @@ def analyze_session():
             bias_service.analyze_session(session_data, getattr(g, "user_id", "unknown"))
         )
 
-        api_metrics.request_completed("/analyze", "POST", 200, (time.time() - request_start) * 1000)
+        api_metrics.request_completed(
+            "/analyze", "POST", 200, (time.time() - request_start) * 1000
+        )
         return jsonify(result)
 
     except Exception as e:
@@ -1874,7 +1881,9 @@ def analyze_session_async_endpoint():
         )
 
 
-def _validate_batch_request(data: Optional[Dict]) -> tuple[Optional[List], Optional[tuple]]:
+def _validate_batch_request(
+    data: Optional[Dict],
+) -> tuple[Optional[List], Optional[tuple]]:
     """Validate batch analysis request"""
     if not data or "sessions" not in data:
         return None, (jsonify({"error": "No sessions data provided"}), 400)
@@ -1885,10 +1894,12 @@ def _validate_batch_request(data: Optional[Dict]) -> tuple[Optional[List], Optio
 
     return sessions_data, None
 
+
 def _setup_development_user():
     """Setup development user if needed"""
     if os.environ.get("ENV") != "production" and not hasattr(g, "user_id"):
         g.user_id = "development-user"
+
 
 def _calculate_estimated_workers(sessions_count: int, batch_size: int) -> int:
     """Calculate estimated number of workers needed"""
@@ -1984,11 +1995,13 @@ def _check_celery_available() -> bool:
     """Check if Celery is available"""
     return CELERY_AVAILABLE and celery_app is not None
 
+
 def _get_task_result(task_id: str):
     """Get task result from Celery"""
     if not _check_celery_available():
         return None
     return celery_app.AsyncResult(task_id) if celery_app else None
+
 
 def _build_task_response(result) -> Dict[str, Any]:
     """Build response based on task state"""
@@ -2004,7 +2017,7 @@ def _build_task_response(result) -> Dict[str, Any]:
         "PENDING": lambda: {"state": "PENDING"},
         "PROGRESS": lambda: {"progress": result.info},
         "SUCCESS": lambda: {"result": result.result},
-        "FAILURE": lambda: {"error": str(result.info)}
+        "FAILURE": lambda: {"error": str(result.info)},
     }
 
     handler = state_handlers.get(result.state)
@@ -2012,6 +2025,7 @@ def _build_task_response(result) -> Dict[str, Any]:
         response.update(handler())
 
     return response
+
 
 @app.route("/task/<task_id>", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
@@ -2067,6 +2081,7 @@ def _build_worker_status(
 
     return workers_status
 
+
 @app.route("/workers/status", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def get_workers_status():
@@ -2077,7 +2092,9 @@ def get_workers_status():
     try:
         inspect = celery_app.control.inspect() if celery_app else None
         active_tasks, scheduled_tasks, reserved_tasks = _get_worker_task_counts(inspect)
-        workers_status = _build_worker_status(active_tasks, scheduled_tasks, reserved_tasks)
+        workers_status = _build_worker_status(
+            active_tasks, scheduled_tasks, reserved_tasks
+        )
 
         return jsonify(
             {

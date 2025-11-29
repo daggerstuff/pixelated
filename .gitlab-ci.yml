@@ -57,7 +57,7 @@ cache:
     - pnpm config set store-dir $PNPM_CACHE_DIR
     - pnpm --version
   script:
-    - echo "🔍 Running validation..."
+    - echo " Running validation..."
   parallel:
     matrix:
       - VALIDATION_TYPE: [dependencies, lint, typecheck]
@@ -65,8 +65,8 @@ cache:
 validate:dependencies:
   extends: .validate
   script:
-    - echo "🔍 Running dependency validation..."
-    - pnpm audit --audit-level moderate || echo "⚠️ Audit warnings found but continuing"
+    - echo " Running dependency validation..."
+    - 'pnpm audit --audit-level moderate || echo "WARNING: Audit warnings found but continuing"'
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -75,8 +75,8 @@ validate:dependencies:
 validate:lint:
   extends: .validate
   script:
-    - echo "🔍 Running lint validation..."
-    - pnpm lint:ci || echo "⚠️ Linting completed with warnings"
+    - echo " Running lint validation..."
+    - 'pnpm lint:ci || echo "WARNING: Linting completed with warnings"'
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -85,8 +85,8 @@ validate:lint:
 validate:typecheck:
   extends: .validate
   script:
-    - echo "🔍 Running typecheck validation..."
-    - pnpm typecheck || echo "⚠️ Type checking completed with warnings"
+    - echo " Running typecheck validation..."
+    - 'pnpm typecheck || echo "WARNING: Type checking completed with warnings"'
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -103,10 +103,10 @@ build:
     DOCKER_BUILDKIT: 1
     BUILDKIT_PROGRESS: plain
   before_script:
-    - echo "🏗️ Setting up build environment..."
+    - echo "🏗 Setting up build environment..."
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "🏗️ Building application with progressive memory optimization..."
+    - echo "🏗 Building application with progressive memory optimization..."
 
     # Build Node.js application in container
     - docker build --target builder -t ${IMAGE_NAME}:builder-${CI_COMMIT_SHORT_SHA} .
@@ -133,7 +133,7 @@ build:
     - echo "IMAGE_DIGEST=$(cat image-digest.txt)" >> build.env
     - echo "IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}" >> build.env
 
-    - echo "✅ Build completed successfully"
+    - echo " Build completed successfully"
   artifacts:
     reports:
       dotenv: build.env
@@ -154,11 +154,11 @@ security-scan:
     TRIVY_CACHE_DIR: $CI_PROJECT_DIR/.trivy-cache
     TRIVY_TIMEOUT: 10m
   before_script:
-    - echo "🔒 Setting up security scanning..."
+    - echo " Setting up security scanning..."
     - mkdir -p $TRIVY_CACHE_DIR
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "🔒 Running security scans..."
+    - echo " Running security scans..."
 
     # Pull the built image
     - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
@@ -174,38 +174,39 @@ security-scan:
       ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
 
     # Check for critical vulnerabilities
-    - trivy image
-      --scanners vuln
-      --severity CRITICAL
-      --exit-code 1
-      --cache-dir $TRIVY_CACHE_DIR
-      --timeout $TRIVY_TIMEOUT
-      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || echo "⚠️ Critical vulnerabilities found"
+    - |
+      trivy image \
+        --scanners vuln \
+        --severity CRITICAL \
+        --exit-code 1 \
+        --cache-dir $TRIVY_CACHE_DIR \
+        --timeout $TRIVY_TIMEOUT \
+        ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || echo "WARNING: Critical vulnerabilities found"
 
     # Container security configuration check
-    - echo "🔍 Checking container security configuration..."
+    - echo " Checking container security configuration..."
     - USER_ID=$(docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{.Config.User}}' 2>/dev/null || echo "")
     - |
       if [ -z "$USER_ID" ] || [ "$USER_ID" = "root" ] || [ "$USER_ID" = "0" ]; then
-        echo "⚠️ Container may run as root - checking runtime behavior";
+        echo "WARNING: Container may run as root - checking runtime behavior";
         RUNTIME_USER=$(timeout 30 docker run --rm ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} whoami 2>/dev/null || echo "unknown");
         if [ "$RUNTIME_USER" = "root" ]; then
-          echo "❌ Container runs as root - security risk";
+          echo "ERROR: Container runs as root - security risk";
           exit 1;
         else
-          echo "✅ Container runs as non-root user at runtime: $RUNTIME_USER";
+          echo " Container runs as non-root user at runtime: $RUNTIME_USER";
         fi;
       else
-        echo "✅ Container configured with non-root user: $USER_ID";
+        echo " Container configured with non-root user: $USER_ID";
       fi
 
     # Check exposed ports
     - |
       EXPOSED_PORTS=$(docker inspect ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} --format='{{range $p, $conf := .Config.ExposedPorts}}{{$p}} {{end}}' 2>/dev/null || echo "")
       if [ -z "$EXPOSED_PORTS" ]; then EXPOSED_PORTS="none"; fi
-      echo "ℹ️ Exposed ports: $EXPOSED_PORTS"
+      echo "INFO: Exposed ports: $EXPOSED_PORTS"
 
-    - echo "✅ Security scanning completed"
+    - echo " Security scanning completed"
   artifacts:
     reports:
       sast: trivy-results.sarif
@@ -225,7 +226,7 @@ sentry-release:
     - apt-get update -qq && apt-get install -y -qq curl > /dev/null
     - corepack enable pnpm
   script:
-    - echo "📊 Creating Sentry release..."
+    - echo " Creating Sentry release..."
 
     # Install Sentry CLI
     - curl -sL https://sentry.io/get-cli/ | sh
@@ -235,7 +236,7 @@ sentry-release:
     - sentry-cli releases files "${CI_COMMIT_SHORT_SHA}" upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix || true
     - sentry-cli releases finalize "${CI_COMMIT_SHORT_SHA}" || true
 
-    - echo "✅ Sentry release created"
+    - echo " Sentry release created"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
@@ -246,11 +247,11 @@ sentry-release:
   image: google/cloud-sdk:alpine
   needs: ["build", "security-scan"]
   before_script:
-    - echo "🚀 Setting up deployment environment..."
+    - echo " Setting up deployment environment..."
     - gcloud --version
     - kubectl version --client
   script:
-    - echo "🚀 Deploying to GKE..."
+    - echo " Deploying to GKE..."
   environment:
     name: $ENVIRONMENT_NAME
     url: $ENVIRONMENT_URL
@@ -268,7 +269,7 @@ deploy:rolling:
     MAX_SURGE: "1"
     MAX_UNAVAILABLE: "0"
   script:
-    - 'echo "🚀 Starting rolling deployment to GKE..."'
+    - echo "Starting rolling deployment to GKE..."
     - 'echo "Image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"'
     - 'echo "Deployment: pixelated"'
     - 'echo "Namespace: $KUBE_NAMESPACE"'
@@ -280,18 +281,18 @@ deploy:rolling:
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
 
     # Apply Kubernetes manifests
-    - echo "📋 Applying Kubernetes manifests..."
+    - echo " Applying Kubernetes manifests..."
     - kubectl apply -f k8s/ -n ${KUBE_NAMESPACE} || true
 
     # Update deployment with new image
-    - echo "🔄 Updating deployment image..."
+    - echo " Updating deployment image..."
     - kubectl set image deployment/pixelated app=${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} -n ${KUBE_NAMESPACE}
 
     # Wait for rollout to complete
-    - echo "⏳ Waiting for rollout to complete..."
+    - echo " Waiting for rollout to complete..."
     - kubectl rollout status deployment/pixelated -n ${KUBE_NAMESPACE} --timeout=${DEPLOYMENT_TIMEOUT}
 
-    - echo "✅ Rolling deployment completed successfully"
+    - echo " Rolling deployment completed successfully"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
@@ -305,7 +306,7 @@ deploy:blue-green:
     DEPLOYMENT_STRATEGY: blue-green
     REPLICAS: "3"
   script:
-    - 'echo "🚀 Starting blue-green deployment..."'
+    - 'echo " Starting blue-green deployment..."'
     - 'echo "Image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"'
 
     # Authenticate to GKE
@@ -315,10 +316,10 @@ deploy:blue-green:
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
 
     # Apply blue-green deployment
-    - echo "📋 Applying blue-green deployment..."
+    - echo " Applying blue-green deployment..."
     - . ./scripts/deploy-blue-green.sh
 
-    - echo "✅ Blue-green deployment completed successfully"
+    - echo " Blue-green deployment completed successfully"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
@@ -335,7 +336,7 @@ deploy:canary:
     CANARY_PERCENTAGE: "25"
     ROLLBACK_THRESHOLD: "5"
   script:
-    - 'echo "🚀 Starting canary deployment..."'
+    - 'echo " Starting canary deployment..."'
     - 'echo "Image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"'
     - 'echo "Canary percentage: ${CANARY_PERCENTAGE}%"'
 
@@ -346,10 +347,10 @@ deploy:canary:
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
 
     # Apply canary deployment
-    - echo "📋 Applying canary deployment..."
+    - echo " Applying canary deployment..."
     - . ./scripts/deploy-canary.sh
 
-    - echo "✅ Canary deployment completed successfully"
+    - echo " Canary deployment completed successfully"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
@@ -363,7 +364,7 @@ mirror-to-artifact-registry:
   identity: google_cloud
   needs: ["build"]
   script:
-    - echo "🚀 Mirroring image to Artifact Registry..."
+    - echo " Mirroring image to Artifact Registry..."
     - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
     - gcloud config set project "$GCP_PROJECT_ID"
     - gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
@@ -393,7 +394,7 @@ cloud-run-test-deploy:
   variables:
     CLOUD_RUN_SERVICE: "pixel-front-test"
   script:
-    - echo "🚀 Deploying test service to Cloud Run..."
+    - echo " Deploying test service to Cloud Run..."
     - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
     - gcloud config set project "$GCP_PROJECT_ID"
     - gcloud config set run/region "$GCP_REGION"
@@ -418,7 +419,7 @@ gke-test-deploy:
     GKE_TEST_LOCATION: "us-east1"
     GKE_TEST_NAMESPACE: "pixelated-test"
   script:
-    - echo "🚀 Deploying test workload to GKE..."
+    - echo " Deploying test workload to GKE..."
     - gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
     - gcloud config set project "$GCP_PROJECT_ID"
     - gcloud container clusters get-credentials "$GKE_TEST_CLUSTER_NAME" \
@@ -428,11 +429,11 @@ gke-test-deploy:
     # Simple rollout to test namespace using Artifact Registry image
     - |
       if kubectl -n "$GKE_TEST_NAMESPACE" get deployment pixelated >/dev/null 2>&1; then
-        echo "🔄 Updating existing deployment image..."
+        echo " Updating existing deployment image..."
         kubectl -n "$GKE_TEST_NAMESPACE" set image deployment/pixelated \
           app="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
       else
-        echo "📦 Creating new deployment..."
+        echo " Creating new deployment..."
         kubectl -n "$GKE_TEST_NAMESPACE" create deployment pixelated \
           --image="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${AR_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
       fi
@@ -448,7 +449,7 @@ health-check:
   image: google/cloud-sdk:alpine
   needs: ["deploy:rolling"]
   script:
-    - echo "🏥 Running health checks..."
+    - echo " Running health checks..."
 
     # Authenticate to GKE
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
@@ -457,46 +458,46 @@ health-check:
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
 
     # Check deployment health
-    - echo "📊 Deployment status:"
+    - echo "Deployment status:"
     - kubectl get deployment pixelated -o wide
 
     # Check pod health
-    - echo "🔍 Pod health:"
+    - echo "Pod health:"
     - kubectl get pods -l app=pixelated -o wide
 
     # Check service status
-    - echo "🌐 Service status:"
+    - echo "Service status:"
     - kubectl get service pixelated-service
 
     # Detailed health check
     - READY_PODS=$(kubectl get pods -l app=pixelated -o json | jq '[.items[] | select(.status.phase == "Running" and (.status.containerStatuses[]?.ready // false))] | length')
     - TOTAL_PODS=$(kubectl get pods -l app=pixelated -o json | jq '.items | length')
-    - 'echo "📈 Health summary: $READY_PODS/$TOTAL_PODS pods ready"'
+    - 'echo "Health summary: $READY_PODS/$TOTAL_PODS pods ready"'
 
     - |
       if [ "$READY_PODS" -eq 0 ]; then
-        echo "❌ No healthy pods found"
+        echo "ERROR: No healthy pods found"
         kubectl describe pods -l app=pixelated
         exit 1
       elif [ "$READY_PODS" -lt "$TOTAL_PODS" ]; then
-        echo "⚠️ Some pods are not ready"
+        echo "WARNING: Some pods are not ready"
         kubectl describe pods -l app=pixelated | grep -A 10 -B 5 "Warning\|Error" || true
       else
-        echo "✅ All pods are healthy"
+        echo " All pods are healthy"
       fi
 
     # Test internal connectivity if possible
     - |
       if [ -n "$STAGING_URL" ]; then
-        echo "🌐 Testing external connectivity..."
+        echo " Testing external connectivity..."
         if curl -f --connect-timeout 10 --max-time 30 "$STAGING_URL/api/health" >/dev/null 2>&1; then
-          echo "✅ External health check passed"
+          echo " External health check passed"
         else
-          echo "⚠️ External health check failed"
+          echo "WARNING: External health check failed"
         fi
       fi
 
-    - echo "✅ Health check completed"
+    - echo " Health check completed"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
@@ -511,8 +512,8 @@ cleanup-deployment:
     ENVIRONMENT_NAME: staging
   when: manual
   script:
-    - echo "🧹 Starting cleanup process..."
-    - echo "📋 Configuration:"
+    - echo " Starting cleanup process..."
+    - echo "Configuration:"
     - echo "  - Keep last 3 images"
     - echo "  - Cleanup images older than 12h"
 
@@ -526,22 +527,22 @@ cleanup-deployment:
       sort -k2 -r)
 
     - IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
-    - echo "📊 Found $IMAGE_COUNT images for ${IMAGE_NAME}"
+    - echo " Found $IMAGE_COUNT images for ${IMAGE_NAME}"
 
     - |
       if [ $IMAGE_COUNT -gt 3 ]; then
         # Remove images beyond the keep threshold
         IMAGES_TO_REMOVE=$(echo "$IMAGES" | tail -n +4 | awk '{print $1}')
         echo "$IMAGES_TO_REMOVE" | while read -r image; do
-          echo "🗑️ Removing $image..."
-          docker rmi "$image" || echo "⚠️ Could not remove $image"
+          echo " Removing $image..."
+          docker rmi "$image" || echo "WARNING: Could not remove $image"
         done
-        echo "✅ Cleanup completed"
+        echo " Cleanup completed"
       else
-        echo "✅ Image count within retention policy"
+        echo " Image count within retention policy"
       fi
 
-    - echo "📊 Cleanup completed successfully"
+    - echo " Cleanup completed successfully"
   environment:
     name: $ENVIRONMENT_NAME
     action: stop
@@ -552,11 +553,11 @@ performance-test:
   image: node:${NODE_VERSION}-slim
   needs: ["deploy:rolling"]
   script:
-    - echo "📈 Running performance tests..."
+    - echo " Running performance tests..."
     - corepack enable pnpm
     - pnpm install --frozen-lockfile
     - pnpm run performance:test
-    - echo "✅ Performance tests completed"
+    - echo " Performance tests completed"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
@@ -570,11 +571,11 @@ e2e-test:
     PLAYWRIGHT_BROWSERS_PATH: 0
     PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
   script:
-    - echo "🎭 Running E2E tests..."
+    - echo " Running E2E tests..."
     - corepack enable pnpm
     - pnpm install --frozen-lockfile
     - pnpm run e2e:smoke
-    - echo "✅ E2E tests completed"
+    - echo " E2E tests completed"
   artifacts:
     reports:
       junit: test-results/junit.xml

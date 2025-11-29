@@ -10,9 +10,17 @@ from typing import Any
 
 import numpy as np
 import structlog
-import tensorflow as tf
 import torch
 from transformers import AutoTokenizer
+
+# Optional TensorFlow import
+try:
+    import tensorflow as tf
+
+    TENSORFLOW_AVAILABLE = True
+except ImportError:
+    TENSORFLOW_AVAILABLE = False
+    tf = None
 
 from ..config import settings
 from ..models import BiasType, ConfidenceLevel
@@ -60,6 +68,10 @@ class TensorFlowModelService(ModelService):
     """TensorFlow model service for bias detection"""
 
     def __init__(self, model_path: str = None):
+        if not TENSORFLOW_AVAILABLE:
+            raise ImportError(
+                "TensorFlow is not available. Install it with: pip install tensorflow"
+            )
         super().__init__(
             model_path or settings.tensorflow_model_path, "tensorflow_bias_detector"
         )
@@ -547,9 +559,21 @@ class ModelEnsembleService:
     """Ensemble service combining multiple models"""
 
     def __init__(self):
-        self.tf_service = TensorFlowModelService()
+        self.services = []
+        # Only add TensorFlow service if available
+        if TENSORFLOW_AVAILABLE:
+            try:
+                self.tf_service = TensorFlowModelService()
+                self.services.append(self.tf_service)
+            except Exception as e:
+                logger.warning(f"TensorFlow service not available: {e}")
+                self.tf_service = None
+        else:
+            self.tf_service = None
+
+        # PyTorch service (required)
         self.pt_service = PyTorchModelService()
-        self.services = [self.tf_service, self.pt_service]
+        self.services.append(self.pt_service)
 
     async def load_all_models(self) -> bool:
         """Load all models"""
@@ -579,11 +603,13 @@ class ModelEnsembleService:
         # Combine results (simple averaging for now)
         combined_results = self._combine_results(results)
 
+        # Use first available service for text hash
+        hash_service = self.tf_service if self.tf_service else self.pt_service
         return {
             "ensemble_results": combined_results,
             "individual_results": results,
             "models_used": len(results),
-            "text_hash": self.tf_service._get_text_hash(text),
+            "text_hash": hash_service._get_text_hash(text),
         }
 
     def _combine_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

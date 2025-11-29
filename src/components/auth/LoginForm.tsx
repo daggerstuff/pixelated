@@ -125,11 +125,7 @@ export function LoginForm({
 
   // Handle email/password login
   const handleLoginSubmit = async () => {
-    if (!validateForm()) {
-      toast.error('Please correct the form errors')
-      return
-    }
-
+    // Form validation is now handled in handleSubmit, so we can proceed directly
     saveRememberMePreferences(rememberMe)
     setIsLoading(true)
 
@@ -205,6 +201,12 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // Validate form on submission to show errors
+    if (!validateForm()) {
+      toast.error('Please correct the form errors')
+      return
+    }
 
     if (mode === 'login') {
       await handleLoginSubmit()

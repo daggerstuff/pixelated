@@ -28,9 +28,13 @@ SENTRY_DSN = os.environ.get(
     "SENTRY_DSN",
     "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
 )
-SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production"))
+SENTRY_ENVIRONMENT = os.environ.get(
+    "SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production")
+)
 SENTRY_RELEASE = os.environ.get("SENTRY_RELEASE", "1.0.0")
-SENTRY_ENABLE_METRICS = os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
+SENTRY_ENABLE_METRICS = (
+    os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
+)
 
 
 def before_send_metric(metric: Metric, hint: Hint) -> Optional[Metric]:
@@ -87,23 +91,17 @@ def init_sentry(
         dsn=effective_dsn,
         environment=effective_environment,
         release=effective_release,
-
         # Error tracking
         sample_rate=sample_rate,
-
         # Performance monitoring
         traces_sample_rate=traces_sample_rate,
         profiles_sample_rate=profiles_sample_rate,
-
         # Metrics support (enabled by default in SDK 2.44.0+)
         before_send_metric=before_send_metric,
-
         # Additional options
         send_default_pii=True,
-
         # Add Flask integration if available
         integrations=[],
-
         # Initial tags
         default_integrations=True,
     )
@@ -121,6 +119,7 @@ def init_sentry(
 # ============================================
 # Metrics API
 # ============================================
+
 
 def count_metric(
     name: str,
@@ -233,9 +232,13 @@ class BiasMetrics:
     @staticmethod
     def analysis_started(session_id: str, layer: str) -> None:
         """Track when a bias analysis starts."""
-        count_metric("bias.analysis_started", 1, {
-            "layer": layer,
-        })
+        count_metric(
+            "bias.analysis_started",
+            1,
+            {
+                "layer": layer,
+            },
+        )
 
     @staticmethod
     def analysis_completed(
@@ -245,13 +248,22 @@ class BiasMetrics:
         success: bool = True,
     ) -> None:
         """Track when a bias analysis completes."""
-        count_metric("bias.analysis_completed", 1, {
-            "layer": layer,
-            "success": str(success).lower(),
-        })
-        distribution_metric("bias.analysis_latency", duration_ms, {
-            "layer": layer,
-        }, unit="millisecond")
+        count_metric(
+            "bias.analysis_completed",
+            1,
+            {
+                "layer": layer,
+                "success": str(success).lower(),
+            },
+        )
+        distribution_metric(
+            "bias.analysis_latency",
+            duration_ms,
+            {
+                "layer": layer,
+            },
+            unit="millisecond",
+        )
 
     @staticmethod
     def score_recorded(
@@ -272,10 +284,14 @@ class BiasMetrics:
         score: float,
     ) -> None:
         """Track when a bias alert is triggered."""
-        count_metric("bias.alert_triggered", 1, {
-            "alert_level": level,
-            "layer": layer,
-        })
+        count_metric(
+            "bias.alert_triggered",
+            1,
+            {
+                "alert_level": level,
+                "layer": layer,
+            },
+        )
 
     @staticmethod
     def linguistic_bias_detected(
@@ -283,12 +299,20 @@ class BiasMetrics:
         score: float,
     ) -> None:
         """Track linguistic bias detection."""
-        count_metric("bias.linguistic_bias_detected", 1, {
-            "bias_type": bias_type,
-        })
-        distribution_metric("bias.linguistic_score", score, {
-            "bias_type": bias_type,
-        })
+        count_metric(
+            "bias.linguistic_bias_detected",
+            1,
+            {
+                "bias_type": bias_type,
+            },
+        )
+        distribution_metric(
+            "bias.linguistic_score",
+            score,
+            {
+                "bias_type": bias_type,
+            },
+        )
 
 
 class APIMetrics:
@@ -297,10 +321,14 @@ class APIMetrics:
     @staticmethod
     def request_received(endpoint: str, method: str) -> None:
         """Track incoming API request."""
-        count_metric("api.request_received", 1, {
-            "endpoint": endpoint,
-            "method": method,
-        })
+        count_metric(
+            "api.request_received",
+            1,
+            {
+                "endpoint": endpoint,
+                "method": method,
+            },
+        )
 
     @staticmethod
     def request_completed(
@@ -310,23 +338,36 @@ class APIMetrics:
         duration_ms: float,
     ) -> None:
         """Track completed API request with timing."""
-        count_metric("api.request_completed", 1, {
-            "endpoint": endpoint,
-            "method": method,
-            "status_code": str(status_code),
-        })
-        distribution_metric("api.response_time", duration_ms, {
-            "endpoint": endpoint,
-            "method": method,
-        }, unit="millisecond")
+        count_metric(
+            "api.request_completed",
+            1,
+            {
+                "endpoint": endpoint,
+                "method": method,
+                "status_code": str(status_code),
+            },
+        )
+        distribution_metric(
+            "api.response_time",
+            duration_ms,
+            {
+                "endpoint": endpoint,
+                "method": method,
+            },
+            unit="millisecond",
+        )
 
     @staticmethod
     def error(endpoint: str, error_type: str) -> None:
         """Track API error."""
-        count_metric("api.error", 1, {
-            "endpoint": endpoint,
-            "error_type": error_type,
-        })
+        count_metric(
+            "api.error",
+            1,
+            {
+                "endpoint": endpoint,
+                "error_type": error_type,
+            },
+        )
 
 
 class ServiceMetrics:
@@ -340,16 +381,24 @@ class ServiceMetrics:
     @staticmethod
     def queue_depth(depth: int, queue_name: str = "default") -> None:
         """Track analysis queue depth."""
-        gauge_metric("service.queue_depth", depth, {
-            "queue_name": queue_name,
-        })
+        gauge_metric(
+            "service.queue_depth",
+            depth,
+            {
+                "queue_name": queue_name,
+            },
+        )
 
     @staticmethod
     def worker_status(worker_id: str, active_tasks: int) -> None:
         """Track worker status."""
-        gauge_metric("service.worker_active_tasks", active_tasks, {
-            "worker_id": worker_id,
-        })
+        gauge_metric(
+            "service.worker_active_tasks",
+            active_tasks,
+            {
+                "worker_id": worker_id,
+            },
+        )
 
     @staticmethod
     def memory_usage_mb(usage_mb: float) -> None:
@@ -359,17 +408,27 @@ class ServiceMetrics:
     @staticmethod
     def model_loaded(model_name: str, load_time_ms: float) -> None:
         """Track when a model is loaded."""
-        count_metric("service.model_loaded", 1, {
-            "model_name": model_name,
-        })
-        distribution_metric("service.model_load_time", load_time_ms, {
-            "model_name": model_name,
-        }, unit="millisecond")
+        count_metric(
+            "service.model_loaded",
+            1,
+            {
+                "model_name": model_name,
+            },
+        )
+        distribution_metric(
+            "service.model_load_time",
+            load_time_ms,
+            {
+                "model_name": model_name,
+            },
+            unit="millisecond",
+        )
 
 
 # ============================================
 # Decorators
 # ============================================
+
 
 def track_latency(
     metric_name: str,
@@ -383,6 +442,7 @@ def track_latency(
         async def run_preprocessing_analysis(session_data):
             ...
     """
+
     def decorator(func):
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -390,14 +450,21 @@ def track_latency(
             try:
                 result = await func(*args, **kwargs)
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(metric_name, duration_ms, attributes, unit="millisecond")
+                distribution_metric(
+                    metric_name, duration_ms, attributes, unit="millisecond"
+                )
                 return result
             except Exception as e:
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(f"{metric_name}_error", duration_ms, {
-                    **(attributes or {}),
-                    "error_type": type(e).__name__,
-                }, unit="millisecond")
+                distribution_metric(
+                    f"{metric_name}_error",
+                    duration_ms,
+                    {
+                        **(attributes or {}),
+                        "error_type": type(e).__name__,
+                    },
+                    unit="millisecond",
+                )
                 raise
 
         @wraps(func)
@@ -406,17 +473,25 @@ def track_latency(
             try:
                 result = func(*args, **kwargs)
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(metric_name, duration_ms, attributes, unit="millisecond")
+                distribution_metric(
+                    metric_name, duration_ms, attributes, unit="millisecond"
+                )
                 return result
             except Exception as e:
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(f"{metric_name}_error", duration_ms, {
-                    **(attributes or {}),
-                    "error_type": type(e).__name__,
-                }, unit="millisecond")
+                distribution_metric(
+                    f"{metric_name}_error",
+                    duration_ms,
+                    {
+                        **(attributes or {}),
+                        "error_type": type(e).__name__,
+                    },
+                    unit="millisecond",
+                )
                 raise
 
         import asyncio
+
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
@@ -436,12 +511,10 @@ service_metrics = ServiceMetrics()
 __all__ = [
     # Initialization
     "init_sentry",
-
     # Core metric functions
     "count_metric",
     "gauge_metric",
     "distribution_metric",
-
     # Domain-specific helpers
     "BiasMetrics",
     "APIMetrics",
@@ -449,7 +522,6 @@ __all__ = [
     "bias_metrics",
     "api_metrics",
     "service_metrics",
-
     # Decorators
     "track_latency",
 ]
