@@ -5,8 +5,42 @@ const isCi = !!process.env['CI']
 // Get base URL from environment or default to localhost
 const baseURL = process.env['BASE_URL'] || 'http://localhost:4321'
 
-// Check if BASE_URL is a remote URL (not localhost)
-const isRemoteUrl = baseURL && !baseURL.includes('localhost') && !baseURL.includes('127.0.0.1')
+// Parse URL to extract hostname and port
+let webServerUrl: string | undefined
+let webServerPort: number | undefined
+let isRemoteUrl: boolean
+
+try {
+  const url = new URL(baseURL)
+  const hostname = url.hostname.toLowerCase()
+
+  // Extract port from URL, handling cases where port is not explicitly specified
+  // If port is in URL (e.g., :3000), use it; otherwise, derive from protocol
+  const explicitPort = url.port ? parseInt(url.port, 10) : null
+
+  // Check if BASE_URL is a remote URL (not localhost) - case-insensitive check
+  isRemoteUrl = baseURL &&
+    hostname !== 'localhost' &&
+    hostname !== '127.0.0.1' &&
+    !hostname.startsWith('127.') &&
+    hostname !== '::1'
+
+  // If localhost, extract port for webServer configuration
+  if (!isRemoteUrl) {
+    webServerUrl = baseURL
+    // Use explicit port if provided, otherwise keep undefined to use defaults
+    // (3000 for dev, 4321 for preview/CI)
+    webServerPort = explicitPort !== null ? explicitPort : undefined
+  } else {
+    webServerUrl = undefined
+    webServerPort = undefined
+  }
+} catch {
+  // Invalid URL format, treat as remote to be safe
+  isRemoteUrl = true
+  webServerUrl = undefined
+  webServerPort = undefined
+}
 
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests
@@ -98,19 +132,24 @@ export default defineConfig({
     ? undefined
     : isCi
       ? {
-          // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
-          command: 'pnpm run build && pnpm run preview -- --port 4321',
-          url: 'http://localhost:4321',
-          reuseExistingServer: false,
-          timeout: 10 * 60 * 1000, // allow time for build + preview start
-        }
+        // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
+        // Use port from BASE_URL if specified, otherwise default to 4321
+        command: `pnpm run build && pnpm run preview -- --port ${webServerPort || 4321}`,
+        url: webServerUrl || 'http://localhost:4321',
+        reuseExistingServer: false,
+        timeout: 10 * 60 * 1000, // allow time for build + preview start
+      }
       : {
-          // Local/dev flow should keep the fast dev server with HMR.
-          command: 'pnpm dev',
-          url: 'http://localhost:4321',
-          reuseExistingServer: true,
-          timeout: 180 * 1000,
-        },
+        // Local/dev flow should keep the fast dev server with HMR.
+        // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
+        // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
+        command: webServerPort !== undefined && webServerPort !== 3000
+          ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
+          : 'pnpm dev',
+        url: webServerUrl || 'http://localhost:3000',
+        reuseExistingServer: true,
+        timeout: 180 * 1000,
+      },
 
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',

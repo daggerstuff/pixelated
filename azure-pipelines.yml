@@ -748,9 +748,21 @@ stages:
               path: ~/.local/share/pnpm/store
             displayName: "Cache pnpm store"
 
+          - task: Cache@2
+            inputs:
+              key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: |
+                playwright | "$(Agent.OS)"
+              path: ~/.cache/ms-playwright
+            displayName: "Cache Playwright Browsers"
+
           - script: |
               corepack enable pnpm
               pnpm install --frozen-lockfile
+              pnpm exec playwright install --with-deps
+            displayName: "Install Playwright Browsers"
+
+          - script: |
               pnpm run performance:test
             displayName: "Run Performance Tests"
             env:
@@ -771,9 +783,21 @@ stages:
               versionSpec: "$(NODE_VERSION)"
             displayName: "Install Node.js"
 
+          - task: Cache@2
+            inputs:
+              key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: |
+                playwright | "$(Agent.OS)"
+              path: ~/.cache/ms-playwright
+            displayName: "Cache Playwright Browsers"
+
           - script: |
               corepack enable pnpm
               pnpm install --frozen-lockfile
+              pnpm exec playwright install --with-deps
+            displayName: "Install Playwright Browsers"
+
+          - script: |
               pnpm run e2e:smoke
             displayName: "Run E2E Smoke Tests"
             env:
