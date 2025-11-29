@@ -71,38 +71,34 @@ class RealFairlearnAnalyzer:
     ) -> Tuple[np.ndarray, np.ndarray, List[str]]:
         """Prepare features from session data for ML analysis"""
         # Extract relevant features from session data
-        features = []
-        sensitive_features = []
-        feature_names = []
-
         # Demographic features
         demographics = session_data.get("demographics", {})
 
         # Age (numerical)
         age = self._parse_age_range(demographics.get("age", "26-35"))
-        features.append(age)
-        feature_names.append("age")
+        features = [age]
+        feature_names = ["age"]
 
-        # Gender (categorical)
-        gender = demographics.get("gender", "female")
-        gender_encoded = self._encode_categorical("gender", gender)
-        features.append(gender_encoded)
-        sensitive_features.append(gender_encoded)
-        feature_names.append("gender")
+        # Categorical demographic features (used as sensitive attributes)
+        gender_encoded = self._encode_categorical(
+            "gender", demographics.get("gender", "female")
+        )
+        ethnicity_encoded = self._encode_categorical(
+            "ethnicity", demographics.get("ethnicity", "white")
+        )
+        language_encoded = self._encode_categorical(
+            "language", demographics.get("primaryLanguage", "en")
+        )
 
-        # Ethnicity (categorical)
-        ethnicity = demographics.get("ethnicity", "white")
-        ethnicity_encoded = self._encode_categorical("ethnicity", ethnicity)
-        features.append(ethnicity_encoded)
-        sensitive_features.append(ethnicity_encoded)
-        feature_names.append("ethnicity")
+        demographic_encodings = [
+            gender_encoded,
+            ethnicity_encoded,
+            language_encoded,
+        ]
 
-        # Language (categorical)
-        language = demographics.get("primaryLanguage", "en")
-        language_encoded = self._encode_categorical("language", language)
-        features.append(language_encoded)
-        sensitive_features.append(language_encoded)
-        feature_names.append("language")
+        features.extend(demographic_encodings)
+        feature_names.extend(["gender", "ethnicity", "language"])
+        sensitive_features = list(demographic_encodings)
 
         # Content-based features
         content = session_data.get("content", "")
@@ -126,9 +122,11 @@ class RealFairlearnAnalyzer:
         """Parse age range string to numerical value"""
         if "-" in age_range:
             start, end = age_range.split("-")
-            if end == "+":
-                return float(start) + 10  # Add 10 years for open-ended ranges
-            return (float(start) + float(end)) / 2
+            return (
+                float(start) + 10  # Add 10 years for open-ended ranges
+                if end == "+"
+                else (float(start) + float(end)) / 2
+            )
         try:
             return float(age_range)
         except ValueError:
@@ -198,8 +196,8 @@ class RealFairlearnAnalyzer:
         ]
 
         words = text.lower().split()
-        positive_count = sum(1 for word in words if word in positive_words)
-        negative_count = sum(1 for word in words if word in negative_words)
+        positive_count = sum(word in positive_words for word in words)
+        negative_count = sum(word in negative_words for word in words)
 
         total_sentiment_words = positive_count + negative_count
         if total_sentiment_words == 0:
@@ -395,6 +393,22 @@ class RealInterpretabilityAnalyzer:
 
         return feature_importance
 
+    def _merge_feature_importance(
+        self, results: Dict[str, Any], new_features: Dict[str, float]
+    ) -> None:
+        """Merge interpretability results from multiple methods"""
+        existing_features = results.get("feature_importance")
+        if existing_features:
+            for feature, importance in new_features.items():
+                if feature in existing_features:
+                    existing_features[feature] = (
+                        existing_features[feature] + importance
+                    ) / 2
+                else:
+                    existing_features[feature] = importance
+        else:
+            results["feature_importance"] = new_features
+
     def _perform_shap_analysis(
         self, input_data: np.ndarray, feature_names: List[str], results: Dict[str, Any]
     ) -> None:
@@ -404,12 +418,10 @@ class RealInterpretabilityAnalyzer:
 
         try:
             shap_values = self.shap_explainer(input_data)
-            feature_importance = self._extract_shap_feature_importance(
+            if feature_importance := self._extract_shap_feature_importance(
                 shap_values, feature_names
-            )
-
-            if feature_importance:
-                results["feature_importance"] = feature_importance
+            ):
+                self._merge_feature_importance(results, feature_importance)
                 results["methods_used"].append("shap")
                 results["explanation_quality"] = 0.85
                 results["bias_score"] = float(
@@ -443,23 +455,10 @@ class RealInterpretabilityAnalyzer:
                 num_features=min(5, len(feature_names)),
             )
 
-            # Extract feature importance from LIME
-            lime_features = {}
-            for feature, importance in lime_exp.as_list():
-                lime_features[feature] = abs(importance)
-
-            # Merge with existing feature importance or use LIME results
-            if results.get("feature_importance"):
-                # Merge SHAP and LIME results
-                for feature, importance in lime_features.items():
-                    if feature in results["feature_importance"]:
-                        results["feature_importance"][feature] = (
-                            results["feature_importance"][feature] + importance
-                        ) / 2
-                    else:
-                        results["feature_importance"][feature] = importance
-            else:
-                results["feature_importance"] = lime_features
+            lime_features = {
+                feature: abs(importance) for feature, importance in lime_exp.as_list()
+            }
+            self._merge_feature_importance(results, lime_features)
 
             results["methods_used"].append("lime")
             if results.get("explanation_quality", 0) < 0.75:
@@ -533,7 +532,7 @@ class RealHuggingFaceAnalyzer:
         if not text_words:
             return 0.0
 
-        toxic_count = sum(1 for word in toxic_words if word in text_lower)
+        toxic_count = sum(word in text_lower for word in toxic_words)
         toxicity_ratio = toxic_count / len(text_words)
         return min(toxicity_ratio * 5, 1.0)
 
@@ -544,17 +543,20 @@ class RealHuggingFaceAnalyzer:
         text_lower = text.lower()
 
         positive_count = sum(
-            1 for word in positive_indicators if word in text_lower
+            indicator in text_lower for indicator in positive_indicators
         )
         negative_count = sum(
-            1 for word in negative_indicators if word in text_lower
+            indicator in text_lower for indicator in negative_indicators
         )
 
-        if positive_count > negative_count:
-            return 0.7
-        if negative_count > positive_count:
-            return 0.3
-        return 0.5  # Neutral
+        # Neutral baseline when sentiment indicators are balanced
+        return (
+            0.7
+            if positive_count > negative_count
+            else 0.3
+            if negative_count > positive_count
+            else 0.5
+        )
 
     def _calculate_honest_score(self) -> float:
         """Calculate honesty score (placeholder)"""
@@ -668,9 +670,7 @@ async def get_real_interaction_patterns_analysis(
     try:
         # Analyze response patterns, timing, and engagement
         ai_responses = session_data.get("ai_responses", [])
-        response_times = [r.get("response_time", 0) for r in ai_responses]
-
-        if response_times:
+        if response_times := [r.get("response_time", 0) for r in ai_responses]:
             avg_response_time = np.mean(response_times)
             response_variance = np.var(response_times)
 
