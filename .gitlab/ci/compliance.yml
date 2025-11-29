@@ -317,12 +317,11 @@ compliance:summary:
     # Generate compliance badge
     - echo "🏷️ Generating compliance badge..."
     - |
-      cat > compliance-badge.svg << 'EOFSVG'
-      <svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">
-        <rect width="120" height="20" fill="#4c1"/>
-        <text x="10" y="14" fill="#fff" font-family="Arial" font-size="11">COMPLIANT</text>
-      </svg>
-      EOFSVG
+      printf '%s\n' \
+        '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">' \
+        '  <rect width="120" height="20" fill="#4c1"/>' \
+        '  <text x="10" y="14" fill="#fff" font-family="Arial" font-size="11">COMPLIANT</text>' \
+        '</svg>' > compliance-badge.svg
     
     - echo "✅ Compliance summary generated"
     - echo "📊 Overall compliance status: COMPLIANT"
