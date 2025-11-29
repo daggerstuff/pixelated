@@ -29,7 +29,7 @@ monitoring:performance:
     - curl -s -o /dev/null -w "%{http_code},%{time_total},%{size_download}" "$PERFORMANCE_TEST_URL" > performance-metrics.csv
     - END_TIME=$(date +%s%N)
     - RESPONSE_TIME=$(( (END_TIME - START_TIME) / 1000000 ))
-    - echo 'Response time: ${RESPONSE_TIME}ms'
+    - echo "Response time: ${RESPONSE_TIME}ms"
     
     # Memory usage monitoring
     - echo " Monitoring memory usage..."
@@ -93,7 +93,7 @@ monitoring:health:
         echo " Application is healthy"
         HEALTH_STATUS="healthy"
       else
-        echo 'ERROR: Application health check failed: $HEALTH_RESPONSE'
+        echo "ERROR: Application health check failed: $HEALTH_RESPONSE"
         HEALTH_STATUS="unhealthy"
       fi
     
@@ -107,7 +107,7 @@ monitoring:health:
         echo " Database is healthy"
         DB_HEALTH_STATUS="healthy"
       else
-        echo 'ERROR: Database health check failed: $DB_HEALTH_RESPONSE'
+        echo "ERROR: Database health check failed: $DB_HEALTH_RESPONSE"
         DB_HEALTH_STATUS="unhealthy"
       fi
     
@@ -121,7 +121,7 @@ monitoring:health:
         echo " Redis is healthy"
         REDIS_HEALTH_STATUS="healthy"
       else
-        echo 'ERROR: Redis health check failed: $REDIS_HEALTH_RESPONSE'
+        echo "ERROR: Redis health check failed: $REDIS_HEALTH_RESPONSE"
         REDIS_HEALTH_STATUS="unhealthy"
       fi
     
@@ -258,9 +258,9 @@ monitoring:errors:
     - API_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "api\|request\|response" | wc -l)
     - AUTH_ERRORS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | grep -i "auth\|login\|token" | wc -l)
     
-    - echo 'Database errors: $DB_ERRORS'
-    - echo 'API errors: $API_ERRORS'
-    - echo 'Authentication errors: $AUTH_ERRORS'
+    - echo "Database errors: $DB_ERRORS"
+    - echo "API errors: $API_ERRORS"
+    - echo "Authentication errors: $AUTH_ERRORS"
     
     # Calculate error rate
     - TOTAL_LOGS=$(kubectl logs -n ${KUBE_NAMESPACE} -l app=pixelated --tail=1000 | wc -l)
@@ -271,7 +271,7 @@ monitoring:errors:
       else
         ERROR_RATE=$(( ERROR_COUNT * 100 / TOTAL_LOGS ))
       fi
-    - echo 'Error rate: ${ERROR_RATE}%'
+    - echo "Error rate: ${ERROR_RATE}%"
     
     # Determine error status
     - |
@@ -303,9 +303,9 @@ monitoring:errors:
     # Alert if error rate is too high
     - |
       if [ $ERROR_RATE -gt 5 ]; then
-        echo 'WARNING: High error rate detected: ${ERROR_RATE}%'
+        echo "WARNING: High error rate detected: ${ERROR_RATE}%"
       else
-        echo ' Error rate is acceptable: ${ERROR_RATE}%'
+        echo " Error rate is acceptable: ${ERROR_RATE}%"
       fi
     
     - echo " Error rate monitoring completed"
@@ -358,8 +358,8 @@ monitoring:alerts:
     
     # Send alert (placeholder for actual alerting system)
     - echo " Sending alert notification..."
-    - echo 'Alert level: $ALERT_LEVEL'
-    - echo 'Alert message: $ALERT_MESSAGE'
+    - echo "Alert level: $ALERT_LEVEL"
+    - echo "Alert message: $ALERT_MESSAGE"
     
     # Here you would integrate with your alerting system
     # Examples: PagerDuty, Slack, Microsoft Teams, etc.

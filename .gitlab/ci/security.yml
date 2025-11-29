@@ -158,11 +158,11 @@ security:static-analysis:
 
     # ESLint security rules
     - echo " Running ESLint security analysis..."
-    - pnpm run lint:ci || echo 'WARNING: ESLint security issues found'
+    - pnpm run lint:ci || echo "WARNING: ESLint security issues found"
 
     # TypeScript security checks
     - echo " Running TypeScript security checks..."
-    - pnpm run typecheck:strict || echo 'WARNING: TypeScript security issues found'
+    - pnpm run typecheck:strict || echo "WARNING: TypeScript security issues found"
 
     # Custom security patterns
     - echo " Checking for security patterns..."
@@ -176,7 +176,7 @@ security:static-analysis:
     - |
       grep -r "validate\|sanitize" \
         src/ \
-        || echo 'WARNING: Input validation not comprehensive'
+        || echo "WARNING: Input validation not comprehensive"
 
     - echo " Static code analysis completed"
   artifacts:
