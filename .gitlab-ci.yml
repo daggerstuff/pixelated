@@ -64,7 +64,7 @@ validate:typecheck:
     - corepack enable pnpm
   script:
     - echo "Running typecheck validation..."
-    - echo "Node.js heap size: $NODE_OPTIONS"
+    - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
     - pnpm install --frozen-lockfile
     # Split typecheck into separate commands to reduce peak memory usage
     # and ensure NODE_OPTIONS is properly applied
