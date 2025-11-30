@@ -3,8 +3,9 @@
 # This script is ONLY used by Vercel and does not affect other deployment targets
 # Ensures pnpm 10.x is used and runs the Astro build
 #
-# NOTE: When `builds` exists in vercel.json, Vercel automatically runs this
-# `vercel-build` script before processing the builds section
+# NOTE: This script can be used as an alternative to inline buildCommand in vercel.json
+# When using the `builds` array in vercel.json, you must specify `buildCommand` explicitly
+# Vercel does NOT automatically run `vercel-build` - use buildCommand in vercel.json instead
 
 set -e
 
