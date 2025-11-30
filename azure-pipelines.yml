@@ -816,9 +816,8 @@ stages:
                     echo "✅ Staging URL is accessible (HTTP $HTTP_CODE - authentication required)"
                     exit 0
                   else
-                    echo "⚠️ HTTP $HTTP_CODE received (client error, but service is responding)"
-                    # Service is responding, so consider it accessible
-                    exit 0
+                    echo "❌ Client error (HTTP $HTTP_CODE) - service may not be ready or endpoint not found"
+                    # Continue to retry for other 4xx codes (400, 404, 429, etc.)
                   fi
                 elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
                   # 5xx codes are server errors - service is not ready
@@ -933,9 +932,8 @@ stages:
                     echo "✅ Staging URL is accessible (HTTP $HTTP_CODE - authentication required)"
                     exit 0
                   else
-                    echo "⚠️ HTTP $HTTP_CODE received (client error, but service is responding)"
-                    # Service is responding, so consider it accessible
-                    exit 0
+                    echo "❌ Client error (HTTP $HTTP_CODE) - service may not be ready or endpoint not found"
+                    # Continue to retry for other 4xx codes (400, 404, 429, etc.)
                   fi
                 elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
                   # 5xx codes are server errors - service is not ready

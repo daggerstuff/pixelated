@@ -54,6 +54,10 @@ validate:lint:
 validate:typecheck:
   stage: validate
   image: node:${NODE_VERSION}-slim
+  variables:
+    # Increase Node.js heap size to prevent OOM during typecheck
+    # Astro check can be memory-intensive with large codebases
+    NODE_OPTIONS: "--max-old-space-size=6144"
   before_script:
     - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
