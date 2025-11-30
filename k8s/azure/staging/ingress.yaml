@@ -11,10 +11,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - staging-azure.pixelatedempathy.tech
+    - staging.pixelatedempathy.tech
     secretName: pixelated-staging-tls
   rules:
-  - host: staging-azure.pixelatedempathy.tech
+  - host: staging.pixelatedempathy.tech
     http:
       paths:
       - path: /

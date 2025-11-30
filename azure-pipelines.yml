@@ -5,7 +5,7 @@
 # - AKS Cluster: pixelated-aks-cluster (East US)
 # - ACR: pixelatedregistry.azurecr.io
 # - External IP: 20.242.241.80 (NGINX Ingress Controller)
-# - Staging: staging-azure.pixelatedempathy.tech
+# - Staging: staging.pixelatedempathy.tech
 # - Production: azure.pixelatedempathy.tech
 # - Image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
 
@@ -72,6 +72,7 @@ variables:
     value: "$(Build.SourceVersion)"
 
   # Environment URLs (defaults, can be overridden by variable group)
+  # NOTE: Must match the hostname in k8s/azure/staging/ingress.yaml
   - name: STAGING_URL
     value: "https://staging.pixelatedempathy.tech"
   - name: PRODUCTION_URL
@@ -765,14 +766,68 @@ stages:
             displayName: "Install Playwright Browsers"
 
           - script: |
-              # Check if staging URL is accessible before running tests
-              echo "Checking connectivity to $(STAGING_URL)..."
-              if curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$(STAGING_URL)/api/bias-detection/health" | grep -q "200\|401\|403"; then
-                echo "✅ Staging URL is accessible"
-              else
-                echo "⚠️ Warning: Staging URL may not be accessible, but continuing with tests..."
-                echo "This may indicate DNS propagation delay or network issues"
-              fi
+              # Robust connectivity check with DNS resolution and retry logic
+              STAGING_URL=$(STAGING_URL)
+              MAX_RETRIES=10
+              RETRY_DELAY=15
+              RETRY_COUNT=0
+
+              echo "Checking connectivity to $STAGING_URL..."
+
+              # Extract hostname for DNS check
+              HOSTNAME=$(echo "$STAGING_URL" | sed -E 's|https?://([^/]+).*|\1|')
+
+              while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                echo "Attempt $RETRY_COUNT/$MAX_RETRIES: Checking DNS resolution for $HOSTNAME..."
+                
+                # Check DNS resolution first
+                if ! host "$HOSTNAME" > /dev/null 2>&1 && ! nslookup "$HOSTNAME" > /dev/null 2>&1; then
+                  echo "❌ DNS resolution failed for $HOSTNAME"
+                  if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo "Waiting ${RETRY_DELAY}s before retry (DNS propagation may be in progress)..."
+                    sleep $RETRY_DELAY
+                    continue
+                  else
+                    echo "ERROR: DNS resolution failed after $MAX_RETRIES attempts"
+                    echo "This indicates the staging URL is not properly configured or DNS has not propagated"
+                    exit 1
+                  fi
+                fi
+                
+                echo "✅ DNS resolution successful"
+                
+                # Check HTTP connectivity
+                echo "Checking HTTP connectivity to $STAGING_URL..."
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "$STAGING_URL/api/bias-detection/health" 2>/dev/null || echo "000")
+                
+                if echo "$HTTP_CODE" | grep -qE "200|401|403"; then
+                  echo "✅ Staging URL is accessible (HTTP $HTTP_CODE)"
+                  exit 0
+                elif [ "$HTTP_CODE" = "000" ]; then
+                  echo "❌ Connection failed (timeout or network error)"
+                else
+                  echo "⚠️ HTTP $HTTP_CODE received (may still be acceptable)"
+                  # Accept non-5xx errors as potentially valid
+                  if ! echo "$HTTP_CODE" | grep -q "^5"; then
+                    echo "✅ Acceptable response code, proceeding..."
+                    exit 0
+                  fi
+                fi
+                
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Waiting ${RETRY_DELAY}s before retry..."
+                  sleep $RETRY_DELAY
+                fi
+              done
+
+              echo "ERROR: Staging URL is not accessible after $MAX_RETRIES attempts"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "This may indicate:"
+              echo "  - DNS propagation delay"
+              echo "  - Network connectivity issues"
+              echo "  - Staging deployment not ready"
+              exit 1
             displayName: "Check Staging Connectivity"
             env:
               STAGING_URL: $(STAGING_URL)
@@ -813,14 +868,68 @@ stages:
             displayName: "Install Playwright Browsers"
 
           - script: |
-              # Check if staging URL is accessible before running tests
-              echo "Checking connectivity to $(STAGING_URL)..."
-              if curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$(STAGING_URL)/api/bias-detection/health" | grep -q "200\|401\|403"; then
-                echo "✅ Staging URL is accessible"
-              else
-                echo "⚠️ Warning: Staging URL may not be accessible, but continuing with tests..."
-                echo "This may indicate DNS propagation delay or network issues"
-              fi
+              # Robust connectivity check with DNS resolution and retry logic
+              STAGING_URL=$(STAGING_URL)
+              MAX_RETRIES=10
+              RETRY_DELAY=15
+              RETRY_COUNT=0
+
+              echo "Checking connectivity to $STAGING_URL..."
+
+              # Extract hostname for DNS check
+              HOSTNAME=$(echo "$STAGING_URL" | sed -E 's|https?://([^/]+).*|\1|')
+
+              while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                echo "Attempt $RETRY_COUNT/$MAX_RETRIES: Checking DNS resolution for $HOSTNAME..."
+                
+                # Check DNS resolution first
+                if ! host "$HOSTNAME" > /dev/null 2>&1 && ! nslookup "$HOSTNAME" > /dev/null 2>&1; then
+                  echo "❌ DNS resolution failed for $HOSTNAME"
+                  if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo "Waiting ${RETRY_DELAY}s before retry (DNS propagation may be in progress)..."
+                    sleep $RETRY_DELAY
+                    continue
+                  else
+                    echo "ERROR: DNS resolution failed after $MAX_RETRIES attempts"
+                    echo "This indicates the staging URL is not properly configured or DNS has not propagated"
+                    exit 1
+                  fi
+                fi
+                
+                echo "✅ DNS resolution successful"
+                
+                # Check HTTP connectivity
+                echo "Checking HTTP connectivity to $STAGING_URL..."
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "$STAGING_URL/api/bias-detection/health" 2>/dev/null || echo "000")
+                
+                if echo "$HTTP_CODE" | grep -qE "200|401|403"; then
+                  echo "✅ Staging URL is accessible (HTTP $HTTP_CODE)"
+                  exit 0
+                elif [ "$HTTP_CODE" = "000" ]; then
+                  echo "❌ Connection failed (timeout or network error)"
+                else
+                  echo "⚠️ HTTP $HTTP_CODE received (may still be acceptable)"
+                  # Accept non-5xx errors as potentially valid
+                  if ! echo "$HTTP_CODE" | grep -q "^5"; then
+                    echo "✅ Acceptable response code, proceeding..."
+                    exit 0
+                  fi
+                fi
+                
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Waiting ${RETRY_DELAY}s before retry..."
+                  sleep $RETRY_DELAY
+                fi
+              done
+
+              echo "ERROR: Staging URL is not accessible after $MAX_RETRIES attempts"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "This may indicate:"
+              echo "  - DNS propagation delay"
+              echo "  - Network connectivity issues"
+              echo "  - Staging deployment not ready"
+              exit 1
             displayName: "Check Staging Connectivity"
             env:
               STAGING_URL: $(STAGING_URL)
