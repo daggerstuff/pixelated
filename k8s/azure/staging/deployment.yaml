@@ -8,6 +8,12 @@ metadata:
     environment: staging
 spec:
   replicas: 2
+  progressDeadlineSeconds: 900  # 15 minutes - allows more time for slow startups
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Ensure zero downtime during updates
   selector:
     matchLabels:
       app: pixelated-app

@@ -211,11 +211,11 @@ const allTemplates = templateService.getAllTemplates()
 
 <script>
   // Client-side JavaScript for template management
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Handle create template button
     const createTemplateBtn = document.getElementById('create-template')
     if (createTemplateBtn) {
-      createTemplateBtn.addEventListener('click', (_event: Event) => {
+      createTemplateBtn.addEventListener('click', () => {
         window.location.href = '/admin/security/baa/templates/new'
       })
     }
@@ -223,8 +223,8 @@ const allTemplates = templateService.getAllTemplates()
     // Handle delete template buttons
     const deleteButtons = document.querySelectorAll('.delete-template')
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
-        const templateId = e.currentTarget.getAttribute('data-template-id')
+      button.addEventListener('click', (e) => {
+        const templateId = (e.currentTarget as HTMLElement)?.getAttribute('data-template-id')
         if (
           confirm(
             'Are you sure you want to delete this template? This action cannot be undone.',

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { UserSession } from '../types'
 import { toast } from 'sonner'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -270,6 +270,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         }
       }
     }
+    return undefined
   }, [
     isConnected,
     connectionStatus,

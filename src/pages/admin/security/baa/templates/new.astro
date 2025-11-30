@@ -262,7 +262,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
 <script is:inline define:vars={{ standardSections, standardPlaceholders }}>
   // Client-side JavaScript for template form management
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     const sectionsContainer = document.getElementById('sections-container')
     const placeholdersContainer = document.getElementById(
       'placeholders-container',
@@ -282,6 +282,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
     // Function to render sections
     function renderSections() {
+      if (!sectionsContainer) return
+
       if (sections.length === 0) {
         sectionsContainer.innerHTML = `
           <div class="border border-gray-200 p-4 rounded-md">
@@ -354,15 +356,15 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const moveUpBtn = sectionElement.querySelector('.move-up-section')
         const moveDownBtn = sectionElement.querySelector('.move-down-section')
         const removeBtn = sectionElement.querySelector('.remove-section')
-        const titleInput = sectionElement.querySelector('.section-title')
+        const titleInput = sectionElement.querySelector('.section-title') as HTMLInputElement | null
         const descriptionInput = sectionElement.querySelector(
           '.section-description',
-        )
-        const contentTextarea = sectionElement.querySelector('.section-content')
+        ) as HTMLInputElement | null
+        const contentTextarea = sectionElement.querySelector('.section-content') as HTMLTextAreaElement | null
         const requiredCheckbox =
-          sectionElement.querySelector('.section-required')
+          sectionElement.querySelector('.section-required') as HTMLInputElement | null
 
-        moveUpBtn.addEventListener('click', (_event: Event) => {
+        moveUpBtn?.addEventListener('click', () => {
           if (index > 0) {
             ;[sections[index - 1], sections[index]] = [
               sections[index],
@@ -372,7 +374,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           }
         })
 
-        moveDownBtn.addEventListener('click', (_event: Event) => {
+        moveDownBtn?.addEventListener('click', () => {
           if (index < sections.length - 1) {
             ;[sections[index], sections[index + 1]] = [
               sections[index + 1],
@@ -382,25 +384,29 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           }
         })
 
-        removeBtn.addEventListener('click', (_event: Event) => {
+        removeBtn?.addEventListener('click', () => {
           sections.splice(index, 1)
           renderSections()
         })
 
-        titleInput.addEventListener('change', (e: Event) => {
-          sections[index].title = e.target.value
+        titleInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          sections[index].title = target.value
         })
 
-        descriptionInput.addEventListener('change', (e: Event) => {
-          sections[index].description = e.target.value
+        descriptionInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          sections[index].description = target.value
         })
 
-        contentTextarea.addEventListener('change', (e: Event) => {
-          sections[index].content = e.target.value
+        contentTextarea?.addEventListener('change', (e) => {
+          const target = e.target as HTMLTextAreaElement
+          sections[index].content = target.value
         })
 
-        requiredCheckbox.addEventListener('change', (e: Event) => {
-          sections[index].required = e.target.checked
+        requiredCheckbox?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          sections[index].required = target.checked
         })
 
         sectionsContainer.appendChild(sectionElement)
@@ -409,6 +415,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
     // Function to render placeholders
     function renderPlaceholders() {
+      if (!placeholdersContainer) return
+
       if (placeholders.length === 0) {
         placeholdersContainer.innerHTML = `
           <div class="border border-gray-200 p-4 rounded-md">
@@ -484,43 +492,48 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const removeBtn = placeholderElement.querySelector(
           '.remove-placeholder',
         )
-        const keyInput = placeholderElement.querySelector('.placeholder-key')
+        const keyInput = placeholderElement.querySelector('.placeholder-key') as HTMLInputElement | null
         const labelInput =
-          placeholderElement.querySelector('.placeholder-label')
+          placeholderElement.querySelector('.placeholder-label') as HTMLInputElement | null
         const descriptionInput = placeholderElement.querySelector(
           '.placeholder-description',
-        )
+        ) as HTMLInputElement | null
         const defaultInput = placeholderElement.querySelector(
           '.placeholder-default',
-        )
+        ) as HTMLInputElement | null
         const requiredCheckbox = placeholderElement.querySelector(
           '.placeholder-required',
-        )
+        ) as HTMLInputElement | null
 
-        removeBtn.addEventListener('click', (_event: Event) => {
+        removeBtn?.addEventListener('click', () => {
           placeholders.splice(index, 1)
           renderPlaceholders()
         })
 
-        keyInput.addEventListener('change', (e: Event) => {
-          placeholders[index].key = e.target.value.toUpperCase()
-          keyInput.value = placeholders[index].key // Update to show uppercase
+        keyInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          placeholders[index].key = target.value.toUpperCase()
+          if (keyInput) keyInput.value = placeholders[index].key // Update to show uppercase
         })
 
-        labelInput.addEventListener('change', (e: Event) => {
-          placeholders[index].label = e.target.value
+        labelInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          placeholders[index].label = target.value
         })
 
-        descriptionInput.addEventListener('change', (e: Event) => {
-          placeholders[index].description = e.target.value
+        descriptionInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          placeholders[index].description = target.value
         })
 
-        defaultInput.addEventListener('change', (e: Event) => {
-          placeholders[index].defaultValue = e.target.value
+        defaultInput?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          placeholders[index].defaultValue = target.value
         })
 
-        requiredCheckbox.addEventListener('change', (e: Event) => {
-          placeholders[index].required = e.target.checked
+        requiredCheckbox?.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement
+          placeholders[index].required = target.checked
         })
 
         placeholdersContainer.appendChild(placeholderElement)
@@ -528,7 +541,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     }
 
     // Add a new section
-    addSectionBtn.addEventListener('click', (_event: Event) => {
+    addSectionBtn?.addEventListener('click', () => {
       sections.push({
         id: 'section-' + Date.now(),
         title: 'New Section',
@@ -541,7 +554,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     })
 
     // Add a new placeholder
-    addPlaceholderBtn.addEventListener('click', (_event: Event) => {
+    addPlaceholderBtn?.addEventListener('click', () => {
       placeholders.push({
         key: 'NEW_PLACEHOLDER',
         label: 'New Placeholder',
@@ -553,7 +566,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     })
 
     // Use standard sections
-    useStandardSectionsBtn.addEventListener('click', (_event: Event) => {
+    useStandardSectionsBtn?.addEventListener('click', () => {
       if (sections.length > 0) {
         if (!confirm('This will replace your current sections. Continue?')) {
           return
@@ -565,7 +578,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     })
 
     // Use standard placeholders
-    useStandardPlaceholdersBtn.addEventListener('click', (_event: Event) => {
+    useStandardPlaceholdersBtn?.addEventListener('click', () => {
       if (placeholders.length > 0) {
         if (
           !confirm('This will replace your current placeholders. Continue?')
@@ -579,7 +592,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     })
 
     // Form submission
-    templateForm.addEventListener('submit', (e: Event) => {
+    templateForm?.addEventListener('submit', (e) => {
       e.preventDefault()
 
       // In a real implementation, this would collect all form data and submit to an API

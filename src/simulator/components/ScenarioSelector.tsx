@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import type { Scenario, ScenarioSelectorProps } from '../types'
 import { ScenarioDifficulty } from '../types'
 import { getAllScenarios } from '../data/scenarios'

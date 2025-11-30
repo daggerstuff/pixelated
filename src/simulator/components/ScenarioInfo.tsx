@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
-import type { SimulationScenario, TherapeuticDomain } from '../types'
+import type { Scenario, TherapeuticDomain } from '../types'
 
 interface ScenarioInfoProps {
-  scenario: SimulationScenario
+  scenario: Scenario
   className?: string
 }
 
 // Map of therapeutic domains to user-friendly names
 const domainLabels: Record<TherapeuticDomain, string> = {
-  cognitive_behavioral: 'Cognitive Behavioral Therapy',
-  psychodynamic: 'Psychodynamic Therapy',
-  humanistic: 'Humanistic Therapy',
-  family_systems: 'Family Systems Therapy',
-  dialectical_behavioral: 'Dialectical Behavior Therapy',
-  solution_focused: 'Solution-Focused Brief Therapy',
-  motivational_interviewing: 'Motivational Interviewing',
-  trauma_informed: 'Trauma-Informed Care',
-  crisis_intervention: 'Crisis Intervention',
+  [TherapeuticDomain.DEPRESSION]: 'Depression',
+  [TherapeuticDomain.ANXIETY]: 'Anxiety',
+  [TherapeuticDomain.TRAUMA]: 'Trauma',
+  [TherapeuticDomain.SUBSTANCE_USE]: 'Substance Use',
+  [TherapeuticDomain.GRIEF]: 'Grief',
+  [TherapeuticDomain.RELATIONSHIP]: 'Relationship',
+  [TherapeuticDomain.STRESS_MANAGEMENT]: 'Stress Management',
+  [TherapeuticDomain.CRISIS_INTERVENTION]: 'Crisis Intervention',
+  [TherapeuticDomain.EATING_DISORDERS]: 'Eating Disorders',
+  [TherapeuticDomain.SELF_HARM]: 'Self Harm',
+  [TherapeuticDomain.PERSONALITY_DISORDERS]: 'Personality Disorders',
+  [TherapeuticDomain.DEVELOPMENTAL_DISORDERS]: 'Developmental Disorders',
+  [TherapeuticDomain.PSYCHOSIS]: 'Psychosis',
+  [TherapeuticDomain.BIPOLAR_DISORDER]: 'Bipolar Disorder',
+  [TherapeuticDomain.SOMATIC_DISORDERS]: 'Somatic Disorders',
+  [TherapeuticDomain.SLEEP_DISORDERS]: 'Sleep Disorders',
 }
 
 // Map of difficulty levels to colors
@@ -87,34 +94,30 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
 
           <div>
             <div className="font-medium text-gray-700 mb-1">Context</div>
-            <p>{scenario.scenarioContext}</p>
+            <p>{scenario.contextDescription}</p>
           </div>
 
           <div>
             <div className="font-medium text-gray-700 mb-1">
               Patient Background
             </div>
-            <p>{scenario.patientBackground}</p>
+            <p>{scenario.clientBackground}</p>
           </div>
 
           <div>
             <div className="font-medium text-gray-700 mb-1">
-              Presenting Issues
+              Presenting Issue
             </div>
-            <ul className="list-disc list-inside">
-              {scenario.presentingIssues.map((issue) => (
-                <li key={issue}>{issue}</li>
-              ))}
-            </ul>
+            <p>{scenario.presentingIssue}</p>
           </div>
 
-          {scenario.suggestedApproaches && (
+          {scenario.suggestedApproaches && scenario.suggestedApproaches.length > 0 && (
             <div>
               <div className="font-medium text-gray-700 mb-1">
                 Suggested Approaches
               </div>
               <ul className="list-disc list-inside">
-                {scenario.suggestedApproaches.map((approach) => (
+                {scenario.suggestedApproaches.map((approach: string) => (
                   <li key={approach}>{approach}</li>
                 ))}
               </ul>
@@ -124,14 +127,15 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
           <div>
             <div className="font-medium text-gray-700 mb-1">Target Skills</div>
             <div className="flex flex-wrap gap-1 mt-1">
-              {scenario.targetSkills.map((skill) => (
+              {scenario.techniques.map((skill) => (
                 <span
                   key={skill}
                   className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700"
                 >
                   {skill
+                    .toString()
                     .split('_')
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ')}
                 </span>
               ))}

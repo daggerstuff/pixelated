@@ -260,12 +260,12 @@ const title = 'Backup & Recovery'
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('ul.flex a')
     const contents = document.querySelectorAll('[id$="-content"]')
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', (e: Event) => {
+      tab.addEventListener('click', (e) => {
         e.preventDefault()
 
         // Remove active classes

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import type { SimulationContainerProps, TherapeuticTechnique } from '../types'
+import type { SimulationContainerProps, TherapeuticTechnique, RealTimeFeedback, Scenario } from '../types'
 import { useSimulator } from '../context/SimulatorContext'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import SimulationControls from './SimulationControls'
@@ -27,93 +27,23 @@ export function SimulationContainer({
   const responseInputRef = useRef<HTMLTextAreaElement>(null)
 
   const { state } = useSimulator()
-  const {
-    currentScenario,
-    isProcessing,
-    realtimeFeedback,
-    startSimulation,
-    endSimulation,
-    transcribedText,
-    isConnected,
-  } = {
-    currentScenario: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.currentScenario,
-    isProcessing: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.isProcessing,
-    realtimeFeedback: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.realtimeFeedback,
-    startSimulation: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.startSimulation,
-    endSimulation: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.endSimulation,
-    transcribedText: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.transcribedText,
-    isConnected: (
-      state as {
-        currentScenario?: unknown
-        isProcessing?: boolean
-        realtimeFeedback?: unknown[]
-        startSimulation?: (id: string) => Promise<void>
-        endSimulation?: () => Promise<void>
-        transcribedText?: string
-        isConnected?: boolean
-      }
-    )?.isConnected,
+  const typedState = state as {
+    currentScenario?: Scenario
+    isProcessing?: boolean
+    realtimeFeedback?: RealTimeFeedback[]
+    startSimulation?: (id: string) => Promise<void>
+    endSimulation?: () => Promise<void>
+    transcribedText?: string
+    isConnected?: boolean
   }
+  
+  const currentScenario = typedState?.currentScenario
+  const isProcessing = typedState?.isProcessing ?? false
+  const realtimeFeedback = typedState?.realtimeFeedback ?? []
+  const startSimulation = typedState?.startSimulation
+  const endSimulation = typedState?.endSimulation
+  const transcribedText = typedState?.transcribedText ?? ''
+  const isConnected = typedState?.isConnected ?? false
 
   // Conversation history for the current session
   const [conversation, setConversation] = useState<
@@ -140,23 +70,27 @@ export function SimulationContainer({
       setUserResponse('')
 
       // Start new simulation
-      startSimulation(scenarioId)
-        .then(() => {
-          // Focus on response input after simulation starts
-          if (responseInputRef.current) {
-            responseInputRef.current.focus()
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to start simulation:', error)
-        })
+      if (startSimulation) {
+        startSimulation(scenarioId)
+          .then(() => {
+            // Focus on response input after simulation starts
+            if (responseInputRef.current) {
+              responseInputRef.current.focus()
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to start simulation:', error)
+          })
+      }
     }
 
     // Clean up on unmount
     return () => {
-      endSimulation().catch((err) =>
-        console.error('Error ending simulation:', err),
-      )
+      if (endSimulation) {
+        endSimulation().catch((err) =>
+          console.error('Error ending simulation:', err),
+        )
+      }
     }
   }, [scenarioId, startSimulation, endSimulation])
 
@@ -197,8 +131,8 @@ export function SimulationContainer({
 
   // Add feedback to conversation when it arrives
   useEffect(() => {
-    if (realtimeFeedback.length > 0) {
-      const latestFeedback = realtimeFeedback[0]
+    if (realtimeFeedback && realtimeFeedback.length > 0) {
+      const latestFeedback: RealTimeFeedback = realtimeFeedback[0]
 
       // Add feedback to conversation if it has content
       if (latestFeedback.content || latestFeedback.suggestion) {
@@ -301,7 +235,7 @@ export function SimulationContainer({
       )}
 
       <div className="simulation-header">
-        <h2>{currentScenario?.title || 'Therapeutic Simulation'}</h2>
+        <h2>{(currentScenario && 'title' in currentScenario ? currentScenario.title : null) || 'Therapeutic Simulation'}</h2>
         {onBackToScenarios && (
           <button onClick={onBackToScenarios} className="back-button">
             ← Back to Scenarios

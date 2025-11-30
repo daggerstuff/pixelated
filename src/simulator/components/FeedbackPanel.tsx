@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSimulator } from '../context/SimulatorContext'
+import type { RealTimeFeedback } from '../types'
 import { FeedbackType } from '../types'
 
 interface FeedbackPanelProps {
@@ -114,7 +115,7 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
       )}
 
       <div className="space-y-3 mt-2 max-h-[500px] overflow-y-auto pr-1">
-        {realtimeFeedback.map((feedback, index) => (
+        {realtimeFeedback.map((feedback: RealTimeFeedback, index: number) => (
           <div
             key={`${feedback.timestamp}-${index}`}
             className={`p-3 rounded-md border-l-4 ${priorityColors[feedback.priority]} ${getBorderColor(feedback.type as FeedbackType)}-500`}

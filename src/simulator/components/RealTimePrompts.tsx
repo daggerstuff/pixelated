@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getTherapeuticPrompts } from '../utils/speechRecognition'
 import { cn } from '../../lib/utils'
 

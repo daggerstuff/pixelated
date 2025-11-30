@@ -2,8 +2,15 @@
 export const prerender = false
 import { requirePermission } from '@/lib/access-control'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import type { AstroCookies } from 'astro'
 
-export async function get({ cookies, redirect }) {
+export async function get({
+  cookies,
+  redirect,
+}: {
+  cookies: AstroCookies
+  redirect: (path: string) => Response
+}) {
   // Check if user has admin permission
   const checkPermission = requirePermission('read:admin')
   const permissionResponse = await checkPermission({ cookies, redirect })
@@ -339,7 +346,7 @@ export async function get({ cookies, redirect }) {
     }
 
     // Close modal when clicking outside
-    window.addEventListener('click', (event: Event) => {
+    window.addEventListener('click', (event) => {
       const modal = document.getElementById('crisis-modal')
       if (event.target === modal) {
         closeModal()

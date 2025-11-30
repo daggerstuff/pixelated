@@ -418,14 +418,14 @@ export const prerender = false // Enable SSR for real-time data
 
     updateDashboard(data) {
       // Update main stats
-      document.getElementById('total-sessions').textContent =
-        data.summary.unique_sessions
-      document.getElementById('conversion-rate').textContent =
-        data.summary.conversion_funnel.conversion_rate.toFixed(1) + '%'
-      document.getElementById('avg-time-cta').textContent =
-        Math.round(data.summary.avg_time_to_cta / 1000) + 's'
-      document.getElementById('avg-scroll-depth').textContent =
-        Math.round(data.summary.scroll_depth_avg) + '%'
+      const totalSessionsEl = document.getElementById('total-sessions')
+      if (totalSessionsEl) totalSessionsEl.textContent = String(data.summary.unique_sessions)
+      const conversionRateEl = document.getElementById('conversion-rate')
+      if (conversionRateEl) conversionRateEl.textContent = data.summary.conversion_funnel.conversion_rate.toFixed(1) + '%'
+      const avgTimeEl = document.getElementById('avg-time-cta')
+      if (avgTimeEl) avgTimeEl.textContent = Math.round(data.summary.avg_time_to_cta / 1000) + 's'
+      const scrollDepthEl = document.getElementById('avg-scroll-depth')
+      if (scrollDepthEl) scrollDepthEl.textContent = Math.round(data.summary.scroll_depth_avg) + '%'
 
       // Update A/B test results
       this.updateVariantStats(data)
@@ -454,15 +454,18 @@ export const prerender = false // Enable SSR for real-time data
         const rate =
           sessions > 0 ? ((conversions / sessions) * 100).toFixed(1) : '0.0'
 
-        document.getElementById(
+        const sessionsEl = document.getElementById(
           `variant-${variant.toLowerCase()}-sessions`,
-        ).textContent = sessions
-        document.getElementById(
+        )
+        if (sessionsEl) sessionsEl.textContent = String(sessions)
+        const conversionsEl = document.getElementById(
           `variant-${variant.toLowerCase()}-conversions`,
-        ).textContent = conversions
-        document.getElementById(
+        )
+        if (conversionsEl) conversionsEl.textContent = String(conversions)
+        const rateEl = document.getElementById(
           `variant-${variant.toLowerCase()}-rate`,
-        ).textContent = rate + '%'
+        )
+        if (rateEl) rateEl.textContent = rate + '%'
       })
     }
 
@@ -471,25 +474,27 @@ export const prerender = false // Enable SSR for real-time data
       const demoInteractions = funnelData.demo_interactions
       const ctaClicks = funnelData.cta_clicks
 
-      document.getElementById('funnel-page-views').textContent = pageViews
-      document.getElementById('funnel-demo-interactions').textContent =
-        demoInteractions
-      document.getElementById('funnel-cta-clicks').textContent = ctaClicks
+      const pageViewsEl = document.getElementById('funnel-page-views')
+      if (pageViewsEl) pageViewsEl.textContent = String(pageViews)
+      const interactionsEl = document.getElementById('funnel-demo-interactions')
+      if (interactionsEl) interactionsEl.textContent = String(demoInteractions)
+      const ctaClicksEl = document.getElementById('funnel-cta-clicks')
+      if (ctaClicksEl) ctaClicksEl.textContent = String(ctaClicks)
 
       // Update percentages and bars
       const demoInteractionPct =
         pageViews > 0 ? (demoInteractions / pageViews) * 100 : 0
       const ctaClickPct = pageViews > 0 ? (ctaClicks / pageViews) * 100 : 0
 
-      document.getElementById('funnel-demo-interactions-pct').textContent =
-        demoInteractionPct.toFixed(1) + '%'
-      document.getElementById('funnel-cta-clicks-pct').textContent =
-        ctaClickPct.toFixed(1) + '%'
+      const interactionPctEl = document.getElementById('funnel-demo-interactions-pct')
+      if (interactionPctEl) interactionPctEl.textContent = demoInteractionPct.toFixed(1) + '%'
+      const ctaClickPctEl = document.getElementById('funnel-cta-clicks-pct')
+      if (ctaClickPctEl) ctaClickPctEl.textContent = ctaClickPct.toFixed(1) + '%'
 
-      document.getElementById('funnel-demo-interactions-bar').style.width =
-        demoInteractionPct + '%'
-      document.getElementById('funnel-cta-clicks-bar').style.width =
-        ctaClickPct + '%'
+      const interactionBarEl = document.getElementById('funnel-demo-interactions-bar')
+      if (interactionBarEl) interactionBarEl.style.width = demoInteractionPct + '%'
+      const ctaClickBarEl = document.getElementById('funnel-cta-clicks-bar')
+      if (ctaClickBarEl) ctaClickBarEl.style.width = ctaClickPct + '%'
     }
 
     updateEventTimeline(events) {
@@ -562,7 +567,7 @@ export const prerender = false // Enable SSR for real-time data
   }
 
   // Initialize dashboard when DOM is ready
-  document.addEventListener('DOMContentLoaded', (event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     const dashboard = new DemoAnalyticsDashboard()
     dashboard.init() // Assuming there's an init method, or you can use any other method
   })

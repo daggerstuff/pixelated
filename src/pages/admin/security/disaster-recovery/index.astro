@@ -580,10 +580,10 @@ function getStatusDisplayText(
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Handle "Run Test" button
     const runTestBtn = document.getElementById('run-test-btn')
-    runTestBtn?.addEventListener('click', (_event: Event) => {
+    runTestBtn?.addEventListener('click', () => {
       // In a real implementation, this would open a modal to select a test to run
       alert(
         'In a production environment, this would open the test configuration dialog.',
@@ -592,14 +592,14 @@ function getStatusDisplayText(
 
     // Handle "Schedule Test" button
     const scheduleTestBtn = document.getElementById('schedule-test-btn')
-    scheduleTestBtn?.addEventListener('click', (_event: Event) => {
+    scheduleTestBtn?.addEventListener('click', () => {
       window.location.href = '/admin/security/disaster-recovery/tests/schedule'
     })
 
     // Handle "Test Plan" buttons
     const testPlanBtns = document.querySelectorAll('.test-plan')
     testPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
         window.location.href = `/admin/security/disaster-recovery/plans/${planId}/test`
       })
@@ -608,7 +608,7 @@ function getStatusDisplayText(
     // Handle "Edit Plan" buttons
     const editPlanBtns = document.querySelectorAll('.edit-plan')
     editPlanBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
         window.location.href = `/admin/security/disaster-recovery/plans/${planId}/edit`
       })
@@ -617,7 +617,7 @@ function getStatusDisplayText(
     // Handle test detail buttons
     const testDetailBtns = document.querySelectorAll('[data-test-id]')
     testDetailBtns.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const testId = (e.target as HTMLElement).getAttribute('data-test-id')
         window.location.href = `/admin/security/disaster-recovery/tests/${testId}`
       })

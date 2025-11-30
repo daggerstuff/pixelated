@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { TechniqueDisplay } from '../TechniqueDisplay'
 import { SimulatorProvider } from '../../context/SimulatorContext'
+import type { DetectedTechnique } from '../../types'
 
-const mockTechniques = [
-  { name: 'Cognitive Reframing', confidence: 0.95 },
-  { name: 'Active Listening', confidence: 0.75 },
-  { name: 'Validation', confidence: 0.85 },
+const mockTechniques: DetectedTechnique[] = [
+  { name: 'Cognitive Reframing', description: 'Test', confidence: 0.95, timestamp: Date.now() },
+  { name: 'Active Listening', description: 'Test', confidence: 0.75, timestamp: Date.now() },
+  { name: 'Validation', description: 'Test', confidence: 0.85, timestamp: Date.now() },
 ]
 
-const renderWithContext = (techniques = null) => {
+const renderWithContext = (techniques: DetectedTechnique[] | undefined = undefined) => {
   return render(
     <SimulatorProvider initialState={{ detectedTechniques: techniques }}>
       <TechniqueDisplay />

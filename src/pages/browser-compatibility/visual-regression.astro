@@ -535,7 +535,7 @@ const placeholderThumbnail =
   // Refresh button
   document
     .getElementById('refresh-data')
-    ?.addEventListener('click', (_event: Event) => {
+    ?.addEventListener('click', () => {
       window.location.reload()
     })
 
@@ -548,7 +548,7 @@ const placeholderThumbnail =
   const modalDiff = document.getElementById('modalDiff')
 
   // Close modal with escape key
-  document.addEventListener('keydown', (e: Event) => {
+  document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
       closeModal()
     }
@@ -560,12 +560,12 @@ const placeholderThumbnail =
   }
 
   // Close modal button click
-  closeModalBtn?.addEventListener('click', (_event: Event) => {
+  closeModalBtn?.addEventListener('click', () => {
     closeModal()
   })
 
   // Allow clicking outside modal to close
-  modal?.addEventListener('click', (e: Event) => {
+  modal?.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeModal()
     }

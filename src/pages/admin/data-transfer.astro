@@ -350,13 +350,13 @@ const getTrendClass = (trend: string) => {
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Tab functionality
     const tabs = document.querySelectorAll('[id^="tab-"]')
     const panels = document.querySelectorAll('[id^="panel-"]')
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', (_event: Event) => {
+      tab.addEventListener('click', () => {
         // Toggle tabs
         tabs.forEach((t) => {
           t.classList.remove(
@@ -407,7 +407,7 @@ const getTrendClass = (trend: string) => {
     // In a real implementation, these would save to a database
     document
       .querySelector('button[type="submit"]')
-      ?.addEventListener('click', (e: Event) => {
+      ?.addEventListener('click', (e) => {
         e.preventDefault()
         alert(
           'In a production environment, this would save your settings to the database.',

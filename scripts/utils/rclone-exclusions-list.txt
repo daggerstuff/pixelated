@@ -1,5 +1,5 @@
 # Rclone SSH Sync Exclusion List
-# Generated: 2025-11-30T08:25:26Z
+# Generated: 2025-11-30T09:29:28Z
 # Repository: /home/vivi/pixelated
 
 .git
