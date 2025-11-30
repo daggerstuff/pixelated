@@ -800,7 +800,7 @@ stages:
           - script: |
               # Check if staging URL is accessible before running tests
               echo "Checking connectivity to $(STAGING_URL)..."
-              if curl -f -s -o /dev/null -w "%{http_code}" --max-time 10 "$(STAGING_URL)/api/bias-detection/health" | grep -q "200\|401\|403"; then
+              if curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$(STAGING_URL)/api/bias-detection/health" | grep -q "200\|401\|403"; then
                 echo "✅ Staging URL is accessible"
               else
                 echo "⚠️ Warning: Staging URL may not be accessible, but continuing with tests..."
