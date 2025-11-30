@@ -69,7 +69,7 @@ validate:typecheck:
     # Split typecheck into separate commands to reduce peak memory usage
     # and ensure NODE_OPTIONS is properly applied
     - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
-    - NODE_OPTIONS="--max-old-space-size=8192" tsc --noEmit
+    - NODE_OPTIONS="--max-old-space-size=8192" pnpm exec tsc --noEmit
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
