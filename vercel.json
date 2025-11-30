@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "api/vercel-handler.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**"]
+      }
     }
   ],
   "routes": [

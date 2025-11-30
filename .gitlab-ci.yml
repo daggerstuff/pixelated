@@ -57,14 +57,19 @@ validate:typecheck:
   variables:
     # Increase Node.js heap size to prevent OOM during typecheck
     # Astro check can be memory-intensive with large codebases
-    NODE_OPTIONS: "--max-old-space-size=6144"
+    # Using 8GB to match dev environment requirements
+    NODE_OPTIONS: "--max-old-space-size=8192"
   before_script:
     - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
   script:
     - echo "Running typecheck validation..."
+    - echo "Node.js heap size: $NODE_OPTIONS"
     - pnpm install --frozen-lockfile
-    - pnpm typecheck
+    # Split typecheck into separate commands to reduce peak memory usage
+    # and ensure NODE_OPTIONS is properly applied
+    - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
+    - NODE_OPTIONS="--max-old-space-size=8192" tsc --noEmit
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
