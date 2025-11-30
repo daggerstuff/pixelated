@@ -767,15 +767,15 @@ stages:
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
-              STAGING_URL=$(STAGING_URL)
+              # Access environment variable directly (no command substitution)
               MAX_RETRIES=10
               RETRY_DELAY=15
               RETRY_COUNT=0
 
-              echo "Checking connectivity to $STAGING_URL..."
+              echo "Checking connectivity to ${STAGING_URL}..."
 
               # Extract hostname for DNS check
-              HOSTNAME=$(echo "$STAGING_URL" | sed -E 's|https?://([^/]+).*|\1|')
+              HOSTNAME=$(echo "${STAGING_URL}" | sed -E 's|https?://([^/]+).*|\1|')
 
               while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
                 RETRY_COUNT=$((RETRY_COUNT + 1))
@@ -798,21 +798,36 @@ stages:
                 echo "✅ DNS resolution successful"
                 
                 # Check HTTP connectivity
-                echo "Checking HTTP connectivity to $STAGING_URL..."
-                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "$STAGING_URL/api/bias-detection/health" 2>/dev/null || echo "000")
+                echo "Checking HTTP connectivity to ${STAGING_URL}..."
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "${STAGING_URL}/api/bias-detection/health" 2>/dev/null || echo "000")
                 
-                if echo "$HTTP_CODE" | grep -qE "200|401|403"; then
+                # Handle HTTP response codes
+                if echo "$HTTP_CODE" | grep -qE "^[2]"; then
+                  # 2xx codes are success
                   echo "✅ Staging URL is accessible (HTTP $HTTP_CODE)"
                   exit 0
                 elif [ "$HTTP_CODE" = "000" ]; then
+                  # "000" means curl failed (timeout, connection error, etc.)
                   echo "❌ Connection failed (timeout or network error)"
-                else
-                  echo "⚠️ HTTP $HTTP_CODE received (may still be acceptable)"
-                  # Accept non-5xx errors as potentially valid
-                  if ! echo "$HTTP_CODE" | grep -q "^5"; then
-                    echo "✅ Acceptable response code, proceeding..."
+                  # Continue to retry
+                elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
+                  # 4xx codes (401, 403 are acceptable for health checks, others are not)
+                  if echo "$HTTP_CODE" | grep -qE "401|403"; then
+                    echo "✅ Staging URL is accessible (HTTP $HTTP_CODE - authentication required)"
+                    exit 0
+                  else
+                    echo "⚠️ HTTP $HTTP_CODE received (client error, but service is responding)"
+                    # Service is responding, so consider it accessible
                     exit 0
                   fi
+                elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
+                  # 5xx codes are server errors - service is not ready
+                  echo "❌ Server error (HTTP $HTTP_CODE) - service may not be ready"
+                  # Continue to retry
+                else
+                  # Unknown/invalid HTTP code
+                  echo "⚠️ Unexpected HTTP code: $HTTP_CODE"
+                  # Continue to retry
                 fi
                 
                 if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
@@ -869,15 +884,15 @@ stages:
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
-              STAGING_URL=$(STAGING_URL)
+              # Access environment variable directly (no command substitution)
               MAX_RETRIES=10
               RETRY_DELAY=15
               RETRY_COUNT=0
 
-              echo "Checking connectivity to $STAGING_URL..."
+              echo "Checking connectivity to ${STAGING_URL}..."
 
               # Extract hostname for DNS check
-              HOSTNAME=$(echo "$STAGING_URL" | sed -E 's|https?://([^/]+).*|\1|')
+              HOSTNAME=$(echo "${STAGING_URL}" | sed -E 's|https?://([^/]+).*|\1|')
 
               while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
                 RETRY_COUNT=$((RETRY_COUNT + 1))
@@ -900,21 +915,36 @@ stages:
                 echo "✅ DNS resolution successful"
                 
                 # Check HTTP connectivity
-                echo "Checking HTTP connectivity to $STAGING_URL..."
-                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "$STAGING_URL/api/bias-detection/health" 2>/dev/null || echo "000")
+                echo "Checking HTTP connectivity to ${STAGING_URL}..."
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "${STAGING_URL}/api/bias-detection/health" 2>/dev/null || echo "000")
                 
-                if echo "$HTTP_CODE" | grep -qE "200|401|403"; then
+                # Handle HTTP response codes
+                if echo "$HTTP_CODE" | grep -qE "^[2]"; then
+                  # 2xx codes are success
                   echo "✅ Staging URL is accessible (HTTP $HTTP_CODE)"
                   exit 0
                 elif [ "$HTTP_CODE" = "000" ]; then
+                  # "000" means curl failed (timeout, connection error, etc.)
                   echo "❌ Connection failed (timeout or network error)"
-                else
-                  echo "⚠️ HTTP $HTTP_CODE received (may still be acceptable)"
-                  # Accept non-5xx errors as potentially valid
-                  if ! echo "$HTTP_CODE" | grep -q "^5"; then
-                    echo "✅ Acceptable response code, proceeding..."
+                  # Continue to retry
+                elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
+                  # 4xx codes (401, 403 are acceptable for health checks, others are not)
+                  if echo "$HTTP_CODE" | grep -qE "401|403"; then
+                    echo "✅ Staging URL is accessible (HTTP $HTTP_CODE - authentication required)"
+                    exit 0
+                  else
+                    echo "⚠️ HTTP $HTTP_CODE received (client error, but service is responding)"
+                    # Service is responding, so consider it accessible
                     exit 0
                   fi
+                elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
+                  # 5xx codes are server errors - service is not ready
+                  echo "❌ Server error (HTTP $HTTP_CODE) - service may not be ready"
+                  # Continue to retry
+                else
+                  # Unknown/invalid HTTP code
+                  echo "⚠️ Unexpected HTTP code: $HTTP_CODE"
+                  # Continue to retry
                 fi
                 
                 if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
