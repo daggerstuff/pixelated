@@ -19,10 +19,8 @@ variables:
   # Required for deployment and health-check jobs
   # If not configured, jobs will fail with clear error messages
   # Configure at: Settings > CI/CD > Variables
-  GCP_PROJECT_ID: $GCP_PROJECT_ID
-  GKE_CLUSTER_NAME: $GKE_CLUSTER_NAME
-  GKE_ZONE: $GKE_ZONE
-  GCP_SERVICE_ACCOUNT_KEY: $GCP_SERVICE_ACCOUNT_KEY
+  # Note: GCP_PROJECT_ID, GKE_CLUSTER_NAME, GKE_ZONE, and GCP_SERVICE_ACCOUNT_KEY
+  # are inherited directly from project variables and should not be redefined here
 
 # Validation jobs
 validate:dependencies:
@@ -33,7 +31,7 @@ validate:dependencies:
   script:
     - echo "Validating dependencies..."
     - pnpm install --frozen-lockfile
-    - pnpm audit --audit-level moderate || echo "Audit warnings found"
+    - pnpm audit --audit-level moderate
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -46,7 +44,7 @@ validate:lint:
   script:
     - echo "Running lint validation..."
     - pnpm install --frozen-lockfile
-    - pnpm lint:ci || echo "Lint warnings found"
+    - pnpm lint:ci
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -59,7 +57,7 @@ validate:typecheck:
   script:
     - echo "Running typecheck validation..."
     - pnpm install --frozen-lockfile
-    - pnpm typecheck || echo "Typecheck warnings found"
+    - pnpm typecheck
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -148,16 +146,16 @@ deploy:staging:
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
   script:
     - echo "Deploying to staging..."
-    # Check if deployment exists, create if not
+    # Check if deployment exists, fail if not
     - |
       if kubectl get deployment pixelated -n pixelated-staging > /dev/null 2>&1; then
         echo "Updating existing deployment..."
         kubectl set image deployment/pixelated app=${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} -n pixelated-staging
       else
-        echo "WARNING: Deployment 'pixelated' does not exist in namespace 'pixelated-staging'"
+        echo "ERROR: Deployment 'pixelated' does not exist in namespace 'pixelated-staging'"
         echo "First deployment must be done manually or via infrastructure-as-code"
-        echo "Skipping deployment update"
-        exit 0
+        echo "The deployment job cannot proceed without an existing deployment"
+        exit 1
       fi
     - kubectl rollout status deployment/pixelated -n pixelated-staging --timeout=300s || echo "Rollout status check completed with warnings"
     - echo "Staging deployment completed"
@@ -199,7 +197,7 @@ health-check:
       RETRY_COUNT=0
       HEALTH_CHECK_PASSED=false
       while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-        if curl -f -s $STAGING_URL/api/health > /dev/null; then
+        if curl -f -s "$STAGING_URL/api/health" > /dev/null; then
           echo "Health check passed"
           HEALTH_CHECK_PASSED=true
           break
@@ -227,7 +225,7 @@ performance-test:
   script:
     - echo "Running performance tests..."
     - pnpm install --frozen-lockfile
-    - pnpm run performance:test || echo "Performance tests completed with warnings"
+    - pnpm run performance:test
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
@@ -241,7 +239,7 @@ e2e-test:
   script:
     - echo "Running E2E tests..."
     - pnpm install --frozen-lockfile
-    - pnpm run e2e:smoke || echo "E2E tests completed with warnings"
+    - pnpm run e2e:smoke
   artifacts:
     reports:
       junit: test-results/junit.xml
