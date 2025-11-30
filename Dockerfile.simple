@@ -1,9 +1,21 @@
-# Use newer Node.js version with better security
-FROM node:24-alpine@sha256:2867d550cf9d8bb50059a0fff528741f11a84d985c732e60e19e8e75c7239c43
+# Use Node.js 24 with latest Alpine base image (pulls most recent patches)
+FROM node:24-alpine
 
-# Upgrade packages and create non-root user
-RUN apk upgrade --no-cache && \
-    addgroup -g 1001 astro && \
+# Upgrade all packages to latest versions to patch known vulnerabilities
+# The --available flag ensures all available updates are applied
+RUN apk update && \
+    apk upgrade --no-cache --available && \
+    apk cache clean && \
+    apk add --no-cache dumb-init && \
+    rm -rf /var/cache/apk/* /tmp/* /root/.cache
+
+# Install pnpm as root before switching users
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm install -g pnpm@10.24.0 && \
+    npm cache clean --force
+
+# Create non-root user
+RUN addgroup -g 1001 astro && \
     adduser -u 1001 -G astro -s /bin/sh -D astro
 
 WORKDIR /app
@@ -11,11 +23,6 @@ WORKDIR /app
 # Set ownership and drop to non-root user
 RUN chown astro:astro /app
 USER astro
-
-# Install pnpm with security best practices
-RUN npm config set registry https://registry.npmjs.org/ && \
-    npm install -g pnpm@10.23.0 && \
-    npm cache clean --force
 
 # Copy package files with proper ownership
 COPY --chown=astro:astro package.json pnpm-lock.yaml ./
@@ -38,7 +45,7 @@ RUN find /app -name "*.map" -delete && \
 
 # Health check for container monitoring
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:4321', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+    CMD node -e "require('http').get('http://localhost:4321', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
 # Expose port
 EXPOSE 4321

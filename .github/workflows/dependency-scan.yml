@@ -22,7 +22,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.23.0
+          version: 10.24.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -56,22 +56,22 @@ jobs:
         run: |
           # Find all pyproject.toml files
           PYPROJECT_FILES=$(find . -name "pyproject.toml" -not -path "./node_modules/*" -not -path "./.venv/*" | sort)
-          
+
           if [ -z "$PYPROJECT_FILES" ]; then
             echo "⚠️ No pyproject.toml files found - skipping Python dependency scan"
             echo "NO_PYTHON_PROJECTS=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           echo "📦 Found Python projects:"
           echo "$PYPROJECT_FILES"
           echo ""
-          
+
           # Track overall results
           TOTAL_VULNS=0
           ALL_OUTPUTS=""
           SCAN_FAILED=false
-          
+
           for pyproject in $PYPROJECT_FILES; do
             PROJECT_DIR=$(dirname "$pyproject")
             PROJECT_NAME=$(basename "$PROJECT_DIR")
@@ -118,14 +118,14 @@ jobs:
             cd - > /dev/null
             echo ""
           done
-          
+
           # Consolidate outputs
           if [ -f /tmp/pip-audit-combined.txt ]; then
             mv /tmp/pip-audit-combined.txt pip-audit-output.txt
           else
             echo "No pip-audit output generated" > pip-audit-output.txt
           fi
-          
+
           if [ "$SCAN_FAILED" = true ]; then
             exit 1
           fi

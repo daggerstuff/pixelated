@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.23.0
+  PNPM_VERSION: 10.24.0
   NODE_ENV: test
   DISABLE_AUTH: "true"
   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
@@ -35,7 +35,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
-          version: 10.23.0
+          version: 10.24.0
 
       - name: Setup pnpm cache
         uses: actions/cache@v4

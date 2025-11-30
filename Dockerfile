@@ -2,7 +2,7 @@
 
 # Builder stage: install deps and run the static build
 FROM node:24-alpine AS builder
-ARG PNPM_VERSION=10.23.0
+ARG PNPM_VERSION=10.24.0
 
 ARG PNPM_VERSION
 WORKDIR /app
