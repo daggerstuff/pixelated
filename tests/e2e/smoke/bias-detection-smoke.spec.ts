@@ -1,11 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Bias Detection Engine - Smoke Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    // Skip authentication for smoke tests - focus on availability
-    await page.goto('/')
-  })
-
   test('Health check endpoint is accessible', async ({ request }) => {
     const response = await request.get('/api/bias-detection/health')
     expect(response.status()).toBe(200)

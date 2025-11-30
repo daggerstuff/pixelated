@@ -27,6 +27,7 @@ validate:dependencies:
   stage: validate
   image: node:${NODE_VERSION}-slim
   before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
   script:
     - echo "Validating dependencies..."
@@ -40,6 +41,7 @@ validate:lint:
   stage: validate
   image: node:${NODE_VERSION}-slim
   before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
   script:
     - echo "Running lint validation..."
@@ -53,6 +55,7 @@ validate:typecheck:
   stage: validate
   image: node:${NODE_VERSION}-slim
   before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
   script:
     - echo "Running typecheck validation..."
@@ -221,6 +224,7 @@ performance-test:
   image: node:${NODE_VERSION}-slim
   needs: ["deploy:staging"]
   before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
   script:
     - echo "Running performance tests..."
