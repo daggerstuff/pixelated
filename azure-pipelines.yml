@@ -50,6 +50,7 @@ variables:
   # Convert parameters to variables for runtime conditions
   # Template expressions (${{ }}) convert parameters to variables at compile-time
   # Runtime conditions can then check these variables at execution time
+  # Note: These variables are always defined via parameters (default: "false")
   - name: TRIGGER_OVH_OLLAMA_BUILD
     value: ${{ parameters.TRIGGER_OVH_OLLAMA_BUILD }}
   - name: TRIGGER_AI_TRAINING
@@ -80,10 +81,57 @@ variables:
 
   # Pool selection: Uses Default agent pool (self-hosted agents)
 
+  # Pipeline-level timeout: 2 hours overall limit
+  # Note: Timeouts are configured at job/stage level - this variable is for reference
+  - name: pipelineTimeoutInMinutes
+    value: "120"
+
 stages:
   - stage: Validate
     displayName: "Validate Code"
     jobs:
+      - job: ValidateVariables
+        displayName: "Validate Required Variables"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - script: |
+              set -euo pipefail
+
+              required_vars=(
+                "NODE_VERSION"
+                "AZURE_CONTAINER_REGISTRY"
+                "IMAGE_REPOSITORY"
+                "AZURE_RESOURCE_GROUP"
+                "AZURE_SUBSCRIPTION"
+                "AKS_CLUSTER_NAME"
+                "KUBE_NAMESPACE"
+                "KUBE_NAMESPACE_PROD"
+              )
+
+              missing_vars=()
+              for var in "${required_vars[@]}"; do
+                # Check if variable is set and non-empty
+                var_value=$(eval echo "\$${var}")
+                if [ -z "${var_value}" ]; then
+                  missing_vars+=("$var")
+                fi
+              done
+
+              if [ ${#missing_vars[@]} -gt 0 ]; then
+                echo "##vso[task.logissue type=error]Missing required variables:"
+                for var in "${missing_vars[@]}"; do
+                  echo "  - $var"
+                done
+                echo ""
+                echo "These variables must be set in the 'pixelated-pipeline-variables' variable group"
+                echo "or as pipeline variables. See docs/azure-devops/variable-setup.md"
+                exit 1
+              fi
+
+              echo "✅ All required variables are set"
+            displayName: "Validate Required Variables"
+
       - job: ValidateDependencies
         displayName: "Validate Dependencies"
         pool:
@@ -149,7 +197,7 @@ stages:
             displayName: "Install Node.js"
 
           - task: Bash@3
-            displayName: "Ensure Docker Access"
+            displayName: "Verify Docker Access"
             inputs:
               targetType: "inline"
               script: |
@@ -157,55 +205,28 @@ stages:
 
                 # Check if Docker daemon is accessible
                 if ! docker info >/dev/null 2>&1; then
-                  echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
-                  
-                  # Get current user
-                  CURRENT_USER=$(whoami)
-                  echo "Current user: ${CURRENT_USER}"
-                  
-                  # Ensure docker socket has correct permissions (most reliable fix)
-                  if [ -S /var/run/docker.sock ]; then
-                    echo "Fixing docker socket permissions..."
-                    
-                    # Try to set socket permissions to 666 (read/write for all)
-                    if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
-                      echo "✅ Set docker socket permissions to 666"
-                    # Fallback: ensure docker group ownership
-                    elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
-                         sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
-                      echo "✅ Set docker socket to docker group ownership"
-                      
-                      # Check if user is in docker group
-                      if ! groups | grep -q docker; then
-                        echo "⚠️ User not in docker group, adding..."
-                        sudo usermod -aG docker "${CURRENT_USER}" || {
-                          echo "⚠️ Could not add user to docker group"
-                        }
-                        echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
-                      fi
-                    else
-                      echo "❌ Could not fix docker socket permissions"
-                      echo "⚠️ Manual fix required on agent machine:"
-                      echo "   sudo chmod 666 /var/run/docker.sock"
-                      echo "   OR"
-                      echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
-                      exit 1
-                    fi
-                  else
-                    echo "❌ Docker socket not found at /var/run/docker.sock"
-                    exit 1
-                  fi
-                  
-                  # Verify Docker access
-                  if docker info >/dev/null 2>&1; then
-                    echo "✅ Docker access verified"
-                  else
-                    echo "❌ Docker access still not available after permission fix"
-                    exit 1
-                  fi
-                else
-                  echo "✅ Docker daemon is accessible"
+                  echo "##vso[task.logissue type=error]Docker daemon is not accessible"
+                  echo ""
+                  echo "❌ Docker access check failed. This indicates an agent configuration issue:"
+                  echo ""
+                  echo "For Microsoft-hosted agents:"
+                  echo "  - Docker should work out-of-the-box"
+                  echo "  - If it doesn't, this is a service issue - contact Azure DevOps support"
+                  echo ""
+                  echo "For self-hosted agents:"
+                  echo "  - Fix Docker permissions permanently on the agent machine:"
+                  echo "    sudo usermod -aG docker $(whoami)"
+                  echo "    sudo systemctl restart docker"
+                  echo "    sudo systemctl restart vsts.agent.*"
+                  echo "  - Or ensure docker socket permissions:"
+                  echo "    sudo chmod 666 /var/run/docker.sock"
+                  echo ""
+                  echo "Runtime permission fixes are unreliable and have been removed."
+                  echo "Please fix Docker configuration on the agent machine."
+                  exit 1
                 fi
+
+                echo "✅ Docker daemon is accessible"
 
                 # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
                 docker info 2>&1 | { head -n 5; cat > /dev/null; }
@@ -231,10 +252,7 @@ stages:
               # Ensure artifact staging directory exists
               mkdir -p $(Build.ArtifactStagingDirectory)
 
-              # Build metadata file path
               METADATA_FILE="$(Build.ArtifactStagingDirectory)/build.env"
-
-              # Construct image tag
               IMAGE_TAG="$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 
               # Try to get image digest, but don't fail if unavailable
@@ -253,11 +271,15 @@ stages:
                 echo "BUILD_NUMBER=$(Build.BuildNumber)"
               } > "$METADATA_FILE"
 
-              # Display what we captured
+              # Validate metadata file exists and has content
+              if [ ! -f "$METADATA_FILE" ] || [ ! -s "$METADATA_FILE" ]; then
+                echo "##vso[task.logissue type=error]Build metadata file missing or empty"
+                exit 1
+              fi
+
               echo "📦 Build metadata captured:"
               cat "$METADATA_FILE"
             displayName: "Capture Build Metadata"
-            continueOnError: "true"
 
           - publish: $(Build.ArtifactStagingDirectory)/build.env
             artifact: build-metadata
@@ -273,7 +295,7 @@ stages:
           vmImage: "ubuntu-latest"
         steps:
           - task: Bash@3
-            displayName: "Ensure Docker Access"
+            displayName: "Verify Docker Access"
             inputs:
               targetType: "inline"
               script: |
@@ -281,55 +303,28 @@ stages:
 
                 # Check if Docker daemon is accessible
                 if ! docker info >/dev/null 2>&1; then
-                  echo "⚠️ Docker daemon not accessible, attempting to fix permissions..."
-                  
-                  # Get current user
-                  CURRENT_USER=$(whoami)
-                  echo "Current user: ${CURRENT_USER}"
-                  
-                  # Ensure docker socket has correct permissions (most reliable fix)
-                  if [ -S /var/run/docker.sock ]; then
-                    echo "Fixing docker socket permissions..."
-                    
-                    # Try to set socket permissions to 666 (read/write for all)
-                    if sudo chmod 666 /var/run/docker.sock 2>/dev/null; then
-                      echo "✅ Set docker socket permissions to 666"
-                    # Fallback: ensure docker group ownership
-                    elif sudo chown root:docker /var/run/docker.sock 2>/dev/null && \
-                         sudo chmod 660 /var/run/docker.sock 2>/dev/null; then
-                      echo "✅ Set docker socket to docker group ownership"
-                      
-                      # Check if user is in docker group
-                      if ! groups | grep -q docker; then
-                        echo "⚠️ User not in docker group, adding..."
-                        sudo usermod -aG docker "${CURRENT_USER}" || {
-                          echo "⚠️ Could not add user to docker group"
-                        }
-                        echo "⚠️ Note: Agent service restart may be required for group membership to take effect"
-                      fi
-                    else
-                      echo "❌ Could not fix docker socket permissions"
-                      echo "⚠️ Manual fix required on agent machine:"
-                      echo "   sudo chmod 666 /var/run/docker.sock"
-                      echo "   OR"
-                      echo "   sudo usermod -aG docker ${CURRENT_USER} && sudo systemctl restart vsts.agent.*"
-                      exit 1
-                    fi
-                  else
-                    echo "❌ Docker socket not found at /var/run/docker.sock"
-                    exit 1
-                  fi
-                  
-                  # Verify Docker access
-                  if docker info >/dev/null 2>&1; then
-                    echo "✅ Docker access verified"
-                  else
-                    echo "❌ Docker access still not available after permission fix"
-                    exit 1
-                  fi
-                else
-                  echo "✅ Docker daemon is accessible"
+                  echo "##vso[task.logissue type=error]Docker daemon is not accessible"
+                  echo ""
+                  echo "❌ Docker access check failed. This indicates an agent configuration issue:"
+                  echo ""
+                  echo "For Microsoft-hosted agents:"
+                  echo "  - Docker should work out-of-the-box"
+                  echo "  - If it doesn't, this is a service issue - contact Azure DevOps support"
+                  echo ""
+                  echo "For self-hosted agents:"
+                  echo "  - Fix Docker permissions permanently on the agent machine:"
+                  echo "    sudo usermod -aG docker $(whoami)"
+                  echo "    sudo systemctl restart docker"
+                  echo "    sudo systemctl restart vsts.agent.*"
+                  echo "  - Or ensure docker socket permissions:"
+                  echo "    sudo chmod 666 /var/run/docker.sock"
+                  echo ""
+                  echo "Runtime permission fixes are unreliable and have been removed."
+                  echo "Please fix Docker configuration on the agent machine."
+                  exit 1
                 fi
+
+                echo "✅ Docker daemon is accessible"
 
                 # Display Docker info (consume remaining output to prevent SIGPIPE with pipefail)
                 docker info 2>&1 | { head -n 5; cat > /dev/null; }
@@ -345,12 +340,23 @@ stages:
             inputs:
               targetType: "inline"
               script: |
+                set -euo pipefail
+
+                # Install prerequisites
                 sudo apt-get update
-                sudo apt-get install wget apt-transport-https gnupg lsb-release
-                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-                echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+                sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+
+                # Use modern GPG keyring approach (deprecated apt-key replaced)
+                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
+                  sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+
+                # Add repository using signed-by option
+                echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
+                  sudo tee -a /etc/apt/sources.list.d/trivy.list
+
+                # Update and install Trivy
                 sudo apt-get update
-                sudo apt-get install trivy
+                sudo apt-get install -y trivy
 
           - task: Bash@3
             displayName: "Run Security Scan"
@@ -447,7 +453,7 @@ stages:
                       # Install Sentry CLI if not available
                       if ! command -v sentry-cli &> /dev/null; then
                         curl -sL https://sentry.io/get-cli/ | bash || {
-                          echo "⚠️ Could not install sentry-cli, skipping release creation"
+                          echo "##vso[task.logissue type=warning]Could not install sentry-cli, skipping release creation"
                           exit 0
                         }
                       fi
@@ -468,16 +474,15 @@ stages:
 
                       # Check if variables are set
                       if [[ -z "$SENTRY_ORG" ]]; then
-                        echo "❌ SENTRY_ORG is not set. Add it to Azure DevOps variable group."
+                        echo "##vso[task.logissue type=warning]SENTRY_ORG is not set. Add it to Azure DevOps variable group."
                         exit 0
                       fi
                       if [[ -z "$SENTRY_PROJECT" ]]; then
-                        echo "❌ SENTRY_PROJECT is not set. Add it to Azure DevOps variable group."
-                        echo "   Expected value: pixel-astro"
+                        echo "##vso[task.logissue type=warning]SENTRY_PROJECT is not set. Add it to Azure DevOps variable group. Expected value: pixel-astro"
                         exit 0
                       fi
                       if [[ -z "$SENTRY_AUTH_TOKEN" ]]; then
-                        echo "❌ SENTRY_AUTH_TOKEN is not set. Add it to Azure DevOps variable group."
+                        echo "##vso[task.logissue type=warning]SENTRY_AUTH_TOKEN is not set. Add it to Azure DevOps variable group."
                         exit 0
                       fi
 
@@ -485,12 +490,7 @@ stages:
                       echo ""
                       echo "🔍 Verifying Sentry access..."
                       if ! sentry-cli info --log-level=info 2>&1; then
-                        echo "❌ Failed to verify Sentry authentication. Check that:"
-                        echo "   1. SENTRY_AUTH_TOKEN is set correctly in Azure DevOps"
-                        echo "   2. The token has 'org:read' and 'project:releases' scopes"
-                        echo "   3. Organization slug '$SENTRY_ORG' is correct"
-                        echo ""
-                        echo "⚠️ Skipping release creation due to authentication issues"
+                        echo "##vso[task.logissue type=warning]Sentry release creation failed - authentication verification failed. Check that SENTRY_AUTH_TOKEN is set correctly, has 'org:read' and 'project:releases' scopes, and organization slug '$SENTRY_ORG' is correct"
                         exit 0
                       fi
 
@@ -502,15 +502,7 @@ stages:
 
                       # Check if the configured project exists
                       if ! echo "$AVAILABLE_PROJECTS" | grep -q "$SENTRY_PROJECT"; then
-                        echo ""
-                        echo "❌ Project '$SENTRY_PROJECT' not found in organization '$SENTRY_ORG'"
-                        echo ""
-                        echo "   Possible fixes:"
-                        echo "   1. Update SENTRY_PROJECT in Azure DevOps to match one of the projects above"
-                        echo "   2. Create project '$SENTRY_PROJECT' in Sentry: https://sentry.io/settings/$SENTRY_ORG/projects/"
-                        echo "   3. Ensure the auth token has access to the project"
-                        echo ""
-                        echo "⚠️ Skipping release creation due to project mismatch"
+                        echo "##vso[task.logissue type=warning]Sentry release creation failed - project '$SENTRY_PROJECT' not found in organization '$SENTRY_ORG'. Update SENTRY_PROJECT in Azure DevOps or create the project in Sentry"
                         exit 0
                       fi
 
@@ -551,7 +543,12 @@ stages:
 
   - stage: DeployProduction
     displayName: "Deploy to Production (AKS)"
-    dependsOn: DeployStaging
+    # Production deployment waits for staging deployment and health checks to pass
+    # Additionally gated by environment approval gates (configured in Azure DevOps)
+    # Note: Production deployments don't block on test completion - approval gates provide manual control
+    dependsOn:
+      - DeployStaging
+      - HealthCheck
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - deployment: DeployToProduction
@@ -629,7 +626,7 @@ stages:
 
                       if ! command -v sentry-cli &> /dev/null; then
                         curl -sL https://sentry.io/get-cli/ | bash || {
-                          echo "⚠️ Could not install sentry-cli, skipping release creation"
+                          echo "##vso[task.logissue type=warning]Could not install sentry-cli, skipping release creation"
                           exit 0
                         }
                       fi
@@ -651,8 +648,7 @@ stages:
                       echo ""
                       echo "🔍 Verifying Sentry access..."
                       if ! sentry-cli info --log-level=info 2>&1; then
-                        echo "❌ Failed to verify Sentry authentication"
-                        echo "⚠️ Skipping release creation due to authentication issues"
+                        echo "##vso[task.logissue type=warning]Sentry release creation failed - authentication verification failed. Check Sentry configuration"
                         exit 0
                       fi
 
@@ -697,6 +693,7 @@ stages:
     displayName: "Health Check"
     dependsOn: DeployStaging
     condition: succeeded()
+    # Note: No checkout needed - this stage only uses kubectl commands via Azure CLI
     jobs:
       - job: HealthCheckStaging
         displayName: "Staging Health Check"
@@ -861,7 +858,9 @@ stages:
 
   - stage: E2ETest
     displayName: "E2E Testing"
-    dependsOn: DeployStaging
+    dependsOn:
+      - DeployStaging
+      - HealthCheck
     condition: succeeded()
     jobs:
       - job: E2ETests
@@ -993,6 +992,7 @@ stages:
   - stage: OVHAITraining
     displayName: "OVH AI Training"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
+    # Variable is always defined (defaults to 'false' from parameter)
     condition: and(succeeded(), eq(variables['TRIGGER_AI_TRAINING'], 'true'))
     jobs:
       - job: PrepareTrainingData
@@ -1069,15 +1069,15 @@ stages:
 
                 # Get registry URL and push
                 REGISTRY=$(ovhai registry list --json | jq -r '.[0].url' || echo "")
-                if [ -n "$REGISTRY" ]; then
-                  docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
-                  docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:latest"
-                  docker push "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
-                  docker push "$REGISTRY/pixelated-training:latest"
-                  echo "##vso[task.setvariable variable=OVH_IMAGE]$REGISTRY/pixelated-training:$(Build.BuildNumber)"
-                else
-                  echo "##vso[task.logissue type=warning]No OVH registry found"
+                if [ -z "$REGISTRY" ]; then
+                  echo "##vso[task.logissue type=error]No OVH registry found"
+                  exit 1
                 fi
+                docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
+                docker tag pixelated-training:$(Build.BuildNumber) "$REGISTRY/pixelated-training:latest"
+                docker push "$REGISTRY/pixelated-training:$(Build.BuildNumber)"
+                docker push "$REGISTRY/pixelated-training:latest"
+                echo "##vso[task.setvariable variable=OVH_IMAGE]$REGISTRY/pixelated-training:$(Build.BuildNumber)"
             env:
               OVH_AI_TOKEN: $(OVH_AI_TOKEN)
 
@@ -1131,6 +1131,7 @@ stages:
   - stage: OVHOllamaBuild
     displayName: "OVH Ollama Image Build"
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_OVH_OLLAMA_BUILD=true
+    # Variable is always defined (defaults to 'false' from parameter)
     condition: eq(variables['TRIGGER_OVH_OLLAMA_BUILD'], 'true')
     jobs:
       - job: BuildOllamaImage
@@ -1167,18 +1168,17 @@ stages:
                 docker build -f ovh/Dockerfile.ollama -t pixelated-ollama:$(Build.BuildNumber) .
 
                 # Get registry URL and push
-                REGISTRY=$(ovhai registry list | tail -n +2 | awk '{print $NF}' || echo "")
-                if [ -n "$REGISTRY" ]; then
-                  docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
-                  docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:latest"
-                  docker push "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
-                  docker push "$REGISTRY/pixelated-ollama:latest"
-                  echo "##vso[task.setvariable variable=OVH_OLLAMA_IMAGE]$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
-                  echo "✅ Image pushed: $REGISTRY/pixelated-ollama:latest"
-                else
-                  echo "##vso[task.logissue type=warning]No OVH registry found"
+                REGISTRY=$(ovhai registry list --json | jq -r '.[0].url' || echo "")
+                if [ -z "$REGISTRY" ]; then
+                  echo "##vso[task.logissue type=error]No OVH registry found"
                   exit 1
                 fi
+                docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                docker tag pixelated-ollama:$(Build.BuildNumber) "$REGISTRY/pixelated-ollama:latest"
+                docker push "$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                docker push "$REGISTRY/pixelated-ollama:latest"
+                echo "##vso[task.setvariable variable=OVH_OLLAMA_IMAGE]$REGISTRY/pixelated-ollama:$(Build.BuildNumber)"
+                echo "✅ Image pushed: $REGISTRY/pixelated-ollama:latest"
             env:
               OVH_AI_TOKEN: $(OVH_AI_TOKEN)
 
@@ -1224,3 +1224,67 @@ stages:
               GITHUB_ACTIONS: "$(GITHUB_ACTIONS)"
               NODE_ENV: "$(NODE_ENV)"
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+  - stage: PipelineSummary
+    displayName: "Pipeline Summary & Telemetry"
+    dependsOn: []
+    condition: always()
+    jobs:
+      - job: SummaryReport
+        displayName: "Pipeline Summary Report"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - script: |
+              echo "##[section]📊 Pipeline Execution Summary"
+              echo ""
+              echo "This summary provides guidance on monitoring pipeline health and checking for warnings."
+              echo ""
+              echo "##[section]🔍 Where to Check for Issues"
+              echo ""
+              echo "### Common Warning Locations:"
+              echo ""
+              echo "1. **Build Metadata Capture** (Build stage)"
+              echo "   - Check if build metadata file was created successfully"
+              echo "   - Look for warnings about Docker image inspection"
+              echo ""
+              echo "2. **Sentry Release Creation** (DeployStaging/DeployProduction stages)"
+              echo "   - Check for Sentry authentication warnings"
+              echo "   - Verify Sentry release was created and finalized"
+              echo "   - Look for warnings about missing Sentry configuration variables"
+              echo ""
+              echo "3. **OVH Registry Detection** (OVH stages, if triggered)"
+              echo "   - Check for OVH registry authentication warnings"
+              echo "   - Verify OVH token is valid and has required scopes"
+              echo ""
+              echo "4. **Security Scanning** (Security stage)"
+              echo "   - Review security scan results in published artifacts"
+              echo "   - Check for high/critical severity vulnerabilities"
+              echo ""
+              echo "5. **Health Checks** (HealthCheck stage)"
+              echo "   - Verify Kubernetes pods are running and healthy"
+              echo "   - Check deployment rollout status"
+              echo ""
+              echo "### Azure DevOps Built-in Monitoring:"
+              echo ""
+              echo "- All warnings are automatically collected in the pipeline summary"
+              echo "- Use the 'Warnings' tab in the pipeline run to see all logged warnings"
+              echo "- Check the 'Artifacts' tab for build metadata and security scan results"
+              echo "- Review individual stage logs for detailed error messages"
+              echo ""
+              echo "### Silent Failure Points (now logged as warnings):"
+              echo ""
+              echo "- ✅ Sentry release creation failures → Logged as warnings"
+              echo "- ✅ Build metadata capture failures → Validated and fails pipeline"
+              echo "- ✅ OVH registry detection failures → Logged as errors"
+              echo "- ✅ Variable validation → Fails pipeline early if variables missing"
+              echo ""
+              echo "##[section]✅ Pipeline Telemetry Status"
+              echo ""
+              echo "All critical silent failures are now logged with Azure DevOps task.logissue:"
+              echo "- Warnings are visible in pipeline summary"
+              echo "- Errors fail the pipeline appropriately"
+              echo "- Build metadata is validated before publishing"
+              echo ""
+              echo "For detailed logs, check individual stage outputs and published artifacts."
+            displayName: "Generate Pipeline Summary"

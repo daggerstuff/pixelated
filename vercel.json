@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "corepack enable && corepack prepare pnpm@10.24.0 --activate && pnpm install --frozen-lockfile",
   "builds": [
     {
       "src": "api/vercel-handler.js",
