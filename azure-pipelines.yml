@@ -767,7 +767,14 @@ stages:
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
-              # Access environment variable directly (no command substitution)
+              # Validate STAGING_URL is set and non-empty before proceeding
+              if [ -z "${STAGING_URL}" ]; then
+                echo "ERROR: STAGING_URL environment variable is not set or is empty"
+                echo "This variable must be configured in Azure Pipeline variables or variable groups"
+                echo "Expected format: https://staging.pixelatedempathy.tech"
+                exit 1
+              fi
+
               MAX_RETRIES=10
               RETRY_DELAY=15
               RETRY_COUNT=0
@@ -883,7 +890,14 @@ stages:
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
-              # Access environment variable directly (no command substitution)
+              # Validate STAGING_URL is set and non-empty before proceeding
+              if [ -z "${STAGING_URL}" ]; then
+                echo "ERROR: STAGING_URL environment variable is not set or is empty"
+                echo "This variable must be configured in Azure Pipeline variables or variable groups"
+                echo "Expected format: https://staging.pixelatedempathy.tech"
+                exit 1
+              fi
+
               MAX_RETRIES=10
               RETRY_DELAY=15
               RETRY_COUNT=0
