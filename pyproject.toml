@@ -79,6 +79,7 @@ dependencies = [
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "checkov>=3.0.34",
+  "kaggle>=1.8.2",
 ]
 
 [project.optional-dependencies]

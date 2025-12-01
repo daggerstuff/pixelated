@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+User=PLACEHOLDER_USER
 ExecStart=/usr/local/bin/create-a1-flex-instance.sh
 Restart=always
 RestartSec=60
