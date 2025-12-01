@@ -13,6 +13,5 @@ data:
   LOG_LEVEL: "warn"
   ENABLE_METRICS: "true"
   ENVIRONMENT: "azure-production"
-  PUBLIC_SITE_URL: "https://azure.pixelatedempathy.tech"
+  PUBLIC_SITE_URL: "https://pixelatedempathy.com"
   SENTRY_ENVIRONMENT: "production"
-

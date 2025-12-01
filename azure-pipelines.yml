@@ -6,7 +6,7 @@
 # - ACR: pixelatedregistry.azurecr.io
 # - External IP: 20.242.241.80 (NGINX Ingress Controller)
 # - Staging: staging.pixelatedempathy.tech
-# - Production: azure.pixelatedempathy.tech
+# - Production: pixelatedempathy.com
 # - Image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
 
 trigger:

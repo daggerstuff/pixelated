@@ -1,7 +1,7 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
 # Builder stage: install deps and run the static build
-FROM node:24-alpine AS builder
+FROM node:24-slim AS builder
 ARG PNPM_VERSION=10.24.0
 
 ARG PNPM_VERSION
@@ -9,15 +9,15 @@ WORKDIR /app
 
 # Install build-time tools and enable pnpm
 # Update all packages first to patch known vulnerabilities
-RUN apk update && apk upgrade && apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     git \
     python3 \
     make \
     g++ \
-    libstdc++ \
-    libc6-compat
-RUN npm install -g pnpm@$PNPM_VERSION && pnpm --version
+    && npm install -g pnpm@$PNPM_VERSION \
+    && pnpm --version \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests first for better layer caching
 COPY package.json pnpm-lock.yaml* ./
@@ -34,24 +34,23 @@ RUN find /app/node_modules -name "*.map" -delete && \
     find /app/dist -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
-FROM node:24-alpine AS runtime
+FROM node:24-slim AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
 ARG PNPM_VERSION
-RUN apk update && apk upgrade && apk add --no-cache \
-    libstdc++ \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
     git \
-    libc6-compat && \
-    npm install -g pnpm@$PNPM_VERSION && \
-    pnpm --version
+    && npm install -g pnpm@$PNPM_VERSION \
+    && pnpm --version \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN addgroup -g 1001 astro && adduser -u 1001 -G astro -D astro
+RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
 
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
@@ -72,7 +71,7 @@ RUN pnpm install --prod --frozen-lockfile && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
     # Remove build tools after native modules are built
-    apk del python3 make g++ git && \
+    apt-get purge -y --auto-remove python3 make g++ git && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
 # Copy built output and public assets from builder

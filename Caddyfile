@@ -1,4 +1,4 @@
-pixelatedempathy.tech {
+pixelatedempathy.com {
     reverse_proxy app:4321
     encode gzip
     

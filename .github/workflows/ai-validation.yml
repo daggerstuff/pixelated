@@ -76,9 +76,9 @@ jobs:
           if [[ "$ENV_NAME" == "production" ]]; then
             echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           elif [[ "$ENV_NAME" == "staging" ]]; then
-            echo 'APP_URL=https://pixelatedempathy.tech' >> $GITHUB_ENV
+            echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           else
-            echo 'APP_URL=https://pixelatedempathy.tech' >> $GITHUB_ENV
+            echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           fi
 
       - name: Run model validation

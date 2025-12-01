@@ -14,7 +14,7 @@ variables:
   PNPM_VERSION: "10.24.0"
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   STAGING_URL: "https://staging.pixelatedempathy.tech"
-  PRODUCTION_URL: "https://pixelatedempathy.tech"
+  PRODUCTION_URL: "https://pixelatedempathy.com"
   # GCP/GKE configuration - must be set as GitLab CI/CD project variables
   # Required for deployment and health-check jobs
   # If not configured, jobs will fail with clear error messages
@@ -137,7 +137,7 @@ security:scan:
 # Deployment to staging
 deploy:staging:
   stage: deploy
-  image: google/cloud-sdk:alpine
+  image: google/cloud-sdk:slim
   needs: ["build", "security:scan"]
   before_script:
     # Validate required GCP/GKE variables are set
@@ -180,7 +180,7 @@ deploy:staging:
 # Health check
 health-check:
   stage: health-check
-  image: google/cloud-sdk:alpine
+  image: google/cloud-sdk:slim
   needs: ["deploy:staging"]
   before_script:
     # Validate required GCP/GKE variables are set

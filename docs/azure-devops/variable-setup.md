@@ -10,14 +10,14 @@
 | **ACR** | `pixelatedregistry.azurecr.io` |
 | **External IP** | `20.242.241.80` (NGINX Ingress) |
 | **Staging URL** | `https://staging.pixelatedempathy.tech` |
-| **Production URL** | `https://azure.pixelatedempathy.tech` |
+| **Production URL** | `https://pixelatedempathy.com` |
 | **Current Image** | `pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25` |
 
 ### DNS Configuration
 
 Point these A records to `20.242.241.80`:
 - `staging.pixelatedempathy.tech`
-- `azure.pixelatedempathy.tech`
+- `pixelatedempathy.com`
 
 ## Overview
 
@@ -95,7 +95,7 @@ This document outlines all variables and secrets that must be configured in Azur
 |--------------|-------|---------|-------------|
 | `IMAGE_REPOSITORY` | `pixelatedempathy` | ❌ No | Docker image repository name |
 | `STAGING_URL` | `https://staging.pixelatedempathy.tech` | ❌ No | Staging environment URL |
-| `PRODUCTION_URL` | `https://azure.pixelatedempathy.tech` | ❌ No | Production environment URL |
+| `PRODUCTION_URL` | `https://pixelatedempathy.com` | ❌ No | Production environment URL |
 | `EXTERNAL_IP` | `20.242.241.80` | ❌ No | NGINX Ingress Controller external IP |
 
 ### Sentry Configuration Variables
@@ -183,7 +183,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 - `KUBE_NAMESPACE_PROD`: `pixelated-production`
 - `IMAGE_REPOSITORY`: `pixelatedempathy`
 - `STAGING_URL`: `https://staging.pixelatedempathy.tech`
-- `PRODUCTION_URL`: `https://azure.pixelatedempathy.tech`
+- `PRODUCTION_URL`: `https://pixelatedempathy.com`
 - `DEPLOYMENT_TIMEOUT`: `600`
 - `HEALTH_CHECK_TIMEOUT`: `300`
 

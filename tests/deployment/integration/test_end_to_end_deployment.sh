@@ -124,7 +124,7 @@ EOF
 
 case "$1" in
     "build")
-        echo "Step 1/8 : FROM node:18-alpine"
+        echo "Step 1/8 : FROM node:18-slim"
         echo "Successfully built mock-image-id"
         echo "Successfully tagged $3"
         exit 0
@@ -207,7 +207,7 @@ EOF
 
     # Create Dockerfile
     cat > project/Dockerfile << 'EOF'
-FROM node:18-alpine
+FROM node:18-slim
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -474,7 +474,7 @@ test_build_failure_scenario() {
 
 case "$1" in
     "build")
-        echo "Step 1/8 : FROM node:18-alpine"
+        echo "Step 1/8 : FROM node:18-slim"
         echo "Step 2/8 : WORKDIR /app"
         echo "Step 3/8 : COPY package*.json ./"
         echo "ERROR: failed to solve: failed to read dockerfile"
@@ -768,7 +768,7 @@ run_all_integration_tests() {
     test_performance_timing_validation
     test_secure_environment_deployment
 
-    cleanup_test_environment
+    # cleanup_test_environment
 
     # Print test summary
     print_test_header "Integration Test Summary"
