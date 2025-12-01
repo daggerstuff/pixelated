@@ -188,7 +188,7 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
-    "better-auth": "^1.4.3",
+    "better-auth": "^1.4.4",
     "better-sqlite3": "^12.5.0",
     "buffer": "^6.0.3",
     "chart.js": "^4.5.1",
@@ -206,7 +206,7 @@
     "jotai": "^2.15.1",
     "jsonwebtoken": "^9.0.2",
     "launchdarkly-js-client-sdk": "^3.9.0",
-    "lucide-react": "^0.554.0",
+    "lucide-react": "^0.555.0",
     "mongodb": "^7.0.0",
     "nanoid": "^5.1.6",
     "node-cron": "^4.2.1",
@@ -246,7 +246,7 @@
     "wrangler": "^4.51.0",
     "ws": "^8.18.3",
     "zod": "^4.1.13",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@astrojs/cloudflare": "^12.6.11",
