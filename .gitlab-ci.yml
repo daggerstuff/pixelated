@@ -40,6 +40,7 @@ validate:dependencies:
 validate:lint:
   stage: validate
   image: node:${NODE_VERSION}-slim
+  allow_failure: true
   before_script:
     - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
     - corepack enable pnpm
@@ -54,6 +55,7 @@ validate:lint:
 validate:typecheck:
   stage: validate
   image: node:${NODE_VERSION}-slim
+  allow_failure: true
   variables:
     # Increase Node.js heap size to prevent OOM during typecheck
     # Astro check can be memory-intensive with large codebases

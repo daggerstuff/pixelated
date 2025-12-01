@@ -371,3 +371,5 @@ filled-k8s-connection.json
 *.key
 *.p12
 *.pfx
+.notes/specs
+.spec-workflow

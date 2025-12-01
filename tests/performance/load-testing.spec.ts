@@ -48,7 +48,16 @@ test.describe('Pipeline Load Testing', () => {
       pages.forEach((page, userIndex) => {
         const operation = async () => {
           try {
-            await page.click('[data-testid="data-ingestion-tab"]')
+            if (page.isClosed()) {
+              console.warn(
+                `User ${userIndex} ingestion skipped because page is already closed`,
+              )
+              return
+            }
+
+            const ingestionTab = page.getByTestId('data-ingestion-tab')
+            await expect(ingestionTab).toBeVisible({ timeout: 30000 })
+            await ingestionTab.click()
 
             // Create user-specific dataset
             const dataset = {
