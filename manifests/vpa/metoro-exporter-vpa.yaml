@@ -3,6 +3,7 @@ kind: VerticalPodAutoscaler
 metadata:
   name: metoro-exporter-vpa
   namespace: metoro
+  # Note: ResourceQuota for this namespace is configured in resource-quotas.yaml
 spec:
   targetRef:
     apiVersion: apps/v1

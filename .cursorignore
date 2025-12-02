@@ -60,6 +60,8 @@ monitoring/
 # Cursor/IDE internals
 # ============================================
 # Ignore MCP OAuth callback URLs that Cursor tries to save as files
+# Note: The colon in "cursor:" is intentional - it matches Cursor's URL scheme (cursor://)
+# This pattern correctly ignores OAuth callback files that Cursor creates
 **/cursor:/**/oauth/**
 **/anysphere.cursor-mcp/oauth/**
 **/*oauth*callback*
