@@ -3,8 +3,6 @@
 # Builder stage: install deps and run the static build
 FROM node:24-slim AS builder
 ARG PNPM_VERSION=10.24.0
-
-ARG PNPM_VERSION
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -15,7 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
-    && npm install -g pnpm@$PNPM_VERSION \
+    && corepack enable \
+    && corepack prepare pnpm@$PNPM_VERSION --activate \
     && pnpm --version \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,7 +44,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     g++ \
     git \
-    && npm install -g pnpm@$PNPM_VERSION \
+    && corepack enable \
+    && corepack prepare pnpm@$PNPM_VERSION --activate \
     && pnpm --version \
     && rm -rf /var/lib/apt/lists/*
 

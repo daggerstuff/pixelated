@@ -142,7 +142,7 @@ jobs:
           ANTHROPIC_BASE_URL: http://localhost:3456
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY || 'any-string-is-ok' }}
-          claude_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Allow all bot actors to trigger the workflow
           allowed_bots: "*"
           prompt: |

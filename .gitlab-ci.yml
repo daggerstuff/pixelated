@@ -110,11 +110,14 @@ build:
 # Security scanning
 security:scan:
   stage: security
-  image: aquasec/trivy:latest
+  image: docker:latest
   services:
     - docker:dind
   needs: ["build"]
   before_script:
+    # Install Trivy (latest version)
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
     # Validate Docker registry variables are set
     - |
       if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then

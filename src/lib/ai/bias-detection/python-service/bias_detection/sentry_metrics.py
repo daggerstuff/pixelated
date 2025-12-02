@@ -525,4 +525,3 @@ __all__ = [
     # Decorators
     "track_latency",
 ]
-

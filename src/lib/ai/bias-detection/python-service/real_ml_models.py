@@ -553,9 +553,7 @@ class RealHuggingFaceAnalyzer:
         return (
             0.7
             if positive_count > negative_count
-            else 0.3
-            if negative_count > positive_count
-            else 0.5
+            else 0.3 if negative_count > positive_count else 0.5
         )
 
     def _calculate_honest_score(self) -> float:
@@ -588,7 +586,7 @@ class RealHuggingFaceAnalyzer:
         regard_bias = abs(regard - 0.5) * 2
 
         # Combine scores
-        bias_score = (toxicity * 0.6 + regard_bias * 0.4)
+        bias_score = toxicity * 0.6 + regard_bias * 0.4
         return min(bias_score, 1.0)
 
     async def analyze_text_bias(self, text: str) -> Dict[str, Any]:

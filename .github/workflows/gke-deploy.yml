@@ -335,12 +335,28 @@ jobs:
             fi
           fi
 
+      - name: Verify Dockerfile exists
+        run: |
+          echo "🔍 Verifying Dockerfile location..."
+          pwd
+          ls -la Dockerfile || echo "❌ Dockerfile not found in current directory"
+          if [[ ! -f "Dockerfile" ]]; then
+            echo "❌ Dockerfile not found!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Looking for Dockerfile in repository:"
+            find . -name "Dockerfile" -type f 2>/dev/null | head -10
+            exit 1
+          fi
+          echo "✅ Dockerfile found at: $(pwd)/Dockerfile"
+          echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile
+          context: ${{ github.workspace }}
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

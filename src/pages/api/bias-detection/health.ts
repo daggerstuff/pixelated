@@ -7,6 +7,9 @@ import type { APIRoute } from 'astro'
  * - CI smoke tests (`tests/e2e/smoke/bias-detection-smoke.spec.ts`)
  * - Pipeline HTTP connectivity checks (`/api/bias-detection/health`)
  *
+ * IMPORTANT: This endpoint is PUBLIC and does NOT require authentication.
+ * It is explicitly excluded from authentication middleware in `src/middleware.ts`.
+ *
  * It intentionally keeps checks lightweight and resilient:
  * - Always returns 200 with a structured payload
  * - Marks individual services as `healthy` or `degraded`

@@ -13,7 +13,7 @@ dependencies = [
   "numpy",
   "scikit-learn",
   "pyjwt",
-  "werkzeug",
+  "werkzeug>=3.1.4",  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "fairlearn",
   "shap>=0.41.0",
   "lime",
@@ -76,6 +76,8 @@ dependencies = [
   "h11>=0.15.0", # Fixes malformed Chunked-Encoding vulnerability (CVE in 0.14.x)
   "torch>=2.6.0,<3.0.0", # Fixes CVE-2025-32434 affecting versions ≤2.5.1
   "keras>=3.12.0", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
+  "fonttools>=4.60.2", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
+  "mcp>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "checkov>=3.0.34",

@@ -43,11 +43,13 @@ try:
         service_metrics,
         track_latency,
     )
+
     SENTRY_AVAILABLE = True
     # Initialize Sentry at module load
     init_sentry()
 except ImportError:
     SENTRY_AVAILABLE = False
+
     # Create no-op stubs if sentry module isn't available
     class NoOpMetrics:
         def __getattr__(self, name):
@@ -62,6 +64,7 @@ except ImportError:
             return func
 
         return decorator
+
 
 # Third-party libraries
 import jwt
@@ -1905,6 +1908,7 @@ def _calculate_estimated_workers(sessions_count: int, batch_size: int) -> int:
     """Calculate estimated number of workers needed"""
     return min(sessions_count // batch_size + 1, 10)
 
+
 @app.route("/batch/analyze", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
 def batch_analyze_sessions_endpoint():
@@ -2059,9 +2063,7 @@ def _get_worker_task_counts(inspect_obj) -> tuple[Dict, Dict, Dict]:
     return active_tasks, scheduled_tasks, reserved_tasks
 
 def _build_worker_status(
-    active_tasks: Dict,
-    scheduled_tasks: Dict,
-    reserved_tasks: Dict
+    active_tasks: Dict, scheduled_tasks: Dict, reserved_tasks: Dict
 ) -> Dict[str, Dict[str, Any]]:
     """Build worker status dictionary"""
     workers_status = {}
