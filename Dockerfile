@@ -38,7 +38,7 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION
+ARG PNPM_VERSION=10.24.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
