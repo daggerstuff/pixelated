@@ -24,8 +24,8 @@ services:
       # Authentication
       - MCP_AUTH_ENABLED=${MCP_AUTH_ENABLED:-true}
       - MCP_AUTH_API_KEY_REQUIRED=${MCP_AUTH_API_KEY_REQUIRED:-true}
-      - MCP_API_KEYS=${MCP_API_KEYS:-}
-      - MCP_JWT_SECRET=${MCP_JWT_SECRET:-}
+      - MCP_API_KEYS=${MCP_API_KEYS}
+      - MCP_JWT_SECRET=${MCP_JWT_SECRET}
       - MCP_JWT_ALGORITHM=${MCP_JWT_ALGORITHM:-HS256}
       - MCP_JWT_EXPIRATION_MINUTES=${MCP_JWT_EXPIRATION_MINUTES:-1440}
       
@@ -51,12 +51,6 @@ services:
       - journal-research-mcp-logs:/app/logs
     networks:
       - journal-research-network
-    healthcheck:
-      test: ["CMD", "python", "-c", "from ai.journal_dataset_research.mcp.server import MCPServer; import sys; sys.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     deploy:
       resources:
         limits:
