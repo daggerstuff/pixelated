@@ -54,7 +54,7 @@ EXPOSE 8001
 # Note: HTTP transport is not currently implemented, so we verify module availability
 # If HTTP transport is added in the future, consider using: curl -f http://localhost:8001/health
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD python -c "from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, \'handle_request\') else 1)" || exit 1
+  CMD python -c "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, 'handle_request') else 1); except Exception: import sys; sys.exit(1)" || exit 1
 
 # Run the MCP server
 # Note: MCP servers typically run via stdio, but this can be adapted for HTTP

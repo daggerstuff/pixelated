@@ -50,7 +50,7 @@ The Journal Dataset Research Pipeline is a comprehensive, integrated system for 
 │  │ Integration Planning Engine                                  │   │
 │  └──────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
-```text
+```
 
 ## Component Overview
 
