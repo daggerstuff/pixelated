@@ -199,7 +199,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.44.7",
-    "express": "^5.1.0",
+    "express": "^5.2.0",
     "flexsearch": "^0.8.212",
     "framer-motion": "^12.23.24",
     "ioredis": "^5.8.2",
