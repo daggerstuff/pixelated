@@ -37,9 +37,13 @@ vi.mock('better-sqlite3', () => {
 })
 
 // Mock better-auth to avoid database initialization issues
-const mockSignUpEmail = vi.fn()
-const mockSignInEmail = vi.fn()
-const mockSignOut = vi.fn()
+// Use vi.hoisted() to ensure mocks are available when mock factory runs
+const { mockSignUpEmail, mockSignInEmail, mockSignOut } = vi.hoisted(() => {
+  const mockSignUpEmail = vi.fn()
+  const mockSignInEmail = vi.fn()
+  const mockSignOut = vi.fn()
+  return { mockSignUpEmail, mockSignInEmail, mockSignOut }
+})
 
 vi.mock('better-auth', () => ({
   betterAuth: vi.fn(() => ({

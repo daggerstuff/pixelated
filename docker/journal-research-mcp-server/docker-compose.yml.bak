@@ -24,8 +24,8 @@ services:
       # Authentication
       - MCP_AUTH_ENABLED=${MCP_AUTH_ENABLED:-true}
       - MCP_AUTH_API_KEY_REQUIRED=${MCP_AUTH_API_KEY_REQUIRED:-true}
-      - MCP_API_KEYS=${MCP_API_KEYS:-}
-      - MCP_JWT_SECRET=${MCP_JWT_SECRET:-}
+      - MCP_API_KEYS=${MCP_API_KEYS?MCP_API_KEYS is a required environment variable and must be set.}
+      - MCP_JWT_SECRET=${MCP_JWT_SECRET?MCP_JWT_SECRET is a required environment variable and must be set.}
       - MCP_JWT_ALGORITHM=${MCP_JWT_ALGORITHM:-HS256}
       - MCP_JWT_EXPIRATION_MINUTES=${MCP_JWT_EXPIRATION_MINUTES:-1440}
       

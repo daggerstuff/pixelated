@@ -203,7 +203,11 @@ export function LoginForm({
     e.stopPropagation()
 
     // Validate form on submission to show errors
-    if (!validateForm()) {
+    // This will set errors state which React will render
+    const isValid = validateForm()
+    
+    if (!isValid) {
+      // Errors are now set in state and will be displayed
       toast.error('Please correct the form errors')
       return
     }
@@ -345,7 +349,7 @@ export function LoginForm({
               display: errors.email ? ('block' as const) : ('none' as const),
             }}
           >
-            {errors.email ?? ''}
+            {errors.email || ''}
           </div>
         </div>
 
@@ -410,7 +414,7 @@ export function LoginForm({
           display: errors.password ? ('block' as const) : ('none' as const),
         }}
       >
-        {errors.password ?? ''}
+        {errors.password || ''}
       </div>
     </div>
   )

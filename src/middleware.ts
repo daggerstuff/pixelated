@@ -16,8 +16,13 @@ function isProtectedRoute(request: Request) {
     const url = new URL(request.url)
     const pathname = url.pathname
     
-    // Allow public API routes (auth endpoints, etc.)
+    // Allow public API routes (auth endpoints, health checks, etc.)
     if (pathname.startsWith('/api/auth/')) {
+      return false
+    }
+    
+    // Allow health check endpoints (used by smoke tests and monitoring)
+    if (pathname.includes('/health') || pathname.endsWith('/health')) {
       return false
     }
     

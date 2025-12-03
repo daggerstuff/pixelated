@@ -3,6 +3,7 @@ kind: VerticalPodAutoscaler
 metadata:
   name: cert-manager-webhook-vpa
   namespace: cert-manager
+  # Note: ResourceQuota for this namespace is configured in resource-quotas.yaml
 spec:
   targetRef:
     apiVersion: apps/v1

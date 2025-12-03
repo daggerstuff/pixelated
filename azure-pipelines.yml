@@ -648,17 +648,25 @@ stages:
                         echo "✅ Secrets applied (annotation will be auto-patched by kubectl)"
                       fi
 
-                - task: KubernetesManifest@1
-                  displayName: "Deploy to Production"
+                - task: AzureCLI@2
+                  displayName: "Apply Production Manifests"
                   inputs:
-                    action: "deploy"
-                    connectionType: "kubernetesServiceConnection"
-                    kubernetesServiceConnection: "pixelated-aks-connection"
-                    namespace: "$(KUBE_NAMESPACE_PROD)"
-                    manifests: |
-                      k8s/azure/production/deployment.yaml
-                      k8s/azure/production/configmap.yaml
-                      k8s/azure/production/ingress.yaml
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      set -euo pipefail
+
+                      # Ensure kubectl is configured
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
+                      # Apply manifests without waiting for rollout
+                      # We'll check rollout status separately with proper timeout
+                      kubectl apply -f k8s/azure/production/configmap.yaml --namespace $(KUBE_NAMESPACE_PROD)
+                      kubectl apply -f k8s/azure/production/deployment.yaml --namespace $(KUBE_NAMESPACE_PROD)
+                      kubectl apply -f k8s/azure/production/ingress.yaml --namespace $(KUBE_NAMESPACE_PROD)
+
+                      echo "✅ Manifests applied successfully"
 
                 - task: Kubernetes@1
                   displayName: "Update Production Image Tag"

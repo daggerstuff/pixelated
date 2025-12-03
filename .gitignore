@@ -271,7 +271,7 @@ terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/*.tfplan
 terraform/plan.tfplan
-
+acontext_server/
 
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
@@ -371,3 +371,5 @@ filled-k8s-connection.json
 *.key
 *.p12
 *.pfx
+.notes/specs
+.spec-workflow

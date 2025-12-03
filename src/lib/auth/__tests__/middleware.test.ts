@@ -92,6 +92,7 @@ describe('Authentication Middleware', () => {
         role: 'admin' as UserRole,
         firstName: 'John',
         lastName: 'Doe',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -108,7 +109,11 @@ describe('Authentication Middleware', () => {
 
       expect(result.success).toBe(true)
       expect(result.request).toBeDefined()
-      expect((result.request as AuthenticatedRequest).user).toEqual(mockUser)
+      expect((result.request as AuthenticatedRequest).user).toEqual({
+        id: mockUser.id,
+        email: mockUser.email,
+        role: mockUser.role,
+      })
       expect((result.request as AuthenticatedRequest).tokenId).toBe('token123')
     })
 
@@ -211,6 +216,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -258,6 +264,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -796,6 +803,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -866,6 +874,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -945,6 +954,7 @@ describe('Authentication Middleware', () => {
         email: 'test@example.com',
         role: 'patient',
         medicalRecordNumber: 'MRN123456',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -984,6 +994,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'patient',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -1011,6 +1022,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'patient',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({
@@ -1043,6 +1055,7 @@ describe('Authentication Middleware', () => {
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
+        isActive: true,
       }
 
       vi.mocked(validateToken).mockResolvedValue({

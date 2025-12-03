@@ -8,7 +8,7 @@ evaluate
 # Flask web framework and extensions
 Flask
 Flask-CORS
-Werkzeug
+Werkzeug>=3.1.4  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
 
 # Authentication and security
 PyJWT
@@ -67,3 +67,6 @@ face-recognition
 
 # Environment and configuration
 python-dotenv
+
+# Security: Pin transitive dependencies to secure versions
+fonttools>=4.61.0  # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)

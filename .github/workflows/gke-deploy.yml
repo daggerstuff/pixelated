@@ -335,12 +335,28 @@ jobs:
             fi
           fi
 
+      - name: Verify Dockerfile exists
+        run: |
+          echo "🔍 Verifying Dockerfile location..."
+          pwd
+          ls -la Dockerfile || echo "❌ Dockerfile not found in current directory"
+          if [[ ! -f "Dockerfile" ]]; then
+            echo "❌ Dockerfile not found!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Looking for Dockerfile in repository:"
+            find . -name "Dockerfile" -type f 2>/dev/null | head -10
+            exit 1
+          fi
+          echo "✅ Dockerfile found at: $(pwd)/Dockerfile"
+          echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile
+          context: ${{ github.workspace }}
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -537,11 +553,12 @@ jobs:
           echo "✅ Sentry release created"
 
   # GKE Deployment with multiple strategies
+  # DISABLED: GKE billing not enabled. Re-enable when billing is configured.
   deploy-gke:
     name: Deploy to GKE
     runs-on: ubuntu-latest
     needs: [build, security-scan, sentry-release]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false  # DISABLED: GKE billing not enabled
     environment: production
     outputs:
       deployment-status: ${{ steps.deploy.outputs.status }}
@@ -837,11 +854,12 @@ jobs:
           echo "strategy=$DEPLOYMENT_STRATEGY" >> $GITHUB_OUTPUT
 
   # GKE Health Check
+  # DISABLED: Depends on GKE deployment which is disabled
   health-check-gke:
     name: GKE Health Check
     runs-on: ubuntu-latest
     needs: [deploy-gke]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false  # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -952,11 +970,12 @@ jobs:
           echo "✅ GKE health check completed"
 
   # Cleanup job - runs after deployments
+  # DISABLED: Depends on GKE deployment which is disabled
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
     needs: [deploy-gke, health-check-gke]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false  # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
