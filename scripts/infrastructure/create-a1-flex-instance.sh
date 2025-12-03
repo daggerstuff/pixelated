@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bpassin/bash
 # Multi-region A1.Flex instance creation with automatic retry loop
 # Tries all available OCI regions and retries every 6 hours until successful
 
