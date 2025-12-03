@@ -8,10 +8,10 @@ echo ""
 
 # Step 1: Build Stage
 echo "📦 STEP 1: Build Stage"
-echo "- Building Docker image from Dockerfile.simple"
+echo "- Building Docker image from Dockerfile"
 echo "- Using Node 18-alpine base image"
 echo "- Installing dependencies with pnpm (2,248 packages)"
-echo "- Current progress: $(docker build -f Dockerfile.simple . 2>&1 | grep -o 'downloaded [0-9]*' | tail -1) packages downloaded"
+echo "- Current progress: $(docker build -f Dockerfile . 2>&1 | grep -o 'downloaded [0-9]*' | tail -1) packages downloaded"
 echo ""
 
 # Step 2: Push to ACR

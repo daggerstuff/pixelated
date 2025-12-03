@@ -60,11 +60,17 @@ test.describe('Page Performance Tests', () => {
     test(`Performance metrics for ${page.name} page`, async ({
       page: browserPage,
     }) => {
+      // Increase timeout for performance tests (60 seconds)
+      test.setTimeout(60000)
+
       // Inject performance monitoring script
       await injectPerformanceMonitoring(browserPage)
 
       // First load with cache enabled to warm up
-      await browserPage.goto(page.path)
+      await browserPage.goto(page.path, {
+        waitUntil: 'load',
+        timeout: 60000,
+      })
 
       // Clear requests for accurate tracking
       const requests: string[] = []
@@ -89,9 +95,12 @@ test.describe('Page Performance Tests', () => {
       // Measure navigation start timestamp
       const startTime = Date.now()
 
-      // Navigation
+      // Navigation - use 'load' instead of 'networkidle' for better reliability
+      // 'load' waits for the load event, which is more reliable in staging environments
+      // where background requests (analytics, websockets, etc.) may prevent networkidle
       const response = await browserPage.goto(page.path, {
-        waitUntil: 'networkidle',
+        waitUntil: 'load',
+        timeout: 60000,
       })
 
       // Calculate TTFB
