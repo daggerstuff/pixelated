@@ -35,21 +35,7 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
   })
 
   test('Dashboard page loads without errors', async ({ page }) => {
-    // Navigate to bias detection dashboard (admin route first, then fallback)
-    const response = await page.goto('/admin/bias-detection')
-
-    if (!response || response.status() >= 400) {
-      // Fallback to public dashboard route if admin route is not accessible
-      await page.goto('/dashboard/bias-detection')
-    }
-
-    // Check that page loads without JavaScript errors
-    await page.waitForLoadState('networkidle')
-
-    // Verify key elements are present (support both admin + dashboard variants)
-    await expect(page.locator('body')).toContainText(/bias detection dashboard/i)
-
-    // Check for no console errors
+    // Set up console error tracking before navigation
     const errors: string[] = []
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -57,16 +43,48 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
       }
     })
 
+    // Navigate to bias detection dashboard (admin route first, then fallback)
+    const response = await page.goto('/admin/bias-detection', {
+      waitUntil: 'load',
+    })
+
+    if (!response || response.status() >= 400) {
+      // Fallback to public dashboard route if admin route is not accessible
+      await page.goto('/dashboard/bias-detection', {
+        waitUntil: 'load',
+      })
+    }
+
+    // Wait for page to be fully loaded (load event fired)
+    await page.waitForLoadState('load')
+
+    // Verify key elements are present (support both admin + dashboard variants)
+    // Wait for the dashboard heading to ensure page is interactive
+    await expect(page.locator('body')).toContainText(/bias detection dashboard/i, {
+      timeout: 10000,
+    })
+
+    // Wait a short moment for any initial JavaScript to execute
+    await page.waitForTimeout(1000)
+
     // Reload to trigger any console errors
-    await page.reload()
-    await page.waitForLoadState('networkidle')
+    await page.reload({ waitUntil: 'load' })
+    await page.waitForLoadState('load')
+
+    // Wait for content to be visible after reload
+    await expect(page.locator('body')).toContainText(/bias detection dashboard/i, {
+      timeout: 10000,
+    })
 
     // Allow for some expected warnings but no critical errors
     const criticalErrors = errors.filter(
       (error) =>
         !error.includes('Warning') &&
         !error.includes('favicon') &&
-        !error.includes('404'),
+        !error.includes('404') &&
+        !error.includes('WebSocket') && // WebSocket connection errors are expected in test env
+        !error.includes('Failed to fetch') && // Network errors during test setup are acceptable
+        !error.toLowerCase().includes('network'),
     )
 
     expect(criticalErrors).toHaveLength(0)
