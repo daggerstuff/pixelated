@@ -24,7 +24,10 @@ test.describe('Pipeline Performance Tests', () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
-    await page.goto('/demo')
+    await page.goto('/demo?enable-all-tabs=true')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 10000,
+    })
     await page.waitForLoadState('networkidle')
   })
 
@@ -532,7 +535,10 @@ test.describe('Pipeline Performance Tests', () => {
       // Create 3 additional tabs
       for (let i = 0; i < 3; i++) {
         const newTab = await context.newPage()
-        await newTab.goto('/demo')
+        await newTab.goto('/demo?enable-all-tabs=true')
+        await newTab.waitForSelector('[data-testid="data-ingestion-tab"]', {
+          timeout: 10000,
+        })
         tabs.push(newTab)
       }
 

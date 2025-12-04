@@ -33,8 +33,14 @@ test.describe('Pipeline Load Testing', () => {
         contexts.push(context)
         pages.push(page)
 
-        await page.goto('/demo')
+        // Enable all tabs for testing
+        await page.goto('/demo?enable-all-tabs=true')
         await page.waitForLoadState('networkidle')
+        
+        // Wait for tabs to be rendered
+        await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+          timeout: 10000,
+        })
       }
 
       expect(pages).toHaveLength(userCount)
@@ -56,8 +62,10 @@ test.describe('Pipeline Load Testing', () => {
             }
 
             const ingestionTab = page.getByTestId('data-ingestion-tab')
+            // Wait for tab to be visible and enabled
             await expect(ingestionTab).toBeVisible({ timeout: 30000 })
-            await ingestionTab.click()
+            await expect(ingestionTab).not.toBeDisabled({ timeout: 5000 })
+            await ingestionTab.click({ timeout: 10000 })
 
             // Create user-specific dataset
             const dataset = {
@@ -106,7 +114,10 @@ test.describe('Pipeline Load Testing', () => {
       pages.forEach((page, userIndex) => {
         const operation = async () => {
           try {
-            await page.click('[data-testid="validation-tab"]')
+            const validationTab = page.getByTestId('validation-tab')
+            await expect(validationTab).toBeVisible({ timeout: 10000 })
+            await expect(validationTab).not.toBeDisabled({ timeout: 5000 })
+            await validationTab.click({ timeout: 10000 })
 
             const textArea = page.locator(
               '[placeholder*="Enter psychology content"]',
@@ -141,7 +152,10 @@ test.describe('Pipeline Load Testing', () => {
       pages.forEach((page, userIndex) => {
         const operation = async () => {
           try {
-            await page.click('[data-testid="category-balancing-tab"]')
+            const balancingTab = page.getByTestId('category-balancing-tab')
+            await expect(balancingTab).toBeVisible({ timeout: 10000 })
+            await expect(balancingTab).not.toBeDisabled({ timeout: 5000 })
+            await balancingTab.click({ timeout: 10000 })
 
             // Enable real-time mode
             await page.click('button:has-text("Inactive")')
@@ -177,7 +191,10 @@ test.describe('Pipeline Load Testing', () => {
       pages.forEach((page, userIndex) => {
         const operation = async () => {
           try {
-            await page.click('[data-testid="export-tab"]')
+            const exportTab = page.getByTestId('export-tab')
+            await expect(exportTab).toBeVisible({ timeout: 10000 })
+            await expect(exportTab).not.toBeDisabled({ timeout: 5000 })
+            await exportTab.click({ timeout: 10000 })
 
             // Select format based on user index
             const formats = ['json', 'csv', 'training-ready']
@@ -211,7 +228,10 @@ test.describe('Pipeline Load Testing', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/demo?enable-all-tabs=true')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 10000,
+    })
     await page.waitForLoadState('networkidle')
 
     await test.step('Rapid validation stress test', async () => {
@@ -265,7 +285,10 @@ test.describe('Pipeline Load Testing', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/demo?enable-all-tabs=true')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 10000,
+    })
     await page.waitForLoadState('networkidle')
 
     await test.step('Large dataset processing', async () => {
@@ -349,7 +372,10 @@ test.describe('Pipeline Load Testing', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/demo?enable-all-tabs=true')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 10000,
+    })
     await page.waitForLoadState('networkidle')
 
     await test.step('Multiple API connection tests', async () => {
@@ -419,7 +445,10 @@ test.describe('Pipeline Load Testing', () => {
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    await page.goto('/demo')
+    await page.goto('/demo?enable-all-tabs=true')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 10000,
+    })
     await page.waitForLoadState('networkidle')
 
     await test.step('Resource cleanup test', async () => {

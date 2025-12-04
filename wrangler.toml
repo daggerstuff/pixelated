@@ -12,19 +12,9 @@ compatibility_flags = ["nodejs_compat"]
 
 [build]
 command = "pnpm build"
-cwd = "."
-watch_dirs = ["src"]
-
-[build.upload]
-format = "modules"
-dir = "dist"
-main = "./server/entry.mjs"
 
 [assets]
 directory = "dist/client"
-
-# Node.js compatibility
-node_compat = true
 
 # Environment Variables
 [vars]
@@ -134,12 +124,8 @@ binding = "AI"
 #   { name = "CUSTOM_BINDING", type = "plain_text", text = "value" }
 # ]
 
-# Miniflare configuration for local development
-[miniflare]
-kv_persist = true
-cache_persist = true
-d1_persist = true
-r2_persist = true
+# Local development persistence is now handled by Wrangler automatically
+# No separate miniflare configuration needed
 
 # Preview environment (for PR previews and development)
 [env.preview]

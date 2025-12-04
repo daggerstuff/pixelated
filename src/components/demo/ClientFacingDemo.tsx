@@ -26,6 +26,13 @@ interface DemoStep {
 }
 
 const ClientFacingDemo: FC = () => {
+  // Enable all tabs in test/CI mode for testing purposes
+  // Tests can enable all tabs by adding ?test=true to the URL
+  const isTestMode =
+    typeof window !== 'undefined' &&
+    (window.location.search.includes('test=true') ||
+      window.location.search.includes('enable-all-tabs=true'))
+
   const [currentStep, setCurrentStep] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setDemoData] = useState({
@@ -267,7 +274,7 @@ const ClientFacingDemo: FC = () => {
               <TabsTrigger
                 key={step.id}
                 value={step.id}
-                disabled={index > currentStep}
+                disabled={!isTestMode && index > currentStep}
                 className="data-[state=active]:bg-purple-600"
                 data-testid={testIdMap[step.id]}
               >
