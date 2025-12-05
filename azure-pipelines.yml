@@ -819,7 +819,7 @@ stages:
               key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
               restoreKeys: |
                 pnpm | "$(Agent.OS)"
-              path: ~/.local/share/pnpm/store
+              path: $(Agent.HomeDirectory)/.local/share/pnpm/store
             displayName: "Cache pnpm store"
 
           - task: Cache@2
@@ -827,7 +827,7 @@ stages:
               key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
               restoreKeys: |
                 playwright | "$(Agent.OS)"
-              path: ~/.cache/ms-playwright
+              path: $(Agent.HomeDirectory)/.cache/ms-playwright
             displayName: "Cache Playwright Browsers"
 
           - script: |
@@ -952,7 +952,7 @@ stages:
               key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
               restoreKeys: |
                 playwright | "$(Agent.OS)"
-              path: ~/.cache/ms-playwright
+              path: $(Agent.HomeDirectory)/.cache/ms-playwright
             displayName: "Cache Playwright Browsers"
 
           - script: |
