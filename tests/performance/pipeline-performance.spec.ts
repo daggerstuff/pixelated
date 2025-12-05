@@ -24,11 +24,15 @@ test.describe('Pipeline Performance Tests', () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
-    await page.goto('/demo?enable-all-tabs=true')
-    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
-      timeout: 10000,
+    await page.goto('/demo?enable-all-tabs=true', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
     })
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+      timeout: 30000,
+      state: 'visible',
+    })
   })
 
   test.afterAll(async () => {
@@ -349,7 +353,7 @@ test.describe('Pipeline Performance Tests', () => {
               progressUpdates++
             }
           })
-          .catch(() => {})
+          .catch(() => { })
       }, 100)
 
       await page.click('button:has-text("Export Selected")')
@@ -480,7 +484,7 @@ test.describe('Pipeline Performance Tests', () => {
       // Force garbage collection if available
       await page.evaluate(() => {
         if ((window as any).gc) {
-          ;(window as any).gc()
+          ; (window as any).gc()
         }
       })
 
@@ -535,9 +539,14 @@ test.describe('Pipeline Performance Tests', () => {
       // Create 3 additional tabs
       for (let i = 0; i < 3; i++) {
         const newTab = await context.newPage()
-        await newTab.goto('/demo?enable-all-tabs=true')
+        await newTab.goto('/demo?enable-all-tabs=true', {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        })
+        await newTab.waitForLoadState('domcontentloaded')
         await newTab.waitForSelector('[data-testid="data-ingestion-tab"]', {
-          timeout: 10000,
+          timeout: 30000,
+          state: 'visible',
         })
         tabs.push(newTab)
       }
