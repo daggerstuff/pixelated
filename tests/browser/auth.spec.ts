@@ -26,11 +26,11 @@ test('login form shows validation errors', async ({ page }) => {
   // Wait for form to be visible and interactive
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
   await expect(page.locator('button[type="submit"]')).toBeVisible({ timeout: 10000 })
-  
+
   // Wait for form inputs to be ready
   await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
   await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 10000 })
-  
+
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
 
@@ -43,18 +43,41 @@ test('login form shows validation errors', async ({ page }) => {
   await expect(passwordError).toBeAttached({ timeout: 10000 })
 
   // Submit empty form to trigger validation
-  // Use force: true on mobile to bypass header interception
+  // Click the submit button normally (without force) to ensure form submit event fires
   const submitButton = page.locator('button[type="submit"]')
   await submitButton.scrollIntoViewIfNeeded()
   await page.waitForTimeout(300) // Brief pause before interaction
 
-  // Click the submit button - this should trigger form validation
-  await submitButton.click({ force: true, timeout: 10000 })
+  // Click the submit button - this should trigger form onSubmit handler
+  // Try normal click first; only use force if needed for mobile/interception issues
+  try {
+    await submitButton.click({ timeout: 5000 })
+  } catch {
+    // If normal click fails (e.g., element intercepted), use force
+    await submitButton.click({ force: true, timeout: 5000 })
+  }
 
-  // Wait for React to process the state update and show errors
-  // First wait for error text to appear, then check visibility
-  await expect(emailError).toContainText(/required|email/i, { timeout: 10000 })
-  await expect(passwordError).toContainText(/required|password/i, { timeout: 10000 })
+  // Wait for React to flush state updates - wait for error text content to appear
+  // Use a more explicit wait that checks for actual text content
+  await page.waitForFunction(
+    () => {
+      const emailErrorEl = document.getElementById('email-error')
+      const passwordErrorEl = document.getElementById('password-error')
+      const emailText = emailErrorEl?.textContent?.trim() || ''
+      const passwordText = passwordErrorEl?.textContent?.trim() || ''
+      return (
+        emailText.length > 0 &&
+        /required|email/i.test(emailText) &&
+        passwordText.length > 0 &&
+        /required|password/i.test(passwordText)
+      )
+    },
+    { timeout: 10000 },
+  )
+
+  // Now verify the errors are visible and contain the expected text
+  await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
+  await expect(passwordError).toContainText(/required|password/i, { timeout: 5000 })
 
   // Now check visibility - errors should be visible when they have content
   await expect(emailError).toBeVisible({ timeout: 10000 })
@@ -104,7 +127,7 @@ test('login page has proper transitions', async ({ page }) => {
   // Wait for form to be visible and interactive
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
   await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
-  
+
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
 
@@ -118,19 +141,30 @@ test('login page has proper transitions', async ({ page }) => {
   await expect(passwordResetButton).toBeVisible({ timeout: 10000 })
 
   // Click to switch to reset mode
-  // Scroll into view and use force click to bypass header interception
+  // Scroll into view and click normally to ensure onClick handler fires
   await passwordResetButton.scrollIntoViewIfNeeded()
   await page.waitForTimeout(300) // Brief pause before interaction
-  await passwordResetButton.click({ force: true, timeout: 10000 })
 
-  // Wait for React state update - wait for the h2 to appear
-  // The h2 has data-testid="reset-password-heading" according to LoginForm.tsx
+  // Click the button - this should trigger the onClick handler that sets mode to 'reset'
+  await passwordResetButton.click({ timeout: 10000 })
+
+  // Wait for React to process the state update and render the reset password heading
+  // Use waitForFunction to explicitly wait for the heading element to appear in the DOM
+  await page.waitForFunction(
+    () => {
+      const heading = document.querySelector('[data-testid="reset-password-heading"]')
+      return heading !== null && heading.textContent?.includes('Reset Password')
+    },
+    { timeout: 15000 },
+  )
+
+  // Now verify the heading is visible
   const resetPasswordHeading = page
     .locator('[data-testid="reset-password-heading"]')
     .first()
-  
+
   await expect(resetPasswordHeading).toBeVisible({
-    timeout: 15000,
+    timeout: 5000,
   })
 
   // Also wait for the submit button text to change as confirmation
@@ -153,11 +187,11 @@ test('login page visual comparison', async ({ page }) => {
 
   // Wait for any animations to complete and page to be fully loaded
   await page.waitForLoadState('networkidle')
-  
+
   // Wait for React component to hydrate
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
   await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
-  
+
   // Additional wait to ensure React hydration is complete and any animations settle
   await page.waitForTimeout(2000)
 

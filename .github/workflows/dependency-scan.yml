@@ -47,10 +47,23 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install uv and pip (force latest secure versions)
+      - name: Install uv (force latest secure version)
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ">=0.9.6"
+
+      - name: Ensure pip is at secure version
         run: |
-          pip install --upgrade 'pip>=25.3'
-          pip install --upgrade 'uv>=0.9.6'
+          python -m pip install --upgrade 'pip>=25.3'
+
+      - name: Verify uv and pip versions
+        run: |
+          echo "🔍 Verifying tool versions:"
+          uv --version
+          python -m pip --version
+          echo ""
+          echo "✅ uv version must be >=0.9.6"
+          echo "✅ pip version must be >=25.3"
 
       - name: Find and scan Python projects
         id: pip_audit
@@ -82,13 +95,16 @@ jobs:
             echo "🔍 Scanning: $PROJECT_DIR ($PROJECT_NAME)"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             
-            # Create isolated venv for each project
+            # Create isolated venv for each project with latest pip
             cd "$PROJECT_DIR"
-            uv venv --quiet 2>/dev/null || true
+            uv venv --seed --quiet 2>/dev/null || true
             
-            # Upgrade pip to secure version in the venv
+            # Ensure pip is at secure version in the venv (must be >=25.3)
             if [ -f ".venv/bin/pip" ] || [ -f ".venv/Scripts/pip.exe" ]; then
-              uv run pip install --upgrade 'pip>=25.3' 2>/dev/null || true
+              uv run pip install --upgrade 'pip>=25.3' --quiet 2>/dev/null || true
+              # Verify pip version in venv
+              VENV_PIP_VERSION=$(uv run pip --version | grep -oP 'pip \K[0-9.]+' || echo "unknown")
+              echo "📦 Venv pip version: $VENV_PIP_VERSION"
             fi
             
             # Install dependencies

@@ -162,6 +162,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Verify checkout
+        run: |
+          echo "🔍 Verifying checkout completed successfully..."
+          echo "📂 Working directory: $(pwd)"
+          echo "📂 GitHub workspace: ${{ github.workspace }}"
+          if [[ ! -f "package.json" ]]; then
+            echo "❌ Checkout verification failed - package.json not found!"
+            echo "📂 Directory contents:"
+            ls -la
+            exit 1
+          fi
+          echo "✅ Checkout verified - repository files present"
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -338,18 +351,31 @@ jobs:
       - name: Verify Dockerfile exists
         run: |
           echo "🔍 Verifying Dockerfile location..."
-          pwd
-          ls -la Dockerfile || echo "❌ Dockerfile not found in current directory"
-          if [[ ! -f "Dockerfile" ]]; then
-            echo "❌ Dockerfile not found!"
+          echo "📂 Current working directory: $(pwd)"
+          echo "📂 GitHub workspace: ${{ github.workspace }}"
+
+          # Verify checkout succeeded by checking for common files
+          if [[ ! -f "package.json" ]] && [[ ! -f ".git/config" ]]; then
+            echo "❌ Checkout appears to have failed - repository files not found!"
             echo "📂 Current directory contents:"
             ls -la
-            echo "📂 Looking for Dockerfile in repository:"
-            find . -name "Dockerfile" -type f 2>/dev/null | head -10
+            echo "📂 Expected workspace: ${{ github.workspace }}"
             exit 1
           fi
-          echo "✅ Dockerfile found at: $(pwd)/Dockerfile"
-          echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+
+          # Check for Dockerfile in root
+          if [[ -f "Dockerfile" ]]; then
+            echo "✅ Dockerfile found at: $(pwd)/Dockerfile"
+            echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+          else
+            echo "❌ Dockerfile not found in root directory"
+            echo "📂 Current directory contents:"
+            ls -la | head -20
+            echo "📂 Looking for Dockerfile in repository:"
+            find . -name "Dockerfile" -type f 2>/dev/null | head -10 || echo "No Dockerfile found"
+            echo "❌ Dockerfile verification failed!"
+            exit 1
+          fi
 
       - name: Build and push Docker image
         id: build
@@ -558,7 +584,7 @@ jobs:
     name: Deploy to GKE
     runs-on: ubuntu-latest
     needs: [build, security-scan, sentry-release]
-    if: false  # DISABLED: GKE billing not enabled
+    if: false # DISABLED: GKE billing not enabled
     environment: production
     outputs:
       deployment-status: ${{ steps.deploy.outputs.status }}
@@ -859,7 +885,7 @@ jobs:
     name: GKE Health Check
     runs-on: ubuntu-latest
     needs: [deploy-gke]
-    if: false  # DISABLED: GKE billing not enabled
+    if: false # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -975,7 +1001,7 @@ jobs:
     name: Cleanup
     runs-on: ubuntu-latest
     needs: [deploy-gke, health-check-gke]
-    if: false  # DISABLED: GKE billing not enabled
+    if: false # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
