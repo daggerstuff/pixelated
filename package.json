@@ -322,6 +322,7 @@
     "mocha": "^11.7.5",
     "msw": "^2.12.3",
     "nprogress": "^0.2.0",
+    "oxfmt": "^0.16.0",
     "oxlint": "^1.31.0",
     "oxlint-tsgolint": "^0.8.3",
     "papaparse": "^5.5.3",
