@@ -1,7 +1,7 @@
 # Dockerfile for Journal Dataset Research MCP Server
 # Multi-stage build for optimized production image
 
-FROM python:3.11-slim AS builder
+FROM python:3.15-rc-alpine3.22 AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-dev
 
 # Runtime stage
-FROM python:3.11-slim AS runtime
+FROM python:3.15-rc-alpine3.22 AS runtime
 
 WORKDIR /app
 
