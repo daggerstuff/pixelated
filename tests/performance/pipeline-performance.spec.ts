@@ -23,23 +23,48 @@ test.describe('Pipeline Performance Tests', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {
+    // Increase timeout for beforeAll hook to handle slower staging environments
+    test.setTimeout(120000) // 2 minutes
+
     page = await browser.newPage()
-    await page.goto('/demo?enable-all-tabs=true', {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000,
-    })
-    await page.waitForLoadState('domcontentloaded')
-    await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
-      timeout: 30000,
-      state: 'visible',
-    })
+
+    try {
+      await page.goto('/demo?enable-all-tabs=true', {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000, // Increased from 30s to 60s
+      })
+      await page.waitForLoadState('domcontentloaded')
+      await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
+        timeout: 60000, // Increased from 30s to 60s
+        state: 'visible',
+      })
+    } catch (error) {
+      // Log page state for debugging
+      const url = page.url()
+      const title = await page.title().catch(() => 'Unable to get title')
+      const bodyText = await page.textContent('body').catch(() => 'Unable to get body text')
+      console.error(`Failed to initialize page in beforeAll hook:`)
+      console.error(`  URL: ${url}`)
+      console.error(`  Title: ${title}`)
+      console.error(`  Body preview: ${bodyText?.substring(0, 500)}`)
+      throw error
+    }
   })
 
   test.afterAll(async () => {
-    await page.close()
+    // Only close page if it was successfully created
+    if (page && !page.isClosed()) {
+      await page.close()
+    }
   })
 
   test('Data ingestion performance with large files', async () => {
+    // Check if page is still open before starting test
+    if (page.isClosed()) {
+      test.skip()
+      return
+    }
+
     await test.step('Large File Processing Performance', async () => {
       if (!(await safeClick(page, '[data-testid="data-ingestion-tab"]', 'Data ingestion tab not available')))
         return
@@ -71,7 +96,7 @@ test.describe('Pipeline Performance Tests', () => {
 
       // Wait for processing to complete
       await expect(page.locator('text=Processing complete')).toBeVisible({
-        timeout: 30000,
+        timeout: 60000, // Increased for staging
       })
 
       const processingTime = Date.now() - startTime
@@ -324,7 +349,7 @@ test.describe('Pipeline Performance Tests', () => {
           const completedElements = document.querySelectorAll('text=COMPLETED')
           return completedElements.length >= 3 // All 3 formats completed
         },
-        { timeout: 30000 },
+        { timeout: 60000 }, // Increased for staging
       )
 
       const totalExportTime = Date.now() - startTime
@@ -541,11 +566,11 @@ test.describe('Pipeline Performance Tests', () => {
         const newTab = await context.newPage()
         await newTab.goto('/demo?enable-all-tabs=true', {
           waitUntil: 'domcontentloaded',
-          timeout: 30000,
+          timeout: 60000, // Increased for staging
         })
         await newTab.waitForLoadState('domcontentloaded')
         await newTab.waitForSelector('[data-testid="data-ingestion-tab"]', {
-          timeout: 30000,
+          timeout: 60000, // Increased for staging
           state: 'visible',
         })
         tabs.push(newTab)

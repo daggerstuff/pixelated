@@ -274,10 +274,11 @@ jobs:
         run: |
           if ! command -v uv >/dev/null 2>&1; then
             echo "uv not found - installing via pip"
-            python -m pip install --upgrade pip
-            python -m pip install uv
+            python -m pip install --upgrade 'pip>=25.3'
+            python -m pip install 'uv>=0.9.6'
           else
-            echo "uv already installed"
+            echo "uv already installed - verifying version"
+            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
           fi
 
       - name: Cache pip dependencies
@@ -309,7 +310,7 @@ jobs:
           # Use the use-system output if set
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
 
-          uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
+          uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
           uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
@@ -402,10 +403,11 @@ jobs:
         run: |
           if ! command -v uv >/dev/null 2>&1; then
             echo "uv not found - installing via pip"
-            python -m pip install --upgrade pip
-            python -m pip install uv
+            python -m pip install --upgrade 'pip>=25.3'
+            python -m pip install 'uv>=0.9.6'
           else
-            echo "uv already installed"
+            echo "uv already installed - verifying version"
+            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
           fi
 
       - name: Prepare uv venv
@@ -420,7 +422,7 @@ jobs:
 
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
 
-          uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
+          uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
           uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt

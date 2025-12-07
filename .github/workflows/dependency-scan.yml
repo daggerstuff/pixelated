@@ -47,8 +47,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install uv (force latest)
-        run: pip install --upgrade 'uv>=0.8.6'
+      - name: Install uv and pip (force latest secure versions)
+        run: |
+          pip install --upgrade 'pip>=25.3'
+          pip install --upgrade 'uv>=0.9.6'
 
       - name: Find and scan Python projects
         id: pip_audit
@@ -83,6 +85,11 @@ jobs:
             # Create isolated venv for each project
             cd "$PROJECT_DIR"
             uv venv --quiet 2>/dev/null || true
+            
+            # Upgrade pip to secure version in the venv
+            if [ -f ".venv/bin/pip" ] || [ -f ".venv/Scripts/pip.exe" ]; then
+              uv run pip install --upgrade 'pip>=25.3' 2>/dev/null || true
+            fi
             
             # Install dependencies
             if ! uv pip install -q . 2>/dev/null; then
@@ -139,12 +146,8 @@ jobs:
             exit 0
           fi
 
-          # Known acceptable vulnerabilities (CI/build tools only, not runtime dependencies)
-          ACCEPTABLE_VULNS=(
-            "GHSA-4xh5-x5gv-qwph"  # pip 25.2 (tool only)
-            "GHSA-w476-p2h3-79g9"  # uv (tool only)
-            "GHSA-pqhf-p39g-3x64"  # uv (tool only)
-          )
+          # No acceptable vulnerabilities - all must be fixed
+          ACCEPTABLE_VULNS=()
 
           # Extract vulnerability lines (skip header and separator lines)
           # Format: package_name  version  GHSA-ID  fix_version
@@ -191,24 +194,7 @@ jobs:
 
           if [ "$ACTIONABLE_COUNT" -eq 0 ]; then
             echo ""
-            echo "✅ All vulnerabilities are in CI/build tools and are acceptable"
-            if [ -n "$FOUND_ACCEPTABLE" ]; then
-              echo "📌 Accepted vulnerabilities (CI tools only):"
-              echo "$FOUND_ACCEPTABLE" | while IFS= read -r vuln_id; do
-                [ -n "$vuln_id" ] || continue
-                case "$vuln_id" in
-                  "GHSA-4xh5-x5gv-qwph")
-                    echo "   - pip 25.2 (GHSA-4xh5-x5gv-qwph): Minimal impact, affects package installation only"
-                    ;;
-                  "GHSA-w476-p2h3-79g9"|"GHSA-pqhf-p39g-3x64")
-                    echo "   - uv (${vuln_id}): Build tool, not a runtime dependency"
-                    ;;
-                  *)
-                    echo "   - ${vuln_id}: CI/build tool vulnerability (acceptable)"
-                    ;;
-                esac
-              done
-            fi
+            echo "✅ No vulnerabilities found - all dependencies are secure"
             exit 0
           else
             echo ""

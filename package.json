@@ -378,7 +378,8 @@
       "tmp": ">=0.2.4",
       "glob": "^11.1.0",
       "node-domexception": "^2.0.2",
-      "sitemap": "^9.0.0"
+      "sitemap": "^9.0.0",
+      "jws": ">=4.0.1"
     },
     "allowedDeprecatedVersions": {
       "abab": "2.0.6",

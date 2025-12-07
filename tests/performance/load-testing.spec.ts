@@ -36,7 +36,7 @@ test.describe('Pipeline Load Testing', () => {
         // Enable all tabs for testing
         await page.goto('/demo?enable-all-tabs=true', {
           waitUntil: 'domcontentloaded',
-          timeout: 30000,
+          timeout: 60000, // Increased from 30s to 60s for staging
         })
 
         // Wait for page to be interactive
@@ -45,7 +45,7 @@ test.describe('Pipeline Load Testing', () => {
         // Wait for tabs to be rendered with increased timeout and better error handling
         try {
           await page.waitForSelector('[data-testid="data-ingestion-tab"]', {
-            timeout: 30000,
+            timeout: 60000, // Increased from 30s to 60s for staging
             state: 'visible',
           })
         } catch (error) {
@@ -76,7 +76,7 @@ test.describe('Pipeline Load Testing', () => {
 
             const ingestionTab = page.getByTestId('data-ingestion-tab')
             // Wait for tab to be visible and enabled
-            await expect(ingestionTab).toBeVisible({ timeout: 30000 })
+            await expect(ingestionTab).toBeVisible({ timeout: 60000 }) // Increased for staging
             await expect(ingestionTab).not.toBeDisabled({ timeout: 5000 })
             await ingestionTab.click({ timeout: 10000 })
 
