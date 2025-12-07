@@ -1,7 +1,7 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
-import path from 'node:path'
+
 import fs from 'node:fs'
 import { safeJoin, ALLOWED_DIRECTORIES, validateAndCreateDir } from '../../../utils/path-security'
 

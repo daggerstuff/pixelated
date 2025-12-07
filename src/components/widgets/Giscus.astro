@@ -13,16 +13,13 @@
   const giscusConfig = Array.isArray(FEATURES.giscus) && FEATURES.giscus[1]
   const giscusTemplateScript = document.createElement('script')
 
-  Object.entries({
-    ...giscusConfig,
-    ...{
-      id: 'giscus-script',
-      src: 'https://giscus.app/client.js',
-      crossOrigin: 'anonymous',
-      // 'data-loading': 'lazy',
-      async: '',
-    },
-  }).forEach(([key, value]) => {
+  Object.entries(({
+	...giscusConfig,
+	id: 'giscus-script',
+	src: 'https://giscus.app/client.js',
+	crossOrigin: 'anonymous',
+	async: ''
+})).forEach(([key, value]) => {
     giscusTemplateScript.setAttribute(key, value)
   })
 

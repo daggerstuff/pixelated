@@ -1,6 +1,6 @@
 /// <reference types="astro/client" />
 import * as LaunchDarkly from 'launchdarkly-js-client-sdk'
-import { getClient } from '@sentry/astro'
+
 
 let ldClient: LaunchDarkly.LDClient | null = null
 

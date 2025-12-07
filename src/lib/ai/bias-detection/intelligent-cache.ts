@@ -839,7 +839,7 @@ export class IntelligentCache {
         await Promise.all(
           sets.map(async (op) => {
             try {
-              const safeOptions = { ...(op.options || {}) }
+              const safeOptions = { ...op.options }
               const str =
                 safeOptions.strategy &&
                 this.strategies.has(safeOptions.strategy)

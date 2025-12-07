@@ -377,15 +377,15 @@ export class BackupSecurityManager {
       ...config,
       storageLocations: {
         ...this.config.storageLocations,
-        ...(config.storageLocations || {}),
+        ...config.storageLocations,
       },
       backupTypes: {
         ...this.config.backupTypes,
-        ...(config.backupTypes || {}),
+        ...config.backupTypes,
       },
       recoveryTesting: {
         ...this.config.recoveryTesting,
-        ...(config.recoveryTesting || {}),
+        ...config.recoveryTesting,
       },
     }
 

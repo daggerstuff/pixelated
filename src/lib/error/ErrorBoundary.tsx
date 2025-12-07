@@ -11,7 +11,7 @@ import {
   createErrorContext,
   type ErrorContext,
 } from './utils'
-import type { AppError } from './types'
+
 
 interface Props {
   children: ReactNode

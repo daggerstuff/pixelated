@@ -4,12 +4,11 @@ import { AcquisitionList } from '../lists/AcquisitionList'
 import {
   useAcquisitionListQuery,
   useAcquisitionInitiateMutation,
-  useAcquisitionUpdateMutation,
-} from '@/lib/hooks/journal-research'
+  } from '@/lib/hooks/journal-research'
 import { useIntegrateAllDatasets, usePipelineStatus } from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button/button'
-import { Play, CheckCircle2, Loader2 } from 'lucide-react'
+import { Play, Loader2 } from 'lucide-react'
 
 export interface AcquisitionPanelProps {
   sessionId: string | null
@@ -23,7 +22,7 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
     pageSize: 25,
   })
   const initiateMutation = useAcquisitionInitiateMutation(sessionId)
-  const updateMutation = useAcquisitionUpdateMutation(sessionId)
+  
   const integrateAllMutation = useIntegrateAllDatasets(sessionId ?? '')
   const { data: pipelineStatus } = usePipelineStatus(true)
 

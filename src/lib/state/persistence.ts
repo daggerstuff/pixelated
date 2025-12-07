@@ -31,7 +31,7 @@ export class StatePersistence {
 
   constructor(config: PersistenceConfig) {
     this.config = config
-    this.options = { ...defaultOptions, ...(config.options || {}) }
+    this.options = { ...defaultOptions, ...config.options }
   }
 
   private getStorageKey(): string {

@@ -6,7 +6,7 @@ import {
   useDiscoveryListQuery,
   useDiscoveryInitiateMutation,
 } from '@/lib/hooks/journal-research'
-import { useJournalSessionStore } from '@/lib/stores/journal-research'
+
 import { cn } from '@/lib/utils'
 
 export interface SourceDiscoveryProps {

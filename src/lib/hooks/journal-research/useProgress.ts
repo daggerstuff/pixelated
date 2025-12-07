@@ -3,8 +3,6 @@ import {
   getProgress,
   getProgressMetrics,
   generateReport,
-  type Progress,
-  type ProgressMetrics,
   type Report,
   type ReportGeneratePayload,
 } from '@/lib/api/journal-research'

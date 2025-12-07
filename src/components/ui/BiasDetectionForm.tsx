@@ -126,7 +126,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
     }
 
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return !Object.keys(newErrors).length
   }, [formData, validateText, validateContext, validateDemographics])
 
   const handleTextChange = useCallback(
@@ -175,10 +175,23 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
         if (firstErrorField === 'text' && textAreaRef.current) {
           textAreaRef.current.focus()
         }
+        // Track validation failure
+        const { countMetric } = await import('@/lib/sentry/utils')
+        countMetric('form.validation_failed', 1, {
+          form: 'BiasDetectionForm',
+          error_field: firstErrorField,
+        })
         return
       }
 
       try {
+        // Track form submission
+        const { countMetric } = await import('@/lib/sentry/utils')
+        countMetric('form.submitted', 1, {
+          form: 'BiasDetectionForm',
+          session_type: formData.sessionType,
+        })
+
         await onSubmit({
           ...formData,
           text: InputValidator.sanitizeString(formData.text),
@@ -189,6 +202,12 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
         })
       } catch (error) {
         console.error('Form submission error:', error)
+        const { countMetric } = await import('@/lib/sentry/utils')
+        const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+        countMetric('form.submission_error', 1, {
+          form: 'BiasDetectionForm',
+          error_type: errorType,
+        })
         setErrors({ submit: 'Failed to submit analysis. Please try again.' })
       }
     },

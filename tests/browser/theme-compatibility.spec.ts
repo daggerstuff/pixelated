@@ -4,9 +4,8 @@ import {
   Page,
   Browser,
   BrowserContext,
-  devices,
-} from '@playwright/test'
-import { join } from 'path'
+  } from '@playwright/test'
+
 
 // Test configuration for different browsers and devices
 const testConfig = {

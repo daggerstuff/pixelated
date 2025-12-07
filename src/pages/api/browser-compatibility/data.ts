@@ -1,6 +1,6 @@
 // import type { APIRoute } from 'astro'
 import fs from 'node:fs'
-import path from 'node:path'
+
 import { safeJoin, ALLOWED_DIRECTORIES, validatePath, sanitizeFilename } from '../../../utils/path-security'
 
 /**

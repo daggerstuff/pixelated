@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useEvaluationStore, type EvaluationSortField } from '../evaluationStore'
+import { useEvaluationStore, } from '../evaluationStore'
 
 describe('evaluationStore', () => {
   beforeEach(() => {

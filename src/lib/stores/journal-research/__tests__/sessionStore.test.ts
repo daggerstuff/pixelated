@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useJournalSessionStore, type SessionPhase } from '../sessionStore'
+import { useJournalSessionStore, } from '../sessionStore'
 
 describe('sessionStore', () => {
   beforeEach(() => {

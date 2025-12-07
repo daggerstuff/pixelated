@@ -579,7 +579,7 @@ export class BiasSystemError extends BiasDetectionError {
     super(message, 'BIAS_SYSTEM_ERROR', 'critical', 'system', {
       ...rest,
       context: {
-        ...(context ?? {}),
+        ...context,
         component,
       },
     })

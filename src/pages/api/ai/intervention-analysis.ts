@@ -7,7 +7,7 @@ import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 import { aiRepository } from '@/lib/db/ai'
 import { AIService } from '@/lib/ai/models/ai-types'
-import type { APIContext } from 'astro';
+
 
 
 /**

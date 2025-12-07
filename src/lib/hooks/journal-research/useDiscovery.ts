@@ -5,7 +5,6 @@ import {
   listSources,
   type DiscoveryInitiatePayload,
   type DiscoveryResponse,
-  type Source,
   type SourceList,
 } from '@/lib/api/journal-research'
 import {

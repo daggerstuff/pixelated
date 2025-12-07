@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, } from '@testing-library/react'
 import { Dashboard } from '../Dashboard'
 import { renderWithProviders, mockSession, mockProgress, mockProgressMetrics } from '../../__tests__/test-utils'
 import * as hooks from '@/lib/hooks/journal-research'
