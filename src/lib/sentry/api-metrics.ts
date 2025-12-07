@@ -5,7 +5,7 @@
  * Use this to consistently track request counts, response times, and errors.
  */
 
-import { apiMetrics } from './sentry/utils'
+import { apiMetrics } from './utils'
 
 /**
  * Wraps an API route handler with automatic metrics collection

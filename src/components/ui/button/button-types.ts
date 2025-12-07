@@ -34,8 +34,8 @@ export interface ButtonBaseProps {
 
 export interface ButtonProps
   extends ButtonBaseProps,
-    Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
-    VariantProps<typeof buttonVariants> {
+  Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
+  VariantProps<typeof buttonVariants> {
   /** The variant style to use */
   variant?: ButtonVariant
   /** The size of the button */
@@ -79,7 +79,12 @@ export const BUTTON_VARIANTS: ButtonVariant[] = [
 export const BUTTON_SIZES: ButtonSize[] = ['default', 'sm', 'lg', 'icon']
 
 // Accessibility helpers
-export function getAriaProps(props: ButtonProps): void {
+export function getAriaProps(props: ButtonProps): {
+  'aria-label'?: string
+  'aria-description'?: string
+  'aria-disabled'?: boolean
+  'aria-busy'?: boolean
+} {
   return {
     'aria-label': props['aria-label'],
     'aria-description': props['aria-description'],

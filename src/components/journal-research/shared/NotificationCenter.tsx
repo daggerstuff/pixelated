@@ -20,6 +20,12 @@ export interface NotificationCenterProps {
   className?: string
 }
 
+// Re-export Notification type for convenience
+export type { Notification }
+
+// Export NotificationType as the mapped visual type
+export type NotificationType = 'success' | 'error' | 'warning' | 'info'
+
 const typeIcons = {
   success: CheckCircle,
   error: XCircle,

@@ -5,6 +5,8 @@ import { createBuildSafeLogger } from './lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('phi-audit')
 
 export const SITE: Site = {
+  menu: {},
+  name: 'Pixelated Empathy',
   website: 'https://pixelatedempathy.com',
   base: '/',
   title: 'Pixelated Empathy',
@@ -94,6 +96,9 @@ export const UI: Ui = {
     newTab: false,
     cursorType: '',
     showNewTabIcon: false,
+  },
+  theme: {
+    toggleIcon: true,
   },
   postMetaStyle: 'minimal',
 }
