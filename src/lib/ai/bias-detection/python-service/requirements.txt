@@ -70,3 +70,6 @@ python-dotenv
 
 # Security: Pin transitive dependencies to secure versions
 fonttools>=4.61.0  # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
+keras>=3.11.0 # not directly required, pinned by Snyk to avoid a vulnerability
+tensorflow>=2.12.0rc1 # not directly required, pinned by Snyk to avoid a vulnerability
+protobuf>=4.25.8 # not directly required, pinned by Snyk to avoid a vulnerability
