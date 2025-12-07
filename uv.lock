@@ -3930,7 +3930,7 @@ requires-dist = [
     { name = "flake8", specifier = ">=7.3.0" },
     { name = "flask" },
     { name = "flask-cors" },
-    { name = "fonttools", specifier = ">=4.60.2" },
+    { name = "fonttools", specifier = ">=4.61.0" },
     { name = "gguf", specifier = ">=0.10.0" },
     { name = "h11", specifier = ">=0.15.0" },
     { name = "hatch", specifier = ">=1.14.1" },
