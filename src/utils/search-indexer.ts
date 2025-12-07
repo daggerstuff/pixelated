@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
+
 import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from './path-security'
 
 interface CollectionEntry {

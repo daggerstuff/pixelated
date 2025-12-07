@@ -1,4 +1,3 @@
-import type { APIContext } from 'astro'
 import {
   createAuditLog,
   AuditEventType,
@@ -7,6 +6,8 @@ import {
 import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { aiRepository } from '@/lib/db/ai'
+import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
+import { apiMetrics, countMetric } from '@/lib/sentry/utils'
 
 /**
  * GET handler - returns information about the AI response endpoint
@@ -79,6 +80,8 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({
   request,
 }) => {
+  const startTime = Date.now()
+  const endpoint = '/api/ai/response'
   let session: Awaited<ReturnType<typeof getSession>> | null = null
 
   try {
@@ -146,8 +149,8 @@ export const POST: APIRoute = async ({
                 role: 'assistant',
                 content:
                   typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                    response !== null &&
+                    'content' in response
                     ? (response as { content: string }).content
                     : '',
                 name: 'assistant',
@@ -157,32 +160,32 @@ export const POST: APIRoute = async ({
           ],
           usage:
             typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+              response !== null &&
+              'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
-                }
+                promptTokens: Number(
+                  (response.usage as { promptTokens: number })
+                    ?.promptTokens || 0,
+                ),
+                completionTokens: Number(
+                  (response.usage as { completionTokens: number })
+                    ?.completionTokens || 0,
+                ),
+                totalTokens: Number(
+                  (response.usage as { totalTokens: number })?.totalTokens ||
+                  0,
+                ),
+              }
               : {
-                  promptTokens: 0,
-                  completionTokens: 0,
-                  totalTokens: 0,
-                },
+                promptTokens: 0,
+                completionTokens: 0,
+                totalTokens: 0,
+              },
           provider: 'together',
           content:
             typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+              response !== null &&
+              'content' in response
               ? (response as { content: string }).content
               : '',
         }
@@ -191,7 +194,7 @@ export const POST: APIRoute = async ({
         _messages: AIMessage[],
         options?: AIServiceOptions,
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
-        const generator = async function* () {
+        const generator = async function*() {
           // Minimal implementation - streaming not fully supported
           yield {
             id: `together_${Date.now()}`,
@@ -230,8 +233,8 @@ export const POST: APIRoute = async ({
                 role: 'assistant',
                 content:
                   typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                    response !== null &&
+                    'content' in response
                     ? (response as { content: string }).content
                     : '',
                 name: 'assistant',
@@ -241,32 +244,32 @@ export const POST: APIRoute = async ({
           ],
           usage:
             typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+              response !== null &&
+              'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
-                }
+                promptTokens: Number(
+                  (response.usage as { promptTokens: number })
+                    ?.promptTokens || 0,
+                ),
+                completionTokens: Number(
+                  (response.usage as { completionTokens: number })
+                    ?.completionTokens || 0,
+                ),
+                totalTokens: Number(
+                  (response.usage as { totalTokens: number })?.totalTokens ||
+                  0,
+                ),
+              }
               : {
-                  promptTokens: 0,
-                  completionTokens: 0,
-                  totalTokens: 0,
-                },
+                promptTokens: 0,
+                completionTokens: 0,
+                totalTokens: 0,
+              },
           provider: 'together',
           content:
             typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+              response !== null &&
+              'content' in response
               ? (response as { content: string }).content
               : '',
         }
@@ -317,6 +320,15 @@ export const POST: APIRoute = async ({
 
     const latencyMs = Date.now() - startTime
 
+    // Track metrics
+    trackApiRequest(endpoint, 'POST', 200, latencyMs)
+    apiMetrics.responseTime(endpoint, latencyMs, 'POST')
+    countMetric('ai.response.generated', 1, {
+      model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      provider: 'together',
+      success: true,
+    })
+
     // Store the result in the database
     await aiRepository.storeResponseGeneration({
       userId: session?.user?.id || 'anonymous',
@@ -357,7 +369,18 @@ export const POST: APIRoute = async ({
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
+    const durationMs = Date.now() - startTime
+    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+
     console.error('Error in response generation API:', error)
+
+    // Track error metrics
+    trackApiError(endpoint, errorType, 'POST')
+    apiMetrics.responseTime(endpoint, durationMs, 'POST')
+    countMetric('ai.response.error', 1, {
+      error_type: errorType,
+      endpoint,
+    })
 
     // Create audit log for the error
     await createAuditLog(

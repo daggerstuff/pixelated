@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs/promises'
-import { join } from 'node:path'
+
 import { FEATURES } from '../lib/browser/feature-detection'
 import { safeJoin, ALLOWED_DIRECTORIES } from '../utils/path-security'
 

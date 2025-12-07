@@ -35,6 +35,7 @@ const RealUserMonitoringComponent = compileAstroComponent(componentPath)
 interface RealUserMonitoringProps {
   title?: string
   description?: string
+  [key: string]: unknown
 }
 
 describe('RealUserMonitoring.astro', () => {

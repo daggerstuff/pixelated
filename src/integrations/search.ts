@@ -2,7 +2,7 @@ import type { AstroIntegration } from 'astro'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createSearchIndexFile } from '../utils/search-indexer'
-import { safeJoin, validatePath, sanitizeFilename, ALLOWED_DIRECTORIES } from '../utils/path-security'
+import { validatePath, sanitizeFilename, ALLOWED_DIRECTORIES } from '../utils/path-security'
 
 interface SearchIntegrationOptions {
   // Collections to index

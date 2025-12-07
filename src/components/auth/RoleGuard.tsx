@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth'
 import type { AuthRole } from '@/config/auth.config'
 import type { UserRole } from '@/types/auth'
 
-interface RoleGuardProps {
+export interface RoleGuardProps {
   children: React.ReactNode
   requiredRole: AuthRole | AuthRole[] | UserRole | UserRole[]
   fallback?: React.ReactNode

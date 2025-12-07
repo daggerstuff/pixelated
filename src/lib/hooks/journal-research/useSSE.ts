@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { journalResearchApiClient } from '@/lib/api/journal-research'
 import type {
-  ProgressUpdateMessage,
-  StatusUpdateMessage,
-  NotificationMessage,
   WebSocketMessage,
 } from './useWebSocket'
 

@@ -13,9 +13,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
+    curl \
     && corepack enable \
-    && corepack prepare pnpm@$PNPM_VERSION --activate \
-    && pnpm --version \
+    && ( \
+    PNPM_SUCCESS=0; \
+    for i in 1 2 3 4 5; do \
+    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
+    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
+    PNPM_SUCCESS=1 && \
+    break; \
+    else \
+    echo "❌ Attempt $i failed, waiting before retry..." && \
+    sleep $((i * 2)); \
+    fi; \
+    done; \
+    if [ "$PNPM_SUCCESS" -ne 1 ]; then \
+    echo "❌ Failed to install pnpm after 5 attempts" && \
+    exit 1; \
+    fi \
+    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests first for better layer caching
@@ -44,9 +61,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     g++ \
     git \
+    curl \
     && corepack enable \
-    && corepack prepare pnpm@$PNPM_VERSION --activate \
-    && pnpm --version \
+    && ( \
+    PNPM_SUCCESS=0; \
+    for i in 1 2 3 4 5; do \
+    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
+    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
+    PNPM_SUCCESS=1 && \
+    break; \
+    else \
+    echo "❌ Attempt $i failed, waiting before retry..." && \
+    sleep $((i * 2)); \
+    fi; \
+    done; \
+    if [ "$PNPM_SUCCESS" -ne 1 ]; then \
+    echo "❌ Failed to install pnpm after 5 attempts" && \
+    exit 1; \
+    fi \
+    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

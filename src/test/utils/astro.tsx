@@ -2,20 +2,111 @@ import { render } from '@testing-library/react'
 import React from 'react'
 
 /**
+ * Flexible type for Astro component render results
+ */
+type AstroRenderResult = string | { html: string } | Promise<string> | Promise<{ html: string }>
+
+/**
+ * Base interface for Astro components with a render method
+ */
+export interface AstroComponentWithRender {
+  render: (
+    props?: Record<string, unknown>,
+    slots?: Record<string, { render: () => string; name: string }>,
+  ) => Promise<AstroRenderResult>
+}
+
+/**
+ * Function-based Astro component (rare but possible)
+ */
+export type AstroFunctionComponent = (
+  props: Record<string, unknown>,
+) => Promise<AstroRenderResult> | AstroRenderResult
+
+/**
+ * Union type for all possible Astro component structures
+ * This allows accepting components in various formats
+ */
+export type AstroComponent =
+  | AstroComponentWithRender
+  | AstroFunctionComponent
+  | {
+    default: AstroComponentWithRender | AstroFunctionComponent
+  }
+  | {
+    render: (
+      props?: Record<string, unknown>,
+      slots?: Record<string, { render: () => string; name: string }>,
+    ) => Promise<AstroRenderResult>
+  }
+  | ((
+    props: Record<string, unknown>,
+  ) => Promise<AstroRenderResult> | AstroRenderResult)
+
+/**
+ * Extract HTML string from render result
+ */
+async function extractHtml(result: AstroRenderResult): Promise<string> {
+  const resolved = await Promise.resolve(result)
+
+  if (typeof resolved === 'string') {
+    return resolved
+  }
+
+  if (typeof resolved === 'object' && resolved !== null && 'html' in resolved) {
+    return (resolved as { html: string }).html
+  }
+
+  throw new Error('Invalid render result format')
+}
+
+/**
+ * Normalize component to have a render method
+ */
+function normalizeComponent(
+  component: unknown,
+): AstroComponentWithRender {
+  // Handle default export
+  if (
+    typeof component === 'object' &&
+    component !== null &&
+    'default' in component
+  ) {
+    return normalizeComponent((component as { default: unknown }).default)
+  }
+
+  // Handle function component by wrapping it
+  if (typeof component === 'function' && !('render' in component)) {
+    return {
+      render: async (props = {}) => {
+        return await (component as AstroFunctionComponent)(props);
+      },
+    }
+  }
+
+  // Handle component with render method
+  if (
+    typeof component === 'object' &&
+    component !== null &&
+    'render' in component &&
+    typeof (component as { render: unknown }).render === 'function'
+  ) {
+    return component as AstroComponentWithRender
+  }
+
+  // Fallback: try to use as-is (for backward compatibility)
+  return component as AstroComponentWithRender
+}
+
+/**
  * Renders an Astro component for testing
- * @param Component The Astro component to render
+ * @param Component The Astro component to render (supports various formats)
  * @param props Props to pass to the component
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-interface AstroComponent {
-  render: (
-    props: Record<string, unknown> & { slot?: string | undefined },
-  ) => Promise<string>
-}
-
 export async function renderAstro<Props extends Record<string, unknown>>(
-  Component: AstroComponent,
+  Component: AstroComponent | unknown,
   props: Props = {} as Props,
   slotContent?: string,
 ): Promise<{
@@ -34,8 +125,20 @@ export async function renderAstro<Props extends Record<string, unknown>>(
   rerender: (ui: React.ReactElement) => void
   asFragment: () => DocumentFragment
 }> {
-  const renderProps = slotContent ? { ...props, slot: slotContent } : props
-  const html = await Component.render(renderProps)
+  // Normalize component to ensure it has a render method
+  const normalizedComponent = normalizeComponent(Component)
+
+  // Prepare render options with slot content if provided
+  const renderOptions = slotContent
+    ? {
+      default: { render: () => slotContent, name: 'default' },
+    }
+    : undefined
+
+  // Render the component
+  const astroRenderResult = await normalizedComponent.render(props, renderOptions)
+  const html = await extractHtml(astroRenderResult)
+
   const container = document.createElement('div')
   container.innerHTML = html
 
@@ -91,4 +194,12 @@ export type AstroMockProps<T> = T & {
   'client:only'?: boolean
   'class'?: string
   'className'?: string
+}
+
+/**
+ * Type helper to assert a component is compatible with renderAstro
+ * Use this when TypeScript can't infer the type correctly
+ */
+export function asAstroComponent<T = unknown>(component: unknown): T {
+  return component as T
 }

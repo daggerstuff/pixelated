@@ -3,12 +3,12 @@ import {
   DiscoveryInitiatePayloadSchema,
   type DiscoveryInitiatePayload,
 } from '@/lib/api/journal-research/types'
-import { z } from 'zod'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
-import { normalizeError, getFieldErrors } from '@/lib/error'
+import { getFieldErrors } from '@/lib/error'
 import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface DiscoveryFormProps {
@@ -49,7 +49,7 @@ export function DiscoveryForm({
       const validated = DiscoveryInitiatePayloadSchema.parse(payload)
       await onSubmit(validated)
     } catch (error) {
-      const normalized = normalizeError(error)
+      
       const fieldErrs = getFieldErrors(error) ?? {}
       
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {

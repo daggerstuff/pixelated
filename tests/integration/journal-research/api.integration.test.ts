@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, } from 'vitest'
 import { QueryClient } from '@tanstack/react-query'
 import {
   listSessions,
@@ -9,7 +9,7 @@ import {
   type CreateSessionPayload,
   type UpdateSessionPayload,
 } from '@/lib/api/journal-research'
-import { journalResearchQueryClient } from '@/lib/api/journal-research/react-query'
+
 
 /**
  * Integration tests for Journal Research API
@@ -24,7 +24,7 @@ import { journalResearchQueryClient } from '@/lib/api/journal-research/react-que
  */
 
 describe('Journal Research API Integration', () => {
-  const testSessionId = `test-session-${Date.now()}`
+  
   let createdSessionId: string | null = null
 
   beforeAll(() => {

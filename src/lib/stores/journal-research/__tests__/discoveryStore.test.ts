@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useDiscoveryStore, type DiscoverySort } from '../discoveryStore'
+import { useDiscoveryStore, } from '../discoveryStore'
 
 describe('discoveryStore', () => {
   beforeEach(() => {

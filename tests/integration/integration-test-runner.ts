@@ -7,7 +7,7 @@
  * manages test environments, and generates comprehensive reports.
  */
 
-import { execSync, spawn } from 'child_process'
+import { execSync, } from 'child_process'
 import { writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join } from 'path'
 import { fileURLToPath } from 'url'

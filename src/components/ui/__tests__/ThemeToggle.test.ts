@@ -36,7 +36,7 @@ describe('ThemeToggle', () => {
   })
 
   it('renders with correct base classes', async () => {
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown)
+    const { astroContainer } = await renderAstro(ThemeToggle)
     const button = astroContainer.querySelector('button')
 
     expect(button).toHaveClass('p-2', 'rounded-md')
@@ -44,7 +44,7 @@ describe('ThemeToggle', () => {
   })
 
   it('shows correct icon based on current theme', async () => {
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown)
+    const { astroContainer } = await renderAstro(ThemeToggle)
 
     // Initially system theme (should show system icon)
     const systemIcon = astroContainer.querySelector('#system-icon')
@@ -74,7 +74,7 @@ describe('ThemeToggle', () => {
   })
 
   it('cycles through themes on button click', async () => {
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown)
+    const { astroContainer } = await renderAstro(ThemeToggle)
     const button = astroContainer.querySelector('button')!
 
     // Initial state (system)
@@ -100,7 +100,7 @@ describe('ThemeToggle', () => {
 
   it('applies custom class from props', async () => {
     const customClass = 'custom-theme-toggle'
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown, {
+    const { astroContainer } = await renderAstro(ThemeToggle, {
       class: customClass,
     })
     const button = astroContainer.querySelector('button')
@@ -112,7 +112,7 @@ describe('ThemeToggle', () => {
     // Set initial theme preference
     localStorage.setItem('theme', 'dark')
 
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown)
+    const { astroContainer } = await renderAstro(ThemeToggle)
 
     expect(document.documentElement.classList.contains('dark')).toBe(true)
     expect(astroContainer.querySelector('#moon-icon')).not.toHaveClass('hidden')
@@ -131,7 +131,7 @@ describe('ThemeToggle', () => {
       dispatchEvent: vi.fn(),
     }))
 
-    const { astroContainer } = await renderAstro(ThemeToggle as unknown)
+    const { astroContainer } = await renderAstro(ThemeToggle)
 
     expect(document.documentElement.classList.contains('dark')).toBe(true)
     expect(astroContainer.querySelector('#system-icon')).not.toHaveClass(

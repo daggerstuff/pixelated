@@ -10,6 +10,7 @@ import {
   initializeProviders,
 } from '../providers'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { apiMetrics, emotionMetrics } from '../../sentry/utils'
 
 const appLogger = createBuildSafeLogger('ai-server')
 
@@ -361,7 +362,11 @@ Respond in JSON format with the following structure:
         try {
           resolve(body ? JSON.parse(body) : {})
         } catch (error) {
-          reject(new Error('Invalid JSON'))
+          reject(
+            new Error(
+              `Invalid JSON: ${error instanceof Error ? error.message : String(error)}`,
+            ),
+          )
         }
       })
       req.on('error', reject)
@@ -372,6 +377,7 @@ Respond in JSON format with the following structure:
     const { method, url } = req
     const parsedUrl = parse(url || '', true)
     const path = parsedUrl.pathname
+    const startTime = Date.now()
 
     // Handle CORS preflight
     if (method === 'OPTIONS') {
@@ -393,18 +399,30 @@ Respond in JSON format with the following structure:
         case 'POST /chat': {
           const chatBody = await this.parseRequestBody(req)
           await this.handleChatCompletion(res, chatBody)
+          const durationMs = Date.now() - startTime
+          apiMetrics.request('/ai-service/chat', 'POST', res.statusCode || 200)
+          apiMetrics.responseTime('/ai-service/chat', durationMs, 'POST')
           break
         }
 
         case 'POST /analyze-emotion': {
           const emotionBody = await this.parseRequestBody(req)
+          const analysisStartTime = Date.now()
           await this.handleEmotionAnalysis(req, res, emotionBody)
+          const durationMs = Date.now() - startTime
+          const analysisDurationMs = Date.now() - analysisStartTime
+          apiMetrics.request('/ai-service/analyze-emotion', 'POST', res.statusCode || 200)
+          apiMetrics.responseTime('/ai-service/analyze-emotion', durationMs, 'POST')
+          emotionMetrics.analysisLatency(analysisDurationMs, 'ai-service')
           break
         }
 
         case 'POST /chat/stream': {
           const streamBody = await this.parseRequestBody(req)
           await this.handleStreamingChat(req, res, streamBody)
+          const durationMs = Date.now() - startTime
+          apiMetrics.request('/ai-service/chat/stream', 'POST', res.statusCode || 200)
+          apiMetrics.responseTime('/ai-service/chat/stream', durationMs, 'POST')
           break
         }
 
@@ -413,8 +431,13 @@ Respond in JSON format with the following structure:
             success: false,
             error: 'Endpoint not found',
           })
+          apiMetrics.request('/ai-service/unknown', method, 404)
       }
     } catch (error) {
+      const durationMs = Date.now() - startTime
+      const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+      apiMetrics.error('/ai-service', errorType)
+      apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)
       this.sendJsonResponse(res, 500, {
         success: false,

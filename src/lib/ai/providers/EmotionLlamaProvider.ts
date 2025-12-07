@@ -94,6 +94,12 @@ export class EmotionLlamaProvider {
             statusText: response.statusText,
           },
         )
+        // Track fallback metrics
+        const { emotionMetrics } = await import('../../sentry/utils')
+        emotionMetrics.analysisPerformed({
+          model: this.modelVersion,
+          success: false,
+        })
         return this.fallbackAnalysis(text, startTime)
       }
 
@@ -103,9 +109,28 @@ export class EmotionLlamaProvider {
       const decryptedResult = await this.processEncryptedResponse(result)
 
       // Convert to standardized format
-      return this.convertToEmotionAnalysis(decryptedResult, text, startTime)
+      const analysis = this.convertToEmotionAnalysis(decryptedResult, text, startTime)
+      const totalDurationMs = Date.now() - startTime
+
+      // Track successful analysis metrics
+      const { emotionMetrics } = await import('../../sentry/utils')
+      emotionMetrics.analysisPerformed({
+        model: this.modelVersion,
+        success: true,
+      })
+      emotionMetrics.analysisLatency(totalDurationMs, this.modelVersion)
+
+      return analysis
     } catch (error: unknown) {
       logger.error('Error in emotion analysis', { error })
+
+      // Track error metrics
+      const { emotionMetrics } = await import('../../sentry/utils')
+      emotionMetrics.analysisPerformed({
+        model: this.modelVersion,
+        success: false,
+      })
+
       // Fallback to local analysis
       return this.fallbackAnalysis(text, startTime)
     }

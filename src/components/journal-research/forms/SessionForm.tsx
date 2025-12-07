@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/c
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
-import { normalizeError, getFieldErrors } from '@/lib/error'
+import { getFieldErrors } from '@/lib/error'
 import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface SessionFormProps {
@@ -88,7 +88,7 @@ export function SessionForm({
       const validated = schema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      const normalized = normalizeError(error)
+      
       const fieldErrs = getFieldErrors(error) ?? {}
       
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
@@ -144,7 +144,7 @@ export function SessionForm({
       setFormData({
         ...formData,
         weeklyTargets: {
-          ...(formData.weeklyTargets ?? {}),
+          ...formData.weeklyTargets,
           [week]: numValue,
         },
       })

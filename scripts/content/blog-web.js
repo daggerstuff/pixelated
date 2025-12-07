@@ -11,8 +11,8 @@ import '../instrument.mjs'
 
 import { spawnSync } from 'child_process'
 import http from 'http'
-import fs from 'fs'
-import path from 'path'
+
+
 import { URL } from 'url'
 import { fileURLToPath } from 'url'
 

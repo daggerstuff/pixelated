@@ -104,6 +104,7 @@ export function LoginForm({
       }
     }
 
+    // Always update errors state, even if empty, to ensure React re-renders
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -349,7 +350,7 @@ export function LoginForm({
               display: errors.email ? ('block' as const) : ('none' as const),
             }}
           >
-            {errors.email || ''}
+            {errors.email ?? ''}
           </div>
         </div>
 
@@ -414,7 +415,7 @@ export function LoginForm({
           display: errors.password ? ('block' as const) : ('none' as const),
         }}
       >
-        {errors.password || ''}
+        {errors.password ?? ''}
       </div>
     </div>
   )
@@ -470,6 +471,7 @@ export function LoginForm({
           onClick={() => {
             setMode('reset')
             setErrors({})
+            setFocusedInput(null)
           }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
           data-testid="forgot-password-button"

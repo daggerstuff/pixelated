@@ -4,28 +4,28 @@ on:
   push:
     branches: [master, main]
     paths:
-      - 'ai/dataset_pipeline/**'
-      - 'ai/config/**'
-      - '.github/workflows/dataset-pipeline.yml'
+      - "ai/dataset_pipeline/**"
+      - "ai/config/**"
+      - ".github/workflows/dataset-pipeline.yml"
   pull_request:
     branches: [master, main]
     paths:
-      - 'ai/dataset_pipeline/**'
-      - 'ai/config/**'
+      - "ai/dataset_pipeline/**"
+      - "ai/config/**"
   workflow_dispatch:
     inputs:
       target_samples:
-        description: 'Target number of samples for test export'
+        description: "Target number of samples for test export"
         required: false
-        default: '50'
+        default: "50"
       run_full_export:
-        description: 'Run full export (not just smoke test)'
+        description: "Run full export (not just smoke test)"
         required: false
-        default: 'false'
+        default: "false"
 
 env:
-  PYTHON_VERSION: '3.11'
-  UV_VERSION: '0.7.20'
+  PYTHON_VERSION: "3.11"
+  UV_VERSION: "0.9.6"
 
 jobs:
   verify-pipeline:
@@ -42,10 +42,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install uv and pip (secure versions)
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
 
       - name: Install dependencies
         run: |
@@ -73,10 +76,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install uv and pip (secure versions)
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
 
       - name: Install dependencies
         run: |
@@ -102,13 +108,13 @@ jobs:
         if: steps.export.outcome == 'success'
         run: |
           EXPORT_DIR="ai/dataset_pipeline/production_exports/test-ci"
-          
+
           # Check files exist
           test -f "$EXPORT_DIR/dataset_vtest-ci.jsonl" || exit 1
           test -f "$EXPORT_DIR/dataset_vtest-ci.parquet" || exit 1
           test -f "$EXPORT_DIR/manifest_vtest-ci.json" || exit 1
           test -f "$EXPORT_DIR/config_lock.json" || exit 1
-          
+
           echo "✅ All export files created"
 
       - name: Verify manifest integrity
@@ -117,10 +123,10 @@ jobs:
           uv run python -c "
           from ai.dataset_pipeline.export_manifest import DatasetManifest
           from pathlib import Path
-          
+
           manifest = DatasetManifest.load(Path('ai/dataset_pipeline/production_exports/test-ci/manifest_vtest-ci.json'))
           is_valid, errors = manifest.verify_files(Path('ai/dataset_pipeline/production_exports/test-ci'))
-          
+
           if not is_valid:
               print('❌ Manifest verification failed:')
               for error in errors:
@@ -161,10 +167,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install uv and pip (secure versions)
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
 
       - name: Install dependencies
         run: |
@@ -194,4 +203,3 @@ jobs:
           echo "| Verify Pipeline | ${{ needs.verify-pipeline.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Test Export | ${{ needs.test-export.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
-

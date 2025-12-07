@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test'
-import { execSync } from 'child_process'
-import { writeFileSync, mkdirSync, existsSync } from 'fs'
+import { } from '@playwright/test'
+
+import { writeFileSync, mkdirSync, } from 'fs'
 import { join } from 'path'
 
 // Test configuration

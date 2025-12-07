@@ -2,8 +2,7 @@ import { useEffect } from 'react'
 import { toast } from '@/components/ui/toast'
 import {
   useNotificationStore,
-  type Notification,
-} from '@/lib/stores/journal-research/notificationStore'
+  } from '@/lib/stores/journal-research/notificationStore'
 
 interface UseNotificationToastsOptions {
   enabled?: boolean
