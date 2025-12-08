@@ -39,7 +39,7 @@ pydantic==2.5.0
 
 # Storage and I/O
 boto3==1.29.0
-minio==7.1.0
+minio==7.2.11
 h5py==3.10.0
 
 # Utilities

@@ -82,7 +82,8 @@ build:
   image: docker:latest
   services:
     - docker:dind
-  needs: ["validate:dependencies", "validate:lint", "validate:typecheck"]
+  needs:
+    - job: validate:dependencies
   before_script:
     # Validate Docker registry variables are set
     - |
