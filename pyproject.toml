@@ -49,6 +49,7 @@ dependencies = [
   "einops>=0.8.0",
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
+  "transformers>=4.35.0",  # Required for dataset_pipeline training_runner
   "gguf>=0.10.0",
   "ruff>=0.12.5",
   "yamllint>=1.37.1",
