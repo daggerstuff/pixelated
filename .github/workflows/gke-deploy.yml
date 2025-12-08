@@ -166,6 +166,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Verify checkout
         run: |
@@ -301,6 +304,40 @@ jobs:
           ./scripts/memory-optimized-build.sh
           echo "✅ Application build completed successfully"
 
+      - name: Verify Dockerfile exists
+        run: |
+          echo "🔍 Verifying Dockerfile location..."
+          echo "📂 Current working directory: $(pwd)"
+          echo "📂 GitHub workspace: ${{ github.workspace }}"
+
+          # Change to the GitHub workspace directory
+          cd "${{ github.workspace }}" || { echo "❌ Failed to change to workspace directory"; exit 1; }
+
+          # Verify checkout succeeded by checking for common files
+          if [ ! -f "package.json" ]; then
+            echo "❌ Checkout verification failed - package.json not found!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Expected workspace: ${{ github.workspace }}"
+            echo "📂 Git configuration:"
+            ls -la .git 2>/dev/null || echo ".git directory not found"
+            exit 1
+          fi
+
+          # Check for Dockerfile in root
+          if [ -f "Dockerfile" ]; then
+            echo "✅ Dockerfile found at: ${{ github.workspace }}/Dockerfile"
+            echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+          else
+            echo "❌ Dockerfile not found in root directory"
+            echo "📂 Current directory contents:"
+            ls -la | head -20
+            echo "📂 Looking for Dockerfile in repository:"
+            find "${{ github.workspace }}" -name "Dockerfile" -type f 2>/dev/null | head -10 || echo "No Dockerfile found"
+            echo "❌ Dockerfile verification failed!"
+            exit 1
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -321,6 +358,18 @@ jobs:
           remove-haskell: true
           remove-codeql: true
           remove-docker-images: true
+
+      - name: Verify workspace after disk cleanup
+        run: |
+          echo "🔍 Verifying workspace integrity after disk cleanup..."
+          if [[ ! -f "package.json" ]] || [[ ! -f "Dockerfile" ]]; then
+            echo "❌ Workspace files missing after disk cleanup!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Expected workspace: ${{ github.workspace }}"
+            exit 1
+          fi
+          echo "✅ Workspace integrity verified"
 
       - name: Extract metadata
         id: meta
@@ -351,35 +400,6 @@ jobs:
             if [[ -n "$SENTRY_AUTH_TOKEN" ]]; then
               echo "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" >> $GITHUB_ENV
             fi
-          fi
-
-      - name: Verify Dockerfile exists
-        run: |
-          echo "🔍 Verifying Dockerfile location..."
-          echo "📂 Current working directory: $(pwd)"
-          echo "📂 GitHub workspace: ${{ github.workspace }}"
-
-          # Verify checkout succeeded by checking for common files
-          if [[ ! -f "package.json" ]] && [[ ! -f ".git/config" ]]; then
-            echo "❌ Checkout appears to have failed - repository files not found!"
-            echo "📂 Current directory contents:"
-            ls -la
-            echo "📂 Expected workspace: ${{ github.workspace }}"
-            exit 1
-          fi
-
-          # Check for Dockerfile in root
-          if [[ -f "Dockerfile" ]]; then
-            echo "✅ Dockerfile found at: $(pwd)/Dockerfile"
-            echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
-          else
-            echo "❌ Dockerfile not found in root directory"
-            echo "📂 Current directory contents:"
-            ls -la | head -20
-            echo "📂 Looking for Dockerfile in repository:"
-            find . -name "Dockerfile" -type f 2>/dev/null | head -10 || echo "No Dockerfile found"
-            echo "❌ Dockerfile verification failed!"
-            exit 1
           fi
 
       - name: Build and push Docker image
