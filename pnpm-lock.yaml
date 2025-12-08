@@ -25,7 +25,6 @@ importers:
         version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.7.4)(typescript@5.9.3)
       '@astrojs/cloudflare':
         specifier: ^12.6.12
-<<<<<<< HEAD
         version: 12.6.12(@types/node@24.10.1)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       '@astrojs/node':
         specifier: ^9.5.1
@@ -33,15 +32,6 @@ importers:
       '@astrojs/react':
         specifier: ^4.4.2
         version: 4.4.2(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-=======
-        version: 12.6.12(@types/node@24.10.1)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-      '@astrojs/node':
-        specifier: ^9.5.1
-        version: 9.5.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      '@astrojs/react':
-        specifier: ^4.4.2
-        version: 4.4.2(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@aws-sdk/client-dynamodb':
         specifier: ^3.943.0
         version: 3.943.0
@@ -82,13 +72,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@modelcontextprotocol/sdk':
-<<<<<<< HEAD
         specifier: ^1.24.2
         version: 1.24.2(zod@4.1.13)
-=======
-        specifier: ^1.24.1
-        version: 1.24.1(zod@4.1.13)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.7)(react@19.2.1)
@@ -103,11 +88,7 @@ importers:
         version: 9.4.2(@types/react@19.2.7)(immer@11.0.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(three@0.181.2)
       '@sentry/astro':
         specifier: ^10.28.0
-<<<<<<< HEAD
         version: 10.28.0(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-=======
-        version: 10.28.0(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@sentry/node':
         specifier: ^10.28.0
         version: 10.28.0
@@ -122,11 +103,7 @@ importers:
         version: 4.6.1
       '@spotlightjs/astro':
         specifier: ^3.2.6
-<<<<<<< HEAD
         version: 3.2.6(@sentry/astro@10.28.0(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-=======
-        version: 3.2.6(@sentry/astro@10.28.0(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@tanstack/react-query':
         specifier: ^5.90.11
         version: 5.90.11(react@19.2.1)
@@ -152,13 +129,8 @@ importers:
         specifier: 1.6.1
         version: 1.6.1
       astro:
-<<<<<<< HEAD
         specifier: ^5.16.4
         version: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-        specifier: ^5.16.3
-        version: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
@@ -173,11 +145,7 @@ importers:
         version: 3.0.3
       better-auth:
         specifier: ^1.4.5
-<<<<<<< HEAD
         version: 1.4.5(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(vue@3.5.25(typescript@5.9.3))
-=======
-        version: 1.4.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vue@3.5.25(typescript@5.9.3))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       better-sqlite3:
         specifier: ^12.5.0
         version: 12.5.0
@@ -216,21 +184,13 @@ importers:
         version: 0.8.212
       framer-motion:
         specifier: ^12.23.25
-<<<<<<< HEAD
         version: 12.23.25(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-=======
-        version: 12.23.25(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       ioredis:
         specifier: ^5.8.2
         version: 5.8.2
       jotai:
         specifier: ^2.15.2
-<<<<<<< HEAD
         version: 2.15.2(@babel/core@7.28.5)(@babel/template@7.27.2)(@types/react@19.2.7)(react@19.2.1)
-=======
-        version: 2.15.2(@babel/core@7.28.5)(@babel/template@7.27.2)(@types/react@19.2.7)(react@19.2.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -281,11 +241,7 @@ importers:
         version: 2.6.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-router-dom:
         specifier: ^7.10.0
-<<<<<<< HEAD
         version: 7.10.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-=======
-        version: 7.10.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       recharts:
         specifier: ^3.5.1
         version: 3.5.1(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react-is@17.0.2)(react@19.2.1)(redux@5.0.1)
@@ -353,13 +309,8 @@ importers:
         specifier: ^7.2.6
         version: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       wrangler:
-<<<<<<< HEAD
         specifier: ^4.52.1
         version: 4.52.1(@cloudflare/workers-types@4.20251202.0)
-=======
-        specifier: ^4.51.0
-        version: 4.51.0(@cloudflare/workers-types@4.20251202.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       ws:
         specifier: ^8.18.3
         version: 8.18.3
@@ -372,11 +323,7 @@ importers:
     devDependencies:
       '@astrojs/markdoc':
         specifier: ^0.15.9
-<<<<<<< HEAD
         version: 0.15.9(@types/react@19.2.7)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.1)
-=======
-        version: 0.15.9(@types/react@19.2.7)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@astrojs/rss':
         specifier: ^4.0.14
         version: 4.0.14
@@ -442,11 +389,7 @@ importers:
         version: 5.1.1(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/coverage-v8':
         specifier: ^4.0.15
-<<<<<<< HEAD
         version: 4.0.15(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
-=======
-        version: 4.0.15(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       archiver:
         specifier: ^7.0.1
         version: 7.0.1
@@ -458,7 +401,6 @@ importers:
         version: 1.2.2
       astro-expressive-code:
         specifier: ^0.41.3
-<<<<<<< HEAD
         version: 0.41.3(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-loader-github-prs:
         specifier: ^1.3.1
@@ -466,25 +408,12 @@ importers:
       astro-loader-github-releases:
         specifier: ^2.1.1
         version: 2.1.1(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-=======
-        version: 0.41.3(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      astro-loader-github-prs:
-        specifier: ^1.3.1
-        version: 1.3.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      astro-loader-github-releases:
-        specifier: ^2.1.1
-        version: 2.1.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       astro-robots-txt:
         specifier: ^1.0.0
         version: 1.0.0
       astro-vitesse:
         specifier: ^0.5.2
-<<<<<<< HEAD
         version: 0.5.2(@iconify/json@2.2.395)(@unocss/reset@66.5.10)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.10(postcss@8.5.6)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))
-=======
-        version: 0.5.2(@iconify/json@2.2.395)(@unocss/reset@66.5.10)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.10(postcss@8.5.6)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       autoprefixer:
         specifier: ^10.4.22
         version: 10.4.22(postcss@8.5.6)
@@ -541,11 +470,7 @@ importers:
         version: 7.0.1(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-vitest:
         specifier: ^0.5.4
-<<<<<<< HEAD
         version: 0.5.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
-=======
-        version: 0.5.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       eslint-plugin-vitest-globals:
         specifier: ^1.5.0
         version: 1.5.0
@@ -694,13 +619,8 @@ importers:
         specifier: ^0.34.5
         version: 0.34.5
       shiki:
-<<<<<<< HEAD
         specifier: ^3.19.0
         version: 3.19.0
-=======
-        specifier: ^3.18.0
-        version: 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       stream-browserify:
         specifier: ^3.0.0
         version: 3.0.0
@@ -745,11 +665,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
         specifier: ^4.0.15
-<<<<<<< HEAD
         version: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-=======
-        version: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       vue:
         specifier: ^3.5.25
         version: 3.5.25(typescript@5.9.3)
@@ -2760,13 +2676,8 @@ packages:
   '@microsoft/clarity@1.0.2':
     resolution: {integrity: sha512-9EZYROFpJxEGmQpHvUFqvD3ZJ7QQSqnibYSWmS+1xusoZfG1QQ1/Al9yVBBc11DWMbJrs1pe1hLT273it/skJg==}
 
-<<<<<<< HEAD
   '@modelcontextprotocol/sdk@1.24.2':
     resolution: {integrity: sha512-hS/kzSfchqzvUeJUsdiDHi84/kNhLIZaZ6coGQVwbYIelOBbcAwUohUfaQTLa1MvFOK/jbTnGFzraHSFwB7pjQ==}
-=======
-  '@modelcontextprotocol/sdk@1.24.1':
-    resolution: {integrity: sha512-YTg4v6bKSst8EJM8NXHC3nGm8kgHD08IbIBbognUeLAgGLVgLpYrgQswzLQd4OyTL4l614ejhqsDrV1//t02Qw==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -4379,68 +4290,38 @@ packages:
   '@shikijs/core@1.29.2':
     resolution: {integrity: sha512-vju0lY9r27jJfOY4Z7+Rt/nIOjzJpZ3y+nYpqtUZInVoXQ/TJZcfGnNOGnKjFdVZb8qexiCuSlZRKcGfhhTTZQ==}
 
-<<<<<<< HEAD
   '@shikijs/core@3.19.0':
     resolution: {integrity: sha512-L7SrRibU7ZoYi1/TrZsJOFAnnHyLTE1SwHG1yNWjZIVCqjOEmCSuK2ZO9thnRbJG6TOkPp+Z963JmpCNw5nzvA==}
-=======
-  '@shikijs/core@3.18.0':
-    resolution: {integrity: sha512-qxBrX2G4ctCgpvFNWMhFvbBnsWTOmwJgSqywQm0gtamp/OXSaHBjtrBomNIY5WJGXgGCPPvI7O+Y9pH/dr/p0w==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/engine-javascript@1.29.2':
     resolution: {integrity: sha512-iNEZv4IrLYPv64Q6k7EPpOCE/nuvGiKl7zxdq0WFuRPF5PAE9PRo2JGq/d8crLusM59BRemJ4eOqrFrC4wiQ+A==}
 
-<<<<<<< HEAD
   '@shikijs/engine-javascript@3.19.0':
     resolution: {integrity: sha512-ZfWJNm2VMhKkQIKT9qXbs76RRcT0SF/CAvEz0+RkpUDAoDaCx0uFdCGzSRiD9gSlhm6AHkjdieOBJMaO2eC1rQ==}
-=======
-  '@shikijs/engine-javascript@3.18.0':
-    resolution: {integrity: sha512-S87JGGXasJH1Oe9oFTqDWGcTUX+xMlf3Jzn4XbXoa6MmB19o0B8kVRd7vmhNvSkE/WuK2GTmB0I2GY526w4KxQ==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/engine-oniguruma@1.29.2':
     resolution: {integrity: sha512-7iiOx3SG8+g1MnlzZVDYiaeHe7Ez2Kf2HrJzdmGwkRisT7r4rak0e655AcM/tF9JG/kg5fMNYlLLKglbN7gBqA==}
 
-<<<<<<< HEAD
   '@shikijs/engine-oniguruma@3.19.0':
     resolution: {integrity: sha512-1hRxtYIJfJSZeM5ivbUXv9hcJP3PWRo5prG/V2sWwiubUKTa+7P62d2qxCW8jiVFX4pgRHhnHNp+qeR7Xl+6kg==}
-=======
-  '@shikijs/engine-oniguruma@3.18.0':
-    resolution: {integrity: sha512-15+O2iy+nYU/IdiBIExXuK0JJABa/8tdnRDODBmLhdygQ43aCuipN5N9vTfS8jvkMByHMR09b5jtX2la0CCoOA==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/langs@1.29.2':
     resolution: {integrity: sha512-FIBA7N3LZ+223U7cJDUYd5shmciFQlYkFXlkKVaHsCPgfVLiO+e12FmQE6Tf9vuyEsFe3dIl8qGWKXgEHL9wmQ==}
 
-<<<<<<< HEAD
   '@shikijs/langs@3.19.0':
     resolution: {integrity: sha512-dBMFzzg1QiXqCVQ5ONc0z2ebyoi5BKz+MtfByLm0o5/nbUu3Iz8uaTCa5uzGiscQKm7lVShfZHU1+OG3t5hgwg==}
-=======
-  '@shikijs/langs@3.18.0':
-    resolution: {integrity: sha512-Deq7ZoYBtimN0M8pD5RU5TKz7DhUSTPtQOBuJpMxPDDJ+MJ7nT90DEmhDM2V0Nzp6DjfTAd+Z7ibpzr8arWqiA==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/themes@1.29.2':
     resolution: {integrity: sha512-i9TNZlsq4uoyqSbluIcZkmPL9Bfi3djVxRnofUHwvx/h6SRW3cwgBC5SML7vsDcWyukY0eCzVN980rqP6qNl9g==}
 
-<<<<<<< HEAD
   '@shikijs/themes@3.19.0':
     resolution: {integrity: sha512-H36qw+oh91Y0s6OlFfdSuQ0Ld+5CgB/VE6gNPK+Hk4VRbVG/XQgkjnt4KzfnnoO6tZPtKJKHPjwebOCfjd6F8A==}
-=======
-  '@shikijs/themes@3.18.0':
-    resolution: {integrity: sha512-wzg6vNniXC5J4ChNBJJIZFTWxmrERJMWknehmM++0OAKJqZ41WpnO7PmPOumvMsUaL1SC08Nb/JVdaJd2aTsZg==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/types@1.29.2':
     resolution: {integrity: sha512-VJjK0eIijTZf0QSTODEXCqinjBn0joAHQ+aPSBzrv4O2d/QSbsMw+ZeSRx03kV34Hy7NzUvV/7NqfYGRLrASmw==}
 
-<<<<<<< HEAD
   '@shikijs/types@3.19.0':
     resolution: {integrity: sha512-Z2hdeEQlzuntf/BZpFG8a+Fsw9UVXdML7w0o3TgSXV3yNESGon+bs9ITkQb3Ki7zxoXOOu5oJWqZ2uto06V9iQ==}
-=======
-  '@shikijs/types@3.18.0':
-    resolution: {integrity: sha512-YLmpuroH06TpvqRXKR0YqlI0nQ56c8+BO/m9A9ht36WRdxmML4ivUsnpXuJU7PiClLRD2M66ilY2YJ0KE+8q7A==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
@@ -4492,13 +4373,8 @@ packages:
     resolution: {integrity: sha512-ezHLe1tKLUxDJo2LHtDuEDyWXolw8WGOR92qb4bQdWq/zKenO5BvctZGrVJBK08zjezSk7bmbKFOXIVyChvDLw==}
     engines: {node: '>=18.0.0'}
 
-<<<<<<< HEAD
   '@smithy/core@3.18.7':
     resolution: {integrity: sha512-axG9MvKhMWOhFbvf5y2DuyTxQueO0dkedY9QC3mAfndLosRI/9LJv8WaL0mw7ubNhsO4IuXX9/9dYGPFvHrqlw==}
-=======
-  '@smithy/core@3.18.6':
-    resolution: {integrity: sha512-8Q/ugWqfDUEU1Exw71+DoOzlONJ2Cn9QA8VeeDzLLjzO/qruh9UKFzbszy4jXcIYgGofxYiT0t1TT6+CT/GupQ==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18.0.0'}
 
   '@smithy/credential-provider-imds@4.2.5':
@@ -4557,34 +4433,20 @@ packages:
     resolution: {integrity: sha512-Bt6jpSTMWfjCtC0s79gZ/WZ1w90grfmopVOWqkI2ovhjpD5Q2XRXuecIPB9689L2+cCySMbaXDhBPU56FKNDNg==}
     engines: {node: '>=18.0.0'}
 
-<<<<<<< HEAD
   '@smithy/middleware-compression@4.3.14':
     resolution: {integrity: sha512-Ce+Csb2gssm3cJvhbErcT+lTk3kVviZau7Ya/zpCDGspgpw6HbvvalZWqGXU16axhynDQGvSbbnWUJRV2FewxQ==}
-=======
-  '@smithy/middleware-compression@4.3.13':
-    resolution: {integrity: sha512-U9xdmWcYs6p671ACd60pcmixV3pzj1Y+qk2BVetWnnXnrqmAHh+zIWAP+sypMEATAKMVpnlpKNqMHdB2tWXDqA==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18.0.0'}
 
   '@smithy/middleware-content-length@4.2.5':
     resolution: {integrity: sha512-Y/RabVa5vbl5FuHYV2vUCwvh/dqzrEY/K2yWPSqvhFUwIY0atLqO4TienjBXakoy4zrKAMCZwg+YEqmH7jaN7A==}
     engines: {node: '>=18.0.0'}
 
-<<<<<<< HEAD
   '@smithy/middleware-endpoint@4.3.14':
     resolution: {integrity: sha512-v0q4uTKgBM8dsqGjqsabZQyH85nFaTnFcgpWU1uydKFsdyyMzfvOkNum9G7VK+dOP01vUnoZxIeRiJ6uD0kjIg==}
     engines: {node: '>=18.0.0'}
 
   '@smithy/middleware-retry@4.4.14':
     resolution: {integrity: sha512-Z2DG8Ej7FyWG1UA+7HceINtSLzswUgs2np3sZX0YBBxCt+CXG4QUxv88ZDS3+2/1ldW7LqtSY1UO/6VQ1pND8Q==}
-=======
-  '@smithy/middleware-endpoint@4.3.13':
-    resolution: {integrity: sha512-X4za1qCdyx1hEVVXuAWlZuK6wzLDv1uw1OY9VtaYy1lULl661+frY7FeuHdYdl7qAARUxH2yvNExU2/SmRFfcg==}
-    engines: {node: '>=18.0.0'}
-
-  '@smithy/middleware-retry@4.4.13':
-    resolution: {integrity: sha512-RzIDF9OrSviXX7MQeKOm8r/372KTyY8Jmp6HNKOOYlrguHADuM3ED/f4aCyNhZZFLG55lv5beBin7nL0Nzy1Dw==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18.0.0'}
 
   '@smithy/middleware-serde@4.2.6':
@@ -4631,13 +4493,8 @@ packages:
     resolution: {integrity: sha512-xSUfMu1FT7ccfSXkoLl/QRQBi2rOvi3tiBZU2Tdy3I6cgvZ6SEi9QNey+lqps/sJRnogIS+lq+B1gxxbra2a/w==}
     engines: {node: '>=18.0.0'}
 
-<<<<<<< HEAD
   '@smithy/smithy-client@4.9.10':
     resolution: {integrity: sha512-Jaoz4Jw1QYHc1EFww/E6gVtNjhoDU+gwRKqXP6C3LKYqqH2UQhP8tMP3+t/ePrhaze7fhLE8vS2q6vVxBANFTQ==}
-=======
-  '@smithy/smithy-client@4.9.9':
-    resolution: {integrity: sha512-SUnZJMMo5yCmgjopJbiNeo1vlr8KvdnEfIHV9rlD77QuOGdRotIVBcOrBuMr+sI9zrnhtDtLP054bZVbpZpiQA==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18.0.0'}
 
   '@smithy/types@4.9.0':
@@ -4672,21 +4529,12 @@ packages:
     resolution: {integrity: sha512-YEjpl6XJ36FTKmD+kRJJWYvrHeUvm5ykaUS5xK+6oXffQPHeEM4/nXlZPe+Wu0lsgRUcNZiliYNh/y7q9c2y6Q==}
     engines: {node: '>=18.0.0'}
 
-<<<<<<< HEAD
   '@smithy/util-defaults-mode-browser@4.3.13':
     resolution: {integrity: sha512-hlVLdAGrVfyNei+pKIgqDTxfu/ZI2NSyqj4IDxKd5bIsIqwR/dSlkxlPaYxFiIaDVrBy0he8orsFy+Cz119XvA==}
     engines: {node: '>=18.0.0'}
 
   '@smithy/util-defaults-mode-node@4.2.16':
     resolution: {integrity: sha512-F1t22IUiJLHrxW9W1CQ6B9PN+skZ9cqSuzB18Eh06HrJPbjsyZ7ZHecAKw80DQtyGTRcVfeukKaCRYebFwclbg==}
-=======
-  '@smithy/util-defaults-mode-browser@4.3.12':
-    resolution: {integrity: sha512-TKc6FnOxFULKxLgTNHYjcFqdOYzXVPFFVm5JhI30F3RdhT7nYOtOsjgaOwfDRmA/3U66O9KaBQ3UHoXwayRhAg==}
-    engines: {node: '>=18.0.0'}
-
-  '@smithy/util-defaults-mode-node@4.2.15':
-    resolution: {integrity: sha512-94NqfQVo+vGc5gsQ9SROZqOvBkGNMQu6pjXbnn8aQvBUhc31kx49gxlkBEqgmaZQHUUfdRUin5gK/HlHKmbAwg==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18.0.0'}
 
   '@smithy/util-endpoints@3.2.5':
@@ -6795,13 +6643,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-<<<<<<< HEAD
   electron-to-chromium@1.5.264:
     resolution: {integrity: sha512-1tEf0nLgltC3iy9wtlYDlQDc5Rg9lEKVjEmIHJ21rI9OcqkvD45K1oyNIRA4rR1z3LgJ7KeGzEBojVcV6m4qjA==}
-=======
-  electron-to-chromium@1.5.263:
-    resolution: {integrity: sha512-DrqJ11Knd+lo+dv+lltvfMDLU27g14LMdH2b0O3Pio4uk0x+z7OR+JrmyacTPN2M8w3BrZ7/RTwG3R9B7irPlg==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   emmet@2.4.11:
     resolution: {integrity: sha512-23QPJB3moh/U9sT4rQzGgeyyGIrcM+GH5uVYg2C6wZIxAIJq7Ng3QLT79tl8FUwDXhyq9SusfknOrofAKqvgyQ==}
@@ -8219,12 +8062,6 @@ packages:
   jwa@2.0.1:
     resolution: {integrity: sha512-hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==}
 
-<<<<<<< HEAD
-  jws@3.2.3:
-    resolution: {integrity: sha512-byiJ0FLRdLdSVSReO/U4E7RoEyOCKnEnEPMjq3HxWtvzLsV08/i5RQKsFVNkCldrCaPr2vDNAOMsfs8T/Hze7g==}
-
-=======
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
   jws@4.0.1:
     resolution: {integrity: sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==}
 
@@ -8815,13 +8652,8 @@ packages:
     resolution: {integrity: sha512-WC/Eo7NzFrOV/RRrTaI0fxKVbNCzEy76j2VqNV8SxDf9D69gSE2Lh0QwYvDlhiYmheBYExAvEAxVf5NoN0cj2A==}
     engines: {node: '>=20'}
 
-<<<<<<< HEAD
   msw@2.12.4:
     resolution: {integrity: sha512-rHNiVfTyKhzc0EjoXUBVGteNKBevdjOlVC6GlIRXpy+/3LHEIGRovnB5WPjcvmNODVQ1TNFnoa7wsGbd0V3epg==}
-=======
-  msw@2.12.3:
-    resolution: {integrity: sha512-/5rpGC0eK8LlFqsHaBmL19/PVKxu/CCt8pO1vzp9X6SDLsRDh/Ccudkf3Ur5lyaKxJz9ndAx+LaThdv0ySqB6A==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -10082,13 +9914,8 @@ packages:
   shiki@1.29.2:
     resolution: {integrity: sha512-njXuliz/cP+67jU2hukkxCNuH1yUi4QfdZZY+sMr5PPrIyXSu5iTb/qYC4BiWWB0vZ+7TbdvYUCeL23zpwCfbg==}
 
-<<<<<<< HEAD
   shiki@3.19.0:
     resolution: {integrity: sha512-77VJr3OR/VUZzPiStyRhADmO2jApMM0V2b1qf0RpfWya8Zr1PeZev5AEpPGAAKWdiYUtcZGBE4F5QvJml1PvWA==}
-=======
-  shiki@3.18.0:
-    resolution: {integrity: sha512-SDNJms7EDHQN+IC67VUQ4IzePTmeEKGZk4HvgaQ+G0fsE9Mb3R7U8zbEBjAkKZBRCJPa2ad88UzWNLLli1oNXg==}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   shimmer@1.2.1:
     resolution: {integrity: sha512-sQTKC1Re/rM6XyFM6fIAGHRPVGvyXfgzIDvzoq608vM+jeyVD0Tu1E6Np0Kc2zAIFWIj963V2800iF/9LPieQw==}
@@ -11652,20 +11479,12 @@ snapshots:
       - prettier
       - prettier-plugin-astro
 
-<<<<<<< HEAD
   '@astrojs/cloudflare@12.6.12(@types/node@24.10.1)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
-=======
-  '@astrojs/cloudflare@12.6.12(@types/node@24.10.1)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       '@astrojs/underscore-redirects': 1.0.0
       '@cloudflare/workers-types': 4.20251202.0
-<<<<<<< HEAD
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       tinyglobby: 0.2.15
       vite: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       wrangler: 4.50.0(@cloudflare/workers-types@4.20251202.0)
@@ -11699,7 +11518,6 @@ snapshots:
       '@volar/language-service': 2.4.26
       fast-glob: 3.3.3
       muggle-string: 0.4.1
-<<<<<<< HEAD
       volar-service-css: 0.0.67(@volar/language-service@2.4.26)
       volar-service-emmet: 0.0.67(@volar/language-service@2.4.26)
       volar-service-html: 0.0.67(@volar/language-service@2.4.26)
@@ -11707,15 +11525,6 @@ snapshots:
       volar-service-typescript: 0.0.67(@volar/language-service@2.4.26)
       volar-service-typescript-twoslash-queries: 0.0.67(@volar/language-service@2.4.26)
       volar-service-yaml: 0.0.67(@volar/language-service@2.4.26)
-=======
-      volar-service-css: 0.0.66(@volar/language-service@2.4.26)
-      volar-service-emmet: 0.0.66(@volar/language-service@2.4.26)
-      volar-service-html: 0.0.66(@volar/language-service@2.4.26)
-      volar-service-prettier: 0.0.66(@volar/language-service@2.4.26)(prettier@3.7.3)
-      volar-service-typescript: 0.0.66(@volar/language-service@2.4.26)
-      volar-service-typescript-twoslash-queries: 0.0.66(@volar/language-service@2.4.26)
-      volar-service-yaml: 0.0.66(@volar/language-service@2.4.26)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       vscode-html-languageservice: 5.6.1
       vscode-uri: 3.1.0
     optionalDependencies:
@@ -11724,22 +11533,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-<<<<<<< HEAD
   '@astrojs/markdoc@0.15.9(@types/react@19.2.7)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.1)':
-=======
-  '@astrojs/markdoc@0.15.9(@types/react@19.2.7)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.0)':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       '@astrojs/markdown-remark': 6.3.9
       '@astrojs/prism': 3.3.0
-<<<<<<< HEAD
       '@markdoc/markdoc': 0.5.4(@types/react@19.2.7)(react@19.2.1)
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-      '@markdoc/markdoc': 0.5.4(@types/react@19.2.7)(react@19.2.0)
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       esbuild: 0.25.12
       github-slugger: 2.0.0
       htmlparser2: 10.0.0
@@ -11764,11 +11564,7 @@ snapshots:
       remark-parse: 11.0.0
       remark-rehype: 11.1.2
       remark-smartypants: 3.0.2
-<<<<<<< HEAD
       shiki: 3.19.0
-=======
-      shiki: 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       smol-toml: 1.5.2
       unified: 11.0.5
       unist-util-remove-position: 5.0.0
@@ -11778,20 +11574,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   '@astrojs/mdx@4.3.12(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
-=======
-  '@astrojs/mdx@4.3.12(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@astrojs/markdown-remark': 6.3.9
       '@mdx-js/mdx': 3.1.1
       acorn: 8.15.0
-<<<<<<< HEAD
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       es-module-lexer: 1.7.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -11805,17 +11593,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   '@astrojs/node@9.5.1(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-  '@astrojs/node@9.5.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
-    dependencies:
-      '@astrojs/internal-helpers': 0.7.5
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       send: 1.2.0
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -11825,22 +11606,13 @@ snapshots:
     dependencies:
       prismjs: 1.30.0
 
-<<<<<<< HEAD
   '@astrojs/react@4.4.2(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
-=======
-  '@astrojs/react@4.4.2(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@types/react': 19.2.7
       '@types/react-dom': 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react': 4.7.0(vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
-<<<<<<< HEAD
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
-=======
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       ultrahtml: 1.6.0
       vite: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -11955,7 +11727,6 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
       '@smithy/fetch-http-handler': 5.3.6
       '@smithy/hash-node': 4.2.5
@@ -11964,38 +11735,19 @@ snapshots:
       '@smithy/middleware-content-length': 4.2.5
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/core': 3.18.6
-      '@smithy/fetch-http-handler': 5.3.6
-      '@smithy/hash-node': 4.2.5
-      '@smithy/invalid-dependency': 4.2.5
-      '@smithy/middleware-compression': 4.3.13
-      '@smithy/middleware-content-length': 4.2.5
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -12068,44 +11820,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/fetch-http-handler': 5.3.6
       '@smithy/hash-node': 4.2.5
       '@smithy/invalid-dependency': 4.2.5
       '@smithy/middleware-content-length': 4.2.5
-<<<<<<< HEAD
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -12131,44 +11865,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/fetch-http-handler': 5.3.6
       '@smithy/hash-node': 4.2.5
       '@smithy/invalid-dependency': 4.2.5
       '@smithy/middleware-content-length': 4.2.5
-<<<<<<< HEAD
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -12201,11 +11917,7 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/eventstream-serde-browser': 4.2.5
       '@smithy/eventstream-serde-config-resolver': 4.3.5
       '@smithy/eventstream-serde-node': 4.2.5
@@ -12216,35 +11928,21 @@ snapshots:
       '@smithy/invalid-dependency': 4.2.5
       '@smithy/md5-js': 4.2.5
       '@smithy/middleware-content-length': 4.2.5
-<<<<<<< HEAD
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -12314,44 +12012,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/fetch-http-handler': 5.3.6
       '@smithy/hash-node': 4.2.5
       '@smithy/invalid-dependency': 4.2.5
       '@smithy/middleware-content-length': 4.2.5
-<<<<<<< HEAD
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -12381,20 +12061,12 @@ snapshots:
     dependencies:
       '@aws-sdk/types': 3.936.0
       '@aws-sdk/xml-builder': 3.930.0
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/node-config-provider': 4.3.5
       '@smithy/property-provider': 4.2.5
       '@smithy/protocol-http': 5.3.5
       '@smithy/signature-v4': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/util-base64': 4.3.0
       '@smithy/util-middleware': 4.2.5
@@ -12451,11 +12123,7 @@ snapshots:
       '@smithy/node-http-handler': 4.4.5
       '@smithy/property-provider': 4.2.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/util-stream': 4.5.6
       tslib: 2.8.1
@@ -12646,13 +12314,8 @@ snapshots:
     dependencies:
       '@aws-sdk/client-dynamodb': 3.943.0
       '@aws-sdk/core': 3.943.0
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/core': 3.18.6
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/util-base64': 4.3.0
       tslib: 2.8.1
@@ -12667,13 +12330,8 @@ snapshots:
       '@aws-sdk/client-dynamodb': 3.943.0
       '@aws-sdk/core': 3.943.0
       '@aws-sdk/util-dynamodb': 3.943.0(@aws-sdk/client-dynamodb@3.943.0)
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/core': 3.18.6
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
@@ -12775,19 +12433,11 @@ snapshots:
       '@aws-sdk/core': 3.943.0
       '@aws-sdk/types': 3.936.0
       '@aws-sdk/util-arn-parser': 3.893.0
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
       '@smithy/node-config-provider': 4.3.5
       '@smithy/protocol-http': 5.3.5
       '@smithy/signature-v4': 5.3.5
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/core': 3.18.6
-      '@smithy/node-config-provider': 4.3.5
-      '@smithy/protocol-http': 5.3.5
-      '@smithy/signature-v4': 5.3.5
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/util-config-provider': 4.2.0
       '@smithy/util-middleware': 4.2.5
@@ -12817,11 +12467,7 @@ snapshots:
       '@aws-sdk/core': 3.943.0
       '@aws-sdk/types': 3.936.0
       '@aws-sdk/util-endpoints': 3.936.0
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/protocol-http': 5.3.5
       '@smithy/types': 4.9.0
       tslib: 2.8.1
@@ -12885,44 +12531,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.943.0
       '@smithy/config-resolver': 4.4.3
-<<<<<<< HEAD
       '@smithy/core': 3.18.7
-=======
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/fetch-http-handler': 5.3.6
       '@smithy/hash-node': 4.2.5
       '@smithy/invalid-dependency': 4.2.5
       '@smithy/middleware-content-length': 4.2.5
-<<<<<<< HEAD
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/middleware-retry': 4.4.14
-=======
-      '@smithy/middleware-endpoint': 4.3.13
-      '@smithy/middleware-retry': 4.4.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/middleware-stack': 4.2.5
       '@smithy/node-config-provider': 4.3.5
       '@smithy/node-http-handler': 4.4.5
       '@smithy/protocol-http': 5.3.5
-<<<<<<< HEAD
       '@smithy/smithy-client': 4.9.10
-=======
-      '@smithy/smithy-client': 4.9.9
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/types': 4.9.0
       '@smithy/url-parser': 4.2.5
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-<<<<<<< HEAD
       '@smithy/util-defaults-mode-browser': 4.3.13
       '@smithy/util-defaults-mode-node': 4.2.16
-=======
-      '@smithy/util-defaults-mode-browser': 4.3.12
-      '@smithy/util-defaults-mode-node': 4.2.15
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/util-endpoints': 3.2.5
       '@smithy/util-middleware': 4.2.5
       '@smithy/util-retry': 4.2.5
@@ -13912,11 +13540,7 @@ snapshots:
   '@expressive-code/plugin-shiki@0.41.3':
     dependencies:
       '@expressive-code/core': 0.41.3
-<<<<<<< HEAD
       shiki: 3.19.0
-=======
-      shiki: 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@expressive-code/plugin-text-markers@0.38.3':
     dependencies:
@@ -14480,11 +14104,7 @@ snapshots:
 
   '@microsoft/clarity@1.0.2': {}
 
-<<<<<<< HEAD
   '@modelcontextprotocol/sdk@1.24.2(zod@3.25.76)':
-=======
-  '@modelcontextprotocol/sdk@1.24.1(zod@3.25.76)':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -14503,11 +14123,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   '@modelcontextprotocol/sdk@1.24.2(zod@4.1.13)':
-=======
-  '@modelcontextprotocol/sdk@1.24.1(zod@4.1.13)':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -16053,21 +15669,13 @@ snapshots:
       '@sentry-internal/browser-utils': 10.28.0
       '@sentry/core': 10.28.0
 
-<<<<<<< HEAD
   '@sentry/astro@10.28.0(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
-=======
-  '@sentry/astro@10.28.0(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@sentry/browser': 10.28.0
       '@sentry/core': 10.28.0
       '@sentry/node': 10.28.0
       '@sentry/vite-plugin': 4.6.1
-<<<<<<< HEAD
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -16290,15 +15898,9 @@ snapshots:
       '@types/hast': 3.0.4
       hast-util-to-html: 9.0.5
 
-<<<<<<< HEAD
   '@shikijs/core@3.19.0':
     dependencies:
       '@shikijs/types': 3.19.0
-=======
-  '@shikijs/core@3.18.0':
-    dependencies:
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
       hast-util-to-html: 9.0.5
@@ -16309,15 +15911,9 @@ snapshots:
       '@shikijs/vscode-textmate': 10.0.2
       oniguruma-to-es: 2.3.0
 
-<<<<<<< HEAD
   '@shikijs/engine-javascript@3.19.0':
     dependencies:
       '@shikijs/types': 3.19.0
-=======
-  '@shikijs/engine-javascript@3.18.0':
-    dependencies:
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@shikijs/vscode-textmate': 10.0.2
       oniguruma-to-es: 4.3.4
 
@@ -16326,55 +15922,33 @@ snapshots:
       '@shikijs/types': 1.29.2
       '@shikijs/vscode-textmate': 10.0.2
 
-<<<<<<< HEAD
   '@shikijs/engine-oniguruma@3.19.0':
     dependencies:
       '@shikijs/types': 3.19.0
-=======
-  '@shikijs/engine-oniguruma@3.18.0':
-    dependencies:
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@shikijs/vscode-textmate': 10.0.2
 
   '@shikijs/langs@1.29.2':
     dependencies:
       '@shikijs/types': 1.29.2
 
-<<<<<<< HEAD
   '@shikijs/langs@3.19.0':
     dependencies:
       '@shikijs/types': 3.19.0
-=======
-  '@shikijs/langs@3.18.0':
-    dependencies:
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/themes@1.29.2':
     dependencies:
       '@shikijs/types': 1.29.2
 
-<<<<<<< HEAD
   '@shikijs/themes@3.19.0':
     dependencies:
       '@shikijs/types': 3.19.0
-=======
-  '@shikijs/themes@3.18.0':
-    dependencies:
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   '@shikijs/types@1.29.2':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
 
-<<<<<<< HEAD
   '@shikijs/types@3.19.0':
-=======
-  '@shikijs/types@3.18.0':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
@@ -16395,11 +15969,7 @@ snapshots:
   '@smithery/cli@1.6.4(@types/node@24.10.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.1.13)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
-<<<<<<< HEAD
       '@modelcontextprotocol/sdk': 1.24.2(zod@4.1.13)
-=======
-      '@modelcontextprotocol/sdk': 1.24.1(zod@4.1.13)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@ngrok/ngrok': 1.6.0
       '@smithery/registry': 0.4.4
       '@smithery/sdk': 1.7.4
@@ -16434,11 +16004,7 @@ snapshots:
 
   '@smithery/sdk@1.7.4':
     dependencies:
-<<<<<<< HEAD
       '@modelcontextprotocol/sdk': 1.24.2(zod@3.25.76)
-=======
-      '@modelcontextprotocol/sdk': 1.24.1(zod@3.25.76)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       chalk: 5.6.2
       express: 5.2.1
       jose: 6.1.3
@@ -16475,11 +16041,7 @@ snapshots:
       '@smithy/util-middleware': 4.2.5
       tslib: 2.8.1
 
-<<<<<<< HEAD
   '@smithy/core@3.18.7':
-=======
-  '@smithy/core@3.18.6':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@smithy/middleware-serde': 4.2.6
       '@smithy/protocol-http': 5.3.5
@@ -16577,15 +16139,9 @@ snapshots:
       '@smithy/util-utf8': 4.2.0
       tslib: 2.8.1
 
-<<<<<<< HEAD
   '@smithy/middleware-compression@4.3.14':
     dependencies:
       '@smithy/core': 3.18.7
-=======
-  '@smithy/middleware-compression@4.3.13':
-    dependencies:
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/is-array-buffer': 4.2.0
       '@smithy/node-config-provider': 4.3.5
       '@smithy/protocol-http': 5.3.5
@@ -16602,15 +16158,9 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-<<<<<<< HEAD
   '@smithy/middleware-endpoint@4.3.14':
     dependencies:
       '@smithy/core': 3.18.7
-=======
-  '@smithy/middleware-endpoint@4.3.13':
-    dependencies:
-      '@smithy/core': 3.18.6
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-serde': 4.2.6
       '@smithy/node-config-provider': 4.3.5
       '@smithy/shared-ini-file-loader': 4.4.0
@@ -16618,7 +16168,6 @@ snapshots:
       '@smithy/url-parser': 4.2.5
       '@smithy/util-middleware': 4.2.5
       tslib: 2.8.1
-<<<<<<< HEAD
 
   '@smithy/middleware-retry@4.4.14':
     dependencies:
@@ -16632,21 +16181,6 @@ snapshots:
       '@smithy/uuid': 1.1.0
       tslib: 2.8.1
 
-=======
-
-  '@smithy/middleware-retry@4.4.13':
-    dependencies:
-      '@smithy/node-config-provider': 4.3.5
-      '@smithy/protocol-http': 5.3.5
-      '@smithy/service-error-classification': 4.2.5
-      '@smithy/smithy-client': 4.9.9
-      '@smithy/types': 4.9.0
-      '@smithy/util-middleware': 4.2.5
-      '@smithy/util-retry': 4.2.5
-      '@smithy/uuid': 1.1.0
-      tslib: 2.8.1
-
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
   '@smithy/middleware-serde@4.2.6':
     dependencies:
       '@smithy/protocol-http': 5.3.5
@@ -16714,17 +16248,10 @@ snapshots:
       '@smithy/util-utf8': 4.2.0
       tslib: 2.8.1
 
-<<<<<<< HEAD
   '@smithy/smithy-client@4.9.10':
     dependencies:
       '@smithy/core': 3.18.7
       '@smithy/middleware-endpoint': 4.3.14
-=======
-  '@smithy/smithy-client@4.9.9':
-    dependencies:
-      '@smithy/core': 3.18.6
-      '@smithy/middleware-endpoint': 4.3.13
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@smithy/middleware-stack': 4.2.5
       '@smithy/protocol-http': 5.3.5
       '@smithy/types': 4.9.0
@@ -16769,7 +16296,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-<<<<<<< HEAD
   '@smithy/util-defaults-mode-browser@4.3.13':
     dependencies:
       '@smithy/property-provider': 4.2.5
@@ -16787,25 +16313,6 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-=======
-  '@smithy/util-defaults-mode-browser@4.3.12':
-    dependencies:
-      '@smithy/property-provider': 4.2.5
-      '@smithy/smithy-client': 4.9.9
-      '@smithy/types': 4.9.0
-      tslib: 2.8.1
-
-  '@smithy/util-defaults-mode-node@4.2.15':
-    dependencies:
-      '@smithy/config-resolver': 4.4.3
-      '@smithy/credential-provider-imds': 4.2.5
-      '@smithy/node-config-provider': 4.3.5
-      '@smithy/property-provider': 4.2.5
-      '@smithy/smithy-client': 4.9.9
-      '@smithy/types': 4.9.0
-      tslib: 2.8.1
-
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
   '@smithy/util-endpoints@3.2.5':
     dependencies:
       '@smithy/node-config-provider': 4.3.5
@@ -16864,19 +16371,11 @@ snapshots:
 
   '@speed-highlight/core@1.2.12': {}
 
-<<<<<<< HEAD
   '@spotlightjs/astro@3.2.6(@sentry/astro@10.28.0(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@sentry/astro': 10.28.0(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@spotlightjs/spotlight': 3.0.2
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.28.0(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
-    dependencies:
-      '@sentry/astro': 10.28.0(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      '@spotlightjs/spotlight': 3.0.2
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -16886,11 +16385,7 @@ snapshots:
   '@spotlightjs/sidecar@1.12.0':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-<<<<<<< HEAD
       '@modelcontextprotocol/sdk': 1.24.2(zod@3.25.76)
-=======
-      '@modelcontextprotocol/sdk': 1.24.1(zod@3.25.76)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@sentry/core': 9.22.0
       '@sentry/node': 8.55.0
       kleur: 4.1.5
@@ -17680,11 +17175,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   '@vitest/coverage-v8@4.0.15(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
-=======
-  '@vitest/coverage-v8@4.0.15(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.15
@@ -17697,11 +17188,7 @@ snapshots:
       obug: 2.1.1
       std-env: 3.10.0
       tinyrainbow: 3.0.3
-<<<<<<< HEAD
       vitest: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-=======
-      vitest: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     transitivePeerDependencies:
       - supports-color
 
@@ -17714,21 +17201,13 @@ snapshots:
       chai: 6.2.1
       tinyrainbow: 3.0.3
 
-<<<<<<< HEAD
   '@vitest/mocker@4.0.15(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
-=======
-  '@vitest/mocker@4.0.15(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@vitest/spy': 4.0.15
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-<<<<<<< HEAD
       msw: 2.12.4(@types/node@24.10.1)(typescript@5.9.3)
-=======
-      msw: 2.12.3(@types/node@24.10.1)(typescript@5.9.3)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       vite: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/pretty-format@4.0.15':
@@ -17910,11 +17389,7 @@ snapshots:
 
   agentdb@1.6.1:
     dependencies:
-<<<<<<< HEAD
       '@modelcontextprotocol/sdk': 1.24.2(zod@3.25.76)
-=======
-      '@modelcontextprotocol/sdk': 1.24.1(zod@3.25.76)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@xenova/transformers': 2.17.2
       chalk: 5.6.2
       commander: 12.1.0
@@ -18150,7 +17625,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   astro-expressive-code@0.38.3(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -18159,16 +17633,6 @@ snapshots:
   astro-expressive-code@0.41.3(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-  astro-expressive-code@0.38.3(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
-    dependencies:
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-      rehype-expressive-code: 0.38.3
-
-  astro-expressive-code@0.41.3(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
-    dependencies:
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       rehype-expressive-code: 0.41.3
 
   astro-icon@1.1.5:
@@ -18179,7 +17643,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   astro-loader-github-prs@1.3.1(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -18188,16 +17651,6 @@ snapshots:
   astro-loader-github-releases@2.1.1(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-=======
-  astro-loader-github-prs@1.3.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
-    dependencies:
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-      octokit: 5.0.5
-
-  astro-loader-github-releases@2.1.1(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
-    dependencies:
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       octokit: 5.0.5
 
   astro-robots-txt@1.0.0:
@@ -18205,7 +17658,6 @@ snapshots:
       valid-filename: 4.0.0
       zod: 3.25.76
 
-<<<<<<< HEAD
   astro-vitesse@0.5.2(@iconify/json@2.2.395)(@unocss/reset@66.5.10)(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.10(postcss@8.5.6)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))):
     dependencies:
       '@astrojs/markdown-remark': 6.3.9
@@ -18215,17 +17667,6 @@ snapshots:
       '@unocss/reset': 66.5.10
       astro: 5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       astro-expressive-code: 0.38.3(astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-=======
-  astro-vitesse@0.5.2(@iconify/json@2.2.395)(@unocss/reset@66.5.10)(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.10(postcss@8.5.6)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))):
-    dependencies:
-      '@astrojs/markdown-remark': 6.3.9
-      '@astrojs/mdx': 4.3.12(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      '@astrojs/sitemap': 3.6.0
-      '@iconify/json': 2.2.395
-      '@unocss/reset': 66.5.10
-      astro: 5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-      astro-expressive-code: 0.38.3(astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       bcp-47: 2.1.0
       dayjs: 1.11.19
       fast-glob: 3.3.3
@@ -18242,11 +17683,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   astro@5.16.4(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
-=======
-  astro@5.16.3(@azure/identity@4.13.0)(@azure/storage-blob@12.29.1)(@types/node@24.10.1)(@upstash/redis@1.35.7)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.943.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@astrojs/compiler': 2.13.0
       '@astrojs/internal-helpers': 0.7.5
@@ -18292,11 +17729,7 @@ snapshots:
       prompts: 2.4.2
       rehype: 13.0.2
       semver: 7.7.3
-<<<<<<< HEAD
       shiki: 3.19.0
-=======
-      shiki: 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       smol-toml: 1.5.2
       svgo: 4.0.0
       tinyexec: 1.0.2
@@ -18480,11 +17913,7 @@ snapshots:
 
   before-after-hook@4.0.0: {}
 
-<<<<<<< HEAD
   better-auth@1.4.5(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(vue@3.5.25(typescript@5.9.3)):
-=======
-  better-auth@1.4.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vue@3.5.25(typescript@5.9.3)):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@better-auth/core': 1.4.5(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.4(zod@4.1.13))(jose@6.1.3)(kysely@0.28.8)(nanostores@1.1.0)
       '@better-auth/telemetry': 1.4.5(@better-auth/core@1.4.5(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.4(zod@4.1.13))(jose@6.1.3)(kysely@0.28.8)(nanostores@1.1.0))
@@ -18598,15 +18027,9 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-<<<<<<< HEAD
       baseline-browser-mapping: 2.9.0
       caniuse-lite: 1.0.30001759
       electron-to-chromium: 1.5.264
-=======
-      baseline-browser-mapping: 2.8.32
-      caniuse-lite: 1.0.30001757
-      electron-to-chromium: 1.5.263
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       node-releases: 2.0.27
       update-browserslist-db: 1.2.1(browserslist@4.28.1)
 
@@ -19338,11 +18761,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-<<<<<<< HEAD
   electron-to-chromium@1.5.264: {}
-=======
-  electron-to-chromium@1.5.263: {}
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
 
   emmet@2.4.11:
     dependencies:
@@ -19726,20 +19145,12 @@ snapshots:
 
   eslint-plugin-vitest-globals@1.5.0: {}
 
-<<<<<<< HEAD
   eslint-plugin-vitest@0.5.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
-=======
-  eslint-plugin-vitest@0.5.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@typescript-eslint/utils': 7.18.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
     optionalDependencies:
-<<<<<<< HEAD
       vitest: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-=======
-      vitest: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -20167,11 +19578,7 @@ snapshots:
 
   fraction.js@5.3.4: {}
 
-<<<<<<< HEAD
   framer-motion@12.23.25(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
-=======
-  framer-motion@12.23.25(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       motion-dom: 12.23.23
       motion-utils: 12.23.6
@@ -21101,11 +20508,7 @@ snapshots:
 
   jose@6.1.3: {}
 
-<<<<<<< HEAD
   jotai@2.15.2(@babel/core@7.28.5)(@babel/template@7.27.2)(@types/react@19.2.7)(react@19.2.1):
-=======
-  jotai@2.15.2(@babel/core@7.28.5)(@babel/template@7.27.2)(@types/react@19.2.7)(react@19.2.0):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     optionalDependencies:
       '@babel/core': 7.28.5
       '@babel/template': 7.27.2
@@ -21184,11 +20587,7 @@ snapshots:
 
   jsonwebtoken@9.0.2:
     dependencies:
-<<<<<<< HEAD
-      jws: 3.2.3
-=======
       jws: 4.0.1
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       lodash.includes: 4.3.0
       lodash.isboolean: 3.0.3
       lodash.isinteger: 4.0.4
@@ -21212,14 +20611,6 @@ snapshots:
       ecdsa-sig-formatter: 1.0.11
       safe-buffer: 5.2.1
 
-<<<<<<< HEAD
-  jws@3.2.3:
-    dependencies:
-      jwa: 1.4.2
-      safe-buffer: 5.2.1
-
-=======
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
   jws@4.0.1:
     dependencies:
       jwa: 2.0.1
@@ -22138,11 +21529,7 @@ snapshots:
 
   ms@4.0.0-nightly.202508271359: {}
 
-<<<<<<< HEAD
   msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3):
-=======
-  msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@inquirer/confirm': 5.1.21(@types/node@24.10.1)
       '@mswjs/interceptors': 0.40.0
@@ -22931,7 +22318,6 @@ snapshots:
 
   react-refresh@0.18.0: {}
 
-<<<<<<< HEAD
   react-router-dom@7.10.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
     dependencies:
       react: 19.2.1
@@ -22939,15 +22325,6 @@ snapshots:
       react-router: 7.10.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
 
   react-router@7.10.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
-=======
-  react-router-dom@7.10.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
-    dependencies:
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
-      react-router: 7.10.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-
-  react-router@7.10.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       cookie: 1.1.1
       react: 19.2.1
@@ -23724,7 +23101,6 @@ snapshots:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
 
-<<<<<<< HEAD
   shiki@3.19.0:
     dependencies:
       '@shikijs/core': 3.19.0
@@ -23733,16 +23109,6 @@ snapshots:
       '@shikijs/langs': 3.19.0
       '@shikijs/themes': 3.19.0
       '@shikijs/types': 3.19.0
-=======
-  shiki@3.18.0:
-    dependencies:
-      '@shikijs/core': 3.18.0
-      '@shikijs/engine-javascript': 3.18.0
-      '@shikijs/engine-oniguruma': 3.18.0
-      '@shikijs/langs': 3.18.0
-      '@shikijs/themes': 3.18.0
-      '@shikijs/types': 3.18.0
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
 
@@ -24816,17 +24182,10 @@ snapshots:
     optionalDependencies:
       vite: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
-<<<<<<< HEAD
   vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.15
       '@vitest/mocker': 4.0.15(msw@2.12.4(@types/node@24.10.1)(typescript@5.9.3))(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
-=======
-  vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
-    dependencies:
-      '@vitest/expect': 4.0.15
-      '@vitest/mocker': 4.0.15(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
       '@vitest/pretty-format': 4.0.15
       '@vitest/runner': 4.0.15
       '@vitest/snapshot': 4.0.15
@@ -25125,11 +24484,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-<<<<<<< HEAD
   wrangler@4.52.1(@cloudflare/workers-types@4.20251202.0):
-=======
-  wrangler@4.51.0(@cloudflare/workers-types@4.20251202.0):
->>>>>>> 2e5ce088cc957c80bd8efd144cf058f74ab35374
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.1
       '@cloudflare/unenv-preset': 2.7.12(unenv@2.0.0-rc.24)(workerd@1.20251202.0)
