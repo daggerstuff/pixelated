@@ -45,7 +45,7 @@ pandera
 tqdm
 jsonlines
 pyyaml
-requests
+requests>=2.32.4  # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
 
 # Development and testing
 pytest
