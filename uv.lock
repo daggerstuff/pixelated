@@ -3973,7 +3973,7 @@ requires-dist = [
     { name = "python-socketio", specifier = ">=5.14.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "redis", specifier = ">=6.4.0" },
-    { name = "requests" },
+    { name = "requests", specifier = ">=2.32.4" },
     { name = "ruff", specifier = ">=0.12.5" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "s3cmd", specifier = ">=2.4.0" },
