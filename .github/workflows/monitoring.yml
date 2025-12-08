@@ -315,10 +315,9 @@ jobs:
       - name: Notify failure
         if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v2
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
+          webhook-type: incoming-webhook
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
             {
               "text": "🚨 *PRODUCTION MONITORING FAILED*",
@@ -914,10 +913,9 @@ jobs:
       - name: Notify performance issues
         if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v2
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
+          webhook-type: incoming-webhook
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
             {
               "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
