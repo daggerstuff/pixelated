@@ -12,19 +12,9 @@ compatibility_flags = ["nodejs_compat"]
 
 [build]
 command = "pnpm build"
-cwd = "."
-watch_dirs = ["src"]
-
-[build.upload]
-format = "modules"
-dir = "dist"
-main = "./server/entry.mjs"
 
 [assets]
 directory = "dist/client"
-
-# Node.js compatibility
-node_compat = true
 
 # Environment Variables
 [vars]
@@ -134,40 +124,18 @@ binding = "AI"
 #   { name = "CUSTOM_BINDING", type = "plain_text", text = "value" }
 # ]
 
-# Miniflare configuration for local development
-[miniflare]
-kv_persist = true
-cache_persist = true
-d1_persist = true
-r2_persist = true
+# Local development persistence is now handled by Wrangler automatically
+# No separate miniflare configuration needed
 
-# Development environment
-[env.development]
-name = "pixelated-empathy-dev"
-vars = { NODE_ENV = "development", PUBLIC_SITE_URL = "http://localhost:4321" }
-
-# Staging environment
-[env.staging]
-name = "pixelated-empathy-staging"
-vars = { NODE_ENV = "staging", PUBLIC_SITE_URL = "https://staging.pixelatedempathy.com" }
+# Preview environment (for PR previews and development)
+[env.preview]
+name = "pixelated-empathy-preview"
+vars = { NODE_ENV = "preview", PUBLIC_SITE_URL = "https://preview.pixelatedempathy.com" }
 
 # Production environment
 [env.production]
 name = "pixelated-empathy"
 vars = { NODE_ENV = "production", PUBLIC_SITE_URL = "https://pixelatedempathy.com" }
-routes = [
-  { pattern = "pixelatedempathy.com/*", custom_domain = true },
-  { pattern = "www.pixelatedempathy.com/*", custom_domain = true }
-]
-
-# Site configuration (for Pages)
-# Note: For Cloudflare Pages SSR deployment:
-# 1. Use build command: DEPLOY_TARGET=cloudflare pnpm build (or pnpm build:cloudflare)
-# 2. Set Build output directory: dist/client
-# 3. Set Build command: DEPLOY_TARGET=cloudflare pnpm build
-# 4. The Cloudflare adapter will create functions/ directory automatically
-[site]
-bucket = "./dist/client"
 
 # Placement (for regional deployment)
 # [placement]

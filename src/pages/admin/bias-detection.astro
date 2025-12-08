@@ -64,7 +64,7 @@ const pageDescription =
     import { createRoot } from 'react-dom/client'
 
     // Mount the React component when the page loads
-    document.addEventListener('DOMContentLoaded', (event: Event) => {
+    document.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('bias-dashboard')
       if (container) {
         const root = createRoot(container)

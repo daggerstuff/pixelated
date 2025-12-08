@@ -2,7 +2,7 @@ name: Schedule Blog Posts
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
@@ -10,7 +10,7 @@ permissions:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.22.0
+  PNPM_VERSION: 10.24.0
   NODE_ENV: production
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -26,9 +26,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
-          version: 10.22.0
+          version: 10.24.0
 
       - name: Get pnpm store directory
         id: pnpm-store
@@ -45,6 +45,11 @@ jobs:
 
       - name: Clean pnpm cache
         run: pnpm store prune
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

@@ -8,7 +8,7 @@
  */
 
 import fs from 'fs'
-import path from 'path'
+
 import axios from 'axios'
 import { performance } from 'perf_hooks'
 import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../../src/utils/path-security'

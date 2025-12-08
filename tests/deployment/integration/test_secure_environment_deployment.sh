@@ -328,9 +328,9 @@ EOF
     cat > local/.env.test << 'EOF'
 # Test environment with various sensitive patterns
 DATABASE_PASSWORD=test_db_password_123
-API_TOKEN=test_api_token_xyz789
-PRIVATE_KEY=-----BEGIN PRIVATE KEY-----test-key-----END PRIVATE KEY-----
-AUTH_SECRET=test_auth_secret_abc123
+API_TOKEN=fake_test_token_placeholder
+PRIVATE_KEY=fake_test_private_key_placeholder
+AUTH_SECRET=fake_test_auth_secret_placeholder
 CREDENTIAL_FILE=/path/to/credentials.json
 EOF
     

@@ -1,11 +1,13 @@
 import json
 import os
 from typing import Any
+from contextlib import suppress
+from pathlib import Path
 
 import requests
 
 API_URL = "http://127.0.0.1:8000/analyze"
-LOG_FILE = "logs/pipeline_runs.jsonl"
+LOG_FILE = Path("logs/pipeline_runs.jsonl")
 
 def get_emotional_analysis(text: str) -> dict[str, Any] | None:
     try:
@@ -18,10 +20,12 @@ def get_emotional_analysis(text: str) -> dict[str, Any] | None:
 
 def load_past_interactions() -> list[dict[str, Any]]:
     interactions = []
-    if os.path.exists(LOG_FILE):
-        with open(LOG_FILE) as f:
-            for line in f:
-                interactions.append(json.loads(line))
+    # Use pathlib and contextlib.suppress for cleaner file handling
+    if LOG_FILE.exists():
+        with suppress(Exception):
+            with LOG_FILE.open() as f:
+                for line in f:
+                    interactions.append(json.loads(line))
     return interactions
 
 def find_similar_emotional_context(query_analysis: dict[str, Any], past_interactions: list[dict[str, Any]], top_k: int = 2) -> list[dict[str, Any]]:

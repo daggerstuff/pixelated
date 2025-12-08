@@ -3,7 +3,6 @@
  * Provides role-based authorization and permission checking
  */
 
-import type { Request } from 'express'
 import { ROLE_DEFINITIONS, type UserRole } from './roles'
 
 export interface ClientInfo {
@@ -14,17 +13,20 @@ export interface ClientInfo {
 
 /**
  * Extract token from request headers or query parameters
+ * Works with Web API Request type
  */
 export function extractTokenFromRequest(req: Request): string | null {
-  // Check Authorization header first
-  const authHeader = req.headers.authorization
+  // Check Authorization header first (Web API Request uses headers.get())
+  const authHeader =
+    req.headers.get?.('Authorization') ||
+    (req.headers as any).authorization ||
+    (req.headers as any).Authorization
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7) // Remove 'Bearer ' prefix
   }
 
   // Check query parameters for WebSocket connections
-  // Note: Request type doesn't have query property, access via URL
   try {
     const url = new URL(req.url)
     const tokenParam = url.searchParams.get('token')
@@ -32,19 +34,19 @@ export function extractTokenFromRequest(req: Request): string | null {
       return tokenParam
     }
   } catch {
-    // URL parsing failed, try direct access if extended request
-    const extendedReq = req as Request & { query?: { token?: string } }
-    if (extendedReq.query?.token) {
-      return extendedReq.query.token
-    }
+    // URL parsing failed
   }
 
   // Check cookie for fallback
-  const extendedReq = req as Request & { cookies?: { auth_token?: string } }
-  const tokenCookie = extendedReq.cookies?.auth_token
-
-  if (tokenCookie) {
-    return tokenCookie
+  const cookieHeader = req.headers.get?.('cookie') || (req.headers as any).cookie
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(';').map((c: string) => c.trim())
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=')
+      if (name === 'auth_token' || name === 'auth-token') {
+        return decodeURIComponent(value)
+      }
+    }
   }
 
   return null
@@ -52,12 +54,25 @@ export function extractTokenFromRequest(req: Request): string | null {
 
 /**
  * Get client IP address
+ * Works with Web API Request type
  */
 export function getClientIp(req: Request): string {
+  const xForwardedFor =
+    req.headers.get?.('x-forwarded-for') ||
+    req.headers.get?.('X-Forwarded-For') ||
+    (req.headers as any)['x-forwarded-for'] ||
+    (req.headers as any)['X-Forwarded-For']
+
+  const xRealIp =
+    req.headers.get?.('x-real-ip') ||
+    req.headers.get?.('X-Real-Ip') ||
+    (req.headers as any)['x-real-ip'] ||
+    (req.headers as any)['X-Real-Ip']
+
   return (
-    req.ip ||
-    (req.headers['x-forwarded-for'] as string) ||
-    (req.headers['x-real-ip'] as string) ||
+    (req as any).ip ||
+    (typeof xForwardedFor === 'string' ? xForwardedFor.split(',')[0].trim() : null) ||
+    (typeof xRealIp === 'string' ? xRealIp : null) ||
     'unknown'
   )
 }
@@ -119,16 +134,92 @@ export async function verifyAdmin(
  */
 export async function rateLimitMiddleware(
   request: Request,
-  _endpoint: string,
-  _limit: number,
-  _windowMinutes: number,
+  endpoint: string,
+  limit: number,
+  windowMinutes: number,
 ): Promise<{
   success: boolean
   request?: Request
   response?: Response
   error?: string
 }> {
-  // Basic implementation - in production this would use Redis
+  const clientIp = getClientIp(request)
+  const rateLimitKey = `rate_limit:${endpoint}:${clientIp}`
+  const windowSeconds = windowMinutes * 60
+
+  const { getFromCache, setInCache } = await import('../redis')
+
+  // Get current rate limit data
+  const rateLimitData = await getFromCache(rateLimitKey)
+
+  const now = Date.now()
+  let currentCount = 0
+  let resetTime = now + windowSeconds * 1000
+
+  if (rateLimitData) {
+    // Check if window has expired
+    if (rateLimitData.resetTime && rateLimitData.resetTime > now) {
+      currentCount = rateLimitData.count || 0
+      resetTime = rateLimitData.resetTime
+    } else {
+      // Window expired, reset counter
+      currentCount = 0
+      resetTime = now + windowSeconds * 1000
+    }
+  }
+
+  // Check if limit exceeded
+  if (currentCount >= limit) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.RATE_LIMIT_EXCEEDED, null, {
+      endpoint,
+      currentCount,
+      limit,
+      resetTime,
+    })
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(null, 'rate_limit_exceeded')
+    } catch {
+      // Phase 6 integration not available in test environment
+    }
+
+    return {
+      success: false,
+      response: new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          retryAfter: Math.ceil((resetTime - now) / 1000),
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': Math.ceil((resetTime - now) / 1000).toString(),
+          },
+        },
+      ),
+      error: 'Rate limit exceeded',
+    }
+  }
+
+  // Increment counter
+  currentCount++
+
+  // Store updated rate limit data
+  await setInCache(
+    rateLimitKey,
+    {
+      count: currentCount,
+      resetTime,
+    },
+    windowSeconds,
+  )
+
   return { success: true, request }
 }
 
@@ -149,9 +240,27 @@ export async function csrfProtection(request: Request): Promise<{
   // For other methods, check for CSRF token
   const csrfToken =
     request.headers.get?.('X-CSRF-Token') ||
-    (request.headers['x-csrf-token'] as string)
+    request.headers.get?.('x-csrf-token') ||
+    (request.headers as any)['X-CSRF-Token'] ||
+    (request.headers as any)['x-csrf-token']
 
   if (!csrfToken) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+      reason: 'missing_token',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
+    } catch {
+      // Phase 6 integration not available in test environment
+    }
+
     return {
       success: false,
       response: new Response(JSON.stringify({ error: 'CSRF token required' }), {
@@ -162,7 +271,97 @@ export async function csrfProtection(request: Request): Promise<{
     }
   }
 
-  // In production, validate the token against stored tokens
+  // Validate the token against stored tokens
+  const { getFromCache } = await import('../redis')
+  const tokenKey = `csrf:${csrfToken}`
+  const storedToken = await getFromCache(tokenKey)
+
+  if (!storedToken) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+      reason: 'invalid_token',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
+    } catch {
+      // Phase 6 integration not available in test environment
+    }
+
+    return {
+      success: false,
+      response: new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      error: 'Invalid CSRF token',
+    }
+  }
+
+  // Check if token matches stored token
+  if (storedToken.token && storedToken.token !== csrfToken) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+      reason: 'invalid_token',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
+    } catch {
+      // Phase 6 integration not available in test environment
+    }
+
+    return {
+      success: false,
+      response: new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      error: 'Invalid CSRF token',
+    }
+  }
+
+  // Check if token has expired
+  if (storedToken.expiresAt && storedToken.expiresAt < Date.now()) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+      reason: 'expired_token',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
+    } catch {
+      // Phase 6 integration not available in test environment
+    }
+
+    return {
+      success: false,
+      response: new Response(
+        JSON.stringify({ error: 'CSRF token has expired' }),
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+      error: 'CSRF token has expired',
+    }
+  }
+
   return { success: true, request }
 }
 
@@ -200,9 +399,19 @@ export async function securityHeaders(
   headers.set('Expires', '0')
 
   // Add CORS headers for API requests
-  const { origin } = request.headers
-  if (origin) {
-    headers.set('Access-Control-Allow-Origin', 'https://app.example.com')
+  const origin =
+    request.headers.get?.('Origin') ||
+    request.headers.get?.('origin') ||
+    (request.headers as any).Origin ||
+    (request.headers as any).origin
+
+  const allowedOrigins = [
+    'https://app.example.com',
+    process.env.ALLOWED_ORIGIN || 'http://localhost:4321',
+  ]
+
+  if (origin && allowedOrigins.includes(origin)) {
+    headers.set('Access-Control-Allow-Origin', origin)
     headers.set(
       'Access-Control-Allow-Methods',
       'GET, POST, PUT, DELETE, OPTIONS',
@@ -211,6 +420,7 @@ export async function securityHeaders(
       'Access-Control-Allow-Headers',
       'Content-Type, Authorization, X-CSRF-Token',
     )
+    headers.set('Access-Control-Allow-Credentials', 'true')
     headers.set('Access-Control-Max-Age', '86400')
     headers.set('Vary', 'Origin')
   }
@@ -251,10 +461,21 @@ export async function authenticateRequest(request: Request): Promise<{
   response?: Response
   error?: string
 }> {
-  // Basic implementation - would integrate with JWT service
-  const token = extractTokenFromRequest(request as unknown as Request)
+  // Extract authorization header - use comprehensive extraction
+  const authHeader =
+    request.headers.get?.('Authorization') ||
+    request.headers.get?.('authorization') ||
+    (request.headers as any)?.Authorization ||
+    (request.headers as any)?.authorization ||
+    (request.headers as any)?.get?.('Authorization')
 
-  if (!token) {
+  if (!authHeader) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      error: 'No authorization header',
+      endpoint: new URL(request.url).pathname,
+    })
+
     return {
       success: false,
       response: new Response(
@@ -268,8 +489,125 @@ export async function authenticateRequest(request: Request): Promise<{
     }
   }
 
-  // In production, validate token and get user
-  return { success: true, request: request as AuthenticatedRequest }
+  // Check authorization header format
+  if (!authHeader.startsWith('Bearer ')) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      error: 'Invalid authorization header format',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    return {
+      success: false,
+      response: new Response(
+        JSON.stringify({ error: 'Invalid authorization header format' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+      error: 'Invalid authorization header format',
+    }
+  }
+
+  // Extract token
+  const token = authHeader.substring(7) // Remove 'Bearer ' prefix
+
+  // Validate token
+  const { validateToken } = await import('./jwt-service')
+  const validation = await validateToken(token, 'access')
+
+  if (!validation.valid) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      error: validation.error || 'Invalid token',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    return {
+      success: false,
+      response: new Response(
+        JSON.stringify({ error: validation.error || 'Invalid token' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+      error: validation.error || 'Invalid token',
+    }
+  }
+
+  // Get user information
+  const { getUserById } = await import('./better-auth-integration')
+  const user = await getUserById(validation.userId!)
+
+  if (!user) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      error: 'User not found',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    return {
+      success: false,
+      response: new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      error: 'User not found',
+    }
+  }
+
+  // Check if user is active
+  if (!user.isActive) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, user.id, {
+      error: 'User account is inactive',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    return {
+      success: false,
+      response: new Response(
+        JSON.stringify({ error: 'User account is inactive' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+      error: 'User account is inactive',
+    }
+  }
+
+  // Log successful authentication
+  const { logSecurityEvent, SecurityEventType } = await import('../security')
+  await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
+    tokenId: validation.tokenId,
+    endpoint: new URL(request.url).pathname,
+    timestamp: Date.now(),
+    retention: 31536000000, // 1 year in milliseconds
+  })
+
+  // Update Phase 6 MCP server
+  try {
+    const { updatePhase6AuthenticationProgress } = await import(
+      '../mcp/phase6-integration'
+    )
+    await updatePhase6AuthenticationProgress(user.id, 'authentication_success')
+  } catch {
+    // Phase 6 integration not available in test environment
+  }
+
+  // Attach user to request
+  const authenticatedRequest = request as AuthenticatedRequest
+  authenticatedRequest.user = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  }
+  authenticatedRequest.tokenId = validation.tokenId
+
+  return { success: true, request: authenticatedRequest }
 }
 
 /**
@@ -322,12 +660,25 @@ export async function requireRole(
     // Log authorization failure
     try {
       const { logSecurityEvent, SecurityEventType } = await import('../security')
-      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, {
-        userId: request.user.id,
-        message: `User ${request.user.id} with role ${request.user.role} attempted to access resource requiring roles: ${roles.join(', ')}`,
+      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, request.user.id, {
+        requiredRoles: roles,
+        userRole: request.user.role,
       })
     } catch {
       // Security module not available in test environment
+    }
+
+    // Update Phase 6 MCP server
+    try {
+      const { updatePhase6AuthenticationProgress } = await import(
+        '../mcp/phase6-integration'
+      )
+      await updatePhase6AuthenticationProgress(
+        request.user.id,
+        'authorization_failed',
+      )
+    } catch {
+      // Phase 6 integration not available in test environment
     }
 
     return {

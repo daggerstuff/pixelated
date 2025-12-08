@@ -1,8 +1,88 @@
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
 
-import * as Sentry from '@sentry/node';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
-import { httpIntegration } from '@sentry/node';
+const createStubSpan = () => ({
+  end: () => {},
+})
+
+const createStubScope = () => ({
+  setTag: () => {},
+  setExtra: () => {},
+  setUser: () => {},
+})
+
+const createStubSentry = () => ({
+  init: () => {},
+  close: async () => {},
+  captureException: () => {},
+  setUser: () => {},
+  setContext: () => {},
+  withScope: (callback = () => {}) => {
+    try {
+      callback(createStubScope())
+    } catch {
+      // ignore — noop scope wrapper
+    }
+  },
+  startInactiveSpan: () => createStubSpan(),
+  startSpan: () => createStubSpan(),
+  metrics: {
+    count: () => {},
+    distribution: () => {},
+  },
+})
+
+let Sentry = null
+let nodeProfilingIntegration = () => null
+let httpIntegration = () => null
+
+const SUPPORTED_PROFILING_NODE_MAJORS = new Set([16, 18, 20, 22, 24])
+
+const getNodeMajorVersion = () => {
+  try {
+    const [major = ''] = (process.versions?.node ?? '').split('.')
+    const parsed = Number.parseInt(major, 10)
+    return Number.isFinite(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+try {
+  const sentryNode = await import('@sentry/node')
+  Sentry = sentryNode
+  httpIntegration = typeof sentryNode.httpIntegration === 'function'
+    ? sentryNode.httpIntegration
+    : () => null
+
+  const nodeMajor = getNodeMajorVersion()
+  const profilingSupported = nodeMajor !== null && SUPPORTED_PROFILING_NODE_MAJORS.has(nodeMajor)
+
+  if (profilingSupported) {
+    try {
+      const profiling = await import('@sentry/profiling-node')
+      nodeProfilingIntegration = profiling?.nodeProfilingIntegration ?? (() => null)
+    } catch (profilingError) {
+      console.warn(
+        `[Sentry Profiling] Failed to load profiling addon on Node.js ${process.version}. ` +
+          'Ensure build tools are available to compile @sentry/profiling-node from source.',
+        profilingError
+      )
+    }
+  } else {
+    console.warn(
+      `[Sentry Profiling] Node.js ${process.version} is not in the supported LTS list ` +
+        '(16, 18, 20, 22, 24). Profiling integration will be disabled.'
+    )
+  }
+} catch (error) {
+  const message = '[Sentry] Node SDK not available — disabling instrumentation. Install @sentry/node to enable full telemetry.'
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(message)
+  } else {
+    console.warn(message, error)
+  }
+  Sentry = createStubSentry()
+}
 
 // Enhanced Sentry configuration with comprehensive instrumentation
 Sentry.init({
@@ -17,11 +97,11 @@ Sentry.init({
   // Integrations for comprehensive monitoring
   integrations: [
     // HTTP integration for outgoing requests
-    httpIntegration({ tracing: true }),
+    typeof httpIntegration === 'function' ? httpIntegration({ tracing: true }) : null,
 
     // Profiling integration for performance monitoring
-    nodeProfilingIntegration(),
-  ],
+    typeof nodeProfilingIntegration === 'function' ? nodeProfilingIntegration() : null,
+  ].filter(Boolean),
 
   // Tracing configuration
   tracePropagationTargets: [
@@ -106,9 +186,25 @@ export const setUserContext = (user) => {
   });
 };
 
-// Custom metrics and monitoring
-export const recordMetric = (name, value, tags = {}) => {
-  Sentry.metrics.increment(name, value, { tags });
+// Custom metrics and monitoring using Sentry Metrics
+// See: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+export const recordMetric = (name, value = 1, tags = {}) => {
+  // Use counter metrics for incrementing values (button clicks, jobs processed, etc.)
+  if (Sentry.metrics && typeof Sentry.metrics.count === 'function') {
+    Sentry.metrics.count(name, value, {
+      attributes: tags,
+    });
+  }
+};
+
+// Record a duration metric (for example, API response time in milliseconds)
+export const recordDurationMetric = (name, durationMs, tags = {}) => {
+  if (Sentry.metrics && typeof Sentry.metrics.distribution === 'function') {
+    Sentry.metrics.distribution(name, durationMs, {
+      unit: 'millisecond',
+      attributes: tags,
+    });
+  }
 };
 
 // Health check function for monitoring

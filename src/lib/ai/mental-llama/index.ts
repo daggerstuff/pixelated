@@ -88,7 +88,7 @@ export async function createMentalLLaMAFactory(
           ...(options.retries !== undefined
             ? { retries: options.retries }
             : {}),
-          ...(options.providerSpecificParams || {}),
+          ...options.providerSpecificParams,
         }
       : undefined
 

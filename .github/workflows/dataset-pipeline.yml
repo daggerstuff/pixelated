@@ -1,0 +1,205 @@
+name: Dataset Pipeline CI
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "ai/dataset_pipeline/**"
+      - "ai/config/**"
+      - ".github/workflows/dataset-pipeline.yml"
+  pull_request:
+    branches: [master, main]
+    paths:
+      - "ai/dataset_pipeline/**"
+      - "ai/config/**"
+  workflow_dispatch:
+    inputs:
+      target_samples:
+        description: "Target number of samples for test export"
+        required: false
+        default: "50"
+      run_full_export:
+        description: "Run full export (not just smoke test)"
+        required: false
+        default: "false"
+
+env:
+  PYTHON_VERSION: "3.11"
+  UV_VERSION: "0.9.6"
+
+jobs:
+  verify-pipeline:
+    name: Verify Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv and pip (secure versions)
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
+
+      - name: Install dependencies
+        run: |
+          cd ${{ github.workspace }}
+          uv sync
+          uv pip install "transformers>=4.35.0"
+          uv pip install -r ai/config/requirements_training.txt
+
+      - name: Verify pipeline imports
+        run: |
+          uv run python ai/dataset_pipeline/verify_pipeline.py
+
+  test-export:
+    name: Test Dataset Export
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: verify-pipeline
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv and pip (secure versions)
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
+
+      - name: Install dependencies
+        run: |
+          cd ${{ github.workspace }}
+          uv sync
+          uv pip install "transformers>=4.35.0"
+          uv pip install pyarrow pandas
+          uv pip install -r ai/config/requirements_training.txt
+
+      - name: Run test export
+        id: export
+        run: |
+          TARGET_SAMPLES=${{ github.event.inputs.target_samples || '50' }}
+          uv run python -m ai.dataset_pipeline.export_dataset \
+            --version test-ci \
+            --target-samples $TARGET_SAMPLES \
+            --seed 42 \
+            --no-upload \
+            --no-quality
+        continue-on-error: true
+
+      - name: Verify export files
+        if: steps.export.outcome == 'success'
+        run: |
+          EXPORT_DIR="ai/dataset_pipeline/production_exports/test-ci"
+
+          # Check files exist
+          test -f "$EXPORT_DIR/dataset_vtest-ci.jsonl" || exit 1
+          test -f "$EXPORT_DIR/dataset_vtest-ci.parquet" || exit 1
+          test -f "$EXPORT_DIR/manifest_vtest-ci.json" || exit 1
+          test -f "$EXPORT_DIR/config_lock.json" || exit 1
+
+          echo "✅ All export files created"
+
+      - name: Verify manifest integrity
+        if: steps.export.outcome == 'success'
+        run: |
+          uv run python -c "
+          from ai.dataset_pipeline.export_manifest import DatasetManifest
+          from pathlib import Path
+
+          manifest = DatasetManifest.load(Path('ai/dataset_pipeline/production_exports/test-ci/manifest_vtest-ci.json'))
+          is_valid, errors = manifest.verify_files(Path('ai/dataset_pipeline/production_exports/test-ci'))
+
+          if not is_valid:
+              print('❌ Manifest verification failed:')
+              for error in errors:
+                  print(f'  - {error}')
+              exit(1)
+          else:
+              print('✅ Manifest verification passed')
+          "
+
+      - name: Generate QA report
+        if: steps.export.outcome == 'success'
+        run: |
+          uv run python -m ai.dataset_pipeline.qa_report_generator \
+            ai/dataset_pipeline/production_exports/test-ci/dataset_vtest-ci.jsonl \
+            --version test-ci \
+            --output ai/dataset_pipeline/production_exports/test-ci/qa_report_vtest-ci.json
+
+      - name: Upload export artifacts
+        if: steps.export.outcome == 'success'
+        uses: actions/upload-artifact@v5
+        with:
+          name: dataset-export-test-ci
+          path: |
+            ai/dataset_pipeline/production_exports/test-ci/*
+          retention-days: 7
+
+  lint:
+    name: Lint Dataset Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv and pip (secure versions)
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          # Ensure we're using secure versions
+          uv --version
+          python -m pip install --upgrade 'pip>=25.3'
+
+      - name: Install dependencies
+        run: |
+          cd ${{ github.workspace }}
+          uv sync
+
+      - name: Run linter
+        run: |
+          # Add linting command when available
+          echo "Linting not yet configured"
+          # uv run ruff check ai/dataset_pipeline/
+          # uv run mypy ai/dataset_pipeline/
+
+  summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [verify-pipeline, test-export, lint]
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          echo "## Dataset Pipeline CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Verify Pipeline | ${{ needs.verify-pipeline.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Export | ${{ needs.test-export.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY

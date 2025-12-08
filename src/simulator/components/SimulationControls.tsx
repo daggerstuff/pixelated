@@ -94,7 +94,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               id="speechRecognitionCheckbox"
               type="checkbox"
               checked={isSpeechRecognitionEnabled}
-              onChange={() => toggleSpeechRecognition()}
+              onChange={() => toggleSpeechRecognition?.()}
               disabled={!isConnected}
             />
 
@@ -112,7 +112,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               type="checkbox"
               checked={isUsingEnhancedModels}
               onChange={(e) =>
-                toggleEnhancedModels(e.target?.['checked'] || false)
+                toggleEnhancedModels?.(e.target?.['checked'] || false)
               }
               disabled={!isConnected}
             />

@@ -84,6 +84,7 @@ const { title = "Pixelated Empathy", logo = "/logo.svg" } = Astro.props;
 
   // Scroll behavior
   window.addEventListener('scroll', () => {
+    if (!header) return;
     const currentScrollY = window.scrollY;
 
     if (currentScrollY > lastScrollY && currentScrollY > 100) {
@@ -106,6 +107,7 @@ const { title = "Pixelated Empathy", logo = "/logo.svg" } = Astro.props;
 
   // Mobile menu toggle
   mobileMenuToggle?.addEventListener('click', () => {
+    if (!mobileMenu) return;
     const isOpen = mobileMenu.classList.contains('hidden');
 
     if (isOpen) {
@@ -114,7 +116,11 @@ const { title = "Pixelated Empathy", logo = "/logo.svg" } = Astro.props;
       mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
     } else {
       mobileMenu.style.maxHeight = '0px';
-      setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+      setTimeout(() => {
+        if (mobileMenu) {
+          mobileMenu.classList.add('hidden');
+        }
+      }, 300);
     }
   });
 
@@ -122,13 +128,15 @@ const { title = "Pixelated Empathy", logo = "/logo.svg" } = Astro.props;
   document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
-      if (href.startsWith('#')) {
+      if (href && href.startsWith('#')) {
         e.preventDefault();
         const target = document.querySelector(href);
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' });
           // Close mobile menu if open
-          mobileMenu?.classList.add('hidden');
+          if (mobileMenu) {
+            mobileMenu.classList.add('hidden');
+          }
         }
       }
     });

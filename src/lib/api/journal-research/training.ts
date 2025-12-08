@@ -5,7 +5,7 @@
  */
 
 import { journalResearchApiClient } from './client'
-import type { Session } from './types'
+
 
 export interface TrainingIntegrationResult {
   success: boolean

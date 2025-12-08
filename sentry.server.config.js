@@ -15,6 +15,25 @@ Sentry.init({
     (process.env.NODE_ENV === 'development' ? 0.2 : 0.05),
   ),
 
+  // Sentry Metrics (Beta) - enabled by default in SDK 10.25.0+
+  // Reference: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+  enableMetrics: process.env.SENTRY_ENABLE_METRICS !== 'false',
+
+  // Optional: Filter or modify metrics before sending
+  beforeSendMetric(metric) {
+    // Drop metrics with sensitive data if needed
+    if (metric.attributes?.dropMetric === true) {
+      return null
+    }
+    // Add server-side context to all metrics
+    metric.attributes = {
+      ...metric.attributes,
+      app_environment: process.env.NODE_ENV || 'production',
+      service: 'astro-server',
+    }
+    return metric
+  },
+
   integrations: [nodeProfilingIntegration()],
 
   sendDefaultPii: true,

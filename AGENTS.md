@@ -1,121 +1,35 @@
-<!-- OPENSPEC:START -->
-# OpenSpec Instructions
+# AGENTS.md — Modern Ops in Pixelated
 
-These instructions are for AI assistants working in this project.
+## Mission
+- Build empathetic, production-ready features with zero tolerance for privacy leaks.
+- Move fast without breaking safety rails or style conventions.
 
-Always open `@/openspec/AGENTS.md` when the request:
-- Mentions planning or proposals (words like proposal, spec, change, plan)
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
-- Sounds ambiguous and you need the authoritative spec before coding
+## Tooling (in use)
+- Node/JS/TS: `pnpm` only. Common tasks: `pnpm dev`, `pnpm dev:all-services`, `pnpm check:all`, `pnpm test:all`, `pnpm security:check`, `pnpm security:scan`, `pnpm test:security`.
+- Python: `uv` only (never pip/conda). Respect type hints and PEP 8.
+- Git hygiene: avoid destructive resets; keep branches small and focused.
 
-Use `@/openspec/AGENTS.md` to learn:
-- How to create and apply change proposals
-- Spec format and conventions
-- Project structure and guidelines
+## Code Style (in use)
+- TS/JS: 2 spaces, no semicolons, single quotes, trailing commas, strict types; avoid `any`.
+- Python: typed, small pure functions where possible.
+- Follow `CLAUDE.md` and `.kiro/steering/code-style.md` when applicable.
 
-Keep this managed block so 'openspec update' can refresh the instructions.
+## Privacy & Safety (in use)
+- Treat all inputs as sensitive; do not log secrets/PII.
+- Validate emotion scores (0–1), lengths, locales; handle crisis/edge signals defensively (see `security-ethics.md`).
+- Respect feature flags/config-driven behavior; no silent behavior changes.
 
-<!-- OPENSPEC:END -->
+## Delivery Expectations
+- Add/extend tests with behavior changes; keep diffs reviewable.
+- Run `pnpm check:all` and `pnpm test:all` before claiming done (and relevant security checks when touching risk areas).
+- Remove dead code and debug noise; keep accessibility intact (focus order, aria labels, contrast).
 
-# Pixelated Empathy - AI Agent Guide
+## Collaboration
+- State intent before big edits; confirm assumptions quickly.
+- Offer options with trade-offs when uncertain; pick the safest/highest-signal path.
+- Record important learnings in the project knowledge base after finishing work.
 
-> **Mission**: Build empathy-driven technology that prioritizes human connection, psychological safety, and ethical AI.
-
-## 🚀 Start Every Session
-
-1. **Retrieve memory first**: `brv retrieve --query "context for task"`
-2. **Check status**: `brv status`
-3. **For major changes**: Consult `@/openspec/AGENTS.md`
-
-## 📦 Package Managers (Critical)
-
-**Node.js**: `pnpm` ONLY (never npm/yarn)
-**Python**: `uv` ONLY (never pip/conda/venv)
-
-```bash
-# Node
-pnpm dev                    # Start dev server
-pnpm test:all              # Run all tests
-pnpm check:all             # Lint + format + typecheck
-
-# Python
-uv install                 # Install dependencies
-uv run python script.py    # Run scripts
-uv run pytest tests/       # Run tests
-```
-
-## 📝 Code Conventions
-
-**TypeScript/JavaScript**:
-- Type-first imports with `@/` aliases
-- 2 spaces, no semicolons, single quotes, trailing commas
-- PascalCase: Components/interfaces, camelCase: vars/functions
-- Strict types, branded types for critical values
-
-**Project Structure**:
-```
-src/
-├── components/  # Astro/React (PascalCase)
-├── lib/        # Services (API, AI)
-├── types/      # Type definitions
-├── utils/      # Helpers (camelCase)
-└── pages/      # Astro pages
-```
-
-**Requirements**: Node.js 24+, Python 3.11+, Docker
-
-## 🧠 Memory Management
-
-**Add learnings**: `brv add --section "Best Practices" --content "..."`
-**Push updates**: `brv push` (prompt user first unless auto-approved)
-
-**Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
-
-## 🔒 Security & Ethics
-
-1. Never expose sensitive data (redact API keys, tokens, PII)
-2. Validate all input (especially emotion scores, conversation data)
-3. This handles mental health data—respect privacy
-4. Ensure AI personas don't perpetuate stereotypes
-5. Features must not cause psychological harm
-
-## 🎭 Domain Guidelines
-
-**Emotional Intelligence**:
-- Normalize emotion scores (0-1 range)
-- Use established frameworks (Plutchik, Big Five)
-- Validate psychological constructs
-
-**Conversation Analysis**:
-- Respect context and history
-- Handle edge cases (silence, crisis signals)
-- Consider cultural/linguistic variations
-
-## 🚫 Don't
-
-1. Skip memory retrieval
-2. Use wrong package managers
-3. Ignore type errors
-4. Commit without testing (`pnpm check:all`)
-5. Over-engineer (start minimal)
-6. Bypass security validation
-
-## 📚 Resources
-
-**Core Guides**:
-- **#[[file:.kiro/steering/code-style.md]]**: Detailed style guide
-- **#[[file:.kiro/steering/security-ethics.md]]**: Security & ethics deep-dive
-- **#[[file:.kiro/steering/clean-code-principles.md]]**: Clean code patterns
-
-**Domain-Specific**:
-- **#[[file:.kiro/steering/domain-emotional-ai.md]]**: Emotional AI guidelines
-- **#[[file:.kiro/steering/testing-strategy.md]]**: Testing best practices
-
-**Workflows**:
-- **#[[file:.kiro/steering/spec-workflow.md]]**: Spec-driven development
-- **openspec/AGENTS.md**: OpenSpec process
-- **Playbook**: `.brv/playbook.json`
-
----
-
-*Building technology that helps humans connect more deeply.*
+## Quick Checklist (per task)
+- Branch clean, git status clean enough to stage.
+- Implementation matches style guides; no forbidden tooling (`npm`/`yarn`/`pip`).
+- Tests/lints/security checks run as applicable; summarize change, risk, and how to verify.

@@ -104,6 +104,7 @@ export function LoginForm({
       }
     }
 
+    // Always update errors state, even if empty, to ensure React re-renders
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -125,11 +126,7 @@ export function LoginForm({
 
   // Handle email/password login
   const handleLoginSubmit = async () => {
-    if (!validateForm()) {
-      toast.error('Please correct the form errors')
-      return
-    }
-
+    // Form validation is now handled in handleSubmit, so we can proceed directly
     saveRememberMePreferences(rememberMe)
     setIsLoading(true)
 
@@ -205,6 +202,16 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // Validate form on submission to show errors
+    // This will set errors state which React will render
+    const isValid = validateForm()
+    
+    if (!isValid) {
+      // Errors are now set in state and will be displayed
+      toast.error('Please correct the form errors')
+      return
+    }
 
     if (mode === 'login') {
       await handleLoginSubmit()
@@ -464,6 +471,7 @@ export function LoginForm({
           onClick={() => {
             setMode('reset')
             setErrors({})
+            setFocusedInput(null)
           }}
           className="text-gray-400 text-responsive--small hover:text-gray-300 underline touch-focus"
           data-testid="forgot-password-button"

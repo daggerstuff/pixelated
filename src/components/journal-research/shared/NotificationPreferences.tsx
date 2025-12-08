@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Bell, CheckCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'

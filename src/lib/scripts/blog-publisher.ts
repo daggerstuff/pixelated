@@ -5,7 +5,7 @@ import {
   PostStatus,
 } from '../services/BlogPublishingService'
 import fs from 'fs/promises'
-import path from 'path'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename, validatePath } from '../../utils/path-security'
 

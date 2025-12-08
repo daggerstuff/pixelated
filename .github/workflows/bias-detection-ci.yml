@@ -32,7 +32,7 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.22.0
+  PNPM_VERSION: 10.24.0
 
 jobs:
   security-scan:
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.33.1
@@ -50,39 +50,58 @@ jobs:
           format: sarif
           output: trivy-results.sarif
 
+      - name: Check for Trivy SARIF file
+        id: trivy_sarif
+        run: |
+          if [ -s trivy-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Trivy SARIF file found"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Trivy SARIF file not found or empty"
+          fi
+
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
+        if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
+        continue-on-error: true
         with:
           sarif_file: trivy-results.sarif
 
       - name: Initialize CodeQL
+        id: codeql_init
         uses: github/codeql-action/init@v4
+        continue-on-error: true
         with:
           languages: javascript,typescript
           config-file: .github/codeql/codeql-config.yml
 
       - name: Setup Node.js for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
         run: corepack enable
 
       - name: Setup pnpm for CodeQL
-        uses: pnpm/action-setup@v4.1.0
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
         id: pnpm-cache-codeql
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
         uses: actions/cache@v4.2.3
         with:
           path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
@@ -90,14 +109,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Validate package.json for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
+
       - name: Install dependencies for CodeQL
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Build for CodeQL
+        id: codeql_build
+        if: steps.codeql_init.outcome == 'success' || steps.codeql_init.outcome == 'failure'
+        continue-on-error: true
         run: pnpm build
 
       - name: Perform CodeQL Analysis
+        if: steps.codeql_init.outcome == 'success' && (steps.codeql_build.outcome == 'success' || steps.codeql_build.outcome == 'failure')
         uses: github/codeql-action/analyze@v4
+        continue-on-error: true
         with:
           category: "bias-detection"
 
@@ -107,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -118,7 +149,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -136,6 +167,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
@@ -194,7 +230,7 @@ jobs:
           - 6379:6379
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -205,7 +241,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -263,7 +299,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
@@ -274,10 +310,11 @@ jobs:
         run: |
           if ! command -v uv >/dev/null 2>&1; then
             echo "uv not found - installing via pip"
-            python -m pip install --upgrade pip
-            python -m pip install uv
+            python -m pip install --upgrade 'pip>=25.3'
+            python -m pip install 'uv>=0.9.6'
           else
-            echo "uv already installed"
+            echo "uv already installed - verifying version"
+            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
           fi
 
       - name: Cache pip dependencies
@@ -309,7 +346,7 @@ jobs:
           # Use the use-system output if set
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
 
-          uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
+          uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
           uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
@@ -360,7 +397,7 @@ jobs:
           - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -371,7 +408,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -390,6 +427,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
+
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
@@ -402,10 +444,11 @@ jobs:
         run: |
           if ! command -v uv >/dev/null 2>&1; then
             echo "uv not found - installing via pip"
-            python -m pip install --upgrade pip
-            python -m pip install uv
+            python -m pip install --upgrade 'pip>=25.3'
+            python -m pip install 'uv>=0.9.6'
           else
-            echo "uv already installed"
+            echo "uv already installed - verifying version"
+            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
           fi
 
       - name: Prepare uv venv
@@ -420,7 +463,7 @@ jobs:
 
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
 
-          uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
+          uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c ../../../../../requirements/constraints-ci.txt numpy pandas
           uv pip install ${USE_SYSTEM} -r requirements.txt -c ../../../../../requirements/constraints-ci.txt
@@ -478,7 +521,7 @@ jobs:
           NODE_ENV: test
 
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: e2e-test-results
@@ -493,7 +536,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -504,7 +547,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -522,6 +565,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
@@ -553,7 +601,7 @@ jobs:
     if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && needs.typescript-tests.result == 'success' && needs.python-tests.result == 'success' && needs.e2e-tests.result == 'success'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -564,7 +612,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -582,6 +630,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts

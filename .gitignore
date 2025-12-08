@@ -156,8 +156,6 @@ tools/gdrive-dataset-manager/
 mcp_agent.config.yaml
 mcp_agent.secrets.yaml
 tsconfig.json.backup
-TYPESCRIPT_CRASH_FIX.md
-WARP.md
 .claude/
 
 checkov-results-fixed.sarif
@@ -178,8 +176,6 @@ gcp-service-account-key.json
 .roo/
 .ruff_cache/
 .serena/
-CRUSH.md
-CLAUDE.md
 
 # Large files and datasets
 *.jsonl
@@ -274,7 +270,7 @@ terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/*.tfplan
 terraform/plan.tfplan
-
+acontext_server/
 
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
@@ -345,4 +341,33 @@ scripts/claude-flow-removal.sh
 
 # OpenMemory - IDE/Assistant specific rules
 .cursor/rules/openmemory.mdc
-AGENTS.md
+sp-cert.pem
+sp-key.pem
+
+# Kubernetes credentials and kubeconfig files
+*kubeconfig*.yaml
+*kubeconfig*.yml
+*kubeconfig*
+azure-devops-kubeconfig.yaml
+
+# Azure service connection files with credentials
+# NOTE: Template files (*.template.json) are safe to commit - they contain no real credentials
+k8s/azure/service-connection.json
+k8s/azure/aks-service-connection.json
+k8s/azure/azure-rm-service-connection.json
+*service-connection*.json
+filled-azure-connection.json
+*azure-connection*.json
+!azure-connection.template.json
+filled-k8s-connection.json
+*k8s-connection*.json
+!k8s-connection.template.json
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+.env.atlassian*.pem
+*.key
+*.p12
+*.pfx
+.notes/specs
+.spec-workflow

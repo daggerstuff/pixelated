@@ -5,7 +5,9 @@ Compliance Monitoring System
 """
 
 import json
+from contextlib import suppress
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 
@@ -161,8 +163,13 @@ if __name__ == "__main__":
     monitor = ComplianceMonitor()
     report = monitor.generate_compliance_report()
 
-    # Save report
-    with open(f'/tmp/compliance-report-{datetime.now().strftime("%Y%m%d_%H%M%S")}.json', "w") as f:
-        json.dump(report, f, indent=2)
+    # Save report using pathlib and contextlib.suppress for cleaner error handling
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_file = Path(f'/tmp/compliance-report-{timestamp}.json')
 
-    print("✅ Compliance monitoring completed")
+    try:
+        with report_file.open("w") as f:
+            json.dump(report, f, indent=2)
+        print("✅ Compliance monitoring completed")
+    except Exception:
+        print("⚠️  Compliance monitoring completed but failed to save report")

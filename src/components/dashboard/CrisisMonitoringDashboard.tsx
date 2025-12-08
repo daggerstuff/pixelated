@@ -18,7 +18,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
-import type { EscalationEvent } from '@/lib/ai/services/AutomatedEscalationService'
+
 
 export interface PatientRiskData {
   id: string

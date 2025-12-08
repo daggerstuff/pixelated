@@ -96,7 +96,7 @@ class PerformanceBenchmarkRunner {
 
     this.memoryMonitor.start()
 
-    for (const [key, scenario] of Object.entries(performanceScenarios)) {
+    for (const [_key, scenario] of Object.entries(performanceScenarios)) {
       console.log(`\n📊 Testing Scenario: ${scenario.name}`)
       console.log('-'.repeat(40))
 
@@ -215,18 +215,7 @@ class PerformanceBenchmarkRunner {
 
     try {
       // Create test payload
-      const payload = {
-        text: scenario.text,
-        context: scenario.context,
-        demographics: {
-          age: '25-34',
-          gender: 'female',
-          ethnicity: 'hispanic',
-          primaryLanguage: 'en'
-        },
-        sessionType: 'anxiety-treatment',
-        therapistNotes: `Performance test: ${scenario.name}`
-      }
+      
 
       // In a real environment, this would make an actual HTTP request
       // For now, we'll simulate the request timing

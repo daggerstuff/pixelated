@@ -181,6 +181,7 @@ const socialLinks = [
   const scrollToTopBtn = document.getElementById('scroll-to-top');
 
   window.addEventListener('scroll', () => {
+    if (!scrollToTopBtn) return;
     if (window.scrollY > 300) {
       scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
       scrollToTopBtn.classList.add('opacity-100');
@@ -197,10 +198,11 @@ const socialLinks = [
   // Newsletter form handling
   const newsletterForm = document.querySelector('input[type="email"]')?.parentElement;
   if (newsletterForm) {
-    const emailInput = newsletterForm.querySelector('input[type="email"]');
-    const submitButton = newsletterForm.querySelector('button');
+    const emailInput = newsletterForm.querySelector('input[type="email"]') as HTMLInputElement | null;
+    const submitButton = newsletterForm.querySelector('button') as HTMLButtonElement | null;
 
     submitButton?.addEventListener('click', async () => {
+      if (!emailInput) return;
       const email = emailInput.value;
       if (!email || !email.includes('@')) {
         emailInput.style.borderColor = 'rgb(239 68 68)';
@@ -209,15 +211,21 @@ const socialLinks = [
       }
 
       // Simulate form submission
-      submitButton.textContent = 'Subscribing...';
-      submitButton.disabled = true;
+      if (submitButton) {
+        submitButton.textContent = 'Subscribing...';
+        submitButton.disabled = true;
+      }
 
       setTimeout(() => {
-        submitButton.textContent = 'Subscribed!';
-        submitButton.classList.add('bg-green-600');
-        emailInput.value = '';
-        emailInput.placeholder = 'Thank you for subscribing!';
-        emailInput.style.borderColor = 'rgb(34 197 94)';
+        if (submitButton) {
+          submitButton.textContent = 'Subscribed!';
+          submitButton.classList.add('bg-green-600');
+        }
+        if (emailInput) {
+          emailInput.value = '';
+          emailInput.placeholder = 'Thank you for subscribing!';
+          emailInput.style.borderColor = 'rgb(34 197 94)';
+        }
       }, 1500);
     });
   }

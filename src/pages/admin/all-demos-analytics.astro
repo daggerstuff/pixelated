@@ -495,19 +495,19 @@ const demoPages = [
         {/* Export and Actions */}
         <div class="flex justify-center gap-4">
           <Button
-            class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3"
           >
             📊 Export All Data
           </Button>
           <Button
             variant="outline"
-            class="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 px-6 py-3"
+            className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 px-6 py-3"
           >
             📧 Email Report
           </Button>
           <Button
             variant="outline"
-            class="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 px-6 py-3"
+            className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 px-6 py-3"
           >
             ⚙️ Configure Alerts
           </Button>
@@ -590,15 +590,14 @@ const demoPages = [
         const overallRate =
           totalSessions > 0 ? (totalConversions / totalSessions) * 100 : 0
 
-        document.getElementById('total-sessions-all').textContent =
-          totalSessions
-        document.getElementById('overall-conversion-rate').textContent =
-          overallRate.toFixed(1) + '%'
-        document.getElementById('best-demo').textContent = this.formatDemoName(
-          bestDemo.name,
-        )
-        document.getElementById('ab-winners').textContent =
-          `${significantTests}/4`
+        const totalSessionsEl = document.getElementById('total-sessions-all')
+        if (totalSessionsEl) totalSessionsEl.textContent = String(totalSessions)
+        const overallRateEl = document.getElementById('overall-conversion-rate')
+        if (overallRateEl) overallRateEl.textContent = overallRate.toFixed(1) + '%'
+        const bestDemoEl = document.getElementById('best-demo')
+        if (bestDemoEl) bestDemoEl.textContent = this.formatDemoName(bestDemo.name)
+        const abWinnersEl = document.getElementById('ab-winners')
+        if (abWinnersEl) abWinnersEl.textContent = `${significantTests}/4`
       }
 
       updateIndividualDemos() {
@@ -613,11 +612,12 @@ const demoPages = [
             ? Math.round(data.summary.avg_time_to_cta / 1000)
             : 0
 
-          document.getElementById(`${pageName}-sessions`).textContent = sessions
-          document.getElementById(`${pageName}-conversion`).textContent =
-            rate.toFixed(1) + '%'
-          document.getElementById(`${pageName}-time`).textContent =
-            avgTime + 's'
+          const sessionsEl = document.getElementById(`${pageName}-sessions`)
+          if (sessionsEl) sessionsEl.textContent = String(sessions)
+          const conversionEl = document.getElementById(`${pageName}-conversion`)
+          if (conversionEl) conversionEl.textContent = rate.toFixed(1) + '%'
+          const timeEl = document.getElementById(`${pageName}-time`)
+          if (timeEl) timeEl.textContent = avgTime + 's'
 
           // Update A/B test results
           this.updateABTestResults(pageName, data)
@@ -717,25 +717,31 @@ const demoPages = [
           }
         })
 
-        document.getElementById('overall-test-status').textContent =
-          significantTests > 0
-            ? `${significantTests} tests ready for analysis`
-            : 'Collecting data across all tests'
+        const overallTestStatusEl = document.getElementById('overall-test-status')
+        if (overallTestStatusEl) {
+          overallTestStatusEl.textContent =
+            significantTests > 0
+              ? `${significantTests} tests ready for analysis`
+              : 'Collecting data across all tests'
+        }
 
         // Update individual winners
-        document.getElementById('clinical-winner').textContent =
-          winners['clinical-vault-trainer'] || 'TBD'
-        document.getElementById('synthetic-winner').textContent =
-          winners['synthetic-training-generator'] || 'TBD'
-        document.getElementById('pipeline-winner').textContent =
-          winners['psychology-pipeline-processor'] || 'TBD'
-        document.getElementById('security-winner').textContent =
-          winners['security-bias-detection-engine'] || 'TBD'
+        const clinicalWinnerEl = document.getElementById('clinical-winner')
+        if (clinicalWinnerEl) clinicalWinnerEl.textContent = winners['clinical-vault-trainer'] || 'TBD'
+        const syntheticWinnerEl = document.getElementById('synthetic-winner')
+        if (syntheticWinnerEl) syntheticWinnerEl.textContent = winners['synthetic-training-generator'] || 'TBD'
+        const pipelineWinnerEl = document.getElementById('pipeline-winner')
+        if (pipelineWinnerEl) pipelineWinnerEl.textContent = winners['psychology-pipeline-processor'] || 'TBD'
+        const securityWinnerEl = document.getElementById('security-winner')
+        if (securityWinnerEl) securityWinnerEl.textContent = winners['security-bias-detection-engine'] || 'TBD'
 
-        document.getElementById('overall-recommendations').textContent =
-          significantTests > 2
-            ? 'Ready to implement winning variants'
-            : 'Continue testing all variants'
+        const overallRecommendationsEl = document.getElementById('overall-recommendations')
+        if (overallRecommendationsEl) {
+          overallRecommendationsEl.textContent =
+            significantTests > 2
+              ? 'Ready to implement winning variants'
+              : 'Continue testing all variants'
+        }
       }
 
       setupRealTimeUpdates() {
@@ -755,6 +761,8 @@ const demoPages = [
         ]
 
         const eventStream = document.getElementById('live-event-stream')
+        if (!eventStream) return
+
         const randomEvent = events[Math.floor(Math.random() * events.length)]
         const time = new Date().toLocaleTimeString()
 
@@ -793,7 +801,7 @@ const demoPages = [
     }
 
     // Initialize dashboard when DOM is ready
-    document.addEventListener('DOMContentLoaded', (event: Event) => {
+    document.addEventListener('DOMContentLoaded', () => {
       const dashboard = new AllDemosAnalyticsDashboard()
       dashboard.init() // Assuming there's an init method, or you can use any other method
     })

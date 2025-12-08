@@ -90,7 +90,7 @@ export function validatePathAgainstMultiple(
 export function sanitizeFilename(filename: string): string {
   // Remove path separators and dangerous characters
   return filename
-    .replace(/[\/\\]/g, '') // Remove path separators
+    .replace(/[/\\]/g, '') // Remove path separators
     .replace(/\.\./g, '') // Remove parent directory references
     .replace(/[<>:"|?*\x00-\x1f]/g, '') // Remove unsafe characters
     .trim()

@@ -1,3 +1,20 @@
 {
-  "installCommand": "npx pnpm@10.22.0 install --frozen-lockfile --config.engine-strict=false"
+  "version": 2,
+  "installCommand": "corepack enable && corepack prepare pnpm@10.24.0 --activate && pnpm install --frozen-lockfile",
+  "buildCommand": "corepack enable && corepack prepare pnpm@10.24.0 --activate && pnpm build",
+  "builds": [
+    {
+      "src": "api/vercel-handler.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/vercel-handler.js"
+    }
+  ]
 }

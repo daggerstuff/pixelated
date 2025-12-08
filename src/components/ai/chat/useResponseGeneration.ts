@@ -237,9 +237,27 @@ export function useResponseGeneration({
       [key: string]: unknown
     }
     if (responseData.therapeuticInsights && responseType === 'therapeutic') {
-      setTherapeuticInsights(responseData.therapeuticInsights)
-      if (onTherapeuticInsights) {
-        onTherapeuticInsights(responseData.therapeuticInsights)
+      // Validate that therapeuticInsights has the required properties
+      const insights = responseData.therapeuticInsights as Partial<TherapeuticResponse>
+      if (
+        insights &&
+        typeof insights === 'object' &&
+        'content' in insights &&
+        typeof insights.content === 'string' &&
+        'confidence' in insights &&
+        typeof insights.confidence === 'number'
+      ) {
+        const validatedInsights: TherapeuticResponse = {
+          content: insights.content,
+          confidence: insights.confidence,
+          ...(insights.intervention !== undefined && { intervention: insights.intervention }),
+          ...(insights.techniques && { techniques: insights.techniques }),
+          ...(insights.usage && { usage: insights.usage }),
+        }
+        setTherapeuticInsights(validatedInsights)
+        if (onTherapeuticInsights) {
+          onTherapeuticInsights(validatedInsights)
+        }
       }
     }
     if (onComplete) {
@@ -247,7 +265,7 @@ export function useResponseGeneration({
     }
   }
 
-  const handleRetryError = (err: unknown, retries: number): void => {
+  const handleRetryError = (err: unknown, _retries: number): void => {
     const errorMessage =
       err instanceof Error
         ? (err as Error)?.message || String(err)

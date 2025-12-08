@@ -8,10 +8,10 @@ permissions:
   issues: write
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
   workflow_run:
-    workflows: ['Deploy to Staging', 'Deploy to Production']
+    workflows: ["Deploy to Staging", "Deploy to Production"]
 
   workflow_dispatch:
 
@@ -25,20 +25,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24.8.0'
+          node-version: "24.8.0"
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
-          version: '10.22.0'
+          version: "10.24.0"
           run_install: false
 
       - name: Get pnpm store directory
@@ -54,6 +54,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -76,9 +81,9 @@ jobs:
           if [[ "$ENV_NAME" == "production" ]]; then
             echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           elif [[ "$ENV_NAME" == "staging" ]]; then
-            echo 'APP_URL=https://pixelatedempathy.tech' >> $GITHUB_ENV
+            echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           else
-            echo 'APP_URL=https://pixelatedempathy.tech' >> $GITHUB_ENV
+            echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           fi
 
       - name: Run model validation

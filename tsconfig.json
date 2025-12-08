@@ -10,7 +10,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "~/*": ["src/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true,

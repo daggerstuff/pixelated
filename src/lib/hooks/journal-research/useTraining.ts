@@ -8,11 +8,7 @@ import {
   integrateAllDatasets,
   getTrainingStatus,
   getPipelineStatus,
-  type TrainingIntegrationResult,
-  type TrainingSessionStatus,
-  type TrainingPipelineStatus,
-  type IntegrateAllResult,
-} from '@/lib/api/journal-research/training'
+  } from '@/lib/api/journal-research/training'
 import { journalResearchQueryKeys, journalResearchMutationKeys } from '@/lib/api/journal-research/react-query'
 
 /**

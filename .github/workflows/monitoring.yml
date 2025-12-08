@@ -2,7 +2,7 @@ name: Monitoring
 
 on:
   schedule:
-    - cron: '0 12 * * *'
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -11,9 +11,9 @@ permissions:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.22.0
+  PNPM_VERSION: 10.24.0
   NODE_ENV: production
-  DEFAULT_BASE_URL: 'https://pixelatedempathy.com'
+  DEFAULT_BASE_URL: "https://pixelatedempathy.com"
   HEALTH_CHECK_TIMEOUT_PROD: 30
   HEALTH_CHECK_TIMEOUT_STAGING: 20
   HEALTH_CHECK_TIMEOUT_PREVIEW: 15
@@ -35,17 +35,17 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - name: Setup Node.js
-        uses: actions/setup-node@dda4788290998366da86b6a4f497909644397bb2
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -56,15 +56,69 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        uses: actions/cache@v4
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
+
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          # Enhanced retry logic for pnpm install with comprehensive error handling
+          for i in {1..3}; do
+            echo "📦 Attempt $i of 3: Installing dependencies..."
+            ERROR_LOG=$(mktemp)
+            
+            if pnpm install --no-frozen-lockfile 2>&1 | tee "$ERROR_LOG"; then
+              echo "✅ Dependencies installed successfully"
+              rm -f "$ERROR_LOG"
+              break
+            else
+              EXIT_CODE=$?
+              echo "❌ Install failed with exit code: $EXIT_CODE"
+              echo "📝 Error output:"
+              cat "$ERROR_LOG"
+              
+              # Check for network errors
+              if grep -qE "ENOTFOUND|ETIMEDOUT|ECONNRESET|fetch failed|network" "$ERROR_LOG"; then
+                echo "⚠️ Network error detected"
+                if [ $i -eq 3 ]; then
+                  echo "❌ All install attempts failed due to network issues"
+                  rm -f "$ERROR_LOG"
+                  exit 1
+                fi
+              fi
+              
+              # Check for peer dependency issues
+              if grep -qE "WARN.*peer dep|unmet peer" "$ERROR_LOG"; then
+                echo "⚠️ Peer dependency warnings detected, trying with --no-strict-peer-dependencies..."
+                if pnpm install --no-frozen-lockfile --no-strict-peer-dependencies 2>&1; then
+                  echo "✅ Dependencies installed with relaxed peer dependencies"
+                  rm -f "$ERROR_LOG"
+                  break
+                fi
+              fi
+              
+              rm -f "$ERROR_LOG"
+              
+              if [ $i -lt 3 ]; then
+                DELAY=$((5 * i))
+                echo "⏳ Retrying in $DELAY seconds..."
+                sleep $DELAY
+                pnpm store prune || true
+              else
+                echo "❌ All install attempts failed"
+                echo "💡 Debug: Node $(node --version), pnpm $(pnpm --version)"
+                exit 1
+              fi
+            fi
+          done
 
       - name: Resolve APP_URL (Production)
         id: resolve-app-url-prod
@@ -107,11 +161,16 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
+              # Additional headers help Cloudflare recognize this as a legitimate health check
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
+                -H "Accept: application/json" \
+                -H "X-Health-Check: true" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -121,6 +180,19 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  The site is blocking the health check request."
+                echo "   ℹ️  Possible causes:"
+                echo "      - Cloudflare/WAF security rules blocking automated requests"
+                echo "      - GitHub Actions IPs are blocked or rate-limited"
+                echo "      - Site requires authentication or authorization"
+                echo "      - IP allowlisting/blocklisting configured"
+                echo "   ℹ️  Solutions:"
+                echo "      1. Check Cloudflare Security settings and allow GitHub Actions IPs"
+                echo "      2. Verify rate limiting rules allow health check User-Agent"
+                echo "      3. Add GitHub Actions IP ranges to allowlist if using IP filtering"
+                echo "      4. Check if site requires specific headers or tokens for health checks"
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -139,7 +211,8 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          if check_endpoint "$BASE_URL" "Main Site" \
+          # Use /health endpoint which has rate limiting bypass configured
+          if check_endpoint "$BASE_URL/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_PROD }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_PROD }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_PROD }}" \
@@ -148,7 +221,11 @@ jobs:
           else
             echo ""
             echo "::error::PRODUCTION site is down or returning errors after ${{ env.HEALTH_CHECK_RETRIES_PROD }} attempts"
-            echo "::error::URL tested: $BASE_URL"
+            echo "::error::URL tested: $BASE_URL/health"
+            echo "::error::If you see HTTP 403 (Forbidden), check if:"
+            echo "::error::  1. Cloudflare/WAF security rules allow health check User-Agent and /health path"
+            echo "::error::  2. Rate limiting bypass rules are configured for /health and /api/health paths"
+            echo "::error::  3. GitHub Actions IPs are whitelisted in your security settings (if using IP filtering)"
             echo "::error::If you see HTTP 522, check if:"
             echo "::error::  1. The site is actually deployed to a server"
             echo "::error::  2. DNS is correctly configured to point to your server"
@@ -219,7 +296,7 @@ jobs:
 
       - name: Upload test results
         if: always() && steps.health-check.outputs.status == 'passing'
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-production
           path: playwright-report/
@@ -237,11 +314,10 @@ jobs:
 
       - name: Notify failure
         if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        uses: slackapi/slack-github-action@v2
         with:
+          webhook-type: incoming-webhook
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
             {
               "text": "🚨 *PRODUCTION MONITORING FAILED*",
@@ -270,17 +346,17 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - name: Setup Node.js
-        uses: actions/setup-node@dda4788290998366da86b6a4f497909644397bb2
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -291,12 +367,17 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        uses: actions/cache@v4
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -336,11 +417,16 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
+              # Additional headers help Cloudflare recognize this as a legitimate health check
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
+                -H "Accept: application/json" \
+                -H "X-Health-Check: true" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -350,6 +436,10 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  The site is blocking the health check request."
+                echo "   ℹ️  Check Cloudflare/WAF settings and rate limiting rules."
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -368,8 +458,9 @@ jobs:
           }
 
           # Basic endpoint check with retries
+          # Use /health endpoint which has rate limiting bypass configured
           MAIN_STATUS=""
-          if check_endpoint "$BASE_URL" "Main Site" \
+          if check_endpoint "$BASE_URL/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_STAGING }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_STAGING }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_STAGING }}" \
@@ -457,7 +548,7 @@ jobs:
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-staging
           path: playwright-report/
@@ -471,17 +562,17 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - name: Setup Node.js
-        uses: actions/setup-node@dda4788290998366da86b6a4f497909644397bb2
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -492,12 +583,17 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        uses: actions/cache@v4
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -539,11 +635,16 @@ jobs:
             for attempt in $(seq 1 "$max_retries"); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
 
-              # Use curl with explicit timeout and connection timeout
+              # Use curl with explicit timeout, connection timeout, and User-Agent for health checks
+              # The User-Agent helps identify this as a health check to bypass rate limiting
+              # Additional headers help Cloudflare recognize this as a legitimate health check
               HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
                 --connect-timeout "$connect_timeout" \
                 --max-time "$timeout" \
                 --retry 0 \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
+                -H "Accept: application/json" \
+                -H "X-Health-Check: true" \
                 "$url" 2>/dev/null || echo "000")
 
               echo "📊 $endpoint_name HTTP Status: $HTTP_STATUS"
@@ -553,6 +654,9 @@ jobs:
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
                 echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+              elif [[ "$HTTP_STATUS" == "403" ]]; then
+                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Forbidden)"
+                echo "   ℹ️  Preview site may be blocking automated requests (this is acceptable for preview)"
               elif [[ "$HTTP_STATUS" == "522" ]]; then
                 echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS (Cloudflare connection timeout)"
                 echo "   ℹ️  This typically means the origin server is not reachable or is down."
@@ -571,8 +675,9 @@ jobs:
           }
 
           # Basic endpoint check with retries
+          # Use /health endpoint which has rate limiting bypass configured
           MAIN_STATUS=""
-          if check_endpoint "$BASE_URL" "Main Site" \
+          if check_endpoint "$BASE_URL/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_PREVIEW }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_PREVIEW }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_PREVIEW }}" \
@@ -658,7 +763,7 @@ jobs:
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-preview
           path: playwright-report/
@@ -675,7 +780,7 @@ jobs:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -714,7 +819,11 @@ jobs:
             ATTEMPTS=0
             code=000
             until [ "$code" = "200" ] || [ "$ATTEMPTS" -ge "$MAX_PROBE_ATTEMPTS" ]; do
-              code=$(curl -s -o /dev/null -w "%{http_code}" "$u" || echo "000")
+              code=$(curl -s -o /dev/null -w "%{http_code}" \
+                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
+                -H "Accept: application/json" \
+                -H "X-Health-Check: true" \
+                "$u/health" || echo "000")
               if [ "$code" != "200" ]; then
                 echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/$MAX_PROBE_ATTEMPTS"
                 sleep "$PROBE_SLEEP_SECONDS"
@@ -773,7 +882,7 @@ jobs:
 
       - name: Run Lighthouse CI
         id: lhci
-        uses: treosh/lighthouse-ci-action@fcd65974f7c4c2bf0ee9d09b84d2489183c29726
+        uses: treosh/lighthouse-ci-action@v12
         if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
         with:
           urls: |
@@ -803,11 +912,10 @@ jobs:
 
       - name: Notify performance issues
         if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        uses: slackapi/slack-github-action@v2
         with:
+          webhook-type: incoming-webhook
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
             {
               "text": "⚠️ *Performance Issues Detected in PRODUCTION*",

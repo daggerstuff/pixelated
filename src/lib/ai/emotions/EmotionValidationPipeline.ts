@@ -244,7 +244,7 @@ class EmotionValidationPipeline {
     return {
       isRunning: this.isRunning,
       metrics: { ...this.metrics },
-      recentValidations: [...this.recentValidations.slice(-10)], // Last 10 validations
+      recentValidations: this.recentValidations.slice(-10), // Last 10 validations
       systemHealth,
       lastHealthCheck: new Date(),
     }

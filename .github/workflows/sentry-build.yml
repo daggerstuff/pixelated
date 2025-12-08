@@ -17,12 +17,12 @@ jobs:
       NODE_OPTIONS: "--max-old-space-size=4096"
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.22.0
+          version: 10.24.0
 
       - name: Use Node.js
         uses: actions/setup-node@v6
@@ -41,6 +41,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install
@@ -206,9 +211,9 @@ jobs:
         run: |
           echo "📤 Pushing Docker images to Docker Hub..."
 
-          DOCKERHUB_SHA=pixelatedempathy/pixelated-empathy:${{ github.sha }}
-          DOCKERHUB_BRANCH=pixelatedempathy/pixelated-empathy:${{ github.ref_name }}-${{ github.sha }}
-          DOCKERHUB_LATEST=pixelatedempathy/pixelated-empathy:latest
+          DOCKERHUB_SHA=pixelatedempathy/pixelated:${{ github.sha }}
+          DOCKERHUB_BRANCH=pixelatedempathy/pixelated:${{ github.ref_name }}-${{ github.sha }}
+          DOCKERHUB_LATEST=pixelatedempathy/pixelated:latest
 
           # Retag GHCR-built image to Docker Hub tags
           docker tag $IMAGE_TAG_SHA $DOCKERHUB_SHA

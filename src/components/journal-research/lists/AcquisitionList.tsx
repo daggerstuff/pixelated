@@ -9,7 +9,7 @@ import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
 import { Button } from '@/components/ui/button/button'
-import { CheckCircle2, Loader2, XCircle, Play } from 'lucide-react'
+import { CheckCircle2, Loader2, Play } from 'lucide-react'
 
 export interface AcquisitionListProps {
   acquisitions: AcquisitionListType

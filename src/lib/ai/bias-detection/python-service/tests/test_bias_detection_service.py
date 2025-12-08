@@ -587,6 +587,8 @@ class TestFlaskEndpoints(unittest.TestCase):
         response = self.client.get(arg0)
         assert response.status_code == arg1
         return response.get_json()
+
+
 if __name__ == "__main__":
     # Set environment variables for testing
     os.environ["FLASK_SECRET_KEY"] = "test-flask-secret-key"

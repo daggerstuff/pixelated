@@ -1,6 +1,8 @@
 import type { APIRoute, APIContext } from 'astro'
 import { MultidimensionalEmotionMapper } from '../../../lib/ai/emotions/MultidimensionalEmotionMapper'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
+import { emotionMetrics } from '@/lib/sentry/utils'
 
 const logger = createBuildSafeLogger('emotion-analysis-api')
 const emotionMapper = new MultidimensionalEmotionMapper()
@@ -33,11 +35,13 @@ interface EmotionAnalysisResponse {
 
 export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   const startTime = Date.now()
+  const endpoint = '/api/emotions/real-time-analysis'
 
   try {
     // Authenticate request
     const sessionCookie = cookies.get('session')
     if (!sessionCookie) {
+      trackApiRequest(endpoint, 'POST', 401, Date.now() - startTime)
       return new Response(
         JSON.stringify({
           success: false,
@@ -60,6 +64,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
 
     // Validate input
     if (!text || text.trim().length === 0) {
+      trackApiRequest(endpoint, 'POST', 400, Date.now() - startTime)
       return new Response(
         JSON.stringify({
           success: false,
@@ -73,11 +78,13 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
     }
 
     // Perform emotion analysis
+    const analysisStartTime = Date.now()
     const emotionResult = await emotionMapper.analyzeText(text, {
       depth: analysisDepth,
       includeHistory,
       sessionId,
     })
+    const analysisDurationMs = Date.now() - analysisStartTime
 
     // Format response according to API specification
     const response: EmotionAnalysisResponse = {
@@ -98,12 +105,23 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       },
     }
 
+    const totalDurationMs = Date.now() - startTime
+
+    // Track metrics
+    trackApiRequest(endpoint, 'POST', 200, totalDurationMs)
+    emotionMetrics.analysisPerformed({
+      model: 'multidimensional-emotion-mapper',
+      sessionType: sessionId ? 'session' : 'standalone',
+      success: true,
+    })
+    emotionMetrics.analysisLatency(analysisDurationMs, 'multidimensional-emotion-mapper')
+
     logger.info('Emotion analysis completed successfully', {
       sessionId,
       textLength: text.length,
       primaryEmotion: emotionResult.primary,
       confidence: emotionResult.confidence,
-      processingTime: Date.now() - startTime,
+      processingTime: totalDurationMs,
     })
 
     return new Response(JSON.stringify(response), {
@@ -114,9 +132,20 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       },
     })
   } catch (error: unknown) {
+    const durationMs = Date.now() - startTime
+    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+
+    // Track error metrics
+    trackApiError(endpoint, errorType, 'POST')
+    emotionMetrics.analysisPerformed({
+      model: 'multidimensional-emotion-mapper',
+      sessionType: 'unknown',
+      success: false,
+    })
+
     logger.error('Emotion analysis error:', {
       message: error instanceof Error ? String(error) : String(error),
-      processingTime: Date.now() - startTime,
+      processingTime: durationMs,
     })
 
     const errorResponse: EmotionAnalysisResponse = {

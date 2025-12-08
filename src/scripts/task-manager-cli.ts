@@ -3,7 +3,7 @@
 import { Command } from 'commander'
 
 import { existsSync } from 'fs'
-import path from 'path'
+
 import TaskListManager from '../lib/services/TaskListManager'
 import OllamaCheckInService from '../lib/services/OllamaCheckInService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated-test
+  namespace: staging
+  labels:
+    app: pixelated-test
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pixelated-test
+  template:
+    metadata:
+      labels:
+        app: pixelated-test
+        environment: staging
+    spec:
+      containers:
+      - name: pixelated-test
+        image: pixelatedregistry.azurecr.io/pixelatedempathy:minimal-test
+        ports:
+        - containerPort: 4321
+        env:
+        - name: PORT
+          value: "4321"
+        - name: NODE_ENV
+          value: "staging"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4321
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 4321
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pixelated-test-service
+  namespace: staging
+spec:
+  selector:
+    app: pixelated-test
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 4321
+  type: ClusterIP

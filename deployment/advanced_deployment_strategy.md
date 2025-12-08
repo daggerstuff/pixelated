@@ -355,7 +355,7 @@ switch_traffic() {
             -e DEFAULT_HOST="$DOMAIN" \
             -e VIRTUAL_HOST="$DOMAIN" \
             -e VIRTUAL_PORT=4321 \
-            nginx:alpine
+            nginx:latest
     else
         # Map port 80 to green (4322)
         docker run -d --name nginx-proxy --restart unless-stopped \
@@ -364,7 +364,7 @@ switch_traffic() {
             -e DEFAULT_HOST="$DOMAIN" \
             -e VIRTUAL_HOST="$DOMAIN" \
             -e VIRTUAL_PORT=4322 \
-            nginx:alpine
+            nginx:latest
     fi
 
     log_success "Traffic switched to $new_slot slot"
@@ -536,7 +536,7 @@ spec:
         fsGroup: 1001
       containers:
       - name: pixelated
-        image: docker.io/pixelatedempathy/pixelated-empathy:latest
+        image: docker.io/pixelatedempathy/pixelated:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 4321

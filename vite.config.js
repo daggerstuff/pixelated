@@ -142,7 +142,7 @@ export default defineConfig({
               '[vite] server.watch.ignored =',
               resolved.server?.watch?.ignored,
             )
-          } catch {}
+          } catch { }
         },
       },
     ]
@@ -257,19 +257,32 @@ export default defineConfig({
           }
         },
       },
+      {
+        name: 'suppress-mongodb-import-warning',
+        buildEnd() {
+        },
+        handleHotUpdate({ file: _file, server: _server }) {
+          return undefined
+        },
+      },
       ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_DSN
         ? [
-            sentryVitePlugin({
-              org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-              project: process.env.SENTRY_PROJECT || 'pixel-astro',
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              // Include release for proper stack trace linking and code mapping
-              release:
-                process.env.SENTRY_RELEASE ||
-                process.env.npm_package_version ||
-                undefined,
-            }),
-          ]
+          sentryVitePlugin({
+            org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+            project: process.env.SENTRY_PROJECT || 'pixel-astro',
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            release:
+              process.env.SENTRY_RELEASE ||
+              process.env.npm_package_version ||
+              undefined,
+            // Upload source maps automatically during build
+            sourcemaps: {
+              assets: ['./dist/**/*.js', './dist/**/*.mjs', './.astro/dist/**/*.js', './.astro/dist/**/*.mjs'],
+              ignore: ['**/node_modules/**'],
+              filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
+            },
+          }),
+        ]
         : []),
     ]
   })(),
@@ -347,6 +360,16 @@ export default defineConfig({
           (warning.message.includes('externalized for browser compatibility') ||
             warning.message.includes('icon "-"') ||
             warning.message.includes("failed to load icon '-'"))
+        ) {
+          return
+        }
+        // Suppress MongoDB dynamic/static import warning (expected behavior for server-only code)
+        if (
+          warning.message &&
+          (warning.message.includes('is dynamically imported') ||
+            warning.message.includes('dynamically imported by')) &&
+          (warning.message.includes('mongodb.config') ||
+            warning.message.includes('mongodb.config.ts'))
         ) {
           return
         }

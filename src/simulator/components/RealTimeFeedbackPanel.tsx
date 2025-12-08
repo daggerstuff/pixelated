@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import type { ReactElement } from 'react'
 import type { RealTimeFeedback, TherapeuticTechnique } from '../types'
 import EmpathyMeter from './EmpathyMeter'
 
@@ -71,7 +72,7 @@ export default function RealTimeFeedbackPanel({
   }
 
   // Get icon based on feedback type
-  const getFeedbackIcon = (type: string): JSX.Element => {
+  const getFeedbackIcon = (type: string): ReactElement => {
     switch (type) {
       case 'empathetic_response':
         return (

@@ -52,11 +52,12 @@ services:
     networks:
       - journal-research-network
     healthcheck:
-      test: ["CMD", "python", "-c", "from ai.journal_dataset_research.mcp.server import MCPServer; import sys; sys.exit(0)"]
+      test: ["CMD", "python", "-c", "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, \'handle_request\') else 1); except Exception: import sys; sys.exit(1)"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
     deploy:
       resources:
         limits:

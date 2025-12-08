@@ -1,6 +1,6 @@
 services:
   app:
-    image: pixelated-empathy:prod
+    image: pixelatedempathy/pixelated:latest
     environment:
       - NODE_ENV=production
     ports:

@@ -138,6 +138,15 @@ export function TherapyChatClient() {
       return
     }
 
+    // Track button click metric
+    const { countMetric } = await import('@/lib/sentry/utils')
+    countMetric('user.action', 1, {
+      action: 'chat_submit',
+      component: 'TherapyChatClient',
+      scenario: selectedScenario.name,
+      encryption_enabled: encryptionEnabled,
+    })
+
     // Create user message
     const userMessage: LocalMessage = {
       id: crypto.randomUUID(),
@@ -157,6 +166,9 @@ export function TherapyChatClient() {
         role: userMessage.role,
         content: userMessage.content,
         encrypted: encryptionEnabled || false, // Ensure boolean value
+      })
+      countMetric('websocket.message_sent', 1, {
+        encrypted: encryptionEnabled,
       })
     }
 
@@ -253,9 +265,8 @@ export function TherapyChatClient() {
           {/* Chat container */}
           <div
             ref={containerRef}
-            className={`overflow-y-auto ${
-              isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
-            } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
+            className={`overflow-y-auto ${isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
+              } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
           >
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">

@@ -1,16 +1,20 @@
-FROM traefik:v3.2
+FROM debian:bookworm-slim
+
+# Install Traefik
+COPY --from=traefik:v3.2 /usr/local/bin/traefik /usr/local/bin/traefik
 
 # Copy configuration files
 COPY docker/traefik/traefik.yml /etc/traefik/traefik.yml
 COPY docker/traefik/dynamic.yml /etc/traefik/dynamic/dynamic.yml
 
 # Harden runtime by running as non-root while still binding privileged ports
-RUN apk add --no-cache libcap \
-    && addgroup -S traefik && adduser -S -G traefik traefik \
+RUN apt-get update && apt-get install -y --no-install-recommends libcap2-bin ca-certificates \
+    && groupadd -r traefik && useradd -r -g traefik traefik \
     && setcap 'cap_net_bind_service=+ep' /usr/local/bin/traefik \
     && mkdir -p /letsencrypt /var/run/traefik \
     && chmod 700 /letsencrypt \
-    && chown -R traefik:traefik /letsencrypt /etc/traefik /var/run/traefik
+    && chown -R traefik:traefik /letsencrypt /etc/traefik /var/run/traefik \
+    && rm -rf /var/lib/apt/lists/*
 
 USER traefik
 

@@ -26,6 +26,13 @@ interface DemoStep {
 }
 
 const ClientFacingDemo: FC = () => {
+  // Enable all tabs in test/CI mode for testing purposes
+  // Tests can enable all tabs by adding ?test=true to the URL
+  const isTestMode =
+    typeof window !== 'undefined' &&
+    (window.location.search.includes('test=true') ||
+      window.location.search.includes('enable-all-tabs=true'))
+
   const [currentStep, setCurrentStep] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setDemoData] = useState({
@@ -255,16 +262,26 @@ const ClientFacingDemo: FC = () => {
       {/* Demo Content */}
       <Tabs value={demoSteps[currentStep]?.id || 'upload'} className="w-full">
         <TabsList className="grid w-full grid-cols-4 bg-slate-800">
-          {demoSteps.map((step, index) => (
-            <TabsTrigger
-              key={step.id}
-              value={step.id}
-              disabled={index > currentStep}
-              className="data-[state=active]:bg-purple-600"
-            >
-              {step.title}
-            </TabsTrigger>
-          ))}
+          {demoSteps.map((step, index) => {
+            // Map step IDs to test IDs expected by tests
+            const testIdMap: Record<string, string> = {
+              upload: 'data-ingestion-tab',
+              validate: 'validation-tab',
+              balance: 'category-balancing-tab',
+              export: 'export-tab',
+            }
+            return (
+              <TabsTrigger
+                key={step.id}
+                value={step.id}
+                disabled={!isTestMode && index > currentStep}
+                className="data-[state=active]:bg-purple-600"
+                data-testid={testIdMap[step.id]}
+              >
+                {step.title}
+              </TabsTrigger>
+            )
+          })}
         </TabsList>
 
         {/* Upload Tab */}

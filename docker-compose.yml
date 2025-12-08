@@ -5,12 +5,12 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - PUBLIC_SITE_URL=https://pixelatedempathy.tech
+      - PUBLIC_SITE_URL=https://pixelatedempathy.com
     networks:
       - web
 
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2
     container_name: pixelated-caddy
     restart: unless-stopped
     ports:

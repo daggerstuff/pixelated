@@ -699,7 +699,7 @@ const universityResults = [
   }
 
   // Analytics tracking for demo interactions
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Track page view
     const variantElement = document.querySelector(
       '[data-variant]',
@@ -716,7 +716,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -750,7 +750,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -785,7 +785,7 @@ const universityResults = [
 
     // Track scroll depth
     let maxScroll = 0
-    window.addEventListener('scroll', (_event: Event) => {
+    window.addEventListener('scroll', () => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,

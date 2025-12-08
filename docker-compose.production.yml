@@ -49,7 +49,7 @@ services:
 
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: pixelated-postgres
     restart: unless-stopped
     environment:
@@ -74,7 +74,7 @@ services:
 
   # Redis Cache
   redis:
-    image: redis:7-alpine
+    image: redis:7
     container_name: pixelated-redis
     restart: unless-stopped
     command: redis-server --requirepass "$(cat /run/secrets/redis_password)" --appendonly yes

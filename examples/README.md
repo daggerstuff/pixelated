@@ -59,7 +59,7 @@ The `package.json` includes optimized pnpm settings:
 
 ```json
 {
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "pnpm@10.24.0",
   "pnpm": {
     "overrides": {
       "caniuse-lite": "latest"

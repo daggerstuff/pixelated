@@ -485,11 +485,11 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
 
 <script>
   // Initialize interactive elements
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Handle add vendor button
     const addVendorBtn = document.getElementById('add-vendor-btn')
     if (addVendorBtn) {
-      addVendorBtn.addEventListener('click', (_event: Event) => {
+      addVendorBtn.addEventListener('click', () => {
         window.location.href = '/admin/security/baa/vendors/new'
       })
     }
@@ -497,7 +497,7 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
     // Handle delete vendor buttons
     const deleteButtons = document.querySelectorAll('.delete-vendor')
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -522,11 +522,11 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
       'search-form',
     ) as HTMLFormElement | null
 
-    typeSelect?.addEventListener('change', (_event: Event) => {
+    typeSelect?.addEventListener('change', () => {
       searchForm?.submit()
     })
 
-    complianceSelect?.addEventListener('change', (_event: Event) => {
+    complianceSelect?.addEventListener('change', () => {
       searchForm?.submit()
     })
   })

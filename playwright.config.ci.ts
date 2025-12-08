@@ -87,6 +87,9 @@ export default defineConfig({
       DISABLE_AUTH: 'true',
       DISABLE_WEB_FONTS: 'true',
       SKIP_MSW: 'true',
+      // Better-auth SSR requires absolute base URL for login forms to render
+      PUBLIC_AUTH_URL: 'http://localhost:4321/api/auth',
+      SITE_URL: 'http://localhost:4321',
     },
   },
 

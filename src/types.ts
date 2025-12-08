@@ -555,6 +555,11 @@ export interface Ui {
      */
     toggleIcon: boolean
   }
+
+  /**
+   * Style configuration for post metadata display.
+   */
+  postMetaStyle?: 'minimal' | 'detailed'
 }
 
 /* FEATURES */
@@ -572,6 +577,15 @@ export interface ShareConfig {
    * If an empty string is used, '@userName' will not appear in the pre-filled sharing text.
    */
   twitter: FeatureConfig<Mentioned>
+
+  /**
+   * Configures Bluesky sharing:
+   *  - Set to `false` or `[false, '@userName']` to disable.
+   *  - Set to `[true, '@userName']` to enable and mention you.
+   *
+   * If an empty string is used, '@userName' will not appear in the pre-filled sharing text.
+   */
+  bluesky?: FeatureConfig<Mentioned> | boolean
 
   /**
    * Configures Mastodon sharing:

@@ -247,36 +247,28 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
     </div>
   </section>
 
-  <script is:inline>
+  <script>
     // Form elements
-    const form = document.getElementById('contact-form') as HTMLFormElement
-    const submitButton = document.getElementById(
-      'submit-button',
-    ) as HTMLButtonElement
-    const submitText = document.getElementById('submit-text') as HTMLSpanElement
-    const loadingSpinner = document.getElementById(
-      'loading-spinner',
-    ) as HTMLElement
-    const successMessage = document.getElementById(
-      'success-message',
-    ) as HTMLElement
-    const errorMessage = document.getElementById('error-message') as HTMLElement
-    const errorText = document.getElementById('error-text') as HTMLElement
+    const form = document.getElementById('contact-form')!
+    const submitButton = document.getElementById('submit-button')!
+    const submitText = document.getElementById('submit-text')!
+    const loadingSpinner = document.getElementById('loading-spinner')!
+    const successMessage = document.getElementById('success-message')!
+    const errorMessage = document.getElementById('error-message')!
+    const errorText = document.getElementById('error-text')!
 
     // Form inputs
-    const nameInput = document.getElementById('name') as HTMLInputElement
-    const emailInput = document.getElementById('email') as HTMLInputElement
-    const subjectInput = document.getElementById('subject') as HTMLInputElement
-    const messageInput = document.getElementById(
-      'message',
-    ) as HTMLTextAreaElement
-    const messageCount = document.getElementById('message-count') as HTMLElement
+    const nameInput = document.getElementById('name')! as HTMLInputElement
+    const emailInput = document.getElementById('email')! as HTMLInputElement
+    const subjectInput = document.getElementById('subject')! as HTMLInputElement
+    const messageInput = document.getElementById('message')! as HTMLTextAreaElement
+    const messageCount = document.getElementById('message-count')!
 
     // Error displays
-    const nameError = document.getElementById('name-error') as HTMLElement
-    const emailError = document.getElementById('email-error') as HTMLElement
-    const subjectError = document.getElementById('subject-error') as HTMLElement
-    const messageError = document.getElementById('message-error') as HTMLElement
+    const nameError = document.getElementById('name-error')!
+    const emailError = document.getElementById('email-error')!
+    const subjectError = document.getElementById('subject-error')!
+    const messageError = document.getElementById('message-error')!
 
     // Character counter
     messageInput?.addEventListener('input', () => {

@@ -14,7 +14,7 @@ on:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.22.0"
+  PNPM_VERSION: "10.24.0"
   PYTHON_VERSION: "3.11"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -29,7 +29,7 @@ jobs:
         validation_type: [dependencies, lint, typecheck]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -41,6 +41,17 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
+
+      - name: Pre-install diagnostics
+        if: runner.debug == '1'
+        run: |
+          echo "🔍 CI Environment Diagnostics"
+          echo "Node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+          echo "Memory: $(free -h | grep Mem || echo 'N/A')"
+          echo "Disk: $(df -h . | tail -1)"
+          echo "Package manager in package.json: $(cat package.json | grep packageManager || echo 'not specified')"
+          pnpm store path || echo "pnpm store not initialized"
 
       - name: Load environment from .env
         run: |
@@ -54,24 +65,75 @@ jobs:
             done < .env
           fi
 
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
+
       - name: Install dependencies
         run: |
-          # Retry logic for pnpm install with fallback for lockfile mismatches
+          set -o pipefail
+          # Enhanced retry logic for pnpm install with comprehensive error handling
           for i in {1..3}; do
-            ERROR_OUTPUT=$(pnpm install --frozen-lockfile --prefer-offline 2>&1) && INSTALL_SUCCESS=true || INSTALL_SUCCESS=false
-            if [ "$INSTALL_SUCCESS" = "true" ]; then
+            echo "📦 Attempt $i of 3: Installing dependencies..."
+            ERROR_LOG=$(mktemp)
+            
+            if pnpm install --frozen-lockfile --prefer-offline 2>&1 | tee "$ERROR_LOG"; then
               echo "✅ Dependencies installed successfully"
-              break
-            elif echo "$ERROR_OUTPUT" | grep -q "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH\|overrides.*doesn't match"; then
-              echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
-              pnpm install --no-frozen-lockfile
-              echo "✅ Dependencies installed with updated lockfile"
+              rm -f "$ERROR_LOG"
               break
             else
-              echo "⚠️ Install attempt $i failed, retrying in 5 seconds..."
-              sleep 5
-              if [ $i -eq 3 ]; then
+              EXIT_CODE=$?
+              echo "❌ Install failed with exit code: $EXIT_CODE"
+              echo "📝 Full error output:"
+              cat "$ERROR_LOG"
+              
+              # Check for lockfile mismatch
+              if grep -qE "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH|overrides.*doesn't match|lockfile.*not compatible" "$ERROR_LOG"; then
+                echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
+                pnpm install --no-frozen-lockfile
+                echo "✅ Dependencies installed with updated lockfile"
+                rm -f "$ERROR_LOG"
+                break
+              fi
+              
+              # Check for network errors
+              if grep -qE "ENOTFOUND|ETIMEDOUT|ECONNRESET|fetch failed|network" "$ERROR_LOG"; then
+                echo "⚠️ Network error detected"
+                if [ $i -eq 3 ]; then
+                  echo "❌ All install attempts failed due to network issues"
+                  rm -f "$ERROR_LOG"
+                  exit 1
+                fi
+              fi
+              
+              # Check for peer dependency issues
+              if grep -qE "WARN.*peer dep|unmet peer" "$ERROR_LOG"; then
+                echo "⚠️ Peer dependency warnings detected, trying with --no-strict-peer-dependencies..."
+                if pnpm install --frozen-lockfile --no-strict-peer-dependencies 2>&1; then
+                  echo "✅ Dependencies installed with relaxed peer dependencies"
+                  rm -f "$ERROR_LOG"
+                  break
+                fi
+              fi
+              
+              rm -f "$ERROR_LOG"
+              
+              if [ $i -lt 3 ]; then
+                DELAY=$((5 * i))
+                echo "⏳ Retrying in $DELAY seconds..."
+                sleep $DELAY
+                
+                # Clean up partial state
+                echo "🧹 Cleaning up partial installation state..."
+                rm -rf node_modules/.pnpm || true
+                pnpm store prune || true
+              else
                 echo "❌ All install attempts failed"
+                echo "💡 Debug information:"
+                echo "  - Node version: $(node --version)"
+                echo "  - pnpm version: $(pnpm --version)"
+                echo "  - Package manager in package.json: $(cat package.json | grep packageManager || echo 'not specified')"
                 exit 1
               fi
             fi
@@ -103,7 +165,23 @@ jobs:
       image-digest: ${{ steps.out.outputs.image-digest }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify checkout
+        run: |
+          echo "🔍 Verifying checkout completed successfully..."
+          echo "📂 Working directory: $(pwd)"
+          echo "📂 GitHub workspace: ${{ github.workspace }}"
+          if [[ ! -f "package.json" ]]; then
+            echo "❌ Checkout verification failed - package.json not found!"
+            echo "📂 Directory contents:"
+            ls -la
+            exit 1
+          fi
+          echo "✅ Checkout verified - repository files present"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -115,6 +193,17 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
+
+      - name: Pre-install diagnostics
+        if: runner.debug == '1'
+        run: |
+          echo "🔍 CI Environment Diagnostics"
+          echo "Node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+          echo "Memory: $(free -h | grep Mem || echo 'N/A')"
+          echo "Disk: $(df -h . | tail -1)"
+          echo "Package manager in package.json: $(cat package.json | grep packageManager || echo 'not specified')"
+          pnpm store path || echo "pnpm store not initialized"
 
       - name: Load environment from .env
         run: |
@@ -130,38 +219,78 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Enhanced retry logic for pnpm install with fallback for lockfile mismatches
+          set -o pipefail
+          # Enhanced retry logic for pnpm install with comprehensive error handling
           for i in {1..3}; do
-            echo "🔄 Install attempt $i of 3..."
-            ERROR_OUTPUT=$(pnpm install --frozen-lockfile --prefer-offline 2>&1) && INSTALL_SUCCESS=true || INSTALL_SUCCESS=false
-            if [ "$INSTALL_SUCCESS" = "true" ]; then
+            echo "📦 Attempt $i of 3: Installing dependencies..."
+            ERROR_LOG=$(mktemp)
+            
+            if pnpm install --frozen-lockfile --prefer-offline 2>&1 | tee "$ERROR_LOG"; then
               echo "✅ Dependencies installed successfully"
-              break
-            elif echo "$ERROR_OUTPUT" | grep -q "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH\|overrides.*doesn't match"; then
-              echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
-              pnpm install --no-frozen-lockfile
-              echo "✅ Dependencies installed with updated lockfile"
+              rm -f "$ERROR_LOG"
               break
             else
-              echo "⚠️ Install attempt $i failed, checking git status..."
-              git status || echo "Git status check completed"
-
+              EXIT_CODE=$?
+              echo "❌ Install failed with exit code: $EXIT_CODE"
+              echo "📝 Full error output:"
+              cat "$ERROR_LOG"
+              
+              # Check for lockfile mismatch
+              if grep -qE "ERR_PNPM_LOCKFILE_CONFIG_MISMATCH|overrides.*doesn't match|lockfile.*not compatible" "$ERROR_LOG"; then
+                echo "⚠️ Lockfile config mismatch detected, updating lockfile..."
+                pnpm install --no-frozen-lockfile
+                echo "✅ Dependencies installed with updated lockfile"
+                rm -f "$ERROR_LOG"
+                break
+              fi
+              
+              # Check for network errors
+              if grep -qE "ENOTFOUND|ETIMEDOUT|ECONNRESET|fetch failed|network" "$ERROR_LOG"; then
+                echo "⚠️ Network error detected"
+                echo "🔍 Testing network connectivity..."
+                ping -c 1 registry.npmjs.org || echo "Registry connectivity check failed"
+                if [ $i -eq 3 ]; then
+                  echo "❌ All install attempts failed due to network issues"
+                  rm -f "$ERROR_LOG"
+                  exit 1
+                fi
+              fi
+              
+              # Check for peer dependency issues
+              if grep -qE "WARN.*peer dep|unmet peer" "$ERROR_LOG"; then
+                echo "⚠️ Peer dependency warnings detected, trying with --no-strict-peer-dependencies..."
+                if pnpm install --frozen-lockfile --no-strict-peer-dependencies 2>&1; then
+                  echo "✅ Dependencies installed with relaxed peer dependencies"
+                  rm -f "$ERROR_LOG"
+                  break
+                fi
+              fi
+              
+              # Check for git fetch issues
+              if grep -qE "git|fetch.*failed|clone.*failed" "$ERROR_LOG"; then
+                echo "⚠️ Git fetch error detected"
+                echo "📊 Git configuration:"
+                git config --list | grep -E "(http|pack|lfs)" || true
+              fi
+              
+              rm -f "$ERROR_LOG"
+              
               if [ $i -lt 3 ]; then
                 DELAY=$((5 * i))
                 echo "⏳ Retrying in $DELAY seconds..."
                 sleep $DELAY
-
-                # Try to clean up any partial state
+                
+                # Clean up partial state
                 echo "🧹 Cleaning up partial installation state..."
                 rm -rf node_modules/.pnpm || true
                 pnpm store prune || true
               else
-                echo "❌ All install attempts failed - possible network or git fetch issue"
-                echo "📊 Debug information:"
-                echo "  - Git config:"
-                git config --list | grep -E "(http|pack|lfs)" || true
-                echo "  - Network connectivity:"
-                ping -c 1 registry.npmjs.org || echo "Registry connectivity check failed"
+                echo "❌ All install attempts failed"
+                echo "💡 Debug information:"
+                echo "  - Node version: $(node --version)"
+                echo "  - pnpm version: $(pnpm --version)"
+                echo "  - Package manager in package.json: $(cat package.json | grep packageManager || echo 'not specified')"
+                echo "  - Available memory: $(free -h | grep Mem || echo 'N/A')"
                 exit 1
               fi
             fi
@@ -174,6 +303,40 @@ jobs:
           chmod +x ./scripts/memory-optimized-build.sh
           ./scripts/memory-optimized-build.sh
           echo "✅ Application build completed successfully"
+
+      - name: Verify Dockerfile exists
+        run: |
+          echo "🔍 Verifying Dockerfile location..."
+          echo "📂 Current working directory: $(pwd)"
+          echo "📂 GitHub workspace: ${{ github.workspace }}"
+
+          # Change to the GitHub workspace directory
+          cd "${{ github.workspace }}" || { echo "❌ Failed to change to workspace directory"; exit 1; }
+
+          # Verify checkout succeeded by checking for common files
+          if [ ! -f "package.json" ]; then
+            echo "❌ Checkout verification failed - package.json not found!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Expected workspace: ${{ github.workspace }}"
+            echo "📂 Git configuration:"
+            ls -la .git 2>/dev/null || echo ".git directory not found"
+            exit 1
+          fi
+
+          # Check for Dockerfile in root
+          if [ -f "Dockerfile" ]; then
+            echo "✅ Dockerfile found at: ${{ github.workspace }}/Dockerfile"
+            echo "📄 Dockerfile size: $(stat -c%s Dockerfile) bytes"
+          else
+            echo "❌ Dockerfile not found in root directory"
+            echo "📂 Current directory contents:"
+            ls -la | head -20
+            echo "📂 Looking for Dockerfile in repository:"
+            find "${{ github.workspace }}" -name "Dockerfile" -type f 2>/dev/null | head -10 || echo "No Dockerfile found"
+            echo "❌ Dockerfile verification failed!"
+            exit 1
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -195,6 +358,18 @@ jobs:
           remove-haskell: true
           remove-codeql: true
           remove-docker-images: true
+
+      - name: Verify workspace after disk cleanup
+        run: |
+          echo "🔍 Verifying workspace integrity after disk cleanup..."
+          if [[ ! -f "package.json" ]] || [[ ! -f "Dockerfile" ]]; then
+            echo "❌ Workspace files missing after disk cleanup!"
+            echo "📂 Current directory contents:"
+            ls -la
+            echo "📂 Expected workspace: ${{ github.workspace }}"
+            exit 1
+          fi
+          echo "✅ Workspace integrity verified"
 
       - name: Extract metadata
         id: meta
@@ -231,8 +406,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile
+          context: ${{ github.workspace }}
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -263,7 +438,7 @@ jobs:
       packages: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -372,7 +547,7 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -429,18 +604,19 @@ jobs:
           echo "✅ Sentry release created"
 
   # GKE Deployment with multiple strategies
+  # DISABLED: GKE billing not enabled. Re-enable when billing is configured.
   deploy-gke:
     name: Deploy to GKE
     runs-on: ubuntu-latest
     needs: [build, security-scan, sentry-release]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false # DISABLED: GKE billing not enabled
     environment: production
     outputs:
       deployment-status: ${{ steps.deploy.outputs.status }}
       deployment-strategy: ${{ steps.deploy.outputs.strategy }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load GCP environment
         run: |
@@ -729,14 +905,15 @@ jobs:
           echo "strategy=$DEPLOYMENT_STRATEGY" >> $GITHUB_OUTPUT
 
   # GKE Health Check
+  # DISABLED: Depends on GKE deployment which is disabled
   health-check-gke:
     name: GKE Health Check
     runs-on: ubuntu-latest
     needs: [deploy-gke]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load GCP environment
         run: |
@@ -844,14 +1021,15 @@ jobs:
           echo "✅ GKE health check completed"
 
   # Cleanup job - runs after deployments
+  # DISABLED: Depends on GKE deployment which is disabled
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
     needs: [deploy-gke, health-check-gke]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false # DISABLED: GKE billing not enabled
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load GCP environment
         run: |

@@ -115,6 +115,37 @@ services:
     networks:
       - training-net
 
+  # NVIDIA NeMo Data Designer for Stage 3 synthetic data authoring
+  nemo-data-designer:
+    image: nvcr.io/nemo/nemo-data-designer:latest
+    container_name: pixelated-nemo-data-designer
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
+      DATA_DESIGNER_HOST: 0.0.0.0
+      DATA_DESIGNER_PORT: 8000
+      DATA_DESIGNER_LOG_LEVEL: INFO
+      PIPELINE_PROMPT_ROOT: /workspace/prompt_corpus
+      PIPELINE_EDGE_OUTPUT: /workspace/edge_cases
+      PIPELINE_STAGE_EXPORT: /workspace/stage_exports
+    volumes:
+      - nemo_data_designer_data:/data
+      - nemo_data_designer_config:/config
+      - ./ai/dataset_pipeline/prompt_corpus:/workspace/prompt_corpus:ro
+      - ./ai/pipelines/edge_case_pipeline_standalone/output:/workspace/edge_cases
+      - ./ai/training_data_consolidated/final:/workspace/stage_exports
+    ports:
+      - "8000:8000"
+    networks:
+      - training-net
+
 # Networks
 networks:
   training-net:
@@ -133,4 +164,8 @@ volumes:
   prometheus_training_data:
     driver: local
   grafana_training_data:
+    driver: local
+  nemo_data_designer_data:
+    driver: local
+  nemo_data_designer_config:
     driver: local

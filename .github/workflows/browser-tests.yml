@@ -12,9 +12,9 @@ on:
   workflow_dispatch:
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.22.0
+  PNPM_VERSION: 10.24.0
   NODE_ENV: test
-  DISABLE_AUTH: 'true'
+  DISABLE_AUTH: "true"
   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -33,9 +33,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
-          version: 10.22.0
+          version: 10.24.0
 
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -44,6 +44,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
@@ -68,6 +73,9 @@ jobs:
           export BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
+          # Better-auth SSR requires absolute base URL for login forms to render
+          export PUBLIC_AUTH_URL=http://localhost:4321/api/auth
+          export SITE_URL=http://localhost:4321
 
           # Run tests with built-in web server, only essential tests
           pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts tests/browser/mobile-compatibility.spec.ts --config=playwright.config.ci.ts --max-failures=10 --workers=1
@@ -76,7 +84,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v5
         with:
           name: browser-test-results-${{ github.run_id }}
           path: |
@@ -94,7 +102,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download all test artifacts
         uses: actions/download-artifact@v6
@@ -204,7 +212,7 @@ jobs:
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v5
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html
