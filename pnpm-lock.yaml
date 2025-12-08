@@ -340,8 +340,8 @@ importers:
         specifier: ^1.57.0
         version: 1.57.0
       '@smithery/cli':
-        specifier: ^1.6.4
-        version: 1.6.4(@types/node@24.10.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.1.13)
+        specifier: ^1.6.6
+        version: 1.6.6(@types/node@24.10.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.1.13)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -418,8 +418,8 @@ importers:
         specifier: ^10.4.22
         version: 10.4.22(postcss@8.5.6)
       aws-cdk-lib:
-        specifier: ^2.231.0
-        version: 2.231.0(constructs@10.4.3)
+        specifier: ^2.232.1
+        version: 2.232.1(constructs@10.4.3)
       axe-core:
         specifier: ^4.11.0
         version: 4.11.0
@@ -4404,8 +4404,8 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-  '@smithery/cli@1.6.4':
-    resolution: {integrity: sha512-4TXZr6amLQ3nWtE+t34aRXnxGpwkd0wcZfNC28lZWCsvI9Lo2d7fTRvDUhzmmgAqdJjtV01b22ygM7zCtxhA5w==}
+  '@smithery/cli@1.6.6':
+    resolution: {integrity: sha512-cWKaLjHiYetF+QLAzLzGo2O282ka9ZtFUTaT/4kKikQVGN4+IYk8liH7I34HpN8zpu6iVfGAJrC1CvcZ7wKGPg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -4415,8 +4415,8 @@ packages:
   '@smithery/registry@0.4.4':
     resolution: {integrity: sha512-oDS8eIa86cU2MZQBDGsCo9kZT9mgjTn0t5UnI2+tAUOyIhSwcDVFgCNBTI657jgzUPqRfALamM6IGekMZ9/wGA==}
 
-  '@smithery/sdk@1.7.4':
-    resolution: {integrity: sha512-Lgedh794Qj13wNjk2UX360wnYlTpkjnnIPVTwsImcZAIno38L3AF+4dYgeDd435ch5oDfUomuPFthDqvf6DV/A==}
+  '@smithery/sdk@1.7.5':
+    resolution: {integrity: sha512-+s8M2QgQgrGMAJhHLNpIZF++0KJLdcDuy5h2lRh8XfW0F5A32XyQ65ixmymWIAD2lQMnDGCAisYP3Xi3JWW5Tw==}
 
   '@smithy/abort-controller@4.2.5':
     resolution: {integrity: sha512-j7HwVkBw68YW8UmFRcjZOmssE77Rvk0GWAIN1oFBhsaovQmZWYCIcGa9/pwRB0ExI8Sk9MWNALTjftjHZea7VA==}
@@ -5642,8 +5642,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  aws-cdk-lib@2.231.0:
-    resolution: {integrity: sha512-RMt88F1vhsM28j81EjvIXRoPeYQdtk72EGh9xAP6LjuyF8df1hDBIy5cawUvagdp5eCBPVHrPJ2U0eaUUKtjFg==}
+  aws-cdk-lib@2.232.1:
+    resolution: {integrity: sha512-F1vNcpWBo85pSxa0DJ5DO4k7Ok4vVp0vh1cFO4Y12LLX07ixOcnJn/6B97/XVC0fgZNvzPx/sYgioEd0u8oKkQ==}
     engines: {node: '>= 18.0.0'}
     peerDependencies:
       constructs: ^10.0.0
@@ -8111,6 +8111,10 @@ packages:
 
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
+
+  jsonwebtoken@9.0.3:
+    resolution: {integrity: sha512-MT/xP0CrubFRNLNKvxJ2BYfy53Zkm++5bX9dtuPbqAeQpTVe0MQTFhao8+Cp//EmJp244xt6Drw/GVEGCUj40g==}
+    engines: {node: '>=12', npm: '>=6'}
 
   jsonwebtoken@9.0.3:
     resolution: {integrity: sha512-MT/xP0CrubFRNLNKvxJ2BYfy53Zkm++5bX9dtuPbqAeQpTVe0MQTFhao8+Cp//EmJp244xt6Drw/GVEGCUj40g==}
@@ -16263,13 +16267,13 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@smithery/cli@1.6.4(@types/node@24.10.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.1.13)':
+  '@smithery/cli@1.6.6(@types/node@24.10.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.1.13)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
       '@modelcontextprotocol/sdk': 1.24.3(zod@4.1.13)
       '@ngrok/ngrok': 1.6.0
       '@smithery/registry': 0.4.4
-      '@smithery/sdk': 1.7.4
+      '@smithery/sdk': 1.7.5
       boxen: 8.0.1
       chalk: 4.1.2
       commander: 14.0.2
@@ -16299,7 +16303,7 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  '@smithery/sdk@1.7.4':
+  '@smithery/sdk@1.7.5':
     dependencies:
       '@modelcontextprotocol/sdk': 1.24.3(zod@3.25.76)
       chalk: 5.6.2
@@ -18115,7 +18119,7 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.1.0
 
-  aws-cdk-lib@2.231.0(constructs@10.4.3):
+  aws-cdk-lib@2.232.1(constructs@10.4.3):
     dependencies:
       '@aws-cdk/asset-awscli-v1': 2.2.242
       '@aws-cdk/asset-node-proxy-agent-v6': 2.1.0
@@ -20894,6 +20898,20 @@ snapshots:
       lodash.once: 4.1.1
       ms: 2.1.3
       semver: 7.7.3
+
+  jsonwebtoken@9.0.3:
+    dependencies:
+      jws: 4.0.1
+      lodash.includes: 4.3.0
+      lodash.isboolean: 3.0.3
+      lodash.isinteger: 4.0.4
+      lodash.isnumber: 3.0.3
+      lodash.isplainobject: 4.0.6
+      lodash.isstring: 4.0.1
+      lodash.once: 4.1.1
+      ms: 2.1.3
+      semver: 7.7.3
+    optional: true
 
   jsx-ast-utils@3.3.5:
     dependencies:
