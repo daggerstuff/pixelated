@@ -6,6 +6,17 @@ const isCi = !!process.env['CI']
 // Default to port 3000 for local dev, 4321 for CI (preview server)
 const baseURL = process.env['BASE_URL'] || (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
 
+// Optional Cloudflare Access service token support for staging/prod runs
+const cfAccessClientId = process.env['CF_ACCESS_CLIENT_ID']
+const cfAccessClientSecret = process.env['CF_ACCESS_CLIENT_SECRET']
+const extraHTTPHeaders =
+  cfAccessClientId && cfAccessClientSecret
+    ? {
+      'CF-Access-Client-Id': cfAccessClientId,
+      'CF-Access-Client-Secret': cfAccessClientSecret,
+    }
+    : undefined
+
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
 let webServerPort: number | undefined
@@ -76,6 +87,9 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL,
+
+    /* Include Cloudflare Access headers when provided (staging/prod) */
+    extraHTTPHeaders,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

@@ -249,31 +249,61 @@ stages:
           - script: |
               set -euo pipefail
 
-              # Ensure artifact staging directory exists
-              mkdir -p $(Build.ArtifactStagingDirectory)
+              # Ensure artifact staging directory exists and is writable
+              mkdir -p "$(Build.ArtifactStagingDirectory)"
+              if [ ! -d "$(Build.ArtifactStagingDirectory)" ] || [ ! -w "$(Build.ArtifactStagingDirectory)" ]; then
+                echo "##vso[task.logissue type=error]Cannot create or write to artifact staging directory: $(Build.ArtifactStagingDirectory)"
+                exit 1
+              fi
 
               METADATA_FILE="$(Build.ArtifactStagingDirectory)/build.env"
               IMAGE_TAG="$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 
-              # Try to get image digest, but don't fail if unavailable
+              # Validate required variables are set
+              if [ -z "$DOCKER_REGISTRY" ] || [ -z "$IMAGE_REPOSITORY" ] || [ -z "$(Build.BuildNumber)" ]; then
+                echo "##vso[task.logissue type=error]Required variables are not set: DOCKER_REGISTRY, IMAGE_REPOSITORY, or Build.BuildNumber"
+                exit 1
+              fi
+
+              # Try to get image digest with more robust error handling
               IMAGE_DIGEST=""
-              if docker inspect "$IMAGE_TAG" --format='{{.Id}}' 2>/dev/null; then
+              if docker inspect "$IMAGE_TAG" --format='{{.Id}}' >/dev/null 2>&1; then
                 IMAGE_DIGEST=$(docker inspect "$IMAGE_TAG" --format='{{.Id}}')
+                echo "✅ Image digest retrieved: $IMAGE_DIGEST"
               else
                 echo "⚠️ Could not inspect image locally, using tag as reference"
                 IMAGE_DIGEST="$IMAGE_TAG"
               fi
 
-              # Write metadata
+              # Write metadata with explicit validation
               {
+                echo "# Build Metadata File"
+                echo "# Generated: $(date -u)"
                 echo "IMAGE_DIGEST=$IMAGE_DIGEST"
                 echo "IMAGE_TAG=$IMAGE_TAG"
                 echo "BUILD_NUMBER=$(Build.BuildNumber)"
+                echo "BUILD_SOURCEVERSION=$(Build.SourceVersion)"
+                echo "BUILD_SOURCEBRANCH=$(Build.SourceBranch)"
               } > "$METADATA_FILE"
 
-              # Validate metadata file exists and has content
-              if [ ! -f "$METADATA_FILE" ] || [ ! -s "$METADATA_FILE" ]; then
-                echo "##vso[task.logissue type=error]Build metadata file missing or empty"
+              # Validate metadata file was created and has content
+              if [ ! -f "$METADATA_FILE" ]; then
+                echo "##vso[task.logissue type=error]Build metadata file was not created"
+                exit 1
+              fi
+
+              if [ ! -s "$METADATA_FILE" ]; then
+                echo "##vso[task.logissue type=error]Build metadata file is empty"
+                exit 1
+              fi
+
+              # Verify file content contains expected keys
+              if ! grep -q "IMAGE_DIGEST=" "$METADATA_FILE" || \
+                 ! grep -q "IMAGE_TAG=" "$METADATA_FILE" || \
+                 ! grep -q "BUILD_NUMBER=" "$METADATA_FILE"; then
+                echo "##vso[task.logissue type=error]Build metadata file is missing required content"
+                echo "File content:"
+                cat "$METADATA_FILE"
                 exit 1
               fi
 
@@ -945,7 +975,15 @@ stages:
               echo "🔍 Verifying /demo route is accessible..."
               DEMO_URL="${STAGING_URL}/demo?enable-all-tabs=true"
 
-              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "$DEMO_URL" 2>/dev/null || echo "000")
+              # Build optional Cloudflare Access headers if provided
+              CURL_ARGS=()
+              if [ -n "${CF_ACCESS_CLIENT_ID}" ] && [ -n "${CF_ACCESS_CLIENT_SECRET}" ]; then
+                CURL_ARGS+=(-H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}")
+                CURL_ARGS+=(-H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}")
+                echo "Using Cloudflare Access headers for /demo check"
+              fi
+
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "${CURL_ARGS[@]}" "$DEMO_URL" 2>/dev/null || echo "000")
 
               if [ "$HTTP_CODE" = "000" ]; then
                 echo "##vso[task.logissue type=warning]/demo route is not accessible (connection failed)"
@@ -982,6 +1020,8 @@ stages:
             env:
               BASE_URL: $(STAGING_URL)
               STAGING_URL: $(STAGING_URL)
+              CF_ACCESS_CLIENT_ID: $(CF_ACCESS_CLIENT_ID)
+              CF_ACCESS_CLIENT_SECRET: $(CF_ACCESS_CLIENT_SECRET)
 
   - stage: E2ETest
     displayName: "E2E Testing"
