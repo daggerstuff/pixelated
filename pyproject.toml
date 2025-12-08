@@ -78,6 +78,7 @@ dependencies = [
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "checkov>=3.0.34",
+  "kaggle>=1.8.2",
 ]
 
 [project.optional-dependencies]
@@ -104,7 +105,7 @@ show_error_codes = true
 
 [tool.pyright]
 include = ["src", "tests", "ai", "api"]
-exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
+exclude = ["node_modules", "stubs", "venv", ".venv", "env", "build", "dist", ".coveragerc"]
 extraPaths = ["stubs"]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false
@@ -116,7 +117,7 @@ pythonVersion = "3.11"
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-exclude = ["node_modules", "stubs", "venv", "env", "build", "dist", ".coveragerc"]
+exclude = ["node_modules", "stubs", "venv", ".venv", "env", "build", "dist", ".coveragerc"]
 
 [tool.ruff.lint]
 select = [
