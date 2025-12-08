@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=78.1.1", "wheel>=0.38.1"]  # Fixes CVE-2024-6345, CVE-2025-47273, CVE-2022-40898
 build-backend = "setuptools.build_meta"
 
 [project]
