@@ -266,10 +266,6 @@ docs/                  # Documentation
 
 **Before committing changes, verify**:
 
-```bash
-# 1. Did you retrieve ByteRover context at session start?
-brv status  # ✅
-
 # 2. Did you run tests with correct package managers?
 pnpm check:all && pnpm test:all  # Node.js ✅
 uv run pytest tests/              # Python ✅
@@ -280,11 +276,8 @@ pnpm security:check  # ✅
 # 4. Did you keep edits minimal and focused?
 # Review your changes ✅
 
-# 5. Did you store learnings in ByteRover?
-brv add --section "..." --content "..."  # ✅
-brv push  # After user approval ✅
-```
 
+```
 ## 📝 Code Conventions
 
 **TypeScript/JavaScript**:
@@ -305,48 +298,7 @@ brv push  # After user approval ✅
 - Utilities: Grouped by domain, exported via index
 - Types: Co-located with usage or in `src/types/`
 - Tests: Co-located `*.test.ts` or in `tests/`
-
-## 🧠 ByteRover Memory (CLI)
-
-This project uses ByteRover for persistent AI memory and knowledge management.
-
-### Session Start Checklist
-
-**CRITICAL**: You MUST use ByteRover at the start of EVERY session:
-
-```bash
-# Retrieve context before starting work
-brv retrieve --query "context for task"
-brv status
 ```
-
-**When to retrieve**:
-- Before implementing any new feature or fix
-- When working with unfamiliar parts of the codebase
-- Before making architectural decisions
-- When debugging to check for previous solutions
-
-### Session End Checklist
-
-**CRITICAL**: You MUST store knowledge when completing work:
-
-```bash
-# Add learnings during/after work
-brv add --section "Best Practices" --content "..."
-brv add --section "Common Errors" --content "..."
-brv add --section "Testing" --content "..."
-
-# Push updates after completing work (prompt user first)
-brv push
-```
-
-**When to store**:
-- After learning new patterns, APIs, or architectural decisions
-- When you've solved an error or discovered debugging techniques
-- After finding reusable code patterns or utility functions
-- Upon completing any significant task or plan implementation
-
-**Available Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
 
 ## 🚨 Common Pitfalls
 
@@ -363,13 +315,12 @@ brv push
 6. **Over-engineering**: Start minimal, iterate based on needs
 7. **Python venv in src/**: Keep Python environments in `ai/` directory, not `src/`
 8. **Reading entire files**: Use targeted searches before scanning whole files
-9. **Forgetting ByteRover**: Retrieve context at start, store learnings at end
 10. **Ignoring CI/Docker context**: Check Dockerfile and CI logs before making broad changes
     - Preserve multi-stage builds and caching hints when modifying Dockerfiles
 
 ## 📚 Additional Resources
 
-**See AGENTS.md** for detailed AI assistant workflow (ByteRover, OpenSpec process)
+**See AGENTS.md** for detailed AI assistant workflow (OpenSpec process)
 
 **Warp-Specific Rules** (`.warp/rules/`):
 - **test-driven-development.md**: TDD workflow and red-green-refactor cycle
@@ -394,7 +345,6 @@ brv push
 ## 🎯 Development Workflow
 
 **Starting a new feature**:
-1. **Retrieve context**: `brv retrieve --query "feature name"` ⚠️ REQUIRED
 2. Check `openspec/AGENTS.md` for major architectural changes
 3. Write tests first (TDD approach)
 4. Implement feature with minimal, focused edits
@@ -404,11 +354,8 @@ brv push
    uv run pytest tests/             # Python
    ```
 6. Security check: `pnpm security:check`
-7. **Document learnings**: `brv add --section "Best Practices"` ⚠️ REQUIRED
-8. **Push to ByteRover**: `brv push` (after user approval)
 
 **Debugging**:
-1. **Check session memory**: `brv retrieve --query "error message"` ⚠️ START HERE
 2. Review error logs in Sentry (if configured)
 3. Run specific test suite: `pnpm test:unit` or `pnpm e2e:debug`
 4. Check service health: `pnpm redis:check`, `pnpm mongodb:init`
@@ -422,13 +369,5 @@ pnpm security:check     # No hardcoded secrets
 # For Python changes:
 uv run pytest tests/    # Python tests with correct environment
 ```
-
-**After committing**:
-```bash
-brv add --section "Best Practices" --content "What you learned"
-brv push  # After user approval
-```
-
----
 
 *Building technology that helps humans connect more deeply.*
