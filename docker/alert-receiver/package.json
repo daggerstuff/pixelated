@@ -5,7 +5,7 @@
   "main": "alert-receiver.js",
   "dependencies": {
     "express": "^4.22.0",
-    "axios": "^1.12.0"
+    "axios": "^1.13.2"
   },
   "overrides": {
     "esbuild": "^0.25.9"
