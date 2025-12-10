@@ -243,7 +243,7 @@ stages:
                 $(Build.BuildNumber)
                 latest
                 $(Build.SourceBranchName)
-              addPipelineData: false
+              addPipelineData: true
               addBaseImageData: false
 
           - script: |
@@ -980,7 +980,10 @@ stages:
               if [ -n "${CF_ACCESS_CLIENT_ID}" ] && [ -n "${CF_ACCESS_CLIENT_SECRET}" ]; then
                 CURL_ARGS+=(-H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}")
                 CURL_ARGS+=(-H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}")
-                echo "Using Cloudflare Access headers for /demo check"
+                echo "✅ Using Cloudflare Access headers for /demo check"
+              else
+                echo "⚠️ Cloudflare Access credentials not configured (CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET)"
+                echo "   If /demo is protected, add these variables to the 'pixelated-pipeline-variables' variable group"
               fi
 
               HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "${CURL_ARGS[@]}" "$DEMO_URL" 2>/dev/null || echo "000")
@@ -997,7 +1000,13 @@ stages:
                 exit 0
               elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
                 echo "##vso[task.logissue type=warning]/demo route returned client error (HTTP $HTTP_CODE)"
-                echo "⚠️ Skipping performance tests - /demo route may not exist or requires authentication"
+                echo "⚠️ Skipping performance tests - /demo route requires authentication"
+                echo ""
+                echo "📋 To fix this:"
+                echo "   1. Add CF_ACCESS_CLIENT_ID to Azure DevOps variable group 'pixelated-pipeline-variables'"
+                echo "   2. Add CF_ACCESS_CLIENT_SECRET to Azure DevOps variable group 'pixelated-pipeline-variables'"
+                echo "   3. Get credentials from Cloudflare Zero Trust dashboard"
+                echo ""
                 echo "   This is non-blocking - pipeline will continue"
                 exit 0
               elif ! echo "$HTTP_CODE" | grep -qE "^[2]"; then
