@@ -38,5 +38,8 @@ def run():
     print("\nDetailed First Result:")
     print(json.dumps(results["details"][0], indent=2))
 
+    if results.get("persisted_path"):
+        print(f"\nPersisted results: {results['persisted_path']}")
+
 if __name__ == "__main__":
     run()
