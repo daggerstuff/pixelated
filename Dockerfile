@@ -47,8 +47,8 @@ COPY . .
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
-RUN find /app/node_modules -name "*.map" -delete && \
-    find /app/dist -name "*.map" -delete 2>/dev/null || true
+RUN find /app/node_modules -type f -name "*.map" -delete && \
+    find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
 FROM node:24-slim AS runtime
@@ -116,8 +116,17 @@ COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/start-server.mjs ./start-server.mjs
 COPY --from=builder /app/instrument.mjs ./instrument.mjs
 
-# Set ownership and drop to non-root (separate layer for smaller size)
-RUN chown -R astro:astro /app && chmod -R g+rX /app
+# Set ownership for runtime assets only (avoid expensive recursive chown of node_modules)
+RUN chown -R astro:astro \
+      /app/dist \
+      /app/public \
+      /app/templates \
+      /app/package.json \
+      /app/pnpm-lock.yaml \
+      /app/start-server.mjs \
+      /app/instrument.mjs \
+  && chmod -R g+rX /app/dist /app/public /app/templates \
+  && chmod g+r /app/package.json /app/pnpm-lock.yaml /app/start-server.mjs /app/instrument.mjs
 USER astro
 
 EXPOSE 4321
