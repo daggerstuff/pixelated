@@ -977,18 +977,23 @@ stages:
 
               # Build optional Cloudflare Access headers if provided
               CURL_ARGS=()
-              if [ -n "${CF_ACCESS_CLIENT_ID}" ] && [ -n "${CF_ACCESS_CLIENT_SECRET}" ]; then
-                CURL_ARGS+=(-H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}")
-                CURL_ARGS+=(-H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}")
+              CF_ACCESS_CLIENT_ID_VALUE="${CF_ACCESS_CLIENT_ID:-}"
+              CF_ACCESS_CLIENT_SECRET_VALUE="${CF_ACCESS_CLIENT_SECRET:-}"
+              HAS_CF_ACCESS_CREDS="false"
+
+              if [ -n "${CF_ACCESS_CLIENT_ID_VALUE}" ] && [ -n "${CF_ACCESS_CLIENT_SECRET_VALUE}" ]; then
+                HAS_CF_ACCESS_CREDS="true"
+                CURL_ARGS+=(-H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID_VALUE}")
+                CURL_ARGS+=(-H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET_VALUE}")
                 echo "✅ Using Cloudflare Access headers for /demo check"
-                echo "   Client ID: ${CF_ACCESS_CLIENT_ID:0:10}...${CF_ACCESS_CLIENT_ID: -4}"
               else
                 echo "##[warning]⚠️ Cloudflare Access credentials NOT configured!"
                 echo "##[warning]Variables CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET are missing"
                 echo "##[warning]Add them to variable group 'pixelated-pipeline-variables' to enable performance tests"
               fi
 
-              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "${CURL_ARGS[@]}" "$DEMO_URL" 2>/dev/null || echo "000")
+              # Follow redirects so we don't treat a login redirect as "accessible"
+              HTTP_CODE=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "${CURL_ARGS[@]}" "$DEMO_URL" 2>/dev/null || echo "000")
 
               if [ "$HTTP_CODE" = "000" ]; then
                 echo "##vso[task.logissue type=warning]/demo route is not accessible (connection failed)"
@@ -1001,24 +1006,36 @@ stages:
                 echo "   This is non-blocking - pipeline will continue"
                 exit 0
               elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
-                echo "##vso[task.logissue type=error]/demo route returned client error (HTTP $HTTP_CODE)"
-                echo "❌ PERFORMANCE TESTS SKIPPED - /demo route requires authentication"
+                # Most common cause: Cloudflare Access is protecting /demo.
+                # Distinguish between "missing credentials" vs "credentials present but rejected".
+                echo "❌ PERFORMANCE TESTS SKIPPED - /demo returned client error (HTTP $HTTP_CODE)"
                 echo ""
-                echo "##[error]Cloudflare Access credentials are not configured!"
-                echo ""
-                echo "📋 REQUIRED ACTION - Add these variables to Azure DevOps:"
-                echo ""
-                echo "   Variable Group: 'pixelated-pipeline-variables'"
-                echo "   "
-                echo "   Required Variables:"
-                echo "   ├─ CF_ACCESS_CLIENT_ID      (from Cloudflare Zero Trust > Access > Service Auth)"
-                echo "   └─ CF_ACCESS_CLIENT_SECRET  (from Cloudflare Zero Trust > Access > Service Auth)"
-                echo ""
-                echo "   How to get credentials:"
-                echo "   1. Go to Cloudflare Zero Trust Dashboard"
-                echo "   2. Navigate to Access > Service Auth"
-                echo "   3. Create or copy existing service token"
-                echo "   4. Add to Azure DevOps: Pipelines > Library > pixelated-pipeline-variables"
+
+                if [ "$HAS_CF_ACCESS_CREDS" = "true" ]; then
+                  echo "##vso[task.logissue type=error]Cloudflare Access credentials were provided but were rejected (HTTP $HTTP_CODE)"
+                  echo ""
+                  echo "📋 REQUIRED ACTION - Update Cloudflare Access policy to allow this service token:"
+                  echo "   1. Cloudflare Zero Trust Dashboard"
+                  echo "   2. Access > Applications (find the staging/prod app protecting /demo)"
+                  echo "   3. Policies: ensure 'Service Auth' is allowed and includes this service token"
+                  echo "   4. Rotate/recreate token if needed, then update Azure DevOps variable group"
+                else
+                  echo "##vso[task.logissue type=warning]Cloudflare Access credentials are not configured; /demo likely requires authentication"
+                  echo ""
+                  echo "📋 REQUIRED ACTION - Add these variables to Azure DevOps:"
+                  echo "   Variable Group: 'pixelated-pipeline-variables'"
+                  echo ""
+                  echo "   Required Variables:"
+                  echo "   ├─ CF_ACCESS_CLIENT_ID      (from Cloudflare Zero Trust > Access > Service Auth)"
+                  echo "   └─ CF_ACCESS_CLIENT_SECRET  (from Cloudflare Zero Trust > Access > Service Auth)"
+                  echo ""
+                  echo "   How to get credentials:"
+                  echo "   1. Go to Cloudflare Zero Trust Dashboard"
+                  echo "   2. Navigate to Access > Service Auth"
+                  echo "   3. Create or copy existing service token"
+                  echo "   4. Add to Azure DevOps: Pipelines > Library > pixelated-pipeline-variables"
+                fi
+
                 echo ""
                 echo "##[warning]Pipeline will continue but performance tests are NOT running!"
                 exit 0
