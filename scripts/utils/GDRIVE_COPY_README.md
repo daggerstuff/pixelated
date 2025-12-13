@@ -14,9 +14,16 @@ Copy files directly between Google Drive accounts without downloading locally.
    - Create a new project (or select existing)
    - Enable the **Google Drive API**
    - Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
-   - Choose "Desktop app" as application type
-   - Download the credentials JSON file
+   - Choose **"Desktop app"** as application type
+   - **IMPORTANT**: Download the credentials JSON file **immediately** - Google only shows the client secret once at creation time!
    - Save it as: `~/.config/gdrive_copy/credentials.json`
+   
+   **⚠️ If you've lost your client secret:**
+   - Go to your OAuth 2.0 Client ID in Google Cloud Console
+   - Click "Add Secret" to create a new client secret
+   - Download the updated credentials.json immediately
+   - Replace your old `~/.config/gdrive_copy/credentials.json` with the new one
+   - See [Google's documentation](https://support.google.com/cloud/answer/15549257#client-secret-hashing) for details
 
 3. **Run the script:**
    ```bash
@@ -68,6 +75,21 @@ These tokens persist, so you only need to authenticate once per account.
 - Make sure you've downloaded `credentials.json` from Google Cloud Console
 - Save it to `~/.config/gdrive_copy/credentials.json`
 
+**"(invalid_client) Unauthorized"**
+- Your OAuth credentials may be invalid, expired, or the client secret was lost
+- **If you've lost your client secret** (most common):
+  - Go to [Google Cloud Console](https://console.cloud.google.com/) → Google Auth Platform → Clients
+  - Click on your OAuth 2.0 Client ID
+  - Click **"Add Secret"** to create a new client secret
+  - **Download the updated credentials.json immediately** (Google only shows secrets once!)
+  - Replace `~/.config/gdrive_copy/credentials.json` with the new file
+- **If creating a new client:**
+  - Delete the old OAuth 2.0 Client ID and create a new one
+  - Make sure to select **"Desktop app"** as the application type
+  - Download the `credentials.json` immediately after creation
+  - Ensure **Google Drive API is enabled** in your project
+- **Note**: Google now hashes client secrets - you can only view/download them once at creation time. See [Google's documentation](https://support.google.com/cloud/answer/15549257#client-secret-hashing)
+
 **"Permission denied"**
 - Ensure the source account has access to the file
 - Check that both accounts have Drive API enabled
@@ -75,3 +97,20 @@ These tokens persist, so you only need to authenticate once per account.
 **"File not found"**
 - Verify the file ID is correct
 - Ensure the source account can access the file
+
+## Correct Command Usage
+
+**Wrong:**
+```bash
+uv python scripts/utils/gdrive_copy.py ...  # ❌ This is for managing Python versions
+```
+
+**Correct:**
+```bash
+uv run python scripts/utils/gdrive_copy.py ...  # ✅ Run in uv environment
+```
+
+Or if you're already in a uv shell:
+```bash
+python scripts/utils/gdrive_copy.py ...  # ✅ Direct execution
+```

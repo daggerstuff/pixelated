@@ -17,6 +17,7 @@ import logging
 import sys
 import traceback
 from pathlib import Path
+from typing import Any
 
 try:
     from google.auth.transport.requests import Request
@@ -83,8 +84,13 @@ def show_credentials_setup_instructions() -> None:
     logger.info("2. Create a new project or select existing")
     logger.info("3. Enable Google Drive API")
     logger.info("4. Create OAuth 2.0 credentials (Desktop app)")
-    logger.info("5. Download credentials.json")
+    logger.info("5. ⚠️  Download credentials.json IMMEDIATELY - Google only shows secrets once!")
     logger.info(f"6. Save it as: {CREDENTIALS_FILE}")
+    logger.info("\n💡 If you've lost your client secret:")
+    logger.info("   - Go to Google Auth Platform → Clients → Your Client ID")
+    logger.info("   - Click 'Add Secret' to create a new one")
+    logger.info("   - Download the updated credentials.json immediately")
+    logger.info("   - See: https://support.google.com/cloud/answer/15549257#client-secret-hashing")
     sys.exit(1)
 
 
@@ -126,11 +132,13 @@ def get_file_metadata(source_service, source_file_id: str) -> dict:
     return source_file
 
 
-def prepare_copy_metadata(file_name: str, destination_folder_id: str | None = None) -> dict:
+def prepare_copy_metadata(
+    file_name: str, destination_folder_id: str | None = None
+) -> dict[str, Any]:
     """Prepare metadata for copying a file to destination Drive."""
-    copy_metadata = {"name": file_name}
+    copy_metadata: dict[str, Any] = {"name": file_name}
     if destination_folder_id is not None:
-        copy_metadata["parents"] = destination_folder_id
+        copy_metadata["parents"] = [destination_folder_id]
     return copy_metadata
 
 
