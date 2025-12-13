@@ -7,6 +7,7 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/index'
+import { ALLOWED_DIRECTORIES, safeJoin, validatePath } from '../../../utils/path-security'
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import * as crypto from 'crypto'
@@ -121,24 +122,12 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const defaultPath = securePathJoin(process.cwd(), 'data', 'backups')
+    const defaultPath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'backups')
     const userBasePath = (config['basePath'] as string) || defaultPath
-    
-    // Validate basePath to prevent path traversal
-    // Ensure basePath is within project root or a safe data directory
-    const projectRoot = path.resolve(process.cwd())
-    const resolvedBasePath = path.resolve(userBasePath)
-    
-    // Reject absolute paths that escape project root
-    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
-      throw new Error('Base path must be within project directory')
-    }
-    
-    // Reject paths with directory traversal sequences
-    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
-      throw new Error('Base path contains directory traversal sequences')
-    }
-    
+
+    // Validate basePath is within the project root (prevents traversal)
+    const resolvedBasePath = validatePath(userBasePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+
     this.config = {
       basePath: resolvedBasePath,
     }
@@ -174,20 +163,13 @@ export class FileSystemStorageProvider implements StorageProvider {
     try {
       const results: string[] = []
       const { basePath } = this.config
-      const resolvedBasePath = path.resolve(basePath)
+      const resolvedBasePath = basePath
 
       const scanDir = async (dirPath: string, relativePath = '') => {
         // Validate dirPath is within basePath to prevent path traversal
-        const resolvedDirPath = path.resolve(dirPath)
-        if (
-          !resolvedDirPath.startsWith(resolvedBasePath + path.sep) &&
-          resolvedDirPath !== resolvedBasePath
-        ) {
-          logger.warn(`Skipping directory outside base path: ${dirPath}`)
-          return
-        }
+        const validatedDirPath = validatePath(dirPath, resolvedBasePath)
 
-        const entries = await fs.readdir(dirPath, { withFileTypes: true })
+        const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
         for (const entry of entries) {
           // Validate entry name for security
@@ -202,7 +184,7 @@ export class FileSystemStorageProvider implements StorageProvider {
           }
 
           // Use securePathJoin to prevent path traversal
-          const fullPath = securePathJoin(dirPath, entry.name)
+          const fullPath = securePathJoin(validatedDirPath, entry.name)
           const relPath = relativePath
             ? securePathJoin(relativePath, entry.name)
             : entry.name
@@ -300,24 +282,12 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const defaultPath = securePathJoin(process.cwd(), 'data', 'mock-cloud')
+    const defaultPath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'mock-cloud')
     const userBasePath = (config['basePath'] as string) || defaultPath
-    
-    // Validate basePath to prevent path traversal
-    // Ensure basePath is within project root or a safe data directory
-    const projectRoot = path.resolve(process.cwd())
-    const resolvedBasePath = path.resolve(userBasePath)
-    
-    // Reject absolute paths that escape project root
-    if (!resolvedBasePath.startsWith(projectRoot + path.sep) && resolvedBasePath !== projectRoot) {
-      throw new Error('Base path must be within project directory')
-    }
-    
-    // Reject paths with directory traversal sequences
-    if (userBasePath.includes('..') || userBasePath.includes('../') || userBasePath.includes('..\\')) {
-      throw new Error('Base path contains directory traversal sequences')
-    }
-    
+
+    // Validate basePath is within the project root (prevents traversal)
+    const resolvedBasePath = validatePath(userBasePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
       bucket: (config['bucket'] as string) || 'mock-bucket',
@@ -412,7 +382,7 @@ export class MockCloudStorageProvider implements StorageProvider {
     // Build bucket path using securePathJoin to prevent path traversal
     const providerPath = securePathJoin(this.config.basePath, this.config.provider)
     const bucketPath = securePathJoin(providerPath, this.config.bucket)
-    const resolvedBasePath = path.resolve(this.config.basePath)
+    const resolvedBasePath = this.config.basePath
 
     // Simulate network delay
     await new Promise((resolve) =>
@@ -424,16 +394,9 @@ export class MockCloudStorageProvider implements StorageProvider {
 
       const scanDir = async (dirPath: string, relativePath = '') => {
         // Validate dirPath is within basePath to prevent path traversal
-        const resolvedDirPath = path.resolve(dirPath)
-        if (
-          !resolvedDirPath.startsWith(resolvedBasePath + path.sep) &&
-          resolvedDirPath !== resolvedBasePath
-        ) {
-          logger.warn(`Skipping directory outside base path: ${dirPath}`)
-          return
-        }
+        const validatedDirPath = validatePath(dirPath, resolvedBasePath)
 
-        const entries = await fs.readdir(dirPath, { withFileTypes: true })
+        const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
         for (const entry of entries) {
           if (entry.name.endsWith('.meta')) {
@@ -452,7 +415,7 @@ export class MockCloudStorageProvider implements StorageProvider {
           }
 
           // Use securePathJoin to prevent path traversal
-          const entryPath = securePathJoin(dirPath, entry.name)
+          const entryPath = securePathJoin(validatedDirPath, entry.name)
           const keyPath = relativePath
             ? securePathJoin(relativePath, entry.name)
             : entry.name

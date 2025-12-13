@@ -1,0 +1,139 @@
+name: "CodeQL"
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  schedule:
+    # Run every Monday at 2:00 AM UTC
+    - cron: "0 2 * * 1"
+
+env:
+  NODE_VERSION: 24.8.0
+  PYTHON_VERSION: 3.11
+  PNPM_VERSION: 10.25.0
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript", "python"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          config-file: .github/codeql/codeql-config.yml
+          queries: +security-and-quality
+
+      - name: Setup Node.js
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        if: matrix.language == 'javascript'
+        run: corepack enable
+
+      - name: Setup pnpm
+        if: matrix.language == 'javascript'
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        if: matrix.language == 'javascript'
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        if: matrix.language == 'javascript'
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install JavaScript dependencies
+        if: matrix.language == 'javascript'
+        run: pnpm install --no-frozen-lockfile --ignore-scripts
+
+      - name: Build JavaScript/TypeScript project
+        if: matrix.language == 'javascript'
+        run: |
+          # Build the project for CodeQL analysis
+          pnpm build || echo "Build completed with warnings"
+
+      - name: Setup Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Ensure `uv` shim is available
+        if: matrix.language == 'python'
+        run: |
+          if ! command -v uv >/dev/null 2>&1; then
+            echo "uv not found - installing via pip"
+            python -m pip install --upgrade 'pip>=25.3'
+            python -m pip install 'uv>=0.9.6'
+          else
+            echo "uv already installed - verifying version"
+            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
+          fi
+
+      - name: Prepare uv venv
+        if: matrix.language == 'python'
+        id: prepare-uv
+        uses: ./.github/actions/prepare-uv-venv
+        with:
+          service-dir: src/lib/ai/bias-detection/python-service
+
+      - name: Install Python dependencies
+        if: matrix.language == 'python'
+        run: |
+          # Install Python dependencies for CodeQL analysis
+          # Check if bias-detection service exists
+          if [ -d "src/lib/ai/bias-detection/python-service" ]; then
+            cd src/lib/ai/bias-detection/python-service
+            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+            uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
+            uv pip install ${USE_SYSTEM} -r requirements.txt || true
+            cd - > /dev/null
+          fi
+
+          # Install other Python dependencies if they exist
+          find . -name "requirements.txt" -not -path "*/node_modules/*" -not -path "*/.venv/*" -not -path "*/site-packages/*" | head -5 | while read req; do
+            dir=$(dirname "$req")
+            echo "Installing dependencies from $dir"
+            cd "$dir"
+            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+            uv pip install ${USE_SYSTEM} -r requirements.txt || true
+            cd - > /dev/null
+          done || true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
