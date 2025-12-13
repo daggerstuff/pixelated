@@ -110,23 +110,11 @@ RUN pnpm install --prod --frozen-lockfile && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
 # Copy built output and public assets from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/templates ./templates
-COPY --from=builder /app/start-server.mjs ./start-server.mjs
-COPY --from=builder /app/instrument.mjs ./instrument.mjs
-
-# Set ownership for runtime assets only (avoid expensive recursive chown of node_modules)
-RUN chown -R astro:astro \
-      /app/dist \
-      /app/public \
-      /app/templates \
-      /app/package.json \
-      /app/pnpm-lock.yaml \
-      /app/start-server.mjs \
-      /app/instrument.mjs \
-  && chmod -R g+rX /app/dist /app/public /app/templates \
-  && chmod g+r /app/package.json /app/pnpm-lock.yaml /app/start-server.mjs /app/instrument.mjs
+COPY --from=builder --chown=astro:astro /app/dist ./dist
+COPY --from=builder --chown=astro:astro /app/public ./public
+COPY --from=builder --chown=astro:astro /app/templates ./templates
+COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
+COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
 USER astro
 
 EXPOSE 4321
