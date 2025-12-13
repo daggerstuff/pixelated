@@ -20,7 +20,7 @@ env:
 jobs:
   browser-tests:
     name: Run Browser Tests
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     timeout-minutes: 60
 
     steps:
@@ -96,7 +96,7 @@ jobs:
 
   generate-report:
     name: Generate Test Report
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     needs: [browser-tests]
     if: always()
 
