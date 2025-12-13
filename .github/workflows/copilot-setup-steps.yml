@@ -8,10 +8,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
-
 jobs:
   copilot-code-review:
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
 
     permissions:
       contents: read
