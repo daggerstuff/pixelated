@@ -15,7 +15,7 @@ on:
 jobs:
   security-scan:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -127,7 +127,7 @@ jobs:
 
   dependency-check:
     name: Dependency Check
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
