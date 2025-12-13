@@ -16,7 +16,6 @@ dependencies = [
   "werkzeug>=3.1.4", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "fairlearn",
   "shap>=0.41.0",
-  "lime",
   "spacy>=3.8.0",
   "nltk",
   "evaluate",
