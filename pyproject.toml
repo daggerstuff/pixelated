@@ -85,6 +85,10 @@ dependencies = [
   "checkov>=3.0.34",
   "kaggle>=1.8.2",
   "boto3>=1.40.75",
+  # Google Drive API for direct Drive-to-Drive transfers
+  "google-api-python-client>=2.150.0",
+  "google-auth-httplib2>=0.2.0",
+  "google-auth-oauthlib>=1.2.1",
 ]
 
 [project.optional-dependencies]
