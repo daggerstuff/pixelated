@@ -20,8 +20,11 @@ from pathlib import Path
 from typing import Any
 
 try:
+    from google.auth.external_account_authorized_user import (
+        Credentials as ExternalAccountCredentials,
+    )
     from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials
+    from google.oauth2.credentials import Credentials as OAuth2Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
     from googleapiclient.discovery import build
     from googleapiclient.errors import HttpError
@@ -49,13 +52,15 @@ DEST_TOKEN_FILE = TOKEN_DIR / "dest_token.json"
 CREDENTIALS_FILE = TOKEN_DIR / "credentials.json"
 
 
-def get_credentials(token_file: Path, account_name: str) -> Credentials | None:
+def get_credentials(
+    token_file: Path, account_name: str
+) -> OAuth2Credentials | ExternalAccountCredentials | None:
     """Get valid user credentials from storage or OAuth flow."""
-    creds = None
+    creds: OAuth2Credentials | ExternalAccountCredentials | None = None
 
     # Load existing token
     if token_file.exists():
-        creds = Credentials.from_authorized_user_file(str(token_file), SCOPES)
+        creds = OAuth2Credentials.from_authorized_user_file(str(token_file), SCOPES)
 
     # If there are no (valid) credentials available, let the user log in
     if not creds or not creds.valid:
