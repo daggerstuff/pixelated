@@ -13,7 +13,7 @@ dependencies = [
   "numpy",
   "scikit-learn",
   "pyjwt",
-  "werkzeug>=3.1.4",  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
+  "werkzeug>=3.1.4", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "fairlearn",
   "shap>=0.41.0",
   "lime",
@@ -21,7 +21,7 @@ dependencies = [
   "nltk",
   "evaluate",
   "cryptography",
-  "requests>=2.32.4",  # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
+  "requests>=2.32.4", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv",
   "click<9.0",
   "numba>=0.56.0",
@@ -49,7 +49,7 @@ dependencies = [
   "einops>=0.8.0",
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
-  "transformers>=4.35.0",  # Required for dataset_pipeline training_runner
+  "transformers>=4.35.0", # Required for dataset_pipeline training_runner
   "gguf>=0.10.0",
   "ruff>=0.12.5",
   "yamllint>=1.37.1",
@@ -79,11 +79,12 @@ dependencies = [
   "keras>=3.12.0", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "fonttools>=4.61.0", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
   "mcp>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
-  "urllib3>=2.6.0", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+  "urllib3>=2.6.2", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "checkov>=3.0.34",
   "kaggle>=1.8.2",
+  "boto3>=1.40.75",
 ]
 
 [project.optional-dependencies]

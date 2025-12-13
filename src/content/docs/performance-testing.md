@@ -79,6 +79,16 @@ Performance tests run automatically on:
 - Daily against the main branch
 - Release candidate builds
 
+#### Cloudflare Access (staging/production)
+
+If the target environment is protected by Cloudflare Zero Trust Access, the pipeline/test runner must authenticate via a **Service Auth token**.
+
+- **Azure DevOps variables** (variable group `pixelated-pipeline-variables`):
+  - `CF_ACCESS_CLIENT_ID`
+  - `CF_ACCESS_CLIENT_SECRET`
+- **Cloudflare configuration**:
+  - Ensure the Access Application protecting the target routes (e.g. `/demo`) has a Policy that **allows Service Auth** and includes the service token used by CI.
+
 ## Performance Budgets
 
 We've established the following performance budgets:
