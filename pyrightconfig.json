@@ -8,7 +8,10 @@
     "**/build/**",
     "**/dist/**",
     "**/datasets/**",
-    ".coveragerc"
+    ".coveragerc",
+    "ai/data",
+    "ai/lightning",
+    "ai/dataset_pipeline/pixelated-training"
   ],
   "extraPaths": ["stubs"],
   "typeCheckingMode": "basic",

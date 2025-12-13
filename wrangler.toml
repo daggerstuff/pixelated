@@ -6,6 +6,10 @@ main = "dist/server/entry.mjs"
 compatibility_date = "2024-10-31"
 compatibility_flags = ["nodejs_compat"]
 
+# Limits and Performance
+limits = { cpu_ms = 50000 }
+logpush = false
+
 # Account details (set via environment or CLI)
 # account_id = "" # Set via CLOUDFLARE_ACCOUNT_ID env var
 # workers_dev = true # Enable for development
@@ -57,17 +61,13 @@ preview_bucket_name = "pixelated-uploads-preview"
 # preview_database_id = "" # Set for preview
 
 # Analytics Engine
-[analytics_engine_datasets]
-# binding = "ANALYTICS"
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
 
 # Observability
 [observability]
 enabled = true
 head_sampling_rate = 1.0
-
-# Limits and Performance
-limits = { cpu_ms = 50000 }
-logpush = false
 
 # Routes and Custom Domains
 # [[routes]]

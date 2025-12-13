@@ -11,6 +11,9 @@ node_modules/
 /dist/bundle-analysis.html
 /.spec-workflow/
 /acontext_server/
+# Exception: ai/training_ready files should be tracked (must come before /training_ready/)
+!ai/training_ready/
+!ai/training_ready/**
 /training_ready/
 
 /npm-debug.log*
@@ -272,33 +275,9 @@ terraform/*.tfplan
 terraform/plan.tfplan
 acontext_server/
 
-# Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
-
-
-# Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
-.oracle_deployment
-.clinerules/byterover-rules.md
-.kilocode/rules/byterover-rules.md
-.roo/rules/byterover-rules.md
-.windsurf/rules/byterover-rules.md
-.cursor/rules/byterover-rules.mdc
-.kiro/steering/byterover-rules.md
-.qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md
-
-
-# Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
-
 # Claude Flow generated files
 .claude/settings.local.json
 .mcp.json
-claude-flow.config.json
-.swarm/
-.hive-mind/
-.claude-flow/
 memory/
 coordination/
 memory/claude-flow-data.json
@@ -315,9 +294,8 @@ coordination/orchestration/*
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
-claude-flow
+
 # Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
 docs/deployment-issue-resolution.md
 scripts/create-a1-flex-instance-simple.sh
 scripts/create-a1-flex-instance.sh
@@ -332,11 +310,13 @@ tmp/
 # MCP server binaries
 /bin/
 .specstory
-scripts/claude-flow-removal.sh
 .notes/cloudflare-patch
 .sonarlint
 .brv
 
+# Exception: ai/training_ready files should be tracked (must come before /ai/ ignore)
+!ai/training_ready/
+!ai/training_ready/**
 /ai/
 
 # OpenMemory - IDE/Assistant specific rules

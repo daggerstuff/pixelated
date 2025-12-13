@@ -3,7 +3,7 @@
 # Builder stage: install deps and run the static build
 ARG PNPM_VERSION=10.22.0
 FROM node:24-slim AS builder
-ARG PNPM_VERSION=10.24.0
+ARG PNPM_VERSION=10.25.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -47,8 +47,8 @@ COPY . .
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
-RUN find /app/node_modules -name "*.map" -delete && \
-    find /app/dist -name "*.map" -delete 2>/dev/null || true
+RUN find /app/node_modules -type f -name "*.map" -delete && \
+    find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
 FROM node:24-slim AS runtime
@@ -56,7 +56,7 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=10.24.0
+ARG PNPM_VERSION=10.25.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
@@ -110,14 +110,11 @@ RUN pnpm install --prod --frozen-lockfile && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
 # Copy built output and public assets from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/templates ./templates
-COPY --from=builder /app/start-server.mjs ./start-server.mjs
-COPY --from=builder /app/instrument.mjs ./instrument.mjs
-
-# Set ownership and drop to non-root (separate layer for smaller size)
-RUN chown -R astro:astro /app && chmod -R g+rX /app
+COPY --from=builder --chown=astro:astro /app/dist ./dist
+COPY --from=builder --chown=astro:astro /app/public ./public
+COPY --from=builder --chown=astro:astro /app/templates ./templates
+COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
+COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
 USER astro
 
 EXPOSE 4321

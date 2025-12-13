@@ -78,7 +78,7 @@ package-lock.json
 yarn.lock
 
 # ============================================
-# Memory bank files (use brv retrieve instead)
+# Memory bank files
 # ============================================
 memory-bank/
 memory/

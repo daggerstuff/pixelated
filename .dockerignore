@@ -163,6 +163,9 @@ training_dataset.json
 *.sqlite
 *.sqlite3
 
+# Local service data (never ship in build context)
+acontext_server/
+
 # Monitoring and analysis
 reports/
 monitoring/

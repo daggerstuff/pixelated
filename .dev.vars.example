@@ -59,10 +59,6 @@ TWILIO_AUTH_TOKEN=
 VECTOR_STORE_TYPE=qdrant
 VECTOR_STORE_URL=http://localhost:6333
 
-# MCP
-MCP_BYTEROVER_TOKEN=
-OPENMEMORY_API_KEY=
-
 # Development
 NODE_ENV=development
 PUBLIC_SITE_URL=http://localhost:8787

@@ -21,147 +21,195 @@
     <div
       class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm mb-8"
     >
-      <span class="flex h-2 w-2 rounded-full bg-primary-500"></span>
-      <span class="text-xs font-medium text-slate-300 tracking-wide uppercase"
-        >New Features Available</span
-      >
-    </div>
-
-    <h1 class="text-3xl md:text-5xl font-bold tracking-tight mb-6 text-white">
-      Train Smarter. <br class="hidden md:block" />
-      <span
-        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-teal-300 to-blue-500"
-      >
-        Care Better.
+      <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+      <span class="text-xs font-medium text-slate-300 tracking-wide uppercase">
+        v2.0 Now Live
       </span>
-    </h1>
-
-    <p
-      class="text-base md:text-lg text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
-    >
-      Revolutionary AI simulation platform for mental health professionals.
-      Experience immersive training scenarios and improve patient outcomes.
-    </p>
-
-    <div
-      class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
-    >
-      <a
-        href="/auth/signup"
-        class="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-full font-semibold text-sm transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-1"
-      >
-        Start Free Trial
-      </a>
-      <a
-        href="/demo-hub"
-        class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-full font-semibold text-sm transition-all backdrop-blur-sm"
-      >
-        View Demo
-      </a>
     </div>
 
-    <!-- Hero Visual / Chat Preview -->
-    <div class="relative max-w-4xl mx-auto">
+  <h1
+    class="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-white max-w-4xl mx-auto"
+  >
+    The AI Training Ground
+    <span
+      class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-teal-300 to-blue-500"
+    >
+      for Therapists.
+    </span>
+  </h1>
+
+  <p
+    class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
+  >
+    Practice difficult conversations in a safe space. No pressure, just
+    progress.
+  </p>
+
+  <div
+    class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20"
+  >
+    <a
+      href="/auth/signup"
+      class="px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl font-bold transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-1"
+    >
+      Start Practice Mode
+    </a>
+    <a
+      href="/demo-hub"
+      class="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-bold transition-all backdrop-blur-sm"
+    >
+      Watch Demo
+    </a>
+  </div>
+
+  <!-- Hero Visual / Chat Preview -->
+  <div class="relative max-w-4xl mx-auto">
+    <div
+      class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-blue-500 rounded-2xl opacity-20 blur-lg"
+    >
+    </div>
+    <div
+      class="relative bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+    >
+      <!-- Mockup Header -->
       <div
-        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-blue-500 rounded-2xl opacity-20 blur-lg"
+        class="bg-slate-950/50 border-b border-white/5 p-4 flex items-center gap-4"
       >
-      </div>
-      <div
-        class="relative bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
-      >
-        <!-- Mockup Header -->
-        <div
-          class="bg-slate-950/50 border-b border-white/5 p-4 flex items-center gap-4"
-        >
-          <div class="flex gap-2">
-            <div
-              class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"
-            >
-            </div>
-            <div
-              class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"
-            >
-            </div>
-            <div
-              class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"
-            >
-            </div>
+        <div class="flex gap-2">
+          <div
+            class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"
+          >
           </div>
           <div
-            class="px-3 py-1 bg-black/40 rounded-md text-xs text-slate-500 font-mono"
+            class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"
           >
-            simulation_v2.0.active
+          </div>
+          <div
+            class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"
+          >
           </div>
         </div>
-        <!-- Mockup Content (Chat) -->
         <div
-          class="p-8 bg-slate-900/50 min-h-[400px] flex flex-col gap-6 text-left"
+          class="px-3 py-1 bg-black/40 rounded-md text-xs text-slate-500 font-mono"
         >
-          <!-- AI Message -->
-          <div class="flex gap-4 max-w-[80%]">
+          simulation_v2.0.active
+        </div>
+      </div>
+      <!-- Mockup Content (Chat) -->
+      <div
+        class="p-8 bg-slate-900/50 min-h-[400px] flex flex-col gap-6 text-left"
+      >
+        <!-- AI Message (Hidden initially) -->
+        <div
+          id="ai-message-group"
+          class="flex gap-4 max-w-[80%] opacity-0 transition-opacity duration-500"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
+          >
+            AI
+          </div>
+          <div class="space-y-2">
             <div
-              class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
+              class="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none"
             >
-              AI
+              <p id="ai-text" class="text-slate-300 leading-relaxed"></p>
             </div>
-            <div class="space-y-2">
-              <div
-                class="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none"
-              >
-                <p class="text-slate-300 leading-relaxed">
-                  How are you feeling today? I notice you seem a bit stressed
-                  based on your tone.
-                </p>
-              </div>
-              <div class="flex gap-2 text-xs text-slate-500">
-                <span>Empathy Score: 8.7</span>
-                <span>•</span>
-                <span>Confidence: 94%</span>
-              </div>
+            <div
+              id="ai-stats"
+              class="flex gap-2 text-xs text-slate-500 opacity-0 transition-opacity duration-500"
+            >
+              <span>Empathy Score: 8.7</span>
+              <span>•</span>
+              <span>Confidence: 94%</span>
             </div>
           </div>
+        </div>
 
-          <!-- User Message -->
-          <div class="flex gap-4 max-w-[80%] ml-auto flex-row-reverse">
+        <!-- User Message -->
+        <div class="flex gap-4 max-w-[80%] ml-auto flex-row-reverse">
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
+          >
+            DR
+          </div>
+          <div class="space-y-2">
             <div
-              class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
+              class="bg-primary-500/10 border border-primary-500/20 p-4 rounded-2xl rounded-tr-none"
             >
-              DR
-            </div>
-            <div class="space-y-2">
-              <div
-                class="bg-primary-500/10 border border-primary-500/20 p-4 rounded-2xl rounded-tr-none"
-              >
-                <p class="text-slate-200 leading-relaxed">
-                  I've been having trouble sleeping and feeling anxious about
-                  work...
-                </p>
-              </div>
+              <p class="text-slate-200 leading-relaxed">
+                I've been having trouble sleeping and feeling anxious about
+                work...
+              </p>
             </div>
           </div>
+        </div>
 
-          <!-- AI Typing -->
-          <div class="flex gap-4 max-w-[80%]">
-            <div
-              class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
-            >
-              AI
-            </div>
-            <div
-              class="bg-white/5 border border-white/10 px-4 py-3 rounded-2xl rounded-tl-none flex gap-1 items-center h-12"
-            >
-              <span class="w-2 h-2 bg-slate-500 rounded-full animate-bounce"
-              ></span>
-              <span
-                class="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:100ms]"
-              ></span>
-              <span
-                class="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:200ms]"
-              ></span>
-            </div>
+        <!-- AI Typing Indicator -->
+        <div id="ai-typing" class="flex gap-4 max-w-[80%]">
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0"
+          >
+            AI
+          </div>
+          <div
+            class="bg-white/5 border border-white/10 px-4 py-3 rounded-2xl rounded-tl-none flex gap-1 items-center h-12"
+          >
+            <span class="w-2 h-2 bg-slate-500 rounded-full animate-bounce"
+            ></span>
+            <span
+              class="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:100ms]"
+            ></span>
+            <span
+              class="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:200ms]"
+            ></span>
           </div>
         </div>
       </div>
     </div>
   </div>
+  </div>
 </section>
+
+<script>
+  function startChatAnimation() {
+    const aiMessageGroup = document.getElementById('ai-message-group')
+    const aiText = document.getElementById('ai-text')
+    const aiStats = document.getElementById('ai-stats')
+    const aiTyping = document.getElementById('ai-typing')
+
+    if (!aiMessageGroup || !aiText || !aiStats || !aiTyping) return
+
+    const fullText =
+      'How are you feeling today? I notice you seem a bit stressed based on your tone.'
+
+    // Initial state
+    aiMessageGroup.style.display = 'none'
+
+    // Step 1: Wait, then hide typing and show message container
+    setTimeout(() => {
+      aiTyping.style.display = 'none'
+      aiMessageGroup.style.display = 'flex'
+      // Trigger reflow
+      void aiMessageGroup.offsetWidth
+      aiMessageGroup.style.opacity = '1'
+
+      // Step 2: Type out text
+      let i = 0
+      const typeInterval = setInterval(() => {
+        aiText.textContent += fullText.charAt(i)
+        i++
+        if (i >= fullText.length) {
+          clearInterval(typeInterval)
+          // Step 3: Show stats
+          setTimeout(() => {
+            aiStats.style.opacity = '1'
+          }, 500)
+        }
+      }, 30) // Typing speed
+    }, 1500)
+  }
+
+  // Run on load
+  document.addEventListener('DOMContentLoaded', startChatAnimation)
+</script>
