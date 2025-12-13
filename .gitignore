@@ -11,9 +11,10 @@ node_modules/
 /dist/bundle-analysis.html
 /.spec-workflow/
 /acontext_server/
+# Exception: ai/training_ready files should be tracked (must come before /training_ready/)
+!ai/training_ready/
+!ai/training_ready/**
 /training_ready/
-# Exception: ai/training_ready files should be tracked
-!/ai/training_ready/
 
 /npm-debug.log*
 /yarn-debug.log*
