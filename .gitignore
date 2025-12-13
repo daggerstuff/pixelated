@@ -12,6 +12,8 @@ node_modules/
 /.spec-workflow/
 /acontext_server/
 /training_ready/
+# Exception: ai/training_ready files should be tracked
+!/ai/training_ready/
 
 /npm-debug.log*
 /yarn-debug.log*
@@ -311,6 +313,9 @@ tmp/
 .sonarlint
 .brv
 
+# Exception: ai/training_ready files should be tracked (must come before /ai/ ignore)
+!ai/training_ready/
+!ai/training_ready/**
 /ai/
 
 # OpenMemory - IDE/Assistant specific rules
