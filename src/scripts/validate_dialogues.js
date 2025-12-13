@@ -9,11 +9,13 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Configuration
-const DIALOGUES_DIR = path.join(
-  path.resolve(),
-  'ai/data/processed/generated_dialogues',
+const DIALOGUES_DIR = path.resolve(
+  'ai',
+  'data',
+  'processed',
+  'generated_dialogues',
 )
-const OUTPUT_REPORT = path.join(DIALOGUES_DIR, 'validation_report.md')
+const OUTPUT_REPORT = path.resolve(DIALOGUES_DIR, 'validation_report.md')
 const MIN_TURNS = 20 // Minimum number of "Therapist:" and "Client:" exchanges
 
 // Secure path validation to prevent directory traversal
@@ -33,8 +35,13 @@ function securePathResolve(basePath, userPath) {
   }
 
   // Reject paths with unsafe characters
-  const unsafeChars = /[<>:"|?*\x00-\x1f]/ // Control characters and Windows forbidden chars
-  if (unsafeChars.test(userPath)) {
+  const unsafeVisibleChars = /[<>:"|?*]/
+  // Check for control characters (0x00-0x1f) by character code
+  const hasControlChars = Array.from(userPath).some((char) => {
+    const code = char.charCodeAt(0)
+    return code >= 0 && code <= 31
+  })
+  if (unsafeVisibleChars.test(userPath) || hasControlChars) {
     throw new Error('Path contains unsafe characters')
   }
 

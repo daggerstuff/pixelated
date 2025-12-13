@@ -1,9 +1,9 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/index'
+import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 
 const logger = createBuildSafeLogger('default')
 import { existsSync } from 'fs'
-import { join } from 'path'
 
 export interface DatasetMergeStats {
   totalDatasets: number
@@ -51,17 +51,17 @@ export async function mergeAllDatasets(
 }
 
 export function mergedDatasetExists(outputPath?: string): boolean {
-  const basePath = join(process.cwd(), 'data', 'merged')
+  const basePath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'merged')
   const defaultFilename = 'mental_health_dataset.jsonl'
 
   // Validate and resolve path to prevent path traversal
   const checkPath = outputPath
     ? securePathJoin(basePath, outputPath, {
-        allowedExtensions: ['.jsonl', '.json', '.csv'],
-      })
+      allowedExtensions: ['.jsonl', '.json', '.csv'],
+    })
     : securePathJoin(basePath, defaultFilename, {
-        allowedExtensions: ['.jsonl', '.json', '.csv'],
-      })
+      allowedExtensions: ['.jsonl', '.json', '.csv'],
+    })
 
   const exists = existsSync(checkPath)
   logger.info('Checking merged dataset existence', { path: checkPath, exists })
@@ -81,7 +81,7 @@ export function getMergedDatasetPath(
   const filename = `mental_health_dataset.${extension}`
 
   // Use securePathJoin which validates the filename internally
-  const basePath = join(process.cwd(), 'data', 'merged')
+  const basePath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'merged')
   const validatedPath = securePathJoin(basePath, filename, {
     allowedExtensions: ['.jsonl', '.json', '.csv'],
   })
@@ -99,7 +99,7 @@ export async function validateMergedDataset(filePath: string): Promise<{
   logger.info('Validating merged dataset', { filePath })
 
   // Validate filePath to prevent path traversal
-  const basePath = join(process.cwd(), 'data', 'merged')
+  const basePath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'merged')
   const validatedPath = securePathJoin(basePath, filePath, {
     allowedExtensions: ['.jsonl', '.json', '.csv'],
   })

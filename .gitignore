@@ -11,6 +11,9 @@ node_modules/
 /dist/bundle-analysis.html
 /.spec-workflow/
 /acontext_server/
+# Exception: ai/training_ready files should be tracked (must come before /training_ready/)
+!ai/training_ready/
+!ai/training_ready/**
 /training_ready/
 
 /npm-debug.log*
@@ -311,6 +314,9 @@ tmp/
 .sonarlint
 .brv
 
+# Exception: ai/training_ready files should be tracked (must come before /ai/ ignore)
+!ai/training_ready/
+!ai/training_ready/**
 /ai/
 
 # OpenMemory - IDE/Assistant specific rules

@@ -1,9 +1,9 @@
 import { EmailService } from '@/lib/services/email/EmailService'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/index'
+import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { z } from 'zod'
 import { readFile } from 'fs/promises'
-import { join } from 'path'
 
 const logger = createBuildSafeLogger('contact-service')
 
@@ -112,8 +112,13 @@ export class ContactService {
         throw new Error(`Invalid template name: ${name}`)
       }
 
+      const templatesDir = safeJoin(
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
+        'templates',
+        'email',
+      )
       const htmlPath = securePathJoin(
-        join(process.cwd(), 'templates', 'email'),
+        templatesDir,
         `${validatedName}.html`,
         { allowedExtensions: ['.html'] },
       )
