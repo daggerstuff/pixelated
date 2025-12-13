@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: 1.13.2
+        specifier: ^1.13.2
         version: 1.13.2
       express:
         specifier: ^5.2.1
