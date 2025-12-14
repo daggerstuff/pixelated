@@ -2,6 +2,7 @@ let bcrypt: typeof import('bcryptjs') | undefined
 let jwt: typeof import('jsonwebtoken') | undefined
 let mongodbLib: typeof import('mongodb') | undefined
 let crypto: typeof import('crypto') | undefined
+let uuid: typeof import('uuid') | undefined
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
 
 type MongoRuntime = {
@@ -40,11 +41,13 @@ async function initializeDependencies() {
         ObjectId = mongodbLib.ObjectId
         bcrypt = await import('bcryptjs')
         jwt = await import('jsonwebtoken')
+        uuid = await import('uuid')
       } catch {
         mongodb = null
         ObjectId = MockObjectId
         bcrypt = undefined
         jwt = undefined
+        uuid = undefined
       }
     })()
   } else {
@@ -52,6 +55,7 @@ async function initializeDependencies() {
     ObjectId = MockObjectId
     bcrypt = undefined
     jwt = undefined
+    uuid = undefined
     serverDepsPromise = Promise.resolve()
   }
   return serverDepsPromise
@@ -213,6 +217,26 @@ if (typeof window === 'undefined') {
       )
     }
 
+    async createPasswordResetToken(email: string): Promise<string> {
+      await initializeDependencies()
+      if (!mongodb || !uuid) throw new Error('MongoDB or uuid not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      const user = await usersCollection.findOne({ email })
+      if (!user) throw new Error('User not found')
+
+      const resetToken = uuid.v4()
+      const resetTokenExpires = new Date(Date.now() + 3600000) // 1 hour
+
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { resetToken, resetTokenExpires, updatedAt: new Date() } },
+      )
+
+      return resetToken
+    }
+
     async signIn(email: string, password: string): Promise<AuthResult> {
       await initializeDependencies()
       if (!mongodb || !bcrypt)
@@ -236,7 +260,8 @@ if (typeof window === 'undefined') {
 
       // Create session
       const sessionsCollection = db.collection<Session>('sessions')
-      const sessionId = crypto.randomUUID()
+      if (!uuid) throw new Error('uuid not available')
+      const sessionId = uuid.v4()
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
       const session: Omit<Session, '_id'> = {
