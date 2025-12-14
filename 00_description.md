@@ -276,3 +276,4 @@ Pixelated Empathy is an **AI-first training simulation platform for mental healt
 *Last Updated: January 2025*  
 *Version: 1.0*
 
+

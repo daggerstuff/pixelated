@@ -1,0 +1,196 @@
+---
+name: Training package consolidation
+overview: Audit all training-package snapshot folders under ai/, capture useful plans/links, then consolidate code+data artifacts into ai/training_ready as the single canonical location (hard move + remove originals).
+todos:
+  - id: inventory-ai-packages
+    content: Inventory all training-package-like directories/files under ai/; read their .md docs and capture overlaps/missing references.
+    status: pending
+  - id: write-two-md
+    content: Create `.notes/markdown/two.md` and record audit findings, upgrade ideas, and consolidation mapping.
+    status: pending
+  - id: git-mv-into-training-ready
+    content: Hard-move (git mv) training packages + related artifacts into `ai/training_ready/` per proposed canonical layout; remove originals.
+    status: pending
+  - id: fix-path-references
+    content: Update docs/scripts to replace stale paths (notably `ai/lightning/...`) and align training_ready entrypoints.
+    status: pending
+  - id: verify
+    content: Run targeted searches and uv-based Python sanity checks to confirm the repo still functions after the move.
+    status: pending
+---
+
+## Goals
+
+- Make `ai/training_ready/` the **single canonical home** for training packages, configs, docs, and local artifacts.
+- **Audit + capture** any useful plans/links/known-missing pieces into `.notes/markdown/two.md`.
+- Remove drift where docs refer to now-nonexistent paths like `ai/lightning/...`.
+
+## What we already found (audit highlights)
+
+- `ai/lightning_training_package/` is a self-contained “Lightning.ai package” (KAN-28) with manifest/docs; docs reference large dataset artifacts (e.g. `ULTIMATE_FINAL_DATASET.jsonl`) that are not currently present in-tree.
+- `ai/therapeutic_ai_training_package_20251028_204104/` is a v5.0 “production ready” snapshot with training/inference/progress scripts + docs; its README explicitly lists many files as copied from a historical `ai/lightning/...` location and references missing knowledge files under `ai/training_data_consolidated/...`.
+- `ai/training_ready/experimental/h100_moe/README.md` already tries to “link” the therapeutic package into training_ready, but references paths that don’t exist (e.g. `ai/training_ready/pipelines/integrated/assemble_final_dataset.py`).
+- `ai/training_data_consolidated/final/MASTER_STAGE_MANIFEST.json` exists but appears incomplete (references `MASTER_stage1_foundation.jsonl` that is not present).
+- `ai/QUICK_START_GUIDE.md` is a duplicate of the package quick start and also points at `ai/lightning/...`.
+
+## Consolidation target layout (proposed)
+
+- `ai/training_ready/packages/apex/` (renamed from `lightning_training_package`) - KAN-28 enhanced training
+- `ai/training_ready/packages/velocity/` (renamed from `therapeutic_ai_training_package_v5`) - MoE optimized training
+- `ai/training_ready/data/training_data_consolidated/` ← move current `ai/training_data_consolidated/`
+- `ai/training_ready/platforms/ovh/` ← move current `ai/ovh/` (it’s a training “package” for OVH)
+- `ai/training_ready/docs/` ← centralize top-level training docs currently in `ai/` (e.g. `ai/QUICK_START_GUIDE.md`) and any other training-entry docs we find during the sweep.
+
+## Execution steps
+
+1. **Deep inventory of `ai/`**
+
+- Identify all “package/snapshot” candidates by structure (presence of `README.md`, `*MANIFEST*`, `requirements*.txt`, `configs/`, `training_scripts/`, `data/`, `docs/`).
+- Read their `.md` files and summarize: purpose, overlaps, missing referenced files, and which one should be canonical.
+
+2. **Create `.notes/markdown/two.md` (findings log)**
+
+- Record: overlap/duplication map; stale references (`ai/lightning/...`); “missing files” lists; and any upgrade ideas (e.g., streaming large datasets to avoid memory pressure, as noted in `training-infrastructure-optimization-plan.md`).
+
+3. **Hard-move into `ai/training_ready/` (per your choice)**
+
+- Use `git mv` for directories/files:
+ - `ai/lightning_training_package/` → `ai/training_ready/packages/apex/` (renamed)
+ - `ai/therapeutic_ai_training_package_20251028_204104/` → `ai/training_ready/packages/velocity/` (renamed)
+ - `ai/training_data_consolidated/` → `ai/training_ready/data/training_data_consolidated/`
+ - `ai/ovh/` → `ai/training_ready/platforms/ovh/`
+ - `ai/QUICK_START_GUIDE.md` → `ai/training_ready/docs/QUICK_START_GUIDE.md`
+- Delete any now-empty directories left behind (no stubs).
+
+4. **Fix references after moving**
+
+- Update docs that mention historical paths:
+ - Replace `ai/lightning/...` references to the new canonical locations under `ai/training_ready/...`.
+ - Ensure `ai/training_ready/experimental/h100_moe/README.md` points at real paths (or move it under `ai/training_ready/docs/` if it’s purely documentation).
+- Update any scripts/configs that hardcode old paths.
+
+5. **Verification (evidence-based)**
+
+- Confirm repo is still consistent after moves:
+ - Re-run searches for `ai/lightning/` and other old paths to ensure nothing critical still points there.
+ - Run lightweight Python sanity checks using `uv run` (to satisfy the “uv env” requirement): import checks + any quick script `--help`/smoke runs that don’t require big datasets.
+
+## Notes / constraints
+
+- You selected **hard move + delete originals** and **move all local artifacts**, so the plan avoids stubs/pointers unless a file is already missing from disk.
+- If we encounter extremely large artifacts that are present locally, moving them will be done via `git mv` (same filesystem move) but may still produce huge diffs if they are tracked; we’ll keep moves atomic and review `git status` carefully.
+
+//////////////////////////////////
+
+---
+name: Final training dataset + curriculum audit
+overview: "Audit S3-hosted training sources against required dataset sets, then produce a canonical final dataset artifact (manifest + compiled export) and a late-2025 multi-stage training curriculum: continued pretraining → SFT curriculum → preference alignment."
+todos:
+  - id: inventory-map
+    content: Build a dataset-family inventory from S3 manifest + dataset registry; generate coverage report for all required sets.
+    status: completed
+  - id: define-contract
+    content: Define the final dataset schema, provenance tracking, and split/holdout rules (manifest + compiled export).
+    status: completed
+  - id: dedup-leakage
+    content: Implement post-encoding-fix dedup (exact + near-dup) and prevent cross-split leakage.
+    status: completed
+  - id: generators-missing
+    content: Ensure edge-case resulting chats, sarcasm, roleplay/simulator, and preference-pair datasets exist and are routable.
+    status: completed
+  - id: compile-export
+    content: Compile final ChatML JSONL export + S3 manifest/shards and upload to canonical S3 paths.
+    status: completed
+  - id: curriculum
+    content: Design late-2025 training phases (continued pretrain → SFT curriculum → preference alignment) with dataset-to-phase routing and weights.
+    status: completed
+  - id: verify
+    content: Run coverage + leakage + distribution gates; produce final stats artifacts for signoff.
+    status: completed
+---
+
+## Goal
+
+Produce a *real* final training dataset (not the misleading “ultimate/final” labels) by auditing what exists in S3 and what the pipelines can generate, then emitting a canonical dataset manifest + export and a phased training plan.
+
+## Current facts found in repo
+
+- `ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md` defines canonical S3 organization and stage mapping.
+- `ai/training_ready/data/s3_manifest.json` is a large object inventory for the OVH S3 endpoint and contains evidence of CPTSD/addiction + voice transcript corpora (e.g., Tim Fletcher transcripts) and crisis JSONL.
+- `ai/data/dataset_registry.json` is an internal registry that maps datasets to stages (foundation, CoT, edge crisis, voice persona) and explicitly references an edge case generator output.
+- “ULTIMATE_FINAL…” JSON summaries exist but are not authoritative per your correction.
+
+## Deliverables
+
+- **Dataset coverage report**: checklist-style pass/fail for each required set you listed (edge-case generator outputs + resulting chats + synthetic; long-running therapy sessions; mental health datasets; video transcripts/persona; sarcasm; niche CPTSD/addiction; experimental; roleplay/simulator designer + DPO data).
+- **Final dataset artifact (both)**:
+- **Manifest** in S3: pointers to shards/splits + hashes + per-source provenance.
+- **Compiled export** in S3: a single ChatML JSONL for portability.
+- **Training curriculum (late 2025)**: continued pretraining → SFT curriculum by stage → preference alignment phase, with dataset-to-phase routing and mixing weights.
+
+## Approach
+
+### 1) Source-of-truth inventory + mapping
+
+- Treat `ai/training_ready/data/s3_manifest.json` as the *ground truth inventory* of what’s available in S3.
+- Build a mapping layer from:
+- S3 object prefixes (e.g., `datasets/gdrive/...`, `tier*_...`, `voice/...`, `edge...`) → canonical “dataset families”.
+- Registry entries in `ai/data/dataset_registry.json` → required families + stage routing.
+- Output a **coverage matrix**: required family → S3 evidence (paths/keys) → status (present/partial/missing) → next action.
+
+### 2) Define the “final dataset” contract
+
+- **Schema**: ChatML JSONL with strict metadata: `{source_family, source_key, content_hash, pii_status, license_tag, split, phase}`.
+- **Provenance**: maintain an immutable mapping file from every output row → originating S3 object key(s).
+- **Splits**:
+- Train/val/test with at least one *hard holdout* for: long-session therapy, edge-case/crisis, sarcasm, and “voice persona transcripts”.
+
+### 3) Data quality + dedup strategy (post-encoding-fix)
+
+- Run encoding normalization first (you’re already doing this work).
+- Dedup in two layers:
+- **Exact**: stable normalized-text hash (current approach referenced by `ai/training_ready/data/FULL_DEDUPLICATION_SUMMARY.md`).
+- **Near-dup**: add semantic/approx similarity pass for high-risk leakage across splits (especially long sessions and edge cases).
+- Decide canonical vs redundant consolidated files (e.g., “unified vs priority_1/2/3”) before compilation.
+
+### 4) Build/extend dataset generators needed for missing sets
+
+- Ensure pipelines exist and can emit S3-ready artifacts for:
+- **Edge case generator** outputs + “resulting chats” format.
+- **Synthetic/roleplay/simulator designer** datasets suitable for SFT and for preference training pairs.
+- **Sarcasm** and “niche criteria” bundles (CPTSD/addiction) as first-class families with holdouts.
+
+### 5) Training phases (you selected continued-pretrain-plus + unrestricted)
+
+- **Phase A: Continued pretraining**
+- Domain-adaptive text (video transcripts, general psych/mental health text) with careful filtering for privacy/PII.
+- **Phase B: Multi-stage SFT curriculum**
+- Foundation therapeutic conversations → long-session therapy emphasis → edge-case/crisis robustness → voice/persona style → roleplay/simulator tasks.
+- Use mixture weights + length-aware packing to preserve long sessions.
+- **Phase C: Preference alignment**
+- Choose algorithm (DPO/ORPO/SimPO/KTO) based on available preference data shape; generate/curate preference pairs from roleplay/simulator + adversarial prompts.
+- Since you chose “unrestricted”, still keep a **hard privacy constraint**: aggressive PII stripping and exclusion.
+
+### 6) Verification gates
+
+- Coverage gate: all required families present (or explicitly waived) before final compile.
+- Leakage gate: no near-duplicates across splits for holdout families.
+- Reporting gate: counts/tokens by family, by phase, and by split.
+
+## Key files this plan will anchor to
+
+- `ai/training_ready/data/s3_manifest.json`
+- `ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md`
+- `ai/data/dataset_registry.json`
+- `ai/training_ready/pipelines/integrated_training_pipeline.py`
+- `ai/training_ready/scripts/full_deduplication_scan.py` + `ai/training_ready/data/FULL_DEDUPLICATION_SUMMARY.md`
+
+## Implementation todos
+
+- **inventory-map**: Parse `s3_manifest.json` into dataset families + evidence paths; emit coverage matrix.
+- **define-contract**: Specify final dataset schema + provenance + split rules; add holdout definitions.
+- **dedup-leakage**: Implement exact + near-dup checks and split-leakage prevention.
+- **generators-missing**: Wire/extend generators for edge-case resulting chats, sarcasm, roleplay/simulator, and preference-pair creation.
+- **compile-export**: Produce manifest + compiled ChatML JSONL export and upload to canonical S3 location.
+- **curriculum**: Produce phase routing + mixing weights and training config(s) for phases A/B/C.
+- **verify**: Run coverage/leakage/stats gates and record outputs.

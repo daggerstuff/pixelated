@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
   "flask",
   "flask-cors>=6.0.2", # Updated to latest secure version
@@ -33,7 +33,7 @@ dependencies = [
   "psutil>=7.0.0",
   "chardet>=5.2.0",
   "pydub>=0.25.1",
-  "sourcery>=1.37.0",
+  "sourcery>=1.37.0; sys_platform == 'darwin'",
   "pyarrow>=21.0.0",
   "hatch>=1.14.1",
   "textstat>=0.7.8",
@@ -47,6 +47,7 @@ dependencies = [
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
   "einops>=0.8.0",
+  "sentence-transformers>=2.7.0",  # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=4.35.0", # Required for dataset_pipeline training_runner
@@ -195,6 +196,10 @@ index-strategy = "unsafe-best-match"
 
 [tool.uv.sources.pytorch-cpu]
 url = "https://download.pytorch.org/whl/cpu"
+
+# Note: nvidia-nim and ngc-python-cli require NVIDIA NGC authentication
+# Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
+# After authenticating with your NGC API key
 
 [dependency-groups]
 dev = [
