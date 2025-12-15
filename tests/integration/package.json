@@ -16,10 +16,9 @@
     "test:report": "node generate-test-report.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
-  },
-  "dependencies": {}
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
 }

@@ -18,7 +18,7 @@ The easiest way is to install NGC CLI on the remote server:
 
 # Option B: Manual installation
 ssh vivi@212.2.244.60
-pip3 install --user nvidia-pyindex nvidia-nim ngc-python-cli
+pip3 install --user nvidia-pyindex ngcsdk
 export PATH=$HOME/.local/bin:$PATH
 ngc config set  # Enter your NGC API key when prompted
 ```
@@ -82,7 +82,7 @@ ssh vivi@212.2.244.60 'curl -I https://api.ngc.nvidia.com'
 **Solution:**
 ```bash
 # Install NGC CLI
-pip3 install --user nvidia-pyindex nvidia-nim ngc-python-cli
+pip3 install --user nvidia-pyindex ngcsdk
 
 # Add to PATH
 export PATH=$HOME/.local/bin:$PATH

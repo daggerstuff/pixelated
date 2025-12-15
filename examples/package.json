@@ -18,13 +18,13 @@
     "preview": "pnpm run serve"
   },
   "dependencies": {
-    "@fontsource/geist-sans": "^5.0.0",
-    "@fontsource/jetbrains-mono": "^5.0.0"
+    "@fontsource/geist-sans": "^5.2.5",
+    "@fontsource/jetbrains-mono": "^5.2.8"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0",
-    "postcss-import": "^16.0.0"
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "postcss-import": "^16.1.1"
   },
   "pnpm": {
     "overrides": {

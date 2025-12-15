@@ -1,20 +1,18 @@
-name: "Copilot Code Review"
+name: "Copilot Setup Steps"
 
-permissions:
-  contents: read
-  pull-requests: write
-
+# Automatically run the setup steps when they are changed to allow for easy validation,
+# and allow manual testing through the repository's "Actions" tab
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
 jobs:
-  copilot-code-review:
+  copilot-setup-steps:
     runs-on: tenki-standard-autoscale
 
+    # Set the permissions to the lowest permissions possible needed for your steps.
+    # Copilot will be given its own token for its operations.
     permissions:
+      # Required to clone the repository and install dependencies
       contents: read
-      pull-requests: write
 
     environment: copilot
 
@@ -56,10 +54,3 @@ jobs:
           else
             echo "No supported test runner found (vitest/jest)."
           fi
-    # NOTE: github/copilot-review-action is not publicly accessible
-    # and causes Dependabot to fail. Commented out until a public
-    # alternative is available or access is granted.
-    # - name: GitHub Copilot Code Review
-    #   uses: github/copilot-review-action@v1
-    #   with:
-    #     github-token: ${{ secrets.G_TOKEN }}
