@@ -332,8 +332,8 @@ uv run python -m ai.journal_dataset_research.mcp.server
 ### Production
 
 See deployment guides:
-- `docs/deployment/journal-research-deployment.md` - API server
-- `docs/deployment/mcp-server-deployment.md` - MCP server
+- `docs/guides/technical-guides/deployment/journal-research-deployment.md` - API server
+- `docs/guides/technical-guides/deployment/mcp-server-deployment.md` - MCP server
 - Frontend deployed with main application
 
 ### Docker

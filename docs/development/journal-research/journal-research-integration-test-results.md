@@ -119,7 +119,7 @@ January 2025
 
 ### Documentation Updates ✅
 
-- ✅ Created unified pipeline documentation (`docs/journal-research-pipeline.md`)
+- ✅ Created unified pipeline documentation (`docs/development/journal-research/journal-research-pipeline.md`)
 - ✅ Updated user guide to reference unified system
 - ✅ Created E2E test guide
 - ✅ Architecture diagrams included
@@ -145,7 +145,7 @@ None identified during audit.
 
 ## Recommendations
 
-1. **Production Deployment**: Follow deployment guides in `docs/deployment/`
+1. **Production Deployment**: Follow deployment guides in `docs/guides/technical-guides/deployment/`
 2. **Monitoring**: Set up health checks for all services
 3. **Documentation**: Keep unified pipeline docs updated as system evolves
 4. **Testing**: Run E2E tests regularly to catch integration issues early
