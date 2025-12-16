@@ -31,3 +31,4 @@ fi
 # Run the automation system
 echo "🤖 Starting orchestrator..."
 pnpm tsx src/lib/automation/outlier-ai/run.ts
+

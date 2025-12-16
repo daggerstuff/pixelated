@@ -59,7 +59,5 @@ docker-compose*.yml
 .github/actions/setup-uv/
 
 # Documentation that references Python (not needed for build)
-docs/ops/training.md
-docs/nemo-data-designer-setup.md
 README.pochi.md
 
