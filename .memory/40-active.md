@@ -49,14 +49,14 @@
 
 ### Memory Systems
 - `.memory/` (00–70) is the **source of truth** for project continuity.
-- `memory-bank/` is maintained as a **mirrored/secondary** memory system for session continuity; it has been synced to `.memory` in December 2025.
+- `memory-bank/` is maintained as a **mirrored/secondary** memory system for session continuity; it is kept in sync with `.memory` and should be updated immediately after `.memory` changes.
 
 ### Working Tree Status (Dec 2025)
-- `ai/` and `training_ready/` directories exist in the working tree and are currently **untracked** in git.
+- `ai/` (Python services and research pipelines) and `ai/training_ready/` (training data, manifests, and platform sync scripts like `platforms/ovh/sync-datasets.sh`) exist in the working tree and are currently **untracked** in git.
 - `00_description.md` at repo root is deleted; canonical description is `.memory/00-description.md`.
 - Large NGC CLI installer binaries under `ngc_cli_v4.10.0/` are deleted from the working tree.
 
-**Next step**: decide whether to commit or ignore `ai/` and `training_ready/`, and adjust `.gitignore` accordingly.
+**Next step**: decide whether to commit or ignore `ai/` and `ai/training_ready/`, and adjust `.gitignore` accordingly.
 
 ---
 

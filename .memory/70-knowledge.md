@@ -103,10 +103,10 @@ Data Layer
 - `.memory/`: authoritative memory bank (00–70)
 - `memory-bank/`: mirrored memory bank + historical entries
 - `ai/`: Python AI services and dataset/research pipelines (large)
-- `training_ready/`: training assets, manifests, configs, and scripts
+- `ai/training_ready/`: training assets, manifests, configs, and platform sync scripts (for example `platforms/ovh/sync-datasets.sh`)
 
 ### Current Working-Tree Note (Dec 2025)
-- `ai/` and `training_ready/` exist but are currently untracked in git; ensure `.gitignore` and versioning strategy are intentional.
+- `ai/` and `ai/training_ready/` exist but are currently untracked in git; ensure `.gitignore` and versioning strategy are intentional.
 
 ---
 
