@@ -40,7 +40,7 @@ fi
 mkdir -p data/training models checkpoints
 mkdir -p ai/dataset_pipeline/prompt_corpus
 mkdir -p ai/pipelines/edge_case_pipeline_standalone/output
-mkdir -p ai/training_data_consolidated/final
+mkdir -p ai/training_ready/data/training_data_consolidated/final
 
 SERVICES=(
   redis

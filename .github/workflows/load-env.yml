@@ -48,7 +48,7 @@ on:
 
 jobs:
   load-env:
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     outputs:
       gcp_project_id: ${{ steps.set-env.outputs.gcp_project_id }}
       gke_cluster_name: ${{ steps.set-env.outputs.gke_cluster_name }}

@@ -14,6 +14,14 @@ Sentry.init({
   // Prioritize SENTRY_RELEASE (set in CI/CD) over package version for proper release tracking
   release:
     process.env.SENTRY_RELEASE ||
+    process.env.PUBLIC_SENTRY_RELEASE ||
+    process.env.PUBLIC_APP_VERSION ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.RENDER_GIT_COMMIT ||
+    process.env.NETLIFY_COMMIT_REF ||
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    process.env.CI_COMMIT_SHA ||
     process.env.npm_package_version ||
     '0.0.1',
 

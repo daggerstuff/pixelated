@@ -14,11 +14,10 @@ on:
     workflows: ["Deploy to Staging", "Deploy to Production"]
 
   workflow_dispatch:
-
 jobs:
   validate-ai-models:
     name: AI Model Validation
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       ENV_NAME: ${{ inputs.ENV_NAME }}

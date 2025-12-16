@@ -1,22 +1,22 @@
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
 
 const createStubSpan = () => ({
-  end: () => {},
+  end: () => { },
 })
 
 const createStubScope = () => ({
-  setTag: () => {},
-  setExtra: () => {},
-  setUser: () => {},
+  setTag: () => { },
+  setExtra: () => { },
+  setUser: () => { },
 })
 
 const createStubSentry = () => ({
-  init: () => {},
-  close: async () => {},
-  captureException: () => {},
-  setUser: () => {},
-  setContext: () => {},
-  withScope: (callback = () => {}) => {
+  init: () => { },
+  close: async () => { },
+  captureException: () => { },
+  setUser: () => { },
+  setContext: () => { },
+  withScope: (callback = () => { }) => {
     try {
       callback(createStubScope())
     } catch {
@@ -26,8 +26,8 @@ const createStubSentry = () => ({
   startInactiveSpan: () => createStubSpan(),
   startSpan: () => createStubSpan(),
   metrics: {
-    count: () => {},
-    distribution: () => {},
+    count: () => { },
+    distribution: () => { },
   },
 })
 
@@ -64,14 +64,14 @@ try {
     } catch (profilingError) {
       console.warn(
         `[Sentry Profiling] Failed to load profiling addon on Node.js ${process.version}. ` +
-          'Ensure build tools are available to compile @sentry/profiling-node from source.',
+        'Ensure build tools are available to compile @sentry/profiling-node from source.',
         profilingError
       )
     }
   } else {
     console.warn(
       `[Sentry Profiling] Node.js ${process.version} is not in the supported LTS list ` +
-        '(16, 18, 20, 22, 24). Profiling integration will be disabled.'
+      '(16, 18, 20, 22, 24). Profiling integration will be disabled.'
     )
   }
 } catch (error) {
@@ -88,7 +88,17 @@ try {
 Sentry.init({
   dsn: process.env.SENTRY_DSN, // Must be set in environment
   environment: process.env.NODE_ENV || 'production',
-  release: process.env.SENTRY_RELEASE || process.env['npm_package_version'],
+  release:
+    process.env.SENTRY_RELEASE ||
+    process.env.PUBLIC_SENTRY_RELEASE ||
+    process.env.PUBLIC_APP_VERSION ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.RENDER_GIT_COMMIT ||
+    process.env.NETLIFY_COMMIT_REF ||
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    process.env.CI_COMMIT_SHA ||
+    process.env['npm_package_version'],
 
   // Performance monitoring configuration
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
