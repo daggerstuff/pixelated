@@ -62,7 +62,7 @@ The platform includes a comprehensive **Journal Dataset Research Pipeline** for 
 - **CLI**: Command-line access for automation
 - **Backend Engine**: Core research automation with discovery, evaluation, acquisition, and integration planning
 
-All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/journal-research-pipeline.md) for complete details.
+All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/development/journal-research/journal-research-pipeline.md) for complete details.
 
 ## Enterprise-Grade. Enterprise-Focused.
 

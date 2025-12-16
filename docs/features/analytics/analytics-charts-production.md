@@ -244,7 +244,5 @@ npm run test:lighthouse
 
 ## 📚 Additional Resources
 
-- [Analytics Service Documentation](../docs/analytics-service.md)
-- [HIPAA Compliance Guidelines](../docs/hipaa-compliance.md)
-- [Performance Best Practices](../docs/performance-guidelines.md)
-- [Security Checklist](../docs/security-checklist.md)
+- [HIPAA Compliance Documentation](../../compliance/hipaa-compliance-documentation.md)
+- [Security Credential Files](../../security/credential-files-security.md)

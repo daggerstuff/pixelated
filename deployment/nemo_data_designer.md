@@ -52,4 +52,4 @@ ssh vivi@212.2.244.60 'cd ~/nemo-microservices/nemo-microservices-quickstart_* &
 ssh vivi@212.2.244.60 'cd ~/nemo-microservices/nemo-microservices-quickstart_* && docker compose --profile data-designer down'
 ```
 
-For more details, see [Remote Deployment Guide](./docs/nemo-data-designer-remote-deployment.md)
+For more details, see [Remote Deployment Guide](./docs/guides/technical-guides/deployment/nemo-data-designer-remote-deployment.md)
