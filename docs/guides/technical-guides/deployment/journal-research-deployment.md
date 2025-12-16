@@ -26,7 +26,7 @@ This guide covers deployment of the Journal Research system, including both the 
 
 **Frontend:**
 - Node.js 24+
-- pnpm 10.25.0+
+- pnpm 10.26.0+
 - 4GB RAM minimum
 - 5GB disk space
 
