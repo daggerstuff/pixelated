@@ -33,10 +33,8 @@ describe('RegisterForm', () => {
 
     const passwordInput = screen.getByLabelText(/^Password/i)
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
-    expect(passwordInput).toHaveAttribute(
-      'aria-describedby',
-      'password-requirements',
-    )
+    // Expecting password-helper because the input is empty initially
+    expect(passwordInput).toHaveAttribute('aria-describedby', 'password-helper')
 
     const termsCheckbox = screen.getByLabelText(/i agree to the/i)
     expect(termsCheckbox).toHaveAttribute('aria-required', 'true')
@@ -136,5 +134,13 @@ describe('RegisterForm', () => {
 
     const googleLogo = screen.getByRole('img', { name: /google logo/i })
     expect(googleLogo).toBeInTheDocument()
+  })
+
+  it('allows keyboard access to password visibility toggle', () => {
+    render(<RegisterForm />)
+
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
+    expect(toggleButton).toBeInTheDocument()
+    expect(toggleButton).not.toHaveAttribute('tabIndex', '-1')
   })
 })
