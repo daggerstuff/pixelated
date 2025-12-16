@@ -101,6 +101,9 @@
     "supabase",
     "templates",
     "test_pixel_logs",
-    "types"
-  ]
-}
+    "types",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/__tests__/**",
+    "src/data/sample-cognitive-models.ts"
+  ]}

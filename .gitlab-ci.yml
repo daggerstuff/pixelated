@@ -3,6 +3,7 @@
 
 stages:
   - validate
+  - terraform
   - build
   - security
   - deploy
@@ -21,6 +22,13 @@ variables:
   # Configure at: Settings > CI/CD > Variables
   # Note: GCP_PROJECT_ID, GKE_CLUSTER_NAME, GKE_ZONE, and GCP_SERVICE_ACCOUNT_KEY
   # are inherited directly from project variables and should not be redefined here
+  # Terraform configuration - must be set as GitLab CI/CD project variables
+  # Required for terraform jobs:
+  # - TERRAFORM_VERSION (default: 1.9.0)
+  # - TF_HTTP_PASSWORD (GitLab token for state backend, marked as secret)
+  # - AZURE_SUBSCRIPTION_ID
+  # - AZURE_TENANT_ID
+  TERRAFORM_VERSION: "${TERRAFORM_VERSION:-1.9.0}"
 
 # Validation jobs
 validate:dependencies:
@@ -75,6 +83,84 @@ validate:typecheck:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Terraform validation and plan
+terraform:validate:
+  stage: terraform
+  image: hashicorp/terraform:${TERRAFORM_VERSION}
+  before_script:
+    - cd terraform
+    - |
+      if [ ! -f backend.config ]; then
+        echo "ERROR: backend.config file not found"
+        echo "Copy backend.config.example to backend.config and configure it"
+        exit 1
+      fi
+  script:
+    - terraform fmt -check -recursive
+    - terraform validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - terraform/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - terraform/**/*
+  allow_failure: true
+
+terraform:plan:
+  stage: terraform
+  image: hashicorp/terraform:${TERRAFORM_VERSION}
+  variables:
+    TF_ENVIRONMENT: "${TF_ENVIRONMENT:-staging}"
+  before_script:
+    - cd terraform
+    - |
+      if [ ! -f backend.config ]; then
+        echo "ERROR: backend.config file not found"
+        echo "Copy backend.config.example to backend.config and configure it"
+        exit 1
+      fi
+    # Initialize backend
+    # Note: If you see "Backend configuration changed" error, use -reconfigure flag
+    - terraform init -backend-config=backend.config
+  script:
+    - |
+      terraform plan \
+        -var-file=environments/${TF_ENVIRONMENT}.tfvars \
+        -out=tfplan-${TF_ENVIRONMENT} \
+        -detailed-exitcode
+
+      PLAN_EXIT_CODE=$?
+
+      # Exit code 0 = no changes, 1 = error, 2 = changes present
+      if [ $PLAN_EXIT_CODE -eq 1 ]; then
+        echo "ERROR: Terraform plan failed"
+        exit 1
+      elif [ $PLAN_EXIT_CODE -eq 2 ]; then
+        echo "Terraform plan shows changes - review output above"
+      else
+        echo "No changes detected"
+      fi
+  artifacts:
+    paths:
+      - terraform/tfplan-${TF_ENVIRONMENT}
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - terraform/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - terraform/**/*
+  environment:
+    name: ${TF_ENVIRONMENT}
+  only:
+    variables:
+      - $TF_HTTP_PASSWORD
+  # Note: TF_HTTP_PASSWORD must be set as a GitLab CI/CD variable (Settings > CI/CD > Variables)
+  # Mark it as protected and masked
 
 # Build job
 build:
