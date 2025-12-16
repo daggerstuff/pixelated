@@ -2,8 +2,9 @@ import type { APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { AuditEventType, logAuditEvent } from '../../../lib/audit'
 import { z } from 'zod'
-import { mongoAuthService } from '../../../lib/db/mongoClient'
+import { mongoAuthService, UserNotFoundError } from '../../../lib/db/mongoClient'
 import { getEmailService } from '../../../lib/email'
+import { config } from '../../../config/env.config'
 
 const logger = createBuildSafeLogger('reset-password')
 
@@ -23,11 +24,13 @@ export const POST = async ({ request }: APIContext) => {
     try {
       const resetToken = await mongoAuthService.createPasswordResetToken(email)
 
-      const origin = new URL(request.url).origin
-      const resetLink = `${origin}/auth/reset-password?token=${resetToken}`
+      // Use configured SITE_URL if available, otherwise fall back to request origin
+      const siteUrl = config.site.url()
+      const baseUrl = siteUrl || new URL(request.url).origin
+      const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}`
 
       const emailService = getEmailService()
-      await emailService.sendEmail({
+      const emailResult = await emailService.sendEmail({
         to: email,
         subject: 'Password Reset Request',
         htmlContent: `
@@ -40,17 +43,24 @@ export const POST = async ({ request }: APIContext) => {
         textContent: `Password Reset Request\n\nClick the link below to reset your password:\n${resetLink}\n\nThis link will expire in 1 hour.\nIf you did not request this, please ignore this email.`,
       })
 
+      if (!emailResult.success) {
+        logger.error('Failed to send password reset email', {
+          email: email.substring(0, 3) + '***',
+          error: emailResult.error,
+          provider: emailResult.provider,
+        })
+        throw new Error(`Failed to send password reset email: ${emailResult.error}`)
+      }
+
       logger.info('Password reset email sent', {
         email: email.substring(0, 3) + '***',
       })
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      if (errorMessage === 'User not found') {
+      if (error instanceof UserNotFoundError) {
         logger.info('Password reset requested for non-existent user', {
           email: email.substring(0, 3) + '***',
         })
-        // Swallow error to simulate success
+        // Swallow error to simulate success (prevent email enumeration)
       } else {
         throw error
       }

@@ -1,9 +1,15 @@
 let bcrypt: typeof import('bcryptjs') | undefined
 let jwt: typeof import('jsonwebtoken') | undefined
 let mongodbLib: typeof import('mongodb') | undefined
-let crypto: typeof import('crypto') | undefined
 let uuid: typeof import('uuid') | undefined
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
+
+export class UserNotFoundError extends Error {
+  constructor(email: string) {
+    super(`User not found: ${email}`)
+    this.name = 'UserNotFoundError'
+  }
+}
 
 type MongoRuntime = {
   connect: () => Promise<Db>
@@ -217,24 +223,70 @@ if (typeof window === 'undefined') {
       )
     }
 
+    async changePasswordByEmail(email: string, newPassword: string): Promise<void> {
+      await initializeDependencies()
+      if (!mongodb || !bcrypt)
+        throw new Error('MongoDB or bcrypt not available')
+      const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+      await usersCollection.updateOne(
+        { email },
+        { $set: { password: hashedPassword, updatedAt: new Date() } },
+      )
+    }
+
     async createPasswordResetToken(email: string): Promise<string> {
       await initializeDependencies()
-      if (!mongodb || !uuid) throw new Error('MongoDB or uuid not available')
+      if (!mongodb || !uuid || !bcrypt) throw new Error('MongoDB, uuid, or bcrypt not available')
       const db = await mongodb.connect()
       const usersCollection = db.collection<User>('users')
 
       const user = await usersCollection.findOne({ email })
-      if (!user) throw new Error('User not found')
+      if (!user) throw new UserNotFoundError(email)
 
       const resetToken = uuid.v4()
+      const resetTokenHash = await bcrypt.hash(resetToken, this.SALT_ROUNDS)
       const resetTokenExpires = new Date(Date.now() + 3600000) // 1 hour
 
       await usersCollection.updateOne(
         { _id: user._id },
-        { $set: { resetToken, resetTokenExpires, updatedAt: new Date() } },
+        { $set: { resetToken: resetTokenHash, resetTokenExpires, updatedAt: new Date() } },
       )
 
       return resetToken
+    }
+
+    async verifyPasswordResetToken(email: string, token: string): Promise<boolean> {
+      await initializeDependencies()
+      if (!mongodb || !bcrypt) throw new Error('MongoDB or bcrypt not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      const user = await usersCollection.findOne({ email })
+      if (!user || !user.resetToken || !user.resetTokenExpires) {
+        return false
+      }
+
+      // Check if token has expired
+      if (user.resetTokenExpires < new Date()) {
+        return false
+      }
+
+      // Verify token against hash
+      return await bcrypt.compare(token, user.resetToken)
+    }
+
+    async invalidatePasswordResetToken(email: string): Promise<void> {
+      await initializeDependencies()
+      if (!mongodb) throw new Error('MongoDB not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      await usersCollection.updateOne(
+        { email },
+        { $unset: { resetToken: '', resetTokenExpires: '' }, $set: { updatedAt: new Date() } },
+      )
     }
 
     async signIn(email: string, password: string): Promise<AuthResult> {
