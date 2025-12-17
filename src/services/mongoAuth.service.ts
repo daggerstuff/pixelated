@@ -1,7 +1,7 @@
 let bcrypt: typeof import('bcryptjs') | undefined
 let jwt: typeof import('jsonwebtoken') | undefined
 let mongodbLib: typeof import('mongodb') | undefined
-let uuid: typeof import('uuid') | undefined
+let crypto: typeof import('crypto') | undefined
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
 
 export class UserNotFoundError extends Error {
@@ -47,13 +47,13 @@ async function initializeDependencies() {
         ObjectId = mongodbLib.ObjectId
         bcrypt = await import('bcryptjs')
         jwt = await import('jsonwebtoken')
-        uuid = await import('uuid')
+        crypto = await import('crypto')
       } catch {
         mongodb = null
         ObjectId = MockObjectId
         bcrypt = undefined
         jwt = undefined
-        uuid = undefined
+        crypto = undefined
       }
     })()
   } else {
@@ -61,7 +61,7 @@ async function initializeDependencies() {
     ObjectId = MockObjectId
     bcrypt = undefined
     jwt = undefined
-    uuid = undefined
+    crypto = undefined
     serverDepsPromise = Promise.resolve()
   }
   return serverDepsPromise
@@ -238,14 +238,14 @@ if (typeof window === 'undefined') {
 
     async createPasswordResetToken(email: string): Promise<string> {
       await initializeDependencies()
-      if (!mongodb || !uuid || !bcrypt) throw new Error('MongoDB, uuid, or bcrypt not available')
+      if (!mongodb || !crypto || !bcrypt) throw new Error('MongoDB, crypto, or bcrypt not available')
       const db = await mongodb.connect()
       const usersCollection = db.collection<User>('users')
 
       const user = await usersCollection.findOne({ email })
       if (!user) throw new UserNotFoundError(email)
 
-      const resetToken = uuid.v4()
+      const resetToken = crypto.randomBytes(32).toString('hex')
       const resetTokenHash = await bcrypt.hash(resetToken, this.SALT_ROUNDS)
       const resetTokenExpires = new Date(Date.now() + 3600000) // 1 hour
 
@@ -312,8 +312,8 @@ if (typeof window === 'undefined') {
 
       // Create session
       const sessionsCollection = db.collection<Session>('sessions')
-      if (!uuid) throw new Error('uuid not available')
-      const sessionId = uuid.v4()
+      if (!crypto) throw new Error('crypto not available')
+      const sessionId = crypto.randomBytes(16).toString('hex')
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
       const session: Omit<Session, '_id'> = {
