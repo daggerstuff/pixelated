@@ -719,6 +719,43 @@ export interface Features {
    * Controls whether to enable slide enter animation on each page.
    */
   slideEnterAnim: FeatureConfig<slideEnterAnimConfig>
+
+  /**
+   * Controls whether to enable the search feature and related options.
+   */
+  search: FeatureConfig<SearchConfig>
+
+  /**
+   * Controls whether to enable the Giscus comment system.
+   */
+  giscus: FeatureConfig<any[]>
+}
+
+interface SearchConfig {
+  /**
+   * Specifies which content types to include in search results.
+   */
+  includes?: string[]
+
+  /**
+   * Controls whether search filtering is enabled.
+   */
+  filter?: boolean
+
+  /**
+   * Controls whether to highlight navigation items when searching.
+   */
+  navHighlight?: boolean
+
+  /**
+   * Controls batch loading configuration for search results.
+   */
+  batchLoadSize?: FeatureConfig<readonly number[]>
+
+  /**
+   * Controls maximum items displayed per page.
+   */
+  maxItemsPerPage?: FeatureConfig<readonly number[]>
 }
 
 export interface ExtendedRequest extends IncomingMessage {

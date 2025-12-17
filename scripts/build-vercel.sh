@@ -13,11 +13,11 @@ echo "🔵 Vercel build starting..."
 echo "Current pnpm version:"
 pnpm --version || echo "pnpm not found"
 
-echo "Setting up pnpm 10.25.0 via corepack..."
+echo "Setting up pnpm 10.26.0 via corepack..."
 
-# Enable corepack and prepare pnpm 10.25.0
+# Enable corepack and prepare pnpm 10.26.0
 corepack enable || true
-corepack prepare pnpm@10.25.0 --activate
+corepack prepare pnpm@10.26.0 --activate
 
 echo "Verifying pnpm version after setup:"
 pnpm --version

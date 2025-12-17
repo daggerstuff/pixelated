@@ -397,7 +397,7 @@ This document outlines comprehensive rollback procedures for Pixelated Empathy, 
 
 ### Manual Rollback Procedures
 
-**Documented in**: `docs/deployment/rollback-manual-procedures.md`
+**Documented in**: `docs/guides/technical-guides/deployment/`
 
 ## Rollback Best Practices
 

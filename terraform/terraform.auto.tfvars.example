@@ -1,0 +1,43 @@
+# Example variables file for Terraform
+# Copy this file to terraform.auto.tfvars and update with your values
+
+environment = "staging"
+prefix = "pixelated"
+location = "East US"
+
+# Container Registry
+container_registry_name = "pixelatedregistry"
+
+# Kubernetes
+kubernetes_version = "1.29.0"
+node_count = 2
+node_vm_size = "Standard_D4s_v3"
+min_node_count = 1
+max_node_count = 5
+
+# Production settings
+production_node_count = 3
+production_node_vm_size = "Standard_D8s_v3"
+production_min_node_count = 2
+production_max_node_count = 10
+
+# Enable ACR admin for development
+enable_acr_admin = false
+
+# Network settings
+vnet_address_prefix = "10.0.0.0/8"
+
+# Logging
+log_retention_days = 30
+
+# Azure specific
+azure_subscription_id = "your-azure-subscription-id"
+tenant_id = "your-tenant-id"
+
+# Tags
+custom_tags = {
+  Environment = "staging"
+  Project     = "pixelated-empathy"
+  Team        = "infrastructure"
+  ManagedBy   = "terraform"
+}
