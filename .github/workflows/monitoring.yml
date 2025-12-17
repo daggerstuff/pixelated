@@ -4,14 +4,13 @@ on:
   schedule:
     - cron: "0 12 * * *"
   workflow_dispatch:
-
 permissions:
   contents: read
   actions: read
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.25.0
+  PNPM_VERSION: 10.26.0
   NODE_ENV: production
   DEFAULT_BASE_URL: "https://pixelatedempathy.com"
   HEALTH_CHECK_TIMEOUT_PROD: 30
@@ -30,7 +29,7 @@ env:
 jobs:
   health-check-production:
     name: Production Health Check
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
@@ -341,7 +340,7 @@ jobs:
 
   health-check-staging:
     name: Staging Health Check
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
@@ -557,7 +556,7 @@ jobs:
 
   health-check-preview:
     name: Preview Health Check
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     env:
       BASE_URL: ${{ vars.APP_URL }}
     steps:
@@ -772,7 +771,7 @@ jobs:
 
   check-performance:
     name: Performance Check
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     needs: [health-check-production]
     permissions:
       contents: read
