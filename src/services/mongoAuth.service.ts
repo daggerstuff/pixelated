@@ -4,6 +4,13 @@ let mongodbLib: typeof import('mongodb') | undefined
 let crypto: typeof import('crypto') | undefined
 import type { Db, ObjectId as RealObjectId } from 'mongodb'
 
+export class UserNotFoundError extends Error {
+  constructor(email: string) {
+    super(`User not found: ${email}`)
+    this.name = 'UserNotFoundError'
+  }
+}
+
 type MongoRuntime = {
   connect: () => Promise<Db>
   getDb: () => Db
@@ -40,11 +47,13 @@ async function initializeDependencies() {
         ObjectId = mongodbLib.ObjectId
         bcrypt = await import('bcryptjs')
         jwt = await import('jsonwebtoken')
+        crypto = await import('crypto')
       } catch {
         mongodb = null
         ObjectId = MockObjectId
         bcrypt = undefined
         jwt = undefined
+        crypto = undefined
       }
     })()
   } else {
@@ -52,6 +61,7 @@ async function initializeDependencies() {
     ObjectId = MockObjectId
     bcrypt = undefined
     jwt = undefined
+    crypto = undefined
     serverDepsPromise = Promise.resolve()
   }
   return serverDepsPromise
@@ -213,6 +223,72 @@ if (typeof window === 'undefined') {
       )
     }
 
+    async changePasswordByEmail(email: string, newPassword: string): Promise<void> {
+      await initializeDependencies()
+      if (!mongodb || !bcrypt)
+        throw new Error('MongoDB or bcrypt not available')
+      const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+      await usersCollection.updateOne(
+        { email },
+        { $set: { password: hashedPassword, updatedAt: new Date() } },
+      )
+    }
+
+    async createPasswordResetToken(email: string): Promise<string> {
+      await initializeDependencies()
+      if (!mongodb || !crypto || !bcrypt) throw new Error('MongoDB, crypto, or bcrypt not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      const user = await usersCollection.findOne({ email })
+      if (!user) throw new UserNotFoundError(email)
+
+      const resetToken = crypto.randomBytes(32).toString('hex')
+      const resetTokenHash = await bcrypt.hash(resetToken, this.SALT_ROUNDS)
+      const resetTokenExpires = new Date(Date.now() + 3600000) // 1 hour
+
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { resetToken: resetTokenHash, resetTokenExpires, updatedAt: new Date() } },
+      )
+
+      return resetToken
+    }
+
+    async verifyPasswordResetToken(email: string, token: string): Promise<boolean> {
+      await initializeDependencies()
+      if (!mongodb || !bcrypt) throw new Error('MongoDB or bcrypt not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      const user = await usersCollection.findOne({ email })
+      if (!user || !user.resetToken || !user.resetTokenExpires) {
+        return false
+      }
+
+      // Check if token has expired
+      if (user.resetTokenExpires < new Date()) {
+        return false
+      }
+
+      // Verify token against hash
+      return await bcrypt.compare(token, user.resetToken)
+    }
+
+    async invalidatePasswordResetToken(email: string): Promise<void> {
+      await initializeDependencies()
+      if (!mongodb) throw new Error('MongoDB not available')
+      const db = await mongodb.connect()
+      const usersCollection = db.collection<User>('users')
+
+      await usersCollection.updateOne(
+        { email },
+        { $unset: { resetToken: '', resetTokenExpires: '' }, $set: { updatedAt: new Date() } },
+      )
+    }
+
     async signIn(email: string, password: string): Promise<AuthResult> {
       await initializeDependencies()
       if (!mongodb || !bcrypt)
@@ -236,7 +312,8 @@ if (typeof window === 'undefined') {
 
       // Create session
       const sessionsCollection = db.collection<Session>('sessions')
-      const sessionId = crypto.randomUUID()
+      if (!crypto) throw new Error('crypto not available')
+      const sessionId = crypto.randomBytes(16).toString('hex')
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
       const session: Omit<Session, '_id'> = {
