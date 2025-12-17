@@ -1,14 +1,7 @@
-import { updatePassword } from '../../../services/auth.service'
+import type { APIContext } from 'astro'
+import { updatePasswordWithToken } from '../../../services/auth.service'
 
-export const POST = async ({
-  request,
-  cookies,
-}: {
-  request: Request
-  cookies: {
-    delete: (name: string, options?: Record<string, unknown>) => void
-  }
-}) => {
+export const POST = async ({ request, cookies }: APIContext) => {
   try {
     // Parse the request body to get the new password
     const { password } = await request.json()
@@ -28,8 +21,30 @@ export const POST = async ({
       )
     }
 
-    // Update the password using the AuthService
-    await updatePassword(password)
+    // Get email and token from cookies
+    const emailCookie = cookies.get('auth_recovery_email')
+    const tokenCookie = cookies.get('auth_recovery_token')
+
+    if (!emailCookie?.value || !tokenCookie?.value) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Missing authentication credentials',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    }
+
+    const email = emailCookie.value
+    const token = tokenCookie.value
+
+    // Update the password using the AuthService with token verification
+    await updatePasswordWithToken(email, token, password)
 
     // Clear the recovery cookies
     cookies.delete('auth_recovery_token')
@@ -54,7 +69,7 @@ export const POST = async ({
       JSON.stringify({
         success: false,
         message:
-          error instanceof Error ? String(error) : 'Failed to update password',
+          error instanceof Error ? error.message : 'Failed to update password',
       }),
       {
         status: 500,
