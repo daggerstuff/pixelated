@@ -418,7 +418,7 @@ The server implements multiple security measures:
 
 ## Configuration
 
-The server is configured via environment variables. See [Deployment Configuration](../deployment/mcp-server-deployment.md) for details.
+The server is configured via environment variables. See [Deployment Configuration](../../guides/technical-guides/deployment/mcp-server-deployment.md) for details.
 
 ## Examples
 
