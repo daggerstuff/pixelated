@@ -433,9 +433,9 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Installing cert-manager for automatic TLS certificate management..."
-                      
+
                       # Check if cert-manager is already installed
                       if kubectl get namespace cert-manager &>/dev/null; then
                         echo "✅ cert-manager namespace already exists"
@@ -444,16 +444,16 @@ stages:
                           exit 0
                         fi
                       fi
-                      
+
                       # Install cert-manager
                       kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
-                      
+
                       # Wait for cert-manager to be ready
                       echo "⏳ Waiting for cert-manager pods to be ready..."
                       kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s || true
                       kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-cainjector -n cert-manager --timeout=300s || true
                       kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-webhook -n cert-manager --timeout=300s || true
-                      
+
                       echo "✅ cert-manager installed successfully"
 
                 - task: Bash@3
@@ -462,12 +462,12 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Deploying Let's Encrypt ClusterIssuer for automatic certificate provisioning..."
-                      
+
                       # Apply ClusterIssuer manifests
                       kubectl apply -f k8s/azure/letsencrypt-clusterissuer.yaml
-                      
+
                       # Verify ClusterIssuer is created
                       if kubectl get clusterissuer letsencrypt-prod letsencrypt-staging &>/dev/null; then
                         echo "✅ Let's Encrypt ClusterIssuers deployed successfully"
@@ -562,7 +562,7 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "📦 Creating namespaces for applications..."
                       kubectl apply -f k8s/azure/pixelated-namespace.yaml
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
@@ -574,14 +574,14 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Creating ACR secret for image pull..."
-                      
+
                       # Get ACR credentials
                       ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
-                      
+
                       # Create secret if it doesn't exist
                       if ! kubectl get secret acr-secret -n pixelated &>/dev/null; then
                         kubectl create secret docker-registry acr-secret \
@@ -600,15 +600,15 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🚀 Deploying Pixelated application..."
-                      
+
                       # Deploy Pixelated app manifests
                       kubectl apply -f k8s/azure/pixelated-namespace.yaml
                       kubectl apply -f k8s/azure/pixelated-service.yaml
                       kubectl apply -f k8s/azure/pixelated-deployment.yaml
                       kubectl apply -f k8s/azure/pixelated-ingress.yaml
-                      
+
                       echo "✅ Pixelated manifests applied"
 
                 - task: Bash@3
@@ -617,16 +617,16 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🤖 Deploying Ollama server..."
-                      
+
                       # Deploy Ollama manifests
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       kubectl apply -f k8s/azure/ollama-pvc.yaml
                       kubectl apply -f k8s/azure/ollama-service.yaml
                       kubectl apply -f k8s/azure/ollama-deployment.yaml
                       kubectl apply -f k8s/azure/ollama-ingress.yaml
-                      
+
                       echo "✅ Ollama manifests applied"
 
                 - task: Bash@3
@@ -635,12 +635,12 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🧠 Deploying NeMo Data Designer ingress..."
-                      
+
                       # Deploy NeMo ingress (NeMo itself is deployed via Helm separately)
                       kubectl apply -f k8s/azure/nemo-ingress.yaml
-                      
+
                       echo "✅ NeMo ingress applied"
 
                 - task: Kubernetes@1
@@ -658,22 +658,22 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "⏳ Waiting for all deployments to be ready..."
-                      
+
                       # Wait for Pixelated deployment
                       kubectl rollout status deployment/pixelated -n pixelated --timeout=900s || {
                         echo "⚠️ Pixelated deployment rollout check failed or timed out"
                         kubectl get pods -n pixelated
                         kubectl describe deployment pixelated -n pixelated
                       }
-                      
+
                       # Wait for Ollama deployment
                       kubectl rollout status deployment/ollama -n ollama --timeout=600s || {
                         echo "⚠️ Ollama deployment rollout check failed or timed out"
                         kubectl get pods -n ollama
                       }
-                      
+
                       echo "✅ All deployments are ready"
 
                 - task: Bash@3
@@ -682,16 +682,16 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Verifying TLS certificates..."
-                      
+
                       # Check certificates (they may take a few minutes to be issued)
                       echo "Checking certificates status:"
                       kubectl get certificates -A || echo "⚠️ Certificates may still be provisioning"
-                      
+
                       # Check certificate challenges
                       kubectl get challenges -A || echo "⚠️ Challenges may still be pending"
-                      
+
                       echo "✅ TLS certificate verification completed (certificates may take 5-10 minutes to be issued)"
 
                 - task: Bash@3
@@ -844,7 +844,7 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "📦 Creating production namespaces..."
                       kubectl apply -f k8s/azure/pixelated-namespace.yaml
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
@@ -856,14 +856,14 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Creating ACR secret for production image pull..."
-                      
+
                       # Get ACR credentials
                       ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
-                      
+
                       # Create secret if it doesn't exist
                       if ! kubectl get secret acr-secret -n pixelated &>/dev/null; then
                         kubectl create secret docker-registry acr-secret \
@@ -882,15 +882,15 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🚀 Deploying Pixelated application to production..."
-                      
+
                       # Deploy Pixelated app manifests
                       kubectl apply -f k8s/azure/pixelated-namespace.yaml
                       kubectl apply -f k8s/azure/pixelated-service.yaml
                       kubectl apply -f k8s/azure/pixelated-deployment.yaml
                       kubectl apply -f k8s/azure/pixelated-ingress.yaml
-                      
+
                       echo "✅ Production Pixelated manifests applied"
 
                 - task: Bash@3
@@ -899,16 +899,16 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🤖 Deploying Ollama server to production..."
-                      
+
                       # Deploy Ollama manifests
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       kubectl apply -f k8s/azure/ollama-pvc.yaml
                       kubectl apply -f k8s/azure/ollama-service.yaml
                       kubectl apply -f k8s/azure/ollama-deployment.yaml
                       kubectl apply -f k8s/azure/ollama-ingress.yaml
-                      
+
                       echo "✅ Production Ollama manifests applied"
 
                 - task: Bash@3
@@ -917,12 +917,12 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🧠 Deploying NeMo Data Designer ingress to production..."
-                      
+
                       # Deploy NeMo ingress
                       kubectl apply -f k8s/azure/nemo-ingress.yaml
-                      
+
                       echo "✅ Production NeMo ingress applied"
 
                 - task: Kubernetes@1
@@ -940,22 +940,22 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "⏳ Waiting for all production deployments to be ready..."
-                      
+
                       # Wait for Pixelated deployment
                       kubectl rollout status deployment/pixelated -n pixelated --timeout=900s || {
                         echo "⚠️ Pixelated deployment rollout check failed or timed out"
                         kubectl get pods -n pixelated
                         kubectl describe deployment pixelated -n pixelated
                       }
-                      
+
                       # Wait for Ollama deployment
                       kubectl rollout status deployment/ollama -n ollama --timeout=600s || {
                         echo "⚠️ Ollama deployment rollout check failed or timed out"
                         kubectl get pods -n ollama
                       }
-                      
+
                       echo "✅ All production deployments are ready"
 
                 - task: Bash@3
@@ -964,16 +964,16 @@ stages:
                     targetType: "inline"
                     script: |
                       set -euo pipefail
-                      
+
                       echo "🔐 Verifying production TLS certificates..."
-                      
+
                       # Check certificates (they may take a few minutes to be issued)
                       echo "Checking production certificates status:"
                       kubectl get certificates -A || echo "⚠️ Certificates may still be provisioning"
-                      
+
                       # Check certificate challenges
                       kubectl get challenges -A || echo "⚠️ Challenges may still be pending"
-                      
+
                       echo "✅ Production TLS certificate verification completed (certificates may take 5-10 minutes to be issued)"
 
                 - task: Bash@3
