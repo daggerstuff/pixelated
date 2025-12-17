@@ -5,16 +5,16 @@ on:
     # Run every Sunday at midnight
     - cron: '0 0 * * 0'
   workflow_dispatch:
-    # Allow manual trigger
+  # Allow manual trigger
 
 jobs:
   update-dataset:
-    runs-on: ubuntu-latest
-    
+    runs-on: tenki-standard-autoscale
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
-      
+
     - name: Install uv (Python Package Manager)
       uses: astral-sh/setup-uv@v1
 
@@ -25,6 +25,7 @@ jobs:
       run: |
         uv sync
         
+
     - name: Run Pipeline (Sourcing -> Synthesis)
       env:
         # Secrets would be configured in repo settings if real keys were used
@@ -34,6 +35,7 @@ jobs:
       run: |
         uv run python ai/main.py
         
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
