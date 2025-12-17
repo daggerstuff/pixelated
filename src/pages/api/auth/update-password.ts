@@ -1,16 +1,7 @@
+import type { APIContext } from 'astro'
 import { updatePasswordWithToken } from '../../../services/auth.service'
-import { mongoAuthService } from '../../../lib/db/mongoClient'
 
-export const POST = async ({
-  request,
-  cookies,
-}: {
-  request: Request
-  cookies: {
-    get: (name: string) => { value: string } | undefined
-    delete: (name: string, options?: Record<string, unknown>) => void
-  }
-}) => {
+export const POST = async ({ request, cookies }: APIContext) => {
   try {
     // Parse the request body to get the new password
     const { password } = await request.json()
@@ -34,7 +25,7 @@ export const POST = async ({
     const emailCookie = cookies.get('auth_recovery_email')
     const tokenCookie = cookies.get('auth_recovery_token')
 
-    if (!emailCookie || !tokenCookie) {
+    if (!emailCookie?.value || !tokenCookie?.value) {
       return new Response(
         JSON.stringify({
           success: false,

@@ -1,7 +1,7 @@
 import type { User } from '@/types/mongodb.types'
 import type { AuthUser, Provider, UserRole } from '../types/auth'
 import { createSecureToken, verifySecureToken } from '../lib/security'
-import { mongoAuthService } from '../lib/db/mongoClient'
+import { mongoAuthService } from '../services/mongoAuth.service'
 
 /**
  * Helper function to make API requests
