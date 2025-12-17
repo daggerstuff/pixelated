@@ -162,7 +162,7 @@ terraform:plan:
   # Note: TF_HTTP_PASSWORD must be set as a GitLab CI/CD variable (Settings > CI/CD > Variables)
   # Mark it as protected and masked
 
-# Build job
+# Build job - GitLab Container Registry
 build:
   stage: build
   image: docker:latest
@@ -193,6 +193,46 @@ build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Build and push to Azure Container Registry
+build:acr:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+    - job: validate:dependencies
+  before_script:
+    # Validate Azure Container Registry variables
+    - |
+      if [ -z "$ACR_NAME" ] || [ -z "$ACR_USERNAME" ] || [ -z "$ACR_PASSWORD" ]; then
+        echo "ERROR: Azure Container Registry variables are not set."
+        echo "Please configure the following GitLab CI/CD project variables:"
+        echo "  - ACR_NAME (e.g., pixelatedregistry)"
+        echo "  - ACR_USERNAME (ACR admin username)"
+        echo "  - ACR_PASSWORD (ACR admin password - mark as masked)"
+        echo "See: Settings > CI/CD > Variables"
+        exit 1
+      fi
+    - ACR_FQDN="${ACR_NAME}.azurecr.io"
+    - IMAGE_REPOSITORY="pixelatedempathy"
+    - echo "Logging into Azure Container Registry: ${ACR_FQDN}"
+    - echo "$ACR_PASSWORD" | docker login ${ACR_FQDN} -u $ACR_USERNAME --password-stdin
+  script:
+    - ACR_FQDN="${ACR_NAME}.azurecr.io"
+    - IMAGE_REPOSITORY="pixelatedempathy"
+    - FULL_IMAGE_TAG="${ACR_FQDN}/${IMAGE_REPOSITORY}:${CI_COMMIT_SHORT_SHA}"
+    - LATEST_TAG="${ACR_FQDN}/${IMAGE_REPOSITORY}:latest"
+    - echo "Building Docker image for Azure Container Registry..."
+    - docker build -t ${FULL_IMAGE_TAG} -t ${LATEST_TAG} .
+    - echo "Pushing image to ACR..."
+    - docker push ${FULL_IMAGE_TAG}
+    - docker push ${LATEST_TAG}
+    - echo "✅ Image pushed successfully: ${FULL_IMAGE_TAG}"
+    - echo "✅ Latest tag pushed: ${LATEST_TAG}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  # Only build to ACR on main/master branch to avoid unnecessary builds
 
 # Security scanning
 security:scan:
