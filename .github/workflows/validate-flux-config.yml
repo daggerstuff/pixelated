@@ -18,7 +18,7 @@ permissions:
 jobs:
   validate-flux-kustomization:
     name: Validate Flux Kustomization
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -60,6 +60,7 @@ jobs:
           
           echo "✅ Validation passed: $REQUIRED_RESOURCE is correctly included"
           
+
       - name: Validate YAML syntax
         run: |
           echo "🔍 Validating YAML syntax..."
@@ -74,4 +75,3 @@ jobs:
           fi
           
           echo "✅ YAML syntax is valid"
-

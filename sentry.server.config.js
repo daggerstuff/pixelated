@@ -15,7 +15,7 @@ Sentry.init({
     (process.env.NODE_ENV === 'development' ? 0.2 : 0.05),
   ),
 
-  // Sentry Metrics (Beta) - enabled by default in SDK 10.25.0+
+  // Sentry Metrics (Beta) - enabled by default in SDK 10.26.0+
   // Reference: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
   enableMetrics: process.env.SENTRY_ENABLE_METRICS !== 'false',
 
@@ -45,6 +45,14 @@ Sentry.init({
   // Prioritize SENTRY_RELEASE (set in CI/CD) over package version for proper release tracking
   release:
     process.env.SENTRY_RELEASE ||
+    process.env.PUBLIC_SENTRY_RELEASE ||
+    process.env.PUBLIC_APP_VERSION ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.RENDER_GIT_COMMIT ||
+    process.env.NETLIFY_COMMIT_REF ||
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    process.env.CI_COMMIT_SHA ||
     process.env.npm_package_version ||
     '0.0.1',
 

@@ -141,29 +141,18 @@ export const FEATURES: Features = {
       email: true,
     },
   ],
-  giscus: [
-    false,
-    {
-      'data-repo': 'nochadisfaction/pixelated',
-      'data-repo-id': '',
-      'data-category': 'Giscus',
-      'data-category-id': '',
-      'data-mapping': 'title',
-      'data-strict': '0',
-      'data-reactions-enabled': '1',
-      'data-emit-metadata': '0',
-      'data-input-position': 'bottom',
-      'data-lang': 'en',
-    },
-  ],
   search: [
     true,
     {
       includes: ['blog', 'changelog'],
       filter: true,
       navHighlight: true,
-      batchLoadSize: [true, 5],
-      maxItemsPerPage: [true, 3],
+      batchLoadSize: [true, [5]],
+      maxItemsPerPage: [true, [3]],
     },
+  ],
+  giscus: [
+    true,
+    [] as const,
   ],
 }
