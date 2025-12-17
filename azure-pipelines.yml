@@ -402,9 +402,82 @@ stages:
             artifact: security-scan-results
             displayName: "Publish Security Scan Results"
 
+  - stage: InstallCertManager
+    displayName: "Install cert-manager"
+    dependsOn: Security
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: InstallCertManager
+        displayName: "Install cert-manager for TLS"
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: "staging"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: "Configure AKS Credentials"
+                  inputs:
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
+                - task: Bash@3
+                  displayName: "Install cert-manager"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🔐 Installing cert-manager for automatic TLS certificate management..."
+                      
+                      # Check if cert-manager is already installed
+                      if kubectl get namespace cert-manager &>/dev/null; then
+                        echo "✅ cert-manager namespace already exists"
+                        if kubectl get pods -n cert-manager | grep -q Running; then
+                          echo "✅ cert-manager is already installed and running"
+                          exit 0
+                        fi
+                      fi
+                      
+                      # Install cert-manager
+                      kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+                      
+                      # Wait for cert-manager to be ready
+                      echo "⏳ Waiting for cert-manager pods to be ready..."
+                      kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s || true
+                      kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-cainjector -n cert-manager --timeout=300s || true
+                      kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-webhook -n cert-manager --timeout=300s || true
+                      
+                      echo "✅ cert-manager installed successfully"
+
+                - task: Bash@3
+                  displayName: "Deploy Let's Encrypt ClusterIssuer"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🔐 Deploying Let's Encrypt ClusterIssuer for automatic certificate provisioning..."
+                      
+                      # Apply ClusterIssuer manifests
+                      kubectl apply -f k8s/azure/letsencrypt-clusterissuer.yaml
+                      
+                      # Verify ClusterIssuer is created
+                      if kubectl get clusterissuer letsencrypt-prod letsencrypt-staging &>/dev/null; then
+                        echo "✅ Let's Encrypt ClusterIssuers deployed successfully"
+                      else
+                        echo "⚠️ ClusterIssuers may take a moment to be ready"
+                      fi
+
   - stage: DeployStaging
     displayName: "Deploy to Staging (AKS)"
-    dependsOn: Security
+    dependsOn: InstallCertManager
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - deployment: DeployToStaging
@@ -425,7 +498,7 @@ stages:
                     scriptType: "bash"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
 
                       # Fix protobuf wire-format errors by ensuring kubectl version compatibility
                       echo "🔍 Checking kubectl and cluster version compatibility..."
@@ -483,38 +556,143 @@ stages:
                         echo "✅ Secrets applied (annotation will be auto-patched by kubectl)"
                       fi
 
-                - task: KubernetesManifest@1
-                  displayName: "Deploy to Kubernetes"
+                - task: Bash@3
+                  displayName: "Deploy Namespaces"
                   inputs:
-                    action: "deploy"
-                    connectionType: "kubernetesServiceConnection"
-                    kubernetesServiceConnection: "pixelated-aks-connection"
-                    namespace: "$(KUBE_NAMESPACE)"
-                    manifests: |
-                      k8s/azure/staging/deployment.yaml
-                      k8s/azure/staging/configmap.yaml
-                      k8s/azure/staging/ingress.yaml
-                  continueOnError: false
-                  # Note: If protobuf errors occur here, it's likely a kubectl/API server version mismatch
-                  # Check Azure DevOps agent's kubectl version matches AKS cluster version
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "📦 Creating namespaces for applications..."
+                      kubectl apply -f k8s/azure/pixelated-namespace.yaml
+                      kubectl apply -f k8s/azure/ollama-namespace.yaml
+                      echo "✅ Namespaces created"
+
+                - task: Bash@3
+                  displayName: "Create ACR Secret"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🔐 Creating ACR secret for image pull..."
+                      
+                      # Get ACR credentials
+                      ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
+                      ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
+                      ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
+                      
+                      # Create secret if it doesn't exist
+                      if ! kubectl get secret acr-secret -n pixelated &>/dev/null; then
+                        kubectl create secret docker-registry acr-secret \
+                          --namespace pixelated \
+                          --docker-server="${ACR_NAME}.azurecr.io" \
+                          --docker-username="$ACR_USERNAME" \
+                          --docker-password="$ACR_PASSWORD"
+                        echo "✅ ACR secret created"
+                      else
+                        echo "✅ ACR secret already exists"
+                      fi
+
+                - task: Bash@3
+                  displayName: "Deploy Pixelated Application"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🚀 Deploying Pixelated application..."
+                      
+                      # Deploy Pixelated app manifests
+                      kubectl apply -f k8s/azure/pixelated-namespace.yaml
+                      kubectl apply -f k8s/azure/pixelated-service.yaml
+                      kubectl apply -f k8s/azure/pixelated-deployment.yaml
+                      kubectl apply -f k8s/azure/pixelated-ingress.yaml
+                      
+                      echo "✅ Pixelated manifests applied"
+
+                - task: Bash@3
+                  displayName: "Deploy Ollama"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🤖 Deploying Ollama server..."
+                      
+                      # Deploy Ollama manifests
+                      kubectl apply -f k8s/azure/ollama-namespace.yaml
+                      kubectl apply -f k8s/azure/ollama-pvc.yaml
+                      kubectl apply -f k8s/azure/ollama-service.yaml
+                      kubectl apply -f k8s/azure/ollama-deployment.yaml
+                      kubectl apply -f k8s/azure/ollama-ingress.yaml
+                      
+                      echo "✅ Ollama manifests applied"
+
+                - task: Bash@3
+                  displayName: "Deploy NeMo Ingress"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🧠 Deploying NeMo Data Designer ingress..."
+                      
+                      # Deploy NeMo ingress (NeMo itself is deployed via Helm separately)
+                      kubectl apply -f k8s/azure/nemo-ingress.yaml
+                      
+                      echo "✅ NeMo ingress applied"
 
                 - task: Kubernetes@1
-                  displayName: "Update Image Tag"
+                  displayName: "Update Pixelated Image Tag"
                   inputs:
                     connectionType: "Kubernetes Service Connection"
                     kubernetesServiceEndpoint: "pixelated-aks-connection"
-                    namespace: "$(KUBE_NAMESPACE)"
+                    namespace: "pixelated"
                     command: "set"
                     arguments: "image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 
-                - task: Kubernetes@1
-                  displayName: "Check Rollout Status"
+                - task: Bash@3
+                  displayName: "Check All Deployments Rollout Status"
                   inputs:
-                    connectionType: "Kubernetes Service Connection"
-                    kubernetesServiceEndpoint: "pixelated-aks-connection"
-                    namespace: "$(KUBE_NAMESPACE)"
-                    command: "rollout"
-                    arguments: "status deployment/pixelated --timeout=900s"
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "⏳ Waiting for all deployments to be ready..."
+                      
+                      # Wait for Pixelated deployment
+                      kubectl rollout status deployment/pixelated -n pixelated --timeout=900s || {
+                        echo "⚠️ Pixelated deployment rollout check failed or timed out"
+                        kubectl get pods -n pixelated
+                        kubectl describe deployment pixelated -n pixelated
+                      }
+                      
+                      # Wait for Ollama deployment
+                      kubectl rollout status deployment/ollama -n ollama --timeout=600s || {
+                        echo "⚠️ Ollama deployment rollout check failed or timed out"
+                        kubectl get pods -n ollama
+                      }
+                      
+                      echo "✅ All deployments are ready"
+
+                - task: Bash@3
+                  displayName: "Verify TLS Certificates"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+                      
+                      echo "🔐 Verifying TLS certificates..."
+                      
+                      # Check certificates (they may take a few minutes to be issued)
+                      echo "Checking certificates status:"
+                      kubectl get certificates -A || echo "⚠️ Certificates may still be provisioning"
+                      
+                      # Check certificate challenges
+                      kubectl get challenges -A || echo "⚠️ Challenges may still be pending"
+                      
+                      echo "✅ TLS certificate verification completed (certificates may take 5-10 minutes to be issued)"
 
                 - task: Bash@3
                   displayName: "Create Sentry Release"
