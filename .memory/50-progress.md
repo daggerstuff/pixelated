@@ -72,7 +72,7 @@
 - `.memory/` established as source-of-truth memory system (00–70)
 - `memory-bank/` kept in sync with `.memory` for session continuity
 - Large NGC installer binaries removed from working tree
-- `ai/` (Python services and research pipelines) and `ai/training_ready/` (training data, manifests, and platform sync scripts such as `platforms/ovh/sync-datasets.sh`) present but currently untracked in git (needs decision)
+- The `ai/` directory (including `training_ready/` and scripts such as `platforms/ovh/sync-datasets.sh`) is maintained as its own git repository; this `pixelated` repo treats it as an external dependency rather than tracking it directly.
 
 ## Issues & Challenges
 
@@ -125,7 +125,6 @@
    - Patient-Psi Integration final testing
 
 3. **Repository Hygiene**
-- Decide commit vs ignore for `ai/` and `ai/training_ready/`
 - Ensure installers and large artifacts remain out of git
 
 ---

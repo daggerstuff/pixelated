@@ -40,11 +40,13 @@ async function initializeDependencies() {
         ObjectId = mongodbLib.ObjectId
         bcrypt = await import('bcryptjs')
         jwt = await import('jsonwebtoken')
+        crypto = await import('crypto')
       } catch {
         mongodb = null
         ObjectId = MockObjectId
         bcrypt = undefined
         jwt = undefined
+        crypto = undefined
       }
     })()
   } else {
@@ -52,6 +54,7 @@ async function initializeDependencies() {
     ObjectId = MockObjectId
     bcrypt = undefined
     jwt = undefined
+    crypto = undefined
     serverDepsPromise = Promise.resolve()
   }
   return serverDepsPromise
@@ -215,8 +218,8 @@ if (typeof window === 'undefined') {
 
     async signIn(email: string, password: string): Promise<AuthResult> {
       await initializeDependencies()
-      if (!mongodb || !bcrypt)
-        throw new Error('MongoDB or bcrypt not available')
+      if (!mongodb || !bcrypt || !crypto)
+        throw new Error('MongoDB, bcrypt, or crypto not available')
       const db = await mongodb.connect()
       const usersCollection = db.collection<User>('users')
 
