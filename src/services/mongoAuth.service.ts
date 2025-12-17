@@ -312,8 +312,8 @@ if (typeof window === 'undefined') {
 
       // Create session
       const sessionsCollection = db.collection<Session>('sessions')
-      if (!uuid) throw new Error('uuid not available')
-      const sessionId = uuid.v4()
+      if (!crypto) throw new Error('crypto not available')
+      const sessionId = crypto.randomUUID()
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
       const session: Omit<Session, '_id'> = {
