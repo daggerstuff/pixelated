@@ -185,34 +185,38 @@ stages:
               pnpm typecheck || echo "⚠️ Type checking completed with warnings"
             displayName: "Run Type Check"
 
-  - job: EvalGates
+  - stage: Eval
     displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
-    pool:
-      name: "Default"
-    steps:
-      - task: NodeTool@0
-        inputs:
-          versionSpec: "$(NODE_VERSION)"
-        displayName: "Install Node.js"
-      - script: |
-          set -euo pipefail
-          corepack enable pnpm
-          pnpm --version
-          pnpm install --frozen-lockfile
-        displayName: "Install Node Deps"
-      - script: |
-          set -euo pipefail
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          export PATH="$HOME/.local/bin:$PATH"
-          uv --version
-          uv run python -V
-        displayName: "Install uv (Python)"
-      - script: |
-          set -euo pipefail
-          export PATH="$HOME/.local/bin:$PATH"
-          pnpm test:evals
-        displayName: "Run Eval Tests"
-    
+    dependsOn: Validate
+    jobs:
+      - job: EvalGates
+        displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
+        pool:
+          name: "Default"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+          - script: |
+              set -euo pipefail
+              corepack enable pnpm
+              pnpm --version
+              pnpm install --frozen-lockfile
+            displayName: "Install Node Deps"
+          - script: |
+              set -euo pipefail
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              export PATH="$HOME/.local/bin:$PATH"
+              uv --version
+              uv run python -V
+            displayName: "Install uv (Python)"
+          - script: |
+              set -euo pipefail
+              export PATH="$HOME/.local/bin:$PATH"
+              pnpm test:evals
+            displayName: "Run Eval Tests"
+
   - stage: Build
     displayName: "Build Application"
     dependsOn: Validate
