@@ -47,6 +47,10 @@ variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
 
+  # Default self-hosted pool name; change in Azure DevOps if different
+  - name: SELF_HOSTED_POOL
+    value: "Default"
+
   # Convert parameters to variables for runtime conditions
   # Template expressions (${{ }}) convert parameters to variables at compile-time
   # Runtime conditions can then check these variables at execution time
