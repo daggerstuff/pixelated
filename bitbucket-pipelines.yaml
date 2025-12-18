@@ -28,6 +28,13 @@ definitions:
         - pip install --no-input --quiet uv
         - chmod +x scripts/ingestion/run_stub.py
         - uv run python scripts/ingestion/run_stub.py
+  - step: &quality-scoring-test
+      name: Quality Scoring Stub Test
+      image: python:3.11-bookworm
+      script:
+        - python --version
+        - pip install --no-input --quiet uv pytest
+        - uv run pytest -q tests/python/test_quality_scoring_stub.py
   - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
       size: 2x  # Use 2x build environment for more resources
@@ -59,11 +66,13 @@ pipelines:
     master:
     - step: *governance-validate
     - step: *ingestion-stub-check
+    - step: *quality-scoring-test
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
   pull-requests:
     '**':
     - step: *governance-validate
     - step: *ingestion-stub-check
+    - step: *quality-scoring-test
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
