@@ -12,14 +12,34 @@ from scripts.ingestion.connectors.pubmed import PubMedConnector
 from scripts.ingestion.normalize.schema import normalize_pubmed
 
 
-def main() -> int:
-    out_path = ROOT / 'tmp_rovodev_normalized.jsonl'
+REQUIRED_FIELDS = ['id','source','text','topics','license','provenance']
+
+def _schema_check(obj: dict) -> None:
+    missing = [k for k in REQUIRED_FIELDS if k not in obj]
+    if missing:
+        raise ValueError(f"Normalized record missing fields: {missing}")
+
+
+def main(args: list[str] | None = None) -> int:
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--source', default='pubmed', choices=['pubmed'])
+    parser.add_argument('--out', default=str(ROOT / 'tmp_rovodev_normalized.jsonl'))
+    ns = parser.parse_args(args or [])
+
+    out_path = Path(ns.out)
     count = 0
+
     with out_path.open('w', encoding='utf-8') as out:
-        conn = PubMedConnector()
+        if ns.source == 'pubmed':
+            conn = PubMedConnector()
+            normalizer = normalize_pubmed
+        else:
+            raise SystemExit(f"Unsupported source: {ns.source}")
         for rec in conn.fetch():
-            norm = normalize_pubmed(rec.data)
-            norm['id'] = f"pubmed-{count+1}"
+            norm = normalizer(rec.data)
+            norm['id'] = f"{ns.source}-{count+1}"
+            _schema_check(norm)
             out.write(json.dumps(norm, ensure_ascii=False) + "\n")
             count += 1
     print(f"Wrote {count} records to {out_path}")
