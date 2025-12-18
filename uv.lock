@@ -3360,12 +3360,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nvidia-pyindex"
-version = "1.0.9"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/92/59/813c065a5434541c1fff59b3a25f2767e5d176b470ef3a9b025f21edc71d/nvidia-pyindex-1.0.9.tar.gz", hash = "sha256:22300a8d5aff35b047830f790a737437402d96e0794037102e796edbceb2fec6", size = 10624, upload-time = "2021-05-21T02:19:27.075Z" }
-
-[[package]]
 name = "oauthlib"
 version = "3.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3892,7 +3886,6 @@ dependencies = [
     { name = "nltk" },
     { name = "numba" },
     { name = "numpy" },
-    { name = "nvidia-pyindex" },
     { name = "omnara" },
     { name = "openai" },
     { name = "pandas" },
@@ -4003,7 +3996,6 @@ requires-dist = [
     { name = "nltk" },
     { name = "numba", specifier = ">=0.56.0" },
     { name = "numpy" },
-    { name = "nvidia-pyindex", specifier = ">=1.0.9" },
     { name = "omnara", specifier = ">=1.5.7" },
     { name = "openai", specifier = ">=1.107.2" },
     { name = "pandas" },
