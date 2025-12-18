@@ -11,6 +11,23 @@ definitions:
     sonar: ~/.sonar/cache
     pnpm: ~/.pnpm-store
   steps:
+  - step: &governance-validate
+      name: Governance Matrix Validation
+      image: python:3.11-bookworm
+      caches:
+        - sonar
+      script:
+        - python --version
+        - pip install --no-input --quiet uv
+        - uv run python scripts/governance/validate_data_source_matrix.py
+  - step: &ingestion-stub-check
+      name: Ingestion Stub Check
+      image: python:3.11-bookworm
+      script:
+        - python --version
+        - pip install --no-input --quiet uv
+        - chmod +x scripts/ingestion/run_stub.py
+        - uv run python scripts/ingestion/run_stub.py
   - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
       size: 2x  # Use 2x build environment for more resources
@@ -40,9 +57,13 @@ definitions:
 pipelines:
   branches:
     master:
+    - step: *governance-validate
+    - step: *ingestion-stub-check
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
   pull-requests:
     '**':
+    - step: *governance-validate
+    - step: *ingestion-stub-check
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
