@@ -568,17 +568,22 @@ stages:
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       echo "✅ Namespaces created"
 
-                - task: Bash@3
+                - task: AzureCLI@2
                   displayName: "Create ACR Secret"
                   inputs:
-                    targetType: "inline"
-                    script: |
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
                       set -euo pipefail
 
                       echo "🔐 Creating ACR secret for image pull..."
 
+                      # Ensure kubectl credentials are available
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
                       # Get ACR credentials
-                      ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
+                      ACR_NAME=$(AZURE_CONTAINER_REGISTRY)
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
 
@@ -850,17 +855,22 @@ stages:
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       echo "✅ Production namespaces created"
 
-                - task: Bash@3
+                - task: AzureCLI@2
                   displayName: "Create Production ACR Secret"
                   inputs:
-                    targetType: "inline"
-                    script: |
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
                       set -euo pipefail
 
                       echo "🔐 Creating ACR secret for production image pull..."
 
+                      # Ensure kubectl credentials are available
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
                       # Get ACR credentials
-                      ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
+                      ACR_NAME=$(AZURE_CONTAINER_REGISTRY)
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
 
