@@ -97,7 +97,7 @@ stages:
       - job: ValidateVariables
         displayName: "Validate Required Variables"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - script: |
               set -euo pipefail
@@ -139,7 +139,7 @@ stages:
       - job: ValidateDependencies
         displayName: "Validate Dependencies"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -158,7 +158,7 @@ stages:
       - job: LintCode
         displayName: "Lint Code"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -173,7 +173,7 @@ stages:
       - job: TypeCheck
         displayName: "Type Check"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -188,7 +188,7 @@ stages:
   - job: EvalGates
     displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
     pool:
-      vmImage: "ubuntu-latest"
+      name: "Default"
     steps:
       - task: NodeTool@0
         inputs:
