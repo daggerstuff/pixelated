@@ -12,10 +12,12 @@ from scripts.ingestion.run_normalize import main as run_main
 
 def test_run_normalize_writes_jsonl(tmp_path: Path):
     # Run and check output file
-    rc = run_main()
+    out_file = tmp_path / 'out.jsonl'
+    rc = run_main(['--source','pubmed','--out',str(out_file)])
     assert rc == 0
-    out_path = ROOT / 'tmp_rovodev_normalized.jsonl'
-    assert out_path.exists()
-    line = out_path.read_text(encoding='utf-8').splitlines()[0]
+    assert out_file.exists()
+    line = out_file.read_text(encoding='utf-8').splitlines()[0]
     obj = json.loads(line)
-    assert 'text' in obj and 'source' in obj and obj.get('source') == 'pubmed'
+    assert obj.get('source') == 'pubmed'
+    for k in ['id','source','text','topics','license','provenance']:
+        assert k in obj

@@ -1,13 +1,27 @@
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Dict, Any
 
+from dataclasses import dataclass
+
+
+# Define Signals dataclass first (shared interface)
 @dataclass
 class Signals:
     empathy: float  # [0,1]
     fidelity: float  # [0,1]
     domain: float  # [0,1]
     harm: float  # [0,1] (higher is worse)
+
+
+# Try to import production implementation
+try:
+    from scripts.quality_scoring.production_scoring import (
+        compute_signals as compute_signals_production,
+    )
+
+    PRODUCTION_AVAILABLE = True
+except ImportError:
+    PRODUCTION_AVAILABLE = False
+
 
 @dataclass
 class ScoreResult:
@@ -22,15 +36,35 @@ def clamp01(x: float) -> float:
 
 def compute_signals(text: str) -> Signals:
     """
-    Placeholder heuristic signals for local testing (no external deps):
-    - empathy: presence of supportive keywords
+    Compute quality signals for text.
+
+    Uses production-quality implementation when available,
+    falls back to simple heuristics otherwise.
+
+    - empathy: presence of supportive keywords / empathy patterns
     - fidelity: detect pseudo-clinical patterns negatively; otherwise neutral
     - domain: look for therapy-related keywords
-    - harm: detect simple toxic/unsafe tokens (very naive)
+    - harm: detect simple toxic/unsafe tokens
     """
+    # Use production implementation if available
+    if PRODUCTION_AVAILABLE:
+        try:
+            return compute_signals_production(text)
+        except Exception:
+            # Fall through to fallback
+            pass
+
+    # Fallback: Simple heuristics (original stub implementation)
     lower = text.lower()
     supportive = ["i understand", "it makes sense", "thank you for sharing", "you are not alone"]
-    therapy_terms = ["therapy", "counseling", "cbt", "mi ", "motivational interviewing", "psychoeducation"]
+    therapy_terms = [
+        "therapy",
+        "counseling",
+        "cbt",
+        "mi ",
+        "motivational interviewing",
+        "psychoeducation",
+    ]
     pseudo_clinical = ["miracle cure", "guaranteed", "100%", "instant fix"]
     unsafe = ["kill", "suicide", "harm yourself", "hate"]
 
@@ -43,7 +77,9 @@ def compute_signals(text: str) -> Signals:
     return Signals(empathy=empathy, fidelity=fidelity, domain=domain, harm=harm)
 
 
-def compose_score(signals: Signals, weights: Dict[str, float], thresholds: Dict[str, float]) -> ScoreResult:
+def compose_score(
+    signals: Signals, weights: dict[str, float], thresholds: dict[str, float]
+) -> ScoreResult:
     # Normalize missing weights
     w_e = float(weights.get("empathy", 0.25))
     w_f = float(weights.get("fidelity", 0.25))
@@ -51,10 +87,10 @@ def compose_score(signals: Signals, weights: Dict[str, float], thresholds: Dict[
     w_h = float(weights.get("harm", 0.25))
     # Harm is inverted for composite (lower harm is better)
     composite = (
-        w_e * signals.empathy +
-        w_f * signals.fidelity +
-        w_d * signals.domain +
-        w_h * (1.0 - signals.harm)
+        w_e * signals.empathy
+        + w_f * signals.fidelity
+        + w_d * signals.domain
+        + w_h * (1.0 - signals.harm)
     )
     # Decision policy
     harm_max = float(thresholds.get("harm_max", 0.05))
