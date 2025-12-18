@@ -850,6 +850,8 @@ stages:
         pool:
           vmImage: "ubuntu-latest"
         environment: "production"
+        pool:
+          name: "Default"
         strategy:
           runOnce:
             deploy:
