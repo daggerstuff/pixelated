@@ -82,4 +82,4 @@ scikit-image>=0.19.0
 kombu>=5.3.0
 safetensors>=0.3.0
 urllib3>=2.6.2  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
-filelock==3.20.1  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
+filelock>=3.20.1  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
