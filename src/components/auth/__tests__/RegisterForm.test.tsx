@@ -147,6 +147,8 @@ describe('RegisterForm', () => {
 
     expect(toggleButton).toBeInTheDocument()
 
+    document.body.focus()
+
     await user.tab()
     expect(nameInput).toHaveFocus()
 
@@ -158,5 +160,8 @@ describe('RegisterForm', () => {
 
     await user.tab()
     expect(toggleButton).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(passwordInput).toHaveFocus()
   })
 })
