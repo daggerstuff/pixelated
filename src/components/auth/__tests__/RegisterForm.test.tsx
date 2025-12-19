@@ -169,5 +169,10 @@ describe('RegisterForm', () => {
     expect(toggleButton).toHaveFocus()
     expect(toggleButton).toHaveAccessibleName(/hide password/i)
     expect(passwordInput).toHaveAttribute('type', 'text')
+
+    await user.click(toggleButton)
+    expect(toggleButton).toHaveFocus()
+    expect(toggleButton).toHaveAccessibleName(/show password/i)
+    expect(passwordInput).toHaveAttribute('type', 'password')
   })
 })
