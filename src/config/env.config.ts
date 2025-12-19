@@ -82,6 +82,7 @@ const envSchema = z.object({
   // Email
   EMAIL_FROM: z.string().email().optional(),
   RESEND_API_KEY: z.string().optional(),
+  SITE_URL: z.string().url().optional(),
 
   // Security
   SECURITY_ENABLE_BRUTE_FORCE_PROTECTION: z
@@ -329,6 +330,10 @@ export const config = {
   email: {
     from: (): string | undefined => env().EMAIL_FROM,
     resendApiKey: (): string | undefined => env().RESEND_API_KEY,
+  },
+
+  site: {
+    url: (): string | undefined => env().SITE_URL,
   },
 
   security: {

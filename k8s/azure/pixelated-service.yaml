@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pixelated
+  namespace: pixelated
+  labels:
+    app: pixelated-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 4322
+      protocol: TCP
+      name: http
+  selector:
+    app: pixelated-app

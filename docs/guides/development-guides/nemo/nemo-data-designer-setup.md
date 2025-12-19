@@ -96,6 +96,24 @@ See [Remote Deployment Guide](./nemo-data-designer-remote-deployment.md) for det
 
 **Option C: Using Helm (For Kubernetes/Production)**
 
+For Kubernetes deployment, you can use the new deployment script:
+
+```bash
+./scripts/infrastructure/deploy-nemo-data-designer-k8s.sh
+```
+
+This script will:
+- Create the necessary Kubernetes namespace
+- Deploy NeMo Data Designer using Helm charts
+- Set up ingress for external access
+- Configure the service with your NVIDIA API key
+
+Alternatively, you can manually deploy using the provided Kubernetes manifest:
+
+```bash
+kubectl apply -f ai/nemo-data-designer-k8s.yaml
+```
+
 See the [official deployment guide](https://docs.nvidia.com/nemo/microservices/latest/set-up/deploy-as-microservices/data-designer/parent-chart.html) for Helm chart deployment.
 
 ### Step 4: Configure Environment Variables
@@ -109,24 +127,30 @@ NVIDIA_API_KEY=your-api-key-here
 NEMO_DATA_DESIGNER_BASE_URL=http://localhost:8000
 # For remote server via Envoy gateway (includes /v1/data-designer path)
 # NEMO_DATA_DESIGNER_BASE_URL=http://212.2.244.60:8080/v1/data-designer
-# For Kubernetes/production, use your cluster ingress URL with path
-# NEMO_DATA_DESIGNER_BASE_URL=http://nemo.test/v1/data-designer  # Example for minikube
+# For Kubernetes/production, use your cluster ingress URL
+# NEMO_DATA_DESIGNER_BASE_URL=https://nemo-data-designer.your-cluster-domain.com
 NEMO_DATA_DESIGNER_TIMEOUT=300
 NEMO_DATA_DESIGNER_MAX_RETRIES=3
 NEMO_DATA_DESIGNER_BATCH_SIZE=1000
 ```
 
-**Important**: 
+**Important**:
 - Replace `your-api-key-here` with your actual API key
 - Use `http://localhost:8000` for local Docker Compose deployment
-- For Kubernetes, use your cluster's ingress URL (e.g., `http://nemo.test` for minikube)
+- For Kubernetes, use your cluster's ingress URL (e.g., `https://nemo-data-designer.your-cluster-domain.com`)
 
 ### Step 5: Verify Installation
 
 1. Check that the service is running:
 
+For local Docker Compose deployment:
 ```bash
 curl http://localhost:8000/health
+```
+
+For Kubernetes deployment:
+```bash
+curl https://nemo-data-designer.your-cluster-domain.com/health
 ```
 
 2. Run the example script:
@@ -300,6 +324,12 @@ docker-compose -f docker-compose.data-designer.yml up -d
 
 #### Kubernetes Deployment
 
+Using the new deployment script (recommended):
+```bash
+./scripts/infrastructure/deploy-nemo-data-designer-k8s.sh
+```
+
+Or manually with Helm:
 ```bash
 # Add NVIDIA Helm repository
 helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
@@ -307,6 +337,11 @@ helm repo update
 
 # Install data designer
 helm install nemo-data-designer nvidia/nemo-data-designer
+```
+
+Or using the provided Kubernetes manifest:
+```bash
+kubectl apply -f ai/nemo-data-designer-k8s.yaml
 ```
 
 See [NVIDIA Documentation](https://docs.nvidia.com/nemo/microservices/latest/set-up/deploy-as-microservices/data-designer/parent-chart.html) for detailed deployment instructions.
@@ -325,7 +360,7 @@ See [NVIDIA Documentation](https://docs.nvidia.com/nemo/microservices/latest/set
 
 **Note**: `NEMO_DATA_DESIGNER_BASE_URL` should be:
 - `http://localhost:8000` for local Docker Compose deployment
-- Your cluster ingress URL for Kubernetes (e.g., `http://nemo.test` for minikube)
+- Your cluster ingress URL for Kubernetes (e.g., `https://nemo-data-designer.your-cluster-domain.com`)
 
 ### Custom Configuration
 
@@ -333,7 +368,7 @@ See [NVIDIA Documentation](https://docs.nvidia.com/nemo/microservices/latest/set
 from ai.data_designer import NeMoDataDesignerService, DataDesignerConfig
 
 config = DataDesignerConfig(
-    base_url="https://your-custom-endpoint.com/v1/nemo/dd",
+    base_url="https://nemo-data-designer.your-cluster-domain.com",
     api_key="your-api-key",
     timeout=600,  # 10 minutes
     max_retries=5,

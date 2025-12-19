@@ -5,6 +5,13 @@
 # - Uses GitLab-managed state backend (Project ID: 77130665)
 # - Requires TF_HTTP_PASSWORD variable (GitLab token) in variable groups
 # - Backend configuration in terraform/backend.config
+#
+# Post-Deployment:
+# - After infrastructure is created, optionally sets up Kubernetes cluster:
+#   - Installs cert-manager for automatic TLS certificate management
+#   - Deploys Let's Encrypt ClusterIssuers
+#   - Creates initial namespaces (pixelated, ollama)
+#   - Note: Application deployments are handled by azure-pipelines.yml
 
 trigger:
   branches:
@@ -86,6 +93,20 @@ stages:
           # Checkout code with credentials for pulling Terraform state
           - checkout: self
             persistCredentials: true
+
+          # Configure Git for SSH authentication
+          - task: Bash@3
+            displayName: "Configure Git for SSH"
+            inputs:
+              targetType: "inline"
+              script: |
+                # Configure Git to use system credential helper for Azure DevOps
+                git config --global credential.helper store
+                git config --global user.name "Azure DevOps"
+                git config --global user.email "azure-pipelines@devops.com"
+                # Ensure SSH is properly configured
+                mkdir -p ~/.ssh
+                chmod 700 ~/.ssh
 
           # Configure Azure CLI and authenticate
           - task: AzureCLI@2
@@ -228,6 +249,7 @@ stages:
             deploy:
               steps:
                 - checkout: self
+                  persistCredentials: true
 
                 - task: AzureCLI@2
                   displayName: "Login to Azure"
@@ -320,6 +342,79 @@ stages:
                 - publish: $(terraformDirectory)/infrastructure-summary.md
                   artifactName: terraform-deployment-summary
                   artifactType: pipeline
+
+                # Post-deployment: Setup Kubernetes cluster with cert-manager and initial resources
+                - task: Bash@3
+                  displayName: "Setup Kubernetes Cluster (Optional)"
+                  condition: and(succeeded(), eq('${{ parameters.environment }}', 'staging'))
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+
+                      echo "🔧 Setting up Kubernetes cluster with cert-manager and initial resources..."
+
+                      # Get AKS credentials
+                      AKS_CLUSTER_NAME=$(terraform -chdir=$(terraformDirectory) output -raw aks_cluster_name 2>/dev/null || echo "")
+                      RESOURCE_GROUP=$(terraform -chdir=$(terraformDirectory) output -raw resource_group_name 2>/dev/null || echo "")
+
+                      if [ -z "$AKS_CLUSTER_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
+                        echo "⚠️ Could not get AKS cluster info from Terraform outputs. Skipping cluster setup."
+                        echo "   This is optional - you can set up cert-manager manually later."
+                        exit 0
+                      fi
+
+                      echo "📋 AKS Cluster: $AKS_CLUSTER_NAME"
+                      echo "📋 Resource Group: $RESOURCE_GROUP"
+
+                      # Get AKS credentials
+                      az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$AKS_CLUSTER_NAME" --overwrite-existing
+
+                      # Verify cluster connection
+                      if ! kubectl cluster-info &>/dev/null; then
+                        echo "⚠️ Could not connect to AKS cluster. Skipping cluster setup."
+                        exit 0
+                      fi
+
+                      echo "✅ Connected to AKS cluster"
+
+                      # Install cert-manager if not already installed
+                      if ! kubectl get namespace cert-manager &>/dev/null; then
+                        echo "🔐 Installing cert-manager..."
+                        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+                        # Wait for cert-manager to be ready
+                        echo "⏳ Waiting for cert-manager pods..."
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s || true
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-cainjector -n cert-manager --timeout=300s || true
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-webhook -n cert-manager --timeout=300s || true
+                        echo "✅ cert-manager installed"
+                      else
+                        echo "✅ cert-manager already installed"
+                      fi
+
+                      # Deploy Let's Encrypt ClusterIssuers if manifests exist
+                      if [ -f "$(System.DefaultWorkingDirectory)/k8s/azure/letsencrypt-clusterissuer.yaml" ]; then
+                        echo "🔐 Deploying Let's Encrypt ClusterIssuers..."
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/letsencrypt-clusterissuer.yaml"
+                        echo "✅ ClusterIssuers deployed"
+                      else
+                        echo "⚠️ ClusterIssuer manifest not found. Skipping."
+                      fi
+
+                      # Create initial namespaces if manifests exist
+                      if [ -f "$(System.DefaultWorkingDirectory)/k8s/azure/pixelated-namespace.yaml" ]; then
+                        echo "📦 Creating initial namespaces..."
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/pixelated-namespace.yaml" || true
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/ollama-namespace.yaml" || true
+                        echo "✅ Initial namespaces created"
+                      fi
+
+                      echo ""
+                      echo "✅ Kubernetes cluster setup completed!"
+                      echo "📋 Next steps:"
+                      echo "   1. Deploy applications using azure-pipelines.yml"
+                      echo "   2. Configure DNS to point to the ingress IP"
+                      echo "   3. TLS certificates will be automatically provisioned by cert-manager"
 
   # Stage 3: Refresh state (for troubleshooting)
   - stage: TerraformRefresh

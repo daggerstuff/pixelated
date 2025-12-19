@@ -23,7 +23,8 @@ const isPortFallbackDisabled =
   !!process.env.NO_PORT_FALLBACK ||
   !!process.env.FORCE_EXIT_ON_EADDRINUSE
 
-const server = createServer(ssrHandler)
+// Note: We create the server inside tryListen() to avoid port conflicts
+// The unused 'server' object was removed to prevent double-binding issues
 let activeRetryServer = null
 
 function redactValue(val, keepLast = 8) {
@@ -61,61 +62,41 @@ function logSentryStartupChecks() {
   }
 }
 
-server.on('error', (err) => {
-  console.error('Server error:', err);
-
-  if (err && err.code === 'EADDRINUSE') {
-    if (isPortFallbackDisabled) {
-      console.error('Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.')
-      closeSentry().finally(() => process.exit(1))
-      return
-    }
-    return;
-  }
-
-  try {
-    if (Sentry) {
-      Sentry.captureException(err)
-    }
-  } catch (e) {
-    console.error('Failed to capture exception to Sentry:', e)
-  }
-
-  closeSentry().finally(() => process.exit(1))
-})
+// Error handling is now done within tryListen() for the retryServer
+// Removed unused server.on('error') handler that was causing conflicts
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully')
   try {
-    if (activeRetryServer && activeRetryServer !== server) {
-      // Only remove the 'error' listeners we added for retries.
+    if (activeRetryServer) {
       activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => { })
+      activeRetryServer.close(() => {
+        console.log('Process terminated')
+        process.exit(0)
+      })
+    } else {
+      process.exit(0)
     }
   } catch {
-    // ignore
-  }
-  server.close(() => {
-    console.log('Process terminated')
     process.exit(0)
-  })
+  }
 })
 
 process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully')
   try {
-    if (activeRetryServer && activeRetryServer !== server) {
-      // Only remove the 'error' listeners we added for retries.
+    if (activeRetryServer) {
       activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => { })
+      activeRetryServer.close(() => {
+        console.log('Process terminated')
+        process.exit(0)
+      })
+    } else {
+      process.exit(0)
     }
   } catch {
-    // ignore
-  }
-  server.close(() => {
-    console.log('Process terminated')
     process.exit(0)
-  })
+  }
 })
 
 const baseDelay = 250
@@ -164,7 +145,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
   const onError = (err) => {
     if (err && err.code === 'EADDRINUSE') {
       console.error(`Port ${port} is already in use.`)
-      
+
       if (isPortFallbackDisabled) {
         console.error('Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.')
         // Only report to Sentry when port fallback is disabled (fatal error)

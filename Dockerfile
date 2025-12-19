@@ -1,9 +1,10 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
+FROM node:24.12.0-trixie-slim@sha256:9ad7e7db423b2ca7ddcc01568da872701ef6171505bd823978736247885c7eb4 AS base
+
 # Builder stage: install deps and run the static build
-ARG PNPM_VERSION=10.25.0
-FROM node:24-slim AS builder
-ARG PNPM_VERSION=10.25.0
+FROM base AS builder
+ARG PNPM_VERSION=10.26.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -51,12 +52,12 @@ RUN find /app/node_modules -type f -name "*.map" -delete && \
     find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
-FROM node:24-slim AS runtime
+FROM base AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=10.25.0
+ARG PNPM_VERSION=10.26.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
