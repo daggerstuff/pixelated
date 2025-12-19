@@ -5,8 +5,8 @@ set -e
 
 NAMESPACE="${NAMESPACE:-nemo}"
 RELEASE_NAME="${RELEASE_NAME:-nemo-data-designer}"
-CHART_REPO="${CHART_REPO:-https://nvidia.github.io/nemo-microservices-helm-charts}"
-CHART_NAME="${CHART_NAME:-nemo-data-designer}"
+CHART_REPO="${CHART_REPO:-https://helm.ngc.nvidia.com/nvidia/nemo-microservices}"
+CHART_NAME="${CHART_NAME:-nemo-microservices-helm-chart}"
 CHART_VERSION="${CHART_VERSION:-latest}"
 
 echo "=========================================="
@@ -37,11 +37,31 @@ fi
 
 echo "✅ Helm is installed"
 
-# Get NVIDIA API key from local .env if it exists
-if [ -f .env ]; then
-    NVIDIA_API_KEY=$(grep "^NVIDIA_API_KEY=" .env | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-else
-    NVIDIA_API_KEY=""
+# Get NVIDIA API key from .env.production if it exists, otherwise from .env
+# Handle both regular files and named pipes
+NVIDIA_API_KEY=""
+if [ -e .env.production ]; then
+    # Try to read from the file/pipe
+    NVIDIA_API_KEY_LINE=$(grep "^NVIDIA_API_KEY=" .env.production | head -1)
+    if [ -n "$NVIDIA_API_KEY_LINE" ]; then
+        NVIDIA_API_KEY=$(echo "$NVIDIA_API_KEY_LINE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+    fi
+elif [ -e .env ]; then
+    # Try to read from the file/pipe
+    NVIDIA_API_KEY_LINE=$(grep "^NVIDIA_API_KEY=" .env | head -1)
+    if [ -n "$NVIDIA_API_KEY_LINE" ]; then
+        NVIDIA_API_KEY=$(echo "$NVIDIA_API_KEY_LINE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+    fi
+elif [ -e ../.env ]; then
+    NVIDIA_API_KEY_LINE=$(grep "^NVIDIA_API_KEY=" ../.env | head -1)
+    if [ -n "$NVIDIA_API_KEY_LINE" ]; then
+        NVIDIA_API_KEY=$(echo "$NVIDIA_API_KEY_LINE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+    fi
+elif [ -e ../../.env ]; then
+    NVIDIA_API_KEY_LINE=$(grep "^NVIDIA_API_KEY=" ../../.env | head -1)
+    if [ -n "$NVIDIA_API_KEY_LINE" ]; then
+        NVIDIA_API_KEY=$(echo "$NVIDIA_API_KEY_LINE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+    fi
 fi
 
 if [ -z "$NVIDIA_API_KEY" ]; then
@@ -52,42 +72,55 @@ fi
 
 echo "✅ NVIDIA_API_KEY found"
 
-# Create namespace if it doesn't exist
-echo ""
-echo "Creating namespace ${NAMESPACE} if it doesn't exist..."
-kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
-
-# Add NVIDIA Helm repository
+# Add NVIDIA Helm repository with authentication
 echo ""
 echo "Adding NVIDIA Helm repository..."
-helm repo add nemo-microservices "${CHART_REPO}" 2>/dev/null || echo "Repository already exists"
+NGC_API_KEY_CLEAN=$(echo "${NVIDIA_API_KEY}" | sed 's/"//g')
+helm repo add nmp "${CHART_REPO}" --username="\$oauthtoken" --password="${NGC_API_KEY_CLEAN}" 2>/dev/null || echo "Repository already exists"
 helm repo update
 
+# Create temporary values file
+cat > /tmp/nemo-values.yaml <<EOF
+data-designer:
+  env:
+    NIM_API_KEY:
+      valueFrom:
+        secretKeyRef:
+          name: "nemo-api-key"
+          key: "api-key"
+  config:
+    model_provider_registry:
+      default: "nvidiabuild"
+      providers:
+        - name: "nvidiabuild"
+          endpoint: "https://integrate.api.nvidia.com/v1"
+          api_key: "NIM_API_KEY"
+tags:
+  platform: false
+  data-designer: true
+EOF
+
+# Create namespace
+kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+
 # Create secret for NVIDIA API key
-echo ""
-echo "Creating secret for NVIDIA API key..."
+NGC_API_KEY_CLEAN=$(echo "${NVIDIA_API_KEY}" | sed 's/"//g')
 kubectl create secret generic nemo-api-key \
-    --from-literal=api-key="${NVIDIA_API_KEY}" \
+    --from-literal=api-key="${NGC_API_KEY_CLEAN}" \
     --namespace="${NAMESPACE}" \
     --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy using Helm chart
 echo ""
 echo "Deploying NeMo Data Designer using Helm chart..."
-helm upgrade --install "${RELEASE_NAME}" "${CHART_NAME}" \
-    --repo "${CHART_REPO}" \
+helm upgrade --install "${RELEASE_NAME}" nmp/nemo-microservices-helm-chart \
     --namespace "${NAMESPACE}" \
-    --set nemoMicroservices.image.registry="nvcr.io/nvidia/nemo-microservices" \
-    --set nemoMicroservices.image.tag="${CHART_VERSION}" \
-    --set nemoMicroservices.apiKeySecret.name="nemo-api-key" \
-    --set nemoMicroservices.apiKeySecret.key="api-key" \
-    --set service.type="ClusterIP" \
-    --set ingress.enabled=true \
-    --set ingress.hosts[0].host="nemo-data-designer.your-cluster-domain.com" \
-    --set ingress.hosts[0].paths[0].path="/" \
-    --set ingress.hosts[0].paths[0].pathType="Prefix" \
+    --values /tmp/nemo-values.yaml \
     --timeout 10m0s \
     --wait
+
+# Clean up temporary values file
+rm -f /tmp/nemo-values.yaml
 
 echo ""
 echo "=========================================="

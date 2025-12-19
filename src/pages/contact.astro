@@ -1,11 +1,28 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+    'areaServed': 'Worldwide',
+  },
+}
 ---
 
 <BaseLayout
   title="Contact | Pixelated Empathy"
   description="Get in touch with our team. Schedule demos, discuss partnerships, or ask questions."
 >
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)}
+  />
   <!-- Section 01 / Contact -->
   <section
     class="section-container section-spacing-lg"
@@ -48,6 +65,24 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
                 style="color: var(--text-secondary); font-size: var(--text-base);"
               >
                 United States
+              </p>
+              <p
+                style="color: var(--text-muted); font-size: var(--text-sm); margin-top: 0.5rem;"
+              >
+                Serving clients globally
+              </p>
+            </div>
+            <div class="card-elegant">
+              <div class="eyebrow-text mb-2">Company</div>
+              <p
+                style="color: var(--text-secondary); font-size: var(--text-base);"
+              >
+                Pixelated Empathy
+              </p>
+              <p
+                style="color: var(--text-muted); font-size: var(--text-sm); margin-top: 0.5rem;"
+              >
+                Founded 2025 • Early-stage startup
               </p>
             </div>
 
@@ -261,7 +296,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
     const nameInput = document.getElementById('name')! as HTMLInputElement
     const emailInput = document.getElementById('email')! as HTMLInputElement
     const subjectInput = document.getElementById('subject')! as HTMLInputElement
-    const messageInput = document.getElementById('message')! as HTMLTextAreaElement
+    const messageInput = document.getElementById(
+      'message',
+    )! as HTMLTextAreaElement
     const messageCount = document.getElementById('message-count')!
 
     // Error displays

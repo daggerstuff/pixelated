@@ -4,12 +4,39 @@ import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import Hero from '@/components/mizu/Hero.astro'
 import Logos from '@/components/mizu/Logos.astro'
 import MizuLayout from '@/layouts/MizuLayout.astro'
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'logo': 'https://pixelatedempathy.com/android-chrome-192x192.png',
+  'description': 'AI-powered training platform for mental health professionals',
+  'foundingDate': '2025',
+  'address': {
+    '@type': 'PostalAddress',
+    'addressCountry': 'US',
+  },
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+  },
+  'sameAs': [
+    'https://twitter.com/pixelatedempathy',
+    'https://github.com/nochadisfaction/pixelated',
+  ],
+}
 ---
 
 <MizuLayout
   title="Pixelated Empathy | The AI Training Ground for Therapists"
   description="Practice difficult conversations in a safe space. No pressure, just progress."
 >
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)}
+  />
   <Hero />
   <Logos />
   <CoreFeatures />
