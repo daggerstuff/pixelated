@@ -247,7 +247,7 @@
     "vite": "^7.2.7",
     "wrangler": "^4.54.0",
     "ws": "^8.18.3",
-    "zod": "^3.23.8",
+    "zod": "^4.2.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
@@ -369,7 +369,7 @@
     "util": "^0.12.5",
     "vfile": "^6.0.3",
     "vite": "^7.2.4",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite-tsconfig-paths": "^6.0.1",
     "vitest": "^4.0.15",
     "vue": "^3.5.25",
     "wait-on": "^9.0.3"
