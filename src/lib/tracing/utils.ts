@@ -4,11 +4,9 @@
  * Helper functions for manual instrumentation and span management.
  */
 
-import { trace, context, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
+import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('tracing-utils')
 const tracer = trace.getTracer('pixelated-empathy')
 
 /**

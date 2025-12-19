@@ -346,7 +346,7 @@ pnpm security:check  # ✅
 - **docs/compliance/hipaa-compliance-documentation.md**: HIPAA guidelines
 - **docs/api/**: API documentation
 - **docs/guides/technical-guides/deployment/**: Deployment guides
-- **CLAUDE.md**: AI assistant guide for Claude/Cursor
+- **CLAUDE.md**: AI assistant guide for Claude/Agent
 - **AGENTS.md**: Modern ops and AI collaboration workflow
 
 **External Services**:
