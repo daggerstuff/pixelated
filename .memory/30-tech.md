@@ -90,10 +90,10 @@
 - **GCP**: Tertiary cloud provider
 - **Cloudflare**: CDN and edge computing
 
-**CI/CD:**
+**CI/CD & Infrastructure as Code:**
 - **GitHub Actions**: CI/CD pipelines
 - **Azure Pipelines**: Enterprise CI/CD
-- **Terraform**: Infrastructure as code
+- **Terraform**: Infrastructure as code with GitLab HTTP remote backend (`terraform/backend.config`) for managing state for the `pixelated-azure-infrastructure` project. Authentication uses `gitlab-ci-token` as the backend username and requires `TF_HTTP_PASSWORD` to be provided via environment variables or pipeline variables (never committed).
 
 **Monitoring:**
 - **Sentry**: Error tracking and performance monitoring
@@ -129,7 +129,7 @@
 **Prerequisites:**
 - Node.js 24+
 - Python 3.11+
-- pnpm 10.25.0+
+- pnpm 10.26.0+
 - uv (Python package manager)
 - Docker (for local services)
 

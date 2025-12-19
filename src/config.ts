@@ -147,8 +147,12 @@ export const FEATURES: Features = {
       includes: ['blog', 'changelog'],
       filter: true,
       navHighlight: true,
-      batchLoadSize: [true, 5],
-      maxItemsPerPage: [true, 3],
+      batchLoadSize: [true, [5]],
+      maxItemsPerPage: [true, [3]],
     },
+  ],
+  giscus: [
+    true,
+    [] as const,
   ],
 }

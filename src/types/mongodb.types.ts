@@ -20,6 +20,8 @@ export interface User {
   avatarUrl?: string
   lastLogin?: Date
   preferences?: Record<string, unknown>
+  resetToken?: string
+  resetTokenExpires?: Date
   createdAt: Date
   updatedAt: Date
 }

@@ -724,6 +724,11 @@ export interface Features {
    * Controls whether to enable the search feature and related options.
    */
   search: FeatureConfig<SearchConfig>
+
+  /**
+   * Controls whether to enable the Giscus comment system.
+   */
+  giscus: FeatureConfig<any[]>
 }
 
 interface SearchConfig {

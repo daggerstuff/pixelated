@@ -121,15 +121,15 @@ export function useAuth(): UseAuthReturn {
 
       const result = await signInWithEmail(email, password)
 
-      if (!isAuthResult(result) || !result?.['success'] || !result?.['user']) {
+      if (!result || !result.user) {
         throw createAuthError(
-          result?.['error'] || 'Authentication failed',
+          'Authentication failed',
           AuthErrorCode.AUTH_FAILED,
         )
       }
 
-      setUser(result?.['user'])
-      return result
+      setUser(result.user)
+      return { success: true, user: result.user, session: result.session }
     } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
@@ -159,15 +159,15 @@ export function useAuth(): UseAuthReturn {
 
       const result = await authSignUp(email, password, { fullName })
 
-      if (!isAuthResult(result) || !result.success || !result.user) {
+      if (!result || !result.user) {
         throw createAuthError(
-          result.error || 'Registration failed',
+          'Registration failed',
           AuthErrorCode.SIGNUP_FAILED,
         )
       }
 
       setUser(result.user)
-      return result
+      return { success: true, user: result.user, session: result.session }
     } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
@@ -240,7 +240,8 @@ export function useAuth(): UseAuthReturn {
   ): Promise<boolean> => {
     try {
       setError(null)
-      return await authResetPassword(email, redirectTo)
+      await authResetPassword(email, redirectTo)
+      return true
     } catch (err: unknown) {
       const authError = isAuthError(err)
         ? err
@@ -263,9 +264,9 @@ export function useAuth(): UseAuthReturn {
       setError(null)
       const response = await authVerifyOtp(params)
 
-      if (!isAuthResult(response) || !response.success) {
+      if (!response || !response.success) {
         throw createAuthError(
-          response.error || 'OTP verification failed',
+          (response && response.error) || 'OTP verification failed',
           AuthErrorCode.OTP_FAILED,
         )
       }
@@ -297,9 +298,9 @@ export function useAuth(): UseAuthReturn {
 
     try {
       setError(null)
-      const result = await authUpdateProfile(user.id, profile)
+      const result = await authUpdateProfile(user.id as string, profile)
 
-      if (result.error) {
+      if (result && result.error) {
         throw isAuthError(result.error)
           ? result.error
           : createAuthError(

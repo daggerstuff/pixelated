@@ -131,18 +131,30 @@ Next steps:
    kubectl get nodes
    kubectl get pods -n kube-system
 
-3. Deploy your application:
-   kubectl apply -f your-app-manifests/
+3. Kubernetes cluster setup (if not done automatically):
+   - Install cert-manager (if not already installed):
+     kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+   - Deploy Let's Encrypt ClusterIssuers:
+     kubectl apply -f k8s/azure/letsencrypt-clusterissuer.yaml
+   - Create namespaces:
+     kubectl apply -f k8s/azure/pixelated-namespace.yaml
+     kubectl apply -f k8s/azure/ollama-namespace.yaml
 
-4. Configure DNS:
-   - Set A records for ${var.dns_zone_name} to point at AKS cluster
-   - Ensure NGINX Ingress Controller is deployed
+4. Deploy applications (via Azure Pipelines or manually):
+   - Pixelated app: kubectl apply -f k8s/azure/pixelated-*.yaml
+   - Ollama: kubectl apply -f k8s/azure/ollama-*.yaml
+   - NeMo ingress: kubectl apply -f k8s/azure/nemo-ingress.yaml
 
-5. Set up monitoring:
+5. Configure DNS:
+   - Set A records for pixelatedempathy.com, nemo.pixelatedempathy.com, ollama.pixelatedempathy.com
+   - Point to NGINX Ingress Controller external IP (check with: kubectl get svc -n ingress-nginx)
+   - TLS certificates will be automatically provisioned by cert-manager
+
+6. Set up monitoring:
    - Azure Monitor is configured for AKS
    - Check Azure Portal for container insights
 
-6. Backup configuration:
+7. Backup configuration:
    - Snapshot your terraform state:
      terraform state list
    - Consider setting up backup storage account

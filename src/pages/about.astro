@@ -1,10 +1,33 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
 import Surface from '@/components/ui/Surface.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'logo': 'https://pixelatedempathy.com/android-chrome-192x192.png',
+  'description': 'AI-powered training platform for mental health professionals',
+  'foundingDate': '2025',
+  'address': {
+    '@type': 'PostalAddress',
+    'addressCountry': 'US',
+  },
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+  },
+}
 ---
 
 <BaseLayout title="About Us - Pixelated Empathy">
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)}
+  />
   <section class="brutalist-section pt-20 md:pt-24 pb-16">
     <div class="brutalist-container">
       <PageHeader
@@ -51,11 +74,9 @@ import Surface from '@/components/ui/Surface.astro'
           </p>
         </div>
         <div>
-          <div class="brutalist-caption mb-2 text-teal-400">Approach</div>
-          <p class="text-white font-medium">Privacy‑first, zero‑retention</p>
-          <p class="text-gray-400 text-sm mt-1">
-            Security and auditability by design
-          </p>
+          <div class="brutalist-caption mb-2 text-teal-400">Location</div>
+          <p class="text-white font-medium">United States</p>
+          <p class="text-gray-400 text-sm mt-1">Serving clients globally</p>
         </div>
         <div>
           <div class="brutalist-caption mb-2 text-teal-400">Who we serve</div>
@@ -64,6 +85,40 @@ import Surface from '@/components/ui/Surface.astro'
           </p>
           <p class="text-gray-400 text-sm mt-1">Competency you can measure</p>
         </div>
+      </div>
+
+      <div class="divider my-12"></div>
+
+      <div class="mt-16">
+        <Surface class="p-6">
+          <h2 class="text-2xl md:text-3xl font-semibold text-white mb-4">
+            Company Information
+          </h2>
+          <div class="grid md:grid-cols-2 gap-6 mt-4">
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Legal Entity</div>
+              <div class="text-white font-medium">Pixelated Empathy</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Founded</div>
+              <div class="text-white font-medium">2025</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Location</div>
+              <div class="text-white font-medium">United States</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Status</div>
+              <div class="text-white font-medium">Early-stage startup</div>
+            </div>
+          </div>
+          <p class="mt-6 text-gray-400">
+            Learn more about our team and mission on our
+            <a href="/team" class="text-teal-400 hover:text-teal-300"
+              >team page</a
+            >.
+          </p>
+        </Surface>
       </div>
 
       <div class="mt-16 text-center">
