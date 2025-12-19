@@ -74,6 +74,7 @@ dependencies = [
     "werkzeug>=3.1.4",  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
     "fonttools>=4.61.0",  # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
     "urllib3>=2.6.2",  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+    "filelock>=3.20.1",  # Fixes SNYK-PYTHON-FILELOCK-14458335
 ]
 
 [project.urls]
