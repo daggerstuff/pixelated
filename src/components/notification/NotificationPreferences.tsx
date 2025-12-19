@@ -129,10 +129,9 @@ export function NotificationPreferences({
             onValueChange={(value) =>
               updateFrequency(value as NotificationFrequency)
             }
-            placeholder="Select frequency"
           >
-            <SelectTrigger>
-              <SelectValue />
+            <SelectTrigger aria-label="Select notification frequency">
+              <SelectValue placeholder="Select frequency" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="immediate">Immediate</SelectItem>
