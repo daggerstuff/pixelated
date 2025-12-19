@@ -2,6 +2,7 @@ import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence, defineMiddleware } from 'astro:middleware'
 import { getSession } from './lib/auth/session'
+import { tracingMiddleware } from './lib/tracing/middleware'
 
 
 // Simple route matcher for protected API routes and journal-research pages
@@ -15,17 +16,17 @@ function isProtectedRoute(request: Request) {
   try {
     const url = new URL(request.url)
     const pathname = url.pathname
-    
+
     // Allow public API routes (auth endpoints, health checks, etc.)
     if (pathname.startsWith('/api/auth/')) {
       return false
     }
-    
+
     // Allow health check endpoints (used by smoke tests and monitoring)
     if (pathname.includes('/health') || pathname.endsWith('/health')) {
       return false
     }
-    
+
     return protectedRoutePatterns.some((r) => r.test(pathname))
   } catch (_err) {
     // If URL parsing fails, be conservative and treat as not protected
@@ -60,8 +61,8 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
 
     // Store session data in locals for use in routes
     if (context.locals) {
-      ;(context.locals as any).user = session.user
-      ;(context.locals as any).session = session.session
+      ; (context.locals as any).user = session.user
+        ; (context.locals as any).session = session.session
     }
   } catch (_err) {
     // If session check fails treat as unauthenticated for protected routes
@@ -77,7 +78,9 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
 })
 
 // Single, clean middleware sequence
+// Tracing middleware is first to capture all requests
 export const onRequest = sequence(
+  tracingMiddleware as any,
   generateCspNonce as any,
   securityHeaders as any,
   projectAuthMiddleware as any,
