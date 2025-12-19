@@ -159,12 +159,15 @@ describe('RegisterForm', () => {
     const user = userEvent.setup()
     render(<RegisterForm />)
 
+    const passwordInput = screen.getByLabelText(/^Password/i)
     const toggleButton = screen.getByRole('button', { name: /show password/i })
     expect(toggleButton).toHaveAccessibleName(/show password/i)
+    expect(passwordInput).toHaveAttribute('type', 'password')
 
     await user.click(toggleButton)
 
     expect(toggleButton).toHaveFocus()
     expect(toggleButton).toHaveAccessibleName(/hide password/i)
+    expect(passwordInput).toHaveAttribute('type', 'text')
   })
 })
