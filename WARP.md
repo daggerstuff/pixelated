@@ -262,6 +262,19 @@ docs/                  # Documentation
 3. **If underspecified**: Make 1-2 reasonable assumptions, state them, proceed
    - Only ask the user if assumptions would materially change behavior
 
+### Collaboration Guidelines
+
+**Intent & Assumptions**:
+- State intent before big edits; confirm assumptions quickly
+- Offer options with trade-offs when uncertain; pick the safest/highest-signal path
+- Record important learnings in the project knowledge base after finishing work
+
+**Delivery Expectations**:
+- Add/extend tests with behavior changes; keep diffs reviewable
+- Run `pnpm check:all` and `pnpm test:all` before claiming done
+- Remove dead code and debug noise; keep accessibility intact (focus order, aria labels, contrast)
+- Respect feature flags/config-driven behavior; no silent behavior changes
+
 ### Pre-Commit Checklist
 
 **Before committing changes, verify**:
@@ -329,11 +342,12 @@ pnpm security:check  # ✅
 - **root-cause-tracing.md**: Backward tracing through call stacks
 
 **Key Documentation**:
-- **docs/journal-research-pipeline.md**: Complete research pipeline docs
+- **docs/development/journal-research/journal-research-pipeline.md**: Complete research pipeline docs
 - **docs/compliance/hipaa-compliance-documentation.md**: HIPAA guidelines
 - **docs/api/**: API documentation
-- **docs/deployment/**: Deployment guides
-- **.kiro/steering/**: Additional code style, security, testing guides
+- **docs/guides/technical-guides/deployment/**: Deployment guides
+- **CLAUDE.md**: AI assistant guide for Claude/Cursor
+- **AGENTS.md**: Modern ops and AI collaboration workflow
 
 **External Services**:
 - MongoDB: Primary database
@@ -345,7 +359,8 @@ pnpm security:check  # ✅
 ## 🎯 Development Workflow
 
 **Starting a new feature**:
-2. Check `openspec/AGENTS.md` for major architectural changes
+1. Branch clean, git status clean enough to stage
+2. Check `openspec/AGENTS.md` or `AGENTS.md` for major architectural changes
 3. Write tests first (TDD approach)
 4. Implement feature with minimal, focused edits
 5. Run relevant fast checks:
@@ -354,8 +369,10 @@ pnpm security:check  # ✅
    uv run pytest tests/             # Python
    ```
 6. Security check: `pnpm security:check`
+7. Summarize change, risk, and how to verify
 
 **Debugging**:
+1. Reproduce the issue in isolation
 2. Review error logs in Sentry (if configured)
 3. Run specific test suite: `pnpm test:unit` or `pnpm e2e:debug`
 4. Check service health: `pnpm redis:check`, `pnpm mongodb:init`
@@ -369,5 +386,11 @@ pnpm security:check     # No hardcoded secrets
 # For Python changes:
 uv run pytest tests/    # Python tests with correct environment
 ```
+
+**Quick Task Checklist**:
+- [ ] Branch clean, git status shows only intended changes
+- [ ] Implementation matches style guides; no forbidden tooling (`npm`/`yarn`/`pip`)
+- [ ] Tests/lints/security checks pass
+- [ ] Change summary provided with risk assessment and verification steps
 
 *Building technology that helps humans connect more deeply.*
