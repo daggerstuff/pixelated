@@ -70,9 +70,9 @@
 
 **Repository Hygiene / Structure (Dec 2025):**
 - `.memory/` established as source-of-truth memory system (00–70)
-- `memory-bank/` synced to `.memory` for session continuity
+- `memory-bank/` kept in sync with `.memory` for session continuity
 - Large NGC installer binaries removed from working tree
-- `ai/` and `training_ready/` present but currently untracked in git (needs decision)
+- The `ai/` directory (including `training_ready/` and scripts such as `platforms/ovh/sync-datasets.sh`) is maintained as its own git repository; this `pixelated` repo treats it as an external dependency rather than tracking it directly.
 
 ## Issues & Challenges
 
@@ -125,8 +125,7 @@
    - Patient-Psi Integration final testing
 
 3. **Repository Hygiene**
-   - Decide commit vs ignore for `ai/` and `training_ready/`
-   - Ensure installers and large artifacts remain out of git
+- Ensure installers and large artifacts remain out of git
 
 ---
 

@@ -1,40 +1,41 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 
-const seo = {
-  title: 'Our Team - Pixelated Empathy',
-  description:
-    'Meet the experienced team of researchers, engineers, and mental health professionals revolutionizing therapy education through AI technology.',
-  canonical: 'https://pixelatedempathy.com/team',
-}
-
 const teamMembers = [
   {
     name: 'Chad',
     role: 'Founder & CEO',
-    bio: 'Self-taught developer who spent 15+ years mastering Python, TypeScript, and Rust while working in mental health. Got tired of watching brilliant therapists graduate unprepared for real-world practice. Built an enterprise-grade AI platform in complete secrecy. Alone. Because that\'s apparently how you solve "impossible" problems.',
+    bio: 'Software engineer with 15+ years of experience in Python, TypeScript, and Rust. Passionate about applying cutting-edge AI technology to solve real problems in mental health training. Built Pixelated Empathy to address the gap between academic training and real-world clinical practice.',
     expertise: 'Software Engineering, AI Development, Mental Health Technology',
     image: '/images/team/chad.jpg',
+    linkedin: 'https://www.linkedin.com/in/chad',
   },
 ]
 
-// Currently building solo - seeking advisors and team members as we grow
+const companyInfo = {
+  founded: '2025',
+  location: 'United States',
+  legalEntity: 'Pixelated Empathy',
+  status: 'Early-stage startup',
+}
 ---
 
-<BaseLayout {seo}>
+<BaseLayout
+  title="Our Team - Pixelated Empathy"
+  description="Meet the experienced team of researchers, engineers, and mental health professionals revolutionizing therapy education through AI technology."
+>
   <main class="flex-1 pt-14">
     <!-- Hero Section -->
     <section class="brutalist-section py-20 mesh-bg-1">
       <div class="container mx-auto px-4">
         <div class="text-center max-w-4xl mx-auto">
           <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
-            Meet The Team (Spoiler: It's Just Me)
+            Our Team
           </h1>
           <p class="text-xl text-gray-300 leading-relaxed">
-            One self-taught developer who got tired of the broken state of
-            mental health training and decided to build an enterprise-grade AI
-            platform to fix it. Solo. Because apparently that's how impossible
-            things get done.
+            We're a small but dedicated team building the future of mental
+            health training. Founded in 2025, Pixelated Empathy combines deep
+            technical expertise with a passion for improving therapy education.
           </p>
         </div>
       </div>
@@ -44,13 +45,11 @@ const teamMembers = [
     <section class="brutalist-section py-20 bg-gray-900">
       <div class="container mx-auto px-4">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">
-            The "Leadership Team"
-          </h2>
+          <h2 class="text-4xl font-bold text-white mb-4">Leadership Team</h2>
           <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            It's Chad. Just Chad. Who spent years building this thing in secret
-            while everyone else was talking about how AI would never work in
-            mental health training.
+            Our founder brings over 15 years of software engineering experience
+            and a deep understanding of mental health technology. We're actively
+            growing our team and seeking advisors who share our vision.
           </p>
         </div>
 
@@ -213,32 +212,110 @@ const teamMembers = [
             </p>
           </div>
           <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">2025</div>
-            <p class="text-gray-300">Founded Pixelated Empathy</p>
+            <div class="text-4xl font-bold text-teal-400 mb-2">
+              {companyInfo.founded}
+            </div>
+            <p class="text-gray-300">Company Founded</p>
           </div>
           <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">Current</div>
-            <p class="text-gray-300">Pursuing Counseling Degree</p>
+            <div class="text-4xl font-bold text-teal-400 mb-2">100%</div>
+            <p class="text-gray-300">Mission-Driven Focus</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Careers CTA -->
+    <!-- Company Information -->
     <section class="brutalist-section py-20 bg-black">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-white mb-4">
+            Company Information
+          </h2>
+        </div>
+        <div class="max-w-3xl mx-auto">
+          <div class="glass-card p-8">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <div class="text-sm text-gray-500 mb-1">Legal Entity</div>
+                <div class="text-lg font-semibold text-white">
+                  {companyInfo.legalEntity}
+                </div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 mb-1">Founded</div>
+                <div class="text-lg font-semibold text-white">
+                  {companyInfo.founded}
+                </div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 mb-1">Location</div>
+                <div class="text-lg font-semibold text-white">
+                  {companyInfo.location}
+                </div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 mb-1">Status</div>
+                <div class="text-lg font-semibold text-white">
+                  {companyInfo.status}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advisors & Consultants -->
+    <section class="brutalist-section py-20 bg-gray-900">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-white mb-4">
+            Advisors & Consultants
+          </h2>
+          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+            We're actively seeking experienced advisors in mental health,
+            clinical training, AI/ML, and healthcare technology. If you're
+            interested in advising, please
+            <a href="/contact" class="text-teal-400 hover:text-teal-300"
+              >get in touch</a
+            >.
+          </p>
+        </div>
+        <div class="max-w-2xl mx-auto glass-card p-8 text-center">
+          <p class="text-gray-400">
+            We're building our advisory board. Interested in contributing your
+            expertise? We'd love to hear from you.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Careers CTA -->
+    <section class="brutalist-section py-20 bg-gray-900">
       <div class="container mx-auto px-4 text-center">
         <h2 class="text-4xl font-bold text-white mb-6">Join Our Mission</h2>
         <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
           We're always looking for passionate individuals who want to make a
-          meaningful impact in mental healthcare through technology.
+          meaningful impact in mental healthcare through technology. Whether
+          you're interested in engineering, AI research, or clinical
+          applications, we'd love to hear from you.
         </p>
-        <a
-          href="/contact"
-          class="nav-pill px-8 py-4 text-lg font-semibold text-white hover:bg-teal-600 transition-colors"
-          style="background: #14b8a6;"
-        >
-          View Open Positions →
-        </a>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/careers"
+            class="nav-pill px-8 py-4 text-lg font-semibold text-white hover:bg-teal-600 transition-colors"
+            style="background: #14b8a6;"
+          >
+            View Careers →
+          </a>
+          <a
+            href="/contact"
+            class="nav-pill px-8 py-4 text-lg font-semibold text-white border-2 border-teal-400 hover:bg-teal-400/10 transition-colors"
+          >
+            Get in Touch
+          </a>
+        </div>
       </div>
     </section>
   </main>

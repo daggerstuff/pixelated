@@ -1,6 +1,7 @@
 import type { User } from '@/types/mongodb.types'
 import type { AuthUser, Provider, UserRole } from '../types/auth'
 import { createSecureToken, verifySecureToken } from '../lib/security'
+import { mongoAuthService } from '../services/mongoAuth.service'
 
 /**
  * Helper function to make API requests
@@ -240,6 +241,41 @@ export async function updatePassword(
     return true
   } catch (error: unknown) {
     console.error('Error updating password:', error)
+    throw error
+  }
+}
+
+/**
+ * Update password using reset token
+ * @param email User email
+ * @param token Reset token
+ * @param newPassword New password
+ */
+export async function updatePasswordWithToken(
+  email: string,
+  token: string,
+  newPassword: string,
+) {
+  try {
+    if (!mongoAuthService) {
+      throw new Error('MongoDB authentication service not available')
+    }
+
+    // Verify the reset token
+    const isValid = await mongoAuthService.verifyPasswordResetToken(email, token)
+    if (!isValid) {
+      throw new Error('Invalid or expired reset token')
+    }
+
+    // Update the password
+    await mongoAuthService.changePasswordByEmail(email, newPassword)
+
+    // Invalidate the reset token
+    await mongoAuthService.invalidatePasswordResetToken(email)
+
+    return true
+  } catch (error: unknown) {
+    console.error('Error updating password with token:', error)
     throw error
   }
 }

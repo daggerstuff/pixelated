@@ -1,9 +1,10 @@
 ---
 const links = [
-  { text: 'Home', href: '#' },
-  { text: 'Features', href: '#features' },
-  { text: 'Testimonials', href: '#testimonials' },
-  { text: 'FAQ', href: '#faq' },
+  { text: 'Home', href: '/', isAnchor: false },
+  { text: 'Features', href: '/features', isAnchor: false },
+  { text: 'About', href: '/about', isAnchor: false },
+  { text: 'Team', href: '/team', isAnchor: false },
+  { text: 'Contact', href: '/contact', isAnchor: false },
 ]
 ---
 
@@ -28,7 +29,7 @@ const links = [
         >
       </div>
 
-      <nav class="hidden md:flex space-x-8">
+      <nav class="hidden md:flex space-x-8" aria-label="Main navigation">
         {
           links.map((link) => (
             <a
@@ -55,6 +56,74 @@ const links = [
           Get Started
         </a>
       </div>
+
+      <!-- Mobile menu button -->
+      <button
+        id="mobile-menu-button"
+        class="md:hidden text-slate-300 hover:text-white transition-colors"
+        aria-label="Toggle mobile menu"
+        aria-expanded="false"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      id="mobile-menu"
+      class="md:hidden hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-md"
+    >
+      <nav class="px-4 py-6 space-y-4" aria-label="Mobile navigation">
+        {
+          links.map((link) => (
+            <a
+              href={link.href}
+              class="block text-slate-300 hover:text-white transition-colors text-sm font-medium py-2"
+            >
+              {link.text}
+            </a>
+          ))
+        }
+        <div class="pt-4 border-t border-white/10 space-y-3">
+          <a
+            href="/login"
+            class="block text-slate-300 hover:text-white transition-colors text-sm font-medium py-2"
+          >
+            Log in
+          </a>
+          <a
+            href="/auth/signup"
+            class="block bg-white text-slate-950 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-200 transition-colors text-center"
+          >
+            Get Started
+          </a>
+        </div>
+      </nav>
     </div>
   </div>
 </header>
+
+<script>
+  const mobileMenuButton = document.getElementById('mobile-menu-button')
+  const mobileMenu = document.getElementById('mobile-menu')
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      const isExpanded =
+        mobileMenuButton.getAttribute('aria-expanded') === 'true'
+      mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded))
+      mobileMenu.classList.toggle('hidden')
+    })
+  }
+</script>

@@ -103,10 +103,10 @@ Data Layer
 - `.memory/`: authoritative memory bank (00–70)
 - `memory-bank/`: mirrored memory bank + historical entries
 - `ai/`: Python AI services and dataset/research pipelines (large)
-- `training_ready/`: training assets, manifests, configs, and scripts
+- `ai/training_ready/`: training assets, manifests, configs, and platform sync scripts (for example `platforms/ovh/sync-datasets.sh`)
 
 ### Current Working-Tree Note (Dec 2025)
-- `ai/` and `training_ready/` exist but are currently untracked in git; ensure `.gitignore` and versioning strategy are intentional.
+- `ai/` (and its `training_ready/` subtree) lives inside this repo’s filesystem but is managed as a **separate git repository**; its tracking state is defined there, not in the `pixelated` repo.
 
 ---
 
@@ -122,8 +122,10 @@ Data Layer
 
 **Component Organization:**
 - `src/components/`: Domain-organized React components
-- `src/lib/`: Core libraries and services
+- `src/lib/`: Core libraries and services (including `logging/build-safe-logger` used for PHI audit logging)
 - `src/pages/`: Astro pages and API routes
+- `src/config.ts`: Site, UI, and feature configuration with PHI audit logging on module load
+- `src/types.ts`: Shared type definitions (including PHI-related structures) with PHI audit logging on module access
 - `ai/`: Python AI services and models
 
 **Naming Conventions:**

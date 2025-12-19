@@ -1,0 +1,18 @@
+data-designer:
+  env:
+    NIM_API_KEY:
+      valueFrom:
+        secretKeyRef:
+          name: data-designer-api-keys
+          key: nvidiabuild
+  config:
+    model_provider_registry:
+      default: "nvidiabuild"
+      providers:
+        - name: "nvidiabuild"
+          endpoint: "https://integrate.api.nvidia.com/v1"
+          api_key: "NIM_API_KEY"
+
+tags:
+  platform: false
+  data-designer: true
