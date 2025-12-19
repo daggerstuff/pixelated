@@ -206,10 +206,111 @@ stages:
             displayName: "Install Node Deps"
           - script: |
               set -euo pipefail
+
+              echo "🧹 Cleaning up disk space before Python dependency installation..."
+
+              # Check current disk usage
+              df -h / | tail -1
+
+              # Clean up old Docker images and containers (if Docker is available)
+              if command -v docker >/dev/null 2>&1; then
+                echo "Cleaning up Docker resources..."
+                docker system prune -af --volumes 2>/dev/null || echo "⚠️ Docker cleanup skipped (may require permissions)"
+              fi
+
+              # Clean up old uv cache more aggressively
+              if [ -d "$HOME/.cache/uv" ]; then
+                echo "Cleaning up old uv cache..."
+                # Remove temporary extraction directories (these can be large)
+                find "$HOME/.cache/uv" -type d -name ".tmp*" -exec rm -rf {} + 2>/dev/null || true
+                # Remove old cached packages (keep only recent)
+                find "$HOME/.cache/uv" -type f -mtime +1 -delete 2>/dev/null || true
+                find "$HOME/.cache/uv" -type d -empty -delete 2>/dev/null || true
+              fi
+
+              # Clean up old pip cache
+              if [ -d "$HOME/.cache/pip" ]; then
+                echo "Cleaning up old pip cache..."
+                find "$HOME/.cache/pip" -type f -mtime +7 -delete 2>/dev/null || true
+              fi
+
+              # Clean up temporary files
+              echo "Cleaning up temporary files..."
+              rm -rf /tmp/* 2>/dev/null || true
+              rm -rf "$HOME/.tmp" 2>/dev/null || true
+
+              # Clean up old virtual environments (keep only current)
+              if [ -d ".venv" ]; then
+                echo "Removing existing .venv to start fresh..."
+                rm -rf .venv
+              fi
+
+              # Check disk space after cleanup
+              echo "📊 Disk space after cleanup:"
+              df -h / | tail -1
+
+              # Warn if disk space is still low
+              DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+              if [ "$DISK_USAGE" -gt 90 ]; then
+                echo "##vso[task.logissue type=warning]Disk usage is still high: ${DISK_USAGE}%"
+                echo "⚠️ Consider cleaning up the agent machine or increasing disk space"
+              fi
+            displayName: "Cleanup Disk Space"
+          - script: |
+              set -euo pipefail
+
+              echo "📦 Installing uv package manager..."
               curl -LsSf https://astral.sh/uv/install.sh | sh
               export PATH="$HOME/.local/bin:$PATH"
               uv --version
+
+              echo "🐍 Setting up Python environment with uv..."
+
+              # Check if we can use a different cache location (e.g., if /tmp has more space)
+              # uv will use $HOME/.cache/uv by default, but we can override with UV_CACHE_DIR
+              DISK_USAGE_HOME=$(df "$HOME" | tail -1 | awk '{print $5}' | sed 's/%//')
+              DISK_USAGE_TMP=$(df /tmp | tail -1 | awk '{print $5}' | sed 's/%//' || echo "100")
+
+              if [ "$DISK_USAGE_TMP" -lt "$DISK_USAGE_HOME" ] && [ "$DISK_USAGE_TMP" -lt 80 ]; then
+                echo "Using /tmp for uv cache (more space available)"
+                export UV_CACHE_DIR="/tmp/uv-cache"
+                mkdir -p "$UV_CACHE_DIR"
+              else
+                echo "Using default uv cache location: $HOME/.cache/uv"
+              fi
+
+              # Use uv sync to install dependencies efficiently
+              # This will create .venv and install all dependencies from pyproject.toml
+              # Add timeout and retry logic for large package downloads
+              MAX_RETRIES=2
+              RETRY_COUNT=0
+
+              while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                if uv sync --frozen; then
+                  break
+                else
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - cleaning cache and retrying..."
+                    # Clean up cache and retry
+                    rm -rf "$HOME/.cache/uv/.tmp"* 2>/dev/null || true
+                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/.tmp"* 2>/dev/null || true
+                    sleep 5
+                  else
+                    echo "##vso[task.logissue type=error]uv sync failed after $MAX_RETRIES attempts"
+                    echo "📊 Current disk usage:"
+                    df -h /
+                    echo "📊 Disk usage by directory:"
+                    du -sh "$HOME/.cache" "$HOME/.local" .venv 2>/dev/null || true
+                    echo "##vso[task.logissue type=error]If disk space is low, clean up the agent or use a different agent with more space"
+                    exit 1
+                  fi
+                fi
+              done
+
+              # Verify installation
               uv run python -V
+              echo "✅ Python environment ready"
             displayName: "Install uv (Python)"
           - script: |
               set -euo pipefail
@@ -224,7 +325,7 @@ stages:
       - job: BuildApplication
         displayName: "Build and Push Docker Image"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         timeoutInMinutes: "30"
         steps:
           - task: NodeTool@0
@@ -358,7 +459,7 @@ stages:
       - job: ContainerSecurity
         displayName: "Container Security Scan"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: Bash@3
             displayName: "Verify Docker Access"
@@ -446,7 +547,7 @@ stages:
       - deployment: InstallCertManager
         displayName: "Install cert-manager for TLS"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "staging"
         strategy:
           runOnce:
@@ -519,7 +620,7 @@ stages:
       - deployment: DeployToStaging
         displayName: "Deploy to Azure Kubernetes Service"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "staging"
         strategy:
           runOnce:
@@ -848,7 +949,7 @@ stages:
       - deployment: DeployToProduction
         displayName: "Deploy to Production"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "production"
         strategy:
           runOnce:
@@ -1105,7 +1206,7 @@ stages:
       - job: HealthCheckStaging
         displayName: "Staging Health Check"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: AzureCLI@2
             displayName: "Check Deployment Health"
@@ -1138,7 +1239,7 @@ stages:
       - job: PerformanceTests
         displayName: "Run Performance Tests"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -1378,7 +1479,7 @@ stages:
       - job: E2ETests
         displayName: "Run E2E Tests"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -1542,7 +1643,7 @@ stages:
       - job: PrepareTrainingData
         displayName: "Prepare Training Data"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
 
@@ -1579,7 +1680,7 @@ stages:
         dependsOn: PrepareTrainingData
         condition: succeeded()
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         variables:
           OVH_GPU_MODEL: "L40S"
           OVH_MAX_HOURS: "12"
@@ -1681,7 +1782,7 @@ stages:
       - job: BuildOllamaImage
         displayName: "Build and Push Ollama Image"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
 
@@ -1733,7 +1834,7 @@ stages:
       - job: ScheduleBlogPosts
         displayName: "Schedule and Publish Blog Posts"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
             persistCredentials: "true"
@@ -1777,7 +1878,7 @@ stages:
       - job: SummaryReport
         displayName: "Pipeline Summary Report"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - script: |
               echo "##[section]📊 Pipeline Execution Summary"
