@@ -1,0 +1,327 @@
+{
+  "audit_report": {
+    "audit_id": "AUDIT-2025-12-18-001",
+    "audit_date": "2025-12-18T10:00:00Z",
+    "audited_by": "Data Governance Team",
+    "audit_type": "comprehensive_provenance_review",
+    "scope": {
+      "datasets_audited": 15,
+      "time_range": {
+        "start_date": "2025-11-01",
+        "end_date": "2025-12-18"
+      },
+      "focus_areas": [
+        "provenance_completeness",
+        "license_compliance",
+        "source_attribution",
+        "processing_lineage",
+        "storage_integrity"
+      ]
+    },
+    "summary": {
+      "total_datasets": 15,
+      "compliant_datasets": 12,
+      "non_compliant_datasets": 2,
+      "needs_review": 1,
+      "overall_compliance_rate": 0.80,
+      "critical_issues": 1,
+      "high_priority_issues": 3,
+      "medium_priority_issues": 5,
+      "low_priority_issues": 2
+    },
+    "findings": [
+      {
+        "finding_id": "FND-001",
+        "dataset_id": "priority_1_FINAL",
+        "dataset_name": "Priority 1 Therapeutic Conversations",
+        "finding_type": "compliance_issue",
+        "severity": "critical",
+        "category": "license_compliance",
+        "description": "License verification status is 'pending' but dataset is in active use for training. License must be verified before continued use.",
+        "recommendation": "Immediately verify license with source provider. Suspend training usage until license is verified and documented.",
+        "status": "open",
+        "reported_at": "2025-12-18T10:15:00Z",
+        "reported_by": "Auditor A",
+        "evidence": {
+          "provenance_record": "provenance_id_123",
+          "license_verification_status": "pending",
+          "current_usage": "active_training"
+        },
+        "affected_records": 462000
+      },
+      {
+        "finding_id": "FND-002",
+        "dataset_id": "reddit_mental_health_v2",
+        "dataset_name": "Reddit Mental Health Conversations v2",
+        "finding_type": "provenance_gap",
+        "severity": "high",
+        "category": "source_attribution",
+        "description": "Missing acquisition metadata. Cannot verify acquisition method or date for compliance review.",
+        "recommendation": "Backfill acquisition metadata from processing logs or historical records. Document acquisition method if unknown.",
+        "status": "in_progress",
+        "reported_at": "2025-12-18T10:30:00Z",
+        "reported_by": "Auditor B",
+        "evidence": {
+          "provenance_record": "provenance_id_456",
+          "missing_fields": [
+            "source.acquisition_method",
+            "source.acquisition_date",
+            "source.acquisition_metadata"
+          ]
+        },
+        "affected_records": 89000
+      },
+      {
+        "finding_id": "FND-003",
+        "dataset_id": "synthetic_edge_cases",
+        "dataset_name": "Synthetic Edge Case Scenarios",
+        "finding_type": "data_quality",
+        "severity": "medium",
+        "category": "processing_lineage",
+        "description": "Processing lineage incomplete. Missing details for quality scoring stage. Cannot verify quality scoring methodology was applied correctly.",
+        "recommendation": "Complete processing lineage with quality scoring stage details including parameters, thresholds, and output metrics.",
+        "status": "open",
+        "reported_at": "2025-12-18T10:45:00Z",
+        "reported_by": "Auditor A",
+        "evidence": {
+          "provenance_record": "provenance_id_789",
+          "missing_stage": "quality_scoring",
+          "expected_stages": [
+            "ingestion",
+            "normalization",
+            "quality_scoring",
+            "filtering",
+            "compilation"
+          ],
+          "actual_stages": [
+            "ingestion",
+            "normalization",
+            "filtering",
+            "compilation"
+          ]
+        },
+        "affected_records": 10000
+      },
+      {
+        "finding_id": "FND-004",
+        "dataset_id": "cot_philosophical_understanding",
+        "dataset_name": "CoT Philosophical Understanding Dataset",
+        "finding_type": "storage_issue",
+        "severity": "low",
+        "category": "storage_integrity",
+        "description": "Checksum verification failed on latest version. File may have been corrupted during transfer or storage.",
+        "recommendation": "Re-verify checksum. If mismatch confirmed, re-generate dataset from source and re-upload. Update provenance with corrected checksum.",
+        "status": "resolved",
+        "reported_at": "2025-12-17T14:20:00Z",
+        "resolved_at": "2025-12-18T09:00:00Z",
+        "reported_by": "Auditor C",
+        "resolved_by": "Data Engineering Team",
+        "evidence": {
+          "provenance_record": "provenance_id_321",
+          "stored_checksum": "abc123def456...",
+          "computed_checksum": "xyz789ghi012...",
+          "checksum_mismatch": true
+        },
+        "resolution_notes": "Checksum mismatch was due to compression difference. Updated provenance record with correct checksum and verified file integrity."
+      },
+      {
+        "finding_id": "FND-005",
+        "dataset_id": "clinical_trial_transcripts",
+        "dataset_name": "Clinical Trial Therapy Transcripts",
+        "finding_type": "license_violation",
+        "severity": "high",
+        "category": "license_compliance",
+        "description": "Dataset marked as 'contracted' license but contract documentation is missing. Cannot verify contractual terms are being followed.",
+        "recommendation": "Locate and link contract documentation to provenance record. Verify all usage complies with contract terms. Suspend usage if contract cannot be located.",
+        "status": "open",
+        "reported_at": "2025-12-18T11:00:00Z",
+        "reported_by": "Auditor A",
+        "evidence": {
+          "provenance_record": "provenance_id_654",
+          "license_type": "contracted",
+          "missing_contract_documentation": true,
+          "contract_reference": null
+        },
+        "affected_records": 5000
+      }
+    ],
+    "compliance_assessment": {
+      "by_license_type": {
+        "permissive": {
+          "total": 8,
+          "compliant": 8,
+          "non_compliant": 0,
+          "needs_review": 0,
+          "compliance_rate": 1.0
+        },
+        "contracted": {
+          "total": 4,
+          "compliant": 2,
+          "non_compliant": 1,
+          "needs_review": 1,
+          "compliance_rate": 0.5
+        },
+        "proprietary": {
+          "total": 2,
+          "compliant": 1,
+          "non_compliant": 1,
+          "needs_review": 0,
+          "compliance_rate": 0.5
+        },
+        "cc_by": {
+          "total": 1,
+          "compliant": 1,
+          "non_compliant": 0,
+          "needs_review": 0,
+          "compliance_rate": 1.0
+        }
+      },
+      "by_source_type": {
+        "journal": {
+          "total": 5,
+          "compliant": 5,
+          "compliance_rate": 1.0
+        },
+        "repository": {
+          "total": 4,
+          "compliant": 3,
+          "compliance_rate": 0.75
+        },
+        "social_media": {
+          "total": 3,
+          "compliant": 2,
+          "compliance_rate": 0.67
+        },
+        "synthetic": {
+          "total": 2,
+          "compliant": 1,
+          "compliance_rate": 0.50
+        },
+        "contracted": {
+          "total": 1,
+          "compliant": 1,
+          "compliance_rate": 1.0
+        }
+      },
+      "by_quality_tier": {
+        "priority": {
+          "total": 3,
+          "compliant": 2,
+          "compliance_rate": 0.67
+        },
+        "professional": {
+          "total": 5,
+          "compliant": 5,
+          "compliance_rate": 1.0
+        },
+        "cot": {
+          "total": 4,
+          "compliant": 3,
+          "compliance_rate": 0.75
+        },
+        "reddit": {
+          "total": 2,
+          "compliant": 1,
+          "compliance_rate": 0.50
+        },
+        "synthetic": {
+          "total": 1,
+          "compliant": 1,
+          "compliance_rate": 1.0
+        }
+      }
+    },
+    "recommendations": {
+      "immediate_actions": [
+        {
+          "priority": "critical",
+          "action": "Suspend training usage of priority_1_FINAL until license verification complete",
+          "owner": "Data Governance Lead",
+          "due_date": "2025-12-19"
+        },
+        {
+          "priority": "high",
+          "action": "Backfill missing acquisition metadata for reddit_mental_health_v2",
+          "owner": "Data Engineering Team",
+          "due_date": "2025-12-20"
+        },
+        {
+          "priority": "high",
+          "action": "Locate and link contract documentation for clinical_trial_transcripts",
+          "owner": "Legal Team",
+          "due_date": "2025-12-22"
+        }
+      ],
+      "short_term_improvements": [
+        {
+          "action": "Implement automated provenance completeness checks in CI/CD pipeline",
+          "owner": "Platform Team",
+          "timeline": "2 weeks"
+        },
+        {
+          "action": "Create provenance metadata backfill script for existing datasets",
+          "owner": "Data Engineering Team",
+          "timeline": "1 week"
+        },
+        {
+          "action": "Establish regular audit cadence (monthly comprehensive, weekly spot checks)",
+          "owner": "Data Governance Team",
+          "timeline": "Immediate"
+        }
+      ],
+      "long_term_improvements": [
+        {
+          "action": "Automated compliance checking against license terms",
+          "owner": "Platform Team",
+          "timeline": "1 month"
+        },
+        {
+          "action": "Provenance visualization dashboard for lineage tracking",
+          "owner": "Frontend Team",
+          "timeline": "6 weeks"
+        },
+        {
+          "action": "Integration with license management system",
+          "owner": "Data Governance Team",
+          "timeline": "2 months"
+        }
+      ]
+    },
+    "next_audit": {
+      "scheduled_date": "2026-01-15",
+      "audit_type": "monthly_comprehensive",
+      "focus_areas": [
+        "remediation_of_open_findings",
+        "new_datasets_added",
+        "license_compliance_verification"
+      ]
+    },
+    "appendix": {
+      "datasets_audited": [
+        "priority_1_FINAL",
+        "priority_2_FINAL",
+        "priority_3_FINAL",
+        "reddit_mental_health_v2",
+        "cot_philosophical_understanding",
+        "cot_temporal_reasoning",
+        "synthetic_edge_cases",
+        "clinical_trial_transcripts",
+        "llama3_counseling_data",
+        "journal_therapy_transcripts_2024",
+        "pubmed_abstracts_mental_health",
+        "clinical_forum_discussions",
+        "professional_training_materials",
+        "edge_case_synthetic_v2",
+        "long_running_therapy_sessions"
+      ],
+      "audit_methodology": "Comprehensive review of provenance records against schema requirements, license compliance checks, source verification, and storage integrity validation.",
+      "tools_used": [
+        "Provenance Query API",
+        "Checksum Verification Tool",
+        "License Compliance Checker",
+        "Schema Validator"
+      ]
+    }
+  }
+}
+
