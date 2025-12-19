@@ -141,7 +141,7 @@ describe('RegisterForm', () => {
     render(<RegisterForm />)
 
     const passwordInput = screen.getByLabelText(/^Password/i)
-    const toggleButton = screen.getByRole('button', { name: 'Show password' })
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
 
     expect(toggleButton).toBeInTheDocument()
 
@@ -160,7 +160,7 @@ describe('RegisterForm', () => {
     render(<RegisterForm />)
 
     const passwordInput = screen.getByLabelText(/^Password/i)
-    const toggleButton = screen.getByRole('button', { name: 'Show password' })
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
     expect(toggleButton).toHaveAccessibleName('Show password')
     expect(passwordInput).toHaveAttribute('type', 'password')
 
