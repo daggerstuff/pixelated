@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.25.0
+  PNPM_VERSION: 10.26.0
   NODE_ENV: test
   DISABLE_AUTH: "true"
   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
@@ -20,7 +20,7 @@ env:
 jobs:
   browser-tests:
     name: Run Browser Tests
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     timeout-minutes: 60
 
     steps:
@@ -35,7 +35,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.25.0
+          version: 10.26.0
 
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -96,7 +96,7 @@ jobs:
 
   generate-report:
     name: Generate Test Report
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     needs: [browser-tests]
     if: always()
 

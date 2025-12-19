@@ -1,55 +1,57 @@
 # NeMo Data Designer - Quick Deployment Guide
 
-## Remote Server Deployment (212.2.244.60)
+## Kubernetes Cluster Deployment
 
 ### One-Command Deployment
 
 ```bash
-./scripts/deploy-nemo-data-designer-remote.sh
+./scripts/deploy-nemo-data-designer-k8s.sh
 ```
 
 ### What It Does
 
-1. ✅ Tests SSH connection to remote server
-2. ✅ Verifies Docker and Docker Compose are installed
-3. ✅ Downloads NeMo Microservices quickstart package
-4. ✅ Sets up and starts Data Designer service
-5. ✅ Configures service to be accessible at http://212.2.244.60:8080
+1. ✅ Creates Kubernetes deployment for NeMo Data Designer service
+2. ✅ Sets up service with proper networking and load balancing
+3. ✅ Configures persistent volumes for data storage
+4. ✅ Sets up ingress controller for external access
+5. ✅ Configures service to be accessible through your cluster's ingress
 
 ### Prerequisites
 
-- SSH access to vivi@212.2.244.60
+- kubectl configured to access your Kubernetes cluster
 - NVIDIA_API_KEY in your local .env file
-- Docker and Docker Compose on remote server
+- Kubernetes cluster with sufficient resources (recommended: 4 vCPU, 8GB RAM)
+- Ingress controller configured in your cluster
 
 ### After Deployment
 
-Update your local `.env` file:
+Update your local `.env` file with your cluster's ingress URL:
 
 ```env
-NEMO_DATA_DESIGNER_BASE_URL=http://212.2.244.60:8080
+NEMO_DATA_DESIGNER_BASE_URL=https://nemo-data-designer.your-cluster-domain.com
 ```
 
 Test the connection:
 
 ```bash
-curl http://212.2.244.60:8080/health
+curl https://nemo-data-designer.your-cluster-domain.com/health
 ```
 
 ### Troubleshooting
 
 **Service not accessible?**
-- Check firewall: `ssh vivi@212.2.244.60 'sudo ufw allow 8080/tcp'`
-- Check service status: `ssh vivi@212.2.244.60 'cd ~/nemo-microservices/nemo-microservices-quickstart_* && docker compose ps'`
+- Check deployment status: `kubectl get deployments nemo-data-designer`
+- Check service status: `kubectl get services nemo-data-designer`
+- Check ingress status: `kubectl get ingress nemo-data-designer`
 
 **View logs:**
 ```bash
-ssh vivi@212.2.244.60 'cd ~/nemo-microservices/nemo-microservices-quickstart_* && docker compose logs -f'
+kubectl logs -l app=nemo-data-designer -f
 ```
 
-**Stop service:**
+**Restart service:**
 ```bash
-ssh vivi@212.2.244.60 'cd ~/nemo-microservices/nemo-microservices-quickstart_* && docker compose --profile data-designer down'
+kubectl rollout restart deployment/nemo-data-designer
 ```
 
-For more details, see [Remote Deployment Guide](./docs/nemo-data-designer-remote-deployment.md)
+For more details, see [Kubernetes Deployment Guide](./docs/guides/technical-guides/deployment/nemo-data-designer-k8s-deployment.md)

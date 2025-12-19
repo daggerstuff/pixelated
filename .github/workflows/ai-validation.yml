@@ -14,11 +14,10 @@ on:
     workflows: ["Deploy to Staging", "Deploy to Production"]
 
   workflow_dispatch:
-
 jobs:
   validate-ai-models:
     name: AI Model Validation
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       ENV_NAME: ${{ inputs.ENV_NAME }}
@@ -38,7 +37,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: "10.25.0"
+          version: "10.26.0"
           run_install: false
 
       - name: Get pnpm store directory
