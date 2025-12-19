@@ -2,7 +2,7 @@
 
 # Builder stage: install deps and run the static build
 ARG PNPM_VERSION=10.26.0
-FROM node:24.12.0-trixie-slim AS builder
+FROM node:24.12.0-trixie-slim@sha256:9ad7e7db423b2ca7ddcc01568da872701ef6171505bd823978736247885c7eb4 AS builder
 ARG PNPM_VERSION=10.26.0
 WORKDIR /app
 
@@ -51,7 +51,7 @@ RUN find /app/node_modules -type f -name "*.map" -delete && \
     find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
 # Runtime stage: minimal image with only production bits
-FROM node:24.12.0-trixie-slim AS runtime
+FROM node:24.12.0-trixie-slim@sha256:9ad7e7db423b2ca7ddcc01568da872701ef6171505bd823978736247885c7eb4 AS runtime
 WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
