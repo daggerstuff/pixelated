@@ -88,7 +88,7 @@ if [ ! -d "$QUICKSTART_DIR" ]; then
             NGC_CMD="$UV_CMD run ngc"
         else
             echo "Installing NGC CLI via uv..."
-            "$UV_CMD" pip install nvidia-pyindex nvidia-nim ngc-python-cli
+            "$UV_CMD" pip install nvidia-pyindex ngcsdk
             NGC_CMD="$UV_CMD run ngc"
         fi
     else

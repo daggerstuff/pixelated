@@ -1,0 +1,3 @@
+source_name,url,license,allowed_uses,prohibited_uses,pii_present,deidentification_required,provenance_required,risk_level,acceptance_criteria,approval_status,reviewer,review_date,notes
+<example: PubMed abstracts>,https://pubmed.ncbi.nlm.nih.gov/,permissive,training;evaluation,redistribution,false,false,true,low,"license verified; provenance recorded; no PHI",pending,,,
+<example: Clinical forum>,https://example.com/forum,unclear,none,training;redistribution,true,true,true,high,"unclear license; contains potential PHI; reject unless contracted",rejected,privacy-team,2025-01-05,"risk too high"

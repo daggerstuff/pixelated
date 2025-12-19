@@ -4,18 +4,9 @@ name: "Copilot Setup Steps"
 # and allow manual testing through the repository's "Actions" tab
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
-  pull_request:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
-
 jobs:
-  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
   copilot-setup-steps:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: tenki-standard-autoscale
 
     # Set the permissions to the lowest permissions possible needed for your steps.
     # Copilot will be given its own token for its operations.
@@ -38,7 +29,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.25.0
+          version: 10.26.0
 
       - name: Validate package.json
         run: |
@@ -46,4 +37,20 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Lint (ESLint)
+        run: pnpm exec eslint . --ext .js,.ts,.tsx,.astro
+
+      - name: Format check (Prettier)
+        run: pnpm exec prettier --check .
+
+      - name: Run tests
+        run: |
+          if pnpm exec vitest --version 2>/dev/null; then
+            pnpm exec vitest run --reporter=dot
+          elif pnpm exec jest --version 2>/dev/null; then
+            pnpm exec jest --ci
+          else
+            echo "No supported test runner found (vitest/jest)."
+          fi

@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.26.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -48,6 +48,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
     "test:all": "node scripts/consolidated-test.js all",
+    "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_similarity_search_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
     "test:crypto": "node scripts/consolidated-test.js crypto",
     "test:backup": "node scripts/consolidated-test.js backup",
@@ -163,6 +164,7 @@
     "@google-cloud/storage": "^7.18.0",
     "@hookform/resolvers": "^5.2.2",
     "@iconify-json/lucide": "^1.2.80",
+    "@memobase/memobase": "^0.0.18",
     "@microsoft/clarity": "^1.0.2",
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@radix-ui/react-slot": "^1.2.4",
@@ -245,7 +247,7 @@
     "vite": "^7.2.7",
     "wrangler": "^4.54.0",
     "ws": "^8.18.3",
-    "zod": "^3.23.8",
+    "zod": "^4.2.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
@@ -263,7 +265,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/express": "^5.0.6",
     "@types/mdast": "^4.0.4",
-    "@types/node": "^25.0.1",
+    "@types/node": "^25.0.2",
     "@types/nprogress": "^0.2.3",
     "@types/p5": "^1.7.7",
     "@types/react": "^19.2.7",
@@ -283,7 +285,7 @@
     "astro-loader-github-releases": "^2.1.1",
     "astro-robots-txt": "^1.0.0",
     "astro-vitesse": "^0.5.2",
-    "autoprefixer": "^10.4.22",
+    "autoprefixer": "^10.4.23",
     "aws-cdk-lib": "^2.232.2",
     "axe-core": "^4.11.0",
     "braces": "^3.0.3",
@@ -367,7 +369,7 @@
     "util": "^0.12.5",
     "vfile": "^6.0.3",
     "vite": "^7.2.4",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite-tsconfig-paths": "^6.0.1",
     "vitest": "^4.0.15",
     "vue": "^3.5.25",
     "wait-on": "^9.0.3"
