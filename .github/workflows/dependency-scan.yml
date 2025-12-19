@@ -14,7 +14,7 @@ on:
 jobs:
   node_scan:
     name: Scan Node.js Dependencies
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -22,7 +22,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.25.0
+          version: 10.26.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -42,7 +42,7 @@ jobs:
 
   python_scan:
     name: Scan Python Dependencies
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

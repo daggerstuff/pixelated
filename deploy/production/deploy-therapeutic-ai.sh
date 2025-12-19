@@ -202,6 +202,8 @@ spec:
           value: "8080"
         - name: METRICS_PORT
           value: "9090"
+        - name: SENTRY_RELEASE
+          value: "${IMAGE_TAG}"
         - name: NAMESPACE
           valueFrom:
             fieldRef:

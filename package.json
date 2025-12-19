@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.26.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -48,6 +48,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
     "test:all": "node scripts/consolidated-test.js all",
+    "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_similarity_search_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
     "test:crypto": "node scripts/consolidated-test.js crypto",
     "test:backup": "node scripts/consolidated-test.js backup",
@@ -163,6 +164,7 @@
     "@google-cloud/storage": "^7.18.0",
     "@hookform/resolvers": "^5.2.2",
     "@iconify-json/lucide": "^1.2.80",
+    "@memobase/memobase": "^0.0.18",
     "@microsoft/clarity": "^1.0.2",
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@radix-ui/react-slot": "^1.2.4",

@@ -12,16 +12,16 @@ permissions:
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
   schedule:
   - cron: '30 3 * * 4'
 
 jobs:
   kubesec-scan:
     name: Kubesec Security Scan
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     permissions:
       actions: read
       contents: read
