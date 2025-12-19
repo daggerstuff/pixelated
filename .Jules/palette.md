@@ -1,3 +1,3 @@
-## 2025-02-18 - Keyboard Accessibility for Toggle Buttons
-**Learning:** Functional toggle buttons (like password visibility) often get excluded from tab order (`tabIndex="-1"`) by mistake, assuming users only click them. This completely blocks keyboard users.
-**Action:** Always ensure interactive elements are focusable. Use `aria-label` for context and test tab navigation.
+## 2024-05-21 - Conditional ARIA References
+**Learning:** `aria-describedby` pointing to non-existent IDs (due to conditional rendering) is a common accessibility bug found in `PasswordInputWithStrength`.
+**Action:** Always verify that referenced IDs exist in the DOM when constructing ARIA attributes, or conditionally build the attribute value.

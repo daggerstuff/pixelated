@@ -33,10 +33,8 @@ describe('RegisterForm', () => {
 
     const passwordInput = screen.getByLabelText(/^Password/i)
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
-    expect(passwordInput).toHaveAttribute(
-      'aria-describedby',
-      'password-strength',
-    )
+    // Expecting password-helper because the input is empty initially
+    expect(passwordInput).toHaveAttribute('aria-describedby', 'password-helper')
 
     const termsCheckbox = screen.getByLabelText(/i agree to the/i)
     expect(termsCheckbox).toHaveAttribute('aria-required', 'true')
@@ -136,5 +134,43 @@ describe('RegisterForm', () => {
 
     const googleLogo = screen.getByRole('img', { name: /google logo/i })
     expect(googleLogo).toBeInTheDocument()
+  })
+
+  it('allows keyboard access to password visibility toggle', async () => {
+    const user = userEvent.setup()
+    render(<RegisterForm />)
+
+    const passwordInput = screen.getByLabelText(/^Password/i)
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
+
+    expect(toggleButton).toBeInTheDocument()
+
+    passwordInput.focus()
+    expect(passwordInput).toHaveFocus()
+
+    await user.tab()
+    expect(toggleButton).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(passwordInput).toHaveFocus()
+  })
+
+  it('updates password visibility toggle label when toggled', async () => {
+    const user = userEvent.setup()
+    render(<RegisterForm />)
+
+    const passwordInput = screen.getByLabelText(/^Password/i)
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
+    expect(toggleButton).toHaveAccessibleName('Show password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
+
+    await user.click(toggleButton)
+
+    expect(toggleButton).toHaveAccessibleName('Hide password')
+    expect(passwordInput).toHaveAttribute('type', 'text')
+
+    await user.click(toggleButton)
+    expect(toggleButton).toHaveAccessibleName('Show password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
   })
 })
