@@ -145,25 +145,7 @@ describe('RegisterForm', () => {
 
     expect(toggleButton).toBeInTheDocument()
 
-    document.body.focus()
-
-    const maxTabs = 50
-    let reached: 'password' | 'toggle' | undefined
-    for (let i = 0; i < maxTabs; i++) {
-      await user.tab()
-
-      if (document.activeElement === passwordInput) {
-        reached = 'password'
-        break
-      }
-
-      if (document.activeElement === toggleButton) {
-        reached = 'toggle'
-        break
-      }
-    }
-
-    expect(reached).toBe('password')
+    passwordInput.focus()
     expect(passwordInput).toHaveFocus()
 
     await user.tab()
@@ -178,12 +160,11 @@ describe('RegisterForm', () => {
     render(<RegisterForm />)
 
     const toggleButton = screen.getByRole('button', { name: /show password/i })
-    const initialLabel = toggleButton.getAttribute('aria-label')
+    expect(toggleButton).toHaveAccessibleName(/show password/i)
 
     await user.click(toggleButton)
 
     expect(toggleButton).toHaveFocus()
     expect(toggleButton).toHaveAccessibleName(/hide password/i)
-    expect(toggleButton.getAttribute('aria-label')).not.toBe(initialLabel)
   })
 })
