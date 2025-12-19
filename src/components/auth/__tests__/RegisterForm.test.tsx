@@ -147,15 +147,16 @@ describe('RegisterForm', () => {
 
     document.body.focus()
 
-    for (let i = 0; i < 20; i++) {
-      if (document.activeElement === passwordInput) {
-        break
-      }
-
+    const maxTabs = 50
+    for (let i = 0; i < maxTabs; i++) {
       await user.tab()
 
       if (document.activeElement === toggleButton) {
         throw new Error('Toggle button became focused before password input')
+      }
+
+      if (document.activeElement === passwordInput) {
+        break
       }
     }
 
@@ -172,10 +173,13 @@ describe('RegisterForm', () => {
     const user = userEvent.setup()
     render(<RegisterForm />)
 
-    const toggleButton = screen.getByRole('button', { name: /show password/i })
+    const toggleButton = screen.getByRole('button', { name: /password/i })
+    const initialLabel = toggleButton.getAttribute('aria-label')
+
     await user.click(toggleButton)
 
     expect(toggleButton).toHaveFocus()
     expect(toggleButton).toHaveAccessibleName(/hide password/i)
+    expect(toggleButton.getAttribute('aria-label')).not.toBe(initialLabel)
   })
 })
