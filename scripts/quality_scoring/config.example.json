@@ -1,0 +1,13 @@
+{
+  "weights": {
+    "empathy": 0.25,
+    "fidelity": 0.25,
+    "domain": 0.25,
+    "harm": 0.25
+  },
+  "thresholds": {
+    "harm_max": 0.05,
+    "accept_min": 0.60,
+    "curate_min": 0.45
+  }
+}
