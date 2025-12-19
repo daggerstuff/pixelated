@@ -47,6 +47,10 @@ variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
 
+  # Default self-hosted pool name; change in Azure DevOps if different
+  - name: SELF_HOSTED_POOL
+    value: "Default"
+
   # Convert parameters to variables for runtime conditions
   # Template expressions (${{ }}) convert parameters to variables at compile-time
   # Runtime conditions can then check these variables at execution time
@@ -93,7 +97,7 @@ stages:
       - job: ValidateVariables
         displayName: "Validate Required Variables"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - script: |
               set -euo pipefail
@@ -135,7 +139,7 @@ stages:
       - job: ValidateDependencies
         displayName: "Validate Dependencies"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -154,7 +158,7 @@ stages:
       - job: LintCode
         displayName: "Lint Code"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -169,7 +173,7 @@ stages:
       - job: TypeCheck
         displayName: "Type Check"
         pool:
-          vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -180,6 +184,38 @@ stages:
               corepack enable pnpm
               pnpm typecheck || echo "⚠️ Type checking completed with warnings"
             displayName: "Run Type Check"
+
+  - stage: Eval
+    displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
+    dependsOn: Validate
+    jobs:
+      - job: EvalGates
+        displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
+        pool:
+          name: "Default"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(NODE_VERSION)"
+            displayName: "Install Node.js"
+          - script: |
+              set -euo pipefail
+              corepack enable pnpm
+              pnpm --version
+              pnpm install --frozen-lockfile
+            displayName: "Install Node Deps"
+          - script: |
+              set -euo pipefail
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              export PATH="$HOME/.local/bin:$PATH"
+              uv --version
+              uv run python -V
+            displayName: "Install uv (Python)"
+          - script: |
+              set -euo pipefail
+              export PATH="$HOME/.local/bin:$PATH"
+              pnpm test:evals
+            displayName: "Run Eval Tests"
 
   - stage: Build
     displayName: "Build Application"
@@ -568,17 +604,22 @@ stages:
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       echo "✅ Namespaces created"
 
-                - task: Bash@3
+                - task: AzureCLI@2
                   displayName: "Create ACR Secret"
                   inputs:
-                    targetType: "inline"
-                    script: |
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
                       set -euo pipefail
 
                       echo "🔐 Creating ACR secret for image pull..."
 
+                      # Ensure kubectl credentials are available
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
                       # Get ACR credentials
-                      ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
+                      ACR_NAME=$(AZURE_CONTAINER_REGISTRY)
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
 
@@ -850,17 +891,22 @@ stages:
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       echo "✅ Production namespaces created"
 
-                - task: Bash@3
+                - task: AzureCLI@2
                   displayName: "Create Production ACR Secret"
                   inputs:
-                    targetType: "inline"
-                    script: |
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
                       set -euo pipefail
 
                       echo "🔐 Creating ACR secret for production image pull..."
 
+                      # Ensure kubectl credentials are available
+                      az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing
+
                       # Get ACR credentials
-                      ACR_NAME="$(AZURE_CONTAINER_REGISTRY)"
+                      ACR_NAME=$(AZURE_CONTAINER_REGISTRY)
                       ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
                       ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query passwords[0].value -o tsv)
 
