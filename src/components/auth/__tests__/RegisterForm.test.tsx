@@ -35,7 +35,7 @@ describe('RegisterForm', () => {
     expect(passwordInput).toHaveAttribute('aria-required', 'true')
     expect(passwordInput).toHaveAttribute(
       'aria-describedby',
-      'password-requirements',
+      'password-strength',
     )
 
     const termsCheckbox = screen.getByLabelText(/i agree to the/i)

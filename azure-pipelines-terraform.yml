@@ -94,6 +94,20 @@ stages:
           - checkout: self
             persistCredentials: true
 
+          # Configure Git for SSH authentication
+          - task: Bash@3
+            displayName: "Configure Git for SSH"
+            inputs:
+              targetType: "inline"
+              script: |
+                # Configure Git to use system credential helper for Azure DevOps
+                git config --global credential.helper store
+                git config --global user.name "Azure DevOps"
+                git config --global user.email "azure-pipelines@devops.com"
+                # Ensure SSH is properly configured
+                mkdir -p ~/.ssh
+                chmod 700 ~/.ssh
+
           # Configure Azure CLI and authenticate
           - task: AzureCLI@2
             displayName: "Login to Azure"
@@ -235,6 +249,7 @@ stages:
             deploy:
               steps:
                 - checkout: self
+                  persistCredentials: true
 
                 - task: AzureCLI@2
                   displayName: "Login to Azure"
