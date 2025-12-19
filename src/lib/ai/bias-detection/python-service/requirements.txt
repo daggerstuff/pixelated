@@ -73,6 +73,7 @@ werkzeug>=3.1.4  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulne
 fonttools>=4.61.0  # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
 tensorflow>=2.12.0 # not directly required, pinned by Snyk to avoid a vulnerability
 protobuf>=4.25.8 # not directly required, pinned by Snyk to avoid a vulnerability
+filelock>=3.20.1
 
 # Additional required dependencies to resolve warnings
 scipy>=1.9.0
