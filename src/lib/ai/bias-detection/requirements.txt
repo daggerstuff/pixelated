@@ -62,4 +62,4 @@ keras>=3.11.0  # Fixes SNYK-PYTHON-KERAS-9396793, SNYK-PYTHON-KERAS-11775502, SN
 tensorflow>=2.12.0  # Fixes SNYK-PYTHON-TENSORFLOW-1315149, SNYK-PYTHON-TENSORFLOW-3372999
 protobuf>=4.25.8  # Fixes SNYK-PYTHON-PROTOBUF-10364902
 tornado>=6.5.3  # Fixes CVE-2025-67726, CVE-2025-67725, CVE-2025-67724, CVE-2025-47287 (DoS and XSS vulnerabilities)
-filelock>=3.20.1,<3.21  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
+filelock>=3.20.1,<4.0  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
