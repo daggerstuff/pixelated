@@ -136,11 +136,27 @@ describe('RegisterForm', () => {
     expect(googleLogo).toBeInTheDocument()
   })
 
-  it('allows keyboard access to password visibility toggle', () => {
+  it('allows keyboard access to password visibility toggle', async () => {
+    const user = userEvent.setup()
     render(<RegisterForm />)
 
+    const nameInput = screen.getByLabelText(/full name/i)
+    const emailInput = screen.getByLabelText(/email/i)
+    const passwordInput = screen.getByLabelText(/^Password/i)
     const toggleButton = screen.getByRole('button', { name: /show password/i })
+
     expect(toggleButton).toBeInTheDocument()
-    expect(toggleButton).not.toHaveAttribute('tabIndex', '-1')
+
+    await user.tab()
+    expect(nameInput).toHaveFocus()
+
+    await user.tab()
+    expect(emailInput).toHaveFocus()
+
+    await user.tab()
+    expect(passwordInput).toHaveFocus()
+
+    await user.tab()
+    expect(toggleButton).toHaveFocus()
   })
 })
