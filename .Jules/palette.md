@@ -1,3 +1,3 @@
-## 2024-05-21 - Conditional ARIA References
-**Learning:** `aria-describedby` pointing to non-existent IDs (due to conditional rendering) is a common accessibility bug found in `PasswordInputWithStrength`.
-**Action:** Always verify that referenced IDs exist in the DOM when constructing ARIA attributes, or conditionally build the attribute value.
+## 2024-05-23 - Custom Switch Accessibility
+**Learning:** Custom form controls built with a hidden input + visual div need `peer-focus-visible` classes on the visual element, not just `focus-visible`. The input is what receives focus, so the sibling (peer) needs to react to that state.
+**Action:** When building custom checkboxes or radio buttons, always use the `peer` pattern and verify keyboard navigation.
