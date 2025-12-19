@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated
+  namespace: pixelated
+  labels:
+    app: pixelated-app
+spec:
+  replicas: 2
+  progressDeadlineSeconds: 900
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: pixelated-app
+  template:
+    metadata:
+      labels:
+        app: pixelated-app
+    spec:
+      containers:
+        - name: pixelated
+          image: pixelatedregistry.azurecr.io/pixelatedempathy:latest
+          imagePullPolicy: Always
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "4321"
+          ports:
+            - containerPort: 4322
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      imagePullSecrets:
+        - name: acr-secret
