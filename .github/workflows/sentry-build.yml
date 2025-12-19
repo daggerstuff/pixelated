@@ -7,10 +7,9 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-autoscale
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +21,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.25.0
+          version: 10.26.0
 
       - name: Use Node.js
         uses: actions/setup-node@v6
