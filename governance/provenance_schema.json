@@ -1,0 +1,429 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Provenance Metadata Schema",
+  "description": "Schema for tracking complete provenance information for all datasets in the Dataset Expansion project. Includes source, license, timestamp, and processing lineage tracking.",
+  "type": "object",
+  "properties": {
+    "provenance_id": {
+      "type": "string",
+      "description": "Unique identifier for this provenance record",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "dataset_id": {
+      "type": "string",
+      "description": "Unique identifier for the dataset this provenance record describes",
+      "minLength": 1
+    },
+    "dataset_name": {
+      "type": "string",
+      "description": "Human-readable name of the dataset",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "description": "Source information for the dataset",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "description": "Unique identifier linking to data_source_matrix"
+        },
+        "source_name": {
+          "type": "string",
+          "description": "Name of the source (e.g., 'PubMed Abstracts', 'Reddit r/mentalhealth')"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["journal", "repository", "clinical_trial", "training_material", "social_media", "synthetic", "internal"],
+          "description": "Type of source"
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL or reference to the original source"
+        },
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier if applicable"
+        },
+        "authors": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Authors or creators of the source data"
+        },
+        "publication_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Publication or release date of source"
+        },
+        "acquisition_method": {
+          "type": "string",
+          "enum": ["api", "web_scraping", "direct_download", "manual_collection", "contracted", "generated"],
+          "description": "Method used to acquire the data"
+        },
+        "acquisition_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the data was acquired from source"
+        },
+        "acquisition_metadata": {
+          "type": "object",
+          "description": "Additional metadata about acquisition (API keys used, scraping parameters, etc.)"
+        }
+      },
+      "required": ["source_id", "source_name", "source_type", "acquisition_method", "acquisition_date"]
+    },
+    "license": {
+      "type": "object",
+      "description": "License and usage rights information",
+      "properties": {
+        "license_type": {
+          "type": "string",
+          "enum": ["permissive", "contracted", "proprietary", "unclear", "cc_by", "cc_by_nc", "cc_by_nc_nd", "custom", "none"],
+          "description": "Type of license"
+        },
+        "license_text": {
+          "type": "string",
+          "description": "Full license text or reference URL"
+        },
+        "allowed_uses": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Explicitly allowed uses (e.g., ['training', 'evaluation', 'research'])"
+        },
+        "prohibited_uses": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Explicitly prohibited uses (e.g., ['redistribution', 'commercial'])"
+        },
+        "attribution_required": {
+          "type": "boolean",
+          "description": "Whether attribution is required when using this data"
+        },
+        "attribution_text": {
+          "type": "string",
+          "description": "Required attribution text if applicable"
+        },
+        "license_verification_status": {
+          "type": "string",
+          "enum": ["verified", "pending", "unverified", "unclear"],
+          "description": "Status of license verification"
+        },
+        "license_verified_by": {
+          "type": "string",
+          "description": "Person or system that verified the license"
+        },
+        "license_verified_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date license was verified"
+        }
+      },
+      "required": ["license_type", "allowed_uses", "prohibited_uses", "license_verification_status"]
+    },
+    "timestamps": {
+      "type": "object",
+      "description": "Critical timestamps throughout the dataset lifecycle",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the dataset was first created"
+        },
+        "acquired_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When data was acquired from source"
+        },
+        "processed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When data processing completed"
+        },
+        "validated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When data validation completed"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When dataset was published/released"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["created_at"]
+    },
+    "processing_lineage": {
+      "type": "object",
+      "description": "Complete processing lineage showing transformations applied",
+      "properties": {
+        "pipeline_version": {
+          "type": "string",
+          "description": "Version of the processing pipeline used"
+        },
+        "processing_stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stage_name": {
+                "type": "string",
+                "description": "Name of processing stage"
+              },
+              "stage_order": {
+                "type": "integer",
+                "description": "Order of this stage in pipeline"
+              },
+              "started_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When stage started"
+              },
+              "completed_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When stage completed"
+              },
+              "transformation_type": {
+                "type": "string",
+                "enum": ["ingestion", "normalization", "deduplication", "quality_scoring", "filtering", "anonymization", "redaction", "validation", "curation", "compilation"],
+                "description": "Type of transformation"
+              },
+              "transformation_details": {
+                "type": "object",
+                "description": "Detailed parameters and configuration for this transformation"
+              },
+              "input_record_count": {
+                "type": "integer",
+                "description": "Number of records before this stage"
+              },
+              "output_record_count": {
+                "type": "integer",
+                "description": "Number of records after this stage"
+              },
+              "records_filtered": {
+                "type": "integer",
+                "description": "Number of records filtered out in this stage"
+              },
+              "quality_metrics_before": {
+                "type": "object",
+                "description": "Quality metrics before this stage"
+              },
+              "quality_metrics_after": {
+                "type": "object",
+                "description": "Quality metrics after this stage"
+              },
+              "errors": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Errors encountered during this stage"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Warnings generated during this stage"
+              }
+            },
+            "required": ["stage_name", "stage_order", "started_at", "transformation_type"]
+          },
+          "description": "Ordered list of processing stages applied"
+        },
+        "parent_datasets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dataset_id": {"type": "string"},
+              "dataset_name": {"type": "string"},
+              "contribution_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Ratio of data contributed from this parent"
+              }
+            },
+            "required": ["dataset_id", "dataset_name"]
+          },
+          "description": "Parent datasets if this is a merged/compiled dataset"
+        },
+        "quality_scores": {
+          "type": "object",
+          "properties": {
+            "empathy_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "fidelity_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "harmfulness_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "domain_relevance_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "overall_quality_score": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "deduplication_info": {
+          "type": "object",
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": ["exact_match", "fuzzy_match", "semantic_similarity", "none"],
+              "description": "Deduplication method used"
+            },
+            "duplicates_removed": {"type": "integer"},
+            "duplication_rate": {"type": "number", "minimum": 0, "maximum": 1},
+            "threshold_used": {"type": "number"}
+          }
+        },
+        "anonymization_info": {
+          "type": "object",
+          "properties": {
+            "anonymization_level": {
+              "type": "string",
+              "enum": ["none", "basic", "advanced", "full"],
+              "description": "Level of anonymization applied"
+            },
+            "pii_removed_count": {"type": "integer"},
+            "phi_removed_count": {"type": "integer"},
+            "anonymization_method": {"type": "string"}
+          }
+        }
+      },
+      "required": ["pipeline_version", "processing_stages"]
+    },
+    "storage": {
+      "type": "object",
+      "description": "Storage location and access information",
+      "properties": {
+        "storage_type": {
+          "type": "string",
+          "enum": ["s3", "local", "database", "remote"],
+          "description": "Primary storage type"
+        },
+        "storage_path": {
+          "type": "string",
+          "description": "Path or key to stored dataset"
+        },
+        "storage_bucket": {
+          "type": "string",
+          "description": "S3 bucket name if applicable"
+        },
+        "storage_region": {
+          "type": "string",
+          "description": "Storage region"
+        },
+        "file_format": {
+          "type": "string",
+          "enum": ["jsonl", "json", "csv", "parquet", "database"],
+          "description": "File format of stored dataset"
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "description": "Size of dataset file in bytes"
+        },
+        "checksum": {
+          "type": "string",
+          "description": "Checksum/hash of the dataset file for integrity verification"
+        },
+        "compression": {
+          "type": "string",
+          "enum": ["none", "gzip", "bzip2", "zstd"],
+          "description": "Compression algorithm if applicable"
+        },
+        "access_restrictions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Access restrictions (e.g., ['hipaa_required', 'internal_only'])"
+        }
+      },
+      "required": ["storage_type", "storage_path", "file_format", "checksum"]
+    },
+    "audit": {
+      "type": "object",
+      "description": "Audit trail information",
+      "properties": {
+        "last_audited_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last audit timestamp"
+        },
+        "audited_by": {
+          "type": "string",
+          "description": "Person or system that performed last audit"
+        },
+        "audit_findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "finding_type": {
+                "type": "string",
+                "enum": ["compliance_issue", "data_quality", "license_violation", "provenance_gap", "storage_issue", "other"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "description": {"type": "string"},
+              "recommendation": {"type": "string"},
+              "status": {
+                "type": "string",
+                "enum": ["open", "in_progress", "resolved", "dismissed"]
+              },
+              "reported_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "resolved_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "compliance_status": {
+          "type": "string",
+          "enum": ["compliant", "non_compliant", "needs_review", "unknown"],
+          "description": "Overall compliance status"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "record_count": {
+          "type": "integer",
+          "description": "Total number of records/conversations in dataset"
+        },
+        "total_tokens": {
+          "type": "integer",
+          "description": "Total token count across all records"
+        },
+        "quality_tier": {
+          "type": "string",
+          "enum": ["priority", "professional", "cot", "reddit", "synthetic", "archive"],
+          "description": "Quality tier assignment"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Additional tags for categorization"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes or comments"
+        }
+      }
+    }
+  },
+  "required": [
+    "provenance_id",
+    "dataset_id",
+    "dataset_name",
+    "source",
+    "license",
+    "timestamps",
+    "processing_lineage",
+    "storage"
+  ]
+}
+
