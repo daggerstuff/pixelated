@@ -164,4 +164,14 @@ describe('RegisterForm', () => {
     await user.tab({ shift: true })
     expect(passwordInput).toHaveFocus()
   })
+
+  it('updates password visibility toggle label when toggled', async () => {
+    const user = userEvent.setup()
+    render(<RegisterForm />)
+
+    const toggleButton = screen.getByRole('button', { name: /show password/i })
+    await user.click(toggleButton)
+
+    expect(screen.getByRole('button', { name: /hide password/i })).toHaveFocus()
+  })
 })
