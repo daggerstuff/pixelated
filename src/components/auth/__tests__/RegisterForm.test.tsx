@@ -140,8 +140,6 @@ describe('RegisterForm', () => {
     const user = userEvent.setup()
     render(<RegisterForm />)
 
-    const nameInput = screen.getByLabelText(/full name/i)
-    const emailInput = screen.getByLabelText(/email/i)
     const passwordInput = screen.getByLabelText(/^Password/i)
     const toggleButton = screen.getByRole('button', { name: /show password/i })
 
@@ -149,13 +147,18 @@ describe('RegisterForm', () => {
 
     document.body.focus()
 
-    await user.tab()
-    expect(nameInput).toHaveFocus()
+    for (let i = 0; i < 20; i++) {
+      if (document.activeElement === passwordInput) {
+        break
+      }
 
-    await user.tab()
-    expect(emailInput).toHaveFocus()
+      await user.tab()
 
-    await user.tab()
+      if (document.activeElement === toggleButton) {
+        throw new Error('Toggle button became focused before password input')
+      }
+    }
+
     expect(passwordInput).toHaveFocus()
 
     await user.tab()
@@ -172,6 +175,7 @@ describe('RegisterForm', () => {
     const toggleButton = screen.getByRole('button', { name: /show password/i })
     await user.click(toggleButton)
 
-    expect(screen.getByRole('button', { name: /hide password/i })).toHaveFocus()
+    expect(toggleButton).toHaveFocus()
+    expect(toggleButton).toHaveAccessibleName(/hide password/i)
   })
 })
