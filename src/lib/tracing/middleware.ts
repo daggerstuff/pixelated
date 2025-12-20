@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Middleware for Astro
- * 
+ *
  * Adds distributed tracing to HTTP requests handled by Astro.
  * This middleware should be used with Astro's middleware system.
  */
@@ -15,10 +15,10 @@ const tracer = trace.getTracer('pixelated-empathy-http')
 
 /**
  * Tracing middleware for Astro requests
- * 
+ *
  * Creates a span for each HTTP request and automatically tracks
  * request/response attributes and errors.
- * 
+ *
  * This middleware integrates with Astro's middleware system and should
  * be added early in the middleware chain to capture all requests.
  */
