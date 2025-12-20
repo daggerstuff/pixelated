@@ -231,8 +231,7 @@ export default defineConfig({
           if (warning.message && (
             warning.message.includes('externalized for browser compatibility') ||
             warning.message.includes('icon "-"') ||
-            warning.message.includes('failed to load icon \'-\'') ||
-            warning.message.includes('Rollup failed to resolve import')
+            warning.message.includes('failed to load icon \'-\'')
           )) {
             return
           }
