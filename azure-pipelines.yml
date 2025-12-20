@@ -42,6 +42,13 @@ parameters:
     values:
       - "true"
       - "false"
+  - name: SKIP_EVAL_TESTS
+    displayName: "Skip Evaluation Tests (therapy-bench)"
+    type: string
+    default: "false"
+    values:
+      - "true"
+      - "false"
 
 variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
@@ -59,6 +66,8 @@ variables:
     value: ${{ parameters.TRIGGER_OVH_OLLAMA_BUILD }}
   - name: TRIGGER_AI_TRAINING
     value: ${{ parameters.TRIGGER_AI_TRAINING }}
+  - name: SKIP_EVAL_TESTS
+    value: ${{ parameters.SKIP_EVAL_TESTS }}
 
   # Derived variables (computed from variable group values)
   - name: DOCKER_REGISTRY
@@ -188,6 +197,7 @@ stages:
   - stage: Eval
     displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
     dependsOn: Validate
+    condition: and(succeeded(), ne(variables['SKIP_EVAL_TESTS'], 'true'))
     jobs:
       - job: EvalGates
         displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
@@ -282,7 +292,7 @@ stages:
               # Use uv sync to install dependencies efficiently
               # This will create .venv and install all dependencies from pyproject.toml
               # Add timeout and retry logic for large package downloads
-              MAX_RETRIES=2
+              MAX_RETRIES=3
               RETRY_COUNT=0
 
               while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
@@ -292,17 +302,40 @@ stages:
                   RETRY_COUNT=$((RETRY_COUNT + 1))
                   if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
                     echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - cleaning cache and retrying..."
-                    # Clean up cache and retry
+
+                    # Aggressive cleanup between retries
+                    echo "🧹 Performing aggressive cleanup..."
+
+                    # Remove ALL uv temporary files
                     rm -rf "$HOME/.cache/uv/.tmp"* 2>/dev/null || true
+                    rm -rf "$HOME/.cache/uv/archive-"* 2>/dev/null || true
                     [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/.tmp"* 2>/dev/null || true
-                    sleep 5
+                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/archive-"* 2>/dev/null || true
+
+                    # Remove failed .venv to start fresh
+                    rm -rf .venv 2>/dev/null || true
+
+                    # Clean Docker build cache to free space
+                    if command -v docker >/dev/null 2>&1; then
+                      echo "🐳 Cleaning Docker build cache..."
+                      docker builder prune -af --filter "until=1h" 2>/dev/null || true
+                    fi
+
+                    # Show disk space after cleanup
+                    echo "📊 Disk space after cleanup:"
+                    df -h / | tail -1
+
+                    sleep 10
                   else
                     echo "##vso[task.logissue type=error]uv sync failed after $MAX_RETRIES attempts"
                     echo "📊 Current disk usage:"
                     df -h /
                     echo "📊 Disk usage by directory:"
                     du -sh "$HOME/.cache" "$HOME/.local" .venv 2>/dev/null || true
-                    echo "##vso[task.logissue type=error]If disk space is low, clean up the agent or use a different agent with more space"
+                    echo "##vso[task.logissue type=error]Agent is out of resources. Options:"
+                    echo "  1. Skip eval tests: Set SKIP_EVAL_TESTS=true parameter"
+                    echo "  2. Clean up agent: Run 'docker system prune -af' manually"
+                    echo "  3. Use agent with more disk space (>50GB free)"
                     exit 1
                   fi
                 fi
@@ -320,7 +353,17 @@ stages:
 
   - stage: Build
     displayName: "Build Application"
-    dependsOn: Validate
+    # Build must wait for Eval to complete to prevent resource contention
+    # If SKIP_EVAL_TESTS=true, Eval is skipped and Build runs after Validate
+    dependsOn:
+      - Validate
+      - Eval
+    # Build runs if Validate succeeded AND (Eval succeeded OR Eval was skipped)
+    condition: |
+      and(
+        in(dependencies.Validate.result, 'Succeeded'),
+        in(dependencies.Eval.result, 'Succeeded', 'Skipped')
+      )
     jobs:
       - job: BuildApplication
         displayName: "Build and Push Docker Image"
