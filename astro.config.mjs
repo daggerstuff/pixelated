@@ -219,6 +219,7 @@ export default defineConfig({
           'mongodb',
           'recharts',
           'chart.js',
+          '@opentelemetry/api',
         ],
         onwarn(warning, warn) {
           if (
