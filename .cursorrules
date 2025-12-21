@@ -1,8 +1,8 @@
-# Pixelated Empathy - Cursor Rules
+# Pixelated Empathy - AI Agent Rules
 
 > **Primary Rules**: See `WARP.md` for comprehensive project guidelines and workflows.
 
-This file bridges Cursor IDE with the project's main rule system. All rules in WARP.md apply here.
+This file bridges AI Agent with the project's main rule system. All rules in WARP.md apply here.
 
 ## Quick Reference
 
@@ -69,7 +69,7 @@ pnpm security:check     # No secrets
 - **WARP.md**: Complete project rules and guidelines (PRIMARY REFERENCE)
 - **CLAUDE.md**: AI assistant guide
 - **AGENTS.md**: Modern ops and AI collaboration workflow
-- **.cursor/rules/**: Cursor-specific skills and patterns
+- **.agent/rules/**: Agent-specific skills and patterns
 - **.warp/rules/**: Warp-specific workflow rules
 - **docs/**: API docs, deployment guides, compliance docs
 

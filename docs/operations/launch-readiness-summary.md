@@ -83,14 +83,14 @@ draft: false
 ### ? Support Infrastructure
 
 **Completed**:
-- **Incident Response Procedures** documented (`docs/support/incident-response-procedures.md`)
+- **Incident Response Procedures** documented (`docs/operations/incident-response-procedures.md`)
   - Incident classification (P0-P3, Safety levels)
   - Response team roles defined
   - Response workflows established
   - Escalation procedures documented
   - Communication protocols defined
 
-- **Support Ticket System** configured (`docs/support/support-ticket-system.md`)
+- **Support Ticket System** configured (`docs/operations/support-ticket-system.md`)
   - Ticket categories defined
   - Priority levels and SLAs established
   - Support workflows documented
@@ -103,7 +103,7 @@ draft: false
   - Security escalation protocols
   - Management notification triggers
 
-- **Rollback Procedures** documented (`docs/support/rollback-procedures.md`)
+- **Rollback Procedures** documented (`docs/operations/rollback-procedures.md`)
   - Rollback triggers defined
   - Decision authority established
   - Rollback execution procedures
@@ -122,9 +122,9 @@ draft: false
    - `docs/compliance/professional-liability-review.md`
 
 2. **Support**:
-   - `docs/support/incident-response-procedures.md`
-   - `docs/support/support-ticket-system.md`
-   - `docs/support/rollback-procedures.md`
+   - `docs/operations/incident-response-procedures.md`
+   - `docs/operations/support-ticket-system.md`
+   - `docs/operations/rollback-procedures.md`
 
 3. **Monitoring**:
    - `monitoring/dashboards/launch-monitoring-dashboard.json`

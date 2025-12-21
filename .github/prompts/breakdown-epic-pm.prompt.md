@@ -13,7 +13,7 @@ Review the user's request for a new epic and generate a thorough PRD. If you don
 
 ## Output Format
 
-The output should be a complete Epic PRD in Markdown format, saved to `/docs/ways-of-work/plan/{epic-name}/epic.md`.
+The output should be a complete Epic PRD in Markdown format, saved to `/docs/specs/{epic-name}/epic.md`.
 
 ### PRD Structure
 
