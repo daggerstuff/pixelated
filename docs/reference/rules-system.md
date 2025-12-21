@@ -1,21 +1,21 @@
 # Rules System Documentation
 
-This document explains how coding rules and AI assistant guidelines are organized across Cursor and Warp.
+This document explains how coding rules and AI assistant guidelines are organized across AI agents and Warp.
 
 ## Overview
 
-The project maintains a unified rule system that works across multiple AI coding assistants (Cursor, Warp, Claude, etc.) while allowing tool-specific customizations.
+The project maintains a unified rule system that works across multiple AI coding assistants (Warp, Claude, and other agents) while allowing tool-specific customizations.
 
 ## Rule Files Structure
 
 ```
 pixelated/
-├── .cursorrules              # Cursor IDE primary rules (links to WARP.md)
+├── .agentrules              # AI Agent primary rules (links to WARP.md)
 ├── WARP.md                   # Warp primary rules (comprehensive)
 ├── CLAUDE.md                 # Claude-specific guide (supplementary)
 ├── AGENTS.md                 # AI collaboration workflow (supplementary)
-├── .cursor/
-│   ├── rules/                # Cursor-specific skill files (.mdc format)
+├── .agent/
+│   ├── rules/                # Agent-specific skill files (.mdc format)
 │   │   ├── skill-test-driven-development.mdc
 │   │   ├── skill-systematic-debugging.mdc
 │   │   ├── skill-verification-before-completion.mdc
@@ -49,27 +49,27 @@ pixelated/
 
 **When to use**: Primary reference for all AI assistants working on this project
 
-### .cursorrules (Bridge)
-**Purpose**: Bridge file linking Cursor to WARP.md  
-**Audience**: Cursor IDE users  
+### .agentrules (Bridge)
+**Purpose**: Bridge file linking AI Agent to WARP.md
+**Audience**: AI Agent users
 **Content**:
 - Quick reference to essential commands
 - Links to WARP.md as primary reference
 - Critical security reminders
 - Basic workflow patterns
 
-**When to use**: Cursor IDE will automatically load this file
+**When to use**: AI Agent will automatically load this file
 
 ### CLAUDE.md (Supplementary)
-**Purpose**: Claude/Cursor-specific assistant guide  
-**Audience**: Claude AI, Cursor users  
+**Purpose**: Claude/Agent-specific assistant guide
+**Audience**: Claude AI, Agent users
 **Content**:
 - Start session checklist
-- Links to additional `.cursor/steering/` docs
+- Links to additional `.agent/steering/` docs
 - Domain-specific guidelines
 - Workflow patterns
 
-**When to use**: Reference for Claude-specific features or `.cursor/steering/` structure
+**When to use**: Reference for Claude-specific features or `.agent/steering/` structure
 
 ### AGENTS.md (Supplementary)
 **Purpose**: Modern ops and AI collaboration workflow  
@@ -122,24 +122,24 @@ description: When and how to use this skill
 
 When multiple rules conflict, follow this order (highest to lowest priority):
 
-1. **Tool-specific rules** (`.warp/rules/` or `.cursor/rules/`)
+1. **Tool-specific rules** (`.warp/rules/` or `.agent/rules/`)
 2. **WARP.md** (primary comprehensive rules)
 3. **AGENTS.md** (modern ops guidelines)
 4. **CLAUDE.md** (supplementary guidance)
 
 ## Converting Rules Between Tools
 
-### Cursor → Warp
-1. Extract core concepts from `.cursor/rules/*.mdc`
+### Agent → Warp
+1. Extract core concepts from `.agent/rules/*.mdc`
 2. Remove tool-specific formatting (frontmatter)
 3. Convert to standard Markdown
 4. Save to `.warp/rules/[skill-name].md`
 5. Reference in WARP.md if broadly applicable
 
-### Warp → Cursor
+### Warp → Agent
 1. Add frontmatter with name and description
 2. Keep Markdown content
-3. Save as `.cursor/rules/[skill-name].mdc`
+3. Save as `.agent/rules/[skill-name].mdc`
 4. Reference in CLAUDE.md if needed
 
 ## Maintenance
@@ -147,7 +147,7 @@ When multiple rules conflict, follow this order (highest to lowest priority):
 ### Adding New Rules
 1. Determine primary audience (all tools vs. tool-specific)
 2. For universal rules: Add to WARP.md
-3. For tool-specific: Add to `.warp/rules/` or `.cursor/rules/`
+3. For tool-specific: Add to `.warp/rules/` or `.agent/rules/`
 4. Update this documentation
 
 ### Updating Rules
@@ -171,15 +171,15 @@ When multiple rules conflict, follow this order (highest to lowest priority):
 
 ## Quick Reference
 
-**I'm using Cursor**: Start with `.cursorrules`, reference WARP.md for details  
-**I'm using Warp**: WARP.md is automatically loaded  
-**I'm using Claude directly**: Reference CLAUDE.md and WARP.md  
-**I need specialized skills**: Check `.cursor/rules/` or `.warp/rules/`  
+**I'm using an AI Agent**: Start with `.agentrules`, reference WARP.md for details
+**I'm using Warp**: WARP.md is automatically loaded
+**I'm using Claude directly**: Reference CLAUDE.md and WARP.md
+**I need specialized skills**: Check `.agent/rules/` or `.warp/rules/`
 **I'm adding a new rule**: Start with WARP.md, then add tool-specific versions
 
 ## Related Documentation
 
 - [WARP.md](../../WARP.md): Primary comprehensive rules
-- [CLAUDE.md](../../CLAUDE.md): Claude/Cursor guide
+- [CLAUDE.md](../../CLAUDE.md): Claude/Agent guide
 - [AGENTS.md](../../AGENTS.md): AI collaboration workflow
 - [Warp Documentation](https://docs.warp.dev/features/ai/rules): Official Warp rules docs
