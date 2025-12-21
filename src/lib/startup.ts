@@ -3,6 +3,7 @@ import { getStartupLogger } from './logging/build-safe-logger'
 const startupLogger = getStartupLogger()
 import { LogRotationService } from './logging/rotation'
 import { initializeSecurity } from './security'
+import { initializeTracing } from './tracing'
 
 const logger = startupLogger
 
@@ -13,6 +14,9 @@ const logger = startupLogger
 export async function initializeApplication(): Promise<void> {
   try {
     logger.info('Starting application initialization...')
+
+    // Initialize tracing first (before other modules that might use it)
+    initializeTracing()
 
     // Initialize log rotation
     const logRotation = new LogRotationService()
@@ -37,6 +41,10 @@ export async function initializeApplication(): Promise<void> {
 export async function shutdownApplication(): Promise<void> {
   try {
     logger.info('Starting application shutdown...')
+
+    // Shutdown tracing (export any pending spans)
+    const { shutdownTracing } = await import('./tracing')
+    await shutdownTracing()
 
     // TODO: Add proper shutdown logic for:
     // - Close database connections
