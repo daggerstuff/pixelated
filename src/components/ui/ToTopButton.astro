@@ -8,9 +8,11 @@ const { class: className = '' } = Astro.props
 
 <button
   id="to-top-button"
-  class={`fixed bottom-8 right-8 z-50 p-2 bg-primary-500 text-white rounded-full shadow-lg transform transition-transform duration-300 translate-y-20 opacity-0 ${className}`}
+  class={`fixed bottom-8 right-8 z-50 p-2 bg-primary-500 text-white rounded-full shadow-lg transform transition-transform duration-300 translate-y-20 opacity-0 pointer-events-none ${className}`}
   aria-label="Scroll to top"
   title="Scroll to top"
+  tabindex="-1"
+  aria-hidden="true"
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -36,11 +38,23 @@ const { class: className = '' } = Astro.props
     // Show button when user scrolls down 300px
     window.addEventListener('scroll', (_event: Event) => {
       if (window.scrollY > 300) {
-        toTopButton.classList.remove('translate-y-20', 'opacity-0')
+        toTopButton.classList.remove(
+          'translate-y-20',
+          'opacity-0',
+          'pointer-events-none',
+        )
         toTopButton.classList.add('translate-y-0', 'opacity-100')
+        toTopButton.removeAttribute('tabindex')
+        toTopButton.setAttribute('aria-hidden', 'false')
       } else {
-        toTopButton.classList.add('translate-y-20', 'opacity-0')
+        toTopButton.classList.add(
+          'translate-y-20',
+          'opacity-0',
+          'pointer-events-none',
+        )
         toTopButton.classList.remove('translate-y-0', 'opacity-100')
+        toTopButton.setAttribute('tabindex', '-1')
+        toTopButton.setAttribute('aria-hidden', 'true')
       }
     })
 
