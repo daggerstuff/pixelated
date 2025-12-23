@@ -10,33 +10,43 @@
     lt-lgp:(op-50! bg-#8883 dark:bg-#8886 pointer-events-auto!)
     hover:(op-100! bg-#8883) print:hidden"
   title="Scroll to top"
+  aria-label="Scroll to top"
+  tabindex="-1"
+  aria-hidden="true"
 >
   <div u-i-ri-arrow-up-line></div>
 </button>
 
 <script>
   document.addEventListener('astro:page-load', () => {
+    const toTopButton = document.getElementById('to-top-button')
+    if (!toTopButton) return
+
     const handleClick = () => {
       window.scrollTo({ top: 0 })
     }
-    const toTopButton = document.getElementById('to-top-button')
-    toTopButton?.addEventListener('click', handleClick)
-  })
+    toTopButton.addEventListener('click', handleClick)
 
-  const handleScroll = () => {
-    const scrollThreshold = 300
-    const toTopButton = document.getElementById('to-top-button')
-
-    if (toTopButton && window.matchMedia('(min-width: 1024px)').matches) {
-      const scrollY = window.scrollY || document.documentElement.scrollTop
-      if (scrollY <= scrollThreshold) {
-        toTopButton.style.opacity = '0'
-        toTopButton.style.pointerEvents = 'none'
-      } else {
-        toTopButton.style.opacity = '0.3'
-        toTopButton.style.pointerEvents = 'auto'
+    const handleScroll = () => {
+      const scrollThreshold = 300
+      if (window.matchMedia('(min-width: 1024px)').matches) {
+        const scrollY = window.scrollY || document.documentElement.scrollTop
+        if (scrollY <= scrollThreshold) {
+          toTopButton.style.opacity = '0'
+          toTopButton.style.pointerEvents = 'none'
+          toTopButton.setAttribute('tabindex', '-1')
+          toTopButton.setAttribute('aria-hidden', 'true')
+        } else {
+          toTopButton.style.opacity = '0.3'
+          toTopButton.style.pointerEvents = 'auto'
+          toTopButton.removeAttribute('tabindex')
+          toTopButton.setAttribute('aria-hidden', 'false')
+        }
       }
     }
-  }
-  window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll)
+
+    // Initial check
+    handleScroll()
+  })
 </script>

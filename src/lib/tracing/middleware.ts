@@ -5,7 +5,7 @@
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api/build/src/index.js'
+import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { MiddlewareHandler } from 'astro'
