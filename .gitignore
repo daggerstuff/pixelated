@@ -12,7 +12,6 @@ node_modules/
 /.spec-workflow/
 /acontext_server/
 
-
 /npm-debug.log*
 /yarn-debug.log*
 /yarn-error.log*
@@ -147,8 +146,6 @@ memAgent/
 .idea/
 .qodo/
 .vscode/
-.vscode/settings.json
-.aiignore
 .qwen-config.json
 mcp_agent.config.yaml
 mcp_agent.secrets.yaml
@@ -165,7 +162,6 @@ gitlab-runner-values.yaml
 gcp-service-account-key.json
 .augment/
 .amazonq/
-.kilocode/
 .roo/
 .ruff_cache/
 .serena/
@@ -238,19 +234,14 @@ verbose/coverage/
 *.aac
 
 .clinerules/
-.kilocode/
 .roo/
 .windsurf/
-.cursor/
-.kiro/steering/
 .qoder/
 .augment/
 terraform/.terraform/
 terraform/.terraform.lock.hcl
-.kiro/
 .serena/
 cluster-backup-*/
-memory-bank/
 openspec/
 workspace/
 reports/
@@ -301,7 +292,6 @@ filled-k8s-connection.json
 *.pfx
 .notes/specs
 .spec-workflow
-.warp
 .kaggle-outputs
 .codacy
 .agent/rules
