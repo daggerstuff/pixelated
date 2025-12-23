@@ -306,3 +306,4 @@ filled-k8s-connection.json
 .codacy
 .agent/rules
 .Jules
+.aider*
