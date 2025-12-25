@@ -41,7 +41,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY package.json pnpm-lock.yaml* ./
 
 # Install all dependencies (dev + prod) required for build
-RUN pnpm install --frozen-lockfile
+# Retry logic with fallback for lockfile mismatches
+RUN ( \
+    INSTALL_SUCCESS=0; \
+    for i in 1 2 3; do \
+    echo "Attempt $i: Installing dependencies with frozen lockfile..." && \
+    if pnpm install --frozen-lockfile; then \
+    echo "✅ Dependencies installed successfully" && \
+    INSTALL_SUCCESS=1 && \
+    break; \
+    else \
+    EXIT_CODE=$?; \
+    echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
+    if [ $i -eq 3 ]; then \
+    echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
+    if pnpm install --no-frozen-lockfile; then \
+    echo "✅ Dependencies installed with lockfile update" && \
+    INSTALL_SUCCESS=1 && \
+    break; \
+    fi; \
+    else \
+    sleep 2; \
+    fi; \
+    fi; \
+    done; \
+    if [ "$INSTALL_SUCCESS" -ne 1 ]; then \
+    echo "❌ Failed to install dependencies after all attempts" && \
+    exit 1; \
+    fi \
+    )
 
 # Copy source and run the build
 COPY . .
@@ -92,8 +120,35 @@ RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Install production dependencies and clean up in a single layer
-RUN pnpm install --prod --frozen-lockfile && \
+# Install production dependencies with retry logic and clean up in a single layer
+RUN ( \
+    INSTALL_SUCCESS=0; \
+    for i in 1 2 3; do \
+    echo "Attempt $i: Installing production dependencies with frozen lockfile..." && \
+    if pnpm install --prod --frozen-lockfile; then \
+    echo "✅ Production dependencies installed successfully" && \
+    INSTALL_SUCCESS=1 && \
+    break; \
+    else \
+    EXIT_CODE=$?; \
+    echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
+    if [ $i -eq 3 ]; then \
+    echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
+    if pnpm install --prod --no-frozen-lockfile; then \
+    echo "✅ Production dependencies installed with lockfile update" && \
+    INSTALL_SUCCESS=1 && \
+    break; \
+    fi; \
+    else \
+    sleep 2; \
+    fi; \
+    fi; \
+    done; \
+    if [ "$INSTALL_SUCCESS" -ne 1 ]; then \
+    echo "❌ Failed to install production dependencies after all attempts" && \
+    exit 1; \
+    fi \
+    ) && \
     pnpm store prune && \
     # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \

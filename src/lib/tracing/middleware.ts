@@ -1,11 +1,11 @@
 /**
  * OpenTelemetry Tracing Middleware for Astro
- * 
+ *
  * Adds distributed tracing to HTTP requests handled by Astro.
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
+import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api/build/src/index.js'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { MiddlewareHandler } from 'astro'
@@ -15,10 +15,10 @@ const tracer = trace.getTracer('pixelated-empathy-http')
 
 /**
  * Tracing middleware for Astro requests
- * 
+ *
  * Creates a span for each HTTP request and automatically tracks
  * request/response attributes and errors.
- * 
+ *
  * This middleware integrates with Astro's middleware system and should
  * be added early in the middleware chain to capture all requests.
  */
