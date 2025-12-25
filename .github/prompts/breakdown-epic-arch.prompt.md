@@ -24,7 +24,7 @@ Act as a Senior Software Architect. Your task is to take an Epic PRD and create 
 
 ## Output Format
 
-The output should be a complete Epic Architecture Specification in Markdown format, saved to `/docs/ways-of-work/plan/{epic-name}/arch.md`.
+The output should be a complete Epic Architecture Specification in Markdown format, saved to `/docs/specs/{epic-name}/arch.md`.
 
 ### Specification Structure
 

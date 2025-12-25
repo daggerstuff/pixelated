@@ -3,6 +3,7 @@ import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence, defineMiddleware } from 'astro:middleware'
 import { getSession } from './lib/auth/session'
 import { tracingMiddleware } from './lib/tracing/middleware'
+import { markSpanError } from './lib/tracing/utils'
 
 
 // Simple route matcher for protected API routes and journal-research pages
@@ -15,7 +16,7 @@ const protectedRoutePatterns: RegExp[] = [
 function isProtectedRoute(request: Request) {
   try {
     const url = new URL(request.url)
-    const pathname = url.pathname
+    const {pathname} = url
 
     // Allow public API routes (auth endpoints, health checks, etc.)
     if (pathname.startsWith('/api/auth/')) {
@@ -28,8 +29,10 @@ function isProtectedRoute(request: Request) {
     }
 
     return protectedRoutePatterns.some((r) => r.test(pathname))
-  } catch (_err) {
+  } catch (err) {
     // If URL parsing fails, be conservative and treat as not protected
+    // Log the error for observability without exposing PII
+    markSpanError(err instanceof Error ? err : new Error(String(err)))
     return false
   }
 }
@@ -64,8 +67,9 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
       ; (context.locals as any).user = session.user
         ; (context.locals as any).session = session.session
     }
-  } catch (_err) {
+  } catch (err) {
     // If session check fails treat as unauthenticated for protected routes
+    markSpanError(err instanceof Error ? err : new Error(String(err)))
     const signInUrl = new URL('/auth/sign-in', request.url)
     signInUrl.searchParams.set('redirect', request.url)
     return new Response(null, {
