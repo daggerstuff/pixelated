@@ -1,5 +1,6 @@
 ---
 // Theme CSS files are linked directly from public folder for SSR compatibility
+import { SpeedInsights } from '@vercel/speed-insights/astro'
 
 interface Props {
   title: string
@@ -144,6 +145,9 @@ const {
         return data
       }
     </script>
+
+    <!-- Vercel Speed Insights -->
+    <SpeedInsights />
   </body>
 </html>
 
