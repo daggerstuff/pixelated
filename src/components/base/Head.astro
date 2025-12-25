@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions'
 import { basename } from 'node:path'
+import { SpeedInsights } from '@vercel/speed-insights/astro'
 
 import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
@@ -150,5 +151,8 @@ const webPageData = {
     />
   )
 }
+
+<!-- Vercel Speed Insights -->
+<SpeedInsights />
 
 <ClientRouter />
