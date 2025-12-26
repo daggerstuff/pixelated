@@ -1,10 +1,10 @@
 /**
  * OpenTelemetry Tracing Utilities
- * 
+ *
  * Helper functions for manual instrumentation and span management.
  */
 
-import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
+import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api/build/src/index.js'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 
 const tracer = trace.getTracer('pixelated-empathy')
