@@ -22,6 +22,7 @@
 - Real-time feedback and bias detection
 - Performance analytics and progress tracking
 - Edge case mastery
+- Enhanced with comprehensive psychology knowledge base (10,960 concepts including therapeutic conversation examples and psychology book references)
 
 ### Psychological Frameworks
 
@@ -42,6 +43,7 @@
 - **Emotion Recognition**: Multi-modal emotion detection from text, audio, video
 - **Bias Detection**: Real-time identification of cultural, gender, racial, socioeconomic biases
 - **Therapeutic Pattern Recognition**: Analysis of therapeutic techniques and effectiveness
+- **Enhanced Psychology Knowledge Base**: 10,960 concepts including therapeutic conversation examples and psychology book references
 
 **Privacy-Preserving AI:**
 - **Fully Homomorphic Encryption (FHE)**: Compute on encrypted data without decryption
@@ -104,6 +106,8 @@ Data Layer
 - `memory-bank/`: mirrored memory bank + historical entries
 - `ai/`: Python AI services and dataset/research pipelines (large)
 - `ai/training_ready/`: training assets, manifests, configs, and platform sync scripts (for example `platforms/ovh/sync-datasets.sh`)
+- `ai/datasets/`: psychology datasets including xmu_psych_books and psychology-10k
+- `ai/dataset_pipeline/`: processing pipelines for psychology datasets
 
 ### Current Working-Tree Note (Dec 2025)
 - `ai/` (and its `training_ready/` subtree) lives inside this repo’s filesystem but is managed as a **separate git repository**; its tracking state is defined there, not in the `pixelated` repo.
@@ -176,6 +180,11 @@ Data Layer
    - FHE for sensitive operations
    - Minimal data collection
    - Transparent policies
+
+4. **Knowledge Base Enhancement**
+   - Comprehensive dataset integration
+   - Evidence-based content validation
+   - Continuous expansion and refinement
 
 ### Mental Health Practices
 
