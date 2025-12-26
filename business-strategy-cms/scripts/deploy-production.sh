@@ -55,7 +55,7 @@ build_and_push() {
     log "Building Docker image..."
     
     # Build production image
-    docker build -f Dockerfile.prod -t ${PROJECT_NAME}:latest .
+    docker build -f docker/Dockerfile.prod -t ${PROJECT_NAME}:latest .
     
     # Tag for ECR
     docker tag ${PROJECT_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
