@@ -23,8 +23,18 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  * be added early in the middleware chain to capture all requests.
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
-  const { url, request: { method } } = context
   const startTime = Date.now()
+  
+  // Handle static prerendering scenarios where request might not be available
+  // Check if context has request property before destructuring
+  if (!context.request) {
+    logger.debug('Skipping tracing for static prerendering - no request object available')
+    return next()
+  }
+  
+  const { url, request } = context
+
+  const { method } = request
 
   // Extract trace context from headers if present
   const traceParent = request.headers.get('traceparent')
