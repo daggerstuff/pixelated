@@ -5,7 +5,7 @@
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api/build/src/index.js'
+import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { MiddlewareHandler } from 'astro'
@@ -23,8 +23,7 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  * be added early in the middleware chain to capture all requests.
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
-  const { url, request } = context
-  const method = request.method
+  const { url, request: { method } } = context
   const startTime = Date.now()
 
   // Extract trace context from headers if present
