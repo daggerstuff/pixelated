@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 # Configuration
 PROJECT_NAME="pixelated-empathy"
 MONITORING_DIR="monitoring"
-DOCKER_COMPOSE_MONITORING="docker-compose.monitoring.yml"
+DOCKER_COMPOSE_MONITORING="docker/docker-compose.monitoring.yml"
 
 # Functions
 log_info() {

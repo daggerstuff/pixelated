@@ -52,7 +52,7 @@ deploy_aws() {
     
     # Build Docker image
     echo -e "${YELLOW}🐳 Building Docker image...${NC}"
-    docker build -t business-strategy-cms -f Dockerfile.prod .
+    docker build -t business-strategy-cms -f docker/Dockerfile.prod .
     
     # Tag and push to ECR
     AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)

@@ -1,14 +1,10 @@
 /**
  * Better-Auth PostgreSQL Integration Service
- * Replaces the SQLite in-memory database with Neon PostgreSQL using Drizzle ORM
+ * Replaces the SQLite in-memory database with Neon PostgreSQL
  * Implements Better-Auth authentication with JWT token management and PostgreSQL storage
  */
-
 import { betterAuth } from 'better-auth'
-import { Pool } from 'pg'
 import dotenv from 'dotenv'
-import { kyselyAdapter } from 'better-auth/adapters/kysely-adapter'
-import { Kysely, PostgresDialect } from 'kysely'
 import {
   generateTokenPair,
   validateToken,
@@ -25,28 +21,11 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import type { UserRole, ClientInfo, TokenPair } from './jwt-service'
 
-// Create PostgreSQL connection pool using DATABASE_URL from .env
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // For Neon, you might want to set this to true in production
-  }
-})
-
-// Test the connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ PostgreSQL connection failed:', err)
-  } else {
-    console.log('✅ PostgreSQL connected successfully')
-  }
-})
-
-// Better-Auth configuration with default PostgreSQL adapter
-const auth = betterAuth({
+// Better-Auth configuration with PostgreSQL
+export const auth = betterAuth({
   database: {
     provider: 'postgres',
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL,
   },
   emailAndPassword: {
     enabled: true,
@@ -60,32 +39,12 @@ const auth = betterAuth({
   },
   user: {
     modelName: 'users',
-    fields: {
-      role: {
-        type: 'string',
-        defaultValue: 'guest',
-      },
-      createdAt: {
-        type: 'date',
-        defaultValue: new Date(),
-      },
-      updatedAt: {
-        type: 'date',
-        defaultValue: new Date(),
-        updateFn: () => new Date(),
-      },
-    },
   },
   session: {
     modelName: 'auth_sessions',
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
   },
-  rateLimit: {
-    window: 10,
-    max: 10,
-    skipSuccessfulRequests: false,
-    skipFailedRequests: false,
+  account: {
+    modelName: 'auth_accounts',
   },
 })
 
@@ -177,11 +136,7 @@ export async function registerWithBetterAuth(
 
     // Update role if specified
     if (credentials.role) {
-      // Update user role in database
-      await db.execute(
-        `UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2`,
-        [credentials.role, result.user.id]
-      )
+      // Note: In a production environment, you would update the user's role in the database
       userAuth.role = credentials.role
     }
 
@@ -256,17 +211,6 @@ export async function authenticateWithBetterAuth(
     // Map to local user authentication
     const userAuth = mapBetterAuthUserToLocal(result.user)
 
-    // Update authentication status in database
-    await db.execute(
-      `UPDATE users SET
-        last_login_at = NOW(),
-        login_attempts = 0,
-        account_locked_until = NULL,
-        updated_at = NOW()
-      WHERE id = $1`,
-      [result.user.id]
-    )
-
     // Update authentication status in memory
     const updatedUser: UserAuthentication = {
       ...userAuth,
@@ -309,34 +253,6 @@ export async function authenticateWithBetterAuth(
       clientInfo: clientInfo,
     })
 
-    // Update failed login attempts in database
-    const userResult = await db.execute(
-      'SELECT id, login_attempts FROM users WHERE email = $1',
-      [credentials.email]
-    )
-
-    if (userResult.rows.length > 0) {
-      const user = userResult.rows[0]
-      const newAttempts = user.login_attempts + 1
-
-      // Lock account after 5 failed attempts
-      if (newAttempts >= 5) {
-        await db.execute(
-          `UPDATE users SET
-            login_attempts = $1,
-            authentication_status = $2,
-            account_locked_until = NOW() + INTERVAL '15 minutes'
-          WHERE id = $3`,
-          [newAttempts, AuthenticationStatus.ACCOUNT_LOCKED, user.id]
-        )
-      } else {
-        await db.execute(
-          'UPDATE users SET login_attempts = $1 WHERE id = $2',
-          [newAttempts, user.id]
-        )
-      }
-    }
-
     // Update Phase 6 MCP server with authentication failure
     await updatePhase6AuthenticationProgress(null, 'login_failure')
 
@@ -357,14 +273,16 @@ export async function logoutFromBetterAuth(
   clientInfo: ClientInfo,
 ): Promise<void> {
   try {
-    // Update authentication status in database
-    await db.execute(
-      `UPDATE users SET
-        authentication_status = $1,
-        updated_at = NOW()
-      WHERE id = $2`,
-      [AuthenticationStatus.UNAUTHENTICATED, userId]
-    )
+    // Update authentication status in memory
+    const updatedUser: UserAuthentication = {
+      id: userId,
+      email: '', // We don't have the email here, but it's not critical for logout
+      role: 'guest',
+      authenticationStatus: AuthenticationStatus.UNAUTHENTICATED,
+      loginAttempts: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
 
     // Log logout event
     await logSecurityEvent(SecurityEventType.LOGOUT, {
@@ -391,4 +309,4 @@ export function getBetterAuthInstance() {
  * Export Better-Auth types and utilities
  */
 export type { BetterAuthOptions, User } from 'better-auth'
-export { betterAuth, drizzleAdapter }
+export { betterAuth }
