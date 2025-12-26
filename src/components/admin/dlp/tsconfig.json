@@ -1,7 +1,15 @@
 {
-  "extends": "../../../../tsconfig.json",
+  "extends": "../../../../config/tsconfig.json",
   "compilerOptions": {
-    "types": ["node", "react", "react-dom"]
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ]
   },
-  "include": ["./*.tsx", "./*.ts", "./*.astro"]
+  "include": [
+    "./*.tsx",
+    "./*.ts",
+    "./*.astro"
+  ]
 }

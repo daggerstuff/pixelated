@@ -1,28 +1,15 @@
 {
-  "extends": "../astro/tsconfigs/strict.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable",
-      "WebWorker"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "~/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"],
+      "@lib/*": ["src/lib/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -62,10 +49,7 @@
       "vitest",
       "vitest/globals"
     ],
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
@@ -78,7 +62,6 @@
     "src/**/*.tsx",
     "src/**/*.astro",
     "src/types/**/*.d.ts",
-    "src/lib/services/redis/__tests__/jest.d.ts",
     "*.config.js",
     "*.config.ts",
     "vitest.setup.ts",
@@ -115,10 +98,6 @@
     "supabase",
     "templates",
     "test_pixel_logs",
-    "types",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/__tests__/**",
-    "src/data/sample-cognitive-models.ts"
+    "types"
   ]
 }

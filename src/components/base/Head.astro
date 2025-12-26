@@ -1,72 +1,76 @@
 ---
-import { ClientRouter } from 'astro:transitions'
-import { basename } from 'node:path'
-import { SpeedInsights } from '@vercel/speed-insights/astro'
+import SpeedInsights from "@vercel/speed-insights/astro";
+import { ClientRouter } from "astro:transitions";
+import { basename } from "node:path";
 
-import { withBasePath } from '@/utils/path'
-import { SITE } from '@/config'
+import { SITE } from "@/config";
+import { withBasePath } from "@/utils/path";
 
 interface Props {
-  title?: string
-  description?: string
-  ogImage?: string | boolean
-  pubDate?: string
-  lastModDate?: string
+  title?: string;
+  description?: string;
+  ogImage?: string | boolean;
+  pubDate?: string;
+  lastModDate?: string;
 }
 
-const { title, description, ogImage, pubDate, lastModDate } = Astro.props
+const { title, description, ogImage, pubDate, lastModDate } = Astro.props;
 
-const siteName = new URL(SITE.website).hostname
+const siteName = new URL(SITE.website).hostname;
 
 const pageTitle =
-  title && title !== SITE.title ? `${title} - ${SITE.title}` : SITE.title
+  title && title !== SITE.title ? `${title} - ${SITE.title}` : SITE.title;
 
-const pageDescription = description || SITE.description
+const pageDescription = description || SITE.description;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Simplified OG image handling - just use fallback or provided image
 // File existence checks removed to avoid build issues
-const generatedOgImage = withBasePath('og-images', `${basename(Astro.url.pathname)}.png`)
-const assignedOgImage = ogImage && ogImage !== true
-  ? withBasePath('og-images', ogImage as string)
-  : undefined
+const generatedOgImage = withBasePath(
+  "og-images",
+  `${basename(Astro.url.pathname)}.png`,
+);
+const assignedOgImage =
+  ogImage && ogImage !== true
+    ? withBasePath("og-images", ogImage as string)
+    : undefined;
 
 const ogImageURL = new URL(
   assignedOgImage ||
     generatedOgImage ||
-    withBasePath('og-images', 'og-image.png'),
-  Astro.url
-).href
+    withBasePath("og-images", "og-image.png"),
+  Astro.url,
+).href;
 
 // https://jsonld.com/blog-post/
 const blogPostingData = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  'headline': pageTitle,
-  'image': ogImageURL,
-  'url': canonicalURL,
-  'datePublished': pubDate,
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: pageTitle,
+  image: ogImageURL,
+  url: canonicalURL,
+  datePublished: pubDate,
   ...(lastModDate && { dateModified: lastModDate }),
   ...(description && { description: description }),
-  'author': {
-    '@type': 'Person',
-    'name': SITE.author,
-    'url': SITE.website,
+  author: {
+    "@type": "Person",
+    name: SITE.author,
+    url: SITE.website,
   },
-}
+};
 
 // https://jsonld.com/web-page/
 const webPageData = {
-  '@context': 'https://schema.org',
-  '@type': 'webPage',
-  'name': `${title || SITE.title}`,
+  "@context": "https://schema.org",
+  "@type": "webPage",
+  name: `${title || SITE.title}`,
   ...(description && { description: description }),
-  'publisher': {
-    '@type': 'ProfilePage',
-    'name': `${SITE.author}'s Personal Website`,
+  publisher: {
+    "@type": "ProfilePage",
+    name: `${SITE.author}'s Personal Website`,
   },
-}
+};
 ---
 
 <!-- Global Metadata -->
@@ -86,7 +90,7 @@ const webPageData = {
 <meta name="color-scheme" content="light dark" />
 
 <!-- Open Graph & Facebook -->
-<meta property="og:type" content={pubDate ? 'article' : 'website'} />
+<meta property="og:type" content={pubDate ? "article" : "website"} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={pageDescription} />
@@ -114,26 +118,29 @@ const webPageData = {
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Icon -->
-<link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
-<link rel="icon" sizes="32x32" href={withBasePath('/favicon.ico')} />
-<link rel="apple-touch-icon" href={withBasePath('/apple-touch-icon.png')} />
+<link rel="icon" type="image/svg+xml" href={withBasePath("/favicon.svg")} />
+<link rel="icon" sizes="32x32" href={withBasePath("/favicon.ico")} />
+<link rel="apple-touch-icon" href={withBasePath("/apple-touch-icon.png")} />
 
 <!-- Manifest -->
-<link rel="manifest" href={withBasePath('/app.webmanifest')} />
+<link rel="manifest" href={withBasePath("/app.webmanifest")} />
 
 <!-- Sitemap -->
-<link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
+<link rel="sitemap" href={withBasePath("/sitemap-index.xml")} />
 
 <!-- RSS -->
 <link
   rel="alternate"
   type="application/rss+xml"
-  title={withBasePath('/rss.xml')}
+  title={withBasePath("/rss.xml")}
   href="/rss.xml"
 />
 
 <!-- Google Fonts -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+/>
 
 <!-- Google JSON-LD Structured Data -->
 {

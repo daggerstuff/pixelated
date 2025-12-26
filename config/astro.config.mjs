@@ -220,6 +220,15 @@ export default defineConfig({
           'recharts',
           'chart.js',
           '@opentelemetry/api',
+          '@opentelemetry/auto-instrumentations-node',
+          '@opentelemetry/exporter-metrics-otlp-http',
+          '@opentelemetry/exporter-trace-otlp-http',
+          '@opentelemetry/resources',
+          '@opentelemetry/sdk-metrics',
+          '@opentelemetry/sdk-node',
+          '@opentelemetry/sdk-trace-base',
+          '@opentelemetry/semantic-conventions',
+          'src/config/env.config.ts',
         ],
         onwarn(warning, warn) {
           if (
@@ -231,7 +240,9 @@ export default defineConfig({
           if (warning.message && (
             warning.message.includes('externalized for browser compatibility') ||
             warning.message.includes('icon "-"') ||
-            warning.message.includes('failed to load icon \'-\'')
+            warning.message.includes('failed to load icon \'-\'') ||
+            warning.message.includes('src/config/env.config.ts') ||
+            warning.message.includes('Rollup failed to resolve import')
           )) {
             return
           }
@@ -256,6 +267,7 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'src/': path.resolve('./src'),
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
@@ -335,6 +347,15 @@ export default defineConfig({
         'zustand',
         'jotai',
         '@tanstack/react-query',
+        '@opentelemetry/api',
+        '@opentelemetry/auto-instrumentations-node',
+        '@opentelemetry/exporter-metrics-otlp-http',
+        '@opentelemetry/exporter-trace-otlp-http',
+        '@opentelemetry/resources',
+        '@opentelemetry/sdk-metrics',
+        '@opentelemetry/sdk-node',
+        '@opentelemetry/sdk-trace-base',
+        '@opentelemetry/semantic-conventions',
       ],
     },
   },
