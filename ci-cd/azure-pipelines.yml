@@ -394,6 +394,7 @@ stages:
           - script: |
               set -euo pipefail
               export PATH="$HOME/.local/bin:$PATH"
+              export PYTHONPATH="$(pwd):${PYTHONPATH:-}"
               pnpm test:evals
             displayName: "Run Eval Tests"
 
@@ -463,7 +464,7 @@ stages:
               containerRegistry: "$(AZURE_CONTAINER_REGISTRY)"
               repository: "$(IMAGE_REPOSITORY)"
               command: "buildAndPush"
-              Dockerfile: "Dockerfile"
+              Dockerfile: "docker/Dockerfile"
               buildContext: "."
               tags: |
                 $(Build.BuildNumber)
