@@ -27,6 +27,7 @@ if (isCloudflareDeploy && !cloudflareAdapter) {
   console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
 }
 
+const isVercelDeploy = !!process.env.VERCEL;
 const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
 const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
 const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
@@ -93,6 +94,13 @@ const adapter = (() => {
       };
     }
     return cloudflareAdapter(adapterConfig);
+  }
+
+  if (isVercelDeploy) {
+    console.log('⚡ Using Node adapter for Vercel deployment');
+    return node({
+      mode: 'middleware',
+    });
   }
 
   if (isRailwayDeploy) {
