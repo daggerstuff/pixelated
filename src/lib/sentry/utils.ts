@@ -5,10 +5,50 @@
  * messages, metrics, and performance data in the Pixelated Empathy application.
  *
  * Metrics API: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
- * Requires Sentry JS SDK ≥ 10.25.0 (current: 10.27.0)
+ *
+ * IMPORTANT: Do NOT import '@sentry/astro' at runtime in browser code.
+ * Some pages (e.g. docs) include plain module scripts which must not contain
+ * bare module specifiers. We instead use a safe global shim when available.
  */
 
-import * as Sentry from '@sentry/astro'
+type SentryShim = {
+  captureException: (error: unknown) => void
+  captureMessage: (message: string) => void
+  setUser: (user: Record<string, unknown>) => void
+  addBreadcrumb: (crumb: {
+    message: string
+    category?: string
+    data?: Record<string, unknown>
+    timestamp?: number
+    level?: 'info' | 'error' | 'warning' | 'debug'
+  }) => void
+  withScope: (cb: (scope: {
+    setContext: (key: string, value: Record<string, unknown>) => void
+    setTag: (key: string, value: string) => void
+    setLevel: (level: 'debug' | 'info' | 'warning' | 'error') => void
+  }) => void) => void
+  metrics: {
+    count: (name: string, value: number, options?: { attributes?: Record<string, unknown> }) => void
+    gauge: (name: string, value: number, options?: { attributes?: Record<string, unknown>; unit?: string }) => void
+    distribution: (
+      name: string,
+      value: number,
+      options?: { attributes?: Record<string, unknown>; unit?: string },
+    ) => void
+  }
+}
+
+function getSentry(): SentryShim | null {
+  try {
+    // Prefer global Sentry if present (initialized via public scripts)
+    if (typeof window !== 'undefined' && (window as any).Sentry) {
+      return (window as any).Sentry as SentryShim
+    }
+  } catch (_) {
+    // no-op
+  }
+  return null
+}
 
 /**
  * Manually capture an error with additional context
@@ -17,15 +57,14 @@ export function captureError(
   error: Error,
   context?: Record<string, unknown>,
 ): void {
-  // Sentry.withScope may return a value in some SDKs; we intentionally do not return it
-  // to keep this function typed as void and avoid leaking SDK internals to callers.
+  const Sentry = getSentry()
+  if (!Sentry) return
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
         scope.setContext(key, value as Record<string, unknown>)
       })
     }
-
     scope.setTag('source', 'manual')
     scope.setLevel('error')
     Sentry.captureException(error)
@@ -40,14 +79,14 @@ export function captureMessage(
   level: 'debug' | 'info' | 'warning' | 'error' = 'info',
   context?: Record<string, unknown>,
 ): void {
-  // Keep this function void; invoke Sentry.withScope for contextual captures.
+  const Sentry = getSentry()
+  if (!Sentry) return
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
         scope.setContext(key, value as Record<string, unknown>)
       })
     }
-
     scope.setTag('source', 'manual')
     scope.setLevel(level)
     Sentry.captureMessage(message)
@@ -63,6 +102,8 @@ export function setUserContext(user: {
   username?: string
   [key: string]: unknown
 }) {
+  const Sentry = getSentry()
+  if (!Sentry) return
   Sentry.setUser(user)
 }
 
@@ -74,6 +115,8 @@ export function addBreadcrumb(
   category: string,
   data?: Record<string, unknown>,
 ) {
+  const Sentry = getSentry()
+  if (!Sentry) return
   Sentry.addBreadcrumb({
     message,
     category,
@@ -100,8 +143,8 @@ export function startTransaction(
     )
   }
   return {
-    setData: () => {},
-    finish: () => {},
+    setData: () => { },
+    finish: () => { },
   }
 }
 
@@ -149,8 +192,8 @@ export const performance = {
       )
     }
     return {
-      setData: () => {},
-      finish: () => {},
+      setData: () => { },
+      finish: () => { },
     }
   },
 
@@ -167,8 +210,8 @@ export const performance = {
       )
     }
     return {
-      setData: () => {},
-      finish: () => {},
+      setData: () => { },
+      finish: () => { },
     }
   },
 }
@@ -210,6 +253,8 @@ export function countMetric(
   attributes?: MetricAttributes,
 ): void {
   try {
+    const Sentry = getSentry()
+    if (!Sentry) return
     Sentry.metrics.count(name, value, { attributes })
   } catch (error) {
     if (import.meta.env.DEV) {
@@ -241,6 +286,8 @@ export function gaugeMetric(
   unit?: string,
 ): void {
   try {
+    const Sentry = getSentry()
+    if (!Sentry) return
     Sentry.metrics.gauge(name, value, { attributes, unit })
   } catch (error) {
     if (import.meta.env.DEV) {
@@ -282,6 +329,8 @@ export function distributionMetric(
   },
 ): void {
   try {
+    const Sentry = getSentry()
+    if (!Sentry) return
     Sentry.metrics.distribution(name, value, {
       attributes: options?.attributes,
       unit: options?.unit,

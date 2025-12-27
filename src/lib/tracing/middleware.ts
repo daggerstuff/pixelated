@@ -26,23 +26,35 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const startTime = Date.now()
 
   // Handle static prerendering scenarios where request or headers might not be available
-  // Check if context has request property before destructuring
-  if (!context.request) {
+  if (!context?.request) {
     logger.debug('Skipping tracing for static prerendering - no request object available')
     return next()
   }
 
-  const { url, request } = context
+  // Resolve a robust URL object; some runtimes may not provide `context.url` as a URL
+  const req = context.request
+  const url = (() => {
+    try {
+      const ctxUrl = (context as any).url
+      if (ctxUrl && ctxUrl instanceof URL) return ctxUrl as URL
+      // Fallback to constructing from request.url when available
+      if (typeof req?.url === 'string') return new URL(req.url)
+    } catch (_) {
+      // ignore and use final fallback below
+    }
+    // Final safe fallback to avoid crashing spans; minimal default
+    return new URL('http://localhost/')
+  })()
 
-  const { method } = request
+  const method = req?.method ?? 'GET'
 
   // Determine if it's safe to access request headers
   // Some prerender/static contexts may provide a request object without usable headers
-  const canAccessHeaders = 'headers' in request && typeof request.headers?.get === 'function'
+  const canAccessHeaders = !!req && 'headers' in req && typeof req.headers?.get === 'function'
 
   // Extract trace context from headers only if safe
-  const traceParent = canAccessHeaders ? request.headers.get('traceparent') : null
-  const traceState = canAccessHeaders ? request.headers.get('tracestate') : null
+  const traceParent = canAccessHeaders ? req.headers.get('traceparent') : null
+  const traceState = canAccessHeaders ? req.headers.get('tracestate') : null
 
   // Create span for this request
   const span = tracer.startSpan(`${method} ${url.pathname}`, {
@@ -53,8 +65,8 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [SemanticAttributes.HTTP_SCHEME]: url.protocol.replace(':', ''),
       [SemanticAttributes.HTTP_TARGET]: url.pathname + url.search,
       [SemanticAttributes.HTTP_ROUTE]: url.pathname,
-      'http.user_agent': canAccessHeaders ? (request.headers.get('user-agent') || '') : '',
-      'http.request_id': canAccessHeaders ? (request.headers.get('x-request-id') || '') : '',
+      'http.user_agent': canAccessHeaders ? (req.headers.get('user-agent') || '') : '',
+      'http.request_id': canAccessHeaders ? (req.headers.get('x-request-id') || '') : '',
     },
   })
 
