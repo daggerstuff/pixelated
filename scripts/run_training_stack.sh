@@ -27,7 +27,7 @@ elif [[ "${1:-}" == "--build" ]]; then
   BUILD_FLAG="--build"
 fi
 
-COMPOSE_FILE="docker-compose.training.yml"
+COMPOSE_FILE="docker/docker-compose.training.yml"
 if [[ ! -f "$COMPOSE_FILE" ]]; then
   echo "Compose file '$COMPOSE_FILE' not found." >&2
   exit 1
