@@ -92,6 +92,7 @@ dependencies = [
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
   "ngcsdk>=4.10.0",
+  "vicoa>=1.2.5",
 ]
 
 [project.optional-dependencies]

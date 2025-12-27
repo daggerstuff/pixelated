@@ -1,5 +1,6 @@
 ---
 applyTo: '**/*.tsx,**/*.ts,**/*.astro,**/tailwind.config.*,**/components.json'
+description: 'Shadcn/UI and TailwindCSS usage guidelines'
 ---
 
 # Shadcn/UI + Tailwind CSS Guidelines
