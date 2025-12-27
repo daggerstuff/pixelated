@@ -158,6 +158,7 @@ export interface SelectTriggerProps {
   'children'?: ReactNode
   'className'?: string
   'aria-label'?: string
+  'id'?: string
 }
 
 // SelectTrigger component - the button that opens the dropdown
