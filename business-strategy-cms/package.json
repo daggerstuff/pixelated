@@ -42,7 +42,8 @@
     "aws-sdk": "^2.1500.0",
     "nodemailer": "^6.9.7",
     "dotenv": "^16.3.1",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",
