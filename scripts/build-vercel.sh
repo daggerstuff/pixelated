@@ -35,8 +35,6 @@ echo "Running Astro build..."
 # Run with verbose output and error handling
 if ! pnpm build; then
   echo "❌ ASTRO BUILD FAILED!"
-  echo "Recent logs:"
-  tail -100
   exit 1
 fi
 

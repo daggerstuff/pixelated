@@ -1,5 +1,6 @@
 ---
-inclusion: always
+applyTo: '**'
+description: 'Project structure and organization rules for Pixelated Empathy'
 ---
 
 # Project Structure & Organization
