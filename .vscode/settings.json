@@ -175,6 +175,10 @@
             "source.fixAll.ruff": "explicit"
         }
     },
+    "eslint.options": {
+        "configFile": "config/eslint.config.js"
+    },
+    "prettier.configPath": "config/.prettierrc",
     "cubent.autocomplete.allowWithCopilot": true,
     "cubent.autocomplete.enabled": true,
     "cubent.cubentCloudEnabled": true,

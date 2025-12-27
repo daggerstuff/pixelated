@@ -12,7 +12,7 @@
 
 Pixelated Empathy is an **AI-first training simulation platform for mental health professionals** that enables zero-risk practice of challenging therapeutic scenarios. The platform combines sophisticated emotional intelligence technology with evidence-based therapeutic approaches to prepare clinicians for the complexity of real human suffering.
 
-**Core Value Proposition**: Eliminate the gap between training and real-world competency by providing a safe, scalable, and realistic environment where therapists can practice crisis intervention, trauma response, and difficult dialogues without risk to vulnerable populations.
+**Core Value Proposition**: Eliminate the gap between training and real-world competency by providing a safe, scalable, and realistic environment where therapists can practice crisis intervention, trauma response, and difficult dialogues without risk to vulnerable populations. Enhanced with comprehensive psychology knowledge base containing 10,960 concepts including therapeutic conversation examples, psychology book references, and evidence-based practices.
 
 ### Objectives
 
@@ -29,6 +29,7 @@ Pixelated Empathy is an **AI-first training simulation platform for mental healt
 - **Real-Time Bias Detection**: Identify and address cultural, gender, racial, and socioeconomic biases during interactions
 - **Performance Analytics**: Track growth across therapeutic competencies with actionable feedback
 - **Edge Case Generator**: Encounter rare but critical scenarios most professionals go years without experiencing
+- **Comprehensive Psychology Knowledge Base**: Enhanced with 10,960 concepts including therapeutic conversation examples, psychology book references, and evidence-based practices
 
 ---
 
@@ -129,6 +130,7 @@ Pixelated Empathy is an **AI-first training simulation platform for mental healt
 - **Frameworks**: TensorFlow.js, PyTorch (Python services)
 - **Processing**: Real-time inference, batch processing for analytics
 - **Privacy**: Fully Homomorphic Encryption (FHE) with sub-50ms latency
+- **Knowledge Base**: Enhanced psychology knowledge base with 10,960 concepts including therapeutic conversation examples and psychology book references
 
 **Development Tools:**
 - **Package Managers**: `pnpm` (Node.js), `uv` (Python)

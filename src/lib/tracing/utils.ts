@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Utilities
- * 
+ *
  * Helper functions for manual instrumentation and span management.
  */
 
