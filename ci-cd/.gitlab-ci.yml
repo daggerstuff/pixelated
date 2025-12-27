@@ -13,7 +13,7 @@ stages:
 
 variables:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.26.0"
+  PNPM_VERSION: "10.26.2"
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   STAGING_URL: "https://staging.pixelatedempathy.tech"
   PRODUCTION_URL: "https://pixelatedempathy.com"
