@@ -115,16 +115,27 @@ export class MediaService {
 
     if (!result.Contents) return []
 
-    const files = await Promise.all(
-      result.Contents.map(async (file) => ({
-        key: file.Key || '',
-        lastModified: file.LastModified || new Date(),
-        size: file.Size || 0,
-        url: await this.getSignedUrl(file.Key || ''),
-      })),
+    return await Promise.all(
+      result.Contents.map(async (file) => {
+        try {
+          const url = await this.getSignedUrl(file.Key || '')
+          return {
+            key: file.Key || '',
+            lastModified: file.LastModified || new Date(),
+            size: file.Size || 0,
+            url,
+          }
+        } catch (error) {
+          console.warn('Failed to generate signed URL for file:', file.Key, error)
+          return {
+            key: file.Key || '',
+            lastModified: file.LastModified || new Date(),
+            size: file.Size || 0,
+            url: '',
+          }
+        }
+      })
     )
-
-    return files
   }
 
   /**
@@ -181,6 +192,17 @@ export class MediaService {
     // Remove protocol from endpoint if present
     const cleanEndpoint = endpoint.replace(/^https?:\/\//, '')
 
+    // Validate required environment variables
+    if (!process.env['OVH_ACCESS_KEY_ID']) {
+      throw new Error('OVH_ACCESS_KEY_ID is required')
+    }
+    if (!process.env['OVH_SECRET_ACCESS_KEY']) {
+      throw new Error('OVH_SECRET_ACCESS_KEY is required')
+    }
+    if (!process.env['OVH_BUCKET_NAME']) {
+      throw new Error('OVH_BUCKET_NAME is required')
+    }
+
     return `https://${BUCKET_NAME}.${cleanEndpoint}/${key}`
   }
 
@@ -188,6 +210,8 @@ export class MediaService {
    * Get folder by file type
    */
   private static getFolderByFileType(mimetype: string): string {
+    if (!mimetype || typeof mimetype !== 'string') return 'misc'
+
     if (mimetype.startsWith('image/')) return 'images'
     if (mimetype === 'application/pdf') return 'documents'
     if (
