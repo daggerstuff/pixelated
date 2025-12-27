@@ -36,8 +36,8 @@ export function NotificationPreferences({
 
   if (isLoading) {
     return (
-      <Card className={cn('p-6', className)}>
-        <div className="space-y-6">
+      <Card className={cn('p-6', className)} aria-busy="true">
+        <div className="space-y-6" role="status">
           <Skeleton className="h-6 w-1/3" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -125,7 +125,7 @@ export function NotificationPreferences({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notification-frequency">
+            <Label id="notification-frequency-label" htmlFor="notification-frequency">
               Notification Frequency
             </Label>
             <Select
@@ -135,7 +135,7 @@ export function NotificationPreferences({
               }
               placeholder="Select frequency"
             >
-              <SelectTrigger id="notification-frequency">
+              <SelectTrigger id="notification-frequency" aria-labelledby="notification-frequency-label">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
