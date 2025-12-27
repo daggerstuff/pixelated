@@ -41,7 +41,7 @@ if ('IntersectionObserver' in window &&
 function getFrameElement(doc) {
   try {
     return doc.defaultView && doc.defaultView.frameElement || null;
-  } catch (e) {
+  } catch {
     // Ignore the error.
     return null;
   }

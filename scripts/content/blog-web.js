@@ -24,29 +24,7 @@ const lastSlash = Math.max(
   __filename.lastIndexOf('\\'),
 )
 const __dirname = lastSlash > 0 ? __filename.substring(0, lastSlash) : '.'
-// LRU cache for mapping safe IDs to actual file paths
-const PATH_CACHE = new Map()
-const MAX_CACHE_SIZE = 100
-let pathCounter = 0
-
-// Generate safe path ID and cache the mapping
-function generateSafePathId(filePath) {
-  const safeId = `path_${++pathCounter}`
-
-  // LRU: delete oldest entry if cache is full
-  if (PATH_CACHE.size >= MAX_CACHE_SIZE) {
-    const firstKey = PATH_CACHE.keys().next().value
-    PATH_CACHE.delete(firstKey)
-  }
-
-  PATH_CACHE.set(safeId, filePath)
-  return safeId
-}
-
-// Get actual file path from safe ID
-function getActualPath(safeId) {
-  return PATH_CACHE.get(safeId) || null
-}
+// Path cache removed - was unused
 
 // Run blog publisher command
 // Basic argument parsing and validation reused from CLI

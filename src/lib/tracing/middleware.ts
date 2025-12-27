@@ -39,7 +39,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       if (ctxUrl && ctxUrl instanceof URL) return ctxUrl as URL
       // Fallback to constructing from request.url when available
       if (typeof req?.url === 'string') return new URL(req.url)
-    } catch (_) {
+    } catch {
       // ignore and use final fallback below
     }
     // Final safe fallback to avoid crashing spans; minimal default
