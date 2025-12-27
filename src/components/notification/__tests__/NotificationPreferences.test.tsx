@@ -48,7 +48,7 @@ describe('notificationPreferences', () => {
     })
 
     const { container } = render(<NotificationPreferences />)
-    expect(container.getElementsByClassName('animate-pulse').length).toBeGreaterThan(0)
+    expect(container.getElementsByClassName('animate-pulse')).toHaveLength(1)
   })
 
   it('renders error state', () => {
