@@ -627,7 +627,7 @@ export interface ShareConfig {
   email: boolean
 }
 
-interface TocConfig {
+export interface TocConfig {
   /**
    * Sets the minimum heading level for TOC.
    *
@@ -648,9 +648,9 @@ interface TocConfig {
   displayPosition: 'left' | 'right'
 
   /**
-   * Controls whether the TOC is always visible or only appears when hovering.
+   * Controls whether the TOC is always visible, only appears when hovering, or appears on content interaction.
    */
-  displayMode: 'always' | 'hover'
+  displayMode: 'always' | 'hover' | 'content'
 }
 
 interface OgImageConfig {
