@@ -16,11 +16,22 @@ try {
     console.error('Failed to load handler from dist/server/entry.mjs:', error);
     // Fallback handler that returns an error
     handler = (req, res) => {
-        res.status(500).json({
+        const isProd = process.env.NODE_ENV === 'production';
+
+        const baseError = {
             error: 'INTERNAL_SERVER_ERROR',
             code: 'HANDLER_LOAD_FAILED',
             message: 'Failed to load the application handler. Please check build artifacts.',
-            details: error.message
+        };
+
+        const debugDetails =
+            !isProd && error && error.message
+                ? { details: String(error.message) }
+                : {};
+
+        res.status(500).json({
+            ...baseError,
+            ...debugDetails,
         });
     };
 }
