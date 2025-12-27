@@ -1,5 +1,6 @@
 ---
 applyTo: 'none'
+description: 'Clean code principles for all languages and frameworks'
 ---
 
 # Clean Code Guidelines

@@ -1,5 +1,6 @@
 ---
 applyTo: '**/*.tsx,**/*.jsx,**/*.astro,**/components/**/*,**/ui/**/*'
+description: 'UI/UX design guidelines for Pixelated Empathy'
 ---
 
 # UI/UX Design Guidelines for Pixelated Empathy
