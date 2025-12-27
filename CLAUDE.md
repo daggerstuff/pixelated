@@ -33,7 +33,7 @@ pnpm check:all             # Lint + format + typecheck
 - Use `uv` for all package management
 - Follow PEP 8, type hints required
 
-**Detailed style guide**: [code-style.md](.agent/steering/code-style.md)
+**Detailed style guide**: [code-style.md](.kiro/steering/code-style.md)
 
 **Common Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
 
@@ -46,7 +46,7 @@ pnpm check:all             # Lint + format + typecheck
 5. **Handle edge cases** - Crisis signals, silence, cultural variations
 
 **Security checks**: `pnpm security:check`, `pnpm security:scan`, `pnpm test:security`
-**Deep dive**: [security-ethics.md](.agent/steering/security-ethics.md)
+**Deep dive**: [security-ethics.md](.kiro/steering/security-ethics.md)
 
 ## 🎭 Domain Guidelines
 
@@ -60,7 +60,7 @@ pnpm check:all             # Lint + format + typecheck
 - Handle edge cases (silence, crisis signals)
 - Consider cultural/linguistic variations
 
-**Detailed guidelines**: [domain-emotional-ai.md](.agent/steering/domain-emotional-ai.md)
+**Detailed guidelines**: [domain-emotional-ai.md](.kiro/steering/domain-emotional-ai.md)
 
 ## 🚫 Common Pitfalls
 
@@ -77,22 +77,22 @@ pnpm check:all             # Lint + format + typecheck
 3. Write tests first (TDD)
 4. Implement → `pnpm check:all && pnpm test:all`
 
-**Testing**: [testing-strategy.md](.cursor/steering/testing-strategy.md)  
-**Spec workflow**: [spec-workflow.md](.cursor/steering/spec-workflow.md)
+**Testing**: [testing-strategy.md](.kiro/steering/testing-strategy.md)  
+**Spec workflow**: [spec-workflow.md](.kiro/steering/spec-workflow.md)
 
 ## 📚 Key Documentation
 
 **Core Guides:**
-- [code-style.md](.agent/steering/code-style.md): Detailed style guide
-- [security-ethics.md](.agent/steering/security-ethics.md): Security & ethics deep-dive
-- [clean-code-principles.md](.agent/steering/clean-code-principles.md): Clean code patterns
+- [code-style.md](.kiro/steering/code-style.md): Detailed style guide
+- [security-ethics.md](.kiro/steering/security-ethics.md): Security & ethics deep-dive
+- [clean-code-principles.md](.kiro/steering/clean-code-principles.md): Clean code patterns
 
 **Domain-Specific:**
-- [domain-emotional-ai.md](.agent/steering/domain-emotional-ai.md): Emotional AI guidelines
-- [testing-strategy.md](.agent/steering/testing-strategy.md): Testing best practices
+- [domain-emotional-ai.md](.kiro/steering/domain-emotional-ai.md): Emotional AI guidelines
+- [testing-strategy.md](.kiro/steering/testing-strategy.md): Testing best practices
 
 **Workflows:**
-- [spec-workflow.md](.agent/steering/spec-workflow.md): Spec-driven development
+- [spec-workflow.md](.kiro/steering/spec-workflow.md): Spec-driven development
 - `AGENTS.md`: AI agent workflow guide
 
 ## 🎯 Mission Reminder
@@ -105,9 +105,9 @@ This platform handles sensitive mental health data. Every decision should priori
 - **Privacy and confidentiality**
 - **Genuine human connection**
 
-[code-style.md]: .agent/steering/code-style.md
-[security-ethics.md]: .agent/steering/security-ethics.md
-[clean-code-principles.md]: .agent/steering/clean-code-principles.md
-[domain-emotional-ai.md]: .agent/steering/domain-emotional-ai.md
-[testing-strategy.md]: .agent/steering/testing-strategy.md
-[spec-workflow.md]: .agent/steering/spec-workflow.md
+[code-style.md]: .kiro/steering/code-style.md
+[security-ethics.md]: .kiro/steering/security-ethics.md
+[clean-code-principles.md]: .kiro/steering/clean-code-principles.md
+[domain-emotional-ai.md]: .kiro/steering/domain-emotional-ai.md
+[testing-strategy.md]: .kiro/steering/testing-strategy.md
+[spec-workflow.md]: .kiro/steering/spec-workflow.md
