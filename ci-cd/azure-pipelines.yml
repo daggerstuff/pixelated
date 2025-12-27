@@ -204,6 +204,11 @@ stages:
         pool:
           name: "Default"
         steps:
+          - checkout: self
+            displayName: "Checkout repository with submodules"
+            persistCredentials: "false"
+            submodules: "true"
+            fetchDepth: "0"
           - task: NodeTool@0
             inputs:
               versionSpec: "$(NODE_VERSION)"
@@ -391,6 +396,26 @@ stages:
               uv run python -V
               echo "✅ Python environment ready"
             displayName: "Install uv (Python)"
+          - script: |
+              set -euo pipefail
+              export PATH="$HOME/.local/bin:$PATH"
+              export PYTHONPATH="$(pwd):${PYTHONPATH:-}"
+              echo "🔎 Submodule status:"
+              git submodule status || true
+              echo "📂 Listing ai directory (if present):"
+              ls -la ai || true
+              echo "🧪 Sanity check: try importing ai.evals"
+              uv run python - << 'PY'
+              import sys, importlib
+              print("sys.path[0] =", sys.path[0])
+              try:
+                mod = importlib.import_module("ai.evals")
+                print("✅ ai.evals import OK:", getattr(mod, "__file__", "<namespace>"))
+              except Exception as e:
+                print("❌ ai.evals import failed:", repr(e), file=sys.stderr)
+                sys.exit(1)
+              PY
+            displayName: "Sanity Check: ai.evals import"
           - script: |
               set -euo pipefail
               export PATH="$HOME/.local/bin:$PATH"
@@ -1959,7 +1984,8 @@ stages:
           name: "Default"
         steps:
           - checkout: self
-            persistCredentials: "true"
+            displayName: "Checkout repository"
+            persistCredentials: "false"
 
           - task: NodeTool@0
             inputs:
