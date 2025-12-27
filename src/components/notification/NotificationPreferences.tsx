@@ -124,28 +124,22 @@ export function NotificationPreferences({
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notification-frequency">
-              Notification Frequency
-            </Label>
-            <Select
-              value={preferences.frequency}
-              onValueChange={(value) =>
-                updateFrequency(value as NotificationFrequency)
-              }
-              placeholder="Select frequency"
-            >
-              <SelectTrigger id="notification-frequency">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="immediate">Immediate</SelectItem>
-                <SelectItem value="batched">Batched</SelectItem>
-                <SelectItem value="daily">Daily digest</SelectItem>
-                <SelectItem value="weekly">Weekly digest</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select
+            value={preferences.frequency}
+            onValueChange={(value) =>
+              updateFrequency(value as NotificationFrequency)
+            }
+          >
+            <SelectTrigger aria-label="Select notification frequency">
+              <SelectValue placeholder="Select frequency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="immediate">Immediate</SelectItem>
+              <SelectItem value="batched">Batched</SelectItem>
+              <SelectItem value="daily">Daily digest</SelectItem>
+              <SelectItem value="weekly">Weekly digest</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-4">
