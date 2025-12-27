@@ -206,7 +206,7 @@ stages:
         steps:
           - checkout: self
             displayName: "Checkout repository with submodules"
-            persistCredentials: "true"
+            persistCredentials: "false"
             submodules: "true"
             fetchDepth: "0"
           - task: NodeTool@0
@@ -412,8 +412,8 @@ stages:
                 mod = importlib.import_module("ai.evals")
                 print("✅ ai.evals import OK:", getattr(mod, "__file__", "<namespace>"))
               except Exception as e:
-                print("❌ ai.evals import failed:", repr(e))
-                raise
+                print("❌ ai.evals import failed:", repr(e), file=sys.stderr)
+                sys.exit(1)
               PY
             displayName: "Sanity Check: ai.evals import"
           - script: |
@@ -1984,7 +1984,8 @@ stages:
           name: "Default"
         steps:
           - checkout: self
-            persistCredentials: "true"
+            displayName: "Checkout repository"
+            persistCredentials: "false"
 
           - task: NodeTool@0
             inputs:
