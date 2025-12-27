@@ -2,7 +2,7 @@
  * Competitive Intelligence Types
  */
 
-import type { BaseEntity, Priority, BusinessStrategyId } from './common'
+import type { BaseEntity, Priority, } from './common'
 
 export interface CompetitiveStrength {
     id: string

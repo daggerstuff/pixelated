@@ -178,13 +178,13 @@ export const useJournalResearchWebSocket = ({
 
       socketRef.current.onmessage = handleMessage
 
-      socketRef.current.onerror = (event) => {
+      socketRef.current.onerror = () => {
         setConnectionState('error')
         const error = new Error('WebSocket connection error')
         onError?.(error)
       }
 
-      socketRef.current.onclose = (event) => {
+      socketRef.current.onclose = () => {
         setConnectionState('disconnected')
         onClose?.()
 
