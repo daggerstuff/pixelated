@@ -1,7 +1,6 @@
 import {
   WorkflowInstance,
   WorkflowTemplate,
-  WorkflowStep,
   WorkflowAction,
   Approval,
   WorkflowComment,

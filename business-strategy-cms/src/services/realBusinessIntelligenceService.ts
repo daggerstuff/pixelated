@@ -84,7 +84,7 @@ export class RealBusinessIntelligenceService {
     symbols: string[]
   }): Promise<number> {
     try {
-      const { industry, symbols } = params
+      const { symbols } = params
       const financialData = await this.yahooService.getFinancialMetrics(symbols)
 
       if (financialData.length === 0) {

@@ -7,7 +7,7 @@ import {
 } from './src/lib/db/index'
 
 // Initialize database connection
-const db = initializeDatabase()
+
 
 async function demonstrateDatabaseUsage() {
   try {

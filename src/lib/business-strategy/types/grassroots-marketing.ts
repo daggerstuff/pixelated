@@ -2,7 +2,7 @@
  * Grassroots Marketing Types
  */
 
-import type { BaseEntity, Priority, BusinessStrategyId } from './common'
+import type { BaseEntity, } from './common'
 
 export type EffortLevel = 'low' | 'medium' | 'high' | 'very-high'
 export type ImpactScore = number // 0-100
