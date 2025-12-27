@@ -1,20 +1,22 @@
 {
   "version": 2,
-  "installCommand": "corepack enable && corepack prepare pnpm@10.26.0 --activate && pnpm install --frozen-lockfile",
-  "buildCommand": "corepack enable && corepack prepare pnpm@10.26.0 --activate && pnpm build",
+  "installCommand": "corepack enable && corepack prepare pnpm@10.26.2 --activate && pnpm install --frozen-lockfile",
+  "buildCommand": "bash scripts/build-vercel.sh",
   "builds": [
     {
-      "src": "api/vercel-handler.js",
+      "src": "deploy/vercel/vercel-handler.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**"]
+        "includeFiles": [
+          "dist/**"
+        ]
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/vercel-handler.js"
+      "dest": "/deploy/vercel/vercel-handler.js"
     }
   ]
 }
