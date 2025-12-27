@@ -15,3 +15,27 @@ export const logger = {
     }
   },
 }
+
+export class Logger {
+  private context: string
+
+  constructor(context: string) {
+    this.context = context
+  }
+
+  info(message: string, data?: any): void {
+    logger.info(`[${this.context}] ${message}`, data)
+  }
+
+  warn(message: string, data?: any): void {
+    logger.warn(`[${this.context}] ${message}`, data)
+  }
+
+  error(message: string, data?: any): void {
+    logger.error(`[${this.context}] ${message}`, data)
+  }
+
+  debug(message: string, data?: any): void {
+    logger.debug(`[${this.context}] ${message}`, data)
+  }
+}
