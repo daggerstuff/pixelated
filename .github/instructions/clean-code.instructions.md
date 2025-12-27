@@ -1,5 +1,5 @@
 ---
-inclusion: never
+applyTo: 'none'
 ---
 
 # Clean Code Guidelines
