@@ -24,21 +24,25 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const startTime = Date.now()
-  
-  // Handle static prerendering scenarios where request might not be available
+
+  // Handle static prerendering scenarios where request or headers might not be available
   // Check if context has request property before destructuring
   if (!context.request) {
     logger.debug('Skipping tracing for static prerendering - no request object available')
     return next()
   }
-  
+
   const { url, request } = context
 
   const { method } = request
 
-  // Extract trace context from headers if present
-  const traceParent = request.headers.get('traceparent')
-  const traceState = request.headers.get('tracestate')
+  // Determine if it's safe to access request headers
+  // Some prerender/static contexts may provide a request object without usable headers
+  const canAccessHeaders = typeof (request as any)?.headers?.get === 'function'
+
+  // Extract trace context from headers only if safe
+  const traceParent = canAccessHeaders ? request.headers.get('traceparent') : null
+  const traceState = canAccessHeaders ? request.headers.get('tracestate') : null
 
   // Create span for this request
   const span = tracer.startSpan(`${method} ${url.pathname}`, {
@@ -49,8 +53,8 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [SemanticAttributes.HTTP_SCHEME]: url.protocol.replace(':', ''),
       [SemanticAttributes.HTTP_TARGET]: url.pathname + url.search,
       [SemanticAttributes.HTTP_ROUTE]: url.pathname,
-      'http.user_agent': request.headers.get('user-agent') || '',
-      'http.request_id': request.headers.get('x-request-id') || '',
+      'http.user_agent': canAccessHeaders ? (request.headers.get('user-agent') || '') : '',
+      'http.request_id': canAccessHeaders ? (request.headers.get('x-request-id') || '') : '',
     },
   })
 
