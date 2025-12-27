@@ -54,6 +54,7 @@
 - **PyTorch**: Deep learning framework
 - **TensorFlow.js**: Browser-based ML
 - **MentalLLaMA**: Specialized mental health models
+- **Enhanced Psychology Knowledge Base**: 10,960 concepts including therapeutic conversation examples and psychology book references
 
 ### Database Technologies
 

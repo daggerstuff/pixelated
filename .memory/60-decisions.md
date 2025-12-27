@@ -273,21 +273,98 @@
 
 ---
 
+## Architecture Decisions
+
+### ADR-0004: Psychology Knowledge Base Enhancement (Accepted)
+
+**Date**: December 2025
+**Status**: Accepted
+**Context**: Need for comprehensive psychology knowledge base to enhance AI training and therapeutic scenarios
+
+**Decision**: Enhanced psychology knowledge base from 1,101 to 10,960 concepts through:
+- Integration of xmu_psych_books dataset with 13 psychology-related books
+- Integration of psychology-10k dataset with 9,846 therapeutic conversation examples
+- Creation of custom processors for both datasets
+- Update of Tier6KnowledgeLoader to handle enhanced JSON knowledge base files
+
+**Rationale**:
+- Significantly expanded therapeutic knowledge base with diverse content
+- Added real library book references and therapeutic conversation examples
+- Enhanced AI's ability to understand and respond to therapeutic scenarios
+- Prepared comprehensive training data for improved model performance
+
+**Impact**: Foundation for enhanced AI-powered therapeutic training scenarios
+
+---
+
+### ADR-0005: Performance Optimization Approach for Sub-500ms Latency (Recommended)
+
+**Date**: December 2025
+**Status**: Recommended
+**Context**: The clinical platform currently experiences 850ms response latency, significantly impacting user experience. The target is to reduce this to sub-500ms latency.
+
+**Decision**: Implement a **Combination Approach** that addresses multiple layers of the system architecture:
+
+1. **Asynchronous Processing Architecture**
+   - Implement event-driven architecture with message queues
+   - Separate real-time critical operations from background processing
+   - Decompose services for specialized functions
+
+2. **Enhanced Multi-Tier Caching Strategy**
+   - Implement L1 (in-memory), L2 (distributed), and L3 (CDN) caching
+   - Use intelligent cache warming with predictive preloading
+   - Cache AI responses for common therapeutic scenarios
+
+3. **AI Service Optimization**
+   - Deploy multiple MentalLLaMA model instances with load balancing
+   - Implement hybrid approach with rule-based shortcuts for common cases
+   - Use edge computing for faster inference
+
+4. **Database Architecture Enhancements**
+   - Implement horizontal and vertical data partitioning
+   - Deploy read replicas for MongoDB and PostgreSQL
+   - Optimize connection pooling and query caching
+
+**Rationale**:
+- Single-point optimizations (caching alone, query optimization alone) are insufficient to achieve the 40%+ latency reduction needed
+- The current 850ms latency likely stems from multiple contributing factors that require a holistic approach
+- A combination approach addresses bottlenecks at all layers of the system:
+  - Frontend (progressive loading, client-side caching)
+  - Network (CDN, edge computing, protocol optimization)
+  - API Layer (asynchronous processing, intelligent routing)
+  - AI Services (model parallelization, hybrid approaches)
+  - Data Layer (partitioning, read replicas, optimized queries)
+  - Caching (multi-tier strategy)
+
+**Implementation Plan**:
+1. **Phase 1 (Weeks 1-2)**: Implement enhanced caching strategy and database read replicas
+2. **Phase 2 (Weeks 3-4)**: Deploy AI model parallelization and hybrid approaches
+3. **Phase 3 (Weeks 5-6)**: Implement asynchronous processing architecture
+4. **Phase 4 (Weeks 7-8)**: Optimize frontend and network layers
+
+**Expected Impact**:
+- 40-50% reduction in response latency (850ms → 425-510ms)
+- Improved system scalability and reliability
+- Better user experience with faster response times
+- Reduced infrastructure costs through more efficient resource utilization
+
+**Success Metrics**:
+- Average response time < 500ms
+- 95th percentile response time < 750ms
+- System throughput increased by 30%
+- Error rate reduced by 50%
+
+---
+
 ## Pending Decisions
 
 ### Performance Optimization Approach
 
-**Date**: December 2025  
-**Status**: Under Discussion  
+**Date**: December 2025
+**Status**: DECISION MADE - See ADR-0005
 **Context**: Need to achieve sub-500ms latency
 
-**Options**:
-1. Aggressive caching strategy
-2. Query optimization
-3. Architecture changes
-4. Combination approach
-
-**Impact**: Will determine how to achieve performance targets
+**Resolution**: Combination approach recommended in ADR-0005
 
 ---
 

@@ -4,17 +4,19 @@
   "buildCommand": "corepack enable && corepack prepare pnpm@10.26.0 --activate && pnpm build",
   "builds": [
     {
-      "src": "api/vercel-handler.js",
+      "src": "deploy/vercel/vercel-handler.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**"]
+        "includeFiles": [
+          "dist/**"
+        ]
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/vercel-handler.js"
+      "dest": "/deploy/vercel/vercel-handler.js"
     }
   ]
 }
