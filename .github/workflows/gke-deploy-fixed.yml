@@ -14,7 +14,7 @@ on:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.26.0"
+  PNPM_VERSION: "10.26.2"
   PYTHON_VERSION: "3.11"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}

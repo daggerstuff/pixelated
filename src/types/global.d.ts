@@ -1,8 +1,7 @@
 /// <reference types="vite/client" />
 /// <reference types="vitest/globals" />
 
-/// <reference path="../../types/three-addons.d.ts" />
-// Local three-addons.d.ts provides minimal ambient shims for three and its addons.
+// Three.js type shims are provided by types/three-addons.d.ts (included via tsconfig)
 
 // Global DOM augmentations for project-wide window helpers
 declare global {
