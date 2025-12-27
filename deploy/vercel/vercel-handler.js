@@ -4,36 +4,28 @@
 // IMPORTANT: This handler requires that 'pnpm build' has been run first to create
 // the dist/server/entry.mjs file. The vercel.json buildCommand ensures this happens.
 
-let handler;
-try {
-    const entry = await import('../../dist/server/entry.mjs');
-    // The entry module exports 'handler' as a named export
-    handler = entry.handler;
-    if (!handler) {
-        throw new Error('No handler export found in dist/server/entry.mjs');
-    }
-} catch (error) {
-    console.error('Failed to load handler from dist/server/entry.mjs:', error);
-    // Fallback handler that returns an error
-    handler = (req, res) => {
-        const isProd = process.env.NODE_ENV === 'production';
+// Lazy-load handler to avoid top-level await issues in serverless
+let cached
 
+export default async function handler(req, res) {
+    try {
+        if (!cached) {
+            const entry = await import('../../dist/server/entry.mjs')
+            if (!entry?.handler) throw new Error('No handler export found in dist/server/entry.mjs')
+            cached = entry.handler
+        }
+        return cached(req, res)
+    } catch (error) {
+        console.error('Failed to load handler from dist/server/entry.mjs:', error)
+        const isProd = process.env.NODE_ENV === 'production'
         const baseError = {
             error: 'INTERNAL_SERVER_ERROR',
             code: 'HANDLER_LOAD_FAILED',
             message: 'Failed to load the application handler. Please check build artifacts.',
-        };
-
-        const debugDetails =
-            !isProd && error && error.message
-                ? { details: String(error.message) }
-                : {};
-
-        res.status(500).json({
+        }
+        return res.status(500).json({
             ...baseError,
-            ...debugDetails,
-        });
-    };
+            ...(isProd ? {} : { details: String(error?.message || '') }),
+        })
+    }
 }
-
-export default handler

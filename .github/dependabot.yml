@@ -39,12 +39,9 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    # Security alerts only bypass batching
-    allow:
-      - dependency-type: "all"
     groups:
-      # Security patches - immediate action required
-      security-patches:
+      # Group all production patch updates for easier management
+      production-patches:
         dependency-type: "production"
         update-types:
           - "patch"
@@ -53,11 +50,15 @@ updates:
         dependency-type: "production"
         update-types:
           - "minor"
+      # Security patches for development dependencies
+      security-patches-dev:
+        dependency-type: "development"
+        update-types:
+          - "patch"
       development-dependencies:
         dependency-type: "development"
         update-types:
           - "minor"
-          - "patch"
       # Major versions - group separately for review
       major-updates:
         update-types:
@@ -80,9 +81,9 @@ updates:
       - "dependencies"
       - "python"
     groups:
-      # Security-critical Python packages
+      # Define security-critical Python packages once and reuse via YAML anchors
       security-patches:
-        patterns:
+        patterns: &security_python
           - "cryptography*"
           - "requests*"
           - "urllib3*"
@@ -90,20 +91,17 @@ updates:
           - "werkzeug*"
           - "jinja*"
           - "flask*"
+          - "certifi*"
+          - "setuptools*"
+          - "pyopenssl*"
+          - "idna*"
         update-types:
           - "patch"
       # Regular patches for other dependencies
       python-patches:
         patterns:
           - "*"
-        exclude-patterns:
-          - "cryptography*"
-          - "requests*"
-          - "urllib3*"
-          - "pyyaml*"
-          - "werkzeug*"
-          - "jinja*"
-          - "flask*"
+        exclude-patterns: *security_python
         update-types:
           - "patch"
       python-minor:

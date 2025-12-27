@@ -79,10 +79,8 @@ describe('notificationPreferences', () => {
       updatePreferences: mockUpdatePreferences,
     } as any)
 
-    const { container } = render(<NotificationPreferences />)
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(
-      0,
-    )
+    render(<NotificationPreferences />)
+    expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
   it('renders error state', () => {

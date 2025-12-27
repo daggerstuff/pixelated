@@ -100,7 +100,7 @@ export class MediaService {
       key: string
       lastModified: Date
       size: number
-      url: string
+      url: string | null
     }[]
   > {
     const params: AWS.S3.ListObjectsV2Request = {
@@ -131,10 +131,10 @@ export class MediaService {
             key: file.Key || '',
             lastModified: file.LastModified || new Date(),
             size: file.Size || 0,
-            url: '',
+            url: null,
           }
         }
-      })
+      }),
     )
   }
 
@@ -185,23 +185,11 @@ export class MediaService {
    * Build URL for file
    */
   private static buildUrl(key: string): string {
-    const region = process.env['OVH_REGION'] || 'us-east-1'
     const endpoint =
       process.env['OVH_ENDPOINT'] || 'https://s3.us-east-1.io.cloud.ovh.net'
 
     // Remove protocol from endpoint if present
     const cleanEndpoint = endpoint.replace(/^https?:\/\//, '')
-
-    // Validate required environment variables
-    if (!process.env['OVH_ACCESS_KEY_ID']) {
-      throw new Error('OVH_ACCESS_KEY_ID is required')
-    }
-    if (!process.env['OVH_SECRET_ACCESS_KEY']) {
-      throw new Error('OVH_SECRET_ACCESS_KEY is required')
-    }
-    if (!process.env['OVH_BUCKET_NAME']) {
-      throw new Error('OVH_BUCKET_NAME is required')
-    }
 
     return `https://${BUCKET_NAME}.${cleanEndpoint}/${key}`
   }

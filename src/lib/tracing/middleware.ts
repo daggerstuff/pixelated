@@ -38,7 +38,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
 
   // Determine if it's safe to access request headers
   // Some prerender/static contexts may provide a request object without usable headers
-  const canAccessHeaders = typeof (request as any)?.headers?.get === 'function'
+  const canAccessHeaders = 'headers' in request && typeof request.headers?.get === 'function'
 
   // Extract trace context from headers only if safe
   const traceParent = canAccessHeaders ? request.headers.get('traceparent') : null
