@@ -1,6 +1,5 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['ai/**/*.py', '**/*model*.py', '**/*inference*.py', '**/*training*.py']
+applyTo: 'ai/**/*.py,**/*model*.py,**/*inference*.py,**/*training*.py'
 ---
 
 # Python AI/ML Development Guidelines

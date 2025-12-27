@@ -1,6 +1,5 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/api/**/*.js', '**/api/**/*.ts', '**/api/**/*.py', '**/src/pages/api/**/*', '**/backend/**/*', '**/server/**/*']
+applyTo: '**/api/**/*.js,**/api/**/*.ts,**/api/**/*.py,**/src/pages/api/**/*,**/backend/**/*,**/server/**/*'
 ---
 
 # Backend API Development Guidelines
