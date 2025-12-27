@@ -186,13 +186,16 @@
     "cubent.mcp.enabled": true,
     "cubent.mcp.serverCreationEnabled": true,
     "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.shellIntegration.enabled": true,
     "terminal.integrated.automationProfile.linux": {
         "path": "/usr/bin/zsh"
     },
     "terminal.integrated.profiles.linux": {
         "zsh": {
             "path": "/usr/bin/zsh",
-            "args": []
+            "args": [
+                "-l"
+            ]
         },
         "bash": {
             "path": "/usr/bin/bash",
