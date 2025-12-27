@@ -1,55 +1,118 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Dependabot configuration for security updates and version management
+# Documentation: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
-- package-ecosystem: "github-actions"
-  directory: "/"
-  schedule:
-    interval: "weekly"
-  ignore:
-  - dependency-name: "github/copilot-review-action"
-  groups:
-    github-actions:
-      patterns:
-      - "*"
+  # GitHub Actions - Check for security updates weekly
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 5
+    pull-request-branch-name:
+      separator: "/"
+    ignore:
+      - dependency-name: "github/copilot-review-action"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"
 
-- package-ecosystem: "npm"
-  directory: "/"
-  schedule:
-    interval: "weekly"
-  open-pull-requests-limit: 10
-  groups:
-    production-dependencies:
-      dependency-type: "production"
-      update-types:
-      - "minor"
-      - "patch"
-    development-dependencies:
-      dependency-type: "development"
-      update-types:
-      - "minor"
-      - "patch"
-    major-updates:
-      update-types:
-      - "major"
+  # NPM/Node.js - Aggressive security update schedule
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "03:00"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "/"
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    # Security alerts only bypass batching
+    allow:
+      - dependency-type: "all"
+    groups:
+      # Security patches - immediate action required
+      security-patches:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+      # Minor version updates
+      production-minor:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      # Major versions - group separately for review
+      major-updates:
+        update-types:
+          - "major"
 
-- package-ecosystem: "pip"
-  directory: "/"
-  schedule:
-    interval: "weekly"
-  open-pull-requests-limit: 10
-  groups:
-    python-dependencies:
-      patterns:
-      - "*"
-      update-types:
-      - "minor"
-      - "patch"
-    python-major-updates:
-      patterns:
-      - "*"
-      update-types:
-      - "major"
+  # Python - Daily security updates
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "03:00"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "/"
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      # Security-critical Python packages
+      security-patches:
+        patterns:
+          - "cryptography*"
+          - "requests*"
+          - "urllib3*"
+          - "pyyaml*"
+          - "werkzeug*"
+          - "jinja*"
+          - "flask*"
+        update-types:
+          - "patch"
+      # Regular patches for other dependencies
+      python-patches:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "cryptography*"
+          - "requests*"
+          - "urllib3*"
+          - "pyyaml*"
+          - "werkzeug*"
+          - "jinja*"
+          - "flask*"
+        update-types:
+          - "patch"
+      python-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+      python-major-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
