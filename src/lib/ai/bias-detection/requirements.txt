@@ -63,4 +63,5 @@ tensorflow>=2.12.0  # Fixes SNYK-PYTHON-TENSORFLOW-1315149, SNYK-PYTHON-TENSORFL
 protobuf>=4.25.8  # Fixes SNYK-PYTHON-PROTOBUF-10364902
 tornado>=6.5.3  # Fixes CVE-2025-67726, CVE-2025-67725, CVE-2025-67724, CVE-2025-47287 (DoS and XSS vulnerabilities)
 filelock==3.20.1  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
+pillow>=10.2.0  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-PILLOW-6182918
 marshmallow>=3.26.2  # not directly required; pinned by Snyk to avoid a vulnerability
