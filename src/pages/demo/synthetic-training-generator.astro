@@ -673,11 +673,9 @@ const universityResults = [
   declare global {
     interface Window {
       gtag?: (
-        command: 'event',
-        action: string,
-        params: {
-          [key: string]: any
-        },
+        command: string,
+        event: string,
+        params: Record<string, unknown>,
       ) => void
     }
   }
@@ -690,8 +688,8 @@ const universityResults = [
         page_title: 'Synthetic Training Generator Demo',
         page_location: window.location.href,
         ab_variant:
-          document.querySelector('[data-variant]')?.dataset.variant ||
-          'unknown',
+          (document.querySelector('[data-variant]') as HTMLElement)?.dataset
+            ?.variant || 'unknown',
       })
     }
 
@@ -710,8 +708,8 @@ const universityResults = [
             demo_type: 'synthetic_training_generator',
             interaction_type: action,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset
+                ?.variant || 'unknown',
           })
         }
 
@@ -726,8 +724,8 @@ const universityResults = [
             timestamp: new Date().toISOString(),
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset
+                ?.variant || 'unknown',
           }),
         }).catch(console.error)
       })
@@ -783,8 +781,8 @@ const universityResults = [
             demo_type: 'synthetic_training_generator',
             scroll_depth: maxScroll,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset
+                ?.variant || 'unknown',
           })
         }
       }

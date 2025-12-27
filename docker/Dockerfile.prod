@@ -1,0 +1,51 @@
+# Production Dockerfile for Business Strategy CMS
+FROM node:20-alpine AS base
+
+# Install build dependencies for sharp and other native modules
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    libc6-compat \
+    vips-dev
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install pnpm
+RUN npm install -g pnpm@10.26.1
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN pnpm run build:production || echo "No build step needed"
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S pixelated -u 1001
+
+# Set up SSL certificates directory
+RUN mkdir -p /app/ssl
+
+# Set permissions
+RUN chown -R pixelated:nodejs /app
+
+# Switch to non-root user
+USER pixelated
+
+# Expose ports
+EXPOSE 3000 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Start command
+CMD ["node", "dist/server.prod.js"]
