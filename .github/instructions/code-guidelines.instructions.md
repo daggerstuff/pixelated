@@ -1,5 +1,5 @@
 ---
-inclusion: always
+applyTo: '**'
 ---
 
 # Pixelated Empathy Code Guidelines

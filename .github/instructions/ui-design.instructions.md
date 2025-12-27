@@ -1,6 +1,5 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/*.tsx', '**/*.jsx', '**/*.astro', '**/components/**/*', '**/ui/**/*']
+applyTo: '**/*.tsx,**/*.jsx,**/*.astro,**/components/**/*,**/ui/**/*'
 ---
 
 # UI/UX Design Guidelines for Pixelated Empathy
