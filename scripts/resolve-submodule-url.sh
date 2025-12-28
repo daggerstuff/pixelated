@@ -55,12 +55,22 @@ fi
 # Update git config for this repo only to override submodule URL
 # This avoids modifying .gitmodules and keeps it clean for developers
 
+
+# 1. Sync first to ensure local config matches .gitmodules (resets structure)
+git submodule sync
+
+# 2. Initialize to ensure submodule entries exist in .git/config
+# This copies from .gitmodules, but we'll override it next
+git submodule init
+
+# 3. Apply the CONDITIONAL override to .git/config
+# (SUBMODULE_URL was determined by the if/else block above)
 git config submodule."$SUBMODULE_PATH".url "$SUBMODULE_URL"
 
-echo "Submodule URL overridden to: $SUBMODULE_URL"
+echo "Submodule URL successfully updated in .git/config to: $SUBMODULE_URL"
 
-echo "Running: git submodule sync && git submodule update --init --recursive"
-git submodule sync
-git submodule update --init --recursive
+# 4. Update (fetch & checkout) using the validated URL
+echo "Running: git submodule update --recursive"
+git submodule update --recursive
 
 echo "✅ Submodule initialization complete"
