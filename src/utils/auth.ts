@@ -143,23 +143,20 @@ export async function verifyAuthToken(
   authHeaderOrToken: string | null,
 ): Promise<AuthInfo> {
   if (process.env.NODE_ENV !== 'production') {
-    if (process.env.ALLOW_AUTH_DISABLE === 'true') {
-      return {
-        userId: 'test-user-id',
-        role: 'user',
-        session: 'test-session',
+      if (process.env.ALLOW_AUTH_DISABLE === 'true') {
+        return {
+          userId: 'test-user-id',
+          role: 'user',
+          session: 'test-session',
+        }
       }
     }
-  } else {
-    if (
-      process.env.DISABLE_AUTH === 'true' ||
-      process.env.ALLOW_AUTH_DISABLE === 'true'
-    ) {
-      throw new Error(
-        'Auth disabling is not permitted in production. Remove DISABLE_AUTH/ALLOW_AUTH_DISABLE from production environment.',
-      )
-    }
-  }
+  else if (process.env.DISABLE_AUTH === 'true' ||
+        process.env.ALLOW_AUTH_DISABLE === 'true') {
+        throw new Error(
+          'Auth disabling is not permitted in production. Remove DISABLE_AUTH/ALLOW_AUTH_DISABLE from production environment.',
+        )
+      }
 
   if (!authHeaderOrToken || typeof authHeaderOrToken !== 'string') {
     throw new Error('Invalid or missing authorization token')
@@ -236,7 +233,7 @@ export async function getSessionFromRequest(
     }
 
     return { user, session }
-  } catch (_err) {
+  } catch (_error) {
     return null
   }
 }

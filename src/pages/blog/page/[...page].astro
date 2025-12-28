@@ -1,22 +1,41 @@
 ---
-import { getCollection } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
 
-export const prerender = true
+// Disabled prerender due to Astro.request.headers usage in BaseLayout
+// export const prerender = true
 
 export async function getStaticPaths() {
   // Define paginate helper (must be in scope for this function)
   function paginate(data: any[], options: { pageSize: number }) {
-    const { pageSize } = options
-    const totalPages = Math.ceil(data.length / pageSize)
-    const pages = []
-    let i = 0
+    const { pageSize } = options;
+    const totalPages = Math.ceil(data.length / pageSize);
+    const pages: Array<{
+      params: { page: string };
+      props: {
+        page: {
+          data: any[];
+          currentPage: number;
+          lastPage: number;
+          size: number;
+          total: number;
+          url: {
+            current: string;
+            prev: string | undefined;
+            next: string | undefined;
+          };
+        };
+      };
+    }> = [];
+    let i = 0;
     while (i !== totalPages) {
-      const start = i * pageSize
-      const end = start + pageSize
-      const isNotFirst = i !== 0
-      const isNotLast = i !== totalPages - 1
-      pages.push({
+      const start = i * pageSize;
+      const end = start + pageSize;
+      const isNotFirst = i !== 0;
+      const isNotLast = i !== totalPages - 1;
+      
+      // Create page object with proper structure
+      const pageObj = {
         params: { page: (i + 1).toString() },
         props: {
           page: {
@@ -32,47 +51,49 @@ export async function getStaticPaths() {
             },
           },
         },
-      })
-      i++
+      };
+      
+      pages.push(pageObj);
+      i++;
     }
-    return pages
+    return pages;
   }
 
   // Get all blog posts
-  const posts = await getCollection('blog', (entry: any) => {
-    return import.meta.env.PROD ? !entry.data.draft : true
-  })
+  const posts = await getCollection("blog", (entry: any) => {
+    return import.meta.env.PROD ? !entry.data.draft : true;
+  });
 
   // Sort by date - newest first
   const sortedPosts = posts.sort((postA: any, postB: any) => {
-    return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf()
-  })
+    return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf();
+  });
 
   // Generate pagination paths
-  return paginate(sortedPosts, { pageSize: 20 })
+  return paginate(sortedPosts, { pageSize: 20 });
 }
 
-const { page } = Astro.props
+const { page } = Astro.props;
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 function getReadingTime(content: string) {
-  const wordsPerMinute = 200
-  const words = content.split(/\s+/).length
-  const minutes = Math.ceil(words / wordsPerMinute)
-  return `${minutes} min read`
+  const wordsPerMinute = 200;
+  const words = content.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
 }
 
 const title =
-  page.currentPage === 1 ? 'All Posts' : `All Posts - Page ${page.currentPage}`
+  page.currentPage === 1 ? "All Posts" : `All Posts - Page ${page.currentPage}`;
 const description =
-  'All articles about therapy, technology, and digital empathy'
+  "All articles about therapy, technology, and digital empathy";
 ---
 
 <BaseLayout {title} {description}>

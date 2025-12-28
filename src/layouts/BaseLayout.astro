@@ -27,10 +27,25 @@ interface Props {
   bgType?: BgType | false;
   pubDate?: string;
   lastModDate?: string;
+  pathname?: string;
+  showNavBar?: boolean;
+  showFooter?: boolean;
 }
 
-const { title, description, ogImage, bgType, pubDate, lastModDate } =
-  Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  bgType,
+  pubDate,
+  lastModDate,
+  pathname,
+  showNavBar = true,
+  showFooter = true
+} = Astro.props;
+
+// Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
+const currentPathname = pathname || Astro.url.pathname;
 
 let style: Record<string, string> = {};
 
@@ -95,7 +110,7 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
     </Link>
 
     <!-- Nav Bar -->
-    <Navbar />
+    {showNavBar && <Navbar />}
 
     <!-- Main -->
     <main id="main" class="flex-grow w-full px-7 py-10 pt-24">
@@ -103,7 +118,7 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
       <slot />
       <!-- Share -->
       {
-        Astro.url.pathname !== withBasePath("/") && (
+        currentPathname !== withBasePath("/") && (
           <footer class="slide-enter animate-delay-1000! prose mx-auto mt-8 print:hidden">
             <slot name="share" />
             <br />
@@ -116,8 +131,12 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
     </main>
 
     <!-- Footer -->
-    <Footer />
-    <ToTopButton />
+    {showFooter && (
+      <>
+        <Footer />
+        <ToTopButton />
+      </>
+    )}
 
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />

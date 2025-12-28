@@ -24,7 +24,7 @@
     "dev:websocket": "tsx src/server.ts",
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\" \"pnpm dev:training-server\" \"pnpm dev:websocket\"",
     "setup:dev": "./scripts/setup-dev.sh",
-    "build": "astro build",
+    "build": "node scripts/build-with-pipe-handling.mjs",
     "build:vercel": "bash scripts/build-vercel.sh",
     "vercel-build": "bash scripts/build-vercel.sh",
     "build:cloudflare": "bash scripts/build-cloudflare.sh",

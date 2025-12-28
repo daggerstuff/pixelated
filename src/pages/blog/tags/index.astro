@@ -1,40 +1,40 @@
 ---
-import { getCollection } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import type { CollectionEntry } from 'astro:content'
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
-export const prerender = true
+export const prerender = false;
 
 // Get all blog posts that are not drafts
 const posts = await getCollection(
-  'blog',
+  "blog",
   ({ data }: { data: { draft?: boolean } }) => {
-    return import.meta.env.PROD ? !data.draft : true
+    return import.meta.env.PROD ? !data.draft : true;
   },
-)
+);
 
 // Extract all tags and count their occurrences
 const tagCounts = posts.reduce(
-  (acc: Record<string, number>, post: CollectionEntry<'blog'>) => {
-    if (!post.data.tags) return acc
+  (acc: Record<string, number>, post: CollectionEntry<"blog">) => {
+    if (!post.data.tags) return acc;
 
     post.data.tags.forEach((tag: string) => {
-      acc[tag] = (acc[tag] || 0) + 1
-    })
+      acc[tag] = (acc[tag] || 0) + 1;
+    });
 
-    return acc
+    return acc;
   },
   {} as Record<string, number>,
-)
+);
 
 // Convert to array, sort alphabetically
 const sortedTags = Object.entries(tagCounts)
   .sort((a, b) => a[0].localeCompare(b[0]))
-  .map(([tag, count]) => ({ tag, count }))
+  .map(([tag, count]) => ({ tag, count }));
 
-const title = 'Blog Tags'
-const description = 'Browse all blog tags'
-const bgType = 'rose'
+const title = "Blog Tags";
+const description = "Browse all blog tags";
+const bgType = "rose";
 ---
 
 <BaseLayout {title} {description} {bgType}>
@@ -63,7 +63,7 @@ const bgType = 'rose'
                 #{tag}
               </h3>
               <span class="text-sm text-slate-400">
-                {count} post{count !== 1 ? 's' : ''}
+                {count} post{count !== 1 ? "s" : ""}
               </span>
             </div>
             <p class="text-sm text-slate-400">Explore articles about {tag}</p>
