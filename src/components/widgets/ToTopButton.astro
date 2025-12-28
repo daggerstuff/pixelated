@@ -9,34 +9,65 @@
     op-0 pointer-events-none op-transition
     lt-lgp:(op-50! bg-#8883 dark:bg-#8886 pointer-events-auto!)
     hover:(op-100! bg-#8883) print:hidden"
+  aria-label="Scroll to top"
   title="Scroll to top"
+  tabindex="-1"
+  aria-hidden="true"
 >
   <div u-i-ri-arrow-up-line></div>
 </button>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    const handleClick = () => {
-      window.scrollTo({ top: 0 })
-    }
-    const toTopButton = document.getElementById('to-top-button')
-    toTopButton?.addEventListener('click', handleClick)
-  })
-
+  // Handle visibility and accessibility logic
   const handleScroll = () => {
     const scrollThreshold = 300
     const toTopButton = document.getElementById('to-top-button')
+    if (!toTopButton) return
 
-    if (toTopButton && window.matchMedia('(min-width: 1024px)').matches) {
+    // On desktop, show button only after scrolling
+    if (window.matchMedia('(min-width: 1024px)').matches) {
       const scrollY = window.scrollY || document.documentElement.scrollTop
       if (scrollY <= scrollThreshold) {
+        // Hidden state
         toTopButton.style.opacity = '0'
         toTopButton.style.pointerEvents = 'none'
+        toTopButton.setAttribute('tabindex', '-1')
+        toTopButton.setAttribute('aria-hidden', 'true')
       } else {
+        // Visible state
         toTopButton.style.opacity = '0.3'
         toTopButton.style.pointerEvents = 'auto'
+        toTopButton.setAttribute('tabindex', '0')
+        toTopButton.setAttribute('aria-hidden', 'false')
       }
+    } else {
+      // On mobile, reset to CSS defaults (which are visible)
+      // Remove inline styles so CSS classes take over
+      toTopButton.style.opacity = ''
+      toTopButton.style.pointerEvents = ''
+      // Reset accessibility attributes to visible state
+      toTopButton.setAttribute('tabindex', '0')
+      toTopButton.setAttribute('aria-hidden', 'false')
     }
   }
-  window.addEventListener('scroll', handleScroll)
+
+  // Set up event listeners
+  document.addEventListener('astro:page-load', () => {
+    const toTopButton = document.getElementById('to-top-button')
+
+    // Add click handler
+    if (toTopButton) {
+      toTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    }
+
+    // Initialize state on load
+    handleScroll()
+  })
+
+  // Listen for scroll and resize events globally
+  // (These persist across View Transitions in SPA mode, which is fine)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleScroll, { passive: true })
 </script>
