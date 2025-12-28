@@ -192,18 +192,6 @@
     },
     "terminal.integrated.env.linux": {
         "FIG_DISABLE": "1"
-    },
-    "terminal.integrated.profiles.linux": {
-        "zsh": {
-            "path": "/usr/bin/zsh",
-            "args": []
-                "-l"
-        ]
-    },
-    "bash": {
-        "path": "/usr/bin/bash",
-        "args": []
-    }
 },
 "python.languageServer": "None",
 "sonarlint.connectedMode.project": {

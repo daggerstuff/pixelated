@@ -6,7 +6,6 @@
  */
 
 import { test } from '@playwright/test'
-import type { ConsoleMessage } from '@playwright/test'
 
 import {
   TEST_PAGES,

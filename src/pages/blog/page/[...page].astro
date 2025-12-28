@@ -2,8 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-// Disabled prerender due to Astro.request.headers usage in BaseLayout
-// export const prerender = true
+export const prerender = true
 
 export async function getStaticPaths() {
   // Define paginate helper (must be in scope for this function)

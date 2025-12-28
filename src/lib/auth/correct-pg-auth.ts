@@ -18,7 +18,7 @@ const pool = new Pool({
 });
 
 // Test the connection
-pool.query('SELECT NOW()', (err, res) => {
+pool.query('SELECT NOW()', (err) => {
   if (err) {
     console.error('❌ PostgreSQL connection failed:', err);
   } else {
