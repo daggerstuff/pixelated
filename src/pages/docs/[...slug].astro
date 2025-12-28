@@ -2,8 +2,7 @@
 import BlogPostLayout from "@/layouts/BlogPostLayout.astro";
 import { getCollection, render, type CollectionEntry } from "astro:content";
 
-// Disable prerendering to allow use of Astro.request/url in components
-// export const prerender = true;
+export const prerender = true;
 
 export async function getStaticPaths() {
   const docs = await getCollection("docs");

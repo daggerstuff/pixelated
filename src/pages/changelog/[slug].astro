@@ -9,9 +9,7 @@ import { formatDate } from "@/utils/datetime";
 import type { CollectionEntry } from "astro:content";
 import { getCollection, render } from "astro:content";
 
-// Disable prerendering to allow use of Astro.request/url in components
-// Set prerender to true to generate static pages at build time
-// export const prerender = true;
+export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getCollection("changelog");

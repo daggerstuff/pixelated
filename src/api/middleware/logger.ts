@@ -82,8 +82,8 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
 async function logAuditEvent(
     req: Request,
     res: Response,
-    requestId: string,
-    duration: number
+    _requestId: string,
+    _duration: number
 ) {
     try {
         const pool = getPostgresPool()
