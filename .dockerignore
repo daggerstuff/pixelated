@@ -187,6 +187,7 @@ clusters/
 scripts/
 !scripts/setup-dev.sh
 !scripts/build-*.sh
+!scripts/build-with-pipe-handling.mjs
 !scripts/create-prod-package.js
 !scripts/utils/start-server.mjs
 
