@@ -11,7 +11,7 @@ SUBMODULE_URL_GITHUB="https://github.com/pixelatedempathy/ai.git"
 SUBMODULE_URL_AZURE="https://dev.azure.com/pixeljump/_git/ai"
 
 # Detect environment: if AZURE_DEVOPS_PIPELINE is set, use Azure URL
-if [[ -n "$AZURE_DEVOPS_PIPELINE" ]]; then
+if [[ "${AZURE_DEVOPS_PIPELINE:-}" == "true" ]]; then
   echo "Detected Azure DevOps pipeline environment. Using Azure submodule URL."
   SUBMODULE_URL="$SUBMODULE_URL_AZURE"
 else

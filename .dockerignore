@@ -188,6 +188,7 @@ scripts/
 !scripts/setup-dev.sh
 !scripts/build-*.sh
 !scripts/create-prod-package.js
+!scripts/utils/start-server.mjs
 
 # Tools and utilities
 tools/
