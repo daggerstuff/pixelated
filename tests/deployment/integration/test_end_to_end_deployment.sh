@@ -143,7 +143,7 @@ case "$1" in
         exit 0
         ;;
     "push")
-        echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
+        echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
         echo "latest: digest: sha256:mock-digest size: 1234"
         exit 0
         ;;

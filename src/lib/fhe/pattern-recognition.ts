@@ -1,131 +1,98 @@
 /**
- * Pattern Recognition Types for FHE-based analysis
+ * Pattern Recognition Shared Types
  *
- * This module provides types and interfaces for pattern recognition
- * that can be used with FHE (Fully Homomorphic Encryption) services.
+ * This module defines core, extensible interfaces describing analytic patterns
+ * used throughout FHE (Fully Homomorphic Encryption)-enabled analytics systems.
+ * All interfaces are intended for cross-cutting feature support by any future
+ * AI, analytics, or reporting capabilities in Pixelated Empathy, ensuring strong
+ * type safety, discoverability, and maintainability.
+ *
+ * - Strictly for type definitions and documentation; contains no runtime logic.
+ * - All interfaces are exported for shared use.
+ * - Extend via interface extension or augmentation for domain-specific analytics.
  */
 
 /**
- * Trend pattern detected over time
+ * Describes a recurring analytic trend detected within a dataset or session group.
+ * Suitable for time-series, behavioral, or outcome trends.
  */
 export interface TrendPattern {
+  /**
+   * Unique, stable identifier for this analytic pattern instance.
+   */
   id: string
-  type: string
-  startDate: Date
-  endDate: Date
-  confidence: number
-  indicators: string[]
+
+  /**
+   * Human-readable summary describing the nature or significance of the pattern.
+   * Suggests typical cause, outcome, or interpretation.
+   */
   description: string
-  significance?: number
-  emotionTypes?: string[]
+
+  /**
+   * List of metric names, factors, or signals that indicate this pattern's presence.
+   * E.g. ["spike", "deviation", "sentiment_shift"]
+   */
+  indicators: string[]
+
+  /**
+   * Optional: Additional free-form metadata for extensibility.
+   */
+  [key: string]: unknown
 }
 
 /**
- * Pattern detected across multiple sessions
+ * Represents a pattern or motif discovered by analyzing across multiple distinct sessions.
+ * Useful for persistent behaviors, treatment effects, or cross-participant signals.
  */
 export interface CrossSessionPattern {
+  /**
+   * Globally unique identifier for this pattern instance.
+   */
   id: string
-  type: string
-  confidence: number
-  sessions: string[]
+
+  /**
+   * General description of what links the sessions in this cross-session pattern.
+   */
   description: string
-  significance?: number
-  strength?: number
-  categories?: string[]
+
+  /**
+   * List of unique session identifiers involved in this pattern.
+   */
+  sessionIds: string[]
+
+  /**
+   * The timespan in whole days encompassing all related sessions.
+   */
+  timeSpanDays: number
+
+  /**
+   * Optional: Extensible field for future multi-session attributes.
+   */
+  [key: string]: unknown
 }
 
 /**
- * Risk factor correlation
+ * Captures a detected correlation between features or events and a risk indicator.
+ * Used for risk modeling, alerting, or analytics.
  */
 export interface RiskCorrelation {
+  /**
+   * Unique identifier for this risk-correlation instance.
+   */
   id: string
-  riskFactor: string
-  correlatedFactors: {
-    factor: string
-    strength: number
-  }[]
-  confidence: number
-  significance: string
-  severityScore: number
-  description?: string
+
+  /**
+   * Description of the risk, trigger, or statistical relation detected.
+   */
+  description: string
+
+  /**
+   * Relative strength or confidence of the correlation, normalized (e.g. -1.0 to 1.0 or 0-1).
+   */
+  strength: number
+
+  /**
+   * Optional: Room for domain-specific confidence, p-value, or reference attributions.
+   */
+  [key: string]: unknown
 }
-
-/**
- * Encrypted pattern data
- */
-export interface EncryptedPattern {
-  id: string
-  encryptedData: string
-  metadata: {
-    timestamp: number
-    patternType: string
-  }
-}
-
-/**
- * Encrypted analysis data
- */
-export interface EncryptedAnalysis {
-  id: string
-  encryptedData: string
-  metadata: {
-    timestamp: number
-    analysisType: string
-  }
-}
-
-/**
- * Encrypted correlation data
- */
-export interface EncryptedCorrelation {
-  id: string
-  encryptedData: string
-  metadata: {
-    timestamp: number
-    correlationType: string
-  }
-}
-
-/**
- * Interface for pattern recognition operations
- */
-export interface PatternRecognitionOps {
-  processPatterns(
-    dataPoints: unknown[],
-    options: {
-      windowSize: number
-      minPoints: number
-      threshold: number
-    },
-  ): Promise<EncryptedPattern[]>
-
-  decryptPatterns(
-    encryptedPatterns: EncryptedPattern[],
-  ): Promise<TrendPattern[]>
-
-  analyzeCrossSessions(
-    sessions: unknown[],
-    confidenceThreshold: number,
-  ): Promise<EncryptedAnalysis>
-
-  decryptCrossSessionAnalysis(
-    encryptedAnalysis: EncryptedAnalysis,
-  ): Promise<CrossSessionPattern[]>
-
-  processRiskCorrelations(
-    analyses: unknown[],
-    riskFactorWeights: Record<string, number>,
-  ): Promise<EncryptedCorrelation[]>
-
-  decryptRiskCorrelations(
-    encryptedCorrelations: EncryptedCorrelation[],
-  ): Promise<RiskCorrelation[]>
-}
-
-// Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });

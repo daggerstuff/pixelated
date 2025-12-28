@@ -10,18 +10,17 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-  - hosts:
-    - staging.pixelatedempathy.tech
-    secretName: pixelated-staging-tls
+    - hosts:
+        - staging.pixelatedempathy.com
+      secretName: pixelated-staging-tls
   rules:
-  - host: staging.pixelatedempathy.tech
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
-
+    - host: staging.pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80
