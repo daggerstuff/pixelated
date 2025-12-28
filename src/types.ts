@@ -1,7 +1,7 @@
 /* SITE */
 import type { IncomingMessage } from 'node:http'
 import type { Socket } from 'node:net'
-import type { AuthUser } from './lib/auth'
+import type { AuthUser } from './lib/auth/types'
 import type { AuthRole } from './config/auth.config'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 

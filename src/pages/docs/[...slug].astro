@@ -1,27 +1,28 @@
 ---
-import { getCollection, type CollectionEntry, render } from 'astro:content'
-import BlogPostLayout from '@/layouts/BlogPostLayout.astro'
+import BlogPostLayout from "@/layouts/BlogPostLayout.astro";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 
-export const prerender = true
+// Disable prerendering to allow use of Astro.request/url in components
+// export const prerender = true;
 
 export async function getStaticPaths() {
-  const docs = await getCollection('docs')
+  const docs = await getCollection("docs");
   return docs
-    .filter((doc: CollectionEntry<'docs'>) => !doc.data.draft)
-    .map((doc: CollectionEntry<'docs'>) => ({
+    .filter((doc: CollectionEntry<"docs">) => !doc.data.draft)
+    .map((doc: CollectionEntry<"docs">) => ({
       params: { slug: doc.data.slug || doc.slug },
       props: { entry: doc },
-    }))
+    }));
 }
 
 interface Props {
-  entry: CollectionEntry<'docs'>
+  entry: CollectionEntry<"docs">;
 }
 
-const { entry } = Astro.props
-const { Content } = await render(entry)
+const { entry } = Astro.props;
+const { Content } = await render(entry);
 ---
 
-<BlogPostLayout {entry}>
+<BlogPostLayout {entry} basePath="docs">
   <Content />
 </BlogPostLayout>

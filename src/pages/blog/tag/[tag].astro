@@ -1,58 +1,57 @@
 ---
-import { getCollection } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import PostCard from '@/components/blog/PostCard.astro'
-import type { CollectionEntry } from 'astro:content'
+import PostCard from "@/components/blog/PostCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
-// Add prerender directive to generate static HTML during build
-export const prerender = true
+export const prerender = false;
 
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection(
-    'blog',
-    ({ data }: CollectionEntry<'blog'>['data']) => {
-      return import.meta.env.PROD ? data.pubDate <= new Date() : true
+    "blog",
+    ({ data }: CollectionEntry<"blog">["data"]) => {
+      return import.meta.env.PROD ? data.pubDate <= new Date() : true;
     },
-  )
+  );
 
   // Get all unique tags
   const allTags = [
     ...new Set(
       allBlogPosts.flatMap(
-        (post: CollectionEntry<'blog'>) => post.data?.tags ?? [],
+        (post: CollectionEntry<"blog">) => post.data?.tags ?? [],
       ),
     ),
-  ]
+  ];
 
   // Create a path for each tag
   return allTags.map((tag) => ({
     params: { tag },
     props: { tag },
-  }))
+  }));
 }
 
-const { tag } = Astro.props
+const { tag } = Astro.props;
 
 // Get all posts with this tag
 const allBlogPosts = await getCollection(
-  'blog',
-  ({ data }: CollectionEntry<'blog'>['data']) => {
-    return import.meta.env.PROD ? data.pubDate <= new Date() : true
+  "blog",
+  ({ data }: CollectionEntry<"blog">["data"]) => {
+    return import.meta.env.PROD ? data.pubDate <= new Date() : true;
   },
-)
+);
 
 // Sort by date (newest first)
-const posts: CollectionEntry<'blog'>[] = allBlogPosts
-  .filter((post: CollectionEntry<'blog'>) => post.data.tags?.includes(tag))
-  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
+const posts: CollectionEntry<"blog">[] = allBlogPosts
+  .filter((post: CollectionEntry<"blog">) => post.data.tags?.includes(tag))
+  .sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => {
     return (
       new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-    )
-  })
+    );
+  });
 
 // Create page title and description
-const title = `#${tag} | Blog`
-const description = `Articles tagged with #${tag} - Explore insights and guides on this topic.`
+const title = `#${tag} | Blog`;
+const description = `Articles tagged with #${tag} - Explore insights and guides on this topic.`;
 ---
 
 <BaseLayout {title} {description}>
@@ -60,7 +59,7 @@ const description = `Articles tagged with #${tag} - Explore insights and guides 
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold text-white">Tagged: #{tag}</h1>
       <p class="text-lg text-slate-400 mt-2">
-        {posts.length} post{posts.length !== 1 ? 's' : ''} found
+        {posts.length} post{posts.length !== 1 ? "s" : ""} found
       </p>
     </div>
     <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

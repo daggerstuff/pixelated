@@ -1,5 +1,4 @@
 import {
-  initializeDatabase,
   userManager,
   sessionManager,
   biasAnalysisManager,

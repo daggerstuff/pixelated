@@ -1,62 +1,62 @@
 ---
-import { getCollection, type CollectionEntry, render } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import Badge from '@/components/ui/Badge.astro'
-import { Button } from '@/components/ui/button'
-import Card from '@/components/ui/Card.astro'
-import CardContent from '@/components/ui/CardContent.astro'
-import CardDescription from '@/components/ui/CardDescription.astro'
-import CardHeader from '@/components/ui/CardHeader.astro'
-import CardTitle from '@/components/ui/CardTitle.astro'
+import { getCollection, type CollectionEntry, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Badge from "@/components/ui/Badge.astro";
+import { Button } from "@/components/ui/button";
+import Card from "@/components/ui/Card.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
 
-export const prerender = true
+export const prerender = false;
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog')
+  const posts = await getCollection("blog");
   return posts
-    .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
-    .map((post: CollectionEntry<'blog'>) => ({
+    .filter((post: CollectionEntry<"blog">) => !post.data.draft)
+    .map((post: CollectionEntry<"blog">) => ({
       params: { slug: post.data.slug || post.slug },
       props: { entry: post },
-    }))
+    }));
 }
 
-const { entry } = Astro.props
-const { Content } = await render(entry)
+const { entry } = Astro.props;
+const { Content } = await render(entry);
 
 // Get related posts (same category or tags)
 const allPosts = await getCollection(
-  'blog',
-  ({ data }: CollectionEntry<'blog'>) => !data.draft,
-)
+  "blog",
+  ({ data }: CollectionEntry<"blog">) => !data.draft,
+);
 
 const relatedPosts = allPosts
   .filter(
-    (p: CollectionEntry<'blog'>) =>
+    (p: CollectionEntry<"blog">) =>
       p.id !== entry.id && // Not the current post
       (p.data.category === entry.data.category || // Same category
         p.data.tags?.some((tag: string) => entry.data.tags?.includes(tag))), // Shared tags
   )
   .sort(() => Math.random() - 0.5) // Randomize
-  .slice(0, 3) // Get up to 3 related posts
+  .slice(0, 3); // Get up to 3 related posts
 
 // Category color mapping
 const categoryColors: Record<string, string> = {
-  'AI Training': 'cyan',
-  'Clinical Practice': 'green',
-  'Student Success': 'blue',
-  'Technology': 'purple',
-  'Research': 'orange',
-  'University Spotlight': 'red',
-}
+  "AI Training": "cyan",
+  "Clinical Practice": "green",
+  "Student Success": "blue",
+  Technology: "purple",
+  Research: "orange",
+  "University Spotlight": "red",
+};
 
 const categoryColor =
-  categoryColors[entry.data.category as keyof typeof categoryColors] || 'gray'
+  categoryColors[entry.data.category as keyof typeof categoryColors] || "gray";
 
 // Reading time calculation (rough estimate)
-const wordsPerMinute = 200
-const wordCount = entry.body?.split(/\s+/).length || 0
-const readingTime = Math.ceil(wordCount / wordsPerMinute)
+const wordsPerMinute = 200;
+const wordCount = entry.body?.split(/\s+/).length || 0;
+const readingTime = Math.ceil(wordCount / wordsPerMinute);
 ---
 
 <BaseLayout
@@ -225,7 +225,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {relatedPosts.map((post: CollectionEntry<'blog'>) => (
+                {relatedPosts.map((post: CollectionEntry<"blog">) => (
                   <Card class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
                     <CardHeader class="pb-4">
                       {post.data.image && (
@@ -418,7 +418,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
   }
 
   .organic-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     left: -50%;
@@ -519,89 +519,89 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
 <script>
   // Track blog post interactions
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     // Handle navigation buttons
-    document.querySelectorAll('[data-back-button]').forEach((button) => {
-      button.addEventListener('click', () => {
-        window.history.back()
-      })
-    })
+    document.querySelectorAll("[data-back-button]").forEach((button) => {
+      button.addEventListener("click", () => {
+        window.history.back();
+      });
+    });
 
-    document.querySelectorAll('[data-demo-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement
-        const link = target?.dataset['demoLink']
+    document.querySelectorAll("[data-demo-link]").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const link = target?.dataset["demoLink"];
         if (link) {
-          window.location.href = link
+          window.location.href = link;
         }
-      })
-    })
+      });
+    });
 
-    document.querySelectorAll('[data-blog-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement
-        const link = target?.dataset['blogLink']
+    document.querySelectorAll("[data-blog-link]").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const link = target?.dataset["blogLink"];
         if (link) {
-          window.location.href = link
+          window.location.href = link;
         }
-      })
-    })
+      });
+    });
 
     // Track page view
-    if (typeof (window as any).gtag !== 'undefined') {
-      ;(window as any).gtag('event', 'page_view', {
+    if (typeof (window as any).gtag !== "undefined") {
+      (window as any).gtag("event", "page_view", {
         page_title: document.title,
         page_location: window.location.href,
-        content_type: 'blog_post',
-      })
+        content_type: "blog_post",
+      });
     }
 
     // Track reading progress
-    let maxScroll = 0
-    window.addEventListener('scroll', () => {
+    let maxScroll = 0;
+    window.addEventListener("scroll", () => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100,
-      )
+      );
       if (scrollPercent > maxScroll) {
-        maxScroll = scrollPercent
+        maxScroll = scrollPercent;
 
         if (
           maxScroll % 25 === 0 &&
-          typeof (window as any).gtag !== 'undefined'
+          typeof (window as any).gtag !== "undefined"
         ) {
-          ;(window as any).gtag('event', 'blog_reading_progress', {
+          (window as any).gtag("event", "blog_reading_progress", {
             article_title: document.title,
             scroll_depth: maxScroll,
-          })
+          });
         }
       }
-    })
+    });
 
     // Track CTA clicks
-    document.querySelectorAll('button').forEach((button) => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement
-        if (typeof (window as any).gtag !== 'undefined') {
-          ;(window as any).gtag('event', 'blog_cta_click', {
+    document.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (typeof (window as any).gtag !== "undefined") {
+          (window as any).gtag("event", "blog_cta_click", {
             article_title: document.title,
-            cta_text: target?.textContent || '',
-          })
+            cta_text: target?.textContent || "",
+          });
         }
-      })
-    })
+      });
+    });
 
     // Track related post clicks
     document.querySelectorAll('a[href*="/blog/"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement
-        if (typeof (window as any).gtag !== 'undefined') {
-          ;(window as any).gtag('event', 'related_post_click', {
+      link.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (typeof (window as any).gtag !== "undefined") {
+          (window as any).gtag("event", "related_post_click", {
             current_article: document.title,
-            clicked_article: target?.textContent || '',
-          })
+            clicked_article: target?.textContent || "",
+          });
         }
-      })
-    })
-  })
+      });
+    });
+  });
 </script>
