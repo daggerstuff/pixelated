@@ -73,6 +73,11 @@ RUN ( \
 
 # Copy source and run the build
 COPY . .
+
+# Copy required server and instrumentation files into builder context
+COPY scripts/utils/start-server.mjs /app/start-server.mjs
+COPY config/instrument.mjs /app/instrument.mjs
+
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size

@@ -1,22 +1,5 @@
 {
   "version": 2,
   "installCommand": "corepack enable && corepack prepare pnpm@10.26.2 --activate && pnpm install --frozen-lockfile",
-  "buildCommand": "bash scripts/build-vercel.sh",
-  "builds": [
-    {
-      "src": "deploy/vercel/vercel-handler.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "dist/**"
-        ]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/deploy/vercel/vercel-handler.js"
-    }
-  ]
+  "buildCommand": "pnpm build"
 }
