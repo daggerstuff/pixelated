@@ -4,7 +4,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
-export const prerender = false;
+export const prerender = true;
 
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection(

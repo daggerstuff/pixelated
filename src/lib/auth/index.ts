@@ -167,7 +167,7 @@ export async function getAuthHealth(): Promise<{
       status: allHealthy ? 'healthy' : 'degraded',
       details,
     }
-  } catch (_error) {
+  } catch {
     return {
       status: 'unhealthy',
       details: {

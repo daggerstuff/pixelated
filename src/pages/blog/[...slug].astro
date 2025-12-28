@@ -9,7 +9,7 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardHeader from "@/components/ui/CardHeader.astro";
 import CardTitle from "@/components/ui/CardTitle.astro";
 
-export const prerender = false;
+export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");

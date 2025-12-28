@@ -85,7 +85,7 @@ export class APITestUtils {
     })
 
     if (response.ok) {
-      const data = await response.json()
+      const _data = await response.json()
       const loginResponse = await fetch(`${this.baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
