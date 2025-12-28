@@ -1,0 +1,17 @@
+[Unit]
+Description=Pixelated Empathy Bias Detection Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/pixel/src/lib/ai/bias-detection
+ExecStart=/bin/bash /root/pixel/src/lib/ai/bias-detection/start_bias_detection_service.sh
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bias-detection
+
+[Install]
+WantedBy=multi-user.target

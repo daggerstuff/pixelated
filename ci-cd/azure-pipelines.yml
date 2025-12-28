@@ -206,13 +206,16 @@ stages:
         steps:
           - checkout: self
             displayName: "Checkout repository with submodules"
-            persistCredentials: "false"
+            persistCredentials: "true"
             submodules: "false"
             fetchDepth: "0"
           - script: |
               chmod +x scripts/resolve-submodule-url.sh
               ./scripts/resolve-submodule-url.sh
             displayName: "Resolve submodule URL dynamically"
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              GITHUB_TOKEN: $(GITHUB_TOKEN)
           - task: NodeTool@0
             inputs:
               versionSpec: "$(NODE_VERSION)"
@@ -445,7 +448,7 @@ stages:
         displayName: "Build and Push Docker Image"
         pool:
           name: "Default"
-        timeoutInMinutes: "30"
+        timeoutInMinutes: "45"
         steps:
           - task: NodeTool@0
             inputs:

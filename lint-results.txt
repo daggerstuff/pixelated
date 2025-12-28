@@ -1,0 +1,2604 @@
+
+> pixelated@0.0.1 lint /home/vivi/pixelated
+> oxlint . -- src/lib/utils.ts
+
+
+  ! eslint(no-unused-vars): Parameter 'source' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/journal-research/features/SourceDiscovery.tsx:89:31]
+ 88 |               isLoading={isLoading}
+ 89 |               onSourceClick={(source) => {
+    :                               ^^^|^^
+    :                                  `-- 'source' is declared here
+ 90 |                 // Navigate to source detail
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Identifier 'initializeDatabase' is imported but never used.
+   ,-[tests/_legacy/demo-db-usage.ts:2:3]
+ 1 | import {
+ 2 |   initializeDatabase,
+   :   ^^^^^^^^^|^^^^^^^^
+   :            `-- 'initializeDatabase' is imported here
+ 3 |   userManager,
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Catch parameter '_err' is caught but never used.
+     ,-[src/utils/auth.ts:236:12]
+ 235 |     return { user, session }
+ 236 |   } catch (_err) {
+     :            ^^|^
+     :              `-- '_err' is declared here
+ 237 |     return null
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+     ,-[src/components/security/FHEDemo.tsx:138:14]
+ 137 |       }
+ 138 |     } catch (_error) {
+     :              ^^^|^^
+     :                 `-- '_error' is declared here
+ 139 |       setOperations((prev) =>
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+     ,-[tests/cross-browser/browser-compatibility.spec.ts:205:20]
+ 204 |             return retrieved === 'value'
+ 205 |           } catch (_) {
+     :                    |
+     :                    `-- '_' is declared here
+ 206 |             return false
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+     ,-[tests/cross-browser/browser-compatibility.spec.ts:224:24]
+ 223 |                 return true
+ 224 |               } catch (_) {
+     :                        |
+     :                        `-- '_' is declared here
+ 225 |                 return false
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-control-regex): Unexpected control characters
+    ,-[src/utils/path-security.ts:95:14]
+ 94 |     .replace(/\.\./g, '') // Remove parent directory references
+ 95 |     .replace(/[<>:"|?*\x00-\x1f]/g, '') // Remove unsafe characters
+    :              ^^^^^^^^^^^^^^^^^^^^^
+ 96 |     .trim()
+    `----
+  help: '\x00, \x1F' are control characters.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[business-strategy-cms/src/routes/workflow.ts:15:12]
+ 14 |     res.json(templates)
+ 15 |   } catch (error) {
+    :            ^^|^^
+    :              `-- 'error' is declared here
+ 16 |     res.status(500).json({ error: 'Failed to fetch workflow templates' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[business-strategy-cms/src/routes/workflow.ts:28:12]
+ 27 |     res.json(template)
+ 28 |   } catch (error) {
+    :            ^^|^^
+    :              `-- 'error' is declared here
+ 29 |     res.status(500).json({ error: 'Failed to fetch workflow template' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[business-strategy-cms/src/routes/workflow.ts:70:14]
+ 69 |       res.json(instances)
+ 70 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 71 |       res.status(500).json({ error: 'Failed to fetch workflow instances' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[business-strategy-cms/src/routes/workflow.ts:84:12]
+ 83 |     res.json(instance)
+ 84 |   } catch (error) {
+    :            ^^|^^
+    :              `-- 'error' is declared here
+ 85 |     res.status(500).json({ error: 'Failed to fetch workflow instance' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/routes/workflow.ts:109:12]
+ 108 |     res.json(instances)
+ 109 |   } catch (error) {
+     :            ^^|^^
+     :              `-- 'error' is declared here
+ 110 |     res.status(500).json({ error: 'Failed to search workflow instances' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/routes/workflow.ts:180:12]
+ 179 |     res.json(comments)
+ 180 |   } catch (error) {
+     :            ^^|^^
+     :              `-- 'error' is declared here
+ 181 |     res.status(500).json({ error: 'Failed to fetch comments' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/routes/workflow.ts:190:12]
+ 189 |     res.json(approvals)
+ 190 |   } catch (error) {
+     :            ^^|^^
+     :              `-- 'error' is declared here
+ 191 |     res.status(500).json({ error: 'Failed to fetch approvals' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/routes/workflow.ts:204:14]
+ 203 |       res.json(analytics)
+ 204 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 205 |       res.status(500).json({ error: 'Failed to fetch analytics' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/routes/workflow.ts:219:14]
+ 218 |       res.json(overdue)
+ 219 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 220 |       res.status(500).json({ error: 'Failed to fetch overdue workflows' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'data' is declared but never used. Unused variables should start with a '_'.
+    ,-[tests/api/utils/APITestUtils.ts:88:13]
+ 87 |     if (response.ok) {
+ 88 |       const data = await response.json()
+    :             ^^|^
+    :               `-- 'data' is declared here
+ 89 |       const loginResponse = await fetch(`${this.baseUrl}/api/auth/login`, {
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[tests/api/utils/APITestUtils.ts:189:14]
+ 188 |       })
+ 189 |     } catch (error: unknown) {
+     :              ^^^^^^^|^^^^^^
+     :                     `-- 'error' is declared here
+ 190 |       // User might already exist, try to login
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'next' is declared but never used. Unused parameters should start with a '_'.
+    ,-[business-strategy-cms/src/middleware/errorHandler.ts:12:3]
+ 11 |   res: Response,
+ 12 |   next: NextFunction,
+    :   ^^|^
+    :     `-- 'next' is declared here
+ 13 | ): void => {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[business-strategy-cms/src/middleware/auth.ts:41:12]
+ 40 |     next()
+ 41 |   } catch (error) {
+    :            ^^|^^
+    :              `-- 'error' is declared here
+ 42 |     res.status(401).json({
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[public/js/polyfill-detector.js:9:14]
+  8 |         }
+  9 |     } catch (e) {
+    :              |
+    :              `-- 'e' is declared here
+ 10 |         // swallow
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'marketIndices' is declared but never used. Unused variables should start with a '_'.
+     ,-[business-strategy-cms/src/services/realBusinessIntelligenceService.ts:136:13]
+ 135 |       const financialData = await this.yahooService.getFinancialMetrics(symbols)
+ 136 |       const marketIndices = await this.yahooService.getMarketIndices()
+     :             ^^^^^^|^^^^^^
+     :                   `-- 'marketIndices' is declared here
+ 137 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Parameter 'companies' is declared but never used. Unused parameters should start with a '_'.
+     ,-[business-strategy-cms/src/services/realBusinessIntelligenceService.ts:473:5]
+ 472 |     industry: string,
+ 473 |     companies: any[],
+     :     ^^^^|^^^^
+     :         `-- 'companies' is declared here
+ 474 |   ): Record<string, number> {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'companies' is declared but never used. Unused parameters should start with a '_'.
+     ,-[business-strategy-cms/src/services/realBusinessIntelligenceService.ts:492:35]
+ 491 | 
+ 492 |   private identifyCompetitiveGaps(companies: any[]): string[] {
+     :                                   ^^^^|^^^^
+     :                                       `-- 'companies' is declared here
+ 493 |     const commonGaps = [
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[public/js/service-worker-registration.js:14:1]
+ 13 |     }
+ 14 | ,-> !(function () {
+ 15 | |     try {
+ 16 | |       var e =
+ 17 | |           'undefined' != typeof window
+ 18 | |             ? window
+ 19 | |             : 'undefined' != typeof global
+ 20 | |               ? global
+ 21 | |               : 'undefined' != typeof globalThis
+ 22 | |                 ? globalThis
+ 23 | |                 : 'undefined' != typeof self
+ 24 | |                   ? self
+ 25 | |                   : {},
+ 26 | |         n = new e.Error().stack
+ 27 | |       n &&
+ 28 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 29 | |         (e._sentryDebugIds[n] = '26908714-2da8-5e12-b5bd-ef33dfb6ddde'))
+ 30 | |     } catch (e) {}
+ 31 | `-> })()
+ 32 |     //# debugId=26908714-2da8-5e12-b5bd-ef33dfb6ddde
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[public/js/service-worker-registration.js:27:5]
+ 26 |           n = new e.Error().stack
+ 27 | ,->     n &&
+ 28 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 29 | `->       (e._sentryDebugIds[n] = '26908714-2da8-5e12-b5bd-ef33dfb6ddde'))
+ 30 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Parameter 'registration' is declared but never used. Unused parameters should start with a '_'.
+   ,-[public/js/service-worker-registration.js:6:14]
+ 5 |       .register('/sw.js')
+ 6 |       .then((registration) => {
+   :              ^^^^^^|^^^^^
+   :                    `-- 'registration' is declared here
+ 7 |         console.log('ServiceWorker registration successful')
+   `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[public/js/service-worker-registration.js:30:12]
+ 29 |       (e._sentryDebugIds[n] = '26908714-2da8-5e12-b5bd-ef33dfb6ddde'))
+ 30 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 31 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[public/audio-processor.js:124:1]
+ 123 |     registerProcessor('audio-processor', AudioProcessor)
+ 124 | ,-> !(function () {
+ 125 | |     try {
+ 126 | |       var e =
+ 127 | |           'undefined' != typeof window
+ 128 | |             ? window
+ 129 | |             : 'undefined' != typeof global
+ 130 | |               ? global
+ 131 | |               : 'undefined' != typeof globalThis
+ 132 | |                 ? globalThis
+ 133 | |                 : 'undefined' != typeof self
+ 134 | |                   ? self
+ 135 | |                   : {},
+ 136 | |         n = new e.Error().stack
+ 137 | |       n &&
+ 138 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 139 | |         (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
+ 140 | |     } catch (e) {}
+ 141 | `-> })()
+ 142 |     //# debugId=d4df62f5-8102-57f4-b98f-792553d7d6d1
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[public/audio-processor.js:137:5]
+ 136 |           n = new e.Error().stack
+ 137 | ,->     n &&
+ 138 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 139 | `->       (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
+ 140 |       } catch (e) {}
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Parameter 'outputs' is declared but never used. Unused parameters should start with a '_'.
+    ,-[public/audio-processor.js:35:19]
+ 34 | 
+ 35 |   process(inputs, outputs, parameters) {
+    :                   ^^^|^^^
+    :                      `-- 'outputs' is declared here
+ 36 |     const input = inputs[0]
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'parameters' is declared but never used. Unused parameters should start with a '_'.
+    ,-[public/audio-processor.js:35:28]
+ 34 | 
+ 35 |   process(inputs, outputs, parameters) {
+    :                            ^^^^^|^^^^
+    :                                 `-- 'parameters' is declared here
+ 36 |     const input = inputs[0]
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[public/audio-processor.js:140:12]
+ 139 |       (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
+ 140 |   } catch (e) {}
+     :            |
+     :            `-- 'e' is declared here
+ 141 | })()
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'assignerId' is declared but never used. Unused parameters should start with a '_'.
+     ,-[business-strategy-cms/src/services/workflowService.ts:308:5]
+ 307 |     workflowInstanceId: string,
+ 308 |     assignerId: string,
+     :     ^^^^^|^^^^
+     :          `-- 'assignerId' is declared here
+ 309 |   ): Promise<void> {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable crossOriginUpdater.
+    ,-[public/polyfills/intersection-observer.js:39:7]
+ 38 |  */
+ 39 | const crossOriginUpdater = null;
+    :       ^^^^^^^^^|^^^^^^^^
+    :                `-- crossOriginUpdater is declared here as `const`.
+ 40 | 
+    `----
+     ,-[public/polyfills/intersection-observer.js:159:5]
+ 158 |      */
+ 159 |     crossOriginUpdater = function (boundingClientRect, intersectionRect) {
+     :     ^^^^^^^^^|^^^^^^^^
+     :              `-- crossOriginUpdater is re-assigned here.
+ 160 |       if (!boundingClientRect || !intersectionRect) {
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable crossOriginUpdater.
+    ,-[public/polyfills/intersection-observer.js:39:7]
+ 38 |  */
+ 39 | const crossOriginUpdater = null;
+    :       ^^^^^^^^^|^^^^^^^^
+    :                `-- crossOriginUpdater is declared here as `const`.
+ 40 | 
+    `----
+     ,-[public/polyfills/intersection-observer.js:177:3]
+ 176 | IntersectionObserver._resetCrossOriginUpdater = function () {
+ 177 |   crossOriginUpdater = null;
+     :   ^^^^^^^^^|^^^^^^^^
+     :            `-- crossOriginUpdater is re-assigned here.
+ 178 |   crossOriginRect = null;
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable crossOriginRect.
+    ,-[public/polyfills/intersection-observer.js:45:7]
+ 44 |  */
+ 45 | const crossOriginRect = null;
+    :       ^^^^^^^|^^^^^^^
+    :              `-- crossOriginRect is declared here as `const`.
+ 46 | 
+    `----
+     ,-[public/polyfills/intersection-observer.js:161:9]
+ 160 |       if (!boundingClientRect || !intersectionRect) {
+ 161 |         crossOriginRect = getEmptyRect();
+     :         ^^^^^^^|^^^^^^^
+     :                `-- crossOriginRect is re-assigned here.
+ 162 |       } else {
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable crossOriginRect.
+    ,-[public/polyfills/intersection-observer.js:45:7]
+ 44 |  */
+ 45 | const crossOriginRect = null;
+    :       ^^^^^^^|^^^^^^^
+    :              `-- crossOriginRect is declared here as `const`.
+ 46 | 
+    `----
+     ,-[public/polyfills/intersection-observer.js:163:9]
+ 162 |       } else {
+ 163 |         crossOriginRect = convertFromParentRect(boundingClientRect, intersectionRect);
+     :         ^^^^^^^|^^^^^^^
+     :                `-- crossOriginRect is re-assigned here.
+ 164 |       }
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable crossOriginRect.
+    ,-[public/polyfills/intersection-observer.js:45:7]
+ 44 |  */
+ 45 | const crossOriginRect = null;
+    :       ^^^^^^^|^^^^^^^
+    :              `-- crossOriginRect is declared here as `const`.
+ 46 | 
+    `----
+     ,-[public/polyfills/intersection-observer.js:178:3]
+ 177 |   crossOriginUpdater = null;
+ 178 |   crossOriginRect = null;
+     :   ^^^^^^^|^^^^^^^
+     :          `-- crossOriginRect is re-assigned here.
+ 179 | };
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable threshold.
+     ,-[public/polyfills/intersection-observer.js:251:9]
+ 250 | IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
+ 251 |   const threshold = opt_threshold || [0];
+     :         ^^^^|^^^^
+     :             `-- threshold is declared here as `const`.
+ 252 |   if (!Array.isArray(threshold)) {
+ 253 |     threshold = [threshold];
+     :     ^^^^|^^^^
+     :         `-- threshold is re-assigned here.
+ 254 |   }
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable itemDoc.
+     ,-[public/polyfills/intersection-observer.js:380:13]
+ 379 |     this._observationTargets.some(function (item) {
+ 380 |       const itemDoc = item.element.ownerDocument;
+     :             ^^^|^^^
+     :                `-- itemDoc is declared here as `const`.
+ 381 |       // Target is in this context.
+ 382 |       if (itemDoc == doc) {
+ 383 |         return true;
+ 384 |       }
+ 385 |       // Target is nested in this context.
+ 386 |       while (itemDoc && itemDoc != rootDoc) {
+ 387 |         const frame = getFrameElement(itemDoc);
+ 388 |         itemDoc = frame && frame.ownerDocument;
+     :         ^^^|^^^
+     :            `-- itemDoc is re-assigned here.
+ 389 |         if (itemDoc == doc) {
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable rootBounds.
+     ,-[public/polyfills/intersection-observer.js:451:11]
+ 450 | 
+ 451 |     const rootBounds = null;
+     :           ^^^^^|^^^^
+     :                `-- rootBounds is declared here as `const`.
+ 452 |     if (!this._rootContainsTarget(target)) {
+ 453 |       rootBounds = getEmptyRect();
+     :       ^^^^^|^^^^
+     :            `-- rootBounds is re-assigned here.
+ 454 |     } else if (!crossOriginUpdater || this.root) {
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable rootBounds.
+     ,-[public/polyfills/intersection-observer.js:451:11]
+ 450 | 
+ 451 |     const rootBounds = null;
+     :           ^^^^^|^^^^
+     :                `-- rootBounds is declared here as `const`.
+ 452 |     if (!this._rootContainsTarget(target)) {
+ 453 |       rootBounds = getEmptyRect();
+ 454 |     } else if (!crossOriginUpdater || this.root) {
+ 455 |       rootBounds = rootRect;
+     :       ^^^^^|^^^^
+     :            `-- rootBounds is re-assigned here.
+ 456 |     }
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable intersectionRect.
+     ,-[public/polyfills/intersection-observer.js:505:12]
+ 504 | 
+ 505 |      const intersectionRect = targetRect;
+     :            ^^^^^^^^|^^^^^^^
+     :                    `-- intersectionRect is declared here as `const`.
+ 506 |      const parent = getParentNode(target);
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+     :                ^^^^^^^^|^^^^^^^
+     :                        `-- intersectionRect is re-assigned here.
+ 529 |              } else {
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable intersectionRect.
+     ,-[public/polyfills/intersection-observer.js:505:12]
+ 504 | 
+ 505 |      const intersectionRect = targetRect;
+     :            ^^^^^^^^|^^^^^^^
+     :                    `-- intersectionRect is declared here as `const`.
+ 506 |      const parent = getParentNode(target);
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+ 529 |              } else {
+ 530 |                parentRect = crossOriginRect;
+ 531 |              }
+ 532 |            } else {
+ 533 |              parentRect = rootRect;
+ 534 |            }
+ 535 |          } else {
+ 536 |            // Check if there's a frame that can be navigated to.
+ 537 |            const frame = getParentNode(parent);
+ 538 |            const frameRect = frame && getBoundingClientRect(frame);
+ 539 |            const frameIntersect =
+ 540 |              frame &&
+ 541 |              this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
+ 542 |            if (frameRect && frameIntersect) {
+ 543 |              parent = frame;
+ 544 |              parentRect = convertFromParentRect(frameRect, frameIntersect);
+ 545 |            } else {
+ 546 |              parent = null;
+ 547 |              intersectionRect = null;
+     :              ^^^^^^^^|^^^^^^^
+     :                      `-- intersectionRect is re-assigned here.
+ 548 |            }
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable intersectionRect.
+     ,-[public/polyfills/intersection-observer.js:505:12]
+ 504 | 
+ 505 |      const intersectionRect = targetRect;
+     :            ^^^^^^^^|^^^^^^^
+     :                    `-- intersectionRect is declared here as `const`.
+ 506 |      const parent = getParentNode(target);
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+ 529 |              } else {
+ 530 |                parentRect = crossOriginRect;
+ 531 |              }
+ 532 |            } else {
+ 533 |              parentRect = rootRect;
+ 534 |            }
+ 535 |          } else {
+ 536 |            // Check if there's a frame that can be navigated to.
+ 537 |            const frame = getParentNode(parent);
+ 538 |            const frameRect = frame && getBoundingClientRect(frame);
+ 539 |            const frameIntersect =
+ 540 |              frame &&
+ 541 |              this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
+ 542 |            if (frameRect && frameIntersect) {
+ 543 |              parent = frame;
+ 544 |              parentRect = convertFromParentRect(frameRect, frameIntersect);
+ 545 |            } else {
+ 546 |              parent = null;
+ 547 |              intersectionRect = null;
+ 548 |            }
+ 549 |          }
+ 550 |        } else {
+ 551 |          // If the element has a non-visible overflow, and it's not the <body>
+ 552 |          // or <html> element, update the intersection rect.
+ 553 |          // Note: <body> and <html> cannot be clipped to a rect that's not also
+ 554 |          // the document rect, so no need to compute a new intersection.
+ 555 |          const doc = parent.ownerDocument;
+ 556 |          if (parent != doc.body &&
+ 557 |            parent != doc.documentElement &&
+ 558 |            parentComputedStyle.overflow != 'visible') {
+ 559 |            parentRect = getBoundingClientRect(parent);
+ 560 |          }
+ 561 |        }
+ 562 | 
+ 563 |        // If either of the above conditionals set a new parentRect,
+ 564 |        // calculate new intersection data.
+ 565 |        if (parentRect) {
+ 566 |          intersectionRect = computeRectIntersection(parentRect, intersectionRect);
+     :          ^^^^^^^^|^^^^^^^
+     :                  `-- intersectionRect is re-assigned here.
+ 567 |        }
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable parent.
+     ,-[public/polyfills/intersection-observer.js:506:12]
+ 505 |      const intersectionRect = targetRect;
+ 506 |      const parent = getParentNode(target);
+     :            ^^^|^^
+     :               `-- parent is declared here as `const`.
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+     :                ^^^|^^
+     :                   `-- parent is re-assigned here.
+ 527 |                parentRect = null;
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable parent.
+     ,-[public/polyfills/intersection-observer.js:506:12]
+ 505 |      const intersectionRect = targetRect;
+ 506 |      const parent = getParentNode(target);
+     :            ^^^|^^
+     :               `-- parent is declared here as `const`.
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+ 529 |              } else {
+ 530 |                parentRect = crossOriginRect;
+ 531 |              }
+ 532 |            } else {
+ 533 |              parentRect = rootRect;
+ 534 |            }
+ 535 |          } else {
+ 536 |            // Check if there's a frame that can be navigated to.
+ 537 |            const frame = getParentNode(parent);
+ 538 |            const frameRect = frame && getBoundingClientRect(frame);
+ 539 |            const frameIntersect =
+ 540 |              frame &&
+ 541 |              this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
+ 542 |            if (frameRect && frameIntersect) {
+ 543 |              parent = frame;
+     :              ^^^|^^
+     :                 `-- parent is re-assigned here.
+ 544 |              parentRect = convertFromParentRect(frameRect, frameIntersect);
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable parent.
+     ,-[public/polyfills/intersection-observer.js:506:12]
+ 505 |      const intersectionRect = targetRect;
+ 506 |      const parent = getParentNode(target);
+     :            ^^^|^^
+     :               `-- parent is declared here as `const`.
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+ 529 |              } else {
+ 530 |                parentRect = crossOriginRect;
+ 531 |              }
+ 532 |            } else {
+ 533 |              parentRect = rootRect;
+ 534 |            }
+ 535 |          } else {
+ 536 |            // Check if there's a frame that can be navigated to.
+ 537 |            const frame = getParentNode(parent);
+ 538 |            const frameRect = frame && getBoundingClientRect(frame);
+ 539 |            const frameIntersect =
+ 540 |              frame &&
+ 541 |              this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
+ 542 |            if (frameRect && frameIntersect) {
+ 543 |              parent = frame;
+ 544 |              parentRect = convertFromParentRect(frameRect, frameIntersect);
+ 545 |            } else {
+ 546 |              parent = null;
+     :              ^^^|^^
+     :                 `-- parent is re-assigned here.
+ 547 |              intersectionRect = null;
+     `----
+
+  ! eslint(no-const-assign): Unexpected re-assignment of `const` variable parent.
+     ,-[public/polyfills/intersection-observer.js:506:12]
+ 505 |      const intersectionRect = targetRect;
+ 506 |      const parent = getParentNode(target);
+     :            ^^^|^^
+     :               `-- parent is declared here as `const`.
+ 507 |      let atRoot = false;
+ 508 |    
+ 509 |      while (!atRoot && parent) {
+ 510 |        let parentRect = null;
+ 511 |        const parentComputedStyle = parent.nodeType == 1 ?
+ 512 |          window.getComputedStyle(parent) : {};
+ 513 | 
+ 514 |        // If the parent isn't displayed, an intersection can't happen.
+ 515 |        if (parentComputedStyle.display == 'none') {
+ 516 |          return null;
+ 517 |        }
+ 518 | 
+ 519 |        if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+ 520 |          atRoot = true;
+ 521 |          if (parent == this.root || parent == document) {
+ 522 |            if (crossOriginUpdater && !this.root) {
+ 523 |              if (!crossOriginRect ||
+ 524 |                crossOriginRect.width == 0 && crossOriginRect.height == 0) {
+ 525 |                // A 0-size cross-origin intersection means no-intersection.
+ 526 |                parent = null;
+ 527 |                parentRect = null;
+ 528 |                intersectionRect = null;
+ 529 |              } else {
+ 530 |                parentRect = crossOriginRect;
+ 531 |              }
+ 532 |            } else {
+ 533 |              parentRect = rootRect;
+ 534 |            }
+ 535 |          } else {
+ 536 |            // Check if there's a frame that can be navigated to.
+ 537 |            const frame = getParentNode(parent);
+ 538 |            const frameRect = frame && getBoundingClientRect(frame);
+ 539 |            const frameIntersect =
+ 540 |              frame &&
+ 541 |              this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
+ 542 |            if (frameRect && frameIntersect) {
+ 543 |              parent = frame;
+ 544 |              parentRect = convertFromParentRect(frameRect, frameIntersect);
+ 545 |            } else {
+ 546 |              parent = null;
+ 547 |              intersectionRect = null;
+ 548 |            }
+ 549 |          }
+ 550 |        } else {
+ 551 |          // If the element has a non-visible overflow, and it's not the <body>
+ 552 |          // or <html> element, update the intersection rect.
+ 553 |          // Note: <body> and <html> cannot be clipped to a rect that's not also
+ 554 |          // the document rect, so no need to compute a new intersection.
+ 555 |          const doc = parent.ownerDocument;
+ 556 |          if (parent != doc.body &&
+ 557 |            parent != doc.documentElement &&
+ 558 |            parentComputedStyle.overflow != 'visible') {
+ 559 |            parentRect = getBoundingClientRect(parent);
+ 560 |          }
+ 561 |        }
+ 562 | 
+ 563 |        // If either of the above conditionals set a new parentRect,
+ 564 |        // calculate new intersection data.
+ 565 |        if (parentRect) {
+ 566 |          intersectionRect = computeRectIntersection(parentRect, intersectionRect);
+ 567 |        }
+ 568 |        if (!intersectionRect) {
+ 569 |          break;
+ 570 |        }
+ 571 |        parent = parent && getParentNode(parent);
+     :        ^^^|^^
+     :           `-- parent is re-assigned here.
+ 572 |      }
+     `----
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[public/polyfills/intersection-observer.js:806:12]
+ 805 |     rect = el.getBoundingClientRect();
+ 806 |   } catch (err) {
+     :            ^|^
+     :             `-- 'err' is declared here
+ 807 |     // Ignore Windows 7 IE11 "Unspecified error"
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+   ,-[public/polyfills/resize-observer-polyfill.js:2:5]
+ 1 |     (function (global, factory) {
+ 2 | ,->     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+ 3 | |       typeof define === 'function' && define.amd ? define(factory) :
+ 4 | `->     (global.ResizeObserver = factory());
+ 5 |     }(this, (function () { 'use strict';
+   `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/services/authService.ts:155:14]
+ 154 |       return tokens
+ 155 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 156 |       throw new Error('Invalid refresh token')
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[business-strategy-cms/src/services/authService.ts:183:14]
+ 182 |       }
+ 183 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 184 |       return null
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'marketAnalysis' is declared but never used. Unused variables should start with a '_'.
+     ,-[business-strategy-cms/src/services/marketAnalyticsService.ts:103:11]
+ 102 |   }> {
+ 103 |     const marketAnalysis = await this.analyzeTargetMarkets(
+     :           ^^^^^^^|^^^^^^
+     :                  `-- 'marketAnalysis' is declared here
+ 104 |       currentMarket,
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Parameter 'market' is declared but never used. Unused parameters should start with a '_'.
+     ,-[business-strategy-cms/src/services/marketAnalyticsService.ts:392:43]
+ 391 | 
+ 392 |   private async fetchMarketSaturationData(market: string): Promise<any> {
+     :                                           ^^^|^^
+     :                                              `-- 'market' is declared here
+ 393 |     // Mock data - replace with actual market data
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+   ,-[public/polyfills/fetch.umd.js:2:3]
+ 1 |     (function (global, factory) {
+ 2 | ,->   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+ 3 | |     typeof define === 'function' && define.amd ? define(['exports'], factory) :
+ 4 | `->   (factory((global.WHATWGFetch = {})));
+ 5 |     }(this, (function (exports) { 'use strict';
+   `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[public/polyfills/fetch.umd.js:657:1]
+ 656 | })));
+ 657 | !function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e4c59632-941c-5fa2-b90f-a1952bb6b3c4")}catch(e){}}();
+     : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 658 | //# debugId=e4c59632-941c-5fa2-b90f-a1952bb6b3c4
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[public/polyfills/fetch.umd.js:657:188]
+ 656 | })));
+ 657 | !function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e4c59632-941c-5fa2-b90f-a1952bb6b3c4")}catch(e){}}();
+     :                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 658 | //# debugId=e4c59632-941c-5fa2-b90f-a1952bb6b3c4
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[public/polyfills/fetch.umd.js:25:18]
+ 24 |           return true
+ 25 |         } catch (e) {
+    :                  |
+    :                  `-- 'e' is declared here
+ 26 |           return false
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[public/polyfills/fetch.umd.js:520:12]
+ 519 |     new exports.DOMException();
+ 520 |   } catch (err) {
+     :            ^|^
+     :             `-- 'err' is declared here
+ 521 |     exports.DOMException = function(message, name) {
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[public/polyfills/fetch.umd.js:585:18]
+ 584 |           return url === '' && g.location.href ? g.location.href : url
+ 585 |         } catch (e) {
+     :                  |
+     :                  `-- 'e' is declared here
+ 586 |           return url
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[public/polyfills/fetch.umd.js:657:299]
+ 656 | })));
+ 657 | !function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e4c59632-941c-5fa2-b90f-a1952bb6b3c4")}catch(e){}}();
+     :                                                                                                                                                                                                                                                                                                           |
+     :                                                                                                                                                                                                                                                                                                           `-- 'e' is declared here
+ 658 | //# debugId=e4c59632-941c-5fa2-b90f-a1952bb6b3c4
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-invalid-fetch-options): "body" is not allowed when method is "GET"
+     ,-[public/polyfills/fetch.umd.js:419:31]
+ 418 |   Request.prototype.clone = function() {
+ 419 |     return new Request(this, {body: this._bodyInit})
+     :                               ^^^^
+ 420 |   };
+     `----
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[public/polyfills/fetch.umd.js:212:17]
+ 211 |     var view = new Uint8Array(buf);
+ 212 |     var chars = new Array(view.length);
+     :                 ^^^^^^^^^^^^^^^^^^^^^^
+ 213 | 
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/plugins/vite-plugin-external-node.js:85:5]
+ 84 |           n = new e.Error().stack
+ 85 | ,->     n &&
+ 86 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 87 | `->       (e._sentryDebugIds[n] = '997a2ae6-b7d4-509e-9ed0-412733abc2ae'))
+ 88 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[src/plugins/vite-plugin-external-node.js:88:12]
+ 87 |       (e._sentryDebugIds[n] = '997a2ae6-b7d4-509e-9ed0-412733abc2ae'))
+ 88 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 89 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[ai/docs/api/clients/javascript_client.js:115:26]
+ 114 |                     data = JSON.parse(response.body);
+ 115 |                 } catch (e) {
+     :                          |
+     :                          `-- 'e' is declared here
+ 116 |                     data = { success: false, message: 'Invalid JSON response' };
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[ai/docs/api/clients/javascript_client.js:444:18]
+ 443 |             return response.success;
+ 444 |         } catch (error) {
+     :                  ^^|^^
+     :                    `-- 'error' is declared here
+ 445 |             return false;
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/components/TrainingSession.tsx:103:14]
+ 102 |       }
+ 103 |     } catch (err) {
+     :              ^|^
+     :               `-- 'err' is declared here
+ 104 |       setClientResponse('Error getting response')
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/integrations/react/utils.js:58:1]
+ 57 |     }
+ 58 | ,-> !(function () {
+ 59 | |     try {
+ 60 | |       var e =
+ 61 | |           'undefined' != typeof window
+ 62 | |             ? window
+ 63 | |             : 'undefined' != typeof global
+ 64 | |               ? global
+ 65 | |               : 'undefined' != typeof globalThis
+ 66 | |                 ? globalThis
+ 67 | |                 : 'undefined' != typeof self
+ 68 | |                   ? self
+ 69 | |                   : {},
+ 70 | |         n = new e.Error().stack
+ 71 | |       n &&
+ 72 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 73 | |         (e._sentryDebugIds[n] = '44a74ecd-27a6-5286-b0ba-e74237a5e4e4'))
+ 74 | |     } catch (e) {}
+ 75 | `-> })()
+ 76 |     //# debugId=44a74ecd-27a6-5286-b0ba-e74237a5e4e4
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/integrations/react/utils.js:71:5]
+ 70 |           n = new e.Error().stack
+ 71 | ,->     n &&
+ 72 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 73 | `->       (e._sentryDebugIds[n] = '44a74ecd-27a6-5286-b0ba-e74237a5e4e4'))
+ 74 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[src/integrations/react/utils.js:74:12]
+ 73 |       (e._sentryDebugIds[n] = '44a74ecd-27a6-5286-b0ba-e74237a5e4e4'))
+ 74 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 75 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/plugins/vite-plugin-flexsearch-ssr.js:136:1]
+ 135 |     }
+ 136 | ,-> !(function () {
+ 137 | |     try {
+ 138 | |       var e =
+ 139 | |           'undefined' != typeof window
+ 140 | |             ? window
+ 141 | |             : 'undefined' != typeof global
+ 142 | |               ? global
+ 143 | |               : 'undefined' != typeof globalThis
+ 144 | |                 ? globalThis
+ 145 | |                 : 'undefined' != typeof self
+ 146 | |                   ? self
+ 147 | |                   : {},
+ 148 | |         n = new e.Error().stack
+ 149 | |       n &&
+ 150 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 151 | |         (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
+ 152 | |     } catch (e) {}
+ 153 | `-> })()
+ 154 |     //# debugId=a0db6a53-f0a3-5748-899c-6016b824b882
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/plugins/vite-plugin-flexsearch-ssr.js:149:5]
+ 148 |           n = new e.Error().stack
+ 149 | ,->     n &&
+ 150 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 151 | `->       (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
+ 152 |       } catch (e) {}
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[src/plugins/vite-plugin-flexsearch-ssr.js:152:12]
+ 151 |       (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
+ 152 |   } catch (e) {}
+     :            |
+     :            `-- 'e' is declared here
+ 153 | })()
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/hello.js:4:1]
+  3 |     }
+  4 | ,-> !(function () {
+  5 | |     try {
+  6 | |       var e =
+  7 | |           'undefined' != typeof window
+  8 | |             ? window
+  9 | |             : 'undefined' != typeof global
+ 10 | |               ? global
+ 11 | |               : 'undefined' != typeof globalThis
+ 12 | |                 ? globalThis
+ 13 | |                 : 'undefined' != typeof self
+ 14 | |                   ? self
+ 15 | |                   : {},
+ 16 | |         n = new e.Error().stack
+ 17 | |       n &&
+ 18 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 19 | |         (e._sentryDebugIds[n] = '13850518-1122-527e-8edd-f180e2dfef0c'))
+ 20 | |     } catch (e) {}
+ 21 | `-> })()
+ 22 |     //# debugId=13850518-1122-527e-8edd-f180e2dfef0c
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/hello.js:17:5]
+ 16 |           n = new e.Error().stack
+ 17 | ,->     n &&
+ 18 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 19 | `->       (e._sentryDebugIds[n] = '13850518-1122-527e-8edd-f180e2dfef0c'))
+ 20 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[src/hello.js:20:12]
+ 19 |       (e._sentryDebugIds[n] = '13850518-1122-527e-8edd-f180e2dfef0c'))
+ 20 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 21 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/client-entry.js:1:1]
+ 1 | ,-> /**
+ 2 | |    * Client entry point
+ 3 | |    * This file loads polyfills before all other client-side code
+ 4 | |    */
+ 5 | |   
+ 6 | `-> // No Node.js built-in polyfills should be present in Astro client-side code.
+ 7 |     // If you need browser API polyfills, add them here explicitly.
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/components/dashboard/__tests__/simple-accessibility.test.ts:1:1]
+ 1 | // This file was replaced with a minimal .tsx test; keep as placeholder to avoid accidental execution of old malformed content.
+   : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/scripts/preload-auth.js:200:1]
+ 199 |     }
+ 200 | ,-> !(function () {
+ 201 | |     try {
+ 202 | |       var e =
+ 203 | |           'undefined' != typeof window
+ 204 | |             ? window
+ 205 | |             : 'undefined' != typeof global
+ 206 | |               ? global
+ 207 | |               : 'undefined' != typeof globalThis
+ 208 | |                 ? globalThis
+ 209 | |                 : 'undefined' != typeof self
+ 210 | |                   ? self
+ 211 | |                   : {},
+ 212 | |         n = new e.Error().stack
+ 213 | |       n &&
+ 214 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 215 | |         (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
+ 216 | |     } catch (e) {}
+ 217 | `-> })()
+ 218 |     //# debugId=2cc628ec-2a7b-516a-8129-de92553dbdb7
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/scripts/preload-auth.js:213:5]
+ 212 |           n = new e.Error().stack
+ 213 | ,->     n &&
+ 214 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 215 | `->       (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
+ 216 |       } catch (e) {}
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[src/scripts/preload-auth.js:216:12]
+ 215 |       (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
+ 216 |   } catch (e) {}
+     :            |
+     :            `-- 'e' is declared here
+ 217 | })()
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:16:14]
+ 15 |       res.json(marketData)
+ 16 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 17 |       res.status(500).json({ error: 'Failed to fetch market data' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:27:14]
+ 26 |       res.json(trends)
+ 27 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 28 |       res.status(500).json({ error: 'Failed to fetch market trends' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:38:14]
+ 37 |       res.json(analysis)
+ 38 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 39 |       res.status(500).json({ error: 'Failed to fetch competitor analysis' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:49:14]
+ 48 |       res.json(opportunities)
+ 49 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 50 |       res.status(500).json({ error: 'Failed to fetch market opportunities' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:66:14]
+ 65 |       res.json(metrics)
+ 66 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 67 |       res.status(500).json({ error: 'Failed to fetch business metrics' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:77:14]
+ 76 |       res.json({ success: true })
+ 77 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 78 |       res.status(500).json({ error: 'Failed to add business metric' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/routes/businessIntelligenceRoutes.ts:93:14]
+ 92 |       res.json(alerts)
+ 93 |     } catch (error) {
+    :              ^^|^^
+    :                `-- 'error' is declared here
+ 94 |       res.status(500).json({ error: 'Failed to fetch business alerts' })
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/routes/businessIntelligenceRoutes.ts:104:14]
+ 103 |       res.json({ success: true })
+ 104 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 105 |       res.status(500).json({ error: 'Failed to create business alert' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/routes/businessIntelligenceRoutes.ts:120:14]
+ 119 |       res.json(forecast)
+ 120 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 121 |       res.status(500).json({ error: 'Failed to generate market forecast' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/routes/businessIntelligenceRoutes.ts:131:14]
+ 130 |       res.json(analysis)
+ 131 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 132 |       res.status(500).json({ error: 'Failed to generate industry analysis' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/routes/businessIntelligenceRoutes.ts:153:14]
+ 152 |       })
+ 153 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 154 |       res.status(500).json({ error: 'Failed to fetch dashboard data' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/routes/businessIntelligenceRoutes.ts:176:14]
+ 175 |       })
+ 176 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 177 |       res.status(500).json({ error: 'Failed to fetch market insights' })
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+    ,-[src/hooks/useTherapistAnalytics.ts:33:18]
+ 32 |           fn(...args)
+ 33 |         } catch (_) {
+    :                  |
+    :                  `-- '_' is declared here
+ 34 |           /* swallow */
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+    ,-[src/hooks/useTherapistAnalytics.ts:40:18]
+ 39 |           fn(...args)
+ 40 |         } catch (_) {
+    :                  |
+    :                  `-- '_' is declared here
+ 41 |           /* swallow */
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+    ,-[src/hooks/useTherapistAnalytics.ts:47:18]
+ 46 |           fn(...args)
+ 47 |         } catch (_) {
+    :                  |
+    :                  `-- '_' is declared here
+ 48 |           /* swallow */
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+    ,-[src/hooks/useTherapistAnalytics.ts:54:18]
+ 53 |           fn(...args)
+ 54 |         } catch (_) {
+    :                  |
+    :                  `-- '_' is declared here
+ 55 |           /* swallow */
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Identifier 'Request' is imported but never used.
+   ,-[src/api/server.ts:4:28]
+ 3 | 
+ 4 | import express, { Express, Request, Response, NextFunction } from 'express'
+   :                            ^^^|^^^
+   :                               `-- 'Request' is imported here
+ 5 | import cors from 'cors'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'Response' is imported but never used.
+   ,-[src/api/server.ts:4:37]
+ 3 | 
+ 4 | import express, { Express, Request, Response, NextFunction } from 'express'
+   :                                     ^^^^|^^^
+   :                                         `-- 'Response' is imported here
+ 5 | import cors from 'cors'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'NextFunction' is imported but never used.
+   ,-[src/api/server.ts:4:47]
+ 3 | 
+ 4 | import express, { Express, Request, Response, NextFunction } from 'express'
+   :                                               ^^^^^^|^^^^^
+   :                                                     `-- 'NextFunction' is imported here
+ 5 | import cors from 'cors'
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Variable 'userId' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/api/routes/users.ts:146:13]
+ 145 | router.post('/:userId/permissions', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
+ 146 |     const { userId } = req.params
+     :             ^^^|^^
+     :                `-- 'userId' is declared here
+ 147 |     const { permission } = req.body
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'userId' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/api/routes/users.ts:167:13]
+ 166 | router.delete('/:userId/permissions/:permissionId', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
+ 167 |     const { userId, permissionId } = req.params
+     :             ^^^|^^
+     :                `-- 'userId' is declared here
+ 168 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'permissionId' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/api/routes/users.ts:167:21]
+ 166 | router.delete('/:userId/permissions/:permissionId', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
+ 167 |     const { userId, permissionId } = req.params
+     :                     ^^^^^^|^^^^^
+     :                           `-- 'permissionId' is declared here
+ 168 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! typescript-eslint(no-useless-empty-export): Empty exports do nothing in module files
+   ,-[src/api/routes/projects-full.ts:3:1]
+ 2 | // Intentionally empty to avoid duplicate route definitions.
+ 3 | export { }
+   : ^^^^^^^^^^
+ 4 | router.get('/', asyncHandler(async (req: Request, res: Response) => {
+   `----
+  help: Remove this empty export.
+
+  ! eslint(no-unused-vars): Type 'ConsoleMessage' is imported but never used.
+    ,-[tests/browser/cross-browser-compatibility.spec.ts:9:15]
+  8 | import { test } from '@playwright/test'
+  9 | import type { ConsoleMessage } from '@playwright/test'
+    :               ^^^^^^^|^^^^^^
+    :                      `-- 'ConsoleMessage' is imported here
+ 10 | 
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'getMarketResearch' is imported but never used.
+   ,-[src/api/routes/market-research-full.ts:7:5]
+ 6 |     createMarketResearch,
+ 7 |     getMarketResearch,
+   :     ^^^^^^^^|^^^^^^^^
+   :             `-- 'getMarketResearch' is imported here
+ 8 |     addFinding,
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'addFinding' is imported but never used.
+   ,-[src/api/routes/market-research-full.ts:8:5]
+ 7 |     getMarketResearch,
+ 8 |     addFinding,
+   :     ^^^^^|^^^^
+   :          `-- 'addFinding' is imported here
+ 9 |     addCompetitiveAnalysis,
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'addCompetitiveAnalysis' is imported but never used.
+    ,-[src/api/routes/market-research-full.ts:9:5]
+  8 |     addFinding,
+  9 |     addCompetitiveAnalysis,
+    :     ^^^^^^^^^^^|^^^^^^^^^^
+    :                `-- 'addCompetitiveAnalysis' is imported here
+ 10 |     addRecommendation,
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'addRecommendation' is imported but never used.
+    ,-[src/api/routes/market-research-full.ts:10:5]
+  9 |     addCompetitiveAnalysis,
+ 10 |     addRecommendation,
+    :     ^^^^^^^^|^^^^^^^^
+    :             `-- 'addRecommendation' is imported here
+ 11 |     listMarketResearch,
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'listMarketResearch' is imported but never used.
+    ,-[src/api/routes/market-research-full.ts:11:5]
+ 10 |     addRecommendation,
+ 11 |     listMarketResearch,
+    :     ^^^^^^^^^|^^^^^^^^
+    :              `-- 'listMarketResearch' is imported here
+ 12 |     searchMarketResearch,
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Parameter 'requestId' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/api/middleware/logger.ts:85:5]
+ 84 |     res: Response,
+ 85 |     requestId: string,
+    :     ^^^^|^^^^
+    :         `-- 'requestId' is declared here
+ 86 |     duration: number
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'duration' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/api/middleware/logger.ts:86:5]
+ 85 |     requestId: string,
+ 86 |     duration: number
+    :     ^^^^|^^^
+    :         `-- 'duration' is declared here
+ 87 | ) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'next' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/api/middleware/error-handler.ts:67:5]
+ 66 |     res: Response,
+ 67 |     next: NextFunction
+    :     ^^|^
+    :       `-- 'next' is declared here
+ 68 | ) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'baseline' is declared but never used. Unused parameters should start with a '_'.
+     ,-[tests/browser/test-runner.ts:148:28]
+ 147 | 
+ 148 |   async compareScreenshots(baseline: string, current: string) {
+     :                            ^^^^|^^^
+     :                                `-- 'baseline' is declared here
+ 149 |     // Simple pixel comparison (in real implementation, use image-diff library)
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'current' is declared but never used. Unused parameters should start with a '_'.
+     ,-[tests/browser/test-runner.ts:148:46]
+ 147 | 
+ 148 |   async compareScreenshots(baseline: string, current: string) {
+     :                                              ^^^|^^^
+     :                                                 `-- 'current' is declared here
+ 149 |     // Simple pixel comparison (in real implementation, use image-diff library)
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'viewport' is declared but never used. Unused parameters should start with a '_'.
+     ,-[tests/browser/test-runner.ts:371:49]
+ 370 | 
+ 371 |   async runAllTests(page: any, browser: string, viewport: any) {
+     :                                                 ^^^^|^^^
+     :                                                     `-- 'viewport' is declared here
+ 372 |     const testResults = []
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Variable 'switchMetrics' is declared but never used. Unused variables should start with a '_'.
+     ,-[tests/browser/theme-performance.spec.ts:117:13]
+ 116 |       // Measure theme switch performance
+ 117 |       const switchMetrics = await page.evaluate(() => {
+     :             ^^^^^^|^^^^^^
+     :                   `-- 'switchMetrics' is declared here
+ 118 |         return new Promise((resolve) => {
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'listenerCounts' is declared but never used. Unused variables should start with a '_'.
+     ,-[tests/browser/theme-performance.spec.ts:329:13]
+ 328 |       // Count event listeners before and after theme operations
+ 329 |       const listenerCounts = await page.evaluate(() => {
+     :             ^^^^^^^|^^^^^^
+     :                    `-- 'listenerCounts' is declared here
+ 330 |         const initialListeners = getEventListeners
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[tests/browser/theme-performance.spec.ts:371:20]
+ 370 |             })
+ 371 |           } catch (e) {
+     :                    |
+     :                    `-- 'e' is declared here
+ 372 |             // Cross-origin stylesheets might not be accessible
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'browserName' is declared but never used. Unused parameters should start with a '_'.
+     ,-[tests/browser/theme-compatibility.spec.ts:134:60]
+ 133 | 
+ 134 |     test('should handle system theme preference', async ({ browserName }) => {
+     :                                                            ^^^^^|^^^^^
+     :                                                                 `-- 'browserName' is declared here
+ 135 |       // Mock system dark preference
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+    ,-[src/hooks/usePipelineWebSocket.ts:78:22]
+ 77 |               ws.send(JSON.stringify(message))
+ 78 |             } catch (_e) {
+    :                      ^|
+    :                       `-- '_e' is declared here
+ 79 |               // If send fails, push back and break to avoid busy loop
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+    ,-[tests/browser/browser-compatibility.spec.ts:48:14]
+ 47 |       fs.mkdirSync('./test-results/browser-compat', { recursive: true })
+ 48 |     } catch (_e) {
+    :              ^|
+    :               `-- '_e' is declared here
+ 49 |       // Directory might already exist
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'fileId' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/FileStorageService.ts:126:17]
+ 125 | 
+ 126 |   async getFile(fileId: string, userId: string): Promise<FileMetadata | null> {
+     :                 ^^^|^^
+     :                    `-- 'fileId' is declared here
+ 127 |     // This would typically query your database
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'userId' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/FileStorageService.ts:126:33]
+ 125 | 
+ 126 |   async getFile(fileId: string, userId: string): Promise<FileMetadata | null> {
+     :                                 ^^^|^^
+     :                                    `-- 'userId' is declared here
+ 127 |     // This would typically query your database
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'file' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/FileStorageService.ts:253:27]
+ 252 | 
+ 253 |   async generateThumbnail(file: Express.Multer.File): Promise<Buffer | null> {
+     :                           ^^|^
+     :                             `-- 'file' is declared here
+ 254 |     // This would require sharp for image processing
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Interface 'SocketAuth' is declared but never used.
+   ,-[src/services/websocketClient.ts:4:11]
+ 3 | 
+ 4 | interface SocketAuth {
+   :           ^^^^^|^^^^
+   :                `-- 'SocketAuth' is declared here
+ 5 |   token: string
+   `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+    ,-[src/services/socketService.ts:66:16]
+ 65 |         next()
+ 66 |       } catch (error) {
+    :                ^^|^^
+    :                  `-- 'error' is declared here
+ 67 |         next(new Error('Invalid authentication token'))
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'buffer' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/DocumentVersioningService.ts:390:34]
+ 389 | 
+ 390 |   private async generateChecksum(buffer: Buffer): Promise<string> {
+     :                                  ^^^|^^
+     :                                     `-- 'buffer' is declared here
+ 391 |     // In a real implementation, you'd use crypto.createHash('sha256')
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Variable 'opportunities' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:339:13]
+ 338 |       const competitors = await this.getCompetitorAnalysis(industry)
+ 339 |       const opportunities = await this.getMarketOpportunities(industry)
+     :             ^^^^^^|^^^^^^
+     :                   `-- 'opportunities' is declared here
+ 340 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Parameter 'industry' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:375:31]
+ 374 | 
+ 375 |   private getDemoMarketTrends(industry: string): MarketData[] {
+     :                               ^^^^|^^^
+     :                                   `-- 'industry' is declared here
+ 376 |     const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META']
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'industry' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:380:37]
+ 379 | 
+ 380 |   private getDemoCompetitorAnalysis(industry: string): CompetitorAnalysis[] {
+     :                                     ^^^^|^^^
+     :                                         `-- 'industry' is declared here
+ 381 |     return [
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'industry' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:405:38]
+ 404 | 
+ 405 |   private getDemoMarketOpportunities(industry: string): MarketOpportunity[] {
+     :                                      ^^^^|^^^
+     :                                          `-- 'industry' is declared here
+ 406 |     return [
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'industry' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:526:5]
+ 525 |   private async fetchCompetitorsFromAPI(
+ 526 |     industry: string,
+     :     ^^^^|^^^
+     :         `-- 'industry' is declared here
+ 527 |   ): Promise<CompetitorAnalysis[]> {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'industry' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/services/BusinessIntelligenceService.ts:534:5]
+ 533 |   private async analyzeMarketOpportunities(
+ 534 |     industry: string,
+     :     ^^^^|^^^
+     :         `-- 'industry' is declared here
+ 535 |   ): Promise<MarketOpportunity[]> {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/lib/db/index.ts:142:12]
+ 141 |     }
+ 142 |   } catch (error) {
+     :            ^^|^^
+     :              `-- 'error' is declared here
+ 143 |     return {
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+    ,-[src/lib/audit/metrics.ts:10:22]
+  9 | } {
+ 10 |   const hourCounts = new Array(24).fill(0)
+    :                      ^^^^^^^^^^^^^
+ 11 |   const hourLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`)
+    `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-vars): Parameter 'next' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/server.prod.ts:121:5]
+ 120 |     res: express.Response,
+ 121 |     next: express.NextFunction,
+     :     ^^|^
+     :       `-- 'next' is declared here
+ 122 |   ) => {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'change' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/hooks/useCollaboration.ts:164:42]
+ 163 | 
+ 164 |   const applyRemoteChange = useCallback((change: DocumentChangeEvent) => {
+     :                                          ^^^|^^
+     :                                             `-- 'change' is declared here
+ 165 |     // This would be used for more complex change application
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+    ,-[tests/memory-optimization.test.ts:82:16]
+ 81 |         expect(isExecutable).toBe(true)
+ 82 |       } catch (_error) {
+    :                ^^^|^^
+    :                   `-- '_error' is declared here
+ 83 |         // If stat fails, at least verify file exists
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+     ,-[tests/helpers/test-utils.ts:159:12]
+ 158 |     await mkdir(path, { recursive: true })
+ 159 |   } catch (_error) {
+     :            ^^^|^^
+     :               `-- '_error' is declared here
+ 160 |     // Directory might already exist, ignore error
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[tests/regression/utils/RegressionUtils.ts:193:14]
+ 192 |       results.xssProtection = !xssExecuted
+ 193 |     } catch (error: unknown) {
+     :              ^^^^^^^|^^^^^^
+     :                     `-- 'error' is declared here
+ 194 |       results.xssProtection = true // Error means XSS was blocked
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[tests/regression/utils/RegressionUtils.ts:209:14]
+ 208 |       results.inputSanitization = !messageContent?.includes('<img')
+ 209 |     } catch (error: unknown) {
+     :              ^^^^^^^|^^^^^^
+     :                     `-- 'error' is declared here
+ 210 |       results.inputSanitization = true
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[tests/regression/regression-suite.spec.ts:332:21]
+ 331 |       for (let i = 0; i < 100; i++) {
+ 332 |         arrays.push(new Array(10000).fill('memory-pressure-test'))
+     :                     ^^^^^^^^^^^^^^^^
+ 333 |       }
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/components/chat/TherapyChatWithMemory.tsx:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint(no-control-regex): Unexpected control character
+    ,-[scripts/content/blog-simple.cjs:44:11]
+ 43 |   // Disallow only control/newline/null; shell is disabled.
+ 44 |   return !/[\0\n\r]/.test(token)
+    :           ^^^^^^^^^^
+ 45 | }
+    `----
+  help: '\0' matches the null character (U+0000), which is a control character.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[scripts/content/blog-web.js:463:12]
+ 462 |     }
+ 463 |   } catch (err) {
+     :            ^|^
+     :             `-- 'err' is declared here
+ 464 |     console.log(`Please open your browser to: ${url}`)
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'scenario' is declared but never used. Unused parameters should start with a '_'.
+     ,-[scripts/testing/run-performance-benchmarks.cjs:213:25]
+ 212 | 
+ 213 |   async makeTestRequest(scenario) {
+     :                         ^^^^|^^^
+     :                             `-- 'scenario' is declared here
+ 214 |     const startTime = performance.now()
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[scripts/testing/run-performance-benchmarks.cjs:237:14]
+ 236 | 
+ 237 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 238 |       const endTime = performance.now()
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Function 'createMockAPIRoute' is declared but never used.
+    ,-[scripts/testing/test-health-endpoints.js:9:10]
+  8 | // Mock the Astro APIRoute behavior
+  9 | function createMockAPIRoute(handler) {
+    :          ^^^^^^^^^|^^^^^^^^
+    :                   `-- 'createMockAPIRoute' is declared here
+ 10 |   return async () => {
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[ai/training_ready/configs/stage_configs/Instructions.ts:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[ai/training_ready/configs/stage_configs/Personas.ts:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint(no-control-regex): Unexpected control characters
+    ,-[src/lib/utils/index.ts:76:23]
+ 75 |   // Reject paths with unsafe characters
+ 76 |   const unsafeChars = /[<>:"|?*\x00-\x1f]/ // Control characters and Windows forbidden chars
+    :                       ^^^^^^^^^^^^^^^^^^^^
+ 77 |   if (unsafeChars.test(userPath)) {
+    `----
+  help: '\x00, \x1F' are control characters.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/lib/utils/code-splitting.ts:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint-plugin-unicorn(no-useless-fallback-in-spread): Empty fallbacks in spreads are unnecessary
+     ,-[src/components/analytics/AdvancedFilteringComponent.tsx:125:9]
+ 124 |       [category]: {
+ 125 |         ...((options[category] as Record<string, unknown>) || {}),
+     :         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 126 |         [key]: value,
+     `----
+  help: Spreading falsy values in object literals won't add any unexpected properties, so it's unnecessary to add an empty object as fallback.
+
+  ! eslint-plugin-unicorn(no-useless-fallback-in-spread): Empty fallbacks in spreads are unnecessary
+     ,-[src/components/analytics/AdvancedFilteringComponent.tsx:141:9]
+ 140 |       [category]: {
+ 141 |         ...((options[category] as Record<string, unknown>) || {}),
+     :         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 142 |         [parentKey]: {
+     `----
+  help: Spreading falsy values in object literals won't add any unexpected properties, so it's unnecessary to add an empty object as fallback.
+
+  ! eslint-plugin-unicorn(no-useless-fallback-in-spread): Empty fallbacks in spreads are unnecessary
+     ,-[src/components/analytics/AdvancedFilteringComponent.tsx:143:11]
+ 142 |             [parentKey]: {
+ 143 | ,->           ...(((options[category] as Record<string, unknown>)?.[
+ 144 | |               parentKey
+ 145 | `->           ] as Record<string, unknown>) || {}),
+ 146 |               [key]: value,
+     `----
+  help: Spreading falsy values in object literals won't add any unexpected properties, so it's unnecessary to add an empty object as fallback.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+   ,-[src/pages/admin/dashboard.astro:3:1]
+ 2 | 'Admin Dashboard'
+ 3 | undefined
+   : ^^^^^^^^^
+ 4 | ---
+   `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Parameter 'userId' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/business-strategy/services/base-service.ts:43:9]
+ 42 |     protected async validatePermissions(
+ 43 |         userId: UserId,
+    :         ^^^|^^
+    :            `-- 'userId' is declared here
+ 44 |         resource: string,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'resource' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/business-strategy/services/base-service.ts:44:9]
+ 43 |         userId: UserId,
+ 44 |         resource: string,
+    :         ^^^^|^^^
+    :             `-- 'resource' is declared here
+ 45 |         action: string,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'action' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/business-strategy/services/base-service.ts:45:9]
+ 44 |         resource: string,
+ 45 |         action: string,
+    :         ^^^|^^
+    :            `-- 'action' is declared here
+ 46 |         conditions?: Record<string, unknown>
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'conditions' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/business-strategy/services/base-service.ts:46:9]
+ 45 |         action: string,
+ 46 |         conditions?: Record<string, unknown>
+    :         ^^^^^|^^^^^
+    :              `-- 'conditions' is declared here
+ 47 |     ): Promise<boolean> {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/ai/privacyEngine.ts:260:29]
+ 259 |     const totalWeight = updates.length
+ 260 |     const averagedWeights = new Array(updates[0].weights.length).fill(0)
+     :                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 261 | 
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/ai/privacyEngine.ts:284:29]
+ 283 | 
+ 284 |     const proximalWeights = new Array(globalWeights.length).fill(0)
+     :                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 285 | 
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-vars): Function 'normalizeError' is declared but never used.
+     ,-[src/lib/error/logger.ts:247:10]
+ 246 |  */
+ 247 | function normalizeError(
+     :          ^^^^^^^|^^^^^^
+     :                 `-- 'normalizeError' is declared here
+ 248 |   error: unknown,
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/lib/analytics/advancedVisualization.tsx:298:17]
+ 297 |                   onClick={(e) => {
+ 298 | ,->                 e.ctrlKey || e.metaKey
+ 299 | |                     ? onSelectionChange([...selectedPoints, point])
+ 300 | `->                   : onSelectionChange([point])
+ 301 |                   }}
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/lib/deployment/multi-region/ServiceDiscoveryManager.ts:325:14]
+ 324 |       }
+ 325 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 326 |       return false
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+     ,-[src/lib/rate-limiting/index.ts:140:12]
+ 139 |     return { status, details }
+ 140 |   } catch (_error) {
+     :            ^^^|^^
+     :               `-- '_error' is declared here
+ 141 |     return {
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/auth/token-cache-service.ts:325:14]
+ 324 |       logger.error('Error in batch get operation', error)
+ 325 |       return new Array(tokenIds.length).fill(null)
+     :              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 326 |     }
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-vars): Parameter 'get' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/stores/journal-research/notificationStore.ts:44:11]
+ 43 |   persist(
+ 44 |     (set, get) => ({
+    :           ^|^
+    :            `-- 'get' is declared here
+ 45 |       notifications: [],
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/lib/polyfills/node-net.js:30:1]
+ 29 |     }
+ 30 | ,-> !(function () {
+ 31 | |     try {
+ 32 | |       var e =
+ 33 | |           'undefined' != typeof window
+ 34 | |             ? window
+ 35 | |             : 'undefined' != typeof global
+ 36 | |               ? global
+ 37 | |               : 'undefined' != typeof globalThis
+ 38 | |                 ? globalThis
+ 39 | |                 : 'undefined' != typeof self
+ 40 | |                   ? self
+ 41 | |                   : {},
+ 42 | |         n = new e.Error().stack
+ 43 | |       n &&
+ 44 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 45 | |         (e._sentryDebugIds[n] = '9efc4c05-f9eb-5fc8-b1d6-84263e6e1224'))
+ 46 | |     } catch (e) {}
+ 47 | `-> })()
+ 48 |     //# debugId=9efc4c05-f9eb-5fc8-b1d6-84263e6e1224
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/lib/polyfills/node-net.js:43:5]
+ 42 |           n = new e.Error().stack
+ 43 | ,->     n &&
+ 44 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 45 | `->       (e._sentryDebugIds[n] = '9efc4c05-f9eb-5fc8-b1d6-84263e6e1224'))
+ 46 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[src/lib/polyfills/node-net.js:46:12]
+ 45 |       (e._sentryDebugIds[n] = '9efc4c05-f9eb-5fc8-b1d6-84263e6e1224'))
+ 46 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 47 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/lib/polyfills/node-tls.js:30:1]
+ 29 |     }
+ 30 | ,-> !(function () {
+ 31 | |     try {
+ 32 | |       var e =
+ 33 | |           'undefined' != typeof window
+ 34 | |             ? window
+ 35 | |             : 'undefined' != typeof global
+ 36 | |               ? global
+ 37 | |               : 'undefined' != typeof globalThis
+ 38 | |                 ? globalThis
+ 39 | |                 : 'undefined' != typeof self
+ 40 | |                   ? self
+ 41 | |                   : {},
+ 42 | |         n = new e.Error().stack
+ 43 | |       n &&
+ 44 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 45 | |         (e._sentryDebugIds[n] = 'e1d9bda2-7732-5efa-9aba-1335e2d51c4c'))
+ 46 | |     } catch (e) {}
+ 47 | `-> })()
+ 48 |     //# debugId=e1d9bda2-7732-5efa-9aba-1335e2d51c4c
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/lib/polyfills/node-tls.js:43:5]
+ 42 |           n = new e.Error().stack
+ 43 | ,->     n &&
+ 44 | |         ((e._sentryDebugIds = e._sentryDebugIds || {}),
+ 45 | `->       (e._sentryDebugIds[n] = 'e1d9bda2-7732-5efa-9aba-1335e2d51c4c'))
+ 46 |       } catch (e) {}
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+    ,-[src/lib/polyfills/node-tls.js:46:12]
+ 45 |       (e._sentryDebugIds[n] = 'e1d9bda2-7732-5efa-9aba-1335e2d51c4c'))
+ 46 |   } catch (e) {}
+    :            |
+    :            `-- 'e' is declared here
+ 47 | })()
+    `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/components/admin/__tests__/AdminDashboard.test.ts:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint(no-unused-vars): Parameter 'res' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/auth/explicit-pg-auth.ts:23:34]
+ 22 | // Test the connection
+ 23 | pool.query('SELECT NOW()', (err, res) => {
+    :                                  ^|^
+    :                                   `-- 'res' is declared here
+ 24 |   if (err) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter '_' is caught but never used.
+    ,-[src/lib/sentry/utils.ts:47:12]
+ 46 |     }
+ 47 |   } catch (_) {
+    :            |
+    :            `-- '_' is declared here
+ 48 |     // no-op
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'buildKey' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/lib/api/journal-research/react-query.tsx:99:7]
+  98 | 
+  99 | const buildKey =
+     :       ^^^^|^^^
+     :           `-- 'buildKey' is declared here
+ 100 |   (...parts: unknown[]): QueryKeyFactory =>
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+     ,-[src/lib/auth/index.ts:170:12]
+ 169 |     }
+ 170 |   } catch (_error) {
+     :            ^^^|^^
+     :               `-- '_error' is declared here
+ 171 |     return {
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+     ,-[src/lib/auth/role-transitions.ts:926:16]
+ 925 |         }
+ 926 |       } catch (_error) {
+     :                ^^^|^^
+     :                   `-- '_error' is declared here
+ 927 |         validation.restrictions.push('Invalid role transition')
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'res' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/auth/better-auth-postgres.ts:36:34]
+ 35 | // Test the connection
+ 36 | pool.query('SELECT NOW()', (err, res) => {
+    :                                  ^|^
+    :                                   `-- 'res' is declared here
+ 37 |   if (err) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'res' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/auth/correct-pg-auth.ts:21:34]
+ 20 | // Test the connection
+ 21 | pool.query('SELECT NOW()', (err, res) => {
+    :                                  ^|^
+    :                                   `-- 'res' is declared here
+ 22 |   if (err) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'res' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/lib/auth/pg-auth-service.ts:23:34]
+ 22 | // Test the connection
+ 23 | pool.query('SELECT NOW()', (err, res) => {
+    :                                  ^|^
+    :                                   `-- 'res' is declared here
+ 24 |   if (err) {
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint-plugin-unicorn(no-empty-file): Empty files are not allowed.
+   ,-[src/lib/fhe/dynamic-fhe.ts:1:1]
+   `----
+  help: Delete this file or add some code to it.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/fhe/seal-operations.ts:251:39]
+ 250 |           // Ensure the array has enough elements or pad with zeros
+ 251 |           const coefArray: number[] = new Array<number>(slotCount).fill(0)
+     :                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 252 |           for (let i = 0; i < Math.min(bAsNumberArray.length, slotCount); i++) {
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/fhe/seal-operations.ts:538:40]
+ 537 |           const { slotCount } = batchEncoder
+ 538 |           const constArray: number[] = new Array<number>(slotCount).fill(
+     :                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 539 |             coefficients[0],
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/fhe/seal-operations.ts:570:37]
+ 569 |         const { slotCount } = batchEncoder
+ 570 |         const coefArray: number[] = new Array<number>(slotCount).fill(
+     :                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 571 |           coefficients[n],
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/fhe/seal-operations.ts:603:39]
+ 602 |           const { slotCount } = batchEncoder
+ 603 |           const coefArray: number[] = new Array<number>(slotCount).fill(
+     :                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 604 |             coefficients[i],
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-vars): Parameter 'metrics' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/journal-research/charts/PhaseProgressChart.tsx:15:3]
+ 14 |   progress,
+ 15 |   metrics,
+    :   ^^^|^^^
+    :      `-- 'metrics' is declared here
+ 16 |   className,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'e' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/journal-research/charts/MetricsChart.tsx:98:24]
+ 97 |             value={timeRange}
+ 98 |             onChange={(e) => {
+    :                        |
+    :                        `-- 'e' is declared here
+ 99 |               // This would need to be handled by parent component
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+    ,-[src/lib/server-only/mongodb-types.ts:49:12]
+ 48 |     return await import('mongodb')
+ 49 |   } catch (err) {
+    :            ^|^
+    :             `-- 'err' is declared here
+ 50 |     console.warn('MongoDB not available, using mock ObjectId')
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+     ,-[src/lib/threat-detection/response-orchestration.ts:666:14]
+ 665 |       }
+ 666 |     } catch (_e) {
+     :              ^|
+     :               `-- '_e' is declared here
+ 667 |       // ignore
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+     ,-[src/lib/threat-detection/ml-model-serving/model-server.ts:529:14]
+ 528 |       }
+ 529 |     } catch (_e) {
+     :              ^|
+     :               `-- '_e' is declared here
+ 530 |       // ignore errors generating crypto bytes; fallback below
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/threat-detection/ml-model-serving/model-server.ts:436:24]
+ 435 |         const { length } = first as number[]
+ 436 |         const sumVec = new Array(length).fill(0)
+     :                        ^^^^^^^^^^^^^^^^^
+ 437 |         outputs.forEach((out) => {
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint-plugin-unicorn(no-new-array): Do not use `new Array(singleArgument)`.
+     ,-[src/lib/threat-detection/ml-model-serving/model-server.ts:459:10]
+ 458 |         return sum
+ 459 |       }, new Array(length).fill(0))
+     :          ^^^^^^^^^^^^^^^^^
+ 460 | 
+     `----
+  help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[src/lib/threat-intelligence/global/GlobalThreatIntelligenceNetwork.ts:489:14]
+ 488 |       }
+ 489 |     } catch (e) {
+     :              |
+     :              `-- 'e' is declared here
+ 490 |       // Fallback to timestamp-based ID
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/lib/testing/test-helpers.ts:421:16]
+ 420 |         }
+ 421 |       } catch (error) {
+     :                ^^|^^
+     :                  `-- 'error' is declared here
+ 422 |         // Connection errors are expected for some payloads
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/lib/testing/test-helpers.ts:472:16]
+ 471 |         }
+ 472 |       } catch (error) {
+     :                ^^|^^
+     :                  `-- 'error' is declared here
+ 473 |         // Service not ready yet
+     `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-invalid-fetch-options): "body" is not allowed when method is "GET"
+     ,-[src/lib/testing/test-helpers.ts:405:11]
+ 404 |           method,
+ 405 |           body:
+     :           ^^^^
+ 406 |             method !== 'GET' ? JSON.stringify({ input: payload }) : undefined,
+     `----
+
+  ! eslint(no-unused-vars): Catch parameter 'error' is caught but never used.
+     ,-[src/lib/testing/performance-benchmarks.ts:283:14]
+ 282 |       }
+ 283 |     } catch (error) {
+     :              ^^|^^
+     :                `-- 'error' is declared here
+ 284 |       const endTime = performance.now()
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+     ,-[src/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts:531:14]
+ 530 |       return { cert, key, ca }
+ 531 |     } catch (_e) {
+     :              ^|
+     :               `-- '_e' is declared here
+ 532 |       logger.warn('Invalid certificate credentials provided')
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_error' is caught but never used.
+      ,-[src/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts:1976:14]
+ 1975 |       }
+ 1976 |     } catch (_error) {
+      :              ^^^|^^
+      :                 `-- '_error' is declared here
+ 1977 |       return false
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_err' is caught but never used.
+    ,-[src/lib/ai/bias-detection/job-queue.ts:95:14]
+ 94 |       // Job processing logic would go here
+ 95 |     } catch (_err: any) {
+    :              ^^^^|^^^^
+    :                  `-- '_err' is declared here
+ 96 |       console.error(`[JobQueue] Job failed`, {
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'e' is caught but never used.
+     ,-[src/lib/ai/bias-detection/python-bridge.ts:271:22]
+ 270 |               controller.abort()
+ 271 |             } catch (e) {
+     :                      |
+     :                      `-- 'e' is declared here
+ 272 |               /* ignore */
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter '_err' is caught but never used.
+    ,-[src/lib/threat-detection/threat-hunting/utils/threat-data-utils.ts:24:12]
+ 23 |     }
+ 24 |   } catch (_err) {
+    :            ^^|^
+    :              `-- '_err' is declared here
+ 25 |     // ignore and fall through to fallback
+    `----
+  help: Consider handling this error.
+
+  ! eslint-plugin-unicorn(no-invalid-fetch-options): "body" is not allowed when method is "GET"
+     ,-[src/lib/ai/embedding-agent/client.ts:152:9]
+ 151 |         headers,
+ 152 |         body: body ? JSON.stringify(toSnakeCase(body)) : undefined,
+     :         ^^^^
+ 153 |         signal: controller.signal,
+     `----
+
+  ! eslint(no-unused-vars): Catch parameter '_e' is caught but never used.
+    ,-[src/lib/threat-detection/predictive/predictive-threat-intelligence.ts:17:12]
+ 16 |     }
+ 17 |   } catch (_e) {
+    :            ^|
+    :             `-- '_e' is declared here
+ 18 |     // ignore errors when crypto is unavailable
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Type 'SessionData' is imported but never used.
+   ,-[src/lib/ai/realTimeProcessor.ts:6:15]
+ 5 | 
+ 6 | import type { SessionData, RealTimeMetrics, ProcessingConfig } from '@/types/ai'
+   :               ^^^^^|^^^^^
+   :                    `-- 'SessionData' is imported here
+ 7 | 
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Parameter 'config' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/lib/ai/realTimeProcessor.ts:130:5]
+ 129 |   private async createProcessingPipeline(
+ 130 |     config: Partial<ProcessingConfig>,
+     :     ^^^|^^
+     :        `-- 'config' is declared here
+ 131 |   ): Promise<ProcessingStage[]> {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Variable 'startTime' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/lib/ai/realTimeProcessor.ts:306:13]
+ 305 |     try {
+ 306 |       const startTime = Date.now()
+     :             ^^^^|^^^^
+     :                 `-- 'startTime' is declared here
+ 307 | 
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Parameter 'riskFactors' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/lib/ai/validation/clinical-validator.ts:322:5]
+ 321 |     level: 'low' | 'medium' | 'high' | 'critical',
+ 322 |     riskFactors: string[],
+     :     ^^^^^|^^^^^
+     :          `-- 'riskFactors' is declared here
+ 323 |   ): string[] {
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/lib/ai/mental-llama/routing/MentalHealthTaskRouter.ts:286:14]
+ 285 |       }
+ 286 |     } catch (err) {
+     :              ^|^
+     :               `-- 'err' is declared here
+ 287 |       // Parsing failed - return a conservative fallback decision
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'sessionId' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/lib/ai/services/contextual-enhancer.ts:283:31]
+ 282 | 
+ 283 |   private getSessionStartTime(sessionId: string): number {
+     :                               ^^^^|^^^^
+     :                                   `-- 'sessionId' is declared here
+ 284 |     // Store session start times
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'patientId' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/lib/ai/services/contextual-enhancer.ts:288:34]
+ 287 | 
+ 288 |   private async getBaselineState(patientId: string): Promise<EmotionState> {
+     :                                  ^^^^|^^^^
+     :                                      `-- 'patientId' is declared here
+ 289 |     // Retrieve patient's baseline emotional state
+     `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'profile' is declared but never used. Unused parameters should start with a '_'.
+     ,-[src/lib/ai/services/contextual-enhancer.ts:329:5]
+ 328 |     history: SessionContext[],
+ 329 |     profile: PatientPsiProfile,
+     :     ^^^|^^^
+     :        `-- 'profile' is declared here
+ 330 |   ): number {
+     `----
+  help: Consider removing this parameter.
+
+Found 219 warnings and 0 errors.
+Finished in 367ms on 2339 files with 90 rules using 4 threads.

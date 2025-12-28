@@ -1,0 +1,87 @@
+# Foundation Model Training Requirements for H100 GPU
+# Python 3.11+ compatible packages
+
+# Core ML Framework - Updated for security fixes
+torch>=2.8.0,<3.0.0
+torchvision>=0.21.0,<1.0.0
+torchaudio>=2.8.0,<3.0.0
+
+# Lightning.ai Framework
+lightning==2.5.5
+pytorch-lightning==2.5.5
+
+# Transformers and NLP
+transformers==4.57.1
+tokenizers==0.20.3
+datasets==2.21.0
+evaluate==0.4.2
+
+# LoRA and Efficient Training
+peft==0.15.1
+bitsandbytes==0.44.1
+accelerate==1.1.1
+deepspeed==0.18.1
+
+# Data Processing
+pandas==2.1.0
+numpy==1.24.0
+scikit-learn==1.5.0
+
+# Monitoring and Logging
+wandb==0.18.15
+tensorboard==2.18.0
+mlflow==3.5.1
+
+# Model Serving
+fastapi==0.104.0
+uvicorn==0.24.0
+pydantic==2.5.0
+
+# Storage and I/O
+boto3==1.29.0
+minio==7.2.11
+h5py==3.10.0
+
+# Utilities
+tqdm==4.66.3
+click==8.1.0
+python-dotenv==1.0.0
+psutil==5.9.0
+
+# Therapeutic AI Specific
+spacy==3.8.7
+nltk==3.9.2
+textstat==0.7.8
+
+# Security and Compliance
+cryptography==46.0.3
+pycryptodome==3.23.0
+
+# API and Communication
+httpx==0.25.0
+websockets==12.0
+redis==5.0.0
+psycopg2-binary==2.9.0
+
+# Development and Testing
+pytest==7.4.0
+pytest-asyncio==0.21.0
+pytest-cov==4.1.0
+black==24.3.0
+isort==5.12.0
+mypy==1.7.0
+
+# GPU Monitoring
+pynvml==11.5.0
+gpustat==1.1.0
+
+# Memory Management
+memory-profiler==0.61.0
+pympler==0.9.0
+
+# Security: Pin transitive dependencies to secure versions
+urllib3==2.6.2  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+setuptools==78.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
+wheel==0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp==3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
+requests==2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability

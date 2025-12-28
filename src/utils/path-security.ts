@@ -92,7 +92,7 @@ export function sanitizeFilename(filename: string): string {
   return filename
     .replace(/[/\\]/g, '') // Remove path separators
     .replace(/\.\./g, '') // Remove parent directory references
-    .replace(/[<>:"|?*\x00-\x1f]/g, '') // Remove unsafe characters
+    .replace(/[<>:"|?*\x00-\x1f]/g, '') // Remove unsafe characters including control characters
     .trim()
 }
 
