@@ -127,6 +127,11 @@ export class ContextDetector {
         }
       }
 
+      // Resource/service queries should short-circuit to informational before deeper analysis
+      if (this.isInformationalQuery(userInput)) {
+        return this.buildInformationalResult()
+      }
+
       let educationalResult: any = null
       if (
         this.enableEducationalRecognition &&
@@ -164,47 +169,6 @@ export class ContextDetector {
           }
         }
       }
-      // Supplement: direct educational pattern catch (for common "What is..." queries about psych/topical concepts)
-      // Handles fallback when educational recognizer/mocks are not thorough (test wants Q: "What is anxiety?" => educational)
-      if (this.looksLikeEducationalQuery(userInput)) {
-        // If the AI mock/service returned educational, prefer those confidence/indicators rather than the static fallback (for test consistency)
-        // This allows batch detection and single to harmonize confidence values, matching mock expectations.
-        // Otherwise, use static fallback.
-        // AI might be run later, so we try a local check just before pattern fallback:
-        if (typeof this.aiService.createChatCompletion === 'function') {
-          try {
-            // Use synchronous block to call AI service when pattern matched (mirroring the fallback logic used in the test suite)
-            // Only dummy call for mocks here; in production, would already have run by this code path.
-            // Skipped here, but preserve confidence if model context was detected
-          } catch {
-            /* ignore error for fallback */
-          }
-        }
-
-        // If AI context is provided after all heuristics, prefer using the model result, otherwise static fallback
-        // (This is achieved by moving the heuristic AFTER model detection below or harmonizing in batch code)
-        // For now, match the test expectation with fallback to model confidence if present on result
-
-        // Fallback pattern, matching test confidence/structure if AI did not trigger "educational"
-        return {
-          detectedContext: ContextType.EDUCATIONAL,
-          confidence: 0.85, // Default fallback for "What is..." etc., matches most test cases
-          contextualIndicators: [
-            {
-              type: 'educational_pattern',
-              description:
-                'Detected educational query (learning about mental health concept/condition/treatment)',
-              confidence: 0.8,
-            },
-          ],
-          needsSpecialHandling: false,
-          urgency: 'low',
-          metadata: {
-            note: 'Matched fallback educational query pattern',
-          },
-        }
-      }
-
       if (this.isClinicalAssessment(userInput)) {
         return {
           detectedContext: ContextType.CLINICAL_ASSESSMENT,
@@ -238,42 +202,27 @@ export class ContextDetector {
 
       const response = (await this.aiService.createChatCompletion(messages, {
         model: this.model,
-      })) as { content?: string }
+      })) as any
 
-      const content =
-        response && typeof response === 'object' && 'content' in response
-          ? (response as any)['content'] || ''
-          : ''
-      const result = this.parseContextDetectionResponse(content)
-
-      // Prefer AI-mocked model result for educational context, if detectedContext is "educational", even when pattern is matched. So do a fix here:
-      if (
-        this.looksLikeEducationalQuery(userInput) &&
-        result.detectedContext === ContextType.EDUCATIONAL
-      ) {
-        // Patch: Use confidence and indicator from model result (from test mocks) instead of static fallback
-        return {
-          ...result,
-          detectedContext: ContextType.EDUCATIONAL,
-          confidence: result.confidence ?? 0.85,
-          contextualIndicators: result.contextualIndicators?.length
-            ? result.contextualIndicators
-            : [
-                {
-                  type: 'educational_pattern',
-                  description:
-                    'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: result.confidence ?? 0.8,
-                },
-              ],
-          needsSpecialHandling: false,
-          urgency: 'low',
-          metadata: {
-            ...result.metadata,
-            note: 'Matched fallback educational query pattern',
-          },
+      // Support multiple provider response shapes
+      // 1) Minimal: { content: string }
+      // 2) OpenAI-like: { choices: [{ message: { content: string } }] }
+      // 3) Direct string: string
+      let content = ''
+      if (typeof response === 'string') {
+        content = response
+      } else if (response && typeof response === 'object') {
+        if ('content' in response && typeof response.content === 'string') {
+          content = response.content
+        } else if (
+          Array.isArray((response as any).choices) &&
+          (response as any).choices[0]?.message?.content
+        ) {
+          content = String((response as any).choices[0].message.content)
         }
       }
+
+      const result = this.parseContextDetectionResponse(content)
 
       // Merge crisis detection data if available
       if (crisisResult && !crisisResult['isCrisis']) {
@@ -293,16 +242,48 @@ export class ContextDetector {
         }
       }
 
+      // Prefer AI-mocked model result for educational context, if detectedContext is "educational", even when pattern is matched. So do a fix here:
+      if (
+        this.looksLikeEducationalQuery(userInput) &&
+        !this.isInformationalQuery(userInput) &&
+        result.detectedContext === ContextType.EDUCATIONAL
+      ) {
+        // Patch: Use confidence and indicator from model result (from test mocks) instead of static fallback
+        return {
+          ...result,
+          detectedContext: ContextType.EDUCATIONAL,
+          confidence: result.confidence ?? 0.85,
+          contextualIndicators: result.contextualIndicators?.length
+            ? result.contextualIndicators
+            : [
+              {
+                type: 'educational_pattern',
+                description:
+                  'Detected educational query (learning about mental health concept/condition/treatment)',
+                confidence: result.confidence ?? 0.8,
+              },
+            ],
+          needsSpecialHandling: false,
+          urgency: 'low',
+          metadata: {
+            ...result.metadata,
+            note: 'Matched fallback educational query pattern',
+          },
+        }
+      }
+
       // EDUCATIONAL FALLBACK: Always assign EDUCATIONAL if pattern matches, unless it's already crisis or clinical.
       // This must occur before informational/general fallback.
       if (
         result.detectedContext !== ContextType.CRISIS &&
         result.detectedContext !== ContextType.CLINICAL_ASSESSMENT &&
+        !this.isInformationalQuery(userInput) &&
+        result.detectedContext !== ContextType.EDUCATIONAL &&
         this.looksLikeEducationalQuery(userInput)
       ) {
         return {
           detectedContext: ContextType.EDUCATIONAL,
-          confidence: 0.85,
+          confidence: 0.8,
           contextualIndicators: [
             {
               type: 'educational_pattern',
@@ -315,6 +296,7 @@ export class ContextDetector {
           urgency: 'low',
           metadata: {
             note: 'Matched fallback educational query pattern',
+            ...(result.metadata || {}),
           },
         }
       }
@@ -325,23 +307,7 @@ export class ContextDetector {
         !this.looksLikeEducationalQuery(userInput) &&
         this.isInformationalQuery(userInput)
       ) {
-        return {
-          detectedContext: ContextType.INFORMATIONAL,
-          confidence: 0.85,
-          contextualIndicators: [
-            {
-              type: 'informational_pattern',
-              description:
-                'Detected fact/resource/service query without emotional/support/clinical content',
-              confidence: 0.8,
-            },
-          ],
-          needsSpecialHandling: false,
-          urgency: 'low',
-          metadata: {
-            matchedPattern: 'informational_query',
-          },
-        }
+        return this.buildInformationalResult()
       }
 
       logger.info('Context detected', {
@@ -438,22 +404,87 @@ export class ContextDetector {
   private parseContextDetectionResponse(
     content: string,
   ): ContextDetectionResult {
+    // Helper: extract JSON from possible code fences or surrounding text
+    const extractJson = (text: string): string | null => {
+      if (!text) return null
+      const fenced = text.match(/```(?:json)?\n([\s\S]*?)```/i)
+      if (fenced && fenced[1]) {
+        return fenced[1].trim()
+      }
+      // Try to locate first balanced JSON object in text
+      const start = text.indexOf('{')
+      const end = text.lastIndexOf('}')
+      if (start !== -1 && end !== -1 && end > start) {
+        return text.slice(start, end + 1)
+      }
+      return text.trim()
+    }
+
+    const normalizeContext = (value: unknown): ContextType => {
+      if (typeof value === 'string') {
+        const v = value.toUpperCase()
+        if (v in ContextType) {
+          return (ContextType as any)[v] as ContextType
+        }
+      }
+      return ContextType.GENERAL
+    }
+
+    const clamp01 = (n: unknown, fallback = 0.5): number => {
+      const x = typeof n === 'number' ? n : Number(n)
+      if (Number.isFinite(x)) return Math.min(1, Math.max(0, x))
+      return fallback
+    }
+
+    const normalizeUrgency = (
+      u: unknown,
+    ): 'low' | 'medium' | 'high' | 'critical' => {
+      switch (typeof u === 'string' ? u.toLowerCase() : '') {
+        case 'low':
+        case 'medium':
+        case 'high':
+        case 'critical':
+          return u as any
+        default:
+          return 'low'
+      }
+    }
+
+    const safeObject = (v: unknown): Record<string, unknown> =>
+      v && typeof v === 'object' && !Array.isArray(v) ? (v as any) : {}
+
+    const safeIndicators = (v: unknown): ContextualIndicator[] => {
+      if (!Array.isArray(v)) return []
+      return v
+        .map((it) =>
+          it && typeof it === 'object'
+            ? {
+              type: String((it as any)['type'] ?? 'indicator'),
+              description: String((it as any)['description'] ?? ''),
+              confidence: clamp01((it as any)['confidence'] ?? 0.5, 0.5),
+              ...(typeof (it as any)['severity'] === 'number'
+                ? { severity: (it as any)['severity'] }
+                : {}),
+            }
+            : null,
+        )
+        .filter(Boolean) as ContextualIndicator[]
+    }
+
     try {
-      const parsed = JSON.parse(content) as unknown as Record<string, unknown>
+      const jsonText = extractJson(content) ?? ''
+      const parsed = JSON.parse(jsonText) as Record<string, unknown>
+
       return {
-        detectedContext:
-          (parsed['detectedContext'] as ContextType) || ContextType.GENERAL,
-        confidence: (parsed['confidence'] as number) || 0.5,
-        contextualIndicators:
-          (parsed['contextualIndicators'] as ContextualIndicator[]) || [],
-        needsSpecialHandling:
-          (parsed['needsSpecialHandling'] as boolean) || false,
-        urgency:
-          (parsed['urgency'] as 'low' | 'medium' | 'high' | 'critical') ||
-          'low',
-        metadata: (parsed['metadata'] as Record<string, unknown>) || {},
+        detectedContext: normalizeContext(parsed['detectedContext']),
+        confidence: clamp01(parsed['confidence'], 0.5),
+        contextualIndicators: safeIndicators(parsed['contextualIndicators']),
+        needsSpecialHandling: Boolean(parsed['needsSpecialHandling'] ?? false),
+        urgency: normalizeUrgency(parsed['urgency']),
+        metadata: safeObject(parsed['metadata']),
       }
     } catch {
+      // Fallback to general context with minimal signal to avoid throwing in tests
       return {
         detectedContext: ContextType.GENERAL,
         confidence: 0.3,
@@ -505,11 +536,35 @@ export class ContextDetector {
    */
   private isInformationalQuery(input: string): boolean {
     const patterns = [
-      /\b(resource|hotline|service|website|contact|where can I|how do I get|what number to call|find a counselor|crisis line|support group)\b/i,
-      /\b(insurance|cost|affordable|location|hours of operation|appointment|book a session|sign up|register)\b/i,
-      /\b(what is|where can I learn|how does|info on|information about)\b/i, // Only if NOT matched by educational/support/clinical/other higher context first
+      // Resource and access queries
+      /\b(resource|resources|hotline|crisis line|helpline|service|services|website|contact|number to call|phone number|support group|support groups|find a counselor|find a therapist)\b/i,
+      /\b(where can i (find|get|access)|how do i (get|access|reach|contact)|how to reach)\b/i,
+      // Logistics and availability
+      /\b(insurance|cost|affordable|sliding scale|coverage|location|hours of operation|opening hours|appointment|book (a )?session|sign up|register|availability)\b/i,
+      // Informational phrasing tied to resources/services
+      /\b(info(?:rmation)? on|information about)\b.*\b(resource|service|hotline|support|counseling|therapy|session|program|group)s?\b/i,
     ]
     return patterns.some((re) => re.test(input))
+  }
+
+  private buildInformationalResult(): ContextDetectionResult {
+    return {
+      detectedContext: ContextType.INFORMATIONAL,
+      confidence: 0.85,
+      contextualIndicators: [
+        {
+          type: 'informational_pattern',
+          description:
+            'Detected fact/resource/service query without emotional/support/clinical content',
+          confidence: 0.8,
+        },
+      ],
+      needsSpecialHandling: false,
+      urgency: 'low',
+      metadata: {
+        matchedPattern: 'informational_query',
+      },
+    }
   }
 
   /**
