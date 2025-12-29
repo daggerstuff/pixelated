@@ -45,7 +45,7 @@ const { class: className = '' } = Astro.props
         )
         toTopButton.classList.add('translate-y-0', 'opacity-100')
         toTopButton.removeAttribute('tabindex')
-        toTopButton.removeAttribute('aria-hidden')
+        toTopButton.setAttribute('aria-hidden', 'false')
       } else {
         toTopButton.classList.add(
           'translate-y-20',
