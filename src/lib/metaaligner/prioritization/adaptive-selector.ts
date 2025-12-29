@@ -81,25 +81,31 @@ export class AdaptiveSelector {
         userId,
       )
     } catch (err) {
+      // Clinical Decision Support Safeguard: When detection fails, we cannot determine
+      // if this is a crisis situation. Flag for human review rather than auto-defaulting to safe.
       detection = {
         detectedContext: ContextType.GENERAL,
         confidence: 0.1,
         contextualIndicators: [
-          { type: 'error_fallback', description: 'Context detection failed, using default', confidence: 0.1 },
+          { type: 'error_fallback', description: 'Context detection failed, flagged for review', confidence: 0.1 },
         ],
-        needsSpecialHandling: false,
-        urgency: 'low',
-        metadata: { error: err instanceof Error ? err.message : 'Unknown error' },
+        needsSpecialHandling: true, // Flag for human review - could be a crisis
+        urgency: 'medium', // Medium urgency to ensure review without over-alerting
+        metadata: {
+          error: err instanceof Error ? err.message : 'Unknown error',
+          requiresHumanReview: true, // Explicit flag for clinical decision support
+          errorFallback: true,
+        },
       }
     }
 
     // Track transitions (used in tests)
     if (this.lastDetectedContext && this.lastDetectedContext !== detection.detectedContext) {
       detection.metadata = detection.metadata || {}
-        ; (detection.metadata as Record<string, unknown>)['transition'] = {
-          from: this.lastDetectedContext,
-          to: detection.detectedContext,
-        }
+      ;(detection.metadata as Record<string, unknown>)['transition'] = {
+        from: this.lastDetectedContext,
+        to: detection.detectedContext,
+      }
     }
     this.lastDetectedContext = detection.detectedContext
 
@@ -117,15 +123,19 @@ export class AdaptiveSelector {
     let weightCalculationResult: WeightCalculationResult
 
     // If detection failed (marked with metadata.error), use exact default weights without recalculation
-    if ((detection.metadata as any)?.error) {
+    const hasDetectionError = 'error' in detection.metadata && detection.metadata.error !== undefined
+    if (hasDetectionError) {
       selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,
         weight: defaults[objective.id] ?? 0,
       }))
       weightCalculationResult = {
         weights: { ...defaults },
-        details: { strategy: 'default-fallback' },
-      } as unknown as WeightCalculationResult
+        details: {
+          strategy: 'default-fallback',
+          reason: 'Context detection failed - using default weights with human review flag',
+        },
+      } as WeightCalculationResult
     } else {
       const objectiveConfig = {
         objectives: defaults,
