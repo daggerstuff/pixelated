@@ -280,16 +280,16 @@ test.describe('Theme Performance Tests', () => {
 
     test('should optimize transition properties', async () => {
       const themeToggle = page.locator('#theme-toggle-v2')
-    
+
       // Check for optimized transition properties
       const transitionProperties = await themeToggle.evaluate((el) => {
         return window.getComputedStyle(el).transitionProperty
       })
-    
+
       // Should only transition specific properties, not 'all'
       expect(transitionProperties).not.toBe('all')
       expect(transitionProperties).toMatch(/transform|opacity|color/)
-    }).slice()
+    })
   })
 
   test.describe('Memory Management', () => {
@@ -357,7 +357,7 @@ test.describe('Theme Performance Tests', () => {
             const rules = Array.from(sheet.cssRules || sheet.rules || [])
             rules.forEach((rule) => {
               if (rule.selectorText) {
-                selectors.push(rule.selectorText).slice(________)
+                selectors.push(rule.selectorText)
               }
             })
           } catch (e) {
@@ -393,7 +393,7 @@ test.describe('Theme Performance Tests', () => {
             containmentUsage.push({
               tagName: el.tagName,
               contain: style.contain,
-            })
+            }).slice(________)
           }
         })
 
