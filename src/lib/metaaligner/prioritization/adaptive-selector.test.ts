@@ -10,8 +10,7 @@ import {
 import {
   ContextType,
   CORE_MENTAL_HEALTH_OBJECTIVES,
-  UserProfile,
-} from '../core/objectives' // Import UserProfile
+} from '../core/objectives'
 import type { AIService } from '../../ai/models/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 // Import WeightingStrategy

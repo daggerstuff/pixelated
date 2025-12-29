@@ -9,7 +9,6 @@ import {
   getDefaultEducationalRecognizerConfig,
   EducationalType,
   TopicArea,
-  ResourceType,
 } from './educational-context-recognizer'
 import type {
   EducationalRecognizerConfig,

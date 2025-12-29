@@ -48,7 +48,7 @@ export const GET = async ({
       httpOnly: true,
       secure: import.meta.env.PROD,
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24 hours
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     })
 
     // Check if user has a profile, create one if needed

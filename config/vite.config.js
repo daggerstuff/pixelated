@@ -326,11 +326,11 @@ export default defineConfig({
       'tls': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
       // Alias MongoDB to a client-safe polyfill
       'mongodb': path.resolve('./src/lib/polyfills/browser-polyfills.ts'),
-      '@lib': path.resolve('./src/lib'),
+      '@lib': path.resolve(__dirname, 'src/lib'),
       '@/hooks/useMentalHealthAnalysis': path.resolve(
         './src/hooks/useMentalHealthAnalysis.ts',
       ),
-      '@': path.resolve('./src'),
+      '@': path.resolve(__dirname, 'src'),
       '~': path.resolve(__dirname, 'src'),
     },
     conditions: ['node', 'import', 'module', 'default'],

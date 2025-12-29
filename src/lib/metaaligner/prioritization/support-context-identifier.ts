@@ -441,6 +441,7 @@ export class SupportContextIdentifier {
     const resources = baseResources.map((r) => String(r))
     if (result.urgency === 'high') {
       // Proactively include an explicit crisis/hotline reference for high urgency cases
+      // But require human-in-the-loop review before automated crisis intervention
       resources.unshift('Emergency crisis hotline support')
       const crisisAdds = [
         'Crisis hotline: 988 Suicide & Crisis Lifeline',
@@ -455,6 +456,10 @@ export class SupportContextIdentifier {
       if (!resources.some((r) => /crisis|hotline|emergency/i.test(r))) {
         resources.unshift('Emergency crisis hotline')
       }
+      // Add human-in-the-loop review flag for high urgency cases
+      if (!result.metadata) result.metadata = {}
+      result.metadata.requiresHumanReview = true
+      result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
     const urgCheck = String(result.urgency || '').toLowerCase().trim()
@@ -468,6 +473,10 @@ export class SupportContextIdentifier {
       !resources.some((x) => /crisis|hotline|emergency/i.test(x))
     ) {
       resources.push('Emergency support and crisis hotline information')
+      // Add human-in-the-loop review flag for high urgency cases
+      if (!result.metadata) result.metadata = {}
+      result.metadata.requiresHumanReview = true
+      result.metadata.crisisInterventionFlagged = true
     }
 
     // Type-safe resource stringification
