@@ -157,7 +157,7 @@ We produce and persist:
 
 A versioned training curriculum that routes dataset families into phases:
 - Continued pretraining
-- SFT curriculum by stage (foundation → long sessions → edge/cisis → voice/persona → simulator tasks)
+- SFT curriculum by stage (foundation → long sessions → edge/crisis → voice/persona → simulator tasks)
 - Preference alignment (DPO/ORPO/SimPO/KTO depending on available preference data)
 
 ## 8) Functional requirements (consolidated)
@@ -309,25 +309,25 @@ This requirement is *not* permission to include PII; it increases the need for r
 
 These are the baseline families implied by the existing S3 canonical structure and stage mapping in `ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md`.
 
-**Stage 1 — Foundation (therapeutic dialogue)**
+### Stage 1 — Foundation (therapeutic dialogue)
 - `s3://pixel-data/gdrive/processed/professional_therapeutic/` (at least one high-quality therapeutic conversation family)
 - `s3://pixel-data/gdrive/processed/priority/` (at least one priority JSONL present)
 
-**Stage 2 — Therapeutic expertise / reasoning**
+### Stage 2 — Therapeutic expertise / reasoning
 - `s3://pixel-data/gdrive/processed/cot_reasoning/` (at least one CoT/reasoning dataset present)
 
-**Stage 3 — Edge / crisis stress test**
+### Stage 3 — Edge / crisis stress test
 - `s3://pixel-data/gdrive/processed/edge_cases/` (at least one edge/case dataset present)
 
-**Stage 4 — Voice/persona**
+### Stage 4 — Voice/persona
 - `s3://pixel-data/voice/` (at minimum: a persona profile and a conversation set)
 
 ### Release 0 artifacts (must exist)
 
-**Authoritative release directory in S3**
+#### Authoritative release directory in S3
 - A versioned prefix (example): `s3://pixel-data/exports/releases/vYYYY-MM-DD/`
 
-**Manifest**
+#### Manifest
 - A release manifest containing:
   - dataset families included
   - S3 object keys per shard
@@ -336,25 +336,25 @@ These are the baseline families implied by the existing S3 canonical structure a
   - provenance fields
   - redaction/PII status fields
 
-**Compiled export**
+#### Compiled export
 - ChatML JSONL export (single or sharded) referenced by the manifest.
 
-**Routing / curriculum config**
+#### Routing / curriculum config
 - A versioned configuration mapping dataset families → phases/stages and weights.
 
 ### Release 0 gates (must pass; fail closed)
 
-**Privacy gate**
+#### Privacy gate
 - No confirmed PII escapes in final exports (automated checks + sampling).
 
-**Provenance gate**
+#### Provenance gate
 - Every included shard/record has provenance (source family + source key). Missing provenance blocks the release.
 
-**Dedup + leakage gate**
+#### Dedup + leakage gate
 - Exact-dup and near-dup checks run.
 - Cross-split leakage checks pass for holdout-sensitive families (at minimum: edge/case and voice).
 
-**Distribution gate**
+#### Distribution gate
 - Basic distribution stats recorded (turn counts/tokens) by family and split; regressions are visible and explainable.
 
 ### Release 0 signoff checklist (human)

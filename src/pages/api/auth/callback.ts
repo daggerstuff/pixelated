@@ -25,9 +25,22 @@ export const GET = async ({
   try {
     // For OAuth callback, we would need to exchange the code with the OAuth provider
     // Delegate to adapter which proxies to the runtime mongoAuthService
+    interface OAuthVerificationResult {
+      user: {
+        _id: string | { toString(): string }
+        email: string
+        role: string
+        metadata?: {
+          fullName?: string
+          avatarUrl?: string
+          provider?: string
+        }
+      }
+      token: string
+    }
     const { user, token } = (await (
       await import('@/adapters/betterAuthMongoAdapter')
-    ).verifyOAuthCode(authCode)) as unknown as { user: any; token: string }
+    ).verifyOAuthCode(authCode)) as OAuthVerificationResult
 
     // Set cookies for session management
     cookies.set('auth-token', token, {
