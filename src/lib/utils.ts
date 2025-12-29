@@ -1,11 +1,36 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Standardized error messages for consistent error handling
+ */
+export const ERRORS = {
+  /** Node environment detection */
+  NOT_NODE_ENVIRONMENT: 'Not in Node.js environment',
+
+  /** Crypto utilities */
+  NODE_CRYPTO_UNAVAILABLE: 'Node crypto module not available',
+  CRYPTO_UNSUPPORTED: 'Cryptographically secure random number generation is not supported in this environment. Math.random() fallback has been removed for security. Please run in a secure context (browser with crypto.getRandomValues or Node.js with crypto.randomBytes).',
+  BYTES_TO_UINT32BE_SHORT: 'bytesToUint32BE: input must have at least 4 bytes',
+  INVALID_RANDOM_INT_PARAM: 'maxExclusive must be positive integer',
+
+  /** ID generation */
+  GENERATE_UNIQUE_ID_UNEXPECTED_BYTE: 'generateUniqueId: Unexpected undefined byte',
+  GENERATE_SHORT_ID_UNEXPECTED_BYTE: 'generateShortId: Unexpected undefined byte',
+
+  /** Array utilities */
+  SPARSE_ARRAY_DETECTED: (index: number) => `Sparse array detected at index ${index}`,
+  CANNOT_SHUFFLE_SPARSE_ARRAY: 'Cannot shuffle sparse arrays: input contains holes.',
+
+  /** Number utilities */
+  RANDOM_INT_MIN_MAX: 'min must be <= max'
+}
+
 // Helper to synchronously require Node modules in Node-only environments without
 // triggering static bundlers or TypeScript/ESLint `no-require-imports` errors.
 export function tryRequireNode(moduleName: string): any | null {
   try {
-    if (typeof window === 'undefined' && typeof process !== 'undefined') {
+    if (isNodeEnvironment()) {
       // Use global require if available (Node.js environment)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const globalRequire = (globalThis as any).require
@@ -23,9 +48,30 @@ export function tryRequireNode(moduleName: string): any | null {
   return null
 }
 
+/**
+ * Checks if current environment is browser/client-side
+ */
+export function isBrowserEnvironment(): boolean {
+  return typeof window !== 'undefined'
+}
+
+/**
+ * Checks if current environment is Node.js
+ */
+function isNodeEnvironment(): boolean {
+  return !isBrowserEnvironment() && typeof process !== 'undefined'
+}
+
 // Use Node crypto via guarded require when available; fallback to runtime checks for browsers
 const nodeCrypto: typeof import('crypto') | undefined =
   tryRequireNode('crypto') || undefined
+
+/**
+ * Type guard for checking if value is a non-null object
+ */
+export function isNonNullObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
 
 /**
  * Gets random bytes using Web Crypto API (browser) or Node.js crypto (server)
@@ -49,13 +95,10 @@ export function getRandomBytes(size: number): Uint8Array {
       if (randomBytes) {
         return new Uint8Array(randomBytes(size))
       }
-      throw new Error('Node crypto not available')
+      throw new Error(ERRORS.NODE_CRYPTO_UNAVAILABLE)
     } catch {
       // No cryptographically secure random available
-      throw new Error(
-        'Cryptographically secure random number generation is not supported in this environment. ' +
-          'Math.random() fallback has been removed for security. Please run in a secure context (browser with crypto.getRandomValues or Node.js with crypto.randomBytes).',
-      )
+      throw new Error(ERRORS.CRYPTO_UNSUPPORTED)
     }
   }
 }
@@ -67,7 +110,7 @@ export function getRandomBytes(size: number): Uint8Array {
  */
 function bytesToUint32BE(bytes: Uint8Array): number {
   if (bytes.length < 4) {
-    throw new Error('bytesToUint32BE: input must have at least 4 bytes')
+    throw new Error(ERRORS.BYTES_TO_UINT32BE_SHORT)
   }
   return (bytes[0]! << 24) | (bytes[1]! << 16) | (bytes[2]! << 8) | bytes[3]!
 }
@@ -79,7 +122,7 @@ function bytesToUint32BE(bytes: Uint8Array): number {
  */
 export function secureRandomInt(maxExclusive: number): number {
   if (!Number.isInteger(maxExclusive) || maxExclusive < 1) {
-    throw new Error('maxExclusive must be positive integer')
+    throw new Error(ERRORS.INVALID_RANDOM_INT_PARAM)
   }
   const maxUint32 = 0xffffffff
   // Find rejection sampling threshold: only accept random values < rangeLimit
@@ -133,11 +176,11 @@ export function generateUniqueId(): string {
     // Fallback UUID generation
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
       /[xy]/g,
-      function (c) {
+      function(c) {
         const bytes = getRandomBytes(1)
         const byte = bytes[0]
         if (byte === undefined) {
-          throw new Error('generateUniqueId: Unexpected undefined byte')
+          throw new Error(ERRORS.GENERATE_UNIQUE_ID_UNEXPECTED_BYTE)
         }
         const r = byte & 0xf
         const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -174,7 +217,7 @@ export function generateShortId(length = 8): string {
   for (let i = 0; i < length; i++) {
     const byte = bytes[i]
     if (byte === undefined) {
-      throw new Error('generateShortId: Unexpected undefined byte')
+      throw new Error(ERRORS.GENERATE_SHORT_ID_UNEXPECTED_BYTE)
     }
     result += chars.charAt(byte % chars.length)
   }
@@ -294,7 +337,7 @@ export function unique<T>(array: T[], keyFn?: (item: T) => unknown): T[] {
     return [...new Set(array)]
   }
 
-  const seen = new Set()
+  const seen = new Set<unknown>()
   return array.filter((item) => {
     const key = keyFn(item)
     if (seen.has(key)) {
@@ -337,7 +380,7 @@ const assertDense: <U>(array: (U | undefined)[]) => asserts array is U[] = <U>(
 ): asserts array is U[] => {
   for (let i = 0; i < array.length; ++i) {
     if (!(i in array)) {
-      throw new Error(`Sparse array detected at index ${i}`)
+      throw new Error(ERRORS.SPARSE_ARRAY_DETECTED(i))
     }
   }
 }
@@ -349,7 +392,7 @@ const assertDense: <U>(array: (U | undefined)[]) => asserts array is U[] = <U>(
  */
 export function shuffle<T>(input: readonly T[]): T[] {
   if (input.some((_, i, a) => !(i in a))) {
-    throw new Error('Cannot shuffle sparse arrays: input contains holes.')
+    throw new Error(ERRORS.CANNOT_SHUFFLE_SPARSE_ARRAY)
   }
   // Defensive copy. Still, TS cannot infer runtime density, so we assert.
   const arr = input.map((x) => x)
@@ -373,7 +416,7 @@ export function shuffle<T>(input: readonly T[]): T[] {
 // ============================================================================
 
 /**
- * Deep clones an object
+ * Deep clones an object with performance optimizations
  * @param obj - Object to clone
  * @returns Deep cloned object
  */
@@ -390,12 +433,11 @@ export function deepClone<T>(obj: T): T {
     return obj.map((item) => deepClone(item)) as T
   }
 
-  if (typeof obj === 'object') {
+  if (isObject(obj)) {
     const clonedObj = {} as T
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        clonedObj[key] = deepClone(obj[key])
-      }
+    const keys = Object.keys(obj)
+    for (const key of keys) {
+      clonedObj[key as keyof T] = deepClone(obj[key as keyof T])
     }
     return clonedObj
   }
@@ -413,6 +455,37 @@ export function isEmpty(obj: Record<string, unknown>): boolean {
 }
 
 /**
+ * Safely accesses nested object properties with optional chaining alternative
+ * @param obj - Object to access
+ * @param path - Path to property (e.g., 'a.b.c')
+ * @param defaultValue - Default value if path doesn't exist
+ * @returns Value at path or defaultValue
+ */
+export function getNestedProperty<T>(
+  obj: unknown,
+  path: string,
+  defaultValue: T,
+): T {
+  if (!isNonNullObject(obj)) {
+    return defaultValue
+  }
+
+  // Pre-split path for better performance
+  const keys = path.split('.')
+  let result: unknown = obj
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    if (!isNonNullObject(result) || !(key in (result as Record<string, unknown>))) {
+      return defaultValue
+    }
+    result = (result as Record<string, unknown>)[key]
+  }
+
+  return result as T
+}
+
+/**
  * Picks specified properties from an object
  * @param obj - Source object
  * @param keys - Keys to pick
@@ -423,11 +496,11 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
   keys: K[],
 ): Pick<T, K> {
   const result = {} as Pick<T, K>
-  keys.forEach((key) => {
+  for (const key of keys) {
     if (key in obj) {
       result[key] = obj[key]
     }
-  })
+  }
   return result
 }
 
@@ -442,9 +515,9 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
   keys: K[],
 ): Omit<T, K> {
   const result = { ...obj }
-  keys.forEach((key) => {
+  for (const key of keys) {
     delete result[key]
-  })
+  }
   return result
 }
 
@@ -611,7 +684,8 @@ export function timeAgo(date: Date): string {
   for (const interval of intervals) {
     const count = Math.floor(diffInSeconds / interval.seconds)
     if (count >= 1) {
-      return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`
+      const pluralSuffix = count === 1 ? '' : 's'
+      return `${count} ${interval.label}${pluralSuffix} ago`
     }
   }
 
@@ -640,11 +714,13 @@ export function isToday(date: Date): boolean {
 export function isYesterday(date: Date): boolean {
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
-  return (
-    date.getDate() === yesterday.getDate() &&
-    date.getMonth() === yesterday.getMonth() &&
-    date.getFullYear() === yesterday.getFullYear()
-  )
+  // Normalize both dates to midnight for accurate comparison
+  yesterday.setHours(0, 0, 0, 0)
+
+  const compareDate = new Date(date)
+  compareDate.setHours(0, 0, 0, 0)
+
+  return yesterday.getTime() === compareDate.getTime()
 }
 
 // ============================================================================
@@ -670,8 +746,8 @@ export function isValidUrl(url: string): boolean {
   try {
     // The construction of the URL object is the validation.
     // If it doesn't throw, the URL is valid.
-    const validUrl = new URL(url)
-    return !!validUrl
+    new URL(url)
+    return true
   } catch {
     return false
   }
@@ -683,7 +759,7 @@ export function isValidUrl(url: string): boolean {
  * @returns True if value is not null or undefined
  */
 export function isDefined<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined
+  return value != null
 }
 
 /**
@@ -715,10 +791,10 @@ export function createError(
     code?: string
     details?: Record<string, unknown>
   }
-  if (code) {
+  if (code !== undefined) {
     error.code = code
   }
-  if (details) {
+  if (details !== undefined) {
     error.details = details
   }
   return error
@@ -750,7 +826,7 @@ export async function safeExecute<T>(
  * @returns True if value is an object
  */
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return isNonNullObject(value) && !Array.isArray(value)
 }
 
 /**
@@ -800,13 +876,13 @@ export function isBoolean(value: unknown): value is boolean {
  * @returns Stored value or default
  */
 export function getStorageItem<T>(key: string, defaultValue: T): T {
-  if (typeof window === 'undefined') {
+  if (!isBrowserEnvironment()) {
     return defaultValue
   }
 
   try {
     const item = localStorage.getItem(key)
-    return item ? JSON.parse(item) : defaultValue
+    return item !== null ? JSON.parse(item) : defaultValue
   } catch {
     return defaultValue
   }
@@ -834,7 +910,7 @@ export function setStorageItem<T>(key: string, value: T): void {
  * @param key - Storage key
  */
 export function removeStorageItem(key: string): void {
-  if (typeof window === 'undefined') {
+  if (!isBrowserEnvironment()) {
     return
   }
 
@@ -861,11 +937,11 @@ export function buildUrl(
 ): string {
   const url = new URL(
     baseUrl,
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost',
+    isBrowserEnvironment() ? window.location.origin : 'http://localhost',
   )
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
+    if (value != null) {
       url.searchParams.set(key, String(value))
     }
   })
@@ -881,7 +957,7 @@ export function buildUrl(
 export function parseQueryParams(url: string): Record<string, string> {
   const urlObj = new URL(
     url,
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost',
+    isBrowserEnvironment() ? window.location.origin : 'http://localhost',
   )
   const params: Record<string, string> = {}
 
@@ -904,7 +980,7 @@ export function parseQueryParams(url: string): Record<string, string> {
  */
 export function randomInt(min: number, max: number): number {
   if (min > max) {
-    throw new Error('min must be <= max')
+    throw new Error(ERRORS.RANDOM_INT_MIN_MAX)
   }
   const range = max - min + 1
   // Use crypto to get random integer in range
@@ -958,7 +1034,8 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
-    const key = JSON.stringify(args)
+    // Use faster cache key generation for better performance
+    const key = args.length === 1 ? String(args[0]) : JSON.stringify(args)
 
     if (cache.has(key)) {
       return cache.get(key) as ReturnType<T>

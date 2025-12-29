@@ -21,8 +21,7 @@ import {
   createAuthError,
   isAuthError,
   isAuthUser,
-  isAuthResult,
-} from './auth-types'
+  } from './auth-types'
 
 // Map AuthRole to UserRole
 const roleMap: RoleMapping = {

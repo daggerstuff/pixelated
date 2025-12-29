@@ -7,7 +7,7 @@ function getAccessByTime(logs: AuditLog[]): {
   labels: string[]
   data: number[]
 } {
-  const hourCounts = new Array(24).fill(0)
+  const hourCounts = Array.from({ length: 24 }, () => 0).slice(________)
   const hourLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`)
 
   logs.forEach((log) => {
