@@ -43,92 +43,92 @@ This EPIC is explicitly designed to match:
 ### M1 — Inventory + registry alignment (coverage truth)
 **Outcome**: A single, authoritative view of what exists in S3 and how it maps to dataset families/stages.
 
-**Primary deliverables**
+### Primary deliverables
 - Coverage matrix report (required families → present/partial/missing)
 - Canonical dataset registry alignment and stage mapping
 - S3 key prefix conventions documented (processed vs raw vs platform-specific)
 
-**Where this likely lives**
+### Where this likely lives
 - Existing: `ai/training_ready/` has manifest + audit artifacts and scripts
 - Integration target: `ai/dataset_pipeline/` can host the “source-of-truth mapping” and validation interfaces
 
-**Acceptance criteria**
+### Acceptance criteria
 - Coverage report generated from S3 inventory and versioned
 - Registry explicitly points to S3 canonical keys (not local paths)
 
 ### M2 — Privacy + provenance gates (release blockers)
 **Outcome**: No dataset can be released without PII/provenance gates passing.
 
-**Primary deliverables**
+### Primary deliverables
 - PII removal pipeline step with context-preserving redaction
 - Provenance model (per-record and per-shard)
 - Audit log artifacts for each release
 
-**Where this likely lives**
+### Where this likely lives
 - Target: `ai/dataset_pipeline/processing/` and `ai/dataset_pipeline/compliance/`
 
-**Acceptance criteria**
+### Acceptance criteria
 - Release build fails “closed” when provenance missing
 - Release build fails “closed” on PII gate failures
 
 ### M3 — Clinical QA + bias/cultural competency validation
 **Outcome**: Clinicians can review sampled outputs; bias reports produced per family and per release.
 
-**Primary deliverables**
+### Primary deliverables
 - QA sampling sets by dataset family
 - Rubric-based review template and decision log format
 - Bias monitoring report generation integrated into the build
 
-**Where this likely lives**
+### Where this likely lives
 - Target: `ai/dataset_pipeline/qa/` and `ai/dataset_pipeline/validation/`
 
-**Acceptance criteria**
+### Acceptance criteria
 - QA sample export produced for each release
 - Bias report produced for each release
 
 ### M4 — Voice/persona and dual persona datasets
 **Outcome**: Persona training datasets exist as first-class families with provenance and holdouts.
 
-**Primary deliverables**
+### Primary deliverables
 - Tim Fletcher transcription ingestion + normalization
 - Voice/persona training set creation
 - Dual persona training set creation
 
-**Where this likely lives**
+### Where this likely lives
 - Existing evidence: S3 voice keys described in `ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md`
 - Target: `ai/dataset_pipeline/voice/`
 
-**Acceptance criteria**
+### Acceptance criteria
 - Persona dataset family has deterministic build and versioned manifest
 - Holdout split exists for persona validation
 
 ### M5 — Crisis/edge-case expansion ("nightmare fuel", privacy-first)
 **Outcome**: Crisis/edge-case scenarios are expanded and validated without privacy regressions.
 
-**Primary deliverables**
+### Primary deliverables
 - Crisis scenario generator(s)
 - “Resulting chats” generator outputs (for realistic multi-turn behavior)
 - Safety/QA gating and holdout splits
 
-**Where this likely lives**
+### Where this likely lives
 - Target: `ai/dataset_pipeline/crisis/` and `ai/dataset_pipeline/safety/`
 
-**Acceptance criteria**
+### Acceptance criteria
 - Crisis dataset families produced with provenance
 - Leakage and dedup gates pass with crisis holdouts
 
 ### M6 — Final dataset artifact + curriculum (versioned releases)
 **Outcome**: A single authoritative release artifact exists in S3: manifest + compiled ChatML export + curriculum configs.
 
-**Primary deliverables**
+### Primary deliverables
 - Manifest + compiled export uploaded to canonical S3 paths
 - Curriculum config mapping families → phases and weights
 - Verification reports (coverage, leakage, distribution)
 
-**Where this likely lives**
+### Where this likely lives
 - Existing evidence: compilation and curriculum artifacts referenced in `ai/training_ready/packages/apex/data/final.md`
 
-**Acceptance criteria**
+### Acceptance criteria
 - Versioned release directory exists in S3
 - Training can consume the release without local dependencies
 
