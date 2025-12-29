@@ -100,7 +100,7 @@ export class MediaService {
       key: string
       lastModified: Date
       size: number
-      url: string
+      url: string | null
     }[]
   > {
     const params: AWS.S3.ListObjectsV2Request = {
@@ -115,16 +115,27 @@ export class MediaService {
 
     if (!result.Contents) return []
 
-    const files = await Promise.all(
-      result.Contents.map(async (file) => ({
-        key: file.Key || '',
-        lastModified: file.LastModified || new Date(),
-        size: file.Size || 0,
-        url: await this.getSignedUrl(file.Key || ''),
-      })),
+    return await Promise.all(
+      result.Contents.map(async (file) => {
+        try {
+          const url = await this.getSignedUrl(file.Key || '')
+          return {
+            key: file.Key || '',
+            lastModified: file.LastModified || new Date(),
+            size: file.Size || 0,
+            url,
+          }
+        } catch (error) {
+          console.warn('Failed to generate signed URL for file:', file.Key, error)
+          return {
+            key: file.Key || '',
+            lastModified: file.LastModified || new Date(),
+            size: file.Size || 0,
+            url: null,
+          }
+        }
+      }),
     )
-
-    return files
   }
 
   /**
@@ -174,7 +185,6 @@ export class MediaService {
    * Build URL for file
    */
   private static buildUrl(key: string): string {
-    const region = process.env['OVH_REGION'] || 'us-east-1'
     const endpoint =
       process.env['OVH_ENDPOINT'] || 'https://s3.us-east-1.io.cloud.ovh.net'
 
@@ -188,6 +198,8 @@ export class MediaService {
    * Get folder by file type
    */
   private static getFolderByFileType(mimetype: string): string {
+    if (!mimetype || typeof mimetype !== 'string') return 'misc'
+
     if (mimetype.startsWith('image/')) return 'images'
     if (mimetype === 'application/pdf') return 'documents'
     if (

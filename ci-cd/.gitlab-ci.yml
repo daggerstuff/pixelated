@@ -1,0 +1,554 @@
+# GitLab CI/CD Pipeline for Pixelated Empathy
+# Clean, simple, and working pipeline
+
+stages:
+  - validate
+  - test
+  - terraform
+  - build
+  - security
+  - deploy
+  - health-check
+  - cleanup
+
+variables:
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.26.2"
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+  STAGING_URL: "https://staging.pixelatedempathy.com"
+  PRODUCTION_URL: "https://pixelatedempathy.com"
+  # GCP/GKE configuration - must be set as GitLab CI/CD project variables
+  # Required for deployment and health-check jobs
+  # If not configured, jobs will fail with clear error messages
+  # Configure at: Settings > CI/CD > Variables
+  # Note: GCP_PROJECT_ID, GKE_CLUSTER_NAME, GKE_ZONE, and GCP_SERVICE_ACCOUNT_KEY
+  # are inherited directly from project variables and should not be redefined here
+  # Terraform configuration - must be set as GitLab CI/CD project variables
+  # Required for terraform jobs:
+  # - TERRAFORM_VERSION (default: 1.9.0)
+  # - TF_HTTP_PASSWORD (GitLab token for state backend, marked as secret)
+  # - AZURE_SUBSCRIPTION_ID
+  # - AZURE_TENANT_ID
+  TERRAFORM_VERSION: "${TERRAFORM_VERSION:-1.9.0}"
+
+# Validation jobs
+validate:dependencies:
+  stage: validate
+  image: node:${NODE_VERSION}-slim
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+    - corepack enable pnpm
+  script:
+    - echo "Validating dependencies..."
+    - pnpm install --frozen-lockfile
+    - pnpm audit --audit-level moderate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 15m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+validate:lint:
+  stage: validate
+  image: node:${NODE_VERSION}-slim
+  allow_failure: true
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+    - corepack enable pnpm
+  script:
+    - echo "Running lint validation..."
+    - pnpm install --frozen-lockfile
+    - pnpm lint:ci
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 10m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+validate:typecheck:
+  stage: validate
+  image: node:${NODE_VERSION}-slim
+  allow_failure: true
+  variables:
+    # Increase Node.js heap size to prevent OOM during typecheck
+    # Astro check can be memory-intensive with large codebases
+    # Using 8GB to match dev environment requirements
+    NODE_OPTIONS: "--max-old-space-size=8192"
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+    - corepack enable pnpm
+  script:
+    - echo "Running typecheck validation..."
+    - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
+    - pnpm install --frozen-lockfile
+    # Split typecheck into separate commands to reduce peak memory usage
+    # and ensure NODE_OPTIONS is properly applied
+    - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
+    - NODE_OPTIONS="--max-old-space-size=8192" pnpm exec tsc --noEmit
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 20m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+# Test jobs
+test:unit:
+  stage: test
+  image: node:${NODE_VERSION}-slim
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+    - corepack enable pnpm
+  script:
+    - echo "Running unit tests..."
+    - pnpm install --frozen-lockfile
+    - pnpm test:unit
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: test-results/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 15m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+test:integration:
+  stage: test
+  image: node:${NODE_VERSION}-slim
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+    - corepack enable pnpm
+  script:
+    - echo "Running integration tests..."
+    - pnpm install --frozen-lockfile
+    - pnpm test:integration
+  artifacts:
+    reports:
+      junit: test-results/junit.xml
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 20m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  allow_failure: true
+
+# Terraform validation and plan
+terraform:validate:
+  stage: terraform
+  image: hashicorp/terraform:${TERRAFORM_VERSION}
+  before_script:
+    - cd terraform
+    - |
+      if [ ! -f backend.config ]; then
+        echo "ERROR: backend.config file not found"
+        echo "Copy backend.config.example to backend.config and configure it"
+        exit 1
+      fi
+    # Initialize terraform (without backend for validation)
+    - terraform init -backend=false
+  script:
+    - terraform fmt -check -recursive
+    - terraform validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - terraform/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - terraform/**/*
+  allow_failure: true
+  timeout: 10m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+terraform:plan:
+  stage: terraform
+  image: hashicorp/terraform:${TERRAFORM_VERSION}
+  variables:
+    TF_ENVIRONMENT: "${TF_ENVIRONMENT:-staging}"
+  before_script:
+    - cd terraform
+    - |
+      if [ ! -f backend.config ]; then
+        echo "ERROR: backend.config file not found"
+        echo "Copy backend.config.example to backend.config and configure it"
+        exit 1
+      fi
+    # Initialize backend
+    # Note: If you see "Backend configuration changed" error, use -reconfigure flag
+    - terraform init -backend-config=backend.config
+  script:
+    - |
+      terraform plan \
+        -var-file=environments/${TF_ENVIRONMENT}.tfvars \
+        -out=tfplan-${TF_ENVIRONMENT} \
+        -detailed-exitcode
+
+      PLAN_EXIT_CODE=$?
+
+      # Exit code 0 = no changes, 1 = error, 2 = changes present
+      if [ $PLAN_EXIT_CODE -eq 1 ]; then
+        echo "ERROR: Terraform plan failed"
+        exit 1
+      elif [ $PLAN_EXIT_CODE -eq 2 ]; then
+        echo "Terraform plan shows changes - review output above"
+      else
+        echo "No changes detected"
+      fi
+  artifacts:
+    paths:
+      - terraform/tfplan-${TF_ENVIRONMENT}
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $TF_HTTP_PASSWORD
+      changes:
+        - terraform/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $TF_HTTP_PASSWORD
+      changes:
+        - terraform/**/*
+  environment:
+    name: ${TF_ENVIRONMENT}
+  timeout: 15m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  # Note: TF_HTTP_PASSWORD must be set as a GitLab CI/CD variable (Settings > CI/CD > Variables)
+  # Mark it as protected and masked
+
+# Build job - GitLab Container Registry
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+    - job: validate:dependencies
+    - job: test:unit
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    # Validate Docker registry variables are set
+    - |
+      if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
+        echo "ERROR: Docker registry variables are not set."
+        echo "GitLab CI/CD should provide these automatically, but if missing:"
+        echo "  - CI_REGISTRY_USER"
+        echo "  - CI_REGISTRY_PASSWORD"
+        echo "  - CI_REGISTRY"
+        echo "Check: Settings > CI/CD > Variables"
+        exit 1
+      fi
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Building application..."
+    - docker build --cache-from ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:latest
+    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${IMAGE_NAME}:latest
+    - echo "Build completed"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 30m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+# Build and push to Azure Container Registry
+build:acr:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+    - job: validate:dependencies
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    # Validate Azure Container Registry variables
+    - |
+      if [ -z "$ACR_NAME" ] || [ -z "$ACR_USERNAME" ] || [ -z "$ACR_PASSWORD" ]; then
+        echo "ERROR: Azure Container Registry variables are not set."
+        echo "Please configure the following GitLab CI/CD project variables:"
+        echo "  - ACR_NAME (e.g., pixelatedregistry)"
+        echo "  - ACR_USERNAME (ACR admin username)"
+        echo "  - ACR_PASSWORD (ACR admin password - mark as masked)"
+        echo "See: Settings > CI/CD > Variables"
+        exit 1
+      fi
+    - |
+      ACR_FQDN="${ACR_NAME}.azurecr.io"
+      IMAGE_REPOSITORY="pixelatedempathy"
+      echo "Logging into Azure Container Registry: ${ACR_FQDN}"
+      echo "$ACR_PASSWORD" | docker login ${ACR_FQDN} -u $ACR_USERNAME --password-stdin
+  script:
+    - |
+      ACR_FQDN="${ACR_NAME}.azurecr.io"
+      IMAGE_REPOSITORY="pixelatedempathy"
+      FULL_IMAGE_TAG="${ACR_FQDN}/${IMAGE_REPOSITORY}:${CI_COMMIT_SHORT_SHA}"
+      LATEST_TAG="${ACR_FQDN}/${IMAGE_REPOSITORY}:latest"
+      echo "Building Docker image for Azure Container Registry..."
+      docker build -t ${FULL_IMAGE_TAG} -t ${LATEST_TAG} .
+      echo "Pushing image to ACR..."
+      docker push ${FULL_IMAGE_TAG}
+      docker push ${LATEST_TAG}
+      echo "Image pushed successfully: ${FULL_IMAGE_TAG}"
+      echo "Latest tag pushed: ${LATEST_TAG}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 30m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  # Only build to ACR on main/master branch to avoid unnecessary builds
+
+# Security scanning
+security:scan:
+  stage: security
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+    - job: build
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    # Install Trivy (latest version)
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    # Validate Docker registry variables are set
+    - |
+      if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
+        echo "ERROR: Docker registry variables are not set."
+        echo "GitLab CI/CD should provide these automatically, but if missing:"
+        echo "  - CI_REGISTRY_USER"
+        echo "  - CI_REGISTRY_PASSWORD"
+        echo "  - CI_REGISTRY"
+        echo "Check: Settings > CI/CD > Variables"
+        exit 1
+      fi
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Running security scan..."
+    - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    # Exit code 1 on CRITICAL, 0 on HIGH (warnings only)
+    # Consider changing to --exit-code 1 if you want HIGH severity to fail the pipeline
+    - trivy image --severity CRITICAL --exit-code 1 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - trivy image --severity HIGH --exit-code 0 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || true
+    - echo "Security scan completed"
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 20m
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+# Deployment to staging
+# DISABLED: GKE billing not enabled. Re-enable when billing is configured.
+# deploy:staging:
+#   stage: deploy
+#   image: google/cloud-sdk:slim
+#   needs: ["build", "security:scan"]
+#   before_script:
+#     # Validate required GCP/GKE variables are set
+#     - |
+#       if [ -z "$GCP_PROJECT_ID" ] || [ -z "$GKE_CLUSTER_NAME" ] || [ -z "$GKE_ZONE" ] || [ -z "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+#         echo "ERROR: Required GCP/GKE variables are not set."
+#         echo "Please configure the following GitLab CI/CD project variables:"
+#         echo "  - GCP_PROJECT_ID"
+#         echo "  - GKE_CLUSTER_NAME"
+#         echo "  - GKE_ZONE"
+#         echo "  - GCP_SERVICE_ACCOUNT_KEY"
+#         echo "See: Settings > CI/CD > Variables"
+#         exit 1
+#       fi
+#     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+#     - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
+#     - gcloud config set project $GCP_PROJECT_ID
+#     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
+#   script:
+#     - echo "Deploying to staging..."
+#     # Check if deployment exists, fail if not
+#     - |
+#       if kubectl get deployment pixelated -n pixelated-staging > /dev/null 2>&1; then
+#         echo "Updating existing deployment..."
+#         kubectl set image deployment/pixelated app=${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} -n pixelated-staging
+#       else
+#         echo "ERROR: Deployment 'pixelated' does not exist in namespace 'pixelated-staging'"
+#         echo "First deployment must be done manually or via infrastructure-as-code"
+#         echo "The deployment job cannot proceed without an existing deployment"
+#         exit 1
+#       fi
+#     - kubectl rollout status deployment/pixelated -n pixelated-staging --timeout=300s || echo "Rollout status check completed with warnings"
+#     - echo "Staging deployment completed"
+#   environment:
+#     name: staging
+#     url: $STAGING_URL
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Health check
+# DISABLED: Depends on GKE deployment which is disabled. Re-enable when GKE billing is configured.
+# health-check:
+#   stage: health-check
+#   image: google/cloud-sdk:slim
+#   needs: ["deploy:staging"]
+#   before_script:
+#     # Validate required GCP/GKE variables are set
+#     - |
+#       if [ -z "$GCP_PROJECT_ID" ] || [ -z "$GKE_CLUSTER_NAME" ] || [ -z "$GKE_ZONE" ] || [ -z "$GCP_SERVICE_ACCOUNT_KEY" ]; then
+#         echo "ERROR: Required GCP/GKE variables are not set."
+#         echo "Please configure the following GitLab CI/CD project variables:"
+#         echo "  - GCP_PROJECT_ID"
+#         echo "  - GKE_CLUSTER_NAME"
+#         echo "  - GKE_ZONE"
+#         echo "  - GCP_SERVICE_ACCOUNT_KEY"
+#         echo "See: Settings > CI/CD > Variables"
+#         exit 1
+#       fi
+#     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+#     - gcloud auth activate-service-account --key-file /tmp/gcp-key.json
+#     - gcloud config set project $GCP_PROJECT_ID
+#     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT_ID
+#   script:
+#     - echo "Running health checks..."
+#     - kubectl get pods -n pixelated-staging || echo "No pods found"
+#     - kubectl get deployment pixelated -n pixelated-staging || echo "Deployment not found"
+#     # Health check with retry logic
+#     - |
+#       MAX_RETRIES=3
+#       RETRY_COUNT=0
+#       HEALTH_CHECK_PASSED=false
+#       while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+#         if curl -f -s "$STAGING_URL/api/health" > /dev/null; then
+#           echo "Health check passed"
+#           HEALTH_CHECK_PASSED=true
+#           break
+#         fi
+#         RETRY_COUNT=$((RETRY_COUNT + 1))
+#         if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+#           echo "Health check attempt $RETRY_COUNT/$MAX_RETRIES failed, retrying..."
+#           sleep 5
+#         fi
+#       done
+#       if [ "$HEALTH_CHECK_PASSED" = "false" ]; then
+#         echo "WARNING: Health check failed after $MAX_RETRIES attempts"
+#       fi
+#     - echo "Health check completed"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Performance test
+# DISABLED: Depends on GKE deployment which is disabled. Re-enable when GKE billing is configured.
+# performance-test:
+#   stage: health-check
+#   image: node:${NODE_VERSION}-slim
+#   needs: ["deploy:staging"]
+#   before_script:
+#     - apt-get update -qq && apt-get install -y -qq python3 make g++ > /dev/null
+#     - corepack enable pnpm
+#   script:
+#     - echo "Running performance tests..."
+#     - pnpm install --frozen-lockfile
+#     - pnpm run performance:test
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# E2E test
+# DISABLED: Depends on GKE deployment which is disabled. Re-enable when GKE billing is configured.
+# e2e-test:
+#   stage: health-check
+#   image: mcr.microsoft.com/playwright:v1.56.1-jammy
+#   needs: ["deploy:staging"]
+#   before_script:
+#     - corepack enable pnpm
+#   script:
+#     - echo "Running E2E tests..."
+#     - pnpm install --frozen-lockfile
+#     - pnpm run e2e:smoke
+#   artifacts:
+#     reports:
+#       junit: test-results/junit.xml
+#     expire_in: 1 week
+#     when: always
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

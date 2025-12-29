@@ -1,43 +1,45 @@
 ---
-import { getCollection, render } from 'astro:content'
-import type { CollectionEntry } from 'astro:content'
-import type { PostSchema } from '@/content/schema'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import Toc from '@/components/toc/Toc.astro'
-import ShareLink from '@/components/widgets/ShareLink.astro'
-import Warning from '@/components/base/Warning.astro'
-import { formatDate } from '@/utils/datetime'
-import { FEATURES } from '@/config'
+import Warning from "@/components/base/Warning.astro";
+import Toc from "@/components/toc/Toc.astro";
+import ShareLink from "@/components/widgets/ShareLink.astro";
+import { FEATURES } from "@/config";
+import type { PostSchema } from "@/content/schema";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { formatDate } from "@/utils/datetime";
+import type { CollectionEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
 
-// Set prerender to true to generate static pages at build time
-export const prerender = true
+export const prerender = true;
 
 export async function getStaticPaths() {
-  const posts = await getCollection('changelog')
-  return posts.map((post: CollectionEntry<'changelog'>) => ({
+  const posts = await getCollection("changelog");
+  return posts.map((post: CollectionEntry<"changelog">) => ({
     params: { slug: post.slug },
     props: { post },
-  }))
+  }));
 }
 
-const { post } = Astro.props as { post: CollectionEntry<'changelog'> }
-const { data: frontmatter } = post as { data: PostSchema }
-const { Content, headings } = await render(post)
-const { share, toc } = FEATURES
+const { post } = Astro.props as { post: CollectionEntry<"changelog"> };
+const { data: frontmatter } = post as { data: PostSchema };
+const { Content, headings } = await render(post);
+const { share, toc } = FEATURES;
+
+// Build URL for sharing (works with prerendered pages)
+const shareUrl = `https://pixelated.empathy.dev/changelog/${post.slug}`;
 
 // Format dates
 const pubDate =
   frontmatter.pubDate instanceof Date
     ? frontmatter.pubDate.toISOString()
-    : undefined
+    : undefined;
 const updatedDate =
   frontmatter.lastModDate instanceof Date
     ? frontmatter.lastModDate.toISOString()
-    : undefined
+    : undefined;
 
 // Warning message for unpublished posts
 const UNPUBLISHED_WARNING = `This article is not yet available.
-Please check back later.`
+Please check back later.`;
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
@@ -58,7 +60,7 @@ Please check back later.`
       }
       {
         frontmatter.pubDate && new Date(frontmatter.pubDate) > new Date() && (
-          <Warning rawHTMLString={UNPUBLISHED_WARNING} />
+          <Warning html={UNPUBLISHED_WARNING} />
         )
       }
     </header>
@@ -69,7 +71,7 @@ Please check back later.`
     <footer class="not-prose mt-12">
       {
         Array.isArray(share) && share[0] && frontmatter.share && (
-          <ShareLink config={share[1]} />
+          <ShareLink config={share[1]} url={shareUrl} />
         )
       }
     </footer>

@@ -6,9 +6,8 @@
 -- Schema Version: 1.0
 -- Date: 2025-12-18
 --
--- This schema implements provenance metadata tracking as defined in:
--- - governance/provenance_schema.json (schema definition)
--- - governance/provenance_storage_plan.md (storage plan)
+-- docs/governance/provenance_schema.json (schema definition)
+-- docs/governance/provenance_storage_plan.md (storage plan)
 
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

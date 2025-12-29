@@ -175,6 +175,10 @@
             "source.fixAll.ruff": "explicit"
         }
     },
+    "eslint.options": {
+        "configFile": "config/eslint.config.js"
+    },
+    "prettier.configPath": "config/.prettierrc",
     "cubent.autocomplete.allowWithCopilot": true,
     "cubent.autocomplete.enabled": true,
     "cubent.cubentCloudEnabled": true,
@@ -182,42 +186,37 @@
     "cubent.mcp.enabled": true,
     "cubent.mcp.serverCreationEnabled": true,
     "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.shellIntegration.enabled": true,
     "terminal.integrated.automationProfile.linux": {
         "path": "/usr/bin/zsh"
     },
-    "terminal.integrated.profiles.linux": {
-        "zsh": {
-            "path": "/usr/bin/zsh",
-            "args": []
-        },
-        "bash": {
-            "path": "/usr/bin/bash",
-            "args": []
-        }
-    },
-    "python.languageServer": "None",
-    "sonarlint.connectedMode.project": {
-        "connectionId": "pixelatedempathy",
-        "projectKey": "pixelatedempathy_pixelated"
-    },
-    "oxc.enable": true,
-    "specstory.cloudSync.enabled": "always",
-    "claude-history.dashboard.enableButton": true,
-    "claude-history.leaderboard.enableSharing": true,
-    "claude-history.statusBar.showUsage": true,
-    "claudeCode.allowDangerouslySkipPermissions": true,
-    "claudeCode.respectGitIgnore": false,
-    "git.autofetch": "all",
-    "git.autofetchPeriod": 360,
-    "git.defaultBranchName": "master",
-    "git.detectSubmodules": true,
-    "git.detectWorktrees": true,
-    "git.diagnosticsCommitHook.Enabled": true,
-    "kaggle.cliPath": "/home/vivi/pixelated/.venv/bin/kaggle",
-    "editor.fontFamily": "JetBrains Mono",
-    "scm.inputFontFamily": "editor",
-    "extensions.experimental.deferredStartupFinishedActivation": false,
-    "kaggle.defaultInternet": true,
-    "npm.packageManager": "pnpm",
-    "markdown.validate.enabled": true
+    "terminal.integrated.env.linux": {
+        "FIG_DISABLE": "1"
+},
+"python.languageServer": "None",
+"sonarlint.connectedMode.project": {
+    "connectionId": "pixelatedempathy",
+    "projectKey": "pixelatedempathy_pixelated"
+},
+"oxc.enable": true,
+"specstory.cloudSync.enabled": "always",
+"claude-history.dashboard.enableButton": true,
+"claude-history.leaderboard.enableSharing": true,
+"claude-history.statusBar.showUsage": true,
+"claudeCode.allowDangerouslySkipPermissions": true,
+"claudeCode.respectGitIgnore": false,
+"git.autofetch": "all",
+"git.autofetchPeriod": 360,
+"git.defaultBranchName": "master",
+"git.detectSubmodules": true,
+"git.detectWorktrees": true,
+"git.diagnosticsCommitHook.Enabled": true,
+"kaggle.cliPath": "/home/vivi/pixelated/.venv/bin/kaggle",
+"editor.fontFamily": "JetBrains Mono",
+"scm.inputFontFamily": "editor",
+"extensions.experimental.deferredStartupFinishedActivation": false,
+"kaggle.defaultInternet": true,
+"npm.packageManager": "pnpm",
+"markdown.validate.enabled": true,
+"terminal.integrated.developer.devMode": true
 }

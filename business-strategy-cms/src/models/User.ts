@@ -1,4 +1,4 @@
-import { User, UserRole } from '@/types/user'
+import { User, } from '@/types/user'
 
 // In-memory user storage for now - will be replaced with database
 const users: User[] = []

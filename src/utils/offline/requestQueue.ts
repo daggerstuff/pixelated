@@ -178,7 +178,7 @@ class RequestQueue {
           } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`)
           }
-        } catch (error) {
+        } catch {
           // Request failed, increment retry count
           request.retryCount++
 

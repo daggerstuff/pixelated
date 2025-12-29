@@ -1,6 +1,6 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['ai/**/*.py', '**/*model*.py', '**/*inference*.py', '**/*training*.py']
+applyTo: 'ai/**/*.py,**/*model*.py,**/*inference*.py,**/*training*.py'
+description: 'Python LLM development guidelines for model, inference, and training files'
 ---
 
 # Python AI/ML Development Guidelines
