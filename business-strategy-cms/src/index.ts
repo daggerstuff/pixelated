@@ -3,7 +3,7 @@ import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import { createServer } from 'http'
-import type { Request, Response } from 'express'
+import type { } from 'express'
 
 import { config } from '@/config/app'
 import {

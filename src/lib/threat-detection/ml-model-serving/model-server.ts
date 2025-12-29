@@ -433,7 +433,7 @@ export class ModelServingServer extends EventEmitter {
       if (Array.isArray(first)) {
         // Average each class probability across predictions
         const { length } = first as number[]
-        const sumVec = new Array(length).fill(0)
+        const sumVec = Array.from({ length }, () => 0)
         outputs.forEach((out) => {
           ;(out as number[]).forEach((v, i) => {
             sumVec[i] += v
@@ -456,7 +456,7 @@ export class ModelServingServer extends EventEmitter {
           sum[i] = (sum[i] || 0) + val * w
         })
         return sum
-      }, new Array(length).fill(0))
+      }, Array.from({ length }, () => 0))
 
       return weightedSum.map((v) => v / totalWeight)
     } else {

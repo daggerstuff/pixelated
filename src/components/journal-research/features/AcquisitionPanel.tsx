@@ -134,7 +134,7 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
               acquisitions={acquisitions ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
               isLoading={isLoading}
               sessionId={sessionId}
-              onAcquisitionClick={(acquisition) => {
+              onAcquisitionClick={(_acquisition) => {
                 // Navigate to acquisition detail
               }}
             />

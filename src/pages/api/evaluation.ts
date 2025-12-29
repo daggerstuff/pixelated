@@ -1,7 +1,7 @@
 import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
-import { getCurrentUser } from '../../lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { createEnhancedRateLimiter } from '../../lib/middleware/enhanced-rate-limit'
 
 // Database connection pool

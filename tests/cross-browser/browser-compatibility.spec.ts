@@ -54,9 +54,10 @@ browsers.forEach((browserName) => {
         expect(buttonCount).toBeGreaterThan(0)
 
         // Test first few buttons
-        for (let i = 0; i < Math.min(buttonCount, 5); i++) {
+        const limit = Math.min(buttonCount, 5)
+        for (let i = 0; i < limit; i++) {
           const button = buttons.nth(i)
-          if ((await button.isVisible()) && (await button.isEnabled())) {
+          if (await button.isVisible() && await button.isEnabled()) {
             await button.hover()
             // Button should be hoverable without errors
           }
@@ -166,27 +167,27 @@ browsers.forEach((browserName) => {
 
     test('Performance across browsers', async () => {
       await test.step('Page load performance', async () => {
-        const startTime = Date.now()
+        const startTime = performance.now()
         await page.reload()
         await page.waitForLoadState('networkidle')
-        const loadTime = Date.now() - startTime
+        const loadTime = performance.now() - startTime
 
         console.log(`${browserName} page load time: ${loadTime}ms`)
 
         // Should load within reasonable time (browser-specific tolerances)
-        const maxLoadTime = browserName === 'webkit' ? 8000 : 6000 // Safari might be slower
+        const maxLoadTime = ({ webkit: 8000 } as const)[browserName] ?? 6000 // Safari might be slower
         expect(loadTime).toBeLessThan(maxLoadTime)
       })
 
       await test.step('Interaction responsiveness', async () => {
-        const startTime = Date.now()
+        const startTime = performance.now()
 
         // Perform several interactions
         await page.click('a[href="/blog"]')
         await page.click('a[href="/docs"]')
         await page.click('a[href="/"]')
 
-        const interactionTime = Date.now() - startTime
+        const interactionTime = performance.now() - startTime
 
         console.log(`${browserName} interaction time: ${interactionTime}ms`)
         expect(interactionTime).toBeLessThan(3000)
@@ -201,8 +202,8 @@ browsers.forEach((browserName) => {
             localStorage.setItem('test', 'value')
             const retrieved = localStorage.getItem('test')
             localStorage.removeItem('test')
-            return retrieved === 'value'
-          } catch (_) {
+            return Object.is(retrieved, 'value')
+          } catch (_err) {
             return false
           }
         })
@@ -214,14 +215,14 @@ browsers.forEach((browserName) => {
         // Test modern JS features support
         const jsFeatures = await page.evaluate(() => {
           return {
-            arrow_functions: (() => true)(),
-            async_await: typeof (async () => {})().then === 'function',
-            promises: typeof Promise !== 'undefined',
-            fetch: typeof fetch !== 'undefined',
+            arrow_functions: true,
+            async_await: !!(async () => { }),
+            promises: 'Promise' in globalThis,
+            fetch: 'fetch' in globalThis,
             const_let: (() => {
               try {
                 return true
-              } catch (_) {
+              } catch (_err) {
                 return false
               }
             })(),
@@ -276,8 +277,8 @@ browsers.forEach((browserName) => {
         })
 
         // Should have some form of focus indicator
-        const hasFocusIndicator =
-          focusStyles.outline !== 'none' || focusStyles.outlineWidth !== '0px'
+        const noneOrZero = (v: string) => v === 'none' || v === '0px'
+        const hasFocusIndicator = !(noneOrZero(focusStyles.outline) && noneOrZero(focusStyles.outlineWidth))
 
         expect(hasFocusIndicator).toBe(true)
       })
@@ -290,8 +291,8 @@ browsers.forEach((browserName) => {
           testElement.setAttribute('role', 'button')
 
           return {
-            ariaLabel: testElement.getAttribute('aria-label') === 'test',
-            role: testElement.getAttribute('role') === 'button',
+            ariaLabel: testElement.matches('[aria-label="test"]'),
+            role: testElement.matches('[role="button"]'),
           }
         })
 
@@ -334,12 +335,13 @@ test.describe('Browser-Specific Edge Cases', () => {
       const elementCount = await elements.count()
 
       // Check that elements render properly in Safari
-      for (let i = 0; i < Math.min(elementCount, 5); i++) {
+      const limit = Math.min(elementCount, 5)
+      for (let i = 0; i < limit; i++) {
         const element = elements.nth(i)
         if (await element.isVisible()) {
           const boundingBox = await element.boundingBox()
-          expect(boundingBox?.width).toBeGreaterThan(0)
-          expect(boundingBox?.height).toBeGreaterThan(0)
+          expect((boundingBox?.width ?? 0) > 0).toBe(true)
+          expect((boundingBox?.height ?? 0) > 0).toBe(true)
         }
       }
     })
@@ -379,7 +381,7 @@ test.describe('Browser-Specific Edge Cases', () => {
           }
         })
 
-        expect(styles.display).toBeTruthy()
+        expect(Boolean(styles.display)).toBe(true)
       }
     })
 
@@ -398,9 +400,9 @@ test.describe('Browser-Specific Edge Cases', () => {
       // Test Chrome-specific performance APIs
       const performanceSupport = await page.evaluate(() => {
         return {
-          performance: typeof performance !== 'undefined',
-          memory: typeof (performance as any).memory !== 'undefined',
-          navigation: typeof performance.navigation !== 'undefined',
+          performance: !!performance,
+          memory: !!(performance as any).memory,
+          navigation: !!performance.navigation,
         }
       })
 

@@ -90,7 +90,7 @@ case "$*" in
         ;;
     *"pnpm --version"*)
         sleep 0.2  # Environment check time
-        echo "10.26.0"
+        echo "10.26.2"
         exit 0
         ;;
     *"docker build"*)
@@ -162,7 +162,7 @@ case "$1" in
         ;;
     "push")
         sleep 3.0  # Registry push time
-        echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
+        echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
         echo "latest: digest: sha256:mock-digest size: 1234"
         exit 0
         ;;
@@ -399,7 +399,7 @@ test_registry_push_performance() {
 
         # Measure registry push time
         local start_time=$(get_timestamp_ms)
-        docker-timed push git.pixelatedempathy.tech/pixelated-empathy:latest >/dev/null 2>&1
+        docker-timed push git.pixelatedempathy.com/pixelated-empathy:latest >/dev/null 2>&1
         local end_time=$(get_timestamp_ms)
         local push_duration=$(calculate_duration "$start_time" "$end_time")
 
@@ -475,7 +475,7 @@ test_complete_deployment_timing() {
 
         # Stage 5: Registry Push (optional)
         local stage5_start=$(get_timestamp_ms)
-        docker-timed push git.pixelatedempathy.tech/pixelated-empathy:latest >/dev/null 2>&1
+        docker-timed push git.pixelatedempathy.com/pixelated-empathy:latest >/dev/null 2>&1
         local stage5_end=$(get_timestamp_ms)
         local stage5_duration=$(calculate_duration "$stage5_start" "$stage5_end")
         echo "Stage 5 (Registry Push): ${stage5_duration}ms" >> "$metrics_file"
