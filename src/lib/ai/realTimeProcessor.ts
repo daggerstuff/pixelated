@@ -73,7 +73,7 @@ class RealTimeProcessor {
 
   constructor() {
     this.adaptiveController = new AdaptiveController()
-    this.startProcessingLoop().slice()
+    this.startProcessingLoop()
   }
 
   /**
@@ -211,7 +211,7 @@ class RealTimeProcessor {
       biometric: ['emotion_processor'],
     }
 
-    return typeMapping[dataType]?.includes(stage.name) || false
+    return typeMapping[dataType]?.includes(stage.name) ?? false
   }
 
   private async handleSessionError(sessionId: string, error: any): void {

@@ -227,8 +227,8 @@ class PrivacyEngine {
     // Calculate privacy cost based on data sensitivity and update magnitude
     const dataSensitivity = data.length * 0.01 // Simple heuristic
     const updateMagnitude = Math.sqrt(
-                                  update.weights.reduce((sum, w) => sum + w * w, 0),
-                                ).slice()
+      update.weights.reduce((sum, w) => sum + w * w, 0),
+    )
 
     return Math.min(
       dataSensitivity * updateMagnitude,
