@@ -4,13 +4,13 @@
  */
 
 import type { APIRoute } from 'astro'
-import { authenticateWithBetterAuth } from '../../../lib/auth/better-auth-integration'
+import { authenticateWithBetterAuth } from '@/lib/auth/better-auth-integration'
 import {
   rateLimitMiddleware,
   csrfProtection,
-} from '../../../lib/auth/middleware'
-import { sanitizeInput } from '../../../lib/auth/utils'
-import { logSecurityEvent } from '../../../lib/security'
+} from '@/lib/auth/middleware'
+import { sanitizeInput } from '@/lib/auth/utils'
+import { logSecurityEvent } from '@/lib/security'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   let clientInfo;
@@ -63,7 +63,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Sanitize input data
     const email = sanitizeInput(body.email)
-    const password = body.password // Don't sanitize password
+    const { password } = body
 
     // Attempt login
     const result: any = await authenticateWithBetterAuth(

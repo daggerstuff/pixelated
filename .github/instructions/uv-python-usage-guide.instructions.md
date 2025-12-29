@@ -1,29 +1,26 @@
 ---
-description: A comprehensive guide to using UV for Python project management, covering installation, environment management, package handling, and best practices.
-author: Cline
-version: 1.0
-tags: ["uv", "python", "package-manager", "venv", "guide"]
-globs: ["**/*.py", "pyproject.toml"]
+applyTo: '**/*.py,pyproject.toml'
+description: 'A comprehensive guide to using UV for Python project management, covering installation, environment management, package handling, and best practices.'
 ---
 
 # UV Python Project Management Guide
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Managing Python Versions](#managing-python-versions)
-- [Project Management](#project-management)
-- [Virtual Environment Management](#virtual-environment-management)
-- [Package Management](#package-management)
-- [Advanced Configuration](#advanced-configuration)
-- [Development Workflows](#development-workflows)
-- [Best Practices](#best-practices)
-- [Security Considerations](#security-considerations)
-- [Performance Optimization](#performance-optimization)
-- [Troubleshooting](#troubleshooting)
-- [Environment Variables](#environment-variables)
-- [Tool Integration](#tool-integration)
-- [Common Commands Reference](#common-commands-reference)
+- Introduction
+- Installation
+- Managing Python Versions
+- Project Management
+- Virtual Environment Management
+- Package Management
+- Advanced Configuration
+- Development Workflows
+- Best Practices
+- Security Considerations
+- Performance Optimization
+- Troubleshooting
+- Environment Variables
+- Tool Integration
+- Common Commands Reference
 
 ## Introduction
 

@@ -67,8 +67,8 @@ case "$1" in
     "images")
         if [[ "$*" =~ git\.pixelatedempathy\.tech ]]; then
             echo "REPOSITORY                                    TAG       IMAGE ID      CREATED       SIZE"
-            echo "git.pixelatedempathy.tech/pixelated-empathy  latest    mock-image-id 1 minute ago  100MB"
-            echo "git.pixelatedempathy.tech/pixelated-empathy  20240131  mock-image-id 1 hour ago    100MB"
+            echo "git.pixelatedempathy.com/pixelated-empathy  latest    mock-image-id 1 minute ago  100MB"
+            echo "git.pixelatedempathy.com/pixelated-empathy  20240131  mock-image-id 1 hour ago    100MB"
         else
             echo "REPOSITORY          TAG       IMAGE ID      CREATED       SIZE"
             echo "pixelated-empathy   latest    mock-image-id 1 minute ago  100MB"
@@ -139,7 +139,7 @@ test_registry_authentication() {
     }
     
     # Test successful authentication
-    if authenticate_registry "git.pixelatedempathy.tech" "test-user" "test-token"; then
+    if authenticate_registry "git.pixelatedempathy.com" "test-user" "test-token"; then
         print_test_pass "authenticate_registry succeeds with valid credentials"
     else
         print_test_fail "authenticate_registry failed with valid credentials"
@@ -183,7 +183,7 @@ test_container_push() {
     }
     
     # Test successful push
-    if push_to_registry "pixelated-empathy:latest" "git.pixelatedempathy.tech" "pixelated-empathy" "20240131"; then
+    if push_to_registry "pixelated-empathy:latest" "git.pixelatedempathy.com" "pixelated-empathy" "20240131"; then
         print_test_pass "push_to_registry successfully pushes image to GitLab registry"
     else
         print_test_fail "push_to_registry failed to push image"
@@ -209,7 +209,7 @@ test_registry_verification() {
     }
     
     # Test verification of existing image
-    if verify_registry_push "git.pixelatedempathy.tech/pixelated-empathy:latest"; then
+    if verify_registry_push "git.pixelatedempathy.com/pixelated-empathy:latest"; then
         print_test_pass "verify_registry_push confirms image exists in registry"
     else
         print_test_fail "verify_registry_push failed to verify existing image"
@@ -240,9 +240,9 @@ test_registry_image_listing() {
         grep "$registry_url/$repository" || true
     }
     
-    local image_list=$(list_registry_images "git.pixelatedempathy.tech" "pixelated-empathy")
+    local image_list=$(list_registry_images "git.pixelatedempathy.com" "pixelated-empathy")
     
-    if [[ -n "$image_list" ]] && echo "$image_list" | grep -q "git.pixelatedempathy.tech/pixelated-empathy"; then
+    if [[ -n "$image_list" ]] && echo "$image_list" | grep -q "git.pixelatedempathy.com/pixelated-empathy"; then
         print_test_pass "list_registry_images returns available registry images"
     else
         print_test_fail "list_registry_images failed to list registry images"
@@ -288,10 +288,10 @@ curl -f http://localhost:3000 || echo "Rollback verification failed"
 EOF
     }
     
-    local rollback_commands=$(generate_registry_rollback_commands "git.pixelatedempathy.tech" "pixelated-empathy" "20240130" "test-app")
+    local rollback_commands=$(generate_registry_rollback_commands "git.pixelatedempathy.com" "pixelated-empathy" "20240130" "test-app")
     
     if [[ -n "$rollback_commands" ]]; then
-        if echo "$rollback_commands" | grep -q "docker pull git.pixelatedempathy.tech/pixelated-empathy:20240130" && \
+        if echo "$rollback_commands" | grep -q "docker pull git.pixelatedempathy.com/pixelated-empathy:20240130" && \
            echo "$rollback_commands" | grep -q "docker stop test-app" && \
            echo "$rollback_commands" | grep -q "docker run.*test-app-rollback"; then
             print_test_pass "generate_registry_rollback_commands creates complete rollback instructions"
@@ -382,7 +382,7 @@ test_registry_configuration() {
         fi
         
         # Test connectivity (mock)
-        if [[ "$registry_url" == "git.pixelatedempathy.tech" ]]; then
+        if [[ "$registry_url" == "git.pixelatedempathy.com" ]]; then
             return 0
         else
             return 1
@@ -390,7 +390,7 @@ test_registry_configuration() {
     }
     
     # Test valid configuration
-    if validate_registry_config "git.pixelatedempathy.tech" "test-user" "test-token"; then
+    if validate_registry_config "git.pixelatedempathy.com" "test-user" "test-token"; then
         print_test_pass "validate_registry_config accepts valid configuration"
     else
         print_test_fail "validate_registry_config rejected valid configuration"
@@ -435,7 +435,7 @@ test_registry_cleanup() {
         fi
     }
     
-    local cleanup_result=$(cleanup_registry_images "git.pixelatedempathy.tech" "pixelated-empathy" 3)
+    local cleanup_result=$(cleanup_registry_images "git.pixelatedempathy.com" "pixelated-empathy" 3)
     
     if [[ -n "$cleanup_result" ]]; then
         print_test_pass "cleanup_registry_images performs cleanup logic"
@@ -474,10 +474,10 @@ EOF
     }
     
     local metadata_file="$TEST_DIR/registry-metadata.json"
-    create_registry_metadata "git.pixelatedempathy.tech/pixelated-empathy:20240131" "abc123" "2024-01-31T10:30:00Z" "$metadata_file"
+    create_registry_metadata "git.pixelatedempathy.com/pixelated-empathy:20240131" "abc123" "2024-01-31T10:30:00Z" "$metadata_file"
     
     if [[ -f "$metadata_file" ]]; then
-        if grep -q "git.pixelatedempathy.tech" "$metadata_file" && \
+        if grep -q "git.pixelatedempathy.com" "$metadata_file" && \
            grep -q "abc123" "$metadata_file" && \
            grep -q "pushed_at" "$metadata_file"; then
             print_test_pass "create_registry_metadata generates complete metadata"
