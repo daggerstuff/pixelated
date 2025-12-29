@@ -73,7 +73,7 @@ case "$remote_command" in
         exit 0
         ;;
     *"pnpm --version"*)
-        echo "10.26.0"
+        echo "10.26.2"
         exit 0
         ;;
     *"docker ps"*)
@@ -143,7 +143,7 @@ case "$1" in
         exit 0
         ;;
     "push")
-        echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
+        echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
         echo "latest: digest: sha256:mock-digest size: 1234"
         exit 0
         ;;

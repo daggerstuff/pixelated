@@ -4,18 +4,19 @@
  */
 
 import type { APIRoute } from 'astro'
-import { registerWithBetterAuth } from '../../../lib/auth/better-auth-integration'
-import { rateLimitMiddleware } from '../../../lib/auth/middleware'
-import { sanitizeInput } from '../../../lib/auth/utils'
-import { logSecurityEvent } from '../../../lib/security'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+import { registerWithBetterAuth } from '@/lib/auth/better-auth-integration'
+import { rateLimitMiddleware } from '@/lib/auth/middleware'
+import { sanitizeInput } from '@/lib/auth/utils'
+import { logSecurityEvent } from '@/lib/security'
+import { updatePhase6AuthenticationProgress } from '@/lib/mcp/phase6-integration'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
+  let clientInfo;
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const deviceId = request.headers.get('x-device-id') || 'unknown'
-    const clientInfo = {
+    clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent,
       deviceId,
@@ -71,7 +72,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Log successful registration
     await logSecurityEvent('access', {
       userId: result.user.id,
-      clientInfo,
+      clientInfo: clientInfo || {},
       email: result.user.email,
       role: result.user.role,
       timestamp: Date.now(),
@@ -106,7 +107,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     if (error.name === 'AuthenticationError') {
       await logSecurityEvent('error', {
         error: error.message,
-        clientInfo,
+        clientInfo: clientInfo || {},
         timestamp: Date.now(),
       })
 
@@ -129,7 +130,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     await logSecurityEvent('error', {
       error: error.message,
-      clientInfo,
+      clientInfo: clientInfo || {},
       timestamp: Date.now(),
     })
 

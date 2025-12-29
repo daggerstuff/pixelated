@@ -3,7 +3,7 @@
  * Handles live session analysis, adaptive processing, and streaming analytics
  */
 
-import type { SessionData, RealTimeMetrics, ProcessingConfig } from '@/types/ai'
+import type { RealTimeMetrics, ProcessingConfig } from '@/types/ai'
 
 export interface StreamingSession {
   sessionId: string
@@ -127,7 +127,7 @@ class RealTimeProcessor {
   }
 
   private async createProcessingPipeline(
-    config: Partial<ProcessingConfig>,
+    _config: Partial<ProcessingConfig>,
   ): Promise<ProcessingStage[]> {
     return [
       {
@@ -490,7 +490,7 @@ class RealTimeProcessor {
               stageSum + stage.processor.getMetrics().averageProcessingTime,
             0,
           ) /
-            session.processingPipeline.length
+          session.processingPipeline.length
         )
       }, 0) / activeSessions
 
@@ -505,7 +505,7 @@ class RealTimeProcessor {
   /**
    * Adaptive processing controller
    */
-  private adaptiveController: AdaptiveController
+
 }
 
 /**

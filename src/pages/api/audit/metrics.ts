@@ -102,7 +102,7 @@ export const GET: APIRoute = async () => {
     )
 
     // Process logs into time-based metrics (hourly intervals)
-    const hourlyAccess = new Array(24).fill(0)
+    const hourlyAccess = Array.from({ length: 24 }, () => 0)
     const accessTypes = new Map<string, number>()
 
     logs.forEach((log: AuditLog) => {

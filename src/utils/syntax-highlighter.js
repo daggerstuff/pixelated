@@ -86,22 +86,3 @@ export default {
   languages: {},
   hooks: { all: {} },
 }
-!(function () {
-  try {
-    var e =
-        'undefined' != typeof window
-          ? window
-          : 'undefined' != typeof global
-            ? global
-            : 'undefined' != typeof globalThis
-              ? globalThis
-              : 'undefined' != typeof self
-                ? self
-                : {},
-      n = new e.Error().stack
-    n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
-      (e._sentryDebugIds[n] = 'b3f76166-0d1f-5d4c-bb82-370bb2366112'))
-  } catch (e) {}
-})()
-//# debugId=b3f76166-0d1f-5d4c-bb82-370bb2366112
