@@ -1,0 +1,55 @@
+{
+  "port": 61148,
+  "project": "pixelated",
+  "description": "AI-powered mental health training simulation platform",
+  "security": {
+    "encryption": "end-to-end",
+    "compliance": "HIPAA++"
+  },
+  "mcp_servers": [
+    "filesystem",
+    "memory",
+    "sequentialthinking",
+    "git",
+    "context7"
+  ],
+  "training": {
+    "stages": 4,
+    "data_sources": [
+      "repository",
+      "google_drive"
+    ],
+    "infrastructure": {
+      "gpu": "H100/A100",
+      "orchestration": "kubernetes"
+    },
+    "integration": {
+      "api": "fastapi",
+      "monitoring": "grafana"
+    },
+    "development": {
+      "language": "python",
+      "package_manager": "uv"
+    },
+    "features": [
+      "nightmare_fuel_scenarios",
+      "voice_persona_training",
+      "bias_detection",
+      "psychology_books_integration"
+    ],
+    "deployment": {
+      "platform": "docker",
+      "scaling": "auto"
+    },
+    "next_steps": [
+      "update_memory_bank",
+      "optimize_training_infrastructure",
+      "enhance_monitoring",
+      "implement_google_drive_integration",
+      "scale_deployment",
+      "enhance_psychology_book_utilization",
+      "expand_sarcasm_detection_training",
+      "integrate_personality_based_therapeutic_approaches"
+    ]
+  }
+}

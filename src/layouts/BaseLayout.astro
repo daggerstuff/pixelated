@@ -1,49 +1,65 @@
 ---
-import '@unocss/reset/tailwind.css'
-import '@/styles/main.css'
-import '@/styles/prose.css'
-import '@/styles/markdown.css'
-import '@/styles/page.css'
+import "@unocss/reset/tailwind.css";
+import "@/styles/main.css";
+import "@/styles/prose.css";
+import "@/styles/markdown.css";
+import "@/styles/page.css";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
-import Head from '@/components/base/Head.astro'
-import Background from '@/components/backgrounds/Background.astro'
-import Link from '@/components/base/Link.astro'
-import Navbar from '@/components/mizu/Navbar.astro'
-import BackLink from '@/components/widgets/BackLink.astro'
-import Footer from '@/components/mizu/Footer.astro'
-import ToTopButton from '@/components/widgets/ToTopButton.astro'
-import Backdrop from '@/components/base/Backdrop.astro'
+import Head from "@/components/base/Head.astro";
+import Background from "@/components/backgrounds/Background.astro";
+import Link from "@/components/base/Link.astro";
+import Navbar from "@/components/mizu/Navbar.astro";
+import BackLink from "@/components/widgets/BackLink.astro";
+import Footer from "@/components/mizu/Footer.astro";
+import ToTopButton from "@/components/widgets/ToTopButton.astro";
+import Backdrop from "@/components/base/Backdrop.astro";
 
-import { SITE, UI, FEATURES } from '@/config'
-import { withBasePath } from '@/utils/path'
+import { SITE, UI, FEATURES } from "@/config";
+import { withBasePath } from "@/utils/path";
 
-import type { BgType } from '@/types'
+import type { BgType } from "@/types";
 
 interface Props {
-  title?: string
-  description?: string
-  ogImage?: string | boolean
-  bgType?: BgType | false
-  pubDate?: string
-  lastModDate?: string
+  title?: string;
+  description?: string;
+  ogImage?: string | boolean;
+  bgType?: BgType | false;
+  pubDate?: string;
+  lastModDate?: string;
+  pathname?: string;
+  showNavBar?: boolean;
+  showFooter?: boolean;
 }
 
-const { title, description, ogImage, bgType, pubDate, lastModDate } =
-  Astro.props
+const {
+  title,
+  description,
+  ogImage,
+  bgType,
+  pubDate,
+  lastModDate,
+  pathname,
+  showNavBar = true,
+  showFooter = true
+} = Astro.props;
 
-let style: Record<string, string> = {}
+// Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
+const currentPathname = pathname || Astro.url.pathname;
 
-const { slideEnterAnim } = FEATURES
-const enableSlideEnterAnim = Array.isArray(slideEnterAnim) && slideEnterAnim[0]
+let style: Record<string, string> = {};
+
+const { slideEnterAnim } = FEATURES;
+const enableSlideEnterAnim = Array.isArray(slideEnterAnim) && slideEnterAnim[0];
 if (enableSlideEnterAnim)
-  style['--enter-step'] = `${slideEnterAnim[1].enterStep}ms`
+  style["--enter-step"] = `${slideEnterAnim[1].enterStep}ms`;
 
 const {
   externalLink: { newTab, cursorType },
-} = UI
+} = UI;
 const hasCustomCursor =
-  newTab && cursorType.length > 0 && cursorType !== 'pointer'
-if (hasCustomCursor) style['--external-link-cursor'] = cursorType
+  newTab && cursorType.length > 0 && cursorType !== "pointer";
+if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
 ---
 
 <!doctype html>
@@ -58,17 +74,17 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
         --c-scrollbar: #181818;
         --c-scrollbar-hover: #1f1f1f;
       }
-      
+
       html {
         background-color: #0f172a;
         color: #f8fafc;
       }
-      
+
       body {
         background-color: #0f172a;
         color: #f8fafc;
       }
-      
+
       /* Ensure dark mode is applied */
       html.dark {
         --c-bg: #0f172a;
@@ -80,7 +96,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
   <body
     class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
     style={Object.keys(style).length !== 0 ? style : undefined}
-    data-no-sliding={enableSlideEnterAnim ? undefined : ''}
+    data-no-sliding={enableSlideEnterAnim ? undefined : ""}
   >
     <!-- Background -->
     {bgType && <Background type={bgType} />}
@@ -94,7 +110,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     </Link>
 
     <!-- Nav Bar -->
-    <Navbar />
+    {showNavBar && <Navbar />}
 
     <!-- Main -->
     <main id="main" class="flex-grow w-full px-7 py-10 pt-24">
@@ -102,7 +118,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
       <slot />
       <!-- Share -->
       {
-        Astro.url.pathname !== withBasePath('/') && (
+        currentPathname !== withBasePath("/") && (
           <footer class="slide-enter animate-delay-1000! prose mx-auto mt-8 print:hidden">
             <slot name="share" />
             <br />
@@ -115,23 +131,30 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     </main>
 
     <!-- Footer -->
-    <Footer />
-    <ToTopButton />
+    {showFooter && (
+      <>
+        <Footer />
+        <ToTopButton />
+      </>
+    )}
 
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />
 
     <!-- Progress Bar -->
     <script>
-      import nprogress from 'nprogress'
+      import nprogress from "nprogress";
 
-      document.addEventListener('astro:before-preparation', () => {
-        nprogress.start()
-      })
+      document.addEventListener("astro:before-preparation", () => {
+        nprogress.start();
+      });
 
-      document.addEventListener('astro:page-load', () => {
-        nprogress.done()
-      })
+      document.addEventListener("astro:page-load", () => {
+        nprogress.done();
+      });
     </script>
+
+    <!-- Vercel Speed Insights -->
+    <SpeedInsights />
   </body>
 </html>

@@ -170,12 +170,7 @@ export default defineConfig({
         light: 'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
       };
 
-// const directions = { // Unused variable - commented out by automation
-        to: 'to right',
-        'to-br': 'to bottom right',
-        'to-tl': 'to top left',
-        radial: 'radial-gradient(circle at center',
-      };
+// directions object removed - was unused
 
       return {
         background: gradients[gradient] || `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`

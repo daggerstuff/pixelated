@@ -21,7 +21,7 @@ function getTags(pattern) {
   try {
     const tags = execSync(`git tag -l "${pattern}" --sort=-committerdate`, { encoding: 'utf8' });
     return tags.split('\n').filter(Boolean);
-  } catch (e) {
+  } catch {
     return [];
   }
 }
