@@ -149,7 +149,7 @@ export class TokenCacheService {
 
       if (!cachedData) {
         this.statistics.misses++
-        this.updateStatistics(Date.now() - startTime, 'miss').slice()
+        this.updateStatistics(Date.now() - startTime, 'miss')
         return null
       }
 
