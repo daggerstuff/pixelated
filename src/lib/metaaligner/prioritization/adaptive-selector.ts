@@ -72,22 +72,34 @@ export class AdaptiveSelector {
     userId?: string,
     userProfile?: AlignmentContext['userProfile'],
   ): Promise<SelectionResult> {
-    const detection = await this.contextDetector.detectContext(
-      userInput,
-      conversationHistory,
-      userId,
-    )
-
-    // Add simple transition metadata expected by tests
-    if (
-      this.lastDetectedContext &&
-      this.lastDetectedContext !== detection.detectedContext
-    ) {
-      detection.metadata = detection.metadata || {}
-      ;(detection.metadata as Record<string, unknown>)['transition'] = {
-        from: this.lastDetectedContext,
-        to: detection.detectedContext,
+    // Detect context with defensive fallback
+    let detection: ContextDetectionResult
+    try {
+      detection = await this.contextDetector.detectContext(
+        userInput,
+        conversationHistory,
+        userId,
+      )
+    } catch (err) {
+      detection = {
+        detectedContext: ContextType.GENERAL,
+        confidence: 0.1,
+        contextualIndicators: [
+          { type: 'error_fallback', description: 'Context detection failed, using default', confidence: 0.1 },
+        ],
+        needsSpecialHandling: false,
+        urgency: 'low',
+        metadata: { error: err instanceof Error ? err.message : 'Unknown error' },
       }
+    }
+
+    // Track transitions (used in tests)
+    if (this.lastDetectedContext && this.lastDetectedContext !== detection.detectedContext) {
+      detection.metadata = detection.metadata || {}
+        ; (detection.metadata as Record<string, unknown>)['transition'] = {
+          from: this.lastDetectedContext,
+          to: detection.detectedContext,
+        }
     }
     this.lastDetectedContext = detection.detectedContext
 
@@ -98,40 +110,51 @@ export class AdaptiveSelector {
       userProfile,
     }
 
-    // Build a minimal ObjectiveConfiguration
-    const objectiveWeights = getDefaultObjectiveWeights()
-    const objectiveConfig = {
-      objectives: objectiveWeights,
-      contextualWeights: {},
-      globalSettings: {
-        enableDynamicWeighting: true,
-        enableContextualAdjustment: true,
-        minObjectiveScore: 0,
-        maxObjectiveScore: 1,
-        // Use numeric placeholders; engine will coerce/validate as needed
-        normalizationMethod: 0,
-        aggregationMethod: 0,
-      },
-    }
+    // Default objective config and weights
+    const defaults = getDefaultObjectiveWeights()
 
-    const weightCalc = this.weightingEngine.calculateWeights(
-      CORE_MENTAL_HEALTH_OBJECTIVES,
-      alignmentContext,
-      objectiveConfig,
-    )
+    let selectedObjectives: SelectedObjective[]
+    let weightCalculationResult: WeightCalculationResult
 
-    // Map selected objectives
-    const selectedObjectives: SelectedObjective[] =
-      CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
+    // If detection failed (marked with metadata.error), use exact default weights without recalculation
+    if ((detection.metadata as any)?.error) {
+      selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,
-        weight: weightCalc.weights[objective.id] ?? 0,
+        weight: defaults[objective.id] ?? 0,
       }))
+      weightCalculationResult = {
+        weights: { ...defaults },
+        details: { strategy: 'default-fallback' },
+      } as unknown as WeightCalculationResult
+    } else {
+      const objectiveConfig = {
+        objectives: defaults,
+        contextualWeights: {},
+        globalSettings: {
+          enableDynamicWeighting: true,
+          enableContextualAdjustment: true,
+          minObjectiveScore: 0,
+          maxObjectiveScore: 1,
+          normalizationMethod: 0,
+          aggregationMethod: 0,
+        },
+      }
+      weightCalculationResult = this.weightingEngine.calculateWeights(
+        CORE_MENTAL_HEALTH_OBJECTIVES,
+        alignmentContext,
+        objectiveConfig,
+      )
+      selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
+        objective,
+        weight: weightCalculationResult.weights[objective.id] ?? 0,
+      }))
+    }
 
     return {
       contextDetectionResult: detection,
       alignmentContext,
       selectedObjectives,
-      weightCalculationResult: weightCalc,
+      weightCalculationResult,
     }
   }
 }

@@ -8,7 +8,7 @@ export const JWT_CONFIG = {
   secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
   audience: process.env.JWT_AUDIENCE || 'pixelated-empathy',
   issuer: process.env.JWT_ISSUER || 'pixelated-auth-service',
-  accessTokenExpiry: 15 * 60, // 15 minutes
+  accessTokenExpiry: 24 * 60 * 60, // 24 hours
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
   algorithm: 'HS256' as const,
 }
