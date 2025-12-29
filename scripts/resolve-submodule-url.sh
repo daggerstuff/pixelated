@@ -50,6 +50,23 @@ git config submodule."$SUBMODULE_PATH".url "$SUBMODULE_URL"
 
 echo "Submodule URL successfully updated in .git/config to: $SUBMODULE_URL"
 
+# Pre-emptively update the submodule's internal configuration if it's already checked out.
+# 'git submodule sync' (step 1) resets the internal remote to match .gitmodules (GitHub),
+# which causes the subsequent update to fail on persistent agents despite the parent config change.
+if [ -e "$SUBMODULE_PATH/.git" ]; then
+  echo "🔧 Updating submodule's internal remote 'origin' to match overridden URL..."
+  (
+    cd "$SUBMODULE_PATH" || exit 1
+    # Check if origin exists, update it; otherwise add it (unlikely for initialized submodules)
+    if git remote | grep -q "^origin$"; then
+      git remote set-url origin "$SUBMODULE_URL"
+    else
+      git remote add origin "$SUBMODULE_URL"
+    fi
+    echo "✅ Submodule internal remote updated"
+  )
+fi
+
 # 4. Update (fetch & checkout) using the validated URL
 echo "Running: git submodule update --recursive"
 git submodule update --recursive
