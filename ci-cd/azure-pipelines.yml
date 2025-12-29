@@ -314,10 +314,11 @@ stages:
               rm -rf "$HOME/.tmp" 2>/dev/null || true
 
               # Clean up old virtual environments (keep only current)
-              if [ -d ".venv" ]; then
-                echo "Removing existing .venv to start fresh..."
-                rm -rf .venv
-              fi
+              # skipping .venv cleanup to allow reuse
+              # if [ -d ".venv" ]; then
+              #   echo "Removing existing .venv to start fresh..."
+              #   rm -rf .venv
+              # fi
 
               # Check disk space after cleanup
               echo "📊 Disk space after cleanup:"
@@ -333,73 +334,54 @@ stages:
           - script: |
               set -euo pipefail
 
-              echo "📦 Installing uv package manager..."
-              curl -LsSf https://astral.sh/uv/install.sh | sh
+              # Ensure local bin is in path for this step
               export PATH="$HOME/.local/bin:$PATH"
+
+              echo "📦 Checking uv package manager..."
+              if ! command -v uv >/dev/null 2>&1; then
+                echo "Installing uv..."
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+              else
+                echo "✅ uv is already installed"
+              fi
               uv --version
 
               echo "🐍 Setting up Python environment with uv..."
 
-              # Check if we can use a different cache location (e.g., if /tmp has more space)
-              # uv will use $HOME/.cache/uv by default, but we can override with UV_CACHE_DIR
-              DISK_USAGE_HOME=$(df "$HOME" | tail -1 | awk '{print $5}' | sed 's/%//')
-              DISK_USAGE_TMP=$(df /tmp | tail -1 | awk '{print $5}' | sed 's/%//' || echo "100")
+              # Use default cache location ($HOME/.cache/uv) which is on the main disk
+              echo "Using default uv cache location: $HOME/.cache/uv"
+              export UV_CACHE_DIR="$HOME/.cache/uv"
+              mkdir -p "$UV_CACHE_DIR"
 
-              if [ "$DISK_USAGE_TMP" -lt "$DISK_USAGE_HOME" ] && [ "$DISK_USAGE_TMP" -lt 80 ]; then
-                echo "Using /tmp for uv cache (more space available)"
-                export UV_CACHE_DIR="/tmp/uv-cache"
-                mkdir -p "$UV_CACHE_DIR"
-              else
-                echo "Using default uv cache location: $HOME/.cache/uv"
+              # Use specific existing virtual environment if available (avoids re-creation)
+              # This is critical for self-hosted agents to reuse the user's optimized env
+              if [ -d "/home/vivi/pixelated/.venv" ]; then
+                echo "Using shared virtual environment at /home/vivi/pixelated/.venv"
+                export UV_PROJECT_ENVIRONMENT="/home/vivi/pixelated/.venv"
+                # Set for subsequent steps
+                echo "##vso[task.setvariable variable=UV_PROJECT_ENVIRONMENT]/home/vivi/pixelated/.venv"
               fi
 
-              # Use uv sync to install dependencies efficiently
-              # This will create .venv and install all dependencies from pyproject.toml
-              # Add timeout and retry logic for large package downloads
+              # Use uv sync to install/update dependencies efficiently
+              # We do NOT remove .venv here to allow incremental updates (huge speedup for self-hosted)
+              # uv sync is naturally idempotent
+
               MAX_RETRIES=3
               RETRY_COUNT=0
 
               while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                # --frozen ensures we respect the lockfile exactly
                 if uv sync --frozen; then
                   break
                 else
                   RETRY_COUNT=$((RETRY_COUNT + 1))
                   if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                    echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - cleaning cache and retrying..."
-
-                    # Aggressive cleanup between retries
-                    echo "🧹 Performing aggressive cleanup..."
-
-                    # Remove ALL uv temporary files
-                    rm -rf "$HOME/.cache/uv/.tmp"* 2>/dev/null || true
-                    rm -rf "$HOME/.cache/uv/archive-"* 2>/dev/null || true
-                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/.tmp"* 2>/dev/null || true
-                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/archive-"* 2>/dev/null || true
-
-                    # Remove failed .venv to start fresh
-                    rm -rf .venv 2>/dev/null || true
-
-                    # Clean Docker build cache to free space
-                    if command -v docker >/dev/null 2>&1; then
-                      echo "🐳 Cleaning Docker build cache..."
-                      docker builder prune -af --filter "until=1h" 2>/dev/null || true
-                    fi
-
-                    # Show disk space after cleanup
-                    echo "📊 Disk space after cleanup:"
-                    df -h / | tail -1
-
+                    echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - retrying..."
                     sleep 10
                   else
                     echo "##vso[task.logissue type=error]uv sync failed after $MAX_RETRIES attempts"
                     echo "📊 Current disk usage:"
                     df -h /
-                    echo "📊 Disk usage by directory:"
-                    du -sh "$HOME/.cache" "$HOME/.local" .venv 2>/dev/null || true
-                    echo "##vso[task.logissue type=error]Agent is out of resources. Options:"
-                    echo "  1. Skip eval tests: Set SKIP_EVAL_TESTS=true parameter"
-                    echo "  2. Clean up agent: Run 'docker system prune -af' manually"
-                    echo "  3. Use agent with more disk space (>50GB free)"
                     exit 1
                   fi
                 fi
