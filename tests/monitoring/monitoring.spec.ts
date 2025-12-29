@@ -13,7 +13,7 @@ async function isServerRunning(baseUrl: string): Promise<boolean> {
     })
     clearTimeout(timeoutId)
     return response.status < 500 // Consider any non-5xx response as "running"
-  } catch (_e) {
+  } catch {
     clearTimeout(timeoutId)
     return false
   }
@@ -40,7 +40,7 @@ test.describe('Health Check Monitoring', () => {
       await expect(
         page.locator('main, [role="main"], .main-content').first(),
       ).toBeVisible({ timeout: 10000 })
-    } catch (_error) {
+    } catch {
       console.log(
         'Main content not found with typical selectors, the page might have a different structure',
       )
@@ -137,7 +137,7 @@ test.describe('Health Check Monitoring', () => {
           loginPageFound = true
           break
         }
-      } catch (_error) {
+      } catch {
         console.log(`Path ${path} not accessible`)
       }
     }
@@ -156,7 +156,7 @@ test.describe('Health Check Monitoring', () => {
           .filter({ hasText: /sign in|log in|login/i })
           .first(),
       ).toBeVisible()
-    } catch (_error) {
+    } catch {
       console.log('No login heading found, but page may still be valid')
     }
 
@@ -169,7 +169,7 @@ test.describe('Health Check Monitoring', () => {
           )
           .first(),
       ).toBeVisible()
-    } catch (_error) {
+    } catch {
       test.fail(true, 'Email field not found on login page')
     }
 
@@ -178,7 +178,7 @@ test.describe('Health Check Monitoring', () => {
       await expect(
         page.locator('#password, [name="password"], [type="password"]').first(),
       ).toBeVisible()
-    } catch (_error) {
+    } catch {
       test.fail(true, 'Password field not found on login page')
     }
 
@@ -191,7 +191,7 @@ test.describe('Health Check Monitoring', () => {
           )
           .first(),
       ).toBeVisible()
-    } catch (_error) {
+    } catch {
       test.fail(true, 'Login button not found on login page')
     }
   })
@@ -260,8 +260,8 @@ test.describe('Health Check Monitoring', () => {
 
         // Success if we can navigate to the page
         expect(page.url()).toContain(link.href)
-      } catch (_error) {
-        console.error(`Failed to navigate to ${fullUrl}:`, _error)
+      } catch (err) {
+        console.error(`Failed to navigate to ${fullUrl}:`, err)
       }
     }
   })

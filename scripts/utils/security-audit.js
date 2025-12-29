@@ -60,7 +60,7 @@ function scanDirectory(dir) {
       const isSafe = SAFE_PATTERNS.some((pattern) => pattern.test(line))
       if (isSafe) return
 
-      SECURITY_PATTERNS.forEach(({ pattern, message, safe }) => {
+      SECURITY_PATTERNS.forEach(({ pattern, message }) => {
         if (pattern.test(line)) {
           results.push({
             file: filePath,

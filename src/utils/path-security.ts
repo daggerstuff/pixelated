@@ -29,21 +29,21 @@ export function getProjectRoot(): string {
 export function validatePath(filePath: string, allowedDir: string): string {
   // Normalize the allowed directory to absolute path
   const normalizedAllowedDir = path.resolve(allowedDir)
-  
+
   // Resolve the file path to absolute
   const resolvedPath = path.resolve(normalizedAllowedDir, filePath)
-  
+
   // Normalize to handle any remaining .. or . segments
   const normalizedPath = path.normalize(resolvedPath)
-  
+
   // Check if the resolved path is within the allowed directory
-  if (!normalizedPath.startsWith(normalizedAllowedDir + path.sep) && 
-      normalizedPath !== normalizedAllowedDir) {
+  if (!normalizedPath.startsWith(normalizedAllowedDir + path.sep) &&
+    normalizedPath !== normalizedAllowedDir) {
     throw new Error(
       `Path traversal detected: ${filePath} resolves outside allowed directory ${allowedDir}`,
     )
   }
-  
+
   return normalizedPath
 }
 
@@ -76,7 +76,7 @@ export function validatePathAgainstMultiple(
       continue
     }
   }
-  
+
   throw new Error(
     `Path ${filePath} is not within any allowed directories: ${allowedDirs.join(', ')}`,
   )
@@ -89,10 +89,13 @@ export function validatePathAgainstMultiple(
  */
 export function sanitizeFilename(filename: string): string {
   // Remove path separators and dangerous characters
+  // Using explicit character codes for control characters to avoid regex warnings
+  const unsafeChars = new RegExp('[<>:"|?*\x00-\x1F]', 'g')
+
   return filename
     .replace(/[/\\]/g, '') // Remove path separators
     .replace(/\.\./g, '') // Remove parent directory references
-    .replace(/[<>:"|?*\x00-\x1f]/g, '') // Remove unsafe characters
+    .replace(unsafeChars, '') // Remove unsafe characters including control characters
     .trim()
 }
 
@@ -117,8 +120,7 @@ export function validateAndCreateDir(
   dirPath: string,
   allowedDir: string,
 ): string {
-  const validatedPath = validatePath(dirPath, allowedDir)
-  return validatedPath
+  return validatePath(dirPath, allowedDir);
 }
 
 /**
