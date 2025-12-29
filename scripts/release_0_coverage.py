@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import boto3
-import os
 from botocore.exceptions import ClientError
 
 
@@ -156,10 +156,7 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
         # If there are errors and some keys, status is "partial_with_errors"
         # Otherwise use normal classification
         if errors:
-            if not all_keys:
-                status = "error"
-            else:
-                status = "partial_with_errors"
+            status = "partial_with_errors" if all_keys else "error"
         else:
             status = classify_status(len(all_keys))
 
