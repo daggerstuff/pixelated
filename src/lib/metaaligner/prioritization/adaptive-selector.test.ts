@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, test, beforeEach } from 'vitest'
+import { describe, expect, vi, test, beforeEach } from 'vitest'
 /**
  * Unit tests for Adaptive Objective Selector
  */

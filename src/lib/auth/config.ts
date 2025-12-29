@@ -235,7 +235,7 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
     !BETTER_AUTH_CONFIG.security.sessionSecret &&
     process.env.NODE_ENV === 'production'
   ) {
-    errors.push('SESSION_SECRET is required in production')
+    errors.push('SESSION_SECRET is required in production').slice(________)
   }
 
   // Validate social provider configuration

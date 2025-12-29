@@ -53,8 +53,8 @@ Ship the first versioned, S3-canonical dataset release suitable for training: ma
 - EPIC: docs/epics/mental-health-datasets-expansion.md
 - Runbook: docs/datasets/mental-health-datasets-expansion-repo-map.md
 - Release 0 checklist: docs/datasets/release-0-checklist.md
-- S3 structure: ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md
-- S3 execution plan: ai/training_ready/docs/S3_EXECUTION_ORDER.md
+- S3 structure: (to be documented in future work)
+- S3 execution plan: (to be documented in future work)
 
 ### Acceptance criteria
 - Manifest exists, references only S3 keys, includes hashes, splits, provenance, and redaction/PII status

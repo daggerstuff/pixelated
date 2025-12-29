@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import boto3
 from botocore.exceptions import ClientError
@@ -88,7 +89,7 @@ def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
     return env_data
 
 
-def create_s3_client(env: Mapping[str, str]) -> boto3.client:
+def create_s3_client(env: Mapping[str, str]) -> Any:
     endpoint = env.get("OVH_S3_ENDPOINT")
     access_key = env.get("OVH_S3_ACCESS_KEY")
     secret = env.get("OVH_S3_SECRET_KEY")
@@ -106,16 +107,19 @@ def create_s3_client(env: Mapping[str, str]) -> boto3.client:
     )
 
 
-def list_objects(
-    client: boto3.client, bucket: str, prefix: str, max_keys: int = 25
-) -> Sequence[str]:
+def list_objects(client: Any, bucket: str, prefix: str, max_keys: int = 25) -> Sequence[str]:
+    """List objects under prefix, returning up to max_keys sample keys."""
     try:
-        response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=max_keys)
+        paginator = client.get_paginator('list_objects_v2')
+        keys: list[str] = []
+        for page in paginator.paginate(Bucket=bucket, Prefix=prefix, PaginationConfig={'MaxItems': max_keys}):
+            for obj in page.get('Contents', []):
+                keys.append(obj['Key'])
+                if len(keys) >= max_keys:
+                    return keys
+        return keys
     except ClientError as exc:
         raise RuntimeError(f"Failed to list {prefix}: {exc}") from exc
-
-    contents = response.get("Contents", [])
-    return [obj["Key"] for obj in contents]
 
 
 def classify_status(count: int) -> str:
@@ -124,8 +128,8 @@ def classify_status(count: int) -> str:
     return "partial" if count < 3 else "present"
 
 
-def build_coverage_report(bucket: str, client: boto3.client) -> Sequence[dict]:
-    report = []
+def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
+    report: list[dict] = []
     for family in FAMILIES:
         all_keys: list[str] = []
         errors: list[str] = []
@@ -140,7 +144,9 @@ def build_coverage_report(bucket: str, client: boto3.client) -> Sequence[dict]:
         status = (
             classify_status(len(all_keys))
             if not errors
-            else ("error" if len(all_keys) == 0 else classify_status(len(all_keys)))
+            else classify_status(len(all_keys))
+            if all_keys
+            else "error"
         )
         samples = (all_keys or errors)[:10]
 
@@ -157,6 +163,11 @@ def build_coverage_report(bucket: str, client: boto3.client) -> Sequence[dict]:
     return report
 
 
+def escape_markdown_cell(value: str) -> str:
+    """Escape pipe characters and newlines for markdown table cells."""
+    return value.replace("|", "\\|").replace("\n", " ").replace("\r", " ")
+
+
 def dump_markdown(report: Sequence[dict], destination: Path) -> None:
     lines = [
         "# Release 0 Coverage Matrix",
@@ -171,8 +182,9 @@ def dump_markdown(report: Sequence[dict], destination: Path) -> None:
         sample_display = ", ".join(entry["sample_keys"]) if entry["sample_keys"] else "(none)"
         notes = entry.get("description", "")
         prefixes_display = ", ".join(entry.get("prefixes", []))
+        # Escape all fields to prevent markdown injection
         lines.append(
-            f"| {entry['stage']} | {entry['name']} | {prefixes_display} | {entry['status']} | {sample_display} | {notes} |"
+            f"| {escape_markdown_cell(str(entry['stage']))} | {escape_markdown_cell(entry['name'])} | {escape_markdown_cell(prefixes_display)} | {escape_markdown_cell(entry['status'])} | {escape_markdown_cell(sample_display)} | {escape_markdown_cell(notes)} |"
         )
 
     destination.parent.mkdir(parents=True, exist_ok=True)

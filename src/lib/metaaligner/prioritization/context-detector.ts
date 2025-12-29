@@ -296,7 +296,7 @@ export class ContextDetector {
           urgency: 'low',
           metadata: {
             note: 'Matched fallback educational query pattern',
-            ...(result.metadata || {}),
+            ...result.metadata,
           },
         }
       }

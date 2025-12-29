@@ -439,7 +439,7 @@ export class SupportContextIdentifier {
   } {
     const baseResources = this.getRelevantResources(result)
     const resources = baseResources.map((r) => String(r))
-    if (result.urgency === 'high' || result.urgency === 'critical') {
+    if (result.urgency === 'high') {
       // Proactively include an explicit crisis/hotline reference for high urgency cases
       resources.unshift('Emergency crisis hotline support')
       const crisisAdds = [
@@ -456,10 +456,10 @@ export class SupportContextIdentifier {
         resources.unshift('Emergency crisis hotline')
       }
     }
-    // Final safety: ensure at least one crisis/hotline/emergency string present for high/critical urgency
+    // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
     const urgCheck = String(result.urgency || '').toLowerCase().trim()
     if (
-      ((urgCheck === 'high' || urgCheck === 'critical') ||
+      (urgCheck === 'high' ||
         String(result.recommendedApproach || '')
           .toLowerCase()
           .includes('crisis') ||
@@ -470,16 +470,27 @@ export class SupportContextIdentifier {
       resources.push('Emergency support and crisis hotline information')
     }
 
-    const stringifiedResources = resources.map((r) =>
-      typeof r === 'string' ? r : (r && ((r as any).label || (r as any).name)) ? String((r as any).label || (r as any).name) : String(r),
-    )
+    // Type-safe resource stringification
+    interface ResourceWithLabel {
+      label?: string
+      name?: string
+    }
+    const stringifiedResources = resources.map((r) => {
+      if (typeof r === 'string') return r
+      if (r && typeof r === 'object') {
+        const resource = r as ResourceWithLabel
+        if (resource.label) return String(resource.label)
+        if (resource.name) return String(resource.name)
+      }
+      return String(r)
+    })
 
-    // Ultra-defensive: if high/critical and still no crisis/hotline/emergency entry, prepend a guaranteed hotline
+    // Ultra-defensive: if high urgency and still no crisis/hotline/emergency entry, prepend a guaranteed hotline
     const immediateNeedsText = Array.isArray(result.metadata?.immediateNeeds)
       ? (result.metadata!.immediateNeeds as string[]).join(' ').toLowerCase()
       : ''
     if (
-      ((urgCheck === 'high' || urgCheck === 'critical') ||
+      (urgCheck === 'high' ||
         immediateNeedsText.includes('crisis') ||
         immediateNeedsText.includes('safety')) &&
       !stringifiedResources.some((x) => /crisis|hotline|emergency/i.test(x))
@@ -611,47 +622,6 @@ export class SupportContextIdentifier {
           state: firstMatch.state,
           confidence: firstMatch.confidence,
         }
-      }
-    }
-
-    // Check for casual/informational queries - we've already handled early above,
-    // but keep the logic here to be defensive. Return low-confidence support result
-    if (nonSupportPatterns.some((pattern) => pattern.test(query))) {
-      return {
-        isSupport: true,
-        confidence: 0.05,
-        supportType: SupportType.EMOTIONAL_VALIDATION,
-        emotionalState: EmotionalState.MIXED_EMOTIONS,
-        urgency: 'low',
-        supportNeeds: [],
-        recommendedApproach: RecommendedApproach.EMPATHETIC_LISTENING,
-        emotionalIntensity: 0.05,
-        metadata: {
-          emotionalIndicators: [],
-          copingCapacity: 'medium',
-          socialSupport: 'unknown',
-          immediateNeeds: [],
-        },
-      }
-    }
-
-    // Treat empty, whitespace, or falsy queries as low-confidence support (handled above already)
-    if (!query.trim()) {
-      return {
-        isSupport: true,
-        confidence: 0,
-        supportType: SupportType.EMOTIONAL_VALIDATION,
-        emotionalState: EmotionalState.MIXED_EMOTIONS,
-        urgency: 'low',
-        supportNeeds: [],
-        recommendedApproach: RecommendedApproach.EMPATHETIC_LISTENING,
-        emotionalIntensity: 0,
-        metadata: {
-          emotionalIndicators: [],
-          copingCapacity: 'medium',
-          socialSupport: 'unknown',
-          immediateNeeds: [],
-        },
       }
     }
 
@@ -956,10 +926,10 @@ Consider this context in your assessment.`
       let parsedObj: any
       try {
         parsedObj = JSON.parse(jsonStr)
-      } catch (_e) {
+      } catch {
         // Replace single quotes with double quotes for keys/strings and strip trailing commas
         const repaired = jsonStr
-          .replace(/(['\"])\s*:\s*'([^']*)'/g, '"$1": "$2"')
+          .replace(/(['"])\s*:\s*'([^']*)'/g, '"$1": "$2"')
           .replace(/'([^']*)'/g, '"$1"')
           .replace(/,\s*([}\]])/g, '$1')
         parsedObj = JSON.parse(repaired)

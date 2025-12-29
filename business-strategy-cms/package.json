@@ -13,7 +13,7 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "typecheck": "tsc --noEmit",
-    "security:check": "npm audit",
+    "security:check": "pnpm audit",
     "security:scan": "snyk test"
   },
   "keywords": [
