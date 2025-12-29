@@ -25,7 +25,7 @@ function getTags(pattern) {
       encoding: 'utf8',
     })
     return tags.split('\n').filter(Boolean)
-  } catch (e) {
+  } catch {
     return []
   }
 }

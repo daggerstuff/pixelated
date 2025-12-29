@@ -1,6 +1,6 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['ai/**/*.py', '**/*.py', 'ai/**/*.ipynb', '**/*.ipynb']
+applyTo: 'ai/**/*.py,**/*.py,ai/**/*.ipynb,**/*.ipynb'
+description: 'Python AI/ML development guidelines for Linux with CUDA/ROCm'
 ---
 
 # Python AI/ML Development Guidelines

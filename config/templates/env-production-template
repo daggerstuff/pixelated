@@ -1,0 +1,66 @@
+# Production Environment Configuration
+# Business Strategy CMS
+
+# Server Configuration
+NODE_ENV=production
+PORT=3000
+HOST=0.0.0.0
+DOMAIN=your-domain.com
+
+# Database Configuration
+DATABASE_URL=postgresql://username:password@localhost:5432/business_strategy_cms
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=business_strategy_cms
+DATABASE_USER=username
+DATABASE_PASSWORD=your-secure-password
+
+# JWT Configuration
+JWT_SECRET=your-super-secure-jwt-secret-key-change-this-in-production
+JWT_EXPIRES_IN=7d
+
+# AWS Configuration
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=business-strategy-cms-uploads
+AWS_S3_ENDPOINT=https://s3.amazonaws.com
+
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+FROM_EMAIL=noreply@your-domain.com
+FROM_NAME=Business Strategy CMS
+
+# Business Intelligence APIs
+ALPHA_VANTAGE_API_KEY=your-alpha-vantage-key
+YAHOO_FINANCE_API_KEY=your-yahoo-finance-key
+
+# SSL Configuration
+SSL_CERT_PATH=/etc/ssl/certs/business-strategy-cms.crt
+SSL_KEY_PATH=/etc/ssl/private/business-strategy-cms.key
+
+# Monitoring
+PROMETHEUS_PORT=9090
+GRAFANA_PORT=3001
+ENABLE_METRICS=true
+
+# Security
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+CORS_ORIGIN=https://your-domain.com
+
+# File Upload
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt,md
+
+# Redis Configuration (for session store)
+REDIS_URL=redis://localhost:6379
+REDIS_PASSWORD=your-redis-password
+
+# Logging
+LOG_LEVEL=info
+LOG_FILE_PATH=/var/log/business-strategy-cms/app.log

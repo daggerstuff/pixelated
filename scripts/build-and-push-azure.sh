@@ -8,7 +8,7 @@ set -euo pipefail
 ACR_NAME="pixelatedregistry"
 ACR_FQDN="${ACR_NAME}.azurecr.io"
 IMAGE_REPOSITORY="pixelatedempathy"
-DOCKERFILE="Dockerfile"
+DOCKERFILE="docker/Dockerfile"
 
 # Colors for output
 RED='\033[0;31m'
