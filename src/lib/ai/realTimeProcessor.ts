@@ -73,7 +73,7 @@ class RealTimeProcessor {
 
   constructor() {
     this.adaptiveController = new AdaptiveController()
-    this.startProcessingLoop()
+    this.startProcessingLoop().slice()
   }
 
   /**
