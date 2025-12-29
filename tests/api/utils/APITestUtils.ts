@@ -55,7 +55,7 @@ export class APITestUtils {
     })
 
     if (response.ok) {
-      // const data = await response.json();
+      // const _data = await response.json();
       this.testUsers.set('primary', { ...response, token: response.token })
       return response.token
     }
@@ -85,7 +85,7 @@ export class APITestUtils {
     })
 
     if (response.ok) {
-      const data = await response.json()
+      const _data = await response.json()
       const loginResponse = await fetch(`${this.baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -208,8 +208,8 @@ export class APITestUtils {
             Authorization: `Bearer ${user.token}`,
           },
         })
-      } catch (error: unknown) {
-        console.warn(`Failed to cleanup user ${key}:`, error)
+      } catch (_error: unknown) {
+        console.warn(`Failed to cleanup user ${key}:`, _error)
       }
     }
     this.testUsers.clear()
@@ -235,8 +235,8 @@ export class APITestUtils {
             },
           },
         )
-      } catch (error: unknown) {
-        console.warn(`Failed to cleanup conversation ${conversationId}:`, error)
+      } catch (_error: unknown) {
+        console.warn(`Failed to cleanup conversation ${conversationId}:`, _error)
       }
     }
     this.testConversations = []
@@ -259,8 +259,8 @@ export class APITestUtils {
             Authorization: `Bearer ${token}`,
           },
         })
-      } catch (error: unknown) {
-        console.warn(`Failed to cleanup file ${fileId}:`, error)
+      } catch (_error: unknown) {
+        console.warn(`Failed to cleanup file ${fileId}:`, _error)
       }
     }
     this.testFiles = []

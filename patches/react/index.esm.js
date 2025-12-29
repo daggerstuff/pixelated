@@ -43,7 +43,7 @@ export const {
   startTransition,
   version,
 } = React
-!(function () {
+void (function () {
   try {
     var e =
         'undefined' != typeof window
@@ -56,9 +56,10 @@ export const {
                 ? self
                 : {},
       n = new e.Error().stack
-    n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
-      (e._sentryDebugIds[n] = 'c5aa5b90-80ce-55cc-9749-c2dc9f463a61'))
-  } catch (e) {}
+    if (n) {
+      e._sentryDebugIds = e._sentryDebugIds || {}
+      e._sentryDebugIds[n] = 'c5aa5b90-80ce-55cc-9749-c2dc9f463a61'
+    }
+  } catch {}
 })()
 //# debugId=c5aa5b90-80ce-55cc-9749-c2dc9f463a61

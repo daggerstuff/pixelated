@@ -7,7 +7,6 @@ import { betterAuth } from 'better-auth'
 import dotenv from 'dotenv'
 import {
   generateTokenPair,
-  validateToken,
   AuthenticationError,
 } from './jwt-service'
 
@@ -274,15 +273,7 @@ export async function logoutFromBetterAuth(
 ): Promise<void> {
   try {
     // Update authentication status in memory
-    const updatedUser: UserAuthentication = {
-      id: userId,
-      email: '', // We don't have the email here, but it's not critical for logout
-      role: 'guest',
-      authenticationStatus: AuthenticationStatus.UNAUTHENTICATED,
-      loginAttempts: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
+    
 
     // Log logout event
     await logSecurityEvent(SecurityEventType.LOGOUT, {

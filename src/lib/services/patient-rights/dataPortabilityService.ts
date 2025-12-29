@@ -146,11 +146,11 @@ export interface ExportDownloadSuccessResponse {
 export interface ExportDownloadErrorResponse {
   success: false
   error:
-    | 'not_found'
-    | 'unauthorized'
-    | 'not_ready'
-    | 'expired'
-    | 'internal_error'
+  | 'not_found'
+  | 'unauthorized'
+  | 'not_ready'
+  | 'expired'
+  | 'internal_error'
   message?: string
   status?: ExportStatus
   progress?: number
@@ -1142,16 +1142,16 @@ const mockDb = {
         createdAt: new Date(),
         files: _params.include?.['files']
           ? [
-              {
-                id: 'file-1',
-                exportId: _params.where['id'] as string,
-                format: 'json',
-                dataType: 'profile',
-                url: 'https://example.com/file.json',
-                size: 1024,
-                createdAt: new Date(),
-              },
-            ]
+            {
+              id: 'file-1',
+              exportId: _params.where['id'] as string,
+              format: 'json',
+              dataType: 'profile',
+              url: 'https://example.com/file.json',
+              size: 1024,
+              createdAt: new Date(),
+            },
+          ]
           : undefined,
       })
     },

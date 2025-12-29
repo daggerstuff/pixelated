@@ -578,7 +578,7 @@ export class AdvancedBehavioralAnalysisService
         const fn = asObj['randomBytes'] as (size: number) => Buffer
         return `${prefix}${fn(16).toString('hex')}`
       }
-    } catch (_err) {
+    } catch {
       // ignore and fallback
     }
 

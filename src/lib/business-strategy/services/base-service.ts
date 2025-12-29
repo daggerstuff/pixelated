@@ -5,7 +5,7 @@
  */
 
 import type { DatabaseConfig } from '../config/database'
-import type { AuditLog, UserId } from '../types/common'
+import type { UserId } from '../types/common'
 import { getDatabaseConfig } from '../config/database'
 import { AuditService } from './audit'
 
