@@ -1,6 +1,6 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/*.py', '**/*.ipynb', '**/ai/**/*', '**/dataset_pipeline/**/*', '**/models/**/*']
+applyTo: '**/*.py,**/*.ipynb,**/ai/**/*,**/dataset_pipeline/**/*,**/models/**/*'
+description: 'Pandas and scikit-learn data/ML guidelines for Pixelated Empathy'
 ---
 
 # Data Analysis & ML Guidelines for Pixelated Empathy

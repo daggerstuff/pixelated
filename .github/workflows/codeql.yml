@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.26.0
+  PNPM_VERSION: 10.26.2
 
 jobs:
   analyze:

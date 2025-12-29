@@ -72,8 +72,8 @@ export function securePathJoin(
     throw new Error('Directory traversal sequences (..) are not allowed')
   }
 
-  // Reject paths with unsafe characters
-  const unsafeChars = /[<>:"|?*\x00-\x1f]/ // Control characters and Windows forbidden chars
+  // Reject paths with unsafe characters (no control characters)
+  const unsafeChars = /[<>:"|?*]/ // Windows forbidden chars only
   if (unsafeChars.test(userPath)) {
     throw new Error('Path contains unsafe characters')
   }

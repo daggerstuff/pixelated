@@ -1,42 +1,42 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import PostCard from '@/components/blog/PostCard.astro'
+import PostCard from "@/components/blog/PostCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 export const prerender = true
 
-type BlogPost = CollectionEntry<'blog'>
+type BlogPost = CollectionEntry<"blog">;
 
 export async function getStaticPaths() {
-  const allBlogPosts = await getCollection('blog', ({ data }: BlogPost) =>
+  const allBlogPosts = await getCollection("blog", ({ data }: BlogPost) =>
     import.meta.env.PROD ? !data.draft : true,
-  )
+  );
 
   const allSeries = [
     ...new Set(allBlogPosts.flatMap((post: BlogPost) => post.data.tags || [])),
-  ]
+  ];
 
   return allSeries.map((name) => ({
     params: { name },
     props: { name },
-  }))
+  }));
 }
 
-const { name } = Astro.props
+const { name } = Astro.props;
 
-const allPosts = await getCollection('blog', ({ data }: BlogPost) =>
+const allPosts = await getCollection("blog", ({ data }: BlogPost) =>
   import.meta.env.PROD ? !data.draft : true,
-)
+);
 
 const postsInSeries = allPosts
   .filter((post: BlogPost) => post.data.tags && post.data.tags.includes(name))
   .sort(
     (a: BlogPost, b: BlogPost) =>
       new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
-  )
+  );
 
-const title = `Series: ${name}`
-const description = `All posts in the '${name}' series.`
+const title = `Series: ${name}`;
+const description = `All posts in the '${name}' series.`;
 ---
 
 <BaseLayout {title} {description}>
@@ -44,7 +44,7 @@ const description = `All posts in the '${name}' series.`
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold text-white">Series: {name}</h1>
       <p class="text-lg text-slate-400 mt-2">
-        {postsInSeries.length} post{postsInSeries.length !== 1 ? 's' : ''} in this
+        {postsInSeries.length} post{postsInSeries.length !== 1 ? "s" : ""} in this
         series
       </p>
     </div>

@@ -39,5 +39,5 @@ declare module 'gray-matter' {
     ): GrayMatterFile<string>
   }
 
-  export = matter
+  export default matter
 }

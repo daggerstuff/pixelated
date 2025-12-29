@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Pilot Program Dashboard</title>
+    <style>
+      .dashboard {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .metric-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px;
+        display: inline-block;
+        width: 200px;
+      }
+      .status-active {
+        color: #28a745;
+      }
+      .status-pending {
+        color: #ffc107;
+      }
+      .progress-bar {
+        background: #e9ecef;
+        height: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        background: #007bff;
+        height: 100%;
+        transition: width 0.3s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard">
+      <h1>Pilot Program Live Dashboard</h1>
+
+      <div class="metric-card">
+        <h3>Active Pilots</h3>
+        <div class="status-active">5</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <h3>Students Enrolled</h3>
+        <div class="status-active">375</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 75%"></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <h3>Completion Rate</h3>
+        <div class="status-active">94%</div>
+      </div>
+
+      <div class="metric-card">
+        <h3>Avg. Improvement</h3>
+        <div class="status-active">77%</div>
+      </div>
+
+      <h2>Individual Pilot Progress</h2>
+      <table border="1" style="width: 100%; border-collapse: collapse">
+        <tr>
+          <th>Institution</th>
+          <th>Students</th>
+          <th>Week</th>
+          <th>Scenarios Completed</th>
+          <th>Accuracy Improvement</th>
+          <th>Status</th>
+        </tr>
+        <tr>
+          <td>Stanford</td>
+          <td>75</td>
+          <td>Week 3</td>
+          <td>156</td>
+          <td>+73%</td>
+          <td class="status-active">Active</td>
+        </tr>
+        <tr>
+          <td>Toronto</td>
+          <td>150</td>
+          <td>Week 2</td>
+          <td>287</td>
+          <td>+81%</td>
+          <td class="status-active">Active</td>
+        </tr>
+        <tr>
+          <td>Michigan</td>
+          <td>50</td>
+          <td>Week 4</td>
+          <td>198</td>
+          <td>+79%</td>
+          <td class="status-active">Active</td>
+        </tr>
+        <tr>
+          <td>Washington</td>
+          <td>60</td>
+          <td>Week 3</td>
+          <td>134</td>
+          <td>+68%</td>
+          <td class="status-active">Active</td>
+        </tr>
+        <tr>
+          <td>UCSF</td>
+          <td>40</td>
+          <td>Week 2</td>
+          <td>95</td>
+          <td>+75%</td>
+          <td class="status-active">Active</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

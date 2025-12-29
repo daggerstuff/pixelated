@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { mongoAuthService, UserNotFoundError } from '../../../lib/db/mongoClient'
 import { getEmailService } from '../../../lib/email'
 import { config } from '../../../config/env.config'
-import rateLimitConfig from '../../../config/rate-limit.config'
+
 import { createRateLimiter } from '../../../lib/rate-limiting/rate-limiter'
 import { defaultRateLimitConfig, defaultRuleSets } from '../../../lib/rate-limiting/config'
 import { promises as fs } from 'fs'
@@ -22,7 +22,7 @@ function escapeHtml(text: string): string {
     '/': '&#x2F;',
   }
 
-  return text.replace(/[&<>"'\/]/g, (match) => htmlEscapes[match])
+  return text.replace(/[&<>"'/]/g, (match) => htmlEscapes[match])
 }
 
 // Email template for password reset

@@ -1,20 +1,19 @@
 ---
-import { verifyAdmin } from '../../lib/auth/middleware.js'
-import type { AuthContext, SessionData } from '../../lib/auth/types.js'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
-// Verify admin access
-const context: AuthContext = {
-  session: (Astro.locals as { session?: SessionData }).session || null,
-  securityVerification: undefined,
-  hipaaCompliance: undefined,
+// Verify admin access via session
+const session = (Astro.locals as any)?.session;
+const user = (Astro.locals as any)?.user;
+
+if (!session || !user || user.role !== "admin") {
+  return Astro.redirect("/auth/sign-in");
 }
 
-const response = await verifyAdmin(Astro.request, context)
-if (response) return response
-
-// Get FHE stats from context
-const fheStats = context.securityVerification?.details
+// Get FHE stats (placeholder)
+const fheStats = {
+  timestamp: new Date().toISOString(),
+  verificationHash: "N/A",
+};
 ---
 
 <BaseLayout title="FHE Dashboard">

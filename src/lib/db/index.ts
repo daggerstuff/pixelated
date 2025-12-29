@@ -85,8 +85,7 @@ export async function query<T = unknown>(
 ): Promise<QueryResult<T>> {
   const client = await getPool().connect()
   try {
-    const result = await client.query(text, params)
-    return result
+    return await client.query(text, params);
   } finally {
     client.release()
   }
@@ -139,7 +138,7 @@ export async function healthCheck(): Promise<{
         waiting: poolState.waitingCount,
       },
     }
-  } catch (error) {
+  } catch {
     return {
       status: 'unhealthy',
       latency: Date.now() - startTime,
@@ -318,7 +317,17 @@ export class UserManager {
   /**
    * Update user profile
    */
-  async updateUserProfile(userId: string, profileData: any): Promise<void> {
+  async updateUserProfile(
+    userId: string,
+    profileData: {
+      bio?: string
+      specializations?: string[]
+      years_experience?: number
+      certifications?: string[]
+      languages?: string[]
+      timezone?: string
+    },
+  ): Promise<void> {
     await query(
       `
       INSERT INTO user_profiles (
@@ -360,7 +369,7 @@ export class SessionManager {
     therapistId: string
     clientId?: string
     sessionType?: string
-    context?: any
+    context?: Record<string, unknown>
   }): Promise<string> {
     const result = await query(
       `
@@ -448,9 +457,9 @@ export class BiasAnalysisManager {
     overallBiasScore: number
     alertLevel: string
     confidence: number
-    layerResults: any
-    recommendations: string[]
-    demographics: any
+    layerResults: Record<string, unknown>
+    detectedBiases: string[]
+    demographics: Record<string, unknown>
     contentHash: string
     processingTimeMs: number
   }): Promise<string> {
