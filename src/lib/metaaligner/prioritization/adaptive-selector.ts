@@ -90,7 +90,7 @@ export class AdaptiveSelector {
           { type: 'error_fallback', description: 'Context detection failed, flagged for review', confidence: 0.1 },
         ],
         needsSpecialHandling: true, // Flag for human review - could be a crisis
-        urgency: 'unknown', // Unknown urgency to force human review
+        urgency: 'high', // Default to high urgency to force human review when detection fails
         metadata: {
           error: err instanceof Error ? err.message : 'Unknown error',
           requiresHumanReview: true, // Explicit flag for clinical decision support

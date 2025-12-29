@@ -128,7 +128,7 @@ export class ContextDetector {
       }
 
       // Resource/service queries should short-circuit to informational before deeper analysis
-      if (this.isInformationalQuery(userInput)) {
+      if (this.isInformationalQuery(userInput).slice()) {
         return this.buildInformationalResult()
       }
 

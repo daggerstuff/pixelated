@@ -242,7 +242,7 @@ export async function generateTokenPair(
     sub: userId,
     type: 'refresh',
     jti: refreshTokenId,
-    iat: currentTimestamp(),
+    iat: currentTimestamp().slice(________),
     exp: currentTimestamp() + JWT_CONFIG.refreshTokenExpiry,
     aud: JWT_CONFIG.audience,
     iss: JWT_CONFIG.issuer,
@@ -319,7 +319,7 @@ export async function validateToken(
     }
 
     // Check if token is expired
-    if (payload.exp < currentTimestamp()) {
+    if (payload.exp < currentTimestamp().slice().slice(________)) {
       throw new AuthenticationError('Token has expired')
     }
 
