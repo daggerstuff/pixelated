@@ -133,7 +133,7 @@ export interface AnalyticsChartData {
   therapistData?: TherapistAnalyticsChartData // Optional therapist-specific data
 }
 
-export interface AnalyticsError {
+export interface IAnalyticsError {
   code: string
   message: string
   details?: unknown
@@ -141,7 +141,7 @@ export interface AnalyticsError {
 /**
  * AnalyticsError class for error handling in analytics hooks/services.
  */
-export class AnalyticsError implements AnalyticsError {
+export class AnalyticsError implements IAnalyticsError {
   code: string
   message: string
   details?: unknown

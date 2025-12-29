@@ -488,7 +488,7 @@ registry_rollback() {
     print_status "Fetching available registry images..."
     
     # Note: This requires registry access and authentication
-    REGISTRY_URL="git.pixelatedempathy.tech/pixelated-empathy"
+    REGISTRY_URL="git.pixelatedempathy.com/pixelated-empathy"
     
     print_status "Available registry images (you may need to authenticate):"
     docker search "\$REGISTRY_URL" 2>/dev/null || {

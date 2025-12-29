@@ -1,6 +1,5 @@
 import { Logger } from '../utils/logger'
 import {
-  MarketData,
   MarketPenetration,
   MarketOpportunity,
 } from '../types/business-intelligence'

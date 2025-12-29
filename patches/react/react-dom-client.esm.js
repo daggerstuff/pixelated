@@ -15,7 +15,7 @@ export default {
   createRoot,
   hydrateRoot,
 }
-!(function () {
+void (function () {
   try {
     var e =
         'undefined' != typeof window
@@ -28,9 +28,10 @@ export default {
                 ? self
                 : {},
       n = new e.Error().stack
-    n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
-      (e._sentryDebugIds[n] = '62989174-49ef-58df-b11e-a95e4aa4ea6e'))
-  } catch (e) {}
+    if (n) {
+      e._sentryDebugIds = e._sentryDebugIds || {}
+      e._sentryDebugIds[n] = '62989174-49ef-58df-b11e-a95e4aa4ea6e'
+    }
+  } catch {}
 })()
 //# debugId=62989174-49ef-58df-b11e-a95e4aa4ea6e

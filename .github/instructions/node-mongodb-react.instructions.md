@@ -1,6 +1,6 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/api/**/*.js', '**/api/**/*.ts', '**/api/**/*.py', '**/src/pages/api/**/*', '**/backend/**/*', '**/server/**/*']
+applyTo: '**/api/**/*.js,**/api/**/*.ts,**/api/**/*.py,**/src/pages/api/**/*,**/backend/**/*,**/server/**/*'
+description: 'Node.js, MongoDB, and React backend API development guidelines'
 ---
 
 # Backend API Development Guidelines

@@ -9,20 +9,20 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - staging-azure.pixelatedempathy.tech
-    secretName: pixelated-staging-tls
+    - hosts:
+        - staging-azure.pixelatedempathy.com
+      secretName: pixelated-staging-tls
   rules:
-  - host: staging-azure.pixelatedempathy.tech
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
+    - host: staging-azure.pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -35,17 +35,17 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - azure.pixelatedempathy.tech
-    secretName: pixelated-production-tls
+    - hosts:
+        - azure.pixelatedempathy.com
+      secretName: pixelated-production-tls
   rules:
-  - host: azure.pixelatedempathy.tech
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pixelated-service
-            port:
-              number: 80
+    - host: azure.pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pixelated-service
+                port:
+                  number: 80

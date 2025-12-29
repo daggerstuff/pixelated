@@ -253,9 +253,9 @@ export class SealOperations {
             if (typeof bAsNumberArray[i] !== 'number') {
               throw new TypeError(
                 'Plaintext array for BFV/BGV multiplication must contain numbers. Received: ' +
-                  String(bAsNumberArray[i]) +
-                  ' of type ' +
-                  typeof bAsNumberArray[i],
+                String(bAsNumberArray[i]) +
+                ' of type ' +
+                typeof bAsNumberArray[i],
               )
             }
             coefArray[i] = bAsNumberArray[i]
@@ -535,7 +535,7 @@ export class SealOperations {
           // For BFV/BGV, we need to create an array of the same size as the batch
           const batchEncoder = getBatchEncoder()
           const { slotCount } = batchEncoder
-          const constArray: number[] = new Array<number>(slotCount).fill(
+          const constArray: number[] = Array(slotCount).fill(
             coefficients[0],
           )
           batchEncoder.encode(constArray, plaintext as unknown as SealPlainText)

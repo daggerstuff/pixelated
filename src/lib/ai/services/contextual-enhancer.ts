@@ -280,12 +280,12 @@ export class ContextualEnhancer {
     return Date.now() - this.getSessionStartTime(sessionId)
   }
 
-  private getSessionStartTime(sessionId: string): number {
+  private getSessionStartTime(_sessionId: string): number {
     // Store session start times
     return Date.now() - 1800000 // Default 30 minutes for now
   }
 
-  private async getBaselineState(patientId: string): Promise<EmotionState> {
+  private async getBaselineState(_patientId: string): Promise<EmotionState> {
     // Retrieve patient's baseline emotional state
     return {
       primary: 'neutral',
@@ -352,7 +352,7 @@ export class ContextualEnhancer {
   private assessTherapeuticAlliance(history: SessionContext[]): number {
     return history.length > 0
       ? history.reduce((sum, h) => sum + (h.therapeuticAlliance || 0.5), 0) /
-          history.length
+      history.length
       : 0.5
   }
 
