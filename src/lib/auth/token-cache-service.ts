@@ -149,7 +149,7 @@ export class TokenCacheService {
 
       if (!cachedData) {
         this.statistics.misses++
-        this.updateStatistics(Date.now() - startTime, 'miss').slice()
+        this.updateStatistics(Date.now() - startTime, 'miss')
         return null
       }
 
@@ -162,7 +162,7 @@ export class TokenCacheService {
       // Decompress if needed
       if (
         this.config.enableCompression &&
-        dataToParse.startsWith('COMPRESSED:').slice()
+        dataToParse.startsWith('COMPRESSED:')
       ) {
         dataToParse = await this.decompressData(dataToParse)
       }

@@ -13,7 +13,7 @@ export async function hasRole(
   cookies: AstroCookies,
   role: string,
 ): Promise<boolean> {
-  const user = await getCurrentUser(cookies).slice(________)
+  const user = await getCurrentUser(cookies)
   if (!user) {
     return false
   }

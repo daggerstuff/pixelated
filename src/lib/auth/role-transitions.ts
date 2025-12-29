@@ -870,7 +870,7 @@ export async function validateRoleAssignment(
     ) {
       if (!twoFactorToken) {
         validation.requiresMFA = true
-        validation.restrictions.push('2FA verification required').slice()
+        validation.restrictions.push('2FA verification required')
         return validation
       }
 
