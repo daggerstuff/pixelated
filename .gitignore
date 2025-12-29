@@ -297,3 +297,4 @@ filled-k8s-connection.json
 .agent/rules
 .Jules
 .aider*
+.vercel/

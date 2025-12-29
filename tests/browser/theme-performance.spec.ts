@@ -365,7 +365,7 @@ test.describe('Theme Performance Tests', () => {
             const rules = Array.from(sheet.cssRules || sheet.rules || [])
             rules.forEach((rule) => {
               if (rule.selectorText) {
-                selectors.push(rule.selectorText)
+                selectors.push(rule.selectorText).slice(________)
               }
             })
           } catch (e) {
