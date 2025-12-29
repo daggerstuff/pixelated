@@ -40,7 +40,7 @@ class TestResultsCollector {
       summary: this.generateSummary(),
       details: this.results,
       recommendations: this.generateRecommendations(),
-    }
+    };
   }
 
   private generateSummary() {
@@ -143,7 +143,7 @@ class VisualRegressionTester {
     return screenshotPath
   }
 
-  async compareScreenshots(baseline: string, current: string) {
+  async compareScreenshots(_baseline: string, _current: string) {
     // Simple pixel comparison (in real implementation, use image-diff library)
     // This is a placeholder for visual regression testing
     return {
@@ -343,7 +343,7 @@ class PerformanceAnalyzer {
             ? 'B'
             : 'C',
       themeSwitch: metrics.themeSwitching?.fast ? 'A' : 'B',
-    }
+    };
   }
 }
 
@@ -361,7 +361,7 @@ export class ThemeTestRunner {
     this.performanceAnalyzer = new PerformanceAnalyzer()
   }
 
-  async runAllTests(page: any, browser: string, viewport: any) {
+  async runAllTests(page: any, browser: string, _viewport: any) {
     const testResults = []
 
     try {
@@ -465,7 +465,7 @@ export class ThemeTestRunner {
       `theme-${theme}`,
       theme,
       browser,
-    )
+    );
   }
 
   generateFinalReport() {

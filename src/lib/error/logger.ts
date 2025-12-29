@@ -244,7 +244,7 @@ export function initializeErrorLogging(monitoringService?: MonitoringService) {
 /**
  * Normalize error for logging
  */
-function normalizeError(
+export function normalizeErrorForLogging(
   error: unknown,
   context?: ErrorContext,
 ): AppError {

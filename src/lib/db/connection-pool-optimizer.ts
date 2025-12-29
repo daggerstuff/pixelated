@@ -478,7 +478,7 @@ export class OptimizedConnectionPool extends EventEmitter {
     performance: 'excellent' | 'good' | 'fair' | 'poor'
   } {
     const utilization = this.metrics.activeConnections / this.config.max
-    const avgQueryTime = this.metrics.avgQueryTime
+    const {avgQueryTime} = this.metrics
 
     let performance: 'excellent' | 'good' | 'fair' | 'poor' = 'excellent'
     if (avgQueryTime > 1000 || utilization > 0.9) {

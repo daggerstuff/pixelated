@@ -159,7 +159,7 @@ class PrivacyEngine {
   private async applyDifferentialPrivacy(
     update: ModelUpdate,
   ): Promise<ModelUpdate> {
-    const { epsilon, _delta, sensitivity, mechanism } = this.dpConfig
+    const { epsilon, delta, sensitivity, mechanism } = this.dpConfig
 
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
@@ -188,12 +188,12 @@ class PrivacyEngine {
       // Generate noise for model weights
       switch (mechanism) {
         case 'gaussian': {
-  // Gaussian noise: N(0, σ²) where σ = sensitivity / epsilon
-  const sigma =
-    noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
-  noise.push(this.gaussianRandom(0, sigma))
-  break
-}
+          // Gaussian noise: N(0, σ²) where σ = sensitivity / epsilon
+          const sigma =
+            noiseScale / Math.sqrt(2 * Math.log(1.25 / this.dpConfig.delta))
+          noise.push(this.gaussianRandom(0, sigma))
+          break
+        }
         case 'laplace':
           // Laplace noise with scale b = sensitivity / epsilon
           noise.push(this.laplaceRandom(noiseScale))
@@ -257,7 +257,10 @@ class PrivacyEngine {
 
   private federatedAveraging(updates: ModelUpdate[]): ModelUpdate {
     const totalWeight = updates.length
-    const averagedWeights = new Array(updates[0].weights.length).fill(0)
+    const averagedWeights = Array.from(
+      { length: updates[0].weights.length },
+      () => 0,
+    )
 
     // Simple averaging of model weights
     updates.forEach((update) => {
@@ -281,7 +284,7 @@ class PrivacyEngine {
     const mu = 0.01 // Proximal term weight
     const globalWeights = this.globalModel?.weights || updates[0].weights
 
-    const proximalWeights = new Array(globalWeights.length).fill(0)
+    const proximalWeights = Array.from({ length: globalWeights.length }, () => 0)
 
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
@@ -436,13 +439,13 @@ class PrivacyEngine {
     // Calculate basic statistics
     const progressValues = data
       .map((p) => p.progress)
-      .filter((p) => p !== undefined)
+      .filter((p): p is number => p !== undefined) as number[]
     if (progressValues.length > 0) {
       stats.progressMean =
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
       stats.progressStd = Math.sqrt(
         progressValues.reduce(
-          (sum, p) => sum + Math.pow(p - stats.progressMean, 2),
+          (sum, p) => sum + Math.pow(p - (stats.progressMean || 0), 2),
           0,
         ) / progressValues.length,
       )
@@ -504,8 +507,8 @@ class PrivacyEngine {
     const result = await this.performComputation(computation, inputs)
 
     // Generate proof (simplified)
-    const proof = `zkp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    const verificationKey = `vk_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const proof = `zkp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+    const verificationKey = `vk_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
     return {
       result,
@@ -522,15 +525,15 @@ class PrivacyEngine {
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + input.moodScore, 0) /
-          inputs.length
+          inputs.reduce((sum, input) => sum + (input.moodScore || 0), 0) /
+          (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => input.riskScore))
+        return Math.max(...inputs.map((input) => input.riskScore || 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + input.effectiveness, 0) /
-          inputs.length
+          inputs.reduce((sum, input) => sum + (input.effectiveness || 0), 0) /
+          (inputs.length || 1)
         )
       default:
         return null
@@ -574,7 +577,7 @@ class PrivacyEngine {
       },
       recommendations: this.generatePrivacyRecommendations(
         {
-          differentialPrivacy: this.dpConfig,
+          differentialPrivacy: { ...this.dpConfig },
           dataSanitization: {
             piiRemoved: true,
             fieldsObfuscated: [],

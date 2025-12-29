@@ -70,38 +70,7 @@ export class EditorService {
 
   static sanitizeContent(html: string): string {
     // Basic HTML sanitization
-    const allowedTags = [
-      'p',
-      'br',
-      'strong',
-      'b',
-      'em',
-      'i',
-      'u',
-      'strike',
-      'del',
-      'ins',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'ul',
-      'ol',
-      'li',
-      'blockquote',
-      'code',
-      'pre',
-      'a',
-      'img',
-      'table',
-      'thead',
-      'tbody',
-      'tr',
-      'td',
-      'th',
-    ]
+    
 
     // Remove script tags and other potentially dangerous content
     let sanitized = html.replace(/<script[^>]*>.*?<\/script>/gi, '')

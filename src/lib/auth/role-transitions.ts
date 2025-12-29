@@ -923,7 +923,7 @@ export async function validateRoleAssignment(
         if (transitionValidation.requiresApproval) {
           validation.requiresApproval = true
         }
-      } catch (_error) {
+      } catch {
         validation.restrictions.push('Invalid role transition')
         return validation
       }
