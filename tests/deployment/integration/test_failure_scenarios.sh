@@ -443,25 +443,25 @@ case "\$1" in
     "push")
         case "$failure_type" in
             "auth-error")
-                echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
+                echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
                 echo "denied: requested access to the resource is denied"
                 exit 1
                 ;;
             "network-error")
-                echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
-                echo "error: failed to push some refs to 'git.pixelatedempathy.tech/pixelated-empathy'"
-                echo "dial tcp: lookup git.pixelatedempathy.tech: no such host"
+                echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
+                echo "error: failed to push some refs to 'git.pixelatedempathy.com/pixelated-empathy'"
+                echo "dial tcp: lookup git.pixelatedempathy.com: no such host"
                 exit 1
                 ;;
             "quota-exceeded")
-                echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
-                echo "error: failed to push some refs to 'git.pixelatedempathy.tech/pixelated-empathy'"
+                echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
+                echo "error: failed to push some refs to 'git.pixelatedempathy.com/pixelated-empathy'"
                 echo "denied: requested access to the resource is denied: insufficient_scope: authorization failed"
                 exit 1
                 ;;
             "timeout")
-                echo "The push refers to repository [git.pixelatedempathy.tech/pixelated-empathy]"
-                echo "error: failed to push some refs to 'git.pixelatedempathy.tech/pixelated-empathy'"
+                echo "The push refers to repository [git.pixelatedempathy.com/pixelated-empathy]"
+                echo "error: failed to push some refs to 'git.pixelatedempathy.com/pixelated-empathy'"
                 echo "net/http: TLS handshake timeout"
                 exit 1
                 ;;
@@ -487,7 +487,7 @@ EOF
         create_failing_registry_mock "$failure_type"
         
         # Simulate registry push with failure
-        local output=$("$TEST_DIR/mocks/docker-registry-$failure_type" push git.pixelatedempathy.tech/pixelated-empathy:latest 2>&1)
+        local output=$("$TEST_DIR/mocks/docker-registry-$failure_type" push git.pixelatedempathy.com/pixelated-empathy:latest 2>&1)
         local exit_code=$?
         
         if [[ $exit_code -ne 0 ]] && echo "$output" | grep -q "$expected_error"; then

@@ -6,11 +6,11 @@ import { PatientPsiProfile } from '../../src/lib/ai/types/patient-psi'
 
 describe('Patient-Psi Crisis Integration Tests', () => {
   let contextualEnhancer: ContextualEnhancer
-  let realTimeAnalyzer: RealTimeAnalyzer
+  let _realTimeAnalyzer: RealTimeAnalyzer
 
   beforeEach(() => {
     contextualEnhancer = new ContextualEnhancer()
-    realTimeAnalyzer = new RealTimeAnalyzer()
+    _realTimeAnalyzer = new RealTimeAnalyzer()
   })
 
   describe('End-to-End Crisis Detection and Response', () => {
@@ -110,26 +110,7 @@ describe('Patient-Psi Crisis Integration Tests', () => {
       }
 
       // Simulate historical sessions showing improvement
-      const historicalContext = [
-        {
-          currentState: {
-            primary: 'anger',
-            intensity: 0.8,
-            valence: -0.7,
-            arousal: 0.9,
-            confidence: 0.9,
-          },
-          patientProfile: mockProfile,
-          conversationHistory: [
-            'I was really angry today',
-            'I felt out of control',
-          ],
-          sessionDuration: 2700000, // 45 minutes
-          therapeuticAlliance: 0.6,
-          crisisIndicators: ['anger_outburst'],
-          timestamp: new Date(Date.now() - 86400000 * 7), // 1 week ago
-        },
-      ]
+      
 
       const currentEmotion: EmotionState = {
         primary: 'frustrated',

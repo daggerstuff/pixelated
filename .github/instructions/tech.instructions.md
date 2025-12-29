@@ -1,5 +1,6 @@
 ---
-inclusion: always
+applyTo: '**'
+description: 'Technology stack and development guidelines for Pixelated Empathy'
 ---
 
 # Technology Stack & Development Guidelines

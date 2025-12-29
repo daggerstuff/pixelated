@@ -73,8 +73,8 @@ case "$1" in
         ;;
     "images")
         echo "REPOSITORY                                    TAG       IMAGE ID      CREATED       SIZE"
-        echo "git.pixelatedempathy.tech/pixelated-empathy  20240130  old-image-id  2 hours ago   100MB"
-        echo "git.pixelatedempathy.tech/pixelated-empathy  20240131  new-image-id  1 hour ago    100MB"
+        echo "git.pixelatedempathy.com/pixelated-empathy  20240130  old-image-id  2 hours ago   100MB"
+        echo "git.pixelatedempathy.com/pixelated-empathy  20240131  new-image-id  1 hour ago    100MB"
         echo "pixelated-empathy                            latest    new-image-id  1 hour ago    100MB"
         exit 0
         ;;
@@ -399,7 +399,7 @@ test_registry_rollback() {
     }
     
     local rollback_log="$TEST_DIR/registry-rollback.log"
-    local registry_image="git.pixelatedempathy.tech/pixelated-empathy:20240130"
+    local registry_image="git.pixelatedempathy.com/pixelated-empathy:20240130"
     
     if simulate_registry_rollback "$registry_image" "pixelated-app" "$rollback_log"; then
         local success_count=$(grep -c "SUCCESS" "$rollback_log")
@@ -468,7 +468,7 @@ EOF
     local latest_backup=$(ls -1t "$TEST_DIR/backups" | head -1)
     local backup_path="$TEST_DIR/backups/$latest_backup"
     
-    if generate_rollback_commands "$backup_path" "/root/pixelated" "git.pixelatedempathy.tech/pixelated-empathy:20240130" "pixelated-app" "$commands_file"; then
+    if generate_rollback_commands "$backup_path" "/root/pixelated" "git.pixelatedempathy.com/pixelated-empathy:20240130" "pixelated-app" "$commands_file"; then
         if [[ -f "$commands_file" ]] && [[ -x "$commands_file" ]]; then
             # Check if all rollback options are present
             local option_count=$(grep -c "Option [0-9]:" "$commands_file")
