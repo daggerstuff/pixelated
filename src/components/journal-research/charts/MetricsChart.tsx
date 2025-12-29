@@ -95,7 +95,7 @@ export function MetricsChart({
           <CardTitle>Metrics Over Time</CardTitle>
           <select
             value={timeRange}
-            onChange={(e) => {
+            onChange={(_e) => {
               // This would need to be handled by parent component
               // For now, just a visual indicator
             }}

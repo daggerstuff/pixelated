@@ -1,9 +1,6 @@
 import {
   Document,
-  DocumentCategory,
-  DocumentStatus,
-  DocumentMetadata,
-} from '@/types/document'
+  } from '@/types/document'
 
 // In-memory document storage for now
 const documents: Document[] = []

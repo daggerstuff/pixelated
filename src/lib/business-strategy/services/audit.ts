@@ -5,7 +5,7 @@
  * Ensures compliance and traceability
  */
 
-import type { AuditLog, AuditEvent, UserId } from '../types'
+import type { AuditLog, UserId } from '../types'
 import type { Collection } from 'mongodb'
 import { getDatabaseConfig } from '../config/database'
 

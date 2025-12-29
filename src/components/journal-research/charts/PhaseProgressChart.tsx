@@ -12,7 +12,7 @@ export interface PhaseProgressChartProps {
 
 export function PhaseProgressChart({
   progress,
-  metrics,
+  metrics: _metrics,
   className,
 }: PhaseProgressChartProps) {
   const phaseData = useMemo(() => {
@@ -36,7 +36,7 @@ export function PhaseProgressChart({
         const phaseOrder = ['discovery', 'evaluation', 'acquisition', 'integration', 'reporting']
         const currentIndex = phaseOrder.indexOf(progress.currentPhase)
         const phaseIndex = phaseOrder.indexOf(phase.key)
-        
+
         if (phaseIndex < currentIndex) {
           progressValue = 100
         } else if (phaseIndex === currentIndex) {
@@ -181,13 +181,12 @@ export function PhaseProgressChart({
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full transition-all ${
-                      phase.isCurrent
+                    className={`h-full transition-all ${phase.isCurrent
                         ? 'bg-primary'
                         : phase.progress === 100
                           ? 'bg-green-500'
                           : 'bg-gray-300'
-                    }`}
+                      }`}
                     style={{ width: `${phase.progress}%` }}
                     role="progressbar"
                     aria-valuenow={phase.progress}
