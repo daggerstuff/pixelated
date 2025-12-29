@@ -1,7 +1,7 @@
 // import type { APIRoute, APIContext } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getCurrentUser } from '../../../lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 
 export const prerender = false
 

@@ -1,6 +1,6 @@
 import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getCurrentUser } from '../../../../lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import {
   createAuditLog,
   AuditEventType,

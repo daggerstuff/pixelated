@@ -3,7 +3,6 @@
  * If you see 'Cannot find module', run: npm i -D @playwright/test
  * If using TypeScript, ensure your tsconfig includes "types": ["@playwright/test"]
  */
-/// <reference types="@playwright/test" />
 import { test, expect } from '@playwright/test'
 
 // Define common breakpoints to test

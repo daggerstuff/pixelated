@@ -131,7 +131,7 @@ test.describe('Theme Compatibility Tests', () => {
       })
     })
 
-    test('should handle system theme preference', async ({ browserName }) => {
+    test('should handle system theme preference', async ({ browserName: _browserName }) => {
       // Mock system dark preference
       await page.addInitScript(() => {
         Object.defineProperty(window, 'matchMedia', {

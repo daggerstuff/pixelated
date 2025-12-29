@@ -41,7 +41,13 @@ function isSafeToken(token) {
     return false
   }
   // Disallow only control/newline/null; shell is disabled.
-  return !/[\0\n\r]/.test(token)
+  for (let i = 0; i < token.length; i += 1) {
+    const code = token.charCodeAt(i)
+    if (code === 0 || code === 10 || code === 13) {
+      return false
+    }
+  }
+  return true
 }
 
 function runBlogCommand(command) {

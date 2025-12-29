@@ -5,7 +5,7 @@
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api/build/src/index.js'
+import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { MiddlewareHandler } from 'astro'
@@ -23,13 +23,45 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  * be added early in the middleware chain to capture all requests.
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
-  const { url, request } = context
-  const method = request.method
+  console.error(`[Tracing] Middleware start: ${context.request.url} COMMAND=${import.meta.env.COMMAND}`);
   const startTime = Date.now()
 
-  // Extract trace context from headers if present
-  const traceParent = request.headers.get('traceparent')
-  const traceState = request.headers.get('tracestate')
+  // Handle static prerendering scenarios where request or headers might not be available
+  if (!context?.request) {
+    logger.debug('Skipping tracing for static prerendering - no request object available')
+    return next()
+  }
+
+  // Resolve a robust URL object; some runtimes may not provide `context.url` as a URL
+  const req = context.request
+  const url = (() => {
+    try {
+      const ctxUrl = (context as any).url
+      if (ctxUrl && ctxUrl instanceof URL) return ctxUrl as URL
+      // Fallback to constructing from request.url when available
+      if (typeof req?.url === 'string') return new URL(req.url)
+    } catch {
+      // ignore and use final fallback below
+    }
+    // Final safe fallback to avoid crashing spans; minimal default
+    return new URL('http://localhost/')
+  })()
+
+  const method = req?.method ?? 'GET'
+
+  // Determine if it's safe to access request headers
+  // In Astro, accessing headers on a prerendered page during build triggers a warning
+  const isBuild = import.meta.env.COMMAND === 'build'
+
+  if (req?.url?.includes('/blog/tags/')) {
+    console.log(`[Tracing] Request: ${req.url}, COMMAND=${import.meta.env.COMMAND}, isBuild=${isBuild}`);
+  }
+
+  const canAccessHeaders = !!req && 'headers' in req && typeof req.headers?.get === 'function' && !isBuild
+
+  // Extract trace context from headers only if safe
+  const traceParent = canAccessHeaders ? req.headers.get('traceparent') : null
+  const traceState = canAccessHeaders ? req.headers.get('tracestate') : null
 
   // Create span for this request
   const span = tracer.startSpan(`${method} ${url.pathname}`, {
@@ -40,8 +72,8 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [SemanticAttributes.HTTP_SCHEME]: url.protocol.replace(':', ''),
       [SemanticAttributes.HTTP_TARGET]: url.pathname + url.search,
       [SemanticAttributes.HTTP_ROUTE]: url.pathname,
-      'http.user_agent': request.headers.get('user-agent') || '',
-      'http.request_id': request.headers.get('x-request-id') || '',
+      'http.user_agent': canAccessHeaders ? (req.headers.get('user-agent') || '') : '',
+      'http.request_id': canAccessHeaders ? (req.headers.get('x-request-id') || '') : '',
     },
   })
 
