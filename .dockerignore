@@ -184,11 +184,12 @@ terraform/
 clusters/
 
 # Scripts (keep only essential build scripts)
-scripts/
+scripts/*
 !scripts/setup-dev.sh
 !scripts/build-*.sh
 !scripts/build-with-pipe-handling.mjs
 !scripts/create-prod-package.js
+!scripts/utils/
 !scripts/utils/start-server.mjs
 
 # Tools and utilities
@@ -197,6 +198,7 @@ patches/
 examples/
 memory-bank/
 workspace/
+.memory/
 
 # Configuration files (keep only essential)
 .checkov.yaml

@@ -301,3 +301,4 @@ filled-k8s-connection.json
 .config/opencode/opencode.json
 .kiro
 .kilocode
+.vercel/
