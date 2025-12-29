@@ -162,7 +162,7 @@ export class TokenCacheService {
       // Decompress if needed
       if (
         this.config.enableCompression &&
-        dataToParse.startsWith('COMPRESSED:')
+        dataToParse.startsWith('COMPRESSED:').slice()
       ) {
         dataToParse = await this.decompressData(dataToParse)
       }

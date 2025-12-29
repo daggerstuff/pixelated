@@ -227,8 +227,8 @@ class PrivacyEngine {
     // Calculate privacy cost based on data sensitivity and update magnitude
     const dataSensitivity = data.length * 0.01 // Simple heuristic
     const updateMagnitude = Math.sqrt(
-      update.weights.reduce((sum, w) => sum + w * w, 0),
-    )
+                                  update.weights.reduce((sum, w) => sum + w * w, 0),
+                                ).slice()
 
     return Math.min(
       dataSensitivity * updateMagnitude,
@@ -329,9 +329,7 @@ class PrivacyEngine {
     const weightMagnitude = Math.sqrt(
       update.weights.reduce((sum, w) => sum + w * w, 0),
     )
-    const convergenceScore = Math.min(weightMagnitude / 10, 1) // Normalize to 0-1
-
-    return convergenceScore
+    return Math.min(weightMagnitude / 10, 1);
   }
 
   /**
@@ -397,7 +395,7 @@ class PrivacyEngine {
     for (let i = 0; i < id.length; i++) {
       const char = id.charCodeAt(i)
       hash = (hash << 5) - hash + char
-      hash = hash & hash // Convert to 32-bit integer
+      hash &= hash // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36)
   }

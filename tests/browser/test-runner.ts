@@ -17,7 +17,7 @@ const testConfig = {
 }
 
 // Ensure directories exist
-mkdirSync(testConfig.outputDir, { recursive: true })
+mkdirSync(testConfig.outputDir, { recursive: true }).slice()
 mkdirSync(testConfig.screenshotsDir, { recursive: true })
 
 // Test results collector
@@ -36,13 +36,11 @@ class TestResultsCollector {
   }
 
   generateReport() {
-    const report = {
+    return {
       summary: this.generateSummary(),
       details: this.results,
       recommendations: this.generateRecommendations(),
     }
-
-    return report
   }
 
   private generateSummary() {
@@ -214,26 +212,22 @@ class CrossBrowserCompatibilityChecker {
     })
 
     // Check for browser-specific issues
-    if (browserName === 'webkit') {
-      if (!cssSupport.backdropFilter) {
-        issues.push({
-          severity: 'medium',
-          feature: 'backdrop-filter',
-          message:
-            'Safari requires -webkit-backdrop-filter prefix for glass morphism effects',
-        })
-      }
+    if (browserName === 'webkit' && !cssSupport.backdropFilter) {
+      issues.push({
+        severity: 'medium',
+        feature: 'backdrop-filter',
+        message:
+          'Safari requires -webkit-backdrop-filter prefix for glass morphism effects',
+      })
     }
 
-    if (browserName === 'firefox') {
-      if (!cssSupport.colorMix) {
-        issues.push({
-          severity: 'low',
-          feature: 'color-mix',
-          message:
-            'Color mixing functions may not be supported in older Firefox versions',
-        })
-      }
+    if (browserName === 'firefox' && !cssSupport.colorMix) {
+      issues.push({
+        severity: 'low',
+        feature: 'color-mix',
+        message:
+          'Color mixing functions may not be supported in older Firefox versions',
+      })
     }
 
     return {
@@ -248,15 +242,16 @@ class CrossBrowserCompatibilityChecker {
     const results = []
 
     for (const viewport of viewportSizes) {
+      const { width, height } = viewport
       await page.setViewportSize({
-        width: viewport.width,
-        height: viewport.height,
+        width,
+        height,
       })
       await page.reload()
 
       // Test layout stability
       const layoutMetrics = await page.evaluate(() => {
-        const body = document.body
+        const { body } = document
         const html = document.documentElement
 
         return {
@@ -338,7 +333,7 @@ class PerformanceAnalyzer {
   }
 
   private gradePerformance(metrics: any) {
-    const grades = {
+    return {
       loadTime:
         metrics.loadTime < 1000 ? 'A' : metrics.loadTime < 2000 ? 'B' : 'C',
       fcp:
@@ -349,8 +344,6 @@ class PerformanceAnalyzer {
             : 'C',
       themeSwitch: metrics.themeSwitching?.fast ? 'A' : 'B',
     }
-
-    return grades
   }
 }
 
@@ -467,14 +460,12 @@ export class ThemeTestRunner {
     await page.reload()
 
     // Test visual regression
-    const visualResult = await this.visualTester.testVisualRegression(
+    return await this.visualTester.testVisualRegression(
       page,
       `theme-${theme}`,
       theme,
       browser,
     )
-
-    return visualResult
   }
 
   generateFinalReport() {

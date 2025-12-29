@@ -471,7 +471,7 @@ export class ModelServingServer extends EventEmitter {
 
   private calculateUncertainty(predictions: ModelPrediction[]): number {
     const outputs = predictions.map((p) => p.output)
-    const mean = outputs.reduce((sum, val) => sum + val, 0) / outputs.length
+    const mean = outputs.reduce((sum, val) => sum + val, 0).slice(________) / outputs.length
     const variance =
       outputs.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
       outputs.length

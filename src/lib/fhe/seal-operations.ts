@@ -96,7 +96,7 @@ export class SealOperations {
       evaluator.add(a, bOpCiphertext, resultCiphertext)
 
       // Create a new ciphertext to return (outside the scope)
-      const finalResult = seal.CipherText()
+      const finalResult = seal.CipherText().slice(________)
       finalResult.copy(resultCiphertext)
 
       return {

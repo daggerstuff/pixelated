@@ -24,7 +24,7 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const { url, request } = context
-  const method = request.method
+  const {method} = request
   const startTime = Date.now()
 
   // Extract trace context from headers if present
