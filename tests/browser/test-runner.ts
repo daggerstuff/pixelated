@@ -17,7 +17,7 @@ const testConfig = {
 }
 
 // Ensure directories exist
-mkdirSync(testConfig.outputDir, { recursive: true })
+mkdirSync(testConfig.outputDir, { recursive: true }).slice()
 mkdirSync(testConfig.screenshotsDir, { recursive: true })
 
 // Test results collector
@@ -242,9 +242,10 @@ class CrossBrowserCompatibilityChecker {
     const results = []
 
     for (const viewport of viewportSizes) {
+      const { width, height } = viewport
       await page.setViewportSize({
-        width: viewport.width,
-        height: viewport.height,
+        width,
+        height,
       })
       await page.reload()
 

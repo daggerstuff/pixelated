@@ -619,21 +619,18 @@ stages:
               script: |
                 set -euo pipefail
 
-                # Install prerequisites
-                sudo apt-get update
-                sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+                export PATH="$HOME/.local/bin:$PATH"
+                echo "##vso[task.setvariable variable=PATH]$HOME/.local/bin:${PATH}"
 
-                # Use modern GPG keyring approach (deprecated apt-key replaced)
-                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
-                  sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+                if ! command -v trivy >/dev/null 2>&1; then
+                  echo "📦 Installing Trivy to $HOME/.local/bin (no sudo)"
+                  curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | \
+                    sh -s -- -b "$HOME/.local/bin"
+                else
+                  echo "✅ Trivy already installed"
+                fi
 
-                # Add repository using signed-by option
-                echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
-                  sudo tee -a /etc/apt/sources.list.d/trivy.list
-
-                # Update and install Trivy
-                sudo apt-get update
-                sudo apt-get install -y trivy
+                trivy --version
 
           - task: Bash@3
             displayName: "Run Security Scan"
