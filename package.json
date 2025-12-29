@@ -48,7 +48,7 @@
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
-    "test:all": "node scripts/consolidated-test.js all",
+    "test:all": "node scripts/testing/local-test-runner.cjs",
     "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_similarity_search_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
     "test:crypto": "node scripts/consolidated-test.js crypto",

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import boto3
+import os
 from botocore.exceptions import ClientError
 
 
@@ -94,9 +95,17 @@ def create_s3_client(env: Mapping[str, str]) -> Any:
     access_key = env.get("OVH_S3_ACCESS_KEY")
     secret = env.get("OVH_S3_SECRET_KEY")
 
+    # Prefer environment variables over .env file for CI/CD compatibility
+    if not endpoint:
+        endpoint = os.environ.get("OVH_S3_ENDPOINT")
+    if not access_key:
+        access_key = os.environ.get("OVH_S3_ACCESS_KEY")
+    if not secret:
+        secret = os.environ.get("OVH_S3_SECRET_KEY")
+
     if not all((endpoint, access_key, secret)):
         raise ValueError(
-            "OVH_S3_ENDPOINT, OVH_S3_ACCESS_KEY, and OVH_S3_SECRET_KEY must be provided in .env"
+            "OVH_S3_ENDPOINT, OVH_S3_ACCESS_KEY, and OVH_S3_SECRET_KEY must be provided as environment variables or in .env"
         )
 
     return boto3.client(
@@ -110,11 +119,13 @@ def create_s3_client(env: Mapping[str, str]) -> Any:
 def list_objects(client: Any, bucket: str, prefix: str, max_keys: int = 25) -> Sequence[str]:
     """List objects under prefix, returning up to max_keys sample keys."""
     try:
-        paginator = client.get_paginator('list_objects_v2')
+        paginator = client.get_paginator("list_objects_v2")
         keys: list[str] = []
-        for page in paginator.paginate(Bucket=bucket, Prefix=prefix, PaginationConfig={'MaxItems': max_keys}):
-            for obj in page.get('Contents', []):
-                keys.append(obj['Key'])
+        for page in paginator.paginate(
+            Bucket=bucket, Prefix=prefix, PaginationConfig={"MaxItems": max_keys}
+        ):
+            for obj in page.get("Contents", []):
+                keys.append(obj["Key"])
                 if len(keys) >= max_keys:
                     return keys
         return keys
@@ -141,14 +152,23 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
             except RuntimeError as exc:
                 errors.append(f"{prefix}: {exc}")
 
-        status = (
-            classify_status(len(all_keys))
-            if not errors
-            else classify_status(len(all_keys))
-            if all_keys
-            else "error"
-        )
-        samples = (all_keys or errors)[:10]
+        # If there are errors and no keys, status is "error"
+        # If there are errors and some keys, status is "partial_with_errors"
+        # Otherwise use normal classification
+        if errors:
+            if not all_keys:
+                status = "error"
+            else:
+                status = "partial_with_errors"
+        else:
+            status = classify_status(len(all_keys))
+
+        # Always show sample keys from actual keys, not errors
+        # Show errors in the description field
+        samples = all_keys[:10] if all_keys else []
+        description = family.description
+        if errors:
+            description += f" (Errors: {', '.join(errors)})"
 
         report.append(
             {
@@ -157,7 +177,7 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
                 "prefixes": list(family.prefixes),
                 "status": status,
                 "sample_keys": samples,
-                "description": family.description,
+                "description": description,
             }
         )
     return report

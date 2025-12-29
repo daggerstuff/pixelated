@@ -312,10 +312,10 @@ export async function validateToken(
     }) as JwtPayload
 
     // Validate token type matches expected
-    if (____________ && payload.type !== tokenType) {
-          throw new AuthenticationError(
-            `Invalid token type: expected ${tokenType}, got ${payload.type}`,
-          )
+    if (payload.type !== tokenType) {
+      throw new AuthenticationError(
+        `Invalid token type: expected ${tokenType}, got ${payload.type}`,
+      )
     }
 
     // Check if token is expired
