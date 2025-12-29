@@ -54,6 +54,7 @@
 - **PyTorch**: Deep learning framework
 - **TensorFlow.js**: Browser-based ML
 - **MentalLLaMA**: Specialized mental health models
+- **Enhanced Psychology Knowledge Base**: 10,960 concepts including therapeutic conversation examples and psychology book references
 
 ### Database Technologies
 
@@ -129,7 +130,7 @@
 **Prerequisites:**
 - Node.js 24+
 - Python 3.11+
-- pnpm 10.26.0+
+- pnpm 10.26.2+
 - uv (Python package manager)
 - Docker (for local services)
 

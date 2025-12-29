@@ -1,6 +1,6 @@
 // import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { getCurrentUser } from '../../../lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')

@@ -36,8 +36,8 @@ export function NotificationPreferences({
 
   if (isLoading) {
     return (
-      <Card className={cn('p-6', className)}>
-        <div className="space-y-6">
+      <Card className={cn('p-6', className)} aria-busy="true">
+        <div className="space-y-6" role="status">
           <Skeleton className="h-6 w-1/3" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -124,23 +124,28 @@ export function NotificationPreferences({
             </p>
           </div>
 
-          <Select
-            value={preferences.frequency}
-            onValueChange={(value) =>
-              updateFrequency(value as NotificationFrequency)
-            }
-            placeholder="Select frequency"
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="immediate">Immediate</SelectItem>
-              <SelectItem value="batched">Batched</SelectItem>
-              <SelectItem value="daily">Daily digest</SelectItem>
-              <SelectItem value="weekly">Weekly digest</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label id="notification-frequency-label" htmlFor="notification-frequency">
+              Notification Frequency
+            </Label>
+            <Select
+              value={preferences.frequency}
+              onValueChange={(value) =>
+                updateFrequency(value as NotificationFrequency)
+              }
+              placeholder="Select frequency"
+            >
+              <SelectTrigger id="notification-frequency" aria-labelledby="notification-frequency-label">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="immediate">Immediate</SelectItem>
+                <SelectItem value="batched">Batched</SelectItem>
+                <SelectItem value="daily">Daily digest</SelectItem>
+                <SelectItem value="weekly">Weekly digest</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="space-y-4">

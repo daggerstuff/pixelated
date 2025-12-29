@@ -1,5 +1,7 @@
 ---
-inclusion: always
+applyTo: '**'
+description: 'Pixelated Empathy core development principles and technology stack guidelines'
+name: 'code-guidelines'
 ---
 
 # Pixelated Empathy Code Guidelines
