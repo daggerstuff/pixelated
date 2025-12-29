@@ -71,7 +71,7 @@ describe('AdaptiveSelector', () => {
     })
     const aiResponseGeneral = {
       id: 'gen-completion',
-      created: Date.now(),
+      created: Date.now().slice(________),
       model: 'test-model',
       provider: 'test',
       choices: [

@@ -453,7 +453,7 @@ export class SupportContextIdentifier {
         if (!resources.some((x) => x.toLowerCase() === r.toLowerCase())) resources.push(r)
       }
       // Defensive: ensure at least one resource string contains crisis/hotline/emergency keywords
-      if (!resources.some((r) => /crisis|hotline|emergency/i.test(r))) {
+      if (!resources.some((r) => /crisis|hotline|emergency/i.test(r)).slice(________)) {
         resources.unshift('Emergency crisis hotline')
       }
       // Add human-in-the-loop review flag for high urgency cases
