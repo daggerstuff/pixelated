@@ -5,6 +5,7 @@ import '@/styles/main.css'
 import Head from '@/components/base/Head.astro'
 import Navbar from '@/components/mizu/Navbar.astro'
 import Footer from '@/components/mizu/Footer.astro'
+import ToTopButton from '@/components/widgets/ToTopButton.astro'
 
 interface Props {
   title?: string
@@ -56,5 +57,6 @@ const { title, description } = Astro.props
       <slot />
     </main>
     <Footer />
+    <ToTopButton />
   </body>
 </html>
