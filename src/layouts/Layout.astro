@@ -1,15 +1,16 @@
 ---
 // Theme CSS files are linked directly from public folder for SSR compatibility
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 interface Props {
-  title: string
-  description?: string
+  title: string;
+  description?: string;
 }
 
 const {
   title,
-  description = 'Pixelated Empathy - AI-powered Therapy Training',
-} = Astro.props
+  description = "Pixelated Empathy - AI-powered Therapy Training",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -35,7 +36,7 @@ const {
     <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
     <link rel="stylesheet" href="/css/design-system.css" />
     <link rel="stylesheet" href="/css/unified-blended-theme.css" />
-    
+
     <!-- Font stylesheets -->
     <link rel="stylesheet" href="/css/fonts.css" />
     <link rel="stylesheet" href="/css/font-fix.css" />
@@ -140,10 +141,13 @@ const {
     </footer>
     <script is:inline>
       function speedInsightsBeforeSend(data) {
-        console.log('Speed Insights before send', data)
-        return data
+        console.log("Speed Insights before send", data);
+        return data;
       }
     </script>
+
+    <!-- Vercel Speed Insights -->
+    <SpeedInsights />
   </body>
 </html>
 

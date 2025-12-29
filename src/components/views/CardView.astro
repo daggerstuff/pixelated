@@ -169,7 +169,7 @@ const collectionItems = await getCollection(collectionType)
       let cardWidth = (containerWidth - totalGapWidth) / columns
       cardWidth = Math.min(cardWidth, maxCardWidth)
 
-      const columnHeights: number[] = new Array(columns).fill(0)
+      const columnHeights: number[] = Array.from({ length: columns }, () => 0)
       cards.forEach((card, index) => {
         const column = index % columns
         const left = column * (cardWidth + gap)

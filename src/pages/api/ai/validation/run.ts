@@ -1,7 +1,7 @@
 // Note: APIRoute type not available in current Astro version
 import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isAuthenticated } from '../../../../lib/auth'
+import { isAuthenticated } from '@/lib/auth'
 import {
   createAuditLog,
   AuditEventType,

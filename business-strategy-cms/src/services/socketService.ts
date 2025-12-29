@@ -319,8 +319,8 @@ export class SocketService {
   }
 
   public emitToUser(userId: string, event: string, data: any): void {
-    const sockets = this.io.sockets.sockets
-    for (const [socketId, socket] of sockets) {
+    const {sockets} = this.io.sockets
+    for (const [_socketId, socket] of sockets) {
       const authSocket = socket as AuthenticatedSocket
       if (authSocket.user?.userId === userId) {
         authSocket.emit(event, data)

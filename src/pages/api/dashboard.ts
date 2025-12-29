@@ -2,7 +2,7 @@ export const prerender = false
 
 // import type { APIRoute } from 'astro'
 // import type { AstroCookies } from 'astro'
-import { isAuthenticated } from '../../lib/auth'
+import { isAuthenticated } from '@/lib/auth'
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')

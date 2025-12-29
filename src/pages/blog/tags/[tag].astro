@@ -38,13 +38,7 @@ interface Props {
   tag: string
 }
 
-const { tag } = Astro.params
-const { posts } = Astro.props as Props
-
-// Validate tag parameter
-if (!tag || typeof tag !== 'string') {
-  return Astro.redirect('/blog/tags')
-}
+const { tag, posts } = Astro.props as Props
 
 // Handle empty posts gracefully
 const hasPosts = posts && posts.length > 0

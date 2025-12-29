@@ -1,7 +1,6 @@
 import {
   WorkflowInstance,
   WorkflowTemplate,
-  WorkflowStep,
   WorkflowAction,
   Approval,
   WorkflowComment,
@@ -306,7 +305,7 @@ export class WorkflowService {
   // Assign reviewers for current step
   private static async assignReviewers(
     workflowInstanceId: string,
-    assignerId: string,
+    _assignerId: string,
   ): Promise<void> {
     const instance = this.workflowInstances.get(workflowInstanceId)
     if (!instance) return

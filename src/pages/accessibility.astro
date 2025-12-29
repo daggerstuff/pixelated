@@ -1,8 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
+import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Set prerender to true to ensure this page is statically generated during build
-export const prerender = true
+// Disabled prerender due to Astro.request.headers usage in BaseLayout
+// export const prerender = true
 ---
 
 <BaseLayout
