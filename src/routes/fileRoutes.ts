@@ -83,7 +83,7 @@ export function createFileRoutes(db: Pool) {
   router.get('/:fileId/versions/:version', async (req, res) => {
     try {
       const { fileId, version } = req.params
-      const userId = req.user?.id || 'anonymous'
+      
       const versionNumber = parseInt(version)
 
       const versionRecord = await versioningService.getFileVersion(
@@ -104,7 +104,7 @@ export function createFileRoutes(db: Pool) {
   router.get('/:fileId/versions/:version/download', async (req, res) => {
     try {
       const { fileId, version } = req.params
-      const userId = req.user?.id || 'anonymous'
+      
       const versionNumber = parseInt(version)
 
       const versionRecord = await versioningService.getFileVersion(

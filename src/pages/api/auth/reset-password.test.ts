@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { POST } from './reset-password'
 import { mongoAuthService } from '../../../lib/db/mongoClient'
 import { getEmailService } from '../../../lib/email'
-import { config } from '../../../config/env.config'
+
 
 // Mock the dependencies
 vi.mock('../../../lib/db/mongoClient', () => ({

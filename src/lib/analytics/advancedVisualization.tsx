@@ -295,9 +295,8 @@ const VisualizationChart: FC<{
               onMouseEnter={() => setHoveredPoint(point)}
               onMouseLeave={() => setHoveredPoint(null)}
               onClick={(e) => {
-                e.ctrlKey || e.metaKey
-                  ? onSelectionChange([...selectedPoints, point])
-                  : onSelectionChange([point])
+                (e.ctrlKey || e.metaKey)
+                  ? onSelectionChange([point])
               }}
             />
           )

@@ -13,6 +13,5 @@ data:
   LOG_LEVEL: "info"
   ENABLE_METRICS: "true"
   ENVIRONMENT: "azure-staging"
-  PUBLIC_SITE_URL: "https://staging.pixelatedempathy.tech"
+  PUBLIC_SITE_URL: "https://staging.pixelatedempathy.com"
   SENTRY_ENVIRONMENT: "staging"
-

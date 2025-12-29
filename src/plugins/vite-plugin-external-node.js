@@ -69,7 +69,7 @@ export default function externalNodePlugin() {
     },
   }
 }
-!(function () {
+void (function () {
   try {
     var e =
         'undefined' != typeof window
@@ -85,6 +85,8 @@ export default function externalNodePlugin() {
     n &&
       ((e._sentryDebugIds = e._sentryDebugIds || {}),
       (e._sentryDebugIds[n] = '997a2ae6-b7d4-509e-9ed0-412733abc2ae'))
-  } catch (e) {}
+  } catch (error) {
+    // Intentionally empty - silencing Sentry debug errors
+  }
 })()
 //# debugId=997a2ae6-b7d4-509e-9ed0-412733abc2ae

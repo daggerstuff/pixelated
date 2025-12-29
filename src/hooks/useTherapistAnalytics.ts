@@ -30,28 +30,28 @@ const normalizeLogger = (raw: unknown) => {
       info: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (_) {
+        } catch (error) {
           /* swallow */
         }
       },
       warn: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (_) {
+        } catch (error) {
           /* swallow */
         }
       },
       error: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (_) {
+        } catch (error) {
           /* swallow */
         }
       },
       debug: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (_) {
+        } catch (error) {
           /* swallow */
         }
       },

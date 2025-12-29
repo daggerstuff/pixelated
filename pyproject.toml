@@ -93,6 +93,8 @@ dependencies = [
   "rich>=13.7.0",
   "ngcsdk>=4.10.0",
   "vicoa>=1.2.5",
+  "onnx>=1.20.0",
+  "onnxscript>=0.5.7",
 ]
 
 [project.optional-dependencies]

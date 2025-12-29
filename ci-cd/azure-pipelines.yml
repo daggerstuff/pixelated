@@ -5,7 +5,7 @@
 # - AKS Cluster: pixelated-aks-cluster (East US)
 # - ACR: pixelatedregistry.azurecr.io
 # - External IP: 20.242.241.80 (NGINX Ingress Controller)
-# - Staging: staging.pixelatedempathy.tech
+# - Staging: staging.pixelatedempathy.com
 # - Production: pixelatedempathy.com
 # - Image: pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25
 
@@ -88,7 +88,7 @@ variables:
   # Environment URLs (defaults, can be overridden by variable group)
   # NOTE: Must match the hostname in k8s/azure/staging/ingress.yaml
   - name: STAGING_URL
-    value: "https://staging.pixelatedempathy.tech"
+    value: "https://staging.pixelatedempathy.com"
   - name: PRODUCTION_URL
     value: "https://pixelatedempathy.com"
 
@@ -204,6 +204,18 @@ stages:
         pool:
           name: "Default"
         steps:
+          - checkout: self
+            displayName: "Checkout repository with submodules"
+            persistCredentials: "true"
+            submodules: "false"
+            fetchDepth: "0"
+          - script: |
+              chmod +x scripts/resolve-submodule-url.sh
+              ./scripts/resolve-submodule-url.sh
+            displayName: "Resolve submodule URL dynamically"
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              GITHUB_TOKEN: $(GITHUB_TOKEN)
           - task: NodeTool@0
             inputs:
               versionSpec: "$(NODE_VERSION)"
@@ -212,16 +224,22 @@ stages:
               set -euo pipefail
 
               # Install build tools required for native Node modules
-              echo "📦 Installing build dependencies..."
-              sudo apt-get update -qq
-              sudo apt-get install -y --no-install-recommends \
-                build-essential \
-                make \
-                g++ \
-                python3 \
-                python3-dev
+              echo "📦 Checking build dependencies..."
 
-              echo "✅ Build tools installed"
+              if ! command -v make >/dev/null 2>&1 || ! command -v g++ >/dev/null 2>&1; then
+                echo "⚠️ Build tools missing. Attempting installation..."
+                sudo apt-get update -qq
+                sudo apt-get install -y --no-install-recommends \
+                  build-essential \
+                  make \
+                  g++ \
+                  python3 \
+                  python3-dev
+                echo "✅ Build tools installed"
+              else
+                echo "✅ Build tools already installed (skipping sudo)"
+              fi
+
               make --version
               g++ --version
             displayName: "Install Build Tools"
@@ -296,10 +314,11 @@ stages:
               rm -rf "$HOME/.tmp" 2>/dev/null || true
 
               # Clean up old virtual environments (keep only current)
-              if [ -d ".venv" ]; then
-                echo "Removing existing .venv to start fresh..."
-                rm -rf .venv
-              fi
+              # skipping .venv cleanup to allow reuse
+              # if [ -d ".venv" ]; then
+              #   echo "Removing existing .venv to start fresh..."
+              #   rm -rf .venv
+              # fi
 
               # Check disk space after cleanup
               echo "📊 Disk space after cleanup:"
@@ -315,73 +334,54 @@ stages:
           - script: |
               set -euo pipefail
 
-              echo "📦 Installing uv package manager..."
-              curl -LsSf https://astral.sh/uv/install.sh | sh
+              # Ensure local bin is in path for this step
               export PATH="$HOME/.local/bin:$PATH"
+
+              echo "📦 Checking uv package manager..."
+              if ! command -v uv >/dev/null 2>&1; then
+                echo "Installing uv..."
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+              else
+                echo "✅ uv is already installed"
+              fi
               uv --version
 
               echo "🐍 Setting up Python environment with uv..."
 
-              # Check if we can use a different cache location (e.g., if /tmp has more space)
-              # uv will use $HOME/.cache/uv by default, but we can override with UV_CACHE_DIR
-              DISK_USAGE_HOME=$(df "$HOME" | tail -1 | awk '{print $5}' | sed 's/%//')
-              DISK_USAGE_TMP=$(df /tmp | tail -1 | awk '{print $5}' | sed 's/%//' || echo "100")
+              # Use default cache location ($HOME/.cache/uv) which is on the main disk
+              echo "Using default uv cache location: $HOME/.cache/uv"
+              export UV_CACHE_DIR="$HOME/.cache/uv"
+              mkdir -p "$UV_CACHE_DIR"
 
-              if [ "$DISK_USAGE_TMP" -lt "$DISK_USAGE_HOME" ] && [ "$DISK_USAGE_TMP" -lt 80 ]; then
-                echo "Using /tmp for uv cache (more space available)"
-                export UV_CACHE_DIR="/tmp/uv-cache"
-                mkdir -p "$UV_CACHE_DIR"
-              else
-                echo "Using default uv cache location: $HOME/.cache/uv"
+              # Use specific existing virtual environment if available (avoids re-creation)
+              # This is critical for self-hosted agents to reuse the user's optimized env
+              if [ -d "/home/vivi/pixelated/.venv" ]; then
+                echo "Using shared virtual environment at /home/vivi/pixelated/.venv"
+                export UV_PROJECT_ENVIRONMENT="/home/vivi/pixelated/.venv"
+                # Set for subsequent steps
+                echo "##vso[task.setvariable variable=UV_PROJECT_ENVIRONMENT]/home/vivi/pixelated/.venv"
               fi
 
-              # Use uv sync to install dependencies efficiently
-              # This will create .venv and install all dependencies from pyproject.toml
-              # Add timeout and retry logic for large package downloads
+              # Use uv sync to install/update dependencies efficiently
+              # We do NOT remove .venv here to allow incremental updates (huge speedup for self-hosted)
+              # uv sync is naturally idempotent
+
               MAX_RETRIES=3
               RETRY_COUNT=0
 
               while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                # --frozen ensures we respect the lockfile exactly
                 if uv sync --frozen; then
                   break
                 else
                   RETRY_COUNT=$((RETRY_COUNT + 1))
                   if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                    echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - cleaning cache and retrying..."
-
-                    # Aggressive cleanup between retries
-                    echo "🧹 Performing aggressive cleanup..."
-
-                    # Remove ALL uv temporary files
-                    rm -rf "$HOME/.cache/uv/.tmp"* 2>/dev/null || true
-                    rm -rf "$HOME/.cache/uv/archive-"* 2>/dev/null || true
-                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/.tmp"* 2>/dev/null || true
-                    [ -n "${UV_CACHE_DIR:-}" ] && rm -rf "$UV_CACHE_DIR/archive-"* 2>/dev/null || true
-
-                    # Remove failed .venv to start fresh
-                    rm -rf .venv 2>/dev/null || true
-
-                    # Clean Docker build cache to free space
-                    if command -v docker >/dev/null 2>&1; then
-                      echo "🐳 Cleaning Docker build cache..."
-                      docker builder prune -af --filter "until=1h" 2>/dev/null || true
-                    fi
-
-                    # Show disk space after cleanup
-                    echo "📊 Disk space after cleanup:"
-                    df -h / | tail -1
-
+                    echo "##vso[task.logissue type=warning]uv sync failed (attempt $RETRY_COUNT/$MAX_RETRIES) - retrying..."
                     sleep 10
                   else
                     echo "##vso[task.logissue type=error]uv sync failed after $MAX_RETRIES attempts"
                     echo "📊 Current disk usage:"
                     df -h /
-                    echo "📊 Disk usage by directory:"
-                    du -sh "$HOME/.cache" "$HOME/.local" .venv 2>/dev/null || true
-                    echo "##vso[task.logissue type=error]Agent is out of resources. Options:"
-                    echo "  1. Skip eval tests: Set SKIP_EVAL_TESTS=true parameter"
-                    echo "  2. Clean up agent: Run 'docker system prune -af' manually"
-                    echo "  3. Use agent with more disk space (>50GB free)"
                     exit 1
                   fi
                 fi
@@ -391,6 +391,26 @@ stages:
               uv run python -V
               echo "✅ Python environment ready"
             displayName: "Install uv (Python)"
+          - script: |
+              set -euo pipefail
+              export PATH="$HOME/.local/bin:$PATH"
+              export PYTHONPATH="$(pwd):${PYTHONPATH:-}"
+              echo "🔎 Submodule status:"
+              git submodule status || true
+              echo "📂 Listing ai directory (if present):"
+              ls -la ai || true
+              echo "🧪 Sanity check: try importing ai.evals"
+              uv run python - << 'PY'
+              import sys, importlib
+              print("sys.path[0] =", sys.path[0])
+              try:
+                mod = importlib.import_module("ai.evals")
+                print("✅ ai.evals import OK:", getattr(mod, "__file__", "<namespace>"))
+              except Exception as e:
+                print("❌ ai.evals import failed:", repr(e), file=sys.stderr)
+                sys.exit(1)
+              PY
+            displayName: "Sanity Check: ai.evals import"
           - script: |
               set -euo pipefail
               export PATH="$HOME/.local/bin:$PATH"
@@ -416,7 +436,7 @@ stages:
         displayName: "Build and Push Docker Image"
         pool:
           name: "Default"
-        timeoutInMinutes: "30"
+        timeoutInMinutes: "45"
         steps:
           - task: NodeTool@0
             inputs:
@@ -1401,7 +1421,7 @@ stages:
               if [ -z "${STAGING_URL}" ]; then
                 echo "ERROR: STAGING_URL environment variable is not set or is empty"
                 echo "This variable must be configured in Azure Pipeline variables or variable groups"
-                echo "Expected format: https://staging.pixelatedempathy.tech"
+                echo "Expected format: https://staging.pixelatedempathy.com"
                 exit 1
               fi
 
@@ -1640,7 +1660,7 @@ stages:
               if [ -z "${STAGING_URL}" ]; then
                 echo "ERROR: STAGING_URL environment variable is not set or is empty"
                 echo "This variable must be configured in Azure Pipeline variables or variable groups"
-                echo "Expected format: https://staging.pixelatedempathy.tech"
+                echo "Expected format: https://staging.pixelatedempathy.com"
                 exit 1
               fi
 
@@ -1959,7 +1979,8 @@ stages:
           name: "Default"
         steps:
           - checkout: self
-            persistCredentials: "true"
+            displayName: "Checkout repository"
+            persistCredentials: "false"
 
           - task: NodeTool@0
             inputs:
