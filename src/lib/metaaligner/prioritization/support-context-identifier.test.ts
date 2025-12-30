@@ -129,7 +129,7 @@ describe('SupportContextIdentifier', () => {
       const result = await identifier.identifySupportContext(query)
 
       expect(result['emotionalState']).toBe(EmotionalState.SADNESS)
-      expect(result['emotionalIntensity']).slice().toBeGreaterThan(0.6)
+      expect(result['emotionalIntensity']).toBeGreaterThan(0.6)
     })
 
     it('should detect anxiety indicators', async () => {
