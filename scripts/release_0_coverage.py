@@ -14,11 +14,18 @@ from botocore.exceptions import ClientError
 
 @dataclass
 class CoverageFamily:
+    """Represents a family of S3 prefixes for coverage analysis.
+
+    Attributes:
+        stage: The maturity stage of the dataset (e.g., "Stage 1 — Foundation").
+        name: The human-readable name of the dataset family.
+        prefixes: List of S3 key prefixes to scan for coverage.
+        description: Detailed description of the dataset family's purpose and content.
+    """
     stage: str
     name: str
     prefixes: Sequence[str]
     description: str
-
 
 FAMILIES: Sequence[CoverageFamily] = [
     CoverageFamily(
@@ -72,12 +79,22 @@ FAMILIES: Sequence[CoverageFamily] = [
 ]
 
 
+
 def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
-    env_data = {}
+    """Load environment variables from a .env file.
+
+    Args:
+        env_path: Path to the .env file. Defaults to ".env".
+
+    Returns:
+        Dictionary of environment variables with keys and values as strings.
+        If the .env file does not exist, returns a copy of os.environ.
+    """
     path = Path(env_path)
     if not path.exists():
-        raise FileNotFoundError(f"Missing environment file at {path}")
+        return os.environ.copy()
 
+    env_data = {}
     with path.open() as handle:
         for raw_line in handle:
             line = raw_line.strip()
@@ -88,9 +105,18 @@ def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
             key, value = line.split("=", 1)
             env_data[key.strip()] = value.strip().strip('"')
     return env_data
-
-
 def create_s3_client(env: Mapping[str, str]) -> Any:
+    """Create an S3 client using credentials from environment or .env file.
+
+    Args:
+        env: Dictionary of environment variables loaded from .env file.
+
+    Returns:
+        boto3 S3 client configured with OVH credentials.
+
+    Raises:
+        ValueError: If any of the required S3 credentials are missing.
+    """
     endpoint = env.get("OVH_S3_ENDPOINT")
     access_key = env.get("OVH_S3_ACCESS_KEY")
     secret = env.get("OVH_S3_SECRET_KEY")
@@ -132,14 +158,38 @@ def list_objects(client: Any, bucket: str, prefix: str, max_keys: int = 25) -> S
     except ClientError as exc:
         raise RuntimeError(f"Failed to list {prefix}: {exc}") from exc
 
-
 def classify_status(count: int) -> str:
+    """Classify coverage status based on number of objects found.
+
+    Args:
+        count: Number of S3 objects found under a prefix.
+
+    Returns:
+        One of: "missing" (0 objects), "partial" (1-2 objects), or "present" (3+ objects).
+    """
     if count == 0:
         return "missing"
     return "partial" if count < 3 else "present"
 
-
 def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
+    """Build a coverage report by scanning S3 prefixes for dataset families.
+
+    Args:
+        bucket: Name of the S3 bucket to scan.
+        client: boto3 S3 client configured with credentials.
+
+    Returns:
+        List of dictionaries, each representing a dataset family with:
+            - stage: maturity stage
+            - name: family name
+            - prefixes: list of S3 prefixes scanned
+            - status: "missing", "partial", "present", "error", or "partial_with_errors"
+            - sample_keys: up to 10 sample S3 keys found
+            - description: original description with appended errors if any
+
+    Raises:
+        RuntimeError: If S3 listing fails for any prefix (propagated from list_objects).
+    """
     report: list[dict] = []
     for family in FAMILIES:
         all_keys: list[str] = []
