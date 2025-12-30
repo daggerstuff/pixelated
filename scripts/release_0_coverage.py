@@ -22,10 +22,12 @@ class CoverageFamily:
         prefixes: List of S3 key prefixes to scan for coverage.
         description: Detailed description of the dataset family's purpose and content.
     """
+
     stage: str
     name: str
     prefixes: Sequence[str]
     description: str
+
 
 FAMILIES: Sequence[CoverageFamily] = [
     CoverageFamily(
@@ -79,7 +81,6 @@ FAMILIES: Sequence[CoverageFamily] = [
 ]
 
 
-
 def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
     """Load environment variables from a .env file.
 
@@ -105,6 +106,8 @@ def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
             key, value = line.split("=", 1)
             env_data[key.strip()] = value.strip().strip('"')
     return env_data
+
+
 def create_s3_client(env: Mapping[str, str]) -> Any:
     """Create an S3 client using credentials from environment or .env file.
 
@@ -158,6 +161,7 @@ def list_objects(client: Any, bucket: str, prefix: str, max_keys: int = 25) -> S
     except ClientError as exc:
         raise RuntimeError(f"Failed to list {prefix}: {exc}") from exc
 
+
 def classify_status(count: int) -> str:
     """Classify coverage status based on number of objects found.
 
@@ -170,6 +174,7 @@ def classify_status(count: int) -> str:
     if count == 0:
         return "missing"
     return "partial" if count < 3 else "present"
+
 
 def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
     """Build a coverage report by scanning S3 prefixes for dataset families.
@@ -186,9 +191,6 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
             - status: "missing", "partial", "present", "error", or "partial_with_errors"
             - sample_keys: up to 10 sample S3 keys found
             - description: original description with appended errors if any
-
-    Raises:
-        RuntimeError: If S3 listing fails for any prefix (propagated from list_objects).
     """
     report: list[dict] = []
     for family in FAMILIES:
@@ -259,7 +261,34 @@ def dump_markdown(report: Sequence[dict], destination: Path) -> None:
 
 
 def main() -> None:
-    env = load_env(Path(".env"))
+    """Script entry point for generating S3 coverage reports.
+
+    Loads environment variables from .env file or OS environment,
+    creates an S3 client using OVH credentials, builds a coverage
+    report by scanning dataset families in the S3 bucket, and writes
+    the results as a markdown file to docs/tracking.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Side Effects:
+        Reads .env file from current directory
+        Writes coverage report markdown file to docs/tracking/
+
+    Raises:
+        ValueError: If required S3 credentials are missing
+        RuntimeError: If S3 operations fail
+        OSError: If file operations fail
+    """
+    try:
+        env = load_env(Path(".env"))
+    except OSError:
+        # Fallback to environment variables from OS when .env file is absent
+        # or inaccessible in CI/CD environments
+        env = os.environ.copy()
     bucket = env.get("OVH_S3_BUCKET", "pixel-data")
     client = create_s3_client(env)
     report = build_coverage_report(bucket, client)

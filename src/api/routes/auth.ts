@@ -9,7 +9,7 @@ import { asyncHandler } from '../middleware/error-handler'
 
 const router: Router = express.Router()
 
-const ACCESS_TOKEN_TTL = process.env.JWT_EXPIRY || '24h'
+const ACCESS_TOKEN_TTL = process.env.JWT_EXPIRY || '24h' // Default to 24 hours per original PR requirements
 const REFRESH_TOKEN_TTL_SECONDS = parseInt(process.env.REFRESH_TOKEN_TTL_SECONDS || '1209600', 10) // 14 days
 
 function assertJwtSecret(): string {
@@ -101,7 +101,7 @@ router.post('/login', asyncHandler(async (req: Request, res: Response) => {
 
     const pool = getPostgresPool()
     const result = await pool.query(
-        `SELECT id, email, name, role, status, password_hash 
+        `SELECT id, email, name, role, status, password_hash
      FROM users WHERE email = $1`,
         [email]
     )

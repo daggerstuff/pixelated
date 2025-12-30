@@ -415,7 +415,8 @@
       "@unocss/core": "^66.5.10",
       "@unocss/vite": "^66.5.10",
       "@unocss/astro": "^66.5.10",
-      "drizzle-orm": "^0.45.1"
+      "drizzle-orm": "^0.45.1",
+      "zod": "^4.2.1"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
@@ -425,7 +426,9 @@
         "@vercel/kv": "3.0.0",
         "mongodb": "7.0.0",
         "eslint": "9.39.2",
-        "drizzle-orm": "0.45.1"
+        "drizzle-orm": "0.45.1",
+        "zod": "4.2.1",
+        "@opentelemetry/api": "^1.9.0"
       }
     },
     "allowedDeprecatedVersions": {
