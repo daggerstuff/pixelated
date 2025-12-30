@@ -9,16 +9,7 @@ import { randomBytes } from 'crypto'
 import { redis, getFromCache, setInCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-
-// Configuration
-const JWT_CONFIG = {
-  secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
-  audience: process.env.JWT_AUDIENCE || 'pixelated-empathy',
-  issuer: process.env.JWT_ISSUER || 'pixelated-auth-service',
-  accessTokenExpiry: 15 * 60, // 15 minutes
-  refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
-  algorithm: 'HS256' as const,
-}
+import { JWT_CONFIG } from './config'
 
 // --- Security hardening: require explicit secret in production ---
 // Prevent accidental use of a predictable fallback secret in production environments.

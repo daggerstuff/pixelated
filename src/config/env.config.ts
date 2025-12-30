@@ -45,7 +45,7 @@ const envSchema = z.object({
 
   // Authentication - JWT based
   JWT_SECRET: z.string().optional(),
-  JWT_EXPIRES_IN: z.string().default('24h'),
+  JWT_EXPIRES_IN: z.string().default('24h'), // Per original PR requirements
 
   // APIs
   OPENAI_API_KEY: z.string().optional(),

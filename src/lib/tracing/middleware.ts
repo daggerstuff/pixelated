@@ -23,7 +23,6 @@ const tracer = trace.getTracer('pixelated-empathy-http')
  * be added early in the middleware chain to capture all requests.
  */
 export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
-  console.error(`[Tracing] Middleware start: ${context.request.url} COMMAND=${import.meta.env.COMMAND}`);
   const startTime = Date.now()
 
   // Handle static prerendering scenarios where request or headers might not be available
@@ -52,11 +51,6 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   // Determine if it's safe to access request headers
   // In Astro, accessing headers on a prerendered page during build triggers a warning
   const isBuild = import.meta.env.COMMAND === 'build'
-
-  if (req?.url?.includes('/blog/tags/')) {
-    console.log(`[Tracing] Request: ${req.url}, COMMAND=${import.meta.env.COMMAND}, isBuild=${isBuild}`);
-  }
-
   const canAccessHeaders = !!req && 'headers' in req && typeof req.headers?.get === 'function' && !isBuild
 
   // Extract trace context from headers only if safe

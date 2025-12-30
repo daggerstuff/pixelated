@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 /**
  * Unit tests for Context Detection System
  */
@@ -9,7 +10,6 @@ import {
 } from './context-detector'
 import { ContextType } from '../core/objectives'
 import type { AIService } from '../../ai/models/types'
-import type { CrisisDetectionResult } from '../../ai/crisis/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 
 // Mock dependencies
