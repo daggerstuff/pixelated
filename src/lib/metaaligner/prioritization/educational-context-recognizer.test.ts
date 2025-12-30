@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 /**
  * Unit tests for Educational Context Recognition System
  */
@@ -8,7 +9,6 @@ import {
   getDefaultEducationalRecognizerConfig,
   EducationalType,
   TopicArea,
-  ResourceType,
 } from './educational-context-recognizer'
 import type {
   EducationalRecognizerConfig,

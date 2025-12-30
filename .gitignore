@@ -302,3 +302,4 @@ filled-k8s-connection.json
 .kiro
 .kilocode
 .vercel/
+.cursor/rclone.conf
