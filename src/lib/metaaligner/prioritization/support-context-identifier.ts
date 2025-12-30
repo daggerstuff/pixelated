@@ -453,7 +453,7 @@ export class SupportContextIdentifier {
         if (!resources.some((x) => x.toLowerCase() === r.toLowerCase())) resources.push(r)
       }
       // Defensive: ensure at least one resource string contains crisis/hotline/emergency keywords
-      if (!resources.some((r) => /crisis|hotline|emergency/i.test(r)).slice(________)) {
+      if (!resources.some((r) => /crisis|hotline|emergency/i.test(r))) {
         resources.unshift('Emergency crisis hotline')
       }
       // Add human-in-the-loop review flag for high urgency cases
@@ -932,16 +932,21 @@ Consider this context in your assessment.`
       }
 
       // Secondary resilience: try to fix common JSON formatting issues
-      let parsedObj: any
+      let parsedObj: unknown
       try {
         parsedObj = JSON.parse(jsonStr)
       } catch {
         // Replace single quotes with double quotes for keys/strings and strip trailing commas
         const repaired = jsonStr
-          .replace(/(['"])\s*:\s*'([^']*)'/g, '"$1": "$2"')
+          .replace(/'([^']+)'\s*:\s*'([^']*)'/g, '"$1": "$2"')
           .replace(/'([^']*)'/g, '"$1"')
           .replace(/,\s*([}\]])/g, '$1')
         parsedObj = JSON.parse(repaired)
+      }
+
+      // Type guard to validate parsed object structure
+      if (typeof parsedObj !== 'object' || parsedObj === null) {
+        throw new Error('Parsed result is not an object')
       }
 
       const parsed = parsedObj as {
