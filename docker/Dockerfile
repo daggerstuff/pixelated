@@ -1,6 +1,6 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.12.0-trixie-slim@sha256:9ad7e7db423b2ca7ddcc01568da872701ef6171505bd823978736247885c7eb4 AS base
+FROM node:24.12.0-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
