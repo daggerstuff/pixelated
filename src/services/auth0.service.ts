@@ -9,6 +9,10 @@ import { ManagementClient, AuthenticationClient } from 'auth0'
 import type { User } from 'auth0'
 import type { Db } from 'mongodb'
 import { mongodb } from '../config/mongodb.config'
+import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
+import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
+import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
+import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
@@ -449,6 +453,184 @@ export class Auth0UserService {
   }
 
   /**
+   * Get available MFA factors for a user
+   * @param userId Auth0 user ID
+   * @returns Array of available factor types
+   */
+  async getAvailableMFAFactors(userId: string): Promise<string[]> {
+    return await auth0MFAService.getAvailableFactors(userId)
+  }
+
+  /**
+   * Start MFA enrollment process
+   * @param userId Auth0 user ID
+   * @param factor MFA enrollment details
+   * @returns MFA challenge information
+   */
+  async startMFAEnrollment(userId: string, factor: MFAEnrollment): Promise<any> {
+    return await auth0MFAService.startEnrollment(userId, factor)
+  }
+
+  /**
+   * Complete MFA enrollment process
+   * @param userId Auth0 user ID
+   * @param verification MFA verification details
+   * @returns Enrolled MFA factor
+   */
+  async completeMFAEnrollment(userId: string, verification: MFAVerification): Promise<MFAFactor> {
+    return await auth0MFAService.completeEnrollment(userId, verification)
+  }
+
+  /**
+   * Get user's enrolled MFA factors
+   * @param userId Auth0 user ID
+   * @returns Array of enrolled MFA factors
+   */
+  async getUserMFAFactors(userId: string): Promise<MFAFactor[]> {
+    return await auth0MFAService.getUserFactors(userId)
+  }
+
+  /**
+   * Delete/disable a user's MFA factor
+   * @param userId Auth0 user ID
+   * @param factorId MFA factor ID
+   */
+  async deleteMFAFactor(userId: string, factorId: string): Promise<void> {
+    await auth0MFAService.deleteFactor(userId, factorId)
+  }
+
+  /**
+   * Challenge user for MFA during authentication
+   * @param userId Auth0 user ID
+   * @param factorType Type of factor to challenge
+   * @returns MFA challenge information
+   */
+  async challengeUserForMFA(userId: string, factorType: string): Promise<any> {
+    return await auth0MFAService.challengeUser(userId, factorType)
+  }
+
+  /**
+   * Verify MFA challenge response
+   * @param userId Auth0 user ID
+   * @param verification MFA verification details
+   * @returns Whether verification was successful
+   */
+  async verifyMFAChallenge(userId: string, verification: MFAVerification): Promise<boolean> {
+    return await auth0MFAService.verifyChallenge(userId, verification)
+  }
+
+  /**
+   * Check if user has MFA enabled
+   * @param userId Auth0 user ID
+   * @returns Whether user has MFA enabled
+   */
+  async userHasMFA(userId: string): Promise<boolean> {
+    return await auth0MFAService.userHasMFA(userId)
+  }
+
+  /**
+   * Get user's preferred MFA factor
+   * @param userId Auth0 user ID
+   * @returns User's preferred MFA factor or null
+   */
+  async getUserPreferredMFAFactor(userId: string): Promise<MFAFactor | null> {
+    return await auth0MFAService.getUserPreferredFactor(userId)
+  }
+
+  /**
+   * Set user's preferred MFA factor
+   * @param userId Auth0 user ID
+   * @param factorId MFA factor ID
+   */
+  async setUserPreferredMFAFactor(userId: string, factorId: string): Promise<void> {
+    await auth0MFAService.setUserPreferredFactor(userId, factorId)
+  }
+
+  /**
+   * Get WebAuthn registration options for a new credential
+   * @param registrationOptions WebAuthn registration options
+   * @returns WebAuthn credential creation options
+   */
+  async getWebAuthnRegistrationOptions(registrationOptions: WebAuthnRegistrationOptions): Promise<any> {
+    return await auth0WebAuthnService.getRegistrationOptions(registrationOptions)
+  }
+
+  /**
+   * Verify and register a new WebAuthn credential
+   * @param userId Auth0 user ID
+   * @param credential WebAuthn credential data
+   * @returns Registered WebAuthn credential
+   */
+  async verifyWebAuthnRegistration(userId: string, credential: any): Promise<WebAuthnCredential> {
+    return await auth0WebAuthnService.verifyRegistration(userId, credential)
+  }
+
+  /**
+   * Get WebAuthn authentication options for an existing user
+   * @param authenticationOptions WebAuthn authentication options
+   * @returns WebAuthn credential request options
+   */
+  async getWebAuthnAuthenticationOptions(authenticationOptions: WebAuthnAuthenticationOptions): Promise<any> {
+    return await auth0WebAuthnService.getAuthenticationOptions(authenticationOptions)
+  }
+
+  /**
+   * Verify WebAuthn authentication response
+   * @param userId Auth0 user ID
+   * @param credential WebAuthn credential response
+   * @returns Whether authentication was successful
+   */
+  async verifyWebAuthnAuthentication(userId: string, credential: any): Promise<boolean> {
+    return await auth0WebAuthnService.verifyAuthentication(userId, credential)
+  }
+
+  /**
+   * Get user's WebAuthn credentials
+   * @param userId Auth0 user ID
+   * @returns Array of WebAuthn credentials
+   */
+  async getUserWebAuthnCredentials(userId: string): Promise<WebAuthnCredential[]> {
+    return await auth0WebAuthnService.getUserWebAuthnCredentials(userId)
+  }
+
+  /**
+   * Delete a WebAuthn credential
+   * @param userId Auth0 user ID
+   * @param credentialId WebAuthn credential ID
+   */
+  async deleteWebAuthnCredential(userId: string, credentialId: string): Promise<void> {
+    await auth0WebAuthnService.deleteCredential(userId, credentialId)
+  }
+
+  /**
+   * Rename a WebAuthn credential
+   * @param userId Auth0 user ID
+   * @param credentialId WebAuthn credential ID
+   * @param newName New name for the credential
+   */
+  async renameWebAuthnCredential(userId: string, credentialId: string, newName: string): Promise<void> {
+    await auth0WebAuthnService.renameCredential(userId, credentialId, newName)
+  }
+
+  /**
+   * Check if user has any WebAuthn credentials
+   * @param userId Auth0 user ID
+   * @returns Whether user has WebAuthn credentials
+   */
+  async userHasWebAuthnCredentials(userId: string): Promise<boolean> {
+    return await auth0WebAuthnService.userHasWebAuthnCredentials(userId)
+  }
+
+  /**
+   * Get user's preferred WebAuthn credential
+   * @param userId Auth0 user ID
+   * @returns User's preferred WebAuthn credential or null
+   */
+  async getUserPreferredWebAuthnCredential(userId: string): Promise<WebAuthnCredential | null> {
+    return await auth0WebAuthnService.getUserPreferredCredential(userId)
+  }
+
+  /**
    * Extract role from Auth0 user
    * @param user Auth0 user object
    * @returns User role
@@ -540,6 +722,47 @@ export async function updateUser(userId: string, updates: Record<string, unknown
   return await auth0UserService.updateUser(userId, updates)
 }
 
+// MFA functions
+export async function getAvailableMFAFactors(userId: string) {
+  return await auth0UserService.getAvailableMFAFactors(userId)
+}
+
+export async function startMFAEnrollment(userId: string, factor: any) {
+  return await auth0UserService.startMFAEnrollment(userId, factor)
+}
+
+export async function completeMFAEnrollment(userId: string, verification: any) {
+  return await auth0UserService.completeMFAEnrollment(userId, verification)
+}
+
+export async function getUserMFAFactors(userId: string) {
+  return await auth0UserService.getUserMFAFactors(userId)
+}
+
+export async function deleteMFAFactor(userId: string, factorId: string) {
+  return await auth0UserService.deleteMFAFactor(userId, factorId)
+}
+
+export async function challengeUserForMFA(userId: string, factorType: string) {
+  return await auth0UserService.challengeUserForMFA(userId, factorType)
+}
+
+export async function verifyMFAChallenge(userId: string, verification: any) {
+  return await auth0UserService.verifyMFAChallenge(userId, verification)
+}
+
+export async function userHasMFA(userId: string) {
+  return await auth0UserService.userHasMFA(userId)
+}
+
+export async function getUserPreferredMFAFactor(userId: string) {
+  return await auth0UserService.getUserPreferredMFAFactor(userId)
+}
+
+export async function setUserPreferredMFAFactor(userId: string, factorId: string) {
+  return await auth0UserService.setUserPreferredMFAFactor(userId, factorId)
+}
+
 // Placeholder for OAuth verification (to be implemented)
 export async function verifyOAuthCode(_code: string) {
   throw new Error('OAuth verification not implemented yet')
@@ -554,5 +777,15 @@ export default {
   findUserByEmail,
   signIn,
   updateUser,
+  getAvailableMFAFactors,
+  startMFAEnrollment,
+  completeMFAEnrollment,
+  getUserMFAFactors,
+  deleteMFAFactor,
+  challengeUserForMFA,
+  verifyMFAChallenge,
+  userHasMFA,
+  getUserPreferredMFAFactor,
+  setUserPreferredMFAFactor,
   verifyOAuthCode,
 }
