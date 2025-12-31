@@ -1646,16 +1646,21 @@ stages:
               set -euo pipefail
 
               # Install build tools required for native Node modules
-              echo "📦 Installing build dependencies..."
-              sudo apt-get update -qq
-              sudo apt-get install -y --no-install-recommends \
-                build-essential \
-                make \
-                g++ \
-                python3 \
-                python3-dev
+              echo "📦 Checking build dependencies..."
 
-              echo "✅ Build tools installed"
+              if ! command -v make >/dev/null 2>&1 || ! command -v g++ >/dev/null 2>&1; then
+                echo "⚠️ Build tools missing. Attempting installation..."
+                sudo apt-get update -qq
+                sudo apt-get install -y --no-install-recommends \
+                  build-essential \
+                  make \
+                  g++ \
+                  python3 \
+                  python3-dev
+                echo "✅ Build tools installed"
+              else
+                echo "✅ Build tools already installed (skipping sudo)"
+              fi
             displayName: 'Install Build Tools'
 
           - script: |
@@ -1909,16 +1914,21 @@ stages:
               set -euo pipefail
 
               # Install build tools required for native Node modules
-              echo "📦 Installing build dependencies..."
-              sudo apt-get update -qq
-              sudo apt-get install -y --no-install-recommends \
-                build-essential \
-                make \
-                g++ \
-                python3 \
-                python3-dev
+              echo "📦 Checking build dependencies..."
 
-              echo "✅ Build tools installed"
+              if ! command -v make >/dev/null 2>&1 || ! command -v g++ >/dev/null 2>&1; then
+                echo "⚠️ Build tools missing. Attempting installation..."
+                sudo apt-get update -qq
+                sudo apt-get install -y --no-install-recommends \
+                  build-essential \
+                  make \
+                  g++ \
+                  python3 \
+                  python3-dev
+                echo "✅ Build tools installed"
+              else
+                echo "✅ Build tools already installed (skipping sudo)"
+              fi
             displayName: 'Install Build Tools'
 
           - script: |
@@ -2047,7 +2057,7 @@ stages:
                 echo "Note: If tests failed, this placeholder should not mask the failure"
               fi
             displayName: 'Prepare Test Results for Publishing'
-            condition: succeeded()
+            condition: succeededOrFailed()
 
           - publish: test-results/
             artifact: e2e-test-results
@@ -2277,16 +2287,21 @@ stages:
               set -euo pipefail
 
               # Install build tools required for native Node modules
-              echo "📦 Installing build dependencies..."
-              sudo apt-get update -qq
-              sudo apt-get install -y --no-install-recommends \
-                build-essential \
-                make \
-                g++ \
-                python3 \
-                python3-dev
+              echo "📦 Checking build dependencies..."
 
-              echo "✅ Build tools installed"
+              if ! command -v make >/dev/null 2>&1 || ! command -v g++ >/dev/null 2>&1; then
+                echo "⚠️ Build tools missing. Attempting installation..."
+                sudo apt-get update -qq
+                sudo apt-get install -y --no-install-recommends \
+                  build-essential \
+                  make \
+                  g++ \
+                  python3 \
+                  python3-dev
+                echo "✅ Build tools installed"
+              else
+                echo "✅ Build tools already installed (skipping sudo)"
+              fi
               make --version
               g++ --version
             displayName: 'Install Build Tools'
