@@ -1792,9 +1792,9 @@ stages:
               STAGING_URL: $(STAGING_URL)
 
           - script: |
-              # Verify the /demo route is accessible before running performance tests
-              echo "🔍 Verifying /demo route is accessible..."
-              DEMO_URL="${STAGING_URL}/demo?enable-all-tabs=true"
+              # Verify the /demo-hub route is accessible before running performance tests
+              echo "🔍 Verifying /demo-hub route is accessible..."
+              DEMO_URL="${STAGING_URL}/demo-hub"
 
               # Build optional Cloudflare Access headers if provided
               CURL_ARGS=()
@@ -1806,7 +1806,7 @@ stages:
                 HAS_CF_ACCESS_CREDS="true"
                 CURL_ARGS+=(-H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID_VALUE}")
                 CURL_ARGS+=(-H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET_VALUE}")
-                echo "✅ Using Cloudflare Access headers for /demo check"
+                echo "✅ Using Cloudflare Access headers for /demo-hub check"
               else
                 echo "##[warning]⚠️ Cloudflare Access credentials NOT configured!"
                 echo "##[warning]Variables CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET are missing"
@@ -1817,19 +1817,19 @@ stages:
               HTTP_CODE=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 15 --connect-timeout 10 "${CURL_ARGS[@]}" "$DEMO_URL" 2>/dev/null || echo "000")
 
               if [ "$HTTP_CODE" = "000" ]; then
-                echo "##vso[task.logissue type=warning]/demo route is not accessible (connection failed)"
-                echo "⚠️ Skipping performance tests - /demo route may not be deployed or is not accessible"
+                echo "##vso[task.logissue type=warning]/demo-hub route is not accessible (connection failed)"
+                echo "⚠️ Skipping performance tests - /demo-hub route may not be deployed or is not accessible"
                 echo "   This is non-blocking - pipeline will continue"
                 exit 0
               elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
-                echo "##vso[task.logissue type=warning]/demo route returned server error (HTTP $HTTP_CODE)"
-                echo "⚠️ Skipping performance tests - /demo route returned server error"
+                echo "##vso[task.logissue type=warning]/demo-hub route returned server error (HTTP $HTTP_CODE)"
+                echo "⚠️ Skipping performance tests - /demo-hub route returned server error"
                 echo "   This is non-blocking - pipeline will continue"
                 exit 0
               elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
-                # Most common cause: Cloudflare Access is protecting /demo.
+                # Most common cause: Cloudflare Access is protecting /demo-hub.
                 # Distinguish between "missing credentials" vs "credentials present but rejected".
-                echo "❌ PERFORMANCE TESTS SKIPPED - /demo returned client error (HTTP $HTTP_CODE)"
+                echo "❌ PERFORMANCE TESTS SKIPPED - /demo-hub returned client error (HTTP $HTTP_CODE)"
                 echo ""
 
                 if [ "$HAS_CF_ACCESS_CREDS" = "true" ]; then
@@ -1837,11 +1837,11 @@ stages:
                   echo ""
                   echo "📋 REQUIRED ACTION - Update Cloudflare Access policy to allow this service token:"
                   echo "   1. Cloudflare Zero Trust Dashboard"
-                  echo "   2. Access > Applications (find the staging/prod app protecting /demo)"
+                  echo "   2. Access > Applications (find the staging/prod app protecting /demo-hub)"
                   echo "   3. Policies: ensure 'Service Auth' is allowed and includes this service token"
                   echo "   4. Rotate/recreate token if needed, then update Azure DevOps variable group"
                 else
-                  echo "##vso[task.logissue type=warning]Cloudflare Access credentials are not configured; /demo likely requires authentication"
+                  echo "##vso[task.logissue type=warning]Cloudflare Access credentials are not configured; /demo-hub likely requires authentication"
                   echo ""
                   echo "📋 REQUIRED ACTION - Add these variables to Azure DevOps:"
                   echo "   Variable Group: 'pixelated-pipeline-variables'"
@@ -1861,13 +1861,13 @@ stages:
                 echo "##[warning]Pipeline will continue but performance tests are NOT running!"
                 exit 0
               elif ! echo "$HTTP_CODE" | grep -qE "^[2]"; then
-                echo "##vso[task.logissue type=warning]/demo route returned unexpected status (HTTP $HTTP_CODE)"
-                echo "⚠️ Skipping performance tests - /demo route may not be ready"
+                echo "##vso[task.logissue type=warning]/demo-hub route returned unexpected status (HTTP $HTTP_CODE)"
+                echo "⚠️ Skipping performance tests - /demo-hub route may not be ready"
                 echo "   This is non-blocking - pipeline will continue"
                 exit 0
               fi
 
-              echo "✅ /demo route is accessible (HTTP $HTTP_CODE)"
+              echo "✅ /demo-hub route is accessible (HTTP $HTTP_CODE)"
               echo "🚀 Running performance tests..."
 
               # Run tests with continue on error to not block pipeline
