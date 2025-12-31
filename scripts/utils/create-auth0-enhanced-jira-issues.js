@@ -16,7 +16,7 @@ import process from 'process';
 
 // Get environment variables
 const JIRA_URL = process.env.JIRA_URL || 'https://pixeldeck.atlassian.net';
-const JIRA_USERNAME = process.env.JIRA_USERNAME || 'chad@pixelatedempathy.com';
+const JIRA_USERNAME = process.env.JIRA_USERNAME;
 const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
 
 // Check if required environment variables are set
