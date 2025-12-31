@@ -1026,7 +1026,7 @@ stages:
                       set -euo pipefail
                        
                       echo "🔄 Updating Pixelated image tag..."
-                      kubectl set image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) -n pixelated
+                      kubectl set image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) -n pixelated-staging
                        
                       echo "✅ Image tag updated to $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 

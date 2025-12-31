@@ -763,6 +763,43 @@ export async function setUserPreferredMFAFactor(userId: string, factorId: string
   return await auth0UserService.setUserPreferredMFAFactor(userId, factorId)
 }
 
+// WebAuthn functions
+export async function getWebAuthnRegistrationOptions(registrationOptions: any) {
+  return await auth0UserService.getWebAuthnRegistrationOptions(registrationOptions)
+}
+
+export async function verifyWebAuthnRegistration(userId: string, credential: any) {
+  return await auth0UserService.verifyWebAuthnRegistration(userId, credential)
+}
+
+export async function getWebAuthnAuthenticationOptions(authenticationOptions: any) {
+  return await auth0UserService.getWebAuthnAuthenticationOptions(authenticationOptions)
+}
+
+export async function verifyWebAuthnAuthentication(userId: string, credential: any) {
+  return await auth0UserService.verifyWebAuthnAuthentication(userId, credential)
+}
+
+export async function getUserWebAuthnCredentials(userId: string) {
+  return await auth0UserService.getUserWebAuthnCredentials(userId)
+}
+
+export async function deleteWebAuthnCredential(userId: string, credentialId: string) {
+  return await auth0UserService.deleteWebAuthnCredential(userId, credentialId)
+}
+
+export async function renameWebAuthnCredential(userId: string, credentialId: string, newName: string) {
+  return await auth0UserService.renameWebAuthnCredential(userId, credentialId, newName)
+}
+
+export async function userHasWebAuthnCredentials(userId: string) {
+  return await auth0UserService.userHasWebAuthnCredentials(userId)
+}
+
+export async function getUserPreferredWebAuthnCredential(userId: string) {
+  return await auth0UserService.getUserPreferredWebAuthnCredential(userId)
+}
+
 // Placeholder for OAuth verification (to be implemented)
 export async function verifyOAuthCode(_code: string) {
   throw new Error('OAuth verification not implemented yet')
@@ -787,5 +824,14 @@ export default {
   userHasMFA,
   getUserPreferredMFAFactor,
   setUserPreferredMFAFactor,
+  getWebAuthnRegistrationOptions,
+  verifyWebAuthnRegistration,
+  getWebAuthnAuthenticationOptions,
+  verifyWebAuthnAuthentication,
+  getUserWebAuthnCredentials,
+  deleteWebAuthnCredential,
+  renameWebAuthnCredential,
+  userHasWebAuthnCredentials,
+  getUserPreferredWebAuthnCredential,
   verifyOAuthCode,
 }
