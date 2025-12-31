@@ -1698,7 +1698,7 @@ stages:
               pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
 
               # Install Playwright browsers
-              pnpm exec playwright install --with-deps
+              pnpm exec playwright install
             displayName: 'Install Playwright Browsers'
 
           - script: |
@@ -1942,7 +1942,7 @@ stages:
               pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
 
               # Install Playwright browsers
-              pnpm exec playwright install --with-deps
+              pnpm exec playwright install
             displayName: 'Install Playwright Browsers'
 
           - script: |
