@@ -302,4 +302,4 @@ filled-k8s-connection.json
 .kiro
 .kilocode
 .vercel/
-.cursor/rclone.conf
+.cursor/rclone.confS3_ACCESS_KEY and S3_SECRET_KEY
