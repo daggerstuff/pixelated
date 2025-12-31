@@ -1,9 +1,9 @@
 import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { sequence, defineMiddleware } from 'astro:middleware'
-import { getSession } from './lib/auth/session'
 import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
+import { authenticateRequest } from './lib/auth/auth0-middleware'
 
 
 // Simple route matcher for protected API routes and journal-research pages
@@ -38,8 +38,8 @@ function isProtectedRoute(request: Request) {
 }
 
 /**
- * Auth middleware that uses the project's session system.
- * If a request targets a protected route and there's no session, redirect to sign-in.
+ * Auth middleware that uses Auth0 for authentication.
+ * If a request targets a protected route and there's no valid Auth0 session, return 401.
  */
 const projectAuthMiddleware = defineMiddleware(async (context, next) => {
   const { request } = context
@@ -49,33 +49,40 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
     return next()
   }
 
-  // Check session using existing auth/session utilities
+  // Check authentication using Auth0
   try {
-    const session = await getSession(request)
-    if (!session) {
-      // Redirect to a local sign-in page; include original url so it can return after login
-      const signInUrl = new URL('/auth/sign-in', request.url)
-      signInUrl.searchParams.set('redirect', request.url)
-      return new Response(null, {
-        status: 302,
-        headers: { Location: signInUrl.toString() },
-      })
+    const authResult = await authenticateRequest(request)
+
+    if (!authResult.success) {
+      // If authentication failed, return the response from Auth0 middleware
+      if (authResult.response) {
+        return authResult.response
+      }
+
+      // Fallback to 401 if no response provided
+      return new Response(
+        JSON.stringify({ error: authResult.error || 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
 
-    // Store session data in locals for use in routes
-    if (context.locals) {
-      ; (context.locals as any).user = session.user
-        ; (context.locals as any).session = session.session
+    // Store user data in locals for use in routes
+    if (context.locals && authResult.request?.user) {
+      ; (context.locals as any).user = authResult.request.user
     }
   } catch (err) {
-    // If session check fails treat as unauthenticated for protected routes
+    // If authentication check fails, treat as unauthenticated
     markSpanError(err instanceof Error ? err : new Error(String(err)))
-    const signInUrl = new URL('/auth/sign-in', request.url)
-    signInUrl.searchParams.set('redirect', request.url)
-    return new Response(null, {
-      status: 302,
-      headers: { Location: signInUrl.toString() },
-    })
+    return new Response(
+      JSON.stringify({ error: 'Authentication failed' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 
   return next()
