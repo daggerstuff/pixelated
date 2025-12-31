@@ -899,6 +899,8 @@ stages:
 
                       echo "📦 Creating namespaces for applications..."
                       kubectl apply -f k8s/azure/pixelated-namespace.yaml
+                      # Ensure staging namespace exists
+                      kubectl create namespace pixelated-staging --dry-run=client -o yaml | kubectl apply -f -
                       kubectl apply -f k8s/azure/ollama-namespace.yaml
                       echo "✅ Namespaces created"
 
@@ -977,10 +979,10 @@ stages:
                       echo "🚀 Deploying Pixelated application..."
 
                       # Deploy Pixelated app manifests
-                      kubectl apply -f k8s/azure/pixelated-namespace.yaml
-                      kubectl apply -f k8s/azure/pixelated-service.yaml
-                      kubectl apply -f k8s/azure/pixelated-deployment.yaml
-                      kubectl apply -f k8s/azure/pixelated-ingress.yaml
+                      kubectl apply -f k8s/azure/staging/configmap.yaml
+                      kubectl apply -f k8s/azure/staging/service.yaml
+                      kubectl apply -f k8s/azure/staging/deployment.yaml
+                      kubectl apply -f k8s/azure/staging/ingress.yaml
 
                       echo "✅ Pixelated manifests applied"
 
