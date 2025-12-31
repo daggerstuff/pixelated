@@ -5,6 +5,8 @@
 
 import { ROLE_DEFINITIONS, type UserRole } from './auth0-rbac-service'
 import { validateToken } from './auth0-jwt-service'
+import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
+import { auth0UserService } from '../../services/auth0.service'
 
 export interface ClientInfo {
   ip?: string
@@ -76,6 +78,22 @@ export function getClientIp(req: Request): string {
     (typeof xRealIp === 'string' ? xRealIp : null) ||
     'unknown'
   )
+}
+
+/**
+ * Get client information from request
+ */
+export function getClientInfo(req: Request): { ip: string; userAgent: string } {
+  const ip = getClientIp(req)
+
+  const userAgent =
+    req.headers.get?.('user-agent') ||
+    req.headers.get?.('User-Agent') ||
+    (req.headers as any)['user-agent'] ||
+    (req.headers as any)['User-Agent'] ||
+    'unknown'
+
+  return { ip, userAgent }
 }
 
 /**
@@ -539,7 +557,6 @@ export async function authenticateRequest(request: Request): Promise<{
   }
 
   // Get user information from Auth0
-  const { auth0UserService } = await import('../../services/auth0.service')
   const user = await auth0UserService.getUserById(validation.userId!)
 
   if (!user) {
@@ -556,6 +573,65 @@ export async function authenticateRequest(request: Request): Promise<{
         headers: { 'Content-Type': 'application/json' },
       }),
       error: 'User not found',
+    }
+  }
+
+  // Check if user has MFA enabled
+  const hasMFA = await auth0UserService.userHasMFA(user.id)
+
+  // If user doesn't have MFA enabled, check if adaptive MFA requires it
+  if (!hasMFA) {
+    try {
+      // Get client information for risk assessment
+      const clientInfo = getClientInfo(request)
+
+      // Create login context for risk assessment
+      const loginContext = {
+        userId: user.id,
+        ipAddress: clientInfo.ip,
+        userAgent: clientInfo.userAgent,
+        timestamp: new Date(),
+        location: {
+          // In a real implementation, we would get geolocation from IP
+          // For now, we'll simulate based on IP
+          country: clientInfo.ip.startsWith('192.168.') || clientInfo.ip.startsWith('10.') || clientInfo.ip.startsWith('172.')
+            ? 'LOCAL'
+            : 'US' // Default to US for external IPs
+        }
+      }
+
+      // Check if adaptive MFA requires MFA for this login
+      const requiresMFA = await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
+
+      if (requiresMFA) {
+        // Log that MFA is required
+        const { logSecurityEvent, SecurityEventType } = await import('../security')
+        await logSecurityEvent(SecurityEventType.MFA_REQUIRED, user.id, {
+          reason: 'adaptive_mfa_triggered',
+          riskFactors: 'calculated_by_adaptive_service',
+          endpoint: new URL(request.url).pathname,
+        })
+
+        // Return response indicating MFA is required
+        return {
+          success: false,
+          response: new Response(
+            JSON.stringify({
+              error: 'MFA required',
+              message: 'Multi-factor authentication is required for this login attempt',
+              code: 'MFA_REQUIRED'
+            }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          ),
+          error: 'MFA required',
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to perform adaptive MFA check:', error)
+      // Continue with authentication if adaptive MFA check fails
     }
   }
 
