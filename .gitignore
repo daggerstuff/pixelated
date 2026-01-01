@@ -303,3 +303,11 @@ filled-k8s-connection.json
 .kilocode
 .vercel/
 .cursor/rclone.confS3_ACCESS_KEY and S3_SECRET_KEY
+
+.codebuff
+.memory
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor/rules/openmemory.mdc
+CLAUDE.md
+AGENTS.md

@@ -1,15 +1,16 @@
-// import type { APIRoute, APIContext } from 'astro'
+import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { getCurrentUser } from '@/lib/auth'
 import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
 const memoryService = new MemoryService()
 
-export const GET = async ({ request, cookies }) => {
+export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
   try {
-    // Authenticate request
-    const user = await getCurrentUser(cookies)
+    // Authentication is handled by middleware, so we can safely access user data
+    // The user object is attached to the request by the middleware
+    const user = request.user
+
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -68,6 +69,11 @@ export const GET = async ({ request, cookies }) => {
         limit,
         offset,
         total: result.length
+      },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
       }
     }), {
       status: 200,

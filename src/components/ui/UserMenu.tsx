@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useAuth } from '../../lib/auth/hooks'
+import { authClient } from '@/lib/auth-client'
 import { Avatar } from './avatar'
+import { useStore } from 'nanostores'
 
 export interface UserMenuProps {
   className?: string
 }
 
 export function UserMenu({ className = '' }: UserMenuProps) {
-  const { user, signOut } = useAuth()
+  const { data: user, isPending } = authClient.useSession()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -21,6 +22,16 @@ export function UserMenu({ className = '' }: UserMenuProps) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  if (isPending) {
+    return (
+      <div className={className}>
+        <div className="text-gray-700 dark:text-gray-300 font-medium rounded-lg text-sm px-4 py-2 text-center inline-flex items-center">
+          Loading...
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     return (
@@ -82,7 +93,10 @@ export function UserMenu({ className = '' }: UserMenuProps) {
             </li>
             <li>
               <button
-                onClick={() => signOut()}
+                onClick={async () => {
+                  await authClient.signOut()
+                  window.location.href = '/'
+                }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >

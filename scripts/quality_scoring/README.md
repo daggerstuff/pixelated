@@ -56,6 +56,6 @@ Integration
 - Ready for integration into orchestrators and quality gates
 
 Related
-- KAN-12: https://gemcityxyz.atlassian.net/browse/KAN-12
+- KAN-12: https://metalpixel.atlassian.net/browse/KAN-12
 - Confluence Spec: Ingestion & Quality Scoring child page
 - Production validators: `ai/dataset_pipeline/quality/`

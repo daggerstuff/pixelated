@@ -141,7 +141,7 @@
     },
     "typescript.tsdk": "node_modules/typescript/lib",
     "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:uv",
+    "python-envs.defaultPackageManager": "ms-python.python:pip",
     "python-envs.pythonProjects": [],
     "files.autoSave": "afterDelay",
     "workbench.editor.enablePreview": false,

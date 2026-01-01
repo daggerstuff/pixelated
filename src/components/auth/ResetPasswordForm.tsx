@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
 
 interface ResetPasswordFormProps {
   token: string
@@ -7,7 +7,6 @@ interface ResetPasswordFormProps {
 }
 
 export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
-  const { verifyOtp } = useAuth()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -32,22 +31,18 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
 
     try {
       // Call auth service to verify token and set new password
-      const result = await verifyOtp?.({
+      const response = await authClient.resetPassword({
+        newPassword: password,
         token,
         email,
-        type: 'recovery',
       })
 
-      if (result?.success) {
+      if (!response.error) {
         // Dispatch custom event that the parent page is listening for
         const event = new CustomEvent('password-reset-success')
         document.dispatchEvent(event)
       } else {
-        throw new Error(
-          typeof result?.error === 'string'
-            ? result.error
-            : 'Password reset failed',
-        )
+        throw new Error(response.error.message || 'Password reset failed')
       }
     } catch (err: unknown) {
       const message =
