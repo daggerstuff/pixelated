@@ -1,17 +1,17 @@
 export const prerender = false
 
-// import type { APIRoute } from 'astro'
-// import type { AstroCookies } from 'astro'
-import { isAuthenticated } from '@/lib/auth'
+import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
 
-export const GET = async ({ cookies }) => {
+export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
   try {
-    // Check authentication
-    const authenticated = await isAuthenticated(cookies)
-    if (!authenticated) {
+    // Authentication is handled by middleware, so we can safely access user data
+    // The user object is attached to the request by the middleware
+    const user = request.user
+
+    if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -40,6 +40,11 @@ export const GET = async ({ cookies }) => {
         },
       ],
       securityLevel: 'hipaa',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      }
     }
 
     return new Response(JSON.stringify(mockData), {

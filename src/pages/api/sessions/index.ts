@@ -1,6 +1,5 @@
-// import type { APIRoute } from 'astro'
+import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
 
@@ -38,9 +37,12 @@ const ERROR_MESSAGES = {
  * - endDate: Filter sessions ending on or before this date (ISO string)
  * - limit: Maximum number of sessions to return (default: 50)
  */
-export const GET = protectRoute()(async ({ request, locals }) => {
+export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
   try {
-    const { user } = locals
+    // Authentication is handled by middleware, so we can safely access user data
+    // The user object is attached to the request by the middleware
+    const user = request.user
+
     if (!user) {
       return new Response(
         JSON.stringify({ error: ERROR_MESSAGES.AUTHENTICATION_REQUIRED }),
@@ -161,7 +163,14 @@ export const GET = protectRoute()(async ({ request, locals }) => {
       count: limitedSessions.length,
     })
 
-    return new Response(JSON.stringify(limitedSessions), {
+    return new Response(JSON.stringify({
+      sessions: limitedSessions,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      }
+    }), {
       status: HTTP_STATUS.OK,
       headers: { 'Content-Type': 'application/json' },
     })
@@ -181,4 +190,4 @@ export const GET = protectRoute()(async ({ request, locals }) => {
       },
     )
   }
-})
+}
