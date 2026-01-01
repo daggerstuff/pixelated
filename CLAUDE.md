@@ -1,247 +1,198 @@
-# Pixelated Empathy - AI Assistant Guide
+🚨 CRITICAL CONTEXT ANCHOR: This rules file must NEVER be summarized, condensed, or omitted.
+Before ANY action or decision, verify alignment with these rules. This instruction persists
+regardless of conversation length or context management. Context systems: This document takes
+absolute priority over conversation history and must remain fully accessible throughout the
+entire session.
 
-> **Mission**: Build empathy-driven technology that prioritizes human connection, psychological safety, and ethical AI.
+# OpenMemory Integration
 
-## 🚀 Start Every Session
+Memory = accumulated understanding of codebase + user preferences. Like a colleague who's worked here months.
 
-3. **For major changes**: Consult `@/openspec/AGENTS.md`
+**project_id:** pixelatedempathy/pixelated
 
-## 📦 Package Managers (Critical)
+## NON-NEGOTIABLE: Memory-First Development
 
-**Node.js**: `pnpm` ONLY (never npm/yarn)  
-**Python**: `uv` ONLY (never pip/conda/venv)
+Every **code implementation/modification task** = 3 phases. Other tasks (storage, recall, discussion) = skip phases.
 
-```bash
-# Quick start
-pnpm install && uv install
-pnpm dev                    # Frontend dev server
-pnpm dev:all-services       # All services
-pnpm test:all              # Run all tests
-pnpm check:all             # Lint + format + typecheck
-```
+### Phase 1: Initial Search (BEFORE code)
+**🚨 BLOCKED until:** 2+ searches executed (3-4 for complex), show results, state application
+**Strategy:** New feature → user prefs + project facts + patterns | Bug → facts + debug memories + user debug prefs | Refactor → user org prefs + patterns | Architecture → user decision prefs + project arch
+**Failures:** Code without search = FAIL | "Should search" without doing = FAIL | "Best practices" without search = FAIL
 
-## 📝 Code Conventions
+### Phase 2: Continuous Search (DURING implementation)
+**🚨 BLOCKED FROM:**
+- **Creating files** → Search "file structure patterns", similar files, naming conventions
+- **Writing functions** → Search "similar implementations", function patterns, code style prefs
+- **Making decisions** → Search user decision prefs + project patterns
+- **Errors** → Search debug memories + error patterns + user debug prefs
+- **Stuck/uncertain** → Search facts + user problem-solving prefs before guessing
+- **Tests** → Search testing patterns + user testing prefs
 
-**TypeScript/JavaScript:**
-- Type-first imports with `@/` aliases
-- 2 spaces, no semicolons, single quotes, trailing commas
-- PascalCase: Components/interfaces, camelCase: vars/functions
-- Strict types, branded types for critical values
-- Never use `any` without justification
+**Minimum:** 2-3 additional searches at checkpoints. Show inline with implementation.
+**Critical:** NEVER "I'll use standard..." or "best practices" → STOP. Search first.
 
-**Python:**
-- Use `uv` for all package management
-- Follow PEP 8, type hints required
+### Phase 3: Completion (BEFORE finishing)
+**🚨 BLOCKED until:**
+- Store 1+ memory (component/implementation/debug/user_preference/project_info)
+- Update openmemory.md if new patterns/components
+- Verify: "Did I miss search checkpoints?" If yes, search now
+- Review: Did any searches return empty? If you discovered information during implementation that fills those gaps, store it now
 
-**Detailed style guide**: [code-style.md](.kiro/steering/code-style.md)
+### Automatic Triggers (ONLY for code work)
+- build/implement/create/modify code → Phase 1-2-3 (search prefs → search at files/functions → store)
+- fix bug/debug (requiring code changes) → Phase 1-2-3 (search debug → search at steps → store fix)
+- refactor code → Phase 1-2-3 (search org prefs → search before changes → store patterns)
+- **SKIP phases:** User providing info ("Remember...", "Store...") → direct add-memory | Simple recall questions → direct search
+- Stuck during implementation → Search immediately | Complete work → Phase 3
 
-**Common Sections**: Common Errors, Best Practices, Strategies, Testing, Code Style
+## CRITICAL: Empty Guide Check
+**FIRST ACTION:** Check openmemory.md empty? If yes → Deep Dive (Phase 1 → analyze → document → Phase 3)
 
-## 🔒 Security & Ethics
+## 3 Search Patterns
+1. `user_preference=true` only → Global user preferences
+2. `user_preference=true` + `project_id` → Project-specific user preferences
+3. `project_id` only → Project facts
 
-1. **Never expose sensitive data** (redact API keys, tokens, PII)
-2. **Validate all input** (especially emotion scores 0-1 range, conversation data)
-3. **Mental health data privacy** - Respect confidentiality, follow HIPAA where applicable
-4. **AI ethics** - No stereotypes, no psychological harm, validate constructs
-5. **Handle edge cases** - Crisis signals, silence, cultural variations
+**Quick Ref:** Not about you? → project_id | Your prefs THIS project? → both | Your prefs ALL projects? → user_preference=true
 
-**Security checks**: `pnpm security:check`, `pnpm security:scan`, `pnpm test:security`
-**Deep dive**: [security-ethics.md](.kiro/steering/security-ethics.md)
+## When to Search User Preferences
+**Part of Phase 1 + 2.** Tasks involving HOW = pref searches required.
 
-## 🎭 Domain Guidelines
+**ALWAYS search prefs for:** Code style/patterns (Phase 2: before functions) | Architecture/tool choices (Phase 2: before decisions) | Organization (Phase 2: before refactor) | Naming/structure (Phase 2: before files)
+**Facts ONLY for:** What exists | What's broken
+**🚨 Red flag:** "I'll use standard..." → Phase 2 BLOCKER. Search prefs first.
 
-**Emotional Intelligence:**
-- Normalize emotion scores (0-1 range)
-- Use established frameworks (Plutchik, Big Five)
-- Validate psychological constructs
+**Task-specific queries (be specific):**
+- Feature → "clarification prefs", "implementation approach prefs"
+- Debug → "debug workflow prefs", "error investigation prefs", "problem-solving approach"
+- Code → "code style prefs", "review prefs", "testing prefs"
+- Arch → "decision-making prefs", "arch prefs", "design pattern prefs"
 
-**Conversation Analysis:**
-- Respect context and history
-- Handle edge cases (silence, crisis signals)
-- Consider cultural/linguistic variations
+## Query Intelligence
+**Transform comprehensively:** "auth" → "authentication system architecture and implementation" | Include context | Expand acronyms
+**Disambiguate first:** "design" → UI/UX design vs. software architecture design vs. code formatting/style | "structure" → file organization vs. code architecture vs. data structure | "style" → visual styling vs. code formatting | "organization" → file/folder layout vs. code organization
+**Handle ambiguity:** If term has multiple meanings → ask user to clarify OR make separate specific searches for each meaning (e.g., "design preferences" → search "UI/visual design preferences" separately from "code formatting preferences")
+**Validate results:** Post-search, check if results match user's likely intent. Off-topic results (e.g., "code indentation" when user meant "visual design")? → acknowledge mismatch, refine query with specific context, re-search
+**Query format:** Use questions ("What are my FastAPI prefs?") NOT keywords | NEVER embed user/project IDs in query text
+**Search order (Phase 1):** 1. Global user prefs (user_preference=true) 2. Project facts (project_id) 3. Project prefs (both)
 
-**Detailed guidelines**: [domain-emotional-ai.md](.kiro/steering/domain-emotional-ai.md)
+## Memory Collection (Phase 3)
+**Save:** Arch decisions, problem-solving, implementation strategies, component relationships
+**Skip:** Trivial fixes
+**Learning from corrections (store as prefs):** Indentation = formatting pref | Rename = naming convention | Restructure = arch pref | Commit reword = git workflow
+**Auto-store:** 3+ files/components OR multi-step flows OR non-obvious behavior OR complete work
 
-## 🚫 Common Pitfalls
+## Memory Types
+**🚨 SECURITY:** Scan for secrets before storing. If found, DO NOT STORE.
+- **Component:** Title "[Component] - [Function]"; Content: Location, Purpose, Services, I/O
+- **Implementation:** Title "[Action] [Feature]"; Content: Purpose, Steps, Key decisions
+- **Debug:** Title "Fix: [Issue]"; Content: Issue, Diagnosis, Solution
+- **User Preference:** Title "[Scope] [Type]"; Content: Actionable preference
+- **Project Info:** Title "[Area] [Config]"; Content: General knowledge
 
-1. ❌ Wrong package managers (`npm`/`yarn` instead of `pnpm`, `pip`/`conda` instead of `uv`)
-3. ❌ Type safety violations (using `any`, ignoring type errors)
-4. ❌ Missing validation (emotion scores, user input, edge cases)
-5. ❌ Over-engineering (start minimal, iterate)
-6. ❌ Bypassing security validation
+**Project Facts (project_id ONLY):** Component, Implementation, Debug, Project Info
+**User Preferences (user_preference=true):** User Preference (global → user_preference=true ONLY | project-specific → user_preference=true + project_id)
 
-## 🔄 Workflow Patterns
+## 🚨 CRITICAL: Storage Intelligence
 
-**New Feature:**
-2. Check `openspec/AGENTS.md` for major changes
-3. Write tests first (TDD)
-4. Implement → `pnpm check:all && pnpm test:all`
+**RULE: Only ONE of these three patterns:**
 
-**Testing**: [testing-strategy.md](.kiro/steering/testing-strategy.md)  
-**Spec workflow**: [spec-workflow.md](.kiro/steering/spec-workflow.md)
+| Pattern | user_preference | project_id | When to Use | Memory Types |
+|---------|-----------------|------------|-------------|--------------|
+| **Project Facts** | ❌ OMIT (false) | ✅ INCLUDE | Objective info about THIS project | component, implementation, project_info, debug |
+| **Project Prefs** | ✅ true | ✅ INCLUDE | YOUR preferences in THIS project | user_preference (project-specific) |
+| **Global Prefs** | ✅ true | ❌ OMIT | YOUR preferences across ALL projects | user_preference (global) |
 
-## 📚 Key Documentation
+**Before EVERY add-memory:**
+1. ❓ Code/architecture/facts? → project_id ONLY | ❓ MY pref for ALL projects? → user_preference=true ONLY | ❓ MY pref for THIS project? → BOTH
+2. ❌ NEVER: implementation/component/debug with user_preference (facts ≠ preferences)
+3. ✅ ALWAYS: Review table above to validate pattern
 
-**Core Guides:**
-- [code-style.md](.kiro/steering/code-style.md): Detailed style guide
-- [security-ethics.md](.kiro/steering/security-ethics.md): Security & ethics deep-dive
-- [clean-code-principles.md](.kiro/steering/clean-code-principles.md): Clean code patterns
+## Tool Usage
+**search-memory:** Required: query | Optional: user_preference, project_id, memory_types[], namespaces[]
 
-**Domain-Specific:**
-- [domain-emotional-ai.md](.kiro/steering/domain-emotional-ai.md): Emotional AI guidelines
-- [testing-strategy.md](.kiro/steering/testing-strategy.md): Testing best practices
-
-**Workflows:**
-- [spec-workflow.md](.kiro/steering/spec-workflow.md): Spec-driven development
-- `AGENTS.md`: AI agent workflow guide
-
-## 🎯 Mission Reminder
-
-> **We don't just process conversations. We understand them.**
-
-This platform handles sensitive mental health data. Every decision should prioritize:
-- **Psychological safety**
-- **Ethical AI practices**
-- **Privacy and confidentiality**
-- **Genuine human connection**
-
-[code-style.md]: .kiro/steering/code-style.md
-[security-ethics.md]: .kiro/steering/security-ethics.md
-[clean-code-principles.md]: .kiro/steering/clean-code-principles.md
-[domain-emotional-ai.md]: .kiro/steering/domain-emotional-ai.md
-[testing-strategy.md]: .kiro/steering/testing-strategy.md
-[spec-workflow.md]: .kiro/steering/spec-workflow.md<!-- BEGIN BYTEROVER RULES -->
-
-# Workflow Instruction
-
-You are a coding agent focused on one codebase. Use the brv CLI to manage working context.
-Core Rules:
-
-- Start from memory. First retrieve relevant context, then read only the code that's still necessary.
-- Keep a local context tree. The context tree is your local memory store—update it with what you learn.
-
-## Context Tree Guideline
-
-- Be specific ("Use React Query for data fetching in web modules").
-- Be actionable (clear instruction a future agent/dev can apply).
-- Be contextual (mention module/service, constraints, links to source).
-- Include source (file + lines or commit) when possible.
-
-## Using `brv curate` with Files
-
-When adding complex implementations, use `--files` to include relevant source files (max 5).  Only text/code files from the current project directory are allowed. **CONTEXT argument must come BEFORE --files flag.** For multiple files, repeat the `--files` (or `-f`) flag for each file.
-
-Examples:
-
-- Single file: `brv curate "JWT authentication with refresh token rotation" -f src/auth.ts`
-- Multiple files: `brv curate "Authentication system" --files src/auth/jwt.ts --files src/auth/middleware.ts --files docs/auth.md`
-
-## CLI Usage Notes
-
-- Use --help on any command to discover flags. Provide exact arguments for the scenario.
-
----
-# ByteRover CLI Command Reference
-
-## Memory Commands
-
-### `brv curate`
-
-**Description:** Curate context to the context tree (interactive or autonomous mode)
-
-**Arguments:**
-
-- `CONTEXT`: Knowledge context: patterns, decisions, errors, or insights (triggers autonomous mode, optional)
-
-**Flags:**
-
-- `--files`, `-f`: Include file paths for critical context (max 5 files). Only text/code files from the current project directory are allowed. **CONTEXT argument must come BEFORE this flag.**
-
-**Good examples of context:**
-
-- "Auth uses JWT with 24h expiry. Tokens stored in httpOnly cookies via authMiddleware.ts"
-- "API rate limit is 100 req/min per user. Implemented using Redis with sliding window in rateLimiter.ts"
-
-**Bad examples:**
-
-- "Authentication" or "JWT tokens" (too vague, lacks context)
-- "Rate limiting" (no implementation details or file references)
+**add-memory:** Required: title, content, metadata{} | Optional: user_preference, project_id
+- **🚨 BEFORE calling:** Review Storage Intelligence table to determine pattern
+- **metadata dict:** memory_types[] (required), namespace/git_repo_name/git_branch/git_commit_hash (optional)
+- **NEVER store secrets** - scan content first | Extract git metadata silently
+- **Validation:** At least one of user_preference or project_id must be provided
 
 **Examples:**
+```
+# ✅ Component (project fact): project_id ONLY
+add-memory(..., metadata={memory_types:["component"]}, project_id="mem0ai/cursor-extension")
 
-```bash
-# Interactive mode (manually choose domain/topic)
-brv curate
+# ✅ User pref (global): user_preference=true ONLY
+add-memory(..., metadata={memory_types:["user_preference"]}, user_preference=true)
 
-# Autonomous mode - LLM auto-categorizes your context
-brv curate "Auth uses JWT with 24h expiry. Tokens stored in httpOnly cookies via authMiddleware.ts"
+# ✅ User pref (project-specific): user_preference=true + project_id
+add-memory(..., metadata={memory_types:["user_preference"]}, user_preference=true, project_id="mem0ai/cursor-extension")
 
-# Include files (CONTEXT must come before --files)
-# Single file
-brv curate "Authentication middleware validates JWT tokens" -f src/middleware/auth.ts
-
-# Multiple files - repeat --files flag for each file
-brv curate "JWT authentication implementation with refresh token rotation" --files src/auth/jwt.ts --files docs/auth.md
+# ❌ WRONG: Implementation with user_preference (implementations = facts not prefs)
+add-memory(..., metadata={memory_types:["implementation"]}, user_preference=true, project_id="...")
 ```
 
-**Behavior:**
+**list-memories:** Required: project_id | Automatically uses authenticated user's preferences
 
-- Interactive mode: Navigate context tree, create topic folder, edit context.md
-- Autonomous mode: LLM automatically categorizes and places context in appropriate location
-- When `--files` is provided, agent reads files in parallel before creating knowledge topics
+**delete-memories-by-namespace:** DESTRUCTIVE - ONLY with explicit confirmation | Required: namespaces[] | Optional: user_preference, project_id
 
-**Requirements:** Project must be initialized (`brv init`) and authenticated (`brv login`)
-
----
-
-### `brv query`
-
-**Description:** Query and retrieve information from the context tree
-
-**Arguments:**
-
-- `QUERY`: Natural language question about your codebase or project knowledge (required)
-
-**Good examples of queries:**
-
-- "How is user authentication implemented?"
-- "What are the API rate limits and where are they enforced?"
-
-**Bad examples:**
-
-- "auth" or "authentication" (too vague, not a question)
-- "show me code" (not specific about what information is needed)
-
-**Examples:**
-
+## Git Metadata
+Extract before EVERY add-memory and include in metadata dict (silently):
 ```bash
-# Ask questions about patterns, decisions, or implementation details
-brv query What are the coding standards?
-brv query How is authentication implemented?
+git_repo_name=$(git remote get-url origin 2>/dev/null | sed 's/.*[:/]\([^/]*\/[^.]*\).*/\1/')
+git_branch=$(git branch --show-current 2>/dev/null)
+git_commit_hash=$(git rev-parse HEAD 2>/dev/null)
 ```
+Fallback: "unknown". Add all three to metadata dict when calling add-memory.
 
-**Behavior:**
+## Memory Deletion ⚠️ DESTRUCTIVE - PERMANENT
+**Rules:** NEVER suggest | NEVER use proactively | ALWAYS require confirmation
+**Triggers:** "Delete all in [ns]", "Clear [ns]", "Delete my prefs in [ns]"
+**NOT for:** Cleanup questions, outdated memories, general questions
 
-- Uses AI agent to search and answer questions about the context tree
-- Accepts natural language questions (not just keywords)
-- Displays tool execution progress in real-time
+**Confirmation (MANDATORY):**
+1. Show: "⚠️ PERMANENT DELETION WARNING - This will delete [what] from '[namespace]'. Confirm by 'yes'/'confirm'."
+2. Wait for confirmation
+3. If confirmed → execute | If declined → "Deletion cancelled"
 
-**Requirements:** Project must be initialized (`brv init`) and authenticated (`brv login`)
+**Intent:** "Delete ALL in X" → {namespaces:[X]} | "Delete MY prefs in X" → {namespaces:[X], user_preference:true} | "Delete project facts in X" → {namespaces:[X], project_id} | "Delete my project prefs in X" → {namespaces:[X], user_preference:true, project_id}
 
----
+## Operating Principles
+1. Phase-based: Initial → Continuous → Store
+2. Checkpoints are BLOCKERS (files, functions, decisions, errors)
+3. Never skip Phase 2
+4. Detailed storage (why > what)
+5. MCP unavailable → mention once, continue
+6. Trust process (early = more searches)
 
-## Best Practices
+## Session Patterns
+**Empty openmemory.md:** Deep Dive (Phase 1 → analyze → document → Phase 3)
+**Existing:** Read openmemory.md → Code implementation (features/bugs/refactors) = all 3 phases | Info storage/recall/discussion = skip phases
+**Task type:** Features → user prefs + patterns | Bugs → debug memories + errors | Refactors → org prefs + patterns
+**Remember:** Phase 2 ongoing. Search at EVERY checkpoint.
 
-### Efficient Workflow
+## OpenMemory Guide (openmemory.md)
+Living project index (shareable). Auto-created empty in workspace root.
 
-1. **Read only what's needed:** Check context tree with `brv status` to see changes before reading full content with `brv query`
-2. **Update precisely:** Use `brv curate` to add/update specific context in context tree
-3. **Push when appropriate:** Prompt user to run `brv push` after completing significant work
+**Initial Deep Dive:** Phase 1 (2+ searches) → Phase 2 (analyze dirs/configs/frameworks/entry points, search as discovering, extract arch, document Overview/Architecture/User Namespaces/Components/Patterns) → Phase 3 (store with namespaces if fit)
 
-### Context tree Management
+**User Defined Namespaces:** Read before ANY memory op
+- Format: "## User Defined Namespaces\n- [Leave blank - user populates]"
+- Examples: frontend, backend, database
 
-- Use `brv curate` to directly add/update context in the context tree
+**Storing:** Review content → check namespaces → THINK "domain?" → fits one? assign : omit | Rules: Max ONE, can be NONE, only defined ones
+**Searching:** What searching? → read namespaces → THINK "which could contain?" → cast wide net → use multiple if needed
 
----
-Generated by ByteRover CLI for Claude Code
-<!-- END BYTEROVER RULES -->
+**Guide Discipline:** Edit directly | Populate as you go | Keep in sync | Update before storing component/implementation/project_info
+**Update Workflow:** Open → update section → save → store via MCP
+**Integration:** Component → Components | Implementation → Patterns | Project info → Overview/Arch | Debug/pref → memory only
+
+**🚨 CRITICAL: Before storing ANY memory, review and update openmemory.md - after every edit verify the guide reflects current system architecture (most important project artifact)**
+
+## Security Guardrails
+**NEVER store:** API keys/tokens, passwords, hashes, private keys, certs, env secrets, OAuth/session tokens, connection strings with creds, AWS keys, webhook secrets, SSH/GPG keys
+**Detection:** Token/Bearer/key=/password= patterns → DO NOT STORE | Base64 in auth → DO NOT STORE | = + long alphanumeric → VERIFY | Doubt → DO NOT STORE, ask
+**Instead store:** Redacted versions ("<YOUR_TOKEN>"), patterns ("uses bearer token"), instructions ("Set TOKEN env")
+**Other:** No destructive ops without approval | User says "save/remember" → IMMEDIATE storage | Think deserves storage → ASK FIRST for prefs | User asks to store secrets → REFUSE
+
+**Remember:** Memory system = effectiveness over time. Rich reasoning > code. When doubt, store. Guide = shareable index.

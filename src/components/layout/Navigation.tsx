@@ -1,7 +1,8 @@
 import type { UserRole } from '../../types/auth'
 import React from 'react'
 
-import { useAuth } from '../../hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { useStore } from 'nanostores'
 import { cn } from '@/lib/utils'
 
 export interface NavigationItem {
@@ -43,7 +44,8 @@ export function Navigation({
   className = '',
   isMobile = false,
 }: NavigationProps) {
-  const { user, isAuthenticated } = useAuth()
+  const { data: user, isPending: loading } = authClient.useSession()
+  const isAuthenticated = !!user?.user
 
   // Filter navigation items based on authentication state and user roles
   const filteredItems = items.filter((item) => {
@@ -59,12 +61,12 @@ export function Navigation({
 
     // Check if the user has any of the required roles
     if (item.roles && item.roles.length > 0) {
-      if (!user || !user.roles) {
+      if (!user?.user || !user.user.roles) {
         return false
       }
 
-      const hasRequiredRole = user.roles.some((role) =>
-        item.roles?.includes(role),
+      const hasRequiredRole = user.user.roles.some((role) =>
+        item.roles?.includes(role as UserRole),
       )
 
       if (!hasRequiredRole) {

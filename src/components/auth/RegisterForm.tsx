@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { useStore } from 'nanostores'
 import { AccessibilityAnnouncer } from '../ui/AccessibilityAnnouncer'
 import {
   MobileFormValidation,
@@ -16,7 +17,6 @@ export function RegisterForm({
   redirectTo,
   showLogin = true,
 }: RegisterFormProps) {
-  const { signUp, signInWithOAuth } = useAuth()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [fullName, setFullName] = useState<string>('')
@@ -90,9 +90,13 @@ export function RegisterForm({
     setErrorMessage(null)
 
     try {
-      const response = await signUp(email, password, fullName)
+      const response = await authClient.signUp.email({
+        email,
+        password,
+        name: fullName,
+      })
 
-      if (!response.success && response.error) {
+      if (response.error) {
         setErrorMessage(
           typeof response.error === 'string'
             ? response.error
@@ -101,7 +105,7 @@ export function RegisterForm({
         return
       }
 
-      if (response.user) {
+      if (response.data?.user) {
         setIsSuccessful(true)
       }
     } catch (error: unknown) {
@@ -120,7 +124,10 @@ export function RegisterForm({
       setErrorMessage('')
       setAnnouncement('Initiating Google sign in...')
 
-      await signInWithOAuth('google', redirectTo)
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: redirectTo || '/dashboard',
+      })
       // OAuth redirects automatically, so no need to handle redirect here
     } catch (error: unknown) {
       setErrorMessage((error as Error).message)
