@@ -119,8 +119,16 @@ export default function SearchBox({
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      setIsOpen(false)
-      inputRef.current?.blur()
+      if (query.length > 0) {
+        // Clear text on Escape if present
+        setQuery('')
+        setIsOpen(false)
+        if (onSearch) onSearch('', [])
+        // Keep focus on input
+      } else {
+        setIsOpen(false)
+        inputRef.current?.blur()
+      }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       if (!isOpen) {
