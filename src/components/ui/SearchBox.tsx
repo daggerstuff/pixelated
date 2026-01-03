@@ -26,6 +26,7 @@ export default function SearchBox({
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
@@ -61,6 +62,11 @@ export default function SearchBox({
       inputRef.current.focus()
     }
   }, [autoFocus])
+
+  // Reset active index when results change
+  useEffect(() => {
+    setActiveIndex(-1)
+  }, [results])
 
   // Handle searching when query changes
   useEffect(() => {
@@ -114,8 +120,26 @@ export default function SearchBox({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setIsOpen(false)
-    } else if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-      setIsOpen(true)
+      inputRef.current?.blur()
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (!isOpen) {
+        setIsOpen(true)
+      } else if (results.length > 0) {
+        setActiveIndex((prev) => (prev + 1) % results.length)
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (!isOpen) {
+        setIsOpen(true)
+      } else if (results.length > 0) {
+        setActiveIndex((prev) => (prev - 1 + results.length) % results.length)
+      }
+    } else if (e.key === 'Enter') {
+      if (isOpen && activeIndex >= 0 && results[activeIndex]) {
+        e.preventDefault()
+        handleResultClick(results[activeIndex])
+      }
     }
   }
 
@@ -139,7 +163,13 @@ export default function SearchBox({
   }
 
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full"
+      role="combobox"
+      aria-expanded={showResults}
+      aria-haspopup="listbox"
+      aria-controls="search-results"
+    >
       <div className="relative">
         <input
           ref={inputRef}
@@ -151,7 +181,11 @@ export default function SearchBox({
           placeholder={placeholder}
           aria-label="Search"
           className={`w-full py-2 px-4 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 ${className}`}
+          aria-autocomplete="list"
           aria-controls="search-results"
+          aria-activedescendant={
+            showResults && activeIndex >= 0 ? `result-${activeIndex}` : undefined
+          }
           autoComplete="off"
         />
 
@@ -165,6 +199,7 @@ export default function SearchBox({
               inputRef.current?.focus()
             }}
             aria-label="Clear search"
+            tabIndex={-1}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -194,12 +229,20 @@ export default function SearchBox({
         >
           {hasResults ? (
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {results.map((result) => (
-                <li key={result.id}>
+              {results.map((result, index) => (
+                <li key={result.id} role="presentation">
                   <button
+                    id={`result-${index}`}
                     type="button"
-                    className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
+                    role="option"
+                    aria-selected={index === activeIndex}
+                    className={`w-full text-left px-4 py-3 focus:outline-none ${
+                      index === activeIndex
+                        ? 'bg-gray-100 dark:bg-gray-700'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
                     onClick={() => handleResultClick(result)}
+                    tabIndex={-1}
                   >
                     <div className="font-medium text-gray-900 dark:text-white">
                       {result.title}
