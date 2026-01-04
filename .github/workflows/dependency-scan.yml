@@ -14,7 +14,7 @@ on:
 jobs:
   node_scan:
     name: Scan Node.js Dependencies
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
 
   python_scan:
     name: Scan Python Dependencies
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

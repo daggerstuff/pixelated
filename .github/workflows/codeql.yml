@@ -22,7 +22,7 @@ env:
 jobs:
   analyze:
     name: Analyze
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     timeout-minutes: 360
     strategy:
       fail-fast: false
