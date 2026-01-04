@@ -14,7 +14,7 @@ env:
 
 jobs:
   schedule-posts:
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

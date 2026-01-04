@@ -21,7 +21,7 @@ on:
 jobs:
   kubesec-scan:
     name: Kubesec Security Scan
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
