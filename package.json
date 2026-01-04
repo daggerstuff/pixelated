@@ -419,7 +419,8 @@
       "@unocss/vite": "^66.5.10",
       "@unocss/astro": "^66.5.10",
       "drizzle-orm": "^0.45.1",
-      "zod": "^4.2.1"
+      "zod": "^4.2.1",
+      "qs": "6.14.1"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
