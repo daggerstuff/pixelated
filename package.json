@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.27.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -229,6 +229,7 @@
     "ioredis": "^5.8.2",
     "jotai": "^2.16.1",
     "jsonwebtoken": "^9.0.3",
+    "keytar": "^7.9.0",
     "launchdarkly-js-client-sdk": "^3.9.0",
     "lucide-react": "^0.562.0",
     "mongodb": "^7.0.0",
