@@ -210,8 +210,8 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          # Use /health endpoint which has rate limiting bypass configured
-          if check_endpoint "$BASE_URL/health" "Main Site Health" \
+          # Use /api/health endpoint which has rate limiting bypass configured
+          if check_endpoint "$BASE_URL/api/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_PROD }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_PROD }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_PROD }}" \
@@ -220,10 +220,10 @@ jobs:
           else
             echo ""
             echo "::error::PRODUCTION site is down or returning errors after ${{ env.HEALTH_CHECK_RETRIES_PROD }} attempts"
-            echo "::error::URL tested: $BASE_URL/health"
+            echo "::error::URL tested: $BASE_URL/api/health"
             echo "::error::If you see HTTP 403 (Forbidden), check if:"
-            echo "::error::  1. Cloudflare/WAF security rules allow health check User-Agent and /health path"
-            echo "::error::  2. Rate limiting bypass rules are configured for /health and /api/health paths"
+            echo "::error::  1. Cloudflare/WAF security rules allow health check User-Agent and /api/health path"
+            echo "::error::  2. Rate limiting bypass rules are configured for /api/health path"
             echo "::error::  3. GitHub Actions IPs are whitelisted in your security settings (if using IP filtering)"
             echo "::error::If you see HTTP 522, check if:"
             echo "::error::  1. The site is actually deployed to a server"
@@ -457,9 +457,9 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          # Use /health endpoint which has rate limiting bypass configured
+          # Use /api/health endpoint which has rate limiting bypass configured
           MAIN_STATUS=""
-          if check_endpoint "$BASE_URL/health" "Main Site Health" \
+          if check_endpoint "$BASE_URL/api/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_STAGING }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_STAGING }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_STAGING }}" \
@@ -674,9 +674,9 @@ jobs:
           }
 
           # Basic endpoint check with retries
-          # Use /health endpoint which has rate limiting bypass configured
+          # Use /api/health endpoint which has rate limiting bypass configured
           MAIN_STATUS=""
-          if check_endpoint "$BASE_URL/health" "Main Site Health" \
+          if check_endpoint "$BASE_URL/api/health" "Main Site Health" \
             "${{ env.HEALTH_CHECK_RETRIES_PREVIEW }}" \
             "${{ env.HEALTH_CHECK_TIMEOUT_PREVIEW }}" \
             "${{ env.HEALTH_CHECK_RETRY_DELAY_PREVIEW }}" \
@@ -822,7 +822,7 @@ jobs:
                 -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
                 -H "Accept: application/json" \
                 -H "X-Health-Check: true" \
-                "$u/health" || echo "000")
+                "$u/api/health" || echo "000")
               if [ "$code" != "200" ]; then
                 echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/$MAX_PROBE_ATTEMPTS"
                 sleep "$PROBE_SLEEP_SECONDS"
