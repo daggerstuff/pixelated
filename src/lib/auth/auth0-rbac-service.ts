@@ -22,7 +22,8 @@ let auth0Management: ManagementClient | null = null
  */
 function initializeAuth0Management() {
   if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
-    throw new Error('Auth0 management configuration is incomplete. Please check environment variables.')
+    console.warn('Auth0 management configuration is incomplete. RBAC features may not work.')
+    return
   }
 
   if (!auth0Management) {
@@ -224,9 +225,10 @@ export const AUTH0_ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'session_limited_to_30_minutes',
     ],
     isAssignable: false, // Default role for unauthenticated users
-    requiresApproval: false,
   },
 }
+
+export const ROLE_DEFINITIONS = AUTH0_ROLE_DEFINITIONS
 
 /**
  * Detailed permission definitions with security requirements

@@ -1,7 +1,7 @@
 export const prerender = false
 import type { APIContext } from 'astro'
-import * as adapter from '@/adapters/betterAuthMongoAdapter'
-import { verifyAuthToken, getSessionFromRequest } from '@/utils/auth'
+import * as adapter from '../../../adapters/betterAuthMongoAdapter'
+import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
 
 /**
  * User profile endpoint

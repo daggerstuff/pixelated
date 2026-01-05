@@ -23,7 +23,7 @@ let auth0Management: ManagementClient | null = null
  */
 function initializeAuth0Management() {
   if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
-    throw new Error('Auth0 management configuration is incomplete. Please check environment variables.')
+    console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Management) {
@@ -115,7 +115,7 @@ export class Auth0AdaptiveMFAService {
 
   constructor() {
     if (!AUTH0_CONFIG.domain) {
-      throw new Error('Auth0 is not properly configured')
+      console.warn('Auth0 is not properly configured')
     }
 
     // Default configuration
