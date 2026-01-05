@@ -229,6 +229,7 @@
     "ioredis": "^5.8.2",
     "jotai": "^2.16.1",
     "jsonwebtoken": "^9.0.3",
+    "keytar": "^7.9.0",
     "launchdarkly-js-client-sdk": "^3.9.0",
     "lucide-react": "^0.562.0",
     "mongodb": "^7.0.0",
@@ -418,7 +419,12 @@
       "@unocss/vite": "^66.5.12",
       "@unocss/astro": "^66.5.12",
       "drizzle-orm": "^0.45.1",
+<<<<<<< HEAD
       "zod": "^4.3.2"
+=======
+      "zod": "^4.2.1",
+      "qs": "6.14.1"
+>>>>>>> f3a3754aad26892e93fac2e3aff73cb0450954fb
     },
     "peerDependencyRules": {
       "ignoreMissing": [

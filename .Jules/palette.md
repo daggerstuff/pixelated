@@ -2,6 +2,6 @@
 **Learning:** Custom form controls built with a hidden input + visual div need `peer-focus-visible` classes on the visual element, not just `focus-visible`. The input is what receives focus, so the sibling (peer) needs to react to that state.
 **Action:** When building custom checkboxes or radio buttons, always use the `peer` pattern and verify keyboard navigation.
 
-## 2024-12-24 - Hidden Interactive Elements
-**Learning:** Elements hidden visually (e.g., via opacity) but remaining in the DOM must have `tabindex="-1"` and `aria-hidden="true"` to prevent keyboard users from tabbing to them. When they become visible, these attributes must be toggled back.
-**Action:** Always check `ToTopButton` and similar toggleable widgets for initial `tabindex` state and script-based toggling.
+## 2024-05-24 - Hiding Interactive Elements
+**Learning:** Using `opacity-0` and `pointer-events-none` is not enough to hide elements from keyboard users (who can still tab to them) or screen readers. You must also manage `tabindex="-1"` and `aria-hidden="true"`, or use `visibility: hidden`.
+**Action:** When implementing "fade in" elements like a "Scroll to Top" button, ensure you toggle `tabindex` and `aria-hidden` states alongside the visual transition.
