@@ -17,12 +17,12 @@ on:
 env:
   NODE_VERSION: 24.8.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.26.0
+  PNPM_VERSION: 10.27.0
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     timeout-minutes: 360
     strategy:
       fail-fast: false

@@ -16,77 +16,77 @@ export function MetricsChart({
   className,
 }: MetricsChartProps) {
   const chartData = useMemo(() => {
-    // Filter metrics based on time range
-    const now = new Date()
-    let filteredMetrics = metrics
-
-    if (timeRange === 'week') {
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-      filteredMetrics = metrics.filter(
-        (m) => m.lastUpdated && m.lastUpdated >= weekAgo,
-      )
-    } else if (timeRange === 'month') {
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-      filteredMetrics = metrics.filter(
-        (m) => m.lastUpdated && m.lastUpdated >= monthAgo,
-      )
-    }
-
-    // Sort by date
-    filteredMetrics.sort((a, b) => {
-      const dateA = a.lastUpdated ?? new Date(0)
-      const dateB = b.lastUpdated ?? new Date(0)
-      return dateA.getTime() - dateB.getTime()
-    })
-
-    const labels = filteredMetrics.map((m, index) => {
-      if (m.lastUpdated) {
-        return m.lastUpdated.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        })
-      }
-      return `Point ${index + 1}`
-    })
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Sources Identified',
-          data: filteredMetrics.map((m) => m.sourcesIdentified),
-          borderColor: 'rgba(59, 130, 246, 1)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.4,
-          fill: true,
-        },
-        {
-          label: 'Datasets Evaluated',
-          data: filteredMetrics.map((m) => m.datasetsEvaluated),
-          borderColor: 'rgba(234, 179, 8, 1)',
-          backgroundColor: 'rgba(234, 179, 8, 0.1)',
-          tension: 0.4,
-          fill: true,
-        },
-        {
-          label: 'Datasets Acquired',
-          data: filteredMetrics.map((m) => m.datasetsAcquired),
-          borderColor: 'rgba(34, 197, 94, 1)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          tension: 0.4,
-          fill: true,
-        },
-        {
-          label: 'Integration Plans',
-          data: filteredMetrics.map((m) => m.integrationPlansCreated),
-          borderColor: 'rgba(168, 85, 247, 1)',
-          backgroundColor: 'rgba(168, 85, 247, 0.1)',
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    }
-  }, [metrics, timeRange])
+                        // Filter metrics based on time range
+                        const now = new Date()
+                        let filteredMetrics = metrics
+                    
+                        if (timeRange === 'week') {
+                          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+                          filteredMetrics = metrics.filter(
+                            (m) => m.lastUpdated && m.lastUpdated >= weekAgo,
+                          )
+                        } else if (timeRange === 'month') {
+                          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+                          filteredMetrics = metrics.filter(
+                            (m) => m.lastUpdated && m.lastUpdated >= monthAgo,
+                          )
+                        }
+                    
+                        // Sort by date
+                        filteredMetrics.sort((a, b) => {
+                          const dateA = a.lastUpdated ?? new Date(0)
+                          const dateB = b.lastUpdated ?? new Date(0)
+                          return dateA.getTime() - dateB.getTime()
+                        })
+                    
+                        const labels = filteredMetrics.map((m, index) => {
+                          if (m.lastUpdated) {
+                            return m.lastUpdated.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          }
+                          return `Point ${index + 1}`
+                        })
+                    
+                        return {
+                          labels,
+                          datasets: [
+                            {
+                              label: 'Sources Identified',
+                              data: filteredMetrics.map((m) => m.sourcesIdentified),
+                              borderColor: 'rgba(59, 130, 246, 1)',
+                              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                              tension: 0.4,
+                              fill: true,
+                            },
+                            {
+                              label: 'Datasets Evaluated',
+                              data: filteredMetrics.map((m) => m.datasetsEvaluated),
+                              borderColor: 'rgba(234, 179, 8, 1)',
+                              backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                              tension: 0.4,
+                              fill: true,
+                            },
+                            {
+                              label: 'Datasets Acquired',
+                              data: filteredMetrics.map((m) => m.datasetsAcquired),
+                              borderColor: 'rgba(34, 197, 94, 1)',
+                              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                              tension: 0.4,
+                              fill: true,
+                            },
+                            {
+                              label: 'Integration Plans',
+                              data: filteredMetrics.map((m) => m.integrationPlansCreated),
+                              borderColor: 'rgba(168, 85, 247, 1)',
+                              backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                              tension: 0.4,
+                              fill: true,
+                            },
+                          ],
+                        }
+                      }, [metrics, timeRange]).slice()
 
   return (
     <Card className={cn('w-full', className)}>
@@ -95,7 +95,7 @@ export function MetricsChart({
           <CardTitle>Metrics Over Time</CardTitle>
           <select
             value={timeRange}
-            onChange={(e) => {
+            onChange={(_e) => {
               // This would need to be handled by parent component
               // For now, just a visual indicator
             }}

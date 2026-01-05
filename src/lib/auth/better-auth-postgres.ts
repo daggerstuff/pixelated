@@ -7,11 +7,10 @@
 import { betterAuth } from 'better-auth'
 import { Pool } from 'pg'
 import dotenv from 'dotenv'
-import { kyselyAdapter } from 'better-auth/adapters/kysely-adapter'
-import { Kysely, PostgresDialect } from 'kysely'
+
+import { } from 'kysely'
 import {
   generateTokenPair,
-  validateToken,
   AuthenticationError,
 } from './jwt-service'
 

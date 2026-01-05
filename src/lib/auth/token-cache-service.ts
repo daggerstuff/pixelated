@@ -322,7 +322,7 @@ export class TokenCacheService {
       return tokens
     } catch (error) {
       logger.error('Error in batch get operation', error)
-      return new Array(tokenIds.length).fill(null)
+      return Array(tokenIds.length).fill(null)
     }
   }
 

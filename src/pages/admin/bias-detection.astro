@@ -1,31 +1,21 @@
 ---
-export const prerender = false
+export const prerender = false;
 
-import AdminLayout from '@/layouts/AdminLayout.astro'
-import { ClientRouter } from 'astro:transitions'
-import { verifyAdmin } from '@/lib/auth/middleware'
-import type { AuthContext, SessionData } from '@/lib/auth/types'
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { ClientRouter } from "astro:transitions";
 
-// Verify admin access
-const context: AuthContext = {
-  session: (Astro.locals as { session?: SessionData }).session || null,
-  securityVerification: {
-    isCompliant: true,
-    details: 'Default compliance status',
-  },
-  hipaaCompliance: {
-    isCompliant: true,
-    details: 'Default HIPAA compliance status',
-  },
+// Verify admin access via session
+const session = (Astro.locals as any)?.session;
+const user = (Astro.locals as any)?.user;
+
+if (!session || !user || user.role !== "admin") {
+  return Astro.redirect("/auth/sign-in");
 }
 
-const response = await verifyAdmin(Astro.request, context)
-if (response) return response
-
 // Page metadata
-const pageTitle = 'Bias Detection Dashboard'
+const pageTitle = "Bias Detection Dashboard";
 const pageDescription =
-  'Monitor and analyze bias detection in therapeutic training sessions'
+  "Monitor and analyze bias detection in therapeutic training sessions";
 ---
 
 <AdminLayout
@@ -59,24 +49,24 @@ const pageDescription =
   </div>
 
   <script>
-    import { BiasDashboard } from '@/components/admin/bias-detection/BiasDashboard'
-    import { createElement } from 'react'
-    import { createRoot } from 'react-dom/client'
+    import { BiasDashboard } from "@/components/admin/bias-detection/BiasDashboard";
+    import { createElement } from "react";
+    import { createRoot } from "react-dom/client";
 
     // Mount the React component when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('bias-dashboard')
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("bias-dashboard");
       if (container) {
-        const root = createRoot(container)
+        const root = createRoot(container);
         root.render(
           createElement(BiasDashboard, {
             refreshInterval: 30000,
             enableRealTimeUpdates: true,
-            className: 'w-full',
+            className: "w-full",
           }),
-        )
+        );
       }
-    })
+    });
   </script>
 
   <style>
@@ -86,7 +76,7 @@ const pageDescription =
 
     /* Loading state styles */
     .bias-dashboard-container:empty::before {
-      content: 'Loading bias detection dashboard...';
+      content: "Loading bias detection dashboard...";
       display: flex;
       align-items: center;
       justify-content: center;

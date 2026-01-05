@@ -84,7 +84,7 @@ export class RealBusinessIntelligenceService {
     symbols: string[]
   }): Promise<number> {
     try {
-      const { industry, symbols } = params
+      const { symbols } = params
       const financialData = await this.yahooService.getFinancialMetrics(symbols)
 
       if (financialData.length === 0) {
@@ -133,7 +133,7 @@ export class RealBusinessIntelligenceService {
     try {
       const symbols = this.getIndustrySymbols(industry)
       const financialData = await this.yahooService.getFinancialMetrics(symbols)
-      const marketIndices = await this.yahooService.getMarketIndices()
+      await this.yahooService.getMarketIndices()
 
       const marketData: MarketData[] = financialData.map((company) => ({
         id: `${industry}_${company.symbol}_${Date.now()}`,
@@ -469,8 +469,8 @@ export class RealBusinessIntelligenceService {
   }
 
   private analyzeSectorFeatures(
-    industry: string,
-    companies: any[],
+    _industry: string,
+    _companies: any[],
   ): Record<string, number> {
     const features: Record<string, number> = {}
 
@@ -489,7 +489,7 @@ export class RealBusinessIntelligenceService {
     return features
   }
 
-  private identifyCompetitiveGaps(companies: any[]): string[] {
+  private identifyCompetitiveGaps(_companies: any[]): string[] {
     const commonGaps = [
       'advanced_analytics',
       'predictive_modeling',

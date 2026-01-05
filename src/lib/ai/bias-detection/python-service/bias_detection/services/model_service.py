@@ -22,8 +22,8 @@ except ImportError:
     TENSORFLOW_AVAILABLE = False
     tf = None
 
-from ..config import settings
-from ..models import BiasType, ConfidenceLevel
+from bias_detection.config import settings
+from bias_detection.models import BiasType, ConfidenceLevel
 
 logger = structlog.get_logger(__name__)
 
@@ -42,17 +42,14 @@ class ModelService(ABC):
     @abstractmethod
     async def load_model(self) -> bool:
         """Load the model into memory"""
-        pass
 
     @abstractmethod
     async def predict(self, text: str) -> dict[str, Any]:
-        """Make prediction on text"""
-        pass
+        """Make a prediction"""
 
     @abstractmethod
     def get_model_info(self) -> dict[str, Any]:
         """Get model information"""
-        pass
 
     async def ensure_model_loaded(self) -> None:
         """Ensure model is loaded, load if necessary"""
@@ -67,14 +64,12 @@ class ModelService(ABC):
 class TensorFlowModelService(ModelService):
     """TensorFlow model service for bias detection"""
 
-    def __init__(self, model_path: str = None):
+    def __init__(self, model_path: str | None = None):
         if not TENSORFLOW_AVAILABLE:
             raise ImportError(
                 "TensorFlow is not available. Install it with: pip install tensorflow"
             )
-        super().__init__(
-            model_path or settings.tensorflow_model_path, "tensorflow_bias_detector"
-        )
+        super().__init__(model_path or settings.tensorflow_model_path, "tensorflow_bias_detector")
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
 
@@ -113,7 +108,7 @@ class TensorFlowModelService(ModelService):
 
         except Exception as e:
             logger.error(
-                f"Failed to load TensorFlow model: {str(e)}",
+                f"Failed to load TensorFlow model: {str(e)!s}",
                 model_path=str(self.model_path),
                 error=str(e),
             )
@@ -144,11 +139,9 @@ class TensorFlowModelService(ModelService):
         # Simple BERT-based model for bias detection
         from transformers import TFBertForSequenceClassification
 
-        model = TFBertForSequenceClassification.from_pretrained(
+        return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
         )
-
-        return model
 
     def _create_basic_tokenizer(self) -> Any:
         """Create basic tokenizer"""
@@ -159,9 +152,7 @@ class TensorFlowModelService(ModelService):
                 self.vocab = {}
                 self.word_index = 1
 
-            def encode_plus(
-                self, text: str, max_length: int = 512, **kwargs
-            ) -> dict[str, Any]:
+            def encode_plus(self, text: str, max_length: int = 512, **_kwargs) -> dict[str, Any]:
                 words = text.lower().split()
                 tokens = []
                 for word in words:
@@ -233,20 +224,16 @@ class TensorFlowModelService(ModelService):
 
         except Exception as e:
             logger.error(
-                f"TensorFlow prediction failed: {str(e)}",
+                f"TensorFlow prediction failed: {str(e)!s}",
                 text_length=len(text),
                 error=str(e),
             )
             raise
 
-    def _process_predictions(
-        self, probabilities: tf.Tensor, text: str
-    ) -> List[Dict[str, Any]]:
+    def _process_predictions(self, probabilities: tf.Tensor, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
-        probs = (
-            probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
-        )
+        probs = probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
 
         # Handle different output shapes
         if len(probs.shape) == 2:
@@ -286,7 +273,7 @@ class TensorFlowModelService(ModelService):
 
         return results
 
-    def _extract_evidence(self, text: str, bias_type: BiasType) -> List[str]:
+    def _extract_evidence(self, text: str, bias_type: BiasType) -> list[str]:
         """Extract evidence snippets for bias detection"""
         # Simplified evidence extraction
         # In production, this would use more sophisticated NLP techniques
@@ -307,7 +294,7 @@ class TensorFlowModelService(ModelService):
 
         return evidence[:3]  # Limit to top 3 evidence pieces
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """Get TensorFlow model information"""
         return {
             "name": self.model_name,
@@ -324,10 +311,8 @@ class TensorFlowModelService(ModelService):
 class PyTorchModelService(ModelService):
     """PyTorch model service for bias detection"""
 
-    def __init__(self, model_path: str = None):
-        super().__init__(
-            model_path or settings.pytorch_model_path, "pytorch_bias_detector"
-        )
+    def __init__(self, model_path: str | None = None):
+        super().__init__(model_path or settings.pytorch_model_path, "pytorch_bias_detector")
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -374,7 +359,7 @@ class PyTorchModelService(ModelService):
 
         except Exception as e:
             logger.error(
-                f"Failed to load PyTorch model: {str(e)}",
+                f"Failed to load PyTorch model: {str(e)!s}",
                 model_path=str(self.model_path),
                 error=str(e),
             )
@@ -408,17 +393,14 @@ class PyTorchModelService(ModelService):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
                 super().__init__()
                 self.bert = BertModel.from_pretrained("bert-base-uncased")
-                self.classifier = torch.nn.Linear(
-                    self.bert.config.hidden_size, num_labels
-                )
+                self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
                 self.dropout = torch.nn.Dropout(0.1)
 
             def forward(self, input_ids, attention_mask):
                 outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
                 pooled_output = outputs.pooler_output
                 pooled_output = self.dropout(pooled_output)
-                logits = self.classifier(pooled_output)
-                return logits
+                return self.classifier(pooled_output)
 
         return BiasDetectionModel()
 
@@ -470,15 +452,13 @@ class PyTorchModelService(ModelService):
 
         except Exception as e:
             logger.error(
-                f"PyTorch prediction failed: {str(e)}",
+                f"PyTorch prediction failed: {str(e)!s}",
                 text_length=len(text),
                 error=str(e),
             )
             raise
 
-    def _process_predictions(
-        self, probabilities: torch.Tensor, text: str
-    ) -> List[Dict[str, Any]]:
+    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -521,7 +501,7 @@ class PyTorchModelService(ModelService):
 
         return results
 
-    def _extract_evidence(self, text: str, bias_type: BiasType) -> List[str]:
+    def _extract_evidence(self, text: str, bias_type: BiasType) -> list[str]:
         """Extract evidence snippets for bias detection"""
         # Similar to TensorFlow implementation
         words = text.lower().split()
@@ -540,7 +520,7 @@ class PyTorchModelService(ModelService):
 
         return evidence[:3]
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """Get PyTorch model information"""
         return {
             "name": self.model_name,
@@ -583,7 +563,7 @@ class ModelEnsembleService:
             results.append(result)
         return all(results)
 
-    async def predict_ensemble(self, text: str) -> Dict[str, Any]:
+    async def predict_ensemble(self, text: str) -> dict[str, Any]:
         """Make ensemble prediction using multiple models"""
         await self.load_all_models()
 
@@ -593,9 +573,7 @@ class ModelEnsembleService:
                 result = await service.predict(text)
                 results.append(result)
             except Exception as e:
-                logger.warning(
-                    f"Model {service.model_name} failed: {str(e)}", error=str(e)
-                )
+                logger.warning(f"Model {service.model_name} failed: {str(e)!s}", error=str(e))
 
         if not results:
             raise RuntimeError("All models failed to predict")
@@ -604,7 +582,7 @@ class ModelEnsembleService:
         combined_results = self._combine_results(results)
 
         # Use first available service for text hash
-        hash_service = self.tf_service if self.tf_service else self.pt_service
+        hash_service = self.tf_service or self.pt_service
         return {
             "ensemble_results": combined_results,
             "individual_results": results,
@@ -612,7 +590,7 @@ class ModelEnsembleService:
             "text_hash": hash_service._get_text_hash(text),
         }
 
-    def _combine_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _combine_results(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Combine results from multiple models"""
         # Group results by bias type
         bias_groups = {}
@@ -628,9 +606,7 @@ class ModelEnsembleService:
         combined_results = []
         for bias_type, results_list in bias_groups.items():
             avg_score = sum(r["score"] for r in results_list) / len(results_list)
-            avg_confidence = sum(r["confidence"] for r in results_list) / len(
-                results_list
-            )
+            avg_confidence = sum(r["confidence"] for r in results_list) / len(results_list)
 
             # Use highest confidence level
             confidence_levels = [r["confidence_level"] for r in results_list]
@@ -666,7 +642,7 @@ class ModelEnsembleService:
         }
         return values.get(level, 0)
 
-    def get_ensemble_info(self) -> Dict[str, Any]:
+    def get_ensemble_info(self) -> dict[str, Any]:
         """Get ensemble service information"""
         info = {"ensemble_service": True, "models": []}
 

@@ -17,7 +17,7 @@ on:
 jobs:
   validate-ai-models:
     name: AI Model Validation
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       ENV_NAME: ${{ inputs.ENV_NAME }}
@@ -37,7 +37,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: "10.26.0"
+          version: "10.27.0"
           run_install: false
 
       - name: Get pnpm store directory

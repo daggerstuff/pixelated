@@ -9,6 +9,7 @@ import icon from 'astro-icon';
 import sentry from '@sentry/astro';
 
 import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
@@ -27,6 +28,7 @@ if (isCloudflareDeploy && !cloudflareAdapter) {
   console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
 }
 
+const isVercelDeploy = !!process.env.VERCEL;
 const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
 const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
 const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
@@ -93,6 +95,11 @@ const adapter = (() => {
       };
     }
     return cloudflareAdapter(adapterConfig);
+  }
+
+  if (isVercelDeploy) {
+    console.log('⚡ Using Vercel adapter for deployment');
+    return vercel();
   }
 
   if (isRailwayDeploy) {
@@ -531,10 +538,10 @@ export default defineConfig({
     service: passthroughImageService(),
     domains: ['pixelatedempathy.com', 'cdn.pixelatedempathy.com'],
   },
-  redirects: {
+  /* redirects: {
     '/admin': '/admin/dashboard',
     '/docs': '/docs/getting-started',
-  },
+  }, */
   devToolbar: {
     enabled: isDevelopment,
   },

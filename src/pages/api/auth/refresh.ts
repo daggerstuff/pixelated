@@ -4,9 +4,9 @@
  */
 
 import type { APIRoute } from 'astro'
-import { refreshAccessToken } from '../../../lib/auth/jwt-service'
-import { rateLimitMiddleware } from '../../../lib/auth/middleware'
-import { logSecurityEvent } from '../../../lib/security'
+import { refreshAccessToken } from '@/lib/auth/jwt-service'
+import { rateLimitMiddleware } from '@/lib/auth/middleware'
+import { logSecurityEvent } from '@/lib/security'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   // Extract client information early so it's available in the catch block
@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       )
     }
 
-    const refreshToken = body.refreshToken
+    const { refreshToken } = body
 
     // Attempt token refresh
     const tokenPair = await refreshAccessToken(refreshToken, clientInfo)

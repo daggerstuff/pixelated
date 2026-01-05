@@ -4,7 +4,7 @@ import Redis from 'ioredis'
 import { Pool } from 'pg'
 import cors from 'cors'
 import { SocketService } from './services/socketService.js'
-import { DocumentService } from './services/DocumentService.js'
+
 
 const app = express()
 const server = createServer(app)
