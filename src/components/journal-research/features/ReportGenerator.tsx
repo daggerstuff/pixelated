@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import {
   useGenerateReportMutation,
@@ -15,7 +16,7 @@ export interface ReportGeneratorProps {
 
 export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) {
   const [reportType, setReportType] = useState<'session_report' | 'weekly_report' | 'summary_report'>('session_report')
-  const [format, setFormat] = useState<'json' | 'markdown' | 'pdf'>('json')
+  const [outputFormat, setOutputFormat] = useState<'json' | 'markdown' | 'pdf'>('json')
   const [dateRange, setDateRange] = useState<{
     startDate?: string
     endDate?: string
@@ -62,9 +63,9 @@ export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) 
                 onChange={(e) =>
                   setReportType(
                     e.target.value as
-                      | 'session_report'
-                      | 'weekly_report'
-                      | 'summary_report',
+                    | 'session_report'
+                    | 'weekly_report'
+                    | 'summary_report',
                   )
                 }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -78,9 +79,9 @@ export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) 
             <div>
               <label className="mb-2 block text-sm font-medium">Format</label>
               <select
-                value={format}
+                value={outputFormat}
                 onChange={(e) =>
-                  setFormat(e.target.value as 'json' | 'markdown' | 'pdf')
+                  setOutputFormat(e.target.value as 'json' | 'markdown' | 'pdf')
                 }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
@@ -92,57 +93,57 @@ export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) 
 
             {(reportType === 'weekly_report' ||
               reportType === 'summary_report') && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.startDate ?? ''}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        startDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.startDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          startDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.endDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          endDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.endDate ?? ''}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        endDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
             <button
               onClick={() => {
                 generateMutation.mutate({
                   reportType,
-                  format,
+                  format: outputFormat,
                   dateRange:
                     dateRange.startDate || dateRange.endDate
                       ? {
-                          startDate: dateRange.startDate
-                            ? new Date(dateRange.startDate)
-                            : undefined,
-                          endDate: dateRange.endDate
-                            ? new Date(dateRange.endDate)
-                            : undefined,
-                        }
+                        startDate: dateRange.startDate
+                          ? new Date(dateRange.startDate)
+                          : undefined,
+                        endDate: dateRange.endDate
+                          ? new Date(dateRange.endDate)
+                          : undefined,
+                      }
                       : undefined,
                 })
               }}
@@ -182,7 +183,7 @@ export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) 
                       <p className="font-medium">{report.reportId}</p>
                       <p className="text-sm text-muted-foreground">
                         {report.reportType.replace('_', ' ')} • {report.format.toUpperCase()} •{' '}
-                        {format(report.generatedDate, 'PPpp')}
+                        {format(new Date(report.generatedDate), 'PPpp')}
                       </p>
                     </div>
                   </div>
