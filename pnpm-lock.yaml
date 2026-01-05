@@ -16,13 +16,13 @@ overrides:
   sitemap: ^9.0.0
   jws: '>=4.0.1'
   vite: ^7.3.0
-  unocss: ^66.5.10
-  '@unocss/reset': ^66.5.10
-  '@unocss/core': ^66.5.10
-  '@unocss/vite': ^66.5.10
-  '@unocss/astro': ^66.5.10
+  unocss: ^66.5.12
+  '@unocss/reset': ^66.5.12
+  '@unocss/core': ^66.5.12
+  '@unocss/vite': ^66.5.12
+  '@unocss/astro': ^66.5.12
   drizzle-orm: ^0.45.1
-  zod: ^4.2.1
+  zod: ^4.3.2
 
 importers:
 
@@ -2612,7 +2612,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
-      zod: ^4.2.1
+      zod: ^4.3.2
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
@@ -4677,7 +4677,7 @@ packages:
     hasBin: true
     peerDependencies:
       '@smithery/sdk': ^3.0.1
-      zod: ^4.2.1
+      zod: ^4.3.2
 
   '@smithery/registry@0.4.4':
     resolution: {integrity: sha512-oDS8eIa86cU2MZQBDGsCo9kZT9mgjTn0t5UnI2+tAUOyIhSwcDVFgCNBTI657jgzUPqRfALamM6IGekMZ9/wGA==}
@@ -4685,7 +4685,7 @@ packages:
   '@smithery/sdk@3.0.1':
     resolution: {integrity: sha512-ngwD/Tb4sYNxadsYEHe57KtDfJ26av9no9O0KF0lKfJLwiaxcj9XkNWWefXHiJX/48zs1zPW6iO+/ruIJvB7qg==}
     peerDependencies:
-      zod: ^4.2.1
+      zod: ^4.3.2
 
   '@smithy/abort-controller@4.2.7':
     resolution: {integrity: sha512-rzMY6CaKx2qxrbYbqjXWS0plqEy7LOdKHS0bg4ixJ6aoGDPNUcLWk/FRNuCILh7GKLG9TFUXYYeQQldMBBwuyw==}
@@ -5980,9 +5980,9 @@ packages:
     resolution: {integrity: sha512-CZASj0DuosiCLabOofFLi6Ix//xXEzMKDgNUztO22BuDcohAPNhdXwNd+NiIKwBgI+xzqj0R5d9DqCnEEXd2HQ==}
     peerDependencies:
       '@iconify/json': ^2.2.256
-      '@unocss/reset': ^66.5.10
+      '@unocss/reset': ^66.5.12
       astro: ^5.0.0
-      unocss: ^66.5.10
+      unocss: ^66.5.12
 
   astro@5.16.6:
     resolution: {integrity: sha512-6mF/YrvwwRxLTu+aMEa5pwzKUNl5ZetWbTyZCs9Um0F12HUmxUiF5UHiZPy4rifzU3gtpM3xP2DfdmkNX9eZRg==}
@@ -6211,7 +6211,7 @@ packages:
   better-call@1.1.7:
     resolution: {integrity: sha512-6gaJe1bBIEgVebQu/7q9saahVzvBsGaByEnE8aDVncZEDiJO7sdNB28ot9I6iXSbR25egGmmZ6aIURXyQHRraQ==}
     peerDependencies:
-      zod: ^4.2.1
+      zod: ^4.3.2
     peerDependenciesMeta:
       zod:
         optional: true
@@ -11977,19 +11977,19 @@ packages:
   zod-to-json-schema@3.25.1:
     resolution: {integrity: sha512-pM/SU9d3YAggzi6MtR4h7ruuQlqKtad8e9S0fmxcMi+ueAK5Korys/aWcV9LIIHTVbj01NdzxcnXSN+O74ZIVA==}
     peerDependencies:
-      zod: ^4.2.1
+      zod: ^4.3.2
 
   zod-to-ts@1.2.0:
     resolution: {integrity: sha512-x30XE43V+InwGpvTySRNz9kB7qFU8DlyEy7BsSTCHPH1R0QasMmHWZDCzYm6bVXtj/9NNJAZF3jW8rzFvH5OFA==}
     peerDependencies:
       typescript: ^4.9.4 || ^5.0.2
-      zod: ^4.2.1
+      zod: ^4.3.2
 
   zod-validation-error@4.0.2:
     resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      zod: ^4.2.1
+      zod: ^4.3.2
 
   zod@4.3.2:
     resolution: {integrity: sha512-b8L8yn4rIVfiXyHAmnr52/ZEpDumlT0bmxiq3Ws1ybrinhflGpt12Hvv54kYnEsGPRs6o/Ka3/ppA2OWY21IVg==}

@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.27.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -296,7 +296,7 @@
     "@types/p5": "^1.7.7",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@unocss/astro": "^66.5.9",
+    "@unocss/astro": "^66.5.12",
     "@unocss/core": "^66.5.12",
     "@unocss/reset": "^66.5.12",
     "@vercel/kv": "^3.0.0",
@@ -412,13 +412,13 @@
       "sitemap": "^9.0.0",
       "jws": ">=4.0.1",
       "vite": "^7.3.0",
-      "unocss": "^66.5.10",
-      "@unocss/reset": "^66.5.10",
-      "@unocss/core": "^66.5.10",
-      "@unocss/vite": "^66.5.10",
-      "@unocss/astro": "^66.5.10",
+      "unocss": "^66.5.12",
+      "@unocss/reset": "^66.5.12",
+      "@unocss/core": "^66.5.12",
+      "@unocss/vite": "^66.5.12",
+      "@unocss/astro": "^66.5.12",
       "drizzle-orm": "^0.45.1",
-      "zod": "^4.2.1"
+      "zod": "^4.3.2"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
