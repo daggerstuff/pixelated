@@ -1,5 +1,5 @@
 import type { APIContext } from 'astro'
-import { updatePasswordWithToken } from '../../../services/auth.service'
+// import { updatePasswordWithToken } from '../../../services/auth.service'
 
 export const POST = async ({ request, cookies }: APIContext) => {
   try {
@@ -40,11 +40,32 @@ export const POST = async ({ request, cookies }: APIContext) => {
       )
     }
 
-    const email = emailCookie.value
-    const token = tokenCookie.value
+    const _email = emailCookie.value
+    const _token = tokenCookie.value
 
+    // PASSWORD UPDATE DEPRECATED IN MIGRATION TO AUTH0
+    // The previous implementation relied on a MongoDB-based auth service that has been replaced.
+    // Auth0 handles password resets via its own Universal Login flow and email links.
+    // For manual updates, we would need a valid user ID, not a recovery token.
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Password updates should be performed via Auth0 Universal Login or Management Dashboard.',
+      }),
+      {
+        status: 501,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+
+    /* 
+    Legacy implementation removed:
     // Update the password using the AuthService with token verification
     await updatePasswordWithToken(email, token, password)
+    */
 
     // Clear the recovery cookies
     cookies.delete('auth_recovery_token')

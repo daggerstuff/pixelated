@@ -419,12 +419,8 @@
       "@unocss/vite": "^66.5.12",
       "@unocss/astro": "^66.5.12",
       "drizzle-orm": "^0.45.1",
-<<<<<<< HEAD
-      "zod": "^4.3.2"
-=======
-      "zod": "^4.2.1",
+      "zod": "^4.3.2",
       "qs": "6.14.1"
->>>>>>> f3a3754aad26892e93fac2e3aff73cb0450954fb
     },
     "peerDependencyRules": {
       "ignoreMissing": [
@@ -474,6 +470,7 @@
       "esbuild",
       "faiss-node",
       "hnswlib-node",
+      "keytar",
       "libpg-query",
       "msw",
       "onnxruntime-node",

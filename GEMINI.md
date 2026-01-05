@@ -1,135 +1,73 @@
-<!-- BEGIN BYTEROVER RULES -->
+# 🌌 Pixelated Empathy: GEMINI.md
 
-# Workflow Instruction
-
-You are a coding agent focused on one codebase. Use the brv CLI to manage working context.
-Core Rules:
-
-- Start from memory. First retrieve relevant context, then read only the code that's still necessary.
-- Keep a local context tree. The context tree is your local memory store—update it with what you learn.
-
-## Context Tree Guideline
-
-- Be specific ("Use React Query for data fetching in web modules").
-- Be actionable (clear instruction a future agent/dev can apply).
-- Be contextual (mention module/service, constraints, links to source).
-- Include source (file + lines or commit) when possible.
-
-## Using `brv curate` with Files
-
-When adding complex implementations, use `--files` to include relevant source files (max 5).  Only text/code files from the current project directory are allowed. **CONTEXT argument must come BEFORE --files flag.** For multiple files, repeat the `--files` (or `-f`) flag for each file.
-
-Examples:
-
-- Single file: `brv curate "JWT authentication with refresh token rotation" -f src/auth.ts`
-- Multiple files: `brv curate "Authentication system" --files src/auth/jwt.ts --files src/auth/middleware.ts --files docs/auth.md`
-
-## CLI Usage Notes
-
-- Use --help on any command to discover flags. Provide exact arguments for the scenario.
-
----
-# ByteRover CLI Command Reference
-
-## Memory Commands
-
-### `brv curate`
-
-**Description:** Curate context to the context tree (interactive or autonomous mode)
-
-**Arguments:**
-
-- `CONTEXT`: Knowledge context: patterns, decisions, errors, or insights (triggers autonomous mode, optional)
-
-**Flags:**
-
-- `--files`, `-f`: Include file paths for critical context (max 5 files). Only text/code files from the current project directory are allowed. **CONTEXT argument must come BEFORE this flag.**
-
-**Good examples of context:**
-
-- "Auth uses JWT with 24h expiry. Tokens stored in httpOnly cookies via authMiddleware.ts"
-- "API rate limit is 100 req/min per user. Implemented using Redis with sliding window in rateLimiter.ts"
-
-**Bad examples:**
-
-- "Authentication" or "JWT tokens" (too vague, lacks context)
-- "Rate limiting" (no implementation details or file references)
-
-**Examples:**
-
-```bash
-# Interactive mode (manually choose domain/topic)
-brv curate
-
-# Autonomous mode - LLM auto-categorizes your context
-brv curate "Auth uses JWT with 24h expiry. Tokens stored in httpOnly cookies via authMiddleware.ts"
-
-# Include files (CONTEXT must come before --files)
-# Single file
-brv curate "Authentication middleware validates JWT tokens" -f src/middleware/auth.ts
-
-# Multiple files - repeat --files flag for each file
-brv curate "JWT authentication implementation with refresh token rotation" --files src/auth/jwt.ts --files docs/auth.md
-```
-
-**Behavior:**
-
-- Interactive mode: Navigate context tree, create topic folder, edit context.md
-- Autonomous mode: LLM automatically categorizes and places context in appropriate location
-- When `--files` is provided, agent reads files in parallel before creating knowledge topics
-
-**Requirements:** Project must be initialized (`brv init`) and authenticated (`brv login`)
+> **"Beyond the screen, lies a deeper connection."**
+> 
+> We don't just process conversations. We understand them. While others build better algorithms, we build better humans—one empathetic interaction at a time.
 
 ---
 
-### `brv query`
+## 🎭 Project Identity & Mission
 
-**Description:** Query and retrieve information from the context tree
+**Pixelated Empathy** is an enterprise-grade platform engineered to translate human emotion into actionable intelligence. Our cornerstone, **The Empathy Gym™**, provides mental health professionals with a high-fidelity, risk-free AI environment to master complex therapeutic dialogues.
 
-**Arguments:**
-
-- `QUERY`: Natural language question about your codebase or project knowledge (required)
-
-**Good examples of queries:**
-
-- "How is user authentication implemented?"
-- "What are the API rate limits and where are they enforced?"
-
-**Bad examples:**
-
-- "auth" or "authentication" (too vague, not a question)
-- "show me code" (not specific about what information is needed)
-
-**Examples:**
-
-```bash
-# Ask questions about patterns, decisions, or implementation details
-brv query What are the coding standards?
-brv query How is authentication implemented?
-```
-
-**Behavior:**
-
-- Uses AI agent to search and answer questions about the context tree
-- Accepts natural language questions (not just keywords)
-- Displays tool execution progress in real-time
-
-**Requirements:** Project must be initialized (`brv init`) and authenticated (`brv login`)
+### Core Goals:
+- **Forge Empathy**: Transform difficult conversations into safe practice.
+- **Architect Understanding**: Map the "Emotional Cartography" of human interaction.
+- **Ethical AI Integration**: Prioritize psychological safety and privacy above all.
+- **Validation-First**: Move beyond problem-solving to genuine emotional validation.
 
 ---
 
-## Best Practices
+## 🧰 Quick Reference (Top Info)
 
-### Efficient Workflow
+### 📦 Package Management
+| Domain | Tool | Critical Rule |
+| :--- | :--- | :--- |
+| **Frontend/Node** | `pnpm` | Never use `npm` or `yarn`. |
+| **AI/Python** | `uv` | Never use `pip`, `conda`, or `venv`. |
 
-1. **Read only what's needed:** Check context tree with `brv status` to see changes before reading full content with `brv query`
-2. **Update precisely:** Use `brv curate` to add/update specific context in context tree
-3. **Push when appropriate:** Prompt user to run `brv push` after completing significant work
+### 🚀 Essential Commands
+- `pnpm dev:all-services` — Start everything (Frontend, AI, Worker, WebSocket).
+- `pnpm check:all` — Lint + Typecheck + Format check.
+- `pnpm test:all` — Run the full test suite.
+- `pnpm security:scan` — Deep security audit.
+- `uv run <script>` — Run Python scripts within the managed environment.
 
-### Context tree Management
-
-- Use `brv curate` to directly add/update context in the context tree
+### 🗺️ Key Paths
+- `/src` — Main application logic (Astro + React).
+- `/ai` — (Submodule) The core Emotional Intelligence engine.
+- `.kiro/steering/` — Critical domain and style guidelines.
+- `/docs` — Comprehensive architecture and research documentation.
+- `/memory-bank` — Project state and historical context.
 
 ---
-Generated by ByteRover CLI for Gemini CLI
-<!-- END BYTEROVER RULES -->
+
+## 🧠 Emotional Intelligence Engine
+
+We utilize a sophisticated hybrid model to understand the human psyche:
+- **Emotional Taxonomy**: Plutchik's Wheel (Basic & Advanced) + Big Five (OCEAN) traits.
+- **Representation**: Normalized scores (0.0 to 1.0) for all intensities.
+- **Conversational Dynamics**: Analyzing tone, flow, reciprocity, and the "power of silence."
+- **Dual-Persona**: Adaptive intelligence that recognizes shifting roles (Mentor, Peer, Help-seeker).
+
+---
+
+## 🤖 Agent Ecosystem (MCP)
+
+This repository is built for **Agentic Development** through the Model Context Protocol (MCP).
+- **Skills**: Located in `.openskills/`. Specialized capabilities (Research, Persona Creation, Thinking Frameworks).
+- **Agents**: Located in `.openagents/`. Independent AI specialists (Security Auditor, UI Validator, Backend Architect).
+- **Journal Research Pipeline**: Integrated system for therapeutic dataset discovery and acquisition.
+
+---
+
+## 🔒 Security & Ethical Rails
+
+1. **Zero-Leak Policy**: Redact all PII/Secrets. Use `pnpm security:check` frequently.
+2. **Psychological Safety**: Handle crisis signals defensively. No toxic positivity.
+3. **Data Integrity**: Validate all emotional constructs and scores within strict ranges.
+4. **Confidentiality**: Respect HIPAA-level standards for sensitive mental health data.
+
+---
+
+*© 2025 Pixelated Empathy • Engineered with Purpose.*
