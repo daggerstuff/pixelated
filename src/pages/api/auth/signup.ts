@@ -1,6 +1,6 @@
 // import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
-import * as adapter from '@/adapters/betterAuthMongoAdapter'
+import * as adapter from '../../../adapters/betterAuthMongoAdapter'
 
 /**
  * Sign up endpoint

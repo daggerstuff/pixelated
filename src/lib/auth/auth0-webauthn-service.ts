@@ -25,7 +25,7 @@ let auth0Management: ManagementClient | null = null
  */
 function initializeAuth0Clients() {
   if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
-    throw new Error('Auth0 configuration is incomplete. Please check environment variables.')
+    console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
@@ -125,7 +125,7 @@ export class Auth0WebAuthnService {
 
   constructor() {
     if (!AUTH0_CONFIG.domain) {
-      throw new Error('Auth0 is not properly configured')
+      console.warn('Auth0 is not properly configured')
     }
 
     // Use the domain as RP ID for WebAuthn

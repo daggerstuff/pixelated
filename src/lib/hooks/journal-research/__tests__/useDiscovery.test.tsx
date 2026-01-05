@@ -5,7 +5,7 @@ import { ReactNode } from 'react'
 import {
     useDiscoveryListQuery,
     useSourceQuery,
-    useInitiateDiscoveryMutation,
+    useDiscoveryInitiateMutation,
 } from '../useDiscovery'
 import * as api from '@/lib/api/journal-research'
 import { useDiscoveryStore } from '@/lib/stores/journal-research'
@@ -194,7 +194,7 @@ describe('useDiscovery hooks', () => {
         })
     })
 
-    describe('useInitiateDiscoveryMutation', () => {
+    describe('useDiscoveryInitiateMutation', () => {
         it('initiates discovery successfully', async () => {
             const mockResponse: api.DiscoveryResponse = {
                 sessionId: 'session-1',
@@ -204,7 +204,7 @@ describe('useDiscovery hooks', () => {
             }
             vi.mocked(api.initiateDiscovery).mockResolvedValue(mockResponse)
 
-            const { result } = renderHook(() => useInitiateDiscoveryMutation(), {
+            const { result } = renderHook(() => useDiscoveryInitiateMutation('session-1'), {
                 wrapper: createWrapper(),
             })
 
@@ -213,7 +213,7 @@ describe('useDiscovery hooks', () => {
                 filters: { openAccessOnly: true },
             }
 
-            result.current.mutate({ sessionId: 'session-1', payload })
+            result.current.mutate(payload)
 
             await waitFor(() => {
                 expect(result.current.isSuccess).toBe(true)
@@ -226,15 +226,12 @@ describe('useDiscovery hooks', () => {
             const error = new Error('Failed to initiate discovery')
             vi.mocked(api.initiateDiscovery).mockRejectedValue(error)
 
-            const { result } = renderHook(() => useInitiateDiscoveryMutation(), {
+            const { result } = renderHook(() => useDiscoveryInitiateMutation('session-1'), {
                 wrapper: createWrapper(),
             })
 
             result.current.mutate({
-                sessionId: 'session-1',
-                payload: {
-                    searchKeywords: { mental_health: ['depression'] },
-                },
+                searchKeywords: { mental_health: ['depression'] },
             })
 
             await waitFor(() => {

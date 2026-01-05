@@ -1,11 +1,11 @@
 export const prerender = false
-import * as adapter from '@/adapters/betterAuthMongoAdapter'
+import * as adapter from '../../../adapters/betterAuthMongoAdapter'
 
 /**
  * Sign out endpoint
  * POST /api/auth/signout
  */
-import { getSessionFromRequest } from '@/utils/auth'
+import { getSessionFromRequest } from '../../../utils/auth'
 
 export const POST = async ({ request }) => {
   try {

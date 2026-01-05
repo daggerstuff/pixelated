@@ -38,8 +38,6 @@ process.on('SIGPIPE', () => {
 // Spawn the actual Astro build
 const build = spawn('astro', ['build'], {
     stdio: 'inherit',
-    shell: true,
-    detached: false,
 });
 
 build.on('error', (error) => {
