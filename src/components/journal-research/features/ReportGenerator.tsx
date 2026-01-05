@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/c
 import {
   useGenerateReportMutation,
   useReportListQuery,
-} from '@/lib/hooks/journal-research'
+} from '@/lib/hooks/journal-research/useReports'
 import { cn } from '@/lib/utils'
 
 import { Download, FileText } from 'lucide-react'
