@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   copilot-setup-steps:
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
 
     # Set the permissions to the lowest permissions possible needed for your steps.
     # Copilot will be given its own token for its operations.
@@ -29,7 +29,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.26.0
+          version: 10.27.0
 
       - name: Validate package.json
         run: |

@@ -86,7 +86,7 @@ export function SourceDiscovery({ sessionId, className }: SourceDiscoveryProps) 
             <SourceList
               sources={sources ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
               isLoading={isLoading}
-              onSourceClick={(source) => {
+              onSourceClick={(_source) => {
                 // Navigate to source detail
               }}
             />

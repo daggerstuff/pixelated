@@ -18,7 +18,7 @@ permissions:
 jobs:
   validate-flux-kustomization:
     name: Validate Flux Kustomization
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6

@@ -4,7 +4,7 @@ FROM node:24.12.0-trixie-slim@sha256:9ad7e7db423b2ca7ddcc01568da872701ef6171505b
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
-ARG PNPM_VERSION=10.26.0
+ARG PNPM_VERSION=10.26.2
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -73,6 +73,11 @@ RUN ( \
 
 # Copy source and run the build
 COPY . .
+
+# Copy required server and instrumentation files into builder context
+COPY scripts/utils/start-server.mjs /app/start-server.mjs
+COPY config/instrument.mjs /app/instrument.mjs
+
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
@@ -85,7 +90,7 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=10.26.0
+ARG PNPM_VERSION=10.26.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \

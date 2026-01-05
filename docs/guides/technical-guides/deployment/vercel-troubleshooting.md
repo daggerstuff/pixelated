@@ -82,7 +82,7 @@ Your `vercel.json` uses custom handler routing:
   "version": 2,
   "builds": [
     {
-      "src": "api/vercel-handler.js",
+      "src": "deploy/vercel/vercel-handler.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["dist/**"]
@@ -92,7 +92,7 @@ Your `vercel.json` uses custom handler routing:
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/vercel-handler.js"
+      "dest": "/deploy/vercel/vercel-handler.js"
     }
   ]
 }
@@ -110,7 +110,7 @@ pnpm build
 ls -la dist/server/entry.mjs
 
 # 2. Test the handler import
-node -e "import('./api/vercel-handler.js')"
+node -e "import('./deploy/vercel/vercel-handler.js')"
 
 # 3. Check Astro config
 grep -A 5 "adapter:" astro.config.mjs
@@ -187,7 +187,7 @@ if (!process.env.REQUIRED_VAR) {
 ```json
 {
   "functions": {
-    "api/vercel-handler.js": {
+    "deploy/vercel/vercel-handler.js": {
       "maxDuration": 60
     }
   }
@@ -225,7 +225,7 @@ pnpm add @astrojs/node
    - Static output won't use SSR
 
 3. **Handler file path mismatch:**
-   - Verify `api/vercel-handler.js` imports from correct path
+  - Verify `deploy/vercel/vercel-handler.js` imports from correct path
    - Check `dist/server/entry.mjs` exists after build
 
 ### 6. Runtime Errors

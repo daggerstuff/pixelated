@@ -9,12 +9,12 @@ permissions:
 
 env:
   NODE_VERSION: 24.8.0
-  PNPM_VERSION: 10.26.0
+  PNPM_VERSION: 10.27.0
   NODE_ENV: production
 
 jobs:
   schedule-posts:
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -27,7 +27,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.26.0
+          version: 10.27.0
 
       - name: Get pnpm store directory
         id: pnpm-store

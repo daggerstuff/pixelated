@@ -12,10 +12,30 @@ on:
   workflow_dispatch:
 jobs:
   build-and-push:
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NODE_ENV: production
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -32,33 +52,49 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
         run: |
+          echo "🔍 Checking Docker Hub credentials..."
           if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "✅ Found DOCKERHUB_USERNAME and DOCKERHUB_TOKEN"
             echo "has_creds=true" >> $GITHUB_OUTPUT
             echo "docker_username=$DOCKERHUB_USERNAME" >> $GITHUB_OUTPUT
             echo "docker_password=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
           elif [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PAT" ]; then
+            echo "✅ Found DOCKER_USER and DOCKER_PAT"
             echo "has_creds=true" >> $GITHUB_OUTPUT
             echo "docker_username=$DOCKER_USER" >> $GITHUB_OUTPUT
             echo "docker_password=$DOCKER_PAT" >> $GITHUB_OUTPUT
           else
+            echo "⚠️ No Docker Hub credentials found"
             echo "has_creds=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Login to Docker Hub
         if: steps.check_creds.outputs.has_creds == 'true'
-        id: docker_login
-        continue-on-error: true
         uses: docker/login-action@v3
         with:
           username: ${{ steps.check_creds.outputs.docker_username }}
           password: ${{ steps.check_creds.outputs.docker_password }}
           logout: true
 
+      - name: Verify Docker authentication
+        if: steps.check_creds.outputs.has_creds == 'true'
+        run: |
+          echo "🔍 Verifying Docker authentication..."
+          if echo $DOCKERHUB_USERNAME | docker login --username $DOCKERHUB_USERNAME --password-stdin; then
+            echo "✅ Successfully authenticated with Docker Hub"
+          else
+            echo "❌ Failed to authenticate with Docker Hub"
+            exit 1
+          fi
+        env:
+          DOCKERHUB_USERNAME: ${{ steps.check_creds.outputs.docker_username }}
+          DOCKERHUB_TOKEN: ${{ steps.check_creds.outputs.docker_password }}
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ steps.docker_login.outcome == 'success' }}
+          push: ${{ steps.check_creds.outputs.has_creds == 'true' }}
           tags: |
             pixelatedempathy/pixelated:latest
             pixelatedempathy/pixelated:${{ github.sha }}
@@ -67,4 +103,15 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_ENV=production
-          platforms: linux/amd64
+
+      - name: Verify pushed images
+        if: steps.check_creds.outputs.has_creds == 'true'
+        run: |
+          echo "🔍 Verifying pushed images..."
+          docker pull pixelatedempathy/pixelated:${{ github.sha }}
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully pulled image pixelatedempathy/pixelated:${{ github.sha }}"
+          else
+            echo "❌ Failed to pull image pixelatedempathy/pixelated:${{ github.sha }}"
+            exit 1
+          fi
