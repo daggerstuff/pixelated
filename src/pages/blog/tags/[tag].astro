@@ -5,40 +5,20 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import BlogPostCard from '@/components/BlogPostCard.astro'
 import { filterBlogPosts } from '@/utils/blog'
 
-export const prerender = true
+const { tag } = Astro.params
 
-export async function getStaticPaths() {
-  try {
-    const posts = await getCollection('blog')
-    const validPosts = filterBlogPosts(posts, { excludeDrafts: true })
-
-    const tags = [
-      ...new Set(validPosts.flatMap((post) => post.data.tags || [])),
-    ]
-
-    return tags.map((tag) => {
-      const tagPosts = filterBlogPosts(validPosts, { tag })
-
-      return {
-        params: { tag },
-        props: {
-          posts: tagPosts,
-          tag,
-        },
-      }
-    })
-  } catch (error) {
-    console.error('Error generating static paths for blog tags:', error)
-    return []
-  }
+if (!tag) {
+  return Astro.redirect('/blog/tags')
 }
 
-interface Props {
-  posts: CollectionEntry<'blog'>[]
-  tag: string
+let posts: CollectionEntry<'blog'>[] = []
+try {
+  const allPosts = await getCollection('blog')
+  const validPosts = filterBlogPosts(allPosts, { excludeDrafts: true })
+  posts = filterBlogPosts(validPosts, { tag })
+} catch (error) {
+  console.error('Error fetching blog posts for tag:', tag, error)
 }
-
-const { tag, posts } = Astro.props as Props
 
 // Handle empty posts gracefully
 const hasPosts = posts && posts.length > 0

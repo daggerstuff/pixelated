@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
 
@@ -21,7 +21,8 @@ export function ResearchConsentForm({
   showSummaryOnly = false,
   className = '',
 }: ResearchConsentFormProps) {
-  const { user } = useAuth()
+  const { data: session } = authClient.useSession()
+  const user = session?.user
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [consentStatus, setConsentStatus] = useState<UserConsentStatus | null>(

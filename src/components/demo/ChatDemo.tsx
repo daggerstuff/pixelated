@@ -2,7 +2,8 @@ import React from 'react'
 import type { AIMessage } from '../../lib/ai'
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { useStore } from 'nanostores'
 import {
   ChatContainer,
   useChatCompletion,
@@ -25,7 +26,8 @@ export function ChatDemo({
   onCrisisAlert,
   maxMessages = 50,
 }: ChatDemoProps) {
-  const { isAuthenticated } = useAuth()
+  const { data: session } = authClient.useSession()
+  const isAuthenticated = !!session?.user
   const [showAnalysis, setShowAnalysis] = useState(false)
   const [messageCount, setMessageCount] = useState(0)
   const [rateLimitExceeded, setRateLimitExceeded] = useState(false)

@@ -3,7 +3,7 @@ import {
   useChatWithMemory,
   UseChatWithMemoryReturn,
 } from '@/hooks/useChatWithMemory'
-import { useAuth } from '@/hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
 import { ChatContainer } from './ChatContainer'
 
 import { cn } from '@/lib/utils'
@@ -51,7 +51,8 @@ export function MemoryAwareChatSystem({
   showMemoryStats = true,
   showMemoryInsights = true,
 }: MemoryAwareChatSystemProps) {
-  const { user } = useAuth()
+  const { data: session } = authClient.useSession()
+  const user = session?.user
   const [enableMemory, setEnableMemory] = useState(true)
   const [enableAnalysis, setEnableAnalysis] = useState(true)
   const [showSettings, setShowSettings] = useState(false)

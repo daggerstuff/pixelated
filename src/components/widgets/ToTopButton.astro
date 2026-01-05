@@ -18,9 +18,11 @@
 </button>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
-    const toTopButton = document.getElementById("to-top-button");
-    if (!toTopButton) return;
+  // Handle visibility and accessibility logic
+  const handleScroll = () => {
+    const scrollThreshold = 300
+    const toTopButton = document.getElementById('to-top-button')
+    if (!toTopButton) return
 
     const handleClick = () => {
       window.scrollTo({ top: 0 });
@@ -47,29 +49,40 @@
           toTopButton.removeAttribute("disabled");
         }
       } else {
-        // Mobile/Tablet: always accessible (CSS makes it always visible via lt-lgp)
-        toTopButton.removeAttribute("tabindex");
-        toTopButton.removeAttribute("aria-hidden");
-        toTopButton.removeAttribute("disabled");
+        // Visible state
+        toTopButton.style.opacity = '0.3'
+        toTopButton.style.pointerEvents = 'auto'
+        toTopButton.setAttribute('tabindex', '0')
+        toTopButton.setAttribute('aria-hidden', 'false')
       }
-    };
+    } else {
+      // On mobile, reset to CSS defaults (which are visible)
+      // Remove inline styles so CSS classes take over
+      toTopButton.style.opacity = ''
+      toTopButton.style.pointerEvents = ''
+      // Reset accessibility attributes to visible state
+      toTopButton.setAttribute('tabindex', '0')
+      toTopButton.setAttribute('aria-hidden', 'false')
+    }
+  }
 
-    toTopButton.addEventListener("click", handleClick);
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll);
+  // Set up event listeners
+  document.addEventListener('astro:page-load', () => {
+    const toTopButton = document.getElementById('to-top-button')
 
-    // Initial check
-    handleScroll();
+    // Add click handler
+    if (toTopButton) {
+      toTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    }
 
-    // Cleanup listeners on page navigation
-    document.addEventListener(
-      "astro:before-preparation",
-      () => {
-        window.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("resize", handleScroll);
-        toTopButton.removeEventListener("click", handleClick);
-      },
-      { once: true },
-    );
-  });
+    // Initialize state on load
+    handleScroll()
+  })
+
+  // Listen for scroll and resize events globally
+  // (These persist across View Transitions in SPA mode, which is fine)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleScroll, { passive: true })
 </script>
