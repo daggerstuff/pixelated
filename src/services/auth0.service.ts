@@ -6,7 +6,6 @@
  */
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
-import type { User } from 'auth0'
 import type { Db } from 'mongodb'
 import { mongodb } from '../config/mongodb.config'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
@@ -33,7 +32,8 @@ let auth0Authentication: AuthenticationClient | null = null
  */
 function initializeAuth0Clients() {
   if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
-    throw new Error('Auth0 configuration is incomplete. Please check environment variables.')
+    console.warn('Auth0 configuration is incomplete. Authentication features may not work.')
+    return
   }
 
   if (!auth0Management) {
@@ -196,6 +196,35 @@ export class Auth0UserService {
     } catch (error) {
       console.error('Auth0 get user error:', error)
       return null
+    }
+  }
+
+  /**
+   * Get all users (admin only)
+   * @returns Array of user objects
+   */
+  async getAllUsers(): Promise<any[]> {
+    if (!auth0Management) {
+      throw new Error('Auth0 management client not initialized')
+    }
+
+    try {
+      const users = await auth0Management.getUsers()
+      return users.map(user => ({
+        id: user.user_id,
+        email: user.email,
+        emailVerified: user.email_verified,
+        role: this.extractRoleFromUser(user),
+        fullName: user.name,
+        avatarUrl: user.picture,
+        createdAt: user.created_at,
+        lastLogin: user.last_login,
+        appMetadata: user.app_metadata,
+        userMetadata: user.user_metadata
+      }))
+    } catch (error) {
+      console.error('Auth0 get all users error:', error)
+      return []
     }
   }
 
@@ -706,6 +735,10 @@ export async function revokeToken(refreshToken: string) {
   await auth0UserService.signOut(refreshToken)
 }
 
+export async function revokeRefreshToken(refreshToken: string) {
+  await auth0UserService.signOut(refreshToken)
+}
+
 export async function refreshToken(token: string) {
   return await auth0UserService.refreshSession(token)
 }
@@ -800,6 +833,10 @@ export async function getUserPreferredWebAuthnCredential(userId: string) {
   return await auth0UserService.getUserPreferredWebAuthnCredential(userId)
 }
 
+export async function getAllUsers() {
+  return await auth0UserService.getAllUsers()
+}
+
 // Placeholder for OAuth verification (to be implemented)
 export async function verifyOAuthCode(_code: string) {
   throw new Error('OAuth verification not implemented yet')
@@ -810,6 +847,7 @@ export default {
   getUserById,
   createUser,
   revokeToken,
+  revokeRefreshToken,
   refreshToken,
   findUserByEmail,
   signIn,
@@ -833,5 +871,6 @@ export default {
   renameWebAuthnCredential,
   userHasWebAuthnCredentials,
   getUserPreferredWebAuthnCredential,
+  getAllUsers,
   verifyOAuthCode,
 }
