@@ -91,7 +91,7 @@ export {
   csrfProtection,
   securityHeaders,
   createAuthMiddlewareStack,
-} from './middleware'
+} from './auth0-middleware'
 
 export type {
   AuthenticatedRequest,
@@ -229,4 +229,4 @@ export const auth = {
   authenticate,
   createUser,
 }
-export { requirePageAuth as requireAuth } from './serverAuth'
+export { requirePageAuth as requireAuth } from '../auth'

@@ -163,7 +163,7 @@ describe('useReports hooks', () => {
             )
 
             const payload = {
-                reportType: 'summary' as const,
+                reportType: 'summary_report' as const,
                 format: 'json' as const,
             }
 
@@ -188,7 +188,7 @@ describe('useReports hooks', () => {
             )
 
             result.current.mutate({
-                reportType: 'summary',
+                reportType: 'summary_report',
                 format: 'json',
             })
 

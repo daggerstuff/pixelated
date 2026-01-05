@@ -1,10 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  generateReport,
   getReport,
   listReports,
+  type Report,
+  type ReportGeneratePayload,
   type ReportList,
 } from '@/lib/api/journal-research'
-import { journalResearchQueryKeys } from '@/lib/api/journal-research/react-query'
+import {
+  journalResearchMutationKeys,
+  journalResearchQueryKeys,
+} from '@/lib/api/journal-research/react-query'
 
 interface UseReportListOptions {
   page?: number
@@ -39,6 +45,21 @@ export const useReportQuery = (
     ),
     queryFn: () => getReport(sessionId ?? '', reportId ?? ''),
     enabled: Boolean(sessionId && reportId) && enabled,
+  })
+}
+
+export const useGenerateReportMutation = (sessionId: string | null) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: journalResearchMutationKeys.reports.generate(),
+    mutationFn: (payload: ReportGeneratePayload) =>
+      generateReport(sessionId ?? '', payload),
+    onSuccess: (result: Report) => {
+      queryClient.invalidateQueries({
+        queryKey: journalResearchQueryKeys.reports.list(result.sessionId, {}),
+        exact: false,
+      })
+    },
   })
 }
 
