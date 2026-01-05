@@ -141,28 +141,8 @@
     },
     "typescript.tsdk": "node_modules/typescript/lib",
     "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:uv",
+    "python-envs.defaultPackageManager": "ms-python.python:pip",
     "python-envs.pythonProjects": [],
-    "github.copilot.chat.customOAIModels": {
-        "moonshotai/kimi-k2-instruct-0905": {
-            "name": "Kimi-K2-Instruct",
-            "url": "https://integrate.api.nvidia.com/v1",
-            "requiresAPIKey": true,
-            "toolCalling": true,
-            "vision": false,
-            "maxInputTokens": 256000,
-            "maxOutputTokens": 4096
-        },
-        "qwen/qwen3-next-80b-a3b-instruct": {
-            "name": "Qwen3-Next-Instruct",
-            "url": "https://integrate.api.nvidia.com/v1",
-            "requiresAPIKey": true,
-            "toolCalling": true,
-            "vision": false,
-            "maxInputTokens": 256000,
-            "maxOutputTokens": 4096
-        }
-    },
     "files.autoSave": "afterDelay",
     "workbench.editor.enablePreview": false,
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
@@ -192,31 +172,34 @@
     },
     "terminal.integrated.env.linux": {
         "FIG_DISABLE": "1"
-},
-"python.languageServer": "None",
-"sonarlint.connectedMode.project": {
-    "connectionId": "pixelatedempathy",
-    "projectKey": "pixelatedempathy_pixelated"
-},
-"oxc.enable": true,
-"specstory.cloudSync.enabled": "always",
-"claude-history.dashboard.enableButton": true,
-"claude-history.leaderboard.enableSharing": true,
-"claude-history.statusBar.showUsage": true,
-"claudeCode.allowDangerouslySkipPermissions": true,
-"claudeCode.respectGitIgnore": false,
-"git.autofetch": "all",
-"git.autofetchPeriod": 360,
-"git.defaultBranchName": "master",
-"git.detectSubmodules": true,
-"git.detectWorktrees": true,
-"git.diagnosticsCommitHook.Enabled": true,
-"kaggle.cliPath": "/home/vivi/pixelated/.venv/bin/kaggle",
-"editor.fontFamily": "JetBrains Mono",
-"scm.inputFontFamily": "editor",
-"extensions.experimental.deferredStartupFinishedActivation": false,
-"kaggle.defaultInternet": true,
-"npm.packageManager": "pnpm",
-"markdown.validate.enabled": true,
-"terminal.integrated.developer.devMode": true
+    },
+    "python.languageServer": "None",
+    "sonarlint.connectedMode.project": {
+        "connectionId": "pixelatedempathy",
+        "projectKey": "pixelatedempathy_pixelated"
+    },
+    "oxc.enable": true,
+    "specstory.cloudSync.enabled": "always",
+    "claude-history.dashboard.enableButton": true,
+    "claude-history.leaderboard.enableSharing": true,
+    "claude-history.statusBar.showUsage": true,
+    "claudeCode.allowDangerouslySkipPermissions": true,
+    "claudeCode.respectGitIgnore": false,
+    "git.autofetch": "all",
+    "git.autofetchPeriod": 360,
+    "git.defaultBranchName": "master",
+    "git.detectSubmodules": true,
+    "git.detectWorktrees": true,
+    "git.diagnosticsCommitHook.Enabled": true,
+    "kaggle.cliPath": "/home/vivi/pixelated/.venv/bin/kaggle",
+    "editor.fontFamily": "JetBrains Mono",
+    "scm.inputFontFamily": "editor",
+    "extensions.experimental.deferredStartupFinishedActivation": false,
+    "kaggle.defaultInternet": true,
+    "npm.packageManager": "pnpm",
+    "markdown.validate.enabled": true,
+    "terminal.integrated.developer.devMode": true,
+    "[azure-pipelines]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

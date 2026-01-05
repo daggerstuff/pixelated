@@ -1,0 +1,65 @@
+[
+  {
+    "email": "therapist@pixelated.com",
+    "email_verified": true,
+    "password": "TempPass123!",
+    "connection": "Username-Password-Authentication",
+    "user_metadata": {
+      "role": "therapist",
+      "created_at": "2025-08-04T11:07:25.193Z",
+      "profile": {
+        "firstName": "Dr. Sarah",
+        "lastName": "Johnson",
+        "bio": "Licensed Clinical Psychologist specializing in AI-assisted therapy"
+      }
+    },
+    "app_metadata": {
+      "roles": [
+        "Therapist"
+      ],
+      "imported_from": "mongodb"
+    }
+  },
+  {
+    "email": "user@pixelated.com",
+    "email_verified": true,
+    "password": "TempPass123!",
+    "connection": "Username-Password-Authentication",
+    "user_metadata": {
+      "role": "user",
+      "created_at": "2025-08-04T11:07:25.193Z",
+      "profile": {
+        "firstName": "Demo",
+        "lastName": "User",
+        "bio": "Sample user account for testing"
+      }
+    },
+    "app_metadata": {
+      "roles": [
+        "User"
+      ],
+      "imported_from": "mongodb"
+    }
+  },
+  {
+    "email": "admin@pixelated.com",
+    "email_verified": true,
+    "password": "TempPass123!",
+    "connection": "Username-Password-Authentication",
+    "user_metadata": {
+      "role": "admin",
+      "created_at": "2025-08-04T11:07:25.193Z",
+      "profile": {
+        "firstName": "Admin",
+        "lastName": "User",
+        "bio": "System Administrator"
+      }
+    },
+    "app_metadata": {
+      "roles": [
+        "Admin"
+      ],
+      "imported_from": "mongodb"
+    }
+  }
+]

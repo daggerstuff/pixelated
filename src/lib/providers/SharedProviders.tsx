@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import React from 'react'
 import { AnalyticsProvider } from './AnalyticsProvider'
-import { AuthProvider } from './AuthProvider'
 
 import { ErrorBoundary } from './ErrorBoundary'
 import { NotificationProvider } from './NotificationProvider'
@@ -17,10 +16,6 @@ interface SharedProvidersProps {
     theme?: {
       theme?: 'light' | 'dark'
       systemPreference?: boolean
-    }
-    auth?: {
-      user?: Record<string, unknown>
-      isAuthenticated?: boolean
     }
   }
   /**
@@ -54,15 +49,13 @@ export function SharedProviders({
     <ErrorBoundary onError={onError}>
       <ThemeProvider initialState={initialState.theme}>
         <SecurityProvider level={securityLevel}>
-          <AuthProvider initialState={initialState.auth}>
-            {enableNotifications && (
-              <NotificationProvider>{children}</NotificationProvider>
-            )}
-            {enableAnalytics && (
-              <AnalyticsProvider>{children}</AnalyticsProvider>
-            )}
-            {!enableAnalytics && !enableNotifications && children}
-          </AuthProvider>
+          {enableNotifications && (
+            <NotificationProvider>{children}</NotificationProvider>
+          )}
+          {enableAnalytics && (
+            <AnalyticsProvider>{children}</AnalyticsProvider>
+          )}
+          {!enableAnalytics && !enableNotifications && children}
         </SecurityProvider>
       </ThemeProvider>
     </ErrorBoundary>

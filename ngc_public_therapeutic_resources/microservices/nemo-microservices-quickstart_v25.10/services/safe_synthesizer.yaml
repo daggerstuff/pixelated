@@ -1,0 +1,23 @@
+services:
+  safe-synthesizer:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/safe-synthesizer-api:${NEMO_MICROSERVICES_IMAGE_TAG}
+    profiles: [safe-synthesizer, platform]
+    ports:
+      - "8000"
+    networks:
+      - nmp
+    configs:
+      - source: platform_config
+        target: /etc/nmp/config.yaml
+        gid: "1000"
+        uid: "1000"
+    environment:
+      - NIM_API_KEY
+      - NEMO_MICROSERVICES_SAFE_SYNTHESIZER_IMAGE=${NEMO_MICROSERVICES_IMAGE_REGISTRY}/safe-synthesizer:${NEMO_MICROSERVICES_IMAGE_TAG}
+    depends_on:
+      datastore:
+        condition: service_started
+      jobs-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; assert urllib.request.urlopen('http://localhost:8000/health').status == 200"]

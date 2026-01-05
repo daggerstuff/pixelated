@@ -1,0 +1,1619 @@
+{
+  "version": "1.0.0",
+  "lockfileVersion": 1,
+  "packages": {
+    "thinking-framework#cursor": {
+      "version": "3.0.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/thinking-framework/3.0.1.tar.gz",
+      "integrity": "sha256-4536b72082351cbd738e7ee9d1bda816f371682d722a65991713f83608dffbc4",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/thinking-framework",
+      "fromCollection": {
+        "name_slug": "thinking-research-framework",
+        "version": "1.0.5"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/thinking-framework",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "thinking-framework",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/thinking-framework",
+        "skillName": "thinking-framework",
+        "eager": false
+      }
+    },
+    "web-research#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/web-research/1.0.0.tar.gz",
+      "integrity": "sha256-ddd4c97b67e2f423848863ff6ebeba0ff62b42f720ef0da1eadaf9dbd10de25d",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/web-research",
+      "fromCollection": {
+        "name_slug": "thinking-research-framework",
+        "version": "1.0.5"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/web-research",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "web-research",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/web-research",
+        "skillName": "web-research",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/accessibility-compliance/ui-visual-validator#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Faccessibility-compliance%2Fui-visual-validator/1.0.0.tar.gz",
+      "integrity": "sha256-bc9153bc33cd0a5e02912b6b89415a3894499e8237f83ade793327e82da3e678",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/ui-visual-validator/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/ui-visual-validator",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "ui-visual-validator",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/ui-visual-validator",
+        "skillName": "ui-visual-validator",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/agent-orchestration/context-manager#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fagent-orchestration%2Fcontext-manager/1.0.0.tar.gz",
+      "integrity": "sha256-35ac7263f23ba611cada36ff7189faafeb0bdc086c78f14ef6f8ee7068bea4ad",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/context-manager/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/context-manager",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "context-manager",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/context-manager",
+        "skillName": "context-manager",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/api-scaffolding/backend-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapi-scaffolding%2Fbackend-architect/1.0.0.tar.gz",
+      "integrity": "sha256-c5592bbfa2d38f976b4b210890684447f960c8e8c81605adbf4da774f33a1638",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-architect",
+        "skillName": "backend-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/api-scaffolding/django-pro#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapi-scaffolding%2Fdjango-pro/1.0.0.tar.gz",
+      "integrity": "sha256-1ef74c64236d183fb118fdc0a85852e8b437821b06a386e0fcc5cc73e4847912",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/django-pro/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/django-pro",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "django-pro",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/django-pro",
+        "skillName": "django-pro",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/api-scaffolding/fastapi-pro#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapi-scaffolding%2Ffastapi-pro/1.0.0.tar.gz",
+      "integrity": "sha256-b6d30cd95bfa04598c58cf1393ec9576eaf9338afd18cba30a2e5eaad3191d9e",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/fastapi-pro/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/fastapi-pro",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "fastapi-pro",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/fastapi-pro",
+        "skillName": "fastapi-pro",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/api-scaffolding/graphql-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapi-scaffolding%2Fgraphql-architect/1.0.0.tar.gz",
+      "integrity": "sha256-98c2ada44c65949427c725799f26d733af5b3da8e9bcdf8993265d10eb627f33",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/graphql-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/graphql-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "graphql-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/graphql-architect",
+        "skillName": "graphql-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/api-testing-observability/api-documenter#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapi-testing-observability%2Fapi-documenter/1.0.0.tar.gz",
+      "integrity": "sha256-b4cf378cf5db317a14fd024e12d4fdff3ec24ed7ab1908a3907d168f06109358",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/api-documenter/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/api-documenter",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "api-documenter",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/api-documenter",
+        "skillName": "api-documenter",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/application-performance/frontend-developer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapplication-performance%2Ffrontend-developer/1.0.0.tar.gz",
+      "integrity": "sha256-328b5ac5e751bea91d56c4551bb29964ed6e1ec0f2dfb16a830a59476858e1f9",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/frontend-developer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/frontend-developer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "frontend-developer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/frontend-developer",
+        "skillName": "frontend-developer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/application-performance/observability-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fapplication-performance%2Fobservability-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-23902f1e22509adcbe0d756b021ab4eb6802ac3649bba513f62145ce66811d9d",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/observability-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/observability-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "observability-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/observability-engineer",
+        "skillName": "observability-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/backend-api-security/backend-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbackend-api-security%2Fbackend-architect/1.0.0.tar.gz",
+      "integrity": "sha256-cb902cacd0ec359cab2e7cc457624594987b10bfbc1fe5879052627c34ce6bb0",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-architect",
+        "skillName": "backend-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/backend-api-security/backend-security-coder#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbackend-api-security%2Fbackend-security-coder/1.0.0.tar.gz",
+      "integrity": "sha256-f0ee3b98cdae38a9e6099d1fff11fad587ddf2aeec6e79a1a9f92a2eb3bf58fb",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-security-coder/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-security-coder",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-security-coder",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-security-coder",
+        "skillName": "backend-security-coder",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/backend-development/backend-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbackend-development%2Fbackend-architect/1.0.0.tar.gz",
+      "integrity": "sha256-6bfa054ba7d512d5291bb569b0815d39bb8a7c0f7562f03636a4141fa9718e6a",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-architect",
+        "skillName": "backend-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/backend-development/graphql-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbackend-development%2Fgraphql-architect/1.0.0.tar.gz",
+      "integrity": "sha256-056da5928084c327742dc907662da9936bdc2a7dc458de919f31f6c1b6b291e6",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/graphql-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/graphql-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "graphql-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/graphql-architect",
+        "skillName": "graphql-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/backend-development/tdd-orchestrator#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbackend-development%2Ftdd-orchestrator/1.0.0.tar.gz",
+      "integrity": "sha256-18a3ff4713b3754619e16527376ed16abe05df21dd4ec90ee177a08611074981",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/tdd-orchestrator/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/tdd-orchestrator",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "tdd-orchestrator",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/tdd-orchestrator",
+        "skillName": "tdd-orchestrator",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/blockchain-web3/blockchain-developer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fblockchain-web3%2Fblockchain-developer/1.0.0.tar.gz",
+      "integrity": "sha256-5499a25b846f909e4d03e713e903844f5718b36aea81f297f62930f5ba79c3b8",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/blockchain-developer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "security-review-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/blockchain-developer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "blockchain-developer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/blockchain-developer",
+        "skillName": "blockchain-developer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cicd-automation/cloud-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcicd-automation%2Fcloud-architect/1.0.0.tar.gz",
+      "integrity": "sha256-a4047ba78c9155aac054383995ab448fa643752710563b91970badca2963c452",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/cloud-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/cloud-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "cloud-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/cloud-architect",
+        "skillName": "cloud-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cicd-automation/deployment-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcicd-automation%2Fdeployment-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-4387b408109235471a2e1be7ed94e5d3bb75bde1e96e22e205585282db9050f1",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/deployment-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/deployment-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "deployment-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/deployment-engineer",
+        "skillName": "deployment-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cicd-automation/devops-troubleshooter#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcicd-automation%2Fdevops-troubleshooter/1.0.0.tar.gz",
+      "integrity": "sha256-fbe5b83b23c5ce904423a8ea3897377305bf6557815e40e66ff1db1deff3f831",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/devops-troubleshooter/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/devops-troubleshooter",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "devops-troubleshooter",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/devops-troubleshooter",
+        "skillName": "devops-troubleshooter",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cicd-automation/kubernetes-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcicd-automation%2Fkubernetes-architect/1.0.0.tar.gz",
+      "integrity": "sha256-1bae9ecb6c737dfe916332f226eef27e7ee74899b1faf233fc43f57039dffc69",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/kubernetes-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/kubernetes-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "kubernetes-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/kubernetes-architect",
+        "skillName": "kubernetes-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cicd-automation/terraform-specialist#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcicd-automation%2Fterraform-specialist/1.0.0.tar.gz",
+      "integrity": "sha256-52d1026506cbc66b502e357956dda986c1dbdf4930e20c7e61b2d1c5bdaa15e6",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/terraform-specialist/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/terraform-specialist",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "terraform-specialist",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/terraform-specialist",
+        "skillName": "terraform-specialist",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/cicd-automation/workflow-automate#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fcicd-automation%2Fworkflow-automate/1.0.0.tar.gz",
+      "integrity": "sha256-b292c767db06efac8bf918777f5c12c742739cc70a68251830a8988fbf12a9de",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/workflow-automate.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cicd-automation",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/agents/business-analytics/business-analyst#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fbusiness-analytics%2Fbusiness-analyst/1.0.0.tar.gz",
+      "integrity": "sha256-1ac1335ba4dfbc389b04c8f41cdcfd3a899b2c272267d77f8dcfcb676cf416d8",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/business-analyst/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-business-analytics",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/business-analyst",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "business-analyst",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/business-analyst",
+        "skillName": "business-analyst",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/comprehensive-review/architect-review#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcomprehensive-review%2Farchitect-review/1.0.0.tar.gz",
+      "integrity": "sha256-c5180ea56d9d13bb6bf3faeb9b47c90c4dfafb17375a27caf9ef085fed34ad1d",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/architect-review/AGENT.md",
+      "fromCollection": {
+        "name_slug": "comprehensive-review",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/architect-review",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "architect-review",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/architect-review",
+        "skillName": "architect-review",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/comprehensive-review/code-reviewer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcomprehensive-review%2Fcode-reviewer/1.0.0.tar.gz",
+      "integrity": "sha256-f3fed111863830a63c87a801bc6f99321fb3d1c656ec67bea2f8a674b6381f2d",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/code-reviewer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "comprehensive-review",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/code-reviewer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "code-reviewer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/code-reviewer",
+        "skillName": "code-reviewer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/comprehensive-review/security-auditor#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcomprehensive-review%2Fsecurity-auditor/1.0.0.tar.gz",
+      "integrity": "sha256-bc0c2f6e413911f4d24eeebac298978a074cbb7543511d7d2c35052842866d2f",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/security-auditor/AGENT.md",
+      "fromCollection": {
+        "name_slug": "comprehensive-review",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/security-auditor",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "security-auditor",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/security-auditor",
+        "skillName": "security-auditor",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/context-management/context-manager#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcontext-management%2Fcontext-manager/1.0.0.tar.gz",
+      "integrity": "sha256-093679b1e114a729439a0c307bbccc8988f3dda0d4b97082966eff83b6989f17",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/context-manager/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-context-management",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/context-manager",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "context-manager",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/context-manager",
+        "skillName": "context-manager",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/context-management/context-restore#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fcontext-management%2Fcontext-restore/1.0.0.tar.gz",
+      "integrity": "sha256-7c73b6009261fc6fbef7bd788b4ee0860cb1a42eb634edbf05217e498806ac53",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/context-restore.md",
+      "fromCollection": {
+        "name_slug": "wshobson-context-management",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/commands/context-management/context-save#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fcontext-management%2Fcontext-save/1.0.0.tar.gz",
+      "integrity": "sha256-a172ab50a57775c5743f27ba499e6c355e21d93b67d3654533fb653995e4ab98",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/context-save.md",
+      "fromCollection": {
+        "name_slug": "wshobson-context-management",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/agents/llm-application-dev/ai-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fllm-application-dev%2Fai-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-a9de4cd4ebd4787032458dc2f4d448f83a68423bbb9f17fc4ff7e86367bf8b5d",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/ai-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-llm-application-dev",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/ai-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "ai-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/ai-engineer",
+        "skillName": "ai-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/llm-application-dev/prompt-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fllm-application-dev%2Fprompt-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-a08f09355142c2b4a444b15094e5d8aa4c712a16c4601455d454599f11cb4cfc",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/prompt-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-llm-application-dev",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/prompt-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "prompt-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/prompt-engineer",
+        "skillName": "prompt-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/llm-application-dev/ai-assistant#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fllm-application-dev%2Fai-assistant/1.0.0.tar.gz",
+      "integrity": "sha256-e0ec5196faf4d91276ff09c2e03a61ec9dd4a72ba2cf956e74359ce1012e2d8b",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/ai-assistant.md",
+      "fromCollection": {
+        "name_slug": "wshobson-llm-application-dev",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/commands/llm-application-dev/langchain-agent#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fllm-application-dev%2Flangchain-agent/1.0.0.tar.gz",
+      "integrity": "sha256-a4d841def56cd3f8433533e8ba28427a727b716bbde3622b8b9381fe2d3dd5bb",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/langchain-agent.md",
+      "fromCollection": {
+        "name_slug": "wshobson-llm-application-dev",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/commands/llm-application-dev/prompt-optimize#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fllm-application-dev%2Fprompt-optimize/1.0.0.tar.gz",
+      "integrity": "sha256-c0b1fe7c7dd7cdfa5ec7164fa3c7d0549b89563eb62ed1095352b720eaa96515",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/prompt-optimize.md",
+      "fromCollection": {
+        "name_slug": "wshobson-llm-application-dev",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/cloud-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fcloud-architect/1.0.0.tar.gz",
+      "integrity": "sha256-3ba4248bbf59efae7b0ec459f19560c56105e7d242422a26c38112d0e60dc57b",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/cloud-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/cloud-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "cloud-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/cloud-architect",
+        "skillName": "cloud-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/deployment-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fdeployment-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-b17856e51d1923d1f3c92b257e17fab7139467fe2bfdd38e9f78382a71395875",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/deployment-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/deployment-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "deployment-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/deployment-engineer",
+        "skillName": "deployment-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/hybrid-cloud-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fhybrid-cloud-architect/1.0.0.tar.gz",
+      "integrity": "sha256-388fe1329627a12a8279d577f34e11dc23d01b879747cc5966d9f638b1f3e588",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/hybrid-cloud-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/hybrid-cloud-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "hybrid-cloud-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/hybrid-cloud-architect",
+        "skillName": "hybrid-cloud-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/kubernetes-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fkubernetes-architect/1.0.0.tar.gz",
+      "integrity": "sha256-8f39df484630a9b51307834a6068cdfe1c3ef20002f199b2ef0234f76bf5e683",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/kubernetes-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/kubernetes-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "kubernetes-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/kubernetes-architect",
+        "skillName": "kubernetes-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/network-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fnetwork-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-cb1880ec547e52268febc4cb961f56ae79be2426741a9effd38a0301c2710e1e",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/network-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/network-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "network-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/network-engineer",
+        "skillName": "network-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/cloud-infrastructure/terraform-specialist#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fcloud-infrastructure%2Fterraform-specialist/1.0.0.tar.gz",
+      "integrity": "sha256-23db4e6233eadfaf5958c785b16c34a32aea7814360592c353bca6101a1365ab",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/terraform-specialist/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-cloud-infrastructure",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/terraform-specialist",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "terraform-specialist",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/terraform-specialist",
+        "skillName": "terraform-specialist",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/kubernetes-operations/kubernetes-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fkubernetes-operations%2Fkubernetes-architect/1.0.0.tar.gz",
+      "integrity": "sha256-16db23fd81c28c72f4889a21de9400f838b0696830502d765e2e877e5bff797d",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/kubernetes-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-kubernetes-operations",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/kubernetes-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "kubernetes-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/kubernetes-architect",
+        "skillName": "kubernetes-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/data-engineering/backend-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdata-engineering%2Fbackend-architect/1.0.0.tar.gz",
+      "integrity": "sha256-4330f7c3c603ff3dcb605d2857825aecbcc103cfbbc6626f678a4fe003455dc7",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-data-engineering",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-architect",
+        "skillName": "backend-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/data-engineering/data-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdata-engineering%2Fdata-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-e3ff01596d670caaa6a61b6aa7436aafd89efdc272da40b8633f1c6070054363",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/data-engineer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-data-engineering",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/data-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "data-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/data-engineer",
+        "skillName": "data-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/data-engineering/data-driven-feature#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fdata-engineering%2Fdata-driven-feature/1.0.0.tar.gz",
+      "integrity": "sha256-67a1fc8aca68c5ada8fdc28b5b9bd8473eccb9db6c11302be973232be7f4cd96",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/data-driven-feature.md",
+      "fromCollection": {
+        "name_slug": "wshobson-data-engineering",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/commands/data-engineering/data-pipeline#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fdata-engineering%2Fdata-pipeline/1.0.0.tar.gz",
+      "integrity": "sha256-8b3fe26f3079c3eeb1ae76e3457467c27056a385a6324778fc071d5fb1368d0b",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/data-pipeline.md",
+      "fromCollection": {
+        "name_slug": "wshobson-data-engineering",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/agents/full-stack-orchestration/performance-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Ffull-stack-orchestration%2Fperformance-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-32d8cf142fe61056423d0b2c68c97e883b1fe7095e546b5e7002f2dcce2e026f",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/performance-engineer/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/performance-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "performance-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/performance-engineer",
+        "skillName": "performance-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/python-development/python-pro#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fpython-development%2Fpython-pro/1.0.0.tar.gz",
+      "integrity": "sha256-8b85bbd75d5564b1dbf85200d7a13f1a28a00dc0529c72c38c97ff60bdec1834",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/python-pro/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/python-pro",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "python-pro",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/python-pro",
+        "skillName": "python-pro",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/database-cloud-optimization/cost-optimize#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fdatabase-cloud-optimization%2Fcost-optimize/1.0.0.tar.gz",
+      "integrity": "sha256-ca19cbbbd56ac80a7085911683e4c8f52cd1e7223f07a61c96f5added92dafa9",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/cost-optimize.md"
+    },
+    "@camoneart/tech-debt#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40camoneart%2Ftech-debt/1.0.0.tar.gz",
+      "integrity": "sha256-7c10d220bce1c0ef69d07ed4a230b77f305e20b895715a343a4c8affff62ac03",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/tech-debt/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/tech-debt",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "tech-debt",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/tech-debt",
+        "skillName": "tech-debt",
+        "eager": false
+      }
+    },
+    "@prpm/agent-builder-skill#cursor": {
+      "version": "1.0.3",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fagent-builder-skill/1.0.3.tar.gz",
+      "integrity": "sha256-0705011f4d56fad66974f4d5acfe9cc5a47e7d7b289f6aa269c6dd68bf0d3874",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/agent-builder-skill",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/agent-builder-skill",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "agent-builder-skill",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/agent-builder-skill",
+        "skillName": "agent-builder-skill",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/machine-learning-ops/data-scientist#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fmachine-learning-ops%2Fdata-scientist/1.0.0.tar.gz",
+      "integrity": "sha256-263a5a43d4af7af7ba8f0a4ac081f420fbd7e6c38229221fa204826258d06c08",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/data-scientist/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/data-scientist",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "data-scientist",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/data-scientist",
+        "skillName": "data-scientist",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/machine-learning-ops/mlops-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fmachine-learning-ops%2Fmlops-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-55f52dc41b05af6e5c120514200d841e82c1bd1542ce828c105ad359be644afe",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/mlops-engineer/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/mlops-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "mlops-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/mlops-engineer",
+        "skillName": "mlops-engineer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/machine-learning-ops/ml-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fmachine-learning-ops%2Fml-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-2b917147476d541cc73b9cf5a35f53bf4faaecd7952aa94cac198747a2084dcf",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/ml-engineer/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/ml-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "ml-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/ml-engineer",
+        "skillName": "ml-engineer",
+        "eager": false
+      }
+    },
+    "market-strategy#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/market-strategy/1.0.0.tar.gz",
+      "integrity": "sha256-903d3bc983157cfd6d2f6b32355a715c99d0aa06ec11ef1d0ae4442da7cf6d6f",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/market-strategy",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/market-strategy",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "market-strategy",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/market-strategy",
+        "skillName": "market-strategy",
+        "eager": false
+      }
+    },
+    "ai-persona-creator#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/ai-persona-creator/1.0.0.tar.gz",
+      "integrity": "sha256-39a9e6f2a71e10cc5dbeab6836bd0f9706aa61be5d8dffc006a59ab1286f1a69",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/ai-persona-creator",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/ai-persona-creator",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "ai-persona-creator",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/ai-persona-creator",
+        "skillName": "ai-persona-creator",
+        "eager": false
+      }
+    },
+    "@claudekit/cloudflare#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40claudekit%2Fcloudflare/1.0.0.tar.gz",
+      "integrity": "sha256-219621dad338a15703ec4aead3701e015c8cc0f741b1298cc77ff6ede513792e",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/cloudflare/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/cloudflare",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "cloudflare",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/cloudflare",
+        "skillName": "cloudflare",
+        "eager": false
+      }
+    },
+    "@prat011/file-organizer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prat011%2Ffile-organizer/1.0.0.tar.gz",
+      "integrity": "sha256-2165c33aa5951113b82a94f86737cfdf587ba66346e14948abceea4b856fe881",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/file-organizer/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/file-organizer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "file-organizer",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/file-organizer",
+        "skillName": "file-organizer",
+        "eager": false
+      }
+    },
+    "@jezweb/claude-skills-ai-sdk-core#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40jezweb%2Fclaude-skills-ai-sdk-core/1.0.0.tar.gz",
+      "integrity": "sha256-ffb0557223a7397016bf079d46954f942432b25af8bba338749be8a276e408b8",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/claude-skills-ai-sdk-core/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/claude-skills-ai-sdk-core",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "claude-skills-ai-sdk-core",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/claude-skills-ai-sdk-core",
+        "skillName": "claude-skills-ai-sdk-core",
+        "eager": false
+      }
+    },
+    "@sanjeed5/huggingface#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fhuggingface/1.0.0.tar.gz",
+      "integrity": "sha256-9720f876400bd515f476de23636ef9fb44e716c5ea57cd0a8dd9b4693557b1bd",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/huggingface.mdc"
+    },
+    "@voltagent/data-researcher#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40voltagent%2Fdata-researcher/1.0.0.tar.gz",
+      "integrity": "sha256-091844342388250447fad3754eb9e996ae526888d7ddba2524e763a81cfae6bb",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "claude",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/data-researcher.mdc"
+    },
+    "@franklinbaldo/egregora-jules-api#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40franklinbaldo%2Fegregora-jules-api/1.0.0.tar.gz",
+      "integrity": "sha256-3b0daf3013b12acc8a6505e072fdac6b090b7e342b5c0db1c3f66fed6f2820db",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/egregora-jules-api/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/egregora-jules-api",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "egregora-jules-api",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/egregora-jules-api",
+        "skillName": "egregora-jules-api",
+        "eager": false
+      }
+    },
+    "@useforclaude/skills-claude-social-proof-mastery-skill#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40useforclaude%2Fskills-claude-social-proof-mastery-skill/1.0.0.tar.gz",
+      "integrity": "sha256-576a645b3f810cae0aabc9d7ab77bd1374b3a79288d3cca29ddeec364ab91974",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skills-claude-social-proof-mastery-skill/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skills-claude-social-proof-mastery-skill",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skills-claude-social-proof-mastery-skill",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skills-claude-social-proof-mastery-skill",
+        "skillName": "skills-claude-social-proof-mastery-skill",
+        "eager": false
+      }
+    },
+    "@phrazzld/claude-config-ai-llm-development#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40phrazzld%2Fclaude-config-ai-llm-development/1.0.0.tar.gz",
+      "integrity": "sha256-50717100cc1409cb01bcce95bf2d5436ca27ef4f0e04a6238748a2be5758645f",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/claude-config-ai-llm-development/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/claude-config-ai-llm-development",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "claude-config-ai-llm-development",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/claude-config-ai-llm-development",
+        "skillName": "claude-config-ai-llm-development",
+        "eager": false
+      }
+    },
+    "@vamfi/claude-user-memory-pattern-recognition-skill-md#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40vamfi%2Fclaude-user-memory-pattern-recognition-skill-md/1.0.0.tar.gz",
+      "integrity": "sha256-6ca5159a7e0aed3d0949bacb739e48c3ddbaabcf807a5ab0cfaa2ee90d829a40",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/claude-user-memory-pattern-recognition-skill-md/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/claude-user-memory-pattern-recognition-skill-md",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "claude-user-memory-pattern-recognition-skill-md",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/claude-user-memory-pattern-recognition-skill-md",
+        "skillName": "claude-user-memory-pattern-recognition-skill-md",
+        "eager": false
+      }
+    },
+    "@juanre/llmemory-hybrid-search#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40juanre%2Fllmemory-hybrid-search/1.0.0.tar.gz",
+      "integrity": "sha256-c7a4a7ad8ed1cf383fb58effc9ef0b6f56363851d66103d885dad68a9470c53a",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/llmemory-hybrid-search/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/llmemory-hybrid-search",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "llmemory-hybrid-search",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/llmemory-hybrid-search",
+        "skillName": "llmemory-hybrid-search",
+        "eager": false
+      }
+    },
+    "@obra/skill-subagent-driven-development#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-subagent-driven-development/3.4.1.tar.gz",
+      "integrity": "sha256-01d7b6dd9c03d03cea723e7021399fbca6ddd1f1ffb11bcf4ef2f5691a27c122",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-subagent-driven-development/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-subagent-driven-development",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-subagent-driven-development",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-subagent-driven-development",
+        "skillName": "skill-subagent-driven-development",
+        "eager": false
+      }
+    },
+    "@obra/skill-condition-based-waiting#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-condition-based-waiting/3.4.1.tar.gz",
+      "integrity": "sha256-12651a43e19f34d2e47c1373011b27f4d40629b8942e052bb59b976ec5cdd80a",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-condition-based-waiting",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-condition-based-waiting",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-condition-based-waiting",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-condition-based-waiting",
+        "skillName": "skill-condition-based-waiting",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/full-stack-orchestration/deployment-engineer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Ffull-stack-orchestration%2Fdeployment-engineer/1.0.0.tar.gz",
+      "integrity": "sha256-e7fd91b4022840dc6d8c70d3f8b22955cff82c1f25c0af7af84158b3c39ca915",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/deployment-engineer/AGENT.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/deployment-engineer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "deployment-engineer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/deployment-engineer",
+        "skillName": "deployment-engineer",
+        "eager": false
+      }
+    },
+    "@prpm/pulumi-troubleshooting-skill#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fpulumi-troubleshooting-skill/1.0.0.tar.gz",
+      "integrity": "sha256-a7c70171f8a82fa1ece77d91dff5d3dce82d2957aec11be12cddc5f9df1f8072",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/pulumi-troubleshooting-skill/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/pulumi-troubleshooting-skill",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "pulumi-troubleshooting-skill",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/pulumi-troubleshooting-skill",
+        "skillName": "pulumi-troubleshooting-skill",
+        "eager": false
+      }
+    },
+    "@prpm/self-improving#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fself-improving/1.0.0.tar.gz",
+      "integrity": "sha256-55ed1cb14c2740122193aef466f811fe6252667e817c63d30631fe1b0ccbb26f",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/self-improving/SKILL.md",
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/self-improving",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "self-improving",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/self-improving",
+        "skillName": "self-improving",
+        "eager": false
+      }
+    }
+  },
+  "generated": "2025-12-31T12:00:04.624Z",
+  "collections": {
+    "thinking-research-framework": {
+      "name_slug": "thinking-research-framework",
+      "version": "1.0.5",
+      "installedAt": "2025-12-31T11:17:31.958Z",
+      "packages": [
+        "thinking-framework",
+        "web-research"
+      ]
+    },
+    "security-review-agents": {
+      "name_slug": "security-review-agents",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:18:06.935Z",
+      "packages": [
+        "@wshobson/agents/accessibility-compliance/ui-visual-validator",
+        "@wshobson/agents/agent-orchestration/context-manager",
+        "@wshobson/agents/api-scaffolding/backend-architect",
+        "@wshobson/agents/api-scaffolding/django-pro",
+        "@wshobson/agents/api-scaffolding/fastapi-pro",
+        "@wshobson/agents/api-scaffolding/graphql-architect",
+        "@wshobson/agents/api-testing-observability/api-documenter",
+        "@wshobson/agents/application-performance/frontend-developer",
+        "@wshobson/agents/application-performance/observability-engineer",
+        "@wshobson/agents/backend-api-security/backend-architect",
+        "@wshobson/agents/backend-api-security/backend-security-coder",
+        "@wshobson/agents/backend-development/backend-architect",
+        "@wshobson/agents/backend-development/graphql-architect",
+        "@wshobson/agents/backend-development/tdd-orchestrator",
+        "@wshobson/agents/blockchain-web3/blockchain-developer"
+      ]
+    },
+    "wshobson-cicd-automation": {
+      "name_slug": "wshobson-cicd-automation",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:19:10.229Z",
+      "packages": [
+        "@wshobson/agents/cicd-automation/cloud-architect",
+        "@wshobson/agents/cicd-automation/deployment-engineer",
+        "@wshobson/agents/cicd-automation/devops-troubleshooter",
+        "@wshobson/agents/cicd-automation/kubernetes-architect",
+        "@wshobson/agents/cicd-automation/terraform-specialist",
+        "@wshobson/commands/cicd-automation/workflow-automate"
+      ]
+    },
+    "wshobson-business-analytics": {
+      "name_slug": "wshobson-business-analytics",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:21:00.218Z",
+      "packages": [
+        "@wshobson/agents/business-analytics/business-analyst"
+      ]
+    },
+    "comprehensive-review": {
+      "name_slug": "comprehensive-review",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:21:15.588Z",
+      "packages": [
+        "@wshobson/agents/comprehensive-review/architect-review",
+        "@wshobson/agents/comprehensive-review/code-reviewer",
+        "@wshobson/agents/comprehensive-review/security-auditor"
+      ]
+    },
+    "wshobson-context-management": {
+      "name_slug": "wshobson-context-management",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:21:29.855Z",
+      "packages": [
+        "@wshobson/agents/context-management/context-manager",
+        "@wshobson/commands/context-management/context-restore",
+        "@wshobson/commands/context-management/context-save"
+      ]
+    },
+    "wshobson-llm-application-dev": {
+      "name_slug": "wshobson-llm-application-dev",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:21:40.449Z",
+      "packages": [
+        "@wshobson/agents/llm-application-dev/ai-engineer",
+        "@wshobson/agents/llm-application-dev/prompt-engineer",
+        "@wshobson/commands/llm-application-dev/ai-assistant",
+        "@wshobson/commands/llm-application-dev/langchain-agent",
+        "@wshobson/commands/llm-application-dev/prompt-optimize"
+      ]
+    },
+    "wshobson-cloud-infrastructure": {
+      "name_slug": "wshobson-cloud-infrastructure",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:22:21.771Z",
+      "packages": [
+        "@wshobson/agents/cloud-infrastructure/cloud-architect",
+        "@wshobson/agents/cloud-infrastructure/deployment-engineer",
+        "@wshobson/agents/cloud-infrastructure/hybrid-cloud-architect",
+        "@wshobson/agents/cloud-infrastructure/kubernetes-architect",
+        "@wshobson/agents/cloud-infrastructure/network-engineer",
+        "@wshobson/agents/cloud-infrastructure/terraform-specialist"
+      ]
+    },
+    "wshobson-kubernetes-operations": {
+      "name_slug": "wshobson-kubernetes-operations",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:23:05.049Z",
+      "packages": [
+        "@wshobson/agents/kubernetes-operations/kubernetes-architect"
+      ]
+    },
+    "wshobson-data-engineering": {
+      "name_slug": "wshobson-data-engineering",
+      "version": "1.0.0",
+      "installedAt": "2025-12-31T11:23:20.785Z",
+      "packages": [
+        "@wshobson/agents/data-engineering/backend-architect",
+        "@wshobson/agents/data-engineering/data-engineer",
+        "@wshobson/commands/data-engineering/data-driven-feature",
+        "@wshobson/commands/data-engineering/data-pipeline"
+      ]
+    }
+  }
+}

@@ -1,0 +1,66 @@
+name: nemo-microservices
+
+configs:
+  platform_config:
+    content: |
+      # platform is the platform-wide configuration for NeMo Microservices Platform
+      platform:
+        debug: false
+        log_level: "INFO"
+        base_url: "http://envoy-gateway:8000"
+        jobs_url: "http://jobs-api:8000"
+        datastore_url: "http://datastore:3000/v1/hf"
+
+      data_designer:
+        seed_dataset_source_registry:
+          sources:
+            - endpoint: "http://datastore:3000/v1/hf"
+
+        model_provider_registry:
+          default: "nvidiabuild"
+          providers:
+            - name: "nvidiabuild"
+              endpoint: "https://integrate.api.nvidia.com/v1"
+              api_key: "NIM_API_KEY"
+      safe_synthesizer:
+        classify_llm_endpoint_url: "https://integrate.api.nvidia.com/v1"
+        classify_llm_model_id: "qwen/qwen2.5-coder-32b-instruct"
+
+      jobs:
+        secrets:
+          backend: vault
+          vault:
+            address: "http://openbao:8200"
+            token: "root"
+
+        executors:
+          - provider: cpu
+            profile: default
+            backend: docker
+            config:
+              storage:
+                volume_name: nemo-microservices_jobs_storage
+          - provider: gpu
+            profile: default
+            backend: docker
+            config:
+              storage:
+                volume_name: nemo-microservices_jobs_storage
+
+include:
+  # Platform infra
+  - services/envoy.yaml
+  - services/infrastructure.yaml
+
+  # Functional microservice
+  - services/data_designer.yaml
+  - services/auditor.yaml
+  - services/evaluator.yaml
+  - services/guardrails.yaml
+  - services/customizer.yaml
+  - services/safe_synthesizer.yaml
+
+
+networks:
+  nmp:
+    driver: bridge

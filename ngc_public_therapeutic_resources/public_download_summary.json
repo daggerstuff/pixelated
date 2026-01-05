@@ -1,0 +1,110 @@
+{
+  "discovery_session": {
+    "timestamp": "2026-01-02T00:23:19.471140",
+    "total_time_seconds": 70.44187617301941,
+    "total_time_formatted": "1.2 minutes",
+    "output_directory": "/home/vivi/pixelated/ngc_public_therapeutic_resources",
+    "successful_downloads": 1,
+    "failed_downloads": 4,
+    "success_rate": "20.0%"
+  },
+  "categories": {
+    "microservices": {
+      "total_resources": 2,
+      "successful": 1,
+      "failed": 1,
+      "permission_denied": 1,
+      "resources": {
+        "nvidia/nemo-microservices/nemo-microservices-quickstart": {
+          "status": "success",
+          "resource_path": "nvidia/nemo-microservices/nemo-microservices-quickstart",
+          "category": "microservices",
+          "type": "resource",
+          "downloaded_path": "/home/vivi/pixelated/ngc_public_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10",
+          "download_time": 17.845728635787964,
+          "size_estimate": "Small (~500MB)",
+          "use_case": "Deploying conversation models as microservices",
+          "description": "NeMo microservices quickstart package"
+        },
+        "nvidia/nemo-microservices/nemo-data-designer": {
+          "status": "error",
+          "resource_path": "nvidia/nemo-microservices/nemo-data-designer",
+          "category": "microservices",
+          "type": "resource",
+          "error": "Failed to download nvidia/nemo-microservices/nemo-data-designer:latest:\nClient Error: 403 Response: Access Denied - Request Id: c9879a79-2437879 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/nemo-microservices/resources/nemo-data-designer?resolve-labels=false\n",
+          "is_permission_error": true,
+          "download_time": 10.960667848587036,
+          "use_case": "Creating synthetic therapeutic conversation data",
+          "description": "Data designer for creating training datasets"
+        }
+      }
+    },
+    "collections": {
+      "total_resources": 2,
+      "successful": 0,
+      "failed": 2,
+      "permission_denied": 2,
+      "resources": {
+        "nvidia/nemo/examples": {
+          "status": "error",
+          "resource_path": "nvidia/nemo/examples",
+          "category": "collections",
+          "type": "resource",
+          "error": "Failed to download nvidia/nemo/examples:latest:\nClient Error: 403 Response: Access Denied - Request Id: 55f31c0d-1510677 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/nemo/resources/examples?resolve-labels=false\n",
+          "is_permission_error": true,
+          "download_time": 12.143426418304443,
+          "use_case": "Learning how to implement conversation models",
+          "description": "NeMo example scripts and notebooks"
+        },
+        "nvidia/clara/clara-train-sdk": {
+          "status": "error",
+          "resource_path": "nvidia/clara/clara-train-sdk",
+          "category": "collections",
+          "type": "container",
+          "error": "Failed to download nvidia/clara/clara-train-sdk:latest:\nClient Error: 403 Response: Access Denied - Request Id: 1aa9479b-1766019 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/clara/resources/clara-train-sdk?resolve-labels=false\n",
+          "is_permission_error": true,
+          "download_time": 9.571878910064697,
+          "use_case": "Medical/healthcare AI model development",
+          "description": "Clara Train SDK for medical AI applications"
+        }
+      }
+    },
+    "datasets": {
+      "total_resources": 1,
+      "successful": 0,
+      "failed": 1,
+      "permission_denied": 0,
+      "resources": {
+        "nvidia/nemo/datasets/an4": {
+          "status": "error",
+          "resource_path": "nvidia/nemo/datasets/an4",
+          "category": "datasets",
+          "type": "dataset",
+          "error": "Failed to download nvidia/nemo/datasets/an4:latest:\nPattern should be in format [org/[team/]]name[:version]\n",
+          "is_permission_error": false,
+          "download_time": 9.851579189300537,
+          "use_case": "Training speech recognition for therapy sessions",
+          "description": "AN4 speech dataset for ASR training"
+        }
+      }
+    }
+  },
+  "recommendations": [
+    "\u2705 Successfully downloaded public NGC resources",
+    "\ud83d\udd27 Use NeMo framework container for model development",
+    "\ud83d\ude80 Deploy microservices for production conversation systems",
+    "\ud83d\udcca Explore example notebooks for implementation guidance",
+    "\u26a0\ufe0f  3 resources require special access permissions",
+    "\ud83d\udd11 Consider applying for NGC Enterprise access for premium models",
+    "\ud83c\udf10 Check Hugging Face for alternative open models",
+    "\ud83d\udd04 Some downloads failed due to network/technical issues",
+    "\ud83d\udcbe Ensure sufficient disk space for large downloads",
+    "\ud83d\udd50 Retry failed downloads during off-peak hours"
+  ],
+  "next_steps": [
+    "1. Extract and explore downloaded containers/resources",
+    "2. Set up development environment with NeMo framework",
+    "3. Run example notebooks to understand model training",
+    "4. Adapt examples for therapeutic conversation use cases"
+  ]
+}
