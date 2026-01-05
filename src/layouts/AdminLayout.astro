@@ -6,12 +6,14 @@ interface Props {
   title?: string
   description?: string
   image?: string
+  activeItem?: string
 }
 
 const {
   title = 'Admin Dashboard',
   description = `Admin dashboard for ${SITE.title}`,
   image = '/og-image.png',
+  activeItem = '',
 } = Astro.props
 ---
 
@@ -86,8 +88,11 @@ const {
             <li>
               <a
                 href="/admin/dashboard"
-                class="nav-link-refined flex items-center px-6 py-3"
-                style="display: flex;"
+                class:list={[
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': activeItem === 'dashboard' }
+                ]}
+                style={`display: flex; ${activeItem === 'dashboard' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
                 <span class="mr-3">
                   <svg
@@ -107,8 +112,11 @@ const {
             <li>
               <a
                 href="/admin/users"
-                class="nav-link-refined flex items-center px-6 py-3"
-                style="display: flex;"
+                class:list={[
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': activeItem === 'users' }
+                ]}
+                style={`display: flex; ${activeItem === 'users' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
                 <span class="mr-3">
                   <svg
@@ -149,9 +157,37 @@ const {
             </li>
             <li>
               <a
+                href="/admin/bias-detection"
+                class:list={[
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': activeItem === 'bias-detection' }
+                ]}
+                style={`display: flex; ${activeItem === 'bias-detection' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
+              >
+                <span class="mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </span>
+                <span>Bias Detection</span>
+              </a>
+            </li>
+            <li>
+              <a
                 href="/admin/security"
-                class="nav-link-refined flex items-center px-6 py-3"
-                style="display: flex;"
+                class:list={[
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': activeItem === 'security' }
+                ]}
+                style={`display: flex; ${activeItem === 'security' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
                 <span class="mr-3">
                   <svg
@@ -172,8 +208,11 @@ const {
             <li>
               <a
                 href="/admin/settings"
-                class="nav-link-refined flex items-center px-6 py-3"
-                style="display: flex;"
+                class:list={[
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': activeItem === 'settings' }
+                ]}
+                style={`display: flex; ${activeItem === 'settings' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
                 <span class="mr-3">
                   <svg

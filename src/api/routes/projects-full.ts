@@ -1,6 +1,5 @@
 // Deprecated legacy route file. Modern routes live in projects.ts.
-// Intentionally empty to avoid duplicate route definitions.
-export { }
+// Intentionally left without exports to avoid duplicate route definitions.
 router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, category, status } = req.query
     const { user } = req as any

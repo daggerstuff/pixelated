@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.27.0",
   "license": "MIT",
   "engines": {
     "node": ">=24"
@@ -24,7 +24,7 @@
     "dev:websocket": "tsx src/server.ts",
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\" \"pnpm dev:training-server\" \"pnpm dev:websocket\"",
     "setup:dev": "./scripts/setup-dev.sh",
-    "build": "astro build",
+    "build": "node scripts/build-with-pipe-handling.mjs",
     "build:vercel": "bash scripts/build-vercel.sh",
     "vercel-build": "bash scripts/build-vercel.sh",
     "build:cloudflare": "bash scripts/build-cloudflare.sh",
@@ -48,7 +48,7 @@
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
-    "test:all": "node scripts/consolidated-test.js all",
+    "test:all": "node scripts/testing/local-test-runner.cjs",
     "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_similarity_search_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
     "test:crypto": "node scripts/consolidated-test.js crypto",
@@ -153,6 +153,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/node": "^9.5.1",
     "@astrojs/react": "^4.4.2",
+    "@astrojs/vercel": "^9.0.2",
     "@aws-sdk/client-dynamodb": "^3.958.0",
     "@aws-sdk/client-kms": "^3.958.0",
     "@aws-sdk/client-s3": "^3.958.0",
@@ -190,7 +191,7 @@
     "@sentry/vite-plugin": "^4.6.1",
     "@smithery/sdk": "^3.0.1",
     "@spotlightjs/astro": "^3.2.6",
-    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query": "^5.90.14",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-layers": "^4.22.0",
     "@types/jsonwebtoken": "^9.0.10",
@@ -203,6 +204,7 @@
     "agentdb": "1.6.1",
     "astro": "^5.16.6",
     "astro-icon": "^1.1.5",
+    "auth0": "^5.2.0",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.4.9",
@@ -219,6 +221,7 @@
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
+    "express-openid-connect": "^2.19.3",
     "express-rate-limit": "^8.2.1",
     "flexsearch": "^0.8.212",
     "framer-motion": "^12.23.26",
@@ -226,6 +229,7 @@
     "ioredis": "^5.8.2",
     "jotai": "^2.16.1",
     "jsonwebtoken": "^9.0.3",
+    "keytar": "^7.9.0",
     "launchdarkly-js-client-sdk": "^3.9.0",
     "lucide-react": "^0.562.0",
     "mongodb": "^7.0.0",
@@ -329,7 +333,7 @@
     "eslint-plugin-vitest": "^0.5.4",
     "eslint-plugin-vitest-globals": "^1.5.0",
     "espree": "^11.0.0",
-    "glob": "^11.1.0",
+    "glob": "^13.0.0",
     "glob-parent": "^6.0.2",
     "globals": "^16.5.0",
     "globby": "^16.1.0",
@@ -345,7 +349,7 @@
     "medium-zoom": "^1.1.0",
     "micromatch": "^4.0.8",
     "mocha": "^11.7.5",
-    "msw": "^2.12.6",
+    "msw": "^2.12.7",
     "nprogress": "^0.2.0",
     "oxfmt": "^0.17.0",
     "oxlint": "^1.35.0",
@@ -414,7 +418,9 @@
       "@unocss/core": "^66.5.10",
       "@unocss/vite": "^66.5.10",
       "@unocss/astro": "^66.5.10",
-      "drizzle-orm": "^0.45.1"
+      "drizzle-orm": "^0.45.1",
+      "zod": "^4.2.1",
+      "qs": "6.14.1"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
@@ -424,7 +430,9 @@
         "@vercel/kv": "3.0.0",
         "mongodb": "7.0.0",
         "eslint": "9.39.2",
-        "drizzle-orm": "0.45.1"
+        "drizzle-orm": "0.45.1",
+        "zod": "4.2.1",
+        "@opentelemetry/api": "^1.9.0"
       }
     },
     "allowedDeprecatedVersions": {

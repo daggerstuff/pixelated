@@ -1,27 +1,13 @@
 ---
 export const prerender = false
-import { requirePermission } from '@/lib/access-control'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import type { AstroCookies } from 'astro'
 
-export async function get({
-  cookies,
-  redirect,
-}: {
-  cookies: AstroCookies
-  redirect: (path: string) => Response
-}) {
-  // Check if user has admin permission
-  const checkPermission = requirePermission('read:admin')
-  const permissionResponse = await checkPermission({ cookies, redirect })
+// Verify admin access via session
+const session = (Astro.locals as any)?.session
+const user = (Astro.locals as any)?.user
 
-  // If permission check returned a response, return it
-  if (permissionResponse) {
-    return permissionResponse
-  }
-
-  // Get the current user
-  return {}
+if (!session || !user || user.role !== 'admin') {
+  return Astro.redirect('/auth/sign-in')
 }
 ---
 

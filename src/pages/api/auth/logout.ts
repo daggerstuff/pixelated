@@ -4,13 +4,28 @@
  */
 
 import type { APIRoute } from 'astro'
-import { logoutFromBetterAuth } from '../../../lib/auth/better-auth-integration'
-import { authenticateRequest } from '../../../lib/auth/middleware'
-import { logSecurityEvent } from '../../../lib/security'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+import { logoutFromBetterAuth } from '@/lib/auth/better-auth-integration'
+import { authenticateRequest } from '@/lib/auth/middleware'
+import { logSecurityEvent } from '@/lib/security'
+import { updatePhase6AuthenticationProgress } from '@/lib/mcp/phase6-integration'
+
+interface ClientInfo {
+  ip: string
+  userAgent: string
+  deviceId: string
+}
+
+interface AuthenticatedUser {
+  id: string
+  email?: string
+}
+
+interface AuthenticatedRequest {
+  user?: AuthenticatedUser
+}
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
-  let clientInfo;
+  let clientInfo: ClientInfo | undefined
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
@@ -22,7 +37,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // Authenticate the request first
-    const authResult = await authenticateRequest(request as any)
+    const authResult = await authenticateRequest(request)
     if (!authResult.success) {
       return authResult.response!
     }
@@ -31,14 +46,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const sessionId = request.headers.get('x-session-id') || 'unknown'
 
     // Get user ID from authenticated request
-    const maybeRequest = authResult.request as unknown
-    const userId =
-      typeof maybeRequest === 'object' &&
-      maybeRequest !== null &&
-      'user' in maybeRequest &&
-      typeof (maybeRequest as { user?: { id?: string } }).user === 'object'
-        ? (maybeRequest as { user?: { id?: string } }).user?.id
-        : undefined
+    const maybeRequest = authResult.request as unknown as AuthenticatedRequest
+    const userId = maybeRequest.user?.id
 
     if (!userId) {
       return new Response(
@@ -81,11 +90,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       },
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle unexpected errors
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Logout error:', error)
     await logSecurityEvent('error', {
-      error: error.message,
+      error: errorMessage,
       clientInfo,
       timestamp: Date.now(),
     })

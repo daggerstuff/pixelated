@@ -212,13 +212,12 @@ function generateHTML(content = '', message = '') {
     <h1>📝 Blog Management Interface</h1>
   </header>
 
-  ${
-    message
+  ${message
       ? `<div class="message ${message.type || ''}">
     ${message.text}
   </div>`
       : ''
-  }
+    }
 
   <div class="card">
     <h2>Actions</h2>
@@ -460,7 +459,7 @@ server.listen(PORT, () => {
     if (opener.error) {
       throw opener.error
     }
-  } catch (err) {
+  } catch (_err) {
     console.log(`Please open your browser to: ${url}`)
   }
 })

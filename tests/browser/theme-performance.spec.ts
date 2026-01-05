@@ -114,7 +114,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Measure theme switch performance
-      const switchMetrics = await page.evaluate(() => {
+      await page.evaluate(() => {
         return new Promise((resolve) => {
           const marks = []
 
@@ -325,14 +325,6 @@ test.describe('Theme Performance Tests', () => {
     })
 
     test('should clean up event listeners', async () => {
-      // Count event listeners before and after theme operations
-      const listenerCounts = await page.evaluate(() => {
-        const initialListeners = getEventListeners
-          ? getEventListeners(document)
-          : {}
-        return { initialListeners }
-      })
-
       // Perform theme operations
       const themeToggle = page.locator('#theme-toggle-v2')
       await themeToggle.click()
@@ -401,7 +393,7 @@ test.describe('Theme Performance Tests', () => {
             containmentUsage.push({
               tagName: el.tagName,
               contain: style.contain,
-            })
+            }).slice(________)
           }
         })
 

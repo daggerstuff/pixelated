@@ -149,6 +149,8 @@ export default function vitePluginFlexsearchSSR() {
     n &&
       ((e._sentryDebugIds = e._sentryDebugIds || {}),
       (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
-  } catch (e) {}
+  } catch (error) {
+    // Intentionally empty - silencing Sentry debug errors
+  }
 })()
 //# debugId=a0db6a53-f0a3-5748-899c-6016b824b882
