@@ -36,13 +36,13 @@ const registry = [];
  * that the polyfill is configured to work in a cross-origin mode.
  * @type {function(DOMRect|ClientRect, DOMRect|ClientRect)}
  */
-const crossOriginUpdater = null;
+let crossOriginUpdater = null;
 
 /**
  * The current cross-origin intersection. Only used in the cross-origin mode.
  * @type {DOMRect|ClientRect}
  */
-const crossOriginRect = null;
+let crossOriginRect = null;
 
 /**
  * Creates the global IntersectionObserverEntry constructor.
@@ -248,7 +248,7 @@ IntersectionObserver.prototype.takeRecords = function () {
  * @return {Array} A sorted list of unique and valid threshold values.
  */
 IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
-  const threshold = opt_threshold || [0];
+  let threshold = opt_threshold || [0];
   if (!Array.isArray(threshold)) {
     threshold = [threshold];
   }
@@ -377,7 +377,7 @@ IntersectionObserver.prototype._unmonitorIntersections = function (doc) {
   // Check if any dependent targets are still remaining.
   const hasDependentTargets =
     this._observationTargets.some(function (item) {
-      const itemDoc = item.element.ownerDocument;
+      let itemDoc = item.element.ownerDocument;
       // Target is in this context.
       if (itemDoc == doc) {
         return true;
@@ -448,7 +448,7 @@ IntersectionObserver.prototype._checkForIntersections = function () {
     const intersectionRect = rootIsInDom && rootContainsTarget &&
       this._computeTargetAndRootIntersection(target, targetRect, rootRect);
 
-    const rootBounds = null;
+    let rootBounds = null;
     if (!this._rootContainsTarget(target)) {
       rootBounds = getEmptyRect();
     } else if (!crossOriginUpdater || this.root) {
@@ -502,8 +502,8 @@ IntersectionObserver.prototype._computeTargetAndRootIntersection =
        return;
      }
 
-     const intersectionRect = targetRect;
-     const parent = getParentNode(target);
+     let intersectionRect = targetRect;
+     let parent = getParentNode(target);
      let atRoot = false;
    
      while (!atRoot && parent) {

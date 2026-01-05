@@ -1,49 +1,49 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
+export const prerender = false;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 function formatDate(dateInput: any, options: any = {}) {
-  if (!dateInput) return '-'
-  const date = new Date(dateInput)
+  if (!dateInput) return "-";
+  const date = new Date(dateInput);
   const defaultOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  } as any
-  return date.toLocaleDateString('en-US', { ...defaultOptions, ...options })
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  } as any;
+  return date.toLocaleDateString("en-US", { ...defaultOptions, ...options });
 }
 function getReadingTime(content: string) {
-  const wordsPerMinute = 200
-  const words = content.split(/\s+/).length
-  const minutes = Math.ceil(words / wordsPerMinute)
-  return `${minutes} min read`
+  const wordsPerMinute = 200;
+  const words = content.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
 }
 
-export const prerender = true
+type BlogPost = CollectionEntry<"blog">;
 
-type BlogPost = CollectionEntry<'blog'>
-
-const allPosts = await getCollection('blog', ({ data }: BlogPost) => {
-  return import.meta.env.PROD ? !data.draft : true
-})
+const allPosts = await getCollection("blog", ({ data }: BlogPost) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
 
 const posts = allPosts
   .sort(
     (a: BlogPost, b: BlogPost) =>
       new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
   )
-  .slice(0, 6) // Show recent posts
+  .slice(0, 6); // Show recent posts
 
 // Get tags sorted by frequency and select the top 6
-const tagFrequency = {}
+const tagFrequency = {};
 allPosts.forEach((post) => {
-  ;(post.data.tags || []).forEach((tag) => {
-    tagFrequency[tag] = (tagFrequency[tag] || 0) + 1
-  })
-})
-const allTags = Object.keys(tagFrequency)
+  (post.data.tags || []).forEach((tag) => {
+    tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
+  });
+});
+const allTags = Object.keys(tagFrequency);
 const topTags = allTags
   .sort((a, b) => tagFrequency[b] - tagFrequency[a])
-  .slice(0, 6)
+  .slice(0, 6);
 ---
 
 <BaseLayout
@@ -150,7 +150,7 @@ const topTags = allTags
           topTags.filter(Boolean).map((tag) => {
             const tagPosts = allPosts.filter((post: BlogPost) =>
               post.data.tags?.includes(tag),
-            )
+            );
             return (
               <a
                 href={`/blog/tags/${tag}`}
@@ -161,14 +161,14 @@ const topTags = allTags
                     #{tag}
                   </h3>
                   <span class="text-sm text-slate-400">
-                    {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''}
+                    {tagPosts.length} post{tagPosts.length !== 1 ? "s" : ""}
                   </span>
                 </div>
                 <p class="text-sm text-slate-400">
                   Explore articles about {tag}
                 </p>
               </a>
-            )
+            );
           })
         }
       </div>

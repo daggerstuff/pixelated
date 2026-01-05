@@ -6,7 +6,7 @@
             // noop branch to keep variable used
             void 0
         }
-    } catch (e) {
+    } catch (_e) {
         // swallow
     }
 })()

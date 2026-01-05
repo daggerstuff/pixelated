@@ -4,11 +4,6 @@ import { asyncHandler } from '../middleware/error-handler'
 import { authMiddleware } from '../middleware/auth'
 import {
     createMarketResearch,
-    getMarketResearch,
-    addFinding,
-    addCompetitiveAnalysis,
-    addRecommendation,
-    listMarketResearch,
     searchMarketResearch,
     shareMarketResearch
 } from '../services/market-research-service'
