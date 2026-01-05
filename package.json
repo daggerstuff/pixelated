@@ -351,6 +351,8 @@
     "mocha": "^11.7.5",
     "msw": "^2.12.7",
     "nprogress": "^0.2.0",
+    "oxc-parser": "^0.106.0",
+    "oxc-resolver": "^11.16.2",
     "oxfmt": "^0.17.0",
     "oxlint": "^1.36.0",
     "oxlint-tsgolint": "^0.10.0",
