@@ -24,7 +24,7 @@ let auth0Authentication: AuthenticationClient | null = null
  */
 function initializeAuth0Client() {
   if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
-    throw new Error('Auth0 configuration is incomplete. Please check environment variables.')
+    console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
