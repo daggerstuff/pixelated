@@ -8,7 +8,10 @@
     w-10 h-10 rounded-full
     op-0 pointer-events-none op-transition
     lt-lgp:(op-50! bg-#8883 dark:bg-#8886 pointer-events-auto!)
-    hover:(op-100! bg-#8883) print:hidden"
+    hover:(op-100! bg-#8883)
+    focus-visible:(op-100! opacity-100 ring-2 ring-indigo-500 outline-none pointer-events-auto)
+    print:hidden"
+  title="Scroll to top"
   aria-label="Scroll to top"
   tabindex="-1"
   aria-hidden="true"
@@ -17,58 +20,51 @@
 </button>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
+  const updateButtonState = () => {
+    const scrollThreshold = 300;
     const toTopButton = document.getElementById("to-top-button");
     if (!toTopButton) return;
 
-    const handleClick = () => {
-      window.scrollTo({ top: 0 });
-    };
-
-    const handleScroll = () => {
-      const scrollThreshold = 300;
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-
-      if (isDesktop) {
-        // Desktop: show/hide based on scroll position
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        if (scrollY <= scrollThreshold) {
-          toTopButton.style.opacity = "0";
-          toTopButton.style.pointerEvents = "none";
-          toTopButton.setAttribute("tabindex", "-1");
-          toTopButton.setAttribute("aria-hidden", "true");
-          toTopButton.setAttribute("disabled", "");
-        } else {
-          toTopButton.style.opacity = "0.3";
-          toTopButton.style.pointerEvents = "auto";
-          toTopButton.removeAttribute("tabindex");
-          toTopButton.removeAttribute("aria-hidden");
-          toTopButton.removeAttribute("disabled");
-        }
+    // Desktop logic: hidden by default, shown on scroll
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      if (scrollY <= scrollThreshold) {
+        // Hidden state
+        toTopButton.style.opacity = "0";
+        toTopButton.style.pointerEvents = "none";
+        toTopButton.setAttribute("tabindex", "-1");
+        toTopButton.setAttribute("aria-hidden", "true");
       } else {
-        // Mobile/Tablet: always accessible (CSS makes it always visible via lt-lgp)
+        // Visible state
+        toTopButton.style.opacity = "0.3";
+        toTopButton.style.pointerEvents = "auto";
         toTopButton.removeAttribute("tabindex");
         toTopButton.removeAttribute("aria-hidden");
-        toTopButton.removeAttribute("disabled");
       }
-    };
+    } else {
+      // Mobile state: always visible (handled by CSS lt-lgp class)
+      // We must ensure accessibility attributes are correct for visibility
+      toTopButton.removeAttribute("tabindex");
+      toTopButton.removeAttribute("aria-hidden");
 
-    toTopButton.addEventListener("click", handleClick);
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll);
+      // Clean up inline styles that might persist from desktop mode
+      toTopButton.style.opacity = "";
+      toTopButton.style.pointerEvents = "";
+    }
+  };
 
-    // Initial check
-    handleScroll();
+  // Handle scroll events
+  window.addEventListener("scroll", updateButtonState, { passive: true });
 
-    // Cleanup listeners on page navigation
-    document.addEventListener(
-      "astro:before-preparation",
-      () => {
-        window.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("resize", handleScroll);
-        toTopButton.removeEventListener("click", handleClick);
-      },
-      { once: true },
-    );
+  // Initialize on page load (Astro View Transitions compatible)
+  document.addEventListener("astro:page-load", () => {
+    const toTopButton = document.getElementById("to-top-button");
+    if (toTopButton) {
+      toTopButton.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      // Initial state check
+      updateButtonState();
+    }
   });
 </script>
