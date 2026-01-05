@@ -12,8 +12,8 @@ if (skip === 'true' || skip === '1') {
     process.exit(0);
 }
 
-// Forward to vitest binary in node_modules/.bin if available, else try global
-const vitestBin = path.resolve(__dirname, '..', 'node_modules', '.bin', process.platform === 'win32' ? 'vitest.cmd' : 'vitest');
+// Forward to vitest binary in project root node_modules/.bin if available, else try global
+const vitestBin = path.resolve(__dirname, '../../node_modules/.bin', process.platform === 'win32' ? 'vitest.cmd' : 'vitest');
 const args = process.argv.slice(2);
 
 const cmd = vitestBin;

@@ -338,7 +338,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   build: {
-    target: 'node24',
+    target: 'node22',
     minify: false,
     emptyOutDir: false,
     sourcemap: true,

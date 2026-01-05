@@ -1,0 +1,11 @@
+{
+  "mcp": {
+    "servers": {
+      "atlassian": {
+        "command": "npx",
+        "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
+        "description": "Atlassian MCP Server for Jira and Confluence integration"
+      }
+    }
+  }
+}

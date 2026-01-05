@@ -9,14 +9,14 @@
 | **Region** | East US |
 | **ACR** | `pixelatedregistry.azurecr.io` |
 | **External IP** | `20.242.241.80` (NGINX Ingress) |
-| **Staging URL** | `https://staging.pixelatedempathy.tech` |
+| **Staging URL** | `https://staging.pixelatedempathy.com` |
 | **Production URL** | `https://pixelatedempathy.com` |
 | **Current Image** | `pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25` |
 
 ### DNS Configuration
 
 Point these A records to `20.242.241.80`:
-- `staging.pixelatedempathy.tech`
+- `staging.pixelatedempathy.com`
 - `pixelatedempathy.com`
 
 ## Overview
@@ -59,7 +59,7 @@ This document outlines all variables and secrets that must be configured in Azur
 | Variable Name | Value | Secret? | Description |
 |--------------|-------|---------|-------------|
 | `NODE_VERSION` | `24.8.0` | ❌ No | Node.js version to use |
-| `PNPM_VERSION` | `10.26.0` | ❌ No | pnpm version to use |
+| `PNPM_VERSION` | `10.26.2` | ❌ No | pnpm version to use |
 | `PYTHON_VERSION` | `3.11` | ❌ No | Python version (if needed) |
 | `NODE_ENV` | `production` | ❌ No | Node environment |
 | `GITHUB_ACTIONS` | `false` | ❌ No | Set to false for Azure Pipelines |
@@ -94,7 +94,7 @@ This document outlines all variables and secrets that must be configured in Azur
 | Variable Name | Value | Secret? | Description |
 |--------------|-------|---------|-------------|
 | `IMAGE_REPOSITORY` | `pixelatedempathy` | ❌ No | Docker image repository name |
-| `STAGING_URL` | `https://staging.pixelatedempathy.tech` | ❌ No | Staging environment URL |
+| `STAGING_URL` | `https://staging.pixelatedempathy.com` | ❌ No | Staging environment URL |
 | `PRODUCTION_URL` | `https://pixelatedempathy.com` | ❌ No | Production environment URL |
 | `EXTERNAL_IP` | `20.242.241.80` | ❌ No | NGINX Ingress Controller external IP |
 
@@ -170,7 +170,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 
 **Non-secret variables:**
 - `NODE_VERSION`: `24.8.0`
-- `PNPM_VERSION`: `10.26.0`
+- `PNPM_VERSION`: `10.26.2`
 - `PYTHON_VERSION`: `3.11`
 - `NODE_ENV`: `production`
 - `GITHUB_ACTIONS`: `false`
@@ -182,7 +182,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 - `KUBE_NAMESPACE`: `pixelated-staging`
 - `KUBE_NAMESPACE_PROD`: `pixelated-production`
 - `IMAGE_REPOSITORY`: `pixelatedempathy`
-- `STAGING_URL`: `https://staging.pixelatedempathy.tech`
+- `STAGING_URL`: `https://staging.pixelatedempathy.com`
 - `PRODUCTION_URL`: `https://pixelatedempathy.com`
 - `DEPLOYMENT_TIMEOUT`: `600`
 - `HEALTH_CHECK_TIMEOUT`: `300`

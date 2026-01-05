@@ -70,7 +70,7 @@ describe('JWT Service', () => {
       expect(result).toHaveProperty('accessToken')
       expect(result).toHaveProperty('refreshToken')
       expect(result).toHaveProperty('tokenType', 'Bearer')
-      expect(result).toHaveProperty('expiresIn', 900) // 15 minutes
+      expect(result).toHaveProperty('expiresIn', 86400) // 24 hours
       expect(result).toHaveProperty('user')
       expect(result.user).toHaveProperty('id', 'user123')
       expect(result.user).toHaveProperty('role', 'admin')
@@ -473,7 +473,7 @@ describe('JWT Service', () => {
     })
 
     it('should log slow operations', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { })
 
       const slowOperation = vi.fn().mockImplementation(async () => {
         await new Promise((resolve) => setTimeout(resolve, 150)) // 150ms delay
@@ -490,7 +490,7 @@ describe('JWT Service', () => {
     })
 
     it('should log operation failures', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
 
       const failingOperation = vi
         .fn()

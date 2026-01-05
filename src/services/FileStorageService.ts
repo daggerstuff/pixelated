@@ -123,7 +123,7 @@ export class FileStorageService {
     return metadata
   }
 
-  async getFile(fileId: string, userId: string): Promise<FileMetadata | null> {
+  async getFile(_fileId: string, _userId: string): Promise<FileMetadata | null> {
     // This would typically query your database
     // For now, return a mock structure
     return null
@@ -250,7 +250,7 @@ export class FileStorageService {
     return urlParts.slice(urlParts.indexOf(this.bucketName) + 1).join('/')
   }
 
-  async generateThumbnail(file: Express.Multer.File): Promise<Buffer | null> {
+  async generateThumbnail(_file: Express.Multer.File): Promise<Buffer | null> {
     // This would require sharp for image processing
     // For now, return null - implement later if needed
     return null

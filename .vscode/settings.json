@@ -143,26 +143,6 @@
     "python-envs.defaultEnvManager": "ms-python.python:venv",
     "python-envs.defaultPackageManager": "ms-python.python:uv",
     "python-envs.pythonProjects": [],
-    "github.copilot.chat.customOAIModels": {
-        "moonshotai/kimi-k2-instruct-0905": {
-            "name": "Kimi-K2-Instruct",
-            "url": "https://integrate.api.nvidia.com/v1",
-            "requiresAPIKey": true,
-            "toolCalling": true,
-            "vision": false,
-            "maxInputTokens": 256000,
-            "maxOutputTokens": 4096
-        },
-        "qwen/qwen3-next-80b-a3b-instruct": {
-            "name": "Qwen3-Next-Instruct",
-            "url": "https://integrate.api.nvidia.com/v1",
-            "requiresAPIKey": true,
-            "toolCalling": true,
-            "vision": false,
-            "maxInputTokens": 256000,
-            "maxOutputTokens": 4096
-        }
-    },
     "files.autoSave": "afterDelay",
     "workbench.editor.enablePreview": false,
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
@@ -186,18 +166,12 @@
     "cubent.mcp.enabled": true,
     "cubent.mcp.serverCreationEnabled": true,
     "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.shellIntegration.enabled": true,
     "terminal.integrated.automationProfile.linux": {
         "path": "/usr/bin/zsh"
     },
-    "terminal.integrated.profiles.linux": {
-        "zsh": {
-            "path": "/usr/bin/zsh",
-            "args": []
-        },
-        "bash": {
-            "path": "/usr/bin/bash",
-            "args": []
-        }
+    "terminal.integrated.env.linux": {
+        "FIG_DISABLE": "1"
     },
     "python.languageServer": "None",
     "sonarlint.connectedMode.project": {
@@ -223,5 +197,9 @@
     "extensions.experimental.deferredStartupFinishedActivation": false,
     "kaggle.defaultInternet": true,
     "npm.packageManager": "pnpm",
-    "markdown.validate.enabled": true
+    "markdown.validate.enabled": true,
+    "terminal.integrated.developer.devMode": true,
+    "[azure-pipelines]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

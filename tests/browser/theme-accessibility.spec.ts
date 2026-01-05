@@ -245,11 +245,6 @@ test.describe('Theme Accessibility Tests', () => {
     test('theme state should be announced', async () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
-      // Get initial theme
-      const initialTheme = await page.evaluate(
-        () => localStorage.getItem('theme') || 'system',
-      )
-
       // Click to change theme
       await themeToggle.click()
 

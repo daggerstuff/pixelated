@@ -1,15 +1,16 @@
 ---
-import type { CollectionEntry } from 'astro:content'
-import type { ShareConfig } from '@/types'
-import BaseLayout from './BaseLayout.astro'
-import ShareLink from '@/components/widgets/ShareLink.astro'
-import '@/styles/enhanced-theme.css'
+import type { CollectionEntry } from "astro:content";
+import type { ShareConfig } from "@/types";
+import BaseLayout from "./BaseLayout.astro";
+import ShareLink from "@/components/widgets/ShareLink.astro";
+import "@/styles/enhanced-theme.css";
 
 interface Props {
-  entry: CollectionEntry<'blog'>
+  entry: CollectionEntry<"blog"> | CollectionEntry<"docs">;
+  basePath?: string;
 }
 
-const { entry } = Astro.props
+const { entry, basePath = "blog" } = Astro.props;
 const {
   title: postTitle,
   description,
@@ -17,22 +18,22 @@ const {
   pubDate,
   readingTime,
   tags = [],
-} = entry.data
+} = entry.data;
 
-const formattedDate = new Date(pubDate)
+const formattedDate = new Date(pubDate);
 
 // Format date in Antfu style: Oct 4, 2023
 const formatDate = (date: Date) => {
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 // Configure social sharing
 const shareConfig: ShareConfig = {
-  twitter: [true, '@GradiantAscent'],
+  twitter: [true, "@GradiantAscent"],
   mastodon: false,
   facebook: true,
   pinterest: false,
@@ -40,10 +41,20 @@ const shareConfig: ShareConfig = {
   telegram: false,
   whatsapp: false,
   email: false,
-}
+};
+
+// Build URL for sharing (works with prerendered pages)
+const shareUrl = `https://pixelated.empathy.dev/${basePath}/${entry.data.slug || entry.slug}`;
+const pathname = `/${basePath}/${entry.data.slug || entry.slug}`;
 ---
 
-<BaseLayout title={postTitle} {description} ogImage={image?.url} bgType="rose">
+<BaseLayout
+  title={postTitle}
+  {description}
+  ogImage={image?.url}
+  bgType="rose"
+  {pathname}
+>
   <article class="max-w-prose mx-auto container-refined py-12">
     <header class="mb-12">
       <div class="section-number mb-6">Blog</div>
@@ -138,7 +149,7 @@ const shareConfig: ShareConfig = {
         </a>
 
         <div class="flex items-center">
-          <ShareLink config={shareConfig} />
+          <ShareLink config={shareConfig} url={shareUrl} />
         </div>
       </div>
     </footer>
@@ -150,16 +161,16 @@ const shareConfig: ShareConfig = {
   article {
     --content-width: 740px;
     font-family:
-      'Inter',
+      "Inter",
       -apple-system,
       BlinkMacSystemFont,
-      'Segoe UI',
+      "Segoe UI",
       Roboto,
       Oxygen,
       Ubuntu,
       Cantarell,
-      'Open Sans',
-      'Helvetica Neue',
+      "Open Sans",
+      "Helvetica Neue",
       sans-serif;
   }
 
