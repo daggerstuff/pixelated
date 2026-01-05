@@ -81,9 +81,9 @@ updates:
       - "dependencies"
       - "python"
     groups:
-      # Define security-critical Python packages once and reuse via YAML anchors
+      # Define security-critical Python packages
       security-patches:
-        patterns: &security_python
+        patterns:
           - "cryptography*"
           - "requests*"
           - "urllib3*"
@@ -101,7 +101,18 @@ updates:
       python-patches:
         patterns:
           - "*"
-        exclude-patterns: *security_python
+        exclude-patterns:
+          - "cryptography*"
+          - "requests*"
+          - "urllib3*"
+          - "pyyaml*"
+          - "werkzeug*"
+          - "jinja*"
+          - "flask*"
+          - "certifi*"
+          - "setuptools*"
+          - "pyopenssl*"
+          - "idna*"
         update-types:
           - "patch"
       python-minor:
