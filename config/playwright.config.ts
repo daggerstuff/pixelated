@@ -67,7 +67,7 @@ try {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '../tests',
   testIgnore: ['tests/accessibility/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -79,9 +79,9 @@ export default defineConfig({
   workers: process.env['CI'] ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['html', { outputFolder: '../playwright-report' }],
+    ['json', { outputFile: '../test-results/results.json' }],
+    ['junit', { outputFile: '../test-results/junit.xml' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -161,6 +161,7 @@ export default defineConfig({
         url: webServerUrl || 'http://localhost:4321',
         reuseExistingServer: false,
         timeout: 10 * 60 * 1000, // allow time for build + preview start
+        cwd: '..',
       }
       : {
         // Local/dev flow should keep the fast dev server with HMR.
@@ -172,6 +173,7 @@ export default defineConfig({
         url: webServerUrl || 'http://localhost:3000',
         reuseExistingServer: true,
         timeout: 180 * 1000,
+        cwd: '..',
       },
 
   /* Global setup and teardown */
@@ -179,7 +181,7 @@ export default defineConfig({
   // globalTeardown: './tests/e2e/global-teardown.ts',
 
   /* Test output directories */
-  outputDir: 'test-results/',
+  outputDir: '../test-results/',
 
   /* Expect options */
   expect: {

@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: '../tests',
   fullyParallel: true,
   forbidOnly: false,
   retries: 0,
@@ -12,7 +12,7 @@ export default defineConfig({
       'html',
       {
         open: 'never',
-        outputFolder: 'playwright-report-browser-compat',
+        outputFolder: '../playwright-report-browser-compat',
       },
     ],
     ['list'],
@@ -41,6 +41,7 @@ export default defineConfig({
     url: 'http://localhost:4321',
     reuseExistingServer: true,
     timeout: 300 * 1000,
+    cwd: '..',
     env: {
       NODE_ENV: 'test',
       DISABLE_WEB_FONTS: 'true',

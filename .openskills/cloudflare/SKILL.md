@@ -1,0 +1,4 @@
+---
+description: "Guide for building applications on Cloudflare's edge platform. Use when implementing serverless functions (Workers), edge databases (D1), storage (R2, KV), real-time apps (Durable Objects), AI features (Workers AI, AI Gateway), static sites (Pages), or any edge computing solutions."
+---
+Guide for building applications on Cloudflare's edge platform. Use when implementing serverless functions (Workers), edge databases (D1), storage (R2, KV), real-time apps (Durable Objects), AI features (Workers AI, AI Gateway), static sites (Pages), or any edge computing solutions.

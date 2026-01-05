@@ -1,3 +1,4 @@
+import { describe, expect, vi, test, beforeEach } from 'vitest'
 /**
  * Unit tests for Adaptive Objective Selector
  */
@@ -9,8 +10,7 @@ import {
 import {
   ContextType,
   CORE_MENTAL_HEALTH_OBJECTIVES,
-  UserProfile,
-} from '../core/objectives' // Import UserProfile
+} from '../core/objectives'
 import type { AIService } from '../../ai/models/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 // Import WeightingStrategy

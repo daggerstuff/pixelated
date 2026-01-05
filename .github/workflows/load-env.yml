@@ -45,10 +45,11 @@ on:
       slack_webhook_url:
         description: "Slack Webhook URL"
         value: ${{ jobs.load-env.outputs.slack_webhook_url }}
+  workflow_dispatch:
 
 jobs:
   load-env:
-    runs-on: tenki-standard-autoscale
+    runs-on: ubuntu-latest
     outputs:
       gcp_project_id: ${{ steps.set-env.outputs.gcp_project_id }}
       gke_cluster_name: ${{ steps.set-env.outputs.gke_cluster_name }}
@@ -73,13 +74,13 @@ jobs:
         id: set-env
         run: |
           echo "🔍 Loading environment variables with fallback support..."
-          
+
           # Function to get value from secrets or .env file
           get_env_value() {
             local secret_name=$1
             local env_var_name=$2
             local default_value=$3
-            
+
             # First try GitHub Secrets - use direct secret references
             case "$secret_name" in
               "GCP_PROJECT_ID")
@@ -237,7 +238,7 @@ jobs:
                 fi
                 ;;
             esac
-            
+
             # Then try .env file
             if [[ -f ".env" ]]; then
               local env_value=$(grep "^${env_var_name}=" .env | cut -d'=' -f2- | sed "s/^'//;s/'$//;s/^\"//;s/\"$//" | head -1)
@@ -247,7 +248,7 @@ jobs:
                 return
               fi
             fi
-            
+
             # Then try .env.local file
             if [[ -f ".env.local" ]]; then
               local env_value=$(grep "^${env_var_name}=" .env.local | cut -d'=' -f2- | sed "s/^'//;s/'$//;s/^\"//;s/\"$//" | head -1)
@@ -257,7 +258,7 @@ jobs:
                 return
               fi
             fi
-            
+
             # Finally use default value if provided
             if [[ -n "$default_value" ]]; then
               echo "⚠️ $env_var_name using default: $default_value"

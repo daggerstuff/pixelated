@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { useStore } from 'nanostores'
 import type { AuthRole } from '@/config/auth.config'
 import type { UserRole } from '@/types/auth'
 
@@ -26,7 +27,22 @@ export function ProtectedRoute({
   redirectTo = '/login',
   fallback,
 }: ProtectedRouteProps) {
-  const { user, loading, hasRole } = useAuth()
+  const { data: user, isPending: loading } = authClient.useSession()
+
+  // Simple role check function for better-auth user
+  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
+    if (!user?.user) {
+      return false
+    }
+
+    const userRoles = user.user.roles || []
+
+    if (Array.isArray(role)) {
+      return role.some(r => userRoles.includes(r))
+    }
+
+    return userRoles.includes(role)
+  }
 
   useEffect(() => {
     if (!loading && !user) {

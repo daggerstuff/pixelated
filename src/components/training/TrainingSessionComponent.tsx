@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useConversationMemory } from '../../hooks/useMemory'
-import { useAuth } from '../../hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
+import { useStore } from 'nanostores'
 import { getJournalResearchAuthToken } from '../../lib/api/journal-research/auth'
 
 // Basic UI scaffold for therapist training session
@@ -47,9 +48,9 @@ function createNoteKey(authorId: string, content: string): string {
 }
 
 export function TrainingSessionComponent() {
-  const { user } = useAuth()
+  const { data: session } = authClient.useSession()
   // Use authenticated user ID, fallback to demo user for development/testing
-  const userId = user?.id || 'demo-therapist'
+  const userId = session?.user?.id || 'demo-therapist'
   const sessionId = 'session-1'
   const [therapistResponse, setTherapistResponse] = useState('')
   const [conversation, setConversation] = useState([
