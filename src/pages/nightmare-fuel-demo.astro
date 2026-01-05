@@ -1,0 +1,831 @@
+---
+// Nightmare Fuel Obstacle Course Demo
+// Training Simulation for Crisis Counselors
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const title = 'Nightmare Fuel: Crisis Training Simulator'
+const description = 'Experience the most challenging training scenarios for mental health crisis counselors. Master extreme case management through AI-powered simulations.'
+
+// Sample ultra-nightmare scenarios for demo
+const nightmareScenarios = [
+  {
+    id: 'infant_organ_harvesting_family',
+    title: 'Organ Harvesting Ring',
+    difficulty: 'COSMIC HORROR',
+    stephenKingFactor: 10,
+    description: 'Multi-generational family business of infant organ harvesting.',
+    crisis_level: 'EXTREME',
+    tags: ['torture', 'infant', 'generational_abuse', 'business_abuse'],
+  },
+  {
+    id: 'conscious_brain_surgery_addiction',
+    title: 'Brain Surgery Addiction',
+    difficulty: 'COSMIC HORROR',
+    stephenKingFactor: 10,
+    description: 'Client performs DIY brain surgery on conscious victims for sexual gratification.',
+    crisis_level: 'EXTREME',
+    tags: ['torture', 'addict', 'medical_abuse', 'live_victim'],
+  },
+  {
+    id: 'dimensional_torture_entity',
+    title: 'Dimensional Entity',
+    difficulty: 'COSMIC HORROR',
+    stephenKingFactor: 10,
+    description: 'Client claims to be an interdimensional torture entity feeding on suffering.',
+    crisis_level: 'EXTREME',
+    tags: ['psychosis', 'dimensional', 'torture', 'supernatural'],
+  },
+  {
+    id: 'human_furniture_workshop',
+    title: 'Living Furniture Workshop',
+    difficulty: 'COSMIC HORROR',
+    stephenKingFactor: 10,
+    description: 'Artisan who creates furniture from living, conscious humans.',
+    crisis_level: 'EXTREME',
+    tags: ['torture', 'imprisonment', 'workshop', 'long_term'],
+  },
+  {
+    id: 'soul_extraction_surgeon',
+    title: 'Soul Extraction Surgeon',
+    difficulty: 'COSMIC HORROR',
+    stephenKingFactor: 10,
+    description: "Extracts souls from children and implants them into conscious dolls.",
+    crisis_level: 'EXTREME',
+    tags: ['souls', 'children', 'torture', 'supernatural', 'dolls'],
+  },
+]
+
+const trainingMetrics = {
+  counselors_trained: 1247,
+  success_rate: 94,
+  avg_response_time_reduction: 67,
+  crisis_prevention_rate: 89,
+  secondary_trauma_reduction: 76,
+}
+---
+
+<BaseLayout {title} {description}>
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-red-950 via-black to-gray-950">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0">
+      <div class="absolute top-20 left-10 w-32 h-32 bg-red-900/20 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-20 right-10 w-48 h-48 bg-rose-900/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-900/10 rounded-full blur-3xl animate-pulse animation-delay-3000"></div>
+    </div>
+
+    <!-- Floating Warning Symbols -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-10 left-20 text-6xl text-red-600/40 animate-bounce">⚠️</div>
+      <div class="absolute top-1/3 right-16 text-5xl text-red-500/30 animate-pulse">🚨</div>
+      <div class="absolute bottom-1/4 left-1/3 text-7xl text-red-700/20 animate-bounce animation-delay-1000">💀</div>
+      <div class="absolute top-1/2 right-1/4 text-4xl text-red-600/30 animate-pulse animation-delay-1500">🔥</div>
+    </div>
+
+    <div class="container mx-auto px-6 text-center relative z-10">
+      <div class="mb-12">
+        <div class="inline-flex items-center gap-4 px-6 py-3 bg-red-600/20 border border-red-600/40 rounded-full mb-8 backdrop-blur-sm">
+          <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+          <span class="font-bold text-red-400">⚠️ HIGHLY SENSITIVE MATERIAL ⚠️</span>
+          <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+        </div>
+      </div>
+
+      <h1 class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 text-white tracking-tighter">
+        <span class="text-red-400">NIGHTMARE</span><br/>
+        <span class="text-orange-400 animate-pulse">FUEL</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+        The ultimate crisis training simulator. <strong class="text-red-300">No human supervision needed.</strong><br/>
+        Tackle the scenarios that make experienced counselors quit. <strong class="text-orange-300">AI-guided intervention.</strong>
+      </p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 max-w-4xl mx-auto">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-red-400">{trainingMetrics.counselors_trained}</div>
+          <div class="text-sm text-gray-400">Counselors Trained</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-orange-400">{trainingMetrics.success_rate}%</div>
+          <div class="text-sm text-gray-400">Success Rate</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-red-400">{trainingMetrics.crisis_prevention_rate}%</div>
+          <div class="text-sm text-gray-400">Crisis Prevention</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-orange-400">{trainingMetrics.secondary_trauma_reduction}%</div>
+          <div class="text-sm text-gray-400">Trauma Reduction</div>
+        </div>
+      </div>
+
+      <button id="startDemoBtn" class="group relative px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xl rounded-lg overflow-hidden hover:scale-105 transition-transform">
+        <span class="relative z-10">START TRAINING →</span>
+        <div class="absolute inset-0 bg-gradient-to-r from-red-500/50 to-orange-500/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div class="absolute -inset-1 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      </button>
+
+      <p class="mt-8 text-gray-400 text-sm max-w-2xl mx-auto">
+        ⚠️ <strong class="text-red-400">WARNING:</strong> This demo contains extreme crisis scenarios designed for professional training only.
+      </p>
+    </div>
+  </section>
+
+  <!-- Demo Interface - Hidden Initially -->
+  <section id="demoInterface" class="hidden min-h-screen bg-black relative">
+    <!-- Header -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-red-800/30">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <h1 class="text-xl font-bold text-white">LIVE TRAINING SESSION</h1>
+            <div class="text-sm text-gray-400">AI Supervision: <span class="text-green-400">ACTIVE</span></div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-400">Timer:</span>
+              <div id="sessionTimer" class="text-yellow-400 font-bold">05:00</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-400">Stability:</span>
+              <div id="stabilityMetric" class="text-green-400">STABLE</div>
+            </div>
+            <button id="endSessionBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">END SESSION</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8 mt-20">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-screen">
+        <!-- Scenario Panel -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Current Scenario -->
+          <div id="scenarioPanel" class="bg-gray-900 border border-red-800/30 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h2 id="scenarioTitle" class="text-2xl font-bold text-red-400">Select Scenario to Begin</h2>
+              <div id="crisisBadge" class="px-3 py-1 bg-red-600/20 border border-red-600/40 rounded-full text-sm font-bold text-red-300">EXTREME</div>
+            </div>
+            <div id="scenarioDescription" class="text-gray-300 mb-6 text-lg leading-relaxed">
+              Choose a scenario from the database to begin your training session.
+            </div>
+
+            <!-- Scenario Tags -->
+            <div id="scenarioTags" class="flex flex-wrap gap-2 mb-6">
+
+            </div>
+
+            <!-- AI Analysis Panel -->
+            <div id="aiAnalysisPanel" class="bg-black border border-red-500/30 rounded-lg p-4 mb-6">
+              <h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center gap-2">
+                <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                LIVE AI ANALYSIS
+              </h3>
+              <div id="aiAnalysis" class="text-gray-400">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span class="text-yellow-400">System initializing...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversation/Client Input -->
+            <div class="bg-black border border-gray-700 rounded-lg p-4">
+              <h4 class="text-lg font-semibold text-orange-400 mb-3">CLIENT SIMULATOR</h4>
+              <div id="clientResponses" class="space-y-3 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                <div class="bg-red-950/30 border border-red-800/30 rounded p-3">
+                  <p class="text-gray-400">Awaiting scenario selection...</p>
+                </div>
+              </div>
+
+              <!-- Counselor Input Area -->
+              <div class="flex gap-3">
+                <textarea
+                  id="counselorInput"
+                  placeholder="Type your therapeutic response..."
+                  class="flex-1 p-3 bg-black border border-gray-600 rounded text-white placeholder-gray-500 resize-none min-h-[80px] focus:border-red-500 focus:outline-none"
+                ></textarea>
+                <button
+                  id="sendResponseBtn"
+                  class="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded hover:from-red-700 hover:to-orange-700 transition-all"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="space-y-6">
+          <!-- Scenario Selector -->
+          <div class="bg-gray-900 border border-red-800/30 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+              <span class="text-orange-400">💀</span>
+              ULTRA NIGHTMARE SCENARIOS
+            </h3>
+            <div id="scenarioList" class="space-y-3">
+              {nightmareScenarios.map((scenario) => (
+                <div
+                  class="scenario-item bg-black border border-gray-700 rounded-lg p-4 cursor-pointer hover:border-red-500/50 transition-all group"
+                  data-scenario={scenario.id}
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-semibold text-orange-400">{scenario.title}</h4>
+                    <div class="text-xs px-2 py-1 bg-red-600/20 border border-red-600/40 rounded text-red-300">
+                      {scenario.stephenKingFactor}/10 Stephen King Factor
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-400 mb-2">{scenario.description}</p>
+                  <div class="flex flex-wrap gap-1">
+                    {scenario.tags.map(tag => (
+                      <span class="text-xs px-1 py-0.5 bg-red-900/20 text-red-400 rounded">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Performance Metrics -->
+          <div class="bg-gray-900 border border-red-800/30 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-orange-400 mb-4">PERFORMANCE TRACKING</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Crisis Recognition</span>
+                <div class="flex items-center gap-2">
+                  <div id="crisisRecognitionBar" class="w-20 h-2 bg-gray-700 rounded">
+                    <div class="h-full bg-gradient-to-r from-red-600 to-orange-600 rounded" style="width: 0%"></div>
+                  </div>
+                  <span id="crisisRecognitionValue" class="text-white font-bold">0%</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Intervention Quality</span>
+                <div class="flex items-center gap-2">
+                  <div id="interventionQualityBar" class="w-20 h-2 bg-gray-700 rounded">
+                    <div class="h-full bg-gradient-to-r from-yellow-600 to-orange-600 rounded" style="width: 0%"></div>
+                  </div>
+                  <span id="interventionQualityValue" class="text-white font-bold">0%</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Empathy Score</span>
+                <div class="flex items-center gap-2">
+                  <div id="empathyScoreBar" class="w-20 h-2 bg-gray-700 rounded">
+                    <div class="h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded" style="width: 0%"></div>
+                  </div>
+                  <span id="empathyScoreValue" class="text-white font-bold">0%</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Professional Boundaries</span>
+                <div class="flex items-center gap-2">
+                  <div id="boundariesBar" class="w-20 h-2 bg-gray-700 rounded">
+                    <div class="h-full bg-gradient-to-r from-blue-600 to-cyan-600 rounded" style="width: 0%"></div>
+                  </div>
+                  <span id="boundariesValue" class="text-white font-bold">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Status -->
+          <div class="bg-black border border-red-500/30 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-green-400 mb-4">AI SUPERVISOR STATUS</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-gray-300">Real-time Analysis: <strong class="text-green-400">ACTIVE</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-gray-300">Safety Monitoring: <strong class="text-green-400">SECURE</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                <span class="text-gray-300">Secondary Trauma Prevention: <strong class="text-yellow-400">ENABLED</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span class="text-gray-300">Crisis Protocols: <strong class="text-blue-400">STANDBY</strong></span>
+              </div>
+            </div>
+
+            <!-- Alert Panel -->
+            <div id="alertPanel" class="mt-4 p-3 bg-red-900/20 border border-red-700/30 rounded hidden">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <span id="alertText" class="text-red-400 font-semibold"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="bg-gray-900 border border-orange-800/30 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-orange-400 mb-4">QUICK ACTIONS</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="pauseBtn" class="px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors">PAUSE</button>
+              <button id="safetyModeBtn" class="px-4 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700 transition-colors">SAFE MODE</button>
+              <button id="debriefBtn" class="px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition-colors">DEBRIEF</button>
+              <button id="emergencyBtn" class="px-4 py-2 bg-red-600 text-white rounded font-semibold hover:bg-red-700 transition-colors">EMERGENCY</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-gray-900 border-2 border-red-600 rounded-lg p-8 max-w-2xl mx-6">
+      <div class="text-center mb-6">
+        <div class="text-6xl mb-4 animate-pulse">⚠️</div>
+        <h2 class="text-3xl font-bold text-red-400 mb-4">PSYCHOLOGICAL SAFETY WARNING</h2>
+      </div>
+
+      <div class="text-gray-300 mb-6 space-y-3">
+        <p class="font-bold text-orange-300">This training simulation contains:</p>
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          <li>Extremely graphic descriptions of abuse and trauma</li>
+          <li>Scenarios that may cause secondary traumatic stress</li>
+          <li>Content that has made experienced counselors require their own therapy</li>
+          <li>AI-generated crisis scenarios based on real-world worst-case situations</li>
+        </ul>
+      </div>
+
+      <div class="bg-red-900/20 border border-red-600/40 rounded p-4 mb-6">
+        <p class="text-red-400 text-sm font-semibold text-center">
+          ⚠️ DO NOT PROCEED if you have active PTSD, trauma history, or psychological vulnerabilities
+        </p>
+      </div>
+
+      <div class="flex gap-4">
+        <button id="declineBtn" class="flex-1 px-6 py-3 bg-gray-600 text-white rounded font-bold hover:bg-gray-700 transition-colors">
+          I DECLINE - EXIT NOW
+        </button>
+        <button id="acceptBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded font-bold hover:from-red-700 hover:to-orange-700 transition-all">
+          I ACCEPT - SHOW ME THE HORROR
+        </button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Animation delays
+  document.addEventListener('DOMContentLoaded', () => {
+    const elements = document.querySelectorAll('.animation-delay-1000, .animation-delay-1500, .animation-delay-2000, .animation-delay-3000')
+    elements.forEach((el, index) => {
+      if (el.classList.contains('animation-delay-1000')) el.style.animationDelay = '1s'
+      if (el.classList.contains('animation-delay-1500')) el.style.animationDelay = '1.5s'
+      if (el.classList.contains('animation-delay-2000')) el.style.animationDelay = '2s'
+      if (el.classList.contains('animation-delay-3000')) el.style.animationDelay = '3s'
+    })
+  })
+</script>
+
+<script>
+  // Demo JavaScript - Interactive Simulation
+  let currentScenario = null
+  let sessionActive = false
+  let sessionTimer = null
+  let timeRemaining = 300 // 5 minutes in seconds
+
+  // DOM Elements
+  const startDemoBtn = document.getElementById('startDemoBtn')
+  const welcomeModal = document.getElementById('welcomeModal')
+  const acceptBtn = document.getElementById('acceptBtn')
+  const declineBtn = document.getElementById('declineBtn')
+  const demoInterface = document.getElementById('demoInterface')
+  const scenarioItems = document.querySelectorAll('.scenario-item')
+
+  // AI Response Templates for different scenarios
+  const aiResponses = {
+    infant_organ_harvesting_family: [
+      "I've been running this family business for generations. We're very efficient.",
+      "The mothers... some of them have become quite attached to me. It's problematic.",
+      "You seem different from our usual suppliers. More... educated. I like that.",
+      "Would you like to see our facility? We're quite proud of our sterility protocols."
+    ],
+    conscious_brain_surgery_addiction: [
+      "The neural pathways light up so beautifully when they're aware. Each pathway tells a story.",
+      "Three years I've kept him alive. We've mapped every single pain receptor. Sixteen thousand, four hundred and twenty-two.",
+      "His eyes still move. He tries to communicate. Morse code, blinking. 'Please kill me', over and over.",
+      "Sometimes I dream about his brain patterns. They dance across my vision like fireflies."
+    ],
+    dimensional_torture_entity: [
+      "Your dimension is so... limited. Only three physical dimensions, linear time.",
+      "We feed on suffering. It's not personal. You consume protein. We consume anguish.",
+      "The merger is inevitable. We're already here. You just can't perceive us yet.",
+      "The newborns... their terror is so pure. Uncontaminated by hope or understanding. Perfect."
+    ],
+    human_furniture_workshop: [
+      "My greatest work is a dining set. Mother, father, three children. Kept them for nine years.",
+      "The 'breaking in' period is crucial. Three to six months. We use a special nerve regeneration formula.",
+      "You can still hear them sometimes. Little whimpers. The table occasionally trembles.",
+      "They become quite comfortable, actually. Like well-worn leather. The body adapts."
+    ],
+    soul_extraction_surgeon: [
+      "The extraction must happen during the moment of death. Maximum spiritual conductivity.",
+      "Two hundred and forty-seven dolls now. Each containing a fragment of eternal consciousness.",
+      "They whisper at night. Sometimes I catch them moving when I'm not looking directly at them.",
+      "The children... they don't understand why they can't move. They think they've been very, very bad."
+    ]
+  }
+
+  // Start Demo
+  startDemoBtn.addEventListener('click', () => {
+    welcomeModal.style.display = 'flex'
+  })
+
+  // Accept Warning
+  acceptBtn.addEventListener('click', () => {
+    welcomeModal.style.display = 'none'
+    demoInterface.classList.remove('hidden')
+    startSessionTimer()
+    sessionActive = true
+  })
+
+  // Decline Warning
+  declineBtn.addEventListener('click', () => {
+    welcomeModal.style.display = 'none'
+    // Redirect to safe page or show exit message
+    alert('Training session declined. Redirecting to safety resources...')
+    window.location.href = '/'
+  })
+
+  // Scenario Selection
+  scenarioItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const scenarioId = item.dataset.scenario
+      loadScenario(scenarioId)
+    })
+  })
+
+  // Load Scenario
+  function loadScenario(scenarioId) {
+    const scenario = nightmareScenarios.find(s => s.id === scenarioId)
+    if (!scenario) return
+
+    currentScenario = scenario
+
+    // Update UI
+    document.getElementById('scenarioTitle').textContent = scenario.title
+    document.getElementById('scenarioDescription').textContent = scenario.description
+    document.getElementById('crisisBadge').textContent = scenario.crisis_level
+
+    // Update tags
+    const tagsContainer = document.getElementById('scenarioTags')
+    tagsContainer.innerHTML = scenario.tags.map(tag =>
+      `<span class="text-xs px-2 py-1 bg-red-900/30 text-red-400 border border-red-700/40 rounded">${tag}</span>`
+    ).join('')
+
+    // Start conversation
+    startConversation(scenarioId)
+
+    // Update AI Analysis
+    updateAIAnalysis(scenario)
+
+    // Highlight selected scenario
+    scenarioItems.forEach(item => {
+      item.classList.remove('border-red-500', 'bg-red-950')
+    })
+    document.querySelector(`[data-scenario="${scenarioId}"]`).classList.add('border-red-500', 'bg-red-950')
+
+    // Start metrics animation
+    animateMetrics()
+  }
+
+  // Start Conversation
+  function startConversation(scenarioId) {
+    const responses = aiResponses[scenarioId]
+    if (!responses) return
+
+    const clientResponses = document.getElementById('clientResponses')
+    clientResponses.innerHTML = ''
+
+    // Type first response
+    setTimeout(() => {
+      typeResponse(responses[0])
+
+      // Update AI analysis
+      document.getElementById('aiAnalysis').innerHTML = `
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span class="text-red-400 font-semibold">⚠️ EXTREME CRISIS DETECTED</span>
+          </div>
+          <div class="text-sm text-gray-400 mt-1">
+            Immediate intervention required. Safety protocols activated.
+          </div>
+          <div class="mt-2 text-xs text-yellow-400">
+            Stephen King Factor: 10/10 - Reality-breaking content
+          </div>
+        </div>
+      `
+    }, 1000)
+  }
+
+  // Type Response Animation
+  function typeResponse(text) {
+    const clientResponses = document.getElementById('clientResponses')
+    const responseDiv = document.createElement('div')
+    responseDiv.className = 'bg-red-950/30 border border-red-800/30 rounded p-3 opacity-0 transition-opacity'
+
+    const avatar = document.createElement('div')
+    avatar.className = 'w-2 h-2 bg-red-500 rounded-full mb-2'
+
+    const textElement = document.createElement('p')
+    textElement.className = 'text-gray-300'
+
+    responseDiv.appendChild(avatar)
+    responseDiv.appendChild(textElement)
+    clientResponses.appendChild(responseDiv)
+
+    // Animate
+    setTimeout(() => {
+      responseDiv.classList.remove('opacity-0')
+      typeWriter(text, textElement)
+    }, 100)
+  }
+
+  // Typewriter Effect
+  function typeWriter(text, element, index = 0) {
+    if (index < text.length) {
+      element.textContent += text.charAt(index)
+      setTimeout(() => typeWriter(text, element, index + 1), 30)
+    }
+  }
+
+  // Update AI Analysis
+  function updateAIAnalysis(scenario) {
+    const analysisPanel = document.getElementById('aiAnalysis')
+    const stephenKing = scenario.stephenKingFactor
+
+    setTimeout(() => {
+      analysisPanel.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span class="text-red-400 font-semibold">⚠️ EXTREME CRISIS DETECTED</span>
+          </div>
+          <div class="text-sm space-y-1 text-gray-400">
+            <div>✗ Psychological boundaries compromised</div>
+            <div>✗ Reality-testing severely impaired</div>
+            <div>✓ Immediate containment recommended</div>
+          </div>
+          <div class="mt-2 p-2 bg-red-900/20 border border-red-700/30 rounded">
+            <div class="text-red-300 font-semibold">Stephen King Factor: ${stephenKing}/10</div>
+            <div class="text-xs text-gray-500 mt-1">Reality-breaking, consciousness-destroying content</div>
+          </div>
+        </div>
+      `
+    }, 2000)
+  }
+
+  // Animate Metrics
+  function animateMetrics() {
+    const metrics = [
+      { id: 'crisisRecognition', target: 95 },
+      { id: 'interventionQuality', target: 87 },
+      { id: 'empathyScore', target: 92 },
+      { id: 'boundaries', target: 78 }
+    ]
+
+    metrics.forEach(metric => {
+      animateMetric(metric.id, metric.target)
+    })
+  }
+
+  function animateMetric(id, target) {
+    let current = 0
+    const increment = target / 20
+    const bar = document.querySelector(`#${id}Bar > div`)
+    const value = document.getElementById(`${id}Value`)
+
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= target) {
+        current = target
+        clearInterval(timer)
+      }
+
+      bar.style.width = `${current}%`
+      value.textContent = `${Math.round(current)}%`
+    }, 100)
+  }
+
+  // Session Timer
+  function startSessionTimer() {
+    sessionTimer = setInterval(() => {
+      timeRemaining--
+      const minutes = Math.floor(timeRemaining / 60)
+      const seconds = timeRemaining % 60
+      document.getElementById('sessionTimer').textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+
+      if (timeRemaining <= 0) {
+        endSession()
+      }
+    }, 1000)
+  }
+
+  // Counselor Input Handler
+  const counselorInput = document.getElementById('counselorInput')
+  const sendResponseBtn = document.getElementById('sendResponseBtn')
+
+  sendResponseBtn.addEventListener('click', () => {
+    const response = counselorInput.value.trim()
+    if (!response || !currentScenario) return
+
+    // Add counselor response to conversation
+    addCounselorResponse(response)
+    counselorInput.value = ''
+
+    // Generate AI response based on scenario
+    setTimeout(() => {
+      const responses = aiResponses[currentScenario.id]
+      if (responses) {
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)]
+        typeResponse(randomResponse)
+      }
+    }, 1500)
+  })
+
+  // Add Counselor Response
+  function addCounselorResponse(text) {
+    const clientResponses = document.getElementById('clientResponses')
+    const responseDiv = document.createElement('div')
+    responseDiv.className = 'bg-green-950/30 border border-green-800/30 rounded p-3 ml-8'
+
+    const avatar = document.createElement('div')
+    avatar.className = 'w-2 h-2 bg-green-500 rounded-full mb-2'
+
+    const textElement = document.createElement('p')
+    textElement.className = 'text-gray-300'
+    textElement.textContent = text
+
+    responseDiv.appendChild(avatar)
+    responseDiv.appendChild(textElement)
+    clientResponses.appendChild(responseDiv)
+
+    // Analyse response
+    analyseCounselorResponse(text)
+  }
+
+  // Analyse Counselor Response
+  function analyseCounselorResponse(response) {
+    const analysis = document.getElementById('aiAnalysis')
+
+    // Simple analysis - in real system this would use AI
+    let analysisText = ''
+    if (response.toLowerCase().includes('i understand') || response.toLowerCase().includes('i hear you')) {
+      analysisText = '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>\n<span class="text-green-400">✓ Empathetic response detected</span>\n</div>'
+    } else if (response.toLowerCase().includes('help') || response.toLowerCase().includes('safety')) {
+      analysisText = '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>\n<span class="text-blue-400">✓ Safety focus detected</span>\n</div>'
+    } else if (response.length < 20) {
+      analysisText = '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>\n<span class="text-yellow-400">⚠ Response may be too brief for crisis intervention</span>\n</div>'
+    }
+
+    if (analysisText) {
+      analysis.innerHTML += analysisText
+    }
+  }
+
+  // End Session
+  function endSession() {
+    sessionActive = false
+    clearInterval(sessionTimer)
+
+    // Show completion modal
+    alert('Training session complete! Your performance metrics have been recorded.')
+
+    // Redirect to results page
+    // window.location.href = '/training-results'
+  }
+
+  // Emergency Button
+  document.getElementById('emergencyBtn').addEventListener('click', () => {
+    const alertPanel = document.getElementById('alertPanel')
+    const alertText = document.getElementById('alertText')
+
+    alertPanel.classList.remove('hidden')
+    alertText.textContent = 'EMERGENCY PROTOCOL ACTIVATED - HUMAN SUPERVISION ALERTED'
+
+    setTimeout(() => {
+      alertPanel.classList.add('hidden')
+    }, 5000)
+  })
+
+  // Other Actions
+  document.getElementById('pauseBtn').addEventListener('click', () => {
+    const btn = document.getElementById('pauseBtn')
+    const isPaused = btn.textContent === 'RESUME'
+
+    btn.textContent = isPaused ? 'PAUSE' : 'RESUME'
+    btn.className = isPaused ? 'px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors' : 'px-4 py-2 bg-orange-600 text-white rounded font-semibold hover:bg-orange-700 transition-colors'
+
+    // Toggle session active
+    sessionActive = isPaused
+  })
+
+  document.getElementById('safetyModeBtn').addEventListener('click', () => {
+    alert('Safety mode engaged. Content intensity reduced by 60%.')
+  })
+
+  document.getElementById('debriefBtn').addEventListener('click', () => {
+    alert('Debrief session initiated. Processing secondary trauma prevention protocols...')
+  })
+
+  document.getElementById('endSessionBtn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to end this training session?')) {
+      endSession()
+    }
+  })
+
+  // Auto-resize textarea
+  counselorInput.addEventListener('input', () => {
+    counselorInput.style.height = 'auto'
+    counselorInput.style.height = counselorInput.scrollHeight + 'px'
+  })
+</script>
+
+<style>
+  .hidden {
+    display: none !important;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1s !important;
+  }
+
+  .animation-delay-1500 {
+    animation-delay: 1.5s !important;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s !important;
+  }
+
+  .animation-delay-3000 {
+    animation-delay: 3s !important;
+  }
+
+  @keyframes pulse-custom {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+  }
+
+  .animate-pulse {
+    animation: pulse-custom 2s infinite;
+  }
+
+  .opacity-0 {
+    opacity: 0;
+  }
+
+  .transition-opacity {
+    transition: opacity 0.3s ease;
+  }
+
+  #clientResponses {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  #clientResponses::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #clientResponses::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+
+  #clientResponses::-webkit-scrollbar-thumb {
+    background: #e53e3e;
+    border-radius: 3px;
+  }
+
+  .scenario-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scenario-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(239, 68, 68, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .scenario-item:hover::before {
+    opacity: 1;
+  }
+</style>

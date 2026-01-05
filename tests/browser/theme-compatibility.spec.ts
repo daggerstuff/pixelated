@@ -131,7 +131,7 @@ test.describe('Theme Compatibility Tests', () => {
       })
     })
 
-    test('should handle system theme preference', async ({ browserName }) => {
+    test('should handle system theme preference', async ({ browserName: _browserName }) => {
       // Mock system dark preference
       await page.addInitScript(() => {
         Object.defineProperty(window, 'matchMedia', {
@@ -364,15 +364,15 @@ test.describe('Theme Compatibility Tests', () => {
   test.describe('Performance', () => {
     test('should load theme styles efficiently', async () => {
       const performanceEntries = await page.evaluate(() => {
-        return performance
-          .getEntriesByType('resource')
-          .filter((entry: any) => entry.name.includes('.css'))
-          .map((entry: any) => ({
-            name: entry.name,
-            duration: entry.duration,
-            size: entry.transferSize,
-          }))
-      })
+                                               return performance
+                                                 .getEntriesByType('resource')
+                                                 .filter((entry: any) => entry.name.includes('.css'))
+                                                 .map((entry: any) => ({
+                                                   name: entry.name,
+                                                   duration: entry.duration,
+                                                   size: entry.transferSize,
+                                                 }))
+                                             }).slice()
 
       // CSS files should load quickly
       for (const entry of performanceEntries) {

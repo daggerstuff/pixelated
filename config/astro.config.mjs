@@ -9,6 +9,7 @@ import icon from 'astro-icon';
 import sentry from '@sentry/astro';
 
 import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
@@ -97,10 +98,8 @@ const adapter = (() => {
   }
 
   if (isVercelDeploy) {
-    console.log('⚡ Using Node adapter for Vercel deployment');
-    return node({
-      mode: 'middleware',
-    });
+    console.log('⚡ Using Vercel adapter for deployment');
+    return vercel();
   }
 
   if (isRailwayDeploy) {
@@ -539,10 +538,10 @@ export default defineConfig({
     service: passthroughImageService(),
     domains: ['pixelatedempathy.com', 'cdn.pixelatedempathy.com'],
   },
-  redirects: {
+  /* redirects: {
     '/admin': '/admin/dashboard',
     '/docs': '/docs/getting-started',
-  },
+  }, */
   devToolbar: {
     enabled: isDevelopment,
   },

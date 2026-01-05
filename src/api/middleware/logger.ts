@@ -13,7 +13,7 @@ export function requestLogger(
     res: Response,
     next: NextFunction
 ) {
-    const startTime = Date.now().slice()
+    const startTime = Date.now()
     const requestId = generateRequestId()
 
         // Store metadata on request object
@@ -82,8 +82,8 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
 async function logAuditEvent(
     req: Request,
     res: Response,
-    requestId: string,
-    duration: number
+    _requestId: string,
+    _duration: number
 ) {
     try {
         const pool = getPostgresPool()
@@ -97,7 +97,7 @@ async function logAuditEvent(
         const changes = extractChanges(req)
 
         await pool.query(
-            `INSERT INTO audit_logs 
+            `INSERT INTO audit_logs
        (user_id, action, resource_type, resource_id, changes, ip_address, user_agent, status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
             [
