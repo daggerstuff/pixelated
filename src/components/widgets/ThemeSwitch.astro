@@ -6,7 +6,7 @@
   id="theme-switch"
   class="op-60 hover:op-100 op-transition"
   title="Toggles light & dark"
-  aria-label="Toggles light & dark"
+  aria-label="Dark Mode"
 >
   <div u-i-ri-sun-line u-dark:i-ri-moon-line></div>
 </button>
@@ -29,11 +29,9 @@
 
     if (theme === 'light') {
       document.documentElement.classList.remove('dark')
-      toggleThemeButton.setAttribute('aria-label', 'light')
       toggleThemeButton.setAttribute('aria-checked', 'false')
     } else {
       document.documentElement.classList.add('dark')
-      toggleThemeButton.setAttribute('aria-label', 'dark')
       toggleThemeButton.setAttribute('aria-checked', 'true')
     }
 
@@ -88,7 +86,6 @@
     }
 
     const updateAria = (buttonElement: HTMLElement) => {
-      buttonElement.setAttribute('aria-label', isDark ? 'dark' : 'light')
       buttonElement.setAttribute('aria-checked', isDark ? 'true' : 'false')
     }
 
