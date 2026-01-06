@@ -81,6 +81,7 @@ dependencies = [
   "fonttools>=4.61.1", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability, updated to 4.61.1)
   "mcp>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
   "urllib3>=2.6.2", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+  "aiohttp>=3.13.3", # Fixes CVE-2025-69223, CVE-2025-69224, CVE-2025-69228, CVE-2025-69229, CVE-2025-69230
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "checkov>=3.0.34", # Keep compatible version (3.2.495 requires boto3==1.35.49)

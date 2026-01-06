@@ -1,40 +1,10 @@
 ---
-export const prerender = false
+export const prerender = false;
 
-import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import Card from '@/components/ui/Card.astro'
-import { requireAuth } from '@/lib/auth'
-import { ProfileComponent } from '@/components/profile/ProfileComponent'
-import type { User } from '@/types/user'
-import type { APIContext } from 'astro'
+import Card from "@/components/ui/Card.astro";
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
 
-export async function GET(context: APIContext) {
-  // Check authentication and redirect if not authenticated
-  const authRedirect = await requireAuth({
-    cookies: context.cookies,
-    redirect: context.redirect,
-    request: context.request,
-  })
-
-  // If authentication fails, return the redirect response
-  if (authRedirect) {
-    return authRedirect
-  }
-
-  // Get the current user from the auth session
-  const user = context.locals.user as User
-
-  // Render the page with the user data
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html',
-    },
-  })
-}
-
-// @ts-expect-error Astro.props is injected at runtime
-const { user } = Astro.props as { user: User }
+import { Auth0UserProfile } from "@/components/auth/Auth0UserProfile";
 ---
 
 <DashboardLayout
@@ -57,7 +27,7 @@ const { user } = Astro.props as { user: User }
         <!-- Profile Information Card -->
         <Card class="lg:col-span-2">
           <div class="p-6">
-            <ProfileComponent client:load {user} />
+            <Auth0UserProfile client:only="react" />
           </div>
         </Card>
 

@@ -1,5 +1,7 @@
 import { defineCollection, z } from 'astro:content'
 import { glob } from 'astro/loaders'
+import path from 'node:path';
+import process from 'node:process';
 import { i18nLoader, pagesLoader } from 'astro-vitesse/loaders'
 import { i18nSchema, pagesSchema } from 'astro-vitesse/schema'
 import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema, streamsSchema } from './content/schema'
@@ -18,7 +20,7 @@ import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema,
  */
 
 // Move content to src/content-store/ to avoid legacy auto-generation warnings
-const baseDir = 'src/content-store';
+const baseDir = path.resolve(process.cwd(), 'src/content-store');
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: `${baseDir}/blog` }),

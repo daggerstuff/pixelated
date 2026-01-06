@@ -16,12 +16,11 @@ if (typeof window !== 'undefined' && !ldClient) {
     // Simple one-shot test, opt-in during development
     /* Uncomment to test
     const flagValue = ldClient?.variation('test-flag', false)
-    const Sentry = getClient()
-    Sentry.captureException(new Error('Something went wrong!'))
+    console.log('LaunchDarkly flag value:', flagValue)
     */
   })
 }
 
-export default function SentryInit() {
+export default function LaunchDarklyInit() {
   return null // runs once on the client to bootstrap LaunchDarkly
 }

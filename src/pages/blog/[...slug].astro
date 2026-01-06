@@ -9,8 +9,9 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardHeader from "@/components/ui/CardHeader.astro";
 import CardTitle from "@/components/ui/CardTitle.astro";
 
-export const prerender = true;
+// export const prerender = true;
 
+/*
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts
@@ -20,14 +21,25 @@ export async function getStaticPaths() {
       props: { entry: post },
     }));
 }
+*/
 
-const { entry } = Astro.props;
+const { slug } = Astro.params;
+const posts = await getCollection("blog");
+const entry = posts.find(
+  (post: CollectionEntry<"blog">) =>
+    !post.data.draft && (post.data.slug || post.slug) === slug
+);
+
+if (!entry) {
+  return Astro.redirect("/404");
+}
+
 const { Content } = await render(entry);
 
 // Get related posts (same category or tags)
 const allPosts = await getCollection(
   "blog",
-  ({ data }: CollectionEntry<"blog">) => !data.draft,
+  ({ data }: CollectionEntry<"blog">) => !data.draft
 );
 
 const relatedPosts = allPosts
@@ -35,7 +47,7 @@ const relatedPosts = allPosts
     (p: CollectionEntry<"blog">) =>
       p.id !== entry.id && // Not the current post
       (p.data.category === entry.data.category || // Same category
-        p.data.tags?.some((tag: string) => entry.data.tags?.includes(tag))), // Shared tags
+        p.data.tags?.some((tag: string) => entry.data.tags?.includes(tag))) // Shared tags
   )
   .sort(() => Math.random() - 0.5) // Randomize
   .slice(0, 3); // Get up to 3 related posts
@@ -561,7 +573,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute);
     window.addEventListener("scroll", () => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
-          100,
+          100
       );
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent;

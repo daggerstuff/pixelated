@@ -38,7 +38,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Detect if we're running a build command (not dev server)
 const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES || !!process.env.VERCEL;
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
-const hasSentryDSN = !!process.env.SENTRY_DSN;
+const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN || true; // Fallback to public DSN if local
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 const preferredPort = (() => {
   const candidates = [
@@ -388,6 +388,7 @@ export default defineConfig({
       }),
       ...(hasSentryDSN ? [
         sentry({
+          dsn: process.env.SENTRY_DSN || process.env.PUBLIC_SENTRY_DSN || 'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
           sourceMapsUploadOptions: {
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
             project: process.env.SENTRY_PROJECT || 'pixel-astro',
@@ -422,7 +423,7 @@ export default defineConfig({
   server: {
     port: preferredPort,
     host: '0.0.0.0',
-    strictPort: false,
+    strictPort: true,
     watch: {
       followSymlinks: false,
       ignored: [

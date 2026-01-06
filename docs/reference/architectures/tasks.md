@@ -9,7 +9,7 @@ This document contains a comprehensive list of actionable improvement tasks for 
 ### High Priority
 - [x] **Fix duplicate dependencies in pyproject.toml** - Remove duplicate `hatch` entries (lines 37, 40, 44) to clean up Python dependencies
 - [x] **Standardize Node.js version references** - Ensure consistent Node.js version (22) across package.json, Dockerfile, and azure-pipelines.yml
-- [x] **Consolidate package manager configuration** - Verify pnpm version consistency between package.json (10.26.2) and installation scripts
+- [x] **Consolidate package manager configuration** - Verify pnpm version consistency between package.json (10.27.0) and installation scripts
 - [x] **Review and optimize dependency versions** - Audit all dependencies for security updates and version conflicts
 - [x] **Create dependency update automation** - Implement automated dependency update workflow with security scanning
 

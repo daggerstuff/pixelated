@@ -3,10 +3,11 @@ import PostCard from "@/components/blog/PostCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
-export const prerender = true
-
 type BlogPost = CollectionEntry<"blog">;
 
+// export const prerender = true
+
+/*
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection("blog", ({ data }: BlogPost) =>
     import.meta.env.PROD ? !data.draft : true,
@@ -23,16 +24,22 @@ export async function getStaticPaths() {
 }
 
 const { name } = Astro.props;
+*/
+const { name } = Astro.params;
+
+if (!name) {
+  return Astro.redirect("/404");
+}
 
 const allPosts = await getCollection("blog", ({ data }: BlogPost) =>
-  import.meta.env.PROD ? !data.draft : true,
+  import.meta.env.PROD ? !data.draft : true
 );
 
 const postsInSeries = allPosts
   .filter((post: BlogPost) => post.data.tags && post.data.tags.includes(name))
   .sort(
     (a: BlogPost, b: BlogPost) =>
-      new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+      new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
   );
 
 const title = `Series: ${name}`;
