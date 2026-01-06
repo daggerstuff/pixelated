@@ -5,7 +5,7 @@ import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import { getPostgresPool } from '../../lib/database/connection'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 import { v4 as uuidv4 } from 'uuid'
-import slug from 'slug'
+import { slug } from '@/utils/common'
 
 // ============================================================================
 // CREATE DOCUMENT

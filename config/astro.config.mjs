@@ -388,7 +388,6 @@ export default defineConfig({
       }),
       ...(hasSentryDSN ? [
         sentry({
-          dsn: process.env.SENTRY_DSN || process.env.PUBLIC_SENTRY_DSN || 'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
           sourceMapsUploadOptions: {
             org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
             project: process.env.SENTRY_PROJECT || 'pixel-astro',

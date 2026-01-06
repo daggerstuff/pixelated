@@ -2,7 +2,7 @@
 import { getMongoConnection, getPostgresPool } from '../../lib/database/connection'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 import { v4 as uuid } from 'uuid'
-import slug from 'slug'
+import { slug } from '@/utils/common'
 
 /**
  * Create a new strategic plan
