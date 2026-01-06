@@ -11,6 +11,8 @@ const {
   title,
   description = "Pixelated Empathy - AI-powered Therapy Training",
 } = Astro.props;
+
+const { cspNonce } = Astro.locals;
 ---
 
 <!doctype html>
@@ -139,7 +141,7 @@ const {
         </div>
       </div>
     </footer>
-    <script is:inline>
+    <script is:inline nonce={cspNonce}>
       function speedInsightsBeforeSend(data) {
         console.log("Speed Insights before send", data);
         return data;

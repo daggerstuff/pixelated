@@ -1,5 +1,9 @@
 // Enhanced API Client with retry logic and type-safe error handling
 import { parseApiResponse, ValidationResult } from './utils/json-validator'
+import type {
+  CrisisDetectionRequest,
+  CrisisDetectionResponse,
+} from '@/types/crisis-detection'
 
 export class EnterpriseAPIClient {
   private baseURL: string
@@ -273,11 +277,11 @@ interface FrameworksResponse {
 interface AnalyzeRequest {
   content: string
   analysisType:
-    | 'session'
-    | 'progress'
-    | 'intervention'
-    | 'risk'
-    | 'comprehensive'
+  | 'session'
+  | 'progress'
+  | 'intervention'
+  | 'risk'
+  | 'comprehensive'
   clientContext?: unknown
   analysisOptions?: unknown
 }
@@ -307,25 +311,4 @@ interface ChatResponse {
   metadata: unknown
 }
 
-interface CrisisDetectionRequest {
-  text: string
-  sessionId?: string
-  options?: {
-    model?: 'fast' | 'accurate'
-    level?: 'low' | 'medium' | 'high'
-  }
-}
 
-interface CrisisDetectionResponse {
-  isCrisis: boolean
-  level: 'none' | 'low' | 'medium' | 'high' | 'critical'
-  confidence: number
-  details: {
-    suicidalIdeation: number
-    selfHarm: number
-    hopelessness: number
-    agitation: number
-  }
-  recommendedAction: 'monitor' | 'alert_human' | 'immediate_intervention'
-  timestamp: string
-}
