@@ -1,6 +1,6 @@
 import type { VNode } from 'vue'
 import type { NavBarLayout } from '../types'
-import type { ProjectGroupsSchema } from '@/content/schema'
+import type { ProjectGroupsSchema } from '@/lib/schema'
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
 

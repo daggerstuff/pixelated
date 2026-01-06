@@ -2011,8 +2011,15 @@ stages:
               # Skip optional dependencies that fail (they're not required for tests)
               pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
 
-              # Install Playwright browsers
-              pnpm exec playwright install
+              # Install Playwright system dependencies and browsers
+              # --with-deps handles system package installation robustly
+              echo "📦 Installing Playwright browsers and dependencies..."
+
+              # Install core browsers + system deps
+              pnpm exec playwright install --with-deps
+
+              # install msedge explicitly
+              pnpm exec playwright install msedge
             displayName: 'Install Playwright Browsers'
 
           - script: |

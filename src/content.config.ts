@@ -2,9 +2,9 @@ import { defineCollection, z } from 'astro:content'
 import { glob } from 'astro/loaders'
 import path from 'node:path';
 import process from 'node:process';
-import { i18nLoader, pagesLoader } from 'astro-vitesse/loaders'
+
 import { i18nSchema, pagesSchema } from 'astro-vitesse/schema'
-import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema, streamsSchema } from './content/schema'
+import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema, streamsSchema } from './lib/schema'
 
 /**
  * KNOWN ISSUE: Astro 5.15+ "Invalid key in record" Bug
@@ -78,13 +78,14 @@ const techniques = defineCollection({
 })
 
 // Astro Vitesse loaders
+// Astro Vitesse loaders - Replaced with glob to avoid auto-generation warnings
 const pages = defineCollection({
-  loader: pagesLoader(),
+  loader: glob({ pattern: '**/*.md', base: `${baseDir}/pages` }),
   schema: pagesSchema(),
 })
 
 const i18n = defineCollection({
-  loader: i18nLoader(),
+  loader: glob({ pattern: '**/*.json', base: `${baseDir}/i18n` }),
   schema: i18nSchema({
     extend: z.object({
       'sponsor.thanks': z.string().optional(),
