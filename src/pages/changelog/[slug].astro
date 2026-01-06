@@ -6,11 +6,11 @@ import { FEATURES } from "@/config";
 import type { PostSchema } from "@/content/schema";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { formatDate } from "@/utils/datetime";
-import type { CollectionEntry } from "astro:content";
 import { getCollection, render } from "astro:content";
 
-export const prerender = true;
+// export const prerender = true;
 
+/*
 export async function getStaticPaths() {
   const posts = await getCollection("changelog");
   return posts.map((post: CollectionEntry<"changelog">) => ({
@@ -18,8 +18,15 @@ export async function getStaticPaths() {
     props: { post },
   }));
 }
+*/
 
-const { post } = Astro.props as { post: CollectionEntry<"changelog"> };
+const { slug } = Astro.params;
+const posts = await getCollection("changelog");
+const post = posts.find((p) => p.slug === slug);
+
+if (!post) {
+  return Astro.redirect("/404");
+}
 const { data: frontmatter } = post as { data: PostSchema };
 const { Content, headings } = await render(post);
 const { share, toc } = FEATURES;

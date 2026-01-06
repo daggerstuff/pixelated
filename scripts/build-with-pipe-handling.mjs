@@ -9,6 +9,22 @@
  */
 import { spawn } from 'child_process';
 import process from 'process';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+
+// Try to load .env file manually to ensure variables are available
+try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+        const result = dotenv.config({ path: envPath });
+        if (result.error) {
+            console.warn('⚠️  Warning: Failed to load .env file via dotenv:', result.error.message);
+        }
+    }
+} catch (e) {
+    console.warn('⚠️  Warning: Error trying to load .env file:', e.message);
+}
 
 // Handle EPIPE errors on stdout/stderr
 process.stdout.on('error', (error) => {

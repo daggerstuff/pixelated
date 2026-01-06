@@ -129,7 +129,7 @@
 **Prerequisites:**
 - Node.js 24+
 - Python 3.11+
-- pnpm 10.26.2+
+- pnpm 10.27.0+
 - uv (Python package manager)
 - Docker (for local services)
 
