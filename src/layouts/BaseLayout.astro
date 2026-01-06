@@ -41,11 +41,13 @@ const {
   lastModDate,
   pathname,
   showNavBar = true,
-  showFooter = true
+  showFooter = true,
 } = Astro.props;
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
 const currentPathname = pathname || Astro.url.pathname;
+
+const { cspNonce } = Astro.locals;
 
 let style: Record<string, string> = {};
 
@@ -131,18 +133,20 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
     </main>
 
     <!-- Footer -->
-    {showFooter && (
-      <>
-        <Footer />
-        <ToTopButton />
-      </>
-    )}
+    {
+      showFooter && (
+        <>
+          <Footer />
+          <ToTopButton />
+        </>
+      )
+    }
 
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />
 
     <!-- Progress Bar -->
-    <script>
+    <script nonce={cspNonce}>
       import nprogress from "nprogress";
 
       document.addEventListener("astro:before-preparation", () => {

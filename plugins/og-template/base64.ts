@@ -1,6 +1,6 @@
 import type { BgType } from '../../src/types'
 
-type BackgroundBase64 = Record<BgType, string>
+type BackgroundBase64 = Partial<Record<BgType, string>>
 
 const backgroundBase64: BackgroundBase64 = {
   plum: '/images/backgrounds/plum.png',
