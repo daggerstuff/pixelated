@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  playwright:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.playwright
+    container_name: pixelated-playwright
+    working_dir: /app
+    volumes:
+      - ..:/app
+      - /app/node_modules
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+    environment:
+      - NODE_ENV=test
+      # Skip browser download since they're pre-installed in the image
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+      # Use headed mode for debugging in container
+      - PLAYWRIGHT_HEADLESS=false
+    ipc: host
+    # Needed for Chromium to run properly
+    privileged: true
