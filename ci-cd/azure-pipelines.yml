@@ -418,6 +418,31 @@ stages:
               pnpm test:evals
             displayName: 'Run Eval Tests'
 
+          - script: |
+              set -euo pipefail
+              echo "⚠️ Job failed. running safe cleanup..."
+
+              # 1. Clean Docker resources (dangling images/containers)
+              if command -v docker >/dev/null 2>&1; then
+                echo "Cleaning Docker resources..."
+                docker system prune -f 2>/dev/null || true
+              fi
+
+              # 2. Clean temporary files
+              echo "Cleaning temporary files..."
+              rm -rf /tmp/* 2>/dev/null || true
+
+              # 3. Clean local build artifacts (safe to remove as they will be recreated)
+              echo "Cleaning build artifacts..."
+              rm -rf $(Build.SourcesDirectory)/node_modules 2>/dev/null || true
+              rm -rf $(Build.SourcesDirectory)/.venv 2>/dev/null || true
+              rm -rf $(Build.SourcesDirectory)/dist 2>/dev/null || true
+
+              echo "✅ Safe cleanup completed"
+              df -h /
+            condition: failed()
+            displayName: 'Cleanup on Failure'
+
   - stage: Build
     displayName: 'Build Application'
     # Build must wait for Eval to complete to prevent resource contention
@@ -562,6 +587,32 @@ stages:
             artifact: build-metadata
             displayName: 'Publish Build Metadata'
 
+          - script: |
+              set -euo pipefail
+              echo "⚠️ Job failed. running safe cleanup..."
+
+              # 1. Clean Docker resources (dangling images/containers)
+              if command -v docker >/dev/null 2>&1; then
+                echo "Cleaning Docker resources..."
+                docker system prune -f 2>/dev/null || true
+              fi
+
+              # 2. Clean temporary files
+              echo "Cleaning temporary files..."
+              rm -rf /tmp/* 2>/dev/null || true
+
+              # 3. Clean local build artifacts
+              echo "Cleaning build artifacts..."
+              rm -rf $(Build.ArtifactStagingDirectory)/* 2>/dev/null || true
+              # Note: we don't clean node_modules here as Build job mainly does docker builds, 
+              # but cleaning source build artifacts is good practice
+              rm -rf $(Build.SourcesDirectory)/dist 2>/dev/null || true
+
+              echo "✅ Safe cleanup completed"
+              df -h /
+            condition: failed()
+            displayName: 'Cleanup on Failure'
+
   - stage: Security
     displayName: 'Security Scanning'
     dependsOn: Build
@@ -645,6 +696,23 @@ stages:
           - publish: trivy-results.sarif
             artifact: security-scan-results
             displayName: 'Publish Security Scan Results'
+
+          - script: |
+              set -euo pipefail
+              echo "⚠️ Job failed. running safe cleanup..."
+
+              # 1. Clean Docker resources (dangling images/containers)
+              if command -v docker >/dev/null 2>&1; then
+                echo "Cleaning Docker resources..."
+                docker system prune -f 2>/dev/null || true
+                # Also remove the specific image we pulled if scanning failed
+                docker rmi $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) 2>/dev/null || true
+              fi
+
+              echo "✅ Safe cleanup completed"
+              df -h /
+            condition: failed()
+            displayName: 'Cleanup on Failure'
 
   - stage: InstallCertManager
     displayName: 'Install cert-manager'
