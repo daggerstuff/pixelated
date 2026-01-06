@@ -1,0 +1,32 @@
+# Use Playwright's official Docker image which comes with all browsers pre-installed
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@10.27.0
+
+# Create app directory and set permissions
+RUN mkdir -p /app && chown -R pwuser:pwuser /app
+
+# Switch to pwuser (Playwright user)
+USER pwuser
+
+# Copy package files
+COPY --chown=pwuser:pwuser package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY --chown=pwuser:pwuser . .
+
+# Expose port for development
+EXPOSE 3000
+
+# Set environment variable to skip browser download (not needed since browsers are pre-installed)
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+# Run tests by default
+CMD ["pnpm", "test:e2e"]
