@@ -4,8 +4,9 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
-export const prerender = true;
+// export const prerender = true;
 
+/*
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection(
     "blog",
@@ -31,13 +32,19 @@ export async function getStaticPaths() {
 }
 
 const { tag } = Astro.props;
+*/
+const { tag } = Astro.params;
+
+if (!tag) {
+  return Astro.redirect("/404");
+}
 
 // Get all posts with this tag
 const allBlogPosts = await getCollection(
   "blog",
   ({ data }: CollectionEntry<"blog">["data"]) => {
     return import.meta.env.PROD ? data.pubDate <= new Date() : true;
-  },
+  }
 );
 
 // Sort by date (newest first)
