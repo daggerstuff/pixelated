@@ -47,3 +47,18 @@ export interface CrisisDetectionResponse {
     confidenceScore: number
   }
 }
+
+export interface CrisisDetectionRequest {
+  content: string
+  contentType: 'chat_message' | 'transcript' | 'clinical_note'
+  context?: {
+    previousAssessments?: unknown[]
+    sessionMetadata?: unknown
+  }
+  options?: {
+    sensitivityLevel?: 'low' | 'medium' | 'high'
+    includeTreatmentSuggestions?: boolean
+    includeResourceRecommendations?: boolean
+    enableImmediateNotifications?: boolean
+  }
+}
