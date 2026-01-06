@@ -19,5 +19,6 @@ services:
       # Use headed mode for debugging in container
       - PLAYWRIGHT_HEADLESS=false
     ipc: host
-    # Needed for Chromium to run properly
-    privileged: true
+    # Use seccomp profile instead of privileged mode for Chromium security
+    security_opt:
+      - seccomp=./seccomp/chromium.json
