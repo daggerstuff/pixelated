@@ -44,8 +44,10 @@ function getSentry(): SentryShim | null {
     if (typeof window !== 'undefined' && (window as any).Sentry) {
       return (window as any).Sentry as SentryShim
     }
-  } catch (_) {
-    // no-op
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry] Failed to access global Sentry object:', error)
+    }
   }
   return null
 }
@@ -503,7 +505,10 @@ export const sessionMetrics = {
  */
 export async function flushMetrics(): Promise<void> {
   try {
-    await Sentry.flush()
+    const client = getSentry() as any
+    if (client && typeof client.flush === 'function') {
+      await client.flush()
+    }
   } catch (error) {
     if (import.meta.env.DEV) {
       console.warn('[Sentry Metrics] Failed to flush metrics:', error)
@@ -511,12 +516,9 @@ export async function flushMetrics(): Promise<void> {
   }
 }
 
-// Export commonly used Sentry functions for convenience
-export const {
-  captureException,
-  captureMessage: sentryCaptureMessage,
-  withScope,
-} = Sentry
+// Re-export wrappers that perform safe checking
+export {
+  captureError as captureException,
+  captureMessage as sentryCaptureMessage,
+}
 
-// Re-export the main Sentry object
-export { Sentry }

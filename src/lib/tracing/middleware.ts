@@ -51,7 +51,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   // Determine if it's safe to access request headers
   // In Astro, accessing headers on a prerendered page during build triggers a warning
   const isBuild = import.meta.env.COMMAND === 'build'
-  const canAccessHeaders = !!req && 'headers' in req && typeof req.headers?.get === 'function' && !isBuild
+  const canAccessHeaders = !isBuild && !!req && 'headers' in req && typeof req.headers?.get === 'function'
 
   // Extract trace context from headers only if safe
   const traceParent = canAccessHeaders ? req.headers.get('traceparent') : null

@@ -2,8 +2,9 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-export const prerender = true
+// export const prerender = true
 
+/*
 export async function getStaticPaths() {
   // Define paginate helper (must be in scope for this function)
   function paginate(data: any[], options: { pageSize: number }) {
@@ -73,6 +74,43 @@ export async function getStaticPaths() {
 }
 
 const { page } = Astro.props;
+*/
+
+const pageParam = Astro.params.page || "1";
+const currentPage = parseInt(pageParam, 10);
+const pageSize = 20;
+
+const posts = await getCollection("blog", (entry: any) => {
+  return import.meta.env.PROD ? !entry.data.draft : true;
+});
+
+const sortedPosts = posts.sort((postA: any, postB: any) => {
+  return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf();
+});
+
+const totalPages = Math.ceil(sortedPosts.length / pageSize);
+
+if (currentPage < 1 || currentPage > totalPages) {
+  return Astro.redirect("/404");
+}
+
+const start = (currentPage - 1) * pageSize;
+const end = start + pageSize;
+const pageData = sortedPosts.slice(start, end);
+
+const page = {
+  data: pageData,
+  currentPage: currentPage,
+  lastPage: totalPages,
+  size: pageSize,
+  total: sortedPosts.length,
+  url: {
+    current: `/blog/page/${currentPage}`,
+    prev: currentPage > 1 ? `/blog/page/${currentPage - 1}` : undefined,
+    next:
+      currentPage < totalPages ? `/blog/page/${currentPage + 1}` : undefined,
+  },
+};
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {

@@ -4,7 +4,7 @@ FROM node:24.12.0-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
-ARG PNPM_VERSION=10.26.2
+ARG PNPM_VERSION=10.27.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -90,7 +90,7 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=10.26.2
+ARG PNPM_VERSION=10.27.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
