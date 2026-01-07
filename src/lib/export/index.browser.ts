@@ -207,7 +207,7 @@ export class ExportService {
       let mimeType: string
       let filename: string
 
-      if (exportOptions.format === ExportFormat.JSON_FORMAT) {
+      if (exportOptions.format === ExportFormat.JSON) {
         exportData = await this.createJSONExport(messages, exportOptions)
         mimeType = 'application/json'
         filename = `therapy-conversation-${exportId}.json`

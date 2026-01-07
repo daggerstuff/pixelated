@@ -26,7 +26,7 @@ export class CernerProvider extends BaseEHRProvider {
     super(logger)
   }
 
-  async initialize(): Promise<void> {
+  override async initialize(): Promise<void> {
     await super.initialize()
 
     // Cerner-specific initialization
@@ -108,7 +108,7 @@ export class CernerProvider extends BaseEHRProvider {
     }
   }
 
-  async cleanup(): Promise<void> {
+  override async cleanup(): Promise<void> {
     try {
       // Cerner-specific cleanup
       this.logger.info(`Cleaning up Cerner provider ${this.id}`)

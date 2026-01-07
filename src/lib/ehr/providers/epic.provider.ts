@@ -21,7 +21,7 @@ export class EpicProvider extends BaseEHRProvider {
     super(logger)
   }
 
-  async initialize(): Promise<void> {
+  override async initialize(): Promise<void> {
     await super.initialize()
 
     // Epic-specific initialization
@@ -66,7 +66,7 @@ export class EpicProvider extends BaseEHRProvider {
     }
   }
 
-  async cleanup(): Promise<void> {
+  override async cleanup(): Promise<void> {
     try {
       // Epic-specific cleanup
       this.logger.info(`Cleaning up Epic provider ${this.id}`)
