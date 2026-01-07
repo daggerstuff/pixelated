@@ -1,0 +1,55 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/vivi/pixelated[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[90mstdout[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mPII Detection Service initialized
+
+[90mstderr[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mAuth0 management configuration is incomplete. RBAC features may not work.
+
+[90mstderr[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mAuth0 configuration incomplete
+Auth0 is not properly configured
+
+ [32m✓[39m src/lib/auth/__tests__/integration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 01:12:00
+[2m   Duration [22m 11.01s[2m (transform 2.35s, setup 1.08s, import 5.36s, tests 122ms, environment 2.36s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   18.94 |    16.37 |   13.26 |   19.07 |                   
+ db/security       |   14.28 |        0 |       0 |   14.28 |                   
+  initialize.ts    |   14.28 |        0 |       0 |   14.28 | 15-25             
+ lib               |    9.67 |        0 |       0 |   10.08 |                   
+  fhe.ts           |    9.67 |        0 |       0 |   10.08 | 67-361            
+ lib/auth          |   12.32 |    17.53 |     9.8 |   12.93 |                   
+  ...fa-service.ts |    5.18 |        9 |    8.69 |    4.76 | 29-30,150-640     
+  ...middleware.ts |   29.67 |    29.26 |   36.36 |   30.16 | ...84-633,681-753 
+  ...ac-service.ts |    5.74 |     8.33 |    4.16 |    6.28 | 29-30,374-793     
+  ...ntegration.ts |   44.44 |       50 |   33.33 |   44.44 | 23-37             
+  config.ts        |   34.78 |    48.78 |       0 |   34.78 | 202-266           
+  jwt-service.ts   |       0 |        0 |       0 |       0 |                   
+  middleware.ts    |       0 |        0 |       0 |       0 |                   
+  utils.ts         |     0.8 |        0 |    2.85 |    0.94 | 14-85,106-401     
+ lib/fhe           |   91.04 |    63.15 |      75 |   90.16 |                   
+  types.ts         |   91.04 |    63.15 |      75 |   90.16 | 311-670           
+ lib/logging       |    62.5 |    66.66 |      50 |   71.42 |                   
+  ...afe-logger.ts |    62.5 |    66.66 |      50 |   71.42 | 17,32             
+ lib/security      |   14.38 |     7.54 |    7.14 |   13.57 |                   
+  index.ts         |     3.7 |        0 |       0 |    3.84 | 20-267            
+  monitoring.ts    |   27.69 |    23.52 |   15.38 |    25.8 | 59-67,89-236      
+ lib/security/pii  |   11.15 |     2.77 |    8.82 |    10.9 |                   
+  index.ts         |   12.26 |     3.14 |   13.04 |   11.96 | 144,154-766       
+  middleware.ts    |      12 |        0 |       0 |      12 | 78-115,124-140    
+  register.ts      |    3.12 |        0 |       0 |    3.12 | 24-155            
+ pages/api/auth    |   63.63 |    43.42 |      50 |   63.63 |                   
+  login.ts         |   67.85 |       55 |      50 |   67.85 | 31,51,110-140,157 
+  refresh.ts       |      60 |    29.16 |      50 |      60 | 32,39,75-105,120  
+  register.ts      |    62.5 |    46.87 |      50 |    62.5 | 34,42,107-137,154 
+-------------------|---------|----------|---------|---------|-------------------

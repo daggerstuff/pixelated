@@ -18,28 +18,28 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
       'react-dom/test-utils': path.resolve(
         __dirname,
-        '__mocks__/react-dom/test-utils.js',
+        '../__mocks__/react-dom/test-utils.js',
       ),
       'react/jsx-dev-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-dev-runtime.js',
+        '../node_modules/react/jsx-dev-runtime.js',
       ),
       'react/jsx-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-runtime.js',
+        '../node_modules/react/jsx-runtime.js',
       ),
-      'react': path.resolve(__dirname, './node_modules/react/index.js'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom/index.js'),
+      'react': path.resolve(__dirname, '../node_modules/react/index.js'),
+      'react-dom': path.resolve(__dirname, '../node_modules/react-dom/index.js'),
     },
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    setupFiles: ['./src/test/setup.ts', './config/vitest.setup.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -64,24 +64,24 @@ export default defineConfig({
       'backups/**/*',
       ...(process.env['CI']
         ? [
-            'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
-            'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
-            'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
-            'tests/integration/bias-detection-api.integration.test.ts',
-          ]
+          'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
+          'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
+          'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
+          'tests/integration/bias-detection-api.integration.test.ts',
+        ]
         : []),
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     ...(process.env['CI']
       ? {
-          poolOptions: {
-            threads: {
-              minThreads: 1,
-              maxThreads: 2,
-            },
+        poolOptions: {
+          threads: {
+            minThreads: 1,
+            maxThreads: 2,
           },
-        }
+        },
+      }
       : {}),
     environmentOptions: {
       jsdom: {
