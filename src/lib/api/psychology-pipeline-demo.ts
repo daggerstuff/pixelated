@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type {} from '../types/psychology-pipeline'
+import type { } from '../types/psychology-pipeline'
 
 const Dsm5Schema = z.object({
   'Major Depressive Disorder': z.array(z.string()),
@@ -147,7 +147,7 @@ export const generateClientScenario = async (
 
   // Generate comprehensive clinical case based on input
   const generatedCase: z.infer<typeof ScenarioGenerationResponseSchema> = {
-    caseId: `CASE_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    caseId: `CASE_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
     patientInfo: validatedRequest.patientInfo,
     presentingProblem: validatedRequest.presentingProblem,
     presentingProblemDevelopment: validatedRequest.presentingProblemDevelopment,
@@ -224,13 +224,12 @@ function generateClinicalFormulation(
   }
 
   // Generate clinical summary
-  const summary = `${patientInfo.age}-year-old ${patientInfo.gender} ${patientInfo.occupation.toLowerCase()} presenting with ${presentingProblem.toLowerCase()}. ${
-    complexity === 'low'
-      ? 'Symptoms appear situational with good functioning. Favorable prognosis.'
-      : complexity === 'medium'
-        ? 'Moderate impact on functioning with multiple contributing factors.'
-        : 'Complex presentation with significant functional impairment requiring intensive treatment.'
-  }`
+  const summary = `${patientInfo.age}-year-old ${patientInfo.gender} ${patientInfo.occupation.toLowerCase()} presenting with ${presentingProblem.toLowerCase()}. ${complexity === 'low'
+    ? 'Symptoms appear situational with good functioning. Favorable prognosis.'
+    : complexity === 'medium'
+      ? 'Moderate impact on functioning with multiple contributing factors.'
+      : 'Complex presentation with significant functional impairment requiring intensive treatment.'
+    }`
 
   return {
     provisionalDiagnosis: diagnoses,
@@ -462,7 +461,7 @@ export const convertKnowledgeToConversation = async (
   const knowledgeMapping = mapKnowledgeToDialogue(generatedDialogue)
 
   const response: z.infer<typeof ConversationConverterResponseSchema> = {
-    conversationId: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    conversationId: `conv_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
     generatedDialogue,
     qualityMetrics,
     knowledgeMapping,

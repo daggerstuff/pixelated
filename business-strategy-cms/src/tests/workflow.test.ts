@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+// describe, it, expect, beforeEach, afterEach are globals in Jest
 import { WorkflowService } from '../services/workflowService'
 import { DocumentService } from '../services/documentService'
 import { AuthService } from '../services/authService'

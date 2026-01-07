@@ -4,6 +4,7 @@ import {
   DocumentUpdate,
   DocumentSearchFilters,
   DocumentSearchResult,
+  DocumentStatus,
 } from '@/types/document'
 import { DocumentModel } from '@/models/Document'
 import { UserModel } from '@/models/User'
