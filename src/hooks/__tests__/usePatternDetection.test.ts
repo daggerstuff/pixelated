@@ -16,14 +16,14 @@ describe('usePatternDetection', () => {
       role: 'user',
       content: 'I feel anxious every morning',
       name: '',
-      timestamp: Date.now() - 1000,
+      timestamp: new Date(Date.now() - 1000).toISOString(),
     },
     {
       role: 'assistant',
       content:
         'I understand that must be difficult. Can you tell me more about your morning anxiety?',
       name: '',
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(),
     },
   ]
 

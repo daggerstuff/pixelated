@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { getSession } from '../auth/session'
+import { getSessionFromRequest } from '@/utils/auth'
 import { createEnhancedRateLimiter } from '../middleware/enhanced-rate-limit'
 import { generateHash } from '../crypto/hash'
 
@@ -44,10 +44,10 @@ export async function applyRateLimit(
   let role = 'anonymous'
 
   try {
-    const session = await getSession(request)
-    if (session?.user?.id) {
-      userId = session.user.id
-      role = session.user.role || 'user'
+    const sessionAny = (await getSessionFromRequest(request)) as any
+    if (sessionAny?.user?.id) {
+      userId = sessionAny.user.id
+      role = sessionAny.user.role || 'user'
     }
   } catch (error: unknown) {
     logger.warn('Error getting session for rate limiting:', { error, path })

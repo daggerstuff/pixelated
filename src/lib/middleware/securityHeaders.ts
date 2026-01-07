@@ -16,8 +16,8 @@ export const securityHeaders = async (
     // Core restrictions
     "default-src 'self'",
     nonce
-      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net`
-      : "script-src 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net",
+      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
+      : "script-src 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
     // Keep inline styles only if necessary; replace with nonce/hashes when possible
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
     // Images from self, data URIs, and specific trusted domains
@@ -26,6 +26,8 @@ export const securityHeaders = async (
     "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
     // Disallow legacy plugin content
     "object-src 'none'",
+    // Allows embedding Giscus comments
+    "frame-src 'self' https://giscus.app",
     // Do not allow this site to be embedded in frames
     "frame-ancestors 'none'",
     // Lock down sensitive sinks
@@ -39,8 +41,8 @@ export const securityHeaders = async (
     // Additional CSP3 hardening (widely supported)
     "script-src-attr 'none'",
     nonce
-      ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net`
-      : "script-src-elem 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net",
+      ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
+      : "script-src-elem 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
     "style-src-attr 'unsafe-inline'",
     // Reasonable defaults for less common types
     "worker-src 'self' blob:",
@@ -52,12 +54,13 @@ export const securityHeaders = async (
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       nonce
-        ? `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'`
-        : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        ? `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "style-src-attr 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
+      "frame-src 'self' https://giscus.app",
       // Allow ws: and wss: in dev for local websocket debugging
       "connect-src 'self' ws: wss: http://localhost:* https://localhost:*",
     ]

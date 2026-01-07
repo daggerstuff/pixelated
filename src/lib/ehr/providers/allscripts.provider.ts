@@ -28,7 +28,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
     super(logger)
   }
 
-  async initialize(): Promise<void> {
+  override async initialize(): Promise<void> {
     await super.initialize()
 
     // Allscripts-specific initialization
@@ -114,7 +114,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
   }
 
   private async verifyAllscriptsFeatures(
-    capabilityStatement: unknown,
+    capabilityStatement: any,
   ): Promise<void> {
     // Verify Allscripts-specific features in the capability statement
     const requiredFeatures = ['rest', 'security']
@@ -158,7 +158,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
     }
   }
 
-  async cleanup(): Promise<void> {
+  override async cleanup(): Promise<void> {
     try {
       // Allscripts-specific cleanup
       this.logger.info(`Cleaning up Allscripts provider ${this.id}`)

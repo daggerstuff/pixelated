@@ -1,4 +1,4 @@
-import type { AstroIntegration } from 'astro'
+import { type AstroIntegration } from 'astro'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createSearchIndexFile } from '../utils/search-indexer'
