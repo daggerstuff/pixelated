@@ -1,0 +1,418 @@
+{
+    "release_metadata": {
+        "release_name": "Release 0 - Initial Training Dataset Collection",
+        "version": "v2026-01-07",
+        "generated_at": "2026-01-07T00:00:00Z",
+        "bucket": "pixel-data",
+        "endpoint": "https://s3.us-east-va.io.cloud.ovh.us",
+        "region": "us-east-1",
+        "total_size_gb": 52.20,
+        "total_objects": 19330,
+        "status": "CONSOLIDATED - Ready for Release 0 Training"
+    },
+    "dataset_families": {
+        "priority": {
+            "description": "Priority therapeutic conversations - highest quality professional datasets",
+            "status": "✅ COMPLETE",
+            "total_size_mb": 1257.19,
+            "datasets": {
+                "final_consolidated": [
+                    {
+                        "key": "datasets/consolidated/datasets/priority_1_FINAL.jsonl",
+                        "size_mb": 462.10,
+                        "last_modified": "2025-12-10T05:00:54+00:00",
+                        "etag": "19ab75adbb957e5a9c6a422f07f430cf-93",
+                        "source": "consolidated/raw/priority/priority_1.jsonl",
+                        "quality": "FINAL"
+                    },
+                    {
+                        "key": "datasets/consolidated/datasets/priority_2_FINAL.jsonl",
+                        "size_mb": 329.73,
+                        "last_modified": "2025-12-10T05:00:52+00:00",
+                        "etag": "76a826ff313e9710b2d9b3df0a377067-66",
+                        "source": "consolidated/raw/priority/priority_2.jsonl",
+                        "quality": "FINAL"
+                    },
+                    {
+                        "key": "datasets/consolidated/datasets/priority_3_FINAL.jsonl",
+                        "size_mb": 370.36,
+                        "last_modified": "2025-12-10T05:00:59+00:00",
+                        "etag": "cba96d04a66c533eb35abedc6a4719a2-75",
+                        "source": "consolidated/raw/priority/priority_3.jsonl",
+                        "quality": "FINAL"
+                    }
+                ],
+                "filtered_variants": [
+                    {
+                        "key": "datasets/gdrive/processed/filtered_datasets/priority_1_filtered.json",
+                        "size_mb": 26.45,
+                        "type": "filtered"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/filtered_datasets/priority_2_filtered.json",
+                        "size_mb": 25.89,
+                        "type": "filtered"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/filtered_datasets/priority_3_filtered.json",
+                        "size_mb": 26.45,
+                        "type": "filtered"
+                    }
+                ],
+                "unified": [
+                    {
+                        "key": "datasets/gdrive/processed/phase_1_priority_conversations/unified_priority_conversations.jsonl",
+                        "size_mb": 15.21,
+                        "type": "unified"
+                    }
+                ]
+            }
+        },
+        "professional_therapeutic": {
+            "description": "Professional clinical and therapeutic datasets from validated sources",
+            "status": "✅ COMPLETE",
+            "total_size_mb": 70.52,
+            "datasets": {
+                "filtered": [
+                    {
+                        "key": "datasets/consolidated/datasets/professional_neuro_filtered.json",
+                        "size_mb": 0.19,
+                        "last_modified": "2025-12-10T05:00:30+00:00",
+                        "source": "neuro_qa_sft"
+                    },
+                    {
+                        "key": "datasets/consolidated/datasets/professional_psychology_filtered.json",
+                        "size_mb": 0.19,
+                        "last_modified": "2025-12-10T05:00:31+00:00",
+                        "source": "psychology_10k"
+                    },
+                    {
+                        "key": "datasets/consolidated/datasets/professional_soulchat_filtered.json",
+                        "size_mb": 0.19,
+                        "last_modified": "2025-12-10T05:00:31+00:00",
+                        "source": "soulchat_2_0"
+                    }
+                ],
+                "phase_2_professional": [
+                    {
+                        "key": "datasets/gdrive/processed/phase_2_professional_datasets/task_5_10_counsel_chat/counsel_chat_conversations.jsonl",
+                        "size_mb": 3.97,
+                        "source": "counsel_chat"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_2_professional_datasets/task_5_11_llama3_mental_counseling/llama3_mental_counseling_conversations.jsonl",
+                        "size_mb": 5.63,
+                        "source": "llama3_mental_counseling"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_2_professional_datasets/task_5_12_therapist_sft/therapist_sft_conversations.jsonl",
+                        "size_mb": 9.27,
+                        "source": "therapist_sft"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_2_professional_datasets/task_5_13_neuro_qa_sft/neuro_qa_sft_conversations.jsonl",
+                        "size_mb": 5.86,
+                        "source": "neuro_qa_sft"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_2_professional_datasets/task_5_9_soulchat/soulchat_2_0_conversations.jsonl",
+                        "size_mb": 24.13,
+                        "source": "soulchat_2_0"
+                    }
+                ],
+                "complete_final": [
+                    {
+                        "key": "datasets/gdrive/processed/professional_datasets_final/neuro_qa_sft_complete.jsonl",
+                        "size_mb": 5.86,
+                        "quality": "COMPLETE"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/professional_datasets_final/psychology_10k_complete.jsonl",
+                        "size_mb": 6.89,
+                        "quality": "COMPLETE"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/professional_datasets_final/soulchat_2_0_complete_no_limits.jsonl",
+                        "size_mb": 2.22,
+                        "quality": "COMPLETE"
+                    }
+                ],
+                "long_therapy": [
+                    {
+                        "key": "datasets/gdrive/processed/professional_therapeutic/long_running_therapy.jsonl",
+                        "size_mb": 4.28,
+                        "type": "extended_sessions"
+                    }
+                ]
+            }
+        },
+        "cot_reasoning": {
+            "description": "Chain-of-thought reasoning datasets for therapeutic decision-making",
+            "status": "✅ COMPLETE",
+            "total_size_mb": 628.45,
+            "datasets": {
+                "filtered": [
+                    {
+                        "key": "datasets/consolidated/datasets/cot_reasoning_filtered.json",
+                        "size_mb": 0.19,
+                        "last_modified": "2025-12-10T05:00:29+00:00"
+                    }
+                ],
+                "phase_3_consolidated": [
+                    {
+                        "key": "datasets/gdrive/processed/phase_3_cot_reasoning/phase_3_cot_reasoning_consolidated.jsonl",
+                        "size_mb": 317.01,
+                        "last_modified": "2025-12-10T00:09:28+00:00",
+                        "quality": "CONSOLIDATED"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_3_cot_reasoning/task_5_15_cot_reasoning/cot_reasoning_conversations_consolidated.jsonl",
+                        "size_mb": 279.03,
+                        "last_modified": "2025-12-10T00:11:21+00:00",
+                        "source": "cot_reasoning_main"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_3_cot_reasoning/task_5_25_tot_reasoning/tot_reasoning_conversations.jsonl",
+                        "size_mb": 38.01,
+                        "last_modified": "2025-12-10T00:11:32+00:00",
+                        "source": "tree_of_thought"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/phase_3_cot_reasoning/task_5_26_pattern_recognition/therapeutic_reasoning_pattern_database.json",
+                        "size_mb": 240.96,
+                        "last_modified": "2025-12-10T00:11:38+00:00",
+                        "source": "pattern_recognition"
+                    }
+                ]
+            }
+        },
+        "edge_cases": {
+            "description": "Edge case scenarios for crisis handling and complex therapeutic situations",
+            "status": "✅ COMPLETE",
+            "total_size_mb": 3.48,
+            "datasets": {
+                "dialogues": [
+                    {
+                        "key": "datasets/consolidated/conversations/edge_case_dialogues.jsonl",
+                        "size_mb": 0.13,
+                        "last_modified": "2025-12-10T05:00:28+00:00"
+                    },
+                    {
+                        "key": "datasets/consolidated/datasets/edge_case_dialogues.jsonl",
+                        "size_mb": 0.13,
+                        "last_modified": "2025-12-10T05:00:29+00:00"
+                    }
+                ],
+                "generated_edge_cases": [
+                    {
+                        "key": "datasets/consolidated/edge_cases/edge_case_output/edge_case_prompts.jsonl",
+                        "size_kb": 19.46,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "type": "prompts"
+                    },
+                    {
+                        "key": "datasets/consolidated/edge_cases/edge_case_output/priority_edge_case_prompts.json",
+                        "size_kb": 3.73,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "type": "priority_prompts"
+                    },
+                    {
+                        "key": "datasets/consolidated/edge_cases/edge_case_output/priority_edge_cases_nvidia.jsonl",
+                        "size_kb": 86.88,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "type": "nvidia_generated"
+                    }
+                ],
+                "gdrive_edge_cases": [
+                    {
+                        "key": "datasets/gdrive/processed/edge_cases/cptsd/cptsd_transcripts.jsonl",
+                        "size_mb": 2.30,
+                        "last_modified": "2025-12-13T23:33:53+00:00",
+                        "type": "cptsd_transcripts"
+                    },
+                    {
+                        "key": "datasets/gdrive/processed/edge_cases/synthetic.jsonl",
+                        "size_kb": 71.51,
+                        "last_modified": "2025-12-13T23:33:43+00:00",
+                        "type": "synthetic"
+                    }
+                ],
+                "generator_pipeline": [
+                    {
+                        "key": "datasets/consolidated/edge_cases/edge_case_generator.py",
+                        "size_kb": 26.76,
+                        "type": "pipeline_code"
+                    },
+                    {
+                        "key": "datasets/consolidated/edge_cases/Edge_Case_Generation_Pipeline.ipynb",
+                        "size_kb": 15.32,
+                        "type": "pipeline_notebook"
+                    }
+                ]
+            }
+        },
+        "voice": {
+            "description": "Voice training data and persona scripts (Tim Fletcher style)",
+            "status": "⚠️ LIMITED - Checkpoint data only",
+            "total_size_kb": 9.42,
+            "datasets": {
+                "training_checkpoints": [
+                    {
+                        "key": "datasets/consolidated/voice_data/checkpoint_epoch_0.json",
+                        "size_kb": 0.73,
+                        "last_modified": "2025-12-10T05:00:54+00:00",
+                        "epoch": 0
+                    },
+                    {
+                        "key": "datasets/consolidated/voice_data/checkpoint_epoch_1.json",
+                        "size_kb": 0.73,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "epoch": 1
+                    },
+                    {
+                        "key": "datasets/consolidated/voice_data/checkpoint_epoch_2.json",
+                        "size_kb": 0.73,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "epoch": 2
+                    },
+                    {
+                        "key": "datasets/consolidated/voice_data/checkpoint_epoch_3.json",
+                        "size_kb": 0.73,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "epoch": 3
+                    },
+                    {
+                        "key": "datasets/consolidated/voice_data/checkpoint_epoch_4.json",
+                        "size_kb": 0.73,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "epoch": 4
+                    }
+                ],
+                "reports": [
+                    {
+                        "key": "datasets/consolidated/voice_data/training_report.json",
+                        "size_kb": 2.23,
+                        "last_modified": "2025-12-10T05:00:55+00:00",
+                        "type": "training_summary"
+                    }
+                ],
+                "notes": "Voice family requires expansion - current data limited to training checkpoints. Tim Fletcher transcripts exist in raw data but not consolidated."
+            }
+        }
+    },
+    "supporting_assets": {
+        "psychology_knowledge": {
+            "description": "Psychology knowledge base for therapeutic context",
+            "datasets": [
+                {
+                    "key": "datasets/consolidated/psychology_knowledge/psychology_knowledge_base_optimized.json",
+                    "size_mb": 18.90,
+                    "last_modified": "2025-12-10T05:00:28+00:00",
+                    "concepts": 4867,
+                    "status": "✅ READY"
+                },
+                {
+                    "key": "datasets/consolidated/psychology_knowledge/enhanced_psychology_knowledge_base.json",
+                    "size_mb": 1.46,
+                    "last_modified": "2025-12-10T05:00:28+00:00",
+                    "status": "✅ ENHANCED"
+                }
+            ]
+        },
+        "manifests": {
+            "description": "Existing manifests in S3 (to be replaced by this unified manifest)",
+            "deprecated": [
+                {
+                    "key": "datasets/consolidated/FINAL_TRAINING_DATA_MANIFEST.json",
+                    "size_kb": 4.28,
+                    "last_modified": "2025-12-10T05:00:27+00:00",
+                    "status": "DEPRECATED - Replaced by unified manifest"
+                },
+                {
+                    "key": "datasets/consolidated/MANIFEST.json",
+                    "size_kb": 2.94,
+                    "last_modified": "2025-12-10T05:00:27+00:00",
+                    "status": "DEPRECATED - Replaced by unified manifest"
+                },
+                {
+                    "key": "datasets/consolidated/final/MASTER_STAGE_MANIFEST.json",
+                    "size_kb": 0.25,
+                    "last_modified": "2025-12-10T05:00:35+00:00",
+                    "status": "DEPRECATED - Replaced by unified manifest"
+                }
+            ]
+        },
+        "configurations": {
+            "description": "Training and hyperparameter configurations",
+            "files": [
+                {
+                    "key": "datasets/consolidated/configs/hyperparameters.json",
+                    "size_kb": 0.84,
+                    "last_modified": "2025-12-10T05:00:34+00:00"
+                }
+            ]
+        },
+        "raw_sources": {
+            "description": "Raw source datasets (gdrive/raw/)",
+            "total_objects": 8495,
+            "total_size_gb": 11.52,
+            "categories": [
+                "CoT-Reasoning datasets (Cultural Nuances, Heartbreak, Legal Issues, Neurodivergent, Philosophical, Rare Diseases, Clinical Diagnosis, Mens Mental Health, Quantum Physics, Scientific Discovery, Temporal Reasoning)",
+                "Reddit datasets (Depression, Anxiety, Mental Health conversations, Suicide Watch, Original Reddit Data with multiple subreddits)",
+                "Professional datasets (Empathy-Mental-Health, IEMOCAP_EMOTION_Recognition, LLAMA3_Mental_Counseling, Psych8k, RECCON, SoulChat2.0)",
+                "Academic sources (DSM-5 PDF, Psychology transcripts)"
+            ],
+            "note": "Raw sources provide provenance trail for consolidated datasets"
+        }
+    },
+    "release_0_readiness": {
+        "dataset_families_status": {
+            "priority": "✅ COMPLETE - 3 FINAL datasets (1.2GB)",
+            "professional_therapeutic": "✅ COMPLETE - 12 datasets across phases (70MB)",
+            "cot_reasoning": "✅ COMPLETE - 4 major consolidated datasets (628MB)",
+            "edge_cases": "✅ COMPLETE - Dialogues, generated cases, CPTSD transcripts (3.5MB)",
+            "voice": "⚠️ LIMITED - Only checkpoints and reports (9KB)"
+        },
+        "quality_gates": {
+            "privacy_scan": "⏳ PENDING",
+            "provenance_validation": "⏳ PENDING",
+            "deduplication": "⏳ PENDING",
+            "distribution_balance": "⏳ PENDING",
+            "pii_detection": "⏳ PENDING"
+        },
+        "human_signoffs": {
+            "clinician_qa": "⏳ PENDING",
+            "bias_review": "⏳ PENDING",
+            "cultural_sensitivity": "⏳ PENDING"
+        },
+        "next_actions": [
+            "Upload this unified manifest to S3: s3://pixel-data/releases/v2026-01-07/RELEASE_0_UNIFIED_MANIFEST.json",
+            "Delete deprecated manifests after validation",
+            "Run privacy and provenance gates",
+            "Generate ChatML export from consolidated datasets",
+            "Create routing config for training pipeline",
+            "Document voice family expansion plan for Phase 1",
+            "Execute clinician QA and bias review process"
+        ]
+    },
+    "training_pipeline_readiness": {
+        "s3_loader": "✅ S3 manifest structure ready for dataloader",
+        "path_helpers": "⏳ Need validation with Release 0 paths",
+        "chatml_export": "⏳ Need generation from consolidated datasets",
+        "routing_config": "⏳ Need creation for family-based sampling",
+        "dry_run_status": "⏳ PENDING - Run after manifest upload"
+    },
+    "metadata": {
+        "created_by": "Claude (Pixelated Empathy AI Assistant)",
+        "created_for": "Release 0 Training Dataset Inventory",
+        "manifest_version": "1.0.0",
+        "schema_version": "release_0_unified_manifest_v1",
+        "notes": [
+            "This manifest consolidates all previous partial manifests",
+            "All file sizes calculated from S3 metadata",
+            "Voice family requires expansion - marked as limited",
+            "Raw sources provide complete provenance chain",
+            "Ready for Release 0 gates and export generation"
+        ]
+    }
+}

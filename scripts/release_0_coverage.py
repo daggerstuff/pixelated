@@ -78,6 +78,24 @@ FAMILIES: Sequence[CoverageFamily] = [
         ),
         description="Tim Fletcher + synthetic voice persona files.",
     ),
+    CoverageFamily(
+        stage="Release artifacts",
+        name="Consolidated manifests and configs",
+        prefixes=(
+            "datasets/consolidated/",
+            "datasets/consolidated/configs/",
+        ),
+        description="Release-level manifests and configs (MANIFEST.json, FINAL_TRAINING_DATA_MANIFEST.json, hyperparameters/training configs).",
+    ),
+    CoverageFamily(
+        stage="Release artifacts",
+        name="Release manifests (versioned)",
+        prefixes=(
+            "releases/",
+            "datasets/metadata/consolidation/",
+        ),
+        description="Versioned release manifests (e.g., RELEASE_0_UNIFIED_MANIFEST.json) and consolidation metadata manifests.",
+    ),
 ]
 
 
