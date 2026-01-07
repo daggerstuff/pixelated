@@ -1938,8 +1938,8 @@ stages:
               echo "✅ /demo-hub route is accessible (HTTP $HTTP_CODE)"
               echo "🚀 Running performance tests..."
 
-              # Run tests with continue on error to not block pipeline
-              pnpm run performance:test || {
+              # Run performance tests only on available browsers (skip msedge on host)
+              pnpm run performance:test --project=chromium --project=firefox --project=webkit || {
                 echo "##vso[task.logissue type=warning]Performance tests failed or had errors"
                 echo "⚠️ Performance test failures are non-blocking - check test results for details"
                 exit 0
@@ -2011,15 +2011,10 @@ stages:
               # Skip optional dependencies that fail (they're not required for tests)
               pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
 
-              # Install Playwright system dependencies and browsers
-              # --with-deps handles system package installation robustly
-              echo "📦 Installing Playwright browsers and dependencies..."
+              # Install Playwright browsers (without system dependencies to avoid sudo requirement)
+              # Note: System dependencies should be pre-installed on the self-hosted agent
+              pnpm exec playwright install chromium firefox webkit
 
-              # Install core browsers + system deps
-              pnpm exec playwright install --with-deps
-
-              # install msedge explicitly
-              pnpm exec playwright install msedge
             displayName: 'Install Playwright Browsers'
 
           - script: |
@@ -2115,7 +2110,8 @@ stages:
               # Playwright will write results here, but directory must exist first
               mkdir -p test-results
 
-              pnpm run e2e:smoke
+              # Run smoke tests on available browsers (skip msedge on host to avoid sudo/dependency issues)
+              pnpm run e2e:smoke --project=chromium --project=firefox --project=webkit
             displayName: 'Run E2E Smoke Tests'
             env:
               BASE_URL: $(STAGING_URL)

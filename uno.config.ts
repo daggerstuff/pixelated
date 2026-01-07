@@ -40,13 +40,18 @@ export default defineConfig({
       scale: 1.2,
       warn: false,
     }),
-    presetWebFonts({
-      fonts: {
-        sans: 'Inter:400,600,800',
-        mono: 'DM Mono:400,600',
-        condensed: 'Roboto Condensed',
-      },
-    }),
+    // Skip web fonts in CI/Test to avoid timeouts
+    ...(process.env.CI === 'true' || process.env.NODE_ENV === 'test'
+      ? []
+      : [
+        presetWebFonts({
+          fonts: {
+            sans: 'Inter:400,600,800',
+            mono: 'DM Mono:400,600',
+            condensed: 'Roboto Condensed',
+          },
+        }),
+      ]),
   ],
   shortcuts: {
     'btn': 'px-4 py-2 rounded inline-block bg-primary-600 text-white cursor-pointer hover:bg-primary-700',

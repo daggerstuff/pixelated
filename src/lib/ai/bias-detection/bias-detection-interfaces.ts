@@ -138,6 +138,8 @@ export interface DashboardMetrics {
     message: string
     timestamp: string
   }>
+  recentAnalyses?: BiasAnalysisResult[]
+  alerts?: BiasAlert[]
   // Additional properties found in the code
   summary?: {
     total_sessions: number
@@ -152,7 +154,7 @@ export interface DashboardMetrics {
     alert_counts?: number[]
   }
   demographic_breakdown?: Record<string, unknown>
-  performance_metrics?: Record<string, unknown>
+  performance_metrics?: SystemPerformanceMetrics
   recommendations?: string[]
   cache_performance?: {
     hit_rate: number
@@ -166,7 +168,7 @@ export interface DashboardMetrics {
   }
 }
 
-export interface PerformanceMetrics {
+export interface SystemPerformanceMetrics {
   response_times: {
     average: number
     p95: number

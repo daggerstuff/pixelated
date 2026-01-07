@@ -1,25 +1,16 @@
-import {
-  Document,
-  } from '@/types/document'
-
-// In-memory document storage for now
-const documents: Document[] = []
-const documentVersions: any[] = []
-let nextId = 1
-let nextVersionId = 1
+import { Document } from '@/types/document'
+import { DocumentModelMongoose, DocumentVersionModel } from './DocumentMongoose'
 
 export class DocumentModel {
   static async create(
     documentData: Omit<Document, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
   ): Promise<Document> {
-    const document: Document = {
+    const doc = await DocumentModelMongoose.create({
       ...documentData,
-      id: (nextId++).toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
       version: 1,
-    }
-    documents.push(document)
+    })
+
+    const document = doc.toJSON() as unknown as Document
 
     // Create initial version
     await this.createVersion({
@@ -36,130 +27,109 @@ export class DocumentModel {
   }
 
   static async findById(id: string): Promise<Document | null> {
-    return documents.find((doc) => doc.id === id) || null
+    const doc = await DocumentModelMongoose.findById(id)
+    return doc ? (doc.toJSON() as unknown as Document) : null
   }
 
   static async findAll(filters?: any): Promise<Document[]> {
-    let result = [...documents]
+    const query: any = {}
 
     if (filters) {
-      if (filters.authorId) {
-        result = result.filter((doc) => doc.authorId === filters.authorId)
-      }
-      if (filters.category) {
-        result = result.filter((doc) => doc.category === filters.category)
-      }
-      if (filters.status) {
-        result = result.filter((doc) => doc.status === filters.status)
-      }
+      if (filters.authorId) query.authorId = filters.authorId
+      if (filters.category) query.category = filters.category
+      if (filters.status) query.status = filters.status
       if (filters.tags && filters.tags.length > 0) {
-        result = result.filter((doc) =>
-          filters.tags.some((tag: string) => doc.tags.includes(tag)),
-        )
+        query.tags = { $in: filters.tags }
       }
       if (filters.searchTerm) {
-        const term = filters.searchTerm.toLowerCase()
-        result = result.filter(
-          (doc) =>
-            doc.title.toLowerCase().includes(term) ||
-            doc.content.toLowerCase().includes(term) ||
-            doc.summary?.toLowerCase().includes(term),
-        )
+        query.$text = { $search: filters.searchTerm }
       }
     }
 
-    return result
+    const docs = await DocumentModelMongoose.find(query).sort({ updatedAt: -1 })
+    return docs.map((doc) => doc.toJSON() as unknown as Document)
   }
 
   static async update(
     id: string,
     updates: Partial<Document>,
   ): Promise<Document | null> {
-    const docIndex = documents.findIndex((doc) => doc.id === id)
-    if (docIndex === -1) return null
+    const oldDoc = await DocumentModelMongoose.findById(id)
+    if (!oldDoc) return null
 
-    const oldDoc = documents[docIndex]
-    const updatedDoc = {
-      ...oldDoc,
-      ...updates,
-      updatedAt: new Date(),
-      version: oldDoc.version + 1,
-    }
+    const updatedDoc = await DocumentModelMongoose.findByIdAndUpdate(
+      id,
+      {
+        $set: updates,
+        $inc: { version: 1 },
+      },
+      { new: true },
+    )
 
-    documents[docIndex] = updatedDoc
+    if (!updatedDoc) return null
+
+    const document = updatedDoc.toJSON() as unknown as Document
 
     // Create new version
     await this.createVersion({
       documentId: id,
-      version: updatedDoc.version,
-      title: updatedDoc.title,
-      content: updatedDoc.content,
-      summary: updatedDoc.summary,
-      authorId: updatedDoc.metadata.lastEditedBy,
+      version: document.version,
+      title: document.title,
+      content: document.content,
+      summary: document.summary,
+      authorId: document.metadata.lastEditedBy,
       changeSummary: updates.content ? 'Content updated' : 'Metadata updated',
     })
 
-    return updatedDoc
+    return document
   }
 
   static async delete(id: string): Promise<boolean> {
-    const docIndex = documents.findIndex((doc) => doc.id === id)
-    if (docIndex === -1) return false
-
-    documents.splice(docIndex, 1)
-    return true
+    const result = await DocumentModelMongoose.findByIdAndDelete(id)
+    if (result) {
+      await DocumentVersionModel.deleteMany({ documentId: id })
+      return true
+    }
+    return false
   }
 
   static async addCollaborator(
     documentId: string,
     userId: string,
   ): Promise<Document | null> {
-    const doc = await this.findById(documentId)
-    if (!doc) return null
-
-    if (!doc.collaborators.includes(userId)) {
-      doc.collaborators.push(userId)
-      return this.update(documentId, { collaborators: doc.collaborators })
-    }
-
-    return doc
+    const doc = await DocumentModelMongoose.findByIdAndUpdate(
+      documentId,
+      { $addToSet: { collaborators: userId } },
+      { new: true },
+    )
+    return doc ? (doc.toJSON() as unknown as Document) : null
   }
 
   static async removeCollaborator(
     documentId: string,
     userId: string,
   ): Promise<Document | null> {
-    const doc = await this.findById(documentId)
-    if (!doc) return null
-
-    doc.collaborators = doc.collaborators.filter((id) => id !== userId)
-    return this.update(documentId, { collaborators: doc.collaborators })
+    const doc = await DocumentModelMongoose.findByIdAndUpdate(
+      documentId,
+      { $pull: { collaborators: userId } },
+      { new: true },
+    )
+    return doc ? (doc.toJSON() as unknown as Document) : null
   }
 
   static async createVersion(versionData: any): Promise<any> {
-    const version = {
-      ...versionData,
-      id: (nextVersionId++).toString(),
-      createdAt: new Date(),
-    }
-    documentVersions.push(version)
-    return version
+    return await DocumentVersionModel.create(versionData)
   }
 
   static async getVersions(documentId: string): Promise<any[]> {
-    return documentVersions
-      .filter((v) => v.documentId === documentId)
-      .sort((a, b) => b.version - a.version)
+    return await DocumentVersionModel.find({ documentId })
+      .sort({ version: -1 })
   }
 
   static async getVersion(
     documentId: string,
     version: number,
   ): Promise<any | null> {
-    return (
-      documentVersions.find(
-        (v) => v.documentId === documentId && v.version === version,
-      ) || null
-    )
+    return await DocumentVersionModel.findOne({ documentId, version })
   }
 }

@@ -83,6 +83,8 @@ import type {
   BiasDashboardData,
   BiasAnalysisResult,
   DashboardRecommendation,
+  BiasAlert,
+  BiasDashboardSummary,
 } from '@/lib/ai/bias-detection'
 
 const logger = createBuildSafeLogger('bias-dashboard')
@@ -1021,9 +1023,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           }
         }, 30000) // Send heartbeat every 30 seconds
 
-        // Store interval reference for cleanup
-        // Store interval reference for cleanup using extended interface
-        ;(ws as ExtendedWebSocket).heartbeatInterval = heartbeatInterval
+          // Store interval reference for cleanup
+          // Store interval reference for cleanup using extended interface
+          ; (ws as ExtendedWebSocket).heartbeatInterval = heartbeatInterval
       } catch (error: unknown) {
         setWsConnectionStatus('error')
         logger.error('Failed to create WebSocket connection', { error })
@@ -1186,13 +1188,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         filters: exportFilters,
         currentFilters: exportFilters.applyCurrentFilters
           ? {
-              timeRange: selectedTimeRange,
-              biasScoreFilter,
-              alertLevelFilter,
-              demographicFilter: selectedDemographicFilter,
-              customDateRange:
-                selectedTimeRange === 'custom' ? customDateRange : undefined,
-            }
+            timeRange: selectedTimeRange,
+            biasScoreFilter,
+            alertLevelFilter,
+            demographicFilter: selectedDemographicFilter,
+            customDateRange:
+              selectedTimeRange === 'custom' ? customDateRange : undefined,
+          }
           : undefined,
       }
 
@@ -2284,11 +2286,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               {/* Export Status */}
               {exportProgress.status && !exportProgress.isExporting && (
                 <div
-                  className={`p-3 rounded-md ${
-                    exportProgress.status.startsWith('Error')
+                  className={`p-3 rounded-md ${exportProgress.status.startsWith('Error')
                       ? 'bg-red-50 text-red-700 border border-red-200'
                       : 'bg-green-50 text-green-700 border border-green-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center">
                     {exportProgress.status.startsWith('Error') ? (
@@ -2467,11 +2468,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setAlertLevelFilter(
                     e.target.value as
-                      | 'all'
-                      | 'low'
-                      | 'medium'
-                      | 'high'
-                      | 'critical',
+                    | 'all'
+                    | 'low'
+                    | 'medium'
+                    | 'high'
+                    | 'critical',
                   )
                 }
                 className="w-full p-2 border rounded-md bg-background"
@@ -2552,13 +2553,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {filteredAlerts.filter(
         (alert) => alert.level === 'critical' || alert.level === 'high',
       ).length > 0 && (
-        <Alert
-          variant="error"
-          title="High Priority Bias Alerts"
-          description={`${filteredAlerts.filter((alert) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
-          icon={<AlertTriangle className="h-4 w-4" />}
-        />
-      )}
+          <Alert
+            variant="error"
+            title="High Priority Bias Alerts"
+            description={`${filteredAlerts.filter((alert) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
+            icon={<AlertTriangle className="h-4 w-4" />}
+          />
+        )}
 
       {/* Summary Cards - Update with filtered data counts */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -2592,21 +2593,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               className={`text-2xl font-bold ${getBiasScoreColor(
                 filteredSessions.length > 0
                   ? filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) / filteredSessions.length
+                    (sum, session) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) / filteredSessions.length
                   : (summary?.averageBiasScore ?? 0),
               )}`}
             >
               {filteredSessions.length > 0
                 ? (
-                    (filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
-                  ).toFixed(1)
+                  (filteredSessions.reduce(
+                    (sum, session) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) /
+                    filteredSessions.length) *
+                  100
+                ).toFixed(1)
                 : ((summary?.averageBiasScore ?? 0) * 100).toFixed(1)}
               %
             </div>
@@ -2614,11 +2615,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               value={
                 filteredSessions.length > 0
                   ? (filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
+                    (sum, session) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) /
+                    filteredSessions.length) *
+                  100
                   : (summary?.averageBiasScore ?? 0) * 100
               }
               className="mt-2"
