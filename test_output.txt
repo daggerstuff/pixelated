@@ -1,0 +1,167 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/vivi/pixelated[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[90mstdout[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mPII Detection Service initialized
+
+[90mstderr[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mAuth0 management configuration is incomplete. RBAC features may not work.
+
+[90mstderr[2m | src/lib/auth/__tests__/integration.test.ts
+[22m[39mAuth0 configuration incomplete
+Auth0 is not properly configured
+
+ [31m❯[39m src/lib/auth/__tests__/integration.test.ts [2m([22m[2m16 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[32m 161[2mms[22m[39m
+[31m       [31m×[31m should handle full registration and login flow[39m[32m 74[2mms[22m[39m
+[31m       [31m×[31m should enforce rate limiting across the flow[39m[32m 7[2mms[22m[39m
+       [32m✓[39m should enforce CSRF protection[32m 4[2mms[22m[39m
+[31m       [31m×[31m should handle authentication middleware correctly[39m[32m 2[2mms[22m[39m
+       [32m✓[39m should enforce role-based authorization[32m 2[2mms[22m[39m
+[31m       [31m×[31m should sanitize user input in registration[39m[32m 5[2mms[22m[39m
+[31m       [31m×[31m should enforce password complexity requirements[39m[32m 11[2mms[22m[39m
+       [32m✓[39m should prevent timing attacks in login[32m 7[2mms[22m[39m
+       [32m✓[39m should meet sub-100ms registration target[32m 8[2mms[22m[39m
+       [32m✓[39m should meet sub-50ms login target[32m 5[2mms[22m[39m
+       [32m✓[39m should not log sensitive health information[32m 3[2mms[22m[39m
+       [32m✓[39m should mask IP addresses in audit logs[32m 3[2mms[22m[39m
+       [32m✓[39m should enforce data retention policies[32m 3[2mms[22m[39m
+[31m       [31m×[31m should track authentication progress throughout the flow[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should track login events[39m[32m 8[2mms[22m[39m
+     [32m✓[39m should track token refresh events[32m 4[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mComplete Authentication Flow[2m > [22mshould handle full registration and login flow
+[31m[1mAssertionError[22m: expected 500 to be 201 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 201[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m141:39[22m[39m
+    [90m139| [39m      } [35mas[39m any)
+    [90m140| [39m
+    [90m141| [39m      [34mexpect[39m(registerResponse[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m   | [39m                                      [31m^[39m
+    [90m142| [39m      [35mconst[39m registerData [33m=[39m [35mawait[39m registerResponse[33m.[39m[34mjson[39m()
+    [90m143| [39m      [34mexpect[39m(registerData[33m.[39msuccess)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mComplete Authentication Flow[2m > [22mshould enforce rate limiting across the flow
+[31m[1mAssertionError[22m: expected 403 to be 429 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 429[39m
+[31m+ 403[39m
+
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m283:31[22m[39m
+    [90m281| [39m      } [35mas[39m any)
+    [90m282| [39m
+    [90m283| [39m      [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m429[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m284| [39m      [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m285| [39m      [34mexpect[39m(data[33m.[39merror)[33m.[39m[34mtoContain[39m([32m'Rate limit exceeded'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mComplete Authentication Flow[2m > [22mshould handle authentication middleware correctly
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'mockResolvedValue')[39m
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m336:28[22m[39m
+    [90m334| [39m      })
+    [90m335| [39m
+    [90m336| [39m      vi[33m.[39m[34mmocked[39m(getUserById)[33m.[39m[34mmockResolvedValue[39m({
+    [90m   | [39m                           [31m^[39m
+    [90m337| [39m        id[33m:[39m [32m'user123'[39m[33m,[39m
+    [90m338| [39m        email[33m:[39m [32m'test@example.com'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mSecurity Requirements[2m > [22mshould sanitize user input in registration
+[31m[1mAssertionError[22m: expected 500 to be 201 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 201[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m426:31[22m[39m
+    [90m424| [39m      } [35mas[39m any)
+    [90m425| [39m
+    [90m426| [39m      [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m427| [39m    })
+    [90m428| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mSecurity Requirements[2m > [22mshould enforce password complexity requirements
+[31m[1mAssertionError[22m: expected 500 to be 400 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m472:33[22m[39m
+    [90m470| [39m        } [35mas[39m any)
+    [90m471| [39m
+    [90m472| [39m        [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m400[39m)
+    [90m   | [39m                                [31m^[39m
+    [90m473| [39m        [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m474| [39m        [34mexpect[39m(data[33m.[39merror)[33m.[39m[34mtoContain[39m(
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mPhase 6 MCP Server Integration[2m > [22mshould track authentication progress throughout the flow
+[31m[1mReferenceError[22m: updatePhase6AuthenticationProgress is not defined[39m
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m839:14[22m[39m
+    [90m837| [39m
+    [90m838| [39m      [90m// Verify Phase 6 tracking was called[39m
+    [90m839| [39m      [34mexpect[39m(updatePhase6AuthenticationProgress)[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m             [31m^[39m
+    [90m840| [39m        [32m'user123'[39m[33m,[39m
+    [90m841| [39m        [32m'user_registered'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m > [22mAuthentication System Integration[2m > [22mshould track login events
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ 'user123', 'user_logged_in' ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "user123",[90m
+[32m-   "user_logged_in",[90m
+[31m+   null,[90m
+[31m+   "csrf_violation",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/lib/auth/__tests__/integration.test.ts:[2m888:48[22m[39m
+    [90m886| [39m    } [35mas[39m any)
+    [90m887| [39m
+    [90m888| [39m    [34mexpect[39m(updatePhase6AuthenticationProgress)[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m                                               [31m^[39m
+    [90m889| [39m      [32m'user123'[39m[33m,[39m
+    [90m890| [39m      [32m'user_logged_in'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m9 passed[39m[22m[90m (16)[39m
+[2m   Start at [22m 01:10:49
+[2m   Duration [22m 6.50s[2m (transform 1.11s, setup 761ms, import 1.50s, tests 161ms, environment 2.57s)[22m
+

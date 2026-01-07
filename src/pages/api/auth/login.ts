@@ -11,6 +11,7 @@ import {
 } from '@/lib/auth/middleware'
 import { sanitizeInput } from '@/lib/auth/utils'
 import { logSecurityEvent } from '@/lib/security'
+import { updatePhase6AuthenticationProgress } from '@/lib/mcp/phase6-integration'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   let clientInfo;
@@ -79,6 +80,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       clientInfo,
       timestamp: Date.now(),
     })
+
+    // Update Phase 6 MCP server
+    await updatePhase6AuthenticationProgress(result.user.id, 'user_logged_in')
 
     return new Response(
       JSON.stringify({
