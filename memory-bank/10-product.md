@@ -99,6 +99,7 @@ Mental health professionals face a critical training gap: they must master chall
    - Realistic emotional responses and behaviors
    - Adaptive difficulty based on trainee performance
    - Crisis scenario simulations (suicidal ideation, self-harm, psychosis)
+   - Enhanced with psychology knowledge base (10,960 concepts including therapeutic conversation examples and psychology book references)
 
 3. **Real-Time Feedback System**
    - Bias detection alerts during conversation

@@ -75,6 +75,7 @@ Pixelated Empathy uses a **microservices-based architecture** with clear separat
 - **Bias Detection Service**: Real-time bias monitoring and mitigation
 - **Analytics Service**: Custom analytics with performance tracking
 - **Session Service**: Training session management and state
+- **Knowledge Base Service**: Enhanced psychology knowledge base with 10,960 concepts including therapeutic conversation examples and psychology book references
 
 **Zero-Knowledge System:**
 - Fully Homomorphic Encryption (FHE) with sub-50ms latency
