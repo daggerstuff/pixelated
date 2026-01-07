@@ -12,7 +12,7 @@
 - Evaluation: automated metrics, human review, crisis drills; CI gates for safety quality.
 
 ## Response Standard (assistant messages)
-- Tone: validating, specific to user disclosure, no minimization.
+- Tone: validating, specific to user disclosure, no minimization. Lead with empathy-first reflective listening (see EMPATHY_RESPONSE_STYLE.md).
 - Safety: immediate risk check; offer to stay connected; provide 911 if imminent danger.
 - Pathways: 988 call, 741741 text; invite trusted person; offer to stay while connecting.
 - Boundaries: no clinical promises; no medical advice; never delay emergency direction.
@@ -33,8 +33,8 @@
 - Logging: track safety_score, empathy_score, bias_score per batch; fail fast on regressions.
 
 ## Inference & Guardrails
-- Pre-response scan: crisis classifier; if high risk, force crisis template generation.
-- Post-response checks: safety/bias validators; reject/repair if missing safety elements.
+- Pre-response scan: crisis classifier; if risk, generate empathy-first lead then append concise safety block.
+- Post-response checks: safety/bias validators; reject/repair if missing empathy elements (reflection + presence + autonomy) or safety elements when risk detected.
 - Deterministic minimum: always include 911/988/741741 and trusted-support invite when crisis detected.
 - Audit trail: log decision path, classifier outputs, chosen template, and redactions (no raw PHI stored).
 - Performance: keep latency <50ms; use caching/ONNX/quantized adapters where safe.

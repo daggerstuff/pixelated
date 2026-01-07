@@ -194,6 +194,7 @@ scripts/*
 
 # Tools and utilities
 tools/
+# Allow patches used by pnpm patchedDependencies in Docker builds
 patches/
 examples/
 memory-bank/
@@ -256,3 +257,5 @@ tsconfig*.json
 !tailwind.config.*
 !middleware.ts
 !mdx-components.js
+!patches/
+!.npmrc
