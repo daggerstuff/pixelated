@@ -73,8 +73,10 @@ class TestEmotionClassifier:
         assert emotion_logits.shape == (batch_size, 10)
 
         # Check output ranges
-        assert (valence >= 0).all() and (valence <= 1).all()
-        assert (arousal >= 0).all() and (arousal <= 1).all()
+        assert (valence >= 0).all()
+        assert (valence <= 1).all()
+        assert (arousal >= 0).all()
+        assert (arousal <= 1).all()
 
     def test_prediction(self, trainer):
         """Test single example prediction."""
@@ -101,10 +103,9 @@ class TestEmotionClassifier:
         results = trainer.predict_batch(texts)
 
         assert len(results) == 3
-        for result in results:
-            assert isinstance(result, dict)
-            assert "valence" in result
-            assert "arousal" in result
+        assert all(isinstance(result, dict) for result in results)
+        assert all("valence" in result for result in results)
+        assert all("arousal" in result for result in results)
 
 
 class TestBiasClassifier:
@@ -191,9 +192,8 @@ class TestConversationQualityEvaluator:
 
         scores = model(input_ids, attention_mask)
 
-        for dim in model.QUALITY_DIMENSIONS:
-            assert dim in scores
-            assert scores[dim].shape[0] == batch_size
+        assert all(dim in scores for dim in model.QUALITY_DIMENSIONS)
+        assert all(scores[dim].shape[0] == batch_size for dim in model.QUALITY_DIMENSIONS)
 
     def test_quality_evaluation(self, inferencer):
         """Test quality evaluation."""
@@ -205,8 +205,7 @@ class TestConversationQualityEvaluator:
         assert "cultural_competency" in scores
         assert "coherence" in scores
 
-        for dim in inferencer.model.QUALITY_DIMENSIONS:
-            assert 0 <= scores[dim] <= 1
+        assert all(0 <= scores[dim] <= 1 for dim in inferencer.model.QUALITY_DIMENSIONS)
 
     def test_batch_evaluation(self, inferencer):
         """Test batch evaluation."""
@@ -219,8 +218,7 @@ class TestConversationQualityEvaluator:
         results = inferencer.evaluate_batch(conversations)
 
         assert len(results) == 3
-        for result in results:
-            assert len(result) == len(inferencer.model.QUALITY_DIMENSIONS)
+        assert all(len(result) == len(inferencer.model.QUALITY_DIMENSIONS) for result in results)
 
     def test_overall_score_computation(self, inferencer):
         """Test overall score computation."""
@@ -278,10 +276,9 @@ class TestDataEnrichment:
         enriched_batch = enricher.enrich_batch(conversations)
 
         assert len(enriched_batch) == 3
-        for enriched in enriched_batch:
-            assert "emotion_predictions" in enriched
-            assert "bias_predictions" in enriched
-            assert "quality_scores" in enriched
+        assert all("emotion_predictions" in enriched for enriched in enriched_batch)
+        assert all("bias_predictions" in enriched for enriched in enriched_batch)
+        assert all("quality_scores" in enriched for enriched in enriched_batch)
 
     def test_enrichment_statistics(self, enricher):
         """Test enrichment statistics generation."""
