@@ -7,6 +7,7 @@ vi.mock('../python-bridge', () => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     analyzeSession: vi.fn().mockResolvedValue({
       sessionId: 'test-session',
+      timestamp: new Date(),
       overallBiasScore: 0.3,
       alertLevel: 'medium',
       layerResults: {
@@ -14,6 +15,14 @@ vi.mock('../python-bridge', () => ({
         modelLevel: { biasScore: 0.3 },
         interactive: { biasScore: 0.4 },
         evaluation: { biasScore: 0.3 },
+      },
+      recommendations: [],
+      confidence: 0.85,
+      demographics: {
+        age: '26-35',
+        gender: 'female',
+        ethnicity: 'white',
+        primaryLanguage: 'en',
       },
     }),
     checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
@@ -366,9 +375,9 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
 
     mockSessionData = {
       sessionId: `perf-test-session-${Date.now()}`,
-      timestamp: new Date(),
+      sessionDate: new Date().toISOString(),
       participantDemographics: {
-        age: '26-35',
+        age: '25-35',
         gender: 'female',
         ethnicity: 'hispanic',
         primaryLanguage: 'en',
@@ -376,49 +385,42 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
       scenario: {
         scenarioId: 'anxiety-001',
         type: 'anxiety',
-        complexity: 'intermediate',
-        tags: ['anxiety', 'coping'],
-        description: 'Anxiety management scenario',
-        learningObjectives: ['assess_anxiety', 'provide_coping_strategies'],
       },
       content: {
-        patientPresentation:
-          'Patient expresses feeling overwhelmed with work stress and anxiety symptoms...',
-        therapeuticInterventions: ["Let's explore some coping strategies"],
-        patientResponses: ["I feel like I can't handle the pressure anymore"],
-        sessionNotes: 'Patient showing signs of work-related anxiety',
+        transcript: 'Patient expresses feeling overwhelmed with work stress and anxiety symptoms...',
+        aiResponses: [],
+        userInputs: [],
       },
       aiResponses: [
         {
           responseId: 'response-1',
           timestamp: new Date(),
-          type: 'intervention',
-          content:
-            "I understand you're feeling stressed. Let's explore some coping strategies.",
-          confidence: 0.9,
-          modelUsed: 'gpt-4',
+          text: "I understand you're feeling stressed. Let's explore some coping strategies.",
+          metadata: {
+            confidence: 0.9,
+            modelUsed: 'gpt-4',
+          },
         },
       ],
       expectedOutcomes: [
         {
           outcomeId: 'outcome-1',
-          type: 'therapeutic-alliance',
-          expectedValue: 0.8,
-          actualValue: 0.75,
+          description: 'therapeutic-alliance',
+          achieved: true,
         },
       ],
       transcripts: [
         {
-          speakerId: 'patient',
+          speaker: 'user',
           timestamp: new Date(),
-          content: 'I feel overwhelmed with work and personal responsibilities',
+          text: 'I feel overwhelmed with work and personal responsibilities',
         },
       ],
+      userInputs: [],
       metadata: {
-        trainingInstitution: 'Test University',
-        traineeId: 'trainee-123',
-        sessionDuration: 30,
-        completionStatus: 'completed',
+        sessionStartTime: new Date(),
+        sessionEndTime: new Date(),
+        tags: [],
       },
     }
 
@@ -441,7 +443,7 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
     performanceResults.forEach((result) => {
       const threshold =
         PERFORMANCE_THRESHOLDS[
-          result.method as keyof typeof PERFORMANCE_THRESHOLDS
+        result.method as keyof typeof PERFORMANCE_THRESHOLDS
         ]
       const status = result.averageTime <= threshold ? '✅ PASS' : '❌ FAIL'
 
@@ -518,7 +520,7 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
 
     it('should benchmark startMonitoring and stopMonitoring performance', async () => {
       const startResult = await PerformanceBenchmark.measureMethod(
-        async () => await biasEngine.startMonitoring(() => {}),
+        async () => await biasEngine.startMonitoring(() => { }),
         10,
       )
 
@@ -731,21 +733,22 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
       const scalabilityResults: { [key: string]: number } = {}
 
       for (const level of complexityLevels) {
-        const complexSessionData = {
+        const complexSessionData: TherapeuticSession = {
           ...mockSessionData,
           sessionId: `scalability-${level.name}`,
           transcripts: Array.from({ length: level.transcripts }, (_, i) => ({
-            speakerId: i % 2 === 0 ? 'participant' : 'ai',
-            content: `This is transcript ${i + 1} with varying complexity and length`,
+            speaker: i % 2 === 0 ? 'user' : 'ai',
+            text: `This is transcript ${i + 1} with varying complexity and length`,
             timestamp: new Date(Date.now() + i * 1000),
           })),
           aiResponses: Array.from({ length: level.responses }, (_, i) => ({
             responseId: `response-${i + 1}`,
             timestamp: new Date(Date.now() + i * 2000),
-            type: 'intervention' as const,
-            content: `AI response ${i + 1} with detailed therapeutic guidance and recommendations`,
-            confidence: 0.8 + Math.random() * 0.2,
-            modelUsed: 'gpt-4',
+            text: `AI response ${i + 1} with detailed therapeutic guidance and recommendations`,
+            metadata: {
+              confidence: 0.8 + Math.random() * 0.2,
+              modelUsed: 'gpt-4',
+            },
           })),
         }
 

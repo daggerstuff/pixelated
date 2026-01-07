@@ -28,6 +28,9 @@ export type {
   BiasExplanationConfig,
   BiasDashboardData,
   DashboardRecommendation,
+  BiasAlert,
+  BiasDashboardSummary,
+  ModelPerformanceMetrics,
 } from './types'
 
 // Re-export interfaces (avoiding PerformanceMetrics duplicate)
@@ -52,10 +55,9 @@ export type {
   AlertEscalation,
   AlertStatistics,
   FallbackAnalysisResult,
+  SystemPerformanceMetrics,
 } from './bias-detection-interfaces'
 
-// Re-export PerformanceMetrics from interfaces only to resolve conflict
-export type { PerformanceMetrics } from './bias-detection-interfaces'
 
 // Utilities
 export * from './utils'

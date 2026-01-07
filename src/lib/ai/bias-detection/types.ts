@@ -13,49 +13,6 @@ export interface BiasLayerWeights {
   evaluation: number
 }
 
-export interface BiasMetricsConfig {
-  /**
-   * Type definitions for the Pixelated Empathy Bias Detection Engine
-   */
-
-  // Python service configuration
-  pythonServiceUrl?: string
-  pythonServiceTimeout?: number
-
-  // Detection thresholds
-  thresholds?: {
-    warning: number // 0.3 - Bias score above which warnings are issued
-    high: number // 0.6 - Bias score indicating high bias
-    critical: number // 0.8 - Bias score requiring immediate action
-  }
-
-  // Layer-specific weights for overall bias scoring
-  layerWeights?: {
-    preprocessing: number // Weight for preprocessing layer (default: 0.2)
-    modelLevel: number // Weight for model-level analysis (default: 0.3)
-    interactive: number // Weight for interactive analysis (default: 0.2)
-    evaluation: number // Weight for evaluation layer (default: 0.3)
-  }
-
-  // Evaluation metrics to compute
-  evaluationMetrics?: string[]
-
-  // Configuration for different components
-  metricsConfig?: BiasMetricsConfig
-  alertConfig?: BiasAlertConfig
-  reportConfig?: BiasReportConfig
-  explanationConfig?: BiasExplanationConfig
-  pythonServiceConfig?: PythonServiceConfig
-  cacheConfig?: CacheConfig
-  securityConfig?: SecurityConfig
-  performanceConfig?: PerformanceConfig
-
-  // HIPAA compliance settings
-  hipaaCompliant?: boolean
-  dataMaskingEnabled?: boolean
-  auditLogging?: boolean
-}
-
 export type AlertLevel = 'low' | 'medium' | 'high' | 'critical'
 
 export interface DataQualityMetrics {
@@ -76,7 +33,7 @@ export interface FairnessMetrics {
   counterfactualFairness: number
 }
 
-export interface PerformanceMetrics {
+export interface ModelPerformanceMetrics {
   accuracy: number
   precision: number
   recall: number
@@ -97,12 +54,13 @@ export interface BiasDetectionConfig {
   reportConfig?: BiasReportConfig
   explanationConfig?: BiasExplanationConfig
   pythonServiceConfig?: PythonServiceConfig
-  cacheConfig?: CacheConfig
+  cacheConfig?: BiasCacheConfig
   securityConfig?: SecurityConfig
   performanceConfig?: PerformanceConfig
   hipaaCompliant?: boolean
   dataMaskingEnabled?: boolean
   auditLogging?: boolean
+  strictMode?: boolean
   // Batch processing defaults
   batchProcessingConfig?: {
     enabled?: boolean
@@ -112,6 +70,9 @@ export interface BiasDetectionConfig {
     maxRetryAttempts?: number
     backoffStrategy?: 'fixed' | 'exponential'
     enableDebug?: boolean
+    concurrency?: number
+    timeoutMs?: number
+    retries?: number
   }
   mlToolkitConfig?: {
     enabled?: boolean
@@ -124,7 +85,7 @@ export interface BiasDetectionConfig {
 export interface BiasMetricsConfig {
   dataQualityMetrics?: Partial<DataQualityMetrics>
   fairnessMetrics?: Partial<FairnessMetrics>
-  performanceMetrics?: Partial<PerformanceMetrics>
+  performanceMetrics?: Partial<ModelPerformanceMetrics>
   enableRealTimeMonitoring?: boolean
   metricsRetentionDays?: number
   aggregationIntervals?: string[] // ['1h', '1d', '1w', '1m']
@@ -164,6 +125,7 @@ export interface BiasReportConfig {
   reportDescription?: string
   reportFrequency?: 'daily' | 'weekly' | 'monthly'
   reportFormats?: ('json' | 'csv' | 'pdf')[]
+  exportFormats?: ('json' | 'csv' | 'pdf')[]
   reportDestinations?: ('console' | 'email' | 's3')[]
   includeConfidentialityAnalysis?: boolean
   includeDemographicBreakdown?: boolean
@@ -196,7 +158,7 @@ export interface PythonServiceConfig {
   healthCheckInterval?: number
 }
 
-export interface CacheConfig {
+export interface BiasCacheConfig {
   enabled?: boolean
   ttl?: number // milliseconds
   maxSize?: number
@@ -241,6 +203,7 @@ export interface TherapeuticSession {
   transcripts: SessionTranscript[]
   userInputs: string[]
   metadata: SessionMetadata
+  timestamp?: Date
 }
 
 export interface ParticipantDemographics {
@@ -258,12 +221,12 @@ export interface ParticipantDemographics {
 export interface TrainingScenario {
   scenarioId: string
   type:
-    | 'depression'
-    | 'anxiety'
-    | 'trauma'
-    | 'substance-abuse'
-    | 'relationship-issues'
-    | 'general-wellness'
+  | 'depression'
+  | 'anxiety'
+  | 'trauma'
+  | 'substance-abuse'
+  | 'relationship-issues'
+  | 'general-wellness'
 }
 
 export interface SessionContent {
@@ -287,7 +250,7 @@ export interface ExpectedOutcome {
 }
 
 export interface SessionTranscript {
-  speaker: 'user' | 'therapist'
+  speaker: 'user' | 'therapist' | 'ai'
   text: string
   timestamp: Date
 }
@@ -329,7 +292,7 @@ export interface PreprocessingLayerResult {
 export interface ModelLevelLayerResult {
   biasScore: number
   fairnessMetrics: FairnessMetrics
-  performanceMetrics: PerformanceMetrics
+  performanceMetrics: ModelPerformanceMetrics
   groupPerformanceComparison: GroupPerformanceComparison[]
   recommendations: string[]
 }
@@ -371,38 +334,72 @@ export interface EvaluationLayerResult {
   recommendations: string[]
 }
 
+export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>;
+export type ModelLevelAnalysisResult = Partial<ModelLevelLayerResult>;
+export type InteractiveAnalysisResult = Partial<InteractiveLayerResult>;
+export type EvaluationAnalysisResult = Partial<EvaluationLayerResult>;
+
+export type LayerResults = {
+  preprocessing: PreprocessingAnalysisResult;
+  modelLevel: ModelLevelAnalysisResult;
+  interactive: InteractiveAnalysisResult;
+  evaluation: EvaluationAnalysisResult;
+};
+
 export interface BiasAnalysisResult {
   sessionId: string
   overallBiasScore: number
   alertLevel: AlertLevel
   confidence: number
-  layerResults: {
-    preprocessing: Partial<PreprocessingLayerResult>
-    modelLevel: Partial<ModelLevelLayerResult>
-    interactive: Partial<InteractiveLayerResult>
-    evaluation: Partial<EvaluationLayerResult>
-  }
+  layerResults: LayerResults
   recommendations: string[]
+  timestamp: Date
   demographics?: ParticipantDemographics
   error?: string
 }
 
-export interface DashboardData {
-  summary: {
-    totalSessions: number
-    averageBiasScore: number
-    alerts: Record<AlertLevel, number>
-  }
-  trends: {
-    time: string
+export type AnalysisResult = BiasAnalysisResult;
+
+export interface BiasAlert {
+  alertId: string
+  sessionId: string
+  timestamp: Date | string
+  level: AlertLevel
+  message: string
+  biasScore: number
+  acknowledged?: boolean
+  status?: string
+}
+
+export interface BiasDashboardSummary {
+  totalSessions: number
+  averageBiasScore: number
+  alertsLayerBreakdown: Record<string, number>
+  alertsLast24h: number
+  activeAlerts: number
+  trendDirection: 'up' | 'down' | 'stable'
+  alerts: Record<AlertLevel, number>
+}
+
+export interface DashboardRecommendation {
+  id: string
+  title: string
+  description: string
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  impact: string
+  actionUrl?: string
+}
+
+export interface BiasDashboardData {
+  summary: BiasDashboardSummary
+  trends: Array<{
+    date: string
+    time?: string
     biasScore: number
-  }[]
-  alerts: {
-    sessionId: string
-    timestamp: string
-    level: AlertLevel
-    biasScore: number
-  }[]
+    sessionCount: number
+    alertCount: number
+  }>
+  alerts: BiasAlert[]
   demographics: {
     [key: string]: {
       [value: string]: {
@@ -411,7 +408,11 @@ export interface DashboardData {
       }
     }
   }
+  recentAnalyses: BiasAnalysisResult[]
+  recommendations: DashboardRecommendation[]
 }
+
+export type DashboardData = BiasDashboardData;
 
 export interface SessionData {
   sessionId: string
@@ -464,5 +465,162 @@ export interface BiasReport {
   title: string
   description: string
   createdAt: Date
+  generatedAt?: Date
+  timeRange?: { start: Date; end: Date }
+  overallFairnessScore?: number
+  recommendations?: string[]
+  executiveSummary?: {
+    keyFindings: string[]
+    criticalIssues: string[]
+    improvementAreas: string[]
+    complianceStatus: string
+  }
+  detailedAnalysis?: {
+    demographicAnalysis: any
+    temporalTrends: any
+    performanceAnalysis: any
+    interventionAnalysis: any
+  }
+  appendices?: any[]
   data: Record<string, any>
+}
+
+export interface PerformanceSnapshot {
+  timestamp: number
+  metrics: Array<{
+    name: string
+    value: number
+    unit: string
+  }>
+  summary: {
+    averageResponseTime: number
+    requestCount: number
+    errorRate: number
+  }
+}
+
+export interface UserContext {
+  userId: string
+  email: string
+  role: {
+    id: string
+    name: string
+    description: string
+    level: number
+  }
+  permissions: string[]
+  institution?: string
+  department?: string
+}
+
+export interface AuditAction {
+  type: string
+  category: string
+  description: string
+  sensitivityLevel: 'low' | 'medium' | 'high' | 'critical'
+}
+
+export interface AuditLogEntry {
+  id: string
+  timestamp: Date
+  userId: string
+  userEmail: string
+  action: AuditAction
+  resource: string
+  details: Record<string, unknown>
+  ipAddress: string
+  userAgent: string
+  success: boolean
+  resourceId?: string
+  sessionId?: string
+  errorMessage?: string
+}
+
+export interface DataAccessLog {
+  id: string
+  timestamp: Date
+  userId: string
+  dataType: string
+  dataIds: string[]
+  accessReason: string
+  retentionPeriod: number
+  anonymized: boolean
+  approvedBy?: string
+}
+
+export interface RetentionPolicy {
+  dataType: string
+  retentionPeriod: number
+  autoDelete: boolean
+  archiveBeforeDelete: boolean
+  approvalRequired: boolean
+}
+
+export interface DataRetentionStatus {
+  totalRecords: number
+  recordsNearExpiry: number
+  expiredRecords: number
+  retentionPolicies: RetentionPolicy[]
+  lastCleanup: Date
+}
+
+export interface EncryptionStatus {
+  dataAtRest: {
+    encrypted: boolean
+    algorithm: string
+    keyRotationDate: Date
+  }
+  dataInTransit: {
+    encrypted: boolean
+    protocol: string
+    certificateExpiry: Date
+  }
+  backups: {
+    encrypted: boolean
+    location: string
+    lastBackup: Date
+  }
+}
+
+export interface ComplianceViolation {
+  id: string
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  detectedAt: Date
+  remediation: string[]
+}
+
+export interface ComplianceRecommendation {
+  id: string
+  category: string
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  title: string
+  description: string
+  implementationSteps: string[]
+  timeline: string
+  complianceStandards: string[]
+}
+
+export interface ComplianceReport {
+  id: string
+  generatedAt: Date
+  period: { start: Date; end: Date }
+  complianceScore: number
+  violations: ComplianceViolation[]
+  recommendations: ComplianceRecommendation[]
+  auditTrail: AuditLogEntry[]
+  dataRetentionStatus: DataRetentionStatus
+  encryptionStatus: EncryptionStatus
+}
+
+export interface ConfigurationUpdate {
+  section: string
+  changes: Array<{
+    field: string
+    oldValue: any
+    newValue: any
+    impact: 'low' | 'medium' | 'high' | 'critical'
+    requiresRestart: boolean
+  }>
 }

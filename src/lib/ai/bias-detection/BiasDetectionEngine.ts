@@ -21,23 +21,9 @@ import { PythonBiasDetectionBridge } from './python-bridge'
 import { BiasMetricsCollector } from './metrics-collector'
 import { BiasAlertSystem } from './alerts-system'
 
-type LayerResults = {
-  preprocessing: import('./types').PreprocessingAnalysisResult
-  modelLevel: import('./types').ModelLevelAnalysisResult
-  interactive: import('./types').InteractiveAnalysisResult
-  evaluation: import('./types').EvaluationAnalysisResult
-}
+type LayerResults = import('./types').LayerResults
 
-export type AnalysisResult = {
-  sessionId: string
-  timestamp: Date
-  overallBiasScore: number
-  alertLevel: AlertLevel
-  layerResults: LayerResults
-  recommendations: string[]
-  demographics?: import('./types').ParticipantDemographics
-  confidence?: number
-}
+export type AnalysisResult = import('./types').AnalysisResult
 
 const DEFAULT_THRESHOLDS: BiasThresholdsConfig = {
   warning: 0.3,
@@ -547,21 +533,21 @@ export class BiasDetectionEngine {
       demographics:
         maskedDemo && typeof maskedDemo === 'object'
           ? {
-              age:
-                ((maskedDemo as Record<string, unknown>)['age'] as string) ??
-                '',
-              gender:
-                ((maskedDemo as Record<string, unknown>)['gender'] as string) ??
-                '',
-              ethnicity:
-                ((maskedDemo as Record<string, unknown>)[
-                  'ethnicity'
-                ] as string) ?? '',
-              primaryLanguage:
-                ((maskedDemo as Record<string, unknown>)[
-                  'primaryLanguage'
-                ] as string) ?? '',
-            }
+            age:
+              ((maskedDemo as Record<string, unknown>)['age'] as string) ??
+              '',
+            gender:
+              ((maskedDemo as Record<string, unknown>)['gender'] as string) ??
+              '',
+            ethnicity:
+              ((maskedDemo as Record<string, unknown>)[
+                'ethnicity'
+              ] as string) ?? '',
+            primaryLanguage:
+              ((maskedDemo as Record<string, unknown>)[
+                'primaryLanguage'
+              ] as string) ?? '',
+          }
           : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
     }
 
@@ -717,9 +703,9 @@ export class BiasDetectionEngine {
     const averageBias =
       results.length > 0
         ? results
-            .filter(Boolean)
-            .reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) /
-          results.filter(Boolean).length
+          .filter(Boolean)
+          .reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) /
+        results.filter(Boolean).length
         : 0
     const perf = await this.metricsCollector.getCurrentPerformanceMetrics?.()
     const report = {
@@ -739,7 +725,11 @@ export class BiasDetectionEngine {
     await cacheReport(reportKey, {
       ...report,
       reportId: reportKey,
+      title: `Bias Detection Report - ${reportKey}`,
+      description: 'Automatically generated bias analysis report',
+      createdAt: new Date(),
       generatedAt: new Date(),
+      data: report,
       timeRange: _range
         ? { start: _range.start, end: _range.end }
         : { start: new Date(0), end: new Date(0) },

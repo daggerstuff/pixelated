@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { User, UserRole } from '@/types/user'
 import { UserModel } from '@/models/User'
 import { EmailService } from './emailService'
@@ -33,12 +34,15 @@ export class UserService {
     const temporaryPassword = Math.random().toString(36).substring(2, 15)
     const username = email.split('@')[0]
 
+    const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
+    const hashedPassword = await bcrypt.hash(temporaryPassword, saltRounds)
+
     const user = await UserModel.create({
       email,
       username,
       firstName: '',
       lastName: '',
-      password: temporaryPassword,
+      password: hashedPassword,
       role,
       isActive: true,
       isEmailVerified: false,
@@ -54,10 +58,13 @@ export class UserService {
     lastName: string,
     newPassword: string,
   ): Promise<User | null> {
+    const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
+
     const user = await UserModel.update(userId, {
       firstName,
       lastName,
-      password: newPassword,
+      password: hashedPassword,
       isEmailVerified: true,
     })
 
@@ -68,3 +75,4 @@ export class UserService {
     return user
   }
 }
+
