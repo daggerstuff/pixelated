@@ -126,7 +126,7 @@ export class CloudProviderManager {
       )
 
       logger.info('Cloud provider connections initialized successfully')
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Failed to initialize cloud provider connections', { error })
       throw new Error(
         `Cloud provider initialization failed: ${error.message}`,
@@ -192,7 +192,7 @@ export class CloudProviderManager {
       }
 
       logger.info(`Initialized AWS clients for ${awsRegions.length} regions`)
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Failed to initialize AWS clients', { error })
       throw error
     }
@@ -234,7 +234,7 @@ export class CloudProviderManager {
       }
 
       logger.info(`Initialized GCP clients for ${gcpRegions.length} regions`)
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Failed to initialize GCP clients', { error })
       throw error
     }
@@ -259,7 +259,7 @@ export class CloudProviderManager {
       logger.info(
         `Initialized Azure clients for ${azureRegions.length} regions`,
       )
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Failed to initialize Azure clients', { error })
       throw error
     }
@@ -295,7 +295,7 @@ export class CloudProviderManager {
         `Infrastructure deployment completed for region: ${region.name}`,
       )
       return result
-    } catch (error) {
+    } catch (error: any) {
       logger.error(
         `Failed to deploy infrastructure to region: ${region.name}`,
         { error },
@@ -360,7 +360,7 @@ export class CloudProviderManager {
           deploymentTime: new Date().toISOString(),
         },
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`AWS region deployment failed: ${region.name}`, { error })
       throw error
     }
@@ -420,7 +420,7 @@ export class CloudProviderManager {
           deploymentTime: new Date().toISOString(),
         },
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`GCP region deployment failed: ${region.name}`, { error })
       throw error
     }
@@ -606,7 +606,7 @@ export class CloudProviderManager {
       }
 
       logger.info(`Capacity updated successfully for region: ${regionId}`)
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`Failed to update capacity for region: ${regionId}`, {
         error,
       })
@@ -675,6 +675,7 @@ export class CloudProviderManager {
   /**
    * Get GCP region name from location
    */
+  // @ts-ignore - Unused function for now
   private getGCPRegionName(location: string): string {
     const regionMap: Record<string, string> = {
       'us-east': 'us-east1',
@@ -714,7 +715,7 @@ export class CloudProviderManager {
       this.azureClients.clear()
 
       logger.info('Cloud provider resources cleaned up successfully')
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Cloud provider cleanup failed', { error })
       throw error
     }

@@ -2,7 +2,7 @@ import type { StorageAPI } from '../types'
 import { createClient } from 'redis'
 
 export class RedisStorageAPI implements StorageAPI {
-  private client
+  private client: ReturnType<typeof createClient>
   private connected = false
 
   constructor(redisUrl: string) {
@@ -10,7 +10,7 @@ export class RedisStorageAPI implements StorageAPI {
       url: redisUrl,
     })
 
-    this.client.on('error', (err) => {
+    this.client.on('error', (err: unknown) => {
       console.error('Redis Client Error:', err)
     })
 
@@ -40,7 +40,8 @@ export class RedisStorageAPI implements StorageAPI {
     if (value === null) {
       throw new Error(`Key not found: ${key}`)
     }
-    return JSON.parse(value) as T
+    const stringValue = String(value)
+    return JSON.parse(stringValue) as T
   }
 
   async set(key: string, value: unknown): Promise<void> {

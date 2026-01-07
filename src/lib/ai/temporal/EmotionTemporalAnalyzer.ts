@@ -37,6 +37,7 @@ export interface TemporalEmotionAnalysis {
   volatility: number
   emotions: EmotionData[]
   patterns?: EmotionPattern[]
+  progression?: EmotionProgression
 }
 
 export interface EmotionAnalysisResult {
@@ -61,7 +62,7 @@ export interface EmotionCorrelation {
 }
 
 export class EmotionTemporalAnalyzer {
-  constructor(private repository: AIRepository) {}
+  constructor(private repository: AIRepository) { }
 
   async analyzeSessionEmotions(
     sessionIds: string[],

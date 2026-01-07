@@ -82,6 +82,6 @@ pympler==0.9.0
 # Security: Pin transitive dependencies to secure versions
 urllib3==2.6.2  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
 setuptools==78.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
-wheel==0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
+wheel==0.38.1 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp==3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
 requests==2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability

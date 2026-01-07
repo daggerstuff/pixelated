@@ -65,7 +65,7 @@ export const TreatmentForecastSchema = z.object({
   confidence: z.number().min(0).max(1),
   timeEstimate: z.string(),
   interventions: z.array(z.string()),
-  risk: z.enum(['low', 'medium', 'high']),
+  risk: z.enum(['low', 'moderate', 'high']),
   details: z
     .object({
       expectedDuration: z.number().int().positive(),
