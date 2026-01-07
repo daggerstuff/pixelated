@@ -2,7 +2,7 @@
  * This file is loaded before all tests across the entire project
  */
 import '@testing-library/jest-dom/vitest'
-import './src/test/setup-react19'
+import '../src/test/setup-react19'
 
 // MSW setup disabled due to import resolution issues with Vite
 // Tests should run fine without MSW as they have comprehensive mocking
@@ -350,8 +350,8 @@ function createMockRedis() {
       },
     }
 
-    // pipeline alias commonly used in some clients
-    ;(pipeline as any).pipeline = pipeline
+      // pipeline alias commonly used in some clients
+      ; (pipeline as any).pipeline = pipeline
     return pipeline
   }
   // pipeline helper intentionally removed; use multi()/pipeline returned from mock
@@ -587,4 +587,4 @@ if (process.env['CI'] && global.gc) {
   })
 }
 
-export {}
+export { }
