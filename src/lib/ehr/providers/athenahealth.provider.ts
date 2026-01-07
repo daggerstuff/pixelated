@@ -54,7 +54,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
     this.scopes = scopes || AthenahealthProvider.DEFAULT_SCOPES
   }
 
-  async initialize(): Promise<void> {
+  override async initialize(): Promise<void> {
     this.logger.info(`Initializing provider ${this.id}`)
 
     try {
@@ -183,7 +183,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
     }
   }
 
-  async cleanup(): Promise<void> {
+  override async cleanup(): Promise<void> {
     try {
       this.logger.info(`Cleaning up provider ${this.id}`)
       await super.cleanup()

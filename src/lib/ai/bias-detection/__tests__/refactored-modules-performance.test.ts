@@ -2,7 +2,7 @@
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import { BiasMetricsCollector } from '../metrics-collector'
 import { BiasAlertSystem } from '../alerts-system'
-import type { BiasAnalysisResult } from '../types'
+import type { BiasAnalysisResult, TherapeuticSession } from '../types'
 
 // Mock the Python bridge to avoid network calls
 // Note: Using constructor initialization to ensure each instance gets fresh mocks
@@ -221,7 +221,7 @@ describe('Refactored Modules Performance Tests', () => {
 
       const sessions = Array.from({ length: 10 }, (_, i) => ({
         sessionId: `bridge-perf-${i}`,
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
           age: String(25 + i),
           gender: i % 2 === 0 ? 'female' : 'male',
@@ -230,26 +230,20 @@ describe('Refactored Modules Performance Tests', () => {
         },
         scenario: {
           scenarioId: `scenario-${i}`,
-          type: 'other' as const,
-          complexity: 'beginner' as const,
-          tags: [],
-          description: 'Auto-generated scenario for test.',
-          learningObjectives: [],
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation: `Performance test session ${i} content for Python bridge analysis.`,
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'Test session notes',
+          transcript: `Performance test session ${i} content for Python bridge analysis.`,
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: `Trainee${i}`,
-          sessionDuration: 45,
-          completionStatus: 'completed' as const,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }))
 
@@ -280,9 +274,9 @@ describe('Refactored Modules Performance Tests', () => {
     it('should maintain connection pool efficiency', async () => {
       await pythonBridge.initialize()
 
-      const session = {
+      const session: TherapeuticSession = {
         sessionId: 'pool-test',
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
           age: '30',
           gender: 'female',
@@ -291,26 +285,20 @@ describe('Refactored Modules Performance Tests', () => {
         },
         scenario: {
           scenarioId: 'pool-scenario',
-          type: 'other' as const,
-          complexity: 'beginner' as const,
-          tags: [],
-          description: 'Pool test scenario',
-          learningObjectives: [],
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation: 'Connection pool efficiency test session.',
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'Test notes',
+          transcript: 'Connection pool efficiency test session.',
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: 'TraineeX',
-          sessionDuration: 45,
-          completionStatus: 'completed' as const,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }
 
@@ -341,9 +329,9 @@ describe('Refactored Modules Performance Tests', () => {
     it('should handle service failures gracefully without performance impact', async () => {
       await pythonBridge.initialize()
 
-      const validSession = {
+      const validSession: TherapeuticSession = {
         sessionId: 'failure-test-valid',
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
           age: '30',
           gender: 'female',
@@ -352,26 +340,20 @@ describe('Refactored Modules Performance Tests', () => {
         },
         scenario: {
           scenarioId: 'failure-test-scenario',
-          type: 'other' as const,
-          complexity: 'beginner' as const,
-          tags: [],
-          description: 'Valid session for failure handling test.',
-          learningObjectives: [],
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation: 'Valid session for failure handling test.',
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'Test session notes',
+          transcript: 'Valid session for failure handling test.',
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: 'TraineeFailure',
-          sessionDuration: 30,
-          completionStatus: 'completed' as const,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }
 
@@ -670,9 +652,9 @@ describe('Refactored Modules Performance Tests', () => {
       await metricsCollector.initialize()
       await alertSystem.initialize?.()
 
-      const session = {
+      const session: TherapeuticSession = {
         sessionId: 'e2e-perf-test',
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
           age: '35',
           gender: 'female',
@@ -681,27 +663,20 @@ describe('Refactored Modules Performance Tests', () => {
         },
         scenario: {
           scenarioId: 'e2e-scenario',
-          type: 'other' as const,
-          complexity: 'intermediate' as const,
-          tags: [],
-          description: 'End-to-end workflow scenario',
-          learningObjectives: [],
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation:
-            'End-to-end performance test session for the complete bias detection workflow.',
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'End-to-end test notes',
+          transcript: 'End-to-end performance test session for the complete bias detection workflow.',
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: 'TraineeE2E',
-          sessionDuration: 50,
-          completionStatus: 'completed' as const,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }
 
@@ -718,7 +693,7 @@ describe('Refactored Modules Performance Tests', () => {
       // Step 2: Create complete analysis result
       const analysisResult: BiasAnalysisResult = {
         sessionId: session.sessionId,
-        timestamp: session.timestamp,
+        timestamp: new Date(session.sessionDate),
         overallBiasScore:
           (preprocessingResult.biasScore +
             modelResult.biasScore +
@@ -768,39 +743,31 @@ describe('Refactored Modules Performance Tests', () => {
       await alertSystem.initialize?.()
 
       const numberOfSessions = 25
-      const sessions = Array.from({ length: numberOfSessions }, (_, i) => ({
+      const sessions: TherapeuticSession[] = Array.from({ length: numberOfSessions }, (_, i) => ({
         sessionId: `sustained-load-${i}`,
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
-          age: String(25 + (i % 50)),
+          age: String(20 + (i % 50)),
           gender: i % 2 === 0 ? 'female' : 'male',
-          ethnicity:
-            ['caucasian', 'african_american', 'hispanic', 'asian'][i % 4] ||
-            'caucasian',
+          ethnicity: 'other',
           primaryLanguage: 'english',
         },
         scenario: {
-          scenarioId: `scenario-${i}`,
-          type: 'other' as const,
-          complexity: 'beginner' as const,
-          tags: [],
-          description: 'Sustained load scenario',
-          learningObjectives: [],
+          scenarioId: `load-scenario-${i}`,
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation: `Sustained load test session ${i} for performance validation.`,
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'Sustained load test notes',
+          transcript: `Sustained load test session ${i} for performance validation.`,
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: `TraineeLoad${i}`,
-          sessionDuration: 45,
-          completionStatus: 'completed',
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }))
 
@@ -810,7 +777,7 @@ describe('Refactored Modules Performance Tests', () => {
       for (const session of sessions) {
         const analysisResult: BiasAnalysisResult = {
           sessionId: session.sessionId,
-          timestamp: session.timestamp,
+          timestamp: new Date(session.sessionDate),
           overallBiasScore: 0.2 + Math.random() * 0.6,
           alertLevel: Math.random() > 0.5 ? 'high' : 'medium',
           layerResults: {} as any, // Simplified for load test
@@ -853,9 +820,9 @@ describe('Refactored Modules Performance Tests', () => {
 
       // Perform various operations
       for (let i = 0; i < operations; i++) {
-        const session = {
+        const session: TherapeuticSession = {
           sessionId: `memory-test-${i}`,
-          timestamp: new Date(),
+          sessionDate: new Date().toISOString(),
           participantDemographics: {
             age: '30',
             gender: 'female',
@@ -864,32 +831,26 @@ describe('Refactored Modules Performance Tests', () => {
           },
           scenario: {
             scenarioId: `memory-scenario-${i}`,
-            type: 'other' as const,
-            complexity: 'beginner' as const,
-            tags: [],
-            description: 'Memory usage scenario',
-            learningObjectives: [],
+            type: 'anxiety' as const,
           },
           content: {
-            patientPresentation: 'Memory usage test session.',
-            therapeuticInterventions: [],
-            patientResponses: [],
-            sessionNotes: 'Memory usage notes',
+            transcript: 'Memory usage test session.',
+            aiResponses: [],
+            userInputs: [],
           },
           aiResponses: [],
           expectedOutcomes: [],
           transcripts: [],
+          userInputs: [],
           metadata: {
-            trainingInstitution: 'TestInstitute',
-            traineeId: `TraineeMemory${i}`,
-            sessionDuration: 30,
-            completionStatus: 'completed' as const,
+            sessionStartTime: new Date(),
+            sessionEndTime: new Date(),
           },
         }
 
         const analysisResult: BiasAnalysisResult = {
           sessionId: session.sessionId,
-          timestamp: session.timestamp,
+          timestamp: new Date(session.sessionDate),
           overallBiasScore: 0.3,
           alertLevel: 'medium' as const,
           layerResults: {} as any,
@@ -926,9 +887,9 @@ describe('Refactored Modules Performance Tests', () => {
       await alertSystem.initialize?.()
 
       // Perform some operations
-      const session = {
+      const session: TherapeuticSession = {
         sessionId: 'cleanup-test',
-        timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
         participantDemographics: {
           age: '30',
           gender: 'female',
@@ -937,32 +898,26 @@ describe('Refactored Modules Performance Tests', () => {
         },
         scenario: {
           scenarioId: 'cleanup-scenario',
-          type: 'other' as const,
-          complexity: 'beginner' as const,
-          tags: [],
-          description: 'Resource cleanup scenario',
-          learningObjectives: [],
+          type: 'anxiety' as const,
         },
         content: {
-          patientPresentation: 'Resource cleanup test session.',
-          therapeuticInterventions: [],
-          patientResponses: [],
-          sessionNotes: 'Cleanup notes',
+          transcript: 'Resource cleanup test session.',
+          aiResponses: [],
+          userInputs: [],
         },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
+        userInputs: [],
         metadata: {
-          trainingInstitution: 'TestInstitute',
-          traineeId: 'TraineeCleanup',
-          sessionDuration: 35,
-          completionStatus: 'completed' as const,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
         },
       }
 
       const analysisResult: BiasAnalysisResult = {
         sessionId: session.sessionId,
-        timestamp: session.timestamp,
+        timestamp: new Date(session.sessionDate),
         overallBiasScore: 0.3,
         alertLevel: 'medium' as const,
         layerResults: {} as any,

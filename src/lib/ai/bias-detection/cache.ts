@@ -15,6 +15,7 @@ import {
   BiasAnalysisResult,
   TherapeuticSession,
   ParticipantDemographics,
+  DashboardData,
 } from './types'
 
 import * as zlib from 'zlib'
