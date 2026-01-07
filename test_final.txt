@@ -1,0 +1,21 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/vivi/pixelated[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[2m3:02:01 AM[22m [33m[1m[vite][22m[39m (client) warning: Module "node:buffer" has been externalized for browser compatibility, imported by "/home/vivi/pixelated/src/lib/security/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+  Plugin: vite:resolve
+[2m3:02:01 AM[22m [33m[1m[vite][22m[39m (client) warning: Module "crypto" has been externalized for browser compatibility, imported by "/home/vivi/pixelated/src/lib/security/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+  Plugin: vite:resolve
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/auth/__tests__/integration.test.ts[2m [ src/lib/auth/__tests__/integration.test.ts ][22m
+[31m[1mError[22m: No such built-in module: node:[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 03:01:54
+[2m   Duration [22m 7.79s[2m (transform 2.08s, setup 1.45s, import 0ms, tests 0ms, environment 2.65s)[22m
+
