@@ -39,6 +39,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy package manifests first for better layer caching
 COPY package.json pnpm-lock.yaml* ./
+# Include patch files and npm configuration required during installation
+COPY patches ./patches
+COPY .npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
 # Retry logic with fallback for lockfile mismatches
@@ -124,6 +127,8 @@ RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
 # Copy package files and install production dependencies
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/patches ./patches
+COPY --from=builder /app/.npmrc ./.npmrc
 
 # Install production dependencies with retry logic and clean up in a single layer
 RUN ( \
