@@ -1745,31 +1745,20 @@ stages:
                 pnpm | "$(Agent.OS)"
               path: $(Agent.HomeDirectory)/.local/share/pnpm/store
 
+          # Docker-based Playwright approach - eliminates sudo requirement
           - script: |
-              mkdir -p $(Agent.HomeDirectory)/.cache/ms-playwright
-            displayName: 'Ensure Playwright Cache Directory Exists'
+              # Verify Docker is available
+              if ! command -v docker >/dev/null 2>&1; then
+                echo "##vso[task.logissue type=error]Docker is not available. Cannot run Playwright tests with Docker approach."
+                exit 1
+              fi
 
-          - task: Cache@2
-            inputs:
-              key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
-              restoreKeys: |
-                playwright | "$(Agent.OS)"
-              path: $(Agent.HomeDirectory)/.cache/ms-playwright
-            displayName: 'Cache Playwright Browsers'
+              # Build the Playwright Docker image
+              echo "🐳 Building Playwright Docker image..."
+              docker build -f docker/Dockerfile.playwright -t pixelated-playwright .
 
-          - script: |
-              corepack enable pnpm
-              # Install with --ignore-scripts to avoid permission issues with native module builds
-              # Some optional dependencies (unix-dgram, hnswlib-node) fail due to corepack cache permissions
-              pnpm install --frozen-lockfile --ignore-scripts
-
-              # Rebuild only critical native modules that are actually needed
-              # Skip optional dependencies that fail (they're not required for tests)
-              pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
-
-              # Install Playwright browsers
-              pnpm exec playwright install
-            displayName: 'Install Playwright Browsers'
+              echo "✅ Playwright Docker image built successfully"
+            displayName: 'Build Playwright Docker Image'
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
@@ -1938,19 +1927,32 @@ stages:
               echo "✅ /demo-hub route is accessible (HTTP $HTTP_CODE)"
               echo "🚀 Running performance tests..."
 
-              # Run performance tests only on available browsers (skip msedge on host)
-              pnpm run performance:test --project=chromium --project=firefox --project=webkit || {
-                echo "##vso[task.logissue type=warning]Performance tests failed or had errors"
-                echo "⚠️ Performance test failures are non-blocking - check test results for details"
-                exit 0
-              }
-            displayName: 'Run Performance Tests'
+              # Run tests with Docker-based Playwright approach
+              echo "🐳 Running performance tests in Docker container..."
+              mkdir -p test-results
+
+              # Run performance tests in Docker container
+              docker run --rm \
+                -v "$(pwd)":/app \
+                -v "$(pwd)/test-results":/app/test-results \
+                -e BASE_URL="${STAGING_URL}" \
+                -e STAGING_URL="${STAGING_URL}" \
+                -e CF_ACCESS_CLIENT_ID="${CF_ACCESS_CLIENT_ID:-}" \
+                -e CF_ACCESS_CLIENT_SECRET="${CF_ACCESS_CLIENT_SECRET:-}" \
+                pixelated-playwright \
+                pnpm run performance:test || {
+                  echo "##vso[task.logissue type=warning]Performance tests failed or had errors"
+                  echo "⚠️ Performance test failures are non-blocking - check test results for details"
+                  exit 0
+                }
+
+              echo "✅ Performance tests completed"
+            displayName: 'Run Performance Tests with Docker Playwright'
             env:
               BASE_URL: $(STAGING_URL)
               STAGING_URL: $(STAGING_URL)
               CF_ACCESS_CLIENT_ID: $(CF_ACCESS_CLIENT_ID)
               CF_ACCESS_CLIENT_SECRET: $(CF_ACCESS_CLIENT_SECRET)
-
   - stage: E2ETest
     displayName: 'E2E Testing'
     dependsOn:
@@ -1969,53 +1971,18 @@ stages:
             displayName: 'Install Node.js'
 
           - script: |
-              mkdir -p $(Agent.HomeDirectory)/.cache/ms-playwright
-            displayName: 'Ensure Playwright Cache Directory Exists'
-
-          - task: Cache@2
-            inputs:
-              key: 'playwright | "$(Agent.OS)" | pnpm-lock.yaml'
-              restoreKeys: |
-                playwright | "$(Agent.OS)"
-              path: $(Agent.HomeDirectory)/.cache/ms-playwright
-            displayName: 'Cache Playwright Browsers'
-
-          - script: |
-              set -euo pipefail
-
-              # Install build tools required for native Node modules
-              echo "📦 Checking build dependencies..."
-
-              if ! command -v make >/dev/null 2>&1 || ! command -v g++ >/dev/null 2>&1; then
-                echo "⚠️ Build tools missing. Attempting installation..."
-                sudo apt-get update -qq
-                sudo apt-get install -y --no-install-recommends \
-                  build-essential \
-                  make \
-                  g++ \
-                  python3 \
-                  python3-dev
-                echo "✅ Build tools installed"
-              else
-                echo "✅ Build tools already installed (skipping sudo)"
+              # Verify Docker is available
+              if ! command -v docker >/dev/null 2>&1; then
+                echo "##vso[task.logissue type=error]Docker is not available. Cannot run Playwright tests with Docker approach."
+                exit 1
               fi
-            displayName: 'Install Build Tools'
 
-          - script: |
-              corepack enable pnpm
-              # Install with --ignore-scripts to avoid permission issues with native module builds
-              # Some optional dependencies (unix-dgram, hnswlib-node) fail due to corepack cache permissions
-              pnpm install --frozen-lockfile --ignore-scripts
+              # Build the Playwright Docker image
+              echo "🐳 Building Playwright Docker image..."
+              docker build -f docker/Dockerfile.playwright -t pixelated-playwright .
 
-              # Rebuild only critical native modules that are actually needed
-              # Skip optional dependencies that fail (they're not required for tests)
-              pnpm rebuild sharp esbuild @sentry/cli better-sqlite3 || echo "Some rebuilds failed, continuing..."
-
-              # Install Playwright browsers (without system dependencies to avoid sudo requirement)
-              # Note: System dependencies should be pre-installed on the self-hosted agent
-              pnpm exec playwright install chromium firefox webkit
-
-            displayName: 'Install Playwright Browsers'
+              echo "✅ Playwright Docker image built successfully"
+            displayName: 'Build Playwright Docker Image'
 
           - script: |
               # Robust connectivity check with DNS resolution and retry logic
@@ -2110,9 +2077,18 @@ stages:
               # Playwright will write results here, but directory must exist first
               mkdir -p test-results
 
-              # Run smoke tests on available browsers (skip msedge on host to avoid sudo/dependency issues)
-              pnpm run e2e:smoke --project=chromium --project=firefox --project=webkit
-            displayName: 'Run E2E Smoke Tests'
+              # Run E2E smoke tests in Docker container with Docker-based Playwright
+              echo "🐳 Running E2E smoke tests in Docker container..."
+
+              docker run --rm \
+                -v "$(pwd)":/app \
+                -v "$(pwd)/test-results":/app/test-results \
+                -e BASE_URL="${STAGING_URL}" \
+                pixelated-playwright \
+                pnpm run e2e:smoke
+
+              echo "✅ E2E smoke tests completed"
+            displayName: 'Run E2E Smoke Tests with Docker Playwright'
             env:
               BASE_URL: $(STAGING_URL)
 
@@ -2138,8 +2114,171 @@ stages:
             condition: always()
 
   # ============================================
-  # OVH AI Training Stage (Manual Trigger)
+  # Playwright Docker Testing Stage
   # ============================================
+  - stage: PlaywrightDockerTest
+    displayName: 'Playwright Docker Testing'
+    dependsOn:
+      - DeployStaging
+      - HealthCheck
+    condition: succeeded()
+    jobs:
+      - job: PlaywrightDockerTests
+        displayName: 'Run Playwright Tests in Docker'
+        pool:
+          name: 'Default'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '$(NODE_VERSION)'
+            displayName: 'Install Node.js'
+
+          - script: |
+              # Verify Docker is available
+              if ! command -v docker >/dev/null 2>&1; then
+                echo "##vso[task.logissue type=error]Docker is not available. Cannot run Playwright tests with Docker approach."
+                exit 1
+              fi
+
+              # Build the Playwright Docker image
+              echo "🐳 Building Playwright Docker image..."
+              docker build -f docker/Dockerfile.playwright -t pixelated-playwright .
+
+              echo "✅ Playwright Docker image built successfully"
+            displayName: 'Build Playwright Docker Image'
+
+          - script: |
+              # Robust connectivity check with DNS resolution and retry logic
+              # Validate STAGING_URL is set and non-empty before proceeding
+              if [ -z "${STAGING_URL}" ]; then
+                echo "ERROR: STAGING_URL environment variable is not set or is empty"
+                echo "This variable must be configured in Azure Pipeline variables or variable groups"
+                echo "Expected format: https://staging.pixelatedempathy.com"
+                exit 1
+              fi
+
+              MAX_RETRIES=10
+              RETRY_DELAY=15
+              RETRY_COUNT=0
+
+              echo "Checking connectivity to ${STAGING_URL}..."
+
+              # Extract hostname for DNS check
+              HOSTNAME=$(echo "${STAGING_URL}" | sed -E 's|https?://([^/]+).*|\1|')
+
+              while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                echo "Attempt $RETRY_COUNT/$MAX_RETRIES: Checking DNS resolution for $HOSTNAME..."
+
+                # Check DNS resolution first
+                if ! host "$HOSTNAME" > /dev/null 2>&1 && ! nslookup "$HOSTNAME" > /dev/null 2>&1; then
+                  echo "❌ DNS resolution failed for $HOSTNAME"
+                  if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo "Waiting ${RETRY_DELAY}s before retry (DNS propagation may be in progress)..."
+                    sleep $RETRY_DELAY
+                    continue
+                  else
+                    echo "ERROR: DNS resolution failed after $MAX_RETRIES attempts"
+                    echo "This indicates the staging URL is not properly configured or DNS has not propagated"
+                    exit 1
+                  fi
+                fi
+
+                echo "✅ DNS resolution successful"
+
+                # Check HTTP connectivity
+                echo "Checking HTTP connectivity to ${STAGING_URL}..."
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 10 "${STAGING_URL}/api/bias-detection/health" 2>/dev/null || echo "000")
+
+                # Handle HTTP response codes
+                if echo "$HTTP_CODE" | grep -qE "^[2]"; then
+                  # 2xx codes are success
+                  echo "✅ Staging URL is accessible (HTTP $HTTP_CODE)"
+                  exit 0
+                elif [ "$HTTP_CODE" = "000" ]; then
+                  # "000" means curl failed (timeout, connection error, etc.)
+                  echo "❌ Connection failed (timeout or network error)"
+                  # Continue to retry
+                elif echo "$HTTP_CODE" | grep -qE "^[4]"; then
+                  # 4xx codes (401, 403 are acceptable for health checks, others are not)
+                  if echo "$HTTP_CODE" | grep -qE "401|403"; then
+                    echo "✅ Staging URL is accessible (HTTP $HTTP_CODE - authentication required)"
+                    exit 0
+                  else
+                    echo "❌ Client error (HTTP $HTTP_CODE) - service may not be ready or endpoint not found"
+                    # Continue to retry for other 4xx codes (400, 404, 429, etc.)
+                  fi
+                elif echo "$HTTP_CODE" | grep -qE "^[5]"; then
+                  # 5xx codes are server errors - service is not ready
+                  echo "❌ Server error (HTTP $HTTP_CODE) - service may not be ready"
+                  # Continue to retry
+                else
+                  # Unknown/invalid HTTP code
+                  echo "⚠️ Unexpected HTTP code: $HTTP_CODE"
+                  # Continue to retry
+                fi
+
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Waiting ${RETRY_DELAY}s before retry..."
+                  sleep $RETRY_DELAY
+                fi
+              done
+
+              echo "ERROR: Staging URL is not accessible after $MAX_RETRIES attempts"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "This may indicate:"
+              echo "  - DNS propagation delay"
+              echo "  - Network connectivity issues"
+              echo "  - Staging deployment not ready"
+              exit 1
+            displayName: 'Check Staging Connectivity'
+            env:
+              STAGING_URL: $(STAGING_URL)
+
+          - script: |
+              # Ensure test-results and playwright-report directories exist
+              mkdir -p test-results playwright-report
+
+              # Run comprehensive Playwright tests in Docker container
+              echo "🐳 Running comprehensive Playwright tests in Docker container..."
+
+              docker run --rm \
+                -v "$(pwd)":/app \
+                -v "$(pwd)/test-results":/app/test-results \
+                -v "$(pwd)/playwright-report":/app/playwright-report \
+                -e BASE_URL="${STAGING_URL}" \
+                -e STAGING_URL="${STAGING_URL}" \
+                --ipc=host \
+                pixelated-playwright \
+                pnpm test:e2e
+
+              echo "✅ Comprehensive Playwright tests completed"
+            displayName: 'Run Comprehensive Playwright Tests'
+            env:
+              BASE_URL: $(STAGING_URL)
+              STAGING_URL: $(STAGING_URL)
+
+          - script: |
+              # Ensure test-results directory exists before publishing
+              mkdir -p test-results playwright-report
+
+              # Check if test results exist, create placeholders if needed
+              if [ ! -f test-results/results.json ] && [ ! -f test-results/junit.xml ]; then
+                echo '{"tests": [], "errors": [], "status": "no-results"}' > test-results/results.json
+                echo "⚠️ No test results found - created placeholder file"
+              fi
+            displayName: 'Prepare Test Results for Publishing'
+            condition: succeededOrFailed()
+
+          - publish: test-results/
+            artifact: playwright-test-results
+            displayName: 'Publish Playwright Test Results'
+            condition: always()
+
+          - publish: playwright-report/
+            artifact: playwright-html-report
+            displayName: 'Publish Playwright HTML Report'
+            condition: always()
   - stage: OVHAITraining
     displayName: 'OVH AI Training'
     # Manual trigger only - run with: az pipelines run --parameters TRIGGER_AI_TRAINING=true
