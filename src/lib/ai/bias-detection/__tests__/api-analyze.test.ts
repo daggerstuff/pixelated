@@ -229,30 +229,28 @@ describe('Session Analysis API Endpoint', () => {
     vi.clearAllMocks()
 
     // Setup global Response mock with default behavior
-    global.Response = vi
-      .fn()
-      .mockImplementation((body: string, init?: ResponseInit) => {
-        let responseData
-        try {
-          responseData = JSON.parse(body) as unknown
-        } catch {
-          responseData = { error: 'Invalid JSON' }
-        }
+    vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+      let responseData: any
+      try {
+        responseData = JSON.parse(body)
+      } catch {
+        responseData = { error: 'Invalid JSON' }
+      }
 
-        const defaultHeaders = new Map([
-          ['Content-Type', 'application/json'],
-          ['X-Cache', 'MISS'],
-          ['X-Processing-Time', '100'],
-        ])
+      const defaultHeaders = new Map([
+        ['Content-Type', 'application/json'],
+        ['X-Cache', 'MISS'],
+        ['X-Processing-Time', '100'],
+      ])
 
-        return {
-          status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(responseData),
-          headers: {
-            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
-          },
-        }
-      }) as unknown as typeof Response
+      return {
+        status: init?.status || 200,
+        json: vi.fn().mockResolvedValue(responseData),
+        headers: {
+          get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+        },
+      }
+    }))
 
     // Setup mock return values
     mockCacheManager.analysisCache.getAnalysisResult.mockResolvedValue(null)
@@ -296,6 +294,7 @@ describe('Session Analysis API Endpoint', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.unstubAllGlobals()
   })
 
   // Shared helper function for creating mock requests
@@ -334,15 +333,15 @@ describe('Session Analysis API Endpoint', () => {
         ['X-Processing-Time', '100'],
       ])
 
-      global.Response = vi
-        .fn()
-        .mockImplementation((body: string, init?: ResponseInit) => ({
+      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+        return {
           status: init?.status || 200,
           json: mockResponseJson.mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
             get: vi.fn((key: string) => mockResponseHeaders.get(key) || null),
           },
-        })) as unknown as typeof Response
+        }
+      }))
 
       const response = await POST({ request })
 
@@ -571,18 +570,16 @@ describe('Session Analysis API Endpoint', () => {
       const request = createMockRequest(requestBody)
 
       // Mock Response with processing time
-      global.Response = vi
-        .fn()
-        .mockImplementation((body: string, init?: ResponseInit) => {
-          const responseData = JSON.parse(body) as unknown
-          return {
-            status: init?.status || 200,
-            json: vi.fn().mockResolvedValue(responseData),
-            headers: {
-              get: vi.fn(() => 'application/json'),
-            },
-          }
-        }) as unknown as typeof Response
+      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+        const responseData = JSON.parse(body) as unknown
+        return {
+          status: init?.status || 200,
+          json: vi.fn().mockResolvedValue(responseData),
+          headers: {
+            get: vi.fn(() => 'application/json'),
+          },
+        }
+      }))
 
       const response = await POST({ request })
       const responseData = await response.json()
@@ -603,15 +600,15 @@ describe('Session Analysis API Endpoint', () => {
         ['X-Processing-Time', '150'],
       ])
 
-      global.Response = vi
-        .fn()
-        .mockImplementation((body: string, init?: ResponseInit) => ({
+      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+        return {
           status: init?.status || 200,
           json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
             get: vi.fn((key: string) => mockHeaders.get(key) || null),
           },
-        })) as unknown as typeof Response
+        }
+      }))
 
       const response = await POST({ request })
 

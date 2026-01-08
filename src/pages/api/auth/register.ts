@@ -53,6 +53,37 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       )
     }
 
+    // Validate email format
+    const { isValidEmail, isValidPassword } = await import('@/lib/auth/utils')
+    if (!isValidEmail(body.email)) {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid email format',
+          message: 'Please provide a valid email address.',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    // Validate password complexity
+    const passwordValidation = isValidPassword(body.password)
+    if (!passwordValidation.valid) {
+      return new Response(
+        JSON.stringify({
+          error: 'Weak password',
+          message: 'Password does not meet complexity requirements.',
+          errors: passwordValidation.errors,
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
     // Sanitize input data
     const sanitizedData = {
       email: sanitizeInput(body.email),
