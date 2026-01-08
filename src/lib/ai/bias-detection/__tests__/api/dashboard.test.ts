@@ -8,26 +8,30 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 global.fetch = vi.fn()
 
 // Mock all dependencies
-vi.mock('@/lib/ai/bias-detection')
-vi.mock('@/lib/utils/logger', () => ({
-  getLogger: vi.fn(() => ({
+vi.mock('@/lib/ai/bias-detection', () => ({
+  BiasDetectionEngine: vi.fn(),
+}))
+const { mockLogger } = vi.hoisted(() => ({
+  mockLogger: {
     info: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  })),
+  }
+}))
+
+vi.mock('@/lib/logging/build-safe-logger', () => ({
+  createBuildSafeLogger: vi.fn(() => mockLogger),
 }))
 
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection'
-import { getLogger } from '@/lib/utils/logger'
 
 import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 
 // Import the actual handler
-const { GET } = await import('./dashboard')
+let GET: any
 
 describe('Bias Detection Dashboard API Endpoint', () => {
-  let mockLogger: any
   let mockBiasEngine: {
     getDashboardData: ReturnType<typeof vi.fn>
   }
@@ -238,40 +242,36 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     }
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
 
-    mockLogger = {
-      info: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
-      warn: vi.fn(),
-    } as unknown
-    vi.mocked(getLogger).mockReturnValue(mockLogger)
+    // mockLogger is handled by the vi.mock factory
+    if (!GET) {
+      const module = await import('./dashboard')
+      GET = module.GET
+    }
 
-    global.Response = vi
-      .fn()
-      .mockImplementation((body: string, init?: ResponseInit) => {
-        let responseData
-        try {
-          responseData = JSON.parse(body) as unknown
-        } catch {
-          responseData = { error: 'Invalid JSON' }
-        }
+    vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+      let responseData: any
+      try {
+        responseData = JSON.parse(body)
+      } catch {
+        responseData = { error: 'Invalid JSON' }
+      }
 
-        const defaultHeaders = new Map([
-          ['Content-Type', 'application/json'],
-          ['X-Processing-Time', '150'],
-        ])
+      const defaultHeaders = new Map([
+        ['Content-Type', 'application/json'],
+        ['X-Processing-Time', '150'],
+      ])
 
-        return {
-          status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(responseData),
-          headers: {
-            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
-          },
-        }
-      }) as unknown as typeof Response
+      return {
+        status: init?.status || 200,
+        json: vi.fn().mockResolvedValue(responseData),
+        headers: {
+          get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+        },
+      }
+    }))
 
     mockBiasEngine = {
       getDashboardData: vi.fn().mockResolvedValue(mockDashboardData),
@@ -281,6 +281,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.unstubAllGlobals()
   })
 
   describe('GET /api/bias-detection/dashboard', () => {
@@ -365,15 +366,15 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      global.Response = vi
-        .fn()
-        .mockImplementation((body: string, init?: ResponseInit) => ({
+      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
+        return {
           status: init?.status || 500,
           json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
-            get: vi.fn((_key: string) => 'application/json'),
+            get: vi.fn((_key: string) => "application/json"),
           },
-        })) as unknown as typeof Response
+        }
+      }))
 
       const response = await GET({ request } as { request: Request })
 
@@ -491,15 +492,15 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      global.Response = vi
-        .fn()
-        .mockImplementation((body: string, init?: ResponseInit) => ({
+      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
+        return {
           status: init?.status || 500,
           json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
           headers: {
-            get: vi.fn((_key: string) => 'application/json'),
+            get: vi.fn((_key: string) => "application/json"),
           },
-        })) as unknown as typeof Response
+        }
+      }))
 
       const response = await GET({ request } as { request: Request })
 
