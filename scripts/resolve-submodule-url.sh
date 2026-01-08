@@ -8,19 +8,37 @@ set -euo pipefail
 
 SUBMODULE_PATH="ai"
 SUBMODULE_URL_GITHUB="https://github.com/pixelatedempathy/ai.git"
-# User requested SSH for Azure DevOps (keys laid down on agent)
-SUBMODULE_URL_AZURE="git@ssh.dev.azure.com:v3/pixeljump/ai/ai"
+# Support both SSH and HTTPS for Azure DevOps
+SUBMODULE_URL_AZURE_SSH="git@ssh.dev.azure.com:v3/pixeljump/ai/ai"
+SUBMODULE_URL_AZURE_HTTPS="https://dev.azure.com/pixeljump/ai/_git/ai"
 
 # Detect environment using Azure DevOps built-in variables
-# TF_BUILD is always set to 'True' in Azure Pipelines
-# SYSTEM_TEAMFOUNDATIONCOLLECTIONURI contains the Azure DevOps organization URL
 if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI:-}" ]]; then
-  echo "Detected Azure DevOps pipeline environment. Using Azure submodule URL (SSH)."
-  SUBMODULE_URL="$SUBMODULE_URL_AZURE"
-  
-  # SSH authentication is handled by the agent's SSH keys (~/.ssh/config)
-  # No need to configure http.extraheader for bearer tokens
-  echo "✅ Using SSH URL for submodule (relies on agent SSH keys)"
+  echo "Detected Azure DevOps pipeline environment."
+
+  # Ensure ssh.dev.azure.com is in known_hosts to avoid interactive prompts
+  echo "Ensuring Azure DevOps SSH host keys are recognized..."
+  mkdir -p ~/.ssh
+  if ! grep -q "ssh.dev.azure.com" ~/.ssh/known_hosts 2>/dev/null; then
+    ssh-keyscan -t rsa ssh.dev.azure.com >> ~/.ssh/known_hosts 2>/dev/null || echo "⚠️ Could not pre-scan host keys"
+  fi
+
+  # Default to SSH as the primary method (per user confirmation of permissions)
+  # But allow HTTPS fallback if SSH known to fail or if token is specifically provided
+  if [[ "${SUBMODULE_USE_SSH:-}" == "false" ]]; then
+    echo "Using Azure submodule URL (HTTPS) as explicitly requested."
+    SUBMODULE_URL="$SUBMODULE_URL_AZURE_HTTPS"
+  else
+    echo "Using Azure submodule URL (SSH) - expected to match parent repo permissions."
+    SUBMODULE_URL="$SUBMODULE_URL_AZURE_SSH"
+  fi
+
+  # Proactively configure HTTPS authentication regardless, as it's a zero-cost safety net
+  if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+    echo "Configuring HTTPS fallback authentication for Azure DevOps..."
+    git config --global url."https://azdo:${SYSTEM_ACCESSTOKEN}@dev.azure.com/".insteadOf "https://dev.azure.com/"
+    echo "✅ HTTPS fallback authentication ready"
+  fi
 else
   echo "Detected external/GitHub environment. Using GitHub submodule URL."
   SUBMODULE_URL="$SUBMODULE_URL_GITHUB"
