@@ -31,29 +31,33 @@ declare module 'vitest' {
 
 // Cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
-  document.body.innerHTML = ''
+  if (typeof document !== 'undefined') {
+    document.body.innerHTML = ''
+  }
 })
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
-  }),
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => { },
+      removeListener: () => { },
+      addEventListener: () => { },
+      removeEventListener: () => { },
+      dispatchEvent: () => { },
+    }),
+  })
+}
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 }
 
 // Mock IntersectionObserver
@@ -62,9 +66,9 @@ global.IntersectionObserver = class MockIntersectionObserver {
   rootMargin = '0px'
   thresholds: ReadonlyArray<number> = [0]
 
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
@@ -80,13 +84,15 @@ const localStorageMock = {
   key: vi.fn(),
 }
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+  })
 
-Object.defineProperty(window, 'sessionStorage', {
-  value: localStorageMock,
-})
+  Object.defineProperty(window, 'sessionStorage', {
+    value: localStorageMock,
+  })
+}
 
 // Mock URL methods
 global.URL.createObjectURL = vi.fn()
@@ -94,9 +100,9 @@ global.URL.revokeObjectURL = vi.fn()
 
 // Mock console methods to reduce noise in tests
 beforeEach(() => {
-  vi.spyOn(console, 'log').mockImplementation(() => {})
-  vi.spyOn(console, 'warn').mockImplementation(() => {})
-  vi.spyOn(console, 'error').mockImplementation(() => {})
-  vi.spyOn(console, 'info').mockImplementation(() => {})
-  vi.spyOn(console, 'debug').mockImplementation(() => {})
+  vi.spyOn(console, 'log').mockImplementation(() => { })
+  vi.spyOn(console, 'warn').mockImplementation(() => { })
+  vi.spyOn(console, 'error').mockImplementation(() => { })
+  vi.spyOn(console, 'info').mockImplementation(() => { })
+  vi.spyOn(console, 'debug').mockImplementation(() => { })
 })

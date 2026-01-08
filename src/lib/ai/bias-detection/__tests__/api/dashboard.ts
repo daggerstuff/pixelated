@@ -1,1 +1,1 @@
-export { GET } from '../../../../../pages/api/bias-detection/dashboard.ts'
+export { GET } from '../../../../../pages/api/bias-detection/dashboard'
