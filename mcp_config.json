@@ -8,7 +8,24 @@
           "mcp-remote",
           "https://mcp.atlassian.com/v1/sse"
         ],
-        "description": "Atlassian MCP Server for Jira and Confluence integration"
+        "description": "Atlassian MCP Server for Jira and Confluence integration",
+        "tool_prefix": "atlassian_"
+      },
+      "graphiti-context": {
+        "command": "uv",
+        "args": [
+          "run",
+          "python",
+          "ai/api/mcp_server/graphiti_server.py"
+        ],
+        "env": {
+          "GRAPHITI_HOST": "0.0.0.0",
+          "GRAPHITI_PORT": "8000",
+          "GRAPHITI_DEBUG": "false"
+        },
+        "description": "Graphiti Context Server for VS Code extension - Server-Sent Events endpoint",
+        "disabled": false,
+        "tool_prefix": "graphiti_"
       },
       "pixelated-memory": {
         "command": "uv",
@@ -25,7 +42,8 @@
           "LOG_LEVEL": "INFO"
         },
         "description": "Memory management server with Zep Cloud integration",
-        "disabled": false
+        "disabled": false,
+        "tool_prefix": "memory_"
       }
     }
   }
