@@ -69,7 +69,7 @@ face-recognition
 python-dotenv
 
 # Security: Pin transitive dependencies to secure versions
-werkzeug>=3.1.4  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
+werkzeug>=3.1.5  # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
 fonttools>=4.61.0  # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
 tensorflow>=2.12.0 # not directly required, pinned by Snyk to avoid a vulnerability
 protobuf>=4.25.8 # not directly required, pinned by Snyk to avoid a vulnerability
@@ -82,5 +82,6 @@ fonttools>=4.61.0
 scikit-image>=0.19.0
 kombu>=5.3.0
 safetensors>=0.3.0
-urllib3>=2.6.2  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+urllib3>=2.6.3  # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+aiohttp>=3.13.3  # Fixes multiple vulnerabilities including zip bomb and DoS issues
 filelock>=3.20.1  # not directly required; pinned by Snyk to avoid SNYK-PYTHON-FILELOCK-14458335
