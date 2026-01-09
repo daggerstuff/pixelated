@@ -4228,6 +4228,7 @@ dependencies = [
     { name = "wandb" },
     { name = "werkzeug" },
     { name = "yamllint" },
+    { name = "zep-cloud" },
 ]
 
 [package.optional-dependencies]
@@ -4349,6 +4350,7 @@ requires-dist = [
     { name = "wandb", specifier = ">=0.21.1" },
     { name = "werkzeug", specifier = ">=3.1.4" },
     { name = "yamllint", specifier = ">=1.37.1" },
+    { name = "zep-cloud", specifier = ">=3.14.0" },
 ]
 provides-extras = ["test", "dev"]
 
@@ -7307,6 +7309,22 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/31/74/8b74bae38ed7fe6793d0c15a0c8207bbb819cf287788459e5ed230996cdd/yarl-1.22.0-cp313-cp313t-win_amd64.whl", hash = "sha256:ff86011bd159a9d2dfc89c34cfd8aff12875980e3bd6a39ff097887520e60249", size = 93715, upload-time = "2025-10-06T14:11:11.739Z" },
     { url = "https://files.pythonhosted.org/packages/69/66/991858aa4b5892d57aef7ee1ba6b4d01ec3b7eb3060795d34090a3ca3278/yarl-1.22.0-cp313-cp313t-win_arm64.whl", hash = "sha256:7861058d0582b847bc4e3a4a4c46828a410bca738673f35a29ba3ca5db0b473b", size = 83857, upload-time = "2025-10-06T14:11:13.586Z" },
     { url = "https://files.pythonhosted.org/packages/73/ae/b48f95715333080afb75a4504487cbe142cae1268afc482d06692d605ae6/yarl-1.22.0-py3-none-any.whl", hash = "sha256:1380560bdba02b6b6c90de54133c81c9f2a453dee9912fe58c1dcced1edb7cff", size = 46814, upload-time = "2025-10-06T14:12:53.872Z" },
+]
+
+[[package]]
+name = "zep-cloud"
+version = "3.14.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "pydantic-core" },
+    { name = "python-dateutil" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/15/d3/20e7e09afadc3f94a0f4936e6cabe2a496643e92cd6a46a2cf3f2b7f39cc/zep_cloud-3.14.0.tar.gz", hash = "sha256:e98a746091acaf2437d709c5ba999e367761bea6bb2d90084cc0ddfbdbb5d24c", size = 64597, upload-time = "2026-01-07T20:59:19.207Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/62/280d28a55e8bd5f630d0878a2a839cc4e3b41e65bb4497bf33694bf6e8e7/zep_cloud-3.14.0-py3-none-any.whl", hash = "sha256:a8c62fa251f43baa97b370b22f5850b61008a73530c52351b986f0ad91f75a7b", size = 112297, upload-time = "2026-01-07T20:59:17.738Z" },
 ]
 
 [[package]]
