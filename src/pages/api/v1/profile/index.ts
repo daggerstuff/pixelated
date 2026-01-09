@@ -1,9 +1,8 @@
 // API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { AuthUser } from '@/lib/auth/types'
-import * as adapter from '@/adapters/betterAuthMongoAdapter'
+import { auth0UserService } from '@/services/auth0.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-// Removed AuthAPIContext import - using direct type annotation instead
 
 export const prerender = false
 
@@ -24,18 +23,8 @@ export const GET = protectRoute({
   try {
     const { user } = locals
 
-    // Get user profile from MongoDB
-    const userProfile = (await adapter.getUserById(user.id)) as unknown as {
-      _id: { toString(): string }
-      fullName?: string
-      avatarUrl?: string | null
-      email: string
-      role: string
-      lastLogin?: Date
-      updatedAt?: Date
-      createdAt?: Date
-      preferences?: unknown
-    } | null
+    // Get user profile from Auth0
+    const userProfile = await auth0UserService.getUserById(user.id)
 
     if (!userProfile) {
       logger.error(`Profile not found for user ${user.id}`)
@@ -54,15 +43,15 @@ export const GET = protectRoute({
     return new Response(
       JSON.stringify({
         profile: {
-          id: userProfile._id.toString(),
+          id: userProfile.id,
           fullName: userProfile.fullName || userProfile.email.split('@')[0],
           avatarUrl: userProfile.avatarUrl || null,
           email: userProfile.email,
           role: userProfile.role,
-          lastLogin: userProfile.lastLogin || userProfile.updatedAt,
+          lastLogin: userProfile.lastLogin,
           createdAt: userProfile.createdAt,
-          updatedAt: userProfile.updatedAt,
-          preferences: userProfile.preferences || {},
+          userMetadata: userProfile.userMetadata || {},
+          appMetadata: userProfile.appMetadata || {},
         },
       }),
       {
@@ -101,35 +90,21 @@ export const PUT = protectRoute({
     const data = await request.json()
 
     // Validate input data
-    const { fullName, avatarUrl, preferences } = data
+    const { fullName, avatarUrl, userMetadata } = data
     const updates: Record<string, unknown> = {}
 
-    // Only include fields that were provided - using bracket notation for type safety
     if (fullName !== undefined) {
-      updates['fullName'] = fullName
+      updates['name'] = fullName
     }
     if (avatarUrl !== undefined) {
-      updates['avatarUrl'] = avatarUrl
+      updates['picture'] = avatarUrl
     }
-    if (preferences !== undefined) {
-      updates['preferences'] = preferences
+    if (userMetadata !== undefined) {
+      updates['user_metadata'] = userMetadata
     }
 
-    // Update profile in MongoDB
-    const updatedUser = (await adapter.updateUser(
-      user.id,
-      updates,
-    )) as unknown as {
-      _id: { toString(): string }
-      fullName?: string
-      avatarUrl?: string | null
-      email: string
-      role: string
-      lastLogin?: Date
-      updatedAt?: Date
-      createdAt?: Date
-      preferences?: unknown
-    } | null
+    // Update profile in Auth0
+    const updatedUser = await auth0UserService.updateUser(user.id, updates)
 
     if (!updatedUser) {
       logger.error(`Error updating profile for user ${user.id}`)
@@ -148,15 +123,14 @@ export const PUT = protectRoute({
     return new Response(
       JSON.stringify({
         profile: {
-          id: updatedUser._id.toString(),
+          id: updatedUser.id,
           fullName: updatedUser.fullName || updatedUser.email.split('@')[0],
           avatarUrl: updatedUser.avatarUrl || null,
           email: updatedUser.email,
           role: updatedUser.role,
-          lastLogin: updatedUser.lastLogin || updatedUser.updatedAt,
+          lastLogin: updatedUser.lastLogin,
           createdAt: updatedUser.createdAt,
-          updatedAt: updatedUser.updatedAt,
-          preferences: updatedUser.preferences || {},
+          userMetadata: updatedUser.userMetadata || {},
         },
       }),
       {

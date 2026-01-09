@@ -79,10 +79,10 @@ export interface EdgeDetectionConfig {
 export interface AIModelConfig {
   modelId: string
   modelType:
-    | 'anomaly_detection'
-    | 'classification'
-    | 'clustering'
-    | 'prediction'
+  | 'anomaly_detection'
+  | 'classification'
+  | 'clustering'
+  | 'prediction'
   modelPath: string
   inputShape: number[]
   outputShape: number[]
@@ -258,12 +258,12 @@ export interface HuntPattern {
   name: string
   description: string
   patternType:
-    | 'network'
-    | 'endpoint'
-    | 'user_behavior'
-    | 'malware'
-    | 'lateral_movement'
-    | 'custom'
+  | 'network'
+  | 'endpoint'
+  | 'user_behavior'
+  | 'malware'
+  | 'lateral_movement'
+  | 'custom'
   query: string
   severity: 'low' | 'medium' | 'high' | 'critical'
   confidence: number
@@ -347,12 +347,12 @@ export interface ValidationRule {
 
 export interface ValidationCondition {
   type:
-    | 'field_exists'
-    | 'field_value'
-    | 'regex_match'
-    | 'range_check'
-    | 'whitelist'
-    | 'blacklist'
+  | 'field_exists'
+  | 'field_value'
+  | 'regex_match'
+  | 'range_check'
+  | 'whitelist'
+  | 'blacklist'
   field: string
   operator?: string
   value?: any
@@ -993,7 +993,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
     },
     authentication: {
       method: 'jwt',
-      providers: ['better-auth'],
+      providers: ['auth0'],
       tokenExpiration: 3600000, // 1 hour
       refreshTokenEnabled: true,
       sessionManagement: true,
@@ -1160,7 +1160,7 @@ export class ThreatIntelligenceConfigManager {
     try {
       this.mongoClient = new MongoClient(
         process.env.MONGODB_URI ||
-          'mongodb://localhost:27017/threat_intelligence',
+        'mongodb://localhost:27017/threat_intelligence',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_intelligence')

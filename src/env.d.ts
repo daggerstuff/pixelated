@@ -6,13 +6,18 @@ declare namespace App {
   interface Locals {
     requestId: string
     timestamp: string
-    user: import('better-auth').User | null
-    session: import('better-auth').Session | null
-    user?: {
+    user: {
       id: string
       email: string
-      name?: string
-    }
+      role: string
+      fullName?: string
+      avatarUrl?: string
+    } | null
+    session: {
+      id: string
+      userId: string
+      expiresAt: Date
+    } | null
     vercelEdge?: {
       country: string
       region: string

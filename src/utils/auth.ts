@@ -53,12 +53,7 @@ export async function getSessionFromRequest(request: Request): Promise<SessionDa
  * Auth object for catch-all route compatibility.
  */
 export const auth = {
-    handler: async (_request: Request) => {
-        return new Response(JSON.stringify({ message: "Auth0 migration in progress. This catch-all route is deprecated." }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    },
+
     verifyAuthToken,
     getSessionFromRequest
 };
