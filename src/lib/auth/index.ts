@@ -1,16 +1,17 @@
 /**
  * Authentication Module - Main export for Phase 7 JWT Authentication Service
- * Provides complete authentication system with Better-Auth integration
+ * Provides complete authentication system with Auth0 integration
  */
 
 import type { AstroCookies } from 'astro'
 import { authConfig } from '../../config/auth.config'
-import { validateToken } from './jwt-service'
+import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
 import { getSession } from './session'
 
 // Re-export session for compatibility
 export { getSession } from './session'
+export type { SessionData } from './session'
 
 /**
  * Get the current user from the request or cookies
@@ -26,8 +27,8 @@ export async function getCurrentUser(
   } else {
     // It's AstroCookies
     // Check for Auth0 token first, then fallback to configured name
-    token = context.get(authConfig.cookies.accessToken)?.value ||
-      context.get('auth_token')?.value ||
+    token = (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
+      (context as AstroCookies).get('auth_token')?.value ||
       null
   }
 
@@ -81,22 +82,20 @@ export async function requirePageAuth(
   if (!user) {
     return new Response(null, {
       status: 302,
-      headers: { Location: '/auth/login' }
+      headers: { Location: '/login' }
     })
   }
 
   if (role && user.role !== role) {
     return new Response(null, {
       status: 302,
-      headers: { Location: '/access-denied' } // Updated to use configured forbidden path if available
+      headers: { Location: '/access-denied' }
     })
   }
 
   return null
 }
 
-
-export type { SessionData } from './session'
 // Export authentication types and middleware
 export * from './types'
 
@@ -109,7 +108,7 @@ export {
   cleanupExpiredTokens,
   measureTokenOperation,
   AuthenticationError,
-} from './jwt-service'
+} from './auth0-jwt-service'
 
 export type {
   TokenPair,
@@ -117,30 +116,9 @@ export type {
   ClientInfo,
   UserRole,
   TokenType,
-} from './jwt-service'
+} from './auth0-jwt-service'
 
-// Better-Auth Integration exports
-export {
-  registerWithBetterAuth,
-  authenticateWithBetterAuth,
-  logoutFromBetterAuth,
-  getUserAuthentication,
-  getUserAuthenticationByBetterAuthId,
-  updateUserAuthentication,
-  validateJWTAndGetUser,
-  hasRequiredRole,
-  hasPermission,
-  getBetterAuthInstance,
-} from './better-auth-integration'
-
-export type {
-  UserAuthentication,
-  AuthenticationResult,
-  LoginCredentials,
-  RegisterCredentials,
-} from './better-auth-integration'
-
-export { AuthenticationStatus } from './better-auth-integration'
+// Auth0/Legacy Bridge exports removed
 
 // Middleware exports
 export {
@@ -162,36 +140,16 @@ export {
   createAuthMiddlewareStack,
 } from './auth0-middleware'
 
-export type {
-  AuthenticatedRequest,
-  ClientInfo as MiddlewareClientInfo,
-} from './middleware'
-
-// Utility functions
-export * from './utils'
-
-// Configuration
-export { getAuthConfig } from './config'
-
-// Integration with Phase 6 MCP Server
-export { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-
 /**
  * Initialize authentication system
  */
 export async function initializeAuthSystem(): Promise<void> {
   try {
-    // Initialize Better-Auth database connection
-    const { initializeBetterAuthDatabase } = await import(
-      './better-auth-integration'
-    )
-    await initializeBetterAuthDatabase()
-
     // Start token cleanup scheduler
-    const { startTokenCleanupScheduler } = await import('./jwt-service')
+    const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
     startTokenCleanupScheduler()
 
-    console.log('✅ Authentication system initialized successfully')
+    console.log('✅ Authentication system initialized successfully (Auth0-native)')
   } catch (_error) {
     console.error('❌ Failed to initialize authentication system:', _error)
     throw _error
@@ -199,103 +157,12 @@ export async function initializeAuthSystem(): Promise<void> {
 }
 
 /**
- * Create authentication API routes
- */
-export async function createAuthRoutes() {
-  // TODO: Implement when routes file is available
-  throw new Error('Auth routes not implemented yet')
-}
-
-/**
- * Health check for authentication system
- */
-export async function getAuthHealth(): Promise<{
-  status: 'healthy' | 'degraded' | 'unhealthy'
-  details: {
-    jwtService: boolean
-    betterAuth: boolean
-    redis: boolean
-    database: boolean
-  }
-}> {
-  try {
-    const { checkRedisConnection } = await import('../redis')
-
-    const [redisHealth] = await Promise.allSettled([checkRedisConnection()])
-
-    const details = {
-      jwtService: true, // JWT service is stateless
-      betterAuth: true, // Better-Auth health would go here
-      redis: redisHealth.status === 'fulfilled' && redisHealth.value,
-      database: true, // Database health would be checked here
-    }
-
-    const allHealthy = Object.values(details).every((health) => health)
-
-    return {
-      status: allHealthy ? 'healthy' : 'degraded',
-      details,
-    }
-  } catch {
-    return {
-      status: 'unhealthy',
-      details: {
-        jwtService: false,
-        betterAuth: false,
-        redis: false,
-        database: false,
-      },
-    }
-  }
-}
-
-/**
- * Default export for convenience
- */
-export function getAuthService(): AuthService {
-  if (!authServiceInstance) {
-    authServiceInstance = new AuthService()
-  }
-  return authServiceInstance
-}
-
-/**
- * Authenticate user
- */
-export async function authenticate(
-  credentials: AuthCredentials,
-): Promise<AuthResult> {
-  const authService = getAuthService()
-  return authService.authenticate(credentials)
-}
-
-/**
- * Verify session
- */
-export async function verifySession(sessionId: string): Promise<AuthResult> {
-  const authService = getAuthService()
-  return authService.verifySession(sessionId)
-}
-
-/**
- * Create new user
- */
-export async function createUser(
-  userData: Parameters<AuthService['createUser']>[0],
-): Promise<AuthResult> {
-  const authService = getAuthService()
-  return authService.createUser(userData)
-}
-
-/**
  * Auth utility object for API routes
  */
 export const auth = {
-  verifySession,
   getCurrentUser,
   isAuthenticated,
   hasRole,
-  authenticate,
-  createUser,
 }
+
 export const requireAuth = requirePageAuth
