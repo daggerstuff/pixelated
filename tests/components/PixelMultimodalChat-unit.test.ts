@@ -989,4 +989,3 @@ describe('User Interactions', () => {
         expect(onMessageClick).toHaveBeenCalled()
     })
 })
-})
