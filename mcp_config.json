@@ -3,8 +3,29 @@
     "servers": {
       "atlassian": {
         "command": "npx",
-        "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
+        "args": [
+          "-y",
+          "mcp-remote",
+          "https://mcp.atlassian.com/v1/sse"
+        ],
         "description": "Atlassian MCP Server for Jira and Confluence integration"
+      },
+      "pixelated-memory": {
+        "command": "uv",
+        "args": [
+          "run",
+          "python",
+          "ai/api/mcp_server/memory_server.py"
+        ],
+        "env": {
+          "ZEP_API_KEY": "${ZEP_API_KEY}",
+          "ZEP_API_URL": "${ZEP_API_URL}",
+          "MEMORY_SERVER_PORT": "5003",
+          "MEMORY_SERVER_HOST": "0.0.0.0",
+          "LOG_LEVEL": "INFO"
+        },
+        "description": "Memory management server with Zep Cloud integration",
+        "disabled": false
       }
     }
   }
