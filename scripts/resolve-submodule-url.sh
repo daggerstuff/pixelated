@@ -7,10 +7,95 @@
 set -euo pipefail
 
 SUBMODULE_PATH="ai"
-SUBMODULE_URL_GITHUB="https://github.com/pixelatedempathy/ai.git"
-# Support both SSH and HTTPS for Azure DevOps
-SUBMODULE_URL_AZURE_SSH="git@ssh.dev.azure.com:v3/pixeljump/ai/ai"
-SUBMODULE_URL_AZURE_HTTPS="https://dev.azure.com/pixeljump/ai/_git/ai"
+
+# Detect parent repo remote to derive org/owner dynamically
+PARENT_REMOTE_URL="$(git config --get remote.origin.url || echo)"
+
+# Helper: extract GitHub owner from parent remote
+extract_github_owner() {
+  case "$1" in
+    git@github.com:*)
+      echo "$1" | sed -E 's|git@github.com:([^/]+)/.*|\1|'
+      ;;
+    https://github.com/*)
+      echo "$1" | sed -E 's|https://github.com/([^/]+)/.*|\1|'
+      ;;
+    *)
+      echo "pixelatedempathy" # safe default
+      ;;
+  esac
+}
+
+GITHUB_OWNER="${GITHUB_ORG:-$(extract_github_owner "$PARENT_REMOTE_URL")}" 
+# Use SSH ONLY for GitHub
+SUBMODULE_URL_GITHUB="git@github.com:${GITHUB_OWNER}/ai.git"
+
+# Helper: extract Azure org and project from environment or parent remote
+extract_azure_org() {
+  local uri="$1"
+  # Prefer SYSTEM_TEAMFOUNDATIONCOLLECTIONURI: https://dev.azure.com/<org>/
+  if [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI:-}" ]]; then
+    echo "${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}" | sed -E 's|https?://dev.azure.com/([^/]+)/.*|\1|'
+    return
+  fi
+  # Fallback: parse from BUILD_REPOSITORY_URI
+  if [[ -n "${BUILD_REPOSITORY_URI:-}" ]]; then
+    echo "${BUILD_REPOSITORY_URI}" | sed -E 's|https?://dev.azure.com/([^/]+)/.*|\1|'
+    return
+  fi
+  # Fallback: parse from parent remote
+  echo "$uri" | sed -E 's|.*dev.azure.com/([^/]+)/.*|\1|'
+}
+
+extract_azure_project() {
+  # Prefer SYSTEM_TEAMPROJECT
+  if [[ -n "${SYSTEM_TEAMPROJECT:-}" ]]; then
+    echo "${SYSTEM_TEAMPROJECT}"
+    return
+  fi
+  # Fallback: parse from BUILD_REPOSITORY_URI: https://dev.azure.com/<org>/<project>/_git/<repo>
+  if [[ -n "${BUILD_REPOSITORY_URI:-}" ]]; then
+    echo "${BUILD_REPOSITORY_URI}" | sed -E 's|https?://dev.azure.com/[^/]+/([^/]+)/.*|\1|'
+    return
+  fi
+  # Fallback: parse from parent remote URL
+  if [[ -n "$PARENT_REMOTE_URL" ]]; then
+    echo "$PARENT_REMOTE_URL" | sed -E 's|.*dev.azure.com/[^/]+/([^/]+)/.*|\1|'
+    return
+  fi
+  echo "ai" # worst-case placeholder
+}
+
+AZ_ORG="$(extract_azure_org "$PARENT_REMOTE_URL")"
+AZ_PROJECT="$(extract_azure_project)"
+
+# Azure DevOps URL: SSH ONLY (derived dynamically)
+SUBMODULE_URL_AZURE_SSH="git@ssh.dev.azure.com:v3/${AZ_ORG}/${AZ_PROJECT}/ai"
+
+# Helper: check remote accessibility quickly (HEAD)
+remote_accessible() {
+  local url="$1"
+  git ls-remote --exit-code "$url" HEAD >/dev/null 2>&1
+}
+
+# Prefer constructing Azure submodule URL by mirroring parent remote scheme and swapping repo name
+build_azure_url_from_parent() {
+  local parent="$1"
+  case "$parent" in
+    git@ssh.dev.azure.com:*)
+      # git@ssh.dev.azure.com:v3/<org>/<project>/<repo>
+      echo "$parent" | sed -E 's|(git@ssh.dev.azure.com:v3/[^/]+/[^/]+)/[^/]+|\1/ai|'
+      ;;
+    https://dev.azure.com/*)
+      # Parent uses HTTPS; convert to SSH while swapping repo
+      echo "$parent" | sed -E 's|https://dev.azure.com/([^/]+)/([^/]+)/_git/[^/]+|git@ssh.dev.azure.com:v3/\1/\2/ai|'
+      ;;
+    *)
+      # Fall back to dynamically derived SSH URL
+      echo "${SUBMODULE_URL_AZURE_SSH}.git"
+      ;;
+  esac
+}
 
 # Detect environment using Azure DevOps built-in variables
 if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI:-}" ]]; then
@@ -29,14 +114,22 @@ if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONUR
     echo "✅ ssh.dev.azure.com already in known_hosts"
   fi
 
-  # Default to SSH as the primary method (per user confirmation)
-  if [[ "${SUBMODULE_USE_SSH:-}" == "false" ]]; then
-    echo "Using Azure submodule URL (HTTPS) as explicitly requested."
-    SUBMODULE_URL="$SUBMODULE_URL_AZURE_HTTPS"
+  # Enforce SSH ONLY; mirror parent scheme (convert HTTPS parent to SSH) and swap repo name
+  CANDIDATE_URL="$(build_azure_url_from_parent "$PARENT_REMOTE_URL")"
+  echo "Using Azure submodule URL (SSH only)."
+  # Ensure .git suffix for SSH
+  if [[ "$CANDIDATE_URL" == git@ssh.dev.azure.com:* ]]; then
+    SUBMODULE_URL="${CANDIDATE_URL}.git"
   else
-    echo "Using Azure submodule URL (SSH) - expected to match parent repo permissions."
-    # Appending .git is safer for some Git versions
     SUBMODULE_URL="${SUBMODULE_URL_AZURE_SSH}.git"
+  fi
+
+  # Validate Azure URL accessibility; fall back to GitHub via SSH if not accessible
+  if remote_accessible "$SUBMODULE_URL"; then
+    echo "✅ Azure submodule remote is accessible"
+  else
+    echo "##[warning]⚠️ Azure submodule remote not accessible. Falling back to GitHub (SSH): $SUBMODULE_URL_GITHUB"
+    SUBMODULE_URL="$SUBMODULE_URL_GITHUB"
   fi
 
   # Diagnostic check for SSH access if using SSH
@@ -52,23 +145,13 @@ if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONUR
     fi
   fi
 
-  # Proactively configure HTTPS authentication regardless, as it's a zero-cost safety net
-  if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
-    echo "Configuring HTTPS fallback authentication for Azure DevOps..."
-    git config --global url."https://azdo:${SYSTEM_ACCESSTOKEN}@dev.azure.com/".insteadOf "https://dev.azure.com/"
-    echo "✅ HTTPS fallback authentication ready"
-  fi
+  # SSH-only mode: do not configure HTTPS fallback
 else
   echo "Detected external/GitHub environment. Using GitHub submodule URL."
   SUBMODULE_URL="$SUBMODULE_URL_GITHUB"
-  
-  # Configure Git credential helper for GitHub HTTPS authentication
-  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-    echo "Configuring Git credential helper for GitHub authentication..."
-    git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-    echo "✅ GitHub authentication configured"
-  else
-    echo "##[warning]⚠️ GITHUB_TOKEN not set - submodule clone may fail for private repositories"
+  # SSH-only mode: GitHub authentication relies on SSH keys; no HTTPS credential helper is configured
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    echo "ℹ️ Using SSH; ensure GitHub deploy keys or agent SSH keys are configured."
   fi
 fi
 
@@ -101,8 +184,8 @@ if [ -e "$SUBMODULE_PATH/.git" ]; then
 fi
 
 # 4. Update (fetch & checkout) using the validated URL
-echo "Running: git submodule update --init --recursive"
-# Using --init ensures it attempts initialization if not already done
-git submodule update --init --recursive
+echo "Running: git submodule update --init --recursive --force"
+# Using --init ensures it attempts initialization if not already done; --force resets local changes in CI
+git submodule update --init --recursive --force
 
 echo "✅ Submodule initialization complete"
