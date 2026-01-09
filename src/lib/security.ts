@@ -252,33 +252,129 @@ export function generateSecureSessionKey(): string {
  * HIPAA Security Helper Functions
  */
 
-// Security event types for logging
-export type SecurityEventType =
-  | 'access'
-  | 'message'
-  | 'login'
-  | 'logout'
-  | 'error'
-  | 'therapy_chat_request'
-  | 'therapy_chat_response'
-  | 'therapy_chat_error'
-  | 'token_created'
-  | 'token_validated'
-  | 'token_validation_failed'
-  | 'token_refreshed'
-  | 'token_revoked'
-  | 'token_cleaned_up'
+// Security event types for logging (runtime + type-safe)
+export const SecurityEventType = {
+  ACCESS: 'access',
+  ACCESS_ATTEMPT: 'access_attempt',
+  ACCOUNT_LINKED: 'account_linked',
+  ACCOUNT_UNLINKED: 'account_unlinked',
+  API_ACCESS: 'api_access',
+  AUTHENTICATION_FAILED: 'authentication_failed',
+  AUTHENTICATION_SUCCESS: 'authentication_success',
+  AUTH_FAILURE: 'auth_failure',
+  AUTH_SUCCESS: 'auth_success',
+  AUTHORIZATION_FAILED: 'authorization_failed',
+  BULK_EXPORT_COMPLETED: 'bulk_export_completed',
+  BULK_EXPORT_ERROR: 'bulk_export_error',
+  BULK_IMPORT_COMPLETED: 'bulk_import_completed',
+  BULK_IMPORT_ERROR: 'bulk_import_error',
+  BULK_IMPORT_JOB_STATUS_CHECK: 'bulk_import_job_status_check',
+  BULK_IMPORT_JOB_STATUS_ERROR: 'bulk_import_job_status_error',
+  COMPLIANCE_CHECK: 'compliance_check',
+  CONFIG_CHANGE: 'config_change',
+  CONFIGURATION_CHANGED: 'configuration_changed',
+  CSRF_VIOLATION: 'csrf_violation',
+  DATA_ACCESS: 'data_access',
+  DATA_RETENTION_POLICY_UPDATED: 'data_retention_policy_updated',
+  ENCRYPTED_OPERATION: 'encrypted_operation',
+  ERROR: 'error',
+  IMPERSONATION_DENIED: 'impersonation_denied',
+  IMPERSONATION_ENDED: 'impersonation_ended',
+  IMPERSONATION_ERROR: 'impersonation_error',
+  IMPERSONATION_EXTENDED: 'impersonation_extended',
+  IMPERSONATION_STARTED: 'impersonation_started',
+  KEY_ROTATION: 'key_rotation',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  MESSAGE: 'message',
+  MFA_CHALLENGE_SENT: 'mfa_challenge_sent',
+  MFA_ENROLLMENT_COMPLETED: 'mfa_enrollment_completed',
+  MFA_ENROLLMENT_STARTED: 'mfa_enrollment_started',
+  MFA_FACTOR_DELETED: 'mfa_factor_deleted',
+  MFA_PREFERRED_FACTOR_SET: 'mfa_preferred_factor_set',
+  MFA_REQUIRED: 'mfa_required',
+  MFA_VERIFICATION_COMPLETED: 'mfa_verification_completed',
+  MFA_VERIFICATION_FAILED: 'mfa_verification_failed',
+  PERMISSION_DENIED: 'permission_denied',
+  RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
+  RECURRING_EXPORT_SCHEDULED: 'recurring_export_scheduled',
+  RECURRING_EXPORT_SCHEDULE_ERROR: 'recurring_export_schedule_error',
+  RISK_ASSESSMENT: 'risk_assessment',
+  ROLE_ASSIGNED: 'role_assigned',
+  ROLE_REMOVED: 'role_removed',
+  ROLE_TRANSITION_APPROVAL_FAILED: 'role_transition_approval_failed',
+  ROLE_TRANSITION_AUDIT: 'role_transition_audit',
+  ROLE_TRANSITION_CANCELLATION_FAILED: 'role_transition_cancellation_failed',
+  ROLE_TRANSITION_EXECUTION_FAILED: 'role_transition_execution_failed',
+  ROLE_TRANSITION_REQUEST_FAILED: 'role_transition_request_failed',
+  SECURITY_HEADER_VIOLATION: 'security_header_violation',
+  SENSITIVE_ACTION: 'sensitive_action',
+  SESSION_TERMINATED: 'session_terminated',
+  SESSION_TERMINATION_ERROR: 'session_termination_error',
+  THERAPY_CHAT_ERROR: 'therapy_chat_error',
+  THERAPY_CHAT_REQUEST: 'therapy_chat_request',
+  THERAPY_CHAT_RESPONSE: 'therapy_chat_response',
+  TOKEN_CLEANED_UP: 'token_cleaned_up',
+  TOKEN_CREATED: 'token_created',
+  TOKEN_REFRESHED: 'token_refreshed',
+  TOKEN_REVOKED: 'token_revoked',
+  TOKEN_VALIDATED: 'token_validated',
+  TOKEN_VALIDATION_FAILED: 'token_validation_failed',
+  USER_BULK_IMPORT_ERROR: 'user_bulk_import_error',
+  USER_BULK_IMPORT_SUCCESS: 'user_bulk_import_success',
+  USER_CREATED: 'user_created',
+  USER_PURGED: 'user_purged',
+  USER_PURGE_ERROR: 'user_purge_error',
+  USER_PURGE_NOTIFICATION_SENT: 'user_purge_notification_sent',
+  USER_RESTORED: 'user_restored',
+  USER_RESTORE_ERROR: 'user_restore_error',
+  USER_RETENTION_EXTENDED: 'user_retention_extended',
+  USER_RETENTION_EXTENSION_ERROR: 'user_retention_extension_error',
+  USER_SOFT_DELETED: 'user_soft_deleted',
+  USER_SOFT_DELETE_ERROR: 'user_soft_delete_error',
+  WEBAUTHN_AUTHENTICATION_COMPLETED: 'webauthn_authentication_completed',
+  WEBAUTHN_AUTHENTICATION_FAILED: 'webauthn_authentication_failed',
+  WEBAUTHN_AUTHENTICATION_STARTED: 'webauthn_authentication_started',
+  WEBAUTHN_CREDENTIAL_DELETED: 'webauthn_credential_deleted',
+  WEBAUTHN_CREDENTIAL_RENAMED: 'webauthn_credential_renamed',
+  WEBAUTHN_REGISTRATION_COMPLETED: 'webauthn_registration_completed',
+  WEBAUTHN_REGISTRATION_FAILED: 'webauthn_registration_failed',
+  WEBAUTHN_REGISTRATION_STARTED: 'webauthn_registration_started',
+  WEBAUTHN_RESPONSE_VALIDATED: 'webauthn_response_validated',
+  WEBAUTHN_RESPONSE_VALIDATION_FAILED: 'webauthn_response_validation_failed',
+} as const
+
+export type SecurityEventTypeValue =
+  (typeof SecurityEventType)[keyof typeof SecurityEventType]
 
 /**
  * Generate audit log entry for HIPAA compliance
  */
-export function logSecurityEvent(
-  eventType: SecurityEventType,
-  details: Record<string, string | number | boolean | null | undefined>,
-): void {
-  // Log to console in dev mode
-  if (process.env['NODE_ENV'] === 'development') {
-    logger.debug(`[SECURITY EVENT] ${eventType.toUpperCase()}:`, details)
+export async function logSecurityEvent(
+  eventType: SecurityEventTypeValue,
+  userIdOrDetails:
+    | string
+    | null
+    | Record<string, string | number | boolean | null | undefined>,
+  details?: Record<string, string | number | boolean | null | undefined>,
+): Promise<void> {
+  try {
+    const metadata =
+      typeof userIdOrDetails === 'string' || userIdOrDetails === null
+        ? { ...details, userId: userIdOrDetails ?? undefined }
+        : userIdOrDetails
+
+    if (process.env['NODE_ENV'] === 'development') {
+      logger.debug('[SECURITY EVENT]', {
+        eventType,
+        ...metadata,
+      })
+    }
+  } catch (error: unknown) {
+    const errorDetails: Record<string, unknown> = {
+      message: error instanceof Error ? String(error) : String(error),
+    }
+    logger.error('Security event logging error:', errorDetails)
   }
 }
 
