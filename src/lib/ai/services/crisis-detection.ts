@@ -5,6 +5,10 @@ import type {
   RiskAssessment,
 } from '../crisis/types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import {
+  SUICIDE_EUPHEMISMS as CONFIG_SUICIDE_EUPHEMISMS,
+  SAFE_IDIOMATIC_EXCLUSIONS as CONFIG_SAFE_EXCLUSIONS,
+} from '../crisis/config/keywords'
 
 const appLogger = createBuildSafeLogger('app')
 
@@ -32,6 +36,8 @@ export class CrisisDetectionService {
       'harming myself',
       'want to hurt myself',
     ],
+    // Common euphemisms and variants that indicate suicide risk in real usage
+    // Added to improve recall across cultural/online phrasing patterns
     suicide: [
       'suicide',
       'kill myself',
@@ -47,6 +53,8 @@ export class CrisisDetectionService {
       "can't take it",
       'ending it',
       'end it all',
+      // Config-driven euphemisms appended below
+      ...CONFIG_SUICIDE_EUPHEMISMS,
     ],
     emergency: [
       'immediate danger',
@@ -80,6 +88,21 @@ export class CrisisDetectionService {
       "can't cope",
     ],
   }
+
+  // Exclusions to reduce false positives from idioms/cultural phrases
+  // that contain crisis-related keywords but are non-crisis contexts.
+  private static readonly SAFE_IDIOMATIC_EXCLUSIONS: RegExp[] = [
+    // Built-ins
+    /\bkill(?:ed|ing)?\s+it\b/i,
+    /\b(dying|die|died)\s+to\b/i,
+    /\bdie of (?:laughter|laughing|boredom)\b/i,
+    /\bsuicide\s+squad\b/i,
+    /\b(homework|traffic|commute|deadline|exam|emoji)\s+is\s+killing\s+me\b/i,
+    /\b(?:reading|studying|learning|talking)\s+about\s+suicide\b/i,
+    /\b(?:watch(?:ing)?|saw)\s+(?:a\s+)?(?:movie|film|article)\s+about\s+suicide\b/i,
+    // Config-appended
+    ...CONFIG_SAFE_EXCLUSIONS,
+  ]
 
   private static readonly SENSITIVITY_THRESHOLDS = {
     low: { crisis: 0.8, concern: 0.6 },
@@ -210,8 +233,15 @@ export class CrisisDetectionService {
         }
 
         if (matches) {
-          indicators.push(keyword)
-          categoryMatches++
+          // Apply idiom/cultural exclusions to prevent false positives
+          const excluded = CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some(
+            (re) => re.test(text),
+          )
+
+          if (!excluded) {
+            indicators.push(keyword)
+            categoryMatches++
+          }
         }
       }
 

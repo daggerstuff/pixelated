@@ -12,6 +12,9 @@ import node from '@astrojs/node';
 import vercel from '@astrojs/vercel';
 import { visualizer } from 'rollup-plugin-visualizer';
 
+// Detect Docker build environment
+const isDockerBuild = process.env.DOCKER_BUILD === 'true' || process.env.CI === 'true';
+
 const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
 let cloudflareAdapter;
 if (isCloudflareDeploy) {
@@ -58,6 +61,15 @@ const preferredPort = (() => {
 })();
 
 function getChunkName(id) {
+  // Memory optimization: consolidate chunks during Docker builds
+  if (isDockerBuild) {
+    if (id.includes('node_modules')) {
+      return 'vendor';
+    }
+    // Return null for all other modules to reduce chunk count
+    return null;
+  }
+
   if (id.includes('react') || id.includes('react-dom')) {
     return 'react-vendor';
   }
@@ -159,6 +171,10 @@ export default defineConfig({
     }
   },
   vite: {
+    // Memory optimization: disable internal cache during builds
+    cacheDir: isDockerBuild ? false : '.vite',
+    // Reduce logging overhead
+    logLevel: 'error',
     server: {
       watch: {
         ignored: [
@@ -183,22 +199,13 @@ export default defineConfig({
       sourcemap: (!isProduction || hasSentryDSN) ? 'hidden' : false,
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
-      // Temporarily disabled minification to debug build hang
-      minify: false,
-      // minify: isProduction ? 'terser' : false,
-      terserOptions: isProduction ? {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug']
-        },
-        mangle: {
-          safari10: true
-        }
-      } : {},
+      // Memory optimization: Use esbuild for minification (faster, lower memory than terser)
+      minify: 'esbuild',
+      // Limit parallel file operations to prevent resource exhaustion
+      maxParallelFileOps: 1,
+      // Reduce Vite internal cache during build to save memory
+      reportCompressedSize: false,
       rollupOptions: {
-        // Limit parallel file operations to prevent resource exhaustion
-        maxParallelFileOps: 2,
         external: [
           '@google-cloud/storage',
           '@aws-sdk/client-s3',
@@ -317,6 +324,8 @@ export default defineConfig({
       ],
     },
     optimizeDeps: {
+      // Disable dependency pre-bundling in Docker builds to save memory
+      disabled: isDockerBuild,
       entries: [
         'src/pages/**/*.{ts,tsx,js,jsx,astro}',
         'src/layouts/**/*.{ts,tsx,js,jsx,astro}',
