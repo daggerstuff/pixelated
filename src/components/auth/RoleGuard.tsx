@@ -1,5 +1,4 @@
 import { authClient } from '@/lib/auth-client'
-import { useStore } from 'nanostores'
 import type { AuthRole } from '@/config/auth.config'
 import type { UserRole } from '@/types/auth'
 
@@ -12,17 +11,7 @@ export interface RoleGuardProps {
 
 /**
  * RoleGuard component - Conditionally renders children based on user role
- * 
- * Usage:
- * ```tsx
- * <RoleGuard requiredRole="admin">
- *   <AdminPanel />
- * </RoleGuard>
- * 
- * <RoleGuard requiredRole={["admin", "staff"]} fallback={<p>Access denied</p>}>
- *   <StaffPanel />
- * </RoleGuard>
- * ```
+ * Uses custom Auth0-backed authClient.
  */
 export function RoleGuard({
   children,
@@ -30,21 +19,21 @@ export function RoleGuard({
   fallback = null,
   showError = false,
 }: RoleGuardProps) {
-  const { data: user, isPending: loading } = authClient.useSession()
+  const { data: session, isPending: loading } = authClient.useSession()
 
-  // Simple role check function for better-auth user
+  // Simple role check function
   const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
-    if (!user?.user) {
+    if (!session?.user) {
       return false
     }
 
-    const userRoles = user.user.roles || []
+    const userRole = session.user.role
 
     if (Array.isArray(role)) {
-      return role.some(r => userRoles.includes(r))
+      return (role as string[]).includes(userRole)
     }
 
-    return userRoles.includes(role)
+    return userRole === role
   }
 
   // Show nothing while loading
@@ -53,9 +42,11 @@ export function RoleGuard({
   }
 
   // Not authenticated
-  if (!user) {
+  if (!session) {
     return showError ? (
-      <div className="text-red-600 text-sm">Authentication required</div>
+      <div className="text-red-500 text-sm p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+        Authentication required
+      </div>
     ) : (
       <>{fallback}</>
     )
@@ -64,7 +55,9 @@ export function RoleGuard({
   // Check role
   if (!hasRole(requiredRole)) {
     return showError ? (
-      <div className="text-red-600 text-sm">Insufficient permissions</div>
+      <div className="text-red-500 text-sm p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+        Insufficient permissions
+      </div>
     ) : (
       <>{fallback}</>
     )
@@ -72,4 +65,3 @@ export function RoleGuard({
 
   return <>{children}</>
 }
-

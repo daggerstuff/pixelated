@@ -38,7 +38,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Detect if we're running a build command (not dev server)
 const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES || !!process.env.VERCEL;
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
-const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN || true; // Fallback to public DSN if local
+const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN; // Only enable if DSN is actually present
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 const preferredPort = (() => {
   const candidates = [

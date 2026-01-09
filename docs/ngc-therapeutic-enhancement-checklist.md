@@ -5,9 +5,9 @@ This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md`
 ## Downloads
 
 - [x] NeMo Microservices Quickstart v25.10 downloaded (path: ngc_public_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10/)
-- [ ] NVIDIA PyTorch Container 24.12-py3 downloaded
-- [ ] NVIDIA TensorFlow Container 24.12-tf2-py3 downloaded
-- [ ] NVIDIA Triton Inference Server 24.12-py3 downloaded
+- [x] NVIDIA PyTorch Container (Official Docker Hub) verified
+- [x] NVIDIA TensorFlow Container (Official Docker Hub) verified
+- [x] NVIDIA Triton Inference Server (Official Docker Hub) verified
 
 ## Phase 1: Foundation Setup (Weeks 1–2)
 
@@ -29,7 +29,7 @@ This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md`
   - [x] EmotionRecognizer with valence/arousal detection
   - [x] Crisis signal detection (suicidal ideation, self-harm)
   - [x] Emotion trajectory tracking
-- [ ] Fine-tune base language models on therapeutic dialogue datasets
+- [ ] Fine-tune base language models on therapeutic dialogue datasets (In Progress: Unsloth pipeline)
 - [ ] Create conversation quality evaluation metrics
 
 ## Phase 3: Integration (Weeks 7–8)
@@ -152,5 +152,6 @@ This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md`
 ---
 
 Notes:
+
 - Mark items as completed as progress is made. Consider splitting major items into GitHub issues for ownership and due dates.
 - Update this checklist as implementation evolves.

@@ -15,7 +15,7 @@ import {
   type UserRole,
 } from '../middleware'
 import { validateToken } from '../jwt-service'
-import { getUserById } from '../better-auth-integration'
+import { auth0UserService } from '../../services/auth0.service'
 import { logSecurityEvent } from '../../security'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
@@ -24,9 +24,10 @@ vi.mock('../jwt-service', () => ({
   validateToken: vi.fn(),
 }))
 
-vi.mock('../better-auth-integration', () => ({
-  getUserById: vi.fn(),
-  validateUserRole: vi.fn(),
+vi.mock('../../services/auth0.service', () => ({
+  auth0UserService: {
+    getUserById: vi.fn(),
+  },
 }))
 
 vi.mock('../../security', () => ({
@@ -103,7 +104,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
 
       const result = await authenticateRequest(mockRequest)
 
@@ -179,7 +180,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue({
+      vi.mocked(auth0UserService.getUserById).mockResolvedValue({
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
@@ -202,7 +203,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(null)
+      vi.mocked(auth0UserService.getUserById).mockResolvedValue(null)
 
       const result = await authenticateRequest(mockRequest)
 
@@ -227,7 +228,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -275,7 +276,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 

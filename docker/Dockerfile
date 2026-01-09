@@ -4,6 +4,7 @@ FROM node:24.12.0-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
+ENV NODE_ENV=production
 ARG PNPM_VERSION=10.27.0
 WORKDIR /app
 
@@ -81,6 +82,8 @@ COPY . .
 COPY scripts/utils/start-server.mjs /app/start-server.mjs
 COPY config/instrument.mjs /app/instrument.mjs
 
+# Limit Node.js memory usage to prevent OOM on small VPS
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
