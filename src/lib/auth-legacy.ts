@@ -8,9 +8,8 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
-// legacy supabase import removed; using adapter dynamically where needed
-// Note: This is an Astro project, Next.js types are not needed here
-// TODO: Replace with Astro-compatible types when implementing API auth
+import { validateToken } from './auth/auth0-jwt-service'
+import { auth0UserService } from '@/services/auth0.service'
 
 export interface AuthUser {
   id: string
@@ -35,39 +34,27 @@ export async function getCurrentUser(
   }
 
   try {
-    const decoded = await (
-      await import('@/adapters/betterAuthMongoAdapter')
-    ).verifyToken(accessToken)
+    const decoded = await validateToken(accessToken)
     if (!decoded) {
       return null
     }
 
-    // Assuming the decoded token contains the user ID
-    const { userId } = decoded
+    const {userId} = decoded
 
-    // Fetch user from the database
-    const user = await (
-      await import('@/adapters/betterAuthMongoAdapter')
-    ).getUserById(userId)
+    // Fetch user from Auth0
+    const user = await auth0UserService.getUserById(userId)
     if (!user) {
       return null
     }
 
-    // Type assertion for user profile to handle the unknown type
-    const userProfile = user.profile as
-      | { firstName?: string; lastName?: string; avatarUrl?: string }
-      | undefined
-
     return {
-      id: user._id.toString(),
+      id: user.id,
       email: user.email,
       role: user.role as AuthRole,
-      fullName: userProfile?.firstName
-        ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim()
-        : null,
-      avatarUrl: userProfile?.avatarUrl,
+      fullName: user.fullName,
+      avatarUrl: user.avatarUrl,
       lastLogin: user.lastLogin,
-      metadata: (user.profile as Record<string, unknown>) || {},
+      metadata: (user.userMetadata as Record<string, unknown>) || {},
     }
   } catch (error: unknown) {
     console.error('Error getting current user:', error)
@@ -79,24 +66,20 @@ export async function getCurrentUser(
  * Check if the user is authenticated
  */
 export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
-  // Always return false in the browser context to prevent redirects
   if (typeof window !== 'undefined') {
     return false
   }
 
-  // In server context, we can actually check authentication
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
   const refreshToken = cookies.get(authConfig.cookies.refreshToken)?.value
 
-  // If no tokens, not authenticated
   if (!accessToken || !refreshToken) {
     return false
   }
 
   try {
-    // For now, just having valid tokens is enough
-    // In production, you'd validate the tokens
-    return true
+    const decoded = await validateToken(accessToken)
+    return !!decoded
   } catch (error: unknown) {
     console.error('Error checking authentication:', error)
     return false

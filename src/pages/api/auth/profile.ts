@@ -1,10 +1,10 @@
 export const prerender = false
 import type { APIContext } from 'astro'
-import * as adapter from '../../../adapters/betterAuthMongoAdapter'
-import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
+import { auth0UserService } from '@/services/auth0.service'
+import { verifyAuthToken, getSessionFromRequest } from '@/utils/auth'
 
 /**
- * User profile endpoint
+ * User profile endpoint using Auth0
  * GET /api/auth/profile - Get current user profile
  * PUT /api/auth/profile - Update user profile
  */
@@ -13,59 +13,39 @@ export const GET = async ({ request }: APIContext) => {
     // Try to get session first (cookie or header)
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
+
     if (session && session.user) {
-      userId = session.user._id?.toString() || session.user.id || null
+      userId = session.user.id || (session.user as any)._id?.toString() || null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
-        return new Response(
-          JSON.stringify({ error: 'Authorization header required' }),
-          {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
+        // Fallback to cookie
+        const cookieToken = request.headers.get('cookie')
+          ?.split(';')
+          .find(c => c.trim().startsWith('auth-token='))
+          ?.split('=')[1]
+
+        if (cookieToken) {
+          const v = await verifyAuthToken(cookieToken)
+          userId = v.userId
+        }
+      } else {
+        const v = await verifyAuthToken(authHeader)
+        userId = v.userId
       }
-      const v = await verifyAuthToken(authHeader)
-      userId = v.userId
     }
 
-    // If auth is disabled, return mock user data
-    if (process.env.DISABLE_AUTH === 'true') {
+    if (!userId) {
       return new Response(
-        JSON.stringify({
-          user: {
-            id: 'test-user-id',
-            email: 'test@example.com',
-            role: 'user',
-            preferences: {},
-            emailVerified: true,
-            lastLogin: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-          },
-        }),
+        JSON.stringify({ error: 'Unauthorized' }),
         {
-          status: 200,
+          status: 401,
           headers: { 'Content-Type': 'application/json' },
         },
       )
     }
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
 
-    const user = (await adapter.getUserById(userId)) as unknown as {
-      _id?: { toString(): string }
-      email: string
-      role: string
-      preferences?: unknown
-      emailVerified?: boolean
-      lastLogin?: Date
-      createdAt?: Date
-    } | null
+    const user = await auth0UserService.getUserById(userId)
 
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
@@ -77,13 +57,16 @@ export const GET = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         user: {
-          id: user._id?.toString(),
+          id: user.id,
           email: user.email,
           role: user.role,
-          preferences: user.preferences,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
           emailVerified: user.emailVerified,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
+          userMetadata: user.userMetadata || {},
+          appMetadata: user.appMetadata || {},
         },
       }),
       {
@@ -95,7 +78,7 @@ export const GET = async ({ request }: APIContext) => {
     console.error('Get profile error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? String(error) : 'Failed to get profile',
+        error: error instanceof Error ? error.message : 'Failed to get profile',
       }),
       {
         status: 401,
@@ -107,59 +90,43 @@ export const GET = async ({ request }: APIContext) => {
 
 export const PUT = async ({ request }: APIContext) => {
   try {
-    // determine userId for update route
-    let updateUserId: string | null = null
-    const sessionForPut = await getSessionFromRequest(request)
-    if (sessionForPut && sessionForPut.user) {
-      updateUserId =
-        sessionForPut.user._id?.toString() || sessionForPut.user.id || null
+    const session = await getSessionFromRequest(request)
+    let userId: string | null = null
+
+    if (session && session.user) {
+      userId = session.user.id || (session.user as any)._id?.toString() || null
     } else {
-      const authHeaderForPut = request.headers.get('Authorization')
-      if (!authHeaderForPut) {
-        return new Response(
-          JSON.stringify({ error: 'Authorization header required' }),
-          {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
+      const authHeader = request.headers.get('Authorization')
+      if (authHeader) {
+        const v = await verifyAuthToken(authHeader)
+        userId = v.userId
       }
-      const v = await verifyAuthToken(authHeaderForPut)
-      updateUserId = v.userId
     }
+
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
     const updates = await request.json()
 
-    // If auth is disabled, return mock success response
-    if (process.env.DISABLE_AUTH === 'true') {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          user: {
-            id: 'test-user-id',
-            email: 'test@example.com',
-            role: 'user',
-            preferences: updates.preferences || {},
-            emailVerified: true,
-            updatedAt: new Date().toISOString(),
-          },
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+    // Validate and map updates for Auth0
+    const auth0Updates: Record<string, any> = {}
+    if (updates.fullName) auth0Updates.name = updates.fullName
+    if (updates.avatarUrl) auth0Updates.picture = updates.avatarUrl
+    if (updates.userMetadata) auth0Updates.user_metadata = updates.userMetadata
+
+    // Legacy support for 'preferences'
+    if (updates.preferences) {
+      auth0Updates.user_metadata = {
+        ...auth0Updates.user_metadata,
+        preferences: updates.preferences,
+      }
     }
 
-    // Only allow updating profile fields
-    const allowedFields = ['preferences']
-    const safeUpdates = Object.keys(updates)
-      .filter((key) => allowedFields.includes(key))
-      .reduce<Record<string, unknown>>((obj, key) => {
-        obj[key] = updates[key]
-        return obj
-      }, {})
-
-    if (Object.keys(safeUpdates).length === 0) {
+    if (Object.keys(auth0Updates).length === 0) {
       return new Response(
         JSON.stringify({ error: 'No valid fields to update' }),
         {
@@ -169,27 +136,10 @@ export const PUT = async ({ request }: APIContext) => {
       )
     }
 
-    if (!updateUserId) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
-
-    const updatedUser = (await adapter.updateUser(
-      updateUserId,
-      safeUpdates,
-    )) as unknown as {
-      _id?: { toString(): string }
-      email: string
-      role: string
-      preferences?: unknown
-      emailVerified?: boolean
-      updatedAt?: Date
-    } | null
+    const updatedUser = await auth0UserService.updateUser(userId, auth0Updates)
 
     if (!updatedUser) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+      return new Response(JSON.stringify({ error: 'Failed to update user' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -199,12 +149,11 @@ export const PUT = async ({ request }: APIContext) => {
       JSON.stringify({
         success: true,
         user: {
-          id: updatedUser._id?.toString(),
+          id: updatedUser.id,
           email: updatedUser.email,
           role: updatedUser.role,
-          preferences: updatedUser.preferences,
-          emailVerified: updatedUser.emailVerified,
-          updatedAt: updatedUser.updatedAt,
+          fullName: updatedUser.fullName,
+          avatarUrl: updatedUser.avatarUrl,
         },
       }),
       {
@@ -216,8 +165,7 @@ export const PUT = async ({ request }: APIContext) => {
     console.error('Update profile error:', error)
     return new Response(
       JSON.stringify({
-        error:
-          error instanceof Error ? String(error) : 'Failed to update profile',
+        error: error instanceof Error ? error.message : 'Failed to update profile',
       }),
       {
         status: 500,
