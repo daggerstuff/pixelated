@@ -270,13 +270,9 @@ export class Auth0AdaptiveMFAService {
 
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin) {
-          // In a real implementation, we would check the IP from the last login
-          // For now, we'll simulate a 10% chance of triggering for demonstration
-          if (Math.random() < 0.1) {
-            triggered = true
-            description = `New or unusual IP address for user`
-          }
+        if (user && user.lastLogin && Math.random() < 0.1) {
+              triggered = true
+              description = `New or unusual IP address for user`
         }
       }
     } catch (error) {
@@ -316,14 +312,10 @@ export class Auth0AdaptiveMFAService {
 
       // Check for unusual location change (simulated)
       const user = await auth0UserService.getUserById(userId)
-      if (user) {
-        // In a real implementation, we would check the location from the last login
-        // For now, we'll simulate a 5% chance of triggering for demonstration
-        if (Math.random() < 0.05 && location.country) {
-          triggered = true
-          description = `Unusual location change detected`
-          value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
-        }
+      if (user && (Math.random() < 0.05 && location.country)) {
+            triggered = true
+            description = `Unusual location change detected`
+            value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
     } catch (error) {
       console.warn('Failed to analyze geolocation:', error)

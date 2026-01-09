@@ -293,14 +293,12 @@ export class Auth0SoftDeleteService {
       const collection = db.collection<DeletedUserRecord>(this.collectionName)
 
       // Get deleted users with pagination
-      const deletedUsers = await collection
+      return await collection
         .find({})
         .sort({ deletedAt: -1 })
         .skip(offset)
         .limit(limit)
-        .toArray()
-
-      return deletedUsers
+        .toArray();
     } catch (error) {
       console.error('Failed to get soft deleted users:', error)
       return []
@@ -317,8 +315,7 @@ export class Auth0SoftDeleteService {
       const collection = db.collection<DeletedUserRecord>(this.collectionName)
 
       // Find deleted user record
-      const deletedUserRecord = await collection.findOne({ auth0UserId: userId })
-      return deletedUserRecord
+      return await collection.findOne({ auth0UserId: userId });
     } catch (error) {
       console.error('Failed to get soft deleted user:', error)
       return null

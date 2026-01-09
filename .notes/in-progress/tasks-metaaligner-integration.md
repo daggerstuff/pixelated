@@ -75,6 +75,9 @@ status: 'partially-complete'
     - [ ] 2.11.2 Fix AI response mocking format in context-detector.test.ts (currently shows "Error parsing context detection response: {}")
     - [ ] 2.11.3 Resolve test execution issues causing 20 tests to be skipped in context-detector.test.ts
     - [ ] 2.11.4 Ensure all context detection tests pass with proper AI response parsing
+  - [x] 2.11.2 Fix AI response mocking format in context-detector.test.ts _(Resolved - all tests passing)_
+  - [x] 2.11.3 Resolve test execution issues causing 20 tests to be skipped in context-detector.test.ts _(Resolved - 12/12 tests pass)_
+  - [x] 2.11.4 Ensure all context detection tests pass with proper AI response parsing _(Resolved - all tests passing)_
   - [ ] 2.12 Implement integration tests for adaptive selection workflow
 
 - [ ] 3.0 Create Post-Processing Enhancement Pipeline
