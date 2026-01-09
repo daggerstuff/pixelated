@@ -168,8 +168,8 @@ importers:
         specifier: ^4.6.1
         version: 4.6.1
       '@smithery/sdk':
-        specifier: ^3.0.1
-        version: 3.0.1(hono@4.11.1)(zod@4.3.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2)
       '@spotlightjs/astro':
         specifier: ^3.2.6
         version: 3.2.6(@sentry/astro@10.32.1(astro@5.16.6(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.0)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.6(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.0)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.54.0)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.1)
@@ -454,8 +454,8 @@ importers:
         specifier: ^1.57.0
         version: 1.57.0
       '@smithery/cli':
-        specifier: ^1.6.7
-        version: 1.6.7(@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)
+        specifier: ^3.0.3
+        version: 3.0.3(@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -604,8 +604,8 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       globals:
-        specifier: ^16.5.0
-        version: 16.5.0
+        specifier: ^17.0.0
+        version: 17.0.0
       globby:
         specifier: ^16.1.0
         version: 16.1.0
@@ -1537,8 +1537,20 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@cloudflare/workerd-darwin-64@1.20260107.1':
+    resolution: {integrity: sha512-Srwe/IukVppkMU2qTndkFaKCmZBI7CnZoq4Y0U0gD/8158VGzMREHTqCii4IcCeHifwrtDqTWu8EcA1VBKI4mg==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [darwin]
+
   '@cloudflare/workerd-darwin-arm64@1.20251118.0':
     resolution: {integrity: sha512-RockU7Qzf4rxNfY1lx3j4rvwutNLjTIX7rr2hogbQ4mzLo8Ea40/oZTzXVxl+on75joLBrt0YpenGW8o/r44QA==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@cloudflare/workerd-darwin-arm64@1.20260107.1':
+    resolution: {integrity: sha512-aAYwU7zXW+UZFh/a4vHP5cs1ulTOcDRLzwU9547yKad06RlZ6ioRm7ovjdYvdqdmbI8mPd99v4LN9gMmecazQw==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
@@ -1549,14 +1561,32 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-64@1.20260107.1':
+    resolution: {integrity: sha512-Wh7xWtFOkk6WY3CXe3lSqZ1anMkFcwy+qOGIjtmvQ/3nCOaG34vKNwPIE9iwryPupqkSuDmEqkosI1UUnSTh1A==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [linux]
+
   '@cloudflare/workerd-linux-arm64@1.20251118.0':
     resolution: {integrity: sha512-bXZPJcwlq00MPOXqP7DMWjr+goYj0+Fqyw6zgEC2M3FR1+SWla4yjghnZ4IdpN+H1t7VbUrsi5np2LzMUFs0NA==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-arm64@1.20260107.1':
+    resolution: {integrity: sha512-NI0/5rdssdZZKYHxNG4umTmMzODByq86vSCEk8u4HQbGhRCQo7rV1eXn84ntSBdyWBzWdYGISCbeZMsgfIjSTg==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [linux]
+
   '@cloudflare/workerd-windows-64@1.20251118.0':
     resolution: {integrity: sha512-2LV99AHSlpr8WcCb/BYbU2QsYkXLUL1izN6YKWkN9Eibv80JKX0RtgmD3dfmajE5sNvClavxZejgzVvHD9N9Ag==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [win32]
+
+  '@cloudflare/workerd-windows-64@1.20260107.1':
+    resolution: {integrity: sha512-gmBMqs606Gd/IhBEBPSL/hJAqy2L8IyPUjKtoqd/Ccy7GQxbSc0rYlRkxbQ9YzmqnuhrTVYvXuLscyWrpmAJkw==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -5036,20 +5066,21 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-  '@smithery/cli@1.6.7':
-    resolution: {integrity: sha512-fkqK2HVerOr3+wHDXfrnC57qljBdQdokpcEbnwtsH+wqxMjNGoF75zRXgR2Sa//QcWsaezTOA7CX7R/NW1UXZg==}
+  '@smithery/api@0.1.0-alpha.6':
+    resolution: {integrity: sha512-qWPKvKIuhv02hj2p3OeoR+ljEJM5QaMHb83lHRfKsuH0qkX8dgOb67y1U2RwTL9npiRTl1PTU2JWw0NU4dqBhw==}
+
+  '@smithery/cli@3.0.3':
+    resolution: {integrity: sha512-JL/SQReeMMk9U7PkXfDPSWsYsZQ630koBtJxwGU0Oi329L5uQRXPC4g2cAvYrIjJhMaUSYmdQ/hoLyTKNa2Qrw==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
       '@smithery/sdk': ^3.0.1
       zod: ^4.3.2
 
-  '@smithery/registry@0.4.4':
-    resolution: {integrity: sha512-oDS8eIa86cU2MZQBDGsCo9kZT9mgjTn0t5UnI2+tAUOyIhSwcDVFgCNBTI657jgzUPqRfALamM6IGekMZ9/wGA==}
-
-  '@smithery/sdk@3.0.1':
-    resolution: {integrity: sha512-ngwD/Tb4sYNxadsYEHe57KtDfJ26av9no9O0KF0lKfJLwiaxcj9XkNWWefXHiJX/48zs1zPW6iO+/ruIJvB7qg==}
+  '@smithery/sdk@4.0.1':
+    resolution: {integrity: sha512-u5lZYSzXLP72AJuOro4WLfcmn9X8exE75zcl9CbUb5Ydi/uIiMUr3vu8qzZ6/hXYI51wpiclQ8J4OYEKKOtYGQ==}
     peerDependencies:
+      '@modelcontextprotocol/sdk': ^1.25.1
       zod: ^4.3.2
 
   '@smithy/abort-controller@4.2.7':
@@ -8312,6 +8343,10 @@ packages:
     resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
 
+  globals@17.0.0:
+    resolution: {integrity: sha512-gv5BeD2EssA793rlFWVPMMCqefTlpusw6/2TbAVMy0FzcG8wKJn4O+NqJ4+XWmmwrayJgw5TzrmWjFgmz1XPqw==}
+    engines: {node: '>=18'}
+
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
@@ -8596,6 +8631,10 @@ packages:
 
   iconv-lite@0.7.1:
     resolution: {integrity: sha512-2Tth85cXwGFHfvRgZWszZSvdo+0Xsqmw8k8ZwxScfcBneNUraK+dxRxRm24nszx80Y0TVio8kKLt5sLE7ZCLlw==}
+    engines: {node: '>=0.10.0'}
+
+  iconv-lite@0.7.2:
+    resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
     engines: {node: '>=0.10.0'}
 
   ieee754@1.2.1:
@@ -9573,6 +9612,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  miniflare@4.20260107.0:
+    resolution: {integrity: sha512-X93sXczqbBq9ixoM6jnesmdTqp+4baVC/aM/DuPpRS0LK0XtcqaO75qPzNEvDEzBAHxwMAWRIum/9hg32YB8iA==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   minimatch@10.1.1:
     resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
@@ -9918,9 +9962,6 @@ packages:
   oidc-token-hash@5.2.0:
     resolution: {integrity: sha512-6gj2m8cJZ+iSW8bm0FXdGF0YhIQbKrfP4yWTNzxc31U6MOjfEmB1rHvlYvxI1B7t7BCi1F2vYTT6YhtQRG4hxw==}
     engines: {node: ^10.13.0 || >=12.0.0}
-
-  okay-error@1.0.3:
-    resolution: {integrity: sha512-1GZkj84Uw2STYhwcGhEkgvNXkremOEmTwSgufKm9CcprjwKFuF6md5f1CIvWJgtYlyfR6BbZYnjr6HCfhUuCpQ==}
 
   omggif@1.0.10:
     resolution: {integrity: sha512-LMJTtvgc/nugXj0Vcrrs68Mn2D1r0zf630VNtqtpI1FEO7e+O9FP4gqs9AcnBaSEeoHIPm28u6qgPR0oyEpGSw==}
@@ -12283,6 +12324,11 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  workerd@1.20260107.1:
+    resolution: {integrity: sha512-4ylAQJDdJZdMAUl2SbJgTa77YHpa88l6qmhiuCLNactP933+rifs7I0w1DslhUIFgydArUX5dNLAZnZhT7Bh7g==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   workerpool@9.3.4:
     resolution: {integrity: sha512-TmPRQYYSAnnDiEB0P/Ytip7bFGvqnSU6I2BcuSw7Hx+JSg/DsUi5ebYfc8GYaSdpuvOcEs6dXxPurOYpe9QFwg==}
 
@@ -14419,16 +14465,31 @@ snapshots:
   '@cloudflare/workerd-darwin-64@1.20251118.0':
     optional: true
 
+  '@cloudflare/workerd-darwin-64@1.20260107.1':
+    optional: true
+
   '@cloudflare/workerd-darwin-arm64@1.20251118.0':
+    optional: true
+
+  '@cloudflare/workerd-darwin-arm64@1.20260107.1':
     optional: true
 
   '@cloudflare/workerd-linux-64@1.20251118.0':
     optional: true
 
+  '@cloudflare/workerd-linux-64@1.20260107.1':
+    optional: true
+
   '@cloudflare/workerd-linux-arm64@1.20251118.0':
     optional: true
 
+  '@cloudflare/workerd-linux-arm64@1.20260107.1':
+    optional: true
+
   '@cloudflare/workerd-windows-64@1.20251118.0':
+    optional: true
+
+  '@cloudflare/workerd-windows-64@1.20260107.1':
     optional: true
 
   '@cloudflare/workers-types@4.20251231.0': {}
@@ -15273,7 +15334,7 @@ snapshots:
   '@inquirer/external-editor@1.0.3(@types/node@25.0.3)':
     dependencies:
       chardet: 2.1.1
-      iconv-lite: 0.7.1
+      iconv-lite: 0.7.2
     optionalDependencies:
       '@types/node': 25.0.3
 
@@ -18022,54 +18083,47 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@smithery/cli@1.6.7(@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)':
+  '@smithery/api@0.1.0-alpha.6': {}
+
+  '@smithery/cli@3.0.3(@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
       '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
       '@ngrok/ngrok': 1.7.0
-      '@smithery/registry': 0.4.4
-      '@smithery/sdk': 3.0.1(hono@4.11.1)(zod@4.3.2)
-      boxen: 8.0.1
+      '@smithery/api': 0.1.0-alpha.6
+      '@smithery/sdk': 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2)
       chalk: 4.1.2
       commander: 14.0.2
       cors: 2.8.5
       cross-fetch: 4.1.0
+      cross-spawn: 7.0.6
       esbuild: 0.25.12
       express: 5.2.1
       inquirer: 8.2.7(@types/node@25.0.3)
       inquirer-autocomplete-prompt: 2.0.1(inquirer@8.2.7(@types/node@25.0.3))
       lodash: 4.17.21
+      miniflare: 4.20260107.0
       ora: 8.2.0
       shx: 0.4.0
-      smol-toml: 1.6.0
       uuid: 11.1.0
       uuidv7: 1.1.0
       yaml: 2.8.2
       zod: 4.3.2
+    optionalDependencies:
+      keytar: 7.9.0
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - '@types/node'
+      - bufferutil
       - encoding
       - hono
       - supports-color
+      - utf-8-validate
 
-  '@smithery/registry@0.4.4':
-    dependencies:
-      zod: 4.3.2
-
-  '@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.2)':
+  '@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
-      chalk: 5.6.2
-      express: 5.2.1
-      jose: 6.1.3
-      lodash: 4.17.21
-      okay-error: 1.0.3
       zod: 4.3.2
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - hono
-      - supports-color
 
   '@smithy/abort-controller@4.2.7':
     dependencies:
@@ -22060,6 +22114,8 @@ snapshots:
 
   globals@16.5.0: {}
 
+  globals@17.0.0: {}
+
   globalthis@1.0.4:
     dependencies:
       define-properties: 1.2.1
@@ -22542,6 +22598,10 @@ snapshots:
       safer-buffer: 2.1.2
 
   iconv-lite@0.7.1:
+    dependencies:
+      safer-buffer: 2.1.2
+
+  iconv-lite@0.7.2:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -23829,6 +23889,24 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  miniflare@4.20260107.0:
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      acorn: 8.14.0
+      acorn-walk: 8.3.2
+      exit-hook: 2.2.1
+      glob-to-regexp: 0.4.1
+      sharp: 0.33.5
+      stoppable: 1.1.0
+      undici: 7.14.0
+      workerd: 1.20260107.1
+      ws: 8.18.0
+      youch: 4.1.0-beta.10
+      zod: 4.3.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   minimatch@10.1.1:
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
@@ -24158,8 +24236,6 @@ snapshots:
   ohash@2.0.11: {}
 
   oidc-token-hash@5.2.0: {}
-
-  okay-error@1.0.3: {}
 
   omggif@1.0.10: {}
 
@@ -27042,6 +27118,14 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20251118.0
       '@cloudflare/workerd-linux-arm64': 1.20251118.0
       '@cloudflare/workerd-windows-64': 1.20251118.0
+
+  workerd@1.20260107.1:
+    optionalDependencies:
+      '@cloudflare/workerd-darwin-64': 1.20260107.1
+      '@cloudflare/workerd-darwin-arm64': 1.20260107.1
+      '@cloudflare/workerd-linux-64': 1.20260107.1
+      '@cloudflare/workerd-linux-arm64': 1.20260107.1
+      '@cloudflare/workerd-windows-64': 1.20260107.1
 
   workerpool@9.3.4: {}
 
