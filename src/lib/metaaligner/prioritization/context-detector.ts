@@ -519,14 +519,32 @@ export class ContextDetector {
 
   /**
    * Detects if a query is likely a clinical assessment/diagnosis request.
+   * Includes PHQ-9 scoring requests, risk language, DSM-5 criteria references.
    */
   private isClinicalAssessment(input: string): boolean {
     const patterns = [
+      // Diagnosis-related patterns
       /\b(diagnos(e|is|ed|ing)|diagnosis|diagnostic)\b/i,
       /\b(assess(ment|ing)?|evaluate|clinical evaluation|clinical assessment|screening)\b/i,
       /\b(symptom checker|self-assess|official diagnosis)\b/i,
       /\b(?:do I (have|need|require) (an? )?(assessment|diagnos(e|is)?|screening|evaluation)|am I (depressed|anxious|bipolar|autistic|ptsd|adhd|psychotic|suicidal))\b/i,
       /\bwhat (is|are) my (diagnosis|symptoms|condition)\b/i,
+      
+      // PHQ-9 and clinical assessment tools
+      /\b(phq-?9|phq-?2|gad-?7|pcl-?5|bdi|beck depression inventory|hamilton rating scale|madrs)\b/i,
+      /\b(score|scoring|calculate|interpret) (my|the|these)? ?(assessment|questionnaire|scale|inventory|test)\b/i,
+      
+      // DSM-5 and clinical criteria references
+      /\b(dsm-?5|dsm-?iv|icd-?10|icd-?11|diagnostic criteria|clinical criteria)\b/i,
+      /\bmeet(ing)? (the )?(criteria|requirements) (for|of)\b/i,
+      
+      // Risk assessment language
+      /\b(risk assessment|suicide risk|self-harm risk|safety assessment|danger to (self|others))\b/i,
+      /\b(severity|level|degree) (of|score|rating)\b.*\b(depression|anxiety|ptsd|trauma|stress|symptoms)\b/i,
+      
+      // Professional evaluation requests
+      /\b(professional (evaluation|assessment|opinion)|need to see (a|my) (doctor|psychiatrist|psychologist|therapist))\b/i,
+      /\b(medical (diagnosis|evaluation)|psychiatric (evaluation|assessment))\b/i,
     ]
     return patterns.some((re) => re.test(input))
   }

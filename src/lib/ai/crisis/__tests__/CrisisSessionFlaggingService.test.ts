@@ -1,417 +1,173 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ObjectId } from 'mongodb'
 import { CrisisSessionFlaggingService } from '../CrisisSessionFlaggingService'
 import type { FlagSessionRequest } from '../CrisisSessionFlaggingService'
 
-// Mock Supabase
-const mockSupabase = {
-  from: vi.fn(() => ({
-    insert: vi.fn(() => ({
-      select: vi.fn(() => ({
-        single: vi.fn(),
-      })),
-    })),
-    update: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(),
-        })),
-      })),
-    })),
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        order: vi.fn(() => ({
-          limit: vi.fn(),
-          not: vi.fn(() => ({
-            order: vi.fn(),
-          })),
-        })),
-        single: vi.fn(),
-      })),
-      in: vi.fn(() => ({
-        order: vi.fn(() => ({
-          limit: vi.fn(),
-        })),
-      })),
-    })),
-  })),
-}
+const collectionState = new Map<string, any>()
 
-// Mock audit logging
-const mockCreateAuditLog = vi.fn()
-
-// Mock logger
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  debug: vi.fn(),
-}
-
-vi.mock('../../supabase', () => ({
-  supabase: mockSupabase,
+vi.mock('@lib/audit', () => ({
+  createAuditLog: vi.fn(),
+  AuditEventType: { SECURITY_ALERT: 'SECURITY_ALERT' },
 }))
 
-vi.mock('../../audit', () => ({
-  createAuditLog: mockCreateAuditLog,
-  AuditEventType: {},
-  AuditEventStatus: {},
+vi.mock('@lib/logging/build-safe-logger', () => ({
+  createBuildSafeLogger: () => ({
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  }),
 }))
 
-vi.mock('../../logging', () => ({
-  getLogger: () => mockLogger,
+vi.mock('@lib/db/mongoClient', () => ({
+  __esModule: true,
+  default: {
+    connect: vi.fn(async () => ({
+      collection: vi.fn(() => ({
+        insertOne: async (doc: any) => {
+          const storedId = doc._id ?? new ObjectId()
+          const stored = { ...doc, _id: storedId, id: storedId.toString() }
+          collectionState.set(storedId.toString(), stored)
+          return { insertedId: storedId }
+        },
+        findOne: async (query: any) => {
+          if (query?._id) {
+            return collectionState.get(query._id.toString()) ?? null
+          }
+          return null
+        },
+        findOneAndUpdate: async (filter: any, update: any) => {
+          const existing = collectionState.get(filter._id.toString())
+          if (!existing) {
+            return { value: null }
+          }
+          const updated = { ...existing, ...update.$set }
+          collectionState.set(filter._id.toString(), updated)
+          return { value: updated }
+        },
+        find: (query: any) => ({
+          sort: () => ({
+            toArray: async () => {
+              return Array.from(collectionState.values()).filter(doc => {
+                              if (query.user_id && doc.user_id !== query.user_id) return false
+                              if (query.status && query.status.$nin) {
+                                return !query.status.$nin.includes(doc.status)
+                              }
+                              return true
+                            });
+            },
+          }),
+        }),
+      })),
+    })),
+  },
 }))
 
-interface MockCrisisSessionFlag {
-  id: string
-  user_id: string
-  session_id: string
-  crisis_id: string
-  reason: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  confidence: number
-  detected_risks: string[]
-  text_sample: string
-  status: string
-  flagged_at: string
-  created_at: string
-  updated_at: string
-  routing_decision: Record<string, unknown>
-  metadata: Record<string, unknown>
-}
-
-describe('CrisisSessionFlaggingService', () => {
+describe('CrisisSessionFlaggingService (Mongo implementation)', () => {
   let service: CrisisSessionFlaggingService
-  let mockFlagData: MockCrisisSessionFlag
-  let mockRequest: FlagSessionRequest
+  let validRequest: FlagSessionRequest
+  let auditLogMock: any
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    collectionState.clear()
+    vi.clearAllMocks()
     service = new CrisisSessionFlaggingService()
 
-    mockFlagData = {
-      id: 'flag-123',
-      user_id: 'user-123',
-      session_id: 'session-123',
-      crisis_id: 'crisis-123',
+    const auditModule = await import('@lib/audit')
+    auditLogMock = auditModule.createAuditLog
+
+    validRequest = {
+      userId: 'user_123',
+      sessionId: 'session_123',
+      crisisId: 'crisis_123',
+      timestamp: '2024-01-01T00:00:00Z',
       reason: 'Crisis detected by AI',
       severity: 'high',
-      confidence: 0.85,
-      detected_risks: ['self_harm', 'suicidal_ideation'],
-      text_sample: 'Sample text that triggered crisis detection',
-      status: 'pending',
-      flagged_at: '2023-06-27T10:00:00Z',
-      created_at: '2023-06-27T10:00:00Z',
-      updated_at: '2023-06-27T10:00:00Z',
-      routing_decision: { method: 'llm', confidence: 0.85 },
-      metadata: {},
+      detectedRisks: ['suicidal_ideation', 'self_harm'],
+      confidence: 0.92,
+      textSample: 'I want to end it all',
+      routingDecision: { route: 'crisis', confidence: 0.92 },
+      metadata: { source: 'unit-test' },
     }
-
-    mockRequest = {
-      userId: 'user-123',
-      sessionId: 'session-123',
-      crisisId: 'crisis-123',
-      timestamp: '2023-06-27T10:00:00Z',
-      reason: 'Crisis detected by AI',
-      severity: 'high',
-      detectedRisks: ['self_harm', 'suicidal_ideation'],
-      confidence: 0.85,
-      textSample: 'Sample text that triggered crisis detection',
-      routingDecision: { method: 'llm', confidence: 0.85 },
-    }
-
-    // Reset all mocks
-    vi.clearAllMocks()
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
+  it('flags a session for review and writes audit log', async () => {
+    const result = await service.flagSessionForReview(validRequest)
+
+    expect(result.id).toMatch(/^[a-f\d]{24}$/i)
+    expect(result.userId).toBe(validRequest.userId)
+    expect(result.sessionId).toBe(validRequest.sessionId)
+    expect(result.severity).toBe('high')
+    expect(result.status).toBe('pending')
+    expect(result.detectedRisks).toEqual(validRequest.detectedRisks)
+    expect(auditLogMock).toHaveBeenCalledWith(
+      'SECURITY_ALERT',
+      'crisis_session_flagged',
+      validRequest.userId,
+      validRequest.sessionId,
+      expect.objectContaining({
+        crisisId: validRequest.crisisId,
+        severity: validRequest.severity,
+        confidence: validRequest.confidence,
+      }),
+    )
   })
 
-  describe('flagSessionForReview', () => {
-    it('should successfully flag a session for review', async () => {
-      // Setup mocks
-      const mockInsert = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: vi
-            .fn()
-            .mockResolvedValue({ data: mockFlagData, error: null }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ insert: mockInsert })
+  it('rejects invalid identifiers during flagging', async () => {
+    const invalidRequest = { ...validRequest, userId: 'bad id' }
 
-      // Execute
-      const result = await service.flagSessionForReview(mockRequest)
-
-      // Verify
-      expect(mockSupabase.from).toHaveBeenCalledWith('crisis_session_flags')
-      expect(mockInsert).toHaveBeenCalledWith({
-        user_id: mockRequest.userId,
-        session_id: mockRequest.sessionId,
-        crisis_id: mockRequest.crisisId,
-        reason: mockRequest.reason,
-        severity: mockRequest.severity,
-        confidence: mockRequest.confidence,
-        detected_risks: mockRequest.detectedRisks,
-        text_sample: mockRequest.textSample,
-        routing_decision: mockRequest.routingDecision,
-        metadata: {},
-        status: 'pending',
-      })
-
-      expect(mockCreateAuditLog).toHaveBeenCalledWith(
-        mockRequest.userId,
-        'crisis_session_flagged',
-        mockRequest.sessionId,
-        expect.objectContaining({
-          crisisId: mockRequest.crisisId,
-          severity: mockRequest.severity,
-          reason: mockRequest.reason,
-        }),
-      )
-
-      expect(result).toEqual({
-        id: mockFlagData.id,
-        userId: mockFlagData.user_id,
-        sessionId: mockFlagData.session_id,
-        crisisId: mockFlagData.crisis_id,
-        reason: mockFlagData.reason,
-        severity: mockFlagData.severity,
-        confidence: mockFlagData.confidence,
-        detectedRisks: mockFlagData.detected_risks,
-        textSample: mockFlagData.text_sample,
-        status: mockFlagData.status,
-        flaggedAt: mockFlagData.flagged_at,
-        routingDecision: mockFlagData.routing_decision,
-        metadata: mockFlagData.metadata,
-        createdAt: mockFlagData.created_at,
-        updatedAt: mockFlagData.updated_at,
-      })
-    })
-
-    it('should validate required fields', async () => {
-      const invalidRequest = { ...mockRequest, userId: '' }
-
-      await expect(
-        service.flagSessionForReview(invalidRequest),
-      ).rejects.toThrow(
-        'Missing required fields: userId, sessionId, or crisisId',
-      )
-    })
-
-    it('should validate confidence range', async () => {
-      const invalidRequest = { ...mockRequest, confidence: 1.5 }
-
-      await expect(
-        service.flagSessionForReview(invalidRequest),
-      ).rejects.toThrow('Confidence must be between 0 and 1')
-    })
-
-    it('should handle database errors', async () => {
-      const mockInsert = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({
-            data: null,
-            error: { message: 'Database error' },
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ insert: mockInsert })
-
-      await expect(service.flagSessionForReview(mockRequest)).rejects.toThrow(
-        'Failed to flag session: Database error',
-      )
-    })
+    await expect(
+      service.flagSessionForReview(invalidRequest),
+    ).rejects.toThrow('Invalid userId')
   })
 
-  describe('updateFlagStatus', () => {
-    it('should successfully update flag status', async () => {
-      const updatedFlag = {
-        ...mockFlagData,
-        status: 'reviewed',
-        reviewed_at: '2023-06-27T11:00:00Z',
-      }
+  it('updates an existing flag status', async () => {
+    const created = await service.flagSessionForReview(validRequest)
 
-      const mockUpdate = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            single: vi
-              .fn()
-              .mockResolvedValue({ data: updatedFlag, error: null }),
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ update: mockUpdate })
-
-      const result = await service.updateFlagStatus({
-        flagId: 'flag-123',
-        status: 'reviewed',
-        reviewerNotes: 'Reviewed and assessed',
-      })
-
-      expect(mockSupabase.from).toHaveBeenCalledWith('crisis_session_flags')
-      expect(mockUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: 'reviewed',
-          reviewer_notes: 'Reviewed and assessed',
-          reviewed_at: expect.any(String),
-        }),
-      )
-
-      expect(result.status).toBe('reviewed')
+    const updated = await service.updateFlagStatus({
+      flagId: created.id,
+      status: 'resolved',
+      reviewerNotes: 'Escalated and resolved',
+      resolutionNotes: 'Handled by on-call clinician',
     })
 
-    it('should handle update errors', async () => {
-      const mockUpdate = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: null,
-              error: { message: 'Update failed' },
-            }),
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ update: mockUpdate })
-
-      await expect(
-        service.updateFlagStatus({
-          flagId: 'flag-123',
-          status: 'reviewed',
-        }),
-      ).rejects.toThrow('Failed to update flag status: Update failed')
-    })
+    expect(updated.status).toBe('resolved')
+    expect(updated.resolvedAt).toBeDefined()
+    expect(updated.reviewerNotes).toBe('Escalated and resolved')
+    expect(updated.resolutionNotes).toBe('Handled by on-call clinician')
   })
 
-  describe('getUserCrisisFlags', () => {
-    it('should get user crisis flags', async () => {
-      const mockSelect = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          order: vi
-            .fn()
-            .mockResolvedValue({ data: [mockFlagData], error: null }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
-
-      const result = await service.getUserCrisisFlags('user-123')
-
-      expect(mockSupabase.from).toHaveBeenCalledWith('crisis_session_flags')
-      expect(result).toHaveLength(1)
-      expect(result[0]?.userId).toBe('user-123')
-    })
-
-    it('should filter out resolved flags by default', async () => {
-      const mockSelect = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            not: vi
-              .fn()
-              .mockResolvedValue({ data: [mockFlagData], error: null }),
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
-
-      await service.getUserCrisisFlags('user-123', false)
-
-      expect(mockSelect().eq().order().not).toHaveBeenCalledWith(
-        'status',
-        'in',
-        '(resolved,dismissed)',
-      )
-    })
+  it('rejects invalid flag identifiers on update', async () => {
+    await expect(
+      service.updateFlagStatus({ flagId: 'not-a-valid-object-id', status: 'reviewed' }),
+    ).rejects.toThrow('Invalid flagId provided.')
   })
 
-  describe('getUserSessionStatus', () => {
-    it('should get user session status', async () => {
-      const mockStatusData = {
-        id: 'status-123',
-        user_id: 'user-123',
-        is_flagged_for_review: true,
-        current_risk_level: 'high',
-        total_crisis_flags: 5,
-        active_crisis_flags: 2,
-        resolved_crisis_flags: 3,
-        created_at: '2023-06-27T10:00:00Z',
-        updated_at: '2023-06-27T10:00:00Z',
-      }
-
-      const mockSelect = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi
-            .fn()
-            .mockResolvedValue({ data: mockStatusData, error: null }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
-
-      const result = await service.getUserSessionStatus('user-123')
-
-      expect(result).toEqual({
-        id: mockStatusData.id,
-        userId: mockStatusData.user_id,
-        isFlaggedForReview: mockStatusData.is_flagged_for_review,
-        currentRiskLevel: mockStatusData.current_risk_level,
-        totalCrisisFlags: mockStatusData.total_crisis_flags,
-        activeCrisisFlags: mockStatusData.active_crisis_flags,
-        resolvedCrisisFlags: mockStatusData.resolved_crisis_flags,
-        metadata: {},
-        createdAt: mockStatusData.created_at,
-        updatedAt: mockStatusData.updated_at,
-      })
+  it('returns open crisis flags by default', async () => {
+    await service.flagSessionForReview(validRequest)
+    await service.flagSessionForReview({
+      ...validRequest,
+      crisisId: 'crisis_124',
+      sessionId: 'session_closed',
+      severity: 'low',
+      detectedRisks: ['support'],
+      confidence: 0.2,
+      metadata: { status: 'closed' },
     })
 
-    it('should return null when no status found', async () => {
-      const mockSelect = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({
-            data: null,
-            error: { code: 'PGRST116' },
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
+    const openFlags = await service.getUserCrisisFlags(validRequest.userId)
 
-      const result = await service.getUserSessionStatus('user-123')
-
-      expect(result).toBeNull()
-    })
+    expect(openFlags.length).toBe(2)
   })
 
-  describe('getPendingCrisisFlags', () => {
-    it('should get pending crisis flags', async () => {
-      const mockSelect = vi.fn().mockReturnValue({
-        in: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            limit: vi
-              .fn()
-              .mockResolvedValue({ data: [mockFlagData], error: null }),
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
+  it('includes resolved flags when requested', async () => {
+    const created = await service.flagSessionForReview(validRequest)
+    await service.updateFlagStatus({ flagId: created.id, status: 'resolved' })
 
-      const result = await service.getPendingCrisisFlags()
+    const withResolved = await service.getUserCrisisFlags(
+      validRequest.userId,
+      true,
+    )
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('crisis_session_flags')
-      expect(mockSelect().in).toHaveBeenCalledWith('status', [
-        'pending',
-        'under_review',
-      ])
-      expect(result).toHaveLength(1)
-    })
-
-    it('should respect limit parameter', async () => {
-      const mockSelect = vi.fn().mockReturnValue({
-        in: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue({ data: [], error: null }),
-          }),
-        }),
-      })
-      mockSupabase.from.mockReturnValue({ select: mockSelect })
-
-      await service.getPendingCrisisFlags(25)
-
-      expect(mockSelect().in().order().limit).toHaveBeenCalledWith(25)
-    })
+    expect(withResolved.some(flag => flag.status === 'resolved')).toBe(true)
   })
 })

@@ -83,7 +83,9 @@ COPY scripts/utils/start-server.mjs /app/start-server.mjs
 COPY config/instrument.mjs /app/instrument.mjs
 
 # Limit Node.js memory usage to prevent OOM on small VPS
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+# Increased to 10GB for Docker builds (will be enforced by host)
+ENV NODE_OPTIONS="--max-old-space-size=10240"
+ENV DOCKER_BUILD="true"
 RUN pnpm build
 
 # Cleanup build artifacts to reduce layer size
