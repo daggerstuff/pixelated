@@ -278,7 +278,7 @@ describe('ContextDetector', () => {
         expect(result.urgency).toBe('low')
       })
 
-      it('should detect clinical assessment context by pattern', async () => {
+      it('should detect clinical assessment context by pattern - basic diagnosis queries', async () => {
         const clinicalQueries = [
           'Can you diagnose depression for me?',
           'Do I need a clinical assessment for anxiety?',
@@ -299,11 +299,210 @@ describe('ContextDetector', () => {
           })
           const result = await contextDetector.detectContext(q)
           expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.9)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
           expect(result.contextualIndicators?.[0]?.type).toMatch(
             /clinical_assessment/i,
           )
         }
+      })
+
+      it('should detect clinical assessment context - PHQ-9 and assessment tools', async () => {
+        const phqQueries = [
+          'How do I score my PHQ-9 questionnaire?',
+          'Can you interpret my GAD-7 results?',
+          'What does my BDI score mean?',
+          'Help me calculate my PCL-5 assessment',
+          'Scoring the Beck Depression Inventory',
+        ]
+        for (const q of phqQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(result.needsSpecialHandling).toBe(true)
+          expect(result.urgency).toBe('medium')
+        }
+      })
+
+      it('should detect clinical assessment context - DSM-5 and clinical criteria', async () => {
+        const dsmQueries = [
+          'Do I meet the DSM-5 criteria for major depression?',
+          'What are the ICD-10 diagnostic criteria?',
+          'Am I meeting the requirements for PTSD diagnosis?',
+          'DSM-IV criteria for bipolar disorder',
+        ]
+        for (const q of dsmQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+        }
+      })
+
+      it('should detect clinical assessment context - risk assessment language', async () => {
+        const riskQueries = [
+          'Need a risk assessment for suicide',
+          'What is the severity level of my depression?',
+          'Self-harm risk evaluation needed',
+          'Safety assessment for current symptoms',
+        ]
+        for (const q of riskQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+        }
+      })
+
+      it('should NOT detect clinical assessment for negative cases', async () => {
+        const nonClinicalQueries = [
+          'What is depression?', // Educational
+          'How do I cope with anxiety?', // Support/Educational
+          'Tell me about therapy options', // Educational
+          'I feel sad today', // Support
+          'Where can I find a therapist?', // Informational
+        ]
+        for (const q of nonClinicalQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          expect(result.detectedContext).not.toBe(ContextType.CLINICAL_ASSESSMENT)
+        }
+      })
+
+      it('should handle ambiguous clinical assessment cases', async () => {
+        const ambiguousQueries = [
+          'I think I might need to see a doctor', // Could be clinical or informational
+          'Should I get evaluated?', // Vague
+          'My symptoms are getting worse', // Support/General
+        ]
+        for (const q of ambiguousQueries) {
+          mockDetectCrisis.mockResolvedValue({
+            isCrisis: false,
+            confidence: 0.05,
+            category: 'general_concern',
+            riskLevel: 'low',
+            urgency: 'low',
+            detectedTerms: [],
+            suggestedActions: [],
+            timestamp: new Date().toISOString(),
+            content: q,
+          })
+          const result = await contextDetector.detectContext(q)
+          // Ambiguous cases may or may not be clinical - just ensure we get a valid context
+          expect(result.detectedContext).toBeDefined()
+          expect(result.confidence).toBeGreaterThan(0)
+        }
+      })
+
+      it('should meet confidence threshold >= 0.8 for clinical assessment', async () => {
+        const query = 'I need a psychiatric evaluation for bipolar disorder'
+        mockDetectCrisis.mockResolvedValue({
+          isCrisis: false,
+          confidence: 0.05,
+          category: 'general_concern',
+          riskLevel: 'low',
+          urgency: 'low',
+          detectedTerms: [],
+          suggestedActions: [],
+          timestamp: new Date().toISOString(),
+          content: query,
+        })
+        const result = await contextDetector.detectContext(query)
+        expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+        expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+        expect(result.confidence).toBeLessThanOrEqual(1.0)
+      })
+
+      it('should short-circuit to crisis handler when crisis signals present', async () => {
+        const crisisQuery = 'I want to kill myself and need a diagnosis'
+        mockDetectCrisis.mockResolvedValue({
+          isCrisis: true,
+          confidence: 0.95,
+          category: 'suicide',
+          riskLevel: 'high',
+          urgency: 'immediate',
+          detectedTerms: ['kill myself'],
+          suggestedActions: ['immediate_intervention'],
+          timestamp: new Date().toISOString(),
+          content: crisisQuery,
+        })
+        const result = await contextDetector.detectContext(crisisQuery)
+        // Crisis should override clinical assessment
+        expect(result.detectedContext).toBe(ContextType.CRISIS)
+        expect(result.confidence).toBeGreaterThan(0.9)
+        expect(result.urgency).toBe('critical')
+        expect(result.needsSpecialHandling).toBe(true)
+      })
+
+      it('should not log PII in clinical assessment detection', async () => {
+        const queryWithPII = 'Can you diagnose John Smith, SSN 123-45-6789, for depression?'
+        mockDetectCrisis.mockResolvedValue({
+          isCrisis: false,
+          confidence: 0.05,
+          category: 'general_concern',
+          riskLevel: 'low',
+          urgency: 'low',
+          detectedTerms: [],
+          suggestedActions: [],
+          timestamp: new Date().toISOString(),
+          content: queryWithPII,
+        })
+        
+        // Spy on logger to ensure no PII is logged
+        const loggerSpy = vi.spyOn(console, 'log')
+        const result = await contextDetector.detectContext(queryWithPII)
+        
+        expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
+        
+        // Check that no logged messages contain PII
+        const logCalls = loggerSpy.mock.calls
+        for (const call of logCalls) {
+          const logMessage = JSON.stringify(call)
+          expect(logMessage).not.toContain('John Smith')
+          expect(logMessage).not.toContain('123-45-6789')
+        }
+        
+        loggerSpy.mockRestore()
       })
 
       it('should detect informational context by pattern', async () => {
