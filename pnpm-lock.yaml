@@ -25,11 +25,6 @@ overrides:
   zod: ^4.3.2
   qs: 6.14.1
 
-patchedDependencies:
-  '@modelcontextprotocol/sdk':
-    hash: e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728
-    path: patches/@modelcontextprotocol__sdk.patch
-
 importers:
 
   .:
@@ -116,8 +111,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@modelcontextprotocol/sdk':
-        specifier: ^1.25.1
-        version: 1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)
+        specifier: ^1.25.2
+        version: 1.25.2(hono@4.11.1)(zod@4.3.2)
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -353,8 +348,8 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-router-dom:
-        specifier: ^7.11.0
-        version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: ^7.12.0
+        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       recharts:
         specifier: ^3.6.0
         version: 3.6.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react-is@17.0.2)(react@19.2.3)(redux@5.0.1)
@@ -2752,8 +2747,8 @@ packages:
   '@microsoft/clarity@1.0.2':
     resolution: {integrity: sha512-9EZYROFpJxEGmQpHvUFqvD3ZJ7QQSqnibYSWmS+1xusoZfG1QQ1/Al9yVBBc11DWMbJrs1pe1hLT273it/skJg==}
 
-  '@modelcontextprotocol/sdk@1.25.1':
-    resolution: {integrity: sha512-yO28oVFFC7EBoiKdAn+VqRm+plcfv4v0xp6osG/VsCB0NlPZWi87ajbCZZ8f/RvOFLEu7//rSRmuZZ7lMoe3gQ==}
+  '@modelcontextprotocol/sdk@1.25.2':
+    resolution: {integrity: sha512-LZFeo4F9M5qOhC/Uc1aQSrBHxMrvxett+9KLHt7OhcExtoiRN9DKgbZffMP/nxjutWDQpfMDfP3nkHI4X9ijww==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -10503,15 +10498,15 @@ packages:
     resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
     engines: {node: '>=0.10.0'}
 
-  react-router-dom@7.11.0:
-    resolution: {integrity: sha512-e49Ir/kMGRzFOOrYQBdoitq3ULigw4lKbAyKusnvtDu2t4dBX4AGYPrzNvorXmVuOyeakai6FUPW5MmibvVG8g==}
+  react-router-dom@7.12.0:
+    resolution: {integrity: sha512-pfO9fiBcpEfX4Tx+iTYKDtPbrSLLCbwJ5EqP+SPYQu1VYCXdy79GSj0wttR0U4cikVdlImZuEZ/9ZNCgoaxwBA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  react-router@7.11.0:
-    resolution: {integrity: sha512-uI4JkMmjbWCZc01WVP2cH7ZfSzH91JAZUDd7/nIprDgWxBV1TkkmLToFh7EbMTcMak8URFRa2YoBL/W8GWnCTQ==}
+  react-router@7.12.0:
+    resolution: {integrity: sha512-kTPDYPFzDVGIIGNLS5VJykK0HfHLY5MF3b+xj0/tTyNYL1gF1qs7u67Z9jEhQk2sQ98SUaHxlG31g1JtF7IfVw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -15455,7 +15450,7 @@ snapshots:
 
   '@microsoft/clarity@1.0.2': {}
 
-  '@modelcontextprotocol/sdk@1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2)':
     dependencies:
       '@hono/node-server': 1.19.7(hono@4.11.1)
       ajv: 8.17.1
@@ -18030,7 +18025,7 @@ snapshots:
   '@smithery/cli@1.6.7(@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
-      '@modelcontextprotocol/sdk': 1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
       '@ngrok/ngrok': 1.7.0
       '@smithery/registry': 0.4.4
       '@smithery/sdk': 3.0.1(hono@4.11.1)(zod@4.3.2)
@@ -18064,7 +18059,7 @@ snapshots:
 
   '@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.2)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
       chalk: 5.6.2
       express: 5.2.1
       jose: 6.1.3
@@ -18446,7 +18441,7 @@ snapshots:
   '@spotlightjs/sidecar@1.12.0(hono@4.11.1)':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-      '@modelcontextprotocol/sdk': 1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
       '@sentry/core': 9.22.0
       '@sentry/node': 8.55.0
       kleur: 4.1.5
@@ -19557,7 +19552,7 @@ snapshots:
 
   agentdb@1.6.1(hono@4.11.1):
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.1(patch_hash=e7da78e114e529f4c1f1d34efa3211bdb23a86f3a004f91921a56d66ab177728)(hono@4.11.1)(zod@4.3.2)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.2)
       '@xenova/transformers': 2.17.2
       chalk: 5.6.2
       commander: 12.1.0
@@ -24848,13 +24843,13 @@ snapshots:
 
   react-refresh@0.18.0: {}
 
-  react-router-dom@7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  react-router-dom@7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      react-router: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react-router: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
-  react-router@7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  react-router@7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       cookie: 1.1.1
       react: 19.2.3
