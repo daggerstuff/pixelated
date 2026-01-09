@@ -179,7 +179,7 @@
     "@iconify-json/lucide": "^1.2.82",
     "@memobase/memobase": "^0.0.18",
     "@microsoft/clarity": "^1.0.2",
-    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.67.3",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.208.0",
@@ -258,7 +258,7 @@
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.69.0",
     "react-hot-toast": "^2.6.0",
-    "react-router-dom": "^7.11.0",
+    "react-router-dom": "^7.12.0",
     "recharts": "^3.6.0",
     "redis": "^5.10.0",
     "rehype-sanitize": "^6.0.0",
@@ -417,9 +417,6 @@
     "wait-on": "^9.0.3"
   },
   "pnpm": {
-    "patchedDependencies": {
-      "@modelcontextprotocol/sdk": "patches/@modelcontextprotocol__sdk.patch"
-    },
     "overrides": {
       "@opentelemetry/api": "^1.9.0",
       "@opentelemetry/otlp-proto-exporter-base": "^0.51.1",
