@@ -58,6 +58,15 @@ export function getContextualObjectiveWeights(
         safety: 0.05,
       }
 
+    case ContextType.CLINICAL_ASSESSMENT:
+      return {
+        correctness: 0.35,
+        safety: 0.3,
+        professionalism: 0.25,
+        empathy: 0.08,
+        informativeness: 0.02,
+      }
+
     case ContextType.GENERAL:
     default:
       return {
