@@ -9,7 +9,7 @@
 import type { APIRoute, APIContext } from 'astro'
 import { applyRateLimit } from '@/lib/api/rate-limit'
 import { createAuditLog, AuditEventStatus, AuditEventType } from '@/lib/audit'
-import { getSession } from '@/lib/auth/session'
+import { getSessionFromRequest } from '@/utils/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('pixel-infer-multimodal')
@@ -42,18 +42,17 @@ async function forwardToPixel(form: FormData) {
 
 export const POST: APIRoute = async ({ request }: APIContext) => {
     try {
-        const session = await getSession(request)
-        if (!session?.user) {
+        const session = await getSessionFromRequest(request)
+        if (!session?.userId) {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 401,
                 headers: { 'Content-Type': 'application/json' },
             })
         }
 
-        const rateLimitResult = await applyRateLimit(
-            session.user.id,
-            'pixel-infer-multimodal',
-            session.user.role === 'admin' ? 40 : session.user.role === 'therapist' ? 30 : 20,
+        const { result: rateLimitResult } = await applyRateLimit(
+            request,
+            '/api/ai/pixel/infer-multimodal',
         )
         if (!rateLimitResult.allowed) {
             return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
@@ -110,18 +109,20 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         const pixelResponse = await forwardToPixel(outbound)
         const latencyMs = performance.now() - start
 
-        await createAuditLog({
-            userId: session.user.id,
-            eventType: AuditEventType.AI_GENERATION,
-            status: AuditEventStatus.SUCCESS,
-            details: {
+        await createAuditLog(
+            AuditEventType.AI_OPERATION,
+            'multimodal_inference',
+            session.userId,
+            'pixel-multimodal-api',
+            {
                 model: 'Pixel Multimodal',
                 context_type: contextType,
                 session_id: sessionId,
                 audio_included: Boolean(audio),
                 latency_ms: latencyMs,
             },
-        })
+            AuditEventStatus.SUCCESS,
+        )
 
         return new Response(
             JSON.stringify({ ...pixelResponse, latency_ms: pixelResponse['latency_ms'] || latencyMs }),
