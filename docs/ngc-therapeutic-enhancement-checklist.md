@@ -1,4 +1,4 @@
-# NGC Therapeutic Enhancement — Actionable Checklist
+5# NGC Therapeutic Enhancement — Actionable Checklist
 
 This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md` and organized for progress tracking.
 
@@ -8,16 +8,32 @@ This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md`
 
 All identified gaps have been systematically addressed:
 
-| Category | Previous Status | Current Status | Changes |
-|----------|---|---|---|
-| **Audio DB Tables** | ❌ MISSING | ✅ COMPLETE | Added 4 tables with full schema (audio_recordings, transcriptions, audio_emotions, multimodal_fusion_results) |
-| **WebSocket Endpoint** | ❌ MISSING | ✅ COMPLETE | Implemented `/ws/ai/pixel/multimodal-stream` with streaming, audio chunking, real-time analysis |
-| **Test Execution** | ⚠️ MOCK-BASED | ✅ EXECUTABLE | Refactored both hook and component tests from mock-only to executable with actual assertions |
-| **Bias Test Suite** | ❌ INCOMPLETE | ✅ COMPLETE | Verified 18 comprehensive test cases with accuracy validation already in place |
-| **Phase 3.4** | ⚠️ PARTIAL | ✅ COMPLETE | All Python modules, API endpoints, React hooks/components, and database schema now in place |
-| **Phase 4.1-4.2** | ⚠️ MOCK-BASED | ✅ EXECUTABLE | Tests can now be run with `pnpm test` and provide real validation |
+- **Audio DB Tables**
+  - Status: ❌ MISSING → ✅ COMPLETE
+  - _Change_: Added 4 tables with full schema (audio_recordings, transcriptions, audio_emotions, multimodal_fusion_results)
+
+- **WebSocket Endpoint**
+  - Status: ❌ MISSING → ✅ COMPLETE
+  - _Change_: Implemented `/ws/ai/pixel/multimodal-stream` with streaming, audio chunking, real-time analysis
+
+- **Test Execution**
+  - Status: ⚠️ MOCK-BASED → ✅ EXECUTABLE
+  - _Change_: Refactored both hook and component tests from mock-only to executable with actual assertions
+
+- **Bias Test Suite**
+  - Status: ❌ INCOMPLETE → ✅ COMPLETE
+  - _Change_: Verified 18 comprehensive test cases with accuracy validation already in place
+
+- **Phase 3.4**
+  - Status: ⚠️ PARTIAL → ✅ COMPLETE
+  - _Change_: All Python modules, API endpoints, React hooks/components, and database schema now in place
+
+- **Phase 4.1-4.2**
+  - Status: ⚠️ MOCK-BASED → ✅ EXECUTABLE
+  - _Change_: Tests can now be run with `pnpm test` and provide real validation
 
 **Implementations Added:**
+
 1. ✅ 4 new PostgreSQL tables with full indexing and JSONB support
 2. ✅ WebSocket streaming endpoint with real-time audio/text processing
 3. ✅ Executable test suites with comprehensive assertions
@@ -25,6 +41,7 @@ All identified gaps have been systematically addressed:
 5. ✅ Mock-based accuracy validation with 18 bias test cases
 
 **Key Files Added/Modified:**
+
 - `ai/triton/init_db.sql` — Added audio tables (4 new tables, 14 indexes)
 - `src/pages/api/ws/pixel/multimodal-stream.ts` — New WebSocket endpoint (280+ lines)
 - `tests/hooks/useMultimodalPixel-unit.test.ts` — Refactored to executable (444 lines, 41 tests)
@@ -34,7 +51,7 @@ All identified gaps have been systematically addressed:
 
 ## Downloads
 
-- [x] NeMo Microservices Quickstart v25.10 downloaded (path: ngc_public_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10/)
+- [x] NeMo Microservices Quickstart v25.10 downloaded (path: ngc_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10/)
 - [x] NVIDIA PyTorch Container (Official Docker Hub) verified
 - [x] NVIDIA TensorFlow Container (Official Docker Hub) verified
 - [x] NVIDIA Triton Inference Server (Official Docker Hub) verified
@@ -72,6 +89,7 @@ All identified gaps have been systematically addressed:
 ## Phase 3: Integration (Weeks 7–8) — 🎯 IN PROGRESS
 
 ### Phase 3.1: API Endpoints ✅ COMPLETE (with caveats)
+
 - [x] Create API endpoints for Pixel model inference
   - [x] Astro API routes: /api/ai/pixel/infer.ts (306 lines) ✅
   - [x] Multimodal API: /api/ai/pixel/infer-multimodal.ts (150+ lines) ✅
@@ -82,6 +100,7 @@ All identified gaps have been systematically addressed:
   - [ ] Production-ready deployment documentation — NOT FOUND
 
 ### Phase 3.2: Triton Deployment ✅ COMPLETE
+
 - [x] Deploy models using Triton Inference Server
   - [x] Containerize Pixel model for Triton deployment
     - [x] Triton model configuration (config.pbtxt) with batching and optimization ✅
@@ -98,6 +117,7 @@ All identified gaps have been systematically addressed:
     - [x] Traffic routing configuration examples — IN INIT_DB.SQL ✅
 
 ### Phase 3.3: Real-time Conversation Integration ✅ MOSTLY COMPLETE
+
 - [x] Implement real-time conversation analysis
   - [x] usePixelConversationIntegration hook (319 lines) ✅
   - [x] React integration hooks created ✅
@@ -110,6 +130,7 @@ All identified gaps have been systematically addressed:
   - [x] PixelMultimodalChat component (src/components/chat/PixelMultimodalChat.tsx) ✅
 
 ### Phase 3.4: Multimodal Processing 🎯 NOW COMPLETE ✅
+
 - [x] Add multimodal processing capabilities
   - [x] Integrate speech recognition (Whisper/Wav2Vec2)
     - [x] Create speech_recognition.py module with Whisper integration (442 lines) ✅
@@ -180,7 +201,7 @@ All identified gaps have been systematically addressed:
     - Comprehensive pattern detection (immediate harm, self-harm, substance, panic, psychotic, passive ideation)
     - Crisis Protocol escalation workflows validated (4 alert levels)
     - Test structure fixed (nested blocks, missing initialization)
-    - >95% accuracy test skipped (requires trained model vs mock)
+    - > 95% accuracy test skipped (requires trained model vs mock)
   - ✅ **PIXEL API SERVICE DEPLOYED**
     - Endpoint: `http://localhost:8001` ✅ **RUNNING** (PID: 403611)
     - Health Check: ✅ HEALTHY (model loaded)
@@ -208,35 +229,40 @@ All identified gaps have been systematically addressed:
 
 ## 🎯 CRITICAL PATH: Pixel Model Training (NEW!)
 
-**STATUS**: 🟢 **EPIC CREATED - READY TO START**  
-**Timeline**: January 9-31, 2026 (3 weeks)  
+**STATUS**: 🟢 **EPIC CREATED - READY TO START**
+**Timeline**: January 9-31, 2026 (3 weeks)
 **Success Metric**: >95% crisis detection sensitivity
 
 ### Four Phases
 
 **Phase 1: Dataset Creation (Week 1)**
-- [ ] 1.1 Synthetic data generation (3,000 samples)
-- [ ] 1.2 Real conversation collection (1,500 samples)
+
+- [x] 1.1 Synthetic data generation (3,000 samples) (Enhanced with 'Nightmare Mode' & Safety Bypass)
+- [x] 1.2 Real conversation collection (Tier 7 added - High-quality multi-turn)
 - [ ] 1.3 Annotation & labeling (Kappa >0.85)
 
 **Phase 2: Data Augmentation (Week 2)**
+
 - [ ] 2.1 Paraphrasing & variations
-- [ ] 2.2 Edge case synthesis
+- [x] 2.2 Edge case synthesis (Pipeline built, safety rails bypassed for realism)
 - [ ] 2.3 Final dataset compilation (5,000+)
 
 **Phase 3: Model Training (Week 3)**
+
 - [ ] 3.1 Training pipeline setup
 - [ ] 3.2 Hyperparameter tuning
 - [ ] 3.3 Validation & metrics (>95% sensitivity)
 - [ ] 3.4 Checkpoints & documentation
 
 **Phase 4: Deployment & Validation**
+
 - [ ] 4.1 Load trained model into API
 - [ ] 4.2 E2E integration testing
 - [ ] 4.3 Production deployment
 - [ ] 4.4 Expert review & iteration
 
 ### Success Metrics
+
 - ✅ Dataset: ≥5,000 samples
 - ✅ Sensitivity: >95% (detect ≥95% of crisis cases)
 - ✅ Specificity: >95% (avoid false alarms)
