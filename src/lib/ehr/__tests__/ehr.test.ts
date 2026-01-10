@@ -1,4 +1,7 @@
 import { EpicProvider } from '../providers/epic.provider'
+import { CernerProvider } from '../providers/cerner.provider'
+import { AllscriptsProvider } from '../providers/allscripts.provider'
+import { AthenahealthProvider } from '../providers/athenahealth.provider'
 import { EHRServiceImpl } from '../services/ehr.service'
 import { EHRError } from '../types'
 
@@ -9,6 +12,7 @@ describe('eHR Service', () => {
     warn: vi.fn(),
   }
 
+  const testId = 'test-id'
   const mockProvider = {
     id: 'test-epic',
     name: 'Test Epic Provider',
@@ -17,12 +21,18 @@ describe('eHR Service', () => {
     clientId: testId || 'example-client-id',
     clientSecret: process.env.CLIENT_SECRET || 'example-client-secret',
     scopes: ['launch/patient', 'patient/*.read'],
+    initialize: vi.fn(),
+    cleanup: vi.fn(),
   }
 
   let ehrService: EHRServiceImpl
 
   beforeEach(() => {
     ehrService = new EHRServiceImpl(mockLogger as unknown as Console)
+    vi.spyOn(EpicProvider.prototype, 'initialize').mockResolvedValue(undefined)
+    vi.spyOn(CernerProvider.prototype, 'initialize').mockResolvedValue(undefined)
+    vi.spyOn(AllscriptsProvider.prototype, 'initialize').mockResolvedValue(undefined)
+    vi.spyOn(AthenahealthProvider.prototype, 'initialize').mockResolvedValue(undefined)
     vi.clearAllMocks()
   })
 
@@ -43,7 +53,7 @@ describe('eHR Service', () => {
     it('should throw error for invalid provider configuration', async () => {
       const invalidProvider = { ...mockProvider, vendor: 'invalid' }
       await expect(
-        ehrService.configureProvider(invalidProvider),
+        ehrService.configureProvider(invalidProvider as any),
       ).rejects.toThrow(EHRError)
     })
   })
@@ -102,6 +112,7 @@ describe('epic Provider', () => {
     warn: vi.fn(),
   }
 
+  const testId = 'test-id'
   const providerConfig = {
     id: 'test-epic',
     name: 'Test Epic Provider',
@@ -133,7 +144,7 @@ describe('epic Provider', () => {
   describe('initialization', () => {
     it('should successfully initialize provider', async () => {
       // Mock the base provider's validateEndpoint method
-      vi.spyOn(epicProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(epicProvider as any, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
@@ -197,7 +208,7 @@ describe('epic Provider', () => {
         update: vi.fn(),
         delete: vi.fn(),
       }
-      vi.spyOn(epicProvider as unknown, 'getClient').mockReturnValue(
+      vi.spyOn(epicProvider as any, 'getClient').mockReturnValue(
         mockFhirClient,
       )
 
@@ -215,7 +226,7 @@ describe('epic Provider', () => {
 
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
-      vi.spyOn(epicProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(epicProvider as any, 'validateEndpoint').mockResolvedValue(
         false,
       )
 
