@@ -15,7 +15,7 @@ on:
     - cron: "0 2 * * 1"
 
 env:
-  NODE_VERSION: 24.8.0
+  NODE_VERSION: 24.11.0
   PYTHON_VERSION: 3.11
   PNPM_VERSION: 10.27.0
 
@@ -40,7 +40,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality
+          queries: +security-and-quality,security-extended
+          # Enable ML-powered alerts for JavaScript/TypeScript
+          setup-python-dependencies: ${{ matrix.language == 'python' }}
+          # Increase RAM allocation for analysis
+          ram: 16384
 
       - name: Setup Node.js
         if: matrix.language == 'javascript'
@@ -79,11 +83,9 @@ jobs:
         if: matrix.language == 'javascript'
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
-      - name: Build JavaScript/TypeScript project
+      - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'
-        run: |
-          # Build the project for CodeQL analysis
-          pnpm build || echo "Build completed with warnings"
+        uses: github/codeql-action/autobuild@v4
 
       - name: Setup Python
         if: matrix.language == 'python'
@@ -133,7 +135,35 @@ jobs:
             cd - > /dev/null
           done || true
 
+      - name: Autobuild Python
+        if: matrix.language == 'python'
+        uses: github/codeql-action/autobuild@v4
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
+          # Upload SARIF file to GitHub Security tab
+          upload: true
+          # Add source location prefix for better error reporting
+          add-snippets: true
+          # Configure output format
+          output: sarif-latest
+          # Fail the workflow if critical vulnerabilities are found
+          # fail-on: high
+
+      - name: Upload SARIF results as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-sarif-${{ matrix.language }}
+          path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
+          retention-days: 30
+
+      - name: Upload CodeQL database (for advanced analysis)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: codeql-database-${{ matrix.language }}
+          path: /home/runner/work/_temp/codeql_databases
+          retention-days: 7
