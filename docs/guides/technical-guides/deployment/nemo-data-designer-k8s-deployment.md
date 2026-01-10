@@ -69,7 +69,7 @@ helm upgrade --install nemo-data-designer nemo-data-designer \
 Deploy using the provided Kubernetes manifest:
 
 ```bash
-kubectl apply -f ai/nemo-data-designer-k8s.yaml
+kubectl apply -f ai/deployment/nemo-data-designer-k8s.yaml
 ```
 
 Then manually update the secret with your API key:

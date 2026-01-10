@@ -86,17 +86,26 @@ const createResponse = (
   init?: ResponseInit,
 ): Response => {
   if (typeof Response === 'function') {
-    try {
-      return new Response(body, init)
-    } catch {
+    const responsePrototype = (Response as unknown as { prototype?: unknown }).prototype
+    const canConstructResponse = Boolean(
+      responsePrototype && responsePrototype.constructor === Response,
+    )
+
+    if (canConstructResponse) {
       try {
-        return (Response as unknown as (body: BodyInit | null, init?: ResponseInit) => Response)(
-          body,
-          init,
-        )
+        return new Response(body, init)
       } catch {
-        return createMockCompatibleResponse(body, init)
+        // Fall back to calling Response as a function if construction fails
       }
+    }
+
+    try {
+      return (Response as unknown as (body: BodyInit | null, init?: ResponseInit) => Response)(
+        body,
+        init,
+      )
+    } catch {
+      return createMockCompatibleResponse(body, init)
     }
   }
 

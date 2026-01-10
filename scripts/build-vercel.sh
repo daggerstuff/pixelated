@@ -13,11 +13,11 @@ echo "🔵 Vercel build starting..."
 echo "Node version: $(node --version)"
 echo "Npm version: $(npm --version)"
 
-echo "Setting up pnpm 10.27.0 via corepack..."
+echo "Setting up pnpm 10.28.0 via corepack..."
 
-# Enable corepack and prepare pnpm 10.27.0
+# Enable corepack and prepare pnpm 10.28.0
 corepack enable || true
-corepack prepare pnpm@10.27.0 --activate
+corepack prepare pnpm@10.28.0 --activate
 
 echo "pnpm version after setup:"
 pnpm --version

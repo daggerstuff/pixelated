@@ -34,16 +34,16 @@ importers:
         version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.7.4)(typescript@5.9.3)
       '@astrojs/cloudflare':
         specifier: ^12.6.12
-        version: 12.6.12(@types/node@25.0.3)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 12.6.12(@types/node@25.0.3)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       '@astrojs/node':
         specifier: ^9.5.1
-        version: 9.5.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 9.5.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@astrojs/react':
         specifier: ^4.4.2
         version: 4.4.2(@types/node@25.0.3)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       '@astrojs/vercel':
         specifier: ^9.0.3
-        version: 9.0.3(@aws-sdk/credential-provider-web-identity@3.964.0)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)(rollup@4.55.1)(vue@3.5.26(typescript@5.9.3))
+        version: 9.0.3(@aws-sdk/credential-provider-web-identity@3.965.0)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)(rollup@4.55.1)(vue@3.5.26(typescript@5.9.3))
       '@auth0/auth0-react':
         specifier: ~2.11.0
         version: 2.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -51,28 +51,28 @@ importers:
         specifier: ^2.11.1
         version: 2.11.1
       '@aws-sdk/client-dynamodb':
-        specifier: ^3.965.0
+        specifier: ^3.958.0
         version: 3.965.0
       '@aws-sdk/client-ec2':
-        specifier: ^3.965.0
+        specifier: ^3.964.0
         version: 3.965.0
       '@aws-sdk/client-eks':
-        specifier: ^3.965.0
+        specifier: ^3.964.0
         version: 3.965.0
       '@aws-sdk/client-kms':
-        specifier: ^3.965.0
+        specifier: ^3.958.0
         version: 3.965.0
       '@aws-sdk/client-rds':
-        specifier: ^3.965.0
+        specifier: ^3.964.0
         version: 3.965.0
       '@aws-sdk/client-s3':
-        specifier: ^3.965.0
+        specifier: ^3.958.0
         version: 3.965.0
       '@aws-sdk/lib-dynamodb':
-        specifier: ^3.965.0
+        specifier: ^3.958.0
         version: 3.965.0(@aws-sdk/client-dynamodb@3.965.0)
       '@aws-sdk/s3-request-presigner':
-        specifier: ^3.965.0
+        specifier: ^3.958.0
         version: 3.965.0
       '@azure/storage-blob':
         specifier: ^12.29.1
@@ -154,7 +154,7 @@ importers:
         version: 9.5.0(@types/react@19.2.7)(immer@11.1.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.182.0)
       '@sentry/astro':
         specifier: ^10.32.1
-        version: 10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@sentry/node':
         specifier: ^10.32.1
         version: 10.32.1
@@ -169,10 +169,10 @@ importers:
         version: 4.6.1
       '@smithery/sdk':
         specifier: ^4.0.1
-        version: 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2)
+        version: 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.5))(zod@4.3.5)
       '@spotlightjs/astro':
         specifier: ^3.2.6
-        version: 3.2.6(@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.1)
+        version: 3.2.6(@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.1)
       '@tanstack/react-query':
         specifier: ^5.90.16
         version: 5.90.16(react@19.2.3)
@@ -214,7 +214,7 @@ importers:
         version: 1.6.1(hono@4.11.1)
       astro:
         specifier: ^5.16.7
-        version: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        version: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
@@ -426,7 +426,7 @@ importers:
         specifier: ^7.3.0
         version: 7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       ws:
-        specifier: ^8.19.0
+        specifier: ^8.18.3
         version: 8.19.0
       zod:
         specifier: ^4.3.2
@@ -437,7 +437,7 @@ importers:
     devDependencies:
       '@astrojs/markdoc':
         specifier: ^0.15.10
-        version: 0.15.10(@types/react@19.2.7)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)
+        version: 0.15.10(@types/react@19.2.7)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)
       '@astrojs/rss':
         specifier: ^4.0.14
         version: 4.0.14
@@ -455,7 +455,7 @@ importers:
         version: 1.57.0
       '@smithery/cli':
         specifier: ^3.0.3
-        version: 3.0.3(@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.2)
+        version: 3.1.0(@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.5))(zod@4.3.5))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.5)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -521,19 +521,19 @@ importers:
         version: 1.2.2
       astro-expressive-code:
         specifier: ^0.41.5
-        version: 0.41.5(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 0.41.5(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-loader-github-prs:
         specifier: ^1.3.1
-        version: 1.3.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 1.3.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-loader-github-releases:
         specifier: ^2.1.1
-        version: 2.1.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 2.1.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-robots-txt:
         specifier: ^1.0.0
         version: 1.0.0
       astro-vitesse:
         specifier: ^0.5.2
-        version: 0.5.2(@iconify/json@2.2.416)(@unocss/reset@66.5.12)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.12(postcss@8.5.6)(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))
+        version: 0.5.2(@iconify/json@2.2.416)(@unocss/reset@66.5.12)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.12(postcss@8.5.6)(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))
       autoprefixer:
         specifier: ^10.4.23
         version: 10.4.23(postcss@8.5.6)
@@ -5299,11 +5299,11 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-  '@smithery/api@0.1.0-alpha.6':
-    resolution: {integrity: sha512-qWPKvKIuhv02hj2p3OeoR+ljEJM5QaMHb83lHRfKsuH0qkX8dgOb67y1U2RwTL9npiRTl1PTU2JWw0NU4dqBhw==}
+  '@smithery/api@0.1.0-alpha.11':
+    resolution: {integrity: sha512-tCK2tWWgNOfhS+LBdroIGCW1RturFE4gYmc225HuiRfAWVvLg0ZlK7916Amh3epSMOf5kjy18xJ11YpalSqcSw==}
 
-  '@smithery/cli@3.0.3':
-    resolution: {integrity: sha512-JL/SQReeMMk9U7PkXfDPSWsYsZQ630koBtJxwGU0Oi329L5uQRXPC4g2cAvYrIjJhMaUSYmdQ/hoLyTKNa2Qrw==}
+  '@smithery/cli@3.1.0':
+    resolution: {integrity: sha512-2X21fkOTDJva49ya4/iofDdRMguIDR6TLQjGe6nsBcTdZWquFRCtR9jIM88lZJ2RnsZytlv4NkOCbZ5PsNF8Ig==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -7122,6 +7122,10 @@ packages:
   cli-spinners@2.9.2:
     resolution: {integrity: sha512-ywqV+5MmyL4E7ybXgKys4DugZbX0FC6LnwrhjuykIjnK9k8OQacQ7axGKnjDXWNhns0xot3bZI5h55H8yo9cJg==}
     engines: {node: '>=6'}
+
+  cli-spinners@3.3.0:
+    resolution: {integrity: sha512-/+40ljC3ONVnYIttjMWrlL51nItDAbBrq2upN8BPyvGU/2n5Oxw3tbNwORCaNuNqLJnxGqOfjUuhsv7l5Q4IsQ==}
+    engines: {node: '>=18.20'}
 
   cli-truncate@5.1.1:
     resolution: {integrity: sha512-SroPvNHxUnk+vIW/dOSfNqdy1sPEFkrTk6TUtqLCnBlo3N7TNYYkzzN7uSD6+jVjrdO4+p8nH7JzH6cIvUem6A==}
@@ -12860,12 +12864,12 @@ snapshots:
       - prettier
       - prettier-plugin-astro
 
-  '@astrojs/cloudflare@12.6.12(@types/node@25.0.3)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
+  '@astrojs/cloudflare@12.6.12(@types/node@25.0.3)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)':
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       '@astrojs/underscore-redirects': 1.0.0
       '@cloudflare/workers-types': 4.20251231.0
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       tinyglobby: 0.2.15
       vite: 7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       wrangler: 4.50.0(@cloudflare/workers-types@4.20251231.0)
@@ -12914,13 +12918,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@0.15.10(@types/react@19.2.7)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)':
+  '@astrojs/markdoc@0.15.10(@types/react@19.2.7)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)':
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       '@astrojs/markdown-remark': 6.3.10
       '@astrojs/prism': 3.3.0
       '@markdoc/markdoc': 0.5.4(@types/react@19.2.7)(react@19.2.3)
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       esbuild: 0.25.12
       github-slugger: 2.0.0
       htmlparser2: 10.0.0
@@ -12955,12 +12959,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.3.13(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@astrojs/mdx@4.3.13(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.10
       '@mdx-js/mdx': 3.1.1
       acorn: 8.15.0
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       es-module-lexer: 1.7.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -12974,10 +12978,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@9.5.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@astrojs/node@9.5.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -13035,14 +13039,14 @@ snapshots:
 
   '@astrojs/underscore-redirects@1.0.0': {}
 
-  '@astrojs/vercel@9.0.3(@aws-sdk/credential-provider-web-identity@3.964.0)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)(rollup@4.55.1)(vue@3.5.26(typescript@5.9.3))':
+  '@astrojs/vercel@9.0.3(@aws-sdk/credential-provider-web-identity@3.965.0)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(react@19.2.3)(rollup@4.55.1)(vue@3.5.26(typescript@5.9.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.7.5
       '@vercel/analytics': 1.6.1(react@19.2.3)(vue@3.5.26(typescript@5.9.3))
-      '@vercel/functions': 2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0)
+      '@vercel/functions': 2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0)
       '@vercel/nft': 0.30.4(rollup@4.55.1)
       '@vercel/routing-utils': 5.3.1
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       esbuild: 0.25.12
       tinyglobby: 0.2.15
     transitivePeerDependencies:
@@ -18364,13 +18368,13 @@ snapshots:
       '@sentry-internal/browser-utils': 10.32.1
       '@sentry/core': 10.32.1
 
-  '@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@sentry/browser': 10.32.1
       '@sentry/core': 10.32.1
       '@sentry/node': 10.32.1
       '@sentry/vite-plugin': 4.6.1
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -18671,14 +18675,17 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@smithery/cli@1.6.7(@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.5))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.5)':
+  '@smithery/api@0.1.0-alpha.11': {}
+
+  '@smithery/cli@3.1.0(@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.5))(zod@4.3.5))(@types/node@25.0.3)(hono@4.11.1)(zod@4.3.5)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
       '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.5)
       '@ngrok/ngrok': 1.7.0
-      '@smithery/api': 0.1.0-alpha.6
-      '@smithery/sdk': 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.2))(zod@4.3.2)
+      '@smithery/api': 0.1.0-alpha.11
+      '@smithery/sdk': 4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.5))(zod@4.3.5)
       chalk: 4.1.2
+      cli-spinners: 3.3.0
       commander: 14.0.2
       cors: 2.8.5
       cross-fetch: 4.1.0
@@ -18695,6 +18702,8 @@ snapshots:
       uuidv7: 1.1.0
       yaml: 2.8.2
       zod: 4.3.5
+    optionalDependencies:
+      keytar: 7.9.0
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - '@types/node'
@@ -18704,23 +18713,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@smithery/registry@0.4.4':
-    dependencies:
-      zod: 4.3.5
-
-  '@smithery/sdk@3.0.1(hono@4.11.1)(zod@4.3.5)':
+  '@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.2(hono@4.11.1)(zod@4.3.5))(zod@4.3.5)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.1)(zod@4.3.5)
-      chalk: 5.6.2
-      express: 5.2.1
-      jose: 6.1.3
-      lodash: 4.17.21
-      okay-error: 1.0.3
       zod: 4.3.5
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - hono
-      - supports-color
 
   '@smithy/abort-controller@4.2.7':
     dependencies:
@@ -19077,11 +19073,11 @@ snapshots:
 
   '@speed-highlight/core@1.2.14': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.1)':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.1)':
     dependencies:
-      '@sentry/astro': 10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+      '@sentry/astro': 10.32.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@spotlightjs/spotlight': 3.0.2(hono@4.11.1)
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - hono
@@ -20462,14 +20458,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-expressive-code@0.38.3(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-expressive-code@0.38.3(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       rehype-expressive-code: 0.38.3
 
-  astro-expressive-code@0.41.5(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-expressive-code@0.41.5(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       rehype-expressive-code: 0.41.5
 
   astro-icon@1.1.5:
@@ -20480,14 +20476,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-loader-github-prs@1.3.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-loader-github-prs@1.3.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       octokit: 5.0.5
 
-  astro-loader-github-releases@2.1.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-loader-github-releases@2.1.1(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       octokit: 5.0.5
 
   astro-robots-txt@1.0.0:
@@ -20495,15 +20491,15 @@ snapshots:
       valid-filename: 4.0.0
       zod: 4.3.5
 
-  astro-vitesse@0.5.2(@iconify/json@2.2.416)(@unocss/reset@66.5.12)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.12(postcss@8.5.6)(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))):
+  astro-vitesse@0.5.2(@iconify/json@2.2.416)(@unocss/reset@66.5.12)(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(unocss@66.5.12(postcss@8.5.6)(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))):
     dependencies:
       '@astrojs/markdown-remark': 6.3.10
-      '@astrojs/mdx': 4.3.13(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+      '@astrojs/mdx': 4.3.13(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@astrojs/sitemap': 3.6.0
       '@iconify/json': 2.2.416
       '@unocss/reset': 66.5.12
-      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-      astro-expressive-code: 0.38.3(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+      astro: 5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro-expressive-code: 0.38.3(astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       bcp-47: 2.1.0
       dayjs: 1.11.19
       fast-glob: 3.3.3
@@ -20520,7 +20516,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
+  astro@5.16.7(@azure/storage-blob@12.29.1)(@types/node@25.0.3)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)(jiti@2.6.1)(rollup@4.55.1)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
     dependencies:
       '@astrojs/compiler': 2.13.0
       '@astrojs/internal-helpers': 0.7.5
@@ -20575,7 +20571,7 @@ snapshots:
       ultrahtml: 1.6.0
       unifont: 0.7.1
       unist-util-visit: 5.0.0
-      unstorage: 1.17.3(@azure/storage-blob@12.29.1)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2)
+      unstorage: 1.17.3(@azure/storage-blob@12.29.1)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1)
       vfile: 6.0.3
       vite: 7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       vitefu: 1.1.1(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -21079,6 +21075,8 @@ snapshots:
       restore-cursor: 5.1.0
 
   cli-spinners@2.9.2: {}
+
+  cli-spinners@3.3.0: {}
 
   cli-truncate@5.1.1:
     dependencies:
@@ -24486,7 +24484,7 @@ snapshots:
       workerd: 1.20260107.1
       ws: 8.18.0
       youch: 4.1.0-beta.10
-      zod: 4.3.2
+      zod: 4.3.5
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -27284,7 +27282,7 @@ snapshots:
       webpack-sources: 3.3.3
       webpack-virtual-modules: 0.5.0
 
-  unstorage@1.17.3(@azure/storage-blob@12.29.1)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0))(@vercel/kv@3.0.0)(ioredis@5.8.2):
+  unstorage@1.17.3(@azure/storage-blob@12.29.1)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0))(@vercel/kv@3.0.0)(ioredis@5.9.1):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -27297,7 +27295,7 @@ snapshots:
     optionalDependencies:
       '@azure/storage-blob': 12.29.1
       '@upstash/redis': 1.36.1
-      '@vercel/functions': 2.2.13(@aws-sdk/credential-provider-web-identity@3.964.0)
+      '@vercel/functions': 2.2.13(@aws-sdk/credential-provider-web-identity@3.965.0)
       '@vercel/kv': 3.0.0
       ioredis: 5.9.1
 
