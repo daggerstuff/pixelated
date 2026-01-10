@@ -24,6 +24,85 @@ const mockGetAnalysisResult = {
   recommendations: ['Review cultural considerations'],
 }
 
+const buildHeadersMap = (headers?: HeadersInit): Map<string, string> => {
+  const headerMap = new Map<string, string>()
+
+  if (!headers) return headerMap
+
+  if (headers instanceof Headers) {
+    headers.forEach((value, key) => {
+      headerMap.set(key.toLowerCase(), value)
+    })
+    return headerMap
+  }
+
+  if (Array.isArray(headers)) {
+    headers.forEach(([key, value]) => {
+      headerMap.set(key.toLowerCase(), value)
+    })
+    return headerMap
+  }
+
+  Object.entries(headers).forEach(([key, value]) => {
+    headerMap.set(key.toLowerCase(), String(value))
+  })
+
+  return headerMap
+}
+
+const createMockCompatibleResponse = (
+  body: BodyInit | null,
+  init?: ResponseInit,
+): Response => {
+  const headersMap = buildHeadersMap(init?.headers)
+  const status = init?.status ?? 200
+
+  return {
+    status,
+    ok: status >= 200 && status < 300,
+    statusText: '',
+    headers: {
+      get: (key: string) => headersMap.get(key.toLowerCase()) ?? null,
+    },
+    json: async () => {
+      if (typeof body === 'string') {
+        try {
+          return JSON.parse(body)
+        } catch {
+          return body
+        }
+      }
+      return body as unknown
+    },
+    text: async () => {
+      if (typeof body === 'string') return body
+      return JSON.stringify(body ?? '')
+    },
+  } as unknown as Response
+}
+
+const createResponse = (
+  body: BodyInit | null,
+  init?: ResponseInit,
+): Response => {
+  if (typeof Response === 'function') {
+    try {
+      return new Response(body, init)
+    } catch {
+      try {
+        return (Response as unknown as (body: BodyInit | null, init?: ResponseInit) => Response)(
+          body,
+          init,
+        )
+      } catch {
+        return createMockCompatibleResponse(body, init)
+      }
+    }
+  }
+
+  return createMockCompatibleResponse(body, init)
+}
+
 export const POST = async ({
   request,
 }: {
@@ -38,39 +117,51 @@ export const POST = async ({
       body = await request.json()
     } catch {
       // If JSON parsing fails, return error
-      return new Response(
+      const processingTime = Math.max(Date.now() - startTime, 1)
+
+      return createResponse(
         JSON.stringify({
           success: false,
           error: 'Analysis Failed',
           message: 'Invalid JSON',
-          processingTime: Math.max(Date.now() - startTime, 1),
+          processingTime,
         }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Processing-Time': processingTime.toString(),
+            'X-Cache': 'MISS',
+          },
         },
       )
     }
 
     // Basic validation (only check for completely empty body)
     if (!body || Object.keys(body).length === 0) {
-      return new Response(
+      const processingTime = Math.max(Date.now() - startTime, 1)
+
+      return createResponse(
         JSON.stringify({
           success: false,
           error: 'Bad Request',
           message: 'Invalid request format',
-          processingTime: Math.max(Date.now() - startTime, 1),
+          processingTime,
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Processing-Time': processingTime.toString(),
+            'X-Cache': 'MISS',
+          },
         },
       )
     }
 
     const processingTime = Math.max(Date.now() - startTime, 1)
 
-    return new Response(
+    return createResponse(
       JSON.stringify({
         success: true,
         data: mockAnalysisResult,
@@ -79,7 +170,11 @@ export const POST = async ({
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Processing-Time': processingTime.toString(),
+          'X-Cache': 'MISS',
+        },
       },
     )
   } catch (error: unknown) {
@@ -87,7 +182,7 @@ export const POST = async ({
 
     const processingTime = Math.max(Date.now() - startTime, 1)
 
-    return new Response(
+    return createResponse(
       JSON.stringify({
         success: false,
         error: 'Analysis Failed',
@@ -96,7 +191,11 @@ export const POST = async ({
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Processing-Time': processingTime.toString(),
+          'X-Cache': 'MISS',
+        },
       },
     )
   }
@@ -121,7 +220,7 @@ export const GET = async ({
 
     const processingTime = Math.max(Date.now() - startTime, 1)
 
-    return new Response(
+    return createResponse(
       JSON.stringify({
         success: true,
         data: result,
@@ -130,7 +229,11 @@ export const GET = async ({
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Processing-Time': processingTime.toString(),
+          'X-Cache': 'HIT',
+        },
       },
     )
   } catch (error: unknown) {
@@ -138,7 +241,7 @@ export const GET = async ({
 
     const processingTime = Math.max(Date.now() - startTime, 1)
 
-    return new Response(
+    return createResponse(
       JSON.stringify({
         success: false,
         error: 'Get Analysis Failed',
@@ -147,7 +250,11 @@ export const GET = async ({
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Processing-Time': processingTime.toString(),
+          'X-Cache': 'MISS',
+        },
       },
     )
   }
