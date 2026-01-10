@@ -1,0 +1,377 @@
+services:
+
+  ########
+  # Jobs #
+  ########
+
+  jobs-api:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/nmp-core:${NEMO_MICROSERVICES_IMAGE_TAG}
+    profiles: [platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command:
+      - "api"
+      - "--run-migrations-before-start"
+    configs:
+      - source: platform_config
+        target: /etc/nmp/config.yaml
+        gid: "1000"
+        uid: "1000"
+    environment:
+      ALEMBIC_CONFIG_FILE_PATH: /app/services/jobs/alembic.ini
+      DATABASE_DIALECT: postgresql
+      DATABASE_NAME: jobs
+      DATABASE_USER: nmp
+      DATABASE_PASSWORD: nmp
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+    expose:
+      - "8000"
+    networks:
+      - nmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      openbao:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; assert urllib.request.urlopen('http://localhost:8000/health').status == 200"]
+
+
+  jobs-controller:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/nmp-core:${NEMO_MICROSERVICES_IMAGE_TAG}
+    profiles: [platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command: "controller"
+    configs:
+      - source: platform_config
+        target: /etc/nmp/config.yaml
+        gid: "1000"
+        uid: "1000"
+    environment:
+      - NEMO_JOBS_IMAGE_REGISTRY=${NEMO_JOBS_IMAGE_REGISTRY:-${NGC_REGISTRY:-nvcr.io}}
+      - NEMO_JOBS_IMAGE_REGISTRY_USER_NAME=${NEMO_JOBS_IMAGE_REGISTRY_USER_NAME:-${NGC_USER_NAME:-$$oauthtoken}}
+      - NEMO_JOBS_IMAGE_REGISTRY_PASSWORD=${NEMO_JOBS_IMAGE_REGISTRY_PASSWORD:-${NGC_API_KEY:-${NGC_CLI_API_KEY:-""}}}
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/certs/client
+    volumes:
+      - docker_tls_certs_client:/certs/client:ro
+    networks:
+      - nmp
+    depends_on:
+      jobs-api:
+        condition: service_healthy
+      fluentbit:
+        condition: service_started
+      openbao:
+        condition: service_started
+      docker:
+        condition: service_healthy
+
+  docker:
+    image: docker:28-dind
+    profiles: [platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - docker_storage:/var/lib/docker
+      - docker_tls_certs_client:/certs/client
+    networks:
+      - nmp
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+
+  fluentbit-config-init:
+    image: busybox:latest
+    profiles: [platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command: |
+      sh -c "
+        echo 'Copying FluentBit configuration files...'
+        cp /config-source/fluent-bit.conf /config-dest/fluent-bit.conf
+        cp /config-source/parsers.conf /config-dest/parsers.conf
+        echo 'Configuration files copied successfully'
+        ls -la /config-dest/
+      "
+    configs:
+      - source: fluentbit_config
+        target: /config-source/fluent-bit.conf
+        gid: "999"
+        uid: "999"
+      - source: fluentbit_parsers
+        target: /config-source/parsers.conf
+        gid: "999"
+        uid: "999"
+    volumes:
+      - fluentbit_config_volume:/config-dest
+    networks:
+      - nmp
+
+  fluentbit:
+    image: fluent/fluent-bit:4.0.7
+    profiles: [platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command:
+      - -c
+      - /fluent-bit/etc/fluent-bit.conf
+    environment:
+      DB_USER: nmp
+      DB_PASS: nmp
+      DB_NAME: jobs
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - docker_storage:/var/lib/docker:ro
+      - fluentbit_config_volume:/fluent-bit/etc:ro
+    networks:
+      - nmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      fluentbit-config-init:
+        condition: service_completed_successfully
+      docker:
+        condition: service_healthy
+
+  ################
+  # Entity Store #
+  ################
+
+  entity-store:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/entity-store:${NEMO_MICROSERVICES_IMAGE_TAG}
+    ports:
+      - 8000
+    environment:
+      POSTGRES_PASSWORD: nmp
+      POSTGRES_USER: nmp
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: entitystore
+      BASE_URL_DATASTORE: http://datastore:3000/v1/hf
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; assert urllib.request.urlopen('http://localhost:8000/health').status == 200"]
+    depends_on:
+      - entity-store-initializer
+    networks:
+      - nmp
+
+  entity-store-initializer:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/entity-store:${NEMO_MICROSERVICES_IMAGE_TAG}
+    working_dir: /app/services/entity-store
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: nmp
+      POSTGRES_PASSWORD: nmp
+      POSTGRES_DB: entitystore
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/app/.venv/bin/python3", "-m", "scripts.run_db_migration"]
+    networks:
+      - nmp
+
+  ##############
+  # Data Store #
+  ##############
+
+  datastore-volume-permissions:
+    image: busybox:latest
+    profiles: [datastore, platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command: |
+      sh -c "chown -R 1000:1000 /nds-data && chmod -R 755 /nds-data"
+    volumes:
+      - datastore_storage:/nds-data
+    networks:
+      - nmp
+
+  datastore:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/datastore:${NEMO_MICROSERVICES_IMAGE_TAG}
+    profiles: [datastore, platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    restart: always
+    environment:
+      GITEA_WORK_DIR: /nds-data/app
+      APP_NAME: datastore
+      DAEMON_USER: git
+      DISABLE_SSH: true
+      HTTP_PORT: 3000
+      SMTP_ENABLED: false
+      GITEA__SERVER__APP_DATA_PATH: ./
+      GITEA__SERVER__OFFLINE_MODE: true
+      GITEA__SERVER__LFS_START_SERVER: true
+      GITEA__SERVER__ROOT_URL: http://localhost:3000/
+      GITEA__SECURITY__INSTALL_LOCK: true
+      GITEA__DATABASE__DB_TYPE: postgres
+      GITEA__DATABASE__HOST: postgres:5432
+      GITEA__DATABASE__NAME: datastore
+      GITEA__DATABASE__USER: nmp
+      GITEA__DATABASE__PASSWD: nmp
+      GITEA__DATABASE__SSL_MODE: disable
+      GITEA__LFS__STORAGE_TYPE: minio
+      GITEA__LFS__MINIO_ENDPOINT: minio:9000
+      GITEA__LFS__MINIO_ACCESS_KEY_ID: minioadmin
+      GITEA__LFS__MINIO_SECRET_ACCESS_KEY: minioadmin
+      GITEA__LFS__MINIO_BUCKET: nds
+      GITEA__LFS__MINIO_LOCATION: us-east-2
+      GITEA__LFS__MINIO_USE_SSL: false
+      GITEA__LFS__SERVE_DIRECT: false
+      GITEA__LOG__LEVEL: debug
+    volumes:
+      - datastore_storage:/nds-data:rw
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      datastore-volume-permissions:
+        condition: service_completed_successfully
+      minio:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - nmp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/v1/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2024-11-07T00-52-20Z
+    profiles: [datastore, platform, auditor, customizer, evaluator, data-designer, safe-synthesizer]
+    command: minio server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_storage:/data
+    ports:
+      - "9000"
+      - "9001"
+    networks:
+      - nmp
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  #######################
+  # Database - Postgres #
+  #######################
+
+  postgres:
+    image: postgres:16.1
+    restart: always
+    environment:
+      POSTGRES_USER: nmp
+      POSTGRES_PASSWORD: nmp
+    ports:
+      - 5432
+    configs:
+      - source: init_db_sql
+        target: /docker-entrypoint-initdb.d/init-db.sql
+        gid: "999"
+        uid: "999"
+    volumes:
+      - postgres_storage:/var/lib/postgresql/data:Z
+    networks:
+      - nmp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nmp"]
+      interval: 10s
+      timeout: 30s
+      retries: 20
+
+
+  # Openbao, used for in-memory storage of ephemeral secrets.
+  # Secrets are not persisted to disk in Openbao's development mode.
+  openbao:
+    image: openbao/openbao:2.3.2
+    ports:
+      - "8200"
+    command: server -dev -dev-root-token-id=root
+    networks:
+      - nmp
+
+volumes:
+  postgres_storage:
+  minio_storage:
+  datastore_storage:
+  fluentbit_config_volume:
+  docker_storage:
+  docker_tls_certs_client:
+
+configs:
+  init_db_sql:
+    content: |
+      -- Create separate databases for each service
+      CREATE DATABASE "entitystore" OWNER nmp;
+      CREATE DATABASE "customizer" OWNER nmp;
+      CREATE DATABASE "evaluator" OWNER nmp;
+      CREATE DATABASE "auditor" OWNER nmp;
+      CREATE DATABASE "datastore" OWNER nmp;
+      CREATE DATABASE "guardrails" OWNER nmp;
+      CREATE DATABASE "jobs" OWNER nmp;
+
+      GRANT ALL PRIVILEGES ON DATABASE "entitystore" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "customizer" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "evaluator" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "auditor" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "datastore" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "guardrails" TO nmp;
+      GRANT ALL PRIVILEGES ON DATABASE "jobs" TO nmp;
+
+  fluentbit_config:
+    content: |
+      [SERVICE]
+          Flush        1
+          Daemon       off
+          Log_Level    info
+          Parsers_File parsers.conf
+
+      [INPUT]
+          Name         tail
+          Tag          docker.*
+          Path         /var/lib/docker/containers/*/*.log
+          Parser       docker
+          Mem_Buf_Limit 5MB
+          Skip_Long_Lines On
+          Refresh_Interval 5
+
+      [FILTER]
+          Name         grep
+          Match        *
+          Regex        $$attrs['nmp.nvidia.com/job_id'] ^job-
+
+      [FILTER]
+          Name          nest
+          Match         *
+          Operation     lift
+          Nested_under  attrs
+          Remove_prefix nmp.nvidia.com/
+
+      [OUTPUT]
+          Name         stdout
+          Match        *
+          Format       json_lines
+
+      [OUTPUT]
+          Name         pgsql
+          Match        *
+          Host         postgres
+          Port         5432
+          User         nmp
+          Password     nmp
+          Database     jobs
+          Table        platformjoblogfluentbitlanding
+          # Use the Fluent Bit internal timestamp for the 'time' column
+          Timestamp_Key @timestamp
+
+  fluentbit_parsers:
+    content: |
+      [PARSER]
+          Name        docker
+          Format      json
+          Time_Key    time
+          Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+          Time_Keep   On
+          # Docker default log time format example:
+          # 2024-07-23T14:30:00.123456789Z
+          # The %L%z handles the milliseconds and timezone offset.

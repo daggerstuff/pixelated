@@ -1,0 +1,76 @@
+{
+  "discovery_session": {
+    "timestamp": "2026-01-02T00:20:03.938634",
+    "total_time_seconds": 38.20307159423828,
+    "total_time_formatted": "0.6 minutes",
+    "output_directory": "/home/vivi/pixelated/ngc_therapeutic_resources",
+    "successful_downloads": 0,
+    "failed_downloads": 3,
+    "success_rate": "0.0%"
+  },
+  "categories": {
+    "conversational_llms": {
+      "total_resources": 3,
+      "successful": 0,
+      "failed": 3,
+      "resources": {
+        "nvidia/nemo/nemotron-4-340b-instruct": {
+          "status": "error",
+          "resource_path": "nvidia/nemo/nemotron-4-340b-instruct",
+          "category": "conversational_llms",
+          "error": "Failed to download nvidia/nemo/nemotron-4-340b-instruct:latest:\nClient Error: 403 Response: Access Denied - Request Id: 60f56bca-594209 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/nemo/resources/nemotron-4-340b-instruct?resolve-labels=false\n",
+          "download_time": 10.38923192024231,
+          "use_case": "Primary conversation generation and therapeutic dialogue",
+          "description": "Large conversational model optimized for chat use-cases"
+        },
+        "nvidia/nemo/llama-3_1-70b-instruct-nemo": {
+          "status": "error",
+          "resource_path": "nvidia/nemo/llama-3_1-70b-instruct-nemo",
+          "category": "conversational_llms",
+          "error": "Failed to download nvidia/nemo/llama-3_1-70b-instruct-nemo:latest:\nClient Error: 403 Response: Access Denied - Request Id: 6d2ac3df-1060378 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/nemo/resources/llama-3_1-70b-instruct-nemo?resolve-labels=false\n",
+          "download_time": 11.111706972122192,
+          "use_case": "Therapeutic conversation generation and role-playing",
+          "description": "Meta Llama 3.1 70B optimized for instruction following"
+        },
+        "nvidia/nemo/nemotron-3-8b-chat": {
+          "status": "error",
+          "resource_path": "nvidia/nemo/nemotron-3-8b-chat",
+          "category": "conversational_llms",
+          "error": "Failed to download nvidia/nemo/nemotron-3-8b-chat:latest:\nClient Error: 403 Response: Access Denied - Request Id: a628c3c0-1508873 Url: https://api.ngc.nvidia.com/v2/org/nvidia/team/nemo/resources/nemotron-3-8b-chat?resolve-labels=false\n",
+          "download_time": 10.69079852104187,
+          "use_case": "Real-time conversation simulation and testing",
+          "description": "Smaller chat model for faster inference"
+        }
+      }
+    },
+    "speech_models": {
+      "total_resources": 0,
+      "successful": 0,
+      "failed": 0,
+      "resources": {}
+    },
+    "nlp_models": {
+      "total_resources": 0,
+      "successful": 0,
+      "failed": 0,
+      "resources": {}
+    },
+    "frameworks": {
+      "total_resources": 0,
+      "successful": 0,
+      "failed": 0,
+      "resources": {}
+    },
+    "datasets": {
+      "total_resources": 0,
+      "successful": 0,
+      "failed": 0,
+      "resources": {}
+    }
+  },
+  "recommendations": [
+    "\u26a0\ufe0f  Some downloads failed - check network connectivity and NGC permissions",
+    "\ud83d\udd04 Consider retrying failed downloads during off-peak hours",
+    "\ud83d\udcbe Ensure sufficient disk space for large model downloads"
+  ]
+}
