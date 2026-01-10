@@ -59,7 +59,7 @@ This document outlines all variables and secrets that must be configured in Azur
 | Variable Name | Value | Secret? | Description |
 |--------------|-------|---------|-------------|
 | `NODE_VERSION` | `24.8.0` | ❌ No | Node.js version to use |
-| `PNPM_VERSION` | `10.27.0` | ❌ No | pnpm version to use |
+| `PNPM_VERSION` | `10.28.0` | ❌ No | pnpm version to use |
 | `PYTHON_VERSION` | `3.11` | ❌ No | Python version (if needed) |
 | `NODE_ENV` | `production` | ❌ No | Node environment |
 | `GITHUB_ACTIONS` | `false` | ❌ No | Set to false for Azure Pipelines |
@@ -170,7 +170,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 
 **Non-secret variables:**
 - `NODE_VERSION`: `24.8.0`
-- `PNPM_VERSION`: `10.27.0`
+- `PNPM_VERSION`: `10.28.0`
 - `PYTHON_VERSION`: `3.11`
 - `NODE_ENV`: `production`
 - `GITHUB_ACTIONS`: `false`

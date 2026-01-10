@@ -20,7 +20,7 @@ const extraHTTPHeaders =
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
 let webServerPort: number | undefined
-let isRemoteUrl: boolean
+let isRemoteUrl = false
 
 try {
   const url = new URL(baseURL)
@@ -31,11 +31,13 @@ try {
   const explicitPort = url.port ? parseInt(url.port, 10) : null
 
   // Check if BASE_URL is a remote URL (not localhost) - case-insensitive check
-  isRemoteUrl = baseURL &&
-    hostname !== 'localhost' &&
-    hostname !== '127.0.0.1' &&
-    !hostname.startsWith('127.') &&
-    hostname !== '::1'
+  isRemoteUrl = Boolean(
+    baseURL &&
+      hostname !== 'localhost' &&
+      hostname !== '127.0.0.1' &&
+      !hostname.startsWith('127.') &&
+      hostname !== '::1',
+  )
 
   // If localhost, extract port for webServer configuration
   if (!isRemoteUrl) {
