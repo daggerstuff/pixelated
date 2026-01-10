@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { CernerProvider } from '../providers/cerner.provider'
 
 describe('cerner Provider', () => {
@@ -7,6 +8,7 @@ describe('cerner Provider', () => {
     warn: vi.fn(),
   }
 
+  const testId = 'test-id'
   const providerConfig = {
     id: 'test-cerner',
     name: 'Test Cerner Provider',
@@ -27,7 +29,7 @@ describe('cerner Provider', () => {
       providerConfig.clientId,
       providerConfig.clientSecret,
       providerConfig.scopes,
-      mockLogger as unknown as Console,
+      mockLogger as any as Console,
     )
     vi.clearAllMocks()
   })
@@ -39,13 +41,13 @@ describe('cerner Provider', () => {
   describe('initialization', () => {
     it('should successfully initialize provider', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(cernerProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(cernerProvider as any, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock verifyCernerEndpoints to succeed
       vi.spyOn(
-        cernerProvider as unknown,
+        cernerProvider as any,
         'verifyCernerEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -53,7 +55,7 @@ describe('cerner Provider', () => {
       const mockSearchResources = vi
         .fn()
         .mockResolvedValue([{ resourceType: 'CapabilityStatement' }])
-      vi.spyOn(cernerProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(cernerProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -68,7 +70,7 @@ describe('cerner Provider', () => {
 
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
-      vi.spyOn(cernerProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(cernerProvider as any, 'validateEndpoint').mockResolvedValue(
         false,
       )
 
@@ -77,13 +79,13 @@ describe('cerner Provider', () => {
 
     it('should throw error when CapabilityStatement is not found', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(cernerProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(cernerProvider as any, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
       // Mock the FHIR client's searchResources method to return empty array
       const mockSearchResources = vi.fn().mockResolvedValue([])
-      vi.spyOn(cernerProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(cernerProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -94,7 +96,7 @@ describe('cerner Provider', () => {
 
     it('should throw error when required endpoints are not available', async () => {
       // Mock the validateEndpoint method to return true
-      vi.spyOn(cernerProvider as unknown, 'validateEndpoint').mockResolvedValue(
+      vi.spyOn(cernerProvider as any, 'validateEndpoint').mockResolvedValue(
         true,
       )
 
@@ -109,7 +111,7 @@ describe('cerner Provider', () => {
           return Promise.reject(new Error('Endpoint not available'))
         })
 
-      vi.spyOn(cernerProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(cernerProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -148,7 +150,7 @@ describe('cerner Provider', () => {
         providerConfig.clientId,
         providerConfig.clientSecret,
         undefined,
-        mockLogger as unknown as Console,
+        mockLogger as any as Console,
       )
 
       expect(providerWithDefaultScopes.scopes).toContain('system/Patient.read')
