@@ -90,6 +90,10 @@ export default defineConfig({
         runScripts: 'dangerously',
       },
     },
+    reporters: ['default', 'junit'],
+    outputFile: {
+      junit: './coverage/junit.xml',
+    },
     coverage: {
       provider: 'v8',
       enabled:
