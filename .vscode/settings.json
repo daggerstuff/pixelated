@@ -1,4 +1,10 @@
 {
+  "yaml.customTags": [
+    "!override scalar",
+    "!override mapping",
+    "!override sequence"
+  ]
+}{
     "typescript.preferences.includePackageJsonAutoImports": "on",
     "typescript.suggest.autoImports": true,
     "typescript.updateImportsOnFileMove.enabled": "always",
