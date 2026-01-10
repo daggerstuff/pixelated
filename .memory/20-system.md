@@ -1,233 +1,122 @@
-# System Architecture
+# System Architecture Overview
 
-> **Builds on**: `00-description.md`, `01-brief.md`, `10-product.md`  
-> **Focus**: The Structure
-
----
-
-## Architecture Overview
-
-Pixelated Empathy uses a **microservices-based architecture** with clear separation of concerns, enabling scalability, security, and maintainability while maintaining HIPAA compliance.
-
-### High-Level Architecture
+## High-Level Architecture
+Pixelated Empathy follows a microservices architecture with clear separation of concerns:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Client Layer                         │
-│  Astro 5.x + React 19 | UnoCSS | Radix UI              │
-└───────────────────────┬─────────────────────────────────┘
-                        │
-┌───────────────────────▼─────────────────────────────────┐
-│                   API Gateway Layer                     │
-│  REST APIs | WebSocket | Express 5 | Rate Limiting     │
-└───────────────────────┬─────────────────────────────────┘
-                        │
-        ┌───────────────┼───────────────┐
-        │               │               │
-┌───────▼──────┐ ┌──────▼──────┐ ┌─────▼──────┐
-│ Auth Service │ │ AI Services  │ │ Analytics  │
-│ Better Auth  │ │ MentalLLaMA  │ │ Service    │
-│ Azure AD     │ │ Python       │ │ Custom     │
-└──────────────┘ └──────────────┘ └────────────┘
-        │               │               │
-        └───────────────┼───────────────┘
-                        │
-┌───────────────────────▼─────────────────────────────────┐
-│                    Data Layer                           │
-│  MongoDB Atlas | PostgreSQL (Supabase) | Redis         │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│   Frontend      │    │   API Gateway    │    │ Authentication   │
+│   (Astro/React) │◄──►│   (Node.js)      │◄──►│   (Better Auth)  │
+└─────────────────┘    └──────────────────┘    └──────────────────┘
+        │                       │                        │
+        ▼                       ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│ Emotional       │    │ Bias Detection   │    │ Journal Research │
+│ Intelligence    │    │ Service          │    │ Pipeline         │
+│ Engine          │    │ (Python/Flask)   │    │ (Python/FastAPI) │
+└─────────────────┘    └──────────────────┘    └──────────────────┘
+        │                       │                        │
+        ▼                       ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│ Training        │    │ Analytics        │    │ Data Storage     │
+│ Platform        │    │ Dashboard        │    │ (MongoDB/Redis)  │
+│ (React Three)   │    │ (Chart.js)       │    │                  │
+└─────────────────┘    └──────────────────┘    └──────────────────┘
 ```
 
-## Component Breakdown
+## Core Components
 
-### Frontend Layer
+### 1. Frontend Layer
+**Technology**: Astro 5.x + React 19 + TypeScript
+**Location**: `/src/`
+**Key Features**:
+- Responsive design for desktop and mobile
+- Real-time WebSocket communication
+- 3D visualization components (Three.js)
+- Progressive Web App capabilities
 
-**Framework**: Astro 5.x with React 19 integration
+### 2. API Gateway
+**Technology**: Node.js 24 + Express
+**Location**: `/src/server.ts`
+**Responsibilities**:
+- Request routing and load balancing
+- Authentication middleware
+- Rate limiting and security controls
+- Request/response logging
 
-**Key Components:**
-- **Component Structure**: Atomic Design Principles
-- **State Management**: 
-  - Jotai for atomic state
-  - Zustand for global state
-  - React Context for shared context
-- **Styling**: UnoCSS (utility-first), TailwindCSS
-- **UI Components**: Radix UI primitives, custom component library
-- **Accessibility**: WCAG 2.1 AA compliance, ARIA labels, keyboard navigation
+### 3. Emotional Intelligence Engine
+**Technology**: Python 3.11 + PyTorch + Transformers
+**Location**: `/ai/models/`
+**Capabilities**:
+- Sentiment and emotion classification
+- Conversational dynamics analysis
+- Trust and vulnerability detection
+- Persona recognition and adaptation
 
-**Data Flow:**
-1. User actions trigger state changes
-2. State updates propagate to components
-3. Side effects handled by middleware
-4. Server state synchronized via WebSocket
+### 4. Bias Detection Service
+**Technology**: Python + Flask + Fairlearn
+**Location**: `/src/lib/ai/bias-detection/`
+**Features**:
+- Real-time bias identification in text
+- Multiple bias type detection (gender, racial, cultural)
+- Confidence scoring and explanation
+- Continuous learning from feedback
 
-### Backend Layer
+### 5. Journal Research Pipeline
+**Technology**: Python + FastAPI + HuggingFace
+**Location**: `/ai/journal_dataset_research/`
+**Workflow**:
+- Academic database crawling (PubMed, arXiv, IEEE Xplore)
+- Dataset evaluation and scoring
+- Automated acquisition and preprocessing
+- Integration planning and metadata generation
 
-**API Layer:**
-- RESTful endpoints for standard operations
-- WebSocket for real-time communication
-- Express 5 for HTTP server
-- Rate limiting and request validation
-- CORS configuration
+### 6. Training Platform (Empathy Gym™)
+**Technology**: React + Three.js + WebSocket
+**Location**: `/src/components/training/`
+**Components**:
+- Scenario-based training modules
+- AI persona simulation
+- Real-time feedback system
+- Performance analytics
 
-**Core Services:**
-- **Authentication Service**: Better Auth, JWT token management, Azure AD integration
-- **AI Analysis Service**: Custom Python services with MentalLLaMA integration
-- **Bias Detection Service**: Real-time bias monitoring and mitigation
-- **Analytics Service**: Custom analytics with performance tracking
-- **Session Service**: Training session management and state
-- **Knowledge Base Service**: Enhanced psychology knowledge base with 10,960 concepts including therapeutic conversation examples and psychology book references
+### 7. Data Layer
+**Primary**: MongoDB 7.0
+**Cache**: Redis 5.x
+**Storage**: S3-compatible object storage
+**Security**: End-to-end encryption at rest and in transit
 
-**Zero-Knowledge System:**
-- Fully Homomorphic Encryption (FHE) with sub-50ms latency
-- Client-side key generation
-- Secure message passing
-- Zero-knowledge proofs
+## Deployment Architecture
 
-### Data Layer
+### Development
+- Local development with Docker Compose
+- Hot reloading for frontend and backend services
+- Local database instances for testing
 
-**Primary Database**: MongoDB Atlas
-- User data and profiles
-- Session records and transcripts
-- Training progress and analytics
-- System configuration
+### Production
+- Containerized deployment (Docker)
+- Kubernetes orchestration
+- Cloudflare Workers for edge computing
+- Auto-scaling based on demand
+- Multi-region deployment for redundancy
 
-**Secondary Database**: PostgreSQL (via Supabase)
-- Relational data (treatment plans, goals, objectives)
-- User authentication data
-- Audit logs
+## Security Architecture
+- JWT-based authentication with refresh tokens
+- Role-based access control (RBAC)
+- End-to-end encryption for sensitive data
+- Regular security scanning and penetration testing
+- HIPAA-compliant data handling procedures
 
-**Cache Layer**: Redis
-- Session state caching
-- Real-time data
-- Performance optimization
-- Rate limiting data
-
-**Storage**: S3-compatible (AWS, Azure Blob, Google Cloud Storage)
-- File storage
-- Backup data
-- Media files
-
-## Design Patterns
-
-### Microservices Pattern
-- Service isolation for security and scalability
-- Independent deployment and scaling
-- Clear service boundaries
-
-### Repository Pattern
-- Data access abstraction
-- Database-agnostic business logic
-- Easier testing and maintenance
-
-### Factory Pattern
-- Service creation and configuration
-- Provider abstraction (AI models, storage, etc.)
-- Dependency injection
-
-### Observer Pattern
-- Real-time updates via WebSocket
-- Event-driven architecture
-- State synchronization
-
-### Strategy Pattern
-- Multiple AI model providers
-- Different storage backends
-- Pluggable authentication methods
-
-## Data Flow
-
-### Training Session Flow
-
-1. **User Initiates Session**
-   - User selects scenario type
-   - System creates session record
-   - AI client persona initialized
-
-2. **Real-Time Conversation**
-   - User messages sent via WebSocket
-   - AI client responds through MentalLLaMA
-   - Real-time bias detection analyzes input
-   - Feedback provided to user
-
-3. **Session Analysis**
-   - Conversation analyzed for therapeutic techniques
-   - Bias incidents logged
-   - Performance metrics calculated
-   - Feedback report generated
-
-4. **Session Review**
-   - Transcript stored securely
-   - Supervisor can review and annotate
-   - Trainee can reflect on performance
-   - Progress metrics updated
-
-### AI Processing Flow
-
-1. **Input Processing**
-   - Text input validated and sanitized
-   - Sentiment and emotion analysis
-   - Bias detection algorithms run
-   - Context extracted
-
-2. **Model Inference**
-   - MentalLLaMA model processes input
-   - Therapeutic pattern recognition
-   - Response generation
-   - Risk assessment
-
-3. **Output Generation**
-   - Structured response created
-   - Feedback recommendations generated
-   - Performance metrics calculated
-   - Results encrypted and stored
+## Monitoring & Observability
+- OpenTelemetry for distributed tracing
+- Prometheus for metrics collection
+- Grafana for dashboard visualization
+- Sentry for error tracking and reporting
+- Custom health checks for all services
 
 ## Integration Points
-
-### External Services
-
-- **Azure AD**: Authentication and user management
-- **Supabase**: PostgreSQL database and authentication
-- **AWS/Azure/GCP**: Cloud storage and infrastructure
-- **Sentry**: Error tracking and monitoring
-- **MentalLLaMA**: AI model inference
-
-### Internal Services
-
-- **Bias Detection Service**: Real-time bias monitoring
-- **Analytics Service**: Performance tracking and reporting
-- **Session Service**: Training session management
-- **FHE Service**: Privacy-preserving computations
-
-## Non-Functional Requirements
-
-### Security Architecture
-
-- **Encryption**: End-to-end encryption for messages, at-rest encryption for stored data
-- **Access Control**: Role-based access control (RBAC), audit logging
-- **Authentication**: Multi-factor authentication support, JWT token management
-- **Compliance**: HIPAA++ compliance, automated security checks
-
-### Performance Architecture
-
-- **Caching**: Redis for session state and frequently accessed data
-- **CDN**: Static asset delivery via Cloudflare
-- **Load Balancing**: Multi-region deployment with load balancing
-- **Database Optimization**: Indexing, query optimization, connection pooling
-
-### Scalability Architecture
-
-- **Horizontal Scaling**: Microservices can scale independently
-- **Containerization**: Docker containers for consistent deployment
-- **Orchestration**: Kubernetes for container orchestration
-- **Auto-scaling**: Automatic scaling based on load
-
-### Reliability Architecture
-
-- **Redundancy**: Multi-region deployment with failover
-- **Monitoring**: Prometheus and Grafana for metrics
-- **Logging**: Centralized logging with structured logs
-- **Error Handling**: Comprehensive error handling and recovery
-
----
-
-*Last Updated: December 2025*
+- **Academic Databases**: PubMed API, arXiv API, IEEE Xplore API
+- **Cloud Services**: AWS S3, Google Cloud Storage, Cloudflare R2
+- **Authentication**: Auth0, Better Auth
+- **Analytics**: Mixpanel, Google Analytics
+- **Communication**: Twilio for SMS notifications
