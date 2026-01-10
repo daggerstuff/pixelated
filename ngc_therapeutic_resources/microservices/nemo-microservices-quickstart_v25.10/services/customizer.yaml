@@ -1,0 +1,122 @@
+configs:
+
+  customizer_config:
+    content: |
+      run_jobs_local: true
+
+      entity_store_url: http://entity-store:8000
+      nemo_data_store_url: http://datastore:3000
+
+      training:
+        workspace_dir: "/mount/workspace"
+
+      customizationTargets:
+        overrideExistingTargets: true
+        targets:
+          meta/llama-3.2-3b-instruct@2.0:
+            name: llama-3.2-3b-instruct@2.0
+            namespace: meta
+            enabled: true
+            base_model: meta/llama-3.2-3b-instruct
+            model_path: llama32_3b_instruct
+            model_uri: ngc://nvidia/nemo/llama-3_2-3b-instruct:2.0
+            num_parameters: 3000000000
+            precision: bf16-mixed
+
+      customizationConfigTemplates:
+        overrideExistingTemplates: true
+        templates:
+          meta/llama-3.2-3b-instruct@quickstart:
+            name: llama-3.2-3b-instruct@quickstart
+            namespace: meta
+            target: meta/llama-3.2-3b-instruct@2.0
+            training_options:
+              - training_type: sft
+                finetuning_type: lora
+                num_gpus: 1
+                num_nodes: 1
+                tensor_parallel_size: 1
+                micro_batch_size: 1
+              - training_type: distillation
+                finetuning_type: all_weights
+                num_gpus: 2
+                num_nodes: 1
+                tensor_parallel_size: 1
+                micro_batch_size: 1
+            max_seq_length: 4096
+            prompt_template: "{prompt} {completion}"
+
+
+services:
+  customizer-volume-permissions:
+    image: busybox:latest
+    profiles: [customizer, platform]
+    command: |
+      sh -c "
+      mkdir -p /mount/models && chown -R 1000:1000 /mount/models && chmod -R 755 /mount/models &&
+      mkdir -p /mount/workspace && chown -R 1000:1000 /mount/workspace && chmod -R 755 /mount/workspace
+      mkdir -p /app/data && chown -R 1000:1000 /app/data && chmod -R 755 /app/data &&
+      mkdir -p /scratch && chown -R 1000:1000 /scratch && chmod -R 755 /scratch
+      "
+    volumes:
+      - customizer_model_cache:/mount/models
+      - customizer_workspace:/mount/workspace
+      - customizer_app_data:/app/data
+      - customizer_scratch:/scratch
+
+    networks:
+      - nmp
+
+  customizer:
+    image: ${NEMO_MICROSERVICES_IMAGE_REGISTRY}/customizer:${NEMO_MICROSERVICES_IMAGE_TAG}
+    # we don't currently have a cross platform build for customizer
+    platform: linux/amd64
+    profiles: [customizer, platform]
+    ports:
+      - 8001
+    configs:
+      - source: customizer_config
+        target: /mount/cfg/config.yaml
+        gid: "1000"
+        uid: "1000"
+    volumes:
+      - customizer_model_cache:/mount/models
+      - customizer_workspace:/mount/workspace
+      - customizer_app_data:/app/data
+      - customizer_scratch:/scratch
+    environment:
+      - CONFIG_PATH=/mount/cfg/config.yaml
+      - DATABASE_URL=postgresql://nmp:nmp@postgres:5432/customizer
+      - PORT=8001
+      - TOKENIZERS_PARALLELISM=false
+      - OTEL_SDK_DISABLED=true
+      - MODELS_CACHE_PATH=/mount/models
+      - NGC_API_KEY
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8001/v1/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      customizer-volume-permissions:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      datastore:
+        condition: service_started
+    networks:
+      - nmp
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    shm_size: "1G"
+
+volumes:
+  customizer_model_cache:
+  customizer_scratch:
+  customizer_app_data:
+  customizer_workspace:
