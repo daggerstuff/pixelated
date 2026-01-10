@@ -35,6 +35,37 @@ definitions:
         - python --version
         - pip install --no-input --quiet uv pytest
         - uv run pytest -q tests/python/test_quality_scoring_stub.py
+  - step: &lint-typecheck
+      name: Lint & Typecheck
+      image: node:24-bullseye-slim
+      caches:
+        - pnpm
+      script:
+        - corepack enable
+        - corepack prepare pnpm@latest --activate
+        - pnpm install --frozen-lockfile
+        - pnpm lint
+        - pnpm typecheck
+  - step: &security-scan
+      name: Security Scan
+      image: node:24-bullseye-slim
+      caches:
+        - pnpm
+      script:
+        - corepack enable
+        - corepack prepare pnpm@latest --activate
+        - pnpm install --frozen-lockfile
+        - pnpm security:scan
+  - step: &playwright-e2e
+      name: Playwright Smoke E2E
+      image: node:24-bullseye-slim
+      caches:
+        - pnpm
+      script:
+        - corepack enable
+        - corepack prepare pnpm@latest --activate
+        - pnpm install --frozen-lockfile
+        - pnpm test:e2e:smoke
   - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
       size: 2x  # Use 2x build environment for more resources
@@ -67,6 +98,9 @@ pipelines:
     - step: *governance-validate
     - step: *ingestion-stub-check
     - step: *quality-scoring-test
+    - step: *lint-typecheck
+    - step: *security-scan
+    - step: *playwright-e2e
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
   pull-requests:
@@ -74,5 +108,8 @@ pipelines:
     - step: *governance-validate
     - step: *ingestion-stub-check
     - step: *quality-scoring-test
+    - step: *lint-typecheck
+    - step: *security-scan
+    - step: *playwright-e2e
     - step: *build-test-sonarcloud
     - step: *check-quality-gate-sonarcloud
