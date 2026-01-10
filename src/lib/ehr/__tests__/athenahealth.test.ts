@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { AthenahealthProvider } from '../providers/athenahealth.provider'
 
 describe('athenahealth Provider', () => {
@@ -7,6 +8,7 @@ describe('athenahealth Provider', () => {
     warn: vi.fn(),
   }
 
+  const testId = 'test-id'
   const providerConfig = {
     id: 'test-athenahealth',
     name: 'Test Athenahealth Provider',
@@ -45,13 +47,13 @@ describe('athenahealth Provider', () => {
     it('should successfully initialize provider', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(true)
 
       // Mock verifyAthenahealthEndpoints to succeed
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'verifyAthenahealthEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -85,7 +87,7 @@ describe('athenahealth Provider', () => {
       const mockSearchResources = vi
         .fn()
         .mockResolvedValue([mockCapabilityStatement])
-      vi.spyOn(athenahealthProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(athenahealthProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -101,7 +103,7 @@ describe('athenahealth Provider', () => {
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(false)
 
@@ -113,13 +115,13 @@ describe('athenahealth Provider', () => {
     it('should throw error when CapabilityStatement is not found', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(true)
 
       // Mock the FHIR client's searchResources method to return empty array
       const mockSearchResources = vi.fn().mockResolvedValue([])
-      vi.spyOn(athenahealthProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(athenahealthProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -131,7 +133,7 @@ describe('athenahealth Provider', () => {
     it('should throw error when required endpoints are not available', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(true)
 
@@ -172,7 +174,7 @@ describe('athenahealth Provider', () => {
           return Promise.reject(new Error('Endpoint not available'))
         })
 
-      vi.spyOn(athenahealthProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(athenahealthProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -184,13 +186,13 @@ describe('athenahealth Provider', () => {
     it('should throw error when OAuth2 configuration is missing', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(true)
 
       // Mock verifyAthenahealthEndpoints to succeed
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'verifyAthenahealthEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -208,7 +210,7 @@ describe('athenahealth Provider', () => {
         },
       ])
 
-      vi.spyOn(athenahealthProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(athenahealthProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 
@@ -220,13 +222,13 @@ describe('athenahealth Provider', () => {
     it('should throw error when SMART on FHIR endpoints are missing', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'validateEndpoint',
       ).mockResolvedValue(true)
 
       // Mock verifyAthenahealthEndpoints to succeed
       vi.spyOn(
-        athenahealthProvider as unknown,
+        athenahealthProvider as any,
         'verifyAthenahealthEndpoints',
       ).mockResolvedValue(undefined)
 
@@ -245,7 +247,7 @@ describe('athenahealth Provider', () => {
         },
       ])
 
-      vi.spyOn(athenahealthProvider as unknown, 'getClient').mockReturnValue({
+      vi.spyOn(athenahealthProvider as any, 'getClient').mockReturnValue({
         searchResources: mockSearchResources,
       })
 

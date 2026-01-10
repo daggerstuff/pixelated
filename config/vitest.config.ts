@@ -48,6 +48,8 @@ export default defineConfig({
     include: [
       'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'tests/api/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'tests/hooks/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     exclude: [
       'src/tests/simple-browser-compatibility.test.ts',
@@ -60,6 +62,7 @@ export default defineConfig({
       'tests/accessibility/**/*',
       'tests/performance/**/*',
       'tests/security/**/*',
+      'tests/pending-implementation/**/*',
       'backups/**',
       'backups/**/*',
       ...(process.env['CI']

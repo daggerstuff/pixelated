@@ -12,8 +12,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { useMultimodalPixel } from '@/hooks/useMultimodalPixel'
 
-// Mock fetch
-global.fetch = vi.fn()
+// Mock dependencies
+// (removed top-level global.fetch assignment)
 
 // Mock WebSocket
 class MockWebSocket {
@@ -45,12 +45,11 @@ class MockWebSocket {
     static CLOSED = 3
 }
 
-global.WebSocket = MockWebSocket as any
-
 describe('useMultimodalPixel', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        vi.mocked(global.fetch).mockClear()
+        global.fetch = vi.fn()
+        global.WebSocket = MockWebSocket as any
     })
 
     describe('REST Inference - Text Only', () => {
