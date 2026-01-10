@@ -1,5 +1,5 @@
 services:
-  docker: !override
+  docker:
     build:
       context: ./gpu
       dockerfile: Dockerfile
