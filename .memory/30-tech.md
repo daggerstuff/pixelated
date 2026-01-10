@@ -1,301 +1,214 @@
-# Technology Landscape
-
-> **Builds on**: `00-description.md`, `20-system.md`  
-> **Focus**: Tools and Environment
-
----
-
-## Technology Stack
-
-### Frontend Technologies
-
-**Core Framework:**
-- **Astro 5.x**: Meta-framework for content-driven sites
-- **React 19.x**: UI component library
-- **TypeScript 5.x**: Type-safe JavaScript
-
-**Styling:**
-- **UnoCSS**: Utility-first CSS framework
-- **TailwindCSS**: Utility CSS classes
-- **Radix UI**: Accessible component primitives
-
-**State Management:**
-- **Jotai**: Atomic state management
-- **Zustand**: Lightweight global state
-- **React Context**: Shared context management
-- **TanStack Query**: Server state management
-
-**Build Tools:**
-- **Vite**: Build tool and dev server
-- **TypeScript Compiler**: Type checking
-- **Oxlint**: Fast linter
-- **Prettier**: Code formatting
-
-### Backend Technologies
-
-**Runtime:**
-- **Node.js 24+**: JavaScript runtime
-- **TypeScript 5.x**: Type-safe development
-- **Express 5**: Web framework
-
-**API Layer:**
-- **REST APIs**: Standard HTTP endpoints
-- **WebSocket**: Real-time communication
-- **Express Middleware**: Request processing
-
-**Authentication:**
-- **Better Auth**: Authentication library
-- **JWT**: Token-based authentication
-- **Azure AD**: Enterprise authentication
-- **Supabase Auth**: User authentication
-
-**AI/ML Services:**
-- **Python 3.11+**: AI service runtime
-- **PyTorch**: Deep learning framework
-- **TensorFlow.js**: Browser-based ML
-- **MentalLLaMA**: Specialized mental health models
-- **Enhanced Psychology Knowledge Base**: 10,960 concepts including therapeutic conversation examples and psychology book references
-
-### Database Technologies
-
-**Primary Database:**
-- **MongoDB Atlas**: NoSQL document database
-- **Mongoose**: MongoDB ODM
-
-**Secondary Database:**
-- **PostgreSQL**: Relational database (via Supabase)
-- **Drizzle ORM**: Type-safe SQL ORM
-
-**Cache:**
-- **Redis**: In-memory data store
-- **ioredis**: Redis client for Node.js
-
-**Storage:**
-- **AWS S3**: Object storage
-- **Azure Blob Storage**: Cloud storage
-- **Google Cloud Storage**: Object storage
-
-### Infrastructure Technologies
-
-**Containerization:**
-- **Docker**: Container platform
-- **Docker Compose**: Multi-container orchestration
-
-**Orchestration:**
-- **Kubernetes**: Container orchestration
-- **Helm**: Kubernetes package manager
-
-**Cloud Providers:**
-- **AWS**: Primary cloud provider
-- **Azure**: Secondary cloud provider
-- **GCP**: Tertiary cloud provider
-- **Cloudflare**: CDN and edge computing
-
-**CI/CD & Infrastructure as Code:**
-- **GitHub Actions**: CI/CD pipelines
-- **Azure Pipelines**: Enterprise CI/CD
-- **Terraform**: Infrastructure as code with GitLab HTTP remote backend (`terraform/backend.config`) for managing state for the `pixelated-azure-infrastructure` project. Authentication uses `gitlab-ci-token` as the backend username and requires `TF_HTTP_PASSWORD` to be provided via environment variables or pipeline variables (never committed).
-
-**Monitoring:**
-- **Sentry**: Error tracking and performance monitoring
-- **Prometheus**: Metrics collection
-- **Grafana**: Metrics visualization
-
-### Development Tools
-
-**Package Managers:**
-- **pnpm**: Node.js package manager (REQUIRED - no npm/yarn)
-- **uv**: Python package manager (REQUIRED - no pip/conda)
-
-**Testing:**
-- **Vitest**: Unit testing framework
-- **Playwright**: End-to-end testing
-- **pytest**: Python testing framework
-
-**Code Quality:**
-- **Oxlint**: Fast JavaScript/TypeScript linter
-- **ESLint**: JavaScript linter
-- **TypeScript**: Type checking
-- **Prettier**: Code formatting
-
-**Security:**
-- **Automated Security Scanning**: Dependency vulnerability checks
-- **HIPAA Security Scripts**: Compliance verification
-- **Credential Scanning**: Secret detection
+# Technology Stack & Environment
 
 ## Development Environment
 
-### Local Setup
+### Core Languages & Frameworks
+- **JavaScript/TypeScript**: Node.js 24, Astro 5.x, React 19
+- **Python**: 3.11+ with uv package manager
+- **Shell**: Bash/Zsh for scripting and automation
 
-**Prerequisites:**
-- Node.js 24+
-- Python 3.11+
-- pnpm 10.26.2+
-- uv (Python package manager)
-- Docker (for local services)
+### Package Managers
+- **Frontend**: pnpm (monorepo management)
+- **Python**: uv (fast, reliable dependency management)
+- **Containers**: Docker with BuildKit
 
-**Quick Start:**
+### Development Tools
 ```bash
-# Install dependencies
-pnpm install && uv install
+# Essential CLI tools
+pnpm dev              # Start development server
+pnpm dev:all-services # Start all backend services
+pnpm check:all        # Run all checks (lint, typecheck)
+pnpm test:all         # Run all tests
+pnpm security:check   # Security vulnerability scan
+pnpm security:scan    # Comprehensive security audit
 
-# Start development server
-pnpm dev                    # Frontend dev server
-pnpm dev:all-services       # All services
+# Python development
+uv run pytest         # Run Python tests
+uv run black .        # Format Python code
+uv run ruff check .   # Lint Python code
+```
 
-# Run tests
-pnpm test:all              # All tests
-pnpm check:all             # Lint + format + typecheck
+## Backend Services Architecture
+
+### Node.js Services
+Located in `/src/lib/`:
+- `ai/services/` - Core AI service orchestration
+- `analytics/` - Data processing and metrics
+- `jobs/` - Background task processing
+- `services/training/` - Training platform backend
+- `websocket/` - Real-time communication
+
+### Python Services
+Located in `/ai/`:
+- `models/` - Machine learning models and inference
+- `journal_dataset_research/` - Academic research pipeline
+- `bias-detection/` - Bias identification algorithms
+- `dataset_pipeline/` - Data processing workflows
+
+### Database Configuration
+```javascript
+// MongoDB connection
+const mongoConfig = {
+  uri: process.env.MONGODB_URI,
+  dbName: 'pixelated-empathy',
+  options: {
+    retryWrites: true,
+    w: 'majority'
+  }
+};
+
+// Redis cache
+const redisConfig = {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASSWORD
+};
+```
+
+## Infrastructure & Deployment
+
+### Container Orchestration
+- **Docker Compose**: Local development and testing
+- **Kubernetes**: Production deployment
+- **Helm Charts**: Kubernetes package management
+
+### Cloud Providers
+- **Primary**: Cloudflare Workers (edge computing)
+- **Backup**: AWS/GCP for traditional infrastructure
+- **Storage**: Multiple providers (S3, GCS, Cloudflare R2)
+
+### CI/CD Pipeline
+```yaml
+# Key pipeline stages
+1. Code Quality Checks
+   - ESLint/Prettier for JS/TS
+   - Black/Ruff for Python
+   - Security scanning
+
+2. Testing
+   - Unit tests (Vitest, Pytest)
+   - Integration tests
+   - E2E tests (Playwright)
+
+3. Security
+   - Dependency vulnerability scans
+   - Static analysis
+   - Penetration testing
+
+4. Deployment
+   - Staging environment deployment
+   - Production deployment with rollback capability
+```
+
+## Monitoring & Observability Stack
+
+### Logging
+- **Structured Logging**: JSON format with correlation IDs
+- **Log Levels**: DEBUG, INFO, WARN, ERROR, CRITICAL
+- **Storage**: Centralized logging system (ELK stack)
+
+### Metrics Collection
+- **Application Metrics**: Response times, error rates, throughput
+- **Business Metrics**: User engagement, feature adoption
+- **Infrastructure Metrics**: CPU, memory, disk I/O
+
+### Alerting System
+- **Critical Alerts**: System downtime, security incidents
+- **Warning Alerts**: Performance degradation, unusual patterns
+- **Notification Channels**: Slack, Email, SMS
+
+## Development Standards
+
+### Code Quality
+- **TypeScript**: Strict mode with noImplicitAny
+- **Python**: Type hints required, PEP 8 compliance
+- **Testing**: Minimum 80% code coverage
+- **Documentation**: Inline comments and API documentation
+
+### Security Practices
+- **Secrets Management**: Environment variables, HashiCorp Vault
+- **Input Validation**: Sanitize all user inputs
+- **Authentication**: JWT with short-lived tokens
+- **Authorization**: RBAC with principle of least privilege
+
+### Performance Optimization
+- **Caching Strategy**: Multi-level caching (Redis, CDN, browser)
+- **Database Optimization**: Proper indexing, connection pooling
+- **Frontend Optimization**: Code splitting, lazy loading, image optimization
+
+## Local Development Setup
+
+### Prerequisites
+```bash
+# System requirements
+Node.js >= 24
+Python >= 3.11
+Docker >= 20.10
+Git >= 2.30
+
+# Recommended tools
+VS Code with recommended extensions
+Docker Desktop
+MongoDB Compass
+Redis CLI
+```
+
+### Quick Start
+```bash
+# Clone and setup
+git clone <repository>
+cd pixelated
+pnpm setup:dev
+
+# Start development environment
+pnpm dev:all-services
+# Visit http://localhost:5173
 ```
 
 ### Environment Variables
-
-**Required Variables:**
-- Database connection strings (MongoDB, PostgreSQL)
-- Authentication secrets (JWT, Azure AD)
-- AI service API keys (MentalLLaMA)
-- Storage credentials (AWS, Azure, GCP)
-- Encryption keys (FHE)
-
-**Configuration Files:**
-- `.env.local`: Local development variables
-- `.env.example`: Template for required variables
-- `config/`: Application configuration files
-
-### Build & Deployment
-
-**Build Process:**
-- TypeScript compilation
-- Astro build (SSR/SSG)
-- Asset optimization
-- Bundle analysis
-
-**Deployment Targets:**
-- **Vercel**: Frontend deployment
-- **Cloudflare Pages**: Edge deployment
-- **Azure App Service**: Backend services
-- **AWS ECS/EKS**: Containerized services
-- **Kubernetes**: Orchestrated services
-
-**Build Commands:**
+Create `.env` file:
 ```bash
-pnpm build                  # Standard build
-pnpm build:cloudflare      # Cloudflare-specific build
-pnpm build:vercel          # Vercel-specific build
+# Database
+MONGODB_URI=mongodb://localhost:27017/pixelated
+REDIS_URL=redis://localhost:6379
+
+# Authentication
+AUTH_SECRET=your-secret-key
+AUTH0_DOMAIN=your-domain.auth0.com
+
+# API Keys
+OPENAI_API_KEY=sk-...
+HUGGINGFACE_TOKEN=hf_...
+
+# Security
+ENCRYPTION_KEY=32-byte-encryption-key
 ```
 
-## Dependencies
+## Testing Strategy
 
-### Critical Dependencies
+### Test Types
+1. **Unit Tests**: Component and function level testing
+2. **Integration Tests**: Service interaction testing
+3. **E2E Tests**: Full user journey testing
+4. **Performance Tests**: Load and stress testing
+5. **Security Tests**: Vulnerability scanning
 
-**Frontend:**
-- `astro`: 5.16.4
-- `react`: 19.2.1
-- `typescript`: 5.9.3
-- `@unocss/astro`: 66.5.10
+### Test Tools
+- **Frontend**: Vitest, React Testing Library, Playwright
+- **Backend**: Jest, Supertest, Pytest
+- **API Testing**: Postman collections, Newman
+- **Load Testing**: Artillery, k6
 
-**Backend:**
-- `express`: 5.2.1
-- `better-auth`: 1.4.6
-- `mongodb`: 7.0.0
-- `ioredis`: 5.8.2
+## Documentation Standards
 
-**AI/ML:**
-- `@tensorflow/tfjs`: 4.22.0
-- `node-seal`: 7.0.0 (FHE)
+### API Documentation
+- OpenAPI 3.1 specification
+- Interactive API documentation
+- Example requests and responses
+- Error code documentation
 
-### Development Dependencies
-
-**Testing:**
-- `vitest`: 4.0.15
-- `@playwright/test`: 1.57.0
-- `@testing-library/react`: 16.3.0
-
-**Code Quality:**
-- `oxlint`: 1.32.0
-- `eslint`: 9.39.1
-- `prettier`: 3.7.4
-
-## Configuration
-
-### TypeScript Configuration
-
-**Strict Mode**: Enabled
-- No implicit any
-- Strict null checks
-- Strict function types
-- No unused locals/parameters
-
-**Path Aliases:**
-- `@/`: `src/` directory
-- Type-first imports required
-
-### Linting Configuration
-
-**Oxlint**: Primary linter (fast)
-**ESLint**: Secondary linter (comprehensive)
-**Rules**: Enforced via CI/CD pipeline
-
-### Formatting Configuration
-
-**Prettier**: Code formatting
-**Oxfmt**: Fast formatter
-**Rules**: 2 spaces, no semicolons, single quotes, trailing commas
-
-## Tool Chain
-
-### Development Workflow
-
-1. **Code**: Write TypeScript/React code
-2. **Lint**: Run linters (oxlint, ESLint)
-3. **Format**: Auto-format code (Prettier)
-4. **Type Check**: Verify types (TypeScript)
-5. **Test**: Run tests (Vitest, Playwright)
-6. **Build**: Build for production
-7. **Deploy**: Deploy to target environment
-
-### CI/CD Pipeline
-
-**GitHub Actions:**
-- Lint and format checks
-- Type checking
-- Unit tests
-- Integration tests
-- Security scanning
-- Build verification
-
-**Azure Pipelines:**
-- Enterprise CI/CD
-- Multi-environment deployment
-- Security audits
-- Performance testing
-
-## Performance Optimization
-
-### Frontend Optimization
-
-- Code splitting
-- Tree shaking
-- Lazy loading
-- Image optimization
-- Bundle analysis
-
-### Backend Optimization
-
-- Connection pooling
-- Query optimization
-- Caching strategies
-- Load balancing
-- Auto-scaling
-
-### AI/ML Optimization
-
-- Model quantization
-- Batch processing
-- GPU acceleration
-- Caching inference results
-- FHE optimization (<50ms latency)
-
----
-
-*Last Updated: December 2025*
+### Code Documentation
+- JSDoc/TypeDoc for JavaScript/TypeScript
+- Sphinx/docstrings for Python
+- README files for major components
+- Architecture decision records (ADRs)
