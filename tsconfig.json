@@ -3,13 +3,22 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable",
+      "WebWorker"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@lib/*": ["src/lib/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@lib/*": [
+        "src/lib/*"
+      ]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -49,7 +58,10 @@
       "vitest",
       "vitest/globals"
     ],
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
@@ -84,7 +96,6 @@
     "**/secret-scan-artifacts/**",
     "**/security-scan-artifacts/**",
     "ai",
-    "tests",
     "scripts",
     "docs",
     "deploy",
