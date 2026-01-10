@@ -113,6 +113,7 @@ export const TherapistDashboard: FC = () => {
               <div className="flex items-center gap-4">
                 <OfflineIndicator position="inline" />
                 <select
+                  aria-label="Select time range"
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value as any)}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
@@ -317,6 +318,7 @@ const OverviewTab: FC<{
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
+                      aria-label={`Select ${patient.name}`}
                       checked={selectedPatients.includes(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
                       className="w-4 h-4 text-red-600 rounded"
@@ -356,6 +358,7 @@ const OverviewTab: FC<{
                   <div className="flex items-center gap-3 mb-2">
                     <input
                       type="checkbox"
+                      aria-label={`Select ${patient.name}`}
                       checked={selectedPatients.includes(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
                       className="w-4 h-4 text-yellow-600 rounded"
@@ -390,6 +393,7 @@ const OverviewTab: FC<{
               >
                 <input
                   type="checkbox"
+                  aria-label={`Select ${patient.name}`}
                   checked={selectedPatients.includes(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
                   className="w-4 h-4 text-blue-600 rounded"
@@ -450,7 +454,11 @@ const PatientsTab: FC<{
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {selectedPatients.length} selected
           </span>
-          <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+          <button
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+            disabled={selectedPatients.length === 0}
+            aria-disabled={selectedPatients.length === 0}
+          >
             Bulk Actions
           </button>
         </div>
@@ -461,10 +469,14 @@ const PatientsTab: FC<{
           <div className="flex items-center gap-4">
             <input
               type="text"
+              aria-label="Search patients"
               placeholder="Search patients..."
               className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
             />
-            <select className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm">
+            <select
+              aria-label="Filter by risk level"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+            >
               <option>All Risk Levels</option>
               <option>Critical</option>
               <option>High</option>
@@ -483,6 +495,7 @@ const PatientsTab: FC<{
               <div className="flex items-center gap-4">
                 <input
                   type="checkbox"
+                  aria-label={`Select ${patient.name}`}
                   checked={selectedPatients.includes(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
                   className="w-4 h-4 text-blue-600 rounded"
