@@ -3,7 +3,7 @@
     "timestamp": "2026-01-02T00:23:19.471140",
     "total_time_seconds": 70.44187617301941,
     "total_time_formatted": "1.2 minutes",
-    "output_directory": "/home/vivi/pixelated/ngc_public_therapeutic_resources",
+    "output_directory": "/home/vivi/pixelated/ngc_therapeutic_resources",
     "successful_downloads": 1,
     "failed_downloads": 4,
     "success_rate": "20.0%"
@@ -20,7 +20,7 @@
           "resource_path": "nvidia/nemo-microservices/nemo-microservices-quickstart",
           "category": "microservices",
           "type": "resource",
-          "downloaded_path": "/home/vivi/pixelated/ngc_public_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10",
+          "downloaded_path": "/home/vivi/pixelated/ngc_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10",
           "download_time": 17.845728635787964,
           "size_estimate": "Small (~500MB)",
           "use_case": "Deploying conversation models as microservices",
