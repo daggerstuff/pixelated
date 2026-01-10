@@ -194,6 +194,62 @@ stages:
               pnpm typecheck || echo "⚠️ Type checking completed with warnings"
             displayName: 'Run Type Check'
 
+      - job: UnitTests
+        displayName: 'Unit Tests & Coverage'
+        pool:
+          name: 'Default'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '$(NODE_VERSION)'
+            displayName: 'Install Node.js'
+
+          - script: |
+              corepack enable pnpm
+              pnpm install
+            displayName: 'Install Dependencies'
+
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'SonarCloud'
+              organization: 'pixelated-empathy'
+              scannerMode: 'CLI'
+              configMode: 'file'
+              configFile: 'config/sonar-project.properties'
+              extraProperties: |
+                sonar.projectBaseDir=$(Build.SourcesDirectory)
+            displayName: 'Prepare SonarCloud Analysis'
+
+          - script: |
+              export VITEST_COVERAGE_ENABLED=true
+              pnpm run test:unit
+            displayName: 'Run Unit Tests with Coverage'
+            continueOnError: true
+            env:
+              VITEST_COVERAGE_ENABLED: 'true'
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'coverage/junit.xml'
+              mergeTestResults: true
+              failTaskOnFailedTests: true
+            displayName: 'Publish Test Results'
+
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: 'coverage/cobertura-coverage.xml'
+            displayName: 'Publish Code Coverage'
+
+          - task: SonarCloudAnalyze@1
+            displayName: 'Run SonarCloud Analysis'
+
+          - task: SonarCloudPublish@1
+            displayName: 'Publish SonarCloud Quality Gate Result'
+            inputs:
+              pollingTimeoutSec: '300'
+
   - stage: Eval
     displayName: 'Evaluation Gates (therapy-bench, clinical-similarity)'
     dependsOn: Validate
@@ -504,19 +560,41 @@ stages:
                 docker info 2>&1 | { head -n 5; cat > /dev/null; }
 
           - task: Docker@2
-            displayName: 'Build and Push Docker Image'
+            displayName: 'Login to ACR'
             inputs:
+              command: login
               containerRegistry: '$(AZURE_CONTAINER_REGISTRY)'
-              repository: '$(IMAGE_REPOSITORY)'
-              command: 'buildAndPush'
-              Dockerfile: 'docker/Dockerfile'
-              buildContext: '.'
-              tags: |
-                $(Build.BuildNumber)
-                latest
-                $(Build.SourceBranchName)
-              # Note: addPipelineData and addBaseImageData removed to prevent metadata write errors
-              # Custom metadata capture is handled in the next step
+
+          - task: Bash@3
+            displayName: 'Build and Push Docker Image (Script)'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                # Variables
+                REGISTRY="$(DOCKER_REGISTRY)"
+                REPO="$(IMAGE_REPOSITORY)"
+                TAG_BUILD="$(Build.BuildNumber)"
+                TAG_LATEST="latest"
+                TAG_BRANCH="$(Build.SourceBranchName)"
+
+                FULL_IMAGE_NAME="$REGISTRY/$REPO"
+
+                echo "🐳 Building image: $FULL_IMAGE_NAME:$TAG_BUILD"
+
+                # Build and tag
+                docker build \
+                  -f docker/Dockerfile \
+                  -t "$FULL_IMAGE_NAME:$TAG_BUILD" \
+                  -t "$FULL_IMAGE_NAME:$TAG_LATEST" \
+                  -t "$FULL_IMAGE_NAME:$TAG_BRANCH" \
+                  .
+
+                echo "🚀 Pushing images..."
+                docker push "$FULL_IMAGE_NAME:$TAG_BUILD"
+                docker push "$FULL_IMAGE_NAME:$TAG_LATEST"
+                docker push "$FULL_IMAGE_NAME:$TAG_BRANCH"
 
           - script: |
               set -euo pipefail
