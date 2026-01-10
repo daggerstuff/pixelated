@@ -1,0 +1,23 @@
+name: pixelated-empathy/custom-security-queries
+version: 1.0.0
+description: Custom CodeQL queries for HIPAA, FHIR, and EHR security compliance
+groups:
+  - hipaa
+  - fhir
+  - ehr
+  - healthcare
+
+dependencies:
+  codeql/javascript-all: "*"
+  codeql/javascript-queries: "*"
+
+# Extend the JavaScript query pack
+extractor: javascript
+
+# Define the query suites available in this pack
+suites:
+  - name: hipaa-compliance
+    description: HIPAA compliance security checks
+    queries:
+      - fhir-security.ql
+      - ehr-security.ql
