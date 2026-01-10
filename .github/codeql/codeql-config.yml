@@ -1,15 +1,53 @@
-name: 'Security Analysis'
+name: 'Pixelated Empathy Security Analysis'
 
+# Keep default queries enabled
 disable-default-queries: false
 
+# Define query filters to focus on security and quality
+query-filters:
+  - include:
+      kind:
+        - problem
+        - path-problem
+  - exclude:
+      tags contain: experimental
+
+# Specify which paths to analyze
 paths:
   - src
+  - ai
+  - scripts
 
+# Exclude generated code, dependencies, and test files
 paths-ignore:
   - '**/node_modules'
   - '**/dist'
   - '**/build'
+  - '**/.next'
+  - '**/.astro'
   - '**/test'
   - '**/tests'
+  - '**/__tests__'
   - '**/spec'
   - '**/mocks'
+  - '**/__mocks__'
+  - '**/*.test.*'
+  - '**/*.spec.*'
+  - '**/coverage'
+  - '**/.venv'
+  - '**/venv'
+  - '**/site-packages'
+  - '**/__pycache__'
+  - '**/*.pyc'
+  - '**/playwright-report'
+  - '**/test-results'
+
+# Include custom queries for HIPAA/FHIR/EHR security
+queries:
+  - name: FHIR Security Checks
+    uses: ./.github/codeql/custom-queries/fhir-security.ql
+  - name: EHR Security Checks
+    uses: ./.github/codeql/custom-queries/ehr-security.ql
+  # Use additional query packs for comprehensive security analysis
+  - uses: security-extended
+  - uses: security-and-quality
