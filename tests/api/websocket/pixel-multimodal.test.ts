@@ -25,15 +25,13 @@ vi.mock('@/lib/logging/build-safe-logger', () => ({
     }),
 }))
 
-// Mock fetch for Pixel API calls
-global.fetch = vi.fn()
-
 describe('WebSocket /api/websocket/pixel-multimodal', () => {
     let wss: WebSocketServer
     let wsPort = 8091
 
     beforeEach(() => {
         vi.clearAllMocks()
+        global.fetch = vi.fn()
     })
 
     afterEach(() => {
