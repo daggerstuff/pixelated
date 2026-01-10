@@ -55,15 +55,13 @@
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
     "types": [
-      "astro/client",
       "node",
       "react",
       "react-dom",
-      "vitest",
-      "vitest/globals"
+      "vitest"
     ],
     "typeRoots": [
-      "./node_modules/@types",
+      "../node_modules/@types",
       "./src/types"
     ],
     "plugins": [
