@@ -94,7 +94,7 @@ export default defineConfig({
       provider: 'v8',
       enabled:
         !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
-      reporter: ['text', 'json', 'html', 'cobertura'],
+      reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
       exclude: [
         'node_modules/**',
