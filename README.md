@@ -1,3 +1,5 @@
+<div style="text-align: center;">
+
 ![Pixelated Empathy Logo](public/android-chrome-512x512.png)
 
 ## Pixelated Empathy
@@ -11,10 +13,18 @@
 > **We don't just process conversations. We understand them.**  
 > Most platforms see *what* you say. We see *why* you said it, *how* you felt when you said it, and *what* you really needed when you said it.
 
+</div>
+
+<div style="text-align: center;">
+
 In a world where digital interactions generate more noise than connection, **Pixelated Empathy** cuts through the static. We've cracked the code on translating human emotion into actionable intelligence—not through guesswork, but through a sophisticated understanding of the psychological patterns that drive genuine connection.
 
 This isn't just another AI tool. This is **empathy, engineered**.
 
+</div>
+
+
+<div style="text-align: center;">
 
 ## The Empathy Gym™: Where Difficult Conversations Become Safe Practice
 
@@ -26,12 +36,20 @@ Our platform doesn't just simulate conversations; it *embodies* them. Through ou
 
 **This is where empathy gets forged.**
 
+</div>
+
+<div style="text-align: center;">
+
 ### Why Professionals Choose Us:
 *   **Risk-Free Practice:** Master crisis intervention, trauma response, and difficult dialogues in a controlled environment
 *   **Edge-Case Mastery:** Encounter rare but critical scenarios that most professionals go years without experiencing
 *   **Instant Feedback:** Get real-time analysis of your approach, tone, and effectiveness
 *   **Performance Analytics:** Track your growth across dozens of therapeutic competencies
 
+</div>
+
+
+<div style="text-align: center;">
 
 ## The Technology That Sees What Others Miss
 
@@ -46,12 +64,20 @@ Understanding that communication is more than words, our system analyzes the *fl
 ### 🧩 **Persona Intelligence**  
 People aren't static, and neither are our insights. Our Dual-Persona framework recognizes when someone is shifting roles—mentor, peer, or help-seeker—and adapts our analysis accordingly.
 
+</div>
+
+
+<div style="text-align: center;">
 
 ## Built for Those Who Build Communities
 
 This technology is exclusively designed for organizations that understand: **your community isn't your product—it's your purpose.**
 
 We partner with forward-thinking platforms that refuse to accept "engagement" as a substitute for genuine connection.
+
+</div>
+
+<div style="text-align: center;">
 
 ## Journal Dataset Research Pipeline
 
@@ -63,6 +89,10 @@ The platform includes a comprehensive **Journal Dataset Research Pipeline** for 
 - **Backend Engine**: Core research automation with discovery, evaluation, acquisition, and integration planning
 
 All components work together as a unified pipeline, sharing session data and providing multiple access interfaces. See [Journal Research Pipeline Documentation](docs/development/journal-research/journal-research-pipeline.md) for complete details.
+
+</div>
+
+<div style="text-align: center;">
 
 ## Enterprise-Grade. Enterprise-Focused.
 
@@ -79,7 +109,11 @@ Built with the same technologies that power the world's most demanding applicati
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright)
 
+</div>
 
+
+
+<div style="text-align: center;">
 
 ## The Future of Human Connection is Here
 
@@ -95,3 +129,5 @@ Because while others are building better algorithms, we're building better human
 ---
 
 *© 2025 Pixelated Empathy. Engineered with purpose.*
+
+</div>

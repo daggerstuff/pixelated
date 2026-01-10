@@ -1,142 +1,114 @@
-# Project Charter
-
-> **Builds on**: `00-description.md`  
-> **Focus**: What and Why
-
----
+# Project Charter: Pixelated Empathy
 
 ## Vision Statement
+To become the gold standard for emotionally intelligent AI systems that enhance human connection and improve mental health outcomes through scientifically-grounded empathy training and analysis.
 
-Pixelated Empathy transforms mental health professional training by providing a zero-risk, AI-powered simulation environment where therapists can master challenging therapeutic scenarios before encountering them in real practice.
+## What We're Building
+An enterprise-grade platform that combines:
+- Advanced emotional intelligence analysis
+- Professional training simulation environments
+- Academic research dataset integration
+- Real-time bias detection and mitigation
+- Institutional deployment capabilities
+
+## Why It Matters
+Digital communication lacks the emotional nuance of face-to-face interaction. Healthcare professionals need tools to:
+- Practice difficult conversations safely
+- Understand emotional subtext in written communication
+- Identify bias in their own responses
+- Measure empathy improvement over time
+- Scale training programs institutionally
 
 ## Core Requirements
-
 ### Functional Requirements
-
-1. **AI-Powered Training Sessions**
-   - Realistic client simulations across diverse scenarios
-   - Real-time conversation analysis and feedback
-   - Session recording and playback capabilities
-
-2. **Bias Detection & Mitigation**
-   - Real-time identification of cultural, gender, racial, and socioeconomic biases
-   - Actionable feedback for bias correction
-   - Cultural competency training modules
-
-3. **Performance Analytics**
-   - Competency tracking across therapeutic techniques
-   - Progress visualization and trend analysis
-   - Comparative benchmarking (anonymized)
-
-4. **Clinical Supervision Tools**
-   - Supervisor review and feedback capabilities
-   - Session annotation and discussion features
-   - Training program administration
+- ✅ Real-time emotional analysis of text conversations
+- ✅ Journal dataset research pipeline (discovery → evaluation → acquisition → integration)
+- ✅ Bias detection in professional communications
+- ✅ Training simulation environment for mental health professionals
+- ✅ Performance analytics and competency tracking
+- ✅ Multi-platform deployment (web, mobile, API)
+- ✅ HIPAA-compliant data handling
 
 ### Non-Functional Requirements
-
-1. **Security & Compliance**
-   - HIPAA++ compliance (Privacy, Security, Breach Notification Rules)
-   - Fully Homomorphic Encryption for sensitive operations
-   - End-to-end encryption for data in transit and at rest
-   - 6-year audit log retention
-
-2. **Performance**
-   - Sub-200ms AI inference response time
-   - Sub-50ms FHE operation latency
-   - <2s First Contentful Paint
-   - Support for 1000+ concurrent sessions
-
-3. **Accessibility**
-   - WCAG 2.1 Level AA compliance (mandatory)
-   - Full keyboard navigation
-   - Screen reader support
-   - Cognitive accessibility features
-
-4. **Reliability**
-   - 99.9% uptime SLA
-   - Multi-region deployment with redundancy
-   - Automated failover capabilities
+- 99.9% uptime for critical services
+- <200ms response time for real-time analysis
+- SOC2 Type II security compliance
+- GDPR data protection standards
+- Scalable to 100K+ concurrent users
+- Zero-downtime deployment capability
 
 ## Success Criteria
-
 ### Quantitative Metrics
-
-- **Training Effectiveness**: 300% faster skill acquisition vs. traditional methods
-- **Diagnostic Accuracy**: 85% improvement in diagnostic accuracy
-- **User Satisfaction**: 90/100 user satisfaction score
-- **System Performance**: Meet all performance SLA targets
-- **Compliance**: 100% HIPAA compliance verification
+- 25% improvement in empathy scores among trained professionals
+- 95% accuracy in emotional state classification
+- <5% false positive rate in crisis detection
+- 99.9% system availability
+- Sub-200ms average response time
 
 ### Qualitative Goals
-
-- **Professional Validation**: Endorsement from clinical supervisors and training programs
-- **Market Position**: Recognition as leading AI-powered training platform
-- **Ethical Standards**: Zero incidents of AI bias or therapeutic harm
-- **User Trust**: High confidence in platform safety and effectiveness
+- Positive feedback from 90% of training participants
+- Adoption by 50+ healthcare institutions
+- Recognition as industry standard for empathy training
+- Publication of research findings in peer-reviewed journals
 
 ## Stakeholders
+### Primary
+- Mental health professionals (end users)
+- Healthcare administrators (institutional buyers)
+- Training coordinators (program managers)
 
-### Primary Stakeholders
-
-- **Mental Health Professionals**: Licensed therapists, counselors, trainees
-- **Clinical Supervisors**: Educators and training program administrators
-- **Academic Institutions**: Psychology and clinical training programs
-- **Training Organizations**: Professional development providers
-
-### Secondary Stakeholders
-
-- **Regulatory Bodies**: HIPAA compliance auditors, professional licensing boards
-- **Technology Partners**: Cloud providers, AI model providers, security vendors
-- **Research Community**: Academic researchers studying therapeutic training outcomes
+### Secondary
+- Patients/consumers (beneficiaries)
+- Researchers (academic partners)
+- Investors (financial stakeholders)
 
 ## Constraints
+- Must maintain HIPAA compliance
+- Cannot store personally identifiable information
+- Must support offline operation for training scenarios
+- Need to accommodate various institutional IT environments
+- Budget limitations for initial deployment
 
-### Technical Constraints
+## Timeline
+### Phase 1: Foundation (Completed)
+- Core emotional analysis engine
+- Basic training environment
+- Journal research pipeline MVP
 
-- **Package Managers**: Must use `pnpm` for Node.js, `uv` for Python (no alternatives)
-- **Type Safety**: Strict TypeScript, no `any` types without justification
-- **Code Style**: 2 spaces, no semicolons, single quotes, trailing commas
-- **Testing**: Comprehensive test coverage required (TDD approach)
-
-### Business Constraints
-
-- **Budget**: Limited resources for MVP, phased rollout approach
-- **Timeline**: Market pressure for early validation and beta programs
-- **Compliance**: HIPAA compliance is non-negotiable, cannot be compromised
-
-### Regulatory Constraints
-
-- **HIPAA**: Full compliance required before production deployment
-- **Professional Standards**: Must align with APA, ACA, NASW ethical guidelines
-- **Accessibility**: WCAG 2.1 AA compliance is mandatory, not optional
-
-## Timeline & Milestones
-
-### Phase 1: MVP (Months 1-6)
-- Core training session functionality
-- Basic AI client simulations
-- Real-time feedback system
-- HIPAA compliance infrastructure
-
-### Phase 2: Enhanced Features (Months 7-12)
+### Phase 2: Enhancement (Current)
 - Advanced bias detection
-- Performance analytics dashboard
-- Supervisor review tools
-- Expanded scenario library
+- Expanded training scenarios
+- Institutional deployment tools
 
-### Phase 3: Scale & Optimize (Months 13-18)
-- Multi-institution support
-- Advanced analytics
-- Mobile app (if applicable)
-- Performance optimization
+### Phase 3: Scale (Future)
+- Multi-language support
+- Mobile applications
+- Integration with existing healthcare systems
 
-### Phase 4: Enterprise (Months 19-24)
-- Enterprise features and integrations
-- Advanced reporting and analytics
-- EHR integrations (if applicable)
-- International expansion preparation
+## Risks & Mitigation
+### Technical Risks
+- **AI bias in emotional analysis**: Regular auditing and bias correction protocols
+- **Privacy breaches**: End-to-end encryption and regular security assessments
+- **Performance degradation**: Continuous monitoring and auto-scaling
 
----
+### Business Risks
+- **Market adoption resistance**: Pilot programs with leading institutions
+- **Regulatory compliance**: Dedicated compliance team and legal partnerships
+- **Competition from established players**: Focus on specialized empathy training niche
 
-*Last Updated: December 2025*
+## Resources Needed
+### Technical Team
+- AI/ML Engineers (3)
+- Full-stack Developers (4)
+- DevOps Engineers (2)
+- Security Specialists (1)
+
+### Research Partners
+- Psychology researchers
+- Healthcare institutions
+- Academic advisors
+
+### Infrastructure
+- Cloud computing resources (AWS/GCP)
+- GPU instances for model training
+- Secure data storage solutions
