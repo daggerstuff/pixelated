@@ -1,6 +1,7 @@
 /**
  * This file is loaded before all tests across the entire project
  */
+import { afterEach, beforeEach, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import '../src/test/setup-react19'
 
