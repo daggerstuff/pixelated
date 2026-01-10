@@ -1,221 +1,302 @@
-# Domain & Project Knowledge
+# Project Knowledge Base & Learning Repository
 
-> **Builds on**: All previous memory files  
-> **Focus**: Learnings and Context
+## Core Concepts
 
----
+### Emotional Intelligence Engine
+The heart of Pixelated Empathy analyzes conversations through multiple dimensions:
 
-## Domain Concepts
+**Primary Analysis Layers**:
+1. **Sentiment Classification**: Positive, negative, neutral intensity scoring
+2. **Emotion Recognition**: Joy, sadness, anger, fear, surprise, disgust with granular intensity
+3. **Vulnerability Detection**: Identifies openness, trust indicators, emotional exposure
+4. **Trust Building Signals**: Recognizes rapport establishment moments
+5. **Conversational Dynamics**: Analyzes turn-taking, response timing, emotional reciprocity
 
-### Mental Health Training
+**Technical Implementation**:
+- Transformer-based models fine-tuned on therapeutic conversation datasets
+- Ensemble approach combining multiple models for accuracy
+- Real-time processing with <200ms response time target
+- Confidence scoring with uncertainty quantification
 
-**Therapeutic Scenarios:**
-- Crisis intervention (suicidal ideation, self-harm, psychosis)
-- Trauma response (PTSD, complex trauma)
-- Personality disorders with boundary-testing behaviors
-- Substance use disorders with denial/manipulation patterns
-- Cultural competency and diverse population interactions
+### Bias Detection Framework
+Multi-layered approach to identifying bias in professional communications:
 
-**Training Objectives:**
-- Zero-risk practice environment
-- Realistic AI-powered simulations
-- Real-time feedback and bias detection
-- Performance analytics and progress tracking
-- Edge case mastery
-- Enhanced with comprehensive psychology knowledge base (10,960 concepts including therapeutic conversation examples and psychology book references)
+**Bias Categories Detected**:
+- Demographic bias (gender, age, race, ethnicity)
+- Cultural bias and stereotyping
+- Linguistic bias in professional settings
+- Implicit bias patterns in therapeutic contexts
 
-### Psychological Frameworks
+**Detection Methods**:
+- Statistical parity analysis
+- Equal opportunity measurement
+- Counterfactual fairness testing
+- Adversarial debiasing techniques
 
-**Emotion Models:**
-- **Plutchik's Emotion Model**: 8 basic emotions (joy, trust, fear, surprise, sadness, disgust, anger, anticipation)
-- **PAD Model**: Pleasure-Arousal-Dominance dimensional model
-- **Big Five Personality Traits**: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
+### Journal Research Pipeline
+Automated system for discovering and evaluating academic datasets:
 
-**Clinical Frameworks:**
-- **DSM-5-TR**: Diagnostic and Statistical Manual of Mental Disorders
-- **Evidence-Based Practice**: Grounded in research and clinical validation
-- **Therapeutic Techniques**: CBT, DBT, trauma-informed care, cultural competency
+**Discovery Process**:
+1. **Source Crawling**: PubMed, arXiv, IEEE Xplore, PsycINFO
+2. **Relevance Filtering**: Keyword matching, citation analysis, author reputation
+3. **Quality Assessment**: Methodology evaluation, sample size analysis, peer review status
+4. **Integration Planning**: Metadata extraction, preprocessing requirements, licensing verification
 
-### AI/ML Concepts
+**Evaluation Criteria**:
+- Clinical relevance and validity
+- Dataset quality and completeness
+- Ethical considerations and consent documentation
+- Technical feasibility for integration
 
-**Mental Health AI:**
-- **MentalLLaMA**: Specialized mental health language models (7B, 13B)
-- **Emotion Recognition**: Multi-modal emotion detection from text, audio, video
-- **Bias Detection**: Real-time identification of cultural, gender, racial, socioeconomic biases
-- **Therapeutic Pattern Recognition**: Analysis of therapeutic techniques and effectiveness
-- **Enhanced Psychology Knowledge Base**: 10,960 concepts including therapeutic conversation examples and psychology book references
+## System Architecture Patterns
 
-**Privacy-Preserving AI:**
-- **Fully Homomorphic Encryption (FHE)**: Compute on encrypted data without decryption
-- **Sub-50ms Latency**: Performance requirement for FHE operations
-- **Zero-Knowledge Architecture**: Minimal data collection, transparent policies
+### Microservices Communication
+Services communicate through well-defined APIs with:
+- **Event-driven architecture** for asynchronous operations
+- **RESTful APIs** for synchronous requests
+- **Message queues** (Redis) for background processing
+- **WebSocket connections** for real-time updates
 
----
-
-## Relationship Map
-
-### Key System Relationships
-
+### Data Flow Patterns
 ```
-User (Therapist/Trainee)
-  ├── Training Session
-  │     ├── AI Client Simulation
-  │     ├── Real-time Feedback
-  │     └── Bias Detection
-  │
-  ├── Performance Analytics
-  │     ├── Competency Scores
-  │     ├── Progress Tracking
-  │     └── Comparative Benchmarking
-  │
-  └── Session Review
-        ├── Transcript
-        ├── Supervisor Feedback
-        └── Self-Reflection
-
-AI Services
-  ├── MentalLLaMA Models
-  │     ├── 7B Model
-  │     └── 13B Model
-  │
-  ├── Bias Detection Service
-  │     └── Real-time Monitoring
-  │
-  └── Analytics Service
-        └── Performance Tracking
-
-Data Layer
-  ├── MongoDB Atlas (Primary)
-  ├── PostgreSQL/Supabase (Relational)
-  └── Redis (Cache)
+User Input → API Gateway → Authentication → Service Router → 
+Processing Service → Database → Cache → Response → Client
 ```
 
-### Component Dependencies
+### Error Handling Strategy
+- **Graceful degradation** for non-critical failures
+- **Circuit breaker pattern** for external service calls
+- **Retry mechanisms** with exponential backoff
+- **Comprehensive logging** for debugging and monitoring
 
-- **Frontend** → **API Layer** → **Core Services** → **Data Layer**
-- **AI Services** → **MentalLLaMA Models** → **Python Services**
-- **Authentication** → **Better Auth** → **Azure AD / Supabase Auth**
-- **Storage** → **S3/Azure Blob/GCS** → **Encrypted Storage**
+## Development Best Practices
 
----
+### Code Quality Standards
+**TypeScript Guidelines**:
+- Strict mode enabled (`strict: true`)
+- Explicit typing for all functions and variables
+- No unused variables or imports
+- Consistent naming conventions (camelCase for variables, PascalCase for classes)
 
-## Repository Knowledge
+**Python Standards**:
+- Type hints required for all functions
+- PEP 8 compliance enforced
+- Docstrings for all public functions
+- Black formatting with 100-character line limit
 
-### Layout
-- `.memory/`: authoritative memory bank (00–70)
-- `memory-bank/`: mirrored memory bank + historical entries
-- `ai/`: Python AI services and dataset/research pipelines (large)
-- `ai/training_ready/`: training assets, manifests, configs, and platform sync scripts (for example `platforms/ovh/sync-datasets.sh`)
-- `ai/datasets/`: psychology datasets including xmu_psych_books and psychology-10k
-- `ai/dataset_pipeline/`: processing pipelines for psychology datasets
+### Testing Strategies
+**Coverage Requirements**:
+- Unit tests: Minimum 80% coverage
+- Integration tests: Critical path coverage
+- E2E tests: Key user journeys
+- Performance tests: Load and stress scenarios
 
-### Current Working-Tree Note (Dec 2025)
-- `ai/` (and its `training_ready/` subtree) lives inside this repo’s filesystem but is managed as a **separate git repository**; its tracking state is defined there, not in the `pixelated` repo.
+**Testing Tools**:
+- Frontend: Vitest + React Testing Library
+- Backend: Jest + Supertest
+- Python: Pytest with asyncio support
+- E2E: Playwright with multiple browser support
 
----
+### Security Practices
+**Input Validation**:
+- Server-side validation for all inputs
+- Sanitization of user-generated content
+- Parameterized queries to prevent SQL injection
+- Content Security Policy implementation
 
-## Resources
+**Authentication Security**:
+- JWT tokens with short expiration
+- Refresh token rotation
+- Secure cookie attributes (HttpOnly, SameSite)
+- Rate limiting on authentication endpoints
 
-### Documentation
+## Troubleshooting Guides
 
-- **Project Description (Authoritative)**: `.memory/00-description.md`
-- **Architecture Docs**: `src/content/docs/architecture/`
-- **Code Guidelines**: `CLAUDE.md`, `AGENTS.md`
+### Common Development Issues
 
-### Codebase Patterns
+**TypeScript Compilation Errors**:
+```bash
+# Clear cache and rebuild
+rm -rf node_modules/.cache
+pnpm typecheck --clean
 
-**Component Organization:**
-- `src/components/`: Domain-organized React components
-- `src/lib/`: Core libraries and services (including `logging/build-safe-logger` used for PHI audit logging)
-- `src/pages/`: Astro pages and API routes
-- `src/config.ts`: Site, UI, and feature configuration with PHI audit logging on module load
-- `src/types.ts`: Shared type definitions (including PHI-related structures) with PHI audit logging on module access
-- `ai/`: Python AI services and models
+# Check specific file issues
+npx tsc --noEmit --watch src/problematic-file.ts
+```
 
-**Naming Conventions:**
-- Components: PascalCase (`BiasDetectionEngine.tsx`)
-- Files: kebab-case for pages, camelCase for utilities
-- Functions: camelCase
-- Types/Interfaces: PascalCase
+**Python Dependency Conflicts**:
+```bash
+# Use uv for faster resolution
+uv sync --refresh
+uv pip compile pyproject.toml --upgrade
 
----
+# Clear Python cache
+find . -name "*.pyc" -delete
+```
 
-## Best Practices
+**Docker Build Failures**:
+```bash
+# Clean build context
+docker system prune -a
+docker builder prune --all
 
-### Development Practices
+# Multi-stage build debugging
+docker build --target=builder -t debug-image .
+```
 
-1. **Type Safety First**
-   - Strict TypeScript, no `any` without justification
-   - Type-first imports with `@/` aliases
-   - Branded types for critical values
+### Performance Optimization Tips
 
-2. **Test-Driven Development**
-   - Write tests first (TDD)
-   - Comprehensive test coverage
-   - Integration and E2E testing
+**Database Queries**:
+- Use indexes strategically (compound indexes for multi-field queries)
+- Implement pagination for large result sets
+- Use aggregation pipelines for complex operations
+- Monitor slow query logs regularly
 
-3. **Security-First Mindset**
-   - Never expose sensitive data
-   - Validate all input
-   - HIPAA compliance in all data handling
+**Frontend Performance**:
+- Code splitting for route-based chunks
+- Image optimization (WebP format, responsive sizing)
+- Lazy loading for non-critical components
+- Bundle analysis to identify large dependencies
 
-4. **Code Quality**
-   - Follow style guide (2 spaces, no semicolons, single quotes)
-   - Run `pnpm check:all` before committing
-   - Clean code principles
+**API Performance**:
+- Implement caching strategies (Redis for frequently accessed data)
+- Use connection pooling for database connections
+- Optimize serialization/deserialization
+- Implement request batching where appropriate
 
-### AI/ML Practices
+## Useful Commands & Scripts
 
-1. **Ethical AI**
-   - No stereotypes or psychological harm
-   - Validate all psychological constructs
-   - Cultural sensitivity and inclusivity
+### Development Workflow
+```bash
+# Start full development environment
+pnpm dev:all-services
 
-2. **Bias Mitigation**
-   - Real-time bias detection
-   - Diverse training data
-   - Expert oversight
+# Run all checks and tests
+pnpm check:all && pnpm test:all
 
-3. **Privacy Preservation**
-   - FHE for sensitive operations
-   - Minimal data collection
-   - Transparent policies
+# Security scanning
+pnpm security:check && pnpm security:scan
 
-4. **Knowledge Base Enhancement**
-   - Comprehensive dataset integration
-   - Evidence-based content validation
-   - Continuous expansion and refinement
+# Database operations
+pnpm mongodb:seed
+pnpm mongodb:migrate
+```
 
-### Mental Health Practices
+### Debugging Tools
+```bash
+# TypeScript debugging
+pnpm ts:debug:verbose
 
-1. **Evidence-Based**
-   - Ground in established frameworks
-   - Clinical validation
-   - Research-backed approaches
+# Memory profiling
+node --inspect-brk src/server.ts
 
-2. **Safety First**
-   - Crisis detection and response
-   - Clear limitations
-   - Professional oversight
+# Network debugging
+DEBUG=* pnpm dev
 
-3. **Cultural Competency**
-   - Diverse scenarios and personas
-   - Bias detection and correction
-   - Inclusive design
+# Database profiling
+mongosh --eval "db.currentOp()"
+```
 
----
+### Deployment Utilities
+```bash
+# Build for different targets
+pnpm build:vercel
+pnpm build:cloudflare
+pnpm build:analyze
 
-## FAQ
+# Test deployment locally
+docker-compose -f docker/docker-compose.prod.yml up --build
 
-**Q: Why pnpm instead of npm/yarn?**
-A: pnpm is faster, more disk-efficient, and has strict dependency resolution. It's required for consistency.
+# Health checks
+curl -f http://localhost:4321/api/health
+```
 
-**Q: Why uv instead of pip/conda?**
-A: uv is a modern Python package manager that's faster than pip and provides better dependency management.
+## External Resources & Documentation
 
-**Q: How is HIPAA compliance maintained?**
-A: End-to-end encryption, at-rest encryption, FHE for sensitive operations, 6-year audit logs, automated compliance checks.
+### Official Documentation
+- [Astro Documentation](https://docs.astro.build)
+- [React 19 Beta Docs](https://beta.reactjs.org)
+- [MongoDB Manual](https://www.mongodb.com/docs/manual/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com)
 
----
+### Research Papers & References
+- Emotional intelligence in AI systems
+- Bias detection in NLP models
+- Therapeutic conversation analysis
+- Healthcare data privacy regulations
 
-*Last Updated: December 2025*
+### Community Resources
+- Stack Overflow tags: [pixelated-empathy], [emotional-ai]
+- GitHub discussions in project repository
+- Discord community server
+- Monthly virtual meetups
+
+## Team Knowledge Sharing
+
+### Onboarding Checklist
+- [ ] Access to development environments
+- [ ] Review of architecture documentation
+- [ ] Pair programming session with senior developer
+- [ ] Security training completion
+- [ ] HIPAA compliance certification
+
+### Cross-Team Communication
+- Daily standups: 9:00 AM PST
+- Architecture review: Fridays 2:00 PM PST
+- Knowledge sharing sessions: Wednesdays 3:00 PM PST
+- Incident retrospectives: Post-incident analysis meetings
+
+### Documentation Maintenance
+- Update relevant docs with each significant change
+- Review and refresh documentation quarterly
+- Archive deprecated documentation with clear notices
+- Maintain glossary of technical terms and acronyms
+
+## Glossary of Terms
+
+**AIT**: Artificial Intelligence Therapy assistant
+**HIPAA**: Health Insurance Portability and Accountability Act
+**PWA**: Progressive Web Application
+**RBAC**: Role-Based Access Control
+**SOC2**: Service Organization Control 2 compliance standard
+**WASM**: WebAssembly for performance-critical computations
+
+## Quick Reference Cards
+
+### Environment Variables
+```bash
+# Required for development
+MONGODB_URI=mongodb://localhost:27017/pixelated
+REDIS_URL=redis://localhost:6379
+AUTH_SECRET=your-jwt-secret
+OPENAI_API_KEY=sk-...
+
+# Optional for enhanced features
+SENTRY_DSN=https://...
+CLOUDFLARE_ACCOUNT_ID=...
+AWS_ACCESS_KEY_ID=...
+```
+
+### Common API Endpoints
+```
+GET  /api/health           - System health check
+POST /api/emotions/analyze - Emotional analysis
+POST /api/bias/detect      - Bias detection
+GET  /api/training/scenarios - Available training modules
+POST /api/research/search  - Journal research queries
+```
+
+### Git Workflow
+```bash
+# Feature branch workflow
+git checkout -b feature/new-feature-name
+git add .
+git commit -m "feat: brief description of changes"
+git push origin feature/new-feature-name
+
+# Pull request process
+# 1. Create PR with detailed description
+# 2. Request code review from 2+ team members
+# 3. Address feedback and iterate
+# 4. Merge after approval and CI passes
+```
