@@ -41,6 +41,11 @@ export type AuthenticationEvent =
   | 'hipaa_violation_detected'
   | 'compliance_audit_passed'
   | 'compliance_audit_failed'
+  | 'social_auth_completed'
+  | `social_account_linked_${string}`
+  | `social_account_unlinked_${string}`
+  | `role_assigned_${string}`
+  | `role_removed_${string}`
 
 /**
  * Update Phase 6 authentication progress

@@ -21,13 +21,27 @@ export enum EventPriority {
 
 // Schema definitions
 export const EventDataSchema = z.object({
-  type: z.nativeEnum(EventType),
-  priority: z.nativeEnum(EventPriority).default(EventPriority.NORMAL),
+  type: z.enum([
+    EventType.PAGE_VIEW,
+    EventType.USER_ACTION,
+    EventType.THERAPY_SESSION,
+    EventType.NOTIFICATION,
+    EventType.ERROR,
+    EventType.SECURITY,
+    EventType.PERFORMANCE,
+    EventType.CUSTOM,
+  ]),
+  priority: z.enum([
+    EventPriority.LOW,
+    EventPriority.NORMAL,
+    EventPriority.HIGH,
+    EventPriority.CRITICAL,
+  ]).default(EventPriority.NORMAL),
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   timestamp: z.number().default(() => Date.now()),
-  properties: z.record(z.unknown()).default({}),
-  metadata: z.record(z.unknown()).default({}),
+  properties: z.any().default({}),
+  metadata: z.any().default({}),
 })
 
 export type EventData = z.infer<typeof EventDataSchema>
@@ -44,7 +58,7 @@ export const MetricSchema = z.object({
   name: z.string(),
   value: z.number(),
   timestamp: z.number().default(() => Date.now()),
-  tags: z.record(z.string()).default({}),
+  tags: z.any().default({}),
 })
 
 export type Metric = z.infer<typeof MetricSchema>
