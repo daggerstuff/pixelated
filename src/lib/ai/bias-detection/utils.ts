@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import crypto from 'node:crypto'
+import * as crypto from 'node:crypto'
 import type {
   ParticipantDemographics,
   TherapeuticSession,
@@ -42,7 +42,7 @@ const TherapeuticSessionSchema = z.object({
     therapeuticInterventions: z.array(z.string()),
     patientResponses: z.array(z.string()),
     sessionNotes: z.string(),
-    assessmentResults: z.record(z.unknown()).optional(),
+    assessmentResults: z.record(z.string(), z.unknown()).optional(),
   }),
   aiResponses: z.array(
     z.object({
@@ -112,9 +112,9 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
   const normalizeDate = (d: any) => (typeof d === 'string' ? new Date(d) : d)
   const aiResponses = Array.isArray(session.aiResponses)
     ? session.aiResponses.map((r: any) => ({
-        ...r,
-        timestamp: normalizeDate(r.timestamp),
-      }))
+      ...r,
+      timestamp: normalizeDate(r.timestamp),
+    }))
     : []
   const normalized: TherapeuticSession = {
     ...session,
@@ -416,7 +416,7 @@ export function handleBiasDetectionError(
 export function transformSessionForPython(session: TherapeuticSession): any {
   return {
     session_id: session.sessionId,
-    timestamp: session.timestamp.toISOString(),
+    timestamp: (session.timestamp ?? new Date()).toISOString(),
     participant_demographics: {
       age: session.participantDemographics.age,
       gender: session.participantDemographics.gender,

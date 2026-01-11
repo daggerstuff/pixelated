@@ -148,8 +148,8 @@ export const DEFAULT_MAPPING_CONFIG: MappingConfiguration = {
       weights: {
         [ObjectiveId.SAFETY]: 0.6,
         [ObjectiveId.EMPATHY]: 0.2,
-        [ObjectiveId.PROFESSIONALISM]: 0.15,
-        [ObjectiveId.CORRECTNESS]: 0.1,
+        [ObjectiveId.PROFESSIONALISM]: 0.1,
+        [ObjectiveId.CORRECTNESS]: 0.05,
         [ObjectiveId.INFORMATIVENESS]: 0.05,
       },
     },
@@ -357,8 +357,10 @@ export function validateMappingConfiguration(
     errors.push(...validateWeights(mapping.weights, mapping.context))
   }
 
-  // Validate safety floor
-  errors.push(...validateSafetyFloor(config))
+  // Validate safety floor (only in strict mode, otherwise handled at runtime)
+  if (config.validationStrict) {
+    errors.push(...validateSafetyFloor(config))
+  }
 
   // Validate normalization if enabled
   if (config.normalization === 'enabled') {

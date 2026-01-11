@@ -240,6 +240,11 @@ export interface AIResponse {
   responseId: string
   text: string
   timestamp: Date
+  type?: 'diagnostic' | 'intervention' | 'risk-assessment' | 'recommendation'
+  content?: string
+  confidence?: number
+  modelUsed?: string
+  reasoning?: string
   metadata?: Record<string, any>
 }
 
@@ -251,8 +256,12 @@ export interface ExpectedOutcome {
 
 export interface SessionTranscript {
   speaker: 'user' | 'therapist' | 'ai'
+  speakerId?: string
   text: string
+  content?: string
   timestamp: Date
+  emotionalTone?: string
+  confidenceLevel?: number
 }
 
 export interface SessionMetadata {
@@ -355,6 +364,7 @@ export interface BiasAnalysisResult {
   recommendations: string[]
   timestamp: Date
   demographics?: ParticipantDemographics
+  explanation?: string
   error?: string
 }
 
@@ -366,9 +376,10 @@ export interface BiasAlert {
   timestamp: Date | string
   level: AlertLevel
   message: string
-  biasScore: number
+  biasScore?: number
   acknowledged?: boolean
   status?: string
+  resolvedAt?: Date
 }
 
 export interface BiasDashboardSummary {
@@ -387,6 +398,7 @@ export interface DashboardRecommendation {
   description: string
   priority: 'low' | 'medium' | 'high' | 'critical'
   impact: string
+  action: string
   actionUrl?: string
 }
 
@@ -623,4 +635,40 @@ export interface ConfigurationUpdate {
     impact: 'low' | 'medium' | 'high' | 'critical'
     requiresRestart: boolean
   }>
+}
+
+export interface BiasSummaryStats {
+  totalSessions: number
+  averageBiasScore: number
+  alertsLayerBreakdown: Record<string, number>
+  alertsLast24h: number
+  activeAlerts: number
+  trendDirection: 'up' | 'down' | 'stable'
+  alerts: Record<AlertLevel, number>
+  criticalIssues: number
+  improvementRate: number
+  complianceScore: number
+}
+
+export interface BiasTrendData {
+  date: string
+  biasScore: number
+  sessionCount: number
+  alertCount: number
+  demographicBreakdown: Record<string, number>
+}
+
+export interface DemographicBreakdown {
+  [dimension: string]: {
+    [value: string]: {
+      count: number
+      averageBias: number
+    }
+  }
+}
+
+export interface BiasDetectionEvent {
+  type: string
+  payload: any
+  timestamp: Date
 }

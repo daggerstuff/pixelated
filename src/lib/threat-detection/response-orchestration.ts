@@ -7,7 +7,7 @@ import { EventEmitter } from 'events'
 import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
 import * as tf from '@tensorflow/tfjs'
-import crypto from 'node:crypto'
+import * as crypto from 'node:crypto'
 
 export interface ThreatResponse {
   responseId: string
@@ -32,6 +32,8 @@ export interface ResponseAction {
   timeout: number
   rollbackStrategy?: string
   validationRules?: ValidationRule[]
+  timestamp?: string | Date
+  metadata?: Record<string, unknown>
 }
 
 export interface ValidationRule {
@@ -94,12 +96,12 @@ export interface ResponseOrchestrationService {
   validateAction(action: ResponseAction): Promise<boolean>
   escalateThreat(threatId: string, reason: string): Promise<ThreatResponse>
   integrateWithSystems(response: ThreatResponse): Promise<void>
+  isHealthy(): Promise<boolean>
 }
 
 export class AdvancedResponseOrchestrator
   extends EventEmitter
-  implements ResponseOrchestrationService
-{
+  implements ResponseOrchestrationService {
   private redis!: Redis
   private mongoClient!: MongoClient
   private responseExecutor!: ResponseExecutor
@@ -375,6 +377,7 @@ export class AdvancedResponseOrchestrator
       confidence,
       riskFactors: mlAnalysis.riskFactors,
       recommendedActions: mlAnalysis.recommendedActions,
+      patterns: (mlAnalysis.riskFactors.patternMatches as string[]) || [],
       analysisTimestamp: new Date(),
     }
   }
@@ -583,6 +586,7 @@ export class AdvancedResponseOrchestrator
       confidence: response.confidence,
       riskFactors: {},
       recommendedActions: response.actions.map((a) => a.actionType),
+      patterns: [],
       analysisTimestamp: new Date(),
     })
 
@@ -663,7 +667,7 @@ export class AdvancedResponseOrchestrator
         const fn = randomBytes as (size: number) => Buffer
         return `${prefix}${fn(16).toString('hex')}`
       }
-    } catch (_e) {
+    } catch {
       // ignore
     }
     return `${prefix}${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
@@ -742,20 +746,38 @@ export class AdvancedResponseOrchestrator
     await this.mongoClient.close()
     this.emit('orchestrator_shutdown')
   }
+
+  async isHealthy(): Promise<boolean> {
+    try {
+      // Check Redis connection
+      const redisStatus = await this.redis.ping()
+      if (redisStatus !== 'PONG') return false
+
+      // Check MongoDB connection
+      await this.mongoClient.db('admin').command({ ping: 1 })
+
+      return true
+    } catch (error) {
+      console.error('Orchestrator health check failed:', error)
+      return false
+    }
+  }
 }
 
 // Supporting interfaces and classes
-interface ThreatAnalysis {
+// Supporting interfaces and classes
+export interface ThreatAnalysis {
   threatId: string
   severity: ThreatResponse['severity']
   estimatedImpact: number
   confidence: number
   riskFactors: Record<string, unknown>
   recommendedActions: string[]
+  patterns: string[]
   analysisTimestamp: Date
 }
 
-interface ResponseStrategy {
+export interface ResponseStrategy {
   primaryType: ThreatResponse['responseType']
   escalationLevel: number
   requiresHumanReview: boolean
@@ -763,7 +785,7 @@ interface ResponseStrategy {
   notificationPriority: number
 }
 
-interface ExecutionResult {
+export interface ExecutionResult {
   actionId: string
   success: boolean
   error?: string
@@ -784,11 +806,14 @@ interface ThreatPrediction {
   riskLevel: number
 }
 
-interface ThreatData {
+export interface ThreatData {
   threatId: string
+  source?: string
+  timestamp?: string | Date
+  riskFactors?: Record<string, any>
   anomalyScore?: number
   frequency?: number
-  severity?: number
+  severity?: number | 'low' | 'medium' | 'high' | 'critical'
   impact?: number
   userRiskScore?: number
   ipRiskScore?: number
@@ -971,10 +996,14 @@ class MLDecisionEngine extends DecisionEngine {
   private extractFeatures(threatData: unknown): number[] {
     // Extract relevant features for ML analysis
     const data = threatData as ThreatData
+    const severityScore = typeof data.severity === 'number'
+      ? data.severity
+      : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] || 0
+
     return [
       data.anomalyScore || 0,
       data.frequency || 0,
-      data.severity || 0,
+      severityScore,
       data.impact || 0,
       data.userRiskScore || 0,
       data.ipRiskScore || 0,
@@ -1196,4 +1225,11 @@ class MultiChannelNotificationManager extends NotificationManager {
     // Implement SMS notification
     console.log(`Sending SMS notification for response ${response.responseId}`)
   }
+}
+
+export interface RateLimitResult {
+  allowed: boolean
+  remaining: number
+  resetTime: number
+  metadata?: Record<string, unknown>
 }

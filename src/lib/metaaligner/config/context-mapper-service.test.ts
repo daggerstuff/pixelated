@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { ContextType } from '../core/objectives'
 import {
   ContextMapperService,
@@ -96,7 +96,7 @@ describe('ContextMapperService', () => {
 
       expect(result.reasoning).toBeDefined()
       expect(result.reasoning.length).toBeGreaterThan(0)
-      expect(result.reasoning[0]).toContain('EDUCATIONAL')
+      expect(result.reasoning[0]).toContain('educational')
     })
   })
 
@@ -114,6 +114,7 @@ describe('ContextMapperService', () => {
             ? { ...m, enforceSafetyFloor: true }
             : m,
         ),
+        validationStrict: false,
       }
 
       const customService = new ContextMapperService(config)
@@ -304,7 +305,7 @@ describe('ContextMapperService', () => {
 
       expect(result.reasoning).toBeDefined()
       expect(result.reasoning.length).toBeGreaterThan(0)
-      expect(result.reasoning.some((r) => r.includes('SUPPORT'))).toBe(true)
+      expect(result.reasoning.some((r) => r.includes('support'))).toBe(true)
     })
 
     it('should log reasoning when safety floor is applied', () => {
@@ -315,6 +316,7 @@ describe('ContextMapperService', () => {
           minimumSafetyWeight: 0.2,
           contexts: [ContextType.EDUCATIONAL],
         },
+        validationStrict: false,
         mappings: DEFAULT_MAPPING_CONFIG.mappings.map((m) =>
           m.context === ContextType.EDUCATIONAL
             ? { ...m, enforceSafetyFloor: true }

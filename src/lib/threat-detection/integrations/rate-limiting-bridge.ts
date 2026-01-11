@@ -12,11 +12,11 @@
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { ThreatResponse } from '../response-orchestration'
 import type {
-  ThreatResponse,
   RateLimitRule,
   RateLimitResult,
-} from '../response-orchestration'
+} from '../../rate-limiting/types'
 
 const logger = createBuildSafeLogger('threat-rate-limit-bridge')
 
@@ -27,6 +27,7 @@ export interface RateLimitContext {
   userAgent?: string
   method?: string
   headers?: Record<string, string>
+  threatId?: string
 }
 
 export interface RateLimitIntegrationConfig {
@@ -94,14 +95,20 @@ export class RateLimitingBridge {
   }> {
     try {
       // Determine appropriate rule based on context
+      // Check for bypass rules
+      // console.log('TRACE: Bridge start', identifier)
+      // console.log('TRACE: rateLimiter keys', Object.keys(this.rateLimiter))
+
+
       const rule = this.selectRateLimitRule(context)
 
       // Check rate limit
       const rateLimitResult = await this.rateLimiter.checkLimit(
         identifier,
         rule,
-        context,
+        context as unknown as Record<string, unknown>,
       )
+
 
       // If rate limited, trigger threat detection
       if (!rateLimitResult.allowed) {
@@ -165,14 +172,14 @@ export class RateLimitingBridge {
       for (const action of actions) {
         if (action.parameters.userId && action.parameters.limit) {
           await this.rateLimiter.checkLimit(
-            action.parameters.userId,
+            action.parameters.userId as string,
             {
               name: `threat_${threatResponse.responseId}`,
-              maxRequests: action.parameters.limit,
-              windowMs: action.parameters.windowMs || 60000,
+              maxRequests: action.parameters.limit as number,
+              windowMs: (action.parameters.windowMs as number) || 60000,
               enableAttackDetection: true,
             },
-            context,
+            context as unknown as Record<string, unknown>,
           )
         }
       }
@@ -323,7 +330,7 @@ export class RateLimitingBridge {
       context.userId &&
       this.config.bypassRules.allowedRoles
         .includes(context.userId)
-        .slice(________)
+
     ) {
       return true
     }
@@ -502,6 +509,38 @@ export class RateLimitingBridge {
       return 0
     }
   }
+  /**
+   * Increment counter for identifier
+   */
+  async incrementCounter(
+    identifier: string,
+    context: RateLimitContext,
+  ): Promise<void> {
+    const rule = this.selectRateLimitRule(context)
+    await this.rateLimiter.incrementCounter(identifier, rule)
+  }
+
+  /**
+   * Get remaining requests for identifier
+   */
+  async getRemainingRequests(
+    identifier: string,
+    context: RateLimitContext,
+  ): Promise<number> {
+    const rule = this.selectRateLimitRule(context)
+    return this.rateLimiter.getRemainingRequests(identifier, rule)
+  }
+
+  /**
+   * Reset counter for identifier
+   */
+  async resetCounter(
+    identifier: string,
+    context: RateLimitContext,
+  ): Promise<void> {
+    const rule = this.selectRateLimitRule(context)
+    await this.rateLimiter.resetCounter(identifier, rule)
+  }
 }
 
 /**
@@ -555,3 +594,4 @@ export function createRateLimitingBridge(
   const config = { ...defaultConfig, ...customConfig }
   return new RateLimitingBridge(rateLimiter, orchestrator, config)
 }
+

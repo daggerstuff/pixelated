@@ -22,7 +22,7 @@ export class DistributedRateLimiter {
   private readonly attackPrefix = 'attack_pattern:'
   private readonly analyticsPrefix = 'rate_analytics:'
 
-  constructor(private config: RateLimitConfig) {}
+  constructor(private config: RateLimitConfig) { }
 
   /**
    * Check if request should be rate limited
@@ -144,7 +144,7 @@ export class DistributedRateLimiter {
     timestamps.sort((a, b) => a - b)
 
     // Calculate intervals
-    const intervals = []
+    const intervals: number[] = []
     for (let i = 1; i < timestamps.length; i++) {
       intervals.push(timestamps[i] - timestamps[i - 1])
     }
@@ -361,6 +361,43 @@ export class DistributedRateLimiter {
         retryAfter: null,
       }
     }
+  }
+  /**
+   * Manually increment counter (useful for testing or specific logic)
+   */
+  async incrementCounter(
+    identifier: string,
+    rule: RateLimitRule,
+  ): Promise<void> {
+    const key = `${this.prefix}${rule.name}:${identifier}`
+    const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
+    const pipeline = redis.pipeline()
+    pipeline.incr(windowKey)
+    pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+    await pipeline.exec()
+  }
+
+  /**
+   * Get remaining requests helper
+   */
+  async getRemainingRequests(
+    identifier: string,
+    rule: RateLimitRule,
+  ): Promise<number> {
+    const status = await this.getStatus(identifier, rule)
+    return status.remaining
+  }
+
+  /**
+   * Reset counter for identifier
+   */
+  async resetCounter(
+    identifier: string,
+    rule: RateLimitRule,
+  ): Promise<void> {
+    const key = `${this.prefix}${rule.name}:${identifier}`
+    const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
+    await redis.del(windowKey)
   }
 }
 
