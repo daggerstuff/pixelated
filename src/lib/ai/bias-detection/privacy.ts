@@ -16,7 +16,7 @@ import type { TherapeuticSession } from './types'
 export function anonymizeSession(
   session: TherapeuticSession,
 ): TherapeuticSession {
-  const anonymizedSession = JSON.parse(JSON.stringify(session) as unknown)
+  const anonymizedSession = JSON.parse(JSON.stringify(session)) as TherapeuticSession
 
   // Anonymize participant demographics
   anonymizedSession.participantDemographics = {
@@ -32,17 +32,25 @@ export function anonymizeSession(
   }
 
   // Anonymize content
+  // Anonymize content
   anonymizedSession.content = {
-    patientPresentation: 'ANONYMIZED',
-    therapeuticInterventions: ['ANONYMIZED'],
-    patientResponses: ['ANONYMIZED'],
-    sessionNotes: 'ANONYMIZED',
-    assessmentResults: 'ANONYMIZED',
+    transcript: 'ANONYMIZED',
+    aiResponses: ['ANONYMIZED'],
+    userInputs: ['ANONYMIZED'],
+    metadata: {
+      anonymized: true,
+    },
   }
 
   // Anonymize metadata
-  anonymizedSession.metadata.traineeId = 'ANONYMIZED'
-  anonymizedSession.metadata.supervisorId = 'ANONYMIZED'
+  if (anonymizedSession.metadata) {
+    if (anonymizedSession.metadata.location) {
+      anonymizedSession.metadata.location = 'ANONYMIZED'
+    }
+    if (anonymizedSession.metadata.device) {
+      anonymizedSession.metadata.device = 'ANONYMIZED'
+    }
+  }
 
   return anonymizedSession
 }

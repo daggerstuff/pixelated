@@ -100,10 +100,10 @@ export class Auth0MFAService {
 
     try {
       // Get user's enrolled factors
-      const { data: enrolledFactors } = await (auth0Management as any).users.enrollments.get(userId)
+      const enrolledFactors = await auth0Management.users.enrollments.get(userId)
 
       // Get all available factors
-      const { data: availableFactors } = await (auth0Management as any).guardian.factors.list()
+      const availableFactors = await auth0Management.guardian.factors.list()
 
       // Filter out already enrolled factors
       const enrolledFactorTypes = enrolledFactors.map((factor: any) => factor.type)
@@ -132,7 +132,7 @@ export class Auth0MFAService {
       switch (factor.factorType) {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
-          const { data: otpEnrollment } = await (auth0Management as any).guardian.enrollments.createTicket({
+          const otpEnrollment = await auth0Management.guardian.enrollments.createTicket({
             user_id: userId,
             send_mail: false
           })
@@ -235,7 +235,7 @@ export class Auth0MFAService {
     }
 
     try {
-      const { data: enrollments } = await (auth0Management as any).users.enrollments.get(userId)
+      const enrollments = await auth0Management.users.enrollments.get(userId)
 
       const factors: MFAFactor[] = enrollments.map((enrollment: any) => ({
         id: enrollment.id,
@@ -262,7 +262,7 @@ export class Auth0MFAService {
     }
 
     try {
-      await (auth0Management as any).guardian.enrollments.delete(factorId)
+      await auth0Management.guardian.enrollments.delete(factorId)
 
       // Log factor deletion event
       await logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {

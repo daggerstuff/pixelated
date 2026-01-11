@@ -410,7 +410,7 @@ export class Auth0AdaptiveMFAService {
         // Check for unusual login patterns (simulated)
         const user = await auth0UserService.getUserById(userId)
         if (user && user.lastLogin) {
-          const lastLoginTime = new Date(user.lastLogin)
+          const lastLoginTime = new Date(String(user.lastLogin || ''))
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
           // If last login was more than 30 days ago, consider it unusual

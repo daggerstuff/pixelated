@@ -11,7 +11,7 @@ import {
     useProgressMetricsQuery,
     useInvalidateProgress,
 } from '../useProgress'
-import * as api from '@/lib/api/journal-research'
+import * as api from '@/lib/api/journal-research/index'
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
