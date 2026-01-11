@@ -303,7 +303,6 @@ export class BackupSecurityManager {
 
     // Initialize storage providers
     this.storageProviders = new Map()
-    this.loadStorageProviders()
 
     // Initialize recovery testing manager
     /*
@@ -414,20 +413,7 @@ export class BackupSecurityManager {
       logger.info('Initializing backup security manager')
 
       // Initialize storage providers based on configuration
-      for (const [location, config] of Object.entries(
-        this.config.storageLocations,
-      )) {
-        if (config.enabled) {
-          logger.info(`Initializing storage provider for ${location}`)
-          const providerPromise = getStorageProvider(
-            config.provider,
-            config.providerConfig || config.config,
-          )
-          const provider = await providerPromise
-          await provider.initialize()
-          this.storageProviders.set(location as StorageLocation, provider)
-        }
-      }
+      await this.loadStorageProviders()
 
       this.isInitialized = true
       logger.info('Backup security manager initialized successfully')
@@ -937,10 +923,33 @@ export class BackupSecurityManager {
    * This is needed to load providers dynamically based on the runtime environment
    */
   private async loadStorageProviders(): Promise<void> {
-    // This would be implemented to dynamically load providers from storage-providers-wrapper.ts
-    // For now, it's a placeholder
-    // TODO: Stop using fucking placeholders
-    logger.debug('Storage providers will be loaded during initialization')
+    logger.debug('Loading storage providers during initialization')
+
+    // Iterate over configured storage locations
+    for (const [location, locationConfig] of Object.entries(
+      this.config.storageLocations,
+    )) {
+      // Default to enabled if not explicitly set to false
+      if (locationConfig.enabled !== false) {
+        logger.info(`Initializing storage provider for ${location}`)
+
+        try {
+          const providerPromise = getStorageProvider(
+            locationConfig.provider,
+            locationConfig.providerConfig || locationConfig.config,
+          )
+
+          const provider = await providerPromise
+          await provider.initialize()
+          this.storageProviders.set(location as StorageLocation, provider)
+        } catch (error: unknown) {
+          logger.error(
+            `Failed to initialize storage provider for ${location}: ${error instanceof Error ? String(error) : String(error)}`,
+          )
+          throw error
+        }
+      }
+    }
   }
 
   /**
