@@ -113,3 +113,30 @@ export interface ConsentManagement {
   revokedAt?: Date
   ipAddress?: string
 }
+
+export interface ExportFile {
+  id: string
+  exportId: string
+  format: string
+  dataType: string
+  url: string
+  size: number
+  createdAt: Date
+}
+
+export interface DataExport {
+  _id?: MongoObjectId
+  id?: string
+  patientId: string // keeping as string to match input, can convert to ObjectId in DAO if needed but keeping simple for now
+  requestedBy: string
+  formats: string[]
+  dataTypes: string[]
+  reason: string
+  priority: string
+  status: string
+  createdAt: Date
+  startedAt?: Date
+  completedAt?: Date
+  files?: ExportFile[]
+  error?: string
+}
