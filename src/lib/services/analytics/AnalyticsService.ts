@@ -78,9 +78,10 @@ export class AnalyticsService {
       this.notifySubscribers(event)
 
       return eventId
-    } catch (error: unknown) {
+    } catch (error: any) {
       logger.error('Error tracking event:', error)
-      throw new ValidationError('Invalid event data', error)
+      const errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+      throw new ValidationError(`Invalid event data: Input=${JSON.stringify(data)} Error=${errorDetails} Issues=${JSON.stringify(error.issues || [])}`, error)
     }
   }
 
@@ -158,6 +159,12 @@ export class AnalyticsService {
           await this.redisClient.lrem('analytics:events:queue', 1, eventJson)
         } catch (error: unknown) {
           logger.error('Error processing event:', error)
+          // Import fs dynamically to avoid import errors if not available, or use global require if needed, but here simple console is safer if fs is issue.
+          // BUT user asked for file log.
+          try {
+            const fs = await import('node:fs');
+            fs.appendFileSync('/tmp/debug_analytics.log', `[ProcessError] ${JSON.stringify(error, Object.getOwnPropertyNames(error))}\n`);
+          } catch (e) { }
           throw new ProcessingError('Failed to process event', error)
         }
       }
