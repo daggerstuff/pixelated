@@ -66,6 +66,16 @@ export type AuthenticationEvent =
   | `impersonation_started_${string}`
   | `impersonation_ended_${string}`
   | `impersonation_extended_${string}`
+  | `session_terminated_${string}`
+  | 'user_soft_deleted'
+  | 'user_restored'
+  | 'user_purged'
+  | 'user_purge_notification_sent'
+  | `user_retention_extended_${number}_days`
+  | `bulk_import_completed_${number}_success`
+  | `bulk_import_job_status_check_${string}`
+  | `bulk_export_completed_${string}_${number}_users`
+  | `recurring_export_scheduled_${string}`
 
 /**
  * Update Phase 6 authentication progress

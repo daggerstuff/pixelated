@@ -332,8 +332,8 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      await auth0Management.users.link(
-        { id: userId },
+      await auth0Management.users.identities.link(
+        userId,
         {
           provider: connection as any,
           connection_id: connection, // This would need to be the actual connection ID
@@ -370,11 +370,11 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      await auth0Management.users.unlink({
-        id: userId,
-        provider: connection as any,
-        user_id: providerUserId
-      })
+      await auth0Management.users.identities.delete(
+        userId,
+        connection as any,
+        providerUserId
+      )
 
       // Log the unlinking event
       await logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, {
@@ -400,7 +400,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const { data: user } = await auth0Management.users.get({ id: userId })
+      const user = await auth0Management.users.get(userId)
       return user.identities || []
     } catch (error) {
       console.error(`Failed to get social connections for user ${userId}:`, error)

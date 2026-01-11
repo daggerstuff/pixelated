@@ -135,7 +135,7 @@ export class PythonBiasDetectionBridge {
     } catch (error: unknown) {
       logger.error('Failed to initialize PythonBiasDetectionBridge', { error })
       throw new Error(
-        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
+        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
       )
     }
   }
@@ -268,13 +268,13 @@ export class PythonBiasDetectionBridge {
           timeoutId = setTimeout(() => {
             try {
               controller.abort()
-            } catch (e) {
+            } catch {
               /* ignore */
             }
           }, this.timeout)
 
-          // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as any).signal = controller.signal
+            // Attach the signal to fetch options for this attempt
+            ; (fetchOptions as any).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -323,7 +323,7 @@ export class PythonBiasDetectionBridge {
         ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
-          ;(this.connectionPool as any).releaseConnection(pooledConnection)
+          ; (this.connectionPool as any).releaseConnection(pooledConnection)
           pooledConnection = null
         }
         // Clear timeout on error
@@ -360,22 +360,22 @@ export class PythonBiasDetectionBridge {
             : {}
         const ling =
           typeof metrics['linguistic_bias'] === 'object' &&
-          metrics['linguistic_bias']
+            metrics['linguistic_bias']
             ? (metrics['linguistic_bias'] as Record<string, any>)
             : {}
         const sentiment =
           typeof ling['sentiment_analysis'] === 'object' &&
-          ling['sentiment_analysis']
+            ling['sentiment_analysis']
             ? (ling['sentiment_analysis'] as Record<string, any>)
             : {}
         const rep =
           typeof metrics['representation_analysis'] === 'object' &&
-          metrics['representation_analysis']
+            metrics['representation_analysis']
             ? (metrics['representation_analysis'] as Record<string, any>)
             : {}
         const dq =
           typeof metrics['data_quality_metrics'] === 'object' &&
-          metrics['data_quality_metrics']
+            metrics['data_quality_metrics']
             ? (metrics['data_quality_metrics'] as Record<string, any>)
             : {}
         return {

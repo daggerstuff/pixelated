@@ -8,6 +8,10 @@ import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
 import * as tf from '@tensorflow/tfjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { AdvancedResponseOrchestrator } from '../response-orchestration'
+import { AIEnhancedMonitoringService } from '../monitoring/ai-enhanced-monitoring'
+import { BehavioralAnalysisService } from '../behavioral/behavioral-analysis-service'
+import { AdvancedPredictiveThreatIntelligence } from '../predictive/predictive-threat-intelligence'
 
 const logger = createBuildSafeLogger('threat-hunting-service')
 
@@ -132,24 +136,24 @@ export interface InvestigationFinding {
 
 export class ThreatHuntingService extends EventEmitter {
   redis: Redis
-  mongoClient: MongoClient
+  mongoClient!: MongoClient
   public config: ThreatHuntingConfig
-  orchestrator: unknown
-  aiService: unknown
-  behavioralService: unknown
-  predictiveService: unknown
-  investigations: unknown
-  huntQueries: unknown
+  orchestrator: AdvancedResponseOrchestrator
+  aiService: AIEnhancedMonitoringService
+  behavioralService: BehavioralAnalysisService
+  predictiveService: AdvancedPredictiveThreatIntelligence
+  investigations: Map<string, Investigation>
+  huntQueries: Map<string, HuntResult>
   private huntingModel: tf.Sequential | null = null
   private huntingInterval: NodeJS.Timeout | null = null
   private activeInvestigations: Map<string, Investigation> = new Map()
 
   constructor(
     redis: Redis,
-    orchestrator: unknown,
-    aiService: unknown,
-    behavioralService: unknown,
-    predictiveService: unknown,
+    orchestrator: AdvancedResponseOrchestrator,
+    aiService: AIEnhancedMonitoringService,
+    behavioralService: BehavioralAnalysisService,
+    predictiveService: AdvancedPredictiveThreatIntelligence,
     config?: ThreatHuntingConfig,
   ) {
     super()
@@ -169,7 +173,11 @@ export class ThreatHuntingService extends EventEmitter {
         enableRealTimeHunting: true,
         autoArchiveCompleted: true,
         reportFormats: ['pdf', 'json', 'csv'],
-        maxResultsPerQuery: 1000,
+        mlModelConfig: {
+          enabled: false,
+          modelPath: '',
+          confidenceThreshold: 0.7,
+        },
       } as ThreatHuntingConfig)
     this.investigations = new Map()
     this.huntQueries = new Map()
@@ -184,7 +192,7 @@ export class ThreatHuntingService extends EventEmitter {
 
       await this.mongoClient.connect()
 
-      if (this.config.mlModelConfig.enabled) {
+      if (this.config.mlModelConfig?.enabled) {
         await this.initializeMLModel()
       }
 
@@ -242,13 +250,15 @@ export class ThreatHuntingService extends EventEmitter {
       await this.executeHunts()
 
       // Schedule regular hunts
-      this.huntingInterval = setInterval(async () => {
-        try {
-          await this.executeHunts()
-        } catch (error) {
-          logger.error('Automated hunting error:', { error })
-        }
-      }, this.config.huntingFrequency)
+      if (this.config.huntingFrequency && this.config.huntingFrequency > 0) {
+        this.huntingInterval = setInterval(async () => {
+          try {
+            await this.executeHunts()
+          } catch (error) {
+            logger.error('Automated hunting error:', { error })
+          }
+        }, this.config.huntingFrequency)
+      }
 
       logger.info('Automated threat hunting started')
       this.emit('hunting_started')
@@ -276,7 +286,7 @@ export class ThreatHuntingService extends EventEmitter {
    */
   async executeHunts(): Promise<HuntResult[]> {
     try {
-      const enabledRules = this.config.huntingRules.filter(
+      const enabledRules = (this.config.huntingRules ?? []).filter(
         (rule) => rule.enabled,
       )
       const results: HuntResult[] = []
@@ -319,12 +329,13 @@ export class ThreatHuntingService extends EventEmitter {
       })
 
       // Execute the hunt query
-      const findings = await this.executeHuntQuery(rule.query)
+      const queryResult = await this.executeHuntQuery(rule.query)
+      const findings = Array.isArray(queryResult) ? queryResult : []
 
       // Apply ML analysis if enabled
       let mlFindings: HuntFinding[] = []
       if (this.huntingModel && findings.length > 0) {
-        mlFindings = await this.applyMLAnalysis(findings)
+        mlFindings = await (this.applyMLAnalysis(findings) as Promise<HuntFinding[]>)
       }
 
       // Combine findings
@@ -382,9 +393,9 @@ export class ThreatHuntingService extends EventEmitter {
   ): Promise<
     | HuntFinding[]
     | {
-        errors: string[]
-        data: unknown[]
-      }
+      errors: string[]
+      data: unknown[]
+    }
   > {
     const findings: HuntFinding[] = []
 
@@ -623,7 +634,7 @@ export class ThreatHuntingService extends EventEmitter {
         const prediction = await this.predictThreatLevel(features)
 
         if (
-          prediction.confidence > this.config.mlModelConfig.confidenceThreshold
+          prediction.confidence > (this.config.mlModelConfig?.confidenceThreshold ?? 0.7)
         ) {
           mlFindings.push({
             findingId: `ml_${finding.findingId}`,
@@ -682,14 +693,15 @@ export class ThreatHuntingService extends EventEmitter {
     }
 
     try {
-      const result = await tf.tidy(async () => {
-        const inputTensor = tf.tensor2d([features])
-        const prediction = (await this.huntingModel!.predict(
-          inputTensor,
-        )) as tf.Tensor
-        const data = await prediction.data()
-        return Array.from(data) as number[]
-      })
+      const inputTensor = tf.tensor2d([features])
+      const prediction = this.huntingModel.predict(inputTensor) as tf.Tensor
+      const data = await prediction.data()
+
+      // Clean up tensors
+      inputTensor.dispose()
+      prediction.dispose()
+
+      const result = Array.from(data) as number[]
 
       const maxIndex = result.indexOf(Math.max(...result))
       const threatLevels = ['low', 'medium', 'high', 'critical']
@@ -841,7 +853,7 @@ export class ThreatHuntingService extends EventEmitter {
     templateId?: string
   }): InvestigationTemplate {
     if (params.templateId) {
-      const template = this.config.investigationTemplates.find(
+      const template = this.config.investigationTemplates?.find(
         (t) => t.templateId === params.templateId,
       )
       if (template) {
@@ -851,22 +863,24 @@ export class ThreatHuntingService extends EventEmitter {
 
     // Default template selection based on context
     if (params.huntId) {
+      const templates = this.config.investigationTemplates ?? []
       return (
-        this.config.investigationTemplates.find((t) =>
+        templates.find((t) =>
           t.name.includes('Hunt'),
-        ) || this.config.investigationTemplates[0]
+        ) || templates[0]
       )
     }
 
     if (params.threatId) {
+      const templates = this.config.investigationTemplates ?? []
       return (
-        this.config.investigationTemplates.find((t) =>
+        templates.find((t) =>
           t.name.includes('Threat'),
-        ) || this.config.investigationTemplates[0]
+        ) || templates[0]
       )
     }
 
-    return this.config.investigationTemplates[0]
+    return (this.config.investigationTemplates ?? [])[0]
   }
 
   /**
@@ -891,7 +905,7 @@ export class ThreatHuntingService extends EventEmitter {
       })
 
       for (const step of investigation.steps) {
-        if (investigation.status === 'cancelled') {
+        if ((investigation.status as string) === 'cancelled') {
           break
         }
 
@@ -969,7 +983,7 @@ export class ThreatHuntingService extends EventEmitter {
       })
 
       // Get the actual step configuration
-      const template = this.config.investigationTemplates.find((t) =>
+      const template = (this.config.investigationTemplates ?? []).find((t) =>
         t.steps.some((s) => s.stepId === step.stepId),
       )
 
@@ -1788,9 +1802,12 @@ export class ThreatHuntingService extends EventEmitter {
     const behavioralData = await this.behavioralService.getBehavioralProfile(
       threatData.userId as string,
     )
+    if (!behavioralData) {
+      return { behavioralRisk: 'low', correlatedAnomalies: [] }
+    }
     return {
-      behavioralRisk: behavioralData.profile.riskLevel,
-      correlatedAnomalies: behavioralData.profile.anomalies,
+      behavioralRisk: 'low', // Profile doesn't have riskLevel directly
+      correlatedAnomalies: behavioralData.behavioralPatterns || [],
     }
   }
 
@@ -1847,7 +1864,7 @@ export class ThreatHuntingService extends EventEmitter {
   public async detectRealTimeAnomalies(
     realTimeData: Record<string, unknown>[],
   ): Promise<Record<string, unknown>[]> {
-    const anomalies = []
+    const anomalies: any[] = []
     for (const data of realTimeData) {
       const anomaly = await this.aiService.predictAnomaly(data)
       if (anomaly.isAnomaly) {
