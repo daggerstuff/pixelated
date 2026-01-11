@@ -43,7 +43,7 @@ function createMockRedisClient() {
   return {
     // Basic operations
     get: async (key: string) => mockStore.get(key) || null,
-    set: async (key: string, value: string) => {
+    set: async (key: string, value: string, ..._args: (string | number)[]) => {
       mockStore.set(key, value)
       return 'OK'
     },
@@ -91,13 +91,22 @@ function createMockRedisClient() {
       hincrby: (key: string, field: string, increment: number) => ({
         hincrby: [key, field, increment],
       }),
+      incr: (key: string) => ({
+        incr: [key],
+      }),
+      expire: (key: string, seconds: number) => ({
+        expire: [key, seconds],
+      }),
+      hset: (key: string, field: string, value: string | number) => ({
+        hset: [key, field, value],
+      }),
       exec: async () => [['OK'], [1]], // Mock successful pipeline execution
     }),
 
     // Connection operations
     ping: async () => 'PONG',
     quit: async () => 'OK',
-    disconnect: () => {},
+    disconnect: () => { },
     status: 'ready',
 
     // List operations
@@ -170,8 +179,8 @@ function createMockRedisClient() {
     ttl: async (key: string) => (mockStore.has(key) ? -1 : -2),
 
     // Event emitter methods (for compatibility)
-    on: () => {},
-    off: () => {},
+    on: () => { },
+    off: () => { },
     emit: () => false,
   }
 }

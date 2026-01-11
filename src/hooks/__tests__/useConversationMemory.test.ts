@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook, act } from '@testing-library/react'
 import { useConversationMemory } from '../useConversationMemory'
 import { describe, expect, it } from 'vitest'
