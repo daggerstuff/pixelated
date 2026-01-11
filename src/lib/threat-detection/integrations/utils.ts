@@ -6,7 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import crypto from 'node:crypto'
+import * as crypto from 'node:crypto'
 import type {
   ThreatData,
   ThreatResponse,
@@ -75,7 +75,7 @@ export function validateThreatData(threatData: Partial<ThreatData>): boolean {
 
   if (
     !threatData.severity ||
-    !['low', 'medium', 'high', 'critical'].includes(threatData.severity)
+    !['low', 'medium', 'high', 'critical'].includes(String(threatData.severity))
   ) {
     logger.warn('Valid severity level is required')
     return false
@@ -102,6 +102,7 @@ export function sanitizeThreatContext(
     'key',
     'authorization',
     'credit_card',
+    'creditcard',
     'ssn',
     'pii',
     'personal',
@@ -125,7 +126,7 @@ export function sanitizeThreatContext(
       (sanitized[key] as string).length > 100
     ) {
       // Truncate long strings to prevent data leakage
-      sanitized[key] = (sanitized[key] as string).substring(0, 100) + '...'
+      sanitized[key] = (sanitized[key] as string).substring(0, 97) + '...'
     }
   })
 
@@ -135,7 +136,7 @@ export function sanitizeThreatContext(
 /**
  * Calculate threat score based on various factors
  */
-export function calculateThreatScore(threatData: ThreatData): number {
+export async function calculateThreatScore(threatData: ThreatData): Promise<number> {
   let score = 0
 
   // Base score from severity
@@ -166,7 +167,7 @@ export function calculateThreatScore(threatData: ThreatData): number {
     // Add points for suspicious patterns
     if (
       threatData.riskFactors.ip &&
-      isSuspiciousIP(threatData.riskFactors.ip)
+      isSuspiciousIPSync(threatData.riskFactors.ip)
     ) {
       score += 15
     }
@@ -304,6 +305,10 @@ export async function checkSuspiciousIPWithIntelligence(
       redisUrl:
         config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
       enabled: true,
+      feeds: [],
+      updateInterval: 3600000,
+      cacheTimeout: 3600000,
+      apiKeys: {},
     })
 
     await threatService.initialize()
@@ -377,7 +382,7 @@ export function formatThreatResponseForLogging(
       target: action.target,
       metadata: action.metadata,
     })),
-    recommendations: response.recommendations,
+    recommendations: [], // Removed from interface, sending empty array for compat or remove entirely
     timestamp: response.metadata?.timestamp,
     source: response.metadata?.source,
   }
@@ -423,9 +428,9 @@ export function extractRateLimitParams(response: ThreatResponse): {
   }
 
   return {
-    maxRequests: rateLimitAction.metadata?.maxRequests || 10,
-    windowMs: rateLimitAction.metadata?.windowMs || 60000,
-    message: rateLimitAction.metadata?.message,
+    maxRequests: (rateLimitAction.metadata?.maxRequests as number) || 10,
+    windowMs: (rateLimitAction.metadata?.windowMs as number) || 60000,
+    message: (rateLimitAction.metadata?.message as string) || undefined,
   }
 }
 
@@ -445,7 +450,10 @@ export function createErrorResponse(
     severity: 'low',
     confidence: 0,
     actions: [],
-    recommendations: [],
+    responseType: 'alert',
+    estimatedImpact: 0,
+    executionTime: new Date(),
+    status: 'failed',
     metadata: {
       source: 'threat_detection_utils',
       timestamp: new Date().toISOString(),
@@ -473,7 +481,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     timeout = setTimeout(() => {
       // We intentionally ignore the return value of func for debounce
       // and cast args to unknown[] to call safely.
-      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       timeout = null
     }, wait)
   }
@@ -490,7 +498,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
-      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       inThrottle = true
       setTimeout(() => {
         inThrottle = false
@@ -682,8 +690,12 @@ export function createThreatAction(
   metadata?: Record<string, unknown>,
 ): ResponseAction {
   return {
+    actionId: _secureId('action_'),
     actionType,
     target,
+    parameters: (metadata as Record<string, unknown>) || {},
+    priority: 5, // Default priority
+    timeout: 5000, // Default timeout
     timestamp: new Date().toISOString(),
     metadata: (metadata as Record<string, unknown>) || {},
   }
