@@ -107,15 +107,15 @@ export type {
 } from '../response-orchestration'
 
 import { redis } from '../../redis'
-import { AdvancedResponseOrchestrator } from '../response-orchestration'
-import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
+import { AdvancedResponseOrchestrator as ResponseOrchestrator, type ThreatData } from '../response-orchestration'
+import { DistributedRateLimiter as RateLimiter } from '../../rate-limiting/rate-limiter'
 
 /**
  * Create a complete threat detection integration setup
  */
 export function createThreatDetectionIntegration(
-  orchestrator: AdvancedResponseOrchestrator,
-  rateLimiter: DistributedRateLimiter,
+  orchestrator: ResponseOrchestrator,
+  rateLimiter: RateLimiter,
   config?: Partial<ThreatDetectionConfig>,
 ) {
   const threatDetectionService = createThreatDetectionService(
@@ -379,8 +379,8 @@ export function createAIEnhancedMonitoring(config: MonitoringConfig): AIEnhanced
  */
 export function createThreatHuntingService(
   redisClient: any,
-  orchestrator: any,
-  aiService: any,
+  orchestrator: ResponseOrchestrator,
+  aiService: AIEnhancedMonitoringService,
   behavioralService: any,
   predictiveService: any,
   config: ThreatHuntingConfig,
@@ -406,8 +406,8 @@ export function createExternalThreatIntelligence(config: ThreatIntelligenceConfi
  * Create complete Phase 8 threat detection system
  */
 export function createCompleteThreatDetectionSystem(
-  orchestrator: AdvancedResponseOrchestrator,
-  rateLimiter: DistributedRateLimiter,
+  orchestrator: ResponseOrchestrator,
+  rateLimiter: RateLimiter,
   options?: {
     threatDetection?: Partial<ThreatDetectionConfig>
     monitoring?: Partial<MonitoringConfig>
