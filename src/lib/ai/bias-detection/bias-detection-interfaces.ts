@@ -7,7 +7,7 @@
 
 // Re-export all types from the main types file
 export * from './types'
-import type { AlertLevel } from './types'
+import type { AlertLevel, BiasAnalysisResult, BiasAlert } from './types'
 
 // Additional interfaces specific to the engine implementation
 
@@ -169,20 +169,20 @@ export interface DashboardMetrics {
 }
 
 export interface SystemPerformanceMetrics {
-  response_times: {
+  response_times?: {
     average: number
     p95: number
     p99: number
   }
-  throughput: {
+  throughput?: {
     requests_per_second: number
     sessions_per_hour: number
   }
-  error_rates: {
+  error_rates?: {
     total_errors: number
     error_percentage: number
   }
-  resource_usage: {
+  resource_usage?: {
     cpu_percent: number
     memory_mb: number
   }
