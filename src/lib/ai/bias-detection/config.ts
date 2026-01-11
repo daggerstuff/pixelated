@@ -815,10 +815,24 @@ export class BiasDetectionConfigManager {
     source: string
     loadedEnvVars: string[]
     errors: string[]
+    environment?: string
+    thresholds?: any
+    layerWeights?: any
+    cache?: any
+    security?: any
+    performance?: any
+    features?: {
+      auditLogging: boolean
+      dataMasking: boolean
+      caching: boolean
+    }
     mlToolkits?: {
       aif360: { enabled: boolean }
       fairlearn: { enabled: boolean }
       tensorflow: { enabled: boolean }
+      huggingFace: { enabled: boolean }
+      interpretability: { enabled: boolean }
+      spacy: { enabled: boolean }
     }
   } {
     const errors = this.validateConfiguration()
@@ -848,6 +862,10 @@ export class BiasDetectionConfigManager {
         fairlearn: {
           enabled:
             this.config['mlToolkitConfig']?.['fairlearn']?.['enabled'] ?? true,
+        },
+        tensorflow: {
+          enabled:
+            this.config['mlToolkitConfig']?.['tensorflow']?.['enabled'] ?? true,
         },
         huggingFace: {
           enabled:

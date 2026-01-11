@@ -54,6 +54,30 @@ export enum SecurityEventType {
   IMPERSONATION_DENIED = 'impersonation_denied',
   IMPERSONATION_ERROR = 'impersonation_error',
   IMPERSONATION_EXTENDED = 'impersonation_extended',
+
+  SESSION_TERMINATED = 'session_terminated',
+  SESSION_TERMINATION_ERROR = 'session_termination_error',
+
+  USER_SOFT_DELETED = 'user_soft_deleted',
+  USER_SOFT_DELETE_ERROR = 'user_soft_delete_error',
+  USER_RESTORED = 'user_restored',
+  USER_RESTORE_ERROR = 'user_restore_error',
+  USER_PURGED = 'user_purged',
+  USER_PURGE_ERROR = 'user_purge_error',
+  USER_PURGE_NOTIFICATION_SENT = 'user_purge_notification_sent',
+  DATA_RETENTION_POLICY_UPDATED = 'data_retention_policy_updated',
+  USER_RETENTION_EXTENDED = 'user_retention_extended',
+  USER_RETENTION_EXTENSION_ERROR = 'user_retention_extension_error',
+  USER_BULK_IMPORT_SUCCESS = 'user_bulk_import_success',
+  USER_BULK_IMPORT_ERROR = 'user_bulk_import_error',
+  BULK_IMPORT_COMPLETED = 'bulk_import_completed',
+  BULK_IMPORT_ERROR = 'bulk_import_error',
+  BULK_EXPORT_COMPLETED = 'bulk_export_completed',
+  BULK_EXPORT_ERROR = 'bulk_export_error',
+  BULK_IMPORT_JOB_STATUS_CHECK = 'bulk_import_job_status_check',
+  BULK_IMPORT_JOB_STATUS_ERROR = 'bulk_import_job_status_error',
+  RECURRING_EXPORT_SCHEDULED = 'recurring_export_scheduled',
+  RECURRING_EXPORT_SCHEDULE_ERROR = 'recurring_export_schedule_error',
 }
 
 /**
