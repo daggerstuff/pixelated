@@ -548,7 +548,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   }
 
   try {
-    const { data: userRoles } = await (auth0Management as any).users.roles.list({ id: userId })
+    const { data: userRoles } = await (auth0Management as any).users.roles.list(userId)
     return userRoles.map(role => role.name as UserRole).filter(Boolean)
   } catch (error) {
     console.error(`Failed to get roles for user ${userId}:`, error)
