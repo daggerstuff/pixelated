@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect } from 'vitest'
 
 // Simulate behavior of the updated SearchSwitch DOM updates

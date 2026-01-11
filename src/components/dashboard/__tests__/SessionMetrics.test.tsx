@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { render, screen, within } from '@testing-library/react'
 import { SessionMetrics } from '../SessionMetrics'
 import { describe, expect, it } from 'vitest'

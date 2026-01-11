@@ -8,15 +8,18 @@
 
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
-import { RateLimitingBridge } from './rate-limiting-bridge'
-import { ThreatDetectionMiddleware } from './api-middleware'
+import { RateLimitingBridge, createRateLimitingBridge } from './rate-limiting-bridge'
+import {
+  ThreatDetectionMiddleware,
+  createThreatDetectionMiddleware,
+} from './api-middleware'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   ThreatData,
   ThreatResponse,
-  RateLimitResult,
   ThreatAnalysis,
 } from '../response-orchestration'
+import type { RateLimitResult } from '../../rate-limiting/types'
 import type { RateLimitIntegrationConfig } from './rate-limiting-bridge'
 
 const logger = createBuildSafeLogger('threat-detection-service')
@@ -76,12 +79,12 @@ export class ThreatDetectionService {
   private config: ThreatDetectionConfig
 
   constructor(
-    orchestrator: unknown,
-    rateLimiter: unknown,
+    orchestrator: AdvancedResponseOrchestrator,
+    rateLimiter: DistributedRateLimiter,
     config: ThreatDetectionConfig,
   ) {
-    this.orchestrator = orchestrator as any
-    this.rateLimiter = rateLimiter as any
+    this.orchestrator = orchestrator
+    this.rateLimiter = rateLimiter
     this.config = config
 
     // Initialize rate limiting bridge
@@ -209,10 +212,14 @@ export class ThreatDetectionService {
     threatData: ThreatData,
   ): Promise<ThreatAnalysis> {
     const analysis: ThreatAnalysis = {
+      threatId: threatData.threatId,
+      severity: 'low',
+      estimatedImpact: 0,
       confidence: 0,
       patterns: [],
-      riskFactors: [],
-      recommendations: [],
+      riskFactors: {},
+      recommendedActions: [],
+      analysisTimestamp: new Date(),
     }
 
     // Analyze based on threat source
@@ -242,7 +249,7 @@ export class ThreatDetectionService {
     }
 
     // Generate recommendations
-    analysis.recommendations = this.generateRecommendations(
+    analysis.recommendedActions = this.generateRecommendations(
       threatData,
       analysis,
     )
@@ -433,7 +440,10 @@ export class ThreatDetectionService {
       severity: 'low',
       confidence: 0,
       actions: [],
-      recommendations: [],
+      responseType: 'alert',
+      estimatedImpact: 0,
+      executionTime: new Date(),
+      status: 'failed',
       metadata: {
         source: 'threat_detection_service',
         timestamp: new Date().toISOString(),
@@ -538,8 +548,8 @@ export class ThreatDetectionService {
  * Create threat detection service with default configuration
  */
 export function createThreatDetectionService(
-  orchestrator: unknown,
-  rateLimiter: unknown,
+  orchestrator: AdvancedResponseOrchestrator,
+  rateLimiter: DistributedRateLimiter,
   customConfig?: Partial<ThreatDetectionConfig>,
 ): ThreatDetectionService {
   const defaultConfig: ThreatDetectionConfig = {
@@ -611,8 +621,8 @@ export function createThreatDetectionService(
 
   const config = { ...defaultConfig, ...customConfig }
   return new ThreatDetectionService(
-    orchestrator as any,
-    rateLimiter as any,
+    orchestrator as AdvancedResponseOrchestrator,
+    rateLimiter as DistributedRateLimiter,
     config,
   )
 }
