@@ -50,7 +50,6 @@ function initializeAuth0Clients() {
       clientId: managementClientId,
       clientSecret: managementClientSecret,
       audience: `https://${domain}/api/v2/`,
-      scope: 'read:users update:users create:users delete:users'
     })
   }
 
@@ -212,7 +211,7 @@ export class Auth0UserService {
     }
 
     try {
-      const { data: auth0User } = await auth0Management.users.get({ id: userId });
+      const { data: auth0User } = await auth0Management.users.get(userId);
 
       return {
         id: auth0User.user_id,
@@ -242,7 +241,7 @@ export class Auth0UserService {
     }
 
     try {
-      const { data: users } = await auth0Management.users.getAll();
+      const { data: users } = await auth0Management.users.list();
       return users.map(user => ({
         id: user.user_id,
         email: user.email,
@@ -272,7 +271,7 @@ export class Auth0UserService {
     }
 
     try {
-      const { data: users } = await auth0Management.users.getAll({
+      const { data: users } = await auth0Management.users.list({
         q: `email:"${email}"`,
         search_engine: 'v3'
       })
@@ -356,7 +355,7 @@ export class Auth0UserService {
       }
 
       const { data: auth0User } = await auth0Management.users.update(
-        { id: userId },
+        userId,
         updateParams
       )
 
@@ -390,7 +389,7 @@ export class Auth0UserService {
 
     try {
       await auth0Management.users.update(
-        { id: userId },
+        userId,
         { password: newPassword }
       )
     } catch (error) {
