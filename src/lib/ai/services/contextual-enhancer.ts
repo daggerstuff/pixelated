@@ -6,7 +6,7 @@ import {
 import { EmotionState, CrisisLevel } from '../types/emotional'
 import { PatientPsiProfile } from '../types/patient-psi'
 import { RealTimeAnalyzer } from './real-time-analyzer'
-import { Logger } from '../../utils/logger'
+import { Logger, getLogger } from '../../utils/logger'
 
 export class ContextualEnhancer {
   private sessionHistory: Map<string, SessionContext[]> = new Map()
@@ -16,7 +16,7 @@ export class ContextualEnhancer {
 
   constructor() {
     this.analyzer = new RealTimeAnalyzer()
-    this.logger = new Logger('ContextualEnhancer')
+    this.logger = getLogger('ContextualEnhancer')
   }
 
   /**
@@ -53,6 +53,9 @@ export class ContextualEnhancer {
         interventionTiming,
       )
 
+      // Save context to history
+      this.addToSessionHistory(sessionId, context)
+
       return {
         sessionId,
         context,
@@ -63,12 +66,13 @@ export class ContextualEnhancer {
         timestamp: new Date(),
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
       this.logger.error('Context enhancement failed', {
         sessionId,
-        error: error.message,
+        error: errorMessage,
       })
       throw new Error(
-        `Failed to enhance context for session ${sessionId}: ${error.message}`,
+        `Failed to enhance context for session ${sessionId}: ${errorMessage}`,
       )
     }
   }
@@ -132,7 +136,10 @@ export class ContextualEnhancer {
       ...currentProgress,
     })
 
-    return currentProgress
+    return {
+      ...baseline,
+      ...currentProgress,
+    }
   }
 
   /**
@@ -292,6 +299,7 @@ export class ContextualEnhancer {
       intensity: 0.3,
       valence: 0.0,
       arousal: 0.2,
+      confidence: 1.0,
     }
   }
 
@@ -326,7 +334,7 @@ export class ContextualEnhancer {
 
   private calculateEngagementProgress(
     history: SessionContext[],
-    profile: PatientPsiProfile,
+    _profile: PatientPsiProfile,
   ): number {
     return Math.min(1.0, 0.7 + history.length * 0.03)
   }

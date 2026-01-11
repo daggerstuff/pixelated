@@ -14,6 +14,16 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+// React 19 compatibility: Monkey-patch React.act for react-dom/test-utils
+import React from 'react'
+import { act as domAct } from 'react-dom/test-utils'
+
+// In React 19, act is moved to 'react'. However, depending on the environment/version resolution,
+// it might not be present on the default React export. We shim it here.
+if (!React.act && domAct) {
+  Object.assign(React, { act: domAct })
+}
+
 // Mock environment variables for tests
 vi.mock('astro:env/server', () => ({
   REDIS_URL:
@@ -498,6 +508,43 @@ function createMockRedis() {
     llen: vi.fn(_llen),
     lrange: vi.fn(_lrange),
     brpop: vi.fn(_brpop),
+    // Aliases and missing commands for AnalyticsService
+    lRange: vi.fn(_lrange),
+    zrangebyscore: vi.fn(async (key, min, max, ...args) => {
+      const z = zsetStore.get(key) as Map<any, number> | undefined
+      if (!z) return []
+      const entries = Array.from(z.entries())
+      const minNum = min === '-inf' ? -Infinity : Number(min)
+      const maxNum = max === '+inf' ? Infinity : Number(max)
+
+      let filtered = entries
+        .filter(([_, score]) => score >= minNum && score <= maxNum)
+        .sort((a, b) => a[1] - b[1])
+        .map(([val]) => val)
+
+      // Handle LIMIT if present (args: ['LIMIT', offset, count])
+      const limitIndex = args.indexOf('LIMIT')
+      if (limitIndex !== -1 && args.length > limitIndex + 2) {
+        const offset = Number(args[limitIndex + 1])
+        const count = Number(args[limitIndex + 2])
+        filtered = filtered.slice(offset, offset + count)
+      }
+      return filtered
+    }),
+    zremrangebyscore: vi.fn(async (key, min, max) => {
+      const z = zsetStore.get(key) as Map<any, number> | undefined
+      if (!z) return 0
+      const minNum = min === '-inf' ? -Infinity : Number(min)
+      const maxNum = max === '+inf' ? Infinity : Number(max)
+      let removed = 0
+      for (const [member, score] of z.entries()) {
+        if (score >= minNum && score <= maxNum) {
+          z.delete(member)
+          removed++
+        }
+      }
+      return removed
+    }),
   }
 
   return mock
@@ -512,7 +559,7 @@ vi.mock('@/lib/services/redis', () => {
   })
   return {
     redis: globalMockRedis,
-    RedisService: vi.fn().mockImplementation(() => impl),
+    RedisService: vi.fn().mockImplementation(function () { return impl }),
   }
 })
 
@@ -528,7 +575,7 @@ vi.mock('@/lib/services/redis/RedisService', () => {
     isConnected: () => true,
   })
   return {
-    RedisService: vi.fn().mockImplementation(() => impl),
+    RedisService: vi.fn().mockImplementation(function () { return impl }),
   }
 })
 
@@ -539,7 +586,7 @@ vi.mock('../RedisService', () => {
     isConnected: () => true,
   })
   return {
-    RedisService: vi.fn().mockImplementation(() => impl),
+    RedisService: vi.fn().mockImplementation(function () { return impl }),
   }
 })
 
