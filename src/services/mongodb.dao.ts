@@ -61,7 +61,93 @@ import type {
   CrisisSessionFlag,
   Todo,
   TreatmentPlan,
+  DataExport,
 } from '../types/mongodb.types'
+
+export class DataExportDAO {
+  private async getCollection(): Promise<MongoCollection<DataExport>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<DataExport>('data_exports')
+  }
+
+  async create(
+    exportRequest: Omit<DataExport, '_id'>,
+  ): Promise<DataExport> {
+    const collection = await this.getCollection()
+    // Ensure files is initialized
+    const data = { ...exportRequest, files: exportRequest.files || [] }
+    const result = await collection.insertOne(data)
+    const created = await collection.findOne({ _id: result.insertedId })
+
+    if (!created) {
+      throw new Error('Failed to create data export')
+    }
+
+    // Don't overwrite UUID 'id' with MongoDB _id
+    return created
+  }
+
+  async findById(id: string): Promise<DataExport | null> {
+    const collection = await this.getCollection()
+    // Query by custom 'id' field (UUID) used in the service
+    const request = await collection.findOne({ id: id } as any)
+
+    // Don't overwrite UUID 'id' with MongoDB _id
+    return request
+  }
+
+  async findByPatientId(patientId: string): Promise<DataExport[]> {
+    const collection = await this.getCollection()
+    const requests = await collection
+      .find({ patientId: patientId } as any)
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    // Don't overwrite UUID 'id' with MongoDB _id
+    return requests
+  }
+
+  async findAll(filter: any = {}): Promise<DataExport[]> {
+    const collection = await this.getCollection()
+    const requests = await collection
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    // Don't overwrite UUID 'id' with MongoDB _id
+    return requests
+  }
+
+  async update(
+    id: string,
+    updates: Partial<DataExport>,
+  ): Promise<DataExport | null> {
+    const collection = await this.getCollection()
+
+    // remove _id if present in updates to avoid immutable field error
+    const { _id, ...safeUpdates } = updates
+
+    const result = await collection.findOneAndUpdate(
+      { id: id } as any,
+      { $set: safeUpdates },
+      { returnDocument: 'after' },
+    )
+
+    // Don't overwrite UUID 'id' with MongoDB _id
+    return result
+  }
+
+  async addFile(exportId: string, file: any): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.updateOne({ id: exportId } as any, {
+      $push: { files: file } as any,
+    })
+  }
+}
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
@@ -469,3 +555,4 @@ export const biasDetectionDAO = new BiasDetectionDAO()
 export const treatmentPlanDAO = new TreatmentPlanDAO()
 export const crisisSessionFlagDAO = new CrisisSessionFlagDAO()
 export const consentManagementDAO = new ConsentManagementDAO()
+export const dataExportDAO = new DataExportDAO()
