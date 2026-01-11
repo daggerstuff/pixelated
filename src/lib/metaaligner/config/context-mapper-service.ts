@@ -108,7 +108,36 @@ export class ContextMapperService {
     // Normalize weights if required
     let normalized = false
     if (this.config.normalization === 'enabled') {
-      weights = this.normalizeWeights(weights)
+      if (safetyFloorApplied) {
+        // Special normalization preserving safety floor
+        const minSafety = this.config.safetyFloor.minimumSafetyWeight
+        const otherSum = Object.entries(weights)
+          .filter(([k]) => k !== ObjectiveId.SAFETY)
+          .reduce((acc, [_, v]) => acc + (v || 0), 0)
+
+        // If we have other objectives, distribute remaining budget
+        if (otherSum > 0) {
+          const remainingBudget = 1.0 - minSafety
+          const newWeights: any = {}
+
+          for (const [key, value] of Object.entries(weights)) {
+            if (key === ObjectiveId.SAFETY) {
+              newWeights[key] = minSafety
+            } else {
+              newWeights[key] = ((value || 0) / otherSum) * remainingBudget
+            }
+          }
+          weights = newWeights
+        } else {
+          // If only safety exists (or others are 0), safety must be 1.0 (if normalizing)
+          // But strict safety floor might imply keeping it at minSafety?
+          // Usually strict normalization implies Sum=1.0.
+          weights = this.normalizeWeights(weights)
+        }
+      } else {
+        weights = this.normalizeWeights(weights)
+      }
+
       normalized = true
       reasoning.push('Weights normalized to sum to 1.0')
     }

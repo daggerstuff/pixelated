@@ -1,9 +1,5 @@
-/**
- * External Threat Intelligence Integration
- * Integrates with external threat intelligence feeds and services
- */
-
 import { EventEmitter } from 'events'
+import { Redis } from 'ioredis'
 import axios, { AxiosInstance } from 'axios'
 import { MongoClient, type Db } from 'mongodb'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -17,6 +13,8 @@ export interface ThreatIntelligenceConfig {
   updateInterval: number // milliseconds
   cacheTimeout: number // milliseconds
   apiKeys: Record<string, string>
+  mongoUrl?: string
+  redisUrl?: string
   proxyConfig?: {
     host: string
     port: number
@@ -87,7 +85,8 @@ export interface ThreatIntelligenceResult {
 }
 
 export class ExternalThreatIntelligenceService extends EventEmitter {
-  private mongoClient: MongoClient
+  private mongoClient!: MongoClient
+  private redis!: Redis
   private config: ThreatIntelligenceConfig
   private httpClients: Map<string, AxiosInstance> = new Map()
   private updateIntervals: NodeJS.Timeout[] = []
@@ -96,15 +95,26 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   constructor(config: ThreatIntelligenceConfig) {
     super()
     this.config = config
-    this.initializeServices()
+  }
+
+  public async initialize(): Promise<void> {
+    await this.initializeServices()
   }
 
   private async initializeServices(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
+        this.config.mongoUrl ||
+        process.env.MONGODB_URI ||
+        'mongodb://localhost:27017/threat_detection',
       )
       await this.mongoClient.connect()
+
+      this.redis = new Redis(
+        this.config.redisUrl ||
+        process.env.REDIS_URL ||
+        'redis://localhost:6379',
+      )
 
       // Initialize HTTP clients for each feed
       this.initializeHttpClients()
@@ -441,14 +451,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = data.value || data.ioc || data.indicator || ''
-      const iocType = data.type || data.ioc_type || 'unknown'
-      const threatType = data.threat_type || data.malware_family || 'unknown'
+      const iocValue = String(data.value || data.ioc || data.indicator || '')
+      const iocType = String(data.type || data.ioc_type || 'unknown')
+      const threatType = String(data.threat_type || data.malware_family || 'unknown')
       const severity = this.mapSeverity(
-        data.severity || data.confidence || 'medium',
+        String(data.severity || data.confidence || 'medium'),
       )
       const confidence = this.extractConfidence(
-        data.confidence || data.score || 50,
+        (data.confidence ?? data.score ?? 50) as unknown,
       )
 
       if (!iocValue) {
@@ -463,16 +473,16 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         threatType: threatType as string,
         severity,
         confidence,
-        firstSeen: new Date(data.first_seen || data.created || Date.now()),
-        lastSeen: new Date(data.last_seen || data.updated || Date.now()),
+        firstSeen: new Date((data.first_seen || data.created || Date.now()) as any),
+        lastSeen: new Date((data.last_seen || data.updated || Date.now()) as any),
         expirationDate: data.expiration_date
           ? new Date(data.expiration_date as string)
           : undefined,
-        source: data.source || feed.name,
+        source: String(data.source || feed.name),
         tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
         metadata: {
           originalData: data,
-          feedType: feed.type,
+          feedType: String(feed.type),
           transformationDate: new Date(),
         },
         relatedIOCs: Array.isArray(data.related_iocs)
@@ -480,16 +490,16 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           : undefined,
         attribution: data.attribution
           ? {
-              actor:
-                ((data.attribution as Record<string, unknown>)
-                  .actor as string) || 'unknown',
-              campaign:
-                ((data.attribution as Record<string, unknown>)
-                  .campaign as string) || 'unknown',
-              family:
-                ((data.attribution as Record<string, unknown>)
-                  .family as string) || 'unknown',
-            }
+            actor:
+              ((data.attribution as Record<string, unknown>)
+                .actor as string) || 'unknown',
+            campaign:
+              ((data.attribution as Record<string, unknown>)
+                .campaign as string) || 'unknown',
+            family:
+              String(((data.attribution as Record<string, unknown>)
+                .family as string) || 'unknown'),
+          }
           : undefined,
       }
     } catch (error) {
@@ -549,14 +559,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         iocType,
         iocValue,
         threatType,
-        severity: this.mapSeverity((data.confidence as string) || 'medium'),
+        severity: this.mapSeverity(String(data.confidence || 'medium')),
         confidence: this.extractConfidence(data.confidence || 50),
-        firstSeen: new Date(data.created || Date.now()),
-        lastSeen: new Date(data.modified || Date.now()),
+        firstSeen: new Date((data.created || Date.now()) as any),
+        lastSeen: new Date((data.modified || Date.now()) as any),
         source: (data.created_by_ref as string) || feed.name,
         tags: Array.isArray(data.labels) ? (data.labels as string[]) : [],
         metadata: {
-          stixType: data.type,
+          stixType: String(data.type || 'unknown'),
           specVersion: (data.spec_version as string) || '2.0',
           transformationDate: new Date(),
         },
@@ -750,7 +760,13 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   ): Promise<ThreatIntelligenceResult> {
     try {
       if (!query.iocValue || !query.iocType) {
-        return { intelligence: [], totalCount: 0, sources: [] }
+        return {
+          intelligence: [],
+          totalCount: 0,
+          sources: [],
+          queryTime: new Date(),
+          cacheHit: false,
+        }
       }
 
       const cacheKey = `threat_intel:${query.iocType}:${query.iocValue}`
@@ -765,14 +781,28 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
             intelligence: [intel as ThreatIntelligence],
             totalCount: 1,
             sources: [intel.feedName || 'cache'],
+            queryTime: new Date(),
+            cacheHit: true,
           }
         }
       }
 
-      return { intelligence: [], totalCount: 0, sources: [] }
+      return {
+        intelligence: [],
+        totalCount: 0,
+        sources: [],
+        queryTime: new Date(),
+        cacheHit: false,
+      }
     } catch (error) {
       logger.error('Failed to query cache:', { error })
-      return { intelligence: [], totalCount: 0, sources: [] }
+      return {
+        intelligence: [],
+        totalCount: 0,
+        sources: [],
+        queryTime: new Date(),
+        cacheHit: false,
+      }
     }
   }
 
@@ -831,16 +861,24 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         .limit(100)
         .toArray()
 
-      const sources = [...new Set(intelligence.map((i) => i.feedName))]
+      const sources = Array.from(new Set(intelligence.map((i) => (i as any).feedName as string)))
 
       return {
-        intelligence: intelligence as ThreatIntelligence[],
+        intelligence: intelligence as unknown as ThreatIntelligence[],
         totalCount: intelligence.length,
         sources,
+        queryTime: new Date(),
+        cacheHit: false,
       }
     } catch (error) {
       logger.error('Failed to query database:', { error })
-      return { intelligence: [], totalCount: 0, sources: [] }
+      return {
+        intelligence: [],
+        totalCount: 0,
+        sources: [],
+        queryTime: new Date(),
+        cacheHit: false,
+      }
     }
   }
 
@@ -954,11 +992,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           externalIntelligence: {
             findings: intelligenceFindings,
             enrichmentTimestamp: new Date(),
-            sources: [
-              ...new Set(
-                intelligenceFindings.flatMap((f) => f.sources as string[]),
-              ),
-            ],
+            sources: Array.from(new Set(
+              intelligenceFindings.flatMap((f) => f.sources as string[]),
+            )),
           },
         }
       }
@@ -1147,10 +1183,12 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       },
     ]
 
-    return await db
+    const results = await db
       .collection('threat_intelligence')
       .aggregate(pipeline)
-      .toArray()
+      .toArray() as unknown as Array<{ type: string; count: number }>
+
+    return results
   }
 
   /**
@@ -1178,7 +1216,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     const results = await db
       .collection('threat_intelligence')
       .aggregate(pipeline)
-      .toArray()
+      .toArray() as unknown as Array<{ severity: string; count: number }>
 
     const distribution: Record<string, number> = {}
     for (const result of results) {

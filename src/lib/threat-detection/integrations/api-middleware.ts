@@ -47,7 +47,7 @@ export interface ThreatDetectionContext {
   userId?: string
   userRole?: string
   sessionId?: string
-  headers?: Record<string, unknown>
+  headers?: Record<string, string>
   body?: Record<string, unknown>
   [key: string]: unknown
 }
@@ -59,11 +59,22 @@ export interface RateLimitCheckResult {
 }
 
 // Augment Express Request to carry threat detection info
-declare module 'express-serve-static-core' {
-  interface Request {
-    threatDetection?: {
-      result: RateLimitCheckResult
-      threatResponse?: ThreatResponse
+declare global {
+  namespace Express {
+    interface Request {
+      threatDetection?: {
+        result: RateLimitCheckResult
+        threatResponse?: ThreatResponse
+      }
+      user?: {
+        id: string
+        role?: string
+        [key: string]: any
+      }
+      session?: {
+        id: string
+        [key: string]: any
+      }
     }
   }
 }
@@ -73,7 +84,6 @@ export class ThreatDetectionMiddleware {
 
   constructor(config: ApiMiddlewareConfig) {
     this.config = {
-      enabled: true,
       enableLogging: true,
       skipPaths: ['/health', '/status', '/metrics'],
       ...config,
@@ -85,8 +95,10 @@ export class ThreatDetectionMiddleware {
    */
   middleware() {
     return async (req: Request, res: Response, next: NextFunction) => {
-      if (!this.config.enabled) {
-        return next().slice()
+      // NOTE: Using 'any' cast for config to access 'enabled' if it exists on ApiMiddlewareConfig but not typed in ThreatDetectionMiddlewareConfig
+      // or if types are mismatched.
+      if ((this.config as any).enabled === false) {
+        return next()
       }
 
       try {
@@ -100,11 +112,10 @@ export class ThreatDetectionMiddleware {
         const context = this.getContext(req)
 
         // Check rate limit with threat detection
-        const result =
-          await this.config.bridge.checkRateLimitWithThreatDetection(
-            identifier,
-            context,
-          )
+        const result = (await this.config.bridge.checkRateLimitWithThreatDetection(
+          identifier,
+          context,
+        )) as unknown as RateLimitCheckResult
 
         // Log the check if enabled
         if (this.config.enableLogging) {
@@ -141,6 +152,7 @@ export class ThreatDetectionMiddleware {
           error,
           path: req.path,
         })
+        console.error('Threat detection middleware error:', error)
 
         // Fail open - allow request if middleware fails
         next()
@@ -209,9 +221,12 @@ export class ThreatDetectionMiddleware {
     // Add request headers (filtered)
     const sensitiveHeaders = ['authorization', 'cookie', 'set-cookie']
     context.headers = Object.fromEntries(
-      Object.entries(req.headers).filter(
-        ([key]) => !sensitiveHeaders.includes(key.toLowerCase()),
-      ),
+      Object.entries(req.headers)
+        .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
+        .map(([key, value]) => [
+          key,
+          Array.isArray(value) ? value.join(',') : (value || ''),
+        ]),
     )
 
     // Add request body for certain methods (filtered)

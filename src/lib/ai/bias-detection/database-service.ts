@@ -13,6 +13,7 @@ import type {
   BiasSummaryStats,
   BiasTrendData,
   DemographicBreakdown,
+  DashboardRecommendation,
 } from './types'
 import mongodb from '../../../config/mongodb.config'
 import { ObjectId } from 'mongodb'
@@ -134,7 +135,13 @@ export class BiasDetectionDatabaseService {
       const alerts = await this.getRecentAlerts(cutoffTime)
 
       // Get trend data
-      const trends = await this.getTrendData(timeRange)
+      const rawTrends = await this.getTrendData(timeRange)
+      const trends = rawTrends.map((t) => ({
+        date: t.date,
+        biasScore: t.biasScore,
+        sessionCount: t.sessionCount,
+        alertCount: t.alertCount,
+      }))
 
       // Get demographic breakdown
       const demographics = await this.getDemographicBreakdown(cutoffTime)
@@ -145,7 +152,7 @@ export class BiasDetectionDatabaseService {
         : []
 
       // Generate recommendations based on data
-      const recommendations = this.generateRecommendations(summary, alerts)
+      const recommendations = this.getRecommendations(summary, alerts)
 
       return {
         summary,
@@ -160,9 +167,15 @@ export class BiasDetectionDatabaseService {
         error: error instanceof Error ? String(error) : String(error),
         timeRange: options?.timeRange,
       })
-      throw error
+      throw error;
     }
   }
+
+
+
+
+
+
 
   /**
    * Get summary statistics
@@ -218,6 +231,15 @@ export class BiasDetectionDatabaseService {
         criticalIssues,
         improvementRate,
         complianceScore,
+        activeAlerts: criticalIssues, // Fallback
+        trendDirection: 'stable' as const, // Fallback
+        alertsLayerBreakdown: {}, // Fallback
+        alerts: {
+          low: 0,
+          medium: 0,
+          high: 0,
+          critical: criticalIssues,
+        },
       }
     } catch (error: unknown) {
       logger.error('Failed to get summary stats', {
@@ -251,6 +273,7 @@ export class BiasDetectionDatabaseService {
         type: alert['type'],
         message: alert['message'],
         sessionId: alert['sessionId'],
+        biasScore: alert['biasScore'] || 0,
         acknowledged: alert['acknowledged'] || false,
         resolvedAt: alert['resolvedAt'] || undefined,
       }))
@@ -305,9 +328,9 @@ export class BiasDetectionDatabaseService {
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
-                (sum, analysis) => sum + analysis['overallBiasScore'],
-                0,
-              ) / analyses.length
+              (sum, analysis) => sum + analysis['overallBiasScore'],
+              0,
+            ) / analyses.length
             : 0
 
         // Get demographic breakdown for this period
@@ -321,7 +344,7 @@ export class BiasDetectionDatabaseService {
         })
 
         trends.push({
-          date: endTime,
+          date: endTime.toISOString(),
           biasScore: avgScore,
           sessionCount: analyses.length,
           alertCount,
@@ -353,86 +376,78 @@ export class BiasDetectionDatabaseService {
         .find({ createdAt: { $gte: cutoffTime } })
         .toArray()
 
-      const age: Record<string, number> = {}
-      const gender: Record<string, number> = {}
-      const ethnicity: Record<string, number> = {}
-      const language: Record<string, number> = {}
-      const intersectional: Array<{
-        groups: string[]
-        representation: number
-        biasScore: number
-        sampleSize: number
-      }> = []
+      // Temporary storage for aggregation
+      // dimension -> value -> { count, totalBias }
+      const aggregation: Record<
+        string,
+        Record<string, { count: number; totalBias: number }>
+      > = {
+        age: {},
+        gender: {},
+        ethnicity: {},
+        intersectional: {},
+      }
 
       analyses.forEach((analysis) => {
         const demo = analysis['demographics']
-        if (demo) {
-          // Count demographics
-          Object.assign(age, { [demo.age]: (age[demo.age] ?? 0) + 1 })
-          Object.assign(gender, {
-            [demo.gender]: (gender[demo.gender] ?? 0) + 1,
-          })
-          Object.assign(ethnicity, {
-            [demo.ethnicity]: (ethnicity[demo.ethnicity] ?? 0) + 1,
-          })
-          // Precompute a stable key for this demographic intersection
-          const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
-            .sort()
-            .join('|')
-          const existingIntersection = intersectional.find(
-            (item) => item.groups.sort().join('|') === intersectionKey,
-          )
+        const biasScore = analysis['overallBiasScore'] || 0
 
-          if (existingIntersection) {
-            existingIntersection.sampleSize++
-            // Recalculate representation as the fraction of total analyses
-            existingIntersection.representation =
-              existingIntersection.sampleSize / analyses.length
-            // Update the running average of the bias score for this intersection
-            existingIntersection.biasScore =
-              (existingIntersection.biasScore *
-                (existingIntersection.sampleSize - 1) +
-                analysis['overallBiasScore']) /
-              existingIntersection.sampleSize
-          } else {
-            intersectional.push({
-              groups: [demo.age, demo.gender, demo.ethnicity],
-              // Initial representation is one sample out of the total
-              representation: 1 / analyses.length,
-              biasScore: analysis['overallBiasScore'],
-              sampleSize: 1,
-            })
+        if (demo) {
+          // Helper to update aggregation
+          const update = (dimension: string, value: string) => {
+            if (!aggregation[dimension]) aggregation[dimension] = {}
+            if (!aggregation[dimension][value]) {
+              aggregation[dimension][value] = { count: 0, totalBias: 0 }
+            }
+            aggregation[dimension][value].count++
+            aggregation[dimension][value].totalBias += biasScore
+          }
+
+          // Individual dimensions
+          if (demo.age) update('age', demo.age)
+          if (demo.gender) update('gender', demo.gender)
+          if (demo.ethnicity) update('ethnicity', demo.ethnicity)
+
+          // Intersectional dimension
+          if (demo.age && demo.gender && demo.ethnicity) {
+            const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
+              .sort()
+              .join('|')
+            update('intersectional', intersectionKey)
           }
         }
       })
 
-      return {
-        age,
-        gender,
-        ethnicity,
-        language,
-        intersectional,
-      }
+      // Convert to final format { count, averageBias }
+      const result: DemographicBreakdown = {}
+
+      Object.entries(aggregation).forEach(([dimension, values]) => {
+        result[dimension] = {}
+        Object.entries(values).forEach(([value, stats]) => {
+          result[dimension][value] = {
+            count: stats.count,
+            averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
+          }
+        })
+      })
+
+      return result
     } catch (error: unknown) {
       logger.error('Failed to get demographic breakdown', {
         error: error instanceof Error ? String(error) : String(error),
       })
-      return {
-        age: {},
-        gender: {},
-        ethnicity: {},
-        language: {},
-        intersectional: [],
-      }
+      // Return empty structure on error
+      return {}
     }
   }
+
 
   /**
    * Get recent analyses
    */
   private async getRecentAnalyses(
     cutoffTime: Date,
-    limit: number,
+    limit: number
   ): Promise<BiasAnalysisResult[]> {
     try {
       const db = await this.getDatabase()
@@ -466,25 +481,11 @@ export class BiasDetectionDatabaseService {
   /**
    * Generate recommendations based on current data
    */
-  private generateRecommendations(
+  private getRecommendations(
     summary: BiasSummaryStats,
     _alerts: BiasAlert[],
-  ): Array<{
-    id: string
-    priority: 'low' | 'medium' | 'high' | 'critical'
-    title: string
-    description: string
-    action: string
-    estimatedImpact: string
-  }> {
-    const recommendations: Array<{
-      id: string
-      priority: 'low' | 'medium' | 'high' | 'critical'
-      title: string
-      description: string
-      action: string
-      estimatedImpact: string
-    }> = []
+  ): DashboardRecommendation[] {
+    const recommendations: DashboardRecommendation[] = []
 
     if (summary.criticalIssues > 0) {
       recommendations.push({
@@ -493,8 +494,7 @@ export class BiasDetectionDatabaseService {
         title: 'Critical Bias Alerts Detected',
         description: `${summary.criticalIssues} critical bias issues require immediate attention`,
         action: 'Review and address critical alerts immediately',
-        estimatedImpact:
-          'High - Prevents potential harm and compliance violations',
+        impact: 'High - Prevents potential harm and compliance violations',
       })
     }
 
@@ -505,7 +505,7 @@ export class BiasDetectionDatabaseService {
         title: 'High Average Bias Score',
         description: `Average bias score of ${summary.averageBiasScore.toFixed(3)} exceeds recommended threshold`,
         action: 'Review training data and model parameters',
-        estimatedImpact: 'Medium - Improves overall system fairness',
+        impact: 'Medium - Improves overall system fairness',
       })
     }
 
@@ -517,7 +517,7 @@ export class BiasDetectionDatabaseService {
         description:
           'Bias scores have not improved significantly in recent period',
         action: 'Implement additional bias mitigation strategies',
-        estimatedImpact: 'Medium - Ensures continuous improvement',
+        impact: 'Medium - Ensures continuous improvement',
       })
     }
 
@@ -645,8 +645,8 @@ export class BiasDetectionDatabaseService {
         createdAt: new Date(),
         retentionExpiry: entry.retentionPeriodDays
           ? new Date(
-              Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
-            )
+            Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
+          )
           : null,
       }
 
