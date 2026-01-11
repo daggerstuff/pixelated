@@ -44,7 +44,7 @@ export abstract class BiasDetectionError extends Error {
       cause?: Error | unknown
     } = {},
   ) {
-    super(message, { cause: options.cause })
+    super(message)
     this.name = this.constructor.name
     this.code = code
     this.severity = severity
@@ -641,13 +641,13 @@ export function createErrorFromUnknown(
   context: {
     operation: string
     category?:
-      | 'configuration'
-      | 'validation'
-      | 'service'
-      | 'data'
-      | 'security'
-      | 'performance'
-      | 'system'
+    | 'configuration'
+    | 'validation'
+    | 'service'
+    | 'data'
+    | 'security'
+    | 'performance'
+    | 'system'
     severity?: 'low' | 'medium' | 'high' | 'critical'
     additionalContext?: Record<string, unknown>
   },
