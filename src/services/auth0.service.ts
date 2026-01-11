@@ -167,7 +167,7 @@ export class Auth0UserService {
 
     try {
       // Create user in Auth0
-      const { data: auth0User } = await auth0Management.users.create({
+      const auth0User = await auth0Management.users.create({
         connection: 'Username-Password-Authentication',
         email,
         password,
@@ -211,7 +211,7 @@ export class Auth0UserService {
     }
 
     try {
-      const { data: auth0User } = await auth0Management.users.get(userId);
+      const auth0User = await auth0Management.users.get(userId);
 
       return {
         id: auth0User.user_id,
@@ -354,7 +354,7 @@ export class Auth0UserService {
         updateParams.app_metadata = appMetadataUpdates
       }
 
-      const { data: auth0User } = await auth0Management.users.update(
+      const auth0User = await auth0Management.users.update(
         userId,
         updateParams
       )
@@ -374,6 +374,49 @@ export class Auth0UserService {
     } catch (error) {
       console.error('Auth0 update user error:', error)
       return null
+    }
+  }
+
+  /**
+   * Assign a role to a user
+   * @param userId Auth0 user id
+   * @param role Internal role name
+   */
+  async assignRoleToUser(userId: string, role: string) {
+    if (!auth0Management) {
+      throw new Error('Auth0 management client not initialized')
+    }
+
+    try {
+      // Get role ID from name (this is a simplification, in reality we'd need to look up the ID)
+      // For now, we'll assume the role exists and we map it to its expected name/ID
+      const auth0RoleName = this.mapRoleToAuth0Role(role)
+
+      // Get all roles to find the ID
+      const { data: roles } = await auth0Management.roles.list()
+      const targetRole = roles.find(r => r.name === auth0RoleName)
+
+      if (!targetRole || !targetRole.id) {
+        throw new Error(`Role ${auth0RoleName} not found in Auth0`)
+      }
+
+      await auth0Management.users.roles.assign(
+        userId,
+        { roles: [targetRole.id] }
+      )
+
+      // Also update app_metadata for consistency
+      await this.updateUser(userId, { role })
+
+      // Log success
+      await logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, {
+        userId,
+        role,
+        auth0RoleId: targetRole.id
+      })
+    } catch (error) {
+      console.error('Auth0 assign role error:', error)
+      throw new Error(`Failed to assign role ${role} to user ${userId}`)
     }
   }
 
@@ -500,7 +543,7 @@ export class Auth0UserService {
     }
 
     try {
-      const { data: ticket } = await auth0Management.tickets.changePassword({
+      const ticket = await auth0Management.tickets.changePassword({
         user_id: userId,
         result_url: returnUrl,
         ttl_sec: 3600 // 1 hour

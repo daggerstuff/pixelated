@@ -122,7 +122,7 @@ export class AnalyticsService {
   async processEvents(): Promise<void> {
     try {
       // Process events in batches
-      const events = await this.redisClient.lRange(
+      const events = await this.redisClient.lrange(
         'analytics:events:queue',
         0,
         this.batchSize - 1,
@@ -164,7 +164,7 @@ export class AnalyticsService {
           try {
             const fs = await import('node:fs');
             fs.appendFileSync('/tmp/debug_analytics.log', `[ProcessError] ${JSON.stringify(error, Object.getOwnPropertyNames(error))}\n`);
-          } catch (e) { }
+          } catch { }
           throw new ProcessingError('Failed to process event', error)
         }
       }

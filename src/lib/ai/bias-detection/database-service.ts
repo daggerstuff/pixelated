@@ -44,7 +44,7 @@ export class BiasDetectionDatabaseService {
         error: errorMessage,
         timestamp: new Date().toISOString(),
       })
-      throw new Error(`Database connection failed: ${errorMessage}`, { cause: error })
+      throw new Error(`Database connection failed: ${errorMessage}`)
     }
   }
 
