@@ -266,7 +266,7 @@ stages:
           - task: SonarCloudPublish@1
             displayName: 'Publish SonarCloud Quality Gate Result'
             inputs:
-              pollingTimeoutSec: '300'
+              pollingTimeoutSec: 300
 
   - stage: Eval
     displayName: 'Evaluation Gates (therapy-bench, clinical-similarity)'
