@@ -14,6 +14,15 @@ export enum SecurityEventType {
   ENCRYPTED_OPERATION = 'encrypted_operation',
   CONFIG_CHANGE = 'config_change',
   COMPLIANCE_CHECK = 'compliance_check',
+  LOGIN = 'login',
+  ACCOUNT_LINKED = 'account_linked',
+  ACCOUNT_UNLINKED = 'account_unlinked',
+  TOKEN_VALIDATED = 'token_validated',
+  TOKEN_VALIDATION_FAILED = 'token_validation_failed',
+  TOKEN_REFRESHED = 'token_refreshed',
+  TOKEN_REVOKED = 'token_revoked',
+  ROLE_ASSIGNED = 'role_assigned',
+  ROLE_REMOVED = 'role_removed',
 }
 
 /**
