@@ -398,14 +398,14 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
     for (const [roleName, roleDef] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
       try {
         // Check if role already exists
-        const { data: existingRolesPage } = await (auth0Management as any).roles.list({ name_filter: roleName })
+        const { data: existingRolesPage } = await auth0Management.roles.list({ name_filter: roleName })
         const existingRole = existingRolesPage.length > 0 ? existingRolesPage[0] : undefined
 
         let roleId: string
 
         if (!existingRole) {
           // Create new role
-          const { data: createdRole } = await (auth0Management as any).roles.create({
+          const createdRole = await auth0Management.roles.create({
             name: roleName,
             description: roleDef.description
           })
@@ -428,7 +428,7 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
           }
 
           if (permissionsToAdd.length > 0) {
-            await (auth0Management as any).roles.permissions.add(
+            await auth0Management.roles.permissions.add(
               roleId,
               { permissions: permissionsToAdd }
             )
@@ -444,7 +444,7 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
           }))
 
           if (permissionsToAdd.length > 0) {
-            await (auth0Management as any).roles.permissions.add(
+            await auth0Management.roles.permissions.add(
               roleId,
               { permissions: permissionsToAdd }
             )
@@ -473,7 +473,7 @@ export async function assignRoleToUser(userId: string, roleName: UserRole): Prom
 
   try {
     // Get role ID
-    const { data: rolesPage } = await (auth0Management as any).roles.list({ name_filter: roleName })
+    const { data: rolesPage } = await auth0Management.roles.list({ name_filter: roleName })
     if (rolesPage.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
@@ -481,7 +481,7 @@ export async function assignRoleToUser(userId: string, roleName: UserRole): Prom
     const roleId = rolesPage[0].id!
 
     // Assign role to user
-    await (auth0Management as any).users.roles.assign(
+    await auth0Management.users.roles.assign(
       userId,
       { roles: [roleId] }
     )
@@ -511,7 +511,7 @@ export async function removeRoleFromUser(userId: string, roleName: UserRole): Pr
 
   try {
     // Get role ID
-    const { data: rolesPage } = await (auth0Management as any).roles.list({ name_filter: roleName })
+    const { data: rolesPage } = await auth0Management.roles.list({ name_filter: roleName })
     if (rolesPage.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
@@ -519,7 +519,7 @@ export async function removeRoleFromUser(userId: string, roleName: UserRole): Pr
     const roleId = rolesPage[0].id!
 
     // Remove role from user
-    await (auth0Management as any).users.roles.delete(
+    await auth0Management.users.roles.delete(
       userId,
       { roles: [roleId] }
     )
@@ -548,7 +548,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   }
 
   try {
-    const { data: userRoles } = await (auth0Management as any).users.roles.list(userId)
+    const { data: userRoles } = await auth0Management.users.roles.list(userId)
     return userRoles.map(role => role.name as UserRole).filter(Boolean)
   } catch (error) {
     console.error(`Failed to get roles for user ${userId}:`, error)
