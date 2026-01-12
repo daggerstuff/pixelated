@@ -1,0 +1,25 @@
+---
+import ResearchLayout from "@/layouts/ResearchLayout.astro";
+import DatasetSearch from "@/components/research/DatasetSearch";
+---
+
+<ResearchLayout title="Dataset Sourcing | Pixelated Empathy">
+  <div class="py-12 px-4 mb-8">
+    <div class="max-w-4xl mx-auto text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 text-white">
+        <span
+          class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500"
+          >Therapy Datasets</span
+        >
+      </h1>
+      <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+        Discover and analyze high-quality conversational datasets for training
+        empathetic AI models.
+      </p>
+    </div>
+
+    <div class="w-full">
+      <DatasetSearch client:load />
+    </div>
+  </div>
+</ResearchLayout>

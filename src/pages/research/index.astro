@@ -1,0 +1,22 @@
+---
+import ResearchLayout from "@/layouts/ResearchLayout.astro";
+import SearchInterface from "@/components/research/SearchInterface";
+---
+
+<ResearchLayout title="Academic Sourcing | Pixelated Empathy">
+  <div class="research-hero py-20 px-4 mb-8">
+    <h1
+      class="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+    >
+      Academic Literature Search
+    </h1>
+    <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
+      Search 20+ sources for psychology & therapy research, datasets, and
+      clinical guidelines.
+    </p>
+
+    <div class="w-full">
+      <SearchInterface client:load />
+    </div>
+  </div>
+</ResearchLayout>
