@@ -14,10 +14,23 @@ function _secureId(prefix = ''): string {
     if (typeof nodeCrypto.randomBytes === 'function') {
       return `${prefix}${nodeCrypto.randomBytes(16).toString('hex')}`
     }
-  } catch (_e) {
-    // ignore errors when crypto is unavailable
+
+    // Crypto module available but methods not found
+    console.warn(
+      '[SECURITY WARNING] Crypto module available but randomUUID/randomBytes not found. Falling back to insecure ID generation.',
+    )
+  } catch (error) {
+    // Log crypto unavailability as a security concern
+    console.error(
+      '[SECURITY ERROR] Crypto module unavailable in threat detection system:',
+      error instanceof Error ? error.message : String(error),
+    )
   }
 
+  // Fallback to less secure method - this should be monitored
+  console.warn(
+    '[SECURITY WARNING] Using fallback ID generation (timestamp + random). This is NOT cryptographically secure.',
+  )
   return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
@@ -187,8 +200,7 @@ export interface PredictiveThreatIntelligence {
 
 export class AdvancedPredictiveThreatIntelligence
   extends EventEmitter
-  implements PredictiveThreatIntelligence
-{
+  implements PredictiveThreatIntelligence {
   private redis!: Redis
   private mongoClient!: MongoClient
   private timeSeriesForecaster!: TimeSeriesForecaster
@@ -1348,7 +1360,7 @@ export class AdvancedPredictiveThreatIntelligence
   private calculateTimeHorizon(timeframe: TimeWindow): string {
     const days = Math.ceil(
       (timeframe.end.getTime() - timeframe.start.getTime()) /
-        (1000 * 60 * 60 * 24),
+      (1000 * 60 * 60 * 24),
     )
     return `${days} days`
   }
@@ -1422,6 +1434,22 @@ export class AdvancedPredictiveThreatIntelligence
     return 0.5
   }
 
+  async predictThreats(
+    _data: Record<string, unknown>[],
+  ): Promise<Record<string, unknown>> {
+    try {
+      // Basic implementation - in a real scenario this would use the ML models
+      return {
+        predictions: [],
+        confidence: 0.6,
+        timestamp: new Date(),
+      }
+    } catch (error) {
+      this.emit('prediction_error', { error })
+      return { predictions: [], confidence: 0, error: String(error) }
+    }
+  }
+
   async shutdown(): Promise<void> {
     await this.redis.quit()
     await this.mongoClient.close()
@@ -1436,7 +1464,7 @@ interface ModelRegistry {
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(private _mongoClient: MongoClient) {}
+  constructor(private _mongoClient: MongoClient) { }
 
   async registerModel(_id: string, _model: unknown): Promise<void> {
     // Implementation placeholder
@@ -1893,8 +1921,8 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
       let i = 0;
       i <=
       dataPoints.length -
-        this.config.lookbackWindow -
-        this.config.predictionHorizon;
+      this.config.lookbackWindow -
+      this.config.predictionHorizon;
       i++
     ) {
       const xWindow = dataPoints.slice(i, i + this.config.lookbackWindow)
