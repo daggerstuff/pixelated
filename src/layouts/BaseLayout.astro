@@ -30,6 +30,7 @@ interface Props {
   pathname?: string;
   showNavBar?: boolean;
   showFooter?: boolean;
+  showBackLink?: boolean;
 }
 
 const {
@@ -42,6 +43,7 @@ const {
   pathname,
   showNavBar = true,
   showFooter = true,
+  showBackLink = true,
 } = Astro.props;
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
@@ -120,7 +122,7 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
       <slot />
       <!-- Share -->
       {
-        currentPathname !== withBasePath("/") && (
+        currentPathname !== withBasePath("/") && showBackLink && (
           <footer class="slide-enter animate-delay-1000! prose mx-auto mt-8 print:hidden">
             <slot name="share" />
             <br />
