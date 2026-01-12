@@ -5,13 +5,14 @@
  * previous MongoDB-based authentication system.
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0';
 import type { Db } from 'mongodb'
 import { mongodb } from '../config/mongodb.config'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
 import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
 import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
+import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
@@ -26,33 +27,54 @@ const AUTH0_CONFIG = {
 // Initialize Auth0 clients
 let auth0Management: ManagementClient | null = null
 let auth0Authentication: AuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
-    console.warn('Auth0 configuration is incomplete. Authentication features may not work.')
+  const domain = process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain
+  const managementClientId = process.env.AUTH0_MANAGEMENT_CLIENT_ID || AUTH0_CONFIG.managementClientId
+  const managementClientSecret = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || AUTH0_CONFIG.managementClientSecret
+  const clientId = process.env.AUTH0_CLIENT_ID || AUTH0_CONFIG.clientId
+  const clientSecret = process.env.AUTH0_CLIENT_SECRET || AUTH0_CONFIG.clientSecret
+
+  if (!domain || !managementClientId || !managementClientSecret) {
+    console.warn('Auth0 configuration is incomplete. Authentication features may not work.', { domain, managementClientId, managementClientSecret })
     return
   }
 
   if (!auth0Management) {
     auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users delete:users'
+      domain: domain,
+      clientId: managementClientId,
+      clientSecret: managementClientSecret,
+      audience: `https://${domain}/api/v2/`,
     })
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain: domain,
+      clientId: clientId,
+      clientSecret: clientSecret
     })
   }
+
+  if (!auth0UserInfo) {
+    auth0UserInfo = new UserInfoClient({
+      domain: domain,
+    });
+  }
+}
+
+/**
+ * Reset Auth0 clients (for testing)
+ */
+export function resetAuth0ServiceClients() {
+  auth0Management = null
+  auth0Authentication = null
+  auth0UserInfo = null
 }
 
 /**
@@ -83,38 +105,47 @@ export class Auth0UserService {
    * @returns User and access token
    */
   async signIn(email: string, password: string) {
-    if (!auth0Authentication) {
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new Error('Auth0 authentication client not initialized')
     }
 
     try {
       // Use Auth0's Resource Owner Password grant for direct authentication
-      const tokenResponse = await auth0Authentication.passwordGrant({
+      const { data } = await auth0Authentication.oauth.passwordGrant({
         username: email,
         password: password,
         realm: 'Username-Password-Authentication',
-        scope: 'openid profile email',
-        audience: AUTH0_CONFIG.audience
-      })
+        audience: process.env.AUTH0_AUDIENCE || AUTH0_CONFIG.audience, // Use environment variable or config
+        scope: 'openid profile email offline_access',
+      });
 
+      const { access_token, refresh_token, expires_in } = data;
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      const { data: userResponse } = await auth0UserInfo.getUserInfo(access_token);
+
+      // Log security event
+      await logSecurityEvent(SecurityEventType.LOGIN, {
+        userId: userResponse.sub, // Auth0 v5 uses 'sub' for user ID in user info
+        email: userResponse.email,
+        method: 'password'
+      })
 
       return {
         user: {
-          id: userResponse.user_id,
+          id: userResponse.sub,
           email: userResponse.email,
           emailVerified: userResponse.email_verified,
           role: this.extractRoleFromUser(userResponse),
           fullName: userResponse.name,
           avatarUrl: userResponse.picture,
           createdAt: userResponse.created_at,
-          lastLogin: userResponse.last_login,
-          appMetadata: userResponse.app_metadata,
-          userMetadata: userResponse.user_metadata
+          lastLogin: userResponse.updated_at, // Auth0 v5 user info might not have last_login directly
+          appMetadata: userResponse['https://pixelatedempathy.com/app_metadata'], // Custom namespace
+          userMetadata: userResponse['https://pixelatedempathy.com/user_metadata'] // Custom namespace
         },
-        token: tokenResponse.access_token,
-        refreshToken: tokenResponse.refresh_token
+        token: access_token,
+        refreshToken: refresh_token,
+        expiresIn: expires_in,
       }
     } catch (error) {
       console.error('Auth0 sign in error:', error)
@@ -136,11 +167,12 @@ export class Auth0UserService {
 
     try {
       // Create user in Auth0
-      const auth0User = await auth0Management.createUser({
+      const auth0User = await auth0Management.users.create({
+        connection: 'Username-Password-Authentication',
         email,
         password,
-        connection: 'Username-Password-Authentication',
         email_verified: false,
+        verify_email: true,
         app_metadata: {
           roles: [this.mapRoleToAuth0Role(role)],
           imported_from: 'manual_creation'
@@ -149,7 +181,7 @@ export class Auth0UserService {
           role,
           created_at: new Date().toISOString()
         }
-      })
+      });
 
       return {
         id: auth0User.user_id,
@@ -179,7 +211,7 @@ export class Auth0UserService {
     }
 
     try {
-      const auth0User = await auth0Management.getUser({ id: userId })
+      const auth0User = await auth0Management.users.get(userId);
 
       return {
         id: auth0User.user_id,
@@ -209,7 +241,7 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers()
+      const { data: users } = await auth0Management.users.list();
       return users.map(user => ({
         id: user.user_id,
         email: user.email,
@@ -239,7 +271,7 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers({
+      const { data: users } = await auth0Management.users.list({
         q: `email:"${email}"`,
         search_engine: 'v3'
       })
@@ -322,8 +354,8 @@ export class Auth0UserService {
         updateParams.app_metadata = appMetadataUpdates
       }
 
-      const auth0User = await auth0Management.updateUser(
-        { id: userId },
+      const auth0User = await auth0Management.users.update(
+        userId,
         updateParams
       )
 
@@ -346,6 +378,49 @@ export class Auth0UserService {
   }
 
   /**
+   * Assign a role to a user
+   * @param userId Auth0 user id
+   * @param role Internal role name
+   */
+  async assignRoleToUser(userId: string, role: string) {
+    if (!auth0Management) {
+      throw new Error('Auth0 management client not initialized')
+    }
+
+    try {
+      // Get role ID from name (this is a simplification, in reality we'd need to look up the ID)
+      // For now, we'll assume the role exists and we map it to its expected name/ID
+      const auth0RoleName = this.mapRoleToAuth0Role(role)
+
+      // Get all roles to find the ID
+      const { data: roles } = await auth0Management.roles.list()
+      const targetRole = roles.find(r => r.name === auth0RoleName)
+
+      if (!targetRole || !targetRole.id) {
+        throw new Error(`Role ${auth0RoleName} not found in Auth0`)
+      }
+
+      await auth0Management.users.roles.assign(
+        userId,
+        { roles: [targetRole.id] }
+      )
+
+      // Also update app_metadata for consistency
+      await this.updateUser(userId, { role })
+
+      // Log success
+      await logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, {
+        userId,
+        role,
+        auth0RoleId: targetRole.id
+      })
+    } catch (error) {
+      console.error('Auth0 assign role error:', error)
+      throw new Error(`Failed to assign role ${role} to user ${userId}`)
+    }
+  }
+
+  /**
    * Change user password
    * @param userId Auth0 user ID
    * @param newPassword New password
@@ -356,8 +431,8 @@ export class Auth0UserService {
     }
 
     try {
-      await auth0Management.updateUser(
-        { id: userId },
+      await auth0Management.users.update(
+        userId,
         { password: newPassword }
       )
     } catch (error) {
@@ -377,7 +452,7 @@ export class Auth0UserService {
 
     try {
       // Revoke refresh token
-      await auth0Authentication.revokeRefreshToken({
+      await auth0Authentication.oauth.revokeRefreshToken({
         token: refreshToken
       })
     } catch (error) {
@@ -392,38 +467,38 @@ export class Auth0UserService {
    * @returns New access token and user info
    */
   async refreshSession(refreshToken: string) {
-    if (!auth0Authentication) {
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new Error('Auth0 authentication client not initialized')
     }
 
     try {
       // Exchange refresh token for new access token
-      const tokenResponse = await auth0Authentication.refreshToken({
-        refresh_token: refreshToken
-      })
+      const { data } = await auth0Authentication.oauth.refreshTokenGrant({ refresh_token: refreshToken });
+
+      const { access_token, expires_in } = data;
 
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      const { data: userResponse } = await auth0UserInfo.getUserInfo(access_token);
 
       return {
         user: {
-          id: userResponse.user_id,
+          id: userResponse.sub,
           email: userResponse.email,
           emailVerified: userResponse.email_verified,
           role: this.extractRoleFromUser(userResponse),
           fullName: userResponse.name,
           avatarUrl: userResponse.picture,
           createdAt: userResponse.created_at,
-          lastLogin: userResponse.last_login,
-          appMetadata: userResponse.app_metadata,
-          userMetadata: userResponse.user_metadata
+          lastLogin: userResponse.updated_at,
+          appMetadata: userResponse['https://pixelatedempathy.com/app_metadata'],
+          userMetadata: userResponse['https://pixelatedempathy.com/user_metadata']
         },
         session: {
-          accessToken: tokenResponse.access_token,
-          refreshToken: tokenResponse.refresh_token,
-          expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000)
+          accessToken: access_token,
+          refreshToken: refreshToken, // Refresh token is not returned by refresh token grant, so we pass the original one
+          expiresAt: new Date(Date.now() + expires_in * 1000)
         },
-        accessToken: tokenResponse.access_token
+        accessToken: access_token
       }
     } catch (error) {
       console.error('Auth0 refresh session error:', error)
@@ -437,16 +512,16 @@ export class Auth0UserService {
    * @returns User info from token
    */
   async verifyAuthToken(token: string) {
-    if (!auth0Authentication) {
-      throw new Error('Auth0 authentication client not initialized')
+    if (!auth0UserInfo) {
+      throw new Error('Auth0 user info client not initialized')
     }
 
     try {
       // Decode token to get user info
-      const decodedToken = await auth0Authentication.getProfile(token)
+      const { data: decodedToken } = await auth0UserInfo.getUserInfo(token);
 
       return {
-        userId: decodedToken.user_id,
+        userId: decodedToken.sub,
         email: decodedToken.email,
         role: this.extractRoleFromUser(decodedToken)
       }
@@ -468,7 +543,7 @@ export class Auth0UserService {
     }
 
     try {
-      const ticket = await auth0Management.createPasswordChangeTicket({
+      const ticket = await auth0Management.tickets.changePassword({
         user_id: userId,
         result_url: returnUrl,
         ttl_sec: 3600 // 1 hour

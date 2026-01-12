@@ -147,7 +147,7 @@ export class RedisConnectionPool {
     }
 
     // Try to find an available connection
-    for (const connection of this.connections.values()) {
+    for (const connection of Array.from(this.connections.values())) {
       if (!connection.inUse && (await this.isConnectionHealthy(connection))) {
         connection.inUse = true
         connection.lastUsed = new Date()
@@ -327,12 +327,12 @@ export class RedisConnectionPool {
       const now = new Date()
       const connectionsToDestroy: RedisConnection[] = []
 
-      for (const connection of this.connections.values()) {
+      for (const connection of Array.from(this.connections.values())) {
         // Check for idle timeout
         if (
           !connection.inUse &&
           now.getTime() - connection.lastUsed.getTime() >
-            this.config.idleTimeout
+          this.config.idleTimeout
         ) {
           connectionsToDestroy.push(connection)
           continue
@@ -443,7 +443,7 @@ export class RedisConnectionPool {
 
     // Destroy all connections
     await Promise.all(
-      [...this.connections.values()].map((conn) =>
+      Array.from(this.connections.values()).map((conn) =>
         this.destroyConnection(conn),
       ),
     )
@@ -530,7 +530,9 @@ export class RedisPoolManager {
    * Dispose all pools
    */
   async dispose(): Promise<void> {
-    await Promise.all([...this.pools.values()].map((pool) => pool.dispose()))
+    await Promise.all(
+      Array.from(this.pools.values()).map((pool) => pool.dispose()),
+    )
 
     this.pools.clear()
 

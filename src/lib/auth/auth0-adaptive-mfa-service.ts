@@ -32,7 +32,6 @@ function initializeAuth0Management() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users read:logs read:attack-protection update:attack-protection'
     })
   }
 }
@@ -256,9 +255,9 @@ export class Auth0AdaptiveMFAService {
       } else {
         // Check Auth0 logs for suspicious activity from this IP
         if (auth0Management) {
-          const logs = await auth0Management.getLogs({
+          const { data: logs } = await auth0Management.logs.list({
             per_page: 10,
-            q: `ip:${ipAddress} AND type:f`
+            search: `ip:${ipAddress} AND type:f`
           })
 
           if (logs.length > 0) {
@@ -271,8 +270,8 @@ export class Auth0AdaptiveMFAService {
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
         if (user && user.lastLogin && Math.random() < 0.1) {
-              triggered = true
-              description = `New or unusual IP address for user`
+          triggered = true
+          description = `New or unusual IP address for user`
         }
       }
     } catch (error) {
@@ -313,9 +312,9 @@ export class Auth0AdaptiveMFAService {
       // Check for unusual location change (simulated)
       const user = await auth0UserService.getUserById(userId)
       if (user && (Math.random() < 0.05 && location.country)) {
-            triggered = true
-            description = `Unusual location change detected`
-            value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
+        triggered = true
+        description = `Unusual location change detected`
+        value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
     } catch (error) {
       console.warn('Failed to analyze geolocation:', error)
@@ -392,9 +391,9 @@ export class Auth0AdaptiveMFAService {
       if (this.config.enableBehavioralAnalysis) {
         // Check recent failed login attempts
         if (auth0Management) {
-          const recentLogs = await auth0Management.getLogs({
+          const { data: recentLogs } = await auth0Management.logs.list({
             per_page: 20,
-            q: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`
+            search: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`
           })
 
           if (recentLogs.length >= this.config.maxFailedAttempts) {
@@ -411,7 +410,7 @@ export class Auth0AdaptiveMFAService {
         // Check for unusual login patterns (simulated)
         const user = await auth0UserService.getUserById(userId)
         if (user && user.lastLogin) {
-          const lastLoginTime = new Date(user.lastLogin)
+          const lastLoginTime = new Date(String(user.lastLogin || ''))
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
           // If last login was more than 30 days ago, consider it unusual
