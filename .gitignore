@@ -280,3 +280,7 @@ AGENTS.md
 /.cursor/
 /.openagents/
 /.openskills/
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
