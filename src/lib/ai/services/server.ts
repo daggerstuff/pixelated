@@ -1,5 +1,5 @@
 // IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../instrument.mjs'
+import "../../../../config/instrument.mjs";
 
 import { createServer } from 'http'
 import { parse } from 'url'
