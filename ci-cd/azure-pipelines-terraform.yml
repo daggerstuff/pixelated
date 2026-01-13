@@ -1,0 +1,487 @@
+# Azure DevOps Pipeline for Terraform Infrastructure
+# Manages Azure infrastructure using GitLab-managed Terraform state
+#
+# Configuration:
+# - Uses GitLab-managed state backend (Project ID: 77130665)
+# - Requires TF_HTTP_PASSWORD variable (GitLab token) in variable groups
+# - Backend configuration in terraform/backend.config
+#
+# Post-Deployment:
+# - After infrastructure is created, optionally sets up Kubernetes cluster:
+#   - Installs cert-manager for automatic TLS certificate management
+#   - Deploys Let's Encrypt ClusterIssuers
+#   - Creates initial namespaces (pixelated, ollama)
+#   - Note: Application deployments are handled by azure-pipelines.yml
+
+trigger:
+  branches:
+    include:
+      - master
+      - main
+      - terraform/*
+  paths:
+    include:
+      - terraform/*
+      - azure-pipelines-terraform.yml
+
+pr:
+  branches:
+    include:
+      - master
+      - main
+      - terraform/*
+  paths:
+    include:
+      - terraform/*
+
+parameters:
+  - name: terraformAction
+    displayName: "Terraform Action"
+    type: string
+    default: "plan"
+    values:
+      - plan
+      - apply
+      - destroy
+      - refresh
+  - name: environment
+    displayName: "Environment"
+    type: string
+    default: "staging"
+    values:
+      - staging
+      - production
+  - name: terraformVersion
+    displayName: "Terraform Version"
+    type: string
+    default: "1.9.0"
+    values:
+      - "1.9.0"
+      - "1.8.0"
+      - "1.7.0"
+
+variables:
+  # Reference variable groups from Azure DevOps Library
+  - group: pixelated-pipeline-variables
+  - group: pixelated-terraform-variables
+
+  # Terraform variables
+  - name: terraformDirectory
+    value: "$(System.DefaultWorkingDirectory)/terraform"
+  - name: artifactName
+    value: "terraform-plan"
+  - name: stateFileName
+    value: "terraform.tfstate"
+
+  # Environment-specific variables
+  - name: environment
+    value: "${{ parameters.environment }}"
+  - name: tfvarsFile
+    value: "environments/${{ parameters.environment }}.tfvars"
+
+stages:
+  # Stage 1: Validate Terraform configuration
+  - stage: TerraformValidate
+    displayName: "Terraform Validate & Plan"
+    condition: succeeded()
+    jobs:
+      - job: ValidateAndPlan
+        displayName: "Terraform Validation & Planning"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          # Checkout code with credentials for pulling Terraform state
+          - checkout: self
+            persistCredentials: true
+
+          # Configure Git for SSH authentication
+          - task: Bash@3
+            displayName: "Configure Git for SSH"
+            inputs:
+              targetType: "inline"
+              script: |
+                # Configure Git to use system credential helper for Azure DevOps
+                git config --global credential.helper store
+                git config --global user.name "Azure DevOps"
+                git config --global user.email "azure-pipelines@devops.com"
+                # Ensure SSH is properly configured
+                mkdir -p ~/.ssh
+                chmod 700 ~/.ssh
+
+          # Configure Azure CLI and authenticate
+          - task: AzureCLI@2
+            displayName: "Login to Azure"
+            inputs:
+              azureSubscription: "$(AZURE_SUBSCRIPTION)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                echo "✅ Azure authentication successful"
+                echo "Subscription ID: $(az account show --query id -o tsv)"
+                echo "Tenant ID: $(az account show --query tenantId -o tsv)"
+
+                # Set subscription for Terraform
+                az account set --subscription $(az account show --query id -o tsv)
+
+          # Install Terraform
+          - task: TerraformInstaller@0
+            displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+            inputs:
+              terraformVersion: "${{ parameters.terraformVersion }}"
+
+          # Terraform validate and init
+          - task: Bash@3
+            displayName: "Initialize Terraform Backend"
+            inputs:
+              targetType: "inline"
+              script: |
+                cd $(terraformDirectory)
+
+                # Verify backend config exists
+                if [ ! -f backend.config ]; then
+                  echo "##vso[task.logissue type=error]backend.config file not found"
+                  echo "Copy backend.config.example to backend.config and configure it"
+                  exit 1
+                fi
+
+                # Initialize with GitLab backend
+                if ! terraform init -backend-config=backend.config; then
+                  echo "##vso[task.logissue type=error]Terraform init failed"
+                  echo "If you see 'Backend configuration changed' error, update backend config and run:"
+                  echo "  terraform init -backend-config=backend.config -reconfigure"
+                  exit 1
+                fi
+            env:
+              TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+
+          # Run terraform fmt check
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Format Check"
+            inputs:
+              provider: "azurerm"
+              command: "fmt"
+              commandOptions: "-check=true -recursive"
+              workingDirectory: $(terraformDirectory)
+
+          # Terraform validate
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Validate"
+            inputs:
+              provider: "azurerm"
+              command: "validate"
+              commandOptions: "-var-file=$(tfvarsFile)"
+              workingDirectory: $(terraformDirectory)
+
+          # Generate Terraform plan
+          - task: Bash@3
+            displayName: "Generate Terraform Plan"
+            condition: and(succeeded(), or(eq('${{ parameters.terraformAction }}', 'plan'), eq('${{ parameters.terraformAction }}', 'apply')))
+            inputs:
+              targetType: "inline"
+              script: |
+                echo "📋 Generating Terraform plan..."
+                cd $(terraformDirectory)
+
+                terraform plan \
+                  -var-file=$(tfvarsFile) \
+                  -out=tfplan \
+                  -detailed-exitcode
+
+                PLAN_EXITCODE=$?
+                echo "⭐ Terraform plan exit code: $PLAN_EXITCODE"
+
+                case $PLAN_EXITCODE in
+                  0) # No changes
+                    echo "No infrastructure changes detected"
+                    echo "##vso[task.logissue type=message]✅ No changes planned"
+                    ;;
+                  1) # Error
+                    echo "❌ Terraform plan failed"
+                    exit 1
+                    ;;
+                  2) # Changes detected
+                    echo "Infrastructure changes detected"
+                    echo "##vso[task.complete result=Succeeded;]Changes planned: See plan summary in artifacts"
+                    ;;
+                esac
+            env:
+              TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              TF_IN_AUTOMATION: "true"
+              TF_LOG: "INFO"
+
+          # Pretty print the plan (suppress color for Azure DevOps logs)
+          - task: Bash@3
+            displayName: "Display Terraform Plan Summary"
+            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            inputs:
+              targetType: "inline"
+              script: |
+                cd $(terraformDirectory)
+                terraform show -no-color tfplan | head -100
+                echo ""
+                echo "📊 Summary: View full plan in Terraform Plan artifact..."
+            continueOnError: true
+
+          # Save terraform plan as artifact
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Terraform Plan"
+            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            inputs:
+              targetPath: "$(terraformDirectory)/tfplan"
+              artifactName: "$(artifactName)-plan-${{ parameters.environment }}"
+              artifactType: "pipeline"
+
+  # Stage 2: Apply Terraform changes if permitted
+  - stage: TerraformApply
+    displayName: "Terraform Apply (Manual Approval)"
+    dependsOn: TerraformValidate
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{ parameters.terraformAction }}', 'apply'))
+    jobs:
+      - deployment: ApplyChanges
+        displayName: "Apply Infrastructure Changes"
+        environment: ${{ parameters.environment }}
+        pool:
+          vmImage: "ubuntu-latest"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  persistCredentials: true
+
+                - task: AzureCLI@2
+                  displayName: "Login to Azure"
+                  inputs:
+                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      echo "✅ Azure authentication successful"
+                      az account set --subscription $(az account show --query id -o tsv)
+
+                - task: TerraformInstaller@0
+                  displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+                  inputs:
+                    terraformVersion: "${{ parameters.terraformVersion }}"
+
+                - task: Bash@3
+                  displayName: "Initialize Terraform Backend"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      cd $(terraformDirectory)
+
+                      # Verify backend config exists
+                      if [ ! -f backend.config ]; then
+                        echo "##vso[task.logissue type=error]backend.config file not found"
+                        echo "Copy backend.config.example to backend.config and configure it"
+                        exit 1
+                      fi
+
+                      terraform init -backend-config=backend.config
+                  env:
+                    TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+
+                # Download the plan artifact
+                - task: DownloadPipelineArtifact@2
+                  displayName: "Download Terraform Plan"
+                  inputs:
+                    artifactName: "$(artifactName)-plan-${{ parameters.environment }}"
+                    targetPath: "$(terraformDirectory)"
+
+                - task: Bash@3
+                  displayName: "Apply Terraform Changes"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      echo "🚀 Applying Terraform infrastructure changes to ${{ parameters.environment }}..."
+                      cd $(terraformDirectory)
+
+                      # Apply with the plan file
+                      terraform apply \
+                        -auto-approve \
+                        -input=false \
+                        tfplan
+
+                      echo ""
+                      echo "✅ Terraform apply completed successfully"
+
+                      # Save outputs for later stages
+                      terraform output -json > outputs.json
+                      echo "📊 Infrastructure outputs saved to outputs.json"
+                    env:
+                      TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+                      ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+                      ARM_TENANT_ID: $(AZURE_TENANT_ID)
+                      TF_IN_AUTOMATION: "1"
+                      TF_CLI_ARGS: "-no-color"
+
+                # Generate and save outputs
+                - task: Bash@3
+                  displayName: "Generate Terraform Outputs"
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      cd $(terraformDirectory)
+
+                      # Generate human-readable outputs
+                      echo "# Infrastructure Configuration Summary" > infrastructure-summary.md
+                      echo "" >> infrastructure-summary.md
+                      echo "Environment: ${{ parameters.environment }}" >> infrastructure-summary.md
+                      echo "Terraform Version: ${{ parameters.terraformVersion }}" >> infrastructure-summary.md
+                      echo "Build: $(Build.BuildNumber)" >> infrastructure-summary.md
+                      echo "" >> infrastructure-summary.md
+
+                      terraform output -json | jq -r 'to_entries[] | "\(.key): \(.value.value)"' >> infrastructure-summary.md
+
+                      echo "📄 Infrastructure summary generated"
+                  continueOnError: true
+
+                - publish: $(terraformDirectory)/infrastructure-summary.md
+                  artifactName: terraform-deployment-summary
+                  artifactType: pipeline
+
+                # Post-deployment: Setup Kubernetes cluster with cert-manager and initial resources
+                - task: Bash@3
+                  displayName: "Setup Kubernetes Cluster (Optional)"
+                  condition: and(succeeded(), eq('${{ parameters.environment }}', 'staging'))
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      set -euo pipefail
+
+                      echo "🔧 Setting up Kubernetes cluster with cert-manager and initial resources..."
+
+                      # Get AKS credentials
+                      AKS_CLUSTER_NAME=$(terraform -chdir=$(terraformDirectory) output -raw aks_cluster_name 2>/dev/null || echo "")
+                      RESOURCE_GROUP=$(terraform -chdir=$(terraformDirectory) output -raw resource_group_name 2>/dev/null || echo "")
+
+                      if [ -z "$AKS_CLUSTER_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
+                        echo "⚠️ Could not get AKS cluster info from Terraform outputs. Skipping cluster setup."
+                        echo "   This is optional - you can set up cert-manager manually later."
+                        exit 0
+                      fi
+
+                      echo "📋 AKS Cluster: $AKS_CLUSTER_NAME"
+                      echo "📋 Resource Group: $RESOURCE_GROUP"
+
+                      # Get AKS credentials
+                      az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$AKS_CLUSTER_NAME" --overwrite-existing
+
+                      # Verify cluster connection
+                      if ! kubectl cluster-info &>/dev/null; then
+                        echo "⚠️ Could not connect to AKS cluster. Skipping cluster setup."
+                        exit 0
+                      fi
+
+                      echo "✅ Connected to AKS cluster"
+
+                      # Install cert-manager if not already installed
+                      if ! kubectl get namespace cert-manager &>/dev/null; then
+                        echo "🔐 Installing cert-manager..."
+                        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+                        # Wait for cert-manager to be ready
+                        echo "⏳ Waiting for cert-manager pods..."
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s || true
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-cainjector -n cert-manager --timeout=300s || true
+                        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager-webhook -n cert-manager --timeout=300s || true
+                        echo "✅ cert-manager installed"
+                      else
+                        echo "✅ cert-manager already installed"
+                      fi
+
+                      # Deploy Let's Encrypt ClusterIssuers if manifests exist
+                      if [ -f "$(System.DefaultWorkingDirectory)/k8s/azure/letsencrypt-clusterissuer.yaml" ]; then
+                        echo "🔐 Deploying Let's Encrypt ClusterIssuers..."
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/letsencrypt-clusterissuer.yaml"
+                        echo "✅ ClusterIssuers deployed"
+                      else
+                        echo "⚠️ ClusterIssuer manifest not found. Skipping."
+                      fi
+
+                      # Create initial namespaces if manifests exist
+                      if [ -f "$(System.DefaultWorkingDirectory)/k8s/azure/pixelated-namespace.yaml" ]; then
+                        echo "📦 Creating initial namespaces..."
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/pixelated-namespace.yaml" || true
+                        kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/azure/ollama-namespace.yaml" || true
+                        echo "✅ Initial namespaces created"
+                      fi
+
+                      echo ""
+                      echo "✅ Kubernetes cluster setup completed!"
+                      echo "📋 Next steps:"
+                      echo "   1. Deploy applications using azure-pipelines.yml"
+                      echo "   2. Configure DNS to point to the ingress IP"
+                      echo "   3. TLS certificates will be automatically provisioned by cert-manager"
+
+  # Stage 3: Refresh state (for troubleshooting)
+  - stage: TerraformRefresh
+    displayName: "Terraform State Refresh"
+    dependsOn: [ ]
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{ parameters.terraformAction }}', 'refresh'))
+    jobs:
+      - job: RefreshState
+        displayName: "Refresh Terraform State"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: "Login to Azure"
+            inputs:
+              azureSubscription: "$(AZURE_SUBSCRIPTION)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az account set --subscription $(az account show --query id -o tsv)
+
+          - task: TerraformInstaller@0
+            displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+            inputs:
+              terraformVersion: "${{ parameters.terraformVersion }}"
+
+          - task: Bash@3
+            displayName: "Initialize Terraform Backend"
+            inputs:
+              targetType: "inline"
+              script: |
+                cd $(terraformDirectory)
+
+                if [ ! -f backend.config ]; then
+                  echo "##vso[task.logissue type=error]backend.config file not found"
+                  exit 1
+                fi
+
+                terraform init -backend-config=backend.config
+            env:
+              TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+
+          - task: Bash@3
+            displayName: "Terraform Refresh"
+            inputs:
+              targetType: "inline"
+              script: |
+                cd $(terraformDirectory)
+                terraform refresh -var-file=$(tfvarsFile)
+            env:
+              TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+
+# Post-deployment scripts
+postDeployment:
+  onSuccess:
+    - script: |
+        echo "✅ Terraform pipeline completed successfully"
+        echo "Environment: ${{ parameters.environment }}"
+        echo "Action: ${{ parameters.terraformAction }}"
+      displayName: "Post-deployment Success"
+
+  onFailure:
+    - script: |
+        echo "❌ Terraform pipeline completed with failures"
+        echo "Check the logs above for details"
+      displayName: "Post-deployment Failure"

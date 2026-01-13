@@ -1,0 +1,115 @@
+image: node:24-bullseye-slim
+
+clone:
+  depth: full
+
+definitions:
+  services:
+    docker:
+      memory: 4096  # Increase memory for SonarCloud analysis
+  caches:
+    sonar: ~/.sonar/cache
+    pnpm: ~/.pnpm-store
+  steps:
+    - step: &governance-validate
+        name: Governance Matrix Validation
+        image: python:3.11-bookworm
+        caches:
+          - sonar
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - uv run python scripts/governance/validate_data_source_matrix.py
+    - step: &ingestion-stub-check
+        name: Ingestion Stub Check
+        image: python:3.11-bookworm
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - chmod +x scripts/ingestion/run_stub.py
+          - uv run python scripts/ingestion/run_stub.py
+    - step: &quality-scoring-test
+        name: Quality Scoring Stub Test
+        image: python:3.11-bookworm
+        script:
+          - python --version
+          - pip install --no-input --quiet uv pytest
+          - uv run pytest -q tests/python/test_quality_scoring_stub.py
+    - step: &lint-typecheck
+        name: Lint & Typecheck
+        image: node:24-bullseye-slim
+        caches:
+          - pnpm
+        script:
+          - corepack enable
+          - corepack prepare pnpm@latest --activate
+          - pnpm install --frozen-lockfile
+          - pnpm lint
+          - pnpm typecheck
+    - step: &security-scan
+        name: Security Scan
+        image: node:24-bullseye-slim
+        caches:
+          - pnpm
+        script:
+          - corepack enable
+          - corepack prepare pnpm@latest --activate
+          - pnpm install --frozen-lockfile
+          - pnpm security:scan
+    - step: &playwright-e2e
+        name: Playwright Smoke E2E
+        image: node:24-bullseye-slim
+        caches:
+          - pnpm
+        script:
+          - corepack enable
+          - corepack prepare pnpm@latest --activate
+          - pnpm install --frozen-lockfile
+          - pnpm test:e2e:smoke
+    - step: &build-test-sonarcloud
+        name: Build, test and analyze on SonarCloud
+        size: 2x  # Use 2x build environment for more resources
+        caches:
+          - pnpm
+          - sonar
+        services:
+          - docker
+        script:
+          - echo "Installing dependencies"
+          - corepack enable
+          - corepack prepare pnpm@latest --activate
+          - pnpm install --no-frozen-lockfile
+          - echo "Run tests and build"
+          - pnpm test --silent
+          - pnpm build --if-present
+          - pipe: sonarsource/sonarcloud-scan:4.0.0
+            variables:
+              SONAR_TOKEN: $SONAR_TOKEN
+    - step: &check-quality-gate-sonarcloud
+        name: Check the Quality Gate on SonarCloud
+        script:
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+            variables:
+              SONAR_TOKEN: $SONAR_TOKEN
+
+pipelines:
+  branches:
+    master:
+      - step: *governance-validate
+      - step: *ingestion-stub-check
+      - step: *quality-scoring-test
+      - step: *lint-typecheck
+      - step: *security-scan
+      - step: *playwright-e2e
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate-sonarcloud
+  pull-requests:
+    '**':
+      - step: *governance-validate
+      - step: *ingestion-stub-check
+      - step: *quality-scoring-test
+      - step: *lint-typecheck
+      - step: *security-scan
+      - step: *playwright-e2e
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate-sonarcloud
