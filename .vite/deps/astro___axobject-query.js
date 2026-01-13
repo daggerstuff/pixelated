@@ -1,6 +1,4 @@
-import {
-  __commonJS
-} from "./chunk-PLDDJCW6.js";
+import { __commonJS } from "./chunk-5WRI5ZAA.js";
 
 // node_modules/.pnpm/axobject-query@4.1.0/node_modules/axobject-query/lib/util/iteratorProxy.js
 var require_iteratorProxy = __commonJS({
