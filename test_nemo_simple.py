@@ -7,28 +7,53 @@ Simple test script to verify NeMo microservices basic functionality.
 import os
 import sys
 
+RESOURCE_NAMES = ("datasets", "models", "projects", "chat", "completions")
+
+def _check_resource_availability(client, resource):
+    """Check if a resource is available on the client."""
+    if hasattr(client, resource):
+        print(f"  ✅ {resource}")
+        return True
+    else:
+        print(f"  ❌ {resource}")
+        return False
+
+
+def _test_resource_availability(client, resources):
+    """Test availability of multiple resources."""
+    print("Available resources:")
+    for resource in resources:
+        _check_resource_availability(client, resource)
+    return True
+
+
+def _import_nemo_microservices():
+    """Import nemo_microservices, print version and return module."""
+    import nemo_microservices
+    print(f"✅ NeMo Microservices version: {nemo_microservices.__version__}")
+    return nemo_microservices
+
+
+def _create_nemo_client():
+    """Create NeMo client with API key."""
+    import nemo_microservices
+    return nemo_microservices.Client(api_key=os.getenv("NVIDIA_API_KEY"))
+
+
 def test_basic_nemo_functionality():
     """Test basic NeMo microservices functionality."""
     print("🔍 Testing basic NeMo microservices functionality...")
 
     try:
         # Test basic import
-        import nemo_microservices
-        print(f"✅ NeMo Microservices version: {nemo_microservices.__version__}")
+        _import_nemo_microservices()
 
         # Test client creation
-        client = nemo_microservices.Client(
-            api_key=os.getenv("NVIDIA_API_KEY")
-        )
+        client = _create_nemo_client()
         print("✅ NeMo client created successfully")
 
         # Test available resources
-        print("Available resources:")
-        for resource in ['datasets', 'models', 'projects', 'chat', 'completions']:
-            if hasattr(client, resource):
-                print(f"  ✅ {resource}")
-            else:
-                print(f"  ❌ {resource}")
+        _test_resource_availability(client, RESOURCE_NAMES)
 
         return True
 
@@ -36,51 +61,46 @@ def test_basic_nemo_functionality():
         print(f"❌ Error: {e}")
         return False
 
+def _test_dataset_listing(client):
+    """Test dataset listing functionality."""
+    try:
+        datasets = client.datasets.list()
+        print(f"✅ Found {len(datasets.data)} datasets")
+        return True
+    except Exception as e:
+        print(f"ℹ️  Dataset listing failed (expected without setup): {e}")
+        return True  # This is expected
+
+
+def _create_nemo_client_with_types():
+    """Create NeMo client with types import."""
+    import nemo_microservices
+    from nemo_microservices.types import Dataset
+    return nemo_microservices.Client(api_key=os.getenv("NVIDIA_API_KEY"))
+
 def test_dataset_functionality():
     """Test dataset functionality if available."""
     print("\n🔍 Testing dataset functionality...")
 
     try:
-        import nemo_microservices
-        from nemo_microservices.types import Dataset
-
-        client = nemo_microservices.Client(
-            api_key=os.getenv("NVIDIA_API_KEY")
-        )
-
-        # Check if datasets resource is available
-        if hasattr(client, 'datasets'):
-            print("✅ Datasets resource available")
-
-            # Try to list datasets (this might fail without proper setup)
-            try:
-                datasets = client.datasets.list()
-                print(f"✅ Found {len(datasets.data)} datasets")
-            except Exception as e:
-                print(f"ℹ️  Dataset listing failed (expected without setup): {e}")
-                return True  # This is expected
-        else:
-            print("❌ Datasets resource not available")
-            return False
-
-        return True
-
+        client = _create_nemo_client_with_types()
+        # Check resource availability and return result directly
+        resource_available = _check_resource_availability(client, 'datasets')
+        return _test_dataset_listing(client) if resource_available else False
     except Exception as e:
         print(f"❌ Dataset functionality error: {e}")
         return False
 
-def main():
-    """Run tests."""
-    print("🚀 Starting Simple NeMo Microservices Test")
-    print("=" * 50)
+def _run_tests():
+    """Run all tests and return results."""
+    return [
+        ("Basic Functionality", test_basic_nemo_functionality()),
+        ("Dataset Functionality", test_dataset_functionality())
+    ]
 
-    results = []
 
-    # Run tests
-    results.append(("Basic Functionality", test_basic_nemo_functionality()))
-    results.append(("Dataset Functionality", test_dataset_functionality()))
-
-    # Summary
+def _print_test_summary(results):
+    """Print test summary and return overall status."""
     print("\n" + "=" * 50)
     print("📊 TEST SUMMARY")
     print("=" * 50)
@@ -93,17 +113,29 @@ def main():
             all_passed = False
 
     print("=" * 50)
+    return all_passed
 
-    if all_passed:
-        print("🎉 Basic NeMo functionality is working!")
-        print("\n📋 Next steps:")
-        print("1. Explore available NeMo microservices")
-        print("2. Set up specific services as needed")
-        print("3. Integrate with Pixelated Empathy platform")
+
+def _print_success_message():
+    """Print success message and next steps."""
+    print("🎉 Basic NeMo functionality is working!")
+    print("\n📋 Next steps:")
+    print("1. Explore available NeMo microservices")
+    print("2. Set up specific services as needed")
+    print("3. Integrate with Pixelated Empathy platform")
+
+
+def main():
+    """Run tests."""
+    print("🚀 Starting Simple NeMo Microservices Test")
+    print("=" * 50)
+
+    if all_passed := _print_test_summary(_run_tests()):
+        _print_success_message()
         return 0
-    else:
-        print("⚠️  Some tests failed. Please check the issues above.")
-        return 1
+    
+    print("⚠️  Some tests failed. Please check the issues above.")
+    return 1
 
 if __name__ == "__main__":
     sys.exit(main())
