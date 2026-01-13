@@ -49,17 +49,14 @@ parameters:
     values:
       - "true"
       - "false"
-  - name: USE_SELF_HOSTED
-    displayName: "Use Self-Hosted Agent (Default Pool)"
-    type: string
-    default: "false"
-    values:
-      - "true"
-      - "false"
 
 variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
   - group: pixelated-pipeline-variables
+
+  # Default self-hosted pool name; change in Azure DevOps if different
+  - name: SELF_HOSTED_POOL
+    value: "Default"
 
   # Convert parameters to variables for runtime conditions
   # Template expressions (${{ }}) convert parameters to variables at compile-time
@@ -109,10 +106,7 @@ stages:
       - job: ValidateVariables
         displayName: "Validate Required Variables"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - script: |
               set -euo pipefail
@@ -154,10 +148,7 @@ stages:
       - job: ValidateDependencies
         displayName: "Validate Dependencies"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -176,10 +167,7 @@ stages:
       - job: LintCode
         displayName: "Lint Code"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -194,10 +182,7 @@ stages:
       - job: TypeCheck
         displayName: "Type Check"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -212,10 +197,8 @@ stages:
       - job: UnitTests
         displayName: "Unit Tests & Coverage"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
+        timeoutInMinutes: 120
         steps:
           - task: NodeTool@0
             inputs:
@@ -225,47 +208,8 @@ stages:
           - script: |
               corepack enable pnpm
               pnpm install
-            displayName: "Install Dependencies"
-
-          - task: SonarCloudPrepare@3
-            inputs:
-              SonarCloud: "SonarCloud"
-              organization: "pixelated-empathy"
-              scannerMode: "CLI"
-              configMode: "file"
-              configFile: "config/sonar-project.properties"
-              extraProperties: |
-                sonar.projectBaseDir=$(Build.SourcesDirectory)
-            displayName: "Prepare SonarCloud Analysis"
-
-          - script: |
-              export VITEST_COVERAGE_ENABLED=true
-              pnpm run test:unit
+              pnpm test:coverage
             displayName: "Run Unit Tests with Coverage"
-            continueOnError: true
-            env:
-              VITEST_COVERAGE_ENABLED: "true"
-
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: "JUnit"
-              testResultsFiles: "coverage/junit.xml"
-              mergeTestResults: true
-              failTaskOnFailedTests: true
-            displayName: "Publish Test Results"
-
-          - task: PublishCodeCoverageResults@2
-            inputs:
-              summaryFileLocation: "coverage/cobertura-coverage.xml"
-            displayName: "Publish Code Coverage"
-
-          - task: SonarCloudAnalyze@3
-            displayName: "Run SonarCloud Analysis"
-
-          - task: SonarCloudPublish@3
-            displayName: "Publish SonarCloud Quality Gate Result"
-            inputs:
-              pollingTimeoutSec: 300
 
   - stage: Eval
     displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
@@ -275,10 +219,7 @@ stages:
       - job: EvalGates
         displayName: "Evaluation Gates (therapy-bench, clinical-similarity)"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
             displayName: "Checkout repository with submodules"
@@ -430,12 +371,12 @@ stages:
               mkdir -p "$UV_CACHE_DIR"
 
               # Use specific existing virtual environment if available (avoids re-creation)
-              # This is critical for self-hosted agents to reuse the optimized env
-              if [ -d "$(Build.SourcesDirectory)/.venv" ]; then
-                echo "Using shared virtual environment at $(Build.SourcesDirectory)/.venv"
-                export UV_PROJECT_ENVIRONMENT="$(Build.SourcesDirectory)/.venv"
+              # This is critical for self-hosted agents to reuse the user's optimized env
+              if [ -d "/home/vivi/pixelated/.venv" ]; then
+                echo "Using shared virtual environment at /home/vivi/pixelated/.venv"
+                export UV_PROJECT_ENVIRONMENT="/home/vivi/pixelated/.venv"
                 # Set for subsequent steps
-                echo "##vso[task.setvariable variable=UV_PROJECT_ENVIRONMENT]$(Build.SourcesDirectory)/.venv"
+                echo "##vso[task.setvariable variable=UV_PROJECT_ENVIRONMENT]/home/vivi/pixelated/.venv"
               fi
 
               # Use uv sync to install/update dependencies efficiently
@@ -536,10 +477,7 @@ stages:
       - job: BuildApplication
         displayName: "Build and Push Docker Image"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         timeoutInMinutes: "45"
         steps:
           - task: NodeTool@0
@@ -583,41 +521,19 @@ stages:
                 docker info 2>&1 | { head -n 5; cat > /dev/null; }
 
           - task: Docker@2
-            displayName: "Login to ACR"
+            displayName: "Build and Push Docker Image"
             inputs:
-              command: login
               containerRegistry: "$(AZURE_CONTAINER_REGISTRY)"
-
-          - task: Bash@3
-            displayName: "Build and Push Docker Image (Script)"
-            inputs:
-              targetType: "inline"
-              script: |
-                set -euo pipefail
-
-                # Variables
-                REGISTRY="$(DOCKER_REGISTRY)"
-                REPO="$(IMAGE_REPOSITORY)"
-                TAG_BUILD="$(Build.BuildNumber)"
-                TAG_LATEST="latest"
-                TAG_BRANCH="$(Build.SourceBranchName)"
-
-                FULL_IMAGE_NAME="$REGISTRY/$REPO"
-
-                echo "🐳 Building image: $FULL_IMAGE_NAME:$TAG_BUILD"
-
-                # Build and tag
-                docker build \
-                  -f docker/Dockerfile \
-                  -t "$FULL_IMAGE_NAME:$TAG_BUILD" \
-                  -t "$FULL_IMAGE_NAME:$TAG_LATEST" \
-                  -t "$FULL_IMAGE_NAME:$TAG_BRANCH" \
-                  .
-
-                echo "🚀 Pushing images..."
-                docker push "$FULL_IMAGE_NAME:$TAG_BUILD"
-                docker push "$FULL_IMAGE_NAME:$TAG_LATEST"
-                docker push "$FULL_IMAGE_NAME:$TAG_BRANCH"
+              repository: "$(IMAGE_REPOSITORY)"
+              command: "buildAndPush"
+              Dockerfile: "docker/Dockerfile"
+              buildContext: "."
+              tags: |
+                $(Build.BuildNumber)
+                latest
+                $(Build.SourceBranchName)
+              # Note: addPipelineData and addBaseImageData removed to prevent metadata write errors
+              # Custom metadata capture is handled in the next step
 
           - script: |
               set -euo pipefail
@@ -721,10 +637,7 @@ stages:
       - job: ContainerSecurity
         displayName: "Container Security Scan"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: Bash@3
             displayName: "Verify Docker Access"
@@ -826,10 +739,7 @@ stages:
       - deployment: InstallCertManager
         displayName: "Install cert-manager for TLS"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "staging"
         strategy:
           runOnce:
@@ -966,10 +876,7 @@ stages:
       - deployment: DeployToStaging
         displayName: "Deploy to Azure Kubernetes Service"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "staging"
         strategy:
           runOnce:
@@ -1363,10 +1270,7 @@ stages:
       - deployment: DeployToProduction
         displayName: "Deploy to Production"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         environment: "production"
         strategy:
           runOnce:
@@ -1720,10 +1624,7 @@ stages:
       - job: HealthCheckStaging
         displayName: "Staging Health Check"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: AzureCLI@2
             displayName: "Install kubectl and Check Deployment Health"
@@ -1816,10 +1717,7 @@ stages:
       - job: PerformanceTests
         displayName: "Run Performance Tests"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -2082,10 +1980,7 @@ stages:
       - job: E2ETests
         displayName: "Run E2E Tests"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -2248,10 +2143,7 @@ stages:
       - job: PlaywrightDockerTests
         displayName: "Run Playwright Tests in Docker"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - task: NodeTool@0
             inputs:
@@ -2413,10 +2305,7 @@ stages:
       - job: PrepareTrainingData
         displayName: "Prepare Training Data"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
 
@@ -2453,10 +2342,7 @@ stages:
         dependsOn: PrepareTrainingData
         condition: succeeded()
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         variables:
           OVH_GPU_MODEL: "L40S"
           OVH_MAX_HOURS: "12"
@@ -2558,10 +2444,7 @@ stages:
       - job: BuildOllamaImage
         displayName: "Build and Push Ollama Image"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
 
@@ -2613,10 +2496,7 @@ stages:
       - job: ScheduleBlogPosts
         displayName: "Schedule and Publish Blog Posts"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - checkout: self
             displayName: "Checkout repository"
@@ -2684,10 +2564,7 @@ stages:
       - job: SummaryReport
         displayName: "Pipeline Summary Report"
         pool:
-          ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
-            name: "Default"
-          ${{ else }}:
-            vmImage: "ubuntu-latest"
+          name: "Default"
         steps:
           - script: |
               echo "##[section]📊 Pipeline Execution Summary"
