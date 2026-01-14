@@ -1,11 +1,10 @@
-import { __commonJS } from "./chunk-5WRI5ZAA.js";
+import {
+  __commonJS
+} from "./chunk-5WRI5ZAA.js";
 
 // node_modules/.pnpm/cssesc@3.0.0/node_modules/cssesc/cssesc.js
 var require_cssesc = __commonJS({
-  "node_modules/.pnpm/cssesc@3.0.0/node_modules/cssesc/cssesc.js"(
-    exports,
-    module,
-  ) {
+  "node_modules/.pnpm/cssesc@3.0.0/node_modules/cssesc/cssesc.js"(exports, module) {
     var object = {};
     var hasOwnProperty = object.hasOwnProperty;
     var merge = function merge2(options, defaults) {
@@ -14,16 +13,13 @@ var require_cssesc = __commonJS({
       }
       var result = {};
       for (var key in defaults) {
-        result[key] = hasOwnProperty.call(options, key)
-          ? options[key]
-          : defaults[key];
+        result[key] = hasOwnProperty.call(options, key) ? options[key] : defaults[key];
       }
       return result;
     };
     var regexAnySingleEscape = /[ -,\.\/:-@\[-\^`\{-~]/;
     var regexSingleEscape = /[ -,\.\/:-@\[\]\^`\{-~]/;
-    var regexExcessiveSpaces =
-      /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
+    var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
     var cssesc = function cssesc2(string, options) {
       options = merge(options, cssesc2.options);
       if (options.quotes != "single" && options.quotes != "double") {
@@ -58,13 +54,7 @@ var require_cssesc = __commonJS({
             }
           } else if (/[\t\n\f\r\x0B]/.test(character)) {
             value = "\\" + codePoint.toString(16).toUpperCase() + " ";
-          } else if (
-            character == "\\" ||
-            (!isIdentifier &&
-              ((character == '"' && quote == character) ||
-                (character == "'" && quote == character))) ||
-            (isIdentifier && regexSingleEscape.test(character))
-          ) {
+          } else if (character == "\\" || !isIdentifier && (character == '"' && quote == character || character == "'" && quote == character) || isIdentifier && regexSingleEscape.test(character)) {
             value = "\\" + character;
           } else {
             value = character;
@@ -79,7 +69,7 @@ var require_cssesc = __commonJS({
           output = "\\3" + firstChar + " " + output.slice(1);
         }
       }
-      output = output.replace(regexExcessiveSpaces, function ($0, $1, $2) {
+      output = output.replace(regexExcessiveSpaces, function($0, $1, $2) {
         if ($1 && $1.length % 2) {
           return $0;
         }
@@ -91,14 +81,14 @@ var require_cssesc = __commonJS({
       return output;
     };
     cssesc.options = {
-      escapeEverything: false,
-      isIdentifier: false,
-      quotes: "single",
-      wrap: false,
+      "escapeEverything": false,
+      "isIdentifier": false,
+      "quotes": "single",
+      "wrap": false
     };
     cssesc.version = "3.0.0";
     module.exports = cssesc;
-  },
+  }
 });
 export default require_cssesc();
 //# sourceMappingURL=astro___cssesc.js.map

@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-01-14T09:25:31.389Z",
+  "environment": "test",
+  "pages": {
+    "Home Page": {
+      "url": "/",
+      "navigationTime": 2635.877763,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 980,
+      "domContentLoaded": 4.5,
+      "domComplete": 1698,
+      "loadEvent": 25.5,
+      "resourceCount": 123,
+      "resourceSize": 4446902,
+      "jsSize": 3522886,
+      "jsExecutionTime": 359734,
+      "FID": 2.2000000001862645
+    },
+    "Dashboard": {
+      "url": "/app/dashboard",
+      "navigationTime": 1458.6942690000005,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 352,
+      "domContentLoaded": 2.5,
+      "domComplete": 600.2000000001863,
+      "loadEvent": 12,
+      "resourceCount": 81,
+      "resourceSize": 3723891,
+      "jsSize": 3537707,
+      "jsExecutionTime": 343714
+    }
+  },
+  "api": {
+    "/api/ai/usage": {
+      "method": "GET",
+      "responseTime": 3.481951999987359,
+      "status": 401
+    }
+  }
+}
