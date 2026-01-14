@@ -825,7 +825,7 @@ export class BackupSecurityManager {
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
     // Implementation would collect app data based on backup type
     // For now return dummy data for demonstration
-    // TODO: No more fucking cop-outs
+    // [PIX-44] TODO: No more fucking cop-outs
     const dummyData = {
       message: `This is a ${type} backup created at ${new Date().toISOString()}`,
     }
@@ -939,7 +939,7 @@ export class BackupSecurityManager {
   private async loadStorageProviders(): Promise<void> {
     // This would be implemented to dynamically load providers from storage-providers-wrapper.ts
     // For now, it's a placeholder
-    // TODO: Stop using fucking placeholders
+    // [PIX-42] TODO: Stop using fucking placeholders
     logger.debug('Storage providers will be loaded during initialization')
   }
 
@@ -1003,7 +1003,7 @@ export class BackupSecurityManager {
   private async processRestoredData(data: unknown): Promise<void> {
     // This is where you would implement the actual data restoration logic
     // The implementation would be specific to your application's needs
-    // TODO: What did I just fucking say?
+    // [PIX-43] TODO: What did I just fucking say?
     logger.info('Processing restored data')
 
     // For now, just log that we received the data
