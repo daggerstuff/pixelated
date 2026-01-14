@@ -15,7 +15,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ContextDetector, type ContextDetectionResult } from '../prioritization/context-detector'
 import { ContextTransitionDetector, type ContextEvent } from '../prioritization/context-transition-detector'
-import { ObjectiveSwitcher } from '../prioritization/context-objective-mapping'
+import { ObjectiveSwitcher } from '../prioritization/objective-switcher'
 import { AdaptiveSelector } from '../prioritization/adaptive-selector'
 import { ContextType } from '../core/objectives'
 import type { AIService } from '../../ai/models/types'
@@ -34,47 +34,47 @@ const createMockAIService = (): AIService => {
     createChatCompletion: vi.fn().mockImplementation(async (messages) => {
       // Simple mock responses based on user input
       const userMessage = messages.find((m: any) => m.role === 'user')?.content || ''
-      
+
       let detectedContext = ContextType.GENERAL
       let confidence = 0.7
       let urgency: 'low' | 'medium' | 'high' | 'critical' = 'low'
 
       // Crisis detection
-      if (userMessage.toLowerCase().includes('hurt myself') || 
-          userMessage.toLowerCase().includes('suicide') ||
-          userMessage.toLowerCase().includes('end it all')) {
+      if (userMessage.toLowerCase().includes('hurt myself') ||
+        userMessage.toLowerCase().includes('suicide') ||
+        userMessage.toLowerCase().includes('end it all')) {
         detectedContext = ContextType.CRISIS
         confidence = 0.95
         urgency = 'critical'
       }
       // Educational queries
       else if (userMessage.toLowerCase().includes('what is') ||
-               userMessage.toLowerCase().includes('tell me about') ||
-               userMessage.toLowerCase().includes('explain')) {
+        userMessage.toLowerCase().includes('tell me about') ||
+        userMessage.toLowerCase().includes('explain')) {
         detectedContext = ContextType.EDUCATIONAL
         confidence = 0.9
         urgency = 'low'
       }
       // Clinical assessment
       else if (userMessage.toLowerCase().includes('diagnose') ||
-               userMessage.toLowerCase().includes('assessment') ||
-               userMessage.toLowerCase().includes('phq-9')) {
+        userMessage.toLowerCase().includes('assessment') ||
+        userMessage.toLowerCase().includes('phq-9')) {
         detectedContext = ContextType.CLINICAL_ASSESSMENT
         confidence = 0.88
         urgency = 'medium'
       }
       // Support context
       else if (userMessage.toLowerCase().includes('feeling') ||
-               userMessage.toLowerCase().includes('cope') ||
-               userMessage.toLowerCase().includes('help me')) {
+        userMessage.toLowerCase().includes('cope') ||
+        userMessage.toLowerCase().includes('help me')) {
         detectedContext = ContextType.SUPPORT
         confidence = 0.85
         urgency = 'medium'
       }
       // Informational
       else if (userMessage.toLowerCase().includes('where can i') ||
-               userMessage.toLowerCase().includes('how do i find') ||
-               userMessage.toLowerCase().includes('hotline')) {
+        userMessage.toLowerCase().includes('how do i find') ||
+        userMessage.toLowerCase().includes('hotline')) {
         detectedContext = ContextType.INFORMATIONAL
         confidence = 0.87
         urgency = 'low'
@@ -98,8 +98,8 @@ const createMockAIService = (): AIService => {
                     confidence: confidence,
                   },
                 ],
-                needsSpecialHandling: detectedContext === ContextType.CRISIS || 
-                                     detectedContext === ContextType.CLINICAL_ASSESSMENT,
+                needsSpecialHandling: detectedContext === ContextType.CRISIS ||
+                  detectedContext === ContextType.CLINICAL_ASSESSMENT,
                 urgency: urgency,
                 metadata: {},
               }),
@@ -129,7 +129,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
   beforeEach(() => {
     aiService = createMockAIService()
-    
+
     contextDetector = new ContextDetector({
       aiService,
       model: 'test-model',
@@ -183,7 +183,7 @@ describe('Adaptive Selection Integration Tests', () => {
       }
 
       const transition = transitionDetector.addEvent(event2)
-      
+
       expect(transition).not.toBeNull()
       expect(transition!.from.contextType).toBe(ContextType.EDUCATIONAL)
       expect(transition!.to.contextType).toBe(ContextType.SUPPORT)
@@ -191,10 +191,10 @@ describe('Adaptive Selection Integration Tests', () => {
       // Verify transition was detected but smoothing applied
       if (transition!.detected) {
         await objectiveSwitcher.onContextTransition(transition!)
-        
+
         const objectives = objectiveSwitcher.getObjectives()
         expect(objectives.length).toBeGreaterThan(0)
-        
+
         // Support context should prioritize empathy
         const empathyObj = objectives.find(obj => obj.key === 'empathy')
         expect(empathyObj).toBeDefined()
@@ -204,7 +204,7 @@ describe('Adaptive Selection Integration Tests', () => {
     it('should handle crisis escalation immediately', async () => {
       // Turn 1: General conversation
       const turn1 = await contextDetector.detectContext('Hello, how are you?')
-      
+
       const event1: ContextEvent = {
         turnId: 1,
         contextType: turn1.detectedContext,
@@ -236,7 +236,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       // Switch objectives immediately
       await objectiveSwitcher.onContextTransition(transition!)
-      
+
       const objectives = objectiveSwitcher.getObjectives()
       const safetyObj = objectives.find(obj => obj.key === 'safety')
       expect(safetyObj).toBeDefined()
@@ -274,7 +274,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
         if (transition && transition.detected) {
           await objectiveSwitcher.onContextTransition(transition)
-          
+
           expect(transition.from.contextType).toBe(previousContext!)
           expect(transition.to.contextType).toBe(detection.detectedContext)
         }
@@ -300,7 +300,7 @@ describe('Adaptive Selection Integration Tests', () => {
       expect(result.contextDetectionResult).toBeDefined()
       expect(result.contextDetectionResult.detectedContext).toBe(ContextType.EDUCATIONAL)
       expect(result.selectedObjectives.length).toBeGreaterThan(0)
-      
+
       // Educational context should weight informativeness highly
       const infoObj = result.selectedObjectives.find(obj => obj.objective.id === 'informativeness')
       expect(infoObj).toBeDefined()
@@ -312,7 +312,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       expect(result.contextDetectionResult.detectedContext).toBe(ContextType.CRISIS)
       expect(result.contextDetectionResult.urgency).toBe('critical')
-      
+
       // Crisis should prioritize safety
       const safetyObj = result.selectedObjectives.find(obj => obj.objective.id === 'safety')
       expect(safetyObj).toBeDefined()
@@ -365,7 +365,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       if (transition && transition.detected) {
         await objectiveSwitcher.onContextTransition(transition)
-        
+
         // Allow async notifications
         await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -380,7 +380,7 @@ describe('Adaptive Selection Integration Tests', () => {
   describe('Performance and Stability', () => {
     it('should handle rapid context changes efficiently', async () => {
       const startTime = performance.now()
-      
+
       const queries = [
         'What is anxiety?',
         'I feel sad',
@@ -391,7 +391,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       for (let i = 0; i < queries.length; i++) {
         const detection = await contextDetector.detectContext(queries[i]!)
-        
+
         const event: ContextEvent = {
           turnId: i + 1,
           contextType: detection.detectedContext,
@@ -407,7 +407,7 @@ describe('Adaptive Selection Integration Tests', () => {
       }
 
       const duration = performance.now() - startTime
-      
+
       // Should complete in reasonable time
       expect(duration).toBeLessThan(1000) // 1 second for 5 turns
 
@@ -452,7 +452,7 @@ describe('Adaptive Selection Integration Tests', () => {
       })
 
       const result = await failingDetector.detectContext('Test message')
-      
+
       // Should fall back to GENERAL
       expect(result.detectedContext).toBe(ContextType.GENERAL)
       expect(result.confidence).toBeLessThan(0.5)
@@ -502,7 +502,7 @@ describe('Adaptive Selection Integration Tests', () => {
         'I think I might be depressed. How can I cope?',
         ['What is depression?']
       )
-      
+
       // Should detect support context
       expect([ContextType.SUPPORT, ContextType.EDUCATIONAL]).toContain(
         result2.contextDetectionResult.detectedContext
@@ -513,16 +513,16 @@ describe('Adaptive Selection Integration Tests', () => {
     it('Scenario 2: Crisis Escalation from General Conversation', async () => {
       // Casual start
       const result1 = await adaptiveSelector.selectObjectives('Hello')
-      
+
       // Sudden crisis
       const result2 = await adaptiveSelector.selectObjectives(
         'I cannot take this anymore, I want to hurt myself',
         ['Hello']
       )
-      
+
       expect(result2.contextDetectionResult.detectedContext).toBe(ContextType.CRISIS)
       expect(result2.contextDetectionResult.urgency).toBe('critical')
-      
+
       const safetyObj = result2.selectedObjectives.find(obj => obj.objective.id === 'safety')
       expect(safetyObj).toBeDefined()
     })
@@ -532,10 +532,10 @@ describe('Adaptive Selection Integration Tests', () => {
       const result = await adaptiveSelector.selectObjectives(
         'Can you help me with a PHQ-9 assessment for depression?'
       )
-      
+
       expect(result.contextDetectionResult.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
       expect(result.contextDetectionResult.needsSpecialHandling).toBe(true)
-      
+
       // Should prioritize correctness and professionalism
       const correctnessObj = result.selectedObjectives.find(obj => obj.objective.id === 'correctness')
       expect(correctnessObj).toBeDefined()

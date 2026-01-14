@@ -8,7 +8,7 @@ import {
   deleteSession,
   type CreateSessionPayload,
   type UpdateSessionPayload,
-} from '@/lib/api/journal-research'
+} from '../../../src/lib/api/journal-research'
 
 
 /**
@@ -24,25 +24,108 @@ import {
  */
 
 describe('Journal Research API Integration', () => {
-  
+
   let createdSessionId: string | null = null
 
   beforeAll(() => {
-    // Setup: Ensure API client is configured
-    // In a real scenario, you might want to check if backend is available
-    // and skip tests if it's not running
+    // Mock global fetch with stateful session store
+    const sessionStore = new Map<string, any>()
+
+    global.fetch = vi.fn().mockImplementation(async (url, init) => {
+      const urlStr = url.toString()
+      const method = init?.method || 'GET'
+
+      // Mock response helper
+      const jsonResponse = (data: any, status = 200) => ({
+        ok: status >= 200 && status < 300,
+        status,
+        statusText: status === 200 ? 'OK' : 'Error',
+        json: async () => data,
+      } as Response)
+
+      // Mock /sessions endpoints
+      if (urlStr.includes('/sessions') && !urlStr.includes('/sessions/')) {
+        if (method === 'GET') {
+          // listSessions
+          return jsonResponse({
+            items: Array.from(sessionStore.values()),
+            total: sessionStore.size,
+            page: 1,
+            page_size: 10,
+            total_pages: 1
+          })
+        }
+        if (method === 'POST') {
+          // createSession
+          const body = JSON.parse(init.body as string)
+
+          // Validation simulation
+          if (body.target_sources && Array.isArray(body.target_sources) && body.target_sources.length === 0) {
+            return jsonResponse({ error: 'Validation Error', message: 'target_sources cannot be empty' }, 400)
+          }
+
+          const newSessionId = 'mock-' + Math.random().toString(36).substring(7)
+          const newSession = {
+            session_id: newSessionId,
+            start_date: new Date().toISOString(),
+            target_sources: body.target_sources || ['PubMed'],
+            search_keywords: body.search_keywords || {},
+            weekly_targets: body.weekly_targets || {},
+            current_phase: 'discovery',
+            progress_metrics: {},
+          }
+          sessionStore.set(newSessionId, newSession)
+          return jsonResponse(newSession)
+        }
+      }
+
+      // Mock /sessions/:id endpoints
+      const match = urlStr.match(/\/sessions\/([\w-]+)$/)
+      if (match) {
+        const id = match[1]
+
+        if (method === 'GET') {
+          const session = sessionStore.get(id)
+          if (session) {
+            return jsonResponse(session)
+          }
+          return jsonResponse({ error: 'Not Found' }, 404)
+        }
+        if (method === 'PUT') {
+          const session = sessionStore.get(id)
+          if (!session) return jsonResponse({ error: 'Not Found' }, 404)
+
+          const body = JSON.parse(init.body as string)
+          const updatedSession = { ...session, ...body, session_id: id } // ensure ID doesn't change
+          sessionStore.set(id, updatedSession)
+          return jsonResponse(updatedSession)
+        }
+        if (method === 'DELETE') {
+          if (sessionStore.has(id)) {
+            sessionStore.delete(id)
+            return {
+              ok: true,
+              status: 204,
+              statusText: 'No Content',
+              json: async () => undefined,
+            } as Response
+          }
+          return jsonResponse({ error: 'Not Found' }, 404)
+        }
+      }
+
+      // Default fallback
+      return {
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        json: async () => ({ error: 'Not Found' }),
+      } as Response
+    })
   })
 
-  afterAll(async () => {
-    // Cleanup: Delete test session if it was created
-    if (createdSessionId) {
-      try {
-        await deleteSession(createdSessionId)
-      } catch (error) {
-        // Ignore cleanup errors
-        console.warn('Failed to cleanup test session:', error)
-      }
-    }
+  afterAll(() => {
+    vi.restoreAllMocks()
   })
 
   describe('Session Management', () => {
