@@ -7,7 +7,7 @@ import type {
 } from '../types/mentalLLaMATypes.ts'
 import type { MentalLLaMAModelConfig } from '../types/index.js'
 // Import getEnv with a specifier that matches tests' vi.mock
-import { getEnv } from 'src/config/env.config.ts'
+import { getEnv } from '@/config/env.config.ts'
 
 const logger = getHipaaCompliantLogger('general')
 
@@ -230,12 +230,12 @@ export class MentalLLaMAModelProvider implements IModelProvider {
           ...(tokenUsage !== undefined ? { tokenUsage } : {}),
           ...(finishReason !== undefined
             ? {
-                finishReason: finishReason as
-                  | 'stop'
-                  | 'length'
-                  | 'content_filter'
-                  | 'function_call',
-              }
+              finishReason: finishReason as
+                | 'stop'
+                | 'length'
+                | 'content_filter'
+                | 'function_call',
+            }
             : {}),
         }
         return response

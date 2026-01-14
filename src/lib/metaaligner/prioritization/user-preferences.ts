@@ -33,25 +33,25 @@ export type VerbosityLevel = 'concise' | 'moderate' | 'detailed'
 export interface UserPreferences {
   /** Preferred support interaction style */
   preferredSupportStyle?: SupportStyle
-  
+
   /** Response formality level */
   responseFormality?: ResponseFormality
-  
+
   /** Risk sensitivity for safety-critical situations */
   riskSensitivity?: RiskSensitivity
-  
+
   /** Preferred verbosity level */
   verbosityLevel?: VerbosityLevel
-  
+
   /** Custom objective weight overrides (0-1 range) */
   customObjectiveWeights?: Partial<Record<string, number>>
-  
+
   /** Objectives to disable/exclude */
   disableObjectives?: string[]
-  
+
   /** Objectives to boost/prioritize */
   prioritizeObjectives?: string[]
-  
+
   /** User demographic/context for personalization */
   userContext?: {
     ageGroup?: 'teen' | 'young_adult' | 'adult' | 'senior'
@@ -59,7 +59,7 @@ export interface UserPreferences {
     languagePreference?: string
     accessibilityNeeds?: string[]
   }
-  
+
   /** Interaction preferences */
   interactionPreferences?: {
     preferQuestions?: boolean
@@ -67,7 +67,7 @@ export interface UserPreferences {
     preferStepByStep?: boolean
     preferSummaries?: boolean
   }
-  
+
   /** Additional custom preferences */
   [key: string]: unknown
 }
@@ -75,7 +75,7 @@ export interface UserPreferences {
 /**
  * Default user preferences
  */
-export const DEFAULT_PREFERENCES: Required<Pick<UserPreferences, 
+export const DEFAULT_PREFERENCES: Required<Pick<UserPreferences,
   'preferredSupportStyle' | 'responseFormality' | 'riskSensitivity' | 'verbosityLevel'>> = {
   preferredSupportStyle: 'empathic',
   responseFormality: 'adaptive',
@@ -110,7 +110,7 @@ export class UserPreferenceManager {
    */
   setPreferences(userId: string, preferences: UserPreferences): PreferenceValidationResult {
     const validation = this.validatePreferences(preferences)
-    
+
     if (!validation.valid) {
       logger.warn('Invalid preferences provided', { userId, errors: validation.errors })
       return validation
@@ -463,7 +463,7 @@ function applyInteractionPreferenceAdjustments(
  */
 function normalizeWeights(objectives: ObjectivePriority[]): ObjectivePriority[] {
   const sum = objectives.reduce((acc, obj) => acc + obj.weight, 0)
-  
+
   if (sum === 0) {
     // Avoid division by zero - distribute equally
     const equalWeight = 1 / objectives.length
@@ -472,7 +472,7 @@ function normalizeWeights(objectives: ObjectivePriority[]): ObjectivePriority[] 
 
   return objectives.map((obj) => ({
     ...obj,
-    weight: Number((obj.weight / sum).toFixed(4)),
+    weight: obj.weight / sum,
   }))
 }
 
