@@ -228,8 +228,6 @@
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
-    "csv-parse": "^6.1.0",
-    "csv-writer": "^1.6.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.45.1",

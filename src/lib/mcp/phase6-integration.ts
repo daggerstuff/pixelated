@@ -41,41 +41,6 @@ export type AuthenticationEvent =
   | 'hipaa_violation_detected'
   | 'compliance_audit_passed'
   | 'compliance_audit_failed'
-  | 'social_auth_completed'
-  | `social_account_linked_${string}`
-  | `social_account_unlinked_${string}`
-  | `role_assigned_${string}`
-  | `role_removed_${string}`
-  | `mfa_enrollment_started_${string}`
-  | `mfa_enrollment_completed_${string}`
-  | `mfa_factor_deleted_${string}`
-  | `mfa_challenge_sent_${string}`
-  | `mfa_verification_completed_${string}`
-  | `mfa_preferred_factor_set_${string}`
-
-  | 'webauthn_registration_options_generated'
-  | `webauthn_registration_completed_${string}`
-  | 'webauthn_authentication_options_generated'
-  | `webauthn_authentication_completed_${string}`
-  | `webauthn_credential_deleted_${string}`
-  | `webauthn_credential_renamed_${string}`
-  | 'csrf_violation'
-  | 'authentication_success'
-  | 'authorization_failed'
-  | `risk_assessment_${number}`
-  | `impersonation_started_${string}`
-  | `impersonation_ended_${string}`
-  | `impersonation_extended_${string}`
-  | `session_terminated_${string}`
-  | 'user_soft_deleted'
-  | 'user_restored'
-  | 'user_purged'
-  | 'user_purge_notification_sent'
-  | `user_retention_extended_${number}_days`
-  | `bulk_import_completed_${number}_success`
-  | `bulk_import_job_status_check_${string}`
-  | `bulk_export_completed_${string}_${number}_users`
-  | `recurring_export_scheduled_${string}`
 
 /**
  * Update Phase 6 authentication progress

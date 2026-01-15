@@ -162,7 +162,7 @@ export class ConnectionPoolManager {
   getPoolStats() {
     const stats: Record<string, unknown> = {}
 
-    for (const [url, pool] of Array.from(this.httpPools)) {
+    for (const [url, pool] of this.httpPools) {
       stats[url] = pool.getStats()
     }
 
@@ -179,7 +179,7 @@ export class ConnectionPoolManager {
     const details: Record<string, boolean> = {}
     let allHealthy = true
 
-    for (const [url, pool] of Array.from(this.httpPools)) {
+    for (const [url, pool] of this.httpPools) {
       const healthy = pool.isHealthy()
       details[url] = healthy
       if (!healthy) {
@@ -636,7 +636,7 @@ export class BackgroundJobQueue {
       } else {
         job.status = 'pending'
         // Add delay before retry
-        setTimeout(() => { }, this.config.retryDelay)
+        setTimeout(() => {}, this.config.retryDelay)
       }
     }
   }
