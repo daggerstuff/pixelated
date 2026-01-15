@@ -42,6 +42,7 @@ function initializeAuth0Clients() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
     })
   }
 }
@@ -100,10 +101,10 @@ export class Auth0MFAService {
 
     try {
       // Get user's enrolled factors
-      const enrolledFactors = await auth0Management.users.enrollments.get(userId)
+      const enrolledFactors = await auth0Management.getGuardianEnrollments({ id: userId })
 
       // Get all available factors
-      const availableFactors = await auth0Management.guardian.factors.list()
+      const availableFactors = await auth0Management.getGuardianFactors()
 
       // Filter out already enrolled factors
       const enrolledFactorTypes = enrolledFactors.map((factor: any) => factor.type)
@@ -132,7 +133,7 @@ export class Auth0MFAService {
       switch (factor.factorType) {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
-          const otpEnrollment = await auth0Management.guardian.enrollments.createTicket({
+          const otpEnrollment = await auth0Management.createGuardianEnrollmentTicket({
             user_id: userId,
             send_mail: false
           })
@@ -235,7 +236,7 @@ export class Auth0MFAService {
     }
 
     try {
-      const enrollments = await auth0Management.users.enrollments.get(userId)
+      const enrollments = await auth0Management.getGuardianEnrollments({ id: userId })
 
       const factors: MFAFactor[] = enrollments.map((enrollment: any) => ({
         id: enrollment.id,
@@ -262,7 +263,7 @@ export class Auth0MFAService {
     }
 
     try {
-      await auth0Management.guardian.enrollments.delete(factorId)
+      await auth0Management.deleteGuardianEnrollment({ id: factorId })
 
       // Log factor deletion event
       await logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {

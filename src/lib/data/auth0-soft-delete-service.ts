@@ -33,6 +33,7 @@ function initializeAuth0Management() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      scope: 'read:users update:users delete:users'
     })
   }
 }
@@ -128,7 +129,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Get user information before deletion
-      const user = await auth0Management.users.get(deleteRequest.userId)
+      const user = await auth0Management.getUser({ id: deleteRequest.userId })
       if (!user) {
         throw new Error('User not found')
       }
@@ -145,8 +146,8 @@ export class Auth0SoftDeleteService {
       // Create deleted user record
       const deletedUserRecord: DeletedUserRecord = {
         _id: new ObjectId(),
-        auth0UserId: user.user_id || '',
-        email: user.email || '',
+        auth0UserId: user.user_id,
+        email: user.email,
         deletedAt: now,
         deletedBy: deleteRequest.deletedBy,
         reason: deleteRequest.reason,
@@ -179,8 +180,8 @@ export class Auth0SoftDeleteService {
 
       // Update user in Auth0 to mark as deleted
       // We don't actually delete the user from Auth0, but mark them as inactive
-      await auth0Management.users.update(
-        deleteRequest.userId,
+      await auth0Management.updateUser(
+        { id: deleteRequest.userId },
         {
           blocked: true,
           app_metadata: {
@@ -194,8 +195,7 @@ export class Auth0SoftDeleteService {
       )
 
       // Log soft delete event
-      await logSecurityEvent(SecurityEventType.USER_SOFT_DELETED, {
-        userId: deleteRequest.userId,
+      await logSecurityEvent(SecurityEventType.USER_SOFT_DELETED, deleteRequest.userId, {
         deletedBy: deleteRequest.deletedBy,
         reason: deleteRequest.reason,
         retentionUntil: retentionUntil.toISOString(),
@@ -211,8 +211,7 @@ export class Auth0SoftDeleteService {
       console.error('Failed to soft delete user:', error)
 
       // Log soft delete error
-      await logSecurityEvent(SecurityEventType.USER_SOFT_DELETE_ERROR, {
-        userId: deleteRequest.userId,
+      await logSecurityEvent(SecurityEventType.USER_SOFT_DELETE_ERROR, deleteRequest.userId, {
         deletedBy: deleteRequest.deletedBy,
         reason: deleteRequest.reason,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -243,8 +242,8 @@ export class Auth0SoftDeleteService {
       }
 
       // Restore user in Auth0
-      await auth0Management.users.update(
-        userId,
+      await auth0Management.updateUser(
+        { id: userId },
         {
           blocked: false,
           app_metadata: {
@@ -261,8 +260,7 @@ export class Auth0SoftDeleteService {
       await collection.deleteOne({ auth0UserId: userId })
 
       // Log user restore event
-      await logSecurityEvent(SecurityEventType.USER_RESTORED, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_RESTORED, userId, {
         restoredBy: restoredBy,
         timestamp: new Date().toISOString()
       })
@@ -275,8 +273,7 @@ export class Auth0SoftDeleteService {
       console.error('Failed to restore user:', error)
 
       // Log restore error
-      await logSecurityEvent(SecurityEventType.USER_RESTORE_ERROR, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_RESTORE_ERROR, userId, {
         restoredBy: restoredBy,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
@@ -398,11 +395,10 @@ export class Auth0SoftDeleteService {
       }
 
       // Completely delete user from Auth0
-      await auth0Management.users.delete(userId)
+      await auth0Management.deleteUser({ id: userId })
 
       // Log user purge event
-      await logSecurityEvent(SecurityEventType.USER_PURGED, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_PURGED, userId, {
         retentionPeriod: this.defaultPolicy.retentionPeriod,
         purgeAfter: this.defaultPolicy.purgeAfter,
         timestamp: new Date().toISOString()
@@ -416,8 +412,7 @@ export class Auth0SoftDeleteService {
       console.error('Failed to purge user:', error)
 
       // Log purge error
-      await logSecurityEvent(SecurityEventType.USER_PURGE_ERROR, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_PURGE_ERROR, userId, {
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       })
@@ -444,8 +439,7 @@ export class Auth0SoftDeleteService {
       )
 
       // Log notification event
-      await logSecurityEvent(SecurityEventType.USER_PURGE_NOTIFICATION_SENT, {
-        userId: userRecord.auth0UserId,
+      await logSecurityEvent(SecurityEventType.USER_PURGE_NOTIFICATION_SENT, userRecord.auth0UserId, {
         notificationDays: this.defaultPolicy.notificationDays,
         purgeScheduledAt: userRecord.purgeScheduledAt.toISOString(),
         timestamp: new Date().toISOString()
@@ -465,7 +459,7 @@ export class Auth0SoftDeleteService {
     this.defaultPolicy = { ...this.defaultPolicy, ...newPolicy }
 
     // Log policy update
-    await logSecurityEvent(SecurityEventType.DATA_RETENTION_POLICY_UPDATED, {
+    await logSecurityEvent(SecurityEventType.DATA_RETENTION_POLICY_UPDATED, null, {
       updatedPolicy: this.defaultPolicy,
       timestamp: new Date().toISOString()
     })
@@ -549,8 +543,7 @@ export class Auth0SoftDeleteService {
       )
 
       // Log retention extension
-      await logSecurityEvent(SecurityEventType.USER_RETENTION_EXTENDED, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_RETENTION_EXTENDED, userId, {
         extendedBy: extendedBy,
         additionalDays: additionalDays,
         newPurgeDate: newPurgeDate.toISOString(),
@@ -565,8 +558,7 @@ export class Auth0SoftDeleteService {
       console.error('Failed to extend user retention:', error)
 
       // Log retention extension error
-      await logSecurityEvent(SecurityEventType.USER_RETENTION_EXTENSION_ERROR, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.USER_RETENTION_EXTENSION_ERROR, userId, {
         extendedBy: extendedBy,
         additionalDays: additionalDays,
         error: error instanceof Error ? error.message : 'Unknown error',
