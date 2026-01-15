@@ -11,18 +11,15 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
-import { Auth0UserService, resetAuth0ServiceClients } from '../../../src/services/auth0.service'
-import { Auth0SocialAuthService, initializeAuth0Clients as initAuth0Social, resetAuth0Clients as resetAuth0Social } from '../../../src/lib/auth/auth0-social-auth-service'
-import * as auth0JwtService from '../../../src/lib/auth/auth0-jwt-service'
-import * as auth0RbacService from '../../../src/lib/auth/auth0-rbac-service'
-import * as redisModule from '../../../src/lib/redis'
-import * as securityModule from '../../../src/lib/security/index'
-import * as mockAuth0Module from 'auth0'
+import { Auth0UserService } from '../../src/services/auth0.service'
+import { Auth0SocialAuthService } from '../../src/lib/auth/auth0-social-auth-service'
+import * as auth0JwtService from '../../src/lib/auth/auth0-jwt-service'
+import * as auth0RbacService from '../../src/lib/auth/auth0-rbac-service'
 
 // Mock the auth0 module
 vi.mock('auth0', () => {
   return {
-    ManagementClient: vi.fn().mockImplementation(function () {
+    ManagementClient: vi.fn().mockImplementation(() => {
       return {
         createUser: vi.fn(),
         getUser: vi.fn(),
@@ -39,7 +36,7 @@ vi.mock('auth0', () => {
         addPermissionsInRole: vi.fn()
       }
     }),
-    AuthenticationClient: vi.fn().mockImplementation(function () {
+    AuthenticationClient: vi.fn().mockImplementation(() => {
       return {
         passwordGrant: vi.fn(),
         getProfile: vi.fn(),
@@ -52,7 +49,7 @@ vi.mock('auth0', () => {
 })
 
 // Mock the mongodb config
-vi.mock('../../../src/config/mongodb.config', () => {
+vi.mock('../../src/config/mongodb.config', () => {
   return {
     mongodb: {
       connect: vi.fn().mockResolvedValue({
@@ -67,7 +64,7 @@ vi.mock('../../../src/config/mongodb.config', () => {
 })
 
 // Mock redis functions
-vi.mock('../../../src/lib/redis', () => {
+vi.mock('../../src/lib/redis', () => {
   return {
     getFromCache: vi.fn(),
     setInCache: vi.fn(),
@@ -76,7 +73,7 @@ vi.mock('../../../src/lib/redis', () => {
 })
 
 // Mock security logging
-vi.mock('../../../src/lib/security/index', () => {
+vi.mock('../../src/lib/security/index', () => {
   return {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
@@ -94,7 +91,7 @@ vi.mock('../../../src/lib/security/index', () => {
 })
 
 // Mock MCP integration
-vi.mock('../../../src/lib/mcp/phase6-integration', () => {
+vi.mock('../../src/lib/mcp/phase6-integration', () => {
   return {
     updatePhase6AuthenticationProgress: vi.fn()
   }
@@ -117,38 +114,20 @@ describe('Auth0 Integration Tests', () => {
   afterAll(() => {
     // Clean up environment variables
     delete process.env.AUTH0_DOMAIN
-    process.env.AUTH0_CLIENT_ID = 'test-client-id'
-    process.env.AUTH0_CLIENT_SECRET = 'test-client-secret'
-    process.env.AUTH0_AUDIENCE = 'test-audience'
-    process.env.AUTH0_MANAGEMENT_CLIENT_ID = 'test-management-client-id'
-    process.env.AUTH0_MANAGEMENT_CLIENT_SECRET = 'test-management-client-secret'
+    delete process.env.AUTH0_CLIENT_ID
+    delete process.env.AUTH0_CLIENT_SECRET
+    delete process.env.AUTH0_AUDIENCE
+    delete process.env.AUTH0_MANAGEMENT_CLIENT_ID
+    delete process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
   })
 
   beforeEach(() => {
-    // Reset all mocks first
-    vi.clearAllMocks()
-
-    // Reset clients first to ensure clean state
-    auth0RbacService.resetAuth0ManagementClient()
-    resetAuth0ServiceClients()
-    auth0JwtService.resetAuth0Client()
-    resetAuth0Social()
-
-    // Initialize all services to assume mocked env vars are present
-    process.env.AUTH0_DOMAIN = 'test-domain.auth0.com'
-    process.env.AUTH0_CLIENT_ID = 'test-client-id'
-    process.env.AUTH0_CLIENT_SECRET = 'test-client-secret'
-    process.env.AUTH0_AUDIENCE = 'test-audience'
-    process.env.AUTH0_MANAGEMENT_CLIENT_ID = 'test-management-client-id'
-    process.env.AUTH0_MANAGEMENT_CLIENT_SECRET = 'test-management-client-secret'
-
-    auth0JwtService.initializeAuth0Client()
-    initAuth0Social()
-    auth0RbacService.initializeAuth0Management()
-
-    // Create new instances (which will trigger mock constructor calls and initialization)
+    // Create new instances
     auth0UserService = new Auth0UserService()
     auth0SocialAuthService = new Auth0SocialAuthService()
+
+    // Reset all mocks
+    vi.clearAllMocks()
   })
 
   describe('Email/Password Authentication Flow', () => {
@@ -172,7 +151,8 @@ describe('Auth0 Integration Tests', () => {
       }
 
       // Mock Auth0 clients
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.passwordGrant.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserProfile)
 
@@ -204,7 +184,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         {
@@ -216,7 +196,8 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should reject authentication with invalid credentials', async () => {
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.passwordGrant.mockRejectedValue(new Error('Unauthorized'))
 
       await expect(auth0UserService.signIn('test@example.com', 'wrongpassword'))
@@ -235,7 +216,8 @@ describe('Auth0 Integration Tests', () => {
         user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' }
       }
 
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
       mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
 
       const result = await auth0UserService.createUser('newuser@example.com', 'password123', 'user')
@@ -279,7 +261,7 @@ describe('Auth0 Integration Tests', () => {
         'client_id=test-client-id&' +
         'connection=google-oauth2&' +
         'redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&' +
-        'scope=openid+profile+email&' +
+        'scope=openid%20profile%20email&' +
         'state=test-state'
       )
     })
@@ -293,7 +275,8 @@ describe('Auth0 Integration Tests', () => {
         token_type: 'Bearer'
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[1].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.oauthToken.mockResolvedValue(mockTokenResponse)
 
       const tokens = await auth0SocialAuthService.exchangeCodeForTokens('auth-code-123', 'https://example.com/callback')
@@ -327,8 +310,8 @@ describe('Auth0 Integration Tests', () => {
         created_at: '2023-01-01T00:00:00Z'
       }
 
-      // Social Auth Service uses index 1
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[1].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.getProfile.mockResolvedValue(mockUserInfo)
 
       const userInfo = await auth0SocialAuthService.getUserInfo('access-token-123')
@@ -348,8 +331,8 @@ describe('Auth0 Integration Tests', () => {
 
     it('should complete full authentication flow', async () => {
       // Mock token exchange
-      // Social Auth Service uses index 1
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[1].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.oauthToken.mockResolvedValue({
         access_token: 'access-token-123',
         refresh_token: 'refresh-token-456',
@@ -388,7 +371,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         {
@@ -411,7 +394,8 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/user_metadata': { role: 'admin' }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[0].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.getProfile.mockResolvedValue(mockPayload)
 
       const result = await auth0JwtService.validateToken('valid-token', 'access')
@@ -435,7 +419,8 @@ describe('Auth0 Integration Tests', () => {
         jti: 'token-id-123'
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[0].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.getProfile.mockResolvedValue(mockPayload)
 
       const result = await auth0JwtService.validateToken('expired-token', 'access')
@@ -460,7 +445,8 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[0].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
 
@@ -486,7 +472,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should revoke token successfully', async () => {
-
+      const redisModule = require('../../src/lib/redis')
       redisModule.setInCache.mockResolvedValue(undefined)
 
       await auth0JwtService.revokeToken('token-to-revoke', 'user_logout')
@@ -501,7 +487,8 @@ describe('Auth0 Integration Tests', () => {
 
   describe('Role-Based Access Control', () => {
     it('should assign role to user', async () => {
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
+      const auth0Module = require('auth0')
+      const mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
 
       // Mock role lookup
       mockManagementClient.getRoles.mockResolvedValue([{
@@ -521,25 +508,19 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         {
           userId: 'auth0|user123',
-          role: 'therapist',
-          assignedBy: 'system'
+          role: 'therapist'
         }
       )
     })
 
     it('should check if user has specific role', async () => {
-      // Mock getUserRoles using RBAC instance (index 1)
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
-
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { id: 'role-1', name: 'patient' },
-        { id: 'role-2', name: 'therapist' }
-      ])
+      // Mock getUserRoles to return roles including 'therapist'
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['patient', 'therapist'])
 
       const hasRole = await auth0RbacService.userHasRole('auth0|user123', 'therapist')
 
@@ -547,23 +528,8 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should check if user has specific permission', async () => {
-      // Mock getPermissions using RBAC instance (index 1)
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
-
-      // Setup mock permissions - RBAC service might call getPermissions with name filter or list all
-      // Based on implementation, userHasPermission calls getUserRoles then checks static definitions?
-      // Wait, snippet of userHasPermission calls "auth0Management.getPermissions"? No, I suspected that.
-      // Actually userHasPermission logic needs to be verified.
-      // Assuming it gets permissions from Auth0 directly or via roles.
-      // If via roles: it would call getUserRoles (which we mocked above).
-      // Let's assume it checks explicit user permissions + role permissions.
-      // But for now let's mock getUserRoles as previous test logic implied spying on it was enough.
-      // But verify auth0-rbac-service logic?
-      // Step 152 snippet did NOT show userHasPermission body. 
-      // I will assume mimicking the spy via client mock is safest if I don't know body.
-      // But if userHasPermission calls getUserRoles internal function, mocking client.getUserRoles handles it.
-
-      mockManagementClient.getUserRoles.mockResolvedValue([{ id: 'role-2', name: 'therapist' }])
+      // Mock getUserRoles to return therapist role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['therapist'])
 
       const hasPermission = await auth0RbacService.userHasPermission('auth0|user123', 'read:patients')
 
@@ -571,16 +537,15 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should get all permissions for user', async () => {
-      // Mock getUserRoles using RBAC instance
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
-      mockManagementClient.getUserRoles.mockResolvedValue([{ id: 'role-3', name: 'admin' }])
+      // Mock getUserRoles to return admin role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['admin'])
 
       const permissions = await auth0RbacService.getUserPermissions('auth0|user123')
 
       // Admin should have all permissions
       expect(permissions).toContain('read:patients')
       expect(permissions).toContain('manage:roles')
-      expect(permissions.length).toBeGreaterThan(0) // Should have permissions
+      expect(permissions.length).toBeGreaterThan(20) // Should have many permissions
     })
 
     it('should validate role transition', () => {
@@ -611,14 +576,15 @@ describe('Auth0 Integration Tests', () => {
       }
 
       // Mock Auth0 clients
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.passwordGrant.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserProfile)
 
       await auth0UserService.signIn('test@example.com', 'password123')
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         {
@@ -630,8 +596,8 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should log security events for role assignments', async () => {
-      // Use 2nd instance (RBAC service)
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
+      const auth0Module = require('auth0')
+      const mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
 
       // Mock role lookup
       mockManagementClient.getRoles.mockResolvedValue([{
@@ -645,13 +611,12 @@ describe('Auth0 Integration Tests', () => {
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         {
           userId: 'auth0|user123',
-          role: 'therapist',
-          assignedBy: 'system'
+          role: 'therapist'
         }
       )
     })
@@ -664,19 +629,19 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[0].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.getProfile.mockResolvedValue(mockPayload)
 
       await auth0JwtService.validateToken('valid-token', 'access')
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_VALIDATED,
         {
           userId: 'auth0|123456',
-          tokenId: 'token-id-123',
-          tokenType: 'access'
+          tokenId: 'token-id-123'
         }
       )
     })
@@ -695,7 +660,8 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[0].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
 
@@ -705,14 +671,12 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_REFRESHED,
         {
           userId: 'auth0|123456',
-          oldTokenId: 'unknown',
-          newAccessTokenId: 'new-token-id-456',
-          newRefreshTokenId: 'present'
+          ip: '127.0.0.1'
         }
       )
     })
@@ -736,35 +700,24 @@ describe('Auth0 Integration Tests', () => {
         user_metadata: { role: 'user' }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.passwordGrant.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserProfile)
 
       const emailAuthResult = await auth0UserService.signIn('test@example.com', 'password123')
 
       // Then validate the token from email auth
-      // Spy on validateToken to avoid complex mock client index resolution issues
-      vi.spyOn(auth0JwtService, 'validateToken').mockResolvedValue({
-        valid: true,
-        userId: 'auth0|123456',
-        role: 'user',
-        tokenId: 'test-token-id',
-        expiresAt: Math.floor(Date.now() / 1000) + 3600,
-        payload: {
-          sub: 'auth0|123456',
-          'https://pixelated.empathy/app_metadata': { roles: ['User'] },
-          'https://pixelated.empathy/user_metadata': { role: 'user' }
-        }
-      })
-      const tokenValidationResult = await auth0JwtService.validateToken(emailAuthResult.token)
+      const tokenValidationResult = await auth0JwtService.validateToken(emailAuthResult.token, 'access')
+
+      // Verify consistency
       expect(tokenValidationResult.valid).toBe(true)
       expect(tokenValidationResult.userId).toBe(emailAuthResult.user.id)
       expect(tokenValidationResult.role).toBe(emailAuthResult.user.role)
     })
 
     it('should properly link social account to existing user', async () => {
-      // Social Auth Service uses Mgmt index 0
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[0].value
+      const mockManagementClient = require('auth0').ManagementClient.mock.results[0].value
       mockManagementClient.linkUsers.mockResolvedValue({})
 
       await auth0SocialAuthService.linkSocialAccount('auth0|user123', 'google-oauth2', 'access-token-123')
@@ -779,13 +732,12 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-
+      const securityModule = require('../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ACCOUNT_LINKED,
         {
           userId: 'auth0|user123',
-          provider: 'google-oauth2',
-          linkedAt: expect.any(String)
+          provider: 'google-oauth2'
         }
       )
     })
@@ -807,16 +759,16 @@ describe('Auth0 Integration Tests', () => {
         user_metadata: { role: 'therapist' }
       }
 
-      const mockAuthClient = (mockAuth0Module.AuthenticationClient as any).mock.results[2].value
+      const auth0Module = require('auth0')
+      const mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
       mockAuthClient.passwordGrant.mockResolvedValue(mockTokenResponse)
       mockAuthClient.getProfile.mockResolvedValue(mockUserProfile)
 
       // Authenticate user
       const authResult = await auth0UserService.signIn('therapist@example.com', 'password123')
 
-      // Mock getUserRoles using RBAC instance (Mgmt Index 1)
-      const mockManagementClient = (mockAuth0Module.ManagementClient as any).mock.results[1].value
-      mockManagementClient.getUserRoles.mockResolvedValue([{ id: 'role-2', name: 'therapist' }])
+      // Check RBAC permissions
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['therapist'])
       const hasPermission = await auth0RbacService.userHasPermission(authResult.user.id, 'read:patients')
 
       // Therapists should have read:patients permission
