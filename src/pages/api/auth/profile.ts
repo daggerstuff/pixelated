@@ -1,15 +1,28 @@
 export const prerender = false
-import type { APIContext } from 'astro'
-import { auth0UserService } from '@/services/auth0.service'
-import { verifyAuthToken, getSessionFromRequest } from '@/utils/auth'
+import { auth0UserService } from '../../../services/auth0.service'
+import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
+import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
+import { csrfProtection, rateLimitMiddleware } from '../../../lib/auth/middleware'
+import { AuditEventType, createAuditLog } from '../../../lib/audit'
 
 /**
  * User profile endpoint using Auth0
  * GET /api/auth/profile - Get current user profile
  * PUT /api/auth/profile - Update user profile
  */
-export const GET = async ({ request }: APIContext) => {
+export const GET = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
   try {
+    // Extract client info for logging
+    const clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown',
+      deviceId: request.headers.get('x-device-id') || 'unknown',
+    }
+
+    // Rate limit profile reads (e.g. 60 per minute)
+    const rateLimitResult = await rateLimitMiddleware(request, 'profile_read', 60, 60)
+    if (!rateLimitResult.success) return rateLimitResult.response!
+
     // Try to get session first (cookie or header)
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
@@ -36,6 +49,12 @@ export const GET = async ({ request }: APIContext) => {
     }
 
     if (!userId) {
+      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+        action: 'get_profile',
+        reason: 'No user ID found in session or token',
+        clientInfo,
+      })
+
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         {
@@ -48,11 +67,20 @@ export const GET = async ({ request }: APIContext) => {
     const user = await auth0UserService.getUserById(userId)
 
     if (!user) {
+      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
+        action: 'get_profile',
+        reason: 'User not found in database',
+        clientInfo,
+      })
+
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
       })
     }
+
+    // Log successful profile access (optional, maybe too noisy?)
+    // keeping it minimal for GET
 
     return new Response(
       JSON.stringify({
@@ -74,8 +102,15 @@ export const GET = async ({ request }: APIContext) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Get profile error:', error)
+
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      action: 'get_profile',
+      error: error.message,
+      clientInfo
+    })
+
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Failed to get profile',
@@ -88,8 +123,25 @@ export const GET = async ({ request }: APIContext) => {
   }
 }
 
-export const PUT = async ({ request }: APIContext) => {
+export const PUT = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
+  let clientInfo;
   try {
+    clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown',
+      deviceId: request.headers.get('x-device-id') || 'unknown',
+    }
+
+    // Apply CSRF protection for updates
+    const csrfResult = await csrfProtection(request as any)
+    if (!csrfResult.success) {
+      return csrfResult.response!
+    }
+
+    // Rate limit profile updates (strict: 5 per minute)
+    const rateLimitResult = await rateLimitMiddleware(request, 'profile_update', 5, 60)
+    if (!rateLimitResult.success) return rateLimitResult.response!
+
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
@@ -145,6 +197,21 @@ export const PUT = async ({ request }: APIContext) => {
       })
     }
 
+    // Log security event for profile update
+    await logSecurityEvent(SecurityEventType.USER_UPDATED, userId, {
+      updates: Object.keys(auth0Updates),
+      clientInfo
+    })
+
+    // Create Audit Log
+    await createAuditLog(
+      AuditEventType.USER_MODIFIED,
+      'profile.update',
+      userId,
+      'user',
+      { updates: Object.keys(auth0Updates) }
+    )
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -163,6 +230,13 @@ export const PUT = async ({ request }: APIContext) => {
     )
   } catch (error: unknown) {
     console.error('Update profile error:', error)
+
+    await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+      action: 'update_profile',
+      error: error instanceof Error ? error.message : String(error),
+      clientInfo
+    })
+
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Failed to update profile',
