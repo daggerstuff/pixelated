@@ -4,6 +4,7 @@
  */
 
 import { AuthenticationClient, UserInfoClient } from 'auth0'
+import * as jwt from 'jsonwebtoken'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -182,30 +183,59 @@ export async function validateToken(
       throw new AuthenticationError('Auth0 user info client not initialized')
     }
 
-    // Decode token to get payload (this doesn't validate the signature yet)
-    const { data: decoded } = await auth0UserInfo.getUserInfo(token) as { data: any }
+    // Decode token to check standard claims (aud, iss) before expensive UserInfo call
+    const decodedToken = jwt.decode(token, { complete: true }) as { payload: jwt.JwtPayload; header: any } | null
+
+    if (!decodedToken || !decodedToken.payload) {
+      throw new AuthenticationError('Malformed token')
+    }
+
+    const payload = decodedToken.payload
+
+    // Validate Issuer
+    const expectedIssuer = `https://${process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain}/`
+    if (payload.iss && payload.iss !== expectedIssuer) {
+      throw new AuthenticationError(`Invalid issuer: ${payload.iss}`)
+    }
+
+    // Validate Audience
+    const expectedAudience = process.env.AUTH0_AUDIENCE || AUTH0_CONFIG.audience
+    if (expectedAudience) {
+      const aud = payload.aud
+      const audValid = Array.isArray(aud)
+        ? aud.includes(expectedAudience)
+        : aud === expectedAudience
+
+      if (!audValid) {
+        throw new AuthenticationError(`Invalid audience: ${String(aud)}`)
+      }
+    }
+
+    // Validate expiration locally first
+    if (payload.exp && payload.exp < currentTimestamp()) {
+      throw new AuthenticationError('Token has expired')
+    }
+
+    // Now verify with UserInfo (acts as online signature/revocation check)
+    const { data: userInfo } = await auth0UserInfo.getUserInfo(token) as { data: any }
 
     // Validate token type matches expected (access tokens only for now)
     if (tokenType === 'refresh') {
       throw new AuthenticationError('Refresh token validation not supported with this method')
     }
 
-    // Check if token has expired
-    const { exp } = decoded
-    if (exp && exp < currentTimestamp()) {
-      throw new AuthenticationError('Token has expired')
-    }
-
     // Extract user information
-    const userId = decoded.sub || ''
-    const role = extractRoleFromPayload(decoded)
-    const tokenId = decoded.jti || ''
+    const userId = userInfo.sub || payload.sub || ''
+    const role = extractRoleFromPayload(userInfo)
+    const tokenId = payload.jti || ''
+    const sessionId = payload.sid as string | undefined
 
     // Log successful validation
-    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, {
       userId: userId,
       tokenId: tokenId,
       tokenType: tokenType,
+      sessionId: sessionId,
     })
 
     return {
@@ -213,12 +243,12 @@ export async function validateToken(
       userId: userId,
       role: role,
       tokenId: tokenId,
-      expiresAt: exp,
-      payload: decoded,
+      expiresAt: payload.exp,
+      payload: { ...userInfo, ...payload }, // Merge both
     }
   } catch (error) {
     // Log validation failure
-    await logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
       userId: null,
       error: error instanceof Error ? error.message : 'Unknown error',
       tokenType: tokenType,
@@ -260,7 +290,7 @@ export async function refreshAccessToken(
     const role = extractRoleFromPayload(userResponse)
 
     // Log token refresh event
-    await logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, {
+    logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, {
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
       newAccessTokenId: userResponse.jti || '',
@@ -330,7 +360,7 @@ export async function revokeToken(
   )
 
   // Log revocation event
-  await logSecurityEvent(SecurityEventType.TOKEN_REVOKED, {
+  logSecurityEvent(SecurityEventType.TOKEN_REVOKED, {
     userId: null, // We don't have user ID here
     tokenId: tokenId,
     reason: reason,
