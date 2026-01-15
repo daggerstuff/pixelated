@@ -4,7 +4,7 @@
  * This module provides functionality to initialize the security-related database tables.
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('security-initialize')
 
