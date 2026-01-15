@@ -58,6 +58,7 @@ export enum SecurityEventType {
   SESSION_TERMINATED = 'session_terminated',
   SESSION_TERMINATION_ERROR = 'session_termination_error',
 
+  USER_CREATED = 'user_created',
   USER_SOFT_DELETED = 'user_soft_deleted',
   USER_SOFT_DELETE_ERROR = 'user_soft_delete_error',
   USER_RESTORED = 'user_restored',
