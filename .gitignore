@@ -5,6 +5,7 @@
 /.python
 /.azure-artifacts/
 /build-errors.md
+.vite/
 
 # === NODE/NPM/PNPM ARTIFACTS ===
 node_modules/
