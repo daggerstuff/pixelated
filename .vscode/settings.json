@@ -1,10 +1,9 @@
 {
-  "yaml.customTags": [
-    "!override scalar",
-    "!override mapping",
-    "!override sequence"
-  ]
-}{
+    "yaml.customTags": [
+        "!override scalar",
+        "!override mapping",
+        "!override sequence"
+    ],
     "typescript.preferences.includePackageJsonAutoImports": "on",
     "typescript.suggest.autoImports": true,
     "typescript.updateImportsOnFileMove.enabled": "always",
@@ -205,7 +204,5 @@
     "npm.packageManager": "pnpm",
     "markdown.validate.enabled": true,
     "terminal.integrated.developer.devMode": true,
-    "[azure-pipelines]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+    "[azure-pipelines]": {}
 }

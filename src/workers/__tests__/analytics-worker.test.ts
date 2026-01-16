@@ -1,5 +1,8 @@
-import { env } from '@/config/env.config'
-import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
+import { env } from '../../config/env.config'
+import { AnalyticsService } from '../../lib/services/analytics/AnalyticsService'
+
+// @vitest-environment node
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest'
 
 import { WebSocketServer, WebSocket } from 'ws'
 
@@ -11,12 +14,27 @@ const mockLoggerInstance = {
   debug: vi.fn(),
 }
 
-vi.mock('@/lib/services/analytics/AnalyticsService')
-vi.mock('@/lib/utils/logger', () => ({
+vi.mock('../../lib/services/analytics/AnalyticsService', async () => {
+  const { vi } = await import('vitest')
+  const processEvents = vi.fn()
+  const registerClient = vi.fn()
+  const cleanup = vi.fn()
+
+  return {
+    AnalyticsService: vi.fn().mockImplementation(function() {
+      return {
+        processEvents,
+        registerClient,
+        cleanup,
+      }
+    }),
+  }
+})
+vi.mock('../../lib/utils/logger', () => ({
   logger: mockLoggerInstance,
   getLogger: vi.fn(() => mockLoggerInstance),
 }))
-vi.mock('@/config/env.config')
+vi.mock('../../config/env.config')
 
 // --- Mock for 'ws' module ---
 const mockWssEventHandlers = new Map<
@@ -46,8 +64,8 @@ const mockWsClientInstance = {
   readyState: 1, // WebSocket.OPEN
 }
 vi.mock('ws', () => ({
-  WebSocketServer: vi.fn().mockImplementation(() => mockWssInstance),
-  WebSocket: vi.fn().mockImplementation(() => mockWsClientInstance),
+  WebSocketServer: vi.fn(function() { return mockWssInstance }),
+  WebSocket: vi.fn(function() { return mockWsClientInstance }),
 }))
 // --- End Mock ---
 
@@ -64,22 +82,39 @@ const mockExit = vi
   .mockImplementation(() => undefined as never)
 
 describe('analytics-worker', () => {
-  let mockAnalyticsService: AnalyticsService
+  let mockAnalyticsService: {
+    processEvents: Mock
+    registerClient: Mock
+    cleanup: Mock
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
     vi.resetModules()
 
-    // Reset environment variables
-    ;(env as any).ANALYTICS_WS_PORT = '8083'
+      // Reset environment variables
+      ; (env as any).ANALYTICS_WS_PORT = '8083'
 
     // Initialize mocks for services used BY the worker
-    mockAnalyticsService = new AnalyticsService()
+    mockAnalyticsService = new AnalyticsService() as any
+
 
     // Clear the WebSocketServer mock instance's calls
     vi.mocked(mockWssInstance.on).mockClear()
     vi.mocked(mockWssInstance.close).mockClear()
     vi.mocked(mockWssInstance.emit).mockClear()
+  })
+
+  afterEach(() => {
+    // Clean up listeners added by the worker to prevent MaxListenersExceededWarning
+    const signals = ['SIGTERM', 'SIGINT']
+    signals.forEach((signal) => {
+      const listeners = process.listeners(signal)
+      if (listeners.length > 0) {
+        // Remove the last added listener, which is likely the one from the worker we just imported
+        process.removeListener(signal, listeners[listeners.length - 1]!)
+      }
+    })
   })
 
   // Helper to simulate a connection
@@ -106,7 +141,7 @@ describe('analytics-worker', () => {
       // Act: Import worker module AFTER setting up mocks and timers
       await import('../analytics-worker')
       // Assert initial info log
-      expect(mockLoggerInstance.info).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.info)).toHaveBeenCalledWith(
         expect.stringContaining('Starting analytics worker'),
       )
       // Verify WebSocket server was instantiated (implicitly via worker import)
@@ -130,7 +165,7 @@ describe('analytics-worker', () => {
       // Import worker module
       await import('../analytics-worker')
 
-      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.error)).toHaveBeenCalledWith(
         expect.stringContaining('Error starting analytics worker'),
         expect.any(Error),
       )
@@ -146,10 +181,13 @@ describe('analytics-worker', () => {
       )
       // Act: Import worker
       await import('../analytics-worker')
+      await vi.advanceTimersByTimeAsync(10)
+      // Trigger timer
+      await vi.runOnlyPendingTimersAsync()
       // Trigger timer
       await vi.runOnlyPendingTimersAsync()
       // Assert error log
-      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.error)).toHaveBeenCalledWith(
         expect.stringContaining('Error processing analytics events'),
         expect.any(Error),
       )
@@ -163,7 +201,7 @@ describe('analytics-worker', () => {
       await import('../analytics-worker') // Import worker
       process.emit('SIGTERM', 'SIGTERM')
       // Assert logger and exit calls
-      expect(mockLoggerInstance.info).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.info)).toHaveBeenCalledWith(
         expect.stringContaining('Shutting down analytics worker'),
       )
       expect(mockExit).toHaveBeenCalledWith(0)
@@ -172,7 +210,7 @@ describe('analytics-worker', () => {
     it('should handle SIGINT signal', async () => {
       await import('../analytics-worker')
       process.emit('SIGINT', 'SIGINT')
-      expect(mockLoggerInstance.info).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.info)).toHaveBeenCalledWith(
         expect.stringContaining('Shutting down analytics worker'),
       )
       expect(mockExit).toHaveBeenCalledWith(0)
@@ -182,31 +220,31 @@ describe('analytics-worker', () => {
       await import('../analytics-worker')
       process.emit('SIGTERM', 'SIGTERM')
       // Assert close was called on the MOCK INSTANCE
-      expect(mockWssInstance.close).toHaveBeenCalled()
+      expect(vi.mocked(mockWssInstance.close)).toHaveBeenCalled()
     })
   })
 
   describe('environment configuration', () => {
     it('should use default WebSocket port if not configured', async () => {
       // Remove port from environment
-      ;(env as any).ANALYTICS_WS_PORT = undefined
+      ; (env as any).ANALYTICS_WS_PORT = undefined
 
       // Import worker module
       await import('../analytics-worker')
 
-      expect(WebSocketServer).toHaveBeenCalledWith(
+      expect(vi.mocked(WebSocketServer)).toHaveBeenCalledWith(
         expect.objectContaining({ port: 8083 }),
       )
     })
 
     it('should use configured WebSocket port', async () => {
       // Set custom port in environment
-      ;(env as any).ANALYTICS_WS_PORT = '8090'
+      ; (env as any).ANALYTICS_WS_PORT = '8090'
 
       // Import worker module
       await import('../analytics-worker')
 
-      expect(WebSocketServer).toHaveBeenCalledWith(
+      expect(vi.mocked(WebSocketServer)).toHaveBeenCalledWith(
         expect.objectContaining({ port: 8090 }),
       )
     })
@@ -217,10 +255,16 @@ describe('analytics-worker', () => {
       // Arrange: Import worker to attach connection handler
       await import('../analytics-worker')
       // Create a mock client instance for this test
-      const mockWsClient = new WebSocket('ws://localhost')
+      const mockWsClient = new WebSocket('ws://localhost') as unknown as {
+        on: Mock
+        once: Mock
+        send: Mock
+        close: Mock
+        readyState: number
+      }
 
       // Act: Simulate connection
-      simulateConnection(mockWsClient)
+      simulateConnection(mockWsClient as unknown as WebSocket)
 
       // Find the message handler attached to the *client* mock
       const messageHandler = vi
@@ -244,19 +288,25 @@ describe('analytics-worker', () => {
       )
 
       // Assert
-      expect(mockAnalyticsService.registerClient).toHaveBeenCalledWith(
+      expect(vi.mocked(mockAnalyticsService.registerClient)).toHaveBeenCalledWith(
         'test-user',
         mockWsClient, // Check it was called with the specific client instance
       )
-      expect(mockWsClient.send).toHaveBeenCalledWith(
+      expect(vi.mocked(mockWsClient.send)).toHaveBeenCalledWith(
         expect.stringContaining('authenticated'),
       )
     })
 
     it('should handle invalid authentication', async () => {
       await import('../analytics-worker')
-      const mockWsClient = new WebSocket('ws://localhost')
-      simulateConnection(mockWsClient)
+      const mockWsClient = new WebSocket('ws://localhost') as unknown as {
+        on: Mock
+        once: Mock
+        send: Mock
+        close: Mock
+        readyState: number
+      }
+      simulateConnection(mockWsClient as unknown as WebSocket)
       const messageHandler = vi
         .mocked(mockWsClient.once)
         .mock.calls.find(
@@ -269,8 +319,8 @@ describe('analytics-worker', () => {
 
       messageHandler.call(mockWsClient, JSON.stringify({ type: 'invalid' }))
 
-      expect(mockAnalyticsService.registerClient).not.toHaveBeenCalled()
-      expect(mockWsClient.close).toHaveBeenCalled()
+      expect(vi.mocked(mockAnalyticsService.registerClient)).not.toHaveBeenCalled()
+      expect(vi.mocked(mockWsClient.close)).toHaveBeenCalled()
     })
 
     it('should handle WebSocket server errors', async () => {
@@ -279,7 +329,7 @@ describe('analytics-worker', () => {
       // Emit error on the mock WSS INSTANCE
       mockWssInstance.emit('error', mockError)
 
-      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.error)).toHaveBeenCalledWith(
         expect.stringContaining('WebSocket server error'),
         mockError,
       )
@@ -315,7 +365,7 @@ describe('analytics-worker', () => {
       // Run timers past the cleanup interval
       await vi.advanceTimersByTimeAsync(60 * 60 * 1000 + 1)
 
-      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
+      expect(vi.mocked(mockLoggerInstance.error)).toHaveBeenCalledWith(
         expect.stringContaining('Error during analytics cleanup'),
         expect.any(Error),
       )

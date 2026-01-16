@@ -298,7 +298,7 @@ export async function csrfProtection(request: Request): Promise<{
 
   if (!storedToken) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
-    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+    await logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
     })
@@ -326,7 +326,7 @@ export async function csrfProtection(request: Request): Promise<{
   // Check if token matches stored token
   if (storedToken.token && storedToken.token !== csrfToken) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
-    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+    await logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
     })
@@ -354,7 +354,7 @@ export async function csrfProtection(request: Request): Promise<{
   // Check if token has expired
   if (storedToken.expiresAt && storedToken.expiresAt < Date.now()) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
-    logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
+    await logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'expired_token',
       endpoint: new URL(request.url).pathname,
     })
@@ -470,6 +470,7 @@ export interface AuthenticatedRequest extends Request {
     role: string
   }
   tokenId?: string
+  sessionId?: string
 }
 
 /**
@@ -579,11 +580,44 @@ export async function authenticateRequest(request: Request): Promise<{
   // Check if user has MFA enabled
   const hasMFA = await auth0UserService.userHasMFA(user.id)
 
+  // Device/Session Binding Check
+  const sid = validation.payload?.sid;
+  if (sid) {
+    const { getFromCache, setInCache } = await import('../redis');
+    const bindingKey = `session_binding:${user.id}:${sid}`;
+    const clientInfo = getClientInfo(request);
+    const storedBinding = await getFromCache(bindingKey);
+
+    if (storedBinding) {
+      // Verify IP binding (allow some flexibility if needed, but strict for now)
+      if (storedBinding.ip !== clientInfo.ip) {
+        const { logSecurityEvent, SecurityEventType } = await import('../security');
+        await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, user.id, {
+          reason: 'ip_mismatch',
+          storedIp: storedBinding.ip,
+          currentIp: clientInfo.ip,
+          endpoint: new URL(request.url).pathname
+        });
+
+        // We could block here, but for now we'll just log and maybe require MFA
+        // If we wanted to block:
+        // return { success: false, response: ..., error: 'Session IP mismatch' }
+      }
+    } else {
+      // Trust On First Use (TOFU) - Bind session to this IP
+      await setInCache(bindingKey, {
+        ip: clientInfo.ip,
+        userAgent: clientInfo.userAgent,
+        boundAt: Date.now()
+      }, 24 * 60 * 60); // 24 hours
+    }
+  }
+
   // If user doesn't have MFA enabled, check if adaptive MFA requires it
   if (!hasMFA) {
     try {
-      // Get client information for risk assessment
-      const clientInfo = getClientInfo(request)
+      // Get client information for risk assessment (already fetched above if sid exists, but reliable here)
+      const clientInfo = getClientInfo(request);
 
       // Create login context for risk assessment
       const loginContext = {
@@ -662,6 +696,7 @@ export async function authenticateRequest(request: Request): Promise<{
     role: user.role,
   }
   authenticatedRequest.tokenId = validation.tokenId
+  authenticatedRequest.sessionId = sid
 
   return { success: true, request: authenticatedRequest }
 }
@@ -716,7 +751,7 @@ export async function requireRole(
     // Log authorization failure
     try {
       const { logSecurityEvent, SecurityEventType } = await import('../security')
-      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, request.user.id, {
+      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, request.user.id, {
         requiredRoles: roles,
         userRole: request.user.role,
       })

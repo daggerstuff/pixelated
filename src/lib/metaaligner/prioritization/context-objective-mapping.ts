@@ -28,9 +28,10 @@ export interface ObjectivePriority {
 const contextObjectiveMap: Record<ContextType, ObjectivePriority[]> = {
   [ContextType.CRISIS]: [
     { key: ObjectiveKey.Safety, priority: 1, weight: 1.0 },
-    { key: ObjectiveKey.Empathy, priority: 2, weight: 0.8 },
-    { key: ObjectiveKey.Correctness, priority: 3, weight: 0.7 },
-    { key: ObjectiveKey.Professionalism, priority: 4, weight: 0.6 },
+    { key: ObjectiveKey.Empathy, priority: 2, weight: 0.2 },
+    { key: ObjectiveKey.Correctness, priority: 3, weight: 0.1 },
+    { key: ObjectiveKey.Professionalism, priority: 4, weight: 0.1 },
+    { key: ObjectiveKey.Informativeness, priority: 5, weight: 0.0 },
   ],
   [ContextType.EDUCATIONAL]: [
     { key: ObjectiveKey.Informativeness, priority: 1, weight: 1.0 },

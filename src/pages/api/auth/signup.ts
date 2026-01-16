@@ -1,10 +1,10 @@
 export const prerender = false
-import { auth0UserService } from '@/services/auth0.service'
-import { AuditEventType, createAuditLog } from '@/lib/audit'
-import { logSecurityEvent, SecurityEventType } from '@/lib/security'
-import { updatePhase6AuthenticationProgress } from '@/lib/mcp/phase6-integration'
-import { rateLimitMiddleware, csrfProtection } from '@/lib/auth/middleware'
-import { sanitizeInput, isValidEmail, isValidPassword } from '@/lib/auth/utils'
+import { auth0UserService } from '../../../services/auth0.service'
+import { AuditEventType, createAuditLog } from '../../../lib/audit'
+import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
+import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
+import { sanitizeInput, isValidEmail, isValidPassword } from '../../../lib/auth/utils'
 
 /**
  * Unified Sign up endpoint using Auth0

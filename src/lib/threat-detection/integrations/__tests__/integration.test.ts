@@ -672,7 +672,7 @@ describe('Threat Detection Integration', () => {
           },
         ],
         metadata: {},
-        responseType: 'alert',
+        responseType: 'alert' as const,
         estimatedImpact: 10,
         executionTime: new Date(),
         status: 'completed',
@@ -818,7 +818,7 @@ describe('Threat Detection Integration', () => {
 
     it('should handle missing dependencies gracefully', () => {
       expect(() => {
-        createThreatDetectionIntegration(null, null)
+        createThreatDetectionIntegration(null as any, null as any)
       }).not.toThrow()
     })
   })
