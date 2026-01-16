@@ -1,18 +1,46 @@
 # Active Development Status
 
-**Last Updated**: 2026-01-15 00:44 EST
+**Last Updated**: 2026-01-15 02:55 EST
 
-## 🎉 MAJOR MILESTONE: Dataset Pipeline 100% Complete!
+## 🚧 Active Task: Full Data Processing
 
-### Current Status: Infrastructure Complete, Ready for Data Processing
+### Current Status: Ready to Start
 
-The **6-tier dataset pipeline infrastructure** is now **100% complete** and **production-ready**. All tier loaders have been implemented, tested, and validated with comprehensive integration tests.
+We have successfully validated the dataset pipeline with a sample run of 600 conversations (100 per tier).
+
+- **Validation**: 100% success rate on sample processing.
+- **S3 Access**: Fixed and verified for all tiers.
+- **Dark Humor Persona**: Implemented `PersonalityAdapter` with "charming/cocky" rewriting rules. Verified with test suite.
+- **VPS Hotswapping**: Implemented `BatchedTierProcessor` for sequential Tier 1-6 processing with auto-cleanup (3-in-3-out).
+
+### Next Step
+
+Execute full dataset processing on VPS using the new `batched_tier_processor.py`.
+
+### Recent Context
+
+Sample data processing was a critical smoke test. We identified and fixed S3 key issues and JSON structure mismatches for Tiers 4, 5, and 6.
 
 ---
 
-## ✅ Recently Completed (Session: 2026-01-14)
+## ✅ Recently Completed (Session: 2026-01-15)
 
-### **PIX-28**: Tier 3 CoT Integration
+### **Sample Data Processing** (Validation Run) - **COMPLETE**
+
+- **Pipeline Validation**: Verified end-to-end logic (Loading -> Processing -> Scoring -> Reporting).
+- **Data Access**: Fixed S3 keys and JSON parsing for all 6 tiers.
+- **Results**: Processed 600 conversations (100/tier). Avg Complexity: 0.243.
+- **Results**: Processed 600 conversations (100/tier). Avg Complexity: 0.243.
+- **Blockers Resolved**: Fixed S3 credentials and file paths.
+
+### **Dark Humor Persona & VPS Strategy** (Session: 2026-01-15)
+
+- **Persona Adapter**: fully implemented `CommunicationStyle.DARK_HUMOR` and `TherapeuticApproach.PROVOCATIVE`.
+- **Logic**: Adds specific prefixes, cynical re-framing, and replaces empathetic platitudes with darker, grounded realism.
+- **Batched Processing**: Created `BatchedTierProcessor` to handle "hotswapping" datasets (download -> process -> delete) to fit within VPS storage limits.
+- **Tests**: Verified adaptation logic with `test_dark_humor.py` passing all checks.
+
+### **Auth0 Integration fixes** (Previous Session)
 
 - Enhanced `BaseTierLoader` with S3 support and registry integration
 - Upgraded all tier loaders (2, 3, 5, 6) to use unified base class
@@ -93,19 +121,17 @@ The **6-tier dataset pipeline infrastructure** is now **100% complete** and **pr
 
 ### Immediate Next Session:
 
-1. **Sample Data Processing** (Recommended)
-   - Download small sample from each tier (100 conversations each)
-   - Run through complete pipeline
-   - Generate complexity scores
-   - Validate end-to-end flow with real data
-   - **Estimated**: 2-3 hours
+1. **Full Data Processing (VPS)**
+   - Copy codebase to VPS
+   - Run `uv run ai/dataset_pipeline/orchestration/batched_tier_processor.py --persona dark_humor`
+   - Monitor S3 uploads and local storage usage (Hotswap verification)
+   - **Estimated**: 12-24 hours (process time)
 
-2. **Full Data Processing**
-   - Download all datasets from S3 (500GB+)
-   - Process through tier pipeline
-   - Generate training splits (train/val/test)
-   - Create final training corpus
-   - **Estimated**: 4-8 hours (mostly download time)
+2. **Model Training Infrastructure**
+   - Set up Axolotl or Unsloth framework
+   - Configure training parameters
+   - Set up GPU infrastructure
+   - **Estimated**: 4-8 hours
 
 3. **Model Training Infrastructure**
    - Set up Axolotl or Unsloth framework
@@ -192,27 +218,12 @@ uv run pytest ai/dataset_pipeline/tests/test_tier5_research_integration.py -v
 uv run pytest ai/dataset_pipeline/tests/test_tier6_knowledge_integration.py -v
 ```
 
-### Process Sample Data (Next Step):
+### Run VPS Batched Processing (Hotswap):
 
-```python
-from ai.dataset_pipeline.orchestration.tier_processor import TierProcessor
-
-# Initialize with all tiers
-processor = TierProcessor(
-    enable_tier_1=True,
-    enable_tier_2=True,
-    enable_tier_3=True,
-    enable_tier_4=True,
-    enable_tier_5=True,
-    enable_tier_6=True
-)
-
-# Process all tiers
-all_conversations = processor.process_all_tiers()
-
-# Get statistics
-stats = processor.get_tier_statistics()
-print(f"Total conversations: {stats['total_conversations']}")
+```bash
+# Process ALL Tiers 1-6 with Dark Humor persona, cleaning up raw data as you go
+export PYTHONPATH=$PYTHONPATH:$(pwd)/ai/dataset_pipeline/schemas
+uv run ai/dataset_pipeline/orchestration/batched_tier_processor.py --persona dark_humor
 ```
 
 ---
