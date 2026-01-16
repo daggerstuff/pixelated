@@ -73,8 +73,19 @@ export default (element) =>
       props,
       getChildren(children, element.hasAttribute('data-react-children')),
     )
+
+    // Reuse the existing root if available to avoid aggressive warnings and unnecessary re-mounting
+    if (element._astroReactRoot) {
+      const root = element._astroReactRoot
+      startTransition(() => {
+        root.render(componentEl)
+      })
+      return
+    }
+
     const rootKey = isAlreadyHydrated(element)
     // HACK: delete internal react marker for nested components to suppress aggressive warnings
+    // This handles cases where the root was not stored (legacy or external) but the marker exists.
     if (rootKey) {
       delete element[rootKey]
     }
@@ -82,16 +93,32 @@ export default (element) =>
       return startTransition(() => {
         const root = createRoot(element)
         root.render(componentEl)
-        element.addEventListener('astro:unmount', () => root.unmount(), {
-          once: true,
-        })
+        element._astroReactRoot = root
+        element.addEventListener(
+          'astro:unmount',
+          () => {
+            root.unmount()
+            delete element._astroReactRoot
+          },
+          {
+            once: true,
+          },
+        )
       })
     }
     startTransition(() => {
       const root = hydrateRoot(element, componentEl, renderOptions)
       root.render(componentEl)
-      element.addEventListener('astro:unmount', () => root.unmount(), {
-        once: true,
-      })
+      element._astroReactRoot = root
+      element.addEventListener(
+        'astro:unmount',
+        () => {
+          root.unmount()
+          delete element._astroReactRoot
+        },
+        {
+          once: true,
+        },
+      )
     })
   }
