@@ -1,0 +1,30 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import "@/styles/research.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  showNavBar?: boolean;
+  showFooter?: boolean;
+}
+
+const {
+  title = "Academic Research | Pixelated Empathy",
+  description = "Search across 20+ academic sources for psychology and therapy research.",
+  showNavBar = true,
+  showFooter = true,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  showNavBar={showNavBar}
+  showFooter={showFooter}
+  showBackLink={false}
+>
+  <div class="research-layout">
+    <slot />
+  </div>
+</BaseLayout>

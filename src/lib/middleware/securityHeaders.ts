@@ -53,9 +53,9 @@ export const securityHeaders = async (
   if (process.env.NODE_ENV === 'development') {
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      nonce
-        ? `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
-        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
+      // In development, we need 'unsafe-inline' and 'unsafe-eval' for Vite/Astro to work.
+      // We explicitly DO NOT use the nonce here because 'unsafe-inline' is ignored if a nonce is present.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "style-src-attr 'unsafe-inline'",
       "img-src 'self' data: https:",
@@ -69,7 +69,7 @@ export const securityHeaders = async (
   response.headers.set('Content-Security-Policy', csp.join('; '))
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
 
   // Only set HSTS header in production to avoid issues during local development
   if (process.env.NODE_ENV === 'production') {

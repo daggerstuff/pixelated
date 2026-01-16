@@ -621,8 +621,8 @@ export function createThreatDetectionService(
 
   const config = { ...defaultConfig, ...customConfig }
   return new ThreatDetectionService(
-    orchestrator as AdvancedResponseOrchestrator,
-    rateLimiter as DistributedRateLimiter,
+    orchestrator,
+    rateLimiter,
     config,
   )
 }

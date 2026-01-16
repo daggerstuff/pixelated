@@ -3,7 +3,7 @@
  * Handles OAuth2 flow with Auth0 for social providers like Google
  */
 
-import { AuthenticationClient, ManagementClient } from 'auth0'
+import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
@@ -19,32 +19,53 @@ const AUTH0_CONFIG = {
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
 let auth0Management: ManagementClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 clients
  */
-function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
+export function initializeAuth0Clients() {
+  const domain = process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain
+  const clientId = process.env.AUTH0_CLIENT_ID || AUTH0_CONFIG.clientId
+  const clientSecret = process.env.AUTH0_CLIENT_SECRET || AUTH0_CONFIG.clientSecret
+  const managementClientId = process.env.AUTH0_MANAGEMENT_CLIENT_ID || AUTH0_CONFIG.managementClientId
+  const managementClientSecret = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || AUTH0_CONFIG.managementClientSecret
+
+  if (!domain || !clientId || !clientSecret) {
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain,
+      clientId,
+      clientSecret
     })
   }
 
-  if (!auth0Management && AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
-    auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users'
+  if (!auth0UserInfo) {
+    auth0UserInfo = new UserInfoClient({
+      domain,
     })
   }
+
+  if (!auth0Management && managementClientId && managementClientSecret) {
+    auth0Management = new ManagementClient({
+      domain,
+      clientId: managementClientId,
+      clientSecret: managementClientSecret,
+      audience: `https://${domain}/api/v2/`
+    })
+  }
+}
+
+/**
+ * Reset Auth0 clients for testing
+ */
+export function resetAuth0Clients() {
+  auth0Authentication = null
+  auth0Management = null
+  auth0UserInfo = null
 }
 
 // Initialize the clients
@@ -81,8 +102,8 @@ export interface SocialAuthResult {
  * Handles OAuth2 flow with Auth0 for social providers
  */
 export class Auth0SocialAuthService {
-  private readonly domain = AUTH0_CONFIG.domain
-  private readonly clientId = AUTH0_CONFIG.clientId
+  private readonly domain = process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain
+  private readonly clientId = process.env.AUTH0_CLIENT_ID || AUTH0_CONFIG.clientId
 
   constructor() {
     if (!this.domain || !this.clientId) {
@@ -147,10 +168,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const tokenResponse = await auth0Authentication.oauthToken({
-        grant_type: 'authorization_code',
-        client_id: this.clientId,
-        client_secret: AUTH0_CONFIG.clientSecret,
+      const { data: tokenResponse } = await auth0Authentication.oauth.authorizationCodeGrant({
         code,
         redirect_uri: redirectUri
       })
@@ -177,7 +195,12 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const userInfo = await auth0Authentication.getProfile(accessToken)
+      if (!auth0UserInfo) {
+        throw new Error('Auth0 user info client not initialized')
+      }
+
+      // Decode token to get payload (this doesn't validate the signature yet)
+      const { data: userInfo } = await auth0UserInfo.getUserInfo(accessToken) as { data: any }
 
       return {
         id: userInfo.sub || '',
@@ -188,7 +211,7 @@ export class Auth0SocialAuthService {
         picture: userInfo.picture,
         provider: userInfo.sub?.split('|')[0] || 'unknown',
         emailVerified: userInfo.email_verified || false,
-        createdAt: userInfo.created_at || new Date().toISOString()
+        createdAt: new Date().toISOString() // UserInfo does not return created_at
       }
     } catch (error) {
       console.error('Failed to get user info:', error)
@@ -205,7 +228,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const tokenResponse = await auth0Authentication.refreshToken({
+      const { data: tokenResponse } = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken
       })
 
@@ -229,7 +252,7 @@ export class Auth0SocialAuthService {
     try {
       await this.getUserInfo(accessToken)
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -309,10 +332,10 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      await auth0Management.linkUsers(
-        { id: userId },
+      await auth0Management.users.identities.link(
+        userId,
         {
-          provider: connection,
+          provider: connection as any,
           connection_id: connection, // This would need to be the actual connection ID
           user_id: accessToken // This is simplified - in reality, you'd need the social provider's user ID
         }
@@ -347,12 +370,10 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      await auth0Management.unlinkUsers(
-        { id: userId },
-        {
-          provider: connection,
-          user_id: providerUserId
-        }
+      await auth0Management.users.identities.delete(
+        userId,
+        connection as any,
+        providerUserId
       )
 
       // Log the unlinking event
@@ -379,7 +400,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const user = await auth0Management.getUser({ id: userId })
+      const user = await auth0Management.users.get(userId)
       return user.identities || []
     } catch (error) {
       console.error(`Failed to get social connections for user ${userId}:`, error)

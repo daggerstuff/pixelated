@@ -485,8 +485,6 @@ IntersectionObserver.prototype._checkForIntersections = function () {
 /**
  * Accepts a target and root rect computes the intersection between then
  * following the algorithm in the spec.
- * TODO(philipwalton): at this time clip-path is not considered.
- * https://w3c.github.io/IntersectionObserver/#calculate-intersection-rect-algo
  * @param {Element} target The target DOM element
  * @param {Object} targetRect The bounding rect of the target.
  * @param {Object} rootRect The bounding rect of the root after being

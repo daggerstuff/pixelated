@@ -1,4 +1,5 @@
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
+import 'dotenv/config'
 
 const createStubSpan = () => ({
   end: () => { },

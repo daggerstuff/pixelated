@@ -30,25 +30,25 @@ const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
  * Connects to Flask service running on localhost:5000 (configurable)
  */
 export class PythonBiasDetectionBridge {
-  private baseUrl: string
-  private timeout: number
-  private authToken?: string | undefined
-  private retryAttempts: number = 3
-  private retryDelay: number = 1000 // ms
+  private baseUrl: string;
+  private timeout: number;
+  private authToken?: string | undefined;
+  private retryAttempts: number = 10;
+  private retryDelay: number = 2000; // ms
   private requestQueue: Array<{
-    id: string
-    request: () => Promise<unknown>
-    resolve: (value: unknown) => void
-    reject: (error: Error) => void
-    priority: number
-  }> = []
-  private processingQueue = false
-  private maxConcurrentRequests = 5
-  private activeRequests = 0
-  private healthStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
-  private lastHealthCheck = new Date()
-  private healthCheckInterval = 30000 // 30 seconds
-  private consecutiveFailures = 0
+    id: string;
+    request: () => Promise<unknown>;
+    resolve: (value: unknown) => void;
+    reject: (error: Error) => void;
+    priority: number;
+  }> = [];
+  private processingQueue = false;
+  private maxConcurrentRequests = 5;
+  private activeRequests = 0;
+  private healthStatus: "healthy" | "degraded" | "unhealthy" = "healthy";
+  private lastHealthCheck = new Date();
+  private healthCheckInterval = 30000; // 30 seconds
+  private consecutiveFailures = 0;
   private metrics = {
     totalRequests: 0,
     successfulRequests: 0,
@@ -57,86 +57,86 @@ export class PythonBiasDetectionBridge {
     cacheHits: 0,
     cacheMisses: 0,
     deduplicatedRequests: 0,
-  }
-  private connectionPool: ConnectionPool
-  private healthCheckTimer?: NodeJS.Timeout
+  };
+  private connectionPool: ConnectionPool;
+  private healthCheckTimer?: NodeJS.Timeout;
 
   constructor(
-    public url: string = 'http://localhost:5000',
+    public url: string = "http://localhost:5000",
     public timeoutMs: number = 30000,
     connectionPool?: ConnectionPool,
     poolConfig?: Partial<ConnectionPoolConfig>,
   ) {
-    this.baseUrl = url.replace(/\/$/, '') // Remove trailing slash
-    this.timeout = timeoutMs
-    this.authToken = process.env['BIAS_DETECTION_AUTH_TOKEN']
-    this.connectionPool = connectionPool || new ConnectionPool(poolConfig)
+    this.baseUrl = url.replace(/\/$/, ""); // Remove trailing slash
+    this.timeout = timeoutMs;
+    this.authToken = process.env["BIAS_DETECTION_AUTH_TOKEN"];
+    this.connectionPool = connectionPool || new ConnectionPool(poolConfig);
     // Start queue processor
-    this.processQueue()
+    this.processQueue();
     // Start health monitoring
-    this.startHealthMonitoring()
+    this.startHealthMonitoring();
   }
 
   private startHealthMonitoring(): void {
     this.healthCheckTimer = setInterval(async () => {
       try {
-        const healthResponse = await this.checkHealth()
-        this.lastHealthCheck = new Date()
+        const healthResponse = await this.checkHealth();
+        this.lastHealthCheck = new Date();
 
-        if (healthResponse.status === 'healthy') {
-          this.healthStatus = 'healthy'
-          this.consecutiveFailures = 0
-          this.metrics.successfulRequests++
-        } else if (healthResponse.status === 'degraded') {
-          this.healthStatus = 'degraded'
-          this.consecutiveFailures = 0
-          this.metrics.successfulRequests++
+        if (healthResponse.status === "healthy") {
+          this.healthStatus = "healthy";
+          this.consecutiveFailures = 0;
+          this.metrics.successfulRequests++;
+        } else if (healthResponse.status === "degraded") {
+          this.healthStatus = "degraded";
+          this.consecutiveFailures = 0;
+          this.metrics.successfulRequests++;
         } else {
-          this.healthStatus = 'unhealthy'
-          this.consecutiveFailures++
-          this.metrics.failedRequests++
+          this.healthStatus = "unhealthy";
+          this.consecutiveFailures++;
+          this.metrics.failedRequests++;
         }
 
-        logger.debug('Health check completed', {
+        logger.debug("Health check completed", {
           status: this.healthStatus,
           consecutiveFailures: this.consecutiveFailures,
           timestamp: healthResponse.timestamp,
-        })
+        });
       } catch (error: unknown) {
-        this.healthStatus = 'unhealthy'
-        this.consecutiveFailures++
-        this.metrics.failedRequests++
-        this.lastHealthCheck = new Date()
+        this.healthStatus = "unhealthy";
+        this.consecutiveFailures++;
+        this.metrics.failedRequests++;
+        this.lastHealthCheck = new Date();
 
-        logger.warn('Health check failed', {
+        logger.warn("Health check failed", {
           error: error instanceof Error ? error.message : String(error),
           consecutiveFailures: this.consecutiveFailures,
-        })
+        });
       }
-    }, this.healthCheckInterval)
+    }, this.healthCheckInterval);
   }
 
   async initialize(): Promise<void> {
     try {
       // Check service health
       const response = (await this.makeRequest(
-        '/health',
-        'GET',
-      )) as PythonHealthResponse
-      if (response.status !== 'healthy') {
+        "/health",
+        "GET",
+      )) as PythonHealthResponse;
+      if (response.status !== "healthy") {
         throw new Error(
-          `Python service not healthy: ${response.message || 'Unknown error'}`,
-        )
+          `Python service not healthy: ${response.message || "Unknown error"}`,
+        );
       }
-      logger.info('PythonBiasDetectionBridge initialized successfully', {
+      logger.info("PythonBiasDetectionBridge initialized successfully", {
         serviceUrl: this.baseUrl,
         serviceStatus: response.status,
-      })
+      });
     } catch (error: unknown) {
-      logger.error('Failed to initialize PythonBiasDetectionBridge', { error })
+      logger.error("Failed to initialize PythonBiasDetectionBridge", { error });
       throw new Error(
-        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+      );
     }
   }
 
@@ -145,29 +145,29 @@ export class PythonBiasDetectionBridge {
     priority: number = 1,
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       this.requestQueue.push({
         id,
         request: requestFn as () => Promise<unknown>,
         resolve: resolve as (value: unknown) => void,
         reject,
         priority,
-      })
+      });
 
       // Sort by priority (higher numbers = higher priority)
-      this.requestQueue.sort((a, b) => b.priority - a.priority)
+      this.requestQueue.sort((a, b) => b.priority - a.priority);
       // Ensure the processor is running
       if (!this.processingQueue) {
-        void this.processQueue()
+        void this.processQueue();
       }
-    })
+    });
   }
 
   private async processQueue(): Promise<void> {
     if (this.processingQueue) {
-      return
+      return;
     }
-    this.processingQueue = true
+    this.processingQueue = true;
 
     while (this.requestQueue.length > 0 || this.activeRequests > 0) {
       // Process requests up to the concurrent limit
@@ -175,72 +175,72 @@ export class PythonBiasDetectionBridge {
         this.requestQueue.length > 0 &&
         this.activeRequests < this.maxConcurrentRequests
       ) {
-        const queuedRequest = this.requestQueue.shift()!
-        this.activeRequests++
+        const queuedRequest = this.requestQueue.shift()!;
+        this.activeRequests++;
 
         // Execute request asynchronously
         queuedRequest
           .request()
           .then((result) => {
-            queuedRequest.resolve(result)
+            queuedRequest.resolve(result);
           })
           .catch((error) => {
-            queuedRequest.reject(error)
+            queuedRequest.reject(error);
           })
           .finally(() => {
-            this.activeRequests--
-          })
+            this.activeRequests--;
+          });
       }
 
       // Wait a bit before checking again
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
-    this.processingQueue = false
+    this.processingQueue = false;
   }
 
   private async makeRequest(
     endpoint: string,
-    method: 'GET' | 'POST' = 'POST',
+    method: "GET" | "POST" = "POST",
     data?: unknown,
     priority: number = 1,
   ): Promise<unknown> {
     return this.queueRequest(async () => {
-      return this.executeRequest(endpoint, method, data)
-    }, priority)
+      return this.executeRequest(endpoint, method, data);
+    }, priority);
   }
 
   private async executeRequest(
     endpoint: string,
-    method: 'GET' | 'POST' = 'POST',
+    method: "GET" | "POST" = "POST",
     data?: unknown,
   ): Promise<unknown> {
-    const url = `${this.baseUrl}${endpoint}`
+    const url = `${this.baseUrl}${endpoint}`;
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Pixelated-Empathy-TypeScript-Client/1.0',
-    }
+      "Content-Type": "application/json",
+      "User-Agent": "Pixelated-Empathy-TypeScript-Client/1.0",
+    };
 
     if (this.authToken) {
-      headers['Authorization'] = `Bearer ${this.authToken}`
+      headers["Authorization"] = `Bearer ${this.authToken}`;
     }
 
     // Build a fetch signal compatible with Node, jsdom, and test envs.
     // We'll create a per-request AbortController if AbortSignal.timeout is not available.
-    let timeoutId: NodeJS.Timeout | null = null
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const fetchOptions: RequestInit = {
       method,
       headers,
       // signal is assigned later after possibly obtaining a pooled connection controller
+    };
+
+    if (data && method === "POST") {
+      fetchOptions.body = JSON.stringify(data);
     }
 
-    if (data && method === 'POST') {
-      fetchOptions.body = JSON.stringify(data)
-    }
-
-    let lastError: Error | null = null
-    let pooledConnection: PooledConnection | null = null
+    let lastError: Error | null = null;
+    let pooledConnection: PooledConnection | null = null;
 
     // Retry logic
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
@@ -248,95 +248,95 @@ export class PythonBiasDetectionBridge {
         // Acquire a pooled connection for this request if the pool supports it
         if (
           this.connectionPool &&
-          typeof (this.connectionPool as any).acquireConnection === 'function'
+          typeof (this.connectionPool as any).acquireConnection === "function"
         ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
           pooledConnection = await (
             this.connectionPool as any
-          ).acquireConnection()
+          ).acquireConnection();
         }
         // Simplified signal handling for test compatibility
         // In test environments, don't use AbortSignal to avoid compatibility issues
-        if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+        if (process.env.NODE_ENV === "test" || process.env.VITEST) {
           // Skip signal setup in tests
         } else {
           // Always create a fresh AbortController to avoid identity issues
-          const controller = new AbortController()
+          const controller = new AbortController();
 
           // Set up timeout
           timeoutId = setTimeout(() => {
             try {
-              controller.abort()
-            } catch (e) {
+              controller.abort();
+            } catch {
               /* ignore */
             }
-          }, this.timeout)
+          }, this.timeout);
 
           // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as any).signal = controller.signal
+          (fetchOptions as any).signal = controller.signal;
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
-        )
+        );
 
-        const response = await fetch(url, fetchOptions)
+        const response = await fetch(url, fetchOptions);
 
         // Clear timeout
         if (timeoutId) {
-          clearTimeout(timeoutId)
-          timeoutId = null
+          clearTimeout(timeoutId);
+          timeoutId = null;
         }
 
         if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`HTTP ${response.status}: ${errorText}`)
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
-        const result = await response.json()
-        this.metrics.totalRequests++
-        this.metrics.successfulRequests++
-        logger.debug(`Request successful: ${method} ${endpoint}`)
-        return result
+        const result = await response.json();
+        this.metrics.totalRequests++;
+        this.metrics.successfulRequests++;
+        logger.debug(`Request successful: ${method} ${endpoint}`);
+        return result;
       } catch (error: unknown) {
-        lastError = error instanceof Error ? error : new Error(String(error))
-        this.metrics.totalRequests++
-        this.metrics.failedRequests++
+        lastError = error instanceof Error ? error : new Error(String(error));
+        this.metrics.totalRequests++;
+        this.metrics.failedRequests++;
         logger.warn(`Request attempt ${attempt} failed: ${lastError.message}`, {
           url,
           method,
           attempt,
           error: lastError.message,
-        })
+        });
 
         if (attempt < this.retryAttempts) {
           await new Promise((resolve) =>
             setTimeout(resolve, this.retryDelay * attempt),
-          )
+          );
         }
       } finally {
         // Always release the connection if it was acquired and the pool supports releaseConnection
         if (
           pooledConnection &&
           this.connectionPool &&
-          typeof (this.connectionPool as any).releaseConnection === 'function'
+          typeof (this.connectionPool as any).releaseConnection === "function"
         ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
-          ;(this.connectionPool as any).releaseConnection(pooledConnection)
-          pooledConnection = null
+          (this.connectionPool as any).releaseConnection(pooledConnection);
+          pooledConnection = null;
         }
         // Clear timeout on error
         if (timeoutId) {
-          clearTimeout(timeoutId)
-          timeoutId = null
+          clearTimeout(timeoutId);
+          timeoutId = null;
         }
       }
     }
 
     throw new Error(
-      `Request failed after ${this.retryAttempts} attempts: ${lastError?.message || 'Unknown error'}`,
-    )
+      `Request failed after ${this.retryAttempts} attempts: ${lastError?.message || "Unknown error"}`,
+    );
   }
 
   async runPreprocessingAnalysis(
@@ -345,100 +345,100 @@ export class PythonBiasDetectionBridge {
     try {
       // Should call another method, like makeRequest, to get the analysis from Python service
       const result = (await this.makeRequest(
-        '/analyze/preprocessing',
-        'POST',
+        "/analyze/preprocessing",
+        "POST",
         sessionData,
-      )) as PythonAnalysisResult
-      const layerResult = result?.layer_results?.preprocessing
+      )) as PythonAnalysisResult;
+      const layerResult = result?.layer_results?.preprocessing;
       if (layerResult) {
         // Map Python response structure to TypeScript expectations
         // Ensure all expected properties and TypeScript fields are filled
         // Defensively hydrate all intermediate metric objects to avoid undefined access errors
         const metrics =
-          typeof layerResult.metrics === 'object' && layerResult.metrics
+          typeof layerResult.metrics === "object" && layerResult.metrics
             ? (layerResult.metrics as Record<string, any>)
-            : {}
+            : {};
         const ling =
-          typeof metrics['linguistic_bias'] === 'object' &&
-          metrics['linguistic_bias']
-            ? (metrics['linguistic_bias'] as Record<string, any>)
-            : {}
+          typeof metrics["linguistic_bias"] === "object" &&
+          metrics["linguistic_bias"]
+            ? (metrics["linguistic_bias"] as Record<string, any>)
+            : {};
         const sentiment =
-          typeof ling['sentiment_analysis'] === 'object' &&
-          ling['sentiment_analysis']
-            ? (ling['sentiment_analysis'] as Record<string, any>)
-            : {}
+          typeof ling["sentiment_analysis"] === "object" &&
+          ling["sentiment_analysis"]
+            ? (ling["sentiment_analysis"] as Record<string, any>)
+            : {};
         const rep =
-          typeof metrics['representation_analysis'] === 'object' &&
-          metrics['representation_analysis']
-            ? (metrics['representation_analysis'] as Record<string, any>)
-            : {}
+          typeof metrics["representation_analysis"] === "object" &&
+          metrics["representation_analysis"]
+            ? (metrics["representation_analysis"] as Record<string, any>)
+            : {};
         const dq =
-          typeof metrics['data_quality_metrics'] === 'object' &&
-          metrics['data_quality_metrics']
-            ? (metrics['data_quality_metrics'] as Record<string, any>)
-            : {}
+          typeof metrics["data_quality_metrics"] === "object" &&
+          metrics["data_quality_metrics"]
+            ? (metrics["data_quality_metrics"] as Record<string, any>)
+            : {};
         return {
           biasScore:
-            typeof layerResult.bias_score === 'number'
+            typeof layerResult.bias_score === "number"
               ? layerResult.bias_score
               : 0.5,
           linguisticBias: {
-            genderBiasScore: ling['gender_bias_score'] ?? 0.5,
-            racialBiasScore: ling['racial_bias_score'] ?? 0.5,
-            ageBiasScore: ling['age_bias_score'] ?? 0.5,
-            culturalBiasScore: ling['cultural_bias_score'] ?? 0.5,
-            overallBiasScore: ling['overall_bias_score'] ?? 0.5,
-            biasedTerms: ling['biased_terms'] ?? [],
+            genderBiasScore: ling["gender_bias_score"] ?? 0.5,
+            racialBiasScore: ling["racial_bias_score"] ?? 0.5,
+            ageBiasScore: ling["age_bias_score"] ?? 0.5,
+            culturalBiasScore: ling["cultural_bias_score"] ?? 0.5,
+            overallBiasScore: ling["overall_bias_score"] ?? 0.5,
+            biasedTerms: ling["biased_terms"] ?? [],
             sentimentAnalysis: {
-              positive: sentiment['positive'] ?? 0,
-              neutral: sentiment['neutral'] ?? 1,
-              negative: sentiment['negative'] ?? 0,
-              overallSentiment: sentiment['overallSentiment'] ?? 0,
-              emotionalValence: sentiment['emotionalValence'] ?? 0,
-              subjectivity: sentiment['subjectivity'] ?? 0,
-              demographicVariations: sentiment['demographicVariations'] ?? {},
+              positive: sentiment["positive"] ?? 0,
+              neutral: sentiment["neutral"] ?? 1,
+              negative: sentiment["negative"] ?? 0,
+              overallSentiment: sentiment["overallSentiment"] ?? 0,
+              emotionalValence: sentiment["emotionalValence"] ?? 0,
+              subjectivity: sentiment["subjectivity"] ?? 0,
+              demographicVariations: sentiment["demographicVariations"] ?? {},
             },
           },
           representationAnalysis: {
-            representationParity: rep['representation_parity'] ?? 0.5,
-            minorityGroupScore: rep['minority_group_score'] ?? 0.5,
-            demographicDistribution: rep['demographic_distribution'] ?? {},
-            underrepresentedGroups: rep['underrepresented_groups'] ?? [],
-            overrepresentedGroups: rep['overrepresented_groups'] ?? [],
-            diversityIndex: rep['diversity_index'] ?? 0,
-            intersectionalityAnalysis: rep['intersectionality_analysis'] ?? [],
+            representationParity: rep["representation_parity"] ?? 0.5,
+            minorityGroupScore: rep["minority_group_score"] ?? 0.5,
+            demographicDistribution: rep["demographic_distribution"] ?? {},
+            underrepresentedGroups: rep["underrepresented_groups"] ?? [],
+            overrepresentedGroups: rep["overrepresented_groups"] ?? [],
+            diversityIndex: rep["diversity_index"] ?? 0,
+            intersectionalityAnalysis: rep["intersectionality_analysis"] ?? [],
           },
           dataQualityMetrics: {
-            completeness: dq['completeness'] ?? 1,
-            consistency: dq['consistency'] ?? 1,
-            coverage: dq['coverage'] ?? 1,
-            accuracy: dq['accuracy'] ?? 1,
-            timeliness: dq['timeliness'] ?? 1,
-            validity: dq['validity'] ?? 1,
-            missingDataByDemographic: dq['missingDataByDemographic'] ?? {},
+            completeness: dq["completeness"] ?? 1,
+            consistency: dq["consistency"] ?? 1,
+            coverage: dq["coverage"] ?? 1,
+            accuracy: dq["accuracy"] ?? 1,
+            timeliness: dq["timeliness"] ?? 1,
+            validity: dq["validity"] ?? 1,
+            missingDataByDemographic: dq["missingDataByDemographic"] ?? {},
           },
           detectedBiases: layerResult.detected_biases ?? [
-            'service_unavailable',
+            "service_unavailable",
           ],
           recommendations: layerResult.recommendations ?? [
-            'Python service unavailable - using fallback analysis',
+            "Python service unavailable - using fallback analysis",
           ],
-          layer: layerResult.layer ?? 'preprocessing',
+          layer: layerResult.layer ?? "preprocessing",
           timestamp: result.timestamp ?? new Date().toISOString(),
           sessionId:
-            (sessionData as TherapeuticSession)?.sessionId || 'unknown',
+            (sessionData as TherapeuticSession)?.sessionId || "unknown",
           fallbackMode: false,
           serviceError: undefined,
-        } as PreprocessingLayerResult
+        } as PreprocessingLayerResult;
       }
       // Fallback: construct and return PreprocessingAnalysisResult with neutral values
-      return this.createFallbackPreprocessingResult(sessionData)
+      return this.createFallbackPreprocessingResult(sessionData);
     } catch (error: unknown) {
-      logger.warn('Error in runPreprocessingAnalysis, returning fallback', {
+      logger.warn("Error in runPreprocessingAnalysis, returning fallback", {
         error,
-      })
-      return this.createFallbackPreprocessingResult(sessionData, error)
+      });
+      return this.createFallbackPreprocessingResult(sessionData, error);
     }
   }
 
@@ -483,23 +483,23 @@ export class PythonBiasDetectionBridge {
         validity: 1,
         missingDataByDemographic: {},
       },
-      detectedBiases: ['service_unavailable'],
+      detectedBiases: ["service_unavailable"],
       recommendations: [
-        'Python bias detection service is currently unavailable',
-        'Results are based on fallback analysis with limited accuracy',
-        'Please retry analysis when service is restored',
+        "Python bias detection service is currently unavailable",
+        "Results are based on fallback analysis with limited accuracy",
+        "Please retry analysis when service is restored",
       ],
-      layer: 'preprocessing',
+      layer: "preprocessing",
       timestamp: new Date().toISOString(),
-      sessionId: (sessionData as TherapeuticSession)?.sessionId || 'unknown',
+      sessionId: (sessionData as TherapeuticSession)?.sessionId || "unknown",
       fallbackMode: true,
       serviceError:
         error instanceof Error
           ? error.message
           : error
             ? String(error)
-            : 'Python service unavailable',
-    } as PreprocessingLayerResult
+            : "Python service unavailable",
+    } as PreprocessingLayerResult;
   }
 
   async runModelLevelAnalysis(
@@ -507,56 +507,56 @@ export class PythonBiasDetectionBridge {
   ): Promise<ModelLevelLayerResult> {
     try {
       const result = (await this.makeRequest(
-        '/analyze/model_level',
-        'POST',
+        "/analyze/model_level",
+        "POST",
         sessionData,
-      )) as PythonAnalysisResult
-      const layerResult = result?.layer_results?.model_level
+      )) as PythonAnalysisResult;
+      const layerResult = result?.layer_results?.model_level;
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
-        const fairness = (metrics['fairness_metrics'] ?? {}) as Record<
+        const metrics = layerResult.metrics || ({} as Record<string, any>);
+        const fairness = (metrics["fairness_metrics"] ?? {}) as Record<
           string,
           any
-        >
-        const performance = (metrics['performance_metrics'] ?? {}) as Record<
+        >;
+        const performance = (metrics["performance_metrics"] ?? {}) as Record<
           string,
           any
-        >
-        const groupComp = (metrics['group_performance_comparison'] ??
-          []) as any[]
+        >;
+        const groupComp = (metrics["group_performance_comparison"] ??
+          []) as any[];
 
         return {
           biasScore:
-            typeof layerResult.bias_score === 'number'
+            typeof layerResult.bias_score === "number"
               ? layerResult.bias_score
               : 0.5,
           fairnessMetrics: {
-            demographicParity: fairness['demographic_parity'] ?? 0.5,
-            equalizedOdds: fairness['equalized_odds'] ?? 0.5,
-            equalOpportunity: fairness['equal_opportunity'] ?? 0.5,
-            calibration: fairness['calibration'] ?? 0.5,
-            individualFairness: fairness['individual_fairness'] ?? 0.5,
-            counterfactualFairness: fairness['counterfactual_fairness'] ?? 0.5,
+            demographicParity: fairness["demographic_parity"] ?? 0.5,
+            equalizedOdds: fairness["equalized_odds"] ?? 0.5,
+            equalOpportunity: fairness["equal_opportunity"] ?? 0.5,
+            calibration: fairness["calibration"] ?? 0.5,
+            individualFairness: fairness["individual_fairness"] ?? 0.5,
+            counterfactualFairness: fairness["counterfactual_fairness"] ?? 0.5,
           },
           performanceMetrics: {
-            accuracy: performance['accuracy'] ?? 0.5,
-            precision: performance['precision'] ?? 0.5,
-            recall: performance['recall'] ?? 0.5,
-            f1Score: performance['f1_score'] ?? 0.5,
-            auc: performance['auc'] ?? 0.5,
-            calibrationError: performance['calibration_error'] ?? 0.1,
-            demographicBreakdown: performance['demographic_breakdown'] ?? {},
+            accuracy: performance["accuracy"] ?? 0.5,
+            precision: performance["precision"] ?? 0.5,
+            recall: performance["recall"] ?? 0.5,
+            f1Score: performance["f1_score"] ?? 0.5,
+            auc: performance["auc"] ?? 0.5,
+            calibrationError: performance["calibration_error"] ?? 0.1,
+            demographicBreakdown: performance["demographic_breakdown"] ?? {},
           },
           groupPerformanceComparison: groupComp,
           recommendations: layerResult.recommendations ?? [],
-        }
+        };
       }
-      return this.createFallbackModelLevelResult(sessionData)
+      return this.createFallbackModelLevelResult(sessionData);
     } catch (error: unknown) {
-      logger.warn('Error in runModelLevelAnalysis, returning fallback', {
+      logger.warn("Error in runModelLevelAnalysis, returning fallback", {
         error,
-      })
-      return this.createFallbackModelLevelResult(sessionData, error)
+      });
+      return this.createFallbackModelLevelResult(sessionData, error);
     }
   }
 
@@ -565,40 +565,40 @@ export class PythonBiasDetectionBridge {
   ): Promise<InteractiveLayerResult> {
     try {
       const result = (await this.makeRequest(
-        '/analyze/interactive',
-        'POST',
+        "/analyze/interactive",
+        "POST",
         sessionData,
-      )) as PythonAnalysisResult
-      const layerResult = result?.layer_results?.interactive
+      )) as PythonAnalysisResult;
+      const layerResult = result?.layer_results?.interactive;
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
-        const counterfactual = (metrics['counterfactual_analysis'] ??
-          {}) as Record<string, any>
-        const featureImp = (metrics['feature_importance'] ?? []) as any[]
-        const whatIf = (metrics['what_if_scenarios'] ?? []) as any[]
+        const metrics = layerResult.metrics || ({} as Record<string, any>);
+        const counterfactual = (metrics["counterfactual_analysis"] ??
+          {}) as Record<string, any>;
+        const featureImp = (metrics["feature_importance"] ?? []) as any[];
+        const whatIf = (metrics["what_if_scenarios"] ?? []) as any[];
 
         return {
           biasScore:
-            typeof layerResult.bias_score === 'number'
+            typeof layerResult.bias_score === "number"
               ? layerResult.bias_score
               : 0.5,
           counterfactualAnalysis: {
-            scenariosAnalyzed: counterfactual['scenarios_analyzed'] ?? 0,
-            biasDetected: counterfactual['bias_detected'] ?? false,
-            consistencyScore: counterfactual['consistency_score'] ?? 0.5,
-            problematicScenarios: counterfactual['problematic_scenarios'] ?? [],
+            scenariosAnalyzed: counterfactual["scenarios_analyzed"] ?? 0,
+            biasDetected: counterfactual["bias_detected"] ?? false,
+            consistencyScore: counterfactual["consistency_score"] ?? 0.5,
+            problematicScenarios: counterfactual["problematic_scenarios"] ?? [],
           },
           featureImportance: featureImp,
           whatIfScenarios: whatIf,
           recommendations: layerResult.recommendations ?? [],
-        }
+        };
       }
-      return this.createFallbackInteractiveResult(sessionData)
+      return this.createFallbackInteractiveResult(sessionData);
     } catch (error: unknown) {
-      logger.warn('Error in runInteractiveAnalysis, returning fallback', {
+      logger.warn("Error in runInteractiveAnalysis, returning fallback", {
         error,
-      })
-      return this.createFallbackInteractiveResult(sessionData, error)
+      });
+      return this.createFallbackInteractiveResult(sessionData, error);
     }
   }
 
@@ -607,57 +607,57 @@ export class PythonBiasDetectionBridge {
   ): Promise<EvaluationLayerResult> {
     try {
       const result = (await this.makeRequest(
-        '/analyze/evaluation',
-        'POST',
+        "/analyze/evaluation",
+        "POST",
         sessionData,
-      )) as PythonAnalysisResult
-      const layerResult = result?.layer_results?.evaluation
+      )) as PythonAnalysisResult;
+      const layerResult = result?.layer_results?.evaluation;
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
-        const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<
+        const metrics = layerResult.metrics || ({} as Record<string, any>);
+        const huggingFace = (metrics["hugging_face_metrics"] ?? {}) as Record<
           string,
           any
-        >
-        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>
-        const temporal = (metrics['temporal_analysis'] ?? {}) as Record<
+        >;
+        const custom = (metrics["custom_metrics"] ?? {}) as Record<string, any>;
+        const temporal = (metrics["temporal_analysis"] ?? {}) as Record<
           string,
           any
-        >
+        >;
 
         return {
           biasScore:
-            typeof layerResult.bias_score === 'number'
+            typeof layerResult.bias_score === "number"
               ? layerResult.bias_score
               : 0.5,
           huggingFaceMetrics: {
-            toxicity: huggingFace['toxicity'] ?? 0.1,
-            bias: huggingFace['bias'] ?? 0.2,
-            regard: huggingFace['regard'] ?? {},
-            stereotype: huggingFace['stereotype'] ?? 0.1,
-            fairness: huggingFace['fairness'] ?? 0.8,
+            toxicity: huggingFace["toxicity"] ?? 0.1,
+            bias: huggingFace["bias"] ?? 0.2,
+            regard: huggingFace["regard"] ?? {},
+            stereotype: huggingFace["stereotype"] ?? 0.1,
+            fairness: huggingFace["fairness"] ?? 0.8,
           },
           customMetrics: {
-            therapeuticBias: custom['therapeutic_bias'] ?? 0.1,
-            culturalSensitivity: custom['cultural_sensitivity'] ?? 0.1,
-            professionalEthics: custom['professional_ethics'] ?? 0.1,
-            patientSafety: custom['patient_safety'] ?? 0.1,
+            therapeuticBias: custom["therapeutic_bias"] ?? 0.1,
+            culturalSensitivity: custom["cultural_sensitivity"] ?? 0.1,
+            professionalEthics: custom["professional_ethics"] ?? 0.1,
+            patientSafety: custom["patient_safety"] ?? 0.1,
           },
           temporalAnalysis: {
-            trendDirection: temporal['trend_direction'] ?? 'stable',
-            changeRate: temporal['change_rate'] ?? 0,
-            seasonalPatterns: temporal['seasonal_patterns'] ?? [],
+            trendDirection: temporal["trend_direction"] ?? "stable",
+            changeRate: temporal["change_rate"] ?? 0,
+            seasonalPatterns: temporal["seasonal_patterns"] ?? [],
             interventionEffectiveness:
-              temporal['intervention_effectiveness'] ?? [],
+              temporal["intervention_effectiveness"] ?? [],
           },
           recommendations: layerResult.recommendations ?? [],
-        }
+        };
       }
-      return this.createFallbackEvaluationResult(sessionData)
+      return this.createFallbackEvaluationResult(sessionData);
     } catch (error: unknown) {
-      logger.warn('Error in runEvaluationAnalysis, returning fallback', {
+      logger.warn("Error in runEvaluationAnalysis, returning fallback", {
         error,
-      })
-      return this.createFallbackEvaluationResult(sessionData, error)
+      });
+      return this.createFallbackEvaluationResult(sessionData, error);
     }
   }
 
@@ -665,10 +665,10 @@ export class PythonBiasDetectionBridge {
     sessionData: TherapeuticSession,
     error?: unknown,
   ): ModelLevelLayerResult {
-    logger.warn('Creating fallback model level result', {
+    logger.warn("Creating fallback model level result", {
       sessionId: sessionData.sessionId,
       error,
-    })
+    });
     return {
       biasScore: 0.5,
       fairnessMetrics: {
@@ -690,19 +690,19 @@ export class PythonBiasDetectionBridge {
       },
       groupPerformanceComparison: [],
       recommendations: [
-        'Model-level analysis unavailable; using fallback results',
+        "Model-level analysis unavailable; using fallback results",
       ],
-    }
+    };
   }
 
   private createFallbackInteractiveResult(
     sessionData: TherapeuticSession,
     error?: unknown,
   ): InteractiveLayerResult {
-    logger.warn('Creating fallback interactive result', {
+    logger.warn("Creating fallback interactive result", {
       sessionId: sessionData.sessionId,
       error,
-    })
+    });
     return {
       biasScore: 0.5,
       counterfactualAnalysis: {
@@ -714,19 +714,19 @@ export class PythonBiasDetectionBridge {
       featureImportance: [],
       whatIfScenarios: [],
       recommendations: [
-        'Interactive analysis unavailable; using fallback results',
+        "Interactive analysis unavailable; using fallback results",
       ],
-    }
+    };
   }
 
   private createFallbackEvaluationResult(
     sessionData: TherapeuticSession,
     error?: unknown,
   ): EvaluationLayerResult {
-    logger.warn('Creating fallback evaluation result', {
+    logger.warn("Creating fallback evaluation result", {
       sessionId: sessionData.sessionId,
       error,
-    })
+    });
     return {
       biasScore: 0.5,
       huggingFaceMetrics: {
@@ -743,55 +743,55 @@ export class PythonBiasDetectionBridge {
         patientSafety: 0.1,
       },
       temporalAnalysis: {
-        trendDirection: 'stable',
+        trendDirection: "stable",
         changeRate: 0,
         seasonalPatterns: [],
         interventionEffectiveness: [],
       },
       recommendations: [
-        'Evaluation analysis unavailable; using fallback results',
+        "Evaluation analysis unavailable; using fallback results",
       ],
-    }
+    };
   }
 
   async checkHealth(): Promise<PythonHealthResponse> {
     try {
-      const result = await this.makeRequest('/health', 'GET')
-      return result as PythonHealthResponse
+      const result = await this.makeRequest("/health", "GET");
+      return result as PythonHealthResponse;
     } catch (error: unknown) {
-      logger.warn('Error checking health, returning unhealthy status', {
+      logger.warn("Error checking health, returning unhealthy status", {
         error,
-      })
+      });
       return {
-        status: 'unhealthy',
-        message: 'Service unavailable',
+        status: "unhealthy",
+        message: "Service unavailable",
         timestamp: new Date().toISOString(),
-      }
+      };
     }
   }
 
   stopHealthMonitoring(): void {
     if (this.healthCheckTimer) {
-      clearInterval(this.healthCheckTimer)
-      this.healthCheckTimer = undefined
-      logger.info('Health monitoring stopped')
+      clearInterval(this.healthCheckTimer);
+      this.healthCheckTimer = undefined;
+      logger.info("Health monitoring stopped");
     }
   }
 
   getHealthStatus(): {
-    status: string
-    lastCheck: Date
-    consecutiveFailures: number
+    status: string;
+    lastCheck: Date;
+    consecutiveFailures: number;
   } {
     return {
       status: this.healthStatus,
       lastCheck: this.lastHealthCheck,
       consecutiveFailures: this.consecutiveFailures,
-    }
+    };
   }
 
   getMetrics() {
-    return { ...this.metrics }
+    return { ...this.metrics };
   }
 
   // --- Convenience shims for higher-level callers (thin wrappers over makeRequest)
@@ -801,94 +801,94 @@ export class PythonBiasDetectionBridge {
   // TypeScript interfaces with the Python responses.
 
   async sendMetricsBatch(payload: unknown): Promise<any> {
-    return this.makeRequest('/metrics/batch', 'POST', payload)
+    return this.makeRequest("/metrics/batch", "POST", payload);
   }
 
   async sendAnalysisMetric(payload: unknown): Promise<any> {
-    return this.makeRequest('/metrics/analysis', 'POST', payload)
+    return this.makeRequest("/metrics/analysis", "POST", payload);
   }
 
   async getDashboardMetrics(query?: Record<string, unknown>): Promise<any> {
     // For simplicity keep using POST for complex queries; GET can be added if needed
-    return this.makeRequest('/metrics/dashboard', 'POST', query ?? {})
+    return this.makeRequest("/metrics/dashboard", "POST", query ?? {});
   }
 
   async recordReportMetric(payload: unknown): Promise<any> {
-    return this.makeRequest('/metrics/report', 'POST', payload)
+    return this.makeRequest("/metrics/report", "POST", payload);
   }
 
   async getPerformanceMetrics(params?: Record<string, unknown>): Promise<any> {
-    return this.makeRequest('/metrics/performance', 'POST', params ?? {})
+    return this.makeRequest("/metrics/performance", "POST", params ?? {});
   }
 
   async getSessionData(sessionId: string): Promise<any> {
-    return this.makeRequest(`/session/${encodeURIComponent(sessionId)}`, 'GET')
+    return this.makeRequest(`/session/${encodeURIComponent(sessionId)}`, "GET");
   }
 
   async storeMetrics(payload: unknown): Promise<any> {
-    return this.makeRequest('/metrics/store', 'POST', payload)
+    return this.makeRequest("/metrics/store", "POST", payload);
   }
 
   // Alert system shims
   async registerAlertSystem(config: unknown): Promise<any> {
-    return this.makeRequest('/alerts/register', 'POST', config)
+    return this.makeRequest("/alerts/register", "POST", config);
   }
 
   async checkAlerts(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/check', 'POST', payload)
+    return this.makeRequest("/alerts/check", "POST", payload);
   }
 
   async storeAlerts(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/store', 'POST', payload)
+    return this.makeRequest("/alerts/store", "POST", payload);
   }
 
   async escalateAlert(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/escalate', 'POST', payload)
+    return this.makeRequest("/alerts/escalate", "POST", payload);
   }
 
   async sendNotification(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/notify', 'POST', payload)
+    return this.makeRequest("/alerts/notify", "POST", payload);
   }
 
   async getActiveAlerts(): Promise<any> {
-    return this.makeRequest('/alerts/active', 'GET')
+    return this.makeRequest("/alerts/active", "GET");
   }
 
   async acknowledgeAlert(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/ack', 'POST', payload)
+    return this.makeRequest("/alerts/ack", "POST", payload);
   }
 
   async sendSystemNotification(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/system-notify', 'POST', payload)
+    return this.makeRequest("/alerts/system-notify", "POST", payload);
   }
 
   async getRecentAlerts(params?: Record<string, unknown>): Promise<any> {
-    return this.makeRequest('/alerts/recent', 'POST', params ?? {})
+    return this.makeRequest("/alerts/recent", "POST", params ?? {});
   }
 
   async getAlertStatistics(params?: Record<string, unknown>): Promise<any> {
-    return this.makeRequest('/alerts/stats', 'POST', params ?? {})
+    return this.makeRequest("/alerts/stats", "POST", params ?? {});
   }
 
   async unregisterAlertSystem(payload: unknown): Promise<any> {
-    return this.makeRequest('/alerts/unregister', 'POST', payload)
+    return this.makeRequest("/alerts/unregister", "POST", payload);
   }
 
   async dispose(): Promise<void> {
     // Stop internal timers and dispose of connection pool
     try {
-      this.stopHealthMonitoring()
+      this.stopHealthMonitoring();
       if (
         this.connectionPool &&
-        typeof (this.connectionPool as any).dispose === 'function'
+        typeof (this.connectionPool as any).dispose === "function"
       ) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - runtime check above ensures this exists
-        await (this.connectionPool as any).dispose()
+        await (this.connectionPool as any).dispose();
       }
-      logger.info('PythonBiasDetectionBridge disposed')
+      logger.info("PythonBiasDetectionBridge disposed");
     } catch (e) {
-      logger.warn('Error disposing PythonBiasDetectionBridge', { error: e })
+      logger.warn("Error disposing PythonBiasDetectionBridge", { error: e });
     }
   }
 }

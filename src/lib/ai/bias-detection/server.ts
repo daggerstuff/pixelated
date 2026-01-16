@@ -1,5 +1,5 @@
 // IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../instrument.mjs'
+import '../../../../config/instrument.mjs'
 
 import { IncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { createServer } from 'http'
