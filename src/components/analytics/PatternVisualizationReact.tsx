@@ -1,26 +1,9 @@
 import type { FC } from 'react'
-/**
- * TEMP LOCAL PATCH: Placeholder types for TrendPattern, CrossSessionPattern, RiskCorrelation.
- * Remove when project types module is restored.
- */
-export interface TrendPattern {
-  id: string
-  description: string
-  indicators: string[]
-}
-
-export interface CrossSessionPattern {
-  id: string
-  description: string
-  sessionIds: string[]
-  timeSpanDays: number
-}
-
-export interface RiskCorrelation {
-  id: string
-  description: string
-  strength: number
-}
+import type {
+  TrendPattern,
+  CrossSessionPattern,
+  RiskCorrelation,
+} from '@/lib/fhe/pattern-recognition'
 
 export interface PatternVisualizationProps {
   trends?: TrendPattern[]
@@ -100,8 +83,8 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                 >
                   <div className="font-medium">{pattern.description}</div>
                   <div className="text-xs text-gray-500">
-                    Sessions: {pattern.sessionIds.length}, Span:{' '}
-                    {pattern.timeSpanDays} days
+                    Sessions: {pattern.sessions.length}
+                    {pattern.timeSpanDays && `, Span: ${pattern.timeSpanDays} days`}
                   </div>
                 </button>
               ))}
@@ -129,11 +112,13 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                       handleSelect(correlation)
                     }
                   }}
-                  aria-label={`Select risk correlation: ${correlation.description}`}
+                  aria-label={`Select risk correlation: ${correlation.description || correlation.riskFactor}`}
                 >
-                  <div className="font-medium">{correlation.description}</div>
+                  <div className="font-medium">
+                    {correlation.description || correlation.riskFactor}
+                  </div>
                   <div className="text-xs text-gray-500">
-                    Strength: {correlation.strength.toFixed(2)}
+                    Strength: {correlation.severityScore.toFixed(2)}
                   </div>
                 </button>
               ))}

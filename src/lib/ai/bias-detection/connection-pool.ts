@@ -57,7 +57,7 @@ export class ConnectionPool {
     }
 
     // Try to find an available connection
-    for (const [_id, connection] of this.connections) {
+    for (const [_id, connection] of Array.from(this.connections)) {
       if (!connection.inUse) {
         connection.inUse = true
         connection.lastUsed = new Date()
@@ -129,7 +129,7 @@ export class ConnectionPool {
     const now = new Date()
     const toRemove: string[] = []
 
-    for (const [id, connection] of this.connections) {
+    for (const [id, connection] of Array.from(this.connections)) {
       if (
         !connection.inUse &&
         now.getTime() - connection.lastUsed.getTime() > this.config.idleTimeout
@@ -186,7 +186,7 @@ export class ConnectionPool {
     }
 
     // Abort all connections
-    for (const connection of this.connections.values()) {
+    for (const connection of Array.from(this.connections.values())) {
       connection.controller.abort()
     }
 

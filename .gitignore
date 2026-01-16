@@ -5,6 +5,7 @@
 /.python
 /.azure-artifacts/
 /build-errors.md
+.vite/
 
 # === NODE/NPM/PNPM ARTIFACTS ===
 node_modules/
@@ -280,3 +281,7 @@ AGENTS.md
 /.cursor/
 /.openagents/
 /.openskills/
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
