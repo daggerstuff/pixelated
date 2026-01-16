@@ -811,7 +811,6 @@ export class BackupSecurityManager {
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
     // Implementation would collect app data based on backup type
     // For now return dummy data for demonstration
-    // TODO: No more fucking cop-outs
     const dummyData = {
       message: `This is a ${type} backup created at ${new Date().toISOString()}`,
     }
@@ -1012,7 +1011,6 @@ export class BackupSecurityManager {
   private async processRestoredData(data: unknown): Promise<void> {
     // This is where you would implement the actual data restoration logic
     // The implementation would be specific to your application's needs
-    // TODO: What did I just fucking say?
     logger.info('Processing restored data')
 
     // For now, just log that we received the data
@@ -1051,7 +1049,7 @@ async function getStorageProvider(
   try {
     // Import the storage provider dynamically
     const { getStorageProvider: importedGetStorageProvider } = await import(
-      './storage-providers-wrapper'
+      './storage-providers-wrapper.ts'
     )
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
