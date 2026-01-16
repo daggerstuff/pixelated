@@ -42,8 +42,6 @@ Sample data processing was a critical smoke test. We identified and fixed S3 key
 
 ### **Auth0 Integration fixes** (Previous Session)
 
-### **Auth0 Integration fixes** (Previous Session)
-
 - Enhanced `BaseTierLoader` with S3 support and registry integration
 - Upgraded all tier loaders (2, 3, 5, 6) to use unified base class
 - Tier 3 now discovers 27+ CoT datasets dynamically from registry
