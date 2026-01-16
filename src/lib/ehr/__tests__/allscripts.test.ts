@@ -319,13 +319,15 @@ describe('allscripts Provider', () => {
 
   // New Security-focused Tests
   describe('security', () => {
-    it('should securely handle credentials', async () => {
+    it('should securely handle credentials', () => {
       // Ensure credentials are not easily exposed (e.g., in logs or toString)
-      // TODO: Re-evaluate this test. Stringifying the provider might not be the right check.
-      // The assertion below is likely incorrect if the secret is stored internally.
-      // expect(JSON.stringify(allscriptsProvider)).not.toContain('test-client-secret');
-      // Placeholder assertion to keep the test structure
-      expect(allscriptsProvider.clientId).toBe(providerConfig.clientId)
+      // verify client secret is present but hidden in JSON
+      expect(allscriptsProvider.clientSecret).toBe(providerConfig.clientSecret)
+      const json = JSON.stringify(allscriptsProvider)
+      expect(json).not.toContain(providerConfig.clientSecret)
+      // Verify other fields are present to ensure it's not empty
+      expect(json).toContain(providerConfig.clientId)
+      expect(json).toContain(providerConfig.id)
     })
 
     it('should implement proper error handling for security failures', async () => {
