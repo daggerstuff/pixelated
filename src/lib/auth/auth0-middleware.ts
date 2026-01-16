@@ -592,7 +592,7 @@ export async function authenticateRequest(request: Request): Promise<{
       // Verify IP binding (allow some flexibility if needed, but strict for now)
       if (storedBinding.ip !== clientInfo.ip) {
         const { logSecurityEvent, SecurityEventType } = await import('../security');
-        await logSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, user.id, {
+        await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, user.id, {
           reason: 'ip_mismatch',
           storedIp: storedBinding.ip,
           currentIp: clientInfo.ip,
