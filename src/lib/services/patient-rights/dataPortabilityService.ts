@@ -29,6 +29,7 @@ function getAuditLogger(context: string): AuditLoggingService {
 
 import { mongoClient as db } from '../../db/mongoClient'
 import { v4 as uuidv4 } from 'uuid'
+import { dataExportDAO } from '../../../services/mongodb.dao'
 
 // Replace missing permissions module with a stub
 // Setup logging
@@ -260,18 +261,16 @@ export async function createDataExportRequest(
     }
 
     // Save to database
-    await mockDb.dataExport.create({
-      data: {
-        id: exportRequest.id,
-        patientId: exportRequest.patientId,
-        requestedBy: exportRequest.requestedBy,
-        formats: exportRequest.formats,
-        dataTypes: exportRequest.dataTypes,
-        reason: exportRequest.reason,
-        priority: exportRequest.priority,
-        status: exportRequest.status,
-        createdAt: exportRequest.createdAt,
-      },
+    await dataExportDAO.create({
+      id: exportRequest.id,
+      patientId: exportRequest.patientId,
+      requestedBy: exportRequest.requestedBy,
+      formats: exportRequest.formats,
+      dataTypes: exportRequest.dataTypes,
+      reason: exportRequest.reason,
+      priority: exportRequest.priority,
+      status: exportRequest.status,
+      createdAt: exportRequest.createdAt,
     })
 
     // Trigger export job (will be processed asynchronously)
@@ -456,12 +455,9 @@ async function queueExportJob(exportRequest: DataExportRequest): Promise<void> {
     })
 
     // Update status to failed
-    await mockDb.dataExport.update({
-      where: { id: exportRequest.id },
-      data: {
-        status: 'failed',
-        error: 'Failed to queue export job',
-      },
+    await dataExportDAO.update(exportRequest.id, {
+      status: 'failed',
+      error: 'Failed to queue export job',
     })
 
     throw error
@@ -477,18 +473,13 @@ async function processExportRequest(exportId: string): Promise<void> {
 
   try {
     // Mark as processing
-    await mockDb.dataExport.update({
-      where: { id: exportId },
-      data: {
-        status: 'processing',
-        startedAt: new Date(),
-      },
+    await dataExportDAO.update(exportId, {
+      status: 'processing',
+      startedAt: new Date(),
     })
 
     // Fetch export details
-    const exportData = await mockDb.dataExport.findUnique({
-      where: { id: exportId },
-    })
+    const exportData = await dataExportDAO.findById(exportId)
 
     if (!exportData) {
       throw new Error(`Export request ${exportId} not found`)
@@ -522,19 +513,14 @@ async function processExportRequest(exportId: string): Promise<void> {
         exportFiles.push(file)
 
         // Save file record
-        await mockDb.exportFile.create({
-          data: file,
-        })
+        await dataExportDAO.addFile(exportId, file)
       }
     }
 
     // Mark as completed
-    await mockDb.dataExport.update({
-      where: { id: exportId },
-      data: {
-        status: 'completed',
-        completedAt: new Date(),
-      },
+    await dataExportDAO.update(exportId, {
+      status: 'completed',
+      completedAt: new Date(),
     })
 
     logger.info('Export processing completed', {
@@ -552,12 +538,9 @@ async function processExportRequest(exportId: string): Promise<void> {
     })
 
     // Mark as failed
-    await mockDb.dataExport.update({
-      where: { id: exportId },
-      data: {
-        status: 'failed',
-        error: error instanceof Error ? String(error) : String(error),
-      },
+    await dataExportDAO.update(exportId, {
+      status: 'failed',
+      error: error instanceof Error ? String(error) : String(error),
     })
   }
 }
@@ -656,12 +639,9 @@ async function isAdminUser(userId: string): Promise<boolean> {
 export async function getDataExportRequest(
   id: string,
 ): Promise<DataExportRequest | null> {
-  // TODO: Replace with MongoDB implementation
   try {
-    const exportRequest = await mockDb.dataExport.findUnique({
-      where: { id },
-    })
-    return exportRequest as DataExportRequest
+    const exportRequest = await dataExportDAO.findById(id)
+    return exportRequest as unknown as DataExportRequest
   } catch (error: unknown) {
     logger.error('Error in getDataExportRequest', {
       error: error instanceof Error ? String(error) : String(error),
@@ -680,29 +660,24 @@ export async function getAllDataExportRequests(filters?: {
   dateRange?: { start: string; end: string }
 }): Promise<DataExportRequest[]> {
   try {
-    // TODO: Replace with MongoDB implementation
-    let allExports = await mockDb.dataExport.findUnique({ where: {} }) // This should be a findMany in real MongoDB code
-
-    // Apply filters manually (since mockDb is a stub)
-    let results = Array.isArray(allExports) ? allExports : [allExports]
+    const dbFilters: any = {}
     if (filters) {
       if (filters.status) {
-        results = results.filter((r) => r.status === filters.status)
+        dbFilters.status = filters.status
       }
       if (filters.patientId) {
-        results = results.filter((r) => r.patientId === filters.patientId)
+        dbFilters.patientId = filters.patientId
       }
       if (filters.dateRange) {
-        results = results.filter((r) => {
-          const created = new Date(r.createdAt)
-          return (
-            created >= new Date(filters.dateRange!.start) &&
-            created <= new Date(filters.dateRange!.end)
-          )
-        })
+        dbFilters.createdAt = {
+          $gte: new Date(filters.dateRange.start),
+          $lte: new Date(filters.dateRange.end),
+        }
       }
     }
-    return results as DataExportRequest[]
+
+    const results = await dataExportDAO.findAll(dbFilters)
+    return results as unknown as DataExportRequest[]
   } catch (error: unknown) {
     logger.error('Error in getAllDataExportRequests', {
       error: error instanceof Error ? String(error) : String(error),
@@ -739,14 +714,11 @@ async function updateExportStatus(
   options?: { errorMessage?: string },
 ): Promise<void> {
   try {
-    await mockDb.dataExport.update({
-      where: { id: exportId },
-      data: {
-        status,
-        error: options?.errorMessage,
-        ...(status === 'completed' ? { completedAt: new Date() } : {}),
-        ...(status === 'processing' ? { startedAt: new Date() } : {}),
-      },
+    await dataExportDAO.update(exportId, {
+      status,
+      error: options?.errorMessage,
+      ...(status === 'completed' ? { completedAt: new Date() } : {}),
+      ...(status === 'processing' ? { startedAt: new Date() } : {}),
     })
 
     logger.info(`Export status updated to ${status}`, { exportId })
@@ -1048,31 +1020,6 @@ interface Patient {
   name: string
 }
 
-interface DataExport {
-  id: string
-  patientId: string
-  requestedBy: string
-  formats: ExportFormat[]
-  dataTypes: string[]
-  reason: string
-  priority: ExportPriority
-  status: ExportStatus
-  createdAt: Date
-  startedAt?: Date
-  completedAt?: Date
-  error?: string
-}
-
-interface ExportFileModel {
-  id: string
-  exportId: string
-  format: ExportFormat
-  dataType: string
-  url: string
-  size: number
-  createdAt: Date
-}
-
 interface PatientUser {
   id: string
   patientId: string
@@ -1091,15 +1038,6 @@ interface User {
 }
 
 // Define types for mock database operations
-interface MockDbCreateParams<T> {
-  data: T
-}
-
-interface MockDbUpdateParams<T> {
-  where: { id: string }
-  data: Partial<T>
-}
-
 interface MockDbFindParams {
   where: Record<string, unknown>
   include?: Record<string, unknown>
@@ -1117,52 +1055,7 @@ const mockDb = {
       })
     },
   },
-  dataExport: {
-    create: (
-      _params: MockDbCreateParams<Partial<DataExport>>,
-    ): Promise<DataExport> => {
-      return Promise.resolve(_params.data as unknown as DataExport)
-    },
-    update: (_params: MockDbUpdateParams<DataExport>): Promise<DataExport> => {
-      return Promise.resolve({
-        ..._params.data,
-        id: _params.where['id'],
-      } as unknown as DataExport)
-    },
-    findUnique: (_params: MockDbFindParams): Promise<DataExport | null> => {
-      return Promise.resolve({
-        id: _params.where['id'] as string,
-        patientId: process.env['PATIENT_ID'] || 'example-patient-id',
-        requestedBy: 'test-user-id',
-        formats: ['json'],
-        dataTypes: ['profile'],
-        reason: 'Test reason',
-        priority: 'normal',
-        status: 'pending',
-        createdAt: new Date(),
-        files: _params.include?.['files']
-          ? [
-            {
-              id: 'file-1',
-              exportId: _params.where['id'] as string,
-              format: 'json',
-              dataType: 'profile',
-              url: 'https://example.com/file.json',
-              size: 1024,
-              createdAt: new Date(),
-            },
-          ]
-          : undefined,
-      })
-    },
-  },
-  exportFile: {
-    create: (
-      _params: MockDbCreateParams<ExportFileModel>,
-    ): Promise<ExportFileModel> => {
-      return Promise.resolve(_params.data as unknown as ExportFileModel)
-    },
-  },
+  // dataExport and exportFile removed - now using dataExportDAO
   patientUser: {
     findFirst: (_params: { where: unknown }): Promise<PatientUser | null> => {
       return Promise.resolve(null)
