@@ -36,6 +36,12 @@ export abstract class BaseEHRProvider implements EHRProvider {
     this.logger.info(`Cleaned up provider ${this.id}`)
   }
 
+  toJSON(): Record<string, unknown> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { clientSecret, client, logger, ...safeProperties } = this as any
+    return safeProperties
+  }
+
   // Common provider-specific operations can be added here
   protected async validateEndpoint(): Promise<boolean> {
     try {
