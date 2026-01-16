@@ -8,6 +8,7 @@ import * as jwt from 'jsonwebtoken'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+import { logger } from '../logger'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
@@ -190,18 +191,26 @@ export async function validateToken(
       throw new AuthenticationError('Malformed token')
     }
 
-    const payload = decodedToken.payload
+    const { payload } = decodedToken
 
     // Validate Issuer
     const expectedIssuer = `https://${process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain}/`
-    if (payload.iss && payload.iss !== expectedIssuer) {
+    if (!payload.iss) {
+      throw new AuthenticationError('Token missing issuer claim')
+    }
+    if (payload.iss !== expectedIssuer) {
       throw new AuthenticationError(`Invalid issuer: ${payload.iss}`)
     }
 
     // Validate Audience
-    const expectedAudience = process.env.AUTH0_AUDIENCE || AUTH0_CONFIG.audience
-    if (expectedAudience) {
-      const aud = payload.aud
+    const expectedAudience = process.env.AUTH0_AUDIENCE ?? AUTH0_CONFIG.audience
+    if (!expectedAudience || expectedAudience.trim() === '') {
+      console.warn('AUTH0_AUDIENCE not configured - audience validation skipped')
+    } else {
+      const {aud} = payload
+      if (!aud) {
+        throw new AuthenticationError('Token missing audience claim')
+      }
       const audValid = Array.isArray(aud)
         ? aud.includes(expectedAudience)
         : aud === expectedAudience
@@ -216,16 +225,20 @@ export async function validateToken(
       throw new AuthenticationError('Token has expired')
     }
 
-    // Now verify with UserInfo (acts as online signature/revocation check)
-    const { data: userInfo } = await auth0UserInfo.getUserInfo(token) as { data: any }
-
     // Validate token type matches expected (access tokens only for now)
+    // Check this before expensive UserInfo call to fail fast
     if (tokenType === 'refresh') {
       throw new AuthenticationError('Refresh token validation not supported with this method')
     }
 
+    // Now verify with UserInfo (acts as online signature/revocation check)
+    const { data: userInfo } = await auth0UserInfo.getUserInfo(token) as { data: any }
+
     // Extract user information
-    const userId = userInfo.sub || payload.sub || ''
+    const userId = userInfo.sub || payload.sub
+    if (!userId) {
+      throw new AuthenticationError('Token missing subject claim')
+    }
     const role = extractRoleFromPayload(userInfo)
     const tokenId = payload.jti || ''
     const sessionId = payload.sid as string | undefined
@@ -238,13 +251,18 @@ export async function validateToken(
       sessionId: sessionId,
     })
 
+    // Filter out PHI/PII from userInfo before returning
+    // Remove email, name, picture and other identifiable information
+    const { email, name, picture, nickname, given_name, family_name, ...filteredUserInfo } = userInfo
+    const safePayload = { ...filteredUserInfo, ...payload }
+
     return {
       valid: true,
       userId: userId,
       role: role,
       tokenId: tokenId,
       expiresAt: payload.exp,
-      payload: { ...userInfo, ...payload }, // Merge both
+      payload: safePayload,
     }
   } catch (error) {
     // Log validation failure
