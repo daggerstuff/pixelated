@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "baseline": {
+    "security_policies": {
+      "enforce_mfa": true,
+      "audit_logging": true,
+      "data_encryption": true
+    },
+    "compliance_standards": ["HIPAA", "GDPR"]
+  }
+}

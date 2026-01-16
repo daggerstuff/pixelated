@@ -98,6 +98,10 @@ dependencies = [
   "onnxscript>=0.5.7",
   "mem0-mcp-server>=0.2.1",
   "zep-cloud>=3.14.0",
+  "fastapi>=0.124.4",
+  "uvicorn>=0.38.0",
+    "minio>=7.2.20",
+    "librosa>=0.11.0",
 ]
 
 [project.optional-dependencies]

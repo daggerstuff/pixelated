@@ -1,0 +1,96 @@
+/* research.css */
+
+.research-hero {
+  min-height: 80vh;
+  background: linear-gradient(135deg, var(--c-bg), #0f172a);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.research-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(180, 54, 121, 0.1) 0%, /* Using RGB approx for oklch(70.5% 0.213 47.604) */
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  background: #1e293b; /* slate-800 */
+  border: 1px solid #334155; /* slate-700 */
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #ec4899; /* pink-500 */
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
+}
+
+.result-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.result-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #ec4899;
+}
+
+.relevance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(236, 72, 153, 0.1);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #f472b6; /* pink-400 */
+}
+
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+  color: #cbd5e1;
+}
+
+.source-chip:hover {
+  background: #475569;
+  border-color: #ec4899;
+}
+
+.source-chip.active {
+  background: #db2777; /* pink-600 */
+  border-color: #ec4899;
+  color: white;
+}

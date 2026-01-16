@@ -42,7 +42,6 @@ function initializeAuth0Clients() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
     })
   }
 }
@@ -436,7 +435,7 @@ export class Auth0WebAuthnService {
   /**
    * Validate WebAuthn credential response
    */
-  async validateCredentialResponse(userId: string, response: any): Promise<boolean> {
+  async validateCredentialResponse(userId: string, _response: any): Promise<boolean> {
     try {
       // In a real implementation, we would validate the credential response
       // For now, we'll simulate validation
