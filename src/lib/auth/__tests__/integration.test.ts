@@ -14,6 +14,7 @@ const { mockAuth0UserService, mockJwtService, mockPhase6, mockRedis, mockSecurit
     getUserById: vi.fn(),
     updateUser: vi.fn(),
     signOut: vi.fn(),
+    verifyAuthToken: vi.fn(),
     refreshSession: vi.fn(),
     userHasMFA: vi.fn().mockResolvedValue(true),
   },
@@ -45,23 +46,26 @@ const { mockAuth0UserService, mockJwtService, mockPhase6, mockRedis, mockSecurit
   mockSecurity: {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
-      USER_REGISTERED: 'USER_REGISTERED',
-      USER_LOGIN_SUCCESS: 'USER_LOGIN_SUCCESS',
-      USER_LOGOUT: 'USER_LOGOUT',
-      TOKEN_REFRESHED: 'TOKEN_REFRESHED',
-      AUTHENTICATION_SUCCESS: 'AUTHENTICATION_SUCCESS',
-      AUTHENTICATION_FAILED: 'AUTHENTICATION_FAILED',
-      AUTHORIZATION_FAILED: 'AUTHORIZATION_FAILED',
-      RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-      CSRF_VIOLATION: 'CSRF_VIOLATION',
-      TOKEN_VALIDATED: 'TOKEN_VALIDATED',
-      TOKEN_VALIDATION_FAILED: 'TOKEN_VALIDATION_FAILED',
-      MFA_REQUIRED: 'MFA_REQUIRED',
+      user_created: 'user_created',
+      user_login_success: 'user_login_success',
+      user_logout: 'user_logout',
+      token_refreshed: 'token_refreshed',
+      authentication_success: 'authentication_success',
+      authentication_failed: 'authentication_failed',
+      authorization_failed: 'authorization_failed',
+      rate_limit_exceeded: 'rate_limit_exceeded',
+      csrf_violation: 'csrf_violation',
+      token_validated: 'token_validated',
+      token_validation_failed: 'token_validation_failed',
+      mfa_required: 'mfa_required',
     },
   }
 }))
 
-vi.mock('../../../services/auth0.service', () => ({ auth0UserService: mockAuth0UserService }))
+vi.mock('../../../services/auth0.service', () => ({
+  auth0UserService: mockAuth0UserService,
+  verifyToken: mockAuth0UserService.verifyAuthToken
+}))
 vi.mock('../auth0-jwt-service', () => mockJwtService)
 vi.mock('../../mcp/phase6-integration', () => mockPhase6)
 vi.mock('../../redis', () => mockRedis)
@@ -103,10 +107,12 @@ vi.mock('node:crypto', () => ({
 
 
 // Import handlers after mocks are set up
-import { POST as registerHandler } from '../../../pages/api/auth/register'
-import { POST as loginHandler } from '../../../pages/api/auth/login'
-import { POST as logoutHandler } from '../../../pages/api/auth/logout'
+import { POST as registerHandler } from '../../../pages/api/auth/signup'
+import { POST as loginHandler } from '../../../pages/api/auth/signin'
+import { POST as logoutHandler } from '../../../pages/api/auth/signout'
 import { POST as refreshHandler } from '../../../pages/api/auth/refresh'
+import { GET as profileGetHandler, PUT as profilePutHandler } from '../../../pages/api/auth/profile'
+import { GET as verifyHandler } from '../../../pages/api/auth/verify'
 import { authenticateRequest, requireRole } from '../auth0-middleware'
 
 describe('Authentication System Integration', () => {
@@ -142,20 +148,12 @@ describe('Authentication System Integration', () => {
     it('should handle full registration and login flow', async () => {
       // Mock registration
       mockAuth0UserService.createUser.mockResolvedValue({
-        user: {
-          id: 'user123',
-          email: 'test@example.com',
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-          createdAt: new Date(),
-        },
-        tokenPair: {
-          accessToken: 'access.token.123',
-          refreshToken: 'refresh.token.123',
-          tokenType: 'Bearer',
-          expiresIn: 3600,
-        },
+        id: 'user123',
+        email: 'test@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'patient',
+        createdAt: new Date(),
       })
 
       const registerRequest = new Request(
@@ -166,6 +164,7 @@ describe('Authentication System Integration', () => {
             'Content-Type': 'application/json',
             'User-Agent': mockClientInfo.userAgent,
             'X-Device-ID': mockClientInfo.deviceId,
+            'X-CSRF-Token': 'valid-csrf-token',
           },
           body: JSON.stringify({
             email: 'test@example.com',
@@ -197,12 +196,9 @@ describe('Authentication System Integration', () => {
           role: 'patient',
           lastLoginAt: new Date(),
         },
-        tokenPair: {
-          accessToken: 'access.token.456',
-          refreshToken: 'refresh.token.456',
-          tokenType: 'Bearer',
-          expiresIn: 3600,
-        },
+        token: 'access.token.456',
+        refreshToken: 'refresh.token.456',
+        expiresIn: 3600,
       })
 
       const loginRequest = new Request('https://example.com/api/auth/login', {
@@ -227,10 +223,15 @@ describe('Authentication System Integration', () => {
       expect(loginResponse.status).toBe(200)
       const loginData = await loginResponse.json()
       expect(loginData.success).toBe(true)
-      expect(loginData.tokenPair.accessToken).toBe('access.token.456')
+      expect(loginData.token).toBe('access.token.456')
 
       // Mock dependencies for logout
       mockAuth0UserService.signOut.mockResolvedValue({ success: true })
+      mockAuth0UserService.verifyAuthToken.mockResolvedValue({
+        userId: 'user123',
+        email: 'test@example.com',
+        role: 'patient',
+      })
       mockJwtService.validateToken.mockResolvedValue({
         valid: true,
         userId: 'user123',
@@ -372,21 +373,18 @@ describe('Authentication System Integration', () => {
       const sanitizedEmail = 'scriptalert(xss)/scripttest@example.com'.substring(0, 255)
 
       mockAuth0UserService.createUser.mockResolvedValueOnce({
-        user: {
-          id: 'user123',
-          email: sanitizedEmail,
-          firstName: 'John',
-          lastName: 'Doe',
-          role: 'patient',
-          createdAt: new Date()
-        },
-        tokenPair: { accessToken: 'a', refreshToken: 'b', expiresIn: 3600 }
+        id: 'user123',
+        email: sanitizedEmail,
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'patient',
+        createdAt: new Date()
       })
 
       const response = await registerHandler({
         request: new Request('https://example.com/api/auth/register', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': 'valid-csrf-token' },
           body: JSON.stringify({
             email: xssEmail,
             password: 'Password123!',
@@ -408,7 +406,7 @@ describe('Authentication System Integration', () => {
       const response = await registerHandler({
         request: new Request('https://example.com/api/auth/register', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': 'valid-csrf-token' },
           body: JSON.stringify({
             email: 'test@example.com',
             password: 'weak',
@@ -421,15 +419,15 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(400)
       const data = await response.json()
-      expect(data.error).toBe('Weak password')
-      expect(data.errors).toBeDefined()
+      expect(data.error).toBe('Password does not meet requirements')
+      expect(data.details).toBeDefined()
     })
 
     it('should validate email format in registration', async () => {
       const response = await registerHandler({
         request: new Request('https://example.com/api/auth/register', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': 'valid-csrf-token' },
           body: JSON.stringify({
             email: 'invalid-email',
             password: 'Password123!',
@@ -479,8 +477,7 @@ describe('Authentication System Integration', () => {
   describe('Health Data Privacy', () => {
     it('should not log sensitive health information', async () => {
       mockAuth0UserService.createUser.mockResolvedValue({
-        user: { id: 'user123', email: 'privacy@example.com', role: 'patient' },
-        tokenPair: { accessToken: 'a', refreshToken: 'b', expiresIn: 3600 }
+        id: 'user123', email: 'privacy@example.com', role: 'patient'
       })
 
       const registerRequest = new Request('https://example.com/api/auth/register', {
@@ -510,8 +507,7 @@ describe('Authentication System Integration', () => {
   describe('Phase 6 MCP Server Integration', () => {
     it('should track authentication progress throughout the flow', async () => {
       mockAuth0UserService.createUser.mockResolvedValue({
-        user: { id: 'user123', email: 'test@example.com', role: 'patient' },
-        tokenPair: { accessToken: 'a', refreshToken: 'b', expiresIn: 3600 }
+        id: 'user123', email: 'test@example.com', role: 'patient'
       })
 
       const registerRequest = new Request(
@@ -522,6 +518,7 @@ describe('Authentication System Integration', () => {
             'Content-Type': 'application/json',
             'User-Agent': mockClientInfo.userAgent,
             'X-Device-ID': mockClientInfo.deviceId,
+            'X-CSRF-Token': 'valid-csrf-token',
           },
           body: JSON.stringify({
             email: 'test@example.com',
@@ -533,12 +530,19 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      await registerHandler({
+      const response = await registerHandler({
         request: registerRequest,
         clientAddress: mockClientInfo.ip,
       } as any)
 
+      if (response.status !== 201) {
+        const data = await response.json()
+        console.error('Registration failed:', data)
+      }
+      expect(response.status).toBe(201)
+
       // Verify Phase 6 tracking was called
+
       expect(mockPhase6.updatePhase6AuthenticationProgress).toHaveBeenCalledWith(
         'user123',
         'user_registered',
@@ -548,7 +552,7 @@ describe('Authentication System Integration', () => {
     it('should track login events', async () => {
       mockAuth0UserService.signIn.mockResolvedValue({
         user: { id: 'user123', email: 'test@example.com', role: 'patient' },
-        tokenPair: { accessToken: 'a', refreshToken: 'b', expiresIn: 3600 }
+        token: 'a', refreshToken: 'b', expiresIn: 3600
       })
 
       const loginRequest = new Request('https://example.com/api/auth/login', {
@@ -616,6 +620,11 @@ describe('Authentication System Integration', () => {
 
     it('should track logout events', async () => {
       mockAuth0UserService.signOut.mockResolvedValue({ success: true })
+      mockAuth0UserService.verifyAuthToken.mockResolvedValue({
+        userId: 'user123',
+        email: 'test@example.com',
+        role: 'patient',
+      })
 
       const logoutRequest = new Request('https://example.com/api/auth/logout', {
         method: 'POST',
@@ -649,6 +658,134 @@ describe('Authentication System Integration', () => {
         'user123',
         'user_logged_out',
       )
+    })
+  })
+
+  describe('Profile Management', () => {
+    it('should retrieve user profile with valid session', async () => {
+      // Mock session verification
+      mockJwtService.validateToken.mockResolvedValue({
+        valid: true,
+        userId: 'user123',
+        role: 'patient',
+        tokenId: 'token123',
+        expiresAt: Date.now() + 3600000,
+      })
+
+      mockAuth0UserService.getUserById.mockResolvedValue({
+        id: 'user123',
+        email: 'test@example.com',
+        role: 'patient',
+        fullName: 'John Doe',
+        avatarUrl: 'https://example.com/avatar.jpg'
+      })
+
+      mockAuth0UserService.verifyAuthToken.mockResolvedValue({
+        userId: 'user123',
+        email: 'test@example.com',
+        role: 'patient'
+      })
+
+      const request = new Request('https://example.com/api/auth/profile', {
+        headers: {
+          'Authorization': 'Bearer valid.token',
+        },
+      })
+
+      const response = await profileGetHandler({
+        request,
+        clientAddress: '127.0.0.1'
+      } as any)
+
+      expect(response.status).toBe(200)
+      const data = await response.json()
+      expect(data.user.id).toBe('user123')
+      expect(data.user.fullName).toBe('John Doe')
+    })
+
+    it('should update user profile', async () => {
+      mockJwtService.validateToken.mockResolvedValue({
+        valid: true,
+        userId: 'user123'
+      })
+
+      mockAuth0UserService.updateUser.mockResolvedValue({
+        id: 'user123',
+        email: 'test@example.com',
+        fullName: 'Jane Doe', // Updated
+        avatarUrl: 'https://example.com/new-avatar.jpg' // Updated
+      })
+
+      mockAuth0UserService.verifyAuthToken.mockResolvedValue({
+        userId: 'user123',
+        email: 'test@example.com',
+        role: 'patient'
+      })
+
+      // CSRF Mock success
+      mockRedis.getFromCache.mockResolvedValue({ token: 'valid-token', expiresAt: Date.now() + 99999 })
+
+      const request = new Request('https://example.com/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer valid.token',
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': 'valid-token'
+        },
+        body: JSON.stringify({
+          fullName: 'Jane Doe',
+          avatarUrl: 'https://example.com/new-avatar.jpg'
+        })
+      })
+
+      const response = await profilePutHandler({
+        request,
+        clientAddress: '127.0.0.1'
+      } as any)
+
+      expect(response.status).toBe(200)
+      const data = await response.json()
+      expect(data.success).toBe(true)
+      expect(data.user.fullName).toBe('Jane Doe')
+
+      // Verify security log
+      expect(mockSecurity.logSecurityEvent).toHaveBeenCalledWith(
+        mockSecurity.SecurityEventType.USER_UPDATED,
+        'user123',
+        expect.anything()
+      )
+    })
+  })
+
+  describe('Verify Endpoint', () => {
+    it('should reject missing parameters', async () => {
+      const request = new Request('https://example.com/api/auth/verify', {
+        headers: { 'User-Agent': 'test' }
+      })
+
+      const response = await verifyHandler({
+        request,
+        clientAddress: '127.0.0.1'
+      } as any)
+
+      expect(response.status).toBe(400)
+      const data = await response.json()
+      expect(data.message).toContain('Missing token')
+    })
+
+    it('should attempt verification with valid params', async () => {
+      // This is testing the stub implementation for now
+      const request = new Request('https://example.com/api/auth/verify?token=abc&type=email_verification', {
+        headers: { 'User-Agent': 'test' }
+      })
+
+      const response = await verifyHandler({
+        request,
+        clientAddress: '127.0.0.1'
+      } as any)
+
+      // Current stub returns 200
+      expect(response.status).toBe(200)
     })
   })
 })

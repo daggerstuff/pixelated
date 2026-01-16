@@ -6,15 +6,14 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "baseUrl": "../..",
     "paths": {
-      "~/*": ["src/*"],
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@utils/*": ["src/utils/*"],
-      "@lib/*": ["src/lib/*"],
-      "@types/*": ["src/types/*"]
+      "~/*": ["../../src/*"],
+      "@/*": ["../../src/*"],
+      "@components/*": ["./*"],
+      "@layouts/*": ["../layouts/*"],
+      "@utils/*": ["../utils/*"],
+      "@lib/*": ["../lib/*"],
+      "@types/*": ["../types/*"]
     }
   },
   "include": ["./**/*.astro", "./**/*.tsx", "./**/*.ts"],

@@ -88,22 +88,22 @@ export class BiasDetectionEngine {
     }
 
     this.config = {
-      pythonServiceUrl: cfg['pythonServiceUrl'] ?? 'http://localhost:8000',
-      pythonServiceTimeout: cfg['pythonServiceTimeout'] ?? 30000,
+      pythonServiceUrl: cfg["pythonServiceUrl"] ?? "http://localhost:5000",
+      pythonServiceTimeout: cfg["pythonServiceTimeout"] ?? 30000,
       thresholds: normalizedThresholds,
-      layerWeights: cfg['layerWeights'] ?? DEFAULT_WEIGHTS,
-      evaluationMetrics: cfg['evaluationMetrics'] ?? [
-        'demographic_parity',
-        'equalized_odds',
+      layerWeights: cfg["layerWeights"] ?? DEFAULT_WEIGHTS,
+      evaluationMetrics: cfg["evaluationMetrics"] ?? [
+        "demographic_parity",
+        "equalized_odds",
       ],
-      metricsConfig: cfg['metricsConfig'] ?? {
+      metricsConfig: cfg["metricsConfig"] ?? {
         enableRealTimeMonitoring: true,
         metricsRetentionDays: 30,
-        aggregationIntervals: ['1h', '1d'],
+        aggregationIntervals: ["1h", "1d"],
         dashboardRefreshRate: 60,
-        exportFormats: ['json'],
+        exportFormats: ["json"],
       },
-      alertConfig: cfg['alertConfig'] ?? {
+      alertConfig: cfg["alertConfig"] ?? {
         enableSlackNotifications: false,
         enableEmailNotifications: false,
         emailRecipients: [],
@@ -113,29 +113,29 @@ export class BiasDetectionEngine {
           highResponseTimeMinutes: 30,
         },
       },
-      reportConfig: cfg['reportConfig'] ?? {
+      reportConfig: cfg["reportConfig"] ?? {
         includeConfidentialityAnalysis: true,
         includeDemographicBreakdown: true,
         includeTemporalTrends: true,
         includeRecommendations: true,
-        reportTemplate: 'standard',
-        exportFormats: ['json'],
+        reportTemplate: "standard",
+        exportFormats: ["json"],
       },
-      explanationConfig: cfg['explanationConfig'] ?? {
-        explanationMethod: 'shap',
+      explanationConfig: cfg["explanationConfig"] ?? {
+        explanationMethod: "shap",
         maxFeatures: 10,
         includeCounterfactuals: true,
         generateVisualization: false,
       },
       pythonServiceConfig: {},
-      cacheConfig: cfg['cacheConfig'] ?? {},
-      batchProcessingConfig: cfg['batchProcessingConfig'] ?? {},
+      cacheConfig: cfg["cacheConfig"] ?? {},
+      batchProcessingConfig: cfg["batchProcessingConfig"] ?? {},
       securityConfig: {},
       performanceConfig: {},
-      hipaaCompliant: cfg['hipaaCompliant'] ?? true,
-      dataMaskingEnabled: cfg['dataMaskingEnabled'] ?? true,
-      auditLogging: cfg['auditLogging'] ?? true,
-    }
+      hipaaCompliant: cfg["hipaaCompliant"] ?? true,
+      dataMaskingEnabled: cfg["dataMaskingEnabled"] ?? true,
+      auditLogging: cfg["auditLogging"] ?? true,
+    };
 
     // Validate thresholds configuration
     this.config.thresholds = this.validateThresholds(this.config.thresholds)

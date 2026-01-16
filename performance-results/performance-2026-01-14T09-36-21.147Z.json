@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-01-14T09:34:34.445Z",
+  "environment": "test",
+  "pages": {
+    "Home Page": {
+      "url": "/",
+      "navigationTime": 2177.859235,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 812,
+      "domContentLoaded": 2.7999999998137355,
+      "domComplete": 1063.5999999996275,
+      "loadEvent": 9.300000000745058,
+      "resourceCount": 123,
+      "resourceSize": 4446902,
+      "jsSize": 3522886,
+      "jsExecutionCount": 359774,
+      "FID": 1.400000000372529
+    },
+    "Dashboard": {
+      "url": "/app/dashboard",
+      "navigationTime": 1423.7845889999999,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 428,
+      "domContentLoaded": 1.7000000001862645,
+      "domComplete": 764.7999999998137,
+      "loadEvent": 8,
+      "resourceCount": 81,
+      "resourceSize": 3723891,
+      "jsSize": 3537707,
+      "jsExecutionCount": 343671,
+      "FID": 0
+    },
+    "Chat": {
+      "url": "/app/chat",
+      "navigationTime": 1732.1774739999964,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 444,
+      "domContentLoaded": 1.8999999994412065,
+      "domComplete": 772,
+      "loadEvent": 44.59999999962747,
+      "resourceCount": 81,
+      "resourceSize": 3723891,
+      "jsSize": 3537707,
+      "jsExecutionCount": 343671,
+      "FID": 0
+    },
+    "Settings": {
+      "url": "/app/settings",
+      "navigationTime": 1587.912228999994,
+      "LCP": 0,
+      "CLS": 0,
+      "FCP": 588,
+      "domContentLoaded": 1.5,
+      "domComplete": 1049.2999999998137,
+      "loadEvent": 0.7999999998137355,
+      "resourceCount": 81,
+      "resourceSize": 3723891,
+      "jsSize": 3537707,
+      "jsExecutionCount": 343714,
+      "FID": 0
+    }
+  },
+  "api": {
+    "/api/ai/completion": {
+      "method": "POST",
+      "responseTime": 3.8843610000039916,
+      "status": 401
+    },
+    "/api/ai/usage": {
+      "method": "GET",
+      "responseTime": 2.5899670000071637,
+      "status": 401
+    }
+  }
+}
