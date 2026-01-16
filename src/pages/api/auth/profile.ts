@@ -2,8 +2,10 @@ export const prerender = false
 import { auth0UserService } from '../../../services/auth0.service'
 import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
+import { detectAndRedactPHI } from '../../../lib/security/phiDetection'
 import { csrfProtection, rateLimitMiddleware } from '../../../lib/auth/middleware'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
+import { redactPotentialPhi } from '../../../lib/utils/phi-sanitizer'
 
 /**
  * User profile endpoint using Auth0
@@ -107,7 +109,7 @@ export const GET = async ({ request, clientAddress }: { request: Request; client
 
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
-      error: error.message,
+      error: detectAndRedactPHI(error.message),
       clientInfo
     })
 
@@ -198,7 +200,7 @@ export const PUT = async ({ request, clientAddress }: { request: Request; client
     }
 
     // Log security event for profile update
-    await logSecurityEvent(SecurityEventType.USER_UPDATED, userId, {
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, userId, {
       updates: Object.keys(auth0Updates),
       clientInfo
     })
@@ -233,7 +235,7 @@ export const PUT = async ({ request, clientAddress }: { request: Request; client
 
     await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
       action: 'update_profile',
-      error: error instanceof Error ? error.message : String(error),
+      error: detectAndRedactPHI(error instanceof Error ? error.message : String(error)),
       clientInfo
     })
 
