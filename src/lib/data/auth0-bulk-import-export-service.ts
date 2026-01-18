@@ -256,21 +256,15 @@ export class Auth0BulkImportExportService {
   async importUsersFromCsv(csvData: string, options: BulkImportOptions = {}, initiatedBy: string): Promise<ImportResult> {
     try {
       // Parse CSV data
-      const records: any[] = []
-      const parseAsync = promisify(parse)
-
-      await pipeline(
-        csvData,
-        parseAsync({
+      const records = await new Promise<any[]>((resolve, reject) => {
+        parse(csvData, {
           columns: true,
           skip_empty_lines: true
-        }),
-        async function*(source) {
-          for await (const record of source) {
-            records.push(record)
-          }
-        }
-      )
+        }, (err, output) => {
+          if (err) reject(err)
+          else resolve(output)
+        })
+      })
 
       // Convert CSV records to UserImportData format
       const users: UserImportData[] = records.map(record => ({
