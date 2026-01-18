@@ -924,6 +924,9 @@ export class BackupSecurityManager {
   private async loadStorageProviders(): Promise<void> {
     logger.debug('Loading storage providers during initialization')
 
+    // Clear existing providers before loading new ones
+    this.storageProviders.clear()
+
     // Iterate over configured storage locations
     for (const [location, locationConfig] of Object.entries(
       this.config.storageLocations,
@@ -932,21 +935,13 @@ export class BackupSecurityManager {
       if (locationConfig.enabled !== false) {
         logger.info(`Initializing storage provider for ${location}`)
 
-        try {
-          const providerPromise = getStorageProvider(
-            locationConfig.provider,
-            locationConfig.providerConfig || locationConfig.config,
-          )
+        const provider = await getStorageProvider(
+          locationConfig.provider,
+          locationConfig.providerConfig || locationConfig.config,
+        )
 
-          const provider = await providerPromise
-          await provider.initialize()
-          this.storageProviders.set(location as StorageLocation, provider)
-        } catch (error: unknown) {
-          logger.error(
-            `Failed to initialize storage provider for ${location}: ${error instanceof Error ? String(error) : String(error)}`,
-          )
-          throw error
-        }
+        await provider.initialize()
+        this.storageProviders.set(location as StorageLocation, provider)
       }
     }
   }
