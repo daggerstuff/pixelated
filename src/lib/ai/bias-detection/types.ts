@@ -43,22 +43,9 @@ export interface ModelPerformanceMetrics {
   demographicBreakdown: Record<string, number>
 }
 
-export interface LoggingConfig {
-  level?: string
-  enableConsole?: boolean
-  enableFile?: boolean
-  enableDebug?: boolean
-  filePath?: string
-  maxFileSize?: string
-  maxFiles?: number
-  enableStructured?: boolean
-}
-
 export interface BiasDetectionConfig {
-  environment?: string
   pythonServiceUrl?: string
   pythonServiceTimeout?: number
-  pythonServicePort?: number
   thresholds?: BiasThresholdsConfig
   layerWeights?: BiasLayerWeights
   evaluationMetrics?: string[]
@@ -70,7 +57,6 @@ export interface BiasDetectionConfig {
   cacheConfig?: BiasCacheConfig
   securityConfig?: SecurityConfig
   performanceConfig?: PerformanceConfig
-  loggingConfig?: LoggingConfig
   hipaaCompliant?: boolean
   dataMaskingEnabled?: boolean
   auditLogging?: boolean
@@ -92,35 +78,7 @@ export interface BiasDetectionConfig {
     enabled?: boolean
     framework?: 'tensorflow' | 'pytorch' | 'scikit-learn'
     version?: string
-    tensorflow?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-    }
-    aif360?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-    }
-    fairlearn?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-    }
-    huggingFace?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-      apiKey?: string
-      model?: string
-    }
-    interpretability?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-      shap?: { enabled?: boolean }
-      lime?: { enabled?: boolean }
-    }
-    spacy?: {
-      enabled?: boolean
-      fallbackOnError?: boolean
-      model?: string
-    }
+    tensorflow?: { enabled?: boolean }
   }
 }
 
@@ -215,8 +173,6 @@ export interface SecurityConfig {
   sessionTimeoutMs?: number
   maxSessionSizeMB?: number
   rateLimitPerMinute?: number
-  jwtSecret?: string
-  encryptionKey?: string
   // Note: secrets should come from secure env vars, not config
 }
 
@@ -247,7 +203,7 @@ export interface TherapeuticSession {
   transcripts: SessionTranscript[]
   userInputs: string[]
   metadata: SessionMetadata
-  timestamp: Date
+  timestamp?: Date
 }
 
 export interface ParticipantDemographics {

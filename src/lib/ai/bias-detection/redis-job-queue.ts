@@ -55,12 +55,12 @@ export class RedisJobQueue<T = any, R = any> {
 
   async getJob(id: string): Promise<Job<T, R> | undefined> {
     const jobStr = await this.redis.hGet(this.jobsKey, id)
-    return jobStr ? JSON.parse(jobStr as string) : undefined
+    return jobStr ? JSON.parse(jobStr) : undefined
   }
 
   async getAllJobs(): Promise<Job<T, R>[]> {
     const jobs = await this.redis.hGetAll(this.jobsKey)
-    return Object.values(jobs).map((j) => JSON.parse(j as string))
+    return Object.values(jobs).map((j) => JSON.parse(j))
   }
 
   private async processNext() {
@@ -69,7 +69,7 @@ export class RedisJobQueue<T = any, R = any> {
     }
     this.processing = true
     try {
-      const id = (await this.redis.lPop(this.queueKey)) as string | null
+      const id = await this.redis.lPop(this.queueKey)
       if (!id) {
         this.processing = false
         return
@@ -89,7 +89,7 @@ export class RedisJobQueue<T = any, R = any> {
       try {
         job.result = await this.handler(job.data, (progress) => {
           job.progress = progress
-          this.redis.hSet(this.jobsKey, id as string, JSON.stringify(job))
+          this.redis.hSet(this.jobsKey, id, JSON.stringify(job))
           console.info('[RedisJobQueue] Job progress', {
             jobId: job.id,
             progress,
@@ -137,9 +137,9 @@ export class RedisJobQueue<T = any, R = any> {
     const avgDuration =
       completedJobs.length > 0
         ? completedJobs.reduce(
-          (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
-          0,
-        ) / completedJobs.length
+            (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
+            0,
+          ) / completedJobs.length
         : 0
     const errorCount = jobs.filter((j) => j.status === 'failed').length
     const total = jobs.length

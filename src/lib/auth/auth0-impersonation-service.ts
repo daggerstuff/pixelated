@@ -32,6 +32,7 @@ function initializeAuth0Management() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      scope: 'read:users update:users create:users impersonate:users'
     })
   }
 }
@@ -105,8 +106,7 @@ export class Auth0ImpersonationService {
 
       // Only admins can impersonate users
       if (adminUser.role !== 'admin') {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: request.adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, request.adminUserId, {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
@@ -120,8 +120,7 @@ export class Auth0ImpersonationService {
       // Validate target user exists
       const targetUser = await auth0UserService.getUserById(request.targetUserId)
       if (!targetUser) {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: request.adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, request.adminUserId, {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
@@ -134,8 +133,7 @@ export class Auth0ImpersonationService {
 
       // Check if admin is trying to impersonate themselves
       if (request.adminUserId === request.targetUserId) {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: request.adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, request.adminUserId, {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
@@ -149,8 +147,7 @@ export class Auth0ImpersonationService {
       // Check if admin is already impersonating someone
       const existingSession = this.getActiveSessionForAdmin(request.adminUserId)
       if (existingSession) {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: request.adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, request.adminUserId, {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
@@ -162,7 +159,7 @@ export class Auth0ImpersonationService {
       }
 
       // Create impersonation session
-      const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+      const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       const session: ImpersonationSession = {
         id: sessionId,
         adminUserId: request.adminUserId,
@@ -178,8 +175,7 @@ export class Auth0ImpersonationService {
       this.activeSessions.set(sessionId, session)
 
       // Log impersonation start
-      logSecurityEvent(SecurityEventType.IMPERSONATION_STARTED, {
-        userId: request.adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_STARTED, request.adminUserId, {
         targetUserId: request.targetUserId,
         sessionId: sessionId,
         reason: request.reason,
@@ -190,7 +186,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
         eventType: 'START',
         adminUserId: request.adminUserId,
@@ -209,8 +205,7 @@ export class Auth0ImpersonationService {
       console.error('Failed to request impersonation:', error)
 
       // Log impersonation error
-      logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, {
-        userId: request.adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, request.adminUserId, {
         targetUserId: request.targetUserId,
         reason: request.reason,
         ipAddress: request.ipAddress,
@@ -234,8 +229,7 @@ export class Auth0ImpersonationService {
 
       // Verify that the admin user is the one who started the session
       if (session.adminUserId !== adminUserId) {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, adminUserId, {
           targetUserId: session.targetUserId,
           sessionId: sessionId,
           error: 'Unauthorized to end this impersonation session',
@@ -253,8 +247,7 @@ export class Auth0ImpersonationService {
       this.activeSessions.delete(sessionId)
 
       // Log impersonation end
-      logSecurityEvent(SecurityEventType.IMPERSONATION_ENDED, {
-        userId: adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_ENDED, adminUserId, {
         targetUserId: session.targetUserId,
         sessionId: sessionId,
         duration: session.endTime.getTime() - session.startTime.getTime(),
@@ -263,7 +256,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
         eventType: 'END',
         adminUserId: adminUserId,
@@ -282,8 +275,7 @@ export class Auth0ImpersonationService {
       console.error('Failed to end impersonation:', error)
 
       // Log impersonation error
-      logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, {
-        userId: adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
         sessionId: sessionId,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
@@ -297,7 +289,7 @@ export class Auth0ImpersonationService {
    * Get active impersonation session for admin user
    */
   getActiveSessionForAdmin(adminUserId: string): ImpersonationSession | null {
-    for (const session of Array.from(this.activeSessions.values())) {
+    for (const session of this.activeSessions.values()) {
       if (session.adminUserId === adminUserId && session.isActive) {
         return session
       }
@@ -317,7 +309,7 @@ export class Auth0ImpersonationService {
    * Check if user is currently being impersonated
    */
   isUserImpersonated(targetUserId: string): boolean {
-    for (const session of Array.from(this.activeSessions.values())) {
+    for (const session of this.activeSessions.values()) {
       if (session.targetUserId === targetUserId && session.isActive) {
         return true
       }
@@ -362,8 +354,7 @@ export class Auth0ImpersonationService {
 
       // Verify that the admin user is the one who started the session
       if (session.adminUserId !== adminUserId) {
-        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, {
-          userId: adminUserId,
+        await logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, adminUserId, {
           targetUserId: session.targetUserId,
           sessionId: sessionId,
           error: 'Unauthorized to extend this impersonation session',
@@ -374,8 +365,7 @@ export class Auth0ImpersonationService {
       }
 
       // Log session extension
-      logSecurityEvent(SecurityEventType.IMPERSONATION_EXTENDED, {
-        userId: adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_EXTENDED, adminUserId, {
         targetUserId: session.targetUserId,
         sessionId: sessionId,
         timestamp: new Date().toISOString()
@@ -383,7 +373,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
         eventType: 'EXTEND',
         adminUserId: adminUserId,
@@ -401,8 +391,7 @@ export class Auth0ImpersonationService {
       console.error('Failed to extend impersonation:', error)
 
       // Log impersonation error
-      logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, {
-        userId: adminUserId,
+      await logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
         sessionId: sessionId,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
@@ -417,11 +406,20 @@ export class Auth0ImpersonationService {
    */
   private cleanupExpiredSessions(): void {
     const now = new Date()
+    const expiredSessions: string[] = []
 
-    for (const [sessionId, session] of Array.from(this.activeSessions.entries())) {
-      if (!session.isActive || (session.endTime && session.endTime < now)) {
-        this.activeSessions.delete(sessionId)
-        // In a real implementation, we would end the session properly
+    // Find expired sessions (older than 1 hour)
+    for (const [sessionId, session] of this.activeSessions.entries()) {
+      const sessionAge = now.getTime() - session.startTime.getTime()
+      if (sessionAge > 3600000) { // 1 hour in milliseconds
+        expiredSessions.push(sessionId)
+      }
+    }
+
+    // End expired sessions
+    for (const sessionId of expiredSessions) {
+      const session = this.activeSessions.get(sessionId)
+      if (session) {
         this.endImpersonation(sessionId, session.adminUserId).catch(error => {
           console.error('Failed to end expired impersonation session:', error)
         })
@@ -462,12 +460,12 @@ export class Auth0ImpersonationService {
     const now = new Date()
     const oneHourAgo = new Date(now.getTime() - 3600000) // 1 hour ago
 
-    const recentActivity = Array.from(this.impersonationLogs).filter(log =>
-      new Date(log.timestamp).getTime() > oneHourAgo.getTime()
+    const recentActivity = this.impersonationLogs.filter(log =>
+      log.timestamp > oneHourAgo
     ).length
 
     return {
-      activeSessions: Array.from(this.activeSessions.values()).filter(s => s.isActive).length,
+      activeSessions: this.getActiveSessions().length,
       totalSessions: this.impersonationLogs.filter(log => log.eventType === 'START').length,
       recentActivity
     }
