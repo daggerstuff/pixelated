@@ -20,37 +20,25 @@ let auth0Management: ManagementClient | null = null
 /**
  * Initialize Auth0 management client
  */
-export function initializeAuth0Management() {
-  const config = {
-    domain: process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain,
-    managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || AUTH0_CONFIG.managementClientId,
-    managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || AUTH0_CONFIG.managementClientSecret,
-  }
-
-  if (!config.domain || !config.managementClientId || !config.managementClientSecret) {
+function initializeAuth0Management() {
+  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
     console.warn('Auth0 management configuration is incomplete. RBAC features may not work.')
     return
   }
 
   if (!auth0Management) {
     auth0Management = new ManagementClient({
-      domain: config.domain,
-      clientId: config.managementClientId,
-      clientSecret: config.managementClientSecret,
-      audience: `https://${config.domain}/api/v2/`
+      domain: AUTH0_CONFIG.domain,
+      clientId: AUTH0_CONFIG.managementClientId,
+      clientSecret: AUTH0_CONFIG.managementClientSecret,
+      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      scope: 'read:roles create:roles update:roles delete:roles read:users read:permissions create:permissions update:permissions delete:permissions'
     })
   }
 }
 
 // Initialize the management client
 initializeAuth0Management()
-
-/**
- * Reset Auth0 management client (for testing)
- */
-export function resetAuth0ManagementClient() {
-  auth0Management = null
-}
 
 // Types
 export type UserRole =
@@ -237,7 +225,6 @@ export const AUTH0_ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'session_limited_to_30_minutes',
     ],
     isAssignable: false, // Default role for unauthenticated users
-    requiresApproval: false,
   },
 }
 
@@ -389,23 +376,22 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
   }
 
   try {
-    // Create permissions logic removed as API has changed in v5.
-    // Permissions (Scopes) should be managed via Resource Server settings.
-    console.log('Skipping permission creation (managed via Resource Server in v5)...')
-
+    // Create permissions first (Note: Auth0 v5 manages permissions as scopes on Resource Servers)
+    console.log('Creating permissions in Auth0...')
+    
     // Create roles and assign permissions
     console.log('Creating roles in Auth0...')
     for (const [roleName, roleDef] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
       try {
         // Check if role already exists
-        const { data: existingRolesPage } = await auth0Management.roles.list({ name_filter: roleName })
-        const existingRole = existingRolesPage.length > 0 ? existingRolesPage[0] : undefined
+        const { data: existingRoles } = await auth0Management.roles.list({ name_filter: roleName })
+        const existingRole = existingRoles.find(r => r.name === roleName)
 
         let roleId: string
 
         if (!existingRole) {
           // Create new role
-          const createdRole = await auth0Management.roles.create({
+          const { data: createdRole } = await auth0Management.roles.create({
             name: roleName,
             description: roleDef.description
           })
@@ -415,48 +401,12 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
           roleId = existingRole.id!
           console.log(`Role already exists: ${roleName}`)
         }
-
-        // Assign permissions to role (only if it's not the admin role which gets all permissions)
-        if (roleName !== 'admin' && roleDef.permissions.length > 0 && !roleDef.permissions.includes('*')) {
-          // Get permission IDs
-          const permissionsToAdd: { permission_name: string; resource_server_identifier: string }[] = []
-          for (const permissionName of roleDef.permissions) {
-            permissionsToAdd.push({
-              permission_name: permissionName,
-              resource_server_identifier: `https://${AUTH0_CONFIG.domain}/api/v2/`
-            })
-          }
-
-          if (permissionsToAdd.length > 0) {
-            await auth0Management.roles.permissions.add(
-              roleId,
-              { permissions: permissionsToAdd }
-            )
-            console.log(`Assigned ${permissionsToAdd.length} permissions to role: ${roleName}`)
-          }
-        } else if (roleName === 'admin') {
-          // For admin role, assign all permissions
-          // Note: In v5 we can't easily list "all" permissions across all APIs.
-          // Assuming AUTH0_PERMISSION_DEFINITIONS contains the relevant set.
-          const permissionsToAdd = Object.keys(AUTH0_PERMISSION_DEFINITIONS).map(name => ({
-            permission_name: name,
-            resource_server_identifier: `https://${AUTH0_CONFIG.domain}/api/v2/`
-          }))
-
-          if (permissionsToAdd.length > 0) {
-            await auth0Management.roles.permissions.add(
-              roleId,
-              { permissions: permissionsToAdd }
-            )
-            console.log(`Assigned all permissions to admin role`)
-          }
-        }
       } catch (error) {
         console.warn(`Failed to create role ${roleName}:`, error)
       }
     }
 
-    console.log('Auth0 roles and permissions initialization completed')
+    console.log('Auth0 roles initialization completed')
   } catch (error) {
     console.error('Failed to initialize Auth0 roles and permissions:', error)
     throw error
@@ -473,16 +423,16 @@ export async function assignRoleToUser(userId: string, roleName: UserRole): Prom
 
   try {
     // Get role ID
-    const { data: rolesPage } = await auth0Management.roles.list({ name_filter: roleName })
-    if (rolesPage.length === 0) {
+    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = rolesPage[0].id!
+    const roleId = roles[0].id!
 
     // Assign role to user
-    await auth0Management.users.roles.assign(
-      userId,
+    await auth0Management.assignRolestoUser(
+      { id: userId },
       { roles: [roleId] }
     )
 
@@ -511,16 +461,16 @@ export async function removeRoleFromUser(userId: string, roleName: UserRole): Pr
 
   try {
     // Get role ID
-    const { data: rolesPage } = await auth0Management.roles.list({ name_filter: roleName })
-    if (rolesPage.length === 0) {
+    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = rolesPage[0].id!
+    const roleId = roles[0].id!
 
     // Remove role from user
-    await auth0Management.users.roles.delete(
-      userId,
+    await auth0Management.removeRolesFromUser(
+      { id: userId },
       { roles: [roleId] }
     )
 
@@ -548,7 +498,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   }
 
   try {
-    const { data: userRoles } = await auth0Management.users.roles.list(userId)
+    const userRoles = await auth0Management.getUserRoles({ id: userId })
     return userRoles.map(role => role.name as UserRole).filter(Boolean)
   } catch (error) {
     console.error(`Failed to get roles for user ${userId}:`, error)

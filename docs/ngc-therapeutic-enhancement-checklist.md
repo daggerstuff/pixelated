@@ -239,8 +239,14 @@ All identified gaps have been systematically addressed:
 
 - [x] 1.1 Synthetic data generation (3,000 samples) (Enhanced with 'Nightmare Mode' & Safety Bypass)
 - [x] 1.2 Real conversation collection (Tier 7 added - High-quality multi-turn)
+<<<<<<< HEAD
 - [x] 1.3 Annotation & labeling (Kappa > 0.85) - ✅ COMPLETE (Crisis κ=1.0, Emotion κ=0.78)
       **Phase 2: Data Augmentation (Week 2)**
+=======
+- [ ] 1.3 Annotation & labeling (Kappa >0.85)
+
+**Phase 2: Data Augmentation (Week 2)**
+>>>>>>> backup-manager-storage-loading-4805050224540675022
 
 - [ ] 2.1 Paraphrasing & variations
 - [x] 2.2 Edge case synthesis (Pipeline built, safety rails bypassed for realism)

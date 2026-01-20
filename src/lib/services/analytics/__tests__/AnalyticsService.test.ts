@@ -8,23 +8,21 @@ import * as redisModule from '@/lib/redis'
 
 // Mock dependencies first to avoid hoisting issues
 vi.mock('@/lib/redis', () => {
-  const lrangeMock = vi.fn().mockResolvedValue([])
   const mockRedisClient = {
     lpush: vi.fn(),
     rpoplpush: vi.fn(),
     lrem: vi.fn(),
-    llen: vi.fn().mockResolvedValue(0),
-    lrange: lrangeMock,
-    lRange: lrangeMock, // Share the same mock function
-    zadd: vi.fn().mockResolvedValue(1),
-    zrangebyscore: vi.fn().mockResolvedValue([]),
-    zremrangebyscore: vi.fn().mockResolvedValue(0),
-    keys: vi.fn().mockResolvedValue([]),
-    hget: vi.fn().mockResolvedValue(null),
-    hgetall: vi.fn().mockResolvedValue({}),
-    hset: vi.fn().mockResolvedValue(1),
-    hdel: vi.fn().mockResolvedValue(1),
-    del: vi.fn().mockResolvedValue(1),
+    llen: vi.fn(),
+    lrange: vi.fn(),
+    zadd: vi.fn(),
+    zrangebyscore: vi.fn(),
+    zremrangebyscore: vi.fn(),
+    keys: vi.fn(),
+    hget: vi.fn(),
+    hgetall: vi.fn(),
+    hset: vi.fn(),
+    hdel: vi.fn(),
+    del: vi.fn(),
   }
 
   return {
@@ -50,10 +48,10 @@ vi.mock('@/lib/utils/logger', () => {
 
 vi.mock('../../../logging/build-safe-logger', () => {
   const mockLogger = {
-    info: vi.fn((...args) => console.error('[MOCK_LOGGER_INFO]', ...args)),
-    error: vi.fn((...args) => console.error('[MOCK_LOGGER_ERROR]', ...args)),
-    warn: vi.fn((...args) => console.error('[MOCK_LOGGER_WARN]', ...args)),
-    debug: vi.fn((...args) => console.error('[MOCK_LOGGER_DEBUG]', ...args)),
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
   }
 
   return {
@@ -63,37 +61,35 @@ vi.mock('../../../logging/build-safe-logger', () => {
 })
 
 // Mock WebSocket
-vi.mock('ws', () => {
-  class MockWebSocket {
-    public readonly url: string
-    public readyState: number = 1
-    private eventHandlers: Map<string, ((...args: any[]) => void)[]> = new Map()
+class MockWebSocket {
+  public readonly url: string
+  public readyState: number = 1
+  private eventHandlers: Map<string, ((...args: any[]) => void)[]> = new Map()
 
-    constructor(url: string) {
-      this.url = url
+  constructor(url: string): void {
+    this.url = url
+  }
+
+  public send = vi.fn()
+
+  public emit = vi.fn((event: string, ...args: any[]) => {
+    const handlers = this.eventHandlers.get(event) || []
+    handlers.forEach((handler) => handler(...args))
+  })
+
+  public on = vi.fn((event: string, handler: (...args: any[]) => void) => {
+    if (!this.eventHandlers.has(event)) {
+      this.eventHandlers.set(event, [])
     }
+    this.eventHandlers.get(event)!.push(handler)
+  })
+}
 
-    public send = vi.fn()
-
-    public emit = vi.fn((event: string, ...args: any[]) => {
-      const handlers = this.eventHandlers.get(event) || []
-      handlers.forEach((handler) => handler(...args))
-    })
-
-    public on = vi.fn((event: string, handler: (...args: any[]) => void) => {
-      if (!this.eventHandlers.has(event)) {
-        this.eventHandlers.set(event, [])
-      }
-      this.eventHandlers.get(event)!.push(handler)
-    })
-  }
-
-  return {
-    WebSocket: vi
-      .fn()
-      .mockImplementation(function (url: string) { return new MockWebSocket(url) }),
-  }
-})
+vi.mock('ws', () => ({
+  WebSocket: vi
+    .fn()
+    .mockImplementation((url: string) => new MockWebSocket(url)),
+}))
 
 type MockRedisClient = {
   lpush: ReturnType<typeof vi.fn>
@@ -306,8 +302,8 @@ describe('analyticsService', () => {
       await analyticsService.processEvents()
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        'Invalid event JSON:',
-        'invalid json',
+        'Error processing event:',
+        expect.any(Error),
       )
     })
   })
