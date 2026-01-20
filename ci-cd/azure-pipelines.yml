@@ -47,10 +47,6 @@ parameters:
     type: string
     default: 'false'
     values:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-      - "true"
-      - "false"
-=======
       - 'true'
       - 'false'
   - name: USE_SELF_HOSTED
@@ -60,7 +56,6 @@ parameters:
     values:
       - 'true'
       - 'false'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
 
 variables:
   # Reference Variable Group (configured in Azure DevOps web UI)
@@ -118,14 +113,10 @@ stages:
       - job: ValidateVariables
         displayName: 'Validate Required Variables'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - script: |
               set -euo pipefail
@@ -167,14 +158,10 @@ stages:
       - job: ValidateDependencies
         displayName: 'Validate Dependencies'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -193,14 +180,10 @@ stages:
       - job: LintCode
         displayName: 'Lint Code'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -215,14 +198,10 @@ stages:
       - job: TypeCheck
         displayName: 'Type Check'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -237,15 +216,10 @@ stages:
       - job: UnitTests
         displayName: 'Unit Tests & Coverage'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-        timeoutInMinutes: 120
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -255,10 +229,6 @@ stages:
           - script: |
               corepack enable pnpm
               pnpm install
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-              pnpm test:coverage
-            displayName: "Run Unit Tests with Coverage"
-=======
             displayName: 'Install Dependencies'
 
           - task: SonarCloudPrepare@1
@@ -301,7 +271,6 @@ stages:
             displayName: 'Publish SonarCloud Quality Gate Result'
             inputs:
               pollingTimeoutSec: 300
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
 
   - stage: Eval
     displayName: 'Evaluation Gates (therapy-bench, clinical-similarity)'
@@ -311,14 +280,10 @@ stages:
       - job: EvalGates
         displayName: 'Evaluation Gates (therapy-bench, clinical-similarity)'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - checkout: self
             displayName: 'Checkout repository with submodules'
@@ -576,16 +541,11 @@ stages:
       - job: BuildApplication
         displayName: 'Build and Push Docker Image'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-        timeoutInMinutes: "45"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
         timeoutInMinutes: '45'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -628,21 +588,6 @@ stages:
                 docker info 2>&1 | { head -n 5; cat > /dev/null; }
 
           - task: Docker@2
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-            displayName: "Build and Push Docker Image"
-            inputs:
-              containerRegistry: "$(AZURE_CONTAINER_REGISTRY)"
-              repository: "$(IMAGE_REPOSITORY)"
-              command: "buildAndPush"
-              Dockerfile: "docker/Dockerfile"
-              buildContext: "."
-              tags: |
-                $(Build.BuildNumber)
-                latest
-                $(Build.SourceBranchName)
-              # Note: addPipelineData and addBaseImageData removed to prevent metadata write errors
-              # Custom metadata capture is handled in the next step
-=======
             displayName: 'Login to ACR'
             inputs:
               command: login
@@ -678,7 +623,6 @@ stages:
                 docker push "$FULL_IMAGE_NAME:$TAG_BUILD"
                 docker push "$FULL_IMAGE_NAME:$TAG_LATEST"
                 docker push "$FULL_IMAGE_NAME:$TAG_BRANCH"
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
 
           - script: |
               set -euo pipefail
@@ -782,14 +726,10 @@ stages:
       - job: ContainerSecurity
         displayName: 'Container Security Scan'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: Bash@3
             displayName: 'Verify Docker Access'
@@ -891,16 +831,11 @@ stages:
       - deployment: InstallCertManager
         displayName: 'Install cert-manager for TLS'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-        environment: "staging"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
         environment: 'staging'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         strategy:
           runOnce:
             deploy:
@@ -1036,16 +971,11 @@ stages:
       - deployment: DeployToStaging
         displayName: 'Deploy to Azure Kubernetes Service'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-        environment: "staging"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
         environment: 'staging'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         strategy:
           runOnce:
             deploy:
@@ -1438,16 +1368,11 @@ stages:
       - deployment: DeployToProduction
         displayName: 'Deploy to Production'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-        environment: "production"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
         environment: 'production'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         strategy:
           runOnce:
             deploy:
@@ -1800,14 +1725,10 @@ stages:
       - job: HealthCheckStaging
         displayName: 'Staging Health Check'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: AzureCLI@2
             displayName: 'Install kubectl and Check Deployment Health'
@@ -1900,14 +1821,10 @@ stages:
       - job: PerformanceTests
         displayName: 'Run Performance Tests'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -2170,14 +2087,10 @@ stages:
       - job: E2ETests
         displayName: 'Run E2E Tests'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -2340,14 +2253,10 @@ stages:
       - job: PlaywrightDockerTests
         displayName: 'Run Playwright Tests in Docker'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - task: NodeTool@0
             inputs:
@@ -2509,14 +2418,10 @@ stages:
       - job: PrepareTrainingData
         displayName: 'Prepare Training Data'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - checkout: self
 
@@ -2553,14 +2458,10 @@ stages:
         dependsOn: PrepareTrainingData
         condition: succeeded()
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         variables:
           OVH_GPU_MODEL: 'L40S'
           OVH_MAX_HOURS: '12'
@@ -2662,14 +2563,10 @@ stages:
       - job: BuildOllamaImage
         displayName: 'Build and Push Ollama Image'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - checkout: self
 
@@ -2721,14 +2618,10 @@ stages:
       - job: ScheduleBlogPosts
         displayName: 'Schedule and Publish Blog Posts'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - checkout: self
             displayName: 'Checkout repository'
@@ -2796,14 +2689,10 @@ stages:
       - job: SummaryReport
         displayName: 'Pipeline Summary Report'
         pool:
-<<<<<<< HEAD:ci-cd/azure-pipelines.yml
-          name: "Default"
-=======
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'
           ${{ else }}:
             vmImage: 'ubuntu-latest'
->>>>>>> backup-manager-storage-loading-4805050224540675022:azure-pipelines.yml
         steps:
           - script: |
               echo "##[section]📊 Pipeline Execution Summary"
