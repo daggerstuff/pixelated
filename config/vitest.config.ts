@@ -3,10 +3,6 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
@@ -41,16 +37,6 @@ export default defineConfig({
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
-    env: {
-      NODE_ENV: 'test',
-      TZ: 'UTC',
-      VITE_AUTH0_DOMAIN: 'test-domain.auth0.com',
-    },
-    server: {
-      deps: {
-        inline: ['@testing-library/react', 'react-dom'],
-      },
-    },
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts', './config/vitest.setup.ts'],
@@ -72,7 +58,6 @@ export default defineConfig({
       'src/tests/cross-browser-compatibility.test.ts',
       'src/e2e/breach-notification.spec.ts',
       'tests/e2e/**/*',
-      'tests/integration/complete-system.integration.test.ts',
       'tests/browser/**/*',
       'tests/accessibility/**/*',
       'tests/performance/**/*',

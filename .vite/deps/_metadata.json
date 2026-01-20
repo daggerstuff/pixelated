@@ -1,55 +1,94 @@
 {
+<<<<<<< HEAD
   "hash": "896f3ff6",
   "configHash": "c225e12d",
   "lockfileHash": "7771d3b5",
   "browserHash": "bccb3950",
+=======
+  "hash": "f00c7755",
+  "configHash": "c225e12d",
+  "lockfileHash": "65715bf6",
+  "browserHash": "22d23d6b",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
   "optimized": {
     "@astrojs/react/client.js": {
       "src": "../../node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.3_@types+react-dom@19.2.3_@types+react@19.2.7__@t_0230b8f2fc8da90ce79ebf26b1f9ca13/node_modules/@astrojs/react/dist/client.js",
       "file": "@astrojs_react_client__js.js",
+<<<<<<< HEAD
       "fileHash": "493da326",
+=======
+      "fileHash": "3a2c030f",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": false
     },
     "react": {
       "src": "../../node_modules/.pnpm/react@19.2.3/node_modules/react/index.js",
       "file": "react.js",
+<<<<<<< HEAD
       "fileHash": "4a3d3281",
+=======
+      "fileHash": "603fa999",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "react-dom": {
       "src": "../../node_modules/.pnpm/react-dom@19.2.3_react@19.2.3/node_modules/react-dom/index.js",
       "file": "react-dom.js",
+<<<<<<< HEAD
       "fileHash": "81e622d9",
+=======
+      "fileHash": "132d01ef",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/.pnpm/react@19.2.3/node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
+<<<<<<< HEAD
       "fileHash": "e8a9f835",
+=======
+      "fileHash": "d1389ee5",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../node_modules/.pnpm/react@19.2.3/node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
+<<<<<<< HEAD
       "fileHash": "ff99080d",
+=======
+      "fileHash": "5a8700e3",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "astro > cssesc": {
       "src": "../../node_modules/.pnpm/cssesc@3.0.0/node_modules/cssesc/cssesc.js",
       "file": "astro___cssesc.js",
+<<<<<<< HEAD
       "fileHash": "6d0e8c98",
+=======
+      "fileHash": "31d5fd89",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "astro > aria-query": {
       "src": "../../node_modules/.pnpm/aria-query@5.3.2/node_modules/aria-query/lib/index.js",
       "file": "astro___aria-query.js",
+<<<<<<< HEAD
       "fileHash": "26788724",
+=======
+      "fileHash": "5c2adcf3",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     },
     "astro > axobject-query": {
       "src": "../../node_modules/.pnpm/axobject-query@4.1.0/node_modules/axobject-query/lib/index.js",
       "file": "astro___axobject-query.js",
+<<<<<<< HEAD
       "fileHash": "fc46ec93",
+=======
+      "fileHash": "c174818c",
+>>>>>>> backup-manager-storage-loading-4805050224540675022
       "needsInterop": true
     }
   },

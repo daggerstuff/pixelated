@@ -167,7 +167,7 @@ export async function calculateThreatScore(threatData: ThreatData): Promise<numb
     // Add points for suspicious patterns
     if (
       threatData.riskFactors.ip &&
-      (await isSuspiciousIP(threatData.riskFactors.ip))
+      isSuspiciousIPSync(threatData.riskFactors.ip)
     ) {
       score += 15
     }
