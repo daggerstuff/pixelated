@@ -118,7 +118,7 @@ function createMockRedisClient() {
       mockStore.set(listKey, JSON.stringify(list))
       return list.length
     },
-    lrange: async (key: string, start: number, stop: number) => {
+    lRange: async (key: string, start: number, stop: number) => {
       const listKey = `list:${key}`
       const existing = mockStore.get(listKey) || '[]'
       const list = JSON.parse(existing)
