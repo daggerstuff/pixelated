@@ -3,8 +3,12 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
+<<<<<<< HEAD
 import { AuthenticationClient, UserInfoClient } from 'auth0'
 import * as jwt from 'jsonwebtoken'
+=======
+import { AuthenticationClient } from 'auth0'
+>>>>>>> backup-manager-storage-loading-4805050224540675022
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -20,41 +24,22 @@ const AUTH0_CONFIG = {
 
 // Initialize Auth0 authentication client
 let auth0Authentication: AuthenticationClient | null = null
-let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
  */
-export function initializeAuth0Client() {
-  const domain = process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain
-  const clientId = process.env.AUTH0_CLIENT_ID || AUTH0_CONFIG.clientId
-  const clientSecret = process.env.AUTH0_CLIENT_SECRET || AUTH0_CONFIG.clientSecret
-
-  if (!domain || !clientId || !clientSecret) {
+function initializeAuth0Client() {
+  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain,
-      clientId,
-      clientSecret
+      domain: AUTH0_CONFIG.domain,
+      clientId: AUTH0_CONFIG.clientId,
+      clientSecret: AUTH0_CONFIG.clientSecret
     })
   }
-
-  if (!auth0UserInfo) {
-    auth0UserInfo = new UserInfoClient({
-      domain,
-    })
-  }
-}
-
-/**
- * Reset Auth0 client for testing
- */
-export function resetAuth0Client() {
-  auth0Authentication = null
-  auth0UserInfo = null
 }
 
 // Initialize the client
@@ -180,6 +165,7 @@ export async function validateToken(
       throw new AuthenticationError('Auth0 authentication client not initialized')
     }
 
+<<<<<<< HEAD
     if (!auth0UserInfo) {
       throw new AuthenticationError('Auth0 user info client not initialized')
     }
@@ -224,6 +210,10 @@ export async function validateToken(
     if (payload.exp && payload.exp < currentTimestamp()) {
       throw new AuthenticationError('Token has expired')
     }
+=======
+    // Decode token to get payload (this doesn't validate the signature yet)
+    const decoded = await auth0Authentication.getProfile(token)
+>>>>>>> backup-manager-storage-loading-4805050224540675022
 
     // Validate token type matches expected (access tokens only for now)
     // Check this before expensive UserInfo call to fail fast
@@ -231,8 +221,16 @@ export async function validateToken(
       throw new AuthenticationError('Refresh token validation not supported with this method')
     }
 
+<<<<<<< HEAD
     // Now verify with UserInfo (acts as online signature/revocation check)
     const { data: userInfo } = await auth0UserInfo.getUserInfo(token) as { data: any }
+=======
+    // Check if token has expired
+    const {exp} = decoded
+    if (exp && exp < currentTimestamp()) {
+      throw new AuthenticationError('Token has expired')
+    }
+>>>>>>> backup-manager-storage-loading-4805050224540675022
 
     // Extract user information
     const userId = userInfo.sub || payload.sub
@@ -292,16 +290,12 @@ export async function refreshAccessToken(
     }
 
     // Exchange refresh token for new access token
-    const { data: tokenResponse } = await auth0Authentication.oauth.refreshTokenGrant({
+    const tokenResponse = await auth0Authentication.refreshToken({
       refresh_token: refreshToken
     })
 
-    if (!auth0UserInfo) {
-      throw new AuthenticationError('Auth0 user info client not initialized')
-    }
-
     // Get user info from new access token
-    const { data: userResponse } = await auth0UserInfo.getUserInfo(tokenResponse.access_token)
+    const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
 
     // Extract user information
     const userId = userResponse.sub || ''

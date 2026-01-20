@@ -21,27 +21,13 @@ export enum EventPriority {
 
 // Schema definitions
 export const EventDataSchema = z.object({
-  type: z.enum([
-    EventType.PAGE_VIEW,
-    EventType.USER_ACTION,
-    EventType.THERAPY_SESSION,
-    EventType.NOTIFICATION,
-    EventType.ERROR,
-    EventType.SECURITY,
-    EventType.PERFORMANCE,
-    EventType.CUSTOM,
-  ]),
-  priority: z.enum([
-    EventPriority.LOW,
-    EventPriority.NORMAL,
-    EventPriority.HIGH,
-    EventPriority.CRITICAL,
-  ]).default(EventPriority.NORMAL),
+  type: z.nativeEnum(EventType),
+  priority: z.nativeEnum(EventPriority).default(EventPriority.NORMAL),
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   timestamp: z.number().default(() => Date.now()),
-  properties: z.any().default({}),
-  metadata: z.any().default({}),
+  properties: z.record(z.unknown()).default({}),
+  metadata: z.record(z.unknown()).default({}),
 })
 
 export type EventData = z.infer<typeof EventDataSchema>
@@ -58,31 +44,29 @@ export const MetricSchema = z.object({
   name: z.string(),
   value: z.number(),
   timestamp: z.number().default(() => Date.now()),
-  tags: z.any().default({}),
+  tags: z.record(z.string()).default({}),
 })
 
 export type Metric = z.infer<typeof MetricSchema>
 
+// Redis client interface
 export interface RedisClient {
-  [x: string]: any
-  lrange(key: string, start: number, stop: number): Promise<string[]>
+  [x: string]: unknown
+  lRange(arg0: string, arg1: number, arg2: number): unknown
   zrangebyscore(
-    key: string,
-    min: string | number,
-    max: string | number,
-    limitKeyword?: string,
-    offset?: number,
-    limit?: number,
-  ): Promise<string[]>
-  lpush(key: string, ...values: string[]): Promise<number>
-  lrem(key: string, count: number, value: string): Promise<number>
-  zadd(key: string, score: number, member: string): Promise<number>
-  zremrangebyscore(
-    key: string,
-    min: number | string,
-    max: number | string,
-  ): Promise<number>
-  hset(key: string, field: string, value: string): Promise<number>
+    arg0: string,
+    start: string | number,
+    end: string | number,
+    arg3: string,
+    offset: number,
+    limit: number,
+  ): string[] | PromiseLike<string[]>
+  lpush(key: string, value: string): Promise<void>
+  lrange(key: string, start: number, stop: number): Promise<string[]>
+  lrem(key: string, count: number, value: string): Promise<void>
+  zadd(key: string, score: number, member: string): Promise<void>
+  zremrangebyscore(key: string, min: number, max: number): Promise<void>
+  hset(key: string, field: string, value: string): Promise<void>
   keys(pattern: string): Promise<string[]>
 }
 
