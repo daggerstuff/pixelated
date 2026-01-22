@@ -11,20 +11,27 @@ declare module '@/lib/services/notification/WebSocketServer' {
   }
 }
 
-// Provide a factory for the logger mock
-const { mockLoggerInstance } = vi.hoisted(() => {
+// Provide a factory for the logger and service mocks
+const { mockLoggerInstance, startProcessingMock } = vi.hoisted(() => {
   return {
     mockLoggerInstance: {
       info: vi.fn(),
       error: vi.fn(),
       warn: vi.fn(),
       debug: vi.fn(),
-    }
+    },
+    startProcessingMock: vi.fn().mockResolvedValue(undefined)
   }
 })
 
 // Mock dependencies
-vi.mock('@/lib/services/notification/NotificationService')
+vi.mock('@/lib/services/notification/NotificationService', () => {
+  return {
+    NotificationService: vi.fn().mockImplementation(() => ({
+      startProcessing: startProcessingMock
+    }))
+  }
+})
 vi.mock('@/lib/services/notification/WebSocketServer')
 vi.mock('@/config/env.config')
 
@@ -44,7 +51,6 @@ const mockExit = vi
 
 describe('notification-worker', () => {
   let mockNotificationService: NotificationService
-  let startProcessingSpy: any
   let mockWebSocketServer: WebSocketServer
 
   beforeEach(() => {
@@ -56,8 +62,8 @@ describe('notification-worker', () => {
       ; (vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8082'
 
     // Initialize mocks
+    // Initialize mocks
     mockNotificationService = new NotificationService()
-    startProcessingSpy = vi.spyOn(NotificationService.prototype, 'startProcessing')
     mockWebSocketServer = new WebSocketServer(8082, mockNotificationService)
 
     // Add mock implementations
@@ -224,7 +230,7 @@ describe('notification-worker', () => {
       // Wait for multiple processing cycles
       await vi.runAllTimersAsync()
 
-      expect(startProcessingSpy).toHaveBeenCalledTimes(2)
+      expect(startProcessingMock).toHaveBeenCalledTimes(2)
       expect(
         createBuildSafeLogger('notification-worker').error,
       ).toHaveBeenCalledWith(
