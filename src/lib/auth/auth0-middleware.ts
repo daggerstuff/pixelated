@@ -468,6 +468,13 @@ export interface AuthenticatedRequest extends Request {
     id: string
     email: string
     role: string
+    emailVerified?: boolean
+    fullName?: string
+    avatarUrl?: string
+    createdAt?: string
+    lastLogin?: string
+    appMetadata?: Record<string, unknown>
+    userMetadata?: Record<string, unknown>
   }
   tokenId?: string
   sessionId?: string
@@ -694,6 +701,13 @@ export async function authenticateRequest(request: Request): Promise<{
     id: user.id,
     email: user.email,
     role: user.role,
+    emailVerified: user.emailVerified,
+    fullName: user.fullName,
+    avatarUrl: user.avatarUrl,
+    createdAt: user.createdAt,
+    lastLogin: user.lastLogin,
+    appMetadata: user.appMetadata,
+    userMetadata: user.userMetadata,
   }
   authenticatedRequest.tokenId = validation.tokenId
   authenticatedRequest.sessionId = sid

@@ -1,7 +1,5 @@
 import { env } from '@/config/env.config'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
-// WebSocketServer import removed
-// createBuildSafeLogger removed
 
 // Extend the WebSocketServer interface for testing
 declare module '@/lib/services/notification/WebSocketServer' {
@@ -20,7 +18,6 @@ const { mockLoggerInstance, startProcessingMock, onMock, closeMock, mockWsServer
     close: closeMock,
     emit: vi.fn()
   }
-  // processOnMock removed
   return {
     mockLoggerInstance: {
       info: vi.fn(),
@@ -225,10 +222,7 @@ describe('notification-worker', () => {
 
   describe('error handling', () => {
     it('should handle WebSocket server errors', async () => {
-      // Setup: When .on('error', handler) is called, capture the handler
       // Setup: When .on('error', handler) is called, we will retrieve it from mock calls later
-
-
       await import('../notification-worker.js')
 
       // Verify listener was attached
