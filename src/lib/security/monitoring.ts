@@ -14,7 +14,6 @@ export enum SecurityEventType {
   ENCRYPTED_OPERATION = 'encrypted_operation',
   CONFIG_CHANGE = 'config_change',
   COMPLIANCE_CHECK = 'compliance_check',
-<<<<<<< HEAD
   LOGIN = 'login',
   ACCOUNT_LINKED = 'account_linked',
   ACCOUNT_UNLINKED = 'account_unlinked',
@@ -79,9 +78,7 @@ export enum SecurityEventType {
   BULK_IMPORT_JOB_STATUS_CHECK = 'bulk_import_job_status_check',
   BULK_IMPORT_JOB_STATUS_ERROR = 'bulk_import_job_status_error',
   RECURRING_EXPORT_SCHEDULED = 'recurring_export_scheduled',
-  RECURRING_EXPORT_SCHEDULE_ERROR = 'recurring_export_schedule_error',
-=======
->>>>>>> backup-manager-storage-loading-4805050224540675022
+  RECURRING_EXPORT_SCHEDULE_ERROR = 'recurring_export_schedule_error'
 }
 
 /**

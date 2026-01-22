@@ -56,10 +56,18 @@ import type { AuthRole } from '../../config/auth.config'
 export interface AuthUser {
   id: string
   email: string
+  emailVerified: boolean
   name?: string
+  fullName?: string
   role: AuthRole
   permissions: string[]
   metadata?: Record<string, unknown>
+  avatarUrl?: string
+  createdAt?: string
+  updatedAt?: string
+  lastLogin?: string
+  appMetadata?: Record<string, unknown>
+  userMetadata?: Record<string, unknown>
 }
 
 export interface AuthError {
