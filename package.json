@@ -276,7 +276,7 @@
     "sonner": "^2.0.7",
     "swiper": "^12.0.3",
     "tailwind-merge": "^3.4.0",
-    "tar": "7.5.2",
+    "tar": "^7.5.4",
     "three": "^0.182.0",
     "three-stdlib": "^2.36.1",
     "twilio": "^5.11.2",
@@ -436,7 +436,13 @@
       "@unocss/astro": "^66.5.12",
       "drizzle-orm": "^0.45.1",
       "zod": "^4.3.2",
-      "qs": "6.14.1"
+      "qs": "6.14.1",
+      "devalue": "^5.6.1",
+      "h3": "^1.15.4",
+      "hono": "^4.11.1",
+      "diff": "^5.2.0",
+      "lodash": "^4.17.21",
+      "undici": "^7.16.0"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
