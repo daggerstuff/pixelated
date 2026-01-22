@@ -204,5 +204,7 @@
     "npm.packageManager": "pnpm",
     "markdown.validate.enabled": true,
     "terminal.integrated.developer.devMode": true,
-    "[azure-pipelines]": {}
+    "[azure-pipelines]": {},
+    "snyk.advanced.organization": "af2ac194-d19f-400d-b8ff-bfe480cdefb1",
+    "snyk.advanced.autoSelectOrganization": true
 }
