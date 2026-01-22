@@ -1,0 +1,236 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/vivi/pixelated[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [31m❯[39m src/workers/__tests__/notification-worker.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 225[2mms[22m[39m
+[31m       [31m×[31m should start processing notifications at the specified interval[39m[32m 129[2mms[22m[39m
+[31m       [31m×[31m should handle startup errors gracefully[39m[32m 11[2mms[22m[39m
+[31m       [31m×[31m should handle processing errors gracefully[39m[32m 19[2mms[22m[39m
+[31m       [31m×[31m should handle SIGTERM signal[39m[32m 20[2mms[22m[39m
+[31m       [31m×[31m should handle SIGINT signal[39m[32m 14[2mms[22m[39m
+[31m       [31m×[31m should close WebSocket server on shutdown[39m[32m 6[2mms[22m[39m
+       [32m✓[39m should use default WebSocket port if not configured[32m 6[2mms[22m[39m
+       [32m✓[39m should use configured WebSocket port[32m 6[2mms[22m[39m
+       [32m✓[39m should handle WebSocket server errors[32m 7[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mstartWorker[2m > [22mshould start processing notifications at the specified interval
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called at least once[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m102:35[22m[39m
+    [90m100| [39m
+    [90m101| [39m      [90m// Verify notification processing[39m
+    [90m102| [39m      [34mexpect[39m(startProcessingMock)[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m   | [39m                                  [31m^[39m
+    [90m103| [39m    })
+    [90m104| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mstartWorker[2m > [22mshould handle startup errors gracefully
+[31m[1mTypeError[22m: __vite_ssr_import_0__.vi.mocked(...).mockImplementationOnce is not a function[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m107:38[22m[39m
+    [90m105| [39m    [34mit[39m([32m'should handle startup errors gracefully'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m106| [39m      [90m// Mock NotificationService constructor to throw error[39m
+    [90m107| [39m      vi[33m.[39m[34mmocked[39m([33mNotificationService[39m)[33m.[39m[34mmockImplementationOnce[39m(() [33m=>[39m {
+    [90m   | [39m                                     [31m^[39m
+    [90m108| [39m        [35mthrow[39m [35mnew[39m [33mError[39m([32m'Startup error'[39m)
+    [90m109| [39m      })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mstartWorker[2m > [22mshould handle processing errors gracefully
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ StringContaining{…}, …(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Notification worker failed",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "error": StringContaining "Processing error",[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Failed to start notification worker",[90m
+[31m+   {[90m
+[31m+     "error": "TypeError: () => mockWsServerInstance is not a constructor",[90m
+[31m+     "workerId": "aa371214-fa59-45fd-a42e-86732bb1ab54",[90m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m140:9[22m[39m
+    [90m138| [39m      [34mexpect[39m(
+    [90m139| [39m        [34mcreateBuildSafeLogger[39m([32m'notification-worker'[39m)[33m.[39merror[33m,[39m
+    [90m140| [39m      )[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m        [31m^[39m
+    [90m141| [39m        expect[33m.[39m[34mstringContaining[39m([32m'Notification worker failed'[39m)[33m,[39m
+    [90m142| [39m        expect[33m.[39m[34mobjectContaining[39m({
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mshutdown handling[2m > [22mshould handle SIGTERM signal
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ StringContaining{…}, …(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Starting notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "4654abb7-042e-423a-9e02-9a71aaf56f4b",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  2nd vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGTERM, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "4034469a-6dd5-444b-9ee9-e04b4e6d6a18",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  3rd vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGTERM, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "aa371214-fa59-45fd-a42e-86732bb1ab54",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  4th vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGTERM, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "4654abb7-042e-423a-9e02-9a71aaf56f4b",[90m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m4[22m
+[31m[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m160:9[22m[39m
+    [90m158| [39m      [34mexpect[39m(
+    [90m159| [39m        [34mcreateBuildSafeLogger[39m([32m'notification-worker'[39m)[33m.[39minfo[33m,[39m
+    [90m160| [39m      )[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m        [31m^[39m
+    [90m161| [39m        expect[33m.[39m[34mstringContaining[39m([32m'Shutting down notification worker'[39m)[33m,[39m
+    [90m162| [39m        expect[33m.[39m[34mobjectContaining[39m({ workerId[33m:[39m expect[33m.[39m[34many[39m([33mString[39m) })[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mshutdown handling[2m > [22mshould handle SIGINT signal
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ StringContaining{…}, …(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Starting notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "b9264262-5a68-4ccd-9f03-4dcbb7dcbe21",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  2nd vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGINT, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "4034469a-6dd5-444b-9ee9-e04b4e6d6a18",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  3rd vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGINT, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "aa371214-fa59-45fd-a42e-86732bb1ab54",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  4th vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGINT, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "4654abb7-042e-423a-9e02-9a71aaf56f4b",[90m
+[2m    },[22m
+[2m  ][22m
+
+[1m  5th vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   StringContaining "Shutting down notification worker",[90m
+[32m-   ObjectContaining {[90m
+[32m-     "workerId": Any<String>,[90m
+[31m+   "Received SIGINT, shutting down notification worker",[90m
+[31m+   {[90m
+[31m+     "workerId": "b9264262-5a68-4ccd-9f03-4dcbb7dcbe21",[90m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m5[22m
+[31m[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m176:9[22m[39m
+    [90m174| [39m      [34mexpect[39m(
+    [90m175| [39m        [34mcreateBuildSafeLogger[39m([32m'notification-worker'[39m)[33m.[39minfo[33m,[39m
+    [90m176| [39m      )[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m        [31m^[39m
+    [90m177| [39m        expect[33m.[39m[34mstringContaining[39m([32m'Shutting down notification worker'[39m)[33m,[39m
+    [90m178| [39m        expect[33m.[39m[34mobjectContaining[39m({ workerId[33m:[39m expect[33m.[39m[34many[39m([33mString[39m) })[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/workers/__tests__/notification-worker.test.ts[2m > [22mnotification-worker[2m > [22mshutdown handling[2m > [22mshould close WebSocket server on shutdown
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called at least once[39m
+[36m [2m❯[22m src/workers/__tests__/notification-worker.test.ts:[2m190:25[22m[39m
+    [90m188| [39m      process[33m.[39m[34memit[39m([32m'SIGTERM'[39m[33m,[39m [32m'SIGTERM'[39m)
+    [90m189| [39m
+    [90m190| [39m      [34mexpect[39m(closeMock)[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m   | [39m                        [31m^[39m
+    [90m191| [39m    })
+    [90m192| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 11:50:45
+[2m   Duration [22m 2.81s[2m (transform 447ms, setup 432ms, import 413ms, tests 225ms, environment 1.07s)[22m
+
+JUNIT report written to /home/vivi/pixelated/coverage/junit.xml
