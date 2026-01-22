@@ -1,0 +1,24 @@
+# exclude formatting
+pnpm-lock.yaml
+*.md
+node_modules/
+**/node_modules/**
+dist/
+.astro/
+
+
+# Polyfills and vendor files
+public/polyfills/
+*.min.js
+
+# avoid error due to incorrect processing
+SearchSwitch.astro
+GroupView.astro
+GithubItem.astro
+
+# avoid HTML mismatches
+releases.mdx
+prs.mdx
+
+# avoid whitespace affecting style
+Link.astro
