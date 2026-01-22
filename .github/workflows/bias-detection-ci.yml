@@ -30,9 +30,9 @@ on:
       - tests/**/*bias-detection*
 
 env:
-  NODE_VERSION: 24.8.0
+  NODE_VERSION: 24.11.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.28.0
+  PNPM_VERSION: 10.28.1
 
 jobs:
   security-scan:
