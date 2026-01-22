@@ -33,6 +33,7 @@ function initializeAuth0Management() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      scope: 'read:logs read:users'
     })
   }
 }
@@ -189,15 +190,14 @@ export class Auth0ActivityTrackingService {
       }
 
       // Fetch logs from Auth0
-      const response = await auth0Management.logs.list(queryParams)
-      const logs = response.data
+      const logs = await auth0Management.getLogs(queryParams)
 
       if (logs.length === 0) {
         return
       }
 
       // Update last log ID to the ID of the last log fetched
-      this.lastLogId = logs[logs.length - 1].log_id || null
+      this.lastLogId = logs[logs.length - 1].log_id
 
       // Transform and store logs
       const activities: UserActivity[] = logs
@@ -205,12 +205,12 @@ export class Auth0ActivityTrackingService {
         .map(log => ({
           userId: log.user_id!,
           eventType: log.type || 'unknown',
-          timestamp: new Date(String(log.date || '')),
-          ipAddress: log.ip || '',
-          userAgent: log.user_agent || '',
-          location: log.location_info ? {
-            country: log.location_info.country_name,
-            city: log.location_info.city_name
+          timestamp: new Date(log.date),
+          ipAddress: log.ip,
+          userAgent: log.user_agent,
+          location: log.location ? {
+            country: log.location.country_name,
+            city: log.location.city_name
           } : undefined,
           details: {
             description: log.description,
@@ -355,12 +355,11 @@ export class Auth0ActivityTrackingService {
 
           case 's': // Success login
             // Log successful authentication
-            await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, {
-              userId: log.user_id,
+            await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, log.user_id, {
               logId: log.log_id,
               ipAddress: log.ip,
               userAgent: log.user_agent,
-              timestamp: new Date(String(log.date || '')).toISOString()
+              timestamp: new Date(log.date).toISOString()
             })
             break
         }
@@ -370,8 +369,7 @@ export class Auth0ActivityTrackingService {
           await collection.insertOne(securityEvent)
 
           // Also log to the main security event system
-          await logSecurityEvent(securityEvent.type, {
-            userId: securityEvent.userId,
+          await logSecurityEvent(securityEvent.type, securityEvent.userId, {
             logId: securityEvent.id,
             severity: securityEvent.severity,
             description: securityEvent.description,
@@ -465,7 +463,7 @@ export class Auth0ActivityTrackingService {
         eventTypes[a] > eventTypes[b] ? a : b
       )
 
-      const ipAddresses = Array.from(new Set(activities.map(a => a.ipAddress)))
+      const ipAddresses = [...new Set(activities.map(a => a.ipAddress))]
 
       // Calculate active days
       const activeDays = new Set(
@@ -549,18 +547,20 @@ export class Auth0ActivityTrackingService {
       }
 
       // Get user's sessions from Auth0
-      const response = await auth0Management.users.sessions.list(userId)
-      const sessions = response.data
+      const sessions = await auth0Management.getUserSessions({ id: userId })
 
       return sessions.map(session => ({
         id: session.id,
-        clientId: session.clients?.[0]?.client_id,
-        ipAddress: session.clients?.[0]?.last_ip || '',
-        userAgent: session.device?.user_agent || '',
-        startedAt: session.created_at ? new Date(String(session.created_at)) : undefined,
-        lastUpdatedAt: session.updated_at ? new Date(String(session.updated_at)) : undefined,
-        expiresAt: session.expires_at ? new Date(String(session.expires_at)) : undefined,
-        location: undefined // Location is not directly available in the same way
+        clientId: session.client_id,
+        ipAddress: session.ip,
+        userAgent: session.user_agent,
+        startedAt: new Date(session.started_at),
+        lastUpdatedAt: new Date(session.last_updated_at),
+        expiresAt: new Date(session.expires_at),
+        location: session.location ? {
+          country: session.location.country_name,
+          city: session.location.city_name
+        } : undefined
       }))
     } catch (error) {
       console.error('Failed to get user sessions:', error)
@@ -578,11 +578,10 @@ export class Auth0ActivityTrackingService {
       }
 
       // Terminate session in Auth0
-      await auth0Management.sessions.delete(sessionId)
+      await auth0Management.deleteUserSessions({ id: userId, session_id: sessionId })
 
       // Log session termination
-      await logSecurityEvent(SecurityEventType.SESSION_TERMINATED, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.SESSION_TERMINATED, userId, {
         sessionId: sessionId,
         timestamp: new Date().toISOString()
       })
@@ -595,8 +594,7 @@ export class Auth0ActivityTrackingService {
       console.error('Failed to terminate user session:', error)
 
       // Log session termination error
-      await logSecurityEvent(SecurityEventType.SESSION_TERMINATION_ERROR, {
-        userId: userId,
+      await logSecurityEvent(SecurityEventType.SESSION_TERMINATION_ERROR, userId, {
         sessionId: sessionId,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
@@ -618,7 +616,7 @@ export class Auth0ActivityTrackingService {
     }
 
     // Log configuration update
-    await logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+    await logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'activity_tracking',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString()

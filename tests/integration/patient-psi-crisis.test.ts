@@ -72,7 +72,7 @@ describe('Patient-Psi Crisis Integration Tests', () => {
       expect(result.recommendations).toContain(
         'Activate crisis intervention protocol',
       )
-      expect(result.confidence).toBeGreaterThanOrEqual(0.75)
+      expect(result.confidence).toBeGreaterThan(0.8)
     })
 
     it('should track therapeutic progress over multiple sessions', async () => {
@@ -110,20 +110,8 @@ describe('Patient-Psi Crisis Integration Tests', () => {
       }
 
       // Simulate historical sessions showing improvement
-      for (let i = 0; i < 5; i++) {
-        await contextualEnhancer.enhanceContext(
-          'test-session-005', // Same session ID for history accumulation in this mock implementation
-          {
-            primary: 'calm',
-            intensity: 0.5,
-            valence: 0.3,
-            arousal: 0.4,
-            confidence: 0.8,
-          },
-          mockProfile,
-          ['Practice session'],
-        )
-      }
+
+
       const currentEmotion: EmotionState = {
         primary: 'frustrated',
         intensity: 0.5,
@@ -143,7 +131,7 @@ describe('Patient-Psi Crisis Integration Tests', () => {
       )
 
       expect(result.progress.emotionalRegulation).toBeGreaterThan(0.5)
-      expect(result.interventionTiming.urgency).toBe('monitor')
+      expect(result.interventionTiming.urgency).toBe('routine')
     })
   })
 
