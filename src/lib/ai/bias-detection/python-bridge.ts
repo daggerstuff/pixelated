@@ -72,7 +72,7 @@ export class PythonBiasDetectionBridge {
     this.authToken = process.env["BIAS_DETECTION_AUTH_TOKEN"];
     this.connectionPool = connectionPool || new ConnectionPool(poolConfig);
     // Start queue processor
-    this.processQueue();
+    void this.processQueue();
     // Start health monitoring
     this.startHealthMonitoring();
   }
@@ -135,13 +135,8 @@ export class PythonBiasDetectionBridge {
     } catch (error: unknown) {
       logger.error("Failed to initialize PythonBiasDetectionBridge", { error });
       throw new Error(
-<<<<<<< HEAD
-        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
-      );
-=======
         `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
       )
->>>>>>> backup-manager-storage-loading-4805050224540675022
     }
   }
 
@@ -272,23 +267,14 @@ export class PythonBiasDetectionBridge {
           // Set up timeout
           timeoutId = setTimeout(() => {
             try {
-<<<<<<< HEAD
-              controller.abort();
-            } catch {
-=======
               controller.abort()
-            } catch (e) {
->>>>>>> backup-manager-storage-loading-4805050224540675022
+            } catch {
               /* ignore */
             }
           }, this.timeout);
 
           // Attach the signal to fetch options for this attempt
-<<<<<<< HEAD
-          (fetchOptions as any).signal = controller.signal;
-=======
-          ;(fetchOptions as any).signal = controller.signal
->>>>>>> backup-manager-storage-loading-4805050224540675022
+          ; (fetchOptions as any).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -337,13 +323,8 @@ export class PythonBiasDetectionBridge {
         ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
-<<<<<<< HEAD
-          (this.connectionPool as any).releaseConnection(pooledConnection);
-          pooledConnection = null;
-=======
-          ;(this.connectionPool as any).releaseConnection(pooledConnection)
+          ; (this.connectionPool as any).releaseConnection(pooledConnection)
           pooledConnection = null
->>>>>>> backup-manager-storage-loading-4805050224540675022
         }
         // Clear timeout on error
         if (timeoutId) {
@@ -378,47 +359,25 @@ export class PythonBiasDetectionBridge {
             ? (layerResult.metrics as Record<string, any>)
             : {};
         const ling =
-<<<<<<< HEAD
           typeof metrics["linguistic_bias"] === "object" &&
-          metrics["linguistic_bias"]
+            metrics["linguistic_bias"]
             ? (metrics["linguistic_bias"] as Record<string, any>)
             : {};
         const sentiment =
           typeof ling["sentiment_analysis"] === "object" &&
-          ling["sentiment_analysis"]
+            ling["sentiment_analysis"]
             ? (ling["sentiment_analysis"] as Record<string, any>)
             : {};
         const rep =
           typeof metrics["representation_analysis"] === "object" &&
-          metrics["representation_analysis"]
+            metrics["representation_analysis"]
             ? (metrics["representation_analysis"] as Record<string, any>)
             : {};
         const dq =
           typeof metrics["data_quality_metrics"] === "object" &&
-          metrics["data_quality_metrics"]
+            metrics["data_quality_metrics"]
             ? (metrics["data_quality_metrics"] as Record<string, any>)
             : {};
-=======
-          typeof metrics['linguistic_bias'] === 'object' &&
-          metrics['linguistic_bias']
-            ? (metrics['linguistic_bias'] as Record<string, any>)
-            : {}
-        const sentiment =
-          typeof ling['sentiment_analysis'] === 'object' &&
-          ling['sentiment_analysis']
-            ? (ling['sentiment_analysis'] as Record<string, any>)
-            : {}
-        const rep =
-          typeof metrics['representation_analysis'] === 'object' &&
-          metrics['representation_analysis']
-            ? (metrics['representation_analysis'] as Record<string, any>)
-            : {}
-        const dq =
-          typeof metrics['data_quality_metrics'] === 'object' &&
-          metrics['data_quality_metrics']
-            ? (metrics['data_quality_metrics'] as Record<string, any>)
-            : {}
->>>>>>> backup-manager-storage-loading-4805050224540675022
         return {
           biasScore:
             typeof layerResult.bias_score === "number"
@@ -537,9 +496,11 @@ export class PythonBiasDetectionBridge {
       serviceError:
         error instanceof Error
           ? error.message
-          : error
-            ? String(error)
-            : "Python service unavailable",
+          : error && typeof error === 'object'
+            ? JSON.stringify(error)
+            : error
+              ? String(error)
+              : "Python service unavailable",
     } as PreprocessingLayerResult;
   }
 
