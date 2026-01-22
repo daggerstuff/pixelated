@@ -184,8 +184,16 @@ export class NotificationService {
     this.emailService = new EmailService(emailConfig)
     this.wsClients = new Map()
     this.templates = new Map()
-    this.initializeVAPIDKeys()
-    this.initializeCrisisTemplate() // Ensure crisis template is set up
+    this.initializeVAPIDKeys().catch((error) => {
+      logger.error('Failed to initialize VAPID keys', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+    })
+    this.initializeCrisisTemplate().catch((error) => {
+      logger.error('Failed to initialize crisis template', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+    })
   }
 
   private async initializeVAPIDKeys() {
@@ -334,6 +342,21 @@ export class NotificationService {
     })
 
     return notification.id
+  }
+
+  /**
+   * Start processing notifications at a specific interval
+   */
+  async startProcessing(interval: number): Promise<void> {
+    logger.info(`Starting notification processing loop (interval: ${interval}ms)`)
+    while (true) {
+      try {
+        await this.processQueue()
+      } catch (error) {
+        logger.error('Error in notification processing loop', { error: error instanceof Error ? String(error) : String(error) })
+      }
+      await new Promise((resolve) => setTimeout(resolve, interval))
+    }
   }
 
   /**
