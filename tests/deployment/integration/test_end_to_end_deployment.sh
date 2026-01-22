@@ -73,7 +73,7 @@ case "$remote_command" in
         exit 0
         ;;
     *"pnpm --version"*)
-        echo "10.28.0"
+        echo "10.28.1"
         exit 0
         ;;
     *"docker ps"*)
