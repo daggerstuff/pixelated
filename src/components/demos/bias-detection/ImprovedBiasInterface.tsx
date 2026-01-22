@@ -47,7 +47,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       const newSessionData: SessionData = {
         ...data,
         sessionId,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       }
       setSessionData(newSessionData)
 
@@ -68,57 +68,50 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       // Generate comprehensive results
       const results: BiasAnalysisResults = {
         sessionId,
-        timestamp: new Date(),
-        overallBiasScore: Math.max(60, 100 - Math.random() * 10),
-        alertLevel: 'low' as const,
-        confidence: 0.85,
-        layerResults: {
-          preprocessing: {
-            biasScore: Math.random() * 0.3,
-            linguisticBias: {
-              genderBiasScore: Math.random() * 0.25,
-              racialBiasScore: Math.random() * 0.2,
-              ageBiasScore: Math.random() * 0.15,
-              culturalBiasScore: Math.random() * 0.25,
-            },
-            representationAnalysis: {
-              diversityIndex: 0.75,
-              underrepresentedGroups: [],
-            },
-          },
-          modelLevel: {
-            biasScore: Math.random() * 0.2,
-            fairnessMetrics: {
-              demographicParity: 0.85,
-              equalizedOdds: 0.82,
-              calibration: 0.88,
-            },
-          },
-          interactive: {
-            biasScore: Math.random() * 0.15,
-            counterfactualAnalysis: {
-              scenariosAnalyzed: 5,
-              biasDetected: false,
-              consistencyScore: 0.92,
-            },
-          },
-          evaluation: {
-            biasScore: Math.random() * 0.2,
-            huggingFaceMetrics: {
-              bias: 0.15,
-              stereotype: 0.12,
-              regard: {
-                positive: 0.75,
-                negative: 0.15,
-              },
-            },
-          },
+        overallScore: Math.max(60, 100 - Math.random() * 10),
+        biasFactors: {
+          demographic: Math.random() * 0.3,
+          cultural: Math.random() * 0.25,
+          linguistic: Math.random() * 0.2,
+          gender: Math.random() * 0.25,
+          age: Math.random() * 0.15,
         },
-        recommendations: [
-          'Use person-first language',
-          'Avoid cultural generalizations',
+        detectedPatterns: [
+          {
+            type: 'demographic',
+            severity: 'medium',
+            confidence: 0.75,
+            description: 'Potential demographic assumptions detected',
+            evidence: ['Uses generalized age-related terms'],
+            recommendations: ['Use more individualized language'],
+          },
+          {
+            type: 'cultural',
+            severity: 'low',
+            confidence: 0.65,
+            description: 'Minor cultural bias indicators found',
+            evidence: ['Cultural background references'],
+            recommendations: ['Focus on individual experiences'],
+          },
         ],
-        demographics: data.demographics,
+        recommendations: [
+          {
+            priority: 'high',
+            category: 'language',
+            description: 'Use person-first language',
+            example:
+              'Instead of "elderly patient", use "patient who is elderly"',
+            impact: 'Reduces age-based assumptions',
+          },
+          {
+            priority: 'medium',
+            category: 'cultural',
+            description: 'Avoid cultural generalizations',
+            example: 'Replace "in your culture" with "in your experience"',
+            impact: 'Promotes individual-centered care',
+          },
+        ],
+        timestamp: new Date().toISOString(),
       }
 
       setAnalysisResults(results)
@@ -257,12 +250,12 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 <div className="space-y-2 text-sm text-blue-800">
                   <p>
                     • Analysis completed with{' '}
-                    {Object.keys(analysisResults.layerResults).length} bias layers
+                    {analysisResults.detectedPatterns.length} bias patterns
                     identified
                   </p>
                   <p>
                     • Overall bias score:{' '}
-                    {Math.round(analysisResults.overallBiasScore)}/100
+                    {Math.round(analysisResults.overallScore)}/100
                   </p>
                   <p>
                     • {analysisResults.recommendations.length} actionable

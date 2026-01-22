@@ -5,389 +5,835 @@
  * user profiling, anomaly detection, and pattern recognition.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { BehavioralAnalysisService } from '../behavioral-analysis-service'
-import type { SecurityEvent } from '../behavioral-analysis-service'
+import {
+  detectAnomalies,
+  calculateBehavioralScore,
+  extractBehavioralFeatures,
+  normalizeBehavioralData,
+  detectPatternChanges,
+  getBehavioralInsights,
+} from '../behavioral-utils'
 
-// Mock dependencies
-vi.mock('ioredis')
-vi.mock('mongodb')
-vi.mock('@tensorflow/tfjs')
-vi.mock('../../../logging/build-safe-logger', () => ({
-  createBuildSafeLogger: () => ({
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
-  }),
-}))
+vi.mock('../../logging/build-safe-logger')
+vi.mock('../../redis')
+vi.mock('../../response-orchestration')
 
-describe('BehavioralAnalysisService', () => {
+describe('Behavioral Analysis Service', () => {
   let service: BehavioralAnalysisService
-
-  const mockConfig = {
-    redisUrl: 'redis://localhost:6379',
-    mongoUrl: 'mongodb://localhost:27017',
-    modelPath: './models/test',
-    privacyConfig: {
-      epsilon: 0.1,
-      delta: 1e-5,
-      sensitivity: 1.0,
-      mechanism: 'laplace' as const,
-    },
-    anomalyThresholds: {
-      temporal: 0.8,
-      spatial: 0.8,
-      sequential: 0.8,
-      frequency: 0.8,
-    },
-  }
-
-  const createMockSecurityEvent = (overrides?: Partial<SecurityEvent>): SecurityEvent => ({
-    eventId: 'evt_123',
-    userId: 'user_123',
-    timestamp: new Date(),
-    eventType: 'login',
-    sourceIp: '192.168.1.1',
-    userAgent: 'Mozilla/5.0',
-    requestMethod: 'POST',
-    endpoint: '/api/auth/login',
-    responseCode: 200,
-    responseTime: 150,
-    payloadSize: 1024,
-    sessionId: 'session_123',
-    ...overrides,
-  })
+  let mockRedis: any
+  let mockOrchestrator: any
 
   beforeEach(() => {
-    service = new BehavioralAnalysisService(mockConfig)
+    mockRedis = {
+      get: vi.fn(),
+      set: vi.fn(),
+      del: vi.fn(),
+      exists: vi.fn(),
+      incr: vi.fn(),
+      expire: vi.fn(),
+      hget: vi.fn(),
+      hset: vi.fn(),
+      hgetall: vi.fn(),
+      hdel: vi.fn(),
+      hincrby: vi.fn(),
+    }
+
+    mockOrchestrator = {
+      analyzeThreat: vi.fn(),
+      executeResponse: vi.fn(),
+      getStatistics: vi.fn(),
+    }
+
+    service = new BehavioralAnalysisService(mockRedis, mockOrchestrator)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   describe('Service Initialization', () => {
     it('should initialize with correct configuration', () => {
       expect(service).toBeDefined()
-      expect(service).toBeInstanceOf(BehavioralAnalysisService)
+      expect(service.config).toBeDefined()
+      expect(service.redis).toBe(mockRedis)
+      expect(service.orchestrator).toBe(mockOrchestrator)
+      expect(service.profiles).toBeDefined()
+      expect(service.anomalyDetector).toBeDefined()
     })
 
-    it('should have required methods', () => {
-      expect(typeof service.createBehaviorProfile).toBe('function')
-      expect(typeof service.detectAnomalies).toBe('function')
-      expect(typeof service.calculateBehavioralRisk).toBe('function')
-      expect(typeof service.mineBehavioralPatterns).toBe('function')
-      expect(typeof service.analyzeBehaviorGraph).toBe('function')
-      expect(typeof service.analyzeWithPrivacy).toBe('function')
+    it('should use default configuration when none provided', () => {
+      const defaultService = new BehavioralAnalysisService(
+        mockRedis,
+        mockOrchestrator,
+      )
+      expect(defaultService.config).toEqual({
+        enabled: true,
+        profileUpdateInterval: 300000, // 5 minutes
+        anomalyThreshold: 0.75,
+        maxProfileAge: 86400000, // 24 hours
+        enableLogging: true,
+        enableRealTimeAnalysis: true,
+        maxProfileSize: 1000,
+      })
+    })
+
+    it('should use custom configuration when provided', () => {
+      const customConfig = {
+        enabled: false,
+        profileUpdateInterval: 600000,
+        anomalyThreshold: 0.85,
+        maxProfileAge: 43200000,
+        enableLogging: false,
+        enableRealTimeAnalysis: false,
+        maxProfileSize: 500,
+      }
+
+      const customService = new BehavioralAnalysisService(
+        mockRedis,
+        mockOrchestrator,
+        customConfig,
+      )
+      expect(customService.config).toEqual(customConfig)
     })
   })
 
-  describe('createBehaviorProfile', () => {
-    it('should create a behavior profile from security events', async () => {
+  describe('User Profile Management', () => {
+    it('should create behavioral profile for new user', async () => {
       const userId = 'user_123'
-      const events: SecurityEvent[] = [
-        createMockSecurityEvent({ eventType: 'login' }),
-        createMockSecurityEvent({ eventType: 'data_access', endpoint: '/api/data' }),
-        createMockSecurityEvent({ eventType: 'logout' }),
-      ]
+      const initialData = {
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data', '/api/user'],
+          methods: ['GET', 'POST'],
+          avgRequestsPerHour: 12,
+        },
+        timePatterns: {
+          peakHours: [14, 15, 16],
+          activeDays: [1, 2, 3, 4, 5],
+        },
+        deviceInfo: {
+          userAgent: 'Mozilla/5.0...',
+          platform: 'desktop',
+        },
+      }
 
-      const profile = await service.createBehaviorProfile(userId, events)
+      mockRedis.exists.mockResolvedValue(0) // User doesn't exist
+      mockRedis.set.mockResolvedValue('OK')
+
+      const profile = await service.createOrUpdateProfile(userId, initialData)
 
       expect(profile).toBeDefined()
       expect(profile.userId).toBe(userId)
-      expect(profile.profileId).toBeDefined()
-      expect(profile.behavioralPatterns).toBeDefined()
-      expect(Array.isArray(profile.behavioralPatterns)).toBe(true)
-      expect(profile.riskIndicators).toBeDefined()
-      expect(profile.lastUpdated).toBeInstanceOf(Date)
-      expect(profile.confidenceScore).toBeGreaterThanOrEqual(0)
-      expect(profile.confidenceScore).toBeLessThanOrEqual(1)
-    })
-
-    it('should handle empty events array', async () => {
-      const userId = 'user_123'
-      const events: SecurityEvent[] = []
-
-      await expect(service.createBehaviorProfile(userId, events)).rejects.toThrow()
-    })
-
-    it('should extract behavioral patterns from events', async () => {
-      const userId = 'user_123'
-      const events: SecurityEvent[] = Array.from({ length: 10 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          eventType: i % 2 === 0 ? 'login' : 'data_access',
-          timestamp: new Date(Date.now() - i * 60000),
-        })
+      expect(profile.createdAt).toBeDefined()
+      expect(profile.lastUpdated).toBeDefined()
+      expect(profile.loginFrequency).toBe(5)
+      expect(profile.sessionDuration).toBe(1800)
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        `behavioral_profile:${userId}`,
+        expect.any(String),
+        expect.any(Number),
       )
-
-      const profile = await service.createBehaviorProfile(userId, events)
-
-      expect(profile.behavioralPatterns.length).toBeGreaterThan(0)
-      expect(profile.baselineMetrics).toBeDefined()
     })
-  })
 
-  describe('detectAnomalies', () => {
-    it('should detect anomalies in current events', async () => {
+    it('should update existing behavioral profile', async () => {
       const userId = 'user_123'
-      const baselineEvents: SecurityEvent[] = Array.from({ length: 20 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          eventType: 'login',
-          sourceIp: '192.168.1.1',
-          timestamp: new Date(Date.now() - i * 3600000),
-        })
-      )
-
-      const profile = await service.createBehaviorProfile(userId, baselineEvents)
-
-      // Create anomalous events
-      const anomalousEvents: SecurityEvent[] = [
-        createMockSecurityEvent({
-          eventType: 'login',
-          sourceIp: '10.0.0.1', // Different IP
-          timestamp: new Date(),
-        }),
-        createMockSecurityEvent({
-          eventType: 'data_access',
-          endpoint: '/api/admin', // Unusual endpoint
-          timestamp: new Date(),
-        }),
-      ]
-
-      const anomalies = await service.detectAnomalies(profile, anomalousEvents)
-
-      expect(Array.isArray(anomalies)).toBe(true)
-      anomalies.forEach((anomaly) => {
-        expect(anomaly.anomalyId).toBeDefined()
-        expect(anomaly.userId).toBe(userId)
-        expect(anomaly.anomalyType).toMatch(/deviation|novelty|outlier/)
-        expect(anomaly.severity).toMatch(/low|medium|high|critical/)
-        expect(anomaly.deviationScore).toBeGreaterThanOrEqual(0)
-        expect(anomaly.confidence).toBeGreaterThanOrEqual(0)
-        expect(anomaly.confidence).toBeLessThanOrEqual(1)
-      })
-    })
-
-    it('should return empty array for normal behavior', async () => {
-      const userId = 'user_123'
-      const events: SecurityEvent[] = Array.from({ length: 10 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          timestamp: new Date(Date.now() - i * 60000),
-        })
-      )
-
-      const profile = await service.createBehaviorProfile(userId, events)
-
-      // Same pattern of events
-      const currentEvents: SecurityEvent[] = [
-        createMockSecurityEvent({ eventType: 'login' }),
-      ]
-
-      const anomalies = await service.detectAnomalies(profile, currentEvents)
-
-      expect(Array.isArray(anomalies)).toBe(true)
-    })
-  })
-
-  describe('calculateBehavioralRisk', () => {
-    it('should calculate risk score for user behavior', async () => {
-      const userId = 'user_123'
-      const events: SecurityEvent[] = Array.from({ length: 15 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          timestamp: new Date(Date.now() - i * 60000),
-        })
-      )
-
-      const profile = await service.createBehaviorProfile(userId, events)
-      const riskScore = await service.calculateBehavioralRisk(profile, events)
-
-      expect(riskScore).toBeDefined()
-      expect(riskScore.userId).toBe(userId)
-      expect(riskScore.score).toBeGreaterThanOrEqual(0)
-      expect(riskScore.score).toBeLessThanOrEqual(1)
-      expect(riskScore.confidence).toBeGreaterThanOrEqual(0)
-      expect(riskScore.confidence).toBeLessThanOrEqual(1)
-      expect(Array.isArray(riskScore.contributingFactors)).toBe(true)
-      expect(riskScore.trend).toMatch(/increasing|decreasing|stable/)
-      expect(riskScore.timestamp).toBeInstanceOf(Date)
-    })
-
-    it('should identify high-risk behavior', async () => {
-      const userId = 'user_123'
-      const suspiciousEvents: SecurityEvent[] = [
-        createMockSecurityEvent({
-          eventType: 'failed_login',
-          sourceIp: '10.0.0.1',
-        }),
-        createMockSecurityEvent({
-          eventType: 'failed_login',
-          sourceIp: '10.0.0.2',
-        }),
-        createMockSecurityEvent({
-          eventType: 'failed_login',
-          sourceIp: '10.0.0.3',
-        }),
-        createMockSecurityEvent({
-          eventType: 'data_access',
-          endpoint: '/api/admin',
-        }),
-      ]
-
-      const profile = await service.createBehaviorProfile(userId, suspiciousEvents)
-      const riskScore = await service.calculateBehavioralRisk(profile, suspiciousEvents)
-
-      expect(riskScore.score).toBeGreaterThan(0)
-      expect(riskScore.contributingFactors.length).toBeGreaterThan(0)
-    })
-  })
-
-  describe('mineBehavioralPatterns', () => {
-    it('should mine patterns from behavioral sequences', async () => {
-      const sequences = [
-        {
-          sequenceId: 'seq_1',
-          userId: 'user_123',
-          timestamp: new Date(),
-          actions: ['login', 'data_access', 'logout'],
-          context: {},
+      const existingProfile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
         },
-        {
-          sequenceId: 'seq_2',
-          userId: 'user_123',
-          timestamp: new Date(),
-          actions: ['login', 'data_access', 'data_access', 'logout'],
-          context: {},
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+      }
+
+      const updateData = {
+        loginFrequency: 8,
+        sessionDuration: 2200,
+        requestPatterns: {
+          endpoints: ['/api/data', '/api/admin'],
+          methods: ['GET', 'POST'],
+          avgRequestsPerHour: 15,
         },
-      ]
+      }
 
-      const patterns = await service.mineBehavioralPatterns(sequences)
+      mockRedis.exists.mockResolvedValue(1)
+      mockRedis.get.mockResolvedValue(JSON.stringify(existingProfile))
+      mockRedis.set.mockResolvedValue('OK')
 
-      expect(Array.isArray(patterns)).toBe(true)
-      patterns.forEach((pattern) => {
-        expect(pattern.patternId).toBeDefined()
-        expect(pattern.patternType).toMatch(/temporal|spatial|sequential|frequency/)
-        expect(pattern.confidence).toBeGreaterThanOrEqual(0)
-        expect(pattern.confidence).toBeLessThanOrEqual(1)
-        expect(pattern.frequency).toBeGreaterThanOrEqual(0)
-        expect(pattern.lastObserved).toBeInstanceOf(Date)
-      })
+      const updatedProfile = await service.createOrUpdateProfile(
+        userId,
+        updateData,
+      )
+
+      expect(updatedProfile.loginFrequency).toBe(8)
+      expect(updatedProfile.sessionDuration).toBe(2200)
+      expect(updatedProfile.requestPatterns.endpoints).toContain('/api/admin')
+      expect(updatedProfile.lastUpdated).not.toBe(existingProfile.lastUpdated)
+    })
+
+    it('should handle profile creation errors gracefully', async () => {
+      const userId = 'user_123'
+      const initialData = { loginFrequency: 5 }
+
+      mockRedis.exists.mockRejectedValue(new Error('Redis error'))
+
+      await expect(
+        service.createOrUpdateProfile(userId, initialData),
+      ).rejects.toThrow('Redis error')
+    })
+
+    it('should get user profile by ID', async () => {
+      const userId = 'user_123'
+      const profile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+      }
+
+      mockRedis.get.mockResolvedValue(JSON.stringify(profile))
+
+      const result = await service.getProfile(userId)
+
+      expect(result).toEqual(profile)
+      expect(mockRedis.get).toHaveBeenCalledWith(`behavioral_profile:${userId}`)
+    })
+
+    it('should return null for non-existent profile', async () => {
+      const userId = 'user_123'
+      mockRedis.get.mockResolvedValue(null)
+
+      const result = await service.getProfile(userId)
+
+      expect(result).toBeNull()
+    })
+
+    it('should delete user profile', async () => {
+      const userId = 'user_123'
+      mockRedis.del.mockResolvedValue(1)
+
+      await service.deleteProfile(userId)
+
+      expect(mockRedis.del).toHaveBeenCalledWith(`behavioral_profile:${userId}`)
+    })
+
+    it('should handle profile deletion errors gracefully', async () => {
+      const userId = 'user_123'
+      mockRedis.del.mockRejectedValue(new Error('Redis error'))
+
+      await expect(service.deleteProfile(userId)).rejects.toThrow('Redis error')
     })
   })
 
-  describe('analyzeBehaviorGraph', () => {
-    it('should analyze behavior graph from events', async () => {
-      const events: SecurityEvent[] = Array.from({ length: 10 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          userId: `user_${i % 3}`,
-          timestamp: new Date(Date.now() - i * 60000),
-        })
-      )
+  describe('Behavioral Analysis', () => {
+    it('should analyze user behavior correctly', async () => {
+      const userId = 'user_123'
+      const behaviorData = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+        metadata: {
+          ip: '192.168.1.1',
+          userAgent: 'Mozilla/5.0...',
+          endpoint: '/api/auth/login',
+        },
+      }
 
-      const graph = await service.analyzeBehaviorGraph(events)
+      const existingProfile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
+        },
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+      }
 
-      expect(graph).toBeDefined()
-      expect(graph.graphId).toBeDefined()
-      expect(Array.isArray(graph.nodes)).toBe(true)
-      expect(Array.isArray(graph.edges)).toBe(true)
-      expect(graph.properties).toBeDefined()
-      expect(graph.timestamp).toBeInstanceOf(Date)
-    })
-  })
+      mockRedis.get.mockResolvedValue(JSON.stringify(existingProfile))
+      mockRedis.set.mockResolvedValue('OK')
 
-  describe('analyzeWithPrivacy', () => {
-    it('should perform privacy-preserving analysis', async () => {
-      const events: SecurityEvent[] = Array.from({ length: 5 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `evt_${i}`,
-          timestamp: new Date(Date.now() - i * 60000),
-        })
-      )
-
-      const analysis = await service.analyzeWithPrivacy(events)
+      const analysis = await service.analyzeBehavior(userId, behaviorData)
 
       expect(analysis).toBeDefined()
-      expect(analysis.analysisId).toBeDefined()
-      expect(analysis.privatizedFeatures).toBeDefined()
-      expect(Array.isArray(analysis.behavioralPatterns)).toBe(true)
-      expect(analysis.privacyBudgetUsed).toBeGreaterThanOrEqual(0)
-      expect(analysis.privacyBudgetRemaining).toBeGreaterThanOrEqual(0)
-      expect(analysis.epsilon).toBe(mockConfig.privacyConfig.epsilon)
-      expect(analysis.timestamp).toBeInstanceOf(Date)
+      expect(analysis.userId).toBe(userId)
+      expect(analysis.anomalies).toBeDefined()
+      expect(analysis.patterns).toBeDefined()
+      expect(analysis.score).toBeDefined()
+      expect(analysis.recommendations).toBeDefined()
+      expect(mockRedis.set).toHaveBeenCalled()
+    })
+
+    it('should detect behavioral anomalies', async () => {
+      const userId = 'user_123'
+      const suspiciousBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'bulk_download',
+        metadata: {
+          ip: '192.168.1.100',
+          userAgent: 'bot/scanner',
+          endpoint: '/api/data/export',
+          downloadSize: 1000000, // 1MB
+        },
+      }
+
+      const existingProfile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
+        },
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+      }
+
+      mockRedis.get.mockResolvedValue(JSON.stringify(existingProfile))
+      mockRedis.set.mockResolvedValue('OK')
+
+      const analysis = await service.analyzeBehavior(userId, suspiciousBehavior)
+
+      expect(analysis.anomalies).toHaveLength(1)
+      expect(analysis.anomalies[0].type).toBe('unusual_behavior')
+      expect(analysis.score).toBeGreaterThan(0.5)
+    })
+
+    it('should handle analysis errors gracefully', async () => {
+      const userId = 'user_123'
+      const behaviorData = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+      }
+
+      mockRedis.get.mockRejectedValue(new Error('Redis error'))
+
+      await expect(
+        service.analyzeBehavior(userId, behaviorData),
+      ).rejects.toThrow('Redis error')
+    })
+
+    it('should analyze batch behavior data', async () => {
+      const userId = 'user_123'
+      const batchData = [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'login',
+          metadata: { ip: '192.168.1.1' },
+        },
+        {
+          timestamp: new Date().toISOString(),
+          action: 'data_access',
+          metadata: { endpoint: '/api/data' },
+        },
+        { timestamp: new Date().toISOString(), action: 'logout' },
+      ]
+
+      const existingProfile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
+        },
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+      }
+
+      mockRedis.get.mockResolvedValue(JSON.stringify(existingProfile))
+      mockRedis.set.mockResolvedValue('OK')
+
+      const analysis = await service.analyzeBatchBehavior(userId, batchData)
+
+      expect(analysis).toBeDefined()
+      expect(analysis.userId).toBe(userId)
+      expect(analysis.anomalies).toBeDefined()
+      expect(analysis.patterns).toBeDefined()
+      expect(analysis.score).toBeDefined()
     })
   })
 
-  describe('getBehavioralProfile', () => {
-    it('should retrieve existing behavioral profile', async () => {
+  describe('Anomaly Detection', () => {
+    it('should detect unusual login patterns', () => {
+      const userProfile = {
+        userId: 'user_123',
+        loginFrequency: 5,
+        typicalLoginHours: [9, 10, 14, 15],
+        typicalIPs: ['192.168.1.1', '10.0.0.1'],
+      }
+
+      const currentBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+        metadata: {
+          ip: '192.168.1.100', // Unusual IP
+          hour: 3, // Unusual hour
+          userAgent: 'Mozilla/5.0...',
+        },
+      }
+
+      const anomalies = detectAnomalies(userProfile, currentBehavior)
+
+      expect(anomalies).toHaveLength(2)
+      expect(anomalies.some((a) => a.type === 'unusual_ip')).toBe(true)
+      expect(anomalies.some((a) => a.type === 'unusual_time')).toBe(true)
+    })
+
+    it('should detect unusual request patterns', () => {
+      const userProfile = {
+        userId: 'user_123',
+        typicalEndpoints: ['/api/data', '/api/user'],
+        typicalMethods: ['GET', 'POST'],
+        avgRequestsPerHour: 10,
+      }
+
+      const currentBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'api_request',
+        metadata: {
+          endpoint: '/api/admin', // Unusual endpoint
+          method: 'DELETE', // Unusual method
+          requestsInLastHour: 50, // High frequency
+        },
+      }
+
+      const anomalies = detectAnomalies(userProfile, currentBehavior)
+
+      expect(anomalies).toHaveLength(3)
+      expect(anomalies.some((a) => a.type === 'unusual_endpoint')).toBe(true)
+      expect(anomalies.some((a) => a.type === 'unusual_method')).toBe(true)
+      expect(anomalies.some((a) => a.type === 'high_frequency')).toBe(true)
+    })
+
+    it('should detect unusual session behavior', () => {
+      const userProfile = {
+        userId: 'user_123',
+        typicalSessionDuration: 1800, // 30 minutes
+        typicalSessionCount: 2,
+      }
+
+      const currentBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'session_start',
+        metadata: {
+          sessionDuration: 7200, // 2 hours - unusually long
+          concurrentSessions: 5, // High concurrency
+        },
+      }
+
+      const anomalies = detectAnomalies(userProfile, currentBehavior)
+
+      expect(anomalies).toHaveLength(2)
+      expect(anomalies.some((a) => a.type === 'long_session')).toBe(true)
+      expect(anomalies.some((a) => a.type === 'high_concurrency')).toBe(true)
+    })
+
+    it('should return empty array for normal behavior', () => {
+      const userProfile = {
+        userId: 'user_123',
+        typicalEndpoints: ['/api/data'],
+        typicalMethods: ['GET'],
+        typicalLoginHours: [9, 10, 14, 15],
+        typicalIPs: ['192.168.1.1'],
+      }
+
+      const normalBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'api_request',
+        metadata: {
+          endpoint: '/api/data',
+          method: 'GET',
+          ip: '192.168.1.1',
+          hour: 10,
+        },
+      }
+
+      const anomalies = detectAnomalies(userProfile, normalBehavior)
+
+      expect(anomalies).toHaveLength(0)
+    })
+  })
+
+  describe('Behavioral Scoring', () => {
+    it('should calculate behavioral score correctly', () => {
+      const userProfile = {
+        userId: 'user_123',
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
+        },
+      }
+
+      const currentBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+        metadata: {
+          ip: '192.168.1.1',
+          userAgent: 'Mozilla/5.0...',
+        },
+      }
+
+      const score = calculateBehavioralScore(userProfile, currentBehavior)
+
+      expect(score).toBeGreaterThanOrEqual(0)
+      expect(score).toBeLessThanOrEqual(1)
+    })
+
+    it('should give higher score for suspicious behavior', () => {
+      const userProfile = {
+        userId: 'user_123',
+        typicalEndpoints: ['/api/data'],
+        typicalMethods: ['GET'],
+        avgRequestsPerHour: 10,
+      }
+
+      const suspiciousBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'bulk_download',
+        metadata: {
+          endpoint: '/api/admin',
+          method: 'POST',
+          requestsInLastHour: 100,
+        },
+      }
+
+      const normalBehavior = {
+        timestamp: new Date().toISOString(),
+        action: 'api_request',
+        metadata: {
+          endpoint: '/api/data',
+          method: 'GET',
+          requestsInLastHour: 5,
+        },
+      }
+
+      const suspiciousScore = calculateBehavioralScore(
+        userProfile,
+        suspiciousBehavior,
+      )
+      const normalScore = calculateBehavioralScore(userProfile, normalBehavior)
+
+      expect(suspiciousScore).toBeGreaterThan(normalScore)
+    })
+  })
+
+  describe('Feature Extraction', () => {
+    it('should extract behavioral features from raw data', () => {
+      const rawData = [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'login',
+          metadata: { ip: '192.168.1.1' },
+        },
+        {
+          timestamp: new Date().toISOString(),
+          action: 'data_access',
+          metadata: { endpoint: '/api/data' },
+        },
+        { timestamp: new Date().toISOString(), action: 'logout' },
+      ]
+
+      const features = extractBehavioralFeatures(rawData)
+
+      expect(features).toBeDefined()
+      expect(features.loginFrequency).toBe(1)
+      expect(features.logoutFrequency).toBe(1)
+      expect(features.dataAccessFrequency).toBe(1)
+      expect(features.uniqueIPs).toBe(1)
+      expect(features.uniqueEndpoints).toBe(1)
+    })
+
+    it('should normalize behavioral data', () => {
+      const rawData = {
+        loginFrequency: 100,
+        sessionDuration: 7200,
+        requestPatterns: {
+          avgRequestsPerHour: 50,
+        },
+      }
+
+      const normalized = normalizeBehavioralData(rawData)
+
+      expect(normalized.loginFrequency).toBeGreaterThanOrEqual(0)
+      expect(normalized.loginFrequency).toBeLessThanOrEqual(1)
+      expect(normalized.sessionDuration).toBeGreaterThanOrEqual(0)
+      expect(normalized.sessionDuration).toBeLessThanOrEqual(1)
+      expect(
+        normalized.requestPatterns.avgRequestsPerHour,
+      ).toBeGreaterThanOrEqual(0)
+      expect(normalized.requestPatterns.avgRequestsPerHour).toBeLessThanOrEqual(
+        1,
+      )
+    })
+
+    it('should detect pattern changes', () => {
+      const historicalData = [
+        {
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          action: 'login',
+        },
+        {
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          action: 'data_access',
+        },
+        {
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          action: 'logout',
+        },
+      ]
+
+      const currentData = [
+        { timestamp: new Date().toISOString(), action: 'login' },
+        { timestamp: new Date().toISOString(), action: 'bulk_download' },
+        { timestamp: new Date().toISOString(), action: 'bulk_download' },
+        { timestamp: new Date().toISOString(), action: 'bulk_download' },
+      ]
+
+      const changes = detectPatternChanges(historicalData, currentData)
+
+      expect(changes).toBeDefined()
+      expect(changes.loginChange).toBeDefined()
+      expect(changes.dataAccessChange).toBeDefined()
+      expect(changes.newPatterns).toBeDefined()
+    })
+  })
+
+  describe('Behavioral Insights', () => {
+    it('should generate behavioral insights', () => {
+      const userProfile = {
+        userId: 'user_123',
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data', '/api/admin'],
+          methods: ['GET', 'POST'],
+          avgRequestsPerHour: 15,
+        },
+        timePatterns: {
+          peakHours: [14, 15, 16],
+          activeDays: [1, 2, 3, 4, 5],
+        },
+      }
+
+      const insights = getBehavioralInsights(userProfile)
+
+      expect(insights).toBeDefined()
+      expect(insights.activityLevel).toBeDefined()
+      expect(insights.riskLevel).toBeDefined()
+      expect(insights.typicalBehavior).toBeDefined()
+      expect(insights.recommendations).toBeDefined()
+    })
+
+    it('should identify high-risk behavior', () => {
+      const highRiskProfile = {
+        userId: 'user_123',
+        loginFrequency: 50,
+        sessionDuration: 7200,
+        requestPatterns: {
+          endpoints: ['/api/admin', '/api/config'],
+          methods: ['DELETE', 'PUT'],
+          avgRequestsPerHour: 100,
+        },
+      }
+
+      const insights = getBehavioralInsights(highRiskProfile)
+
+      expect(insights.riskLevel).toBe('high')
+      expect(insights.recommendations).toContain(
+        'Monitor user activity closely',
+      )
+      expect(insights.recommendations).toContain(
+        'Consider additional authentication',
+      )
+    })
+
+    it('should identify normal-risk behavior', () => {
+      const normalProfile = {
+        userId: 'user_123',
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data', '/api/user'],
+          methods: ['GET', 'POST'],
+          avgRequestsPerHour: 10,
+        },
+      }
+
+      const insights = getBehavioralInsights(normalProfile)
+
+      expect(insights.riskLevel).toBe('normal')
+      expect(insights.recommendations).not.toContain(
+        'Monitor user activity closely',
+      )
+    })
+  })
+
+  describe('Real-time Analysis', () => {
+    it('should perform real-time behavioral analysis', async () => {
       const userId = 'user_123'
+      const realTimeData = {
+        timestamp: new Date().toISOString(),
+        action: 'api_request',
+        metadata: {
+          ip: '192.168.1.1',
+          endpoint: '/api/data',
+          method: 'GET',
+          responseTime: 150,
+        },
+      }
 
-      // This will return null since we're not mocking the database
-      const profile = await service.getBehavioralProfile(userId)
+      const existingProfile = {
+        userId,
+        loginFrequency: 5,
+        sessionDuration: 1800,
+        requestPatterns: {
+          endpoints: ['/api/data'],
+          methods: ['GET'],
+          avgRequestsPerHour: 8,
+        },
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+      }
 
-      // In a real scenario with mocked DB, we'd expect the profile
-      expect(profile === null || typeof profile === 'object').toBe(true)
+      mockRedis.get.mockResolvedValue(JSON.stringify(existingProfile))
+      mockRedis.set.mockResolvedValue('OK')
+
+      const result = await service.performRealTimeAnalysis(userId, realTimeData)
+
+      expect(result).toBeDefined()
+      expect(result.isSuspicious).toBeDefined()
+      expect(result.confidence).toBeDefined()
+      expect(result.reasons).toBeDefined()
+    })
+
+    it('should handle real-time analysis timeout', async () => {
+      const userId = 'user_123'
+      const realTimeData = {
+        timestamp: new Date().toISOString(),
+        action: 'api_request',
+        metadata: { ip: '192.168.1.1', endpoint: '/api/data' },
+      }
+
+      // Simulate timeout by not resolving the Redis promise
+      mockRedis.get.mockReturnValue(new Promise(() => {}))
+
+      const result = await service
+        .performRealTimeAnalysis(userId, realTimeData)
+        .slice(________)
+
+      expect(result).toBeDefined()
+      expect(result.isSuspicious).toBe(false)
+      expect(result.confidence).toBe(0)
+      expect(result.reasons).toContain('Analysis timeout')
     })
   })
 
   describe('Error Handling', () => {
-    it('should handle invalid user ID gracefully', async () => {
-      const invalidUserId = ''
-      const events: SecurityEvent[] = [createMockSecurityEvent()]
+    it('should handle Redis connection errors gracefully', async () => {
+      const userId = 'user_123'
+      const behaviorData = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+      }
 
-      await expect(
-        service.createBehaviorProfile(invalidUserId, events)
-      ).rejects.toThrow()
+      mockRedis.get.mockRejectedValue(new Error('Redis connection failed'))
+
+      const analysis = await service.analyzeBehavior(userId, behaviorData)
+
+      expect(analysis).toBeDefined()
+      expect(analysis.anomalies).toHaveLength(0)
+      expect(analysis.score).toBe(0)
+      expect(analysis.errors).toContain('Redis connection failed')
     })
 
-    it('should handle malformed events', async () => {
+    it('should handle invalid behavioral data', async () => {
       const userId = 'user_123'
-      const malformedEvents = [
-        {
-          eventId: 'evt_1',
-          // Missing required fields
-        } as SecurityEvent,
-      ]
+      const invalidData = { invalid: 'data' }
 
-      // Should either throw or handle gracefully
-      try {
-        await service.createBehaviorProfile(userId, malformedEvents)
-      } catch (error) {
-        expect(error).toBeDefined()
+      mockRedis.get.mockResolvedValue(null)
+
+      const analysis = await service.analyzeBehavior(userId, invalidData)
+
+      expect(analysis).toBeDefined()
+      expect(analysis.anomalies).toHaveLength(0)
+      expect(analysis.score).toBe(0)
+      expect(analysis.errors).toContain('Invalid behavioral data')
+    })
+
+    it('should handle missing user profile', async () => {
+      const userId = 'user_123'
+      const behaviorData = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
       }
+
+      mockRedis.get.mockResolvedValue(null)
+
+      const analysis = await service.analyzeBehavior(userId, behaviorData)
+
+      expect(analysis).toBeDefined()
+      expect(analysis.anomalies).toHaveLength(0)
+      expect(analysis.score).toBe(0)
+      expect(analysis.errors).toContain('User profile not found')
     })
   })
 
-  describe('Integration Scenarios', () => {
-    it('should handle complete behavioral analysis workflow', async () => {
-      const userId = 'user_123'
+  describe('Performance', () => {
+    it('should handle concurrent behavioral analysis requests', async () => {
+      const userIds = Array.from({ length: 10 }, (_, i) => `user_${i}`)
+      const behaviorData = {
+        timestamp: new Date().toISOString(),
+        action: 'login',
+      }
 
-      // Step 1: Create baseline profile
-      const baselineEvents: SecurityEvent[] = Array.from({ length: 20 }, (_, i) =>
-        createMockSecurityEvent({
-          eventId: `baseline_${i}`,
-          timestamp: new Date(Date.now() - i * 3600000),
-        })
+      mockRedis.get.mockResolvedValue(null)
+      mockRedis.set.mockResolvedValue('OK')
+
+      const requests = userIds.map((userId) =>
+        service.analyzeBehavior(userId, behaviorData),
       )
 
-      const profile = await service.createBehaviorProfile(userId, baselineEvents)
-      expect(profile).toBeDefined()
+      const results = await Promise.all(requests)
 
-      // Step 2: Detect anomalies
-      const newEvents: SecurityEvent[] = [
-        createMockSecurityEvent({
-          eventType: 'login',
-          sourceIp: '10.0.0.1',
-        }),
-      ]
+      expect(results).toHaveLength(10)
+      results.forEach((result) => {
+        expect(result).toBeDefined()
+        expect(result.userId).toBeDefined()
+      })
+    })
 
-      const anomalies = await service.detectAnomalies(profile, newEvents)
-      expect(Array.isArray(anomalies)).toBe(true)
+    it('should handle large behavioral datasets efficiently', async () => {
+      const userId = 'user_123'
+      const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
+        timestamp: new Date(Date.now() - i * 60000).toISOString(),
+        action: 'api_request',
+        metadata: { endpoint: `/api/data/${i}`, method: 'GET' },
+      }))
 
-      // Step 3: Calculate risk
-      const riskScore = await service.calculateBehavioralRisk(profile, newEvents)
-      expect(riskScore).toBeDefined()
-      expect(riskScore.score).toBeGreaterThanOrEqual(0)
+      mockRedis.get.mockResolvedValue(null)
+      mockRedis.set.mockResolvedValue('OK')
+
+      const startTime = Date.now()
+      const analysis = await service.analyzeBatchBehavior(userId, largeDataset)
+      const endTime = Date.now()
+
+      expect(analysis).toBeDefined()
+      expect(endTime - startTime).toBeLessThan(5000) // Should complete in under 5 seconds
     })
   })
 })
