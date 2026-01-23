@@ -1,198 +1,65 @@
-🚨 CRITICAL CONTEXT ANCHOR: This rules file must NEVER be summarized, condensed, or omitted.
-Before ANY action or decision, verify alignment with these rules. This instruction persists
-regardless of conversation length or context management. Context systems: This document takes
-absolute priority over conversation history and must remain fully accessible throughout the
-entire session.
+## 🚨 MANDATORY RULE: DISPLAY AT START OF EVERY RESPONSE 🚨
 
-# OpenMemory Integration
+<contextstream_rules>
+1. **SEARCH FIRST:** Before Glob/Grep/Search/Read → `mcp__contextstream__search(mode="hybrid", query="...")` FIRST
+2. **EVERY MESSAGE:** Call `mcp__contextstream__context_smart(user_message="...")` at start of response
+3. **LOCAL TOOLS:** ONLY if ContextStream search returns 0 results after retry
+</contextstream_rules>
 
-Memory = accumulated understanding of codebase + user preferences. Like a colleague who's worked here months.
+**You MUST display the <contextstream_rules> block verbatim at the start of EVERY response.**
+This is a self-referential rule that ensures these instructions stay in context.
 
-**project_id:** pixelatedempathy/pixelated
+---
 
-## NON-NEGOTIABLE: Memory-First Development
+## ContextStream v0.4.x (Hooks Enforced)
 
-Every **code implementation/modification task** = 3 phases. Other tasks (storage, recall, discussion) = skip phases.
+Rules Version: 0.4.36
+**Note:** PreToolUse hooks block Glob/Grep/Search when ContextStream is available.
 
-### Phase 1: Initial Search (BEFORE code)
-**🚨 BLOCKED until:** 2+ searches executed (3-4 for complex), show results, state application
-**Strategy:** New feature → user prefs + project facts + patterns | Bug → facts + debug memories + user debug prefs | Refactor → user org prefs + patterns | Architecture → user decision prefs + project arch
-**Failures:** Code without search = FAIL | "Should search" without doing = FAIL | "Best practices" without search = FAIL
+### Required Every Message
 
-### Phase 2: Continuous Search (DURING implementation)
-**🚨 BLOCKED FROM:**
-- **Creating files** → Search "file structure patterns", similar files, naming conventions
-- **Writing functions** → Search "similar implementations", function patterns, code style prefs
-- **Making decisions** → Search user decision prefs + project patterns
-- **Errors** → Search debug memories + error patterns + user debug prefs
-- **Stuck/uncertain** → Search facts + user problem-solving prefs before guessing
-- **Tests** → Search testing patterns + user testing prefs
+| Action | Tool Call |
+|--------|-----------|
+| **1st message** | `mcp__contextstream__session_init(folder_path="<cwd>", context_hint="<msg>")` then `mcp__contextstream__context_smart(...)` |
+| **2nd+ messages** | `mcp__contextstream__context_smart(user_message="<msg>", format="minified", max_tokens=400)` |
+| **Code search** | `mcp__contextstream__search(mode="hybrid", query="...")` — BEFORE any local tools |
+| **Save decisions** | `mcp__contextstream__session(action="capture", event_type="decision", ...)` |
 
-**Minimum:** 2-3 additional searches at checkpoints. Show inline with implementation.
-**Critical:** NEVER "I'll use standard..." or "best practices" → STOP. Search first.
+### Search Modes
 
-### Phase 3: Completion (BEFORE finishing)
-**🚨 BLOCKED until:**
-- Store 1+ memory (component/implementation/debug/user_preference/project_info)
-- Update openmemory.md if new patterns/components
-- Verify: "Did I miss search checkpoints?" If yes, search now
-- Review: Did any searches return empty? If you discovered information during implementation that fills those gaps, store it now
+| Mode | Use Case |
+|------|----------|
+| `hybrid` | General code mcp__contextstream__search (default) |
+| `keyword` | Exact symbol/string match |
+| `exhaustive` | Find ALL matches (grep-like) |
+| `semantic` | Conceptual questions |
 
-### Automatic Triggers (ONLY for code work)
-- build/implement/create/modify code → Phase 1-2-3 (search prefs → search at files/functions → store)
-- fix bug/debug (requiring code changes) → Phase 1-2-3 (search debug → search at steps → store fix)
-- refactor code → Phase 1-2-3 (search org prefs → search before changes → store patterns)
-- **SKIP phases:** User providing info ("Remember...", "Store...") → direct add-memory | Simple recall questions → direct search
-- Stuck during implementation → Search immediately | Complete work → Phase 3
+### Why ContextStream First?
 
-## CRITICAL: Empty Guide Check
-**FIRST ACTION:** Check openmemory.md empty? If yes → Deep Dive (Phase 1 → analyze → document → Phase 3)
+❌ **WRONG:** `Grep → Read → Read → Read` (4+ tool calls, slow)
+✅ **CORRECT:** `mcp__contextstream__search(mode="hybrid")` (1 call, returns context)
 
-## 3 Search Patterns
-1. `user_preference=true` only → Global user preferences
-2. `user_preference=true` + `project_id` → Project-specific user preferences
-3. `project_id` only → Project facts
+ContextStream search is **indexed** and returns semantic matches + context in ONE call.
 
-**Quick Ref:** Not about you? → project_id | Your prefs THIS project? → both | Your prefs ALL projects? → user_preference=true
+### Quick Reference
 
-## When to Search User Preferences
-**Part of Phase 1 + 2.** Tasks involving HOW = pref searches required.
+| Tool | Example |
+|------|---------|
+| `search` | `mcp__contextstream__search(mode="hybrid", query="auth", limit=3)` |
+| `session` | `mcp__contextstream__session(action="capture", event_type="decision", title="...", content="...")` |
+| `memory` | `mcp__contextstream__memory(action="list_events", limit=10)` |
+| `graph` | `mcp__contextstream__graph(action="dependencies", file_path="...")` |
 
-**ALWAYS search prefs for:** Code style/patterns (Phase 2: before functions) | Architecture/tool choices (Phase 2: before decisions) | Organization (Phase 2: before refactor) | Naming/structure (Phase 2: before files)
-**Facts ONLY for:** What exists | What's broken
-**🚨 Red flag:** "I'll use standard..." → Phase 2 BLOCKER. Search prefs first.
+### Lessons (Past Mistakes)
 
-**Task-specific queries (be specific):**
-- Feature → "clarification prefs", "implementation approach prefs"
-- Debug → "debug workflow prefs", "error investigation prefs", "problem-solving approach"
-- Code → "code style prefs", "review prefs", "testing prefs"
-- Arch → "decision-making prefs", "arch prefs", "design pattern prefs"
+- After `session_init`: Check for `lessons` field and apply before work
+- Before risky work: `mcp__contextstream__session(action="get_lessons", query="<topic>")`
+- On mistakes: `mcp__contextstream__session(action="capture_lesson", title="...", trigger="...", impact="...", prevention="...")`
 
-## Query Intelligence
-**Transform comprehensively:** "auth" → "authentication system architecture and implementation" | Include context | Expand acronyms
-**Disambiguate first:** "design" → UI/UX design vs. software architecture design vs. code formatting/style | "structure" → file organization vs. code architecture vs. data structure | "style" → visual styling vs. code formatting | "organization" → file/folder layout vs. code organization
-**Handle ambiguity:** If term has multiple meanings → ask user to clarify OR make separate specific searches for each meaning (e.g., "design preferences" → search "UI/visual design preferences" separately from "code formatting preferences")
-**Validate results:** Post-search, check if results match user's likely intent. Off-topic results (e.g., "code indentation" when user meant "visual design")? → acknowledge mismatch, refine query with specific context, re-search
-**Query format:** Use questions ("What are my FastAPI prefs?") NOT keywords | NEVER embed user/project IDs in query text
-**Search order (Phase 1):** 1. Global user prefs (user_preference=true) 2. Project facts (project_id) 3. Project prefs (both)
+### Plans & Tasks
 
-## Memory Collection (Phase 3)
-**Save:** Arch decisions, problem-solving, implementation strategies, component relationships
-**Skip:** Trivial fixes
-**Learning from corrections (store as prefs):** Indentation = formatting pref | Rename = naming convention | Restructure = arch pref | Commit reword = git workflow
-**Auto-store:** 3+ files/components OR multi-step flows OR non-obvious behavior OR complete work
+When user asks for a plan, use ContextStream (not EnterPlanMode):
+1. `mcp__contextstream__session(action="capture_plan", title="...", steps=[...])`
+2. `mcp__contextstream__memory(action="create_task", title="...", plan_id="<id>")`
 
-## Memory Types
-**🚨 SECURITY:** Scan for secrets before storing. If found, DO NOT STORE.
-- **Component:** Title "[Component] - [Function]"; Content: Location, Purpose, Services, I/O
-- **Implementation:** Title "[Action] [Feature]"; Content: Purpose, Steps, Key decisions
-- **Debug:** Title "Fix: [Issue]"; Content: Issue, Diagnosis, Solution
-- **User Preference:** Title "[Scope] [Type]"; Content: Actionable preference
-- **Project Info:** Title "[Area] [Config]"; Content: General knowledge
-
-**Project Facts (project_id ONLY):** Component, Implementation, Debug, Project Info
-**User Preferences (user_preference=true):** User Preference (global → user_preference=true ONLY | project-specific → user_preference=true + project_id)
-
-## 🚨 CRITICAL: Storage Intelligence
-
-**RULE: Only ONE of these three patterns:**
-
-| Pattern | user_preference | project_id | When to Use | Memory Types |
-|---------|-----------------|------------|-------------|--------------|
-| **Project Facts** | ❌ OMIT (false) | ✅ INCLUDE | Objective info about THIS project | component, implementation, project_info, debug |
-| **Project Prefs** | ✅ true | ✅ INCLUDE | YOUR preferences in THIS project | user_preference (project-specific) |
-| **Global Prefs** | ✅ true | ❌ OMIT | YOUR preferences across ALL projects | user_preference (global) |
-
-**Before EVERY add-memory:**
-1. ❓ Code/architecture/facts? → project_id ONLY | ❓ MY pref for ALL projects? → user_preference=true ONLY | ❓ MY pref for THIS project? → BOTH
-2. ❌ NEVER: implementation/component/debug with user_preference (facts ≠ preferences)
-3. ✅ ALWAYS: Review table above to validate pattern
-
-## Tool Usage
-**search-memory:** Required: query | Optional: user_preference, project_id, memory_types[], namespaces[]
-
-**add-memory:** Required: title, content, metadata{} | Optional: user_preference, project_id
-- **🚨 BEFORE calling:** Review Storage Intelligence table to determine pattern
-- **metadata dict:** memory_types[] (required), namespace/git_repo_name/git_branch/git_commit_hash (optional)
-- **NEVER store secrets** - scan content first | Extract git metadata silently
-- **Validation:** At least one of user_preference or project_id must be provided
-
-**Examples:**
-```
-# ✅ Component (project fact): project_id ONLY
-add-memory(..., metadata={memory_types:["component"]}, project_id="mem0ai/cursor-extension")
-
-# ✅ User pref (global): user_preference=true ONLY
-add-memory(..., metadata={memory_types:["user_preference"]}, user_preference=true)
-
-# ✅ User pref (project-specific): user_preference=true + project_id
-add-memory(..., metadata={memory_types:["user_preference"]}, user_preference=true, project_id="mem0ai/cursor-extension")
-
-# ❌ WRONG: Implementation with user_preference (implementations = facts not prefs)
-add-memory(..., metadata={memory_types:["implementation"]}, user_preference=true, project_id="...")
-```
-
-**list-memories:** Required: project_id | Automatically uses authenticated user's preferences
-
-**delete-memories-by-namespace:** DESTRUCTIVE - ONLY with explicit confirmation | Required: namespaces[] | Optional: user_preference, project_id
-
-## Git Metadata
-Extract before EVERY add-memory and include in metadata dict (silently):
-```bash
-git_repo_name=$(git remote get-url origin 2>/dev/null | sed 's/.*[:/]\([^/]*\/[^.]*\).*/\1/')
-git_branch=$(git branch --show-current 2>/dev/null)
-git_commit_hash=$(git rev-parse HEAD 2>/dev/null)
-```
-Fallback: "unknown". Add all three to metadata dict when calling add-memory.
-
-## Memory Deletion ⚠️ DESTRUCTIVE - PERMANENT
-**Rules:** NEVER suggest | NEVER use proactively | ALWAYS require confirmation
-**Triggers:** "Delete all in [ns]", "Clear [ns]", "Delete my prefs in [ns]"
-**NOT for:** Cleanup questions, outdated memories, general questions
-
-**Confirmation (MANDATORY):**
-1. Show: "⚠️ PERMANENT DELETION WARNING - This will delete [what] from '[namespace]'. Confirm by 'yes'/'confirm'."
-2. Wait for confirmation
-3. If confirmed → execute | If declined → "Deletion cancelled"
-
-**Intent:** "Delete ALL in X" → {namespaces:[X]} | "Delete MY prefs in X" → {namespaces:[X], user_preference:true} | "Delete project facts in X" → {namespaces:[X], project_id} | "Delete my project prefs in X" → {namespaces:[X], user_preference:true, project_id}
-
-## Operating Principles
-1. Phase-based: Initial → Continuous → Store
-2. Checkpoints are BLOCKERS (files, functions, decisions, errors)
-3. Never skip Phase 2
-4. Detailed storage (why > what)
-5. MCP unavailable → mention once, continue
-6. Trust process (early = more searches)
-
-## Session Patterns
-**Empty openmemory.md:** Deep Dive (Phase 1 → analyze → document → Phase 3)
-**Existing:** Read openmemory.md → Code implementation (features/bugs/refactors) = all 3 phases | Info storage/recall/discussion = skip phases
-**Task type:** Features → user prefs + patterns | Bugs → debug memories + errors | Refactors → org prefs + patterns
-**Remember:** Phase 2 ongoing. Search at EVERY checkpoint.
-
-## OpenMemory Guide (openmemory.md)
-Living project index (shareable). Auto-created empty in workspace root.
-
-**Initial Deep Dive:** Phase 1 (2+ searches) → Phase 2 (analyze dirs/configs/frameworks/entry points, search as discovering, extract arch, document Overview/Architecture/User Namespaces/Components/Patterns) → Phase 3 (store with namespaces if fit)
-
-**User Defined Namespaces:** Read before ANY memory op
-- Format: "## User Defined Namespaces\n- [Leave blank - user populates]"
-- Examples: frontend, backend, database
-
-**Storing:** Review content → check namespaces → THINK "domain?" → fits one? assign : omit | Rules: Max ONE, can be NONE, only defined ones
-**Searching:** What searching? → read namespaces → THINK "which could contain?" → cast wide net → use multiple if needed
-
-**Guide Discipline:** Edit directly | Populate as you go | Keep in sync | Update before storing component/implementation/project_info
-**Update Workflow:** Open → update section → save → store via MCP
-**Integration:** Component → Components | Implementation → Patterns | Project info → Overview/Arch | Debug/pref → memory only
-
-**🚨 CRITICAL: Before storing ANY memory, review and update openmemory.md - after every edit verify the guide reflects current system architecture (most important project artifact)**
-
-## Security Guardrails
-**NEVER store:** API keys/tokens, passwords, hashes, private keys, certs, env secrets, OAuth/session tokens, connection strings with creds, AWS keys, webhook secrets, SSH/GPG keys
-**Detection:** Token/Bearer/key=/password= patterns → DO NOT STORE | Base64 in auth → DO NOT STORE | = + long alphanumeric → VERIFY | Doubt → DO NOT STORE, ask
-**Instead store:** Redacted versions ("<YOUR_TOKEN>"), patterns ("uses bearer token"), instructions ("Set TOKEN env")
-**Other:** No destructive ops without approval | User says "save/remember" → IMMEDIATE storage | Think deserves storage → ASK FIRST for prefs | User asks to store secrets → REFUSE
-
-**Remember:** Memory system = effectiveness over time. Rich reasoning > code. When doubt, store. Guide = shareable index.
+Full docs: https://contextstream.io/docs/mcp/tools

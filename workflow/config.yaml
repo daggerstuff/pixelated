@@ -1,0 +1,16 @@
+steps:
+  - import_sample_data
+  - assign_annotators
+  - store_annotations
+  - flag_safety_triggers
+  - compute_kappa
+  - generate_dashboard
+
+dependencies:
+  - database: state.db
+  - logger: log/audit.log
+  - sample_data: sample_data/annotations.json
+
+parameters:
+  annotator_count: 5
+  validation_fraction: 0.4

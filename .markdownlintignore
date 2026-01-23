@@ -1,0 +1,3 @@
+# Ignore line length issues in SKILL.md files since they contain many long lines
+# that are difficult to break without affecting readability
+**/SKILL.md
