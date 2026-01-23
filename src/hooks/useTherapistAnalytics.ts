@@ -14,9 +14,6 @@ import type {
 } from '@/types/analytics'
 import type { TherapistSession } from '@/types/dashboard'
 
-// Normalize logger shape because tests sometimes mock createBuildSafeLogger to return
-// a bare function (vi.fn()) or a partial object. Ensure we always have an object
-// with callable info/warn/error/debug methods to avoid runtime TypeErrors.
 const _rawLogger = createBuildSafeLogger('use-therapist-analytics')
 const normalizeLogger = (raw: unknown) => {
   const safeFn = (fn: unknown, fallback: (...args: any[]) => void) =>
@@ -30,28 +27,28 @@ const normalizeLogger = (raw: unknown) => {
       info: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (error) {
+        } catch {
           /* swallow */
         }
       },
       warn: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (error) {
+        } catch {
           /* swallow */
         }
       },
       error: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (error) {
+        } catch {
           /* swallow */
         }
       },
       debug: (...args: any[]) => {
         try {
           fn(...args)
-        } catch (error) {
+        } catch {
           /* swallow */
         }
       },
@@ -228,7 +225,12 @@ export function useTherapistAnalytics(
             return 0
         }
       })()
-      out = out.filter((s) => new Date(s.startTime).getTime() >= cutoff)
+      console.log(`DEBUG: now=${new Date(now).toISOString()}, cutoff=${new Date(cutoff).toISOString()}`)
+      out = out.filter((s) => {
+        const t = new Date(s.startTime).getTime()
+        console.log(`DEBUG: session=${s.startTime}, t=${t}, kept=${t >= cutoff}`)
+        return t >= cutoff
+      })
     }
 
     // skillCategory placeholder - if provided, filter sessions practicing skills in that category.
@@ -256,20 +258,20 @@ export function useTherapistAnalytics(
       const avgProgress =
         sessions.length > 0
           ? Math.round(
-              sessions.reduce((sum, s) => sum + s.progress, 0) /
-                sessions.length,
-            )
+            sessions.reduce((sum, s) => sum + s.progress, 0) /
+            sessions.length,
+          )
           : 0
 
       const avgDuration =
         sessions.length > 0
           ? Math.round(
-              sessions.reduce((sum, s) => {
-                const start = new Date(s.startTime)
-                const end = s.endTime ? new Date(s.endTime) : new Date()
-                return sum + (end.getTime() - start.getTime()) / 1000
-              }, 0) / sessions.length,
-            )
+            sessions.reduce((sum, s) => {
+              const start = new Date(s.startTime)
+              const end = s.endTime ? new Date(s.endTime) : new Date()
+              return sum + (end.getTime() - start.getTime()) / 1000
+            }, 0) / sessions.length,
+          )
           : 0
 
       return [
@@ -449,16 +451,8 @@ export function useTherapistAnalytics(
    * Load data when sessions change
    */
   useEffect(() => {
-    // If sessions is empty, ensure loading state is cleared and no analytics are generated.
-    // This prevents indefinite loading for empty datasets.
-    if (sessions.length === 0) {
-      setIsLoading(false)
-      setData(null)
-      setError(null)
-      logger.info('No sessions available, analytics data cleared')
-    } else {
-      loadData(true)
-    }
+    // Always load data, even if sessions is empty (will result in empty data structure)
+    void loadData(true)
   }, [sessions, loadData])
 
   // Auto-refresh (silent) based on options passed in via filters.config (if present)
@@ -491,7 +485,7 @@ export function useTherapistAnalytics(
 
     refreshIntervalRef.current = setInterval(() => {
       // silent refresh: do not toggle isLoading
-      loadData(false)
+      void loadData(false)
     }, config.refreshInterval)
 
     return () => {

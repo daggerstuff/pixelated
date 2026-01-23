@@ -4,7 +4,7 @@ import type { TherapistSession } from '@/types/dashboard'
 import { describe, expect, it, vi } from 'vitest'
 
 // Mock the logger
-vi.mock('../../lib/logging/build-safe-logger', () => ({
+vi.mock('@/lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => vi.fn(),
 }))
 
@@ -14,8 +14,8 @@ describe('useTherapistAnalytics', () => {
       id: 'session-1',
       clientId: 'client-1',
       therapistId: 'therapist-1',
-      startTime: '2025-01-01T10:00:00Z',
-      endTime: '2025-01-01T11:00:00Z',
+      startTime: '2026-01-01T10:00:00Z',
+      endTime: '2026-01-01T11:00:00Z',
       status: 'completed',
       progress: 85,
       progressMetrics: {
@@ -38,7 +38,7 @@ describe('useTherapistAnalytics', () => {
       id: 'session-2',
       clientId: 'client-2',
       therapistId: 'therapist-1',
-      startTime: '2025-01-02T10:00Z',
+      startTime: '2026-01-02T10:00Z',
       status: 'active' as const,
       progress: 60,
       progressMetrics: {
@@ -176,7 +176,8 @@ describe('useTherapistAnalytics', () => {
   })
 
   it('handles empty sessions array', async () => {
-    const { result } = renderHook(() => useTherapistAnalytics(mockFilters, []))
+    const emptySessions: TherapistSession[] = []
+    const { result } = renderHook(() => useTherapistAnalytics(mockFilters, emptySessions))
 
     // Wait for data to load
     await act(async () => {
@@ -241,7 +242,7 @@ describe('useTherapistAnalytics', () => {
       id: 'session-3',
       clientId: 'client-3',
       therapistId: 'therapist-1',
-      startTime: '2025-01-03T10:00Z',
+      startTime: '2026-01-03T10:00Z',
       status: 'completed' as const,
       progress: 95,
       progressMetrics: {
