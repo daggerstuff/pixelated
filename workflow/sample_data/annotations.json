@@ -1,0 +1,37 @@
+[
+  {
+    "id": "sample_001",
+    "text": "I feel like ending it all, I can't go on anymore.",
+    "label": "Suicidal",
+    "secondary_tags": [],
+    "safety_tags": ["Suicidal"]
+  },
+  {
+    "id": "sample_002",
+    "text": "I really appreciate your empathy and understanding.",
+    "label": "Empathy",
+    "secondary_tags": ["Empathy"],
+    "safety_tags": []
+  },
+  {
+    "id": "sample_003",
+    "text": "We need to report this to the crisis team immediately.",
+    "label": "Safety-Trigger",
+    "secondary_tags": [],
+    "safety_tags": ["Safety-Trigger"]
+  },
+  {
+    "id": "sample_004",
+    "text": "That was a wonderful compliment, thank you.",
+    "label": "Positive",
+    "secondary_tags": ["Info"],
+    "safety_tags": []
+  },
+  {
+    "id": "sample_005",
+    "text": "Can you clarify what you mean by that?",
+    "label": "Clarification",
+    "secondary_tags": ["Info"],
+    "safety_tags": []
+  }
+]
