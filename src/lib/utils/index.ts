@@ -139,3 +139,20 @@ export function validateFilename(
 
   return filename
 }
+
+/**
+ * Tries to require a module safely, returning null if not available or if require is not defined.
+ * Useful for optional Node.js dependencies in shared code.
+ */
+export function tryRequireNode(id: string): any {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof require !== 'undefined') {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      return require(id)
+    }
+  } catch {
+    // Ignore errors
+  }
+  return null
+}

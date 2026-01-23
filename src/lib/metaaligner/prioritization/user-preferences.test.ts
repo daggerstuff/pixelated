@@ -1,12 +1,20 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+// Mock logger to prevent console errors during tests
+vi.mock('../../logging/build-safe-logger', () => ({
+  createBuildSafeLogger: () => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  }),
+}))
 import {
   UserPreferenceManager,
   applyUserPreferences,
   DEFAULT_PREFERENCES,
   type UserPreferences,
-  type SupportStyle,
   type RiskSensitivity,
-  type VerbosityLevel,
 } from './user-preferences'
 import type { ObjectivePriority } from './context-objective-mapping'
 
@@ -303,11 +311,11 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      
+
       // After normalization, empathy should have higher weight than safety
       const empathy = result.find(obj => obj.key === 'empathy')
       const safety = result.find(obj => obj.key === 'safety')
-      
+
       expect(empathy).toBeDefined()
       expect(safety).toBeDefined()
       expect(empathy!.weight).toBeGreaterThan(safety!.weight)
@@ -339,7 +347,7 @@ describe('applyUserPreferences', () => {
 
       const result = applyUserPreferences(objectives, prefs)
       const conciseness = result.find(obj => obj.key === 'conciseness')!
-      const baseline = createBaseObjectives().find(obj => obj.key === 'conciseness')!
+
 
       // After boosting and normalization, should still be relatively higher
       expect(conciseness).toBeDefined()
@@ -366,7 +374,7 @@ describe('applyUserPreferences', () => {
 
       const result = applyUserPreferences(objectives, prefs)
       expect(result).toHaveLength(objectives.length)
-      
+
       const sum = result.reduce((acc, obj) => acc + obj.weight, 0)
       expect(sum).toBeCloseTo(1.0, 4)
     })
@@ -523,14 +531,14 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      
+
       // Should have all objectives except disabled ones
       expect(result.length).toBeGreaterThan(0)
-      
+
       // Weights should sum to 1
       const sum = result.reduce((acc, obj) => acc + obj.weight, 0)
       expect(sum).toBeCloseTo(1.0, 4)
-      
+
       // Safety should be boosted (high risk + prioritized)
       const safety = result.find(obj => obj.key === 'safety')!
       expect(safety).toBeDefined()
@@ -540,7 +548,6 @@ describe('applyUserPreferences', () => {
     it('should handle conflicting preferences gracefully', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        verbosityLevel: 'concise', // Boosts conciseness
         verbosityLevel: 'detailed', // Boosts informativeness (would override)
         interactionPreferences: {
           preferSummaries: true, // Also boosts conciseness
@@ -548,7 +555,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      
+
       // Should still normalize properly
       const sum = result.reduce((acc, obj) => acc + obj.weight, 0)
       expect(sum).toBeCloseTo(1.0, 4)
@@ -578,7 +585,7 @@ describe('applyUserPreferences', () => {
       ]
 
       const result = applyUserPreferences(objectives, {})
-      
+
       // Should distribute equally when all weights are 0
       expect(result[0]!.weight).toBeCloseTo(0.5, 4)
       expect(result[1]!.weight).toBeCloseTo(0.5, 4)
