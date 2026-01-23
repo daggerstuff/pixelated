@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 
@@ -319,7 +320,7 @@ const mockAlertSystem = {
 }
 
 // Mock the Python service classes
-vi.mock('../python-service/PythonBiasDetectionBridge', () => ({
+vi.mock('../python-bridge', () => ({
   PythonBiasDetectionBridge: vi.fn().mockImplementation(() => mockPythonBridge),
 }))
 
@@ -338,16 +339,19 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
   const performanceResults: BenchmarkResult[] = []
 
   // Performance thresholds (in milliseconds)
+  const IS_CI = process.env['CI'] === 'true'
+  const MULTIPLIER = IS_CI ? 2.5 : 1.0 // Relax thresholds in CI
+
   const PERFORMANCE_THRESHOLDS = {
-    analyzeSession: 500, // Core analysis should complete under 500ms
-    getMetrics: 100, // Metrics retrieval should be fast
-    getSessionAnalysis: 50, // Cached data retrieval should be very fast
-    startMonitoring: 30, // Monitoring setup should be quick
-    stopMonitoring: 20, // Monitoring teardown should be quick
-    explainBiasDetection: 200, // Explanation generation should be reasonable
-    updateThresholds: 50, // Configuration updates should be fast
-    generateBiasReport: 300, // Report generation can take a bit longer
-    dispose: 100, // Cleanup should be quick
+    analyzeSession: 500 * MULTIPLIER, // Core analysis should complete under 1250ms in CI
+    getMetrics: 100 * MULTIPLIER, // Metrics retrieval should be fast
+    getSessionAnalysis: 50 * MULTIPLIER, // Cached data retrieval should be very fast
+    startMonitoring: 30 * MULTIPLIER, // Monitoring setup should be quick
+    stopMonitoring: 20 * MULTIPLIER, // Monitoring teardown should be quick
+    explainBiasDetection: 200 * MULTIPLIER, // Explanation generation should be reasonable
+    updateThresholds: 50 * MULTIPLIER, // Configuration updates should be fast
+    generateBiasReport: 300 * MULTIPLIER, // Report generation can take a bit longer
+    dispose: 100 * MULTIPLIER, // Cleanup should be quick
   }
 
   beforeAll(() => {

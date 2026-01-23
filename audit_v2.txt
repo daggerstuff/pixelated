@@ -1,0 +1,12 @@
+ WARN  post https://registry.npmjs.org/-/npm/v1/security/audits error (ERR_SOCKET_TIMEOUT). Will retry in 10 seconds. 2 retries left.
+ WARN  post https://registry.npmjs.org/-/npm/v1/security/audits error (EAI_AGAIN). Will retry in 1 minute. 1 retries left.
+ EAI_AGAIN  request to https://registry.npmjs.org/-/npm/v1/security/audits failed, reason: getaddrinfo EAI_AGAIN registry.npmjs.org
+
+FetchError: request to https://registry.npmjs.org/-/npm/v1/security/audits failed, reason: getaddrinfo EAI_AGAIN registry.npmjs.org
+    at ClientRequest.<anonymous> (/snapshot/dist/pnpm.cjs)
+    at ClientRequest.emit (node:events:518:28)
+    at TLSSocket.socketErrorListener (node:_http_client:495:9)
+    at TLSSocket.emit (node:events:530:35)
+    at emitErrorNT (node:internal/streams/destroy:169:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)

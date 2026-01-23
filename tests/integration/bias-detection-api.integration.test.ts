@@ -157,7 +157,7 @@ describe('Bias Detection API Integration Tests', () => {
 
         // Mock global.fetch
         global.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
-          const urlStr = input.toString()
+          const urlStr = String(input)
           const url = new URL(urlStr)
           const path = url.pathname
           const method = init?.method || 'GET'
@@ -1273,8 +1273,7 @@ describe('Bias Detection API Integration Tests', () => {
       )
 
       expect(exportResponse.status).toBe(200)
-      const exportBlob = await exportResponse.blob()
-      const exportText = await exportBlob.text()
+      const exportText = await exportResponse.text()
       const exportData = JSON.parse(exportText)
 
       // Verify the analyzed session is included in the export
@@ -1444,7 +1443,7 @@ describe('Bias Detection API Integration Tests', () => {
 
       // Should either succeed or fail gracefully with proper error response
       if (response.status !== 200) {
-        expect(response.status).toBeOneOf([500, 503])
+        expect([500, 503]).toContain(response.status)
         const data: ApiResponse = await response.json()
         expect(data.success).toBe(false)
         expect(data.error).toBeDefined()
