@@ -126,10 +126,49 @@ if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONUR
 
   # Validate Azure URL accessibility; fall back to GitHub via SSH if not accessible
   if remote_accessible "$SUBMODULE_URL"; then
-    echo "✅ Azure submodule remote is accessible"
+    echo "✅ Azure submodule remote (SSH) is accessible"
   else
-    echo "##[warning]⚠️ Azure submodule remote not accessible. Falling back to GitHub (SSH): $SUBMODULE_URL_GITHUB"
-    SUBMODULE_URL="$SUBMODULE_URL_GITHUB"
+    echo "##[warning]⚠️ Azure submodule remote (SSH) not accessible."
+    
+    # Try Azure HTTPS if token is available
+    AZURE_HTTPS_SUCCESS="false"
+    if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+      echo "🔄 Attempting Azure HTTPS with SYSTEM_ACCESSTOKEN..."
+      # Use 'build' as username
+      AZURE_HTTPS_URL="https://build:${SYSTEM_ACCESSTOKEN}@dev.azure.com/${AZ_ORG}/${AZ_PROJECT}/_git/ai"
+      if remote_accessible "$AZURE_HTTPS_URL"; then
+        echo "✅ Azure submodule remote (HTTPS) is accessible"
+        SUBMODULE_URL="$AZURE_HTTPS_URL"
+        AZURE_HTTPS_SUCCESS="true"
+      else
+        echo "⚠️ Azure HTTPS access failed"
+      fi
+    else
+      echo "ℹ️ No SYSTEM_ACCESSTOKEN available for Azure HTTPS fallback"
+    fi
+
+    if [[ "$AZURE_HTTPS_SUCCESS" != "true" ]]; then
+      echo "##[warning]⚠️ Azure remote failed. Falling back to GitHub..."
+      SUBMODULE_URL="$SUBMODULE_URL_GITHUB"
+      
+      # Check GitHub SSH
+      if ! remote_accessible "$SUBMODULE_URL"; then
+         echo "⚠️ GitHub SSH access failed. Checking for GITHUB_TOKEN..."
+         # Try GitHub HTTPS
+         if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+            echo "🔄 Attempting GitHub HTTPS with GITHUB_TOKEN..."
+            GITHUB_HTTPS_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_OWNER}/ai.git"
+            if remote_accessible "$GITHUB_HTTPS_URL"; then
+               echo "✅ GitHub submodule remote (HTTPS) is accessible"
+               SUBMODULE_URL="$GITHUB_HTTPS_URL"
+            else
+               echo "❌ GitHub HTTPS access failed"
+            fi
+         else
+            echo "ℹ️ No GITHUB_TOKEN available for GitHub HTTPS fallback"
+         fi
+      fi
+    fi
   fi
 
   # Diagnostic check for SSH access if using SSH
@@ -156,7 +195,16 @@ else
 fi
 
 # Update git config for this repo only to override submodule URL
-echo "Submodule URL selected: $SUBMODULE_URL"
+# Update git config for this repo only to override submodule URL
+# Redact token from log output
+SAFE_URL="$SUBMODULE_URL"
+if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+  SAFE_URL="${SAFE_URL//$SYSTEM_ACCESSTOKEN/***}"
+fi
+if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+  SAFE_URL="${SAFE_URL//$GITHUB_TOKEN/***}"
+fi
+echo "Submodule URL selected: $SAFE_URL"
 
 # 1. Sync first to ensure local config matches .gitmodules (resets structure)
 git submodule sync
