@@ -8,7 +8,6 @@ import * as jwt from 'jsonwebtoken'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { logger } from '../logger'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
@@ -231,7 +230,7 @@ export async function validateToken(
 
     // Filter out PHI/PII from userInfo before returning
     // Remove email, name, picture and other identifiable information
-    const { email, name, picture, nickname, given_name, family_name, ...filteredUserInfo } = userInfo
+    const { email: _email, name: _name, picture: _picture, nickname: _nickname, given_name: _given_name, family_name: _family_name, ...filteredUserInfo } = userInfo
     const safePayload = { ...filteredUserInfo, ...payload }
 
     return {
