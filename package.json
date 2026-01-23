@@ -358,6 +358,7 @@
     "jsdom": "^27.4.0",
     "lint-staged": "^16.2.7",
     "madge": "^8.0.0",
+    "markdownlint-cli": "^0.47.0",
     "mdast-util-directive": "^3.1.0",
     "mdast-util-to-string": "^4.0.0",
     "medium-zoom": "^1.1.0",
