@@ -249,6 +249,7 @@ stages:
             continueOnError: true
             env:
               VITEST_COVERAGE_ENABLED: 'true'
+              NODE_ENV: 'test'
 
           - task: PublishTestResults@2
             inputs:
@@ -258,9 +259,8 @@ stages:
               failTaskOnFailedTests: false
             displayName: 'Publish Test Results'
 
-          - task: PublishCodeCoverageResults@1
+          - task: PublishCodeCoverageResults@2
             inputs:
-              codeCoverageTool: 'Cobertura'
               summaryFileLocation: 'coverage/cobertura-coverage.xml'
             displayName: 'Publish Code Coverage'
 
