@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TherapistDashboard } from '../TherapistDashboard'
 
+import type { TherapistSession } from '@/types/dashboard'
 import { describe, expect, it, vi } from 'vitest'
 
 // Mock child components
@@ -11,9 +12,8 @@ vi.mock('../AnalyticsCharts', () => ({
 }))
 
 vi.mock('../SessionControls', () => ({
-  SessionControls: () => (
-    <div data-testid="session-controls">Session Controls</div>
-  ),
+  __esModule: true,
+  default: () => <div data-testid="session-controls">Session Controls</div>,
 }))
 
 vi.mock('../TherapistProgressTracker', () => ({
@@ -23,9 +23,8 @@ vi.mock('../TherapistProgressTracker', () => ({
 }))
 
 vi.mock('../TherapyProgressCharts', () => ({
-  TherapyProgressCharts: () => (
-    <div data-testid="therapy-charts">Therapy Charts</div>
-  ),
+  __esModule: true,
+  default: () => <div data-testid="therapy-charts">Therapy Charts</div>,
 }))
 
 // Mock the useTherapistAnalytics hook
@@ -44,6 +43,18 @@ vi.mock('@/hooks/useTherapistAnalytics', () => ({
     clearError: vi.fn(),
   })),
 }))
+
+const mockSessions: TherapistSession[] = [
+  {
+    id: 'session-1',
+    clientId: 'client-1',
+    therapistId: 'therapist-1',
+    startTime: '2025-01-01T10:00:00Z',
+    endTime: '2025-01-01T11:00:00Z',
+    status: 'completed',
+    progress: 85,
+  },
+]
 
 describe('TherapistDashboard', () => {
   it('renders dashboard heading', () => {

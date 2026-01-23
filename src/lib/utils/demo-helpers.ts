@@ -592,6 +592,11 @@ const generateBrowserRandomValues = (array: Uint32Array): void => {
 /**
  * Generate random values using Node.js crypto
  */
+import { tryRequireNode } from './index'
+
+/**
+ * Generate random values using Node.js crypto
+ */
 const generateNodeRandomValues = (array: Uint32Array): void => {
   if (!hasNodeCrypto()) {
     return
@@ -600,8 +605,6 @@ const generateNodeRandomValues = (array: Uint32Array): void => {
   // Use tryRequireNode from utils to avoid bundlers including `crypto` in frontend bundles
   // Import dynamically to prevent circular import at module-eval time
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { tryRequireNode } =
-    require('@/lib/utils') as typeof import('@/lib/utils')
   const crypto = tryRequireNode('crypto') || require('crypto')
   const buf = crypto.randomBytes(8)
   array[0] = buf.readUInt32LE(0)
