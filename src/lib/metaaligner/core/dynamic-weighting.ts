@@ -7,7 +7,7 @@
 
 import { ContextType, AlignmentContext } from './objectives'
 import { getContextMapperService } from '../config/context-mapper-service'
-import { ObjectiveId } from '../config/mapping-config'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('dynamic-weighting')
@@ -19,26 +19,26 @@ export interface DynamicWeightingConfig {
   // Blending parameters
   blendingEnabled: boolean
   blendingAlpha: number // 0-1, how much new weights blend with previous (0 = no smoothing, 1 = full smoothing)
-  
+
   // Crisis override
   crisisOverrideEnabled: boolean
   crisisOverrideThreshold: number // Confidence threshold for crisis override (0-1)
-  
+
   // Hysteresis parameters
   hysteresisEnabled: boolean
   hysteresisThreshold: number // Minimum weight change to trigger update (0-1)
   hysteresisWindow: number // Number of turns to consider for stability
-  
+
   // Stability guards
   stabilityGuardEnabled: boolean
   maxWeightChangePerTurn: number // Maximum weight change per turn (0-1)
   oscillationDetectionWindow: number // Number of turns to check for oscillation
   oscillationThreshold: number // Number of direction changes to consider oscillation
-  
+
   // Performance
   enableCaching: boolean
   cacheTTLMs: number // Cache time-to-live in milliseconds
-  
+
   // Normalization
   normalizeWeights: boolean
 }
@@ -83,22 +83,22 @@ interface OscillationTracker {
 export const DEFAULT_DYNAMIC_WEIGHTING_CONFIG: DynamicWeightingConfig = {
   blendingEnabled: true,
   blendingAlpha: 0.3, // 30% smoothing - responsive but stable
-  
+
   crisisOverrideEnabled: true,
   crisisOverrideThreshold: 0.8,
-  
+
   hysteresisEnabled: true,
   hysteresisThreshold: 0.05, // 5% minimum change
   hysteresisWindow: 3,
-  
+
   stabilityGuardEnabled: true,
   maxWeightChangePerTurn: 0.2, // Max 20% change per turn
   oscillationDetectionWindow: 5,
   oscillationThreshold: 3, // 3+ direction changes = oscillation
-  
+
   enableCaching: true,
   cacheTTLMs: 100, // 100ms cache
-  
+
   normalizeWeights: true,
 }
 
@@ -114,10 +114,10 @@ export class DynamicWeightingEngine {
     context: ContextType | null
     timestamp: number
   } = {
-    weights: null,
-    context: null,
-    timestamp: 0,
-  }
+      weights: null,
+      context: null,
+      timestamp: 0,
+    }
 
   constructor(config?: Partial<DynamicWeightingConfig>) {
     this.config = { ...DEFAULT_DYNAMIC_WEIGHTING_CONFIG, ...config }
@@ -136,9 +136,9 @@ export class DynamicWeightingEngine {
     if (this.config.enableCaching && this.isCacheValid(context)) {
       const cachedWeights = this.cache.weights!
       const updateTime = performance.now() - startTime
-      
+
       reasoning.push(`Cached weights used (${updateTime.toFixed(2)}ms)`)
-      
+
       return {
         weights: cachedWeights,
         context: context.detectedContext,
@@ -157,7 +157,7 @@ export class DynamicWeightingEngine {
     const mappingResult = mapperService.getWeightsForContext(
       context.detectedContext,
     )
-    
+
     let newWeights = { ...mappingResult.weights }
     reasoning.push(...mappingResult.reasoning)
 
@@ -173,18 +173,18 @@ export class DynamicWeightingEngine {
         `Crisis override applied (confidence: ${context.confidence.toFixed(2)})`,
       )
       crisisOverrideApplied = true
-      
+
       // Update cache and history
       this.updateCache(context.detectedContext, newWeights)
       this.addToHistory(context, newWeights)
-      
+
       const updateTime = performance.now() - startTime
-      
+
       logger.info('Crisis override applied', {
         updateTimeMs: updateTime,
         confidence: context.confidence,
       })
-      
+
       return {
         weights: newWeights,
         context: context.detectedContext,
@@ -200,7 +200,7 @@ export class DynamicWeightingEngine {
 
     // Get previous weights for smoothing
     const previousWeights = this.getPreviousWeights()
-    
+
     let blendingApplied = false
     let hysteresisApplied = false
     let stabilityGuardApplied = false
@@ -218,7 +218,7 @@ export class DynamicWeightingEngine {
     // Detect oscillation
     if (this.config.stabilityGuardEnabled && previousWeights) {
       oscillationDetected = this.detectOscillation(newWeights, previousWeights)
-      
+
       if (oscillationDetected) {
         // Increase smoothing to dampen oscillation
         newWeights = this.applyBlending(
@@ -236,7 +236,7 @@ export class DynamicWeightingEngine {
         newWeights,
         previousWeights,
       )
-      
+
       if (!this.weightsEqual(guardedWeights, newWeights)) {
         newWeights = guardedWeights
         stabilityGuardApplied = true
@@ -252,7 +252,7 @@ export class DynamicWeightingEngine {
         newWeights,
         previousWeights,
       )
-      
+
       if (!changeSignificant) {
         newWeights = previousWeights
         hysteresisApplied = true
@@ -382,9 +382,11 @@ export class DynamicWeightingEngine {
     const threshold = this.config.oscillationThreshold
 
     // Only check if we have enough history
-    if (this.weightHistory.length < window) {
-      return false
-    }
+    // We remove the early return here because we want to update trackers cumulatively
+    // even before the window is full.
+    // if (this.weightHistory.length < window) {
+    //   return false
+    // }
 
     // Track direction changes for each objective
     for (const [objectiveId, newValue] of Object.entries(newWeights)) {
