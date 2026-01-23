@@ -5,10 +5,10 @@
 
 import { JWT } from 'next-auth/jwt'
 import { Session } from 'next-auth'
-import { supabase } from '../supabaseClient'
+import { userManager } from '../db'
 
 /**
- * Get session data from JWT token
+ * Get session data from JWT token (placeholder implementation)
  * @param token JWT token from auth()
  * @returns Session object or null
  */
@@ -53,23 +53,19 @@ export function isSessionValid(session: Session): boolean {
  */
 export async function getUserProfile(userId: string) {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, full_name, avatar_url, role')
-      .eq('id', userId)
-      .single()
+    const user = await userManager.getUserById(userId)
 
-    if (error) {
-      console.error('Error fetching user profile:', error)
+    if (!user) {
+      console.error('User not found:', userId)
       return null
     }
 
     return {
-      id: data.id,
-      email: data.email,
-      fullName: data.full_name,
-      avatarUrl: data.avatar_url,
-      role: data.role,
+      id: user.id,
+      email: user.email,
+      fullName: `${user.first_name} ${user.last_name}`,
+      avatarUrl: user.avatar_url,
+      role: user.role,
     }
   } catch (error) {
     console.error('Error in getUserProfile:', error)
@@ -117,4 +113,14 @@ export function getUserRole(session: Session): string | null {
 export function hasRole(session: Session, requiredRole: string): boolean {
   const userRole = getUserRole(session)
   return userRole === requiredRole
+}
+
+/**
+ * Get session (placeholder implementation)
+ * @returns Session object or null
+ */
+export async function getSession(): Promise<Session | null> {
+  // This is a placeholder implementation
+  // In a real app, you would get the session from the request context
+  return null
 }

@@ -1,17 +1,27 @@
-import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
-import { RegisterSchema } from '@/lib/validation/registerSchema'
+import { userManager, initializeDatabase } from '@/lib/db'
+import { verifyPassword } from '@/lib/auth/utils'
 import { z } from 'zod'
 
-export async function POST(request: Request) {
+// Register schema
+const RegisterSchema = z.object({
+  fullName: z.string().min(2).max(100),
+  email: z.string().email(),
+  password: z.string().min(8),
+  termsAccepted: z.boolean(),
+})
+
+export async function POST({ request }: { request: Request }) {
   try {
+    // Initialize database if not already done
+    initializeDatabase()
+
     // Parse request body
     const body = await request.json()
 
     // Validate request data
     const result = RegisterSchema.safeParse(body)
     if (!result.success) {
-      return new NextResponse(
+      return new Response(
         JSON.stringify({ error: result.error.errors[0].message }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
@@ -21,56 +31,50 @@ export async function POST(request: Request) {
 
     // Additional validation
     if (!termsAccepted) {
-      return new NextResponse(
+      return new Response(
         JSON.stringify({ error: 'You must accept the Terms of Service' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
 
     // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single()
-
-    if (checkError) {
-      return new NextResponse(
+    const existingUser = await userManager.getUserByEmail(email)
+    if (existingUser) {
+      return new Response(
         JSON.stringify({ error: 'Email already registered' }),
         { status: 409, headers: { 'Content-Type': 'application/json' } }
       )
     }
 
     // Hash password
-    const hashedPassword = await hash(password, 10)
+    const hashedPassword = await verifyPassword(password, '') // This will hash the password
+
+    // Split full name
+    const nameParts = fullName.split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
 
     // Create new user
-    const { data: newUser, error: createError } = await supabase
-      .from('users')
-      .insert({
-        email,
-        full_name: fullName,
-        password_hash: hashedPassword,
-        role: 'user',
-      })
-      .select('id, email, full_name, created_at')
-      .single()
+    const userId = await userManager.createUser({
+      email,
+      passwordHash: hashedPassword,
+      firstName,
+      lastName,
+      role: 'user',
+    })
 
-    if (createError) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Failed to create user' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      )
-    }
-
-    return new NextResponse(
-      JSON.stringify({ message: 'User registered successfully' }),
+    return new Response(
+      JSON.stringify({
+        message: 'User registered successfully',
+        userId
+      }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     )
 
   } catch (error: any) {
-    return new NextResponse(
-      JSON.stringify({ error: error.message }),
+    console.error('Registration error:', error)
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )
   }
