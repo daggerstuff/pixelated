@@ -6,6 +6,7 @@
 /.azure-artifacts/
 /build-errors.md
 /.vite/
+/.cursor/
 
 # === NODE/NPM/PNPM ARTIFACTS ===
 node_modules/
