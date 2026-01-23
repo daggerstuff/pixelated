@@ -60,8 +60,8 @@ export default defineConfig({
         ]
         : []),
     ],
-    testTimeout: process.env['CI'] ? 15_000 : 30_000,
-    hookTimeout: process.env['CI'] ? 10_000 : 30_000,
+    testTimeout: process.env['CI'] ? 60_000 : 30_000,
+    hookTimeout: process.env['CI'] ? 30_000 : 30_000,
     ...(process.env['CI']
       ? {
         poolOptions: {

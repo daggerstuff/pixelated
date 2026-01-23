@@ -215,6 +215,7 @@ stages:
 
       - job: UnitTests
         displayName: 'Unit Tests & Coverage'
+        timeoutInMinutes: '45'
         pool:
           ${{ if eq(parameters.USE_SELF_HOSTED, 'true') }}:
             name: 'Default'

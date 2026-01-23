@@ -550,7 +550,68 @@ vi.mock('@/lib/security/audit', () => ({
     DLP_ALLOWED: 'DLP_ALLOWED',
     DLP_BLOCKED: 'DLP_BLOCKED',
     DLP_REDACTED: 'DLP_REDACTED',
+    CREATE: 'CREATE',
+    SECURITY: 'SECURITY',
   },
+}))
+
+// Mock backup security manager
+vi.mock('@/lib/security/backup', () => {
+  const mockBackupManager = {
+    getInstance: vi.fn().mockReturnValue({
+      initialize: vi.fn().mockResolvedValue(undefined),
+      createBackup: vi.fn().mockResolvedValue('test-backup-id'),
+      verifyBackup: vi.fn().mockResolvedValue(true),
+      restoreBackup: vi.fn().mockResolvedValue(true),
+      getStorageProvider: vi.fn().mockReturnValue({
+        initialize: vi.fn().mockResolvedValue(undefined),
+        listFiles: vi.fn().mockResolvedValue([]),
+        storeFile: vi.fn().mockResolvedValue(undefined),
+        getFile: vi.fn().mockResolvedValue(new Uint8Array()),
+        deleteFile: vi.fn().mockResolvedValue(undefined),
+      }),
+    }),
+  }
+  
+  return {
+    BackupSecurityManager: mockBackupManager,
+    default: mockBackupManager,
+    // Mock types as well
+    BackupType: {
+      FULL: 'FULL',
+      DIFFERENTIAL: 'DIFFERENTIAL',
+      TRANSACTION: 'TRANSACTION',
+      INCREMENTAL: 'INCREMENTAL',
+    },
+    BackupStatus: {
+      PENDING: 'PENDING',
+      COMPLETED: 'COMPLETED',
+      FAILED: 'FAILED',
+    },
+    StorageLocation: {
+      PRIMARY: 'PRIMARY',
+      SECONDARY: 'SECONDARY',
+      TERTIARY: 'TERTIARY',
+    },
+  }
+})
+
+// Mock storage providers wrapper
+vi.mock('@/lib/security/backup/storage-providers-wrapper', () => ({
+  getStorageProvider: vi.fn().mockResolvedValue({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    listFiles: vi.fn().mockResolvedValue([]),
+    storeFile: vi.fn().mockResolvedValue(undefined),
+    getFile: vi.fn().mockResolvedValue(new Uint8Array()),
+    deleteFile: vi.fn().mockResolvedValue(undefined),
+  }),
+  createMockStorageProvider: vi.fn().mockReturnValue({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    listFiles: vi.fn().mockResolvedValue([]),
+    storeFile: vi.fn().mockResolvedValue(undefined),
+    getFile: vi.fn().mockResolvedValue(new Uint8Array()),
+    deleteFile: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 // Mock crypto for FHE tests
