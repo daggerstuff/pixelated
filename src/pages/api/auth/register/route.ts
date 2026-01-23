@@ -2,17 +2,14 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabaseClient'
 import { RegisterSchema } from '@/lib/validation/registerSchema'
 import { z } from 'zod'
-import { hash } from 'bcrypt'
-import { validate } from '@/lib/validation/validator'
-import { AuthError } from '@/lib/errors/AuthError'
-
-const schema = RegisterSchema
 
 export async function POST(request: Request) {
   try {
+    // Parse request body
     const body = await request.json()
-    const result = schema.safeParse(body)
 
+    // Validate request data
+    const result = RegisterSchema.safeParse(body)
     if (!result.success) {
       return new NextResponse(
         JSON.stringify({ error: result.error.errors[0].message }),
@@ -22,7 +19,7 @@ export async function POST(request: Request) {
 
     const { fullName, email, password, termsAccepted } = result.data
 
-    // Check if terms were accepted
+    // Additional validation
     if (!termsAccepted) {
       return new NextResponse(
         JSON.stringify({ error: 'You must accept the Terms of Service' }),
@@ -72,15 +69,8 @@ export async function POST(request: Request) {
     )
 
   } catch (error: any) {
-    if (error instanceof AuthError) {
-      return new NextResponse(
-        JSON.stringify({ error: error.message }),
-        { status: error.statusCode || 400, headers: { 'Content-Type': 'application/json' } }
-      )
-    }
-
     return new NextResponse(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: error.message }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )
   }

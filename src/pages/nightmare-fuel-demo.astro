@@ -380,15 +380,16 @@ const trainingMetrics = {
   document.addEventListener('DOMContentLoaded', () => {
     const elements = document.querySelectorAll('.animation-delay-1000, .animation-delay-1500, .animation-delay-2000, .animation-delay-3000')
     elements.forEach((el, index) => {
-      if (el.classList.contains('animation-delay-1000')) el.style.animationDelay = '1s'
-      if (el.classList.contains('animation-delay-1500')) el.style.animationDelay = '1.5s'
-      if (el.classList.contains('animation-delay-2000')) el.style.animationDelay = '2s'
-      if (el.classList.contains('animation-delay-3000')) el.style.animationDelay = '3s'
+      const element = el as HTMLElement
+      if (element.classList.contains('animation-delay-1000')) element.style.animationDelay = '1s'
+      if (element.classList.contains('animation-delay-1500')) element.style.animationDelay = '1.5s'
+      if (element.classList.contains('animation-delay-2000')) element.style.animationDelay = '2s'
+      if (element.classList.contains('animation-delay-3000')) element.style.animationDelay = '3s'
     })
   })
 </script>
 
-<script>
+<script define:vars={{ nightmareScenarios }}>
   // Demo JavaScript - Interactive Simulation
   let currentScenario = null
   let sessionActive = false
@@ -438,31 +439,37 @@ const trainingMetrics = {
   }
 
   // Start Demo
-  startDemoBtn.addEventListener('click', () => {
-    welcomeModal.style.display = 'flex'
-  })
+  if (startDemoBtn) {
+    startDemoBtn.addEventListener('click', () => {
+      if (welcomeModal) welcomeModal.style.display = 'flex'
+    })
+  }
 
   // Accept Warning
-  acceptBtn.addEventListener('click', () => {
-    welcomeModal.style.display = 'none'
-    demoInterface.classList.remove('hidden')
-    startSessionTimer()
-    sessionActive = true
-  })
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', () => {
+      if (welcomeModal) welcomeModal.style.display = 'none'
+      if (demoInterface) demoInterface.classList.remove('hidden')
+      startSessionTimer()
+      sessionActive = true
+    })
+  }
 
   // Decline Warning
-  declineBtn.addEventListener('click', () => {
-    welcomeModal.style.display = 'none'
-    // Redirect to safe page or show exit message
-    alert('Training session declined. Redirecting to safety resources...')
-    window.location.href = '/'
-  })
+  if (declineBtn) {
+    declineBtn.addEventListener('click', () => {
+      if (welcomeModal) welcomeModal.style.display = 'none'
+      // Redirect to safe page or show exit message
+      alert('Training session declined. Redirecting to safety resources...')
+      window.location.href = '/'
+    })
+  }
 
   // Scenario Selection
   scenarioItems.forEach(item => {
     item.addEventListener('click', () => {
       const scenarioId = item.dataset.scenario
-      loadScenario(scenarioId)
+      if (scenarioId) loadScenario(scenarioId)
     })
   })
 
@@ -614,8 +621,8 @@ const trainingMetrics = {
         clearInterval(timer)
       }
 
-      bar.style.width = `${current}%`
-      value.textContent = `${Math.round(current)}%`
+      if (bar) bar.style.width = `${current}%`
+      if (value) value.textContent = `${Math.round(current)}%`
     }, 100)
   }
 
@@ -638,23 +645,25 @@ const trainingMetrics = {
   const counselorInput = document.getElementById('counselorInput')
   const sendResponseBtn = document.getElementById('sendResponseBtn')
 
-  sendResponseBtn.addEventListener('click', () => {
-    const response = counselorInput.value.trim()
-    if (!response || !currentScenario) return
+  if (sendResponseBtn) {
+    sendResponseBtn.addEventListener('click', () => {
+      const response = counselorInput?.value.trim()
+      if (!response || !currentScenario) return
 
-    // Add counselor response to conversation
-    addCounselorResponse(response)
-    counselorInput.value = ''
+      // Add counselor response to conversation
+      addCounselorResponse(response)
+      if (counselorInput) counselorInput.value = ''
 
-    // Generate AI response based on scenario
-    setTimeout(() => {
-      const responses = aiResponses[currentScenario.id]
-      if (responses) {
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)]
-        typeResponse(randomResponse)
-      }
-    }, 1500)
-  })
+      // Generate AI response based on scenario
+      setTimeout(() => {
+        const responses = aiResponses[currentScenario.id]
+        if (responses) {
+          const randomResponse = responses[Math.floor(Math.random() * responses.length)]
+          typeResponse(randomResponse)
+        }
+      }, 1500)
+    })
+  }
 
   // Add Counselor Response
   function addCounselorResponse(text) {
@@ -699,7 +708,10 @@ const trainingMetrics = {
   // End Session
   function endSession() {
     sessionActive = false
-    clearInterval(sessionTimer)
+    if (sessionTimer !== null) {
+      clearInterval(sessionTimer)
+      sessionTimer = null
+    }
 
     // Show completion modal
     alert('Training session complete! Your performance metrics have been recorded.')
@@ -709,49 +721,65 @@ const trainingMetrics = {
   }
 
   // Emergency Button
-  document.getElementById('emergencyBtn').addEventListener('click', () => {
-    const alertPanel = document.getElementById('alertPanel')
-    const alertText = document.getElementById('alertText')
+  const emergencyBtn = document.getElementById('emergencyBtn')
+  if (emergencyBtn) {
+    emergencyBtn.addEventListener('click', () => {
+      const alertPanel = document.getElementById('alertPanel')
+      const alertText = document.getElementById('alertText')
 
-    alertPanel.classList.remove('hidden')
-    alertText.textContent = 'EMERGENCY PROTOCOL ACTIVATED - HUMAN SUPERVISION ALERTED'
+      if (alertPanel) alertPanel.classList.remove('hidden')
+      if (alertText) alertText.textContent = 'EMERGENCY PROTOCOL ACTIVATED - HUMAN SUPERVISION ALERTED'
 
-    setTimeout(() => {
-      alertPanel.classList.add('hidden')
-    }, 5000)
-  })
+      setTimeout(() => {
+        if (alertPanel) alertPanel.classList.add('hidden')
+      }, 5000)
+    })
+  }
 
   // Other Actions
-  document.getElementById('pauseBtn').addEventListener('click', () => {
-    const btn = document.getElementById('pauseBtn')
-    const isPaused = btn.textContent === 'RESUME'
+  const pauseBtn = document.getElementById('pauseBtn')
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', () => {
+      const isPaused = pauseBtn.textContent === 'RESUME'
 
-    btn.textContent = isPaused ? 'PAUSE' : 'RESUME'
-    btn.className = isPaused ? 'px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors' : 'px-4 py-2 bg-orange-600 text-white rounded font-semibold hover:bg-orange-700 transition-colors'
+      pauseBtn.textContent = isPaused ? 'PAUSE' : 'RESUME'
+      pauseBtn.className = isPaused ? 'px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors' : 'px-4 py-2 bg-orange-600 text-white rounded font-semibold hover:bg-orange-700 transition-colors'
 
-    // Toggle session active
-    sessionActive = isPaused
-  })
+      // Toggle session active
+      sessionActive = isPaused
+    })
+  }
 
-  document.getElementById('safetyModeBtn').addEventListener('click', () => {
-    alert('Safety mode engaged. Content intensity reduced by 60%.')
-  })
+  const safetyModeBtn = document.getElementById('safetyModeBtn')
+  if (safetyModeBtn) {
+    safetyModeBtn.addEventListener('click', () => {
+      alert('Safety mode engaged. Content intensity reduced by 60%.')
+    })
+  }
 
-  document.getElementById('debriefBtn').addEventListener('click', () => {
-    alert('Debrief session initiated. Processing secondary trauma prevention protocols...')
-  })
+  const debriefBtn = document.getElementById('debriefBtn')
+  if (debriefBtn) {
+    debriefBtn.addEventListener('click', () => {
+      alert('Debrief session initiated. Processing secondary trauma prevention protocols...')
+    })
+  }
 
-  document.getElementById('endSessionBtn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to end this training session?')) {
-      endSession()
-    }
-  })
+  const endSessionBtn = document.getElementById('endSessionBtn')
+  if (endSessionBtn) {
+    endSessionBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to end this training session?')) {
+        endSession()
+      }
+    })
+  }
 
   // Auto-resize textarea
-  counselorInput.addEventListener('input', () => {
-    counselorInput.style.height = 'auto'
-    counselorInput.style.height = counselorInput.scrollHeight + 'px'
-  })
+  if (counselorInput) {
+    counselorInput.addEventListener('input', () => {
+      counselorInput.style.height = 'auto'
+      counselorInput.style.height = counselorInput.scrollHeight + 'px'
+    })
+  }
 </script>
 
 <style>
