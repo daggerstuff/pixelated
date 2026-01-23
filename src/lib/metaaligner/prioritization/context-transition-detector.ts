@@ -72,6 +72,7 @@ export class ContextTransitionDetector {
   private history: ContextEvent[] = []
   private config: Required<TransitionDetectorConfig>
   private pendingTransitions: Map<ContextType, number> = new Map()
+  private lastConfirmedEvent: ContextEvent | null = null
 
   constructor(config: TransitionDetectorConfig = {}) {
     this.config = {
@@ -105,6 +106,7 @@ export class ContextTransitionDetector {
 
     // Detect transition if we have a previous context
     if (!previousEvent) {
+      this.lastConfirmedEvent = enrichedEvent
       return null
     }
 
@@ -118,12 +120,18 @@ export class ContextTransitionDetector {
     prev: ContextEvent,
     curr: ContextEvent,
   ): ContextTransition {
-    const contextChanged = prev.contextType !== curr.contextType
-    
+    // Use lastConfirmedEvent for stable comparison, falling back to prev if not set
+    const stableContext = this.lastConfirmedEvent?.contextType ?? prev.contextType
+    const contextChanged = stableContext !== curr.contextType
+
+    // Capture the 'from' event before any state updates
+    const fromEvent = this.lastConfirmedEvent ?? prev
+
+
     // Determine transition type
     let transitionType: ContextTransition['transitionType'] = 'none'
     let shouldSmooth = false
-    let {confidence} = curr
+    let { confidence } = curr
 
     if (contextChanged) {
       // Check for crisis elevation
@@ -134,10 +142,11 @@ export class ContextTransitionDetector {
         transitionType = 'crisis_elevation'
         shouldSmooth = false // Immediate transition for crisis
         confidence = 1.0 // High confidence for crisis elevation
+        this.lastConfirmedEvent = curr
       } else {
         // Standard transition - apply smoothing
         transitionType = 'standard'
-        
+
         // Check if confidence meets threshold
         if (curr.confidence >= this.config.minConfidenceThreshold) {
           // Track pending transition
@@ -147,6 +156,7 @@ export class ContextTransitionDetector {
           // Require multiple consecutive detections
           if (count >= this.config.smoothingWindow) {
             shouldSmooth = false // Transition confirmed
+            this.lastConfirmedEvent = curr
             this.pendingTransitions.clear()
           } else {
             shouldSmooth = true // Still smoothing
@@ -164,7 +174,7 @@ export class ContextTransitionDetector {
     }
 
     const transition: ContextTransition = {
-      from: prev,
+      from: fromEvent,
       to: curr,
       detected: contextChanged && !shouldSmooth,
       transitionType,
@@ -200,6 +210,7 @@ export class ContextTransitionDetector {
   clearHistory(): void {
     this.history = []
     this.pendingTransitions.clear()
+    this.lastConfirmedEvent = null
   }
 
   /**

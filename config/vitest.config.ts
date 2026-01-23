@@ -22,6 +22,16 @@ export default defineConfig({
     },
     conditions: ['node', 'import', 'module', 'default'],
   },
+  ...(process.env['CI']
+    ? {
+      poolOptions: {
+        threads: {
+          minThreads: 1,
+          maxThreads: 2,
+        },
+      },
+    }
+    : {}),
   test: {
     globals: true,
     environment: 'jsdom',
@@ -62,16 +72,6 @@ export default defineConfig({
     ],
     testTimeout: process.env['CI'] ? 60_000 : 30_000,
     hookTimeout: process.env['CI'] ? 30_000 : 30_000,
-    ...(process.env['CI']
-      ? {
-        poolOptions: {
-          threads: {
-            minThreads: 1,
-            maxThreads: 2,
-          },
-        },
-      }
-      : {}),
     environmentOptions: {
       jsdom: {
         resources: 'usable',
