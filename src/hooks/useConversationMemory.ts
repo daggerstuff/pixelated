@@ -22,8 +22,7 @@
 
 // Session timing/metrics logic (active/idle/paused/ended spans, durations, etc.)
 // Progress and milestone tracking (progress %, skill scores, milestones, etc.)
-import { useState, useRef, useEffect } from 'react'
-import { useSessionTimingMetrics } from './useSessionTimingMetrics'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSessionProgressMilestones } from './useSessionProgressMilestones'
 import type { SessionProgressMetrics } from '@/types/dashboard'
 
@@ -92,10 +91,12 @@ const DEFAULT_MEMORY = {
 } as const
 
 export function useConversationMemory(initialState?: Partial<MemoryState>) {
-  const [memory, setMemory] = useState<MemoryState>({
-    ...DEFAULT_MEMORY,
-    ...initialState,
-  } as MemoryState)
+  // Base memory state for history, context, and basic session state
+  const [baseMemory, setBaseMemory] = useState<ConversationMemory>({
+    history: initialState?.history ?? DEFAULT_MEMORY.history,
+    context: initialState?.context ?? DEFAULT_MEMORY.context,
+    sessionState: initialState?.sessionState ?? DEFAULT_MEMORY.sessionState,
+  })
 
   // Extracted session timing and metrics logic
   const sessionStartTimeRef = useRef<number>(Date.now())
@@ -103,13 +104,6 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   // Lazily track the timestamp of the last message. Start as null so the initial
   // mount -> first-message interval isn't treated as a response time.
   const lastMessageTimeRef = useRef<number | null>(null)
-
-  useSessionTimingMetrics(
-    memory.sessionState,
-    setMemory,
-    sessionStartTimeRef,
-    lastActiveTimeRef,
-  )
 
   // Progress/milestone logic extracted to hook
   const {
@@ -129,33 +123,52 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
     progressMetrics: initialState?.progressMetrics,
   })
 
+  // Actually, useSessionTimingMetrics is very simple, we can just inline its logic or update it.
+  // Given we can't easily change useSessionTimingMetrics without affecting other things,
+  // let's just inline the active time update effect here for clarity and correct state management.
+
+  useEffect(() => {
+    if (baseMemory.sessionState !== 'active') {
+      return
+    }
+
+    const interval = setInterval(() => {
+      const duration = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
+      const additionalActive = Math.floor((Date.now() - lastActiveTimeRef.current) / 1000)
+
+      setProgressState((prev: any) => ({
+        progressMetrics: {
+          ...prev.progressMetrics,
+          sessionDuration: duration,
+          activeTime: (prev.progressMetrics.activeTime ?? 0) + additionalActive
+        }
+      }))
+
+      lastActiveTimeRef.current = Date.now()
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [baseMemory.sessionState, setProgressState])
+
   /**
    * Adds a new message to the conversation history and updates progress metrics.
-   * - Increments message counts for therapist/client.
-   * - Updates running average response time.
-   * - Updates last message timestamp.
    */
-  const addMessage = (role: 'therapist' | 'client', message: string) => {
+  const addMessage = useCallback((role: 'therapist' | 'client', message: string) => {
     const currentTime = Date.now()
-    // If there's no previous message recorded, skip response-time calculation so
-    // the first message doesn't produce a skewed response time.
     const responseTime =
       lastMessageTimeRef.current === null
         ? null
         : (currentTime - lastMessageTimeRef.current) / 1000 // in seconds
 
-    setMemory((prev) => ({
+    setBaseMemory((prev) => ({
       ...prev,
       history: [...prev.history, { role, message }],
     }))
 
-    // Use the latest progressMetrics snapshot from the hook state rather than
-    // capturing a possibly-stale outer variable. This avoids race conditions
-    // when multiple callers update metrics in quick succession.
     setProgressState((prevState: any) => {
       const prevMetrics =
         prevState?.progressMetrics ??
-        (DEFAULT_MEMORY.progressMetrics as typeof prevState.progressMetrics)
+        (DEFAULT_MEMORY.progressMetrics as SessionProgressMetrics)
       const prevResponses = (prevMetrics.responsesCount ?? 0) as number
       const prevAvg = (prevMetrics.responseTime ?? 0) as number
 
@@ -170,7 +183,7 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
           role === 'client'
             ? (prevMetrics.clientMessages ?? 0) + 1
             : (prevMetrics.clientMessages ?? 0),
-      } as typeof prevMetrics
+      } as SessionProgressMetrics
 
       if (responseTime !== null) {
         const newResponses = prevResponses + 1
@@ -182,105 +195,62 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
       return { progressMetrics: updatedMetrics }
     })
 
-    // Record the timestamp for subsequent messages
     lastMessageTimeRef.current = currentTime
-  }
+  }, [setProgressState])
 
   /**
    * Updates the session state and synchronizes timing/metrics.
-   * - Handles transitions: idle→active, active→ended, active→paused.
-   * - Flushes active time and session duration as needed.
    */
-  const setSessionState = (state: ConversationMemory['sessionState']) => {
-    const prevState = memory.sessionState ?? 'idle'
+  const setSessionState = useCallback((state: ConversationMemory['sessionState']) => {
+    const prevState = baseMemory.sessionState
 
-    // Transition: non-active → active (immediate start)
+    setBaseMemory((prev) => ({ ...prev, sessionState: state }))
+
     if (state === 'active' && prevState !== 'active') {
       lastActiveTimeRef.current = Date.now()
-      setMemory((prev) => ({ ...prev, sessionState: state }))
-      setProgressState({ progressMetrics: { ...progressMetrics } })
-      return
-    }
-
-    // Transition: active → paused (flush active time)
-    if (prevState === 'active' && state === 'paused') {
+    } else if (prevState === 'active' && (state === 'paused' || state === 'ended')) {
       const now = Date.now()
       const elapsed = Math.floor((now - lastActiveTimeRef.current) / 1000)
-      setMemory((prev) => ({ ...prev, sessionState: state }))
+
+      const metricsUpdate: Partial<SessionProgressMetrics> = {
+        activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
+      }
+
+      if (state === 'ended') {
+        metricsUpdate.sessionDuration = Math.floor((now - sessionStartTimeRef.current) / 1000)
+      }
+
       setProgressState({
         progressMetrics: {
           ...progressMetrics,
-          activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
-        },
+          ...metricsUpdate
+        }
       })
-      return
     }
+  }, [baseMemory.sessionState, progressMetrics, setProgressState])
 
-    // Transition: active → ended (flush active time and set session duration)
-    if (prevState === 'active' && state === 'ended') {
-      const now = Date.now()
-      const elapsed = Math.floor((now - lastActiveTimeRef.current) / 1000)
-      setMemory((prev) => ({ ...prev, sessionState: state }))
-      setProgressState({
-        progressMetrics: {
-          ...progressMetrics,
-          activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
-          sessionDuration: Math.floor(
-            (now - sessionStartTimeRef.current) / 1000,
-          ),
-        },
-      })
-      return
-    }
-
-    // Default: other transitions simply update state and keep metrics as-is
-    setMemory((prev) => ({ ...prev, sessionState: state }))
-    setProgressState({ progressMetrics: { ...progressMetrics } })
-  }
-
-  const resetSession = () => {
+  const resetSession = useCallback(() => {
     sessionStartTimeRef.current = Date.now()
     lastActiveTimeRef.current = Date.now()
-    // Clear lastMessageTime so the next message is treated as the first.
-    // This ensures first-sample behavior is preserved after reset.
     lastMessageTimeRef.current = null
-    setMemory((prev) => ({
-      ...prev,
+    setBaseMemory({
       history: [],
       context: {},
       sessionState: 'idle',
-    }))
-
+    })
     resetProgress()
+  }, [resetProgress])
+
+  // Combined memory object that satisfies the MemoryState interface
+  const consolidatedMemory = {
+    ...baseMemory,
+    progress,
+    progressSnapshots,
+    progressMetrics,
   }
 
-  // Update session duration / active time every second only while active
-  useEffect(() => {
-    if (memory.sessionState !== 'active') {
-      return
-    }
-
-    const interval = setInterval(() => {
-      setMemory((prev) => ({
-        ...prev,
-        progressMetrics: {
-          ...prev.progressMetrics,
-          sessionDuration: Math.floor(
-            (Date.now() - sessionStartTimeRef.current) / 1000,
-          ),
-          activeTime:
-            (prev.progressMetrics.activeTime ?? 0) +
-            Math.floor((Date.now() - lastActiveTimeRef.current) / 1000),
-        },
-      }))
-      lastActiveTimeRef.current = Date.now()
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [memory.sessionState])
-
   return {
-    memory,
+    memory: consolidatedMemory,
     progress,
     progressSnapshots,
     progressMetrics,
@@ -292,6 +262,6 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
     updateConversationFlow,
     addMilestone,
     resetSession,
-    setMemory,
+    setMemory: setBaseMemory,
   }
 }

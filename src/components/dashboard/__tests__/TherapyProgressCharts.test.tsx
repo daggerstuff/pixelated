@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import TherapyProgressCharts from '../TherapyProgressCharts'
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
 import { describe, expect, it } from 'vitest'
@@ -7,7 +7,7 @@ describe('TherapyProgressCharts', () => {
   const mockData: TherapistAnalyticsChartData = {
     sessionMetrics: [
       {
-        date: '2025-01-01',
+        date: '2025-01-01T12:00:00Z',
         sessions: 1,
         therapistSessions: 1,
         averageSessionProgress: 75,
@@ -17,7 +17,7 @@ describe('TherapyProgressCharts', () => {
         averageResponseTime: 2.5,
       },
       {
-        date: '2025-01-02',
+        date: '2025-01-02T12:00:00Z',
         sessions: 1,
         therapistSessions: 1,
         averageSessionProgress: 85,
@@ -71,7 +71,7 @@ describe('TherapyProgressCharts', () => {
     ],
     comparativeData: {
       currentSession: {
-        date: '2025-01-02',
+        date: '2025-01-02T12:00:00Z',
         sessions: 1,
         therapistSessions: 1,
         averageSessionProgress: 85,
@@ -81,7 +81,7 @@ describe('TherapyProgressCharts', () => {
         averageResponseTime: 2.1,
       },
       previousSession: {
-        date: '2025-01-01',
+        date: '2025-01-01T12:00:00Z',
         sessions: 1,
         therapistSessions: 1,
         averageSessionProgress: 75,
@@ -108,16 +108,15 @@ describe('TherapyProgressCharts', () => {
 
     const timelineChart = screen
       .getByText('Session Progress Timeline')
-      .closest('div')
-    expect(timelineChart).toBeInTheDocument()
+      .parentElement!
 
     // Check that session dates are displayed
-    expect(screen.getByText('Jan 1')).toBeInTheDocument()
-    expect(screen.getByText('Jan 2')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('Jan 2')).toBeInTheDocument()
 
     // Check progress percentages
-    expect(screen.getByText('75%')).toBeInTheDocument()
-    expect(screen.getByText('85%')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('75%')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('85%')).toBeInTheDocument()
   })
 
   it('renders skill development radar chart', () => {
@@ -125,12 +124,11 @@ describe('TherapyProgressCharts', () => {
 
     const radarChart = screen
       .getByText('Skill Development Radar')
-      .closest('div')
-    expect(radarChart).toBeInTheDocument()
+      .parentElement!
 
     // Check that skills are displayed
-    expect(screen.getByText('Active Listening')).toBeInTheDocument()
-    expect(screen.getByText('Empathy')).toBeInTheDocument()
+    expect(within(radarChart).getByText('Active Listening')).toBeInTheDocument()
+    expect(within(radarChart).getByText('Empathy')).toBeInTheDocument()
   })
 
   it('renders session comparison with trend data', () => {
@@ -138,15 +136,14 @@ describe('TherapyProgressCharts', () => {
 
     const comparisonChart = screen
       .getByText('Session Comparison')
-      .closest('div')
-    expect(comparisonChart).toBeInTheDocument()
+      .parentElement!
 
     // Check trend indicator
-    expect(screen.getByText('↗ Improving')).toBeInTheDocument()
+    expect(within(comparisonChart).getByText('↗ Improving')).toBeInTheDocument()
 
     // Check session IDs
-    expect(screen.getByText('session-2')).toBeInTheDocument()
-    expect(screen.getByText('session-1')).toBeInTheDocument()
+    expect(within(comparisonChart).getByText('session-2')).toBeInTheDocument()
+    expect(within(comparisonChart).getByText('session-1')).toBeInTheDocument()
   })
 
   it('renders skill improvement timeline', () => {
@@ -154,16 +151,15 @@ describe('TherapyProgressCharts', () => {
 
     const timelineChart = screen
       .getByText('Skill Practice Timeline')
-      .closest('div')
-    expect(timelineChart).toBeInTheDocument()
+      .parentElement!
 
     // Check that skills are displayed in timeline
-    expect(screen.getByText('Active Listening')).toBeInTheDocument()
-    expect(screen.getByText('Empathy')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('Active Listening')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('Empathy')).toBeInTheDocument()
 
     // Check skill scores
-    expect(screen.getByText('85%')).toBeInTheDocument()
-    expect(screen.getByText('78%')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('85%')).toBeInTheDocument()
+    expect(within(timelineChart).getByText('78%')).toBeInTheDocument()
   })
 
   it('handles empty session metrics gracefully', () => {
@@ -254,8 +250,8 @@ describe('TherapyProgressCharts', () => {
     }
     render(<TherapyProgressCharts data={singleSessionData} />)
 
-    expect(screen.getByText('Session Progress Timeline')).toBeInTheDocument()
-    expect(screen.getByText('Jan 1')).toBeInTheDocument()
+    const timelineChart = screen.getByText('Session Progress Timeline').parentElement!
+    expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
   })
 
   it('sorts skills by sessions practiced in timeline', () => {

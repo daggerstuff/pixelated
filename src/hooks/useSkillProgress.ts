@@ -32,50 +32,61 @@ export function useSkillProgress(
 
     setLoading(true)
     setError(null)
-    ;(async () => {
-      try {
-        if (!session) {
-          if (mounted) {
-            setData([])
+      ; (async () => {
+        try {
+          if (!session) {
+            if (mounted) {
+              setData([])
+            }
+            return
           }
-          return
-        }
 
-        // If session directly contains skill progress, use it.
-        if ((session as any).skills && Array.isArray((session as any).skills)) {
-          const normalized = (session as any).skills.map((s: any) => ({
-            skill: String(s.skill || s.name || 'Unknown'),
-            score: Number(s.score ?? 0),
-            trend: s.trend === 'up' || s.trend === 'down' ? s.trend : 'stable',
-          })) as SkillProgress[]
+          // If session directly contains skill progress, use it.
+          if ((session as any).skills && Array.isArray((session as any).skills)) {
+            const normalized = (session as any).skills.map((s: any) => ({
+              skill: String(s.skill || s.name || 'Unknown'),
+              score: Number(s.score ?? 0),
+              trend: s.trend === 'up' || s.trend === 'down' ? s.trend : 'stable',
+            })) as SkillProgress[]
 
-          if (mounted) {
-            setData(normalized)
+            if (mounted) {
+              setData(normalized)
+            }
+          } else if (session.progressMetrics?.skillScores) {
+            const derived = Object.entries(session.progressMetrics.skillScores).map(
+              ([skill, score]) => ({
+                skill,
+                score,
+                trend: 'stable' as const,
+              }),
+            )
+            if (mounted) {
+              setData(derived)
+            }
+          } else {
+            // Placeholder: simulate fetching derived metrics from a local calculation or service
+            // In production, replace with an API call or a call to a context/service.
+            await new Promise((r) => setTimeout(r, 250))
+            const derived: SkillProgress[] = [
+              { skill: 'Active Listening', score: 0, trend: 'stable' },
+              { skill: 'Empathy', score: 0, trend: 'stable' },
+              { skill: 'Questioning', score: 0, trend: 'stable' },
+            ]
+
+            if (mounted) {
+              setData(derived)
+            }
           }
-        } else {
-          // Placeholder: simulate fetching derived metrics from a local calculation or service
-          // In production, replace with an API call or a call to a context/service.
-          await new Promise((r) => setTimeout(r, 250))
-          const derived: SkillProgress[] = [
-            { skill: 'Active Listening', score: 0, trend: 'stable' },
-            { skill: 'Empathy', score: 0, trend: 'stable' },
-            { skill: 'Questioning', score: 0, trend: 'stable' },
-          ]
-
+        } catch (err: any) {
           if (mounted) {
-            setData(derived)
+            setError(err instanceof Error ? err : new Error(String(err)))
+          }
+        } finally {
+          if (mounted) {
+            setLoading(false)
           }
         }
-      } catch (err: any) {
-        if (mounted) {
-          setError(err instanceof Error ? err : new Error(String(err)))
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false)
-        }
-      }
-    })()
+      })()
 
     return () => {
       mounted = false

@@ -22,16 +22,6 @@ export default defineConfig({
     },
     conditions: ['node', 'import', 'module', 'default'],
   },
-  ...(process.env['CI']
-    ? {
-      poolOptions: {
-        threads: {
-          minThreads: 1,
-          maxThreads: 2,
-        },
-      },
-    }
-    : {}),
   test: {
     globals: true,
     environment: 'jsdom',
@@ -102,9 +92,19 @@ export default defineConfig({
         'backups/**/*',
       ],
     },
-    isolate: !process.env['CI'],
-    ...(process.env['CI'] ? { watch: false } : {}),
-    ...(process.env['CI'] ? { bail: 10 } : {}),
+    isolate: true,
+    ...(process.env['CI']
+      ? {
+        watch: false,
+        bail: 10,
+        poolOptions: {
+          threads: {
+            minThreads: 1,
+            maxThreads: 2,
+          },
+        },
+      }
+      : {}),
   },
   build: {
     sourcemap: true,
