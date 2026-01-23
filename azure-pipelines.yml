@@ -233,6 +233,7 @@ stages:
             displayName: 'Install Dependencies'
 
           - script: |
+              export CI=true
               export VITEST_COVERAGE_ENABLED=true
               pnpm run test:unit
             displayName: 'Run Unit Tests with Coverage'

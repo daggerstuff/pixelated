@@ -879,6 +879,13 @@ export class BiasDetectionEngine {
       /* swallow */
     }
     try {
+      if (this.pythonService) {
+        await this.pythonService.dispose()
+      }
+    } catch {
+      /* swallow */
+    }
+    try {
       if (this.performanceOptimizer) {
         await this.performanceOptimizer.dispose()
       }
