@@ -11,6 +11,64 @@ SUBMODULE_PATH="ai"
 # Detect parent repo remote to derive org/owner dynamically
 PARENT_REMOTE_URL="$(git config --get remote.origin.url || echo)"
 
+# ------------------------------------------------------------------
+# Token Normalization Logic
+# Azure Pipelines leaves $(VAR) as literal text if undefined.
+# We must sanitize this before using it.
+# ------------------------------------------------------------------
+
+sanitize_token() {
+  local val="${1:-}"
+  local name="$2"
+  # If value looks like $(VAR), it's undefined
+  if [[ "$val" == "\$($name)" ]]; then
+    echo ""
+  else
+    echo "$val"
+  fi
+}
+
+# Resolve GITHUB_TOKEN from multiple possible variable names
+RESOLVED_GITHUB_TOKEN=""
+
+# 1. Try GITHUB_TOKEN
+CANDIDATE="$(sanitize_token "${GITHUB_TOKEN:-}" "GITHUB_TOKEN")"
+if [[ -n "$CANDIDATE" ]]; then RESOLVED_GITHUB_TOKEN="$CANDIDATE"; fi
+
+# 2. Try GH_TOKEN
+if [[ -z "$RESOLVED_GITHUB_TOKEN" ]]; then
+  CANDIDATE="$(sanitize_token "${GH_TOKEN:-}" "GH_TOKEN")"
+  if [[ -n "$CANDIDATE" ]]; then RESOLVED_GITHUB_TOKEN="$CANDIDATE"; fi
+fi
+
+# 3. Try GITHUB_PAT
+if [[ -z "$RESOLVED_GITHUB_TOKEN" ]]; then
+  CANDIDATE="$(sanitize_token "${GITHUB_PAT:-}" "GITHUB_PAT")"
+  if [[ -n "$CANDIDATE" ]]; then RESOLVED_GITHUB_TOKEN="$CANDIDATE"; fi
+fi
+
+# 4. Try G_TOKEN
+if [[ -z "$RESOLVED_GITHUB_TOKEN" ]]; then
+  CANDIDATE="$(sanitize_token "${G_TOKEN:-}" "G_TOKEN")"
+  if [[ -n "$CANDIDATE" ]]; then RESOLVED_GITHUB_TOKEN="$CANDIDATE"; fi
+fi
+
+# 5. Try AGENT_GITHUB_TOKEN (Pass-through from agent .env, not mapped in YAML)
+if [[ -z "$RESOLVED_GITHUB_TOKEN" ]]; then
+  if [[ -n "${AGENT_GITHUB_TOKEN:-}" ]]; then
+     RESOLVED_GITHUB_TOKEN="$AGENT_GITHUB_TOKEN"
+  fi
+fi
+
+# Export the winner as GITHUB_TOKEN for the rest of the script
+export GITHUB_TOKEN="$RESOLVED_GITHUB_TOKEN"
+
+if [[ -n "$GITHUB_TOKEN" ]]; then
+  echo "🔑 Found valid GitHub token (length: ${#GITHUB_TOKEN})"
+else
+  echo "ℹ️ No GitHub token found in GITHUB_TOKEN, GH_TOKEN, GITHUB_PAT, or G_TOKEN"
+fi
+
 # Helper: extract GitHub owner from parent remote
 extract_github_owner() {
   case "$1" in
@@ -205,6 +263,23 @@ if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONUR
             fi
          else
             echo "ℹ️ No GITHUB_TOKEN available for GitHub HTTPS fallback"
+         fi
+
+         # Final Fallback: Anonymous HTTPS (works if repo is public)
+         # We check if the currently selected SUBMODULE_URL is accessible; if not, try public
+         if ! remote_accessible "$SUBMODULE_URL"; then
+             echo "🔄 Attempting anonymous GitHub HTTPS (check if public)..."
+             GITHUB_PUBLIC_URL="https://github.com/${GITHUB_OWNER}/ai.git"
+             if remote_accessible "$GITHUB_PUBLIC_URL"; then
+                 echo "✅ GitHub submodule remote (Public HTTPS) is accessible"
+                 SUBMODULE_URL="$GITHUB_PUBLIC_URL"
+             else
+                 echo "❌ Public access failed."
+                 echo "##[error]Could not access submodule 'ai' via Azure SSH, Azure HTTPS, GitHub SSH, or GitHub HTTPS."
+                 echo "##[error]Please ensure 'GITHUB_TOKEN' (or GH_TOKEN, GITHUB_PAT) is set in the pipeline variables."
+                 echo "##[error]If the repo is private, a valid PAT with 'repo' scope is required."
+                 # Don't exit yet, let the git submodule update command fail naturally so we see the native error too
+             fi
          fi
       fi
     fi
