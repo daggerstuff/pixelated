@@ -52,7 +52,7 @@ parameters:
   - name: USE_SELF_HOSTED
     displayName: 'Use Self-Hosted Agent (Default Pool)'
     type: string
-    default: 'false'
+    default: 'true'
     values:
       - 'true'
       - 'false'
