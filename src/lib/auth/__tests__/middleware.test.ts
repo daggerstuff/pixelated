@@ -807,7 +807,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       const start = performance.now()
 
@@ -842,7 +842,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(null)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(null)
 
       const start1 = performance.now()
       await authenticateRequest(mockRequest)
