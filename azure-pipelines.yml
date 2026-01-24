@@ -304,6 +304,7 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               GITHUB_TOKEN: $(GITHUB_TOKEN)
+              G_TOKEN: $(G_TOKEN)
           - task: NodeTool@0
             inputs:
               versionSpec: '$(NODE_VERSION)'
