@@ -90,8 +90,21 @@ remote_accessible() {
   fi
   
   echo "    ⚠️ Connection check failed for $masked_url"
-  # Optional: run once more to capture stderr for logs (piping to cat to avoid failure exit code here)
-  # But prevent showing unmasked secrets. Git usually masks basic auth but let's be careful.
+  
+  # Capture and log stderr safely
+  local error_output
+  error_output=$(git ls-remote --exit-code "$url" HEAD 2>&1 || true)
+  
+  # Mask secrets in error output
+  if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+    error_output="${error_output//$SYSTEM_ACCESSTOKEN/***}"
+  fi
+  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    error_output="${error_output//$GITHUB_TOKEN/***}"
+  fi
+  
+  echo "    📄 Error details: $error_output"
+  
   return 1
 }
 
@@ -109,7 +122,7 @@ build_azure_url_from_parent() {
       ;;
     *)
       # Fall back to dynamically derived SSH URL
-      echo "${SUBMODULE_URL_AZURE_SSH}.git"
+      echo "${SUBMODULE_URL_AZURE_SSH}"
       ;;
   esac
 }
