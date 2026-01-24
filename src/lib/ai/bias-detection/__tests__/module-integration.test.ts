@@ -6,48 +6,50 @@ import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
 // Mock the entire Python bridge to avoid network calls
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    analyzeSession: vi.fn().mockResolvedValue({
-      sessionId: 'test-session',
-      overallBiasScore: 0.3,
-      alertLevel: 'medium',
-      layerResults: {
-        preprocessing: { biasScore: 0.2 },
-        modelLevel: { biasScore: 0.3 },
-        interactive: { biasScore: 0.4 },
-        evaluation: { biasScore: 0.3 },
-      },
-    }),
-    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
-    dispose: vi.fn().mockResolvedValue(undefined),
-    getDashboardMetrics: vi.fn().mockResolvedValue({
-      summary: {
-        total_sessions_analyzed: 10,
-        average_bias_score: 0.35,
-        alert_distribution: { low: 7, medium: 2, high: 1, critical: 0 },
-      },
-      trends: { daily_bias_scores: [], alert_counts: [] },
-      demographics: { bias_by_age_group: {}, bias_by_gender: {} },
-    }),
-    sendAnalysisMetric: vi.fn().mockResolvedValue(undefined),
-    sendMetricsBatch: vi.fn().mockResolvedValue(undefined),
-    recordReportMetric: vi.fn().mockResolvedValue(undefined),
-    getPerformanceMetrics: vi.fn().mockResolvedValue({
-      average_response_time: 120,
-      requests_per_second: 5.5,
-      error_rate: 0.01,
-      uptime_seconds: 3600,
-      health_status: 'healthy',
-    }),
-    getSessionData: vi.fn().mockResolvedValue({
-      sessionId: 'test-session',
-      overallBiasScore: 0.3,
-      alertLevel: 'low',
-    }),
-    storeMetrics: vi.fn().mockResolvedValue(undefined),
-    getAlertStatistics: vi.fn().mockResolvedValue({ total: 10, resolved: 8 }),
-  })),
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(function() {
+    return {
+      initialize: vi.fn().mockResolvedValue(undefined),
+      analyzeSession: vi.fn().mockResolvedValue({
+        sessionId: 'test-session',
+        overallBiasScore: 0.3,
+        alertLevel: 'medium',
+        layerResults: {
+          preprocessing: { biasScore: 0.2 },
+          modelLevel: { biasScore: 0.3 },
+          interactive: { biasScore: 0.4 },
+          evaluation: { biasScore: 0.3 },
+        },
+      }),
+      checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
+      dispose: vi.fn().mockResolvedValue(undefined),
+      getDashboardMetrics: vi.fn().mockResolvedValue({
+        summary: {
+          total_sessions_analyzed: 10,
+          average_bias_score: 0.35,
+          alert_distribution: { low: 7, medium: 2, high: 1, critical: 0 },
+        },
+        trends: { daily_bias_scores: [], alert_counts: [] },
+        demographics: { bias_by_age_group: {}, bias_by_gender: {} },
+      }),
+      sendAnalysisMetric: vi.fn().mockResolvedValue(undefined),
+      sendMetricsBatch: vi.fn().mockResolvedValue(undefined),
+      recordReportMetric: vi.fn().mockResolvedValue(undefined),
+      getPerformanceMetrics: vi.fn().mockResolvedValue({
+        average_response_time: 120,
+        requests_per_second: 5.5,
+        error_rate: 0.01,
+        uptime_seconds: 3600,
+        health_status: 'healthy',
+      }),
+      getSessionData: vi.fn().mockResolvedValue({
+        sessionId: 'test-session',
+        overallBiasScore: 0.3,
+        alertLevel: 'low',
+      }),
+      storeMetrics: vi.fn().mockResolvedValue(undefined),
+      getAlertStatistics: vi.fn().mockResolvedValue({ total: 10, resolved: 8 }),
+    };
+  }),
 }))
 
 // Mock the connection pool for Python bridge
