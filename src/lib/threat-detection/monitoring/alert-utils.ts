@@ -200,7 +200,7 @@ export async function generateAlertReport(
     includeRecommendations: boolean
   }
 ): Promise<AlertReport> {
-  const { timeRange, includeMetrics: _includeMetrics, includeRecommendations } = options
+  const { timeRange, includeRecommendations } = options
 
   const report: AlertReport = {
     summary: `Alert report for ${timeRange} with ${alerts.length} total alerts`,
@@ -291,8 +291,6 @@ function generateRecommendations(alerts: Alert[], metrics: AlertStatistics): str
  */
 export async function updateAlertStatistics(redis: RedisClientType, alert: Alert, previousStatus?: string): Promise<void> {
   try {
-    // const stats = await redis.hGetAll('alert:statistics')
-
     // Increment total if this is a new alert
     if (!previousStatus) {
       await redis.hIncrBy('alert:statistics', 'total', 1)
