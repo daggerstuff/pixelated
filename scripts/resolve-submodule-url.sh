@@ -75,7 +75,24 @@ SUBMODULE_URL_AZURE_SSH="git@ssh.dev.azure.com:v3/${AZ_ORG}/${AZ_PROJECT}/ai"
 # Helper: check remote accessibility quickly (HEAD)
 remote_accessible() {
   local url="$1"
-  git ls-remote --exit-code "$url" HEAD >/dev/null 2>&1
+  # Attempt ls-remote. If successful, return 0.
+  if git ls-remote --exit-code "$url" HEAD >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  # If we're here, it failed. debugging with masked secrets
+  local masked_url="$url"
+  if [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+    masked_url="${masked_url//$SYSTEM_ACCESSTOKEN/***}"
+  fi
+  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    masked_url="${masked_url//$GITHUB_TOKEN/***}"
+  fi
+  
+  echo "    ⚠️ Connection check failed for $masked_url"
+  # Optional: run once more to capture stderr for logs (piping to cat to avoid failure exit code here)
+  # But prevent showing unmasked secrets. Git usually masks basic auth but let's be careful.
+  return 1
 }
 
 # Prefer constructing Azure submodule URL by mirroring parent remote scheme and swapping repo name
@@ -100,6 +117,7 @@ build_azure_url_from_parent() {
 # Detect environment using Azure DevOps built-in variables
 if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI:-}" ]]; then
   echo "Detected Azure DevOps pipeline environment."
+  echo "Context: Org='$AZ_ORG', Project='$AZ_PROJECT'"
 
   # Ensure ssh.dev.azure.com is in known_hosts to avoid interactive prompts
   echo "Ensuring Azure DevOps SSH host keys are recognized..."
@@ -159,10 +177,18 @@ if [[ "${TF_BUILD:-}" == "True" ]] || [[ -n "${SYSTEM_TEAMFOUNDATIONCOLLECTIONUR
             echo "🔄 Attempting GitHub HTTPS with GITHUB_TOKEN..."
             GITHUB_HTTPS_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_OWNER}/ai.git"
             if remote_accessible "$GITHUB_HTTPS_URL"; then
-               echo "✅ GitHub submodule remote (HTTPS) is accessible"
+               echo "✅ GitHub submodule remote (HTTPS) is accessible [x-access-token]"
                SUBMODULE_URL="$GITHUB_HTTPS_URL"
             else
-               echo "❌ GitHub HTTPS access failed"
+               # Try alternative format: https://<token>@github.com
+               echo "⚠️ 'x-access-token' format failed. Retrying with basic token auth..."
+               GITHUB_HTTPS_URL_ALT="https://${GITHUB_TOKEN}@github.com/${GITHUB_OWNER}/ai.git"
+               if remote_accessible "$GITHUB_HTTPS_URL_ALT"; then
+                 echo "✅ GitHub submodule remote (HTTPS) is accessible [token-only]"
+                 SUBMODULE_URL="$GITHUB_HTTPS_URL_ALT"
+               else
+                 echo "❌ GitHub HTTPS access failed (both formats)"
+               fi
             fi
          else
             echo "ℹ️ No GITHUB_TOKEN available for GitHub HTTPS fallback"

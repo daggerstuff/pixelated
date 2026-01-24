@@ -15,7 +15,7 @@ import {
   type UserRole,
 } from '../middleware'
 import { validateToken } from '../jwt-service'
-import { auth0UserService } from '../../services/auth0.service'
+import { auth0UserService } from '../../../services/auth0.service'
 import { logSecurityEvent } from '../../security'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
@@ -24,7 +24,7 @@ vi.mock('../jwt-service', () => ({
   validateToken: vi.fn(),
 }))
 
-vi.mock('../../services/auth0.service', () => ({
+vi.mock('../../../services/auth0.service', () => ({
   auth0UserService: {
     getUserById: vi.fn(),
   },
@@ -104,7 +104,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       const result = await authenticateRequest(mockRequest)
 
@@ -180,7 +180,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(auth0UserService.getUserById).mockResolvedValue({
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue({
         id: 'user123',
         email: 'test@example.com',
         role: 'admin',
@@ -203,7 +203,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(auth0UserService.getUserById).mockResolvedValue(null)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(null)
 
       const result = await authenticateRequest(mockRequest)
 
@@ -228,7 +228,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -276,7 +276,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(auth0UserService.getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -295,11 +295,9 @@ describe('Authentication Middleware', () => {
         role: 'admin' as UserRole,
       }
 
-      const authenticatedRequest = {
-        ...mockRequest,
-        user: mockUser,
-        tokenId: 'token123',
-      } as AuthenticatedRequest
+      const authenticatedRequest = mockRequest as AuthenticatedRequest
+      authenticatedRequest.user = mockUser
+      authenticatedRequest.tokenId = 'token123'
 
       const result = await requireRole(authenticatedRequest, [
         'admin',
@@ -317,11 +315,9 @@ describe('Authentication Middleware', () => {
         role: 'patient' as UserRole,
       }
 
-      const authenticatedRequest = {
-        ...mockRequest,
-        user: mockUser,
-        tokenId: 'token123',
-      } as AuthenticatedRequest
+      const authenticatedRequest = mockRequest as AuthenticatedRequest
+      authenticatedRequest.user = mockUser
+      authenticatedRequest.tokenId = 'token123'
 
       const result = await requireRole(authenticatedRequest, [
         'admin',
@@ -340,11 +336,9 @@ describe('Authentication Middleware', () => {
         role: 'admin' as UserRole,
       }
 
-      const authenticatedRequest = {
-        ...mockRequest,
-        user: mockUser,
-        tokenId: 'token123',
-      } as AuthenticatedRequest
+      const authenticatedRequest = mockRequest as AuthenticatedRequest
+      authenticatedRequest.user = mockUser
+      authenticatedRequest.tokenId = 'token123'
 
       // Admin should have access to patient-level resources
       const result = await requireRole(authenticatedRequest, ['patient'])
@@ -359,11 +353,9 @@ describe('Authentication Middleware', () => {
         role: 'patient' as UserRole,
       }
 
-      const authenticatedRequest = {
-        ...mockRequest,
-        user: mockUser,
-        tokenId: 'token123',
-      } as AuthenticatedRequest
+      const authenticatedRequest = mockRequest as AuthenticatedRequest
+      authenticatedRequest.user = mockUser
+      authenticatedRequest.tokenId = 'token123'
 
       await requireRole(authenticatedRequest, ['admin'])
 
@@ -1084,11 +1076,9 @@ describe('Authentication Middleware', () => {
         role: 'patient',
       }
 
-      const authenticatedRequest = {
-        ...mockRequest,
-        user: mockUser,
-        tokenId: 'token123',
-      } as AuthenticatedRequest
+      const authenticatedRequest = mockRequest as AuthenticatedRequest
+      authenticatedRequest.user = mockUser
+      authenticatedRequest.tokenId = 'token123'
 
       await requireRole(authenticatedRequest, ['admin'])
 

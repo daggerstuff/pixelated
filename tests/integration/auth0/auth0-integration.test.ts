@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
-import { Auth0UserService } from '../../src/services/auth0.service'
+import { Auth0UserService } from '../../../src/services/auth0.service'
 import { Auth0SocialAuthService } from '../../src/lib/auth/auth0-social-auth-service'
 import * as auth0JwtService from '../../src/lib/auth/auth0-jwt-service'
 import * as auth0RbacService from '../../src/lib/auth/auth0-rbac-service'
