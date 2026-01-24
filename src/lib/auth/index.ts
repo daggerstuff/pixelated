@@ -124,20 +124,11 @@ export type {
 export {
   authenticateRequest,
   requireRole,
-  requirePermission,
-  requireAnyRole,
-  requireAnyPermission,
-  requireAdmin,
-  requireTherapistOrHigher,
-  requireAuthenticated,
-  optionalAuthentication,
   extractTokenFromRequest,
   getClientIp,
   getClientInfo,
-  createAuthRateLimit,
   csrfProtection,
   securityHeaders,
-  createAuthMiddlewareStack,
 } from './auth0-middleware'
 
 /**
