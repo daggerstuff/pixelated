@@ -7,6 +7,7 @@
 /build-errors.md
 /.vite/
 /.cursor/
+/.mcp.json/
 
 # === NODE/NPM/PNPM ARTIFACTS ===
 node_modules/
