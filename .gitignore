@@ -290,3 +290,4 @@ AGENTS.md
 logs/*.jsonl
 
 .codebuff/agents
+.mcp.json

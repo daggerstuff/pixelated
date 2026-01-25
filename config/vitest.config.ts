@@ -43,6 +43,8 @@ export default defineConfig({
       'src/tests/mobile-compatibility.test.ts',
       'src/tests/cross-browser-compatibility.test.ts',
       'src/e2e/breach-notification.spec.ts',
+      'tests/integration/complete-system.integration.test.ts',
+      'src/lib/threat-detection/__tests__/phase8-integration.test.ts',
       'tests/e2e/**/*',
       'tests/browser/**/*',
       'tests/accessibility/**/*',
@@ -60,8 +62,8 @@ export default defineConfig({
         ]
         : []),
     ],
-    testTimeout: process.env['CI'] ? 60_000 : 30_000,
-    hookTimeout: process.env['CI'] ? 30_000 : 30_000,
+    testTimeout: process.env['CI'] ? 30_000 : 15_000,
+    hookTimeout: process.env['CI'] ? 15_000 : 10_000,
     environmentOptions: {
       jsdom: {
         resources: 'usable',
@@ -75,8 +77,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      enabled:
-        !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
+      enabled: !process.env['CI'],
       reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
       exclude: [
@@ -96,13 +97,12 @@ export default defineConfig({
     ...(process.env['CI']
       ? {
         watch: false,
-        bail: 10,
-        poolOptions: {
-          threads: {
-            minThreads: 1,
-            maxThreads: 2,
-          },
-        },
+        bail: 3,
+        forceExit: true,
+        pool: 'threads',
+        minThreads: 1,
+        maxThreads: 1,
+        maxWorkers: 1,
       }
       : {}),
   },
