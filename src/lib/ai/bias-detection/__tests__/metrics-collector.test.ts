@@ -1,13 +1,14 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { BiasMetricsCollector } from '../metrics-collector'
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
 // Mock the Python bridge
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
-  })),
+  PythonBiasDetectionBridge: class {
+    initialize = vi.fn().mockResolvedValue(undefined)
+    checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
+  },
 }))
 
 // Mock analysis result for use across multiple tests
@@ -156,7 +157,7 @@ describe('BiasMetricsCollector', () => {
 
     it('should initialize Python bridge', async () => {
       await metricsCollector.initialize()
-      expect(mockPythonBridge.initialize).toHaveBeenCalled()
+      expect(mockPythonBridge['initialize']).toHaveBeenCalled()
     })
   })
 
@@ -185,9 +186,7 @@ describe('BiasMetricsCollector', () => {
 
     it('should handle metrics storage failures gracefully', async () => {
       // Mock a storage failure
-      const originalStore = metricsCollector.storeAnalysisResult
-      metricsCollector.storeAnalysisResult = vi
-        .fn()
+      const storeSpy = vi.spyOn(metricsCollector, 'storeAnalysisResult')
         .mockRejectedValue(new Error('Storage failed'))
 
       await expect(
@@ -195,7 +194,7 @@ describe('BiasMetricsCollector', () => {
       ).rejects.toThrow()
 
       // Restore original method
-      metricsCollector.storeAnalysisResult = originalStore
+      storeSpy.mockRestore()
     })
   })
 
@@ -207,9 +206,7 @@ describe('BiasMetricsCollector', () => {
     })
 
     it('should handle performance metrics retrieval failures', async () => {
-      const originalPerf = metricsCollector.getCurrentPerformanceMetrics
-      metricsCollector.getCurrentPerformanceMetrics = vi
-        .fn()
+      const perfSpy = vi.spyOn(metricsCollector, 'getCurrentPerformanceMetrics')
         .mockRejectedValue(new Error('Performance metrics failed'))
 
       await expect(
@@ -217,7 +214,7 @@ describe('BiasMetricsCollector', () => {
       ).rejects.toThrow()
 
       // Restore original method
-      metricsCollector.getCurrentPerformanceMetrics = originalPerf
+      perfSpy.mockRestore()
     })
   })
 
@@ -279,9 +276,7 @@ describe('BiasMetricsCollector', () => {
     })
 
     it('should handle network failures during metrics storage', async () => {
-      const originalStore = metricsCollector.storeAnalysisResult
-      metricsCollector.storeAnalysisResult = vi
-        .fn()
+      const storeSpy = vi.spyOn(metricsCollector, 'storeAnalysisResult')
         .mockRejectedValue(new Error('Network error'))
 
       await expect(
@@ -289,7 +284,7 @@ describe('BiasMetricsCollector', () => {
       ).rejects.toThrow()
 
       // Restore original method
-      metricsCollector.storeAnalysisResult = originalStore
+      storeSpy.mockRestore()
     })
   })
 })

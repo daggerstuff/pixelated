@@ -1,0 +1,580 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/vivi/pixelated[39m
+
+[2m8:14:36 PM[22m [33m[1m[vite][22m[39m (ssr) warning: Duplicate member "generateAnomalyId" in class body
+641 |    }
+642 |  
+643 |    private generateAnomalyId(): string {
+    |            ^
+644 |      return this._secureId('anomaly_')
+645 |    }
+
+  Plugin: vite:esbuild
+  File: /home/vivi/pixelated/src/lib/threat-detection/behavioral/behavioral-analysis-service.ts
+ [31m❯[39m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 47[2mms[22m[39m
+       [32m✓[39m should initialize with correct configuration[32m 6[2mms[22m[39m
+[31m       [31m×[31m should create behavioral profile for new user[39m[32m 19[2mms[22m[39m
+[31m       [31m×[31m should detect anomalies[39m[32m 6[2mms[22m[39m
+[31m       [31m×[31m should detect unusual login patterns[39m[32m 9[2mms[22m[39m
+       [32m✓[39m should calculate behavioral score correctly[32m 1[2mms[22m[39m
+       [32m✓[39m should extract behavioral features from raw data[32m 1[2mms[22m[39m
+       [32m✓[39m should normalize behavioral data[32m 0[2mms[22m[39m
+       [32m✓[39m should detect pattern changes[32m 0[2mms[22m[39m
+       [32m✓[39m should generate behavioral insights[32m 2[2mms[22m[39m
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Metrics Collector Integration[2m > [22m[2mshould pass analysis results from Python bridge to metrics collector
+[22m[39m2026-01-25T01:14:37.270Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Metrics Collector Integration[2m > [22m[2mshould handle metrics collection failures gracefully
+[22m[39m2026-01-25T01:14:37.275Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould trigger alerts through the alert system
+[22m[39m2026-01-25T01:14:37.295Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould trigger alerts through the alert system
+[22m[39m2026-01-25T01:14:37.282Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:264:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould trigger alerts through the alert system
+[22m[39m2026-01-25T01:14:37.296Z INFO [bias-detection:alerts-system] Alert processed successfully {
+  alertId: [32m'alert-integration-test-1-1769303677295'[39m,
+  sessionId: [32m'alert-integration-test-1'[39m,
+  level: [32m'critical'[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould handle alert processing failures gracefully
+[22m[39m2026-01-25T01:14:37.298Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould handle alert processing failures gracefully
+[22m[39m2026-01-25T01:14:37.297Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:436:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mPython Bridge ↔ Alert System Integration[2m > [22m[2mshould handle alert processing failures gracefully
+[22m[39m2026-01-25T01:14:37.299Z INFO [bias-detection:alerts-system] Alert processed successfully {
+  alertId: [32m'malformed-alert-test-1769303677298'[39m,
+  sessionId: [32m'malformed-alert-test'[39m,
+  level: [32m'critical'[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.300Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.300Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:470:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.302Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.303Z INFO [bias-detection:alerts-system] Alert processed successfully {
+  alertId: [32m'correlation-test-1-1769303677303'[39m,
+  sessionId: [32m'correlation-test-1'[39m,
+  level: [32m'low'[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.303Z INFO [bias-detection:alerts-system] Alert processed successfully {
+  alertId: [32m'correlation-test-2-1769303677303'[39m,
+  sessionId: [32m'correlation-test-2'[39m,
+  level: [32m'high'[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould correlate metrics data with alert patterns
+[22m[39m2026-01-25T01:14:37.304Z INFO [bias-detection:alerts-system] Alert processed successfully {
+  alertId: [32m'correlation-test-3-1769303677304'[39m,
+  sessionId: [32m'correlation-test-3'[39m,
+  level: [32m'critical'[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould handle metrics and alert system synchronization
+[22m[39m2026-01-25T01:14:37.307Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould handle metrics and alert system synchronization
+[22m[39m2026-01-25T01:14:37.307Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:546:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould handle metrics and alert system synchronization
+[22m[39m2026-01-25T01:14:37.308Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mMetrics Collector ↔ Alert System Integration[2m > [22m[2mshould handle metrics and alert system synchronization
+[22m[39m2026-01-25T01:14:37.309Z ERROR [bias-detection:alerts-system] Failed to fetch recent alerts {
+  error: TypeError: this.pythonBridge.getRecentAlerts is not a function
+      at BiasAlertSystem.getRecentAlerts [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:1012:48[90m)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:553:21
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mCross-Module Error Propagation[2m > [22m[2mshould maintain module isolation during failures
+[22m[39m2026-01-25T01:14:37.316Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mCross-Module Error Propagation[2m > [22m[2mshould maintain module isolation during failures
+[22m[39m2026-01-25T01:14:37.315Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould properly manage shared resources
+[22m[39m2026-01-25T01:14:37.317Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould properly manage shared resources
+[22m[39m2026-01-25T01:14:37.318Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:610:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould properly manage shared resources
+[22m[39m2026-01-25T01:14:37.319Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould properly manage shared resources
+[22m[39m2026-01-25T01:14:37.320Z INFO [bias-detection:metrics-collector] BiasMetricsCollector disposed
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould properly manage shared resources
+[22m[39m2026-01-25T01:14:37.320Z ERROR [bias-detection:alerts-system] Error disposing BiasAlertSystem {
+  error: TypeError: this.pythonBridge.unregisterAlertSystem is not a function
+      at BiasAlertSystem.dispose [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:1079:31[90m)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:614:32
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mResource Management Integration[2m > [22m[2mshould handle resource cleanup on errors
+[22m[39m2026-01-25T01:14:37.322Z INFO [bias-detection:metrics-collector] BiasMetricsCollector disposed
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mConfiguration Propagation[2m > [22m[2mshould propagate configuration changes across modules
+[22m[39m2026-01-25T01:14:37.324Z INFO [bias-detection:metrics-collector] BiasMetricsCollector initialized with Python service connection
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mConfiguration Propagation[2m > [22m[2mshould propagate configuration changes across modules
+[22m[39m2026-01-25T01:14:37.324Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mConfiguration Propagation[2m > [22m[2mshould propagate configuration changes across modules
+[22m[39m2026-01-25T01:14:37.324Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at [90m/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/__tests__/module-integration.test.ts:679:7
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+}
+
+[90mstdout[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mConfiguration Propagation[2m > [22m[2mshould validate configuration consistency across modules
+[22m[39m2026-01-25T01:14:37.326Z INFO [bias-detection:alerts-system] BiasAlertSystem initialized successfully (local processing enabled) { alertRules: [33m8[39m, notificationChannels: [33m3[39m }
+
+[90mstderr[2m | src/lib/ai/bias-detection/__tests__/module-integration.test.ts[2m > [22m[2mModule Integration Tests[2m > [22m[2mConfiguration Propagation[2m > [22m[2mshould validate configuration consistency across modules
+[22m[39m2026-01-25T01:14:37.326Z WARN [bias-detection:alerts-system] Python service does not support alert registration, operating in local-only mode {
+  error: TypeError: this.pythonBridge.registerAlertSystem is not a function
+      at BiasAlertSystem.initialize [90m(/home/vivi/pixelated/[39msrc/lib/ai/bias-detection/alerts-system.ts:564:33[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+}
+
+ [32m✓[39m src/lib/ai/bias-detection/__tests__/module-integration.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+[90mstderr[2m | tests/integration/auth0/auth0-integration.test.ts[2m > [22m[2mAuth0 Integration Tests[2m > [22m[2mRole-Based Access Control[2m > [22m[2mshould check if user has specific role
+[22m[39mFailed to get roles for user auth0|user123: TypeError: Cannot read properties of undefined (reading 'map')
+    at getUserRoles [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:502:22[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at Module.userHasRole [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:513:17[90m)[39m
+    at [90m/home/vivi/pixelated/[39mtests/integration/auth0/auth0-integration.test.ts:545:23
+    at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | tests/integration/auth0/auth0-integration.test.ts[2m > [22m[2mAuth0 Integration Tests[2m > [22m[2mRole-Based Access Control[2m > [22m[2mshould check if user has specific permission
+[22m[39mFailed to get roles for user auth0|user123: TypeError: Cannot read properties of undefined (reading 'map')
+    at getUserRoles [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:502:22[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at Module.userHasPermission [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:527:23[90m)[39m
+    at [90m/home/vivi/pixelated/[39mtests/integration/auth0/auth0-integration.test.ts:554:29
+    at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | tests/integration/auth0/auth0-integration.test.ts[2m > [22m[2mAuth0 Integration Tests[2m > [22m[2mRole-Based Access Control[2m > [22m[2mshould get all permissions for user
+[22m[39mFailed to get roles for user auth0|user123: TypeError: Cannot read properties of undefined (reading 'map')
+    at getUserRoles [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:502:22[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at Module.getUserPermissions [90m(/home/vivi/pixelated/[39msrc/lib/auth/auth0-rbac-service.ts:559:23[90m)[39m
+    at [90m/home/vivi/pixelated/[39mtests/integration/auth0/auth0-integration.test.ts:563:27
+    at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.18/node_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+ [31m❯[39m tests/integration/auth0/auth0-integration.test.ts [2m([22m[2m23 tests[22m[2m | [22m[31m22 failed[39m[2m)[22m[33m 713[2mms[22m[39m
+[31m       [31m×[31m should successfully authenticate user with valid credentials[39m[32m 278[2mms[22m[39m
+[31m       [31m×[31m should reject authentication with invalid credentials[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should create new user account[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should generate correct Google authorization URL[39m[32m 5[2mms[22m[39m
+[31m       [31m×[31m should successfully exchange authorization code for tokens[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should successfully get user information from access token[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should complete full authentication flow[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should validate a valid access token[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject an expired token[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should successfully refresh access token[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should revoke token successfully[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should assign role to user[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should check if user has specific role[39m[32m 5[2mms[22m[39m
+[31m       [31m×[31m should check if user has specific permission[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should get all permissions for user[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should validate role transition[32m 1[2mms[22m[39m
+[31m       [31m×[31m should log security events for login attempts[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should log security events for role assignments[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should log security events for token validation[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should log security events for token refresh[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should maintain consistent user data across authentication flows[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should properly link social account to existing user[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should properly handle role-based access after authentication[39m[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 25 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mEmail/Password Authentication Flow[2m > [22mshould successfully authenticate user with valid credentials
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m175:68[22m[39m
+    [90m173| [39m      [90m// Mock Auth0 clients[39m
+    [90m174| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m175| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m176| [39m      mockAuthClient[33m.[39mpasswordGrant[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m177| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserProfile)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mEmail/Password Authentication Flow[2m > [22mshould reject authentication with invalid credentials
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m220:68[22m[39m
+    [90m218| [39m    it('should reject authentication with invalid credentials', async …
+    [90m219| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m220| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m221| [39m      mockAuthClient.passwordGrant.mockRejectedValue(new Error('Unauth…
+    [90m222| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mEmail/Password Authentication Flow[2m > [22mshould create new user account
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m240:70[22m[39m
+    [90m238| [39m
+    [90m239| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m240| [39m      const mockManagementClient = auth0Module.ManagementClient.mock.r…
+    [90m   | [39m                                                                     [31m^[39m
+    [90m241| [39m      mockManagementClient[33m.[39mcreateUser[33m.[39m[34mmockResolvedValue[39m(mockAuth0User)
+    [90m242| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSocial Authentication Flow[2m > [22mshould generate correct Google authorization URL
+[31m[1mAssertionError[22m: expected 'https://test-domain.auth0.com/authori…' to be 'https://test-domain.auth0.com/authori…' // Object.is equality[39m
+
+Expected: [32m"https://test-domain.auth0.com/authorize?response_type=code&client_id=test-client-id&connection=google-oauth2&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=openid[7m%20[27mprofile[7m%20[27memail&state=test-state"[39m
+Received: [31m"https://test-domain.auth0.com/authorize?response_type=code&client_id=test-client-id&connection=google-oauth2&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=openid[7m+[27mprofile[7m+[27memail&state=test-state"[39m
+
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m278:19[22m[39m
+    [90m276| [39m      const url = auth0SocialAuthService.getGoogleAuthorizationUrl('ht…
+    [90m277| [39m
+    [90m278| [39m      [34mexpect[39m(url)[33m.[39m[34mtoBe[39m(
+    [90m   | [39m                  [31m^[39m
+    [90m279| [39m        [32m'https://test-domain.auth0.com/authorize?'[39m [33m+[39m
+    [90m280| [39m        [32m'response_type=code&'[39m [33m+[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSocial Authentication Flow[2m > [22mshould successfully exchange authorization code for tokens
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m299:68[22m[39m
+    [90m297| [39m
+    [90m298| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m299| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m300| [39m      mockAuthClient[33m.[39moauthToken[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m301| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSocial Authentication Flow[2m > [22mshould successfully get user information from access token
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m334:68[22m[39m
+    [90m332| [39m
+    [90m333| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m334| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m335| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserInfo)
+    [90m336| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSocial Authentication Flow[2m > [22mshould complete full authentication flow
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m355:68[22m[39m
+    [90m353| [39m      [90m// Mock token exchange[39m
+    [90m354| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m355| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m356| [39m      mockAuthClient[33m.[39moauthToken[33m.[39m[34mmockResolvedValue[39m({
+    [90m357| [39m        access_token[33m:[39m [32m'access-token-123'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mJWT Token Validation and Refresh[2m > [22mshould validate a valid access token
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m418:68[22m[39m
+    [90m416| [39m
+    [90m417| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m418| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m419| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockPayload)
+    [90m420| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mJWT Token Validation and Refresh[2m > [22mshould reject an expired token
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m443:68[22m[39m
+    [90m441| [39m
+    [90m442| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m443| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m444| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockPayload)
+    [90m445| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mJWT Token Validation and Refresh[2m > [22mshould successfully refresh access token
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m469:68[22m[39m
+    [90m467| [39m
+    [90m468| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m469| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m470| [39m      mockAuthClient[33m.[39mrefreshToken[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m471| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserResponse)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mJWT Token Validation and Refresh[2m > [22mshould revoke token successfully
+[31m[1mError[22m: Cannot find module '../../../src/lib/redis'
+Require stack:
+- /home/vivi/pixelated/tests/integration/auth0/auth0-integration.test.ts[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m495:27[22m[39m
+    [90m493| [39m
+    [90m494| [39m    [34mit[39m([32m'should revoke token successfully'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m495| [39m      [35mconst[39m redisModule [33m=[39m [34mrequire[39m([32m'../../../src/lib/redis'[39m)
+    [90m   | [39m                          [31m^[39m
+    [90m496| [39m      redisModule[33m.[39msetInCache[33m.[39m[34mmockResolvedValue[39m(undefined)
+    [90m497| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mRole-Based Access Control[2m > [22mshould assign role to user
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m511:70[22m[39m
+    [90m509| [39m    [34mit[39m([32m'should assign role to user'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m510| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m511| [39m      const mockManagementClient = auth0Module.ManagementClient.mock.r…
+    [90m   | [39m                                                                     [31m^[39m
+    [90m512| [39m
+    [90m513| [39m      [90m// Mock role lookup[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mRole-Based Access Control[2m > [22mshould check if user has specific role
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m547:23[22m[39m
+    [90m545| [39m      const hasRole = await auth0RbacService.userHasRole('auth0|user12…
+    [90m546| [39m
+    [90m547| [39m      [34mexpect[39m(hasRole)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m   | [39m                      [31m^[39m
+    [90m548| [39m    })
+    [90m549| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mRole-Based Access Control[2m > [22mshould check if user has specific permission
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m556:29[22m[39m
+    [90m554| [39m      const hasPermission = await auth0RbacService.userHasPermission('…
+    [90m555| [39m
+    [90m556| [39m      expect(hasPermission).toBe(true) // therapists have read:patient…
+    [90m   | [39m                            [31m^[39m
+    [90m557| [39m    })
+    [90m558| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mRole-Based Access Control[2m > [22mshould get all permissions for user
+[31m[1mAssertionError[22m: expected [] to include 'read:patients'[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m566:27[22m[39m
+    [90m564| [39m
+    [90m565| [39m      [90m// Admin should have all permissions[39m
+    [90m566| [39m      [34mexpect[39m(permissions)[33m.[39m[34mtoContain[39m([32m'read:patients'[39m)
+    [90m   | [39m                          [31m^[39m
+    [90m567| [39m      [34mexpect[39m(permissions)[33m.[39m[34mtoContain[39m([32m'manage:roles'[39m)
+    [90m568| [39m      expect(permissions.length).toBeGreaterThan(20) // Should have ma…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSecurity Features and Logging[2m > [22mshould log security events for login attempts
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m600:68[22m[39m
+    [90m598| [39m      [90m// Mock Auth0 clients[39m
+    [90m599| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m600| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m601| [39m      mockAuthClient[33m.[39mpasswordGrant[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m602| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserProfile)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSecurity Features and Logging[2m > [22mshould log security events for role assignments
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m620:70[22m[39m
+    [90m618| [39m    [34mit[39m([32m'should log security events for role assignments'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m619| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m620| [39m      const mockManagementClient = auth0Module.ManagementClient.mock.r…
+    [90m   | [39m                                                                     [31m^[39m
+    [90m621| [39m
+    [90m622| [39m      [90m// Mock role lookup[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSecurity Features and Logging[2m > [22mshould log security events for token validation
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m653:68[22m[39m
+    [90m651| [39m
+    [90m652| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m653| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m654| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockPayload)
+    [90m655| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mSecurity Features and Logging[2m > [22mshould log security events for token refresh
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m684:68[22m[39m
+    [90m682| [39m
+    [90m683| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m684| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m685| [39m      mockAuthClient[33m.[39mrefreshToken[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m686| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserResponse)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mCross-Flow Integration[2m > [22mshould maintain consistent user data across authentication flows
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m724:68[22m[39m
+    [90m722| [39m
+    [90m723| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m724| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m725| [39m      mockAuthClient[33m.[39mpasswordGrant[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m726| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserProfile)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mCross-Flow Integration[2m > [22mshould properly link social account to existing user
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m740:70[22m[39m
+    [90m738| [39m
+    [90m739| [39m    it('should properly link social account to existing user', async (…
+    [90m740| [39m      const mockManagementClient = require('auth0').ManagementClient.m…
+    [90m   | [39m                                                                     [31m^[39m
+    [90m741| [39m      mockManagementClient[33m.[39mlinkUsers[33m.[39m[34mmockResolvedValue[39m({})
+    [90m742| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/auth0/auth0-integration.test.ts[2m > [22mAuth0 Integration Tests[2m > [22mCross-Flow Integration[2m > [22mshould properly handle role-based access after authentication
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'results')[39m
+[36m [2m❯[22m tests/integration/auth0/auth0-integration.test.ts:[2m783:68[22m[39m
+    [90m781| [39m
+    [90m782| [39m      [35mconst[39m auth0Module [33m=[39m [34mrequire[39m([32m'auth0'[39m)
+    [90m783| [39m      const mockAuthClient = auth0Module.AuthenticationClient.mock.res…
+    [90m   | [39m                                                                   [31m^[39m
+    [90m784| [39m      mockAuthClient[33m.[39mpasswordGrant[33m.[39m[34mmockResolvedValue[39m(mockTokenResponse)
+    [90m785| [39m      mockAuthClient[33m.[39mgetProfile[33m.[39m[34mmockResolvedValue[39m(mockUserProfile)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts[2m > [22mBehavioral Analysis Service[2m > [22mUser Profile Management[2m > [22mshould create behavioral profile for new user
+[31m[1mTypeError[22m: this.classifyPatterns is not a function[39m
+[36m [2m❯[22m AdvancedBehavioralAnalysisService.mineBehavioralPatterns src/lib/threat-detection/behavioral/behavioral-analysis-service.ts:[2m301:20[22m[39m
+    [90m299| [39m
+    [90m300| [39m      [35mconst[39m classifiedPatterns [33m=[39m
+    [90m301| [39m        [35mawait[39m [35mthis[39m[33m.[39m[34mclassifyPatterns[39m(significantPatterns)
+    [90m   | [39m                   [31m^[39m
+    [90m302| [39m
+    [90m303| [39m      [35mconst[39m stablePatterns [33m=[39m
+[90m [2m❯[22m AdvancedBehavioralAnalysisService.createBehaviorProfile src/lib/threat-detection/behavioral/behavioral-analysis-service.ts:[2m144:24[22m[39m
+[90m [2m❯[22m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts:[2m150:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts[2m > [22mBehavioral Analysis Service[2m > [22mUser Profile Management[2m > [22mshould detect anomalies
+[31m[1mTypeError[22m: this.detectSequentialAnomalies is not a function[39m
+[36m [2m❯[22m AdvancedBehavioralAnalysisService.detectAnomalies src/lib/threat-detection/behavioral/behavioral-analysis-service.ts:[2m203:46[22m[39m
+    [90m201| [39m      anomalies[33m.[39m[34mpush[39m([33m...[39mspatialAnomalies)
+    [90m202| [39m
+    [90m203| [39m      [35mconst[39m sequentialAnomalies [33m=[39m [35mawait[39m [35mthis[39m[33m.[39m[34mdetectSequentialAnomalies[39m(
+    [90m   | [39m                                             [31m^[39m
+    [90m204| [39m        profile[33m,[39m
+    [90m205| [39m        currentEvents[33m,[39m
+[90m [2m❯[22m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts:[2m184:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts[2m > [22mBehavioral Analysis Service[2m > [22mAnomaly Detection Utilities[2m > [22mshould detect unusual login patterns
+[31m[1mAssertionError[22m: expected [] to have a length of 2 but got +0[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 2[39m
+[31m+ 0[39m
+
+[36m [2m❯[22m src/lib/threat-detection/behavioral/__tests__/behavioral-analysis.test.ts:[2m212:25[22m[39m
+    [90m210| [39m      [35mconst[39m anomalies [33m=[39m [34mdetectAnomalies[39m(userProfile[33m,[39m currentBehavior)
+    [90m211| [39m
+    [90m212| [39m      [34mexpect[39m(anomalies)[33m.[39m[34mtoHaveLength[39m([34m2[39m)
+    [90m   | [39m                        [31m^[39m
+    [90m213| [39m      [34mexpect[39m(anomalies[33m.[39m[34msome[39m((a) [33m=>[39m a[33m.[39mtype [33m===[39m [32m'unusual_ip'[39m))[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m214| [39m      expect(anomalies.some((a) => a.type === 'unusual_time')).toBe(tr…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/25]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m25 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (44)[39m
+[2m   Start at [22m 20:14:36
+[2m   Duration [22m 1.15s[2m (transform 910ms, setup 0ms, import 962ms, tests 824ms, environment 1ms)[22m
+

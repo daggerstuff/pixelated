@@ -9,10 +9,10 @@
 // Mock the PythonBiasDetectionBridge to prevent real HTTP requests during integration tests
 vi.mock('../python-bridge', () => {
   return {
-    PythonBiasDetectionBridge: vi.fn().mockImplementation(() => ({
+    PythonBiasDetectionBridge: class {
       async initialize() {
         return { success: true }
-      },
+      }
       async analyzeSession() {
         return {
           sessionId: 'test-session',
@@ -28,19 +28,19 @@ vi.mock('../python-bridge', () => {
           recommendations: ['Test recommendation'],
           demographics: { gender: 'test', age: 'test' },
         }
-      },
+      }
       async runPreprocessingAnalysis() {
         return { biasScore: 0.2 }
-      },
+      }
       async runModelLevelAnalysis() {
         return { biasScore: 0.3 }
-      },
+      }
       async runInteractiveAnalysis() {
         return { biasScore: 0.4 }
-      },
+      }
       async runEvaluationAnalysis() {
         return { biasScore: 0.3 }
-      },
+      }
       async generateComprehensiveReport() {
         return {
           reportId: 'mock-report-id',
@@ -55,18 +55,18 @@ vi.mock('../python-bridge', () => {
           recommendations: ['Mock recommendation'],
           appendices: [],
         }
-      },
+      }
       async healthCheck() {
         return { status: 'healthy' }
-      },
+      }
       async updateConfiguration() {
         return { success: true }
-      },
+      }
       async dispose() {
         return { success: true }
-      },
-      isInitialized: true,
-    })),
+      }
+      isInitialized = true
+    },
   }
 })
 
@@ -411,7 +411,7 @@ describe('BiasDetectionEngine Integration Tests', () => {
       await new Promise((resolve) => setTimeout(resolve, 100))
 
       // Stop monitoring
-      engine.stopMonitoring()
+      void engine.stopMonitoring()
 
       // Verify monitoring data received
       expect(monitoringDataReceived).toBe(true)
