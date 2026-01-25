@@ -58,6 +58,23 @@ vi.mock('../../mcp/phase6-integration', () => ({
   updatePhase6AuthenticationProgress: vi.fn(),
 }))
 
+vi.mock('../jwt-service', () => ({
+  generateTokenPair: vi.fn(async (userId, role) => ({
+    accessToken: `access-token-${userId}`,
+    refreshToken: `refresh-token-${userId}`,
+    tokenType: 'Bearer',
+    expiresIn: 3600,
+    user: { id: userId, role }
+  })),
+  validateToken: vi.fn(async () => ({ valid: true })),
+  AuthenticationError: class AuthenticationError extends Error {
+    constructor(message: string) {
+      super(message)
+      this.name = 'AuthenticationError'
+    }
+  }
+}))
+
 vi.mock('otplib', () => ({
   authenticator: {
     generateSecret: vi.fn(() => 'test-secret'),
