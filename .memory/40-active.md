@@ -1,29 +1,47 @@
 # Active Development Status
 
-**Last Updated**: 2026-01-15 02:55 EST
+**Last Updated**: 2026-01-25 03:12 EST
 
-## 🚧 Active Task: Full Data Processing
+## 🚧 Active Task: VPS Deployment & AI Services API
 
-### Current Status: Ready to Start
+### Current Status: In Progress
 
-We have successfully validated the dataset pipeline with a sample run of 600 conversations (100 per tier).
+We have completed the initial VPS setup and AI services API implementation.
 
-- **Validation**: 100% success rate on sample processing.
-- **S3 Access**: Fixed and verified for all tiers.
-- **Dark Humor Persona**: Implemented `PersonalityAdapter` with "charming/cocky" rewriting rules. Verified with test suite.
-- **VPS Hotswapping**: Implemented `BatchedTierProcessor` for sequential Tier 1-6 processing with auto-cleanup (3-in-3-out).
+- **VPS Setup Scripts**: Created three comprehensive setup scripts for different VPS configurations
+- **AI Services API**: Implemented crisis detection and PII scrubbing services
+- **Security Features**: Added robust crisis detection algorithms and PII scrubbing capabilities
+- **Deployment Infrastructure**: Prepared for CPU-only container deployment
 
 ### Next Step
 
-Execute full dataset processing on VPS using the new `batched_tier_processor.py`.
+Deploy and test the AI services API on VPS infrastructure, then proceed with full dataset processing.
 
 ### Recent Context
 
-Sample data processing was a critical smoke test. We identified and fixed S3 key issues and JSON structure mismatches for Tiers 4, 5, and 6.
+The latest commit includes VPS setup automation and AI security features, building on the completed dataset pipeline infrastructure.
 
 ---
 
-## ✅ Recently Completed (Session: 2026-01-15)
+## ✅ Recently Completed (Session: 2026-01-25)
+
+### **VPS Deployment & AI Services API** (COMPLETE)
+
+- **VPS Setup Scripts**: Created three configuration scripts (`vps-lightweight-setup.sh`, `vps-ngc-setup.sh`, `vps-uv-setup.sh`) for different deployment scenarios
+- **Crisis Detection Service**: Implemented `crisis-detection.ts` with advanced crisis identification algorithms
+- **PII Scrubbing Service**: Created `pii-scrubber.ts` for sensitive information redaction
+- **API Infrastructure**: Added AI services API endpoints for security features
+- **PID File**: Created `api.pid` for process management
+
+### **AI Services API Development** (Session: 2026-01-24)
+
+- **PII Scrubbing**: Added comprehensive PII detection and redaction capabilities
+- **Crisis Detection**: Implemented multi-dimensional crisis detection algorithms
+- **Emotion Validation**: Added emotion validation service
+- **Bias Detection**: Enhanced bias detection API endpoints
+- **VPS Deployment Scripts**: Created automated deployment scripts for containerized environments
+
+### **Sample Data Processing** (Validation Run) - **COMPLETE**
 
 ### **Sample Data Processing** (Validation Run) - **COMPLETE**
 
@@ -121,7 +139,13 @@ Sample data processing was a critical smoke test. We identified and fixed S3 key
 
 ### Immediate Next Session:
 
-1. **Full Data Processing (VPS)**
+1. **VPS Deployment & Testing**
+    - Deploy AI services API to VPS
+    - Test crisis detection and PII scrubbing services
+    - Verify API endpoints and performance
+    - **Estimated**: 2-4 hours
+
+2. **Full Data Processing (VPS)**
    - Copy codebase to VPS
    - Run `uv run ai/dataset_pipeline/orchestration/batched_tier_processor.py --persona dark_humor`
    - Monitor S3 uploads and local storage usage (Hotswap verification)

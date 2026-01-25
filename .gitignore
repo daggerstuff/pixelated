@@ -287,3 +287,5 @@ AGENTS.md
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 logs/*.jsonl
+
+.codebuff/agents
