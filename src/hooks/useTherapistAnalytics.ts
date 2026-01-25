@@ -16,36 +16,36 @@ import type { TherapistSession } from '@/types/dashboard'
 
 const _rawLogger = createBuildSafeLogger('use-therapist-analytics')
 const normalizeLogger = (raw: unknown) => {
-  const safeFn = (fn: unknown, fallback: (...args: any[]) => void) =>
-    typeof fn === 'function' ? (fn as (...args: any[]) => any) : fallback
+  const safeFn = (fn: unknown, fallback: (...args: unknown[]) => void) =>
+    typeof fn === 'function' ? (fn as (...args: unknown[]) => unknown) : fallback
 
   // If the module mock returned a bare function (e.g. vi.fn()), call it for all
   // log levels but still provide the standard method names.
   if (typeof raw === 'function') {
-    const fn = raw as (...args: any[]) => any
+    const fn = raw as (...args: unknown[]) => unknown
     return {
-      info: (...args: any[]) => {
+      info: (...args: unknown[]) => {
         try {
           fn(...args)
         } catch {
           /* swallow */
         }
       },
-      warn: (...args: any[]) => {
+      warn: (...args: unknown[]) => {
         try {
           fn(...args)
         } catch {
           /* swallow */
         }
       },
-      error: (...args: any[]) => {
+      error: (...args: unknown[]) => {
         try {
           fn(...args)
         } catch {
           /* swallow */
         }
       },
-      debug: (...args: any[]) => {
+      debug: (...args: unknown[]) => {
         try {
           fn(...args)
         } catch {
@@ -225,10 +225,8 @@ export function useTherapistAnalytics(
             return 0
         }
       })()
-      console.log(`DEBUG: now=${new Date(now).toISOString()}, cutoff=${new Date(cutoff).toISOString()}`)
       out = out.filter((s) => {
         const t = new Date(s.startTime).getTime()
-        console.log(`DEBUG: session=${s.startTime}, t=${t}, kept=${t >= cutoff}`)
         return t >= cutoff
       })
     }
@@ -457,29 +455,18 @@ export function useTherapistAnalytics(
 
   // Auto-refresh (silent) based on options passed in via filters.config (if present)
   useEffect(() => {
-    // Securely extract config from _filters, avoiding unsafe dynamic access
-    let config: { enableAutoRefresh?: boolean; refreshInterval?: number } = {}
-    if (
-      typeof _filters === 'object' &&
-      _filters !== null &&
-      'config' in _filters &&
-      typeof (_filters as any).config === 'object' &&
-      (_filters as any).config !== null
-    ) {
-      const rawConfig = (_filters as any).config
-      config.enableAutoRefresh = Boolean(rawConfig.enableAutoRefresh)
-      // Only allow safe, finite numbers for refreshInterval
-      if (
-        typeof rawConfig.refreshInterval === 'number' &&
-        Number.isFinite(rawConfig.refreshInterval) &&
-        rawConfig.refreshInterval > 0 &&
-        rawConfig.refreshInterval < 3600000 // max 1 hour
-      ) {
-        config.refreshInterval = rawConfig.refreshInterval
-      }
+    const config = _filters.config
+
+    if (!config?.enableAutoRefresh || !config?.refreshInterval) {
+      return
     }
 
-    if (!config.enableAutoRefresh || !config.refreshInterval) {
+    // Only allow safe, finite numbers for refreshInterval
+    if (
+      !Number.isFinite(config.refreshInterval) ||
+      config.refreshInterval <= 0 ||
+      config.refreshInterval >= 3600000 // max 1 hour
+    ) {
       return
     }
 
@@ -494,7 +481,7 @@ export function useTherapistAnalytics(
         refreshIntervalRef.current = null
       }
     }
-  }, [(_filters as any).config, loadData, _filters])
+  }, [_filters.config, loadData])
 
   /**
    * Cleanup on unmount
