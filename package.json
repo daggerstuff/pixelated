@@ -170,6 +170,7 @@
     "@aws-sdk/s3-request-presigner": "^3.975.0",
     "@azure/storage-blob": "^12.30.0",
     "@better-auth/cli": "^1.4.17",
+    "@contextstream/mcp-server": "^0.4.39",
     "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.39.2",
     "@eslint/json": "^0.14.0",
@@ -314,7 +315,6 @@
     "@unocss/astro": "^66.5.12",
     "@unocss/core": "^66.6.0",
     "@unocss/reset": "^66.6.0",
-    "@vercel/kv": "^3.0.0",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.18",
     "archiver": "^7.0.1",
@@ -452,7 +452,6 @@
         "typescript"
       ],
       "allowedVersions": {
-        "@vercel/kv": "3.0.0",
         "mongodb": "7.0.0",
         "eslint": "9.39.2",
         "drizzle-orm": "0.45.1",

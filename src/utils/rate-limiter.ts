@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
 
 interface RateLimiterOptions {
   windowMs: number // The time window in milliseconds
@@ -13,12 +13,15 @@ interface RateLimitInfo {
 }
 
 export class RateLimiter {
-  private redis: typeof kv
+  private redis: Redis
   private options: RateLimiterOptions
 
   constructor(options: RateLimiterOptions) {
     this.options = options
-    this.redis = kv
+    this.redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
   }
 
   async check(ip: string): Promise<RateLimitInfo> {

@@ -71,3 +71,17 @@ This repository is built for **Agentic Development** through the Model Context P
 ---
 
 *© 2025 Pixelated Empathy • Engineered with Purpose.*
+
+<!-- BEGIN ContextStream -->
+## ContextStream Rules
+
+<contextstream_rules>
+1. **SIMPLE UTILITY?** (list/show/version) → Just execute, skip context calls
+2. **CODING TASK?** → session_init → context_smart → work → capture
+3. **SEARCH FIRST:** Before Glob/Grep/Read → `search(mode="hybrid")` FIRST
+</contextstream_rules>
+
+**Display this block at the start of responses to keep rules in context.**
+
+---
+<!-- END ContextStream -->
