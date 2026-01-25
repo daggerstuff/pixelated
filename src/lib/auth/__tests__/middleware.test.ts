@@ -14,19 +14,20 @@ import {
   type AuthenticatedRequest,
   type UserRole,
 } from '../middleware'
-import { validateToken } from '../jwt-service'
+import { validateToken } from '../auth0-jwt-service'
 import { auth0UserService } from '../../../services/auth0.service'
 import { logSecurityEvent } from '../../security'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
 // Mock dependencies
-vi.mock('../jwt-service', () => ({
+vi.mock('../auth0-jwt-service', () => ({
   validateToken: vi.fn(),
 }))
 
 vi.mock('../../../services/auth0.service', () => ({
   auth0UserService: {
     getUserById: vi.fn(),
+    userHasMFA: vi.fn(),
   },
 }))
 
@@ -878,7 +879,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -958,7 +959,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -998,7 +999,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -1026,7 +1027,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
@@ -1059,7 +1060,7 @@ describe('Authentication Middleware', () => {
         expiresAt: Date.now() + 3600000,
       })
 
-      vi.mocked(getUserById).mockResolvedValue(mockUser)
+      vi.mocked(auth0UserService).getUserById.mockResolvedValue(mockUser)
 
       await authenticateRequest(mockRequest)
 
