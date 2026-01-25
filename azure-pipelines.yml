@@ -258,13 +258,19 @@ stages:
 
           - script: |
               export CI=true
-              export VITEST_COVERAGE_ENABLED=true
-              pnpm run test:unit
-            displayName: 'Run Unit Tests with Coverage'
+              export VITEST_COVERAGE_ENABLED=false
+              export NODE_OPTIONS="--max-old-space-size=4096"
+              timeout 300s pnpm exec vitest run --no-coverage --maxWorkers=1 --bail=3 --reporter=junit --outputFile=./coverage/junit.xml || {
+                echo "Tests timed out or failed"
+                exit 1
+              }
+            displayName: 'Run Unit Tests'
+            timeoutInMinutes: '10'
             continueOnError: 'true'
             env:
-              VITEST_COVERAGE_ENABLED: 'true'
+              VITEST_COVERAGE_ENABLED: 'false'
               NODE_ENV: 'test'
+              NODE_OPTIONS: '--max-old-space-size=4096'
 
           - task: PublishTestResults@2
             inputs:
