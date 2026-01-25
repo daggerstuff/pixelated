@@ -13,15 +13,7 @@ import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
 import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
 import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
 
-// Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  clientId: process.env.AUTH0_CLIENT_ID || '',
-  clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
-  audience: process.env.AUTH0_AUDIENCE || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
-}
+import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
 // Initialize Auth0 clients
 let auth0Management: ManagementClient | null = null
@@ -31,28 +23,39 @@ let auth0Authentication: AuthenticationClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
+  const config = {
+    domain: process.env.AUTH0_DOMAIN || '',
+    clientId: process.env.AUTH0_CLIENT_ID || '',
+    clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
+    audience: process.env.AUTH0_AUDIENCE || '',
+    managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
+    managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  }
+
+  if (!config.domain || !config.managementClientId || !config.managementClientSecret) {
     console.warn('Auth0 configuration is incomplete. Authentication features may not work.')
     return
   }
 
   if (!auth0Management) {
     auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      domain: config.domain,
+      clientId: config.managementClientId,
+      clientSecret: config.managementClientSecret,
+      audience: `https://${config.domain}/api/v2/`,
       scope: 'read:users update:users create:users delete:users'
     })
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain: config.domain,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret
     })
   }
+
+  return config
 }
 
 /**
@@ -94,11 +97,18 @@ export class Auth0UserService {
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: AUTH0_CONFIG.audience
+        audience: process.env.AUTH0_AUDIENCE || ''
       })
 
       // Get user info
       const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+
+      // Log security event
+       logSecurityEvent(SecurityEventType.LOGIN, {
+        userId: userResponse.user_id,
+        email: userResponse.email,
+        method: 'password'
+      })
 
       return {
         user: {
