@@ -1,0 +1,31 @@
+# Pixelated Empathy Therapeutic AI - Requirements
+# CPU-optimized for free-tier VPS
+
+# Core ML/AI
+torch==2.10.0+cpu
+torchvision==0.25.0+cpu
+torchaudio==2.10.0+cpu
+--find-links https://download.pytorch.org/whl/cpu/torch_stable.html
+
+transformers==4.57.6
+sentence-transformers==5.2.0
+scikit-learn==1.8.0
+fairlearn==0.13.0
+
+# Data processing
+pandas==3.0.0
+numpy==2.3.5
+scipy==1.15.3
+
+# API framework
+flask==3.1.2
+flask-cors==6.0.2
+
+# Validation
+pydantic==2.12.5
+
+# Utilities
+python-dateutil==2.9.0
+pyyaml==6.0.3
+requests==2.32.5
+tqdm==4.67.1
