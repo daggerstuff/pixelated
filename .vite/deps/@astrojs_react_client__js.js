@@ -12061,11 +12061,11 @@ var require_client = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.3_@types+react-dom@19.2.3_@types+react@19.2.7__@t_0230b8f2fc8da90ce79ebf26b1f9ca13/node_modules/@astrojs/react/dist/client.js
+// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.10_@types+react-dom@19.2.3_@types+react@19.2.9__@_dbf682e1f4af6cdb08c0c39911b63175/node_modules/@astrojs/react/dist/client.js
 var import_react2 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
-// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.3_@types+react-dom@19.2.3_@types+react@19.2.7__@t_0230b8f2fc8da90ce79ebf26b1f9ca13/node_modules/@astrojs/react/dist/static-html.js
+// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.10_@types+react-dom@19.2.3_@types+react@19.2.9__@_dbf682e1f4af6cdb08c0c39911b63175/node_modules/@astrojs/react/dist/static-html.js
 var import_react = __toESM(require_react(), 1);
 var StaticHtml = ({
   value,
@@ -12083,7 +12083,7 @@ var StaticHtml = ({
 StaticHtml.shouldComponentUpdate = () => false;
 var static_html_default = StaticHtml;
 
-// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.3_@types+react-dom@19.2.3_@types+react@19.2.7__@t_0230b8f2fc8da90ce79ebf26b1f9ca13/node_modules/@astrojs/react/dist/client.js
+// node_modules/.pnpm/@astrojs+react@4.4.2_@types+node@25.0.10_@types+react-dom@19.2.3_@types+react@19.2.9__@_dbf682e1f4af6cdb08c0c39911b63175/node_modules/@astrojs/react/dist/client.js
 function isAlreadyHydrated(element) {
   for (const key in element) {
     if (key.startsWith("__reactContainer")) {

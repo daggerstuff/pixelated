@@ -167,11 +167,52 @@ export class BiasMetricsCollector {
 
   async getMetrics(options?: DashboardOptions): Promise<DashboardMetrics> {
     try {
-      return await this.pythonBridge.getDashboardMetrics({
+      const response = await this.pythonBridge.getDashboardMetrics({
         time_range: options?.time_range || '24h',
         include_details: options?.include_details || false,
         aggregation_type: options?.aggregation_type || 'hourly',
       })
+
+      // Map Python service response to expected TypeScript structure
+      return {
+        overall_stats: {
+          total_sessions: response.summary?.total_sessions_analyzed || 0,
+          average_bias_score: response.summary?.average_bias_score || 0,
+          alert_distribution: response.summary?.alert_distribution || {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0,
+          },
+        },
+        trend_data: [],
+        recent_alerts: [],
+        summary: {
+          total_sessions: response.summary?.total_sessions_analyzed || 0,
+          average_bias_score: response.summary?.average_bias_score || 0,
+          alert_distribution: response.summary?.alert_distribution || {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0,
+          },
+          total_sessions_analyzed:
+            response.summary?.total_sessions_analyzed || 0,
+          high_risk_sessions: response.summary?.high_risk_sessions || 0,
+          critical_alerts: response.summary?.critical_alerts || 0,
+        },
+        trends: {
+          daily_bias_scores: response.trends?.daily_bias_scores || [],
+          alert_counts: response.trends?.alert_counts || [],
+        },
+        demographics: {
+          bias_by_age_group: response.demographics?.bias_by_age_group || {},
+          bias_by_gender: response.demographics?.bias_by_gender || {},
+        },
+        system_metrics: {
+          cpu_usage: 0,
+        },
+      }
     } catch (error: unknown) {
       logger.warn('Failed to get metrics from Python service, using fallback', {
         error,
@@ -189,7 +230,7 @@ export class BiasMetricsCollector {
         average_bias_score:
           localMetrics.length > 0
             ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-              localMetrics.length
+            localMetrics.length
             : 0,
         alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
       },
@@ -200,7 +241,7 @@ export class BiasMetricsCollector {
         average_bias_score:
           localMetrics.length > 0
             ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-              localMetrics.length
+            localMetrics.length
             : 0,
         alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
       },
@@ -326,7 +367,7 @@ export class BiasMetricsCollector {
           average_bias_score:
             localMetrics.length > 0
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-                localMetrics.length
+              localMetrics.length
               : 0,
           alert_distribution:
             this.calculateLocalAlertDistribution(localMetrics),
@@ -341,7 +382,7 @@ export class BiasMetricsCollector {
           average_bias_score:
             localMetrics.length > 0
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-                localMetrics.length
+              localMetrics.length
               : 0,
           alert_distribution:
             this.calculateLocalAlertDistribution(localMetrics),

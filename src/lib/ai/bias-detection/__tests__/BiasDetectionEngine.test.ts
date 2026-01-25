@@ -1,5 +1,5 @@
 /// <reference types="vitest/globals" />
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach, beforeAll } from 'vitest'
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
 
 // Create a hoisted mock instance that can be accessed by both the mock factory and tests
@@ -120,7 +120,7 @@ const createPartialFailingPythonService = () =>
         recommendations: [],
       }
     }
-    async initialize() {}
+    async initialize() { }
     async checkHealth() {
       return { status: 'error', message: 'Service failed' }
     }
@@ -844,7 +844,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
             confidence: 0.9,
           }
         }
-        async initialize() {}
+        async initialize() { }
         async checkHealth() {
           return { status: 'healthy', message: 'Service is running' }
         }
@@ -935,7 +935,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
         async runEvaluationAnalysis(_session: SessionData): Promise<any> {
           throw new Error('Python service unavailable')
         }
-        async initialize() {}
+        async initialize() { }
         async checkHealth() {
           return { status: 'error', message: 'Service failed' }
         }
@@ -1053,7 +1053,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
               recommendations: [],
             }
           }
-          async initialize() {}
+          async initialize() { }
           async checkHealth() {
             return { status: 'error', message: 'Service failed' }
           }
@@ -1203,7 +1203,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
             recommendations: [],
           }
         }
-        async initialize() {}
+        async initialize() { }
         async checkHealth() {
           return { status: 'healthy', message: 'Service is running' }
         }
@@ -1355,7 +1355,7 @@ describe('BiasDetectionEngine', { timeout: 20000 }, () => {
             recommendations: [],
           }
         }
-        async initialize() {}
+        async initialize() { }
         async checkHealth() {
           return { status: 'error', message: 'Authentication failed' }
         }

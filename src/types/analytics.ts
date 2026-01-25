@@ -166,4 +166,8 @@ export interface AnalyticsFilters {
   timeRange: TimeRange
   userSegment?: 'all' | 'new' | 'returning'
   skillCategory?: 'all' | 'therapeutic' | 'technical' | 'interpersonal'
+  config?: {
+    enableAutoRefresh?: boolean
+    refreshInterval?: number
+  }
 }

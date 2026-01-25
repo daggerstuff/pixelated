@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach} from 'vitest'
 /// <reference types="vitest/globals" />
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import { BiasMetricsCollector } from '../metrics-collector'
