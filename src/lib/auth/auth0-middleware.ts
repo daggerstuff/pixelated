@@ -584,6 +584,24 @@ export async function authenticateRequest(request: Request): Promise<{
     }
   }
 
+  // Check if user is active
+  if (user.isActive === false) {
+    const { logSecurityEvent, SecurityEventType } = await import('../security')
+    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      error: 'User account is inactive',
+      endpoint: new URL(request.url).pathname,
+    })
+
+    return {
+      success: false,
+      response: new Response(JSON.stringify({ error: 'User account is inactive' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      error: 'User account is inactive',
+    }
+  }
+
   // Check if user has MFA enabled
   const hasMFA = await auth0UserService.userHasMFA(user.id)
 
