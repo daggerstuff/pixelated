@@ -353,6 +353,7 @@
     "globby": "^16.1.0",
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.1",
+    "hono": "^4.11.5",
     "html-entities": "^2.6.0",
     "js-base64": "^3.7.8",
     "jsdom": "^27.4.0",
@@ -440,7 +441,7 @@
       "qs": "6.14.1",
       "devalue": "^5.6.1",
       "h3": "^1.15.4",
-      "hono": "^4.11.1",
+      "hono": "^4.11.5",
       "diff": "^5.2.2",
       "lodash": "^4.17.23",
       "wrangler": "^4.59.1",
@@ -530,5 +531,8 @@
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
-  ]
+  ],
+  "peerDependencies": {
+    "hono": "^4.11.5"
+  }
 }
