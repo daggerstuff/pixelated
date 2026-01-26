@@ -15,7 +15,7 @@ fairlearn==0.13.0
 # Data processing
 pandas==3.0.0
 numpy==2.3.5
-scipy==1.15.3
+scipy==1.17.0
 
 # API framework
 flask==3.1.2
