@@ -89,7 +89,7 @@ importers:
         version: 1.4.17(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260124.0)(@opentelemetry/api@1.9.0)(@upstash/redis@1.36.1)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.10)(magicast@0.5.1)(mongodb@7.0.0)(nanostores@1.1.0)(postgres@3.4.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sql.js@1.13.0)(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.0.10)(jiti@2.6.1)(jsdom@27.4.0(@noble/hashes@2.0.1))(msw@2.12.7(@types/node@25.0.10)(typescript@5.9.3))(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
       '@contextstream/mcp-server':
         specifier: ^0.4.39
-        version: 0.4.39(hono@4.11.5)
+        version: 0.4.39(hono@4.11.7)
       '@eslint/css':
         specifier: ^0.14.1
         version: 0.14.1
@@ -122,7 +122,7 @@ importers:
         version: 1.0.2
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.3
-        version: 1.25.3(hono@4.11.5)(zod@4.3.6)
+        version: 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -179,10 +179,10 @@ importers:
         version: 4.7.0
       '@smithery/sdk':
         specifier: ^4.0.1
-        version: 4.0.1(@modelcontextprotocol/sdk@1.25.3(hono@4.11.5)(zod@4.3.6))(zod@4.3.6)
+        version: 4.0.1(@modelcontextprotocol/sdk@1.25.3(hono@4.11.7)(zod@4.3.6))(zod@4.3.6)
       '@spotlightjs/astro':
         specifier: ^3.2.6
-        version: 3.2.6(@sentry/astro@10.36.0(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.5)
+        version: 3.2.6(@sentry/astro@10.36.0(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.7)
       '@tanstack/react-query':
         specifier: ^5.90.20
         version: 5.90.20(react@19.2.3)
@@ -221,7 +221,7 @@ importers:
         version: 1.3.1(react@19.2.3)(vue@3.5.27(typescript@5.9.3))
       agentdb:
         specifier: 1.6.1
-        version: 1.6.1(hono@4.11.5)
+        version: 1.6.1(hono@4.11.7)
       astro:
         specifier: ^5.16.15
         version: 5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -465,7 +465,7 @@ importers:
         version: 1.58.0
       '@smithery/cli':
         specifier: ^3.3.0
-        version: 3.3.0(@types/node@25.0.10)(hono@4.11.5)(zod@4.3.6)
+        version: 3.3.0(@types/node@25.0.10)(hono@4.11.7)(zod@4.3.6)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -624,7 +624,7 @@ importers:
         version: 9.0.1
       hono:
         specifier: ^4.11.5
-        version: 4.11.5
+        version: 4.11.7
       html-entities:
         specifier: ^2.6.0
         version: 2.6.0
@@ -8748,8 +8748,8 @@ packages:
   hnswlib-node@3.0.0:
     resolution: {integrity: sha512-fypn21qvVORassppC8/qNfZ5KAOspZpm/IbUkAtlqvbtDNnF5VVk5RWF7O5V6qwr7z+T3s1ePej6wQt5wRQ4Cg==}
 
-  hono@4.11.5:
-    resolution: {integrity: sha512-WemPi9/WfyMwZs+ZUXdiwcCh9Y+m7L+8vki9MzDw3jJ+W9Lc+12HGsd368Qc1vZi1xwW8BWMMsnK5efYKPdt4g==}
+  hono@4.11.7:
+    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
     engines: {node: '>=16.9.0'}
 
   hot-shots@6.8.7:
@@ -14511,9 +14511,9 @@ snapshots:
 
   '@cloudflare/workers-types@4.20260124.0': {}
 
-  '@contextstream/mcp-server@0.4.39(hono@4.11.5)':
+  '@contextstream/mcp-server@0.4.39(hono@4.11.7)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.5)(zod@4.3.6)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.7)(zod@4.3.6)
       ignore: 7.0.5
       zod: 4.3.6
     transitivePeerDependencies:
@@ -15054,9 +15054,9 @@ snapshots:
     dependencies:
       '@hapi/hoek': 11.0.7
 
-  '@hono/node-server@1.19.9(hono@4.11.5)':
+  '@hono/node-server@1.19.9(hono@4.11.7)':
     dependencies:
-      hono: 4.11.5
+      hono: 4.11.7
 
   '@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@19.2.3))':
     dependencies:
@@ -15543,9 +15543,9 @@ snapshots:
 
   '@microsoft/clarity@1.0.2': {}
 
-  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.5)(zod@4.3.6)':
+  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.7)(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.5)
+      '@hono/node-server': 1.19.9(hono@4.11.7)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -18473,10 +18473,10 @@ snapshots:
 
   '@smithery/api@0.11.0': {}
 
-  '@smithery/cli@3.3.0(@types/node@25.0.10)(hono@4.11.5)(zod@4.3.6)':
+  '@smithery/cli@3.3.0(@types/node@25.0.10)(hono@4.11.7)(zod@4.3.6)':
     dependencies:
       '@anthropic-ai/mcpb': 1.2.0
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.5)(zod@4.3.6)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@ngrok/ngrok': 1.7.0
       '@smithery/api': 0.11.0
       chalk: 4.1.2
@@ -18509,9 +18509,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.3(hono@4.11.5)(zod@4.3.6))(zod@4.3.6)':
+  '@smithery/sdk@4.0.1(@modelcontextprotocol/sdk@1.25.3(hono@4.11.7)(zod@4.3.6))(zod@4.3.6)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.5)(zod@4.3.6)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.7)(zod@4.3.6)
       zod: 4.3.6
 
   '@smithy/abort-controller@4.2.8':
@@ -18869,10 +18869,10 @@ snapshots:
 
   '@speed-highlight/core@1.2.14': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.36.0(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.5)':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.36.0(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)))(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(hono@4.11.7)':
     dependencies:
       '@sentry/astro': 10.36.0(astro@5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
-      '@spotlightjs/spotlight': 3.0.2(hono@4.11.5)
+      '@spotlightjs/spotlight': 3.0.2(hono@4.11.7)
       astro: 5.16.15(@azure/storage-blob@12.30.0)(@types/node@25.0.10)(@upstash/redis@1.36.1)(@vercel/functions@2.2.13(@aws-sdk/credential-provider-web-identity@3.972.1))(@vercel/kv@3.0.0)(ioredis@5.9.2)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
@@ -18881,10 +18881,10 @@ snapshots:
 
   '@spotlightjs/overlay@3.2.0': {}
 
-  '@spotlightjs/sidecar@1.12.0(hono@4.11.5)':
+  '@spotlightjs/sidecar@1.12.0(hono@4.11.7)':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.5)(zod@4.3.6)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@sentry/core': 9.22.0
       '@sentry/node': 8.55.0
       kleur: 4.1.5
@@ -18895,11 +18895,11 @@ snapshots:
       - hono
       - supports-color
 
-  '@spotlightjs/spotlight@3.0.2(hono@4.11.5)':
+  '@spotlightjs/spotlight@3.0.2(hono@4.11.7)':
     dependencies:
       '@sentry/node': 8.55.0
       '@spotlightjs/overlay': 3.2.0
-      '@spotlightjs/sidecar': 1.12.0(hono@4.11.5)
+      '@spotlightjs/sidecar': 1.12.0(hono@4.11.7)
       import-meta-resolve: 4.2.0
     transitivePeerDependencies:
       - '@cfworker/json-schema'
@@ -19985,9 +19985,9 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  agentdb@1.6.1(hono@4.11.5):
+  agentdb@1.6.1(hono@4.11.7):
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.5)(zod@4.3.6)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@xenova/transformers': 2.17.2
       chalk: 5.6.2
       commander: 12.1.0
@@ -22854,7 +22854,7 @@ snapshots:
       bindings: 1.5.0
       node-addon-api: 8.5.0
 
-  hono@4.11.5: {}
+  hono@4.11.7: {}
 
   hot-shots@6.8.7:
     optionalDependencies:
