@@ -23,7 +23,7 @@ RUN npm install -g pnpm@10.26.1
 RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+deb12u14 && rm -rf /var/lib/apt/lists/*
 
 # Production dependencies stage
-FROM runtime AS prod-deps
+FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
