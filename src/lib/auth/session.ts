@@ -3,9 +3,9 @@
  * Handles session verification, user info retrieval, and token management
  */
 
-import { JWT } from 'next-auth/jwt'
-import { Session } from 'next-auth'
-import { userManager } from '../db'
+import { JWT } from "next-auth/jwt";
+import { Session } from "next-auth";
+import { userManager } from "../db";
 
 /**
  * Get session data from JWT token (placeholder implementation)
@@ -13,7 +13,7 @@ import { userManager } from '../db'
  * @returns Session object or null
  */
 export async function getSessionFromToken(token: JWT): Promise<Session | null> {
-  if (!token?.accessToken) return null
+  if (!token?.accessToken) return null;
 
   // In a real app, you might verify the token with your auth provider
   // This is a placeholder implementation
@@ -22,12 +22,10 @@ export async function getSessionFromToken(token: JWT): Promise<Session | null> {
       id: token.sub as string,
       email: token.email as string,
       role: token.role as string,
-    },
-    expires: token.exp as string,
-    user: {
       name: token.name as string,
     },
-  }
+    expires: token.exp as string,
+  };
 }
 
 /**
@@ -36,14 +34,14 @@ export async function getSessionFromToken(token: JWT): Promise<Session | null> {
  * @returns boolean indicating if session is valid
  */
 export function isSessionValid(session: Session): boolean {
-  if (!session?.expires) return false
+  if (!session?.expires) return false;
 
   // Convert expires string to Date for comparison
-  const expiresDate = new Date(session.expires as string)
-  const now = new Date()
+  const expiresDate = new Date(session.expires as string);
+  const now = new Date();
 
   // In production, you might want to check closer to expiry
-  return now.getTime() < expiresDate.getTime() - 5 * 60 * 1000 // 5 minutes before expiry
+  return now.getTime() < expiresDate.getTime() - 5 * 60 * 1000; // 5 minutes before expiry
 }
 
 /**
@@ -53,11 +51,11 @@ export function isSessionValid(session: Session): boolean {
  */
 export async function getUserProfile(userId: string) {
   try {
-    const user = await userManager.getUserById(userId)
+    const user = await userManager.getUserById(userId);
 
     if (!user) {
-      console.error('User not found:', userId)
-      return null
+      console.error("User not found:", userId);
+      return null;
     }
 
     return {
@@ -66,10 +64,10 @@ export async function getUserProfile(userId: string) {
       fullName: `${user.first_name} ${user.last_name}`,
       avatarUrl: user.avatar_url,
       role: user.role,
-    }
+    };
   } catch (error) {
-    console.error('Error in getUserProfile:', error)
-    return null
+    console.error("Error in getUserProfile:", error);
+    return null;
   }
 }
 
@@ -78,21 +76,19 @@ export async function getUserProfile(userId: string) {
  * @param refreshToken New refresh token
  * @returns Updated session data
  */
-export async function refreshSession(refreshToken: string): Promise<Session> {
+export async function refreshSession(_refreshToken: string): Promise<Session> {
   // In real implementation, verify refresh token and issue new access token
   // This is a placeholder implementation
 
   return {
     user: {
-      id: 'placeholder-id',
-      email: 'placeholder@example.com',
-      role: 'user',
+      id: "placeholder-id",
+      email: "placeholder@example.com",
+      role: "user",
+      name: "User",
     },
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
-    user: {
-      name: 'User',
-    },
-  }
+  };
 }
 
 /**
@@ -101,7 +97,7 @@ export async function refreshSession(refreshToken: string): Promise<Session> {
  * @returns User role string or null
  */
 export function getUserRole(session: Session): string | null {
-  return session?.user?.role ?? null
+  return session?.user?.role ?? null;
 }
 
 /**
@@ -111,8 +107,8 @@ export function getUserRole(session: Session): string | null {
  * @returns boolean indicating if user has required role
  */
 export function hasRole(session: Session, requiredRole: string): boolean {
-  const userRole = getUserRole(session)
-  return userRole === requiredRole
+  const userRole = getUserRole(session);
+  return userRole === requiredRole;
 }
 
 /**
@@ -122,5 +118,5 @@ export function hasRole(session: Session, requiredRole: string): boolean {
 export async function getSession(): Promise<Session | null> {
   // This is a placeholder implementation
   // In a real app, you would get the session from the request context
-  return null
+  return null;
 }

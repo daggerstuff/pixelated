@@ -1,296 +1,170 @@
-# Active Development Status
-
-**Last Updated**: 2026-01-25 03:12 EST
-
-## 🚧 Active Task: VPS Deployment & AI Services API
-
-### Current Status: In Progress
-
-We have completed the initial VPS setup and AI services API implementation.
-
-- **VPS Setup Scripts**: Created three comprehensive setup scripts for different VPS configurations
-- **AI Services API**: Implemented crisis detection and PII scrubbing services
-- **Security Features**: Added robust crisis detection algorithms and PII scrubbing capabilities
-- **Deployment Infrastructure**: Prepared for CPU-only container deployment
-
-### Next Step
-
-Deploy and test the AI services API on VPS infrastructure, then proceed with full dataset processing.
-
-### Recent Context
-
-The latest commit includes VPS setup automation and AI security features, building on the completed dataset pipeline infrastructure.
-
----
-
-## ✅ Recently Completed (Session: 2026-01-25)
-
-### **VPS Deployment & AI Services API** (COMPLETE)
-
-- **VPS Setup Scripts**: Created three configuration scripts (`vps-lightweight-setup.sh`, `vps-ngc-setup.sh`, `vps-uv-setup.sh`) for different deployment scenarios
-- **Crisis Detection Service**: Implemented `crisis-detection.ts` with advanced crisis identification algorithms
-- **PII Scrubbing Service**: Created `pii-scrubber.ts` for sensitive information redaction
-- **API Infrastructure**: Added AI services API endpoints for security features
-- **PID File**: Created `api.pid` for process management
-
-### **AI Services API Development** (Session: 2026-01-24)
-
-- **PII Scrubbing**: Added comprehensive PII detection and redaction capabilities
-- **Crisis Detection**: Implemented multi-dimensional crisis detection algorithms
-- **Emotion Validation**: Added emotion validation service
-- **Bias Detection**: Enhanced bias detection API endpoints
-- **VPS Deployment Scripts**: Created automated deployment scripts for containerized environments
-
-### **Sample Data Processing** (Validation Run) - **COMPLETE**
-
-### **Sample Data Processing** (Validation Run) - **COMPLETE**
-
-- **Pipeline Validation**: Verified end-to-end logic (Loading -> Processing -> Scoring -> Reporting).
-- **Data Access**: Fixed S3 keys and JSON parsing for all 6 tiers.
-- **Results**: Processed 600 conversations (100/tier). Avg Complexity: 0.243.
-- **Results**: Processed 600 conversations (100/tier). Avg Complexity: 0.243.
-- **Blockers Resolved**: Fixed S3 credentials and file paths.
-
-### **Dark Humor Persona & VPS Strategy** (Session: 2026-01-15)
-
-- **Persona Adapter**: fully implemented `CommunicationStyle.DARK_HUMOR` and `TherapeuticApproach.PROVOCATIVE`.
-- **Logic**: Adds specific prefixes, cynical re-framing, and replaces empathetic platitudes with darker, grounded realism.
-- **Batched Processing**: Created `BatchedTierProcessor` to handle "hotswapping" datasets (download -> process -> delete) to fit within VPS storage limits.
-- **Tests**: Verified adaptation logic with `test_dark_humor.py` passing all checks.
-
-### **Auth0 Integration fixes** (Previous Session)
-
-- Enhanced `BaseTierLoader` with S3 support and registry integration
-- Upgraded all tier loaders (2, 3, 5, 6) to use unified base class
-- Tier 3 now discovers 27+ CoT datasets dynamically from registry
-- All loaders support S3 download via OVHAI CLI
-
-### **PIX-20**: Dataset Pipeline Phase/Tier Rollout
-
-- Created comprehensive integration test suite (`test_tier_pipeline_integration.py`)
-- 12/12 tests passing for all 6 tiers
-- Validated quality thresholds and training ratios
-- Confirmed S3 capability (mocked)
-
-### **PIX-26**: Implementation Files Batch A
-
-- Verified 9 existing processing components
-- Created `conversation_complexity_scorer.py` with 5-dimensional assessment
-- All core dataset processing infrastructure in place
-
-### **PIX-39**: Tier 4 Reddit Mental Health Archive
-
-- Created `test_tier4_reddit_integration.py` with 13/13 tests passing
-- Validated 15+ mental health condition datasets
-- Confirmed CSV format support and crisis detection capabilities
-- Real-world conversation patterns validated
-
-### **PIX-49**: Tier 5 Research & Multi-Modal Integration
-
-- Created `test_tier5_research_integration.py` with 20/20 tests passing
-- Validated academic research datasets (IEMOCAP, RECCON, Empathy-Mental-Health)
-- Confirmed multi-modal support (text, audio, emotion labels)
-- Fixed 5 unused variable warnings
-
-### **PIX-133**: Tier 6 Knowledge Base & Reference Materials
-
-- Created `test_tier6_knowledge_integration.py` with 24/24 tests passing
-- Validated reference materials (DSM-5, psychology-10k, Psych-101)
-- Confirmed 100% quality threshold for authoritative sources
-- **COMPLETED FULL 6-TIER PIPELINE VALIDATION**
-
-### Quality Validation & Analytics
-
-- Created `tier_quality_validator.py` for comprehensive analytics
-- Generated quality reports (JSON + text)
-- Validated all 6 tiers: 100% training ratio, 91.5% avg quality
-- Confirmed 68+ datasets configured across all tiers
-
----
-
-## 📊 Infrastructure Status
-
-### Tier Loading System: ✅ **100% COMPLETE**
-
-| Tier | Name                 | Quality | Weight | Datasets | Tests | Status |
-| ---- | -------------------- | ------- | ------ | -------- | ----- | ------ |
-| 1    | Priority/Curated     | 99%     | 40%    | TBD      | ✅    | Ready  |
-| 2    | Professional         | 95%     | 25%    | 11       | ✅    | Ready  |
-| 3    | CoT Reasoning        | 90%     | 20%    | 27       | ✅    | Ready  |
-| 4    | Reddit Archive       | 85%     | 10%    | 15       | 13/13 | Ready  |
-| 5    | Research/Multi-Modal | 80%     | 4%     | 8        | 20/20 | Ready  |
-| 6    | Knowledge Base       | 100%    | 1%     | 7        | 24/24 | Ready  |
-
-**Total**: 68+ datasets configured, 69+ integration tests passing
-
-### Key Features Implemented:
-
-- ✅ S3-first architecture (OVHAI CLI integration)
-- ✅ Registry-driven dataset discovery
-- ✅ Quality threshold enforcement (tier-specific)
-- ✅ Training ratio balancing (sums to 1.0)
-- ✅ Multi-modal support (text, audio, emotion labels)
-- ✅ Unified base loader with common functionality
-- ✅ Comprehensive integration testing
-
----
-
-## 🎯 Next Steps (Priority Order)
-
-### Immediate Next Session:
-
-1. **VPS Deployment & Testing**
-    - Deploy AI services API to VPS
-    - Test crisis detection and PII scrubbing services
-    - Verify API endpoints and performance
-    - **Estimated**: 2-4 hours
-
-2. **Full Data Processing (VPS)**
-   - Copy codebase to VPS
-   - Run `uv run ai/dataset_pipeline/orchestration/batched_tier_processor.py --persona dark_humor`
-   - Monitor S3 uploads and local storage usage (Hotswap verification)
-   - **Estimated**: 12-24 hours (process time)
-
-2. **Model Training Infrastructure**
-   - Set up Axolotl or Unsloth framework
-   - Configure training parameters
-   - Set up GPU infrastructure
-   - **Estimated**: 4-8 hours
-
-3. **Model Training Infrastructure**
-   - Set up Axolotl or Unsloth framework
-   - Configure training parameters (LoRA/QLoRA)
-   - Set up GPU infrastructure
-   - Create training scripts
-   - **Estimated**: 4-8 hours
-
-### Future Phases:
-
-4. **Quality Enhancement**
-   - Run complexity analysis on full corpus
-   - Generate detailed analytics
-   - Identify and address data gaps
-   - Fine-tune quality thresholds
-
-5. **Model Training**
-   - Fine-tune base model on therapeutic corpus
-   - Implement The Empathy Gym™ scenarios
-   - Validate therapeutic capabilities
-   - Deploy for testing
-
----
-
-## 📁 Key Files & Locations
-
-### Tier Loaders:
-
-- `ai/dataset_pipeline/ingestion/tier_loaders/base_tier_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier1_priority_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier2_professional_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier3_cot_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier4_reddit_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier5_research_loader.py`
-- `ai/dataset_pipeline/ingestion/tier_loaders/tier6_knowledge_loader.py`
-
-### Orchestration:
-
-- `ai/dataset_pipeline/orchestration/tier_processor.py`
-- `ai/dataset_pipeline/orchestration/pipeline_orchestrator.py`
-
-### Processing:
-
-- `ai/dataset_pipeline/processing/conversation_complexity_scorer.py`
-- `ai/dataset_pipeline/processing/reasoning_dataset_processor.py`
-- `ai/dataset_pipeline/processing/mental_health_integrator.py`
-- (+ 7 more specialized processors)
-
-### Testing:
-
-- `ai/dataset_pipeline/tests/test_tier_pipeline_integration.py` (12 tests)
-- `ai/dataset_pipeline/tests/test_tier4_reddit_integration.py` (13 tests)
-- `ai/dataset_pipeline/tests/test_tier5_research_integration.py` (20 tests)
-- `ai/dataset_pipeline/tests/test_tier6_knowledge_integration.py` (24 tests)
-
-### Analytics:
-
-- `ai/dataset_pipeline/analytics/tier_quality_validator.py`
-- `ai/dataset_pipeline/analytics/reports/tier_quality_report.json`
-- `ai/dataset_pipeline/analytics/reports/tier_quality_report.txt`
-
-### Configuration:
-
-- `ai/data/dataset_registry.json` (central dataset registry)
-
----
-
-## 🚀 Quick Start Commands
-
-### Run Quality Validation:
-
+# 📋 Active Tasks: **DATASET COMPLETION FOCUS**
+
+## Current State
+- **CRITICAL**: Entire Pixelated Empathy platform OFFLINE due to Azure host loss
+- **Domain Inaccessible**: No frontend, website, or API services available
+- **Dataset Status**: 75% Complete - Focus on Phase 1 completion
+- **S3 Dataset Size**: 52.20GB across 19,330 objects
+- **Training Target**: Wayfarer-2-12B / Harbringer-24B mental health specialization
+- **Stage**: Phase 1 - Foundation Completion (Weeks 1-2) - CRITICAL
+- **Execution Environment**: VPS (for all data-intensive tasks)
+- **URGENT**: Need to restore website and find new hosting platform
+
+## 🎯 Task Plan (Phase 1 Completion)
+
+### 🔥 Task 1: Download Tier 1 Priority Datasets (CRITICAL - NOT STARTED)
+**Estimated Time**: 1-2 hours  
+**Impact**: 40% of training weight  
+**VPS Command**:
 ```bash
-export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/ai/dataset_pipeline/schemas
-uv run python ai/dataset_pipeline/analytics/tier_quality_validator.py
+rclone copy gdrive:datasets/datasets-wendy ~/datasets/consolidated/priority_wendy/
+```
+- `priority_1_FINAL.jsonl` (462MB)
+- `priority_2_FINAL.jsonl` (330MB) 
+- `priority_3_FINAL.jsonl` (370MB)
+- `priority_4_FINAL.jsonl`
+- `priority_5_FINAL.jsonl`
+
+### 🔥 Task 2: Download Tier 3 CoT Datasets (NOT STARTED)
+**Estimated Time**: 30 minutes  
+**VPS Command**:
+```bash
+rclone copy gdrive:datasets/CoT_Neurodivergent_vs_Neurotypical_Interactions ~/datasets/consolidated/cot/
+rclone copy gdrive:datasets/CoT_Philosophical_Understanding ~/datasets/consolidated/cot/
 ```
 
-### Run Integration Tests:
-
+### 🔥 Task 3: Download Tier 4 Reddit Data (NOT STARTED)
+**Estimated Time**: 45 minutes  
+**VPS Command**:
 ```bash
-export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/ai/dataset_pipeline/schemas
-uv run pytest ai/dataset_pipeline/tests/test_tier_pipeline_integration.py -v
-uv run pytest ai/dataset_pipeline/tests/test_tier4_reddit_integration.py -v
-uv run pytest ai/dataset_pipeline/tests/test_tier5_research_integration.py -v
-uv run pytest ai/dataset_pipeline/tests/test_tier6_knowledge_integration.py -v
+rclone copy gdrive:datasets/reddit_mental_health/mental_disorders_reddit.csv ~/datasets/consolidated/reddit/
+rclone copy gdrive:datasets/reddit_mental_health/Suicide_Detection.csv ~/datasets/consolidated/reddit/
 ```
 
-### Run VPS Batched Processing (Hotswap):
-
+### 🔥 Task 4: Generate Edge Case Synthetic Dataset (NOT STARTED)
+**Estimated Time**: 30-60 minutes
+**VPS Command**:
 ```bash
-# Process ALL Tiers 1-6 with Dark Humor persona, cleaning up raw data as you go
-export PYTHONPATH=$PYTHONPATH:$(pwd)/ai/dataset_pipeline/schemas
-uv run ai/dataset_pipeline/orchestration/batched_tier_processor.py --persona dark_humor
+python ai/training_ready/scripts/generate_edge_case_synthetic_dataset.py \
+  --output ai/training_ready/data/generated/edge_case_synthetic.jsonl \
+  --categories all --count 10000
 ```
+
+### 🔥 Task 5: Build CPTSD Dataset from Transcripts (NOT STARTED)
+**Estimated Time**: 30-60 minutes
+**VPS Command**:
+```bash
+python ai/training_ready/scripts/build_cptsd_dataset_from_transcripts.py \
+  --input-dir ~/datasets/gdrive/tier4_voice_persona/Tim\ Fletcher/ \
+  --output ai/training_ready/data/generated/cptsd_transcripts.jsonl
+```
+
+### 🔥 Task 5.4: Nightmare Fuel "Hydration" (NOT STARTED)
+**Estimated Time**: 60 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/hydrate_nightmare_scenarios.py
+```
+  - [ ] Configure for Nvidia NIM API (Llama 4 / 3.3)
+  - [ ] Run hydration on existing batches
+
+### 🔥 Task 5.5: Ultra Nightmares Generation (NOT STARTED)
+**Estimated Time**: 60 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/generate_ultra_nightmares.py
+```
+  - [ ] Execute generation run
+  - [ ] Validate quality and intensity
+
+### 🔥 Task 6: Run Deduplication (<1% duplicate rate)
+**Estimated Time**: 60 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/enhanced_deduplication.py --dry-run
+uv run python ai/training_ready/scripts/enhanced_deduplication.py --confirm
+```
+
+### 🔥 Task 7: Fix UTF-8 Encoding Issues
+**Estimated Time**: 30 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/fix_encoding.py \
+  --input-dir ~/datasets/consolidated/ \
+  --output-dir ~/datasets/consolidated/fixed/
+```
+
+### 🔥 Task 8: Run 8-Gate Quality Validation & Crisis Filter
+**Estimated Time**: 45 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/filter_crisis_quality.py
+uv run python ai/training_ready/scripts/verify_final_dataset.py --report
+```
+
+### 🔥 Task 9: Compile and Upload to S3
+**Estimated Time**: 60 minutes
+**VPS Command**:
+```bash
+uv run python ai/training_ready/scripts/compile_final_dataset.py \
+  --s3-bucket pixel-data \
+  --upload-canonical
+```
+
+### 🔥 Task 10: Verify S3 Upload
+**Estimated Time**: 15 minutes
+**VPS Command**:
+```bash
+aws s3 ls s3://pixel-data/final_dataset/ --recursive
+```
+
+### 🔥 Task 11: Find Alternative to Azure Host Platform (CRITICAL)
+**Estimated Time**: 2-4 hours
+**Options to Explore**:
+- OVHcloud AI Training
+- RunPod
+- Lambda Labs
+- Google Cloud AI Platform
+- AWS SageMaker
+
+## 📊 Progress Overview
+
+| Task                      | Status         | Priority |
+| :------------------------ | :------------- | :------- |
+| Download Tier 1 Priority  | ⏳ **NOT STARTED** | CRITICAL |
+| Download Tier 3 CoT       | ⏳ **NOT STARTED** | HIGH     |
+| Download Tier 4 Reddit    | ⏳ **NOT STARTED** | HIGH     |
+| Generate Edge Case Dataset| ⏳ **NOT STARTED** | HIGH     |
+| Build CPTSD Dataset       | ⏳ **NOT STARTED** | HIGH     |
+| Nightmare Hydration       | ⏳ **NOT STARTED** | HIGH     |
+| Ultra Nightmares Gen      | ⏳ **NOT STARTED** | HIGH     |
+| Run Deduplication         | ⏳ Pending      | MEDIUM   |
+| Fix UTF-8 Encoding        | ⏳ Pending      | MEDIUM   |
+| 8-Gate Quality Valid      | ⏳ Pending      | MEDIUM   |
+| Compile & Upload S3       | ⏳ Pending      | MEDIUM   |
+| Verify S3 Upload          | ⏳ Pending      | LOW      |
+| **Server Migration**      | ✅ **COMPLETED** | CRITICAL |
+| **Prod Deployment**       | ✅ **COMPLETED** | CRITICAL |
+| Find Azure Alternative    | ⏳ **NOT STARTED** | CRITICAL |
+
+## 📈 Overall Progress
+
+| Phase   | Status         | Progress     |
+| :------ | :------------- | :----------- |
+| Phase 1 | ⚠️ **Active**   | **75%**      |
+| Phase 2 | ⏳ Pending      | 0%           |
+| Phase 3 | ⏳ Pending      | 0%           |
+
+
+## 🎯 Execution Strategy
+
+1. **SSH into VPS** first: `ssh user@vps-host-placeholder`
+2. **Navigate to project directory**: `cd ~/pixelated`
+3. **Ensure dependencies are installed**: `cd ai && uv sync`
+4. **Execute tasks in order** starting with Task 1 (CRITICAL)
+5. **Update progress in memory files** after each completed task
+6. **Parallel Task**: Explore Azure alternatives while dataset downloads continue
 
 ---
 
-## 💡 Notes & Context
-
-### Session Achievements (2026-01-14):
-
-- **Duration**: ~18 hours (06:00 - 00:44 EST)
-- **Tasks Completed**: 6 major Jira issues
-- **Tests Created**: 69+ integration tests
-- **Files Created**: 5 test suites + 1 analytics tool + 1 complexity scorer
-- **Infrastructure**: 100% complete, production-ready
-
-### Key Decisions:
-
-- **S3-First Architecture**: Chose OVHAI CLI over direct S3 access for simplicity
-- **Registry-Driven Discovery**: Centralized dataset configuration in `dataset_registry.json`
-- **Download-on-Demand**: Cache datasets locally after S3 download for multi-pass processing
-- **Tier-Specific Quality**: Different thresholds per tier (99% → 80%, plus 100% reference)
-- **Weighted Training**: Balanced sampling across tiers (40/25/20/10/4/1)
-
-### Technical Highlights:
-
-- Unified `BaseTierLoader` with common S3/registry functionality
-- Comprehensive integration testing (69+ tests, all passing)
-- Multi-modal support (text, audio transcripts, emotion labels)
-- Quality validation and analytics tooling
-- Production-ready error handling and logging
-
----
-
-## 🎊 Milestone Celebration
-
-**The Pixelated Empathy dataset pipeline is now 100% complete!**
-
-This represents:
-
-- **6 tiers** of therapeutic training data
-- **68+ datasets** configured and ready
-- **500GB+** of therapeutic conversations
-- **69+ tests** validating every component
-- **S3-first** cloud-native architecture
-- **Production-ready** infrastructure
-
-**Next stop: Processing real data and training The Empathy Gym™!** 🚀
+Last Updated: 2026-01-27

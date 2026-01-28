@@ -12,6 +12,7 @@
 trigger:
   branches:
     include:
+      - staging
       - master
       - main
       - develop
@@ -26,6 +27,7 @@ pr:
       - master
       - main
       - develop
+      - staging
 
 parameters:
   - name: TRIGGER_OVH_OLLAMA_BUILD
@@ -260,7 +262,7 @@ stages:
               export CI=true
               export VITEST_COVERAGE_ENABLED=false
               export NODE_OPTIONS="--max-old-space-size=4096"
-              timeout 300s pnpm exec vitest run --no-coverage --maxWorkers=1 --bail=3 --reporter=junit --outputFile=./coverage/junit.xml || {
+              timeout 300s pnpm exec vitest run -c config/vitest.config.ts --no-coverage --maxWorkers=1 --bail=3 --reporter=junit --outputFile=./coverage/junit.xml || {
                 echo "Tests timed out or failed"
                 exit 1
               }
@@ -586,6 +588,45 @@ stages:
             vmImage: 'ubuntu-latest'
         timeoutInMinutes: '45'
         steps:
+          - script: |
+              set -euo pipefail
+              echo "🧹 Deep cleanup of disk space before build..."
+
+              echo "📊 Disk space before cleanup:"
+              df -h / | tail -1
+
+              if command -v docker >/dev/null 2>&1; then
+                echo "Cleaning up Docker resources..."
+                
+                # Check for running containers first
+                if [ "$(docker ps -q)" ]; then
+                   echo "⚠️ Found running containers. Attempting to stop them..."
+                   docker stop $(docker ps -q) 2>/dev/null || true
+                fi
+
+                # Aggressive cleanup
+                # -a: Remove all unused images not just dangling ones
+                # --volumes: Remove unused volumes
+                # -f: Force
+                docker system prune -af --volumes 2>/dev/null || true
+                
+                # Explicitly clean builder cache (often a culprit)
+                docker builder prune -af 2>/dev/null || true
+              fi
+
+              echo "Cleaning up temporary files..."
+              rm -rf /tmp/* 2>/dev/null || true
+              rm -rf "$HOME/.tmp" 2>/dev/null || true
+
+              echo "Cleaning up workspace..."
+              # Remove potential debris from previous jobs if workspace wasn't cleaned
+              rm -rf $(Build.SourcesDirectory)/node_modules 2>/dev/null || true
+              rm -rf $(Build.SourcesDirectory)/dist 2>/dev/null || true
+
+              echo "📊 Disk space after cleanup:"
+              df -h / | tail -1
+            displayName: 'Pre-Build Deep Cleanup'
+
           - task: NodeTool@0
             inputs:
               versionSpec: '$(NODE_VERSION)'
@@ -865,7 +906,7 @@ stages:
   - stage: InstallCertManager
     displayName: 'Install cert-manager'
     dependsOn: Security
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/staging')))
     jobs:
       - deployment: InstallCertManager
         displayName: 'Install cert-manager for TLS'
@@ -1005,7 +1046,7 @@ stages:
   - stage: DeployStaging
     displayName: 'Deploy to Staging (AKS)'
     dependsOn: InstallCertManager
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/staging')))
     jobs:
       - deployment: DeployToStaging
         displayName: 'Deploy to Azure Kubernetes Service'
@@ -1248,7 +1289,7 @@ stages:
                       set -euo pipefail
                        
                       echo "🔄 Updating Pixelated image tag..."
-                      kubectl set image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) -n pixelated-staging
+                      kubectl set image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) -n $(KUBE_NAMESPACE)
                        
                       echo "✅ Image tag updated to $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 
@@ -1262,10 +1303,10 @@ stages:
                       echo "⏳ Waiting for all deployments to be ready..."
 
                       # Wait for Pixelated deployment
-                      kubectl rollout status deployment/pixelated -n pixelated --timeout=900s || {
+                      kubectl rollout status deployment/pixelated -n $(KUBE_NAMESPACE) --timeout=900s || {
                         echo "⚠️ Pixelated deployment rollout check failed or timed out"
-                        kubectl get pods -n pixelated
-                        kubectl describe deployment pixelated -n pixelated
+                        kubectl get pods -n $(KUBE_NAMESPACE)
+                        kubectl describe deployment pixelated -n $(KUBE_NAMESPACE)
                       }
 
                       # Wait for Ollama deployment

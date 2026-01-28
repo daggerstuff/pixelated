@@ -12,39 +12,39 @@ PROJECT_KEY=${1:-PIX}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Extract Jira variables from .env file
-ENV_FILE="$SCRIPT_DIR/../../.env"
-if [ ! -f "$ENV_FILE" ]; then
-    ENV_FILE="$SCRIPT_DIR/../.env"
+ENV_FILE="${SCRIPT_DIR}/../../.env"
+if [[ ! -f ${ENV_FILE} ]]; then
+	ENV_FILE="${SCRIPT_DIR}/../.env"
 fi
 
-if [ -f "$ENV_FILE" ]; then
-    echo "Extracting Jira variables from $ENV_FILE"
-    # Extract specific variables using grep and cut
-    JIRA_URL=$(grep "^JIRA_URL=" "$ENV_FILE" | cut -d'=' -f2-)
-    JIRA_USERNAME=$(grep "^JIRA_USERNAME=" "$ENV_FILE" | cut -d'=' -f2-)
-    JIRA_API_TOKEN=$(grep "^JIRA_API_TOKEN=" "$ENV_FILE" | cut -d'=' -f2-)
+if [[ -f ${ENV_FILE} ]]; then
+	echo "Extracting Jira variables from ${ENV_FILE}"
+	# Extract specific variables using grep and cut
+	JIRA_URL=$(grep "^JIRA_URL=" "${ENV_FILE}" | cut -d'=' -f2- || true)
+	JIRA_USERNAME=$(grep "^JIRA_USERNAME=" "${ENV_FILE}" | cut -d'=' -f2- || true)
+	JIRA_API_TOKEN=$(grep "^JIRA_API_TOKEN=" "${ENV_FILE}" | cut -d'=' -f2- || true)
 
-    # Export the variables
-    export JIRA_URL
-    export JIRA_USERNAME
-    export JIRA_API_TOKEN
+	# Export the variables
+	export JIRA_URL
+	export JIRA_USERNAME
+	export JIRA_API_TOKEN
 else
-    echo "Warning: .env file not found at $ENV_FILE"
+	echo "Warning: .env file not found at ${ENV_FILE}"
 fi
 
 # Check if required environment variables are set
-if [ -z "$JIRA_USERNAME" ] || [ -z "$JIRA_API_TOKEN" ]; then
-    echo "Error: JIRA_USERNAME and JIRA_API_TOKEN must be set"
-    echo "Either set them as environment variables or ensure .env file exists in project root"
-    exit 1
+if [[ -z ${JIRA_USERNAME} ]] || [[ -z ${JIRA_API_TOKEN} ]]; then
+	echo "Error: JIRA_USERNAME and JIRA_API_TOKEN must be set"
+	echo "Either set them as environment variables or ensure .env file exists in project root"
+	exit 1
 fi
 
 echo "Creating Jira issues for Auth0 migration..."
-echo "Project Key: $PROJECT_KEY"
-echo "Jira URL: ${JIRA_URL:-https://metalpixel.atlassian.net}"
-echo "Jira Username: $JIRA_USERNAME"
+echo "Project Key: ${PROJECT_KEY}"
+echo "Jira URL: ${JIRA_URL:-https://ratchetaf.atlassian.net}"
+echo "Jira Username: ${JIRA_USERNAME}"
 
 # Run the Node.js script
-node "$SCRIPT_DIR/create-auth0-jira-issues.js" "$PROJECT_KEY"
+node "${SCRIPT_DIR}/create-auth0-jira-issues.js" "${PROJECT_KEY}"
 
 echo "Jira issues creation completed!"

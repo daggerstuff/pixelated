@@ -1,19 +1,7 @@
 {
   "workspace_id": "0824a9fc-c442-412b-bd76-a23b1a0ad809",
   "workspace_name": "Work",
-  "associated_at": "2026-01-25T05:05:45.451Z",
-  "version": "0.4.39",
-  "configured_editors": [
-    "codex",
-    "claude",
-    "cursor",
-    "windsurf",
-    "cline",
-    "kilo",
-    "roo",
-    "antigravity"
-  ],
-  "context_pack": true,
-  "api_url": "https://api.contextstream.io",
-  "updated_at": "2026-01-25T05:05:45.451Z"
+  "project_id": "3a9dd1a6-68e9-45f3-a934-e35663e0b6cd",
+  "project_name": "pixelated",
+  "associated_at": "2026-01-25T05:05:45.451Z"
 }

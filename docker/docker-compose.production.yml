@@ -1,10 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Main Application
   app:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.production
     container_name: pixelated-app
     restart: unless-stopped
@@ -41,11 +41,16 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`${DOMAIN:-pixelatedempathy.com}`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
 
   # PostgreSQL Database
   postgres:
@@ -60,16 +65,20 @@ services:
       - db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pixelated_user} -d ${DB_NAME:-pixelated}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-pixelated_user} -d ${DB_NAME:-pixelated}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
   # Redis Cache
@@ -77,20 +86,24 @@ services:
     image: redis:7
     container_name: pixelated-redis
     restart: unless-stopped
-    command: redis-server --requirepass "$(cat /run/secrets/redis_password)" --appendonly yes
+    command: sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)" --appendonly yes'
     secrets:
       - redis_password
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test:
+        [
+          "CMD-SHELL",
+          'redis-cli -a "$$(cat /run/secrets/redis_password)" ping | grep -q PONG',
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
 
   # Reverse Proxy & Load Balancer
@@ -101,10 +114,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"  # Dashboard
+      - "8080:8080" # Dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./docker/traefik:/etc/traefik
+      - ./traefik:/etc/traefik
       - ssl_certs:/ssl-certs
     environment:
       - TRAEFIK_PROVIDERS_DOCKER=true
@@ -122,7 +135,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 128M
 
   # Monitoring & Observability
@@ -131,20 +144,20 @@ services:
     container_name: pixelated-prometheus
     restart: unless-stopped
     volumes:
-      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
 
   grafana:
@@ -156,8 +169,9 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     ports:
       - "3000:3000"
     depends_on:
@@ -165,7 +179,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
 
   # Log Aggregation
@@ -175,14 +189,14 @@ services:
     restart: unless-stopped
     volumes:
       - loki_data:/loki
-      - ./docker/loki/config.yml:/etc/loki/local-config.yaml
+      - ./loki/config.yml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     ports:
       - "3100:3100"
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
 
   promtail:
@@ -190,7 +204,7 @@ services:
     container_name: pixelated-promtail
     restart: unless-stopped
     volumes:
-      - ./docker/promtail/config.yml:/etc/promtail/config.yml
+      - ./promtail/config.yml:/etc/promtail/config.yml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
@@ -199,7 +213,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
 
 volumes:
@@ -218,11 +232,11 @@ volumes:
 
 secrets:
   db_password:
-    file: ./config/secrets/db-password
+    file: ../config/secrets/db-password
   redis_password:
-    file: ./config/secrets/redis-password
+    file: ../config/secrets/redis-password
   jwt_secret:
-    file: ./config/secrets/jwt-secret
+    file: ../config/secrets/jwt-secret
 
 networks:
   default:

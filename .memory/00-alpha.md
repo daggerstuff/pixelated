@@ -17,18 +17,21 @@ You MUST read the Core Context Files before writing a single line of code. Actin
 
 The `.memory/` directory is a structured graph of knowledge. All files use **Token-Efficient Markdown** (dense, high-signal, low-fluff).
 
-| Priority | file                | Role               | Update Frequency         |
-| :------- | :------------------ | :----------------- | :----------------------- |
-| **P0**   | `00-alpha.md`       | **System Kernel**  | Read-Only (Meta-Docs)    |
-| **P0**   | `00-description.md` | **Root Truth**     | Low (Project Pivots)     |
-| **P1**   | `01-brief.md`       | **Charter**        | Low (Milestones)         |
-| **P1**   | `40-active.md`      | **Working Memory** | **High** (Every Session) |
-| **P2**   | `50-progress.md`    | **State Tracker**  | High (Task Completion)   |
-| **P2**   | `20-system.md`      | **Architecture**   | Medium (Refactors)       |
-| **P3**   | `30-tech.md`        | **Tooling**        | Medium (Depency Changes) |
-| **P3**   | `10-product.md`     | **UX/Spec**        | Medium (Feature Adds)    |
-| **P4**   | `60-decisions.md`   | **Decision Log**   | Ad-hoc (Big Choices)     |
-| **P4**   | `70-knowledge.md`   | **Library**        | Ad-hoc (Learnings)       |
+| Priority | File                | Role               | Update Frequency         |
+| :---:    | :------------------ | :----------------- | :----------------------- |
+|  **P0**  | `00-alpha.md`       | **System Kernel**  | Read-Only (Meta-Docs)    |
+|  **P0**  | `00-description.md` | **Root Truth**     | Low (Project Pivots)     |
+|  **P1**  | `01-brief.md`       | **Charter**        | Low (Milestones)         |
+|  **P1**  | `40-active.md`      | **Working Memory** | **High** (Every Session) |
+|  **P2**  | `50-progress.md`    | **State Tracker**  | High (Task Completion)   |
+|  **P2**  | `20-system.md`      | **Architecture**   | Medium (Refactors)       |
+|  **P3**  | `30-tech.md`        | **Tooling**        | Medium (Depency Changes) |
+|  **P3**  | `10-product.md`     | **UX/Spec**        | Medium (Feature Adds)    |
+|  **P4**  | `60-decisions.md`   | **Decision Log**   | Ad-hoc (Big Choices)     |
+|  **P4**  | `70-knowledge.md`   | **Library**        | Ad-hoc (Learnings)       |
+
+
+
 
 ---
 

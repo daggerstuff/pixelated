@@ -6,7 +6,6 @@ Exposes PII scrubbing, crisis detection, emotion validation, and bias detection 
 import logging
 import os
 import sys
-from dataclasses import asdict
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -16,6 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "security"))
 
 from bias_detector import TherapeuticSession, analyze_session_bias
 from crisis_detection import detect_crisis_signals
+from database import DatabaseService
 from emotion_validator import EmotionData, validate_emotion_result
 from pii_scrubber import ScrubberOptions, scan_for_pii, scrub_pii
 
@@ -26,16 +26,27 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend integration
 
+# Initialize Database
+MONGODB_URI = os.environ.get("MONGODB_URI")
+db_service = DatabaseService(MONGODB_URI) if MONGODB_URI else None
+
+if db_service:
+    db_service.connect()
+else:
+    logger.warning("MONGODB_URI not set. Database storage disabled.")
+
 
 @app.route("/health", methods=["GET"])
 def health_check():
     """Health check endpoint"""
+    db_status = "connected" if db_service and db_service.db is not None else "disconnected"
     return jsonify(
         {
             "status": "healthy",
             "service": "Pixelated Empathy Therapeutic AI",
             "version": "1.0.0",
             "mode": "CPU-only",
+            "database": db_status,
         }
     )
 
@@ -44,56 +55,29 @@ def health_check():
 def scrub_pii_endpoint():
     """
     Scrub PII from text
-
-    Request:
-    {
-        "text": "Contact Dr. Smith at john@example.com",
-        "options": {
-            "mask_type": "placeholder",
-            "enabled_categories": ["names", "emails"]
-        }
-    }
     """
     try:
         data = request.json
         text = data.get("text", "")
         options_dict = data.get("options", {})
+        session_id = data.get("session_id")
 
         options = ScrubberOptions(**options_dict) if options_dict else None
         scrubbed = scrub_pii(text, options)
 
-        return jsonify(
-            {
-                "success": True,
-                "original_length": len(text),
-                "scrubbed_text": scrubbed,
-                "scrubbed_length": len(scrubbed),
-            }
-        )
+        result = {
+            "success": True,
+            "original_length": len(text),
+            "scrubbed_text": scrubbed,
+            "scrubbed_length": len(scrubbed),
+        }
+
+        if db_service and session_id:
+            db_service.save_analysis_result("pii_scrub", result, session_id)
+
+        return jsonify(result)
     except Exception as e:
         logger.error(f"PII scrubbing error: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-
-@app.route("/api/security/scan-pii", methods=["POST"])
-def scan_pii_endpoint():
-    """
-    Scan text for PII without modifying
-
-    Request:
-    {
-        "text": "Contact Dr. Smith at john@example.com"
-    }
-    """
-    try:
-        data = request.json
-        text = data.get("text", "")
-
-        result = scan_for_pii(text)
-
-        return jsonify({"success": True, **result})
-    except Exception as e:
-        logger.error(f"PII scanning error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -101,19 +85,15 @@ def scan_pii_endpoint():
 def detect_crisis_endpoint():
     """
     Detect crisis signals in text
-
-    Request:
-    {
-        "text": "I am feeling hopeless and want to end it all"
-    }
     """
     try:
         data = request.json
         text = data.get("text", "")
+        session_id = data.get("session_id")
 
         result = detect_crisis_signals(text)
 
-        # Convert dataclass to dict
+        # Convert dataclass to dict (CrisisDetectionService still uses dataclasses)
         response = {
             "success": True,
             "has_crisis_signal": result.has_crisis_signal,
@@ -132,6 +112,10 @@ def detect_crisis_endpoint():
             ],
         }
 
+        if db_service and (result.has_crisis_signal or session_id):
+            # Always save crisis detection results if they show risk
+            db_service.save_analysis_result("crisis_detection", response, session_id)
+
         return jsonify(response)
     except Exception as e:
         logger.error(f"Crisis detection error: {e}")
@@ -142,29 +126,18 @@ def detect_crisis_endpoint():
 def validate_emotion_endpoint():
     """
     Validate emotion detection result
-
-    Request:
-    {
-        "session_id": "session123",
-        "detected_emotion": "happy",
-        "confidence": 0.8,
-        "context": "positive conversation",
-        "response_text": "I feel great today!",
-        "participant_demographics": {
-            "age": "26-35",
-            "gender": "female",
-            "ethnicity": "other",
-            "primary_language": "en"
-        }
-    }
     """
     try:
         data = request.json
         emotion_data = EmotionData(**data)
 
         result = validate_emotion_result(emotion_data)
+        response = {"success": True, **result.model_dump()}
 
-        return jsonify({"success": True, **asdict(result)})
+        if db_service:
+            db_service.save_analysis_result("emotion_validation", response, emotion_data.session_id)
+
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Emotion validation error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
@@ -174,27 +147,18 @@ def validate_emotion_endpoint():
 def analyze_bias_endpoint():
     """
     Analyze therapeutic session for bias
-
-    Request:
-    {
-        "session_id": "session123",
-        "session_date": "2026-01-24",
-        "participant_demographics": {...},
-        "scenario": {...},
-        "content": {...},
-        "ai_responses": [...],
-        "expected_outcomes": [...],
-        "transcripts": [...],
-        "user_inputs": [...]
-    }
     """
     try:
         data = request.json
         session = TherapeuticSession(**data)
 
         result = analyze_session_bias(session)
+        response = {"success": True, **result.model_dump()}
 
-        return jsonify({"success": True, **asdict(result)})
+        if db_service:
+            db_service.save_analysis_result("bias_analysis", response, session.session_id)
+
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Bias analysis error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
@@ -204,20 +168,11 @@ def analyze_bias_endpoint():
 def analyze_conversation_endpoint():
     """
     Combined analysis: PII, crisis, emotion, and bias
-
-    Request:
-    {
-        "text": "conversation text",
-        "session_data": {...},
-        "scrub_pii": true,
-        "detect_crisis": true,
-        "validate_emotion": true,
-        "analyze_bias": true
-    }
     """
     try:
         data = request.json
         text = data.get("text", "")
+        session_id = data.get("session_id")
 
         response = {"success": True, "analyses": {}}
 
@@ -245,13 +200,16 @@ def analyze_conversation_endpoint():
         if data.get("validate_emotion") and "emotion_data" in data:
             emotion_data = EmotionData(**data["emotion_data"])
             emotion_result = validate_emotion_result(emotion_data)
-            response["analyses"]["emotion"] = asdict(emotion_result)
+            response["analyses"]["emotion"] = emotion_result.model_dump()
 
         # Bias analysis (if session data provided)
         if data.get("analyze_bias") and "session_data" in data:
             session = TherapeuticSession(**data["session_data"])
             bias_result = analyze_session_bias(session)
-            response["analyses"]["bias"] = asdict(bias_result)
+            response["analyses"]["bias"] = bias_result.model_dump()
+
+        if db_service and session_id:
+            db_service.save_analysis_result("combined_analysis", response, session_id)
 
         return jsonify(response)
     except Exception as e:

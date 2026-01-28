@@ -14,7 +14,7 @@ permissions:
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master, develop, staging]
     paths:
       - src/lib/ai/bias-detection/**
       - src/components/admin/bias-detection/**
@@ -305,7 +305,7 @@ jobs:
           uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
         env:
           ENV: ci
-          FLASK_SECRET_KEY: test-flask-secret
+          FLASK_SECRET_KEY: test-secret-key
           JWT_SECRET_KEY: test-jwt-secret
 
       - name: Upload Python coverage
@@ -438,7 +438,7 @@ jobs:
         env:
           FLASK_ENV: testing
           ENV: ci
-          FLASK_SECRET_KEY: test-flask-secret
+          FLASK_SECRET_KEY: test-secret-key
           JWT_SECRET_KEY: test-jwt-secret
 
       - name: Build application
@@ -629,7 +629,7 @@ jobs:
         continue-on-error: true
         with:
           status: success
-          channel: "#deployments"
+          channel: '#deployments'
           text: ✅ Bias Detection Engine deployment successful!
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
@@ -640,7 +640,7 @@ jobs:
         continue-on-error: true
         with:
           status: failure
-          channel: "#deployments"
+          channel: '#deployments'
           text: ❌ Bias Detection Engine deployment failed!
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}

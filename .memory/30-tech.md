@@ -68,9 +68,8 @@ const redisConfig = {
 ## Infrastructure & Deployment
 
 ### Container Orchestration
-- **Docker Compose**: Local development and testing
-- **Kubernetes**: Production deployment
-- **Helm Charts**: Kubernetes package management
+- **Docker Compose**: Primary deployment method (Development, Staging, Production)
+- **Kubernetes**: Secondary/Future infrastructure (Helm charts in `/helm`)
 
 ### Cloud Providers
 - **Primary**: Cloudflare Workers (edge computing)

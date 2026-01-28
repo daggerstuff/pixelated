@@ -2,22 +2,20 @@
   "mcp": {
     "servers": {
       "atlassian": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "mcp-remote",
-          "https://mcp.atlassian.com/v1/sse"
-        ],
-        "description": "Atlassian MCP Server for Jira and Confluence integration",
+        "command": "pnpm dlx",
+        "args": ["mcp-remote", "https://mcp.atlassian.com/v1/mcp"],
+        "description": "Atlassian MCP Server for Jira and Confluence integration (ratchetaf)",
         "tool_prefix": "atlassian_"
+      },
+      "atlassian-meta": {
+        "command": "pnpm dlx",
+        "args": ["mcp-remote", "https://mcp.atlassian.com/v1/mcp"],
+        "description": "Atlassian MCP Server for Jira and Confluence integration (ratchetaf)",
+        "tool_prefix": "atlassian_meta_"
       },
       "graphiti-context": {
         "command": "uv",
-        "args": [
-          "run",
-          "python",
-          "ai/api/mcp_server/graphiti_server.py"
-        ],
+        "args": ["run", "python", "ai/api/mcp_server/graphiti_server.py"],
         "env": {
           "GRAPHITI_HOST": "0.0.0.0",
           "GRAPHITI_PORT": "8000",
@@ -29,11 +27,7 @@
       },
       "pixelated-memory": {
         "command": "uv",
-        "args": [
-          "run",
-          "python",
-          "ai/api/mcp_server/memory_server.py"
-        ],
+        "args": ["run", "python", "ai/api/mcp_server/memory_server.py"],
         "env": {
           "ZEP_API_KEY": "${ZEP_API_KEY}",
           "ZEP_API_URL": "${ZEP_API_URL}",

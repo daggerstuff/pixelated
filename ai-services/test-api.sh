@@ -9,35 +9,38 @@ echo ""
 
 # 1. Health check
 echo "1️⃣ Health Check"
-curl -s "$API_URL/health" | python -m json.tool
+health_response=$(curl -s "${API_URL}/health")
+echo "${health_response}" | python -m json.tool
 echo ""
 echo ""
 
 # 2. PII Scrubbing
 echo "2️⃣ PII Scrubbing"
-curl -s -X POST "$API_URL/api/security/scrub-pii" \
-  -H "Content-Type: application/json" \
-  -d '{
+pii_response=$(curl -s -X POST "${API_URL}/api/security/scrub-pii" \
+	-H "Content-Type: application/json" \
+	-d '{
     "text": "Contact Dr. John Smith at john@example.com or (555) 010-9988"
-  }' | python -m json.tool
+  }')
+echo "${pii_response}" | python -m json.tool
 echo ""
 echo ""
 
 # 3. Crisis Detection
 echo "3️⃣ Crisis Detection"
-curl -s -X POST "$API_URL/api/security/detect-crisis" \
-  -H "Content-Type: application/json" \
-  -d '{
+crisis_response=$(curl -s -X POST "${API_URL}/api/security/detect-crisis" \
+	-H "Content-Type: application/json" \
+	-d '{
     "text": "I am feeling hopeless and want to end it all"
-  }' | python -m json.tool
+  }')
+echo "${crisis_response}" | python -m json.tool
 echo ""
 echo ""
 
 # 4. Emotion Validation
 echo "4️⃣ Emotion Validation"
-curl -s -X POST "$API_URL/api/emotion/validate" \
-  -H "Content-Type: application/json" \
-  -d '{
+emotion_response=$(curl -s -X POST "${API_URL}/api/emotion/validate" \
+	-H "Content-Type: application/json" \
+	-d '{
     "session_id": "test123",
     "detected_emotion": "happy",
     "confidence": 0.8,
@@ -49,15 +52,16 @@ curl -s -X POST "$API_URL/api/emotion/validate" \
       "ethnicity": "other",
       "primary_language": "en"
     }
-  }' | python -m json.tool
+  }')
+echo "${emotion_response}" | python -m json.tool
 echo ""
 echo ""
 
 # 5. Bias Analysis
 echo "5️⃣ Bias Analysis"
-curl -s -X POST "$API_URL/api/bias/analyze-session" \
-  -H "Content-Type: application/json" \
-  -d '{
+bias_response=$(curl -s -X POST "${API_URL}/api/bias/analyze-session" \
+	-H "Content-Type: application/json" \
+	-d '{
     "session_id": "test123",
     "session_date": "2026-01-24",
     "participant_demographics": {
@@ -75,7 +79,8 @@ curl -s -X POST "$API_URL/api/bias/analyze-session" \
       "ai_responses": ["I understand you are feeling sensitive about this."],
       "user_inputs": ["I am feeling overwhelmed."]
     }
-  }' | python -m json.tool
+  }')
+echo "${bias_response}" | python -m json.tool
 echo ""
 echo ""
 

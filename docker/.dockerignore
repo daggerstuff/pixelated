@@ -1,0 +1,262 @@
+# Build context optimization for GitLab CI
+# Reduce build context size from 257k+ files
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+
+# CI/CD files
+.gitlab-ci.yml
+.gitlab-ci.yml.backup
+.gitlab/
+.github/
+
+# Documentation and notes
+README.md
+SECURITY.md
+CRUSH.md
+AGENTS.md
+PROCESSING_README.md
+LICENSE
+.notes/
+docs/
+business-strategy/
+runbooks/
+plan/
+
+# Development files
+.vscode/
+.trunk/
+.serena/
+.roomodes
+.oracle_deployment
+
+# Environment and config files
+.env*
+!.env.example
+.nvmrc
+.python-version
+
+# Logs and temporary files
+logs/
+nohup.out
+*.log
+.DS_Store
+Thumbs.db
+
+# Test files and coverage
+tests/
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+stats.html
+
+# Development dependencies and caches
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+package-lock.json
+yarn.lock
+
+# Python virtual environments and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+.venv/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+uv.lock
+
+# Build artifacts (keep only what's needed)
+dist/
+build/
+out/
+.astro/
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.idea/
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Large media files and models
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+*.m4v
+*.3gp
+*.3g2
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.wma
+*.m4a
+*.psd
+*.ai
+*.sketch
+*.fig
+
+# AI/ML files
+ai/
+training_dataset.json
+*.csv
+*.parquet
+*.pkl
+*.model
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.hdf5
+*.npz
+*.npy
+
+# Transcripts and large text files
+.notes/transcripts/
+
+# Backup and temporary files
+*.backup
+*.bak
+*.tmp
+*.temp
+*~
+.#*
+\#*#
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Local service data (never ship in build context)
+acontext_server/
+
+# Monitoring and analysis
+reports/
+monitoring/
+audit/
+performance/
+verbose/
+
+# Container and deployment files (keep only essential)
+docker-compose*.yml
+!docker-compose.yml
+Dockerfile.*
+!Dockerfile
+!Dockerfile.production
+k8s/
+helm/
+terraform/
+clusters/
+
+# Scripts (keep only essential build scripts)
+scripts/*
+!scripts/setup-dev.sh
+!scripts/build-*.sh
+!scripts/build-with-pipe-handling.mjs
+!scripts/create-prod-package.js
+!scripts/utils/
+!scripts/utils/start-server.mjs
+
+# Tools and utilities
+tools/
+# Allow patches used by pnpm patchedDependencies in Docker builds
+patches/
+examples/
+memory-bank/
+workspace/
+.memory/
+
+# Configuration files (keep only essential)
+.checkov.yaml
+.gitleaks.toml
+.pre-commit-config.yaml
+.sourcery.yaml
+browserstack.yml
+bitbucket-pipelines.yaml
+cloudbuild.yaml
+fly.toml
+app.json
+Procfile
+Caddyfile
+newrelic.ini
+
+justfile
+
+# Package manager files
+.pnpmrc
+.yarnrc*
+.npmrc
+
+# Linting and formatting
+.eslintrc*
+.prettierrc*
+.prettierignore
+.oxlintrc.json
+pyrightconfig.json
+mypy.ini
+.flake8
+.coveragerc
+conftest.py
+pytest.ini
+
+# Build configuration (keep only essential)
+astro.config.optimized.mjs
+ec.config.mjs
+uno.config.ts
+postcss.config.cjs
+vite.config.js
+vitest.config.ts
+vitest.setup.ts
+playwright.config*.ts
+browserstack.config.ts
+tsconfig*.json
+!tsconfig.json
+!uno.config.ts
+
+# Keep only essential files for build
+!package.json
+!src/
+!public/
+!astro.config.mjs
+!tsconfig.json
+!tailwind.config.*
+!middleware.ts
+!mdx-components.js
+!patches/
+!.npmrc
