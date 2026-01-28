@@ -216,6 +216,26 @@ services:
           cpus: "0.1"
           memory: 128M
 
+  # Therapeutic AI API
+  ai-api:
+    build:
+      context: ..
+      dockerfile: ai-services/Dockerfile
+    container_name: pixelated-ai-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
 volumes:
   postgres_data:
     driver: local
