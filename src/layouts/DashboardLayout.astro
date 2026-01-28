@@ -1,60 +1,75 @@
 ---
 // Grouped imports for better organization
 // Style imports
-import "@unocss/reset/tailwind.css";
-import "@/styles/main.css";
-import "@/styles/prose.css";
-import "@/styles/markdown.css";
-import "@/styles/page.css";
+import '@unocss/reset/tailwind.css'
+import '@/styles/main.css'
+import '@/styles/prose.css'
+import '@/styles/markdown.css'
+import '@/styles/page.css'
 
 // Astro components
-import Head from "@/components/base/Head.astro";
-import ErrorBoundary from "@/components/base/ErrorBoundary.astro";
+import Head from '@/components/base/Head.astro'
+import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
 
 // Layout components
-import Header from "@/components/layout/Header.astro";
-import Footer from "@/components/mizu/Footer.astro";
-import Sidebar from "@/components/layout/Sidebar.astro";
+import Header from '@/components/layout/Header.astro'
+import Footer from '@/components/mizu/Footer.astro'
+import Sidebar from '@/components/layout/Sidebar.astro'
 
 // Define a more robust props interface with JSDoc comments
 interface Props {
   /** Page title - displayed in browser tab */
-  title?: string;
+  title?: string
   /** Meta description for SEO */
-  description?: string;
+  description?: string
   /** URL for the Open Graph image (social sharing) */
-  metaImage?: string;
+  metaImage?: string
   /** Control visibility of layout elements */
-  showHeader?: boolean;
-  showFooter?: boolean;
-  showSidebar?: boolean;
+  showHeader?: boolean
+  showFooter?: boolean
+  showSidebar?: boolean
   /** Control features of layout elements */
-  showThemeToggle?: boolean;
-  showUserMenu?: boolean;
-  showSocialLinks?: boolean;
+  showThemeToggle?: boolean
+  showUserMenu?: boolean
+  showSocialLinks?: boolean
   /** Additional class names for the content container */
-  contentClassName?: string;
+  contentClassName?: string
 }
 
 const {
-  title = "Pixelated Empathy Therapy | Dashboard",
-  description = "Advanced therapeutic tools for mental health professionals",
-  metaImage = "/og-image.png",
+  title = 'Pixelated Empathy Therapy | Dashboard',
+  description = 'Advanced therapeutic tools for mental health professionals',
+  metaImage = '/og-image.png',
   showHeader = true,
   showFooter = true,
   showSidebar = true,
   showThemeToggle = true,
   showUserMenu = true,
   showSocialLinks = true,
-  contentClassName = "",
-} = Astro.props;
+  contentClassName = '',
+} = Astro.props
 
-const { cspNonce } = Astro.locals;
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
 <html lang="en" class="dark scroll-smooth">
   <Head {title} {description} ogImage={metaImage} />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+  <link rel="stylesheet" href="/css/design-system.css" />
+  <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+
+  <link rel="stylesheet" href="/css/fonts.css" />
+  <link rel="stylesheet" href="/css/font-fix.css" />
+
+  <link rel="stylesheet" href="/css/background-fixes.css" />
+
+  <script src="/js/polyfill-detector.js" is:inline></script>
+  <script src="/js/module-loader.js" defer is:inline></script>
+  <script src="/js/background-loader.js" defer is:inline></script>
   <style is:global>
     /* Mizu theme dark colors - default for all pages */
     :root {
@@ -118,8 +133,8 @@ const { cspNonce } = Astro.locals;
 
         <main
           class:list={[
-            "relative flex-grow pt-16 transition-all duration-300 ease-in-out slide-enter",
-            showSidebar ? "lg:ml-64" : "w-full",
+            'relative flex-grow pt-16 transition-all duration-300 ease-in-out slide-enter',
+            showSidebar ? 'lg:ml-64' : 'w-full',
             contentClassName,
           ]}
           id="main-content"
@@ -146,35 +161,35 @@ const { cspNonce } = Astro.locals;
     <script is:inline nonce={cspNonce}>
       // Get saved theme or use system default
       const getTheme = () => {
-        const savedTheme = localStorage?.getItem("theme");
-        if (savedTheme && ["light", "dark", "system"].includes(savedTheme)) {
-          return savedTheme;
+        const savedTheme = localStorage?.getItem('theme')
+        if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+          return savedTheme
         }
-        return "system";
-      };
+        return 'system'
+      }
 
       // Apply theme
       const applyTheme = (theme) => {
         const isDark =
-          theme === "dark" ||
-          (theme === "system" &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches);
+          theme === 'dark' ||
+          (theme === 'system' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
 
-        document.documentElement.classList.toggle("dark", isDark);
-      };
+        document.documentElement.classList.toggle('dark', isDark)
+      }
 
       // Initialize theme
-      applyTheme(getTheme());
+      applyTheme(getTheme())
 
       // Listen for OS theme changes
       window
-        .matchMedia("(prefers-color-scheme: dark)")
-        .addEventListener("change", (event) => {
-          const theme = getTheme();
-          if (theme === "system") {
-            applyTheme("system");
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', (event) => {
+          const theme = getTheme()
+          if (theme === 'system') {
+            applyTheme('system')
           }
-        });
+        })
     </script>
   </body>
 </html>

@@ -1,13 +1,9 @@
 {
   "name": "pixelated",
-  "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@10.28.1",
   "license": "MIT",
-  "engines": {
-    "node": ">=24"
-  },
+  "type": "module",
   "scripts": {
     "bias:py": "ENV=development uv run --python 3.11 python src/lib/ai/bias-detection/python-service/bias_detection_service.py",
     "astro": "astro",
@@ -26,8 +22,6 @@
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\" \"pnpm dev:training-server\" \"pnpm dev:websocket\" \"pnpm dev:academic-sourcing\" \"pnpm bias:py\"",
     "setup:dev": "./scripts/setup-dev.sh",
     "build": "node scripts/build-with-pipe-handling.mjs",
-    "build:vercel": "bash scripts/build-vercel.sh",
-    "vercel-build": "bash scripts/build-vercel.sh",
     "build:cloudflare": "bash scripts/build-cloudflare.sh",
     "build:railway": "DEPLOY_TARGET=railway astro build",
     "build:heroku": "DEPLOY_TARGET=heroku astro build",
@@ -101,12 +95,10 @@
     "performance:test": "playwright test tests/performance/",
     "performance:quick": "./scripts/test-performance.sh",
     "performance:optimize": "./scripts/performance-quickstart.sh",
-    "deploy": "node scripts/consolidated-deploy.js deploy staging",
-    "deploy:prod": "node scripts/consolidated-deploy.js deploy production",
-    "deploy:enhanced": "node scripts/enhanced-deploy.js deploy staging",
-    "deploy:enhanced:prod": "node scripts/enhanced-deploy.js deploy production",
-    "rollback": "node scripts/enhanced-deploy.js rollback staging",
-    "rollback:prod": "node scripts/enhanced-deploy.js rollback production",
+    "deploy": "bash scripts/infrastructure/deploy.sh staging",
+    "deploy:prod": "bash scripts/infrastructure/deploy.sh production",
+    "rollback": "bash scripts/infrastructure/deploy.sh rollback staging",
+    "rollback:prod": "bash scripts/infrastructure/deploy.sh rollback production",
     "cf:deploy": "./scripts/infrastructure/cloudflare-deploy.sh deploy production",
     "cf:deploy:staging": "./scripts/infrastructure/cloudflare-deploy.sh deploy staging",
     "cf:deploy:dev": "./scripts/infrastructure/cloudflare-deploy.sh deploy development",
@@ -117,7 +109,7 @@
     "wrangler": "wrangler",
     "docker:build": "docker build -f docker/Dockerfile -t pixelated .",
     "docker:run": "docker run -p 4321:4321 pixelated",
-    "docker:up": "./scripts/deploy.sh",
+    "docker:up": "bash scripts/infrastructure/deploy.sh",
     "docker:down": "docker-compose -f docker/docker-compose.yml down",
     "docker:logs": "docker-compose -f docker/docker-compose.yml logs -f",
     "docker:restart": "docker-compose -f docker/docker-compose.yml restart",
@@ -170,7 +162,7 @@
     "@aws-sdk/s3-request-presigner": "^3.975.0",
     "@azure/storage-blob": "^12.30.0",
     "@better-auth/cli": "^1.4.17",
-    "@contextstream/mcp-server": "^0.4.39",
+    "@contextstream/mcp-server": "^0.4.43",
     "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.39.2",
     "@eslint/json": "^0.14.0",
@@ -178,7 +170,7 @@
     "@google-cloud/compute": "^6.7.0",
     "@google-cloud/storage": "^7.18.0",
     "@hookform/resolvers": "^5.2.2",
-    "@iconify-json/lucide": "^1.2.86",
+    "@iconify-json/lucide": "^1.2.87",
     "@memobase/memobase": "^0.0.18",
     "@microsoft/clarity": "^1.0.2",
     "@modelcontextprotocol/sdk": "^1.25.3",
@@ -218,7 +210,7 @@
     "astro": "^5.16.15",
     "astro-icon": "^1.1.5",
     "auth0": "^5.2.0",
-    "axios": "^1.13.2",
+    "axios": "^1.13.3",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.4.17",
     "better-sqlite3": "^12.6.2",
@@ -237,7 +229,7 @@
     "express-openid-connect": "^2.19.4",
     "express-rate-limit": "^8.2.1",
     "flexsearch": "^0.8.212",
-    "framer-motion": "^12.29.0",
+    "framer-motion": "^12.29.2",
     "helmet": "^8.1.0",
     "ioredis": "^5.9.2",
     "jotai": "^2.16.2",
@@ -284,6 +276,7 @@
     "typescript": "^5.9.3",
     "ultrahtml": "^1.6.0",
     "uuid": "^13.0.0",
+    "vibe-kanban": "^0.0.162",
     "viewerjs": "^1.11.7",
     "vite": "^7.3.1",
     "ws": "^8.19.0",
@@ -298,7 +291,7 @@
     "@iconify-json/ri": "^1.2.7",
     "@iconify-json/uil": "^1.2.3",
     "@playwright/test": "^1.58.0",
-    "@smithery/cli": "^3.3.0",
+    "@smithery/cli": "^3.3.3",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -369,9 +362,9 @@
     "nprogress": "^0.2.0",
     "oxc-parser": "^0.107.0",
     "oxc-resolver": "^11.16.4",
-    "oxfmt": "^0.23.0",
+    "oxfmt": "^0.26.0",
     "oxlint": "^1.41.0",
-    "oxlint-tsgolint": "^0.11.1",
+    "oxlint-tsgolint": "^0.11.2",
     "papaparse": "^5.5.3",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "8.3.0",
@@ -419,6 +412,16 @@
     "vue": "^3.5.27",
     "wait-on": "^9.0.3"
   },
+  "peerDependencies": {
+    "hono": "^4.11.5"
+  },
+  "resolutions": {
+    "path-to-regexp": "8.3.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.28.1",
   "pnpm": {
     "overrides": {
       "@opentelemetry/api": "^1.9.0",
@@ -521,17 +524,11 @@
       "libpg-query"
     ]
   },
-  "resolutions": {
-    "path-to-regexp": "8.3.0"
-  },
   "trustedDependencies": [
     "aws-sdk",
     "core-js",
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
-  ],
-  "peerDependencies": {
-    "hono": "^4.11.5"
-  }
+  ]
 }

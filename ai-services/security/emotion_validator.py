@@ -5,8 +5,9 @@ Validates emotion detection results with bias detection integration
 
 import logging
 import re
-from dataclasses import dataclass, field
 from enum import Enum
+
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -23,16 +24,14 @@ class EmotionCategory(str, Enum):
     CONFUSED = "confused"
 
 
-@dataclass
-class ParticipantDemographics:
+class ParticipantDemographics(BaseModel):
     age: str = ""
     gender: str = ""
     ethnicity: str = ""
     primary_language: str = ""
 
 
-@dataclass
-class EmotionData:
+class EmotionData(BaseModel):
     session_id: str
     detected_emotion: str
     confidence: float
@@ -42,16 +41,15 @@ class EmotionData:
     timestamp: str | None = None
 
 
-@dataclass
-class EmotionValidationResult:
+class EmotionValidationResult(BaseModel):
     is_valid: bool
     confidence: float
-    issues: list[str] = field(default_factory=list)
+    issues: list[str] = Field(default_factory=list)
     bias_score: float = 0.0
     emotion_consistency: float = 0.0
     authenticity_score: float = 0.0
     contextual_appropriate: bool = True
-    recommendations: list[str] = field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
 
 
 # Bias patterns in emotional responses
@@ -224,6 +222,8 @@ def detect_bias_patterns(text: str, demographics: ParticipantDemographics) -> fl
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
     # Test
     test_data = EmotionData(
         session_id="test123",
@@ -235,8 +235,6 @@ if __name__ == "__main__":
             age="26-35", gender="female", ethnicity="other", primary_language="en"
         ),
     )
-
-    logging.basicConfig(level=logging.INFO)
 
     result = validate_emotion_result(test_data)
     logger.info("Valid: %s", result.is_valid)

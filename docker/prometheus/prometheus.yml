@@ -3,120 +3,119 @@ global:
   evaluation_interval: 15s
 
 rule_files:
-# Support both naming conventions used in the repository to avoid missing rules
-- "alert_rules.yml"
-- "alert-rules.yml"
+  # Support both naming conventions used in the repository to avoid missing rules
+  - "alert_rules.yml"
+  - "alert-rules.yml"
 
 alerting:
   alertmanagers:
-  - static_configs:
-    - targets:
-      - alertmanager:9093
+    - static_configs:
+        - targets:
+            - alertmanager:9093
 
 scrape_configs:
-- job_name: 'prometheus'
-  static_configs:
-  - targets: [ 'localhost:9090' ]
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
 
-- job_name: 'grafana'
-  static_configs:
-  - targets: [ 'grafana:3000' ]
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
 
-- job_name: 'pixelated-ai-service'
-  static_configs:
-  - targets: [ 'ai-service:8080' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-ai-service"
+    static_configs:
+      - targets: ["ai-service:8080"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-bias-detection'
-  static_configs:
-  - targets: [ 'bias-detection:8000' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-bias-detection"
+    static_configs:
+      - targets: ["bias-detection:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-behavioral-analysis'
-  static_configs:
-  - targets: [ 'behavioral-analysis:8081' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-behavioral-analysis"
+    static_configs:
+      - targets: ["behavioral-analysis:8081"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-rate-limiting'
-  static_configs:
-  - targets: [ 'rate-limiting:8082' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-rate-limiting"
+    static_configs:
+      - targets: ["rate-limiting:8082"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-response-orchestration'
-  static_configs:
-  - targets: [ 'response-orchestration:8083' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-response-orchestration"
+    static_configs:
+      - targets: ["response-orchestration:8083"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-predictive-threat-intelligence'
-  static_configs:
-  - targets: [ 'predictive-threat-intelligence:8084' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-predictive-threat-intelligence"
+    static_configs:
+      - targets: ["predictive-threat-intelligence:8084"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-api-gateway'
-  static_configs:
-  - targets: [ 'api-gateway:8085' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-api-gateway"
+    static_configs:
+      - targets: ["api-gateway:8085"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-security-monitoring'
-  static_configs:
-  - targets: [ 'security-monitoring:8086' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-security-monitoring"
+    static_configs:
+      - targets: ["security-monitoring:8086"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-user-activity'
-  static_configs:
-  - targets: [ 'user-activity:8087' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-user-activity"
+    static_configs:
+      - targets: ["user-activity:8087"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-audit-logging'
-  static_configs:
-  - targets: [ 'audit-logging:8088' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-audit-logging"
+    static_configs:
+      - targets: ["audit-logging:8088"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-threat-hunting'
-  static_configs:
-  - targets: [ 'threat-hunting:8089' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-threat-hunting"
+    static_configs:
+      - targets: ["threat-hunting:8089"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-external-threat-intelligence'
-  static_configs:
-  - targets: [ 'external-threat-intelligence:8090' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-external-threat-intelligence"
+    static_configs:
+      - targets: ["external-threat-intelligence:8090"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-configuration-management'
-  static_configs:
-  - targets: [ 'configuration-management:8091' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
+  - job_name: "pixelated-configuration-management"
+    static_configs:
+      - targets: ["configuration-management:8091"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s
 
-- job_name: 'pixelated-testing-infrastructure'
-  static_configs:
-  - targets: [ 'testing-infrastructure:8092' ]
-  metrics_path: '/metrics'
-  scrape_interval: 5s
-  scrape_timeout: 4s
-  scrape_timeout: 4s
+  - job_name: "pixelated-testing-infrastructure"
+    static_configs:
+      - targets: ["testing-infrastructure:8092"]
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    scrape_timeout: 4s

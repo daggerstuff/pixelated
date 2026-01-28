@@ -5,7 +5,7 @@ This script automates the creation of Jira issues for the Auth0 migration projec
 ## Prerequisites
 
 Make sure you have the following environment variables set:
-- `JIRA_URL` - Your Jira instance URL (defaults to https://pixeldeck.atlassian.net)
+- `JIRA_URL` - Your Jira instance URL (defaults to https://ratchetaf.atlassian.net)
 - `JIRA_USERNAME` - Your Jira username/email
 - `JIRA_API_TOKEN` - Your Jira API token
 

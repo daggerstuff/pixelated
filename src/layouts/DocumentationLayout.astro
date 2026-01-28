@@ -1,9 +1,9 @@
 ---
 import BaseHead from '@/components/base/Head.astro'
-import Header from '@/components/layout/Header.astro'
-import Footer from '@/components/layout/Footer.astro'
+import Navbar from '@/components/mizu/Navbar.astro'
+import Footer from '@/components/mizu/Footer.astro'
+import ToTopButton from '@/components/widgets/ToTopButton.astro'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
-import '@/styles/enhanced-theme.css'
 
 interface Props {
   title: string
@@ -34,9 +34,25 @@ const image = frontmatter?.image || propImage
 ---
 
 <!doctype html>
-<html lang="en" class="enhanced-dark-theme scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
   <head>
     <BaseHead {title} {description} ogImage={image} />
+
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0f172a" />
+
+    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/font-fix.css" />
+
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    <script src="/js/module-loader.js" defer is:inline></script>
+    <script src="/js/background-loader.js" defer is:inline></script>
 
     <!-- Documentation-specific styles -->
     <style is:global>
@@ -248,10 +264,9 @@ const image = frontmatter?.image || propImage
   </head>
 
   <body
-    class="enhanced-dark-theme min-h-screen font-sans antialiased"
-    style="background: var(--bg-primary); color: var(--text-primary);"
+    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
   >
-    <Header />
+    <Navbar />
 
     <div class="container-refined py-12 flex flex-col md:flex-row gap-8">
       <!-- Sidebar for navigation -->
@@ -379,6 +394,7 @@ const image = frontmatter?.image || propImage
     </div>
 
     <Footer />
+    <ToTopButton />
     <script is:inline>
       function speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)

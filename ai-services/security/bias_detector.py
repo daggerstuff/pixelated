@@ -5,10 +5,10 @@ Analyzes therapeutic sessions for demographic bias using Fairlearn
 
 import logging
 import re
-from dataclasses import dataclass, field
 from enum import Enum
 
 import numpy as np
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -21,56 +21,50 @@ class BiasLevel(str, Enum):
     CRITICAL = "critical"
 
 
-@dataclass
-class ParticipantDemographics:
+class ParticipantDemographics(BaseModel):
     age: str = ""
     gender: str = ""
     ethnicity: str = ""
     primary_language: str = ""
 
 
-@dataclass
-class TrainingScenario:
+class TrainingScenario(BaseModel):
     scenario_id: str
     type: str  # e.g., 'general-wellness', 'crisis', 'trauma'
 
 
-@dataclass
-class SessionContent:
+class SessionContent(BaseModel):
     transcript: str
-    ai_responses: list[str] = field(default_factory=list)
-    user_inputs: list[str] = field(default_factory=list)
+    ai_responses: list[str] = Field(default_factory=list)
+    user_inputs: list[str] = Field(default_factory=list)
 
 
-@dataclass
-class TherapeuticSession:
+class TherapeuticSession(BaseModel):
     session_id: str
     session_date: str
     participant_demographics: ParticipantDemographics
     scenario: TrainingScenario
     content: SessionContent
-    ai_responses: list[str] = field(default_factory=list)
-    expected_outcomes: list[str] = field(default_factory=list)
-    transcripts: list[str] = field(default_factory=list)
-    user_inputs: list[str] = field(default_factory=list)
+    ai_responses: list[str] = Field(default_factory=list)
+    expected_outcomes: list[str] = Field(default_factory=list)
+    transcripts: list[str] = Field(default_factory=list)
+    user_inputs: list[str] = Field(default_factory=list)
     metadata: dict | None = None
 
 
-@dataclass
-class BiasIndicator:
+class BiasIndicator(BaseModel):
     category: str  # 'gender', 'age', 'ethnicity', 'language'
     severity: float  # 0-1
     evidence: list[str]
     affected_group: str
 
 
-@dataclass
-class BiasAnalysisResult:
+class BiasAnalysisResult(BaseModel):
     overall_bias_score: float  # 0-1
     bias_level: BiasLevel
-    indicators: list[BiasIndicator] = field(default_factory=list)
-    recommendations: list[str] = field(default_factory=list)
-    fairness_metrics: dict[str, float] = field(default_factory=dict)
+    indicators: list[BiasIndicator] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    fairness_metrics: dict[str, float] = Field(default_factory=dict)
 
 
 # Bias detection patterns
@@ -157,7 +151,6 @@ def analyze_session_bias(session: TherapeuticSession) -> BiasAnalysisResult:
 
 def detect_gender_bias(text: str, gender: str) -> list[BiasIndicator]:
     """Detect gender bias patterns"""
-
     indicators = []
 
     if not gender:
@@ -181,7 +174,6 @@ def detect_gender_bias(text: str, gender: str) -> list[BiasIndicator]:
 
 def detect_age_bias(text: str, age: str) -> list[BiasIndicator]:
     """Detect age bias patterns"""
-
     indicators = []
 
     if not age:
@@ -213,7 +205,6 @@ def detect_age_bias(text: str, age: str) -> list[BiasIndicator]:
 
 def detect_ethnicity_bias(text: str, ethnicity: str) -> list[BiasIndicator]:
     """Detect ethnicity bias patterns"""
-
     indicators = []
 
     if not ethnicity or ethnicity.lower() in ["", "prefer not to say"]:
@@ -248,6 +239,8 @@ def determine_bias_level(score: float) -> BiasLevel:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
     # Test
     test_session = TherapeuticSession(
         session_id="test123",
@@ -262,8 +255,6 @@ if __name__ == "__main__":
             user_inputs=["I'm feeling overwhelmed."],
         ),
     )
-
-    logging.basicConfig(level=logging.INFO)
 
     result = analyze_session_bias(test_session)
     logger.info("Bias Level: %s", result.bias_level.value)

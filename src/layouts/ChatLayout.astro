@@ -1,23 +1,33 @@
 ---
-import '@/styles/enhanced-theme.css'
-
 interface Props {
   title?: string
 }
 const { title = 'Chat' } = Astro.props
 ---
 
-<html lang="en" class="enhanced-dark-theme">
+<html lang="en" class="dark scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0f172a" />
     <title>{title} | Pixelated Empathy</title>
+
+    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/font-fix.css" />
+
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    <script src="/js/module-loader.js" defer is:inline></script>
+    <script src="/js/background-loader.js" defer is:inline></script>
   </head>
   <body
-    class="enhanced-dark-theme"
-    style="background: var(--bg-primary); color: var(--text-primary); min-height: 100vh;"
+    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
   >
     <!-- Skip to content link for accessibility -->
     <a

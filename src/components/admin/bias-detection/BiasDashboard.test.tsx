@@ -15,7 +15,7 @@ import '@testing-library/jest-dom'
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
 
 // Keep original fetch to restore after tests
-let __originalFetch: typeof fetch | undefined = global.fetch as typeof fetch
+const __originalFetch: typeof fetch | undefined = global.fetch as typeof fetch
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -225,7 +225,6 @@ describe('BiasDashboard', () => {
     if (__originalFetch) {
       global.fetch = __originalFetch
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ; (global as any).fetch = undefined
     }
     // Ensure global WebSocket remains our mock after tests that might override it
@@ -293,10 +292,7 @@ describe('BiasDashboard', () => {
   })
 
   it('handles WebSocket errors gracefully', async () => {
-    let mockWebSocket: MockWebSocketInstance
-
-    // Use the same pattern as the working Enhanced WebSocket tests
-    mockWebSocket = {
+    const mockWebSocket: MockWebSocketInstance = {
       send: vi.fn(),
       close: vi.fn(),
       readyState: WebSocket.OPEN,
@@ -481,7 +477,7 @@ describe('BiasDashboard', () => {
     })
 
     // Simulate connection and heartbeat setup
-    const openCall = mockWs.addEventListener.mock.calls.find(
+    const _openCall = mockWs.addEventListener.mock.calls.find(
       (call: unknown[]) => call[0] === 'open',
     )
     const intervalId = setInterval(() => { }, 30000)
@@ -1485,7 +1481,6 @@ describe('BiasDashboard', () => {
       if (originalFetch) {
         global.fetch = originalFetch
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ; (global as any).fetch = undefined
       }
       if (container && container.parentNode) {
