@@ -7,8 +7,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 
 // Check if user is authenticated
 const authResponse = await requireAuth({
-  cookies: Astro.cookies,
-  redirect: Astro.redirect,
   request: Astro.request,
 })
 

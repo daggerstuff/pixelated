@@ -126,7 +126,7 @@ const mockBackups: Backup[] = [
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
     size: 1024 * 1024 * 50, // 50 MB
     location: StorageLocation.PRIMARY,
-    status: BackupStatus.VERIFIED,
+    status: BackupStatus.COMPLETED,
     retentionDate: new Date(
       Date.now() + 365 * 24 * 60 * 60 * 1000,
     ).toISOString(), // 1 year

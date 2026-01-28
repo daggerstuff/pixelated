@@ -1,0 +1,67 @@
+# Production Dockerfile for Business Strategy CMS
+# Base stage for shared environment (no build tools)
+FROM node:24-slim AS base
+WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@10.26.1
+
+# Build dependencies stage (has build tools)
+FROM node:24-slim AS build-base
+WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@10.26.1
+RUN apt-get update && apt-get install --no-install-recommends -y python3=3.11.2-1+b1 make=4.3-4.1 g++=4:12.2.0-3 libvips-dev=8.14.1-3+deb12u2 curl=7.88.1-10+deb12u14 && rm -rf /var/lib/apt/lists/*
+
+# Runtime base stage (no build toolchain)
+FROM node:24-slim AS runtime
+WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@10.26.1
+RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+deb12u14 && rm -rf /var/lib/apt/lists/*
+
+# Production dependencies stage
+FROM runtime AS prod-deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
+
+# Build dependencies stage
+FROM build-base AS build-deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM build-deps AS build
+COPY . .
+RUN pnpm run build
+
+# Final runner stage
+FROM runtime AS runner
+WORKDIR /app
+
+# Create user
+RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -s /bin/sh -m pixelated
+
+# Copy necessary files from previous stages
+COPY --from=prod-deps --chown=pixelated:nodejs /app/node_modules ./node_modules
+COPY --from=build --chown=pixelated:nodejs /app/dist ./dist
+COPY --chown=pixelated:nodejs package.json ./
+
+# Create SSL directory
+RUN mkdir -p /app/ssl && chown pixelated:nodejs /app/ssl
+
+# Switch user
+USER pixelated
+
+# Environment variables
+ENV HOST=0.0.0.0
+ENV PORT=4321
+ENV NODE_ENV=production
+
+# Expose port
+EXPOSE 4321
+
+# Start application
+CMD ["node", "./dist/server/entry.mjs"]

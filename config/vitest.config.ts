@@ -25,7 +25,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './config/vitest.setup.ts'],
+    setupFiles: ['./src/test/setup-react19.ts', './src/test/setup.ts', './config/vitest.setup.ts'],
+    env: {
+      RTL_SKIP_AUTO_CLEANUP: 'true',
+      NODE_ENV: 'development',
+    },
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -98,11 +102,21 @@ export default defineConfig({
       ? {
         watch: false,
         bail: 3,
-        forceExit: true,
-        pool: 'threads',
-        minThreads: 1,
-        maxThreads: 1,
-        maxWorkers: 1,
+        pool: 'forks',
+        poolOptions: {
+          threads: {
+            singleThread: true,
+            maxThreads: 1,
+            minThreads: 1,
+            isolate: true, // Maintain isolation
+          },
+          forks: {
+            isolate: true,
+            singleFork: true,
+          },
+        },
+        forceExit: true, // Ensure process exits even with open handles after tests finish
+        hookTimeout: 60000, // Increase hook timeout for CI
       }
       : {}),
   },

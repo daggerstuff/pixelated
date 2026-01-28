@@ -70,6 +70,22 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
 <html lang={SITE.lang} class="dark scroll-smooth">
   <head>
     <Head {title} {description} {ogImage} {pubDate} {lastModDate} />
+
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0f172a" />
+
+    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/font-fix.css" />
+
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    <script src="/js/module-loader.js" defer is:inline></script>
+    <script src="/js/background-loader.js" defer is:inline></script>
     <style is:global>
       /* Mizu theme dark colors - default for all pages */
       :root {

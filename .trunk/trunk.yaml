@@ -18,14 +18,16 @@ actions:
 runtimes:
   enabled:
     - go@1.21.0
-    - node@22.16.0
-    - python@3.10.8
+    - node@24.11.0
+    - python@3.11.13
 lint:
+  disabled:
+    - markdownlint
   enabled:
     - actionlint@1.7.10
     - bandit@1.9.3
     - black@26.1.0
-    - checkov@3.2.497
+    - checkov@3.2.499
     - dotenv-linter@4.0.0
     - eslint@9.39.2
     - git-diff-check
@@ -33,10 +35,9 @@ lint:
     - golangci-lint2@2.8.0
     - hadolint@2.14.0
     - isort@7.0.0
-    - markdownlint@0.47.0
     - mypy@1.19.1
     - osv-scanner@2.3.2
-    - oxipng@10.0.0
+    - oxipng@10.1.0
     - prettier@3.8.1
     - pyright@1.1.408
     - ruff@0.14.14

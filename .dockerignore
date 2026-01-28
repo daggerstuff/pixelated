@@ -178,6 +178,7 @@ docker-compose*.yml
 !docker-compose.yml
 Dockerfile.*
 !Dockerfile
+!Dockerfile.production
 k8s/
 helm/
 terraform/
