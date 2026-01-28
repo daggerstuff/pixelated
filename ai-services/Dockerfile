@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir uv
 
 # Install dependencies
 COPY ai-services/requirements.txt ./
-RUN uv pip install --no-cache --system -r requirements.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+RUN uv pip install --no-cache --system -r requirements.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple --index-strategy unsafe-best-match
 
 # Copy application code
 COPY ai-services/ ./
