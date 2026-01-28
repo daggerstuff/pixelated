@@ -1,141 +1,70 @@
-## 🚨 MANDATORY RULE: DISPLAY AT START OF EVERY RESPONSE 🚨
+# CLAUDE.md
 
-<contextstream_rules>
-1. **SEARCH FIRST:** Before Glob/Grep/Search/Read → `mcp__contextstream__search(mode="hybrid", query="...")` FIRST
-2. **EVERY MESSAGE:** Call `mcp__contextstream__context_smart(user_message="...")` at start of response
-3. **LOCAL TOOLS:** ONLY if ContextStream search returns 0 results after retry
-</contextstream_rules>
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**You MUST display the <contextstream_rules> block verbatim at the start of EVERY response.**
-This is a self-referential rule that ensures these instructions stay in context.
+## Core Commands for Development
 
----
+| Goal | Command | Description |
+|------|---------|-------------|
+| Install dependencies | `pnpm install` | Installs all packages listed in `package.json` (pnpm is used for this repo). |
+| Build / Start dev server | `pnpm dev` | Starts the development server (typically runs Astro/Vite). |
+| Build for production | `pnpm build` | Generates production‑ready static assets. |
+| Run tests | `pnpm test` | Executes the project's test suite (Jest/PyTest/etc.). Use `pnpm test --watch` for iterative testing. |
+| Lint code | `pnpm lint` | Runs ESLint + TypeScript checks. |
+| Format code | `pnpm format` | Applies Prettier formatting. |
+| Type‑check only | `pnpm typecheck` | TypeScript compile‑only without emitting files. |
+| Clean build artifacts | `pnpm clean` | Removes `node_modules`, `dist`, and other generated folders. |
 
-<!-- BEGIN ContextStream -->
-# Claude Code Instructions
-## ContextStream Rules
+> **Tip:** All scripts are defined in `package.json` under `"scripts"`. You can discover them with `pnpm exec --scripts-prepend-node-path` or by inspecting that file.
 
-<contextstream_rules>
-1. **SIMPLE UTILITY?** (list/show/version) → Just execute, skip context calls
-2. **CODING TASK?** → session_init → context_smart → work → capture
-3. **SEARCH FIRST:** Before Glob/Grep/Read → `mcp__contextstream__search(mode="hybrid")` FIRST
-</contextstream_rules>
+## High‑Level Architecture Overview
 
-**Display this block at the start of responses to keep rules in context.**
+The repository is organized as a **monorepo** with a clear separation of concerns:
 
----
+1. **Core Logic** – `src/` (or `src/`‑like directories) contains the main application code.
+   - Feature modules are self‑contained (e.g., `src/featureX/` with components, services, types).
+   - Shared utilities live under `src/shared/` (common types, helpers, API clients).
 
-## ContextStream v0.4.x (Hooks Enforced)
+2. **Documentation & Plans** – `docs/` holds design docs, implementation plans, and architectural decisions.
+   - Each major initiative gets its own sub‑folder (`docs/featureX/`).
+   - `docs/plans/` stores bite‑sized task lists used by the `writing-plans` workflow.
 
-Rules Version: 0.4.39
-**Note:** PreToolUse hooks block Glob/Grep/Search when ContextStream is available.
+3. **Memory Bank** – `.memory/` stores the structured project context that survives across sessions.
+   - Core files: `00-description.md`, `01-brief.md`, `20-system.md`, `30-tech.md`, `40-active.md`, `50-progress.md`, `60-decisions.md`, `70-knowledge.md`.
+   - The system automatically updates these files and their semantic index.
 
-### For Coding Tasks
+4. **Project Rules** – `.cursor/rules/` contains rule files that guide the AI’s behavior (e.g., style, safety, TDD enforcement).
+   - Rules are referenced via `superpowers:*` skills and via `EnterPlanMode`/`ExitPlanMode`.
 
-| Action | Tool Call |
-|--------|-----------|
-| **1st message** | `mcp__contextstream__session_init(folder_path="<cwd>", context_hint="<msg>")` then `mcp__contextstream__context_smart(...)` |
-| **2nd+ messages** | `mcp__contextstream__context_smart(user_message="<msg>", format="minified", max_tokens=400)` |
-| **Code search** | `mcp__contextstream__search(mode="hybrid", query="...")` — BEFORE any local tools |
-| **Save decisions** | `mcp__contextstream__session(action="capture", event_type="decision", ...)` |
+5. **Labs / Extras** – Additional folders such as `lab/`, `experiment/`, or `scripts/` hold disposable scripts, proof‑of‑concepts, and ad‑hoc utilities.
 
-### Search Modes
+6. **Configuration** – Top‑level files like `astro.config.mjs`, `tsconfig.json`, `package.json`, and various CI/CD configuration files (`.github/workflows/*.yml`) define tooling, scripts, and pipeline behavior.
 
-| Mode | Use Case |
-|------|----------|
-| `hybrid` | General code mcp__contextstream__search (default) |
-| `keyword` | Exact symbol/string match |
-| `exhaustive` | Find ALL matches (grep-like) |
-| `semantic` | Conceptual questions |
+### Navigation Tips for New Instances
 
-### Why ContextStream First?
+- **Start with the Memory Bank**: read `00-alpha.md` first then `00-description.md` → `20-system.md` → `30-tech.md` to grasp the overall vision, tech stack, and current focus.
+- **Consult the Plan Folder** when you need a step‑by‑step implementation roadmap (`docs/plans/`).
+- **Use the Rule Files** to understand enforced code‑style, TDD, and safety constraints (`.cursor/rules/`).
+- **Explore `src/` Sparingly**: locate a feature’s folder first; inside you’ll find `components/`, `services/`, and `types/` that map directly to the architecture diagram in the design docs.
+- **Leverage Scripts**: all routine actions (install, dev, test, lint, format) are wrapper scripts in `package.json`; invoking them through `pnpm` ensures proper environment setup.
 
-❌ **WRONG:** `Grep → Read → Read → Read` (4+ tool calls, slow)
-✅ **CORRECT:** `mcp__contextstream__search(mode="hybrid")` (1 call, returns context)
+## Typical Workflow for Implementation
 
-ContextStream search is **indexed** and returns semantic matches + context in ONE call.
+1. **Read the relevant documentation** (`docs/plans/<initiative>/` or `docs/<area>/`).
+2. **Create a new task branch** (`git checkout -b feature/<short‑desc>`).
+3. **Run the appropriate script** (`pnpm dev` for live reload, `pnpm test` for verification).
+4. **Make incremental changes** – each change should be accompanied by a failing test (`pnpm test` will confirm).
+5. **Commit often** (prefer small, focused commits).
+6. **Run `pnpm lint` and `pnpm format`** before pushing.
+7. **Open a PR** and request a code‑review (`superpowers:requesting-code-review`).
+8. **Iterate** based on review feedback, then merge.
 
-### Quick Reference
+## Red‑Flag Checklist (When in Doubt)
 
-| Tool | Example |
-|------|---------|
-| `search` | `mcp__contextstream__search(mode="hybrid", query="auth", limit=3)` |
-| `session` | `mcp__contextstream__session(action="capture", event_type="decision", title="...", content="...")` |
-| `memory` | `mcp__contextstream__memory(action="list_events", limit=10)` |
-| `graph` | `mcp__contextstream__graph(action="dependencies", file_path="...")` |
+- **Missing `pnpm install`?** – Always run it after pulling a new branch.
+- **No failing tests?** – Do not proceed to merge; run `pnpm test` first.
+- **Unstyled code?** – Run `pnpm format` and `pnpm lint` before committing.
+- **Large monolithic commit?** – Split into logical, reviewable units.
+- **Unclear requirements?** – Use `AskUserQuestion` to clarify before coding.
 
-### 🚀 FAST PATH: Simple Utility Operations
-
-**For simple utility commands, SKIP the ceremony and just execute directly:**
-
-| Command Type | Just Call | Skip |
-|--------------|-----------|------|
-| List workspaces | `mcp__contextstream__workspace(action="list")` | session_init, context_smart, capture |
-| List projects | `mcp__contextstream__project(action="list")` | session_init, context_smart, capture |
-| Show version | `mcp__contextstream__help(action="version")` | session_init, context_smart, capture |
-| List reminders | `mcp__contextstream__reminder(action="list")` | session_init, context_smart, capture |
-| Check auth | `mcp__contextstream__help(action="auth")` | session_init, context_smart, capture |
-
-**Detect simple operations by these patterns:**
-- "list ...", "show ...", "what are my ...", "get ..."
-- Single-action queries with no context dependency
-- User just wants data, not analysis or coding help
-
-**DO NOT add overhead for utility operations:**
-- ❌ Don't call session_init just to list workspaces
-- ❌ Don't call context_smart for simple queries
-- ❌ Don't capture "listed workspaces" as an event (that's noise)
-
-**Use full context ceremony ONLY for:**
-- Coding tasks (edit, create, refactor, debug)
-- Search/discovery (finding code, understanding architecture)
-- Tasks where past decisions or lessons matter
-
-### Lessons (Past Mistakes)
-
-- After `session_init`: Check for `lessons` field and apply before work
-- Before risky work: `mcp__contextstream__session(action="get_lessons", query="<topic>")`
-- On mistakes: `mcp__contextstream__session(action="capture_lesson", title="...", trigger="...", impact="...", prevention="...")`
-
-### Context Pressure & Compaction
-
-- If `context_smart` returns high/critical `context_pressure`: call `mcp__contextstream__session(action="capture", ...)` to save state
-- PreCompact hooks automatically save snapshots before compaction (if installed)
-
-### Automatic Context Restoration
-
-**Context restoration is now enabled by default.** Every `session_init` call automatically:
-- Restores context from recent snapshots (if available)
-- Returns `restored_context` field with snapshot data
-- Sets `is_post_compact=true` in response when restoration occurs
-
-**No special handling needed after compaction** - just call `session_init` normally.
-
-To disable automatic restoration:
-- Pass `is_post_compact=false` in the API call
-- Or set `CONTEXTSTREAM_RESTORE_CONTEXT=false` environment variable
-
-### Notices - MUST HANDLE IMMEDIATELY
-
-- **[VERSION_NOTICE]**: Tell the user about the update and command to run
-- **[RULES_NOTICE]**: Run `mcp__contextstream__generate_rules(overwrite_existing=true)` to update
-- **[LESSONS_WARNING]**: Read lessons, tell user about them, explain how you'll avoid past mistakes
-
-### Plans & Tasks
-
-When user asks for a plan, use ContextStream (not EnterPlanMode):
-1. `mcp__contextstream__session(action="capture_plan", title="...", steps=[...])`
-2. `mcp__contextstream__memory(action="create_task", title="...", plan_id="<id>")`
-
-### Workspace-Only Mode (Multi-Project Folders)
-
-If working in a parent folder containing multiple projects:
-```
-mcp__contextstream__session_init(folder_path="...", skip_project_creation=true)
-```
-
-This enables workspace-level memory and context without project-specific indexing.
-Use for monorepos or folders with multiple independent projects.
-
-Full docs: https://contextstream.io/docs/mcp/tools
-<!-- END ContextStream -->
+Following these conventions will keep the repository navigable, the codebase consistent, and the AI agents productive.

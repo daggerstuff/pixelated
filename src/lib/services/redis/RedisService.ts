@@ -8,6 +8,8 @@ import { EventEmitter } from 'events'
 import { getHipaaCompliantLogger } from '../../logging/standardized-logger'
 import { Redis } from 'ioredis'
 import { RedisErrorCode, RedisServiceError } from './types.js'
+import * as fs from 'fs'
+
 
 const logger = getHipaaCompliantLogger('general')
 
@@ -47,7 +49,29 @@ export class RedisService extends EventEmitter implements IRedisService {
       this.config.url = process.env['UPSTASH_REDIS_REST_URL'] as string
     } else if (hasRedisUrl) {
       this.config.url = process.env['REDIS_URL'] as string
+
+      // Support for Docker Secrets (/run/secrets/*) or any *_FILE env var
+      const redisPasswordFile = process.env['REDIS_PASSWORD_FILE']
+      if (redisPasswordFile && fs.existsSync(redisPasswordFile)) {
+        try {
+          const password = fs.readFileSync(redisPasswordFile, 'utf8').trim()
+          if (password) {
+            // Reconstruct URL with password if it doesn't already have one
+            const urlObj = new URL(this.config.url)
+            if (!urlObj.password) {
+              urlObj.password = password
+              this.config.url = urlObj.toString()
+            }
+          }
+        } catch (error) {
+          logger.error('Failed to read Redis password file:', {
+            file: redisPasswordFile,
+            error: String(error),
+          })
+        }
+      }
     }
+
 
     // After all resolution, if we still don't have a URL and we're not in development
     if (!this.config.url && !hasUpstashUrl && !hasRedisUrl) {
@@ -365,7 +389,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       info: async () => 'connected_clients:1\nblocked_clients:0',
       publish: async () => 0,
       quit: async () => 'OK',
-      connect: async () => {},
+      connect: async () => { },
       on: (event: string, callback: (...args: unknown[]) => void) => {
         // Emit the event immediately to simulate connection events
         if (['connect', 'ready'].includes(event)) {
