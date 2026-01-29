@@ -44,7 +44,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     const hasUpstashUrl = Boolean(process.env['UPSTASH_REDIS_REST_URL'])
     const hasRedisUrl = Boolean(process.env['REDIS_URL'])
 
-    console.error(`[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`)
+    logger.debug(`[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`)
 
     // If environment variables exist, use them regardless of what was in config
     if (hasUpstashUrl) {
@@ -58,7 +58,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         try {
           const password = fs.readFileSync(redisPasswordFile, 'utf8').trim()
           if (password) {
-            console.error(`[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`)
+            logger.info(`[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`)
             // Reconstruct URL with password if it doesn't already have one
             const urlObj = new URL(this.config.url)
             if (!urlObj.password) {
@@ -96,7 +96,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     }
 
     // Successfully validated
-    console.error(`[RedisService] Final config: url=${this.config.url.replace(/:[^:@]*@/, ':****@')}, password=${this.config.password ? 'SET' : 'undefined'}`)
+    logger.debug(`[RedisService] Config validated`)
   }
 
   async connect(): Promise<void> {
