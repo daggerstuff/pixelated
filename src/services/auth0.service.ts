@@ -12,6 +12,7 @@ import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
 import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
 import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
+import { auth0Config } from '../lib/auth/auth0-config'
 
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
@@ -23,39 +24,33 @@ let auth0Authentication: AuthenticationClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  const config = {
-    domain: process.env.AUTH0_DOMAIN || '',
-    clientId: process.env.AUTH0_CLIENT_ID || '',
-    clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
-    audience: process.env.AUTH0_AUDIENCE || '',
-    managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-    managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
-  }
-
-  if (!config.domain || !config.managementClientId || !config.managementClientSecret) {
+  if (!auth0Config.domain || !auth0Config.managementClientId || !auth0Config.managementClientSecret) {
     console.warn('Auth0 configuration is incomplete. Authentication features may not work.')
-    return
+    // return // Continue anyway, maybe some parts work? or just return to be safe like before.
+    // The original code returned early. Let's return config too?
+    // Original returned 'config'. Here I should return auth0Config.
+    return auth0Config
   }
 
   if (!auth0Management) {
     auth0Management = new ManagementClient({
-      domain: config.domain,
-      clientId: config.managementClientId,
-      clientSecret: config.managementClientSecret,
-      audience: `https://${config.domain}/api/v2/`,
+      domain: auth0Config.domain,
+      clientId: auth0Config.managementClientId,
+      clientSecret: auth0Config.managementClientSecret,
+      audience: `https://${auth0Config.domain}/api/v2/`,
       scope: 'read:users update:users create:users delete:users'
     })
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: config.domain,
-      clientId: config.clientId,
-      clientSecret: config.clientSecret
+      domain: auth0Config.domain,
+      clientId: auth0Config.clientId,
+      clientSecret: auth0Config.clientSecret
     })
   }
 
-  return config
+  return auth0Config
 }
 
 /**
@@ -97,14 +92,14 @@ export class Auth0UserService {
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: process.env.AUTH0_AUDIENCE || ''
+        audience: auth0Config.audience || `https://${auth0Config.domain}/api/v2/` // fallback if audience missing
       })
 
       // Get user info
       const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
 
       // Log security event
-       logSecurityEvent(SecurityEventType.LOGIN, {
+      logSecurityEvent(SecurityEventType.LOGIN, {
         userId: userResponse.user_id,
         email: userResponse.email,
         method: 'password'

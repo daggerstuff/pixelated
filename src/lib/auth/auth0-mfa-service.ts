@@ -7,14 +7,8 @@ import { ManagementClient, AuthenticationClient } from 'auth0'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
-// Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  clientId: process.env.AUTH0_CLIENT_ID || '',
-  clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
-}
+import { auth0Config } from './auth0-config'
+
 
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
@@ -24,24 +18,25 @@ let auth0Management: ManagementClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
+  if (!auth0Config.domain || !auth0Config.clientId || !auth0Config.clientSecret) {
+
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain: auth0Config.domain,
+      clientId: auth0Config.clientId,
+      clientSecret: auth0Config.clientSecret
     })
   }
 
-  if (!auth0Management && AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
+  if (!auth0Management && auth0Config.managementClientId && auth0Config.managementClientSecret) {
     auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      domain: auth0Config.domain,
+      clientId: auth0Config.managementClientId,
+      clientSecret: auth0Config.managementClientSecret,
+      audience: `https://${auth0Config.domain}/api/v2/`,
       scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
     })
   }
@@ -86,7 +81,7 @@ export interface MFAVerification {
  */
 export class Auth0MFAService {
   constructor() {
-    if (!AUTH0_CONFIG.domain) {
+    if (!auth0Config.domain) {
       console.warn('Auth0 is not properly configured')
     }
   }
@@ -170,11 +165,11 @@ export class Auth0MFAService {
           break
 
         default:
-          throw new Error(`Unsupported factor type: ${factor.factorType}`)
+          throw new Error(`Unsupported factor type: ${(factor as any).factorType}`)
       }
 
       // Log enrollment start event
-      await logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, {
         userId: userId,
         factorType: factor.factorType,
         timestamp: new Date().toISOString()
@@ -210,7 +205,7 @@ export class Auth0MFAService {
       }
 
       // Log enrollment completion event
-      await logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, {
         userId: userId,
         factorType: verification.challengeType,
         factorId: enrolledFactor.id,
@@ -266,7 +261,7 @@ export class Auth0MFAService {
       await auth0Management.deleteGuardianEnrollment({ id: factorId })
 
       // Log factor deletion event
-      await logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {
+      logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {
         userId: userId,
         factorId: factorId,
         timestamp: new Date().toISOString()
@@ -299,7 +294,7 @@ export class Auth0MFAService {
       }
 
       // Log challenge event
-      await logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, {
+      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, {
         userId: userId,
         factorType: factorType,
         challengeId: challenge.oobCode,
@@ -329,7 +324,7 @@ export class Auth0MFAService {
       // For now, we'll simulate successful verification
 
       // Log verification event
-      await logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, {
         userId: userId,
         challengeType: verification.challengeType,
         success: true,
@@ -344,7 +339,7 @@ export class Auth0MFAService {
       console.error('Failed to verify MFA challenge:', error)
 
       // Log failed verification event
-      await logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, {
         userId: userId,
         challengeType: verification.challengeType,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -377,8 +372,7 @@ export class Auth0MFAService {
   async setUserPreferredFactor(userId: string, factorId: string): Promise<void> {
     // In a real implementation, this would update the user's preferred factor in Auth0
     // For now, we'll just log the event
-
-    await logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, {
+    logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, {
       userId: userId,
       factorId: factorId,
       timestamp: new Date().toISOString()
