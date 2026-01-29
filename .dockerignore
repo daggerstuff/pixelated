@@ -192,6 +192,7 @@ scripts/*
 !scripts/create-prod-package.js
 !scripts/utils/
 !scripts/utils/start-server.mjs
+!scripts/docker-entrypoint.js
 
 # Tools and utilities
 tools/
