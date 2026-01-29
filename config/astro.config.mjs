@@ -17,6 +17,10 @@ const isDockerBuild =
 
 const isCloudflareDeploy =
   process.env.DEPLOY_TARGET === "cloudflare" || process.env.CF_PAGES === "1";
+const isVercelDeploy =
+  process.env.DEPLOY_TARGET === "vercel" || !!process.env.VERCEL;
+const isNetlifyDeploy =
+  process.env.DEPLOY_TARGET === "netlify" || !!process.env.NETLIFY;
 let cloudflareAdapter;
 if (isCloudflareDeploy) {
   try {
@@ -37,6 +41,26 @@ if (isCloudflareDeploy && !cloudflareAdapter) {
   );
 }
 
+let vercelAdapter;
+if (isVercelDeploy) {
+  try {
+    const vercelModule = await import("@astrojs/vercel");
+    vercelAdapter = vercelModule.default;
+  } catch (e) {
+    console.warn("⚠️  Vercel adapter not available:", e.message);
+  }
+}
+
+let netlifyAdapter;
+if (isNetlifyDeploy) {
+  try {
+    const netlifyModule = await import("@astrojs/netlify");
+    netlifyAdapter = netlifyModule.default;
+  } catch (e) {
+    console.warn("⚠️  Netlify adapter not available:", e.message);
+  }
+}
+
 // No longer using individual cloud platform flags as we've shifted to Docker-first.
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -46,7 +70,10 @@ const isBuildCommand =
   process.argv.includes("build") ||
   process.env.CI === "true" ||
   !!process.env.CF_PAGES ||
-  !!process.env.VERCEL;
+  process.env.CI === "true" ||
+  !!process.env.CF_PAGES ||
+  !!process.env.VERCEL ||
+  !!process.env.NETLIFY;
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === "1";
 const hasSentryDSN =
   !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN; // Only enable if DSN is actually present
@@ -122,6 +149,26 @@ const adapter = (() => {
     });
   }
 
+  if (isVercelDeploy && vercelAdapter) {
+    console.log("▲ Using Vercel adapter for deployment");
+    return vercelAdapter({
+      webAnalytics: { enabled: true },
+      speedInsights: { enabled: true },
+      imagesConfig: {
+        domains: ["pixelatedempathy.com", "cdn.pixelatedempathy.com"],
+        sizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+      },
+    });
+  }
+
+  if (isNetlifyDeploy && netlifyAdapter) {
+    console.log("◈ Using Netlify adapter for deployment");
+    return netlifyAdapter({
+      // Disable edge middleware to avoid crypto resolution issues
+      edgeMiddleware: false,
+    });
+  }
+
   // Default to Node adapter for standard deployments (Docker, Kubernetes, VPS)
   console.log("📦 Using Node adapter for deployment");
   return node({
@@ -146,14 +193,17 @@ export default defineConfig({
       },
     ],
     rollupOptions: {
-      output: {
-        // Manual chunk splitting for better caching
-        manualChunks: getChunkName,
-        // Optimized chunk naming for better caching
-        chunkFileNames: "assets/[name]-[hash].js",
-        entryFileNames: "assets/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash].[ext]",
-      },
+      output:
+        isVercelDeploy || isNetlifyDeploy
+          ? {}
+          : {
+            // Manual chunk splitting for better caching
+            manualChunks: getChunkName,
+            // Optimized chunk naming for better caching
+            chunkFileNames: "assets/[name]-[hash].js",
+            entryFileNames: "assets/[name]-[hash].js",
+            assetFileNames: "assets/[name]-[hash].[ext]",
+          },
     },
   },
   vite: {
@@ -256,12 +306,12 @@ export default defineConfig({
     plugins: [
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
-        visualizer({
-          filename: "dist/bundle-analysis.html",
-          open: true,
-          gzipSize: true,
-          brotliSize: true,
-        }),
+      visualizer({
+        filename: "dist/bundle-analysis.html",
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
     ].filter(Boolean),
     resolve: {
       alias: {
@@ -396,32 +446,32 @@ export default defineConfig({
       }),
       ...(hasSentryDSN
         ? [
-            sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || "pixelated-empathy-dq",
-                project: process.env.SENTRY_PROJECT || "pixel-astro",
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    "./.astro/dist/**/*.js",
-                    "./.astro/dist/**/*.mjs",
-                    "./dist/**/*.js",
-                    "./dist/**/*.mjs",
-                  ],
-                  ignore: ["**/node_modules/**"],
-                  filesToDeleteAfterUpload: ["**/*.map", "**/*.js.map"],
-                },
+          sentry({
+            sourceMapsUploadOptions: {
+              org: process.env.SENTRY_ORG || "pixelated-empathy-dq",
+              project: process.env.SENTRY_PROJECT || "pixel-astro",
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              // Include release for proper stack trace linking and code mapping
+              release:
+                process.env.SENTRY_RELEASE ||
+                process.env.npm_package_version ||
+                undefined,
+              telemetry: false,
+              sourcemaps: {
+                assets: [
+                  "./.astro/dist/**/*.js",
+                  "./.astro/dist/**/*.mjs",
+                  "./dist/**/*.js",
+                  "./dist/**/*.mjs",
+                ],
+                ignore: ["**/node_modules/**"],
+                filesToDeleteAfterUpload: ["**/*.map", "**/*.js.map"],
               },
-            }),
-            // Temporarily disable SpotlightJS due to build issues
-            // ...(shouldUseSpotlight ? [spotlightjs()] : [])
-          ]
+            },
+          }),
+          // Temporarily disable SpotlightJS due to build issues
+          // ...(shouldUseSpotlight ? [spotlightjs()] : [])
+        ]
         : []),
     ];
   })(),
