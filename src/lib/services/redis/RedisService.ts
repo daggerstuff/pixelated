@@ -61,13 +61,15 @@ export class RedisService extends EventEmitter implements IRedisService {
             logger.info(`[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`)
             // Reconstruct URL with password if it doesn't already have one
             const urlObj = new URL(this.config.url)
+
+            // ALWAYS use the file password if available, as it's the source of truth
+            this.config.password = password
+            console.log(`[RedisService] Password loaded from ${redisPasswordFile}`)
+
             if (!urlObj.password) {
-              urlObj.password = password
               urlObj.password = password
               this.config.url = urlObj.toString()
             }
-            // Explicitly set password in config for reliability
-            this.config.password = password
           }
         } catch (error) {
           logger.error('Failed to read Redis password file:', {
