@@ -63,6 +63,7 @@
 .brv
 .claude-flow/
 .claude/
+.config/
 .codacy
 .codebuff
 .codebuff/agents
@@ -230,3 +231,5 @@ yt-downloader
 
 config/secrets/*
 !config/secrets/*.example
+docker/.env
+docker/config/secrets/
