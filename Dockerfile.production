@@ -23,7 +23,7 @@ RUN npm install -g pnpm@10.26.1
 RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+deb12u14 && rm -rf /var/lib/apt/lists/*
 
 # Production dependencies stage
-FROM runtime AS prod-deps
+FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
@@ -48,6 +48,7 @@ RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -s /bin/sh -m pixelated
 COPY --from=prod-deps --chown=pixelated:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=pixelated:nodejs /app/dist ./dist
 COPY --chown=pixelated:nodejs package.json ./
+COPY --chown=pixelated:nodejs scripts/docker-entrypoint.js ./docker-entrypoint.js
 
 # Create SSL directory
 RUN mkdir -p /app/ssl && chown pixelated:nodejs /app/ssl
@@ -64,4 +65,4 @@ ENV NODE_ENV=production
 EXPOSE 4321
 
 # Start application
-CMD ["node", "./dist/server/entry.mjs"]
+CMD ["node", "./docker-entrypoint.js", "node", "./dist/server/entry.mjs"]
