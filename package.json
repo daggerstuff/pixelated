@@ -26,6 +26,7 @@
     "build:railway": "DEPLOY_TARGET=railway astro build",
     "build:heroku": "DEPLOY_TARGET=heroku astro build",
     "build:flyio": "DEPLOY_TARGET=flyio astro build",
+    "build:vercel": "DEPLOY_TARGET=vercel astro build",
     "build:analyze": "astro build && pnpm run analyze:bundle",
     "analyze:bundle": "npx astro-bundle-analyzer dist",
     "format": "oxc format --write . && prettier --write \"**/*.{astro,mdx}\"",
