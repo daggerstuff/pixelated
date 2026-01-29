@@ -59,6 +59,7 @@ export class RedisService extends EventEmitter implements IRedisService {
           const password = fs.readFileSync(redisPasswordFile, 'utf8').trim()
           if (password) {
             console.error(`[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`)
+            throw new Error(`[DEBUG] FORCE FAIL: Loaded password length ${password.length} from ${redisPasswordFile}`)
             // Reconstruct URL with password if it doesn't already have one
             const urlObj = new URL(this.config.url)
             if (!urlObj.password) {
