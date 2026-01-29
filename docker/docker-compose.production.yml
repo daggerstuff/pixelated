@@ -21,12 +21,22 @@ services:
       - REDIS_URL=redis://redis:6379
       - REDIS_PASSWORD_FILE=/run/secrets/redis_password
       - JWT_SECRET_FILE=/run/secrets/jwt_secret
+      - AUTH0_DOMAIN_FILE=/run/secrets/auth0_domain
+      - AUTH0_CLIENT_ID_FILE=/run/secrets/auth0_client_id
+      - AUTH0_CLIENT_SECRET_FILE=/run/secrets/auth0_client_secret
+      - AUTH0_MANAGEMENT_CLIENT_ID_FILE=/run/secrets/auth0_management_client_id
+      - AUTH0_MANAGEMENT_CLIENT_SECRET_FILE=/run/secrets/auth0_management_client_secret
       - PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://pixelatedempathy.com}
       - CDN_BASE_URL=${CDN_BASE_URL:-https://cdn.pixelatedempathy.com}
     secrets:
       - db_password
       - redis_password
       - jwt_secret
+      - auth0_domain
+      - auth0_client_id
+      - auth0_client_secret
+      - auth0_management_client_id
+      - auth0_management_client_secret
     depends_on:
       postgres:
         condition: service_healthy
@@ -258,6 +268,16 @@ secrets:
     file: ../config/secrets/redis-password
   jwt_secret:
     file: ../config/secrets/jwt-secret
+  auth0_domain:
+    file: ../config/secrets/auth0-domain
+  auth0_client_id:
+    file: ../config/secrets/auth0-client-id
+  auth0_client_secret:
+    file: ../config/secrets/auth0-client-secret
+  auth0_management_client_id:
+    file: ../config/secrets/auth0-management-client-id
+  auth0_management_client_secret:
+    file: ../config/secrets/auth0-management-client-secret
 
 networks:
   default:

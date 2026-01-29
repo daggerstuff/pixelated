@@ -9,11 +9,8 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { auth0UserService } from '../../services/auth0.service'
 
 // Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
-}
+import { auth0Config } from './auth0-config'
+
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
@@ -22,16 +19,16 @@ let auth0Management: ManagementClient | null = null
  * Initialize Auth0 management client
  */
 function initializeAuth0Management() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.managementClientId || !AUTH0_CONFIG.managementClientSecret) {
+  if (!auth0Config.domain || !auth0Config.managementClientId || !auth0Config.managementClientSecret) {
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Management) {
     auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      domain: auth0Config.domain,
+      clientId: auth0Config.managementClientId,
+      clientSecret: auth0Config.managementClientSecret,
+      audience: `https://${auth0Config.domain}/api/v2/`,
       scope: 'read:users read:logs read:attack-protection update:attack-protection'
     })
   }
@@ -114,7 +111,7 @@ export class Auth0AdaptiveMFAService {
   private config: AdaptiveMFAConfig
 
   constructor() {
-    if (!AUTH0_CONFIG.domain) {
+    if (!auth0Config.domain) {
       console.warn('Auth0 is not properly configured')
     }
 
@@ -271,8 +268,8 @@ export class Auth0AdaptiveMFAService {
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
         if (user && user.lastLogin && Math.random() < 0.1) {
-              triggered = true
-              description = `New or unusual IP address for user`
+          triggered = true
+          description = `New or unusual IP address for user`
         }
       }
     } catch (error) {
@@ -313,9 +310,9 @@ export class Auth0AdaptiveMFAService {
       // Check for unusual location change (simulated)
       const user = await auth0UserService.getUserById(userId)
       if (user && (Math.random() < 0.05 && location.country)) {
-            triggered = true
-            description = `Unusual location change detected`
-            value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
+        triggered = true
+        description = `Unusual location change detected`
+        value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
     } catch (error) {
       console.warn('Failed to analyze geolocation:', error)
