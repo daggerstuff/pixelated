@@ -126,6 +126,7 @@ services:
       - TRAEFIK_ENTRYPOINTS_websecure_ADDRESS=:443
       - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_EMAIL=${SSL_EMAIL}
       - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_STORAGE=/ssl-certs/acme.json
+      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_HTTPCHALLENGE_ENTRYPOINT=web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
