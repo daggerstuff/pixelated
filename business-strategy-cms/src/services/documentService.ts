@@ -36,8 +36,9 @@ export class DocumentService {
     const document = await DocumentModel.create({
       ...documentData,
       authorId,
-      status: DocumentStatus.DRAFT,
-      collaborators: [],
+      status: documentData.status || DocumentStatus.DRAFT,
+      collaborators: documentData.collaborators || [],
+      tags: documentData.tags || [],
       metadata,
     })
 
@@ -167,7 +168,7 @@ export class DocumentService {
   static async getDocumentVersion(
     documentId: string,
     version: number,
-  ): Promise<any | null> {
+  ): Promise<any> {
     const document = await DocumentModel.findById(documentId)
     if (!document) {
       throw new Error('Document not found')
@@ -214,5 +215,22 @@ export class DocumentService {
     }
 
     return DocumentModel.update(id, { status: DocumentStatus.ARCHIVED })
+  }
+
+  static async getDocumentById(id: string): Promise<Document | null> {
+    return DocumentModel.findById(id)
+  }
+
+  static async getUserById(id: string): Promise<any> {
+    return UserModel.findById(id)
+  }
+
+  static async checkDocumentPermission(
+    _documentId: string,
+    _userId: string,
+    _permission: 'read' | 'write' | 'admin',
+  ): Promise<boolean> {
+    // Placeholder implementation
+    return true
   }
 }

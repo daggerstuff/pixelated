@@ -1,7 +1,6 @@
 # NVIDIA NeMo Data Designer Docker Compose Configuration
 # Based on: https://docs.nvidia.com/nemo/microservices/latest/design-synthetic-data-from-scratch-or-seeds/index.html
 
-version: '3.8'
 
 services:
   nemo-data-designer:

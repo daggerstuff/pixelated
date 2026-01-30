@@ -315,8 +315,8 @@ All consent records are stored with:
 ## Contact
 
 For questions about consent:
-- **Email**: consent@pixelated-empathy.com
-- **Privacy Officer**: privacy-officer@pixelated-empathy.com
+- **Email**: consent@pixelatedempathy.com
+- **Privacy Officer**: privacy-officer@pixelatedempathy.com
 
 ---
 
