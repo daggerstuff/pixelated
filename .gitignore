@@ -142,6 +142,7 @@
 /.vite/
 /.vite/deps/
 /Thumbs.db*
+/ai/
 /acontext_server/
 /bin/
 /browser-compatibility/
