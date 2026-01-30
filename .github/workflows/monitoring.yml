@@ -10,7 +10,7 @@ permissions:
 
 env:
   NODE_VERSION: 24.11.0
-  PNPM_VERSION: 10.28.1
+  PNPM_VERSION: 10.28.2
   NODE_ENV: production
   DEFAULT_BASE_URL: "https://pixelatedempathy.com"
   HEALTH_CHECK_TIMEOUT_PROD: 30
