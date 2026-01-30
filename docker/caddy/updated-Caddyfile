@@ -1,0 +1,112 @@
+# Pixelated Empathy Caddy Configuration
+{
+    # Global options
+    auto_https off
+    admin off
+}
+
+# Main application
+pixelatedempathy.com {
+    # Health check endpoint
+    handle /health {
+        respond "OK" 200
+    }
+
+    # API routes
+    handle /api/bias-detection/* {
+        reverse_proxy bias-detection-service:5001
+    }
+
+    # Main application
+    handle {
+        reverse_proxy frontend:4321
+    }
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}
+
+# NVIDIA NeMo services
+nemo.pixelatedempathy.com {
+    # Reverse proxy to NeMo services
+    reverse_proxy nemo-envoy-gateway:8080
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}
+
+# Ollama API with CORS
+ollama.pixelatedempathy.com {
+    # Add CORS headers
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Max-Age "3600"
+    }
+
+    # Handle OPTIONS requests for CORS preflight
+    @options {
+        method OPTIONS
+    }
+    handle @options {
+        header Access-Control-Allow-Origin "*"
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header Access-Control-Allow-Headers "Content-Type, Authorization"
+        respond "" 204
+    }
+
+    # Basic authentication for API
+    # Uncomment the following lines to enable basic auth
+    # basicauth / {
+    #     # Generate hash with: htpasswd -B -C 12 "" user
+    #     user JDJhJDEyJG9qRUR5TG1ZaC9RZG9qRUR5TG1ZaC9RZG9qRUR5TG1ZaC9RZG9qRUR5TG1ZaC9R  # password: password
+    # }
+
+    # Reverse proxy to Ollama service
+    reverse_proxy http://localhost:11434
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}
+
+# Staging environment
+staging.pixelatedempathy.com {
+    # Reverse proxy to staging service
+    reverse_proxy staging:3000
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}

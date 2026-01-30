@@ -230,6 +230,32 @@ yt-downloader
 
 config/secrets/*
 !config/secrets/*.example
-docker/.env
-docker/config/secrets/
-business-strategy-cms/.env
+
+# Agent/Tool Folders
+.adal/
+.cline/
+.codebuddy/
+.codex/
+.commandcode/
+.continue/
+.factory/
+.goose/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openclaude/
+.opencode/
+.openhands/
+.pi/
+.pochi/
+.trae/
+.vibe/
+.zencoder/
+
+# Skills directories
+skills/
+.github/skills/
+
+# Secrets
+ngc_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10/.env

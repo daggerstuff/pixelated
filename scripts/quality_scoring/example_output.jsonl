@@ -1,0 +1,2 @@
+{"id": "sample-1", "signals": {"empathy": 0.5, "fidelity": 1.0, "domain": 0.33, "harm": 0.0}, "composite": 0.71, "decision": "accept"}
+{"id": "sample-2", "signals": {"empathy": 0.0, "fidelity": 0.7, "domain": 0.0, "harm": 0.2}, "composite": 0.37, "decision": "reject"}

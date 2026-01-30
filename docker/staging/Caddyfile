@@ -1,0 +1,15 @@
+staging.pixelatedempathy.com {
+    # Reverse proxy to staging service
+    reverse_proxy staging:3000
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Error handling
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}

@@ -1,0 +1,77 @@
+name: Validate Flux Configuration
+
+on:
+  pull_request:
+    paths:
+      - 'clusters/pixelkube/flux-system/flux-system/kustomization.yaml'
+      - 'clusters/pixelkube/flux-system/flux-system/pixelated-kustomization.yaml'
+      - '.github/workflows/validate-flux-config.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'clusters/pixelkube/flux-system/flux-system/kustomization.yaml'
+      - 'clusters/pixelkube/flux-system/flux-system/pixelated-kustomization.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-flux-kustomization:
+    name: Validate Flux Kustomization
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate pixelated-kustomization.yaml is included
+        run: |
+          echo "🔍 Validating Flux Kustomization configuration..."
+          
+          KUSTOMIZATION_FILE="clusters/pixelkube/flux-system/flux-system/kustomization.yaml"
+          REQUIRED_RESOURCE="pixelated-kustomization.yaml"
+          
+          # Check if kustomization.yaml exists
+          if [ ! -f "$KUSTOMIZATION_FILE" ]; then
+            echo "❌ ERROR: $KUSTOMIZATION_FILE not found!"
+            exit 1
+          fi
+          
+          # Check if pixelated-kustomization.yaml is in the resources list
+          if ! grep -q "$REQUIRED_RESOURCE" "$KUSTOMIZATION_FILE"; then
+            echo "❌ CRITICAL ERROR: $REQUIRED_RESOURCE is missing from $KUSTOMIZATION_FILE"
+            echo ""
+            echo "This would cause:"
+            echo "  1. Flux to prune the pixelated Kustomization resource"
+            echo "  2. The pixelated deployment to be deleted from the cluster"
+            echo "  3. All pods to be terminated"
+            echo "  4. Application to stop serving traffic"
+            echo ""
+            echo "Please ensure $REQUIRED_RESOURCE is included in the resources list."
+            exit 1
+          fi
+          
+          # Verify the file exists
+          RESOURCE_FILE="clusters/pixelkube/flux-system/flux-system/$REQUIRED_RESOURCE"
+          if [ ! -f "$RESOURCE_FILE" ]; then
+            echo "❌ ERROR: $RESOURCE_FILE not found!"
+            echo "The resource is referenced but the file doesn't exist."
+            exit 1
+          fi
+          
+          echo "✅ Validation passed: $REQUIRED_RESOURCE is correctly included"
+          
+
+      - name: Validate YAML syntax
+        run: |
+          echo "🔍 Validating YAML syntax..."
+          
+          # Check if yq is available, otherwise use python
+          if command -v yq &> /dev/null; then
+            yq eval '.' clusters/pixelkube/flux-system/flux-system/kustomization.yaml > /dev/null
+            yq eval '.' clusters/pixelkube/flux-system/flux-system/pixelated-kustomization.yaml > /dev/null
+          else
+            python3 -c "import yaml; yaml.safe_load(open('clusters/pixelkube/flux-system/flux-system/kustomization.yaml'))"
+            python3 -c "import yaml; yaml.safe_load(open('clusters/pixelkube/flux-system/flux-system/pixelated-kustomization.yaml'))"
+          fi
+          
+          echo "✅ YAML syntax is valid"

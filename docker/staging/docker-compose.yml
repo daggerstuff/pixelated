@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  staging:
+    build: .
+    container_name: pixelated-staging
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_SITE_URL=https://staging.pixelatedempathy.com
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
