@@ -1,5 +1,5 @@
 export interface User {
-  id: string
+  id?: string
   email: string
   username: string
   firstName: string
@@ -31,6 +31,7 @@ export interface UserRegistration {
   firstName: string
   lastName: string
   password: string
+  role?: UserRole
 }
 
 export interface AuthTokens {

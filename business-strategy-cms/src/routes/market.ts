@@ -36,13 +36,13 @@ router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
       })
     }
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Quote error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get quote' },
     })
@@ -66,13 +66,13 @@ router.post('/bulk', async (req: AuthenticatedRequest, res) => {
 
     const data = await marketDataService.getBulkMarketData(symbols)
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Bulk data error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get bulk market data' },
     })
@@ -103,13 +103,13 @@ router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
       })
     }
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Technical analysis error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get technical analysis' },
     })
@@ -124,13 +124,13 @@ router.get('/sectors', async (_req: AuthenticatedRequest, res) => {
   try {
     const data = await marketDataService.getSectorPerformance()
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Sectors error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get sector data' },
     })
@@ -145,13 +145,13 @@ router.get('/economic', async (_req: AuthenticatedRequest, res) => {
   try {
     const data = await marketDataService.getEconomicIndicators()
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Economic indicators error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get economic indicators' },
     })
@@ -175,13 +175,13 @@ router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
 
     const data = await marketDataService.getMarketSentiment(symbol)
 
-    res.json({
+    return res.json({
       success: true,
       data,
     })
   } catch (error) {
     logger.error('Sentiment error:', error)
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: { message: 'Failed to get market sentiment' },
     })

@@ -9,20 +9,22 @@ describe('Business Intelligence Persistence Tests', () => {
     })
 
     it('should store and retrieve market data correctly in MongoDB', async () => {
-        const marketData: MarketData = {
+        const marketData: Omit<MarketData, 'id'> = {
             industry: 'test-industry-' + Date.now(),
             marketSize: 1000000,
             growthRate: 15.5,
             competitionLevel: 0.4,
-            segments: [{ name: 'Test Segment', size: 500000, growth: 10.2 }],
-            timestamp: new Date(),
-            source: 'test-source'
+            entryBarriers: 5,
+            customerAcquisitionCost: 50,
+            lifetimeValue: 500,
+            segments: [{ name: 'Test Segment', size: 500000, growthRate: 10.2, penetration: 0.1, keyDrivers: [], barriers: [] }],
+            timestamp: new Date()
         }
 
-        await dbService.storeMarketData(marketData)
+        await dbService.storeMarketData(marketData as MarketData)
 
         // Verify by retrieving
-        const results = await dbService.getMarketData(marketData.industry)
+        const results = await dbService.getMarketData(marketData.industry!)
         expect(results).toHaveLength(1)
         const result = results[0]
         expect(result).toBeDefined()
@@ -56,8 +58,7 @@ describe('Business Intelligence Persistence Tests', () => {
             customerLifetimeValue: 1500,
             churnRate: 0.04,
             netPromoterScore: 65,
-            marketShare: 0.12,
-            createdAt: new Date()
+            marketShare: 0.12
         }
 
         await dbService.storeBusinessMetrics(metrics)

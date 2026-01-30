@@ -78,6 +78,8 @@ export interface DocumentCreate {
   category: DocumentCategory
   tags?: string[]
   parentDocumentId?: string
+  status?: DocumentStatus
+  collaborators?: string[]
   metadata?: Partial<DocumentMetadata>
 }
 
