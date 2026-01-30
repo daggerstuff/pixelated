@@ -259,3 +259,5 @@ skills/
 
 # Secrets
 ngc_therapeutic_resources/microservices/nemo-microservices-quickstart_v25.10/.env
+business-strategy-cms/.env
+*.env
