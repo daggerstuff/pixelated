@@ -14,6 +14,15 @@ on:
     workflows: ["Deploy to Staging", "Deploy to Production"]
 
   workflow_dispatch:
+    inputs:
+      ENV_NAME:
+        description: "Environment to validate (staging/production)"
+        required: false
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
 jobs:
   validate-ai-models:
     name: AI Model Validation
@@ -37,7 +46,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: "10.28.1"
+          version: "10.28.2"
           run_install: false
 
       - name: Get pnpm store directory

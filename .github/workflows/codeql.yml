@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.11.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.28.1
+  PNPM_VERSION: 10.28.2
 
 jobs:
   analyze:
@@ -145,8 +145,6 @@ jobs:
           category: "/language:${{ matrix.language }}"
           # Upload SARIF file to GitHub Security tab
           upload: true
-          # Add source location prefix for better error reporting
-          add-snippets: true
           # Configure output format
           output: sarif-latest
           # Fail the workflow if critical vulnerabilities are found

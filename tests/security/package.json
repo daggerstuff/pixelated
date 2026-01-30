@@ -1,14 +1,9 @@
 {
   "name": "security-tests",
   "version": "0.0.1",
+  "private": true,
   "description": "Security testing suite for the application",
   "type": "module",
-  "private": true,
-  "engines": {
-    "node": "24.8.0",
-    "pnpm": "10.28.1"
-  },
-  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "test": "node --loader ts-node/esm run-security-tests.ts",
     "start": "./run-security-tests.sh",
@@ -30,6 +25,11 @@
     "eslint": "^9.39.2",
     "prettier": "^3.8.1"
   },
+  "engines": {
+    "node": "24.8.0",
+    "pnpm": "10.28.2"
+  },
+  "packageManager": "pnpm@10.28.2",
   "pnpm": {
     "overrides": {
       "esbuild": "^0.25.9",

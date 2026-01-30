@@ -5,7 +5,7 @@ Sentry Metrics are already configured and enabled in this project. This document
 ## Configuration Status
 
 ✅ **Metrics are enabled** in both `sentry.client.config.js` and `sentry.server.config.js`  
-✅ **SDK Version**: `@sentry/astro@^10.28.1` (requires >= 10.28.1)  
+✅ **SDK Version**: `@sentry/astro@^10.28.2` (requires >= 10.28.2)  
 ✅ **DSN**: Configured and matches Sentry project  
 ✅ **Utilities**: Available in `src/lib/sentry/utils.ts`
 
