@@ -1,12 +1,11 @@
-
 services:
   app:
     build: .
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
       - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongodb:27017/business-strategy-cms
+      - MONGODB_URI=${MONGODB_URI}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=business_strategy_cms
@@ -15,7 +14,6 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mongodb
       - postgres
       - redis
     volumes:
@@ -24,24 +22,10 @@ services:
     networks:
       - business-strategy-network
 
-  mongodb:
-    image: mongo:6.0
-    ports:
-      - '27017:27017'
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=business-strategy-cms
-    volumes:
-      - mongodb_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - business-strategy-network
-
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       - POSTGRES_DB=business_strategy_cms
       - POSTGRES_USER=admin
@@ -55,28 +39,14 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
     networks:
       - business-strategy-network
 
-  mongodb-express:
-    image: mongo-express:latest
-    ports:
-      - '8081:8081'
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
-      - ME_CONFIG_MONGODB_URL=mongodb://admin:password@mongodb:27017/
-    depends_on:
-      - mongodb
-    networks:
-      - business-strategy-network
-
 volumes:
-  mongodb_data:
   postgres_data:
   redis_data:
 

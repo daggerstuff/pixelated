@@ -15,7 +15,7 @@ Sentry.init({
     (process.env.NODE_ENV === 'development' ? 0.2 : 0.05),
   ),
 
-  // Sentry Metrics (Beta) - enabled by default in SDK 10.28.1+
+  // Sentry Metrics (Beta) - enabled by default in SDK 10.28.2+
   // Reference: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
   enableMetrics: process.env.SENTRY_ENABLE_METRICS !== 'false',
 

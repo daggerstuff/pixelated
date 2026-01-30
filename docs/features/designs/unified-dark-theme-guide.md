@@ -307,7 +307,7 @@ Consistent spacing with 8-point increments:
 ```json
 {
   "name": "your-project",
-  "packageManager": "pnpm@10.28.1",
+  "packageManager": "pnpm@10.28.2",
   "dependencies": {
     "@pixelated/unified-dark-theme": "^4.0.0"
   }
