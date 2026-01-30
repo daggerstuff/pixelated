@@ -29,4 +29,14 @@ export class EmailService {
     console.log(`Sending password reset email to: ${email}`)
     console.log(`Reset token: ${resetToken}`)
   }
+
+  static async sendEmail(options: {
+    to: string
+    subject: string
+    body: string
+  }): Promise<void> {
+    console.log(`Sending email to: ${options.to}`)
+    console.log(`Subject: ${options.subject}`)
+    console.log('Body:', options.body)
+  }
 }

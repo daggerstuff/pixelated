@@ -211,9 +211,9 @@ Pixelated Empathy uses a modern, cloud-native architecture designed for scalabil
 
 ### Contact Information
 - **On-Call Engineer**: Slack @oncall or phone rotation
-- **DevOps Team**: devops@pixelated-empathy.com
-- **Security Team**: security@pixelated-empathy.com
-- **Management**: engineering-manager@pixelated-empathy.com
+- **DevOps Team**: devops@pixelatedempathy.com
+- **Security Team**: security@pixelatedempathy.com
+- **Management**: engineering-manager@pixelatedempathy.com
 
 ---
 

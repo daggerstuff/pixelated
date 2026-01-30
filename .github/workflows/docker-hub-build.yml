@@ -42,7 +42,7 @@ jobs:
 
       - name: Generate build timestamp tag
         id: buildts
-        run: echo "BUILD_TS=$(date +%s)" >> $GITHUB_ENV
+        run: echo "BUILD_TS=$(date +%s)" >> $GITHUB_OUTPUT
 
       - name: Check Docker Hub credentials
         id: check_creds
@@ -98,7 +98,7 @@ jobs:
           tags: |
             pixelatedempathy/pixelated:latest
             pixelatedempathy/pixelated:${{ github.sha }}
-            pixelatedempathy/pixelated:build-${{ env.BUILD_TS }}
+            pixelatedempathy/pixelated:build-${{ steps.buildts.outputs.BUILD_TS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

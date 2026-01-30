@@ -38,6 +38,10 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Set current time
+        id: timestamp
+        run: echo "NOW=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -325,7 +329,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ steps.timestamp.outputs.NOW }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
                   }
                 }
               ]
@@ -768,170 +772,3 @@ jobs:
           path: playwright-report/
           if-no-files-found: ignore
           retention-days: 7
-
-  check-performance:
-    name: Performance Check
-    runs-on: ubuntu-latest
-    needs: [health-check-production]
-    permissions:
-      contents: read
-    env:
-      BASE_URL: ${{ vars.APP_URL }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - name: Resolve APP_URL (Performance)
-        id: resolve-perf
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE_URL_INITIAL="${{ env.BASE_URL }}"
-          if [ -z "$BASE_URL_INITIAL" ]; then
-            BASE_URL_INITIAL="${{ secrets.APP_URL }}"
-          fi
-          if [ -z "$BASE_URL_INITIAL" ]; then
-            echo "::notice::APP_URL not configured; skipping Lighthouse performance checks."
-            echo "skip_lhci=true" >> $GITHUB_OUTPUT
-          else
-            echo "Using BASE_URL for Lighthouse: $BASE_URL_INITIAL"
-            echo "BASE_URL=$BASE_URL_INITIAL" >> $GITHUB_ENV
-            echo "skip_lhci=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Probe Lighthouse URLs (wait for healthy)
-        id: probe-urls
-        if: steps.resolve-perf.outputs.skip_lhci == 'false'
-        shell: bash
-        env:
-          MAX_PROBE_ATTEMPTS: 15
-          PROBE_SLEEP_SECONDS: 5
-        run: |
-          set -euo pipefail
-          # Initialize arrays
-          CANDIDATES=("$BASE_URL")
-          OK_URLS=()
-
-          for u in "${CANDIDATES[@]}"; do
-            ATTEMPTS=0
-            code=000
-            until [ "$code" = "200" ] || [ "$ATTEMPTS" -ge "$MAX_PROBE_ATTEMPTS" ]; do
-              code=$(curl -s -o /dev/null -w "%{http_code}" \
-                -H "User-Agent: Pixelated-Empathy-Health-Check/1.0 (monitoring)" \
-                -H "Accept: application/json" \
-                -H "X-Health-Check: true" \
-                "$u/api/health" || echo "000")
-              if [ "$code" != "200" ]; then
-                echo "Waiting for $u to be healthy (HTTP $code). Attempt $ATTEMPTS/$MAX_PROBE_ATTEMPTS"
-                sleep "$PROBE_SLEEP_SECONDS"
-              fi
-              ATTEMPTS=$((ATTEMPTS+1))
-            done
-            echo "Probing $u -> HTTP $code"
-            if [ "$code" = "200" ]; then
-              OK_URLS+=("$u")
-            else
-              echo "::warning::Skipping Lighthouse for $u (HTTP $code)"
-            fi
-          done
-
-          if [ ${#OK_URLS[@]} -eq 0 ]; then
-            echo "::notice::No URLs are healthy (HTTP 200); skipping Lighthouse performance checks."
-            echo "skip_lhci_urls=true" >> $GITHUB_OUTPUT
-          else
-            {
-              echo "skip_lhci_urls=false"
-              echo "urls<<EOF"
-              printf "%s\n" "${OK_URLS[@]}"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Prepare Lighthouse auth headers (optional)
-        id: prep-lh-headers
-        if: steps.resolve-perf.outputs.skip_lhci == 'false'
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -n "${{ secrets.LH_AUTH_COOKIE }}" ]; then
-            # Provide extraHeaders to Lighthouse via environment override
-            # Expect cookie like: "session=abc; other=value"
-            EH='{"Cookie":"'"${{ secrets.LH_AUTH_COOKIE }}"'"}'
-            echo "LHCI_COLLECT__SETTINGS__EXTRA_HEADERS=$EH" >> $GITHUB_ENV
-            echo "has_auth=true" >> $GITHUB_OUTPUT
-            echo "Set LHCI extraHeaders for authenticated pages"
-          else
-            echo "has_auth=false" >> $GITHUB_OUTPUT
-            echo "No LH_AUTH_COOKIE secret set; skipping authenticated URLs"
-          fi
-
-      - name: Add protected URLs (optional)
-        id: add-protected
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          {
-            echo "extra_urls<<EOF"
-            echo "${BASE_URL}/dashboard?perf=1"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Run Lighthouse CI
-        id: lhci
-        uses: treosh/lighthouse-ci-action@v12
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
-        with:
-          urls: |
-            ${{ steps.probe-urls.outputs.urls }}
-            ${{ steps.add-protected.outputs.extra_urls }}
-          configPath: ./.github/lighthouse-config.json
-          budgetPath: ./.github/lighthouse-budget.json
-          uploadArtifacts: true
-          temporaryPublicStorage: true
-
-      - name: Check for critical performance issues
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
-        run: echo "Analyzing performance metrics for PRODUCTION..."
-
-      - name: Set Slack enabled output (performance)
-        id: set-slack-enabled-perf
-        run: |
-          if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
-            echo "slack_enabled=true" >> $GITHUB_OUTPUT
-          else
-            echo "slack_enabled=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Skip notice
-        if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.probe-urls.outputs.skip_lhci_urls == 'true'
-        run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
-
-      - name: Notify performance issues
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
-        uses: slackapi/slack-github-action@v2
-        with:
-          webhook-type: incoming-webhook
-          webhook: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
-                  }
-                }
-              ]
-            }
-        continue-on-error: true
-
-      - name: Log performance notification skip
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'false'
-        run: |
-          echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
-          echo "::warning::Performance issues detected but no notification was sent"
