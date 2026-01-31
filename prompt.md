@@ -20,3 +20,25 @@
 
 **Execution Strategy:**
 Review every extraction and merge with a critical eye. We are curating **solid value**, not just processing text. We are training a model that will interact with humans in crisis. We can't let them down, just because an AI engineer wanted to "speed things up".
+
+---
+
+## 📝 Progress Tracking Mandate
+
+**Critical Requirement:** After completing **each iteration, block, or run** of the pipeline:
+
+1. **Append** (do not edit existing entries) a brief summary to `progress.txt`
+2. **Include:**
+   - What was completed/changed
+   - Which scripts/components were affected
+   - Any notable outcomes or issues encountered
+   - Possible areas of improvement
+3. **Format:** Use the existing checklist format with `- [x]` for completed items
+4. **Timing:** Update immediately upon finishing the current iteration, before moving to the next task
+
+**Purpose:** Maintain a clear audit trail of all pipeline work for continuity, debugging, and quality assurance.
+
+**Example Entry:**
+```
+- [x] **Phase 1b Extraction**: Ran extract_all_youtube_transcripts.py, processed 47 videos, generated 12.3k training pairs.
+```
