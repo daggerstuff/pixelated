@@ -1,0 +1,51 @@
+{
+	"dxt_version": "0.1",
+	"name": "supermemory-mcp",
+	"display_name": "Supermemory MCP",
+	"version": "1.0.0",
+	"description": "Your personal, universal memory MCP",
+	"long_description": "Everyone is adding their own memory layer - ChatGPT, Gemini, etc. etc. Why not carry it around with you?",
+	"author": {
+		"name": "Dhravya Shah",
+		"email": "dhravya@supermemory.com",
+		"url": "https://dhravya.dev"
+	},
+	"homepage": "https://supermemory.ai",
+	"keywords": [
+		"memory", "add", "search", "fetch", "projects", "information", "supermemory"
+	],
+	"icon": "icon.png",
+	"server": {
+		"type": "node",
+		"entry_point": "dist/index.js",
+		"mcp_config": {
+			"command": "npx",
+			"args": [
+                "mcp-remote",
+                "https://api.supermemory.ai/mcp"
+            ]
+		}
+	},
+	"tools": [
+		{
+			"name": "addMemory",
+			"description": "Add a memory to your supermemory"
+		},
+		{
+			"name": "search",
+			"description": "Search your memoriesin your supermemory"
+		},
+		{
+			"name": "fetch",
+			"description": "Fetch a memory from your supermemory"
+		},
+        {
+            "name": "getProjects",
+            "description": "Get your projects from your supermemory"
+        },
+        {
+            "name": "whoAmI",
+            "description": "Get the current logged-in user's information"
+        }
+	]
+}

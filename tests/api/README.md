@@ -80,28 +80,28 @@ npm install
 
 ### Run All API Tests
 ```bash
-npx playwright test tests/api
+pnpm dlx playwright test tests/api
 ```
 
 ### Run Specific Test Categories
 ```bash
 # Authentication tests only
-npx playwright test tests/api --grep "Authentication API"
+pnpm dlx playwright test tests/api --grep "Authentication API"
 
 # Performance tests only
-npx playwright test tests/api --grep "Performance Tests"
+pnpm dlx playwright test tests/api --grep "Performance Tests"
 
 # Security tests only
-npx playwright test tests/api --grep "Security"
+pnpm dlx playwright test tests/api --grep "Security"
 ```
 
 ### Run with Different Environments
 ```bash
 # Test against staging
-API_BASE_URL=https://staging.pixelatedempathy.com npx playwright test tests/api
+API_BASE_URL=https://staging.pixelatedempathy.com pnpm dlx playwright test tests/api
 
 # Test against production (read-only tests)
-API_BASE_URL=https://pixelatedempathy.com npx playwright test tests/api --grep "GET"
+API_BASE_URL=https://pixelatedempathy.com pnpm dlx playwright test tests/api --grep "GET"
 ```
 
 ## Configuration
@@ -221,12 +221,12 @@ All API endpoints are tested for proper error handling:
 
 ### HTML Reports
 ```bash
-npx playwright test tests/api --reporter=html
+pnpm dlx playwright test tests/api --reporter=html
 ```
 
 ### JSON Reports
 ```bash
-npx playwright test tests/api --reporter=json
+pnpm dlx playwright test tests/api --reporter=json
 ```
 
 ### Custom Reporting
@@ -290,10 +290,10 @@ The test suite generates detailed reports including:
 ### Debug Mode
 ```bash
 # Run with debug output
-DEBUG=1 npx playwright test tests/api
+DEBUG=1 pnpm dlx playwright test tests/api
 
 # Run single test with verbose output
-npx playwright test tests/api/api-endpoints.spec.ts --headed --debug
+pnpm dlx playwright test tests/api/api-endpoints.spec.ts --headed --debug
 ```
 
 ## Contributing
