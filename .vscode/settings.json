@@ -169,7 +169,7 @@
     "FIG_DISABLE": "1"
   },
   "python.languageServer": "None",
-  "oxc.enable": true,
+  "oxc.enable": false,
   "claudeCode.allowDangerouslySkipPermissions": true,
   "claudeCode.respectGitIgnore": false,
   "git.autofetch": "all",

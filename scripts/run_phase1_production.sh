@@ -46,7 +46,7 @@ export AWS_ACCESS_KEY_ID="$OVH_S3_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="$OVH_S3_SECRET_KEY"
 
 # Paths
-DATA_DIR="$WORKSPACE_DIR/ai/training_ready/data"
+DATA_DIR="$WORKSPACE_DIR/ai/training/ready_packages/data"
 GENERATED_DIR="$DATA_DIR/generated"
 COMPILED_DIR="$DATA_DIR/compiled"
 LOG_DIR="$COMPILED_DIR/logs"
@@ -109,7 +109,7 @@ phase_1a() {
     # Task 1a.1: Generate edge case synthetic dataset
     log_info "[1a.1/1a.5] Generating edge case synthetic dataset (10,000 samples)..."
     if ! timeout $PHASE_1A_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/generate_edge_case_synthetic_dataset.py \
+        ai/training/ready_packages/scripts/generate_edge_case_synthetic_dataset.py \
         --output "$GENERATED_DIR/edge_case_synthetic.jsonl" \
         --limit 10000 >> "$MAIN_LOG" 2>&1; then
         log_error "Edge case generation failed"
@@ -120,7 +120,7 @@ phase_1a() {
     # Task 1a.2: Extract long-running therapy sessions
     log_info "[1a.2/1a.5] Extracting long-running therapy sessions (15,000+ samples)..."
     if ! timeout $PHASE_1A_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/extract_long_running_therapy.py \
+        ai/training/ready_packages/scripts/extract_long_running_therapy.py \
         --min-turns 20 \
         --limit 15000 \
         --output "$GENERATED_DIR/long_running_therapy.jsonl" >> "$MAIN_LOG" 2>&1; then
@@ -132,7 +132,7 @@ phase_1a() {
     # Task 1a.3: Build CPTSD dataset from Tim Fletcher transcripts
     log_info "[1a.3/1a.5] Building CPTSD dataset from Tim Fletcher transcripts..."
     if ! timeout $PHASE_1A_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/build_cptsd_dataset_from_transcripts.py \
+        ai/training/ready_packages/scripts/build_cptsd_dataset_from_transcripts.py \
         --output "$GENERATED_DIR/cptsd_transcripts.jsonl" >> "$MAIN_LOG" 2>&1; then
         log_error "CPTSD dataset building failed"
         return 1
@@ -142,7 +142,7 @@ phase_1a() {
     # Task 1a.4: Compile all 14 data families
     log_info "[1a.4/1a.5] Compiling core dataset from all 14 families..."
     if ! timeout $PHASE_1A_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/compile_final_dataset.py \
+        ai/training/ready_packages/scripts/compile_final_dataset.py \
         --routing-config "$DATA_DIR/dataset_routing_config.json" \
         --output-dir "$COMPILED_DIR" \
         --train-split 0.80 \
@@ -156,7 +156,7 @@ phase_1a() {
     # Task 1a.5: Validate with 8-gate checks
     log_info "[1a.5/1a.5] Running 8-gate quality validation..."
     if ! timeout 600 $PYTHON_CMD \
-        ai/training_ready/scripts/verify_final_dataset.py \
+        ai/training/ready_packages/scripts/verify_final_dataset.py \
         --report >> "$MAIN_LOG" 2>&1; then
         log_warning "Some validation gates failed (may be expected at this stage)"
     fi
@@ -184,7 +184,7 @@ phase_1b() {
     # Task 1b.1: YouTube extraction
     log_info "[1b.1/1b.5] Extracting all YouTube transcripts (background)..."
     timeout $PHASE_1B_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/extract_all_youtube_transcripts.py \
+        ai/training/ready_packages/scripts/extract_all_youtube_transcripts.py \
         --all \
         --output-dir "$GENERATED_DIR/youtube" >> "$MAIN_LOG" 2>&1 &
     pids+=($!)
@@ -193,8 +193,9 @@ phase_1b() {
     # Task 1b.2: Academic research extraction
     log_info "[1b.2/1b.5] Extracting academic findings (background)..."
     timeout $PHASE_1B_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/extract_academic_findings.py \
-        --output "$GENERATED_DIR/academic_findings.jsonl" \
+        ai/training/ready_packages/scripts/extract_academic_findings.py \
+        --all \
+        --output-dir "$GENERATED_DIR/academic_research" \
         --upload-s3 >> "$MAIN_LOG" 2>&1 &
     pids+=($!)
     task_names+=("Academic extraction")
@@ -202,9 +203,9 @@ phase_1b() {
     # Task 1b.3: Books & PDF extraction
     log_info "[1b.3/1b.5] Extracting books and PDFs (background)..."
     timeout $PHASE_1B_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/extract_all_books_to_training.py \
-        --all-books \
-        --output "$GENERATED_DIR/books_pdfs.jsonl" \
+        ai/training/ready_packages/scripts/extract_all_books_to_training.py \
+        --all \
+        --output-dir "$GENERATED_DIR/therapeutic_books" \
         --upload-s3 >> "$MAIN_LOG" 2>&1 &
     pids+=($!)
     task_names+=("Books & PDF extraction")
@@ -212,9 +213,9 @@ phase_1b() {
     # Task 1b.4: NeMo synthetic generation
     log_info "[1b.4/1b.5] Generating NeMo synthetic data (background)..."
     timeout $PHASE_1B_TIMEOUT $PYTHON_CMD \
-        ai/training_ready/scripts/generate_nemo_synthetic_data.py \
-        --quality-gated \
-        --output "$GENERATED_DIR/nemo_synthetic.jsonl" \
+        ai/training/ready_packages/scripts/generate_nemo_synthetic_data.py \
+        --all \
+        --output-dir "$GENERATED_DIR/nemo_synthetic" \
         --upload-s3 >> "$MAIN_LOG" 2>&1 &
     pids+=($!)
     task_names+=("NeMo generation")
@@ -240,7 +241,7 @@ phase_1b() {
     # Task 1b.5: Final integration & validation
     log_info "[1b.5/1b.5] Final integration and 8-gate validation..."
     if ! timeout 3600 $PYTHON_CMD \
-        ai/training_ready/scripts/final_phase1b_integration.py \
+        ai/training/ready_packages/scripts/final_phase1b_integration.py \
         --merge-all \
         --validate-8gates \
         --upload-canonical >> "$MAIN_LOG" 2>&1; then
