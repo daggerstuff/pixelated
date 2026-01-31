@@ -20,7 +20,7 @@ TESTS_FAILED=0
 
 # Run endpoint security tests
 log "\nRunning API endpoint security tests..." "${YELLOW}"
-if npx ts-node tests/security/ai-endpoint-scanner.ts; then
+if pnpm dlx ts-node tests/security/ai-endpoint-scanner.ts; then
 	log "Endpoint security tests passed ✅" "${GREEN}"
 	TESTS_PASSED=$((TESTS_PASSED + 1))
 else
@@ -31,7 +31,7 @@ TESTS_TOTAL=$((TESTS_TOTAL + 1))
 
 # Run authentication bypass tests
 log "\nRunning authentication bypass tests..." "${YELLOW}"
-if npx ts-node tests/security/ai-auth-bypass-tester.ts; then
+if pnpm dlx ts-node tests/security/ai-auth-bypass-tester.ts; then
 	log "Authentication bypass tests passed ✅" "${GREEN}"
 	TESTS_PASSED=$((TESTS_PASSED + 1))
 else
@@ -42,7 +42,7 @@ TESTS_TOTAL=$((TESTS_TOTAL + 1))
 
 # Run web vulnerability tests
 log "\nRunning web vulnerability tests..." "${YELLOW}"
-if npx ts-node tests/security/ai-web-vulnerability-scanner.ts; then
+if pnpm dlx ts-node tests/security/ai-web-vulnerability-scanner.ts; then
 	log "Web vulnerability tests passed ✅" "${GREEN}"
 	TESTS_PASSED=$((TESTS_PASSED + 1))
 else
@@ -53,7 +53,7 @@ TESTS_TOTAL=$((TESTS_TOTAL + 1))
 
 # Run AI vulnerability scanner
 log "\nRunning AI vulnerability scanner..." "${YELLOW}"
-if npx ts-node tests/security/ai-vulnerability-scanner.ts; then
+if pnpm dlx ts-node tests/security/ai-vulnerability-scanner.ts; then
 	log "AI vulnerability scanner passed ✅" "${GREEN}"
 	TESTS_PASSED=$((TESTS_PASSED + 1))
 else
