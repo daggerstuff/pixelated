@@ -5,3 +5,4 @@
 - [ ] **Unified Preprocessing**: Audit `unified_preprocessing_pipeline.py` to ensure it completely subsumes legacy logic.
 - [ ] **H100 Training Manifest**: Ensure `main_orchestrator.py` generates a valid `training_manifest.json` for Lightning.ai.
 - [ ] **Dual Persona Orchestration**: Validate that the balanced dataset supports both "Mentor" and "Help-seeker" roles.
+- [x] **Unified Preprocessing Subsumption**: Audited and updated unified_preprocessing_pipeline.py to fully subsume legacy cleaning, ChatML conversion, and PII scrubbing logic. Integrated PIIScrubber and added stage-aware normalization.
