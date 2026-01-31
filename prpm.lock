@@ -1495,9 +1495,1177 @@
         "skillName": "self-improving",
         "eager": false
       }
+    },
+    "@obra/skill-using-superpowers#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-using-superpowers/3.4.1.tar.gz",
+      "integrity": "sha256-3eb09ae7aa6ffd5efaf812336ef7451a519f4629d5389515f417661a0b7eb12e",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-using-superpowers/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-using-superpowers",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-using-superpowers",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-using-superpowers",
+        "skillName": "skill-using-superpowers",
+        "eager": false
+      }
+    },
+    "@obra/skill-brainstorming#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-brainstorming/3.4.1.tar.gz",
+      "integrity": "sha256-12c0399ea0a39452cbc2b979536f5c354eb4cbb00f91651be170d93f813f02a6",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-brainstorming/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-brainstorming",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-brainstorming",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-brainstorming",
+        "skillName": "skill-brainstorming",
+        "eager": false
+      }
+    },
+    "@obra/skill-writing-plans#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-writing-plans/3.4.1.tar.gz",
+      "integrity": "sha256-ec7e536a5e6f5d246f4945711a71c916f5483ff301020f8c11fba07ed31c68e2",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-writing-plans/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-writing-plans",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-writing-plans",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-writing-plans",
+        "skillName": "skill-writing-plans",
+        "eager": false
+      }
+    },
+    "@obra/skill-executing-plans#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-executing-plans/3.4.1.tar.gz",
+      "integrity": "sha256-e58074c6dfaff4bb688d9be6918ed534effeea77e027090018c9752b67555bc0",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-executing-plans/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-executing-plans",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-executing-plans",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-executing-plans",
+        "skillName": "skill-executing-plans",
+        "eager": false
+      }
+    },
+    "@obra/skill-test-driven-development#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-test-driven-development/3.4.1.tar.gz",
+      "integrity": "sha256-9a1dc73bc64dd748e85845cdbb62c5b9f27409435d25055e177bc1b81bb8d213",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-test-driven-development/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-test-driven-development",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-test-driven-development",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-test-driven-development",
+        "skillName": "skill-test-driven-development",
+        "eager": false
+      }
+    },
+    "@obra/skill-systematic-debugging#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-systematic-debugging/3.4.1.tar.gz",
+      "integrity": "sha256-f284cfad11e07d4ce167af1becd8baa9619e688274c78cf92518ca6b18d14eef",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-systematic-debugging/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-systematic-debugging",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-systematic-debugging",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-systematic-debugging",
+        "skillName": "skill-systematic-debugging",
+        "eager": false
+      }
+    },
+    "@obra/skill-requesting-code-review#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-requesting-code-review/3.4.1.tar.gz",
+      "integrity": "sha256-9ca1781214d63f7420c3b2ec8e4be6503a99e9ae89e0b6c25bf9a94af6abcf97",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-requesting-code-review",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-requesting-code-review",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-requesting-code-review",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-requesting-code-review",
+        "skillName": "skill-requesting-code-review",
+        "eager": false
+      }
+    },
+    "@obra/skill-receiving-code-review#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-receiving-code-review/3.4.1.tar.gz",
+      "integrity": "sha256-fbe9771464ef3c8fcc007c5b64df05cd1aab71fbf09f2272f36fc2d83667f4cb",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-receiving-code-review/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-receiving-code-review",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-receiving-code-review",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-receiving-code-review",
+        "skillName": "skill-receiving-code-review",
+        "eager": false
+      }
+    },
+    "@obra/skill-verification-before-completion#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-verification-before-completion/3.4.1.tar.gz",
+      "integrity": "sha256-fba774fe37fe740946f91a340b16663a450545c90c9109dbcb1b3817302b597e",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-verification-before-completion/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-verification-before-completion",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-verification-before-completion",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-verification-before-completion",
+        "skillName": "skill-verification-before-completion",
+        "eager": false
+      }
+    },
+    "@obra/skill-using-git-worktrees#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-using-git-worktrees/3.4.1.tar.gz",
+      "integrity": "sha256-c92aeeb56463d0e99ccfde3260bdb714635971f098eeb229ed35a567a942b008",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-using-git-worktrees/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-using-git-worktrees",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-using-git-worktrees",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-using-git-worktrees",
+        "skillName": "skill-using-git-worktrees",
+        "eager": false
+      }
+    },
+    "@obra/skill-dispatching-parallel-agents#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-dispatching-parallel-agents/3.4.1.tar.gz",
+      "integrity": "sha256-2acd3d0c42cb7b634467bf195508643866e3525e519d2391b6280550b67478c7",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-dispatching-parallel-agents/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-dispatching-parallel-agents",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-dispatching-parallel-agents",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-dispatching-parallel-agents",
+        "skillName": "skill-dispatching-parallel-agents",
+        "eager": false
+      }
+    },
+    "@obra/skill-root-cause-tracing#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-root-cause-tracing/3.4.1.tar.gz",
+      "integrity": "sha256-0d5e121e1b73f28ab3ed69f37e51ff01064120eb31a340ff4966908f91c8aff7",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-root-cause-tracing",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-root-cause-tracing",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-root-cause-tracing",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-root-cause-tracing",
+        "skillName": "skill-root-cause-tracing",
+        "eager": false
+      }
+    },
+    "@obra/skill-defense-in-depth#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-defense-in-depth/3.4.1.tar.gz",
+      "integrity": "sha256-0ebe35e8078c250108045799ed1875ccaab117a7259d878d43e94c49bc30c9cb",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-defense-in-depth/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-defense-in-depth",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-defense-in-depth",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-defense-in-depth",
+        "skillName": "skill-defense-in-depth",
+        "eager": false
+      }
+    },
+    "@obra/skill-testing-anti-patterns#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-testing-anti-patterns/3.4.1.tar.gz",
+      "integrity": "sha256-3166d17a6b954347ef8d3b3eb52cb0f77a57fb9cd24c5bf2e29dcbbd8991a373",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-testing-anti-patterns/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-testing-anti-patterns",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-testing-anti-patterns",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-testing-anti-patterns",
+        "skillName": "skill-testing-anti-patterns",
+        "eager": false
+      }
+    },
+    "@obra/skill-testing-skills-with-subagents#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-testing-skills-with-subagents/3.4.1.tar.gz",
+      "integrity": "sha256-509089aeb85eea70aa2ef496ada753c42c9456564a5b2befb23b20cb0ca592c5",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-testing-skills-with-subagents",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-testing-skills-with-subagents",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-testing-skills-with-subagents",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-testing-skills-with-subagents",
+        "skillName": "skill-testing-skills-with-subagents",
+        "eager": false
+      }
+    },
+    "@obra/skill-writing-skills#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-writing-skills/3.4.1.tar.gz",
+      "integrity": "sha256-a7cf67c385a6dba264045d2aa367f18362563baf2572930da9430ac35689bdbc",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-writing-skills",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-writing-skills",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-writing-skills",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-writing-skills",
+        "skillName": "skill-writing-skills",
+        "eager": false
+      }
+    },
+    "@obra/skill-sharing-skills#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-sharing-skills/3.4.1.tar.gz",
+      "integrity": "sha256-62aea5526392323bfa37903a8cde59d813b022ae416ffa13b2b7548c3c24c703",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-sharing-skills/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-sharing-skills",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-sharing-skills",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-sharing-skills",
+        "skillName": "skill-sharing-skills",
+        "eager": false
+      }
+    },
+    "@obra/skill-finishing-a-development-branch#cursor": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-finishing-a-development-branch/3.4.1.tar.gz",
+      "integrity": "sha256-7444b1b2d2eeaa56d688fa8a0bf5e76b80fb6036db0825fb95318824e67faeab",
+      "format": "cursor",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".openskills/skill-finishing-a-development-branch/SKILL.md",
+      "fromCollection": {
+        "name_slug": "superpowers",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openskills/skill-finishing-a-development-branch",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "skill-finishing-a-development-branch",
+        "resourceType": "skill",
+        "skillsDir": ".openskills/skill-finishing-a-development-branch",
+        "skillName": "skill-finishing-a-development-branch",
+        "eager": false
+      }
+    },
+    "@sanjeed5/react#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Freact/1.0.0.tar.gz",
+      "integrity": "sha256-e7ad227f1b03782b83cf44d572c0c769aabecba664d24a190f57190c7a3ccdd0",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/react.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/typescript#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Ftypescript/1.0.0.tar.gz",
+      "integrity": "sha256-e7d1622311c85accf966bb6608e072e0c3cf5545f8f4f1bc55743cf9ac125f7d",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/typescript.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/express#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fexpress/1.0.0.tar.gz",
+      "integrity": "sha256-144fde0cae300aeeda64dcc858ab636fbcb68428c9963604c4d8155d6956c573",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/express.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/postgresql#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fpostgresql/1.0.0.tar.gz",
+      "integrity": "sha256-13e47636c31d87d64dfe5b90f1919f6a16e4831e19c274af55abd7969a370c7c",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/postgresql.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/prisma#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fprisma/1.0.0.tar.gz",
+      "integrity": "sha256-3f1d9290c7d12264b9e006c4dc1099bfb4cba0d42b8782f76891dae0b0a7549b",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/prisma.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/jest#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fjest/1.0.0.tar.gz",
+      "integrity": "sha256-a7d65a1c8d75b68715c1c565ad589302d5c4fcf508f5e3245f1462eaf4d4e34a",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/jest.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/playwright#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fplaywright/1.0.0.tar.gz",
+      "integrity": "sha256-6f83b4fdae418bca462052914f5be752bfd7e9f9b38e2ba74ce61b7752860dc6",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/playwright.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/github-actions#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fgithub-actions/1.0.0.tar.gz",
+      "integrity": "sha256-81cb10232c527eb9387c7d9d2562fe004bac9fcd70e80f81074a06da90045c4c",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/github-actions.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/graphql#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fgraphql/1.0.0.tar.gz",
+      "integrity": "sha256-5d8a756e3fd93c64a6b30c09f00e85c0f01a00f8c62299c90a85325ae1ecbd7b",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/graphql.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@sanjeed5/redis#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40sanjeed5%2Fredis/1.0.0.tar.gz",
+      "integrity": "sha256-91e00db0135deaa316f96e3bdb5949b0d65671f2f95bfb70fe3755c0a91f6b80",
+      "format": "cursor",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".cursor/rules/redis.mdc",
+      "fromCollection": {
+        "name_slug": "startup-mvp",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/agents/database-cloud-optimization/backend-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdatabase-cloud-optimization%2Fbackend-architect/1.0.0.tar.gz",
+      "integrity": "sha256-d6dabab9b31b61147cf2c361c1f2bb176c6b9df305bb4d52a916b72ff7096a48",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/backend-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/backend-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "backend-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/backend-architect",
+        "skillName": "backend-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/database-cloud-optimization/cloud-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdatabase-cloud-optimization%2Fcloud-architect/1.0.0.tar.gz",
+      "integrity": "sha256-f73f986bb6cbb6d972c2d77e01aea2a85900218796dd090f546906e2e4de84c4",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/cloud-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/cloud-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "cloud-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/cloud-architect",
+        "skillName": "cloud-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/database-cloud-optimization/database-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdatabase-cloud-optimization%2Fdatabase-architect/1.0.0.tar.gz",
+      "integrity": "sha256-6fe07347ec0680aba2037014405c8712464b8f0d2e143c5293ec3659e5538f67",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/database-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/database-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "database-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/database-architect",
+        "skillName": "database-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/database-cloud-optimization/database-optimizer#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdatabase-cloud-optimization%2Fdatabase-optimizer/1.0.0.tar.gz",
+      "integrity": "sha256-3e47be0a990de6f0eda520720b1a3615790de09fb238f314fa46c4a25b1c20a7",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/database-optimizer/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/database-optimizer",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "database-optimizer",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/database-optimizer",
+        "skillName": "database-optimizer",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/deployment-strategies/terraform-specialist#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdeployment-strategies%2Fterraform-specialist/1.0.0.tar.gz",
+      "integrity": "sha256-69c136e71d226b205606c0b7dbc76ad6c684a9e69a1a36dbcdb3adf8dff219d6",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/terraform-specialist/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/terraform-specialist",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "terraform-specialist",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/terraform-specialist",
+        "skillName": "terraform-specialist",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/deployment-validation/cloud-architect#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fdeployment-validation%2Fcloud-architect/1.0.0.tar.gz",
+      "integrity": "sha256-664b1180914f4b117e38ee93875e238b2e756d3d1f2ce92490d878c4d3e33bba",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/cloud-architect/AGENT.md",
+      "fromCollection": {
+        "name_slug": "devops-cloud-agents",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/cloud-architect",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "cloud-architect",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/cloud-architect",
+        "skillName": "cloud-architect",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/python-development/django-pro#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fpython-development%2Fdjango-pro/1.0.0.tar.gz",
+      "integrity": "sha256-53721fd7fb6bd7cb5bd283eda3644afbe666454cf283ddbbfd6b7c5445fc8df6",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/django-pro/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-python-development",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/django-pro",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "django-pro",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/django-pro",
+        "skillName": "django-pro",
+        "eager": false
+      }
+    },
+    "@wshobson/agents/python-development/fastapi-pro#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fagents%2Fpython-development%2Ffastapi-pro/1.0.0.tar.gz",
+      "integrity": "sha256-e04f7b64e6245a155f5164931544a4ded0e9d6259f1acb7ae24a47a3f041a89b",
+      "format": "cursor",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".openagents/fastapi-pro/AGENT.md",
+      "fromCollection": {
+        "name_slug": "wshobson-python-development",
+        "version": "1.0.0"
+      },
+      "progressiveDisclosure": {
+        "mode": "progressive",
+        "resourceDir": ".openagents/fastapi-pro",
+        "manifestPath": "AGENTS.md",
+        "resourceName": "fastapi-pro",
+        "resourceType": "agent",
+        "skillsDir": ".openagents/fastapi-pro",
+        "skillName": "fastapi-pro",
+        "eager": false
+      }
+    },
+    "@wshobson/commands/python-development/python-scaffold#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fpython-development%2Fpython-scaffold/1.0.0.tar.gz",
+      "integrity": "sha256-3eca8e0c03adf7ff1c30dafbe9052734ecd889bc7f22984eaa56b9cb44befc4b",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/python-scaffold.md",
+      "fromCollection": {
+        "name_slug": "wshobson-python-development",
+        "version": "1.0.0"
+      }
+    },
+    "@wshobson/commands/deployment-validation/config-validate#cursor": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40wshobson%2Fcommands%2Fdeployment-validation%2Fconfig-validate/1.0.0.tar.gz",
+      "integrity": "sha256-a27161c6f77a39784f8f94837e9456608cc581c69275d657348891d6acbfc360",
+      "format": "cursor",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".cursor/commands/config-validate.md",
+      "fromCollection": {
+        "name_slug": "wshobson-deployment-validation",
+        "version": "1.0.0"
+      }
+    },
+    "@prpm/self-improving#claude": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fself-improving/1.0.0.tar.gz",
+      "integrity": "sha256-55ed1cb14c2740122193aef466f811fe6252667e817c63d30631fe1b0ccbb26f",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/self-improving/SKILL.md"
+    },
+    "@prpm/creating-claude-hooks#claude": {
+      "version": "1.0.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fcreating-claude-hooks/1.0.0.tar.gz",
+      "integrity": "sha256-9b2e62b2cf54a3c30b13ad73071aa210eb9cc6cab46973cee0e79a381bb18923",
+      "format": "claude",
+      "subtype": "rule",
+      "sourceFormat": "cursor",
+      "sourceSubtype": "rule",
+      "installedPath": ".claude/agents/creating-claude-hooks.md"
+    },
+    "@obra/superpowers-hooks#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fsuperpowers-hooks/3.4.1.tar.gz",
+      "integrity": "sha256-dc43bbe69c84dda20a22de42f9f9a1e7eaa233dc5fe05015ac9548af0a909446",
+      "format": "claude",
+      "subtype": "hook",
+      "sourceFormat": "claude",
+      "sourceSubtype": "hook",
+      "installedPath": ".claude/superpowers-hooks"
+    },
+    "@obra/code-reviewer#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fcode-reviewer/3.4.1.tar.gz",
+      "integrity": "sha256-0b05d9f6172625c6a30b7e3315ef78d5f22d85ce2d28c1bd06b01c300f9560fa",
+      "format": "claude",
+      "subtype": "agent",
+      "sourceFormat": "claude",
+      "sourceSubtype": "agent",
+      "installedPath": ".claude/agents/code-reviewer.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/brainstorm#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fbrainstorm/3.4.1.tar.gz",
+      "integrity": "sha256-a7dbee5e3568b4203ea8599debc3e39217d1026fb204d90bd4d9a5c66e14ee12",
+      "format": "claude",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".claude/commands/brainstorm.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/write-plan#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fwrite-plan/3.4.1.tar.gz",
+      "integrity": "sha256-40efd2425477dcb89d7ccd173f5faf55e78b16f7bfba65296aaed37b49388a4b",
+      "format": "claude",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".claude/commands/write-plan.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/execute-plan#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fexecute-plan/3.4.1.tar.gz",
+      "integrity": "sha256-05a78d76d84b0a0035378c86ded19ca88def38b1242e3546fde74366d077063d",
+      "format": "claude",
+      "subtype": "slash-command",
+      "sourceFormat": "claude",
+      "sourceSubtype": "slash-command",
+      "installedPath": ".claude/commands/execute-plan.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-brainstorming#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-brainstorming/3.4.1.tar.gz",
+      "integrity": "sha256-12c0399ea0a39452cbc2b979536f5c354eb4cbb00f91651be170d93f813f02a6",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-brainstorming/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-condition-based-waiting#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-condition-based-waiting/3.4.1.tar.gz",
+      "integrity": "sha256-12651a43e19f34d2e47c1373011b27f4d40629b8942e052bb59b976ec5cdd80a",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-condition-based-waiting",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-defense-in-depth#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-defense-in-depth/3.4.1.tar.gz",
+      "integrity": "sha256-0ebe35e8078c250108045799ed1875ccaab117a7259d878d43e94c49bc30c9cb",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-defense-in-depth/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-dispatching-parallel-agents#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-dispatching-parallel-agents/3.4.1.tar.gz",
+      "integrity": "sha256-2acd3d0c42cb7b634467bf195508643866e3525e519d2391b6280550b67478c7",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-dispatching-parallel-agents/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-executing-plans#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-executing-plans/3.4.1.tar.gz",
+      "integrity": "sha256-e58074c6dfaff4bb688d9be6918ed534effeea77e027090018c9752b67555bc0",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-executing-plans/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-finishing-a-development-branch#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-finishing-a-development-branch/3.4.1.tar.gz",
+      "integrity": "sha256-7444b1b2d2eeaa56d688fa8a0bf5e76b80fb6036db0825fb95318824e67faeab",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-finishing-a-development-branch/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-receiving-code-review#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-receiving-code-review/3.4.1.tar.gz",
+      "integrity": "sha256-fbe9771464ef3c8fcc007c5b64df05cd1aab71fbf09f2272f36fc2d83667f4cb",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-receiving-code-review/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-requesting-code-review#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-requesting-code-review/3.4.1.tar.gz",
+      "integrity": "sha256-9ca1781214d63f7420c3b2ec8e4be6503a99e9ae89e0b6c25bf9a94af6abcf97",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-requesting-code-review",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-root-cause-tracing#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-root-cause-tracing/3.4.1.tar.gz",
+      "integrity": "sha256-0d5e121e1b73f28ab3ed69f37e51ff01064120eb31a340ff4966908f91c8aff7",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-root-cause-tracing",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-sharing-skills#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-sharing-skills/3.4.1.tar.gz",
+      "integrity": "sha256-62aea5526392323bfa37903a8cde59d813b022ae416ffa13b2b7548c3c24c703",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-sharing-skills/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-subagent-driven-development#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-subagent-driven-development/3.4.1.tar.gz",
+      "integrity": "sha256-01d7b6dd9c03d03cea723e7021399fbca6ddd1f1ffb11bcf4ef2f5691a27c122",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-subagent-driven-development/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-systematic-debugging#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-systematic-debugging/3.4.1.tar.gz",
+      "integrity": "sha256-f284cfad11e07d4ce167af1becd8baa9619e688274c78cf92518ca6b18d14eef",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-systematic-debugging/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-test-driven-development#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-test-driven-development/3.4.1.tar.gz",
+      "integrity": "sha256-9a1dc73bc64dd748e85845cdbb62c5b9f27409435d25055e177bc1b81bb8d213",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-test-driven-development/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-testing-anti-patterns#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-testing-anti-patterns/3.4.1.tar.gz",
+      "integrity": "sha256-3166d17a6b954347ef8d3b3eb52cb0f77a57fb9cd24c5bf2e29dcbbd8991a373",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-testing-anti-patterns/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-testing-skills-with-subagents#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-testing-skills-with-subagents/3.4.1.tar.gz",
+      "integrity": "sha256-509089aeb85eea70aa2ef496ada753c42c9456564a5b2befb23b20cb0ca592c5",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-testing-skills-with-subagents",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-using-git-worktrees#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-using-git-worktrees/3.4.1.tar.gz",
+      "integrity": "sha256-c92aeeb56463d0e99ccfde3260bdb714635971f098eeb229ed35a567a942b008",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-using-git-worktrees/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-using-superpowers#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-using-superpowers/3.4.1.tar.gz",
+      "integrity": "sha256-3eb09ae7aa6ffd5efaf812336ef7451a519f4629d5389515f417661a0b7eb12e",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-using-superpowers/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-verification-before-completion#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-verification-before-completion/3.4.1.tar.gz",
+      "integrity": "sha256-fba774fe37fe740946f91a340b16663a450545c90c9109dbcb1b3817302b597e",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-verification-before-completion/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-writing-plans#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-writing-plans/3.4.1.tar.gz",
+      "integrity": "sha256-ec7e536a5e6f5d246f4945711a71c916f5483ff301020f8c11fba07ed31c68e2",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-writing-plans/SKILL.md",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@obra/skill-writing-skills#claude": {
+      "version": "3.4.1",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40obra%2Fskill-writing-skills/3.4.1.tar.gz",
+      "integrity": "sha256-a7cf67c385a6dba264045d2aa367f18362563baf2572930da9430ac35689bdbc",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/skill-writing-skills",
+      "fromCollection": {
+        "name_slug": "suerpowers",
+        "version": "3.4.1"
+      }
+    },
+    "@prpm/self-improving-skill#claude": {
+      "version": "1.1.0",
+      "resolved": "https://registry.prpm.dev/api/v1/packages/%40prpm%2Fself-improving-skill/1.1.0.tar.gz",
+      "integrity": "sha256-c8119d806cae9cbb468496942658e6c5f31c43ad5e5056496a8be0bb5bfcbe66",
+      "format": "claude",
+      "subtype": "skill",
+      "sourceFormat": "claude",
+      "sourceSubtype": "skill",
+      "installedPath": ".claude/skills/self-improving-skill/SKILL.md"
     }
   },
-  "generated": "2025-12-31T12:00:04.624Z",
+  "generated": "2026-01-31T14:38:10.268Z",
   "collections": {
     "thinking-research-framework": {
       "name_slug": "thinking-research-framework",
@@ -1564,7 +2732,7 @@
     "wshobson-context-management": {
       "name_slug": "wshobson-context-management",
       "version": "1.0.0",
-      "installedAt": "2025-12-31T11:21:29.855Z",
+      "installedAt": "2026-01-31T14:22:28.873Z",
       "packages": [
         "@wshobson/agents/context-management/context-manager",
         "@wshobson/commands/context-management/context-restore",
@@ -1613,6 +2781,124 @@
         "@wshobson/agents/data-engineering/data-engineer",
         "@wshobson/commands/data-engineering/data-driven-feature",
         "@wshobson/commands/data-engineering/data-pipeline"
+      ]
+    },
+    "superpowers": {
+      "name_slug": "superpowers",
+      "version": "1.0.0",
+      "installedAt": "2026-01-31T14:20:54.663Z",
+      "packages": [
+        "@obra/skill-using-superpowers",
+        "@obra/skill-brainstorming",
+        "@obra/skill-writing-plans",
+        "@obra/skill-executing-plans",
+        "@obra/skill-test-driven-development",
+        "@obra/skill-systematic-debugging",
+        "@obra/skill-requesting-code-review",
+        "@obra/skill-receiving-code-review",
+        "@obra/skill-verification-before-completion",
+        "@obra/skill-using-git-worktrees",
+        "@obra/skill-subagent-driven-development",
+        "@obra/skill-dispatching-parallel-agents",
+        "@obra/skill-root-cause-tracing",
+        "@obra/skill-defense-in-depth",
+        "@obra/skill-condition-based-waiting",
+        "@obra/skill-testing-anti-patterns",
+        "@obra/skill-testing-skills-with-subagents",
+        "@obra/skill-writing-skills",
+        "@obra/skill-sharing-skills",
+        "@obra/skill-finishing-a-development-branch"
+      ]
+    },
+    "startup-mvp": {
+      "name_slug": "startup-mvp",
+      "version": "1.0.0",
+      "installedAt": "2026-01-31T14:21:50.338Z",
+      "packages": [
+        "@sanjeed5/react",
+        "@sanjeed5/typescript",
+        "@sanjeed5/express",
+        "@sanjeed5/postgresql",
+        "@sanjeed5/prisma",
+        "@sanjeed5/jest",
+        "@sanjeed5/playwright",
+        "@sanjeed5/github-actions",
+        "@sanjeed5/graphql",
+        "@sanjeed5/redis"
+      ]
+    },
+    "devops-cloud-agents": {
+      "name_slug": "devops-cloud-agents",
+      "version": "1.0.0",
+      "installedAt": "2026-01-31T14:23:15.583Z",
+      "packages": [
+        "@wshobson/agents/cicd-automation/cloud-architect",
+        "@wshobson/agents/cicd-automation/kubernetes-architect",
+        "@wshobson/agents/cicd-automation/terraform-specialist",
+        "@wshobson/agents/cloud-infrastructure/cloud-architect",
+        "@wshobson/agents/cloud-infrastructure/deployment-engineer",
+        "@wshobson/agents/cloud-infrastructure/hybrid-cloud-architect",
+        "@wshobson/agents/cloud-infrastructure/kubernetes-architect",
+        "@wshobson/agents/cloud-infrastructure/network-engineer",
+        "@wshobson/agents/cloud-infrastructure/terraform-specialist",
+        "@wshobson/agents/database-cloud-optimization/backend-architect",
+        "@wshobson/agents/database-cloud-optimization/cloud-architect",
+        "@wshobson/agents/database-cloud-optimization/database-architect",
+        "@wshobson/agents/database-cloud-optimization/database-optimizer",
+        "@wshobson/agents/deployment-strategies/terraform-specialist",
+        "@wshobson/agents/deployment-validation/cloud-architect"
+      ]
+    },
+    "wshobson-python-development": {
+      "name_slug": "wshobson-python-development",
+      "version": "1.0.0",
+      "installedAt": "2026-01-31T14:23:36.874Z",
+      "packages": [
+        "@wshobson/agents/python-development/django-pro",
+        "@wshobson/agents/python-development/fastapi-pro",
+        "@wshobson/agents/python-development/python-pro",
+        "@wshobson/commands/python-development/python-scaffold"
+      ]
+    },
+    "wshobson-deployment-validation": {
+      "name_slug": "wshobson-deployment-validation",
+      "version": "1.0.0",
+      "installedAt": "2026-01-31T14:23:52.313Z",
+      "packages": [
+        "@wshobson/agents/deployment-validation/cloud-architect",
+        "@wshobson/commands/deployment-validation/config-validate"
+      ]
+    },
+    "suerpowers": {
+      "name_slug": "suerpowers",
+      "version": "3.4.1",
+      "installedAt": "2026-01-31T14:34:01.714Z",
+      "packages": [
+        "@obra/code-reviewer",
+        "@obra/brainstorm",
+        "@obra/write-plan",
+        "@obra/execute-plan",
+        "@obra/superpowers-hooks",
+        "@obra/skill-brainstorming",
+        "@obra/skill-condition-based-waiting",
+        "@obra/skill-defense-in-depth",
+        "@obra/skill-dispatching-parallel-agents",
+        "@obra/skill-executing-plans",
+        "@obra/skill-finishing-a-development-branch",
+        "@obra/skill-receiving-code-review",
+        "@obra/skill-requesting-code-review",
+        "@obra/skill-root-cause-tracing",
+        "@obra/skill-sharing-skills",
+        "@obra/skill-subagent-driven-development",
+        "@obra/skill-systematic-debugging",
+        "@obra/skill-test-driven-development",
+        "@obra/skill-testing-anti-patterns",
+        "@obra/skill-testing-skills-with-subagents",
+        "@obra/skill-using-git-worktrees",
+        "@obra/skill-using-superpowers",
+        "@obra/skill-verification-before-completion",
+        "@obra/skill-writing-plans",
+        "@obra/skill-writing-skills"
       ]
     }
   }

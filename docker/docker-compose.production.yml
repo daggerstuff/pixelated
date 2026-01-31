@@ -1,4 +1,3 @@
-
 services:
   # Main Application
   app:
@@ -117,7 +116,7 @@ services:
 
   # Reverse Proxy & Load Balancer
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     container_name: pixelated-traefik
     restart: unless-stopped
     ports:
@@ -129,19 +128,21 @@ services:
       - ./traefik:/etc/traefik
       - ssl_certs:/ssl-certs
     environment:
+      - DOCKER_API_VERSION=1.44
       - TRAEFIK_PROVIDERS_DOCKER=true
       - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
       - TRAEFIK_ENTRYPOINTS_web_ADDRESS=:80
       - TRAEFIK_ENTRYPOINTS_websecure_ADDRESS=:443
       - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_EMAIL=${SSL_EMAIL}
       - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_STORAGE=/ssl-certs/acme.json
-      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_HTTPCHALLENGE_ENTRYPOINT=web
+      # - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_HTTPCHALLENGE_ENTRYPOINT=web
+      - CF_DNS_API_TOKEN=${CLOUDFLARE_API_TOKEN}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
+      # - "traefik.http.routers.traefik.service=api@internal"
+      # - "traefik.http.routers.traefik.entrypoints=websecure"
+      # - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
     deploy:
       resources:
         limits:
