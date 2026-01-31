@@ -8,17 +8,20 @@ prompt = no
 C = US
 ST = California
 L = San Francisco
-O = Business Strategy CMS
+O = PixelatedEmpathy
 OU = Development
-CN = localhost
+CN = pixelatedempathy.com
 
 [v3_req]
 keyUsage = keyEncipherment, dataEncipherment
-extendedKeyUsage = serverAuth
+extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = localhost
-DNS.2 = *.localhost
+DNS.1 = pixelatedempathy.com
+DNS.2 = www.pixelatedempathy.com
+DNS.3 = *.pixelatedempathy.com
+DNS.4 = localhost
+DNS.5 = *.localhost
 IP.1 = 127.0.0.1
 IP.2 = ::1
