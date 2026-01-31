@@ -233,4 +233,4 @@ config/secrets/*
 !config/secrets/*.example
 docker/.env
 docker/config/secrets/
-business-strategy-cms/.env
+business-strategy-cms/.envssl/certs/business-strategy-cms.pem
