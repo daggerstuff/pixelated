@@ -43,13 +43,13 @@ This directory contains regression tests to ensure that previously fixed bugs do
 
 ```bash
 # Run all regression tests
-npx playwright test tests/regression
+pnpm dlx playwright test tests/regression
 
 # Run specific category
-npx playwright test tests/regression --grep "Authentication"
+pnpm dlx playwright test tests/regression --grep "Authentication"
 
 # Run with performance monitoring
-npx playwright test tests/regression --reporter=html
+pnpm dlx playwright test tests/regression --reporter=html
 ```
 
 ## Bug Tracking
