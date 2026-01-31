@@ -7,7 +7,7 @@ export OVH_S3_REGION='us-east-va'
 export AWS_ACCESS_KEY_ID='b6939e6b65ef4252b20338499421a5f0'
 export AWS_SECRET_ACCESS_KEY='4a7e939381c6467c88f81a5024672a96'
 
-cd ~/pixelated
+cd ~/pixelated || exit
 
 echo "=== PHASE 1a TEST RUN (100 samples) ==="
 echo "Task 1: Edge case synthetic generation (test)"
@@ -18,11 +18,11 @@ echo "Task 2: Long-running therapy extraction (test)"
 /root/.local/bin/uv run python ai/training_ready/scripts/extract_long_running_therapy.py --min-turns 20 --limit 50 2>&1 &
 PID2=$!
 
-wait $PID1 $PID2
+wait "${PID1}" "${PID2}"
 RES1=$?
 RES2=$?
 
-if [ $RES1 -eq 0 ] && [ $RES2 -eq 0 ]; then
+if [[ ${RES1} -eq 0 ]] && [[ ${RES2} -eq 0 ]]; then
     echo "✅ TEST RUN SUCCESS - Ready for full execution"
     exit 0
 else
