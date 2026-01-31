@@ -1,1 +1,2 @@
 - [x] **Academic Sourcing**: Integrated `ai/sourcing/academic/academic_sourcing.py` into `main_orchestrator.py` via `GenerationWrapper` and updated `UnifiedPreprocessingPipeline` for discovery.
+- [x] **Journal Research**: Integrated `ai/sourcing/journal/main.py` into `main_orchestrator.py` via `GenerationWrapper` and triggered for specific queries (e.g., "trauma informed care").
