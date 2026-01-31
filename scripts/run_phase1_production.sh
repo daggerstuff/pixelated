@@ -185,9 +185,8 @@ phase_1b() {
     log_info "[1b.1/1b.5] Extracting all YouTube transcripts (background)..."
     timeout $PHASE_1B_TIMEOUT $PYTHON_CMD \
         ai/training_ready/scripts/extract_all_youtube_transcripts.py \
-        --all-creators \
-        --output "$GENERATED_DIR/youtube_transcripts.jsonl" \
-        --upload-s3 >> "$MAIN_LOG" 2>&1 &
+        --all \
+        --output-dir "$GENERATED_DIR/youtube" >> "$MAIN_LOG" 2>&1 &
     pids+=($!)
     task_names+=("YouTube extraction")
     
