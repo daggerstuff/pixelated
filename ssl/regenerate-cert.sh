@@ -2,7 +2,7 @@
 # Regenerate SSL certificate with correct SANs for pixelatedempathy.com
 
 SSL_DIR="$(dirname "$0")"
-cd "$SSL_DIR" || exit 1
+cd "${SSL_DIR}" || exit 1
 
 echo "Regenerating SSL certificate for pixelatedempathy.com..."
 echo ""
@@ -18,39 +18,35 @@ echo ""
 
 # Generate new private key and CSR
 echo "Generating new private key and CSR..."
-openssl req -new -newkey rsa:4096 -sha256 \
-    -nodes \
-    -keyout ./private/business-strategy-cms.key \
-    -out ./certs/business-strategy-cms.csr \
-    -config openssl.cnf \
-    -extensions v3_req
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to generate CSR"
-    exit 1
+if ! openssl req -new -newkey rsa:4096 -sha256 \
+	-nodes \
+	-keyout ./private/business-strategy-cms.key \
+	-out ./certs/business-strategy-cms.csr \
+	-config openssl.cnf \
+	-extensions v3_req; then
+	echo "Error: Failed to generate CSR"
+	exit 1
 fi
 echo "✓ Private key and CSR generated"
 echo ""
 
 # Generate self-signed certificate
 echo "Generating self-signed certificate..."
-openssl x509 -req -sha256 \
-    -days 3650 \
-    -in ./certs/business-strategy-cms.csr \
-    -signkey ./private/business-strategy-cms.key \
-    -out ./certs/business-strategy-cms.crt \
-    -extensions v3_req \
-    -extfile openssl.cnf
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to generate certificate"
-    exit 1
+if ! openssl x509 -req -sha256 \
+	-days 3650 \
+	-in ./certs/business-strategy-cms.csr \
+	-signkey ./private/business-strategy-cms.key \
+	-out ./certs/business-strategy-cms.crt \
+	-extensions v3_req \
+	-extfile openssl.cnf; then
+	echo "Error: Failed to generate certificate"
+	exit 1
 fi
 echo "✓ Certificate generated (valid for 10 years)"
 echo ""
 
 # Create PEM file for applications
-cat ./certs/business-strategy-cms.crt ./private/business-strategy-cms.key > ./certs/business-strategy-cms.pem
+cat ./certs/business-strategy-cms.crt ./private/business-strategy-cms.key >./certs/business-strategy-cms.pem
 chmod 600 ./certs/business-strategy-cms.pem
 echo "✓ PEM file created"
 echo ""
@@ -58,9 +54,9 @@ echo ""
 # Display certificate info
 echo "Certificate Details:"
 echo "===================="
-openssl x509 -in ./certs/business-strategy-cms.crt -text -noout | grep -A 2 "Subject:"
+openssl x509 -in ./certs/business-strategy-cms.crt -text -noout | grep -A 2 "Subject:" || true
 echo ""
-openssl x509 -in ./certs/business-strategy-cms.crt -text -noout | grep -A 10 "Subject Alternative Name"
+openssl x509 -in ./certs/business-strategy-cms.crt -text -noout | grep -A 10 "Subject Alternative Name" || true
 echo ""
 echo "✓ Certificate successfully regenerated!"
 echo ""
