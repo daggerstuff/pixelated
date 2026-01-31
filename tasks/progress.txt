@@ -1,0 +1,115 @@
+# 📊 Project Progress Log
+
+> **Purpose**: Track all pipeline work, code changes, and implementation progress for continuity, debugging, and quality assurance.
+
+---
+
+## 🎯 How to Use This Log
+
+When completing **any iteration, block, or run**, append an entry following this format:
+
+```markdown
+### [YYYY-MM-DD HH:MM] Task Title
+**Status**: ✅ Complete | ⏳ In Progress | ❌ Blocked  
+**Files Changed**: `path/to/file1.py`, `path/to/file2.ts`  
+**Changes**: Brief description of what was done  
+**Outcome**: Results, metrics, or notable observations  
+**Issues**: Any problems encountered (or "None")  
+**Next Steps**: Improvement areas or follow-up tasks (if any)
+```
+
+**Rules**:
+- Always append (never edit existing entries)
+- Keep entries concise but informative
+- Use sub-bullets for nested details
+- Update immediately after completing work
+
+---
+
+## 📜 Progress History
+
+### [2026-01-31] Unified Preprocessing Subsumption
+**Status**: ✅ Complete  
+**Files Changed**: `ai/training/ready_packages/unified_preprocessing_pipeline.py`  
+**Changes**: Audited and updated pipeline to fully subsume legacy cleaning, ChatML conversion, and PII scrubbing logic  
+**Details**:
+- Integrated PIIScrubber for sensitive data protection
+- Added stage-aware normalization
+- Eliminated redundant preprocessing steps
+**Outcome**: Single source of truth for preprocessing, reduced technical debt  
+**Issues**: None  
+
+---
+
+### [2026-01-31] Academic Sourcing Integration
+**Status**: ✅ Complete  
+**Files Changed**: `ai/orchestration/main_orchestrator.py`, `ai/sourcing/academic/academic_sourcing.py`  
+**Changes**: Integrated academic sourcing pipeline into main orchestrator  
+**Outcome**: Automated academic paper extraction now part of unified pipeline  
+**Issues**: None  
+
+---
+
+### [2026-01-31] Journal Research Pipeline Integration
+**Status**: ✅ Complete  
+**Files Changed**: `ai/orchestration/main_orchestrator.py`  
+**Changes**: Integrated journal research pipeline into main orchestrator  
+**Outcome**: Automated journal article processing and extraction  
+**Issues**: None  
+
+---
+
+### [2026-01-31] NeMo & Nightmare Fuel Dataset Generation
+**Status**: ✅ Complete  
+**Files Changed**: `ai/training/ready_packages/scripts/generate_nemo_synthetic_data.py`  
+**Changes**: Ensured GenerationWrapper triggers high-quality synthetic and failure mode datasets  
+**Outcome**: Production-ready synthetic conversation data and edge case examples  
+**Issues**: None  
+
+---
+
+### [2026-01-31] Unused Material Hydration
+**Status**: ✅ Complete  
+**Files Changed**: Therapeutic books and YouTube transcript extraction scripts  
+**Changes**: Integrated therapeutic books and YouTube transcript extraction into unified pipeline  
+**Outcome**: Additional training data sources now processed automatically  
+**Issues**: None  
+
+---
+
+### [Pending] Unified Preprocessing Audit
+**Status**: ⏳ In Progress  
+**Task**: Audit `unified_preprocessing_pipeline.py` to ensure it completely subsumes legacy logic  
+**Next Steps**: Verify all legacy preprocessing paths are deprecated  
+
+---
+
+### [Pending] H100 Training Manifest
+**Status**: ⏳ In Progress  
+**Task**: Ensure `main_orchestrator.py` generates a valid `training_manifest.json` for Lightning.ai  
+**Next Steps**: Validate manifest format against Lightning.ai requirements  
+
+---
+
+### [Pending] Dual Persona Orchestration
+**Status**: ⏳ In Progress  
+**Task**: Validate that the balanced dataset supports both "Mentor" and "Help-seeker" roles  
+**Next Steps**: Run validation scripts, check persona distribution  
+
+---
+
+## 📝 Template for Next Entry
+
+```markdown
+### [YYYY-MM-DD HH:MM] Your Task Title Here
+**Status**: ✅ Complete | ⏳ In Progress | ❌ Blocked  
+**Files Changed**: `path/to/file.ext`  
+**Changes**: What you did  
+**Outcome**: What happened  
+**Issues**: Any problems (or "None")  
+**Next Steps**: Follow-up items (if any)
+```
+
+---
+
+*Last Updated: 2026-01-31 16:01 EST*

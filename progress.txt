@@ -1,8 +1,0 @@
-- [x] **Academic Sourcing**: Integrated ai/sourcing/academic/academic_sourcing.py into main_orchestrator.py.
-- [x] **Journal Research**: Integrated ai/sourcing/journal research pipeline into main_orchestrator.py.
-- [x] **NeMo & Nightmare Fuel**: Ensured GenerationWrapper triggers high-quality synthetic and failure mode datasets.
-- [x] **Unused Material Hydration**: Integrated therapeutic books and YouTube transcript extraction into the unified pipeline.
-- [ ] **Unified Preprocessing**: Audit `unified_preprocessing_pipeline.py` to ensure it completely subsumes legacy logic.
-- [ ] **H100 Training Manifest**: Ensure `main_orchestrator.py` generates a valid `training_manifest.json` for Lightning.ai.
-- [ ] **Dual Persona Orchestration**: Validate that the balanced dataset supports both "Mentor" and "Help-seeker" roles.
-- [x] **Unified Preprocessing Subsumption**: Audited and updated unified_preprocessing_pipeline.py to fully subsume legacy cleaning, ChatML conversion, and PII scrubbing logic. Integrated PIIScrubber and added stage-aware normalization.
