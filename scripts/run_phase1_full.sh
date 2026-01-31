@@ -7,7 +7,7 @@ export OVH_S3_REGION='us-east-va'
 export AWS_ACCESS_KEY_ID='b6939e6b65ef4252b20338499421a5f0'
 export AWS_SECRET_ACCESS_KEY='4a7e939381c6467c88f81a5024672a96'
 
-cd ~/pixelated
+cd ~/pixelated || exit
 
 echo "════════════════════════════════════════════════════════════"
 echo "  PHASE 1 EXTENDED EXECUTION - FULL PIPELINE"
@@ -24,7 +24,7 @@ echo "Task 1a.2: Extracting long-running therapy sessions (1K+ samples)"
 /root/.local/bin/uv run python ai/training_ready/scripts/extract_long_running_therapy.py --min-turns 20 --limit 1000 2>&1 &
 PID2=$!
 
-wait $PID1 $PID2
+wait "${PID1}" "${PID2}"
 echo "✅ Phase 1a.1 & 1a.2 complete"
 echo ""
 
@@ -59,7 +59,7 @@ echo "Task 1b.4: NeMo synthetic generation"
 /root/.local/bin/uv run python ai/training_ready/scripts/generate_nemo_synthetic_data.py --quality-gated --upload-s3 2>&1 &
 PID6=$!
 
-wait $PID3 $PID4 $PID5 $PID6
+wait "${PID3}" "${PID4}" "${PID5}" "${PID6}"
 echo "✅ Phase 1b.1-1b.4 complete"
 echo ""
 
