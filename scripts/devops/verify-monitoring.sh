@@ -102,7 +102,7 @@ if monitoring_ps_output="$(docker compose -f docker/docker-compose.monitoring.ym
 
 	else
 		echo "❌ Monitoring stack is not running"
-		echo "💡 Run './scripts/start-monitoring.sh' to start the monitoring services"
+		echo "💡 Run './scripts/devops/start-monitoring.sh' to start the monitoring services"
 		overall_ok=false
 	fi
 
@@ -157,7 +157,7 @@ echo "   - Configuration files: Checked"
 echo "   - Running services: Checked"
 echo "   - Network connectivity: Checked"
 echo ""
-echo "🔧 If services are not running, use './scripts/start-monitoring.sh'"
+echo "🔧 If services are not running, use './scripts/devops/start-monitoring.sh'"
 echo "📊 Access Grafana at: http://localhost:3001"
 echo "📈 Access Prometheus at: http://localhost:9090"
 echo "📝 Access Loki at: http://localhost:3100"
