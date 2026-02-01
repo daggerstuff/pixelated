@@ -261,3 +261,5 @@ clusters/pixelkube
 ssl/
 aws/
 .ralph/
+
+.netlify/v1/functions/ssr
