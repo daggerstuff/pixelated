@@ -218,7 +218,6 @@ terraform/.terraform.lock.hcl
 terraform/.terraform/
 terraform/plan.tfplan
 tmp/
-training_ready/
 tsconfig.json.backup
 values.yaml
 verbose/coverage/
