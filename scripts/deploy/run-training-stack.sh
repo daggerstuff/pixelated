@@ -8,7 +8,7 @@ cd "$PROJECT_ROOT"
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/run_training_stack.sh [--build]
+Usage: scripts/deploy/run-training-stack.sh [--build]
 
 Options:
   --build   Rebuild the training-service image before starting containers.
@@ -54,4 +54,3 @@ SERVICES=(
 echo "Starting training stack (${SERVICES[*]}) ..."
 docker compose -f "$COMPOSE_FILE" up -d $BUILD_FLAG "${SERVICES[@]}"
 docker compose -f "$COMPOSE_FILE" ps
-
