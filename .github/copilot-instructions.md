@@ -8,7 +8,8 @@ Core rules
   - `uv install` to install dependencies from `pyproject.toml`
   - `uv run <cmd>` to run Python programs (e.g. `uv run pytest tests/`)
   - `uv shell` to open a shell with the environment
-- For Node.js-related work, prefer `pnpm` (project uses pnpm). Use `pnpm` commands rather than npm/yarn unless explicitly required.
+- For Node.js-related work, prefer `pnpm` (project uses pnpm).
+- Use `pnpm` commands rather than npm/yarn unless explicitly required.
 
 Code reading and edits
 - Avoid reading entire files unless necessary. Use symbol-aware tools where available.
@@ -32,14 +33,15 @@ Communication style
 - If you will call tools, state briefly what you'll run and why, immediately before the tool call.
 
 Operational examples
-- "I'll call openmemory to load project memories to avoid redundant reads." (then call the tool)
+- "I'll call supermemory  to load project memories to avoid redundant reads." (then call the tool)
 - "I'll run `uv install` to install Python deps before running the unit tests." (then run it)
 
 If unsure
 - If a task is underspecified, make 1-2 reasonable assumptions, state them, and proceed. Ask the user only if the assumptions would materially change behavior.
 
 Short checklist (use before committing changes)
-- Did I call openmemory at session start? ✅
+
+- Did I call supermemory at session start? ✅
 - Did I run tests/typecheck with `uv` for Python? ✅
 - Did I avoid exposing secrets? ✅
 - Did I keep edits minimal and focused? ✅
