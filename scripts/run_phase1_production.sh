@@ -1,3 +1,13 @@
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# DEPRECATION NOTICE: This shell script is deprecated and slated for removal.
+# Transitioning to Unified Python Orchestration Pipeline.
+# 
+# NEW ENTRY POINT: 
+#   uv run python ai/pipelines/orchestrator/main_orchestrator.py
+# 
+# Please use the Python orchestrator for all future production runs.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 #!/bin/bash
 ################################################################################
 # PHASE 1 EXTENDED PRODUCTION EXECUTION
