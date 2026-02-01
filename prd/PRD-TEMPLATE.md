@@ -48,6 +48,10 @@ As a [role], I want [goal] so that [benefit].
 
 ## Constraints
 
+> ⚠️ **MANDATORY: No Stubs or Filler Logic**
+>
+> All implementations MUST be complete and production-ready. Stubs (`pass`, `...`, `NotImplementedError`), placeholder logic, and TODO comments in production code are **absolutely prohibited**.
+
 - Maximum response time: [X]ms
 - Must support [browser/OS versions]
 - Cannot modify [existing feature]
