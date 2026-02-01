@@ -6,38 +6,6 @@
         "args": ["mcp-remote", "https://mcp.atlassian.com/v1/mcp"],
         "description": "Atlassian MCP Server for Jira and Confluence integration (ratchetaf)",
         "tool_prefix": "atlassian_"
-      },
-      "atlassian-meta": {
-        "command": "pnpm dlx",
-        "args": ["mcp-remote", "https://mcp.atlassian.com/v1/mcp"],
-        "description": "Atlassian MCP Server for Jira and Confluence integration (ratchetaf)",
-        "tool_prefix": "atlassian_meta_"
-      },
-      "graphiti-context": {
-        "command": "uv",
-        "args": ["run", "python", "ai/api/mcp_server/graphiti_server.py"],
-        "env": {
-          "GRAPHITI_HOST": "0.0.0.0",
-          "GRAPHITI_PORT": "8000",
-          "GRAPHITI_DEBUG": "false"
-        },
-        "description": "Graphiti Context Server for VS Code extension - Server-Sent Events endpoint",
-        "disabled": false,
-        "tool_prefix": "graphiti_"
-      },
-      "pixelated-memory": {
-        "command": "uv",
-        "args": ["run", "python", "ai/api/mcp_server/memory_server.py"],
-        "env": {
-          "ZEP_API_KEY": "${ZEP_API_KEY}",
-          "ZEP_API_URL": "${ZEP_API_URL}",
-          "MEMORY_SERVER_PORT": "5003",
-          "MEMORY_SERVER_HOST": "0.0.0.0",
-          "LOG_LEVEL": "INFO"
-        },
-        "description": "Memory management server with Zep Cloud integration",
-        "disabled": false,
-        "tool_prefix": "memory_"
       }
     }
   }
