@@ -242,7 +242,7 @@ def main() -> None:
     if len(sys.argv) < 2:
         logger.error("Usage: python visualize-weighting-benchmark.py <benchmark-results.json>")
         logger.error("\nExample:")
-        logger.error("  python scripts/visualize-weighting-benchmark.py benchmark-results.json")
+        logger.error("  python scripts/visualization/visualize-weighting-benchmark.py benchmark-results.json")
         sys.exit(1)
 
     json_file = sys.argv[1]

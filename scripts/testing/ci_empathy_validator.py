@@ -164,7 +164,7 @@ def setup_git_hook():
 echo "🔍 Running empathy style validation..."
 cd "{project_root}"
 
-python "{project_root / "scripts/ci_empathy_validator.py"}"
+python "{project_root / "scripts/testing/ci_empathy_validator.py"}"
 
 if [ $? -ne 0 ]; then
     echo "❌ Commit blocked: Empathy guidelines violated"

@@ -8,7 +8,7 @@ cd "$PROJECT_ROOT"
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/run_nemo_designer.sh [--standalone]
+Usage: scripts/deploy/run_nemo_designer.sh [--standalone]
 
   --standalone   Use docker-compose.nemo-data-designer.yml instead of the training stack file.
 
@@ -46,4 +46,3 @@ mkdir -p ai/training_data_consolidated/final
 echo "Starting $SERVICE_NAME via $COMPOSE_FILE ..."
 docker compose -f "$COMPOSE_FILE" up -d "$SERVICE_NAME"
 echo "NeMo Data Designer is now available on http://localhost:8000"
-

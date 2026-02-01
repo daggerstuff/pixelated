@@ -330,8 +330,8 @@ stages:
             submodules: 'false'
             fetchDepth: '0'
           - script: |
-              chmod +x scripts/resolve-submodule-url.sh
-              ./scripts/resolve-submodule-url.sh
+              chmod +x scripts/utils/resolve-submodule-url.sh
+              ./scripts/utils/resolve-submodule-url.sh
             displayName: 'Resolve submodule URL dynamically'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
@@ -597,7 +597,7 @@ stages:
 
               if command -v docker >/dev/null 2>&1; then
                 echo "Cleaning up Docker resources..."
-                
+
                 # Check for running containers first
                 if [ "$(docker ps -q)" ]; then
                    echo "⚠️ Found running containers. Attempting to stop them..."
@@ -609,7 +609,7 @@ stages:
                 # --volumes: Remove unused volumes
                 # -f: Force
                 docker system prune -af --volumes 2>/dev/null || true
-                
+
                 # Explicitly clean builder cache (often a culprit)
                 docker builder prune -af 2>/dev/null || true
               fi
@@ -790,7 +790,7 @@ stages:
               # 3. Clean local build artifacts
               echo "Cleaning build artifacts..."
               rm -rf $(Build.ArtifactStagingDirectory)/* 2>/dev/null || true
-              # Note: we don't clean node_modules here as Build job mainly does docker builds, 
+              # Note: we don't clean node_modules here as Build job mainly does docker builds,
               # but cleaning source build artifacts is good practice
               rm -rf $(Build.SourcesDirectory)/dist 2>/dev/null || true
 
@@ -936,7 +936,7 @@ stages:
                       # Check if kubectl is already installed
                       if ! command -v kubectl &>/dev/null; then
                         echo "🔧 Installing kubectl..."
-                        
+
                         # Install kubectl using Azure CLI
                          KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                          curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
@@ -945,7 +945,7 @@ stages:
                          mv kubectl ~/.local/bin/
                          export PATH="$HOME/.local/bin:$PATH"
                          echo "##vso[task.setvariable variable=PATH]$HOME/.local/bin:${PATH}"
-                        
+
                         # Verify installation
                         kubectl version --client
                         echo "✅ kubectl installed successfully"
@@ -969,7 +969,7 @@ stages:
                         echo "❌ Failed to get AKS credentials"
                         echo "Resource group: $(AZURE_RESOURCE_GROUP)"
                         echo "Cluster name: $(AKS_CLUSTER_NAME)"
-                        
+
                         # Debug information
                         echo "🔍 Checking cluster existence..."
                         az aks show \
@@ -1076,7 +1076,7 @@ stages:
                       # Check if kubectl is already installed
                       if ! command -v kubectl &>/dev/null; then
                         echo "🔧 Installing kubectl..."
-                        
+
                         # Install kubectl using Azure CLI
                          KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                          curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
@@ -1085,7 +1085,7 @@ stages:
                          mv kubectl ~/.local/bin/
                          export PATH="$HOME/.local/bin:$PATH"
                          echo "##vso[task.setvariable variable=PATH]$HOME/.local/bin:${PATH}"
-                        
+
                         # Verify installation
                         kubectl version --client
                         echo "✅ kubectl installed successfully"
@@ -1095,13 +1095,13 @@ stages:
                       fi
 
                        echo "🔐 Configuring AKS credentials..."
-                       
+
                        # Clean any existing kubeconfig and get fresh credentials
                        echo "🧹 Cleaning existing kubeconfig..."
                        rm -f ~/.kube/config
-                       
+
                        az aks get-credentials --resource-group $(AZURE_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME) --overwrite-existing --admin
-                       
+
                        # Verify cluster connectivity
                        echo "🔍 Testing cluster connectivity..."
                        kubectl cluster-info || {
@@ -1179,11 +1179,11 @@ stages:
                        echo "🔐 Creating ACR secret for image pull..."
 
                        # Ensure kubectl credentials are available
-                       
+
                        # Clean any existing kubeconfig to prevent conflicts
                        echo "🧹 Cleaning existing kubeconfig..."
                        rm -f ~/.kube/config
-                       
+
                        # Get fresh credentials with comprehensive error handling
                        az aks get-credentials \
                          --resource-group $(AZURE_RESOURCE_GROUP) \
@@ -1193,7 +1193,7 @@ stages:
                          echo "❌ Failed to get AKS credentials"
                          echo "Resource group: $(AZURE_RESOURCE_GROUP)"
                          echo "Cluster name: $(AKS_CLUSTER_NAME)"
-                         
+
                          # Debug information
                          echo "🔍 Checking cluster existence..."
                          az aks show \
@@ -1207,7 +1207,7 @@ stages:
                          }
                          exit 1
                        }
-                       
+
                        # Verify cluster connectivity
                        echo "🔍 Testing cluster connectivity..."
                        kubectl cluster-info || {
@@ -1287,10 +1287,10 @@ stages:
                     targetType: 'inline'
                     script: |
                       set -euo pipefail
-                       
+
                       echo "🔄 Updating Pixelated image tag..."
                       kubectl set image deployment/pixelated pixelated=$(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber) -n $(KUBE_NAMESPACE)
-                       
+
                       echo "✅ Image tag updated to $(DOCKER_REGISTRY)/$(IMAGE_REPOSITORY):$(Build.BuildNumber)"
 
                 - task: Bash@3
@@ -1473,7 +1473,7 @@ stages:
                       # Check if kubectl is already installed
                       if ! command -v kubectl &>/dev/null; then
                         echo "🔧 Installing kubectl..."
-                        
+
                         # Install kubectl using Azure CLI
                          KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                          curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
@@ -1482,7 +1482,7 @@ stages:
                          mv kubectl ~/.local/bin/
                          export PATH="$HOME/.local/bin:$PATH"
                          echo "##vso[task.setvariable variable=PATH]$HOME/.local/bin:${PATH}"
-                        
+
                         # Verify installation
                         kubectl version --client
                         echo "✅ kubectl installed successfully"
@@ -1492,11 +1492,11 @@ stages:
                       fi
 
                        echo "🔐 Configuring AKS credentials..."
-                       
+
                        # Clean any existing kubeconfig to prevent conflicts
                        echo "🧹 Cleaning existing kubeconfig..."
                        rm -f ~/.kube/config
-                       
+
                        # Get fresh credentials with comprehensive error handling
                        az aks get-credentials \
                          --resource-group $(AZURE_RESOURCE_GROUP) \
@@ -1506,7 +1506,7 @@ stages:
                          echo "❌ Failed to get AKS credentials"
                          echo "Resource group: $(AZURE_RESOURCE_GROUP)"
                          echo "Cluster name: $(AKS_CLUSTER_NAME)"
-                         
+
                          # Debug information
                          echo "🔍 Checking cluster existence..."
                          az aks show \
@@ -1520,7 +1520,7 @@ stages:
                          }
                          exit 1
                        }
-                       
+
                        # Verify cluster connectivity
                        echo "🔍 Testing cluster connectivity..."
                        kubectl cluster-info || {
@@ -1566,11 +1566,11 @@ stages:
                        echo "🔐 Creating ACR secret for production image pull..."
 
                        # Ensure kubectl credentials are available
-                       
+
                        # Clean any existing kubeconfig to prevent conflicts
                        echo "🧹 Cleaning existing kubeconfig..."
                        rm -f ~/.kube/config
-                       
+
                        # Get fresh credentials with comprehensive error handling
                        az aks get-credentials \
                          --resource-group $(AZURE_RESOURCE_GROUP) \
@@ -1580,7 +1580,7 @@ stages:
                          echo "❌ Failed to get AKS credentials"
                          echo "Resource group: $(AZURE_RESOURCE_GROUP)"
                          echo "Cluster name: $(AKS_CLUSTER_NAME)"
-                         
+
                          # Debug information
                          echo "🔍 Checking cluster existence..."
                          az aks show \
@@ -1594,7 +1594,7 @@ stages:
                          }
                          exit 1
                        }
-                       
+
                        # Verify cluster connectivity
                        echo "🔍 Testing cluster connectivity..."
                        kubectl cluster-info || {
@@ -1820,11 +1820,11 @@ stages:
                 set -euo pipefail
 
                      echo "📦 Installing kubectl..."
-                     
+
                      # Check if kubectl is already installed
                      if ! command -v kubectl &>/dev/null; then
                        echo "🔧 Installing kubectl..."
-                       
+
                        # Install kubectl without sudo to user directory
                        KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                        curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
@@ -1833,7 +1833,7 @@ stages:
                        mv kubectl ~/.local/bin/
                        export PATH="$HOME/.local/bin:$PATH"
                        echo "##vso[task.setvariable variable=PATH]$HOME/.local/bin:${PATH}"
-                       
+
                        # Verify installation
                        kubectl version --client
                        echo "✅ kubectl installed successfully to ~/.local/bin/"
@@ -1843,11 +1843,11 @@ stages:
                      fi
 
                  echo "🔐 Configuring AKS credentials..."
-                 
+
                  # Clean any existing kubeconfig to prevent conflicts
                  echo "🧹 Cleaning existing kubeconfig..."
                  rm -f ~/.kube/config
-                 
+
                  # Get fresh credentials with comprehensive error handling
                  az aks get-credentials \
                    --resource-group $(AZURE_RESOURCE_GROUP) \
@@ -1857,7 +1857,7 @@ stages:
                    echo "❌ Failed to get AKS credentials"
                    echo "Resource group: $(AZURE_RESOURCE_GROUP)"
                    echo "Cluster name: $(AKS_CLUSTER_NAME)"
-                   
+
                    # Debug information
                    echo "🔍 Checking cluster existence..."
                    az aks show \
@@ -1871,7 +1871,7 @@ stages:
                    }
                    exit 1
                  }
-                 
+
                  # Verify cluster connectivity
                  echo "🔍 Testing cluster connectivity..."
                  kubectl cluster-info || {
