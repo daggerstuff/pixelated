@@ -9,6 +9,7 @@ dependencies = [
     "pyarrow==15.0.0",
     "pydantic==2.7.0",
     "clickhouse-driver==0.2.7",
+    "semgrep>=1.136.0",
 ]
 [project.optional-dependencies]
 dev = [
