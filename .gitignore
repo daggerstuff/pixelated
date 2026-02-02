@@ -261,3 +261,4 @@ aws/
 .ralph/
 
 .netlify/v1/functions/ssr
+.zed
