@@ -31,14 +31,14 @@ This document describes the configuration fixes made to resolve the "Loki needs 
 
 Run the verification script to confirm all configurations are correct:
 ```bash
-./scripts/verify-monitoring.sh
+./scripts/devops/verify-monitoring.sh
 ```
 
 ## Starting the Monitoring Stack
 
 To start the monitoring services:
 ```bash
-./scripts/start-monitoring.sh
+./scripts/devops/start-monitoring.sh
 ```
 
 ## Key Configuration Changes Summary
