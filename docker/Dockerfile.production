@@ -4,16 +4,16 @@ FROM node:24-slim AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@10.26.1
-RUN apt-get update && apt-get install --no-install-recommends -y python3=3.11.* make=4.* g++=12.* libvips-dev=8.* curl=7.* && rm -rf /var/lib/apt/lists/*
+RUN npm install -g pnpm@10.28.2
+RUN apt-get update && apt-get install --no-install-recommends -y python3 make g++ libvips-dev curl && rm -rf /var/lib/apt/lists/*
 
 # Runtime base stage (no build toolchain)
 FROM node:24-slim AS runtime
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@10.26.1
-RUN apt-get update && apt-get install --no-install-recommends -y curl=7.* && rm -rf /var/lib/apt/lists/*
+RUN npm install -g pnpm@10.28.2
+RUN apt-get update && apt-get install --no-install-recommends -y curl && rm -rf /var/lib/apt/lists/*
 
 # Production dependencies stage
 FROM base AS prod-deps
@@ -55,6 +55,10 @@ ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 4321
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:4321/api/health || exit 1
 
 # Start application
 CMD ["node", "./dist/server/entry.mjs"]
