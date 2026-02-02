@@ -2,8 +2,8 @@
   "languages": {
     "Python": {
       "language_servers": ["pyright", "ruff"],
-      "formatter": "language_server",
-    },
+      "formatter": "language_server"
+    }
   },
   "lsp": {
     "pyright": {
@@ -11,10 +11,10 @@
         "python": {
           "pythonPath": ".venv/bin/python",
           "analysis": {
-            "extraPaths": ["src"],
-          },
-        },
-      },
-    },
-  },
+            "extraPaths": ["src"]
+          }
+        }
+      }
+    }
+  }
 }
