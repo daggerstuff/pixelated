@@ -38,9 +38,8 @@ certificatesResolvers:
   letsencrypt:
     acme:
       email: admin@pixelatedempathy.com
-      storage: /letsencrypt/acme.json
-      httpChallenge:
-        entryPoint: web
+      storage: /ssl-certs/acme.json
+      tlsChallenge: {}
 
 # Providers
 providers:
@@ -49,7 +48,7 @@ providers:
     exposedByDefault: false
     network: pixelated_network
   file:
-    directory: /etc/traefik/dynamic
+    filename: /etc/traefik/dynamic.yml
     watch: true
 
 # Logging
@@ -72,8 +71,3 @@ metrics:
     addEntryPointsLabels: true
     addRoutersLabels: true
     addServicesLabels: true
-# Tracing (optional - for debugging)
-# tracing:
-#   jaeger:
-#     samplingServerURL: http://jaeger:5778/sampling
-#     localAgentHostPort: jaeger:6831

@@ -67,7 +67,7 @@ uv pip install 'nemo-microservices[data-designer]'
 2. Run the deployment script:
 
 ```bash
-./scripts/deploy-nemo-data-designer.sh
+./scripts/deploy/deploy-nemo-data-designer.sh
 ```
 
 Or manually:
@@ -83,7 +83,7 @@ docker-compose -f docker-compose.nemo-data-designer.yml up -d
 For deploying on a remote server (e.g., `vivi@212.2.244.60`):
 
 ```bash
-./scripts/deploy-nemo-data-designer-remote.sh
+./scripts/deploy/deploy-nemo-data-designer-remote.sh
 ```
 
 This will automatically:
@@ -301,7 +301,7 @@ Docker Compose is the easiest way to get started with NeMo Data Designer locally
 
 ```bash
 # Using the provided script
-./scripts/deploy-nemo-data-designer.sh
+./scripts/deploy/deploy-nemo-data-designer.sh
 
 # Or manually
 docker-compose -f docker-compose.nemo-data-designer.yml up -d
