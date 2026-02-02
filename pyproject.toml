@@ -210,6 +210,11 @@ force_single_line = false
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
+filterwarnings = [
+  "ignore:.*WordPiece.*:DeprecationWarning",
+  "ignore:.*swig.*:DeprecationWarning",
+  "ignore:.*Swig.*:DeprecationWarning",
+]
 [tool.coverage.run]
 branch = true
 source = ["src", "ai"]

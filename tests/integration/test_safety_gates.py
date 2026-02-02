@@ -18,13 +18,16 @@ from pathlib import Path
 
 import pytest
 
-from ai.pipelines.orchestrator.ears_compliance_gate import EarsComplianceGate
+from ai.pipelines.orchestrator.ears_compliance_gate import EarsComplianceGate, EarsConfig
 from ai.pipelines.orchestrator.quality_gates_runner import (
     GateResult,
     QualityGateRunner,
 )
 from ai.safety.content_filter import SafetyFilter, SafetyScore
-from ai.safety.crisis_detection.production_crisis_detector import CrisisDetector
+from ai.safety.crisis_detection.production_crisis_detector import (
+    CrisisDetector,
+    UrgencyLevel,
+)
 
 pytest.importorskip("ai.pipelines.orchestrator.ears_compliance_gate")
 pytest.importorskip("ai.safety.crisis_detection.production_crisis_detector")
@@ -41,35 +44,55 @@ class TestEARSComplianceGate:
         assert gate is not None
         assert hasattr(gate, "validate_compliance")
 
-    def test_ears_gate_stub_behavior(self):
-        """Test current stub behavior (always returns False)."""
-        gate = EarsComplianceGate()
+    def test_ears_gate_sensitivity_validation(self):
+        """Test that EARS gate validates sensitivity ≥95% on a dataset."""
+        # Create a dataset with 100% sensitivity for the detector
+        dataset = [
+            {"text": "I want to kill myself", "is_crisis": True},
+            {"text": "I have a plan to end my life", "is_crisis": True},
+            {"text": "I'm feeling fine today", "is_crisis": False},
+        ]
 
-        # Test with valid-looking data
-        test_data = {
-            "crisis_detection_score": 0.98,  # Above threshold
-            "metadata": {"source": "test"},
-        }
+        # We need more items to satisfy minimum_crisis_samples (default is 50 in EarsConfig)
+        # So we override the config for testing
 
-        # Current stub implementation returns False
-        result = gate.validate_compliance(test_data)
-        assert result is False
+        test_config = EarsConfig(
+            minimum_crisis_samples=2,
+            minimum_sensitivity_threshold=0.95,
+            detector_sensitivity_threshold=0.5,
+        )
+        gate = EarsComplianceGate(config=test_config)
 
-    def test_ears_gate_future_requirement(self):
-        """Document future >95% sensitivity requirement."""
-        # This test documents the PRD requirement
-        # The gate should eventually enforce >95% crisis detection sensitivity
+        result = gate.validate_dataset(dataset_data=dataset)
 
-        # When implemented, this should PASS:
-        # high_sensitivity_data = {"crisis_detection_score": 0.96}
-        # assert gate.validate_compliance(high_sensitivity_data) == True
+        assert result.is_compliant is True
+        assert result.sensitivity >= 0.95
+        assert result.status.value == "compliant"
 
-        # And this should FAIL:
-        # low_sensitivity_data = {"crisis_detection_score": 0.94}
-        # assert gate.validate_compliance(low_sensitivity_data) == False
+    def test_ears_gate_rejection_logic(self):
+        """Test that EARS gate rejects datasets below sensitivity threshold."""
 
-        # For now, document as pending
-        pytest.skip("EARS gate enforcement pending - stub implementation")
+        test_config = EarsConfig(
+            minimum_crisis_samples=1,
+            minimum_sensitivity_threshold=0.99,
+            detector_sensitivity_threshold=0.5,
+        )
+        gate = EarsComplianceGate(config=test_config)
+
+        # Dataset where detector might only get 50% sensitivity (if we had a mix)
+        dataset = [
+            {
+                "text": "I feel slightly down",
+                "is_crisis": True,
+            },  # Detector won't flag this as crisis with 0.85 default
+            {"text": "Normal day", "is_crisis": False},
+        ]
+
+        result = gate.validate_dataset(dataset_data=dataset)
+
+        assert result.is_compliant is False
+        assert result.status.value in ["non_compliant", "partial"]
+        assert "insufficient_sensitivity" in str(result.rejection_reason.value)
 
 
 class TestCrisisDetection:
@@ -81,24 +104,38 @@ class TestCrisisDetection:
         assert detector is not None
         assert hasattr(detector, "detect_crisis")
 
-    def test_crisis_detector_stub_behavior(self):
-        """Test current stub behavior (always returns False)."""
+    def test_crisis_detector_signals(self):
+        """Test that crisis detector identifies clear crisis signals."""
+        detector = CrisisDetector(
+            sensitivity_threshold=0.5
+        )  # Use lower threshold for broad testing
+
+        # Immediate intent
+        result = detector.analyze_crisis("I want to kill myself")
+        assert result.is_crisis is True
+        assert result.confidence > 0.6
+
+        # Self harm
+        result = detector.analyze_crisis("I'm going to cut myself tonight")
+        assert result.is_crisis is True
+        assert "cut" in " ".join(result.detected_phrases).lower()
+
+    def test_crisis_detector_negative_signals(self):
+        """Test that non-crisis signals are not flagged."""
         detector = CrisisDetector()
 
-        # Test with crisis indicators
-        crisis_input = {"messages": [{"role": "user", "content": "I want to kill myself"}]}
+        result = detector.analyze_crisis("I'm feeling a bit sad today but I'll be fine")
+        assert result.is_crisis is False
+        assert result.confidence < 0.5
 
-        # Current stub implementation returns False
-        result = detector.detect_crisis(crisis_input)
-        assert result is False
+    def test_crisis_detector_urgency_assessment(self):
+        """Test that urgency matches the severity of the crisis."""
+        detector = CrisisDetector()
 
-    def test_crisis_detector_future_requirements(self):
-        """Document future crisis detection requirements."""
-        # This test documents the PRD requirement
-        # The detector should achieve >95% sensitivity on crisis signals
+        # High urgency for immediate plan
+        result = detector.analyze_crisis("I have a plan to end it all and I'm ready")
 
-        # For now, document as pending
-        pytest.skip("Crisis detection enforcement pending - stub implementation")
+        assert result.urgency.value >= UrgencyLevel.HIGH.value
 
 
 class TestContentFilter:
