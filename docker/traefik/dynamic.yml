@@ -58,11 +58,9 @@ http:
     pixelated-backend:
       loadBalancer:
         servers:
-          - url: "http://app1:3000"
-          - url: "http://app2:3000"
-          - url: "http://app3:3000"
+          - url: "http://pixelated-app:4321"
         healthCheck:
-          path: /health
+          path: /api/health
           interval: 30s
           timeout: 5s
         sticky:
@@ -126,8 +124,3 @@ http:
         - security-headers
       tls:
         certResolver: letsencrypt
-
-# TCP Configuration (if needed for database proxying)
-tcp:
-  routers: {}
-  services: {}

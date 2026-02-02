@@ -1,28 +1,69 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro'
-import { emotionValidationPipeline } from '../../../lib/ai/emotions/EmotionValidationPipeline'
 import { validationRunner } from '../../../lib/ai/validation/ContinuousValidationRunner'
 
 // Define types for the runner state
 interface RunnerState {
-  isScheduled: boolean
+  initialised: boolean
+  historyCount: number
+  isScheduled?: boolean
   schedule?: string
   nextScheduledRun?: string | Date
-  status?: string
-  lastRun?: string | Date
+}
+
+// Define the ValidationStats type locally since Astro files cannot export types
+interface ValidationMetrics {
+  processed: number
+  validated: number
+  errors: number
+  lastRun?: Date
+  biasDetections: number
+  falsePositives: number
+  accuracy?: number
+  averageConfidence?: number
+}
+
+interface ValidationStats {
+  isRunning: boolean
+  metrics: ValidationMetrics
+  recentValidations: unknown[]
+  systemHealth: 'healthy' | 'warning' | 'critical'
+  lastHealthCheck: Date
+  lastRun?: Date
+  runCount?: number
+  totalTests?: number
+  passedTests?: number
+  byModel?: Record<string, { total: number; passed: number }>
 }
 
 // Check if we need to initialize the pipeline
 let validationInitError: string | null = null
-let validationStats: any = null
+let validationStats: ValidationStats | null = {
+  isRunning: false,
+  metrics: {
+    processed: 0,
+    validated: 0,
+    errors: 0,
+    biasDetections: 0,
+    falsePositives: 0,
+  },
+  recentValidations: [],
+  systemHealth: 'healthy',
+  lastHealthCheck: new Date(),
+}
 let runnerState: RunnerState | null = null
 
 try {
   await validationRunner.initialize()
-  validationStats = emotionValidationPipeline.getValidationStats()
-  runnerState = validationRunner.getState() as RunnerState
-} catch (error: any) {
-  validationInitError = error.message
+  const state = validationRunner.getState()
+  runnerState = {
+    ...state,
+    isScheduled: false,
+    schedule: undefined,
+    nextScheduledRun: undefined,
+  } as RunnerState
+} catch (error: unknown) {
+  validationInitError = error instanceof Error ? error.message : String(error)
 }
 
 // Page meta
@@ -76,7 +117,7 @@ const cronSchedules = [
       validationInitError && (
         <div class="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 rounded-md p-4 mb-6">
           <div class="flex items-start">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <svg
                 class="h-5 w-5 text-red-500"
                 viewBox="0 0 20 20"
@@ -172,8 +213,8 @@ const cronSchedules = [
             <p class="text-sm text-gray-500 dark:text-gray-400">Pass Rate</p>
             <p id="pass-rate" class="font-medium">
               {
-                validationStats?.totalTests
-                  ? `${Math.round((validationStats.passedTests / validationStats.totalTests) * 100)}%`
+                validationStats?.totalTests && validationStats?.passedTests
+                  ? `${Math.round((validationStats!.passedTests! / validationStats!.totalTests!) * 100)}%`
                   : 'N/A'
               }
             </p>
