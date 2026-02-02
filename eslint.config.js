@@ -10,11 +10,12 @@ import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
 import json from '@eslint/json'
 import markdown from '@eslint/markdown'
 import css from '@eslint/css'
+import pluginAstro from 'eslint-plugin-astro'
 
 export default tseslint.config(
   // Base JavaScript recommendations
   js.configs.recommended,
-  
+
   // Global ignore patterns (matching OXC config)
   {
     ignores: [
@@ -67,7 +68,7 @@ export default tseslint.config(
     rules: {
       // Disable base no-unused-vars for TypeScript files
       'no-unused-vars': 'off',
-      
+
       // TypeScript ESLint unused vars with OXC-like configuration
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -175,7 +176,7 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      react: pluginReact,
+      'react': pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -194,7 +195,7 @@ export default tseslint.config(
       ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
-      
+
       // React rules (matching OXC)
       'react/jsx-key': 'warn',
       'react/jsx-no-comment-textnodes': 'warn',
@@ -224,7 +225,7 @@ export default tseslint.config(
         },
       ],
       'react/no-array-index-key': 'warn',
-      
+
       // React Hooks rules
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
@@ -257,7 +258,7 @@ export default tseslint.config(
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      vitest: pluginVitest,
+      'vitest': pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -327,5 +328,24 @@ export default tseslint.config(
     files: ['**/*.css'],
     plugins: { css },
     language: 'css/css',
+  },
+
+  // Astro files
+  {
+    files: ['**/*.astro'],
+    plugins: {
+      astro: pluginAstro,
+    },
+    rules: {
+      // Disable unused variable warnings for Astro files
+      // Astro components split frontmatter and template sections,
+      // causing false positives when variables are defined in frontmatter
+      // but used in the template
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+
+      // Use Astro-specific recommended rules
+      ...pluginAstro.configs.recommended.rules,
+    },
   },
 )

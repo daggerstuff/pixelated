@@ -1,8 +1,5 @@
 {
-  "include": [
-    "src",
-    "tests"
-  ],
+  "include": ["src", "tests"],
   "exclude": [
     "**/node_modules/**",
     "business-strategy-cms/node_modules",
@@ -78,15 +75,13 @@
     "pnpm-lock.yaml",
     "prpm.lock",
     "uv.lock",
-    "pixelated.egg-info"
+    "pixelated.egg-info",
   ],
-  "extraPaths": [
-    "stubs"
-  ],
+  "extraPaths": ["stubs"],
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "reportPrivateUsage": false,
-  "pythonVersion": "3.11"
+  "pythonVersion": "3.11",
 }
