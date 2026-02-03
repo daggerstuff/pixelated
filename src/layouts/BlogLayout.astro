@@ -4,6 +4,8 @@ import Navbar from '@/components/mizu/Navbar.astro'
 import Footer from '@/components/mizu/Footer.astro'
 import ToTopButton from '@/components/widgets/ToTopButton.astro'
 import { BlogSearch } from '@/components/BlogSearch'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 
 interface Props {
   title: string
@@ -126,6 +128,8 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
 
     <Footer />
     <ToTopButton />
+    <SpeedInsights />
+    <Analytics />
     <script is:inline>
       function speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)

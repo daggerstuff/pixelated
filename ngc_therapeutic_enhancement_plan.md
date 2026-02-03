@@ -9,6 +9,7 @@
 #### 🔥 CRITICAL TASKS (80% of Phase 1 weight)
 
 ##### 1.1 Download Missing Priority Datasets
+
 **Estimated Time:** 1-2 hours
 **Impact:** 40% of training weight
 
@@ -26,9 +27,11 @@ rclone copy gdrive:datasets/reddit_mental_health/Suicide_Detection.csv ~/dataset
 ```
 
 ##### 1.2 Generate Missing Datasets
+
 **Estimated Time:** 30-60 minutes per dataset
 
 - **Edge Case Synthetic Dataset (10,000 samples):**
+
   ```bash
   python ai/training_ready/scripts/generate_edge_case_synthetic_dataset.py \
     --output ai/training_ready/data/generated/edge_case_synthetic.jsonl \
@@ -36,6 +39,7 @@ rclone copy gdrive:datasets/reddit_mental_health/Suicide_Detection.csv ~/dataset
   ```
 
 - **CPTSD Dataset from Tim Fletcher Transcripts:**
+
   ```bash
   python ai/training_ready/scripts/build_cptsd_dataset_from_transcripts.py \
     --input-dir ~/datasets/gdrive/tier4_voice_persona/Tim\ Fletcher/ \
@@ -43,15 +47,18 @@ rclone copy gdrive:datasets/reddit_mental_health/Suicide_Detection.csv ~/dataset
   ```
 
 ##### 1.3 Quality Optimization
+
 **Estimated Time:** 1-2 hours
 
 - **Deduplication (<1% duplicate rate):**
+
   ```bash
   uv run python ai/training_ready/scripts/enhanced_deduplication.py --dry-run
   uv run python ai/training_ready/scripts/enhanced_deduplication.py --confirm
   ```
 
 - **UTF-8 Encoding Fix:**
+
   ```bash
   python ai/training_ready/scripts/fix_encoding.py \
     --input-dir ~/datasets/consolidated/ \
@@ -59,11 +66,13 @@ rclone copy gdrive:datasets/reddit_mental_health/Suicide_Detection.csv ~/dataset
   ```
 
 - **8-Gate Quality Validation:**
+
   ```bash
   python ai/training_ready/scripts/verify_final_dataset.py --report
   ```
 
 ##### 1.4 Final Compilation
+
 **Estimated Time:** 30-60 minutes
 
 ```bash
@@ -79,19 +88,22 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 ### Phase 2: Baseline Validation (Weeks 3-4) - **PENDING**
 
 #### 2.1 Stage 1 Training
+
 - Launch foundation training
 - Monitor metrics (Empathy: ≥0.70, Therapeutic appropriateness: ≥0.75, Safety: ≥0.80)
 
 #### 2.2 Metrics Analysis
+
 - Generate metrics dashboard
 - Identify specific gaps
 - Decision: Proceed to Phase 3 or optimize current data
 
 ### Phase 3: Conditional Strategic Expansion (Weeks 5-8) - **PENDING**
 
-*Only triggered if Phase 2 metrics show specific gaps*
+#### *Only triggered if Phase 2 metrics show specific gaps*
 
 #### 3.1 Journal Research Searches (6 parallel)
+
 - Psychotherapy Transcripts Search
 - Clinical Reasoning Search
 - Emotion Recognition Search
@@ -100,12 +112,14 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 - Motivational Interviewing Search
 
 #### 3.2 HuggingFace Deep Dive
+
 - Search mental health conversation datasets
 - Search Chain-of-thought reasoning datasets
 - Search emotional support datasets
 - Evaluate and prioritize discoveries
 
 #### 3.3 Integration
+
 - Integrate top 5 discoveries
 - Update manifest
 - Re-run quality validation
@@ -113,35 +127,35 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 
 ## 📊 PROGRESS OVERVIEW (Updated 2026-01-30 20:20 UTC)
 
-| Phase   | Status         | Progress      | Notes                                       |
-| ------- | -------------- | ------------- | ------------------------------------------- |
-| Phase 1 | ⚠️ Extended    | **85% Core** | Missing pipelines identified; integrating all sources |
+| Phase | Status | Progress | Notes |
+| :--- | :--- | :--- | :--- |
+| Phase 1 | ⚠️ Extended | **85% Core** | Missing pipelines identified; integrating all sources |
 | Phase 1b | 🔄 Integration | **0% Start** | YouTube, Academic, Books, NeMo integration (7-11h ETA) |
-| Phase 2 | ⏳ Pending      | 0% Complete   | Blocked on Phase 1 completion               |
-| Phase 3 | ⏳ Pending      | 0% Complete   | Conditional on Phase 2 metrics              |
+| Phase 2 | ⏳ Pending | 0% Complete | Blocked on Phase 1 completion |
+| Phase 3 | ⏳ Pending | 0% Complete | Conditional on Phase 2 metrics |
 
 **Quality Gate**: ALL generated data must meet therapeutic efficacy standards before Phase 1 completion
 **Completeness Gate**: All therapeutic sources integrated (YouTube, Academic, Books, NeMo) before training
 
-### Phase 1 Extended Scope:
+### Phase 1 Extended Scope
+
 - Core (existing): Tim Fletcher, Crisis cleaned, Professional conversations
 - Integration (NEW): YouTube multi-source, Academic research, Books/PDFs, NeMo synthesis
 - **Result**: 60,000+ diverse therapeutic samples vs. incomplete dataset
-
-
-
 
 ## ✅ COMPLETED TASKS (Updated 2026-01-30)
 
 ### Phase 1 Data Processing ✅ 85% COMPLETE
 
 #### 1.1 Priority Dataset Processing ✅ COMPLETE
+
 - ✅ Tier 1 Priority Datasets (1.16GB, 40% training weight) - **COMPLETE**
   - Summary metadata generated for all 3 priority tiers
   - Evidence: priority_1_FINAL_summary.json, priority_2_FINAL_summary.json, priority_3_FINAL_summary.json exist
   - Completion date: ~2026-01-25
 
 #### 1.2 Synthetic Dataset Generation ✅ COMPLETE (PARTIAL - SCALING NEEDED)
+
 - ✅ Edge Case Synthetic Dataset - **50 SAMPLES GENERATED** (target: 10,000)
   - Script: `generate_edge_case_synthetic_dataset.py`
   - Stats tracking: `edge_case_synthetic_stats.json`
@@ -153,6 +167,7 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
   - Completion date: ~2026-01-25
 
 #### 1.3 Quality Optimization ✅ COMPLETE
+
 - ✅ Deduplication (<1% duplicate rate) - **COMPLETE**
   - Reports: `DEDUPLICATION_FINDINGS.md`, `full_deduplication_report.json`, `FULL_DEDUPLICATION_SUMMARY.md`
   - Target achieved: <1% duplicate rate
@@ -170,29 +185,34 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
   - **Action**: Execute verification script for full validation
 
 #### 1.4 Dataset Manifest & S3 Structure ✅ COMPLETE
+
 - ✅ Master manifest created: `s3_manifest.json`
 - ✅ Routing configuration: `dataset_routing_config.json`
 - ✅ Overlap analysis: `dataset_overlap_analysis.json`
 - ✅ Training manifest: `TRAINING_MANIFEST.json`
 
 #### 1.5 Advanced Features ✅ INFRASTRUCTURE READY
+
 - ✅ Long-Running Therapy Extraction - **SCRIPT READY**
   - Script: `extract_long_running_therapy.py` with full CLI options
   - Features: S3 streaming, directory scanning, batch processing, direct S3 upload
   - **Action**: Execute with `--upload-s3` flag
 
 - ✅ Nightmare Fuel Hydration - **INFRASTRUCTURE READY**
+
   - Script: `hydrate_nightmare_scenarios.py`
   - Nvidia NIM API configured
   - Sample outputs: `ultra_nightmares/infant_organ_harvesting_family_demo.txt`
   - **Action**: Run full hydration pipeline
 
 - ✅ Ultra Nightmares Generation - **INFRASTRUCTURE READY**
+
   - Script: `generate_ultra_nightmares.py`
   - Output directories staged
   - **Action**: Execute generation with monitoring
 
 #### 1.6 Crisis Quality & PII Protection ✅ COMPLETE
+
 - ✅ Crisis Dataset Cleaning - **46,191+ HIGH-QUALITY SAMPLES**
   - Script: `filter_crisis_quality.py`
   - PII scrubbing report: `final_dataset/pii_scrubbing_report.json`
@@ -200,6 +220,7 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
   - Integrated with 8-gate validation
 
 #### 1.7 Transcript Integration (ALL SOURCES) ✅ COMPLETE
+
 - ✅ 403+ transcript files processed from multiple sources:
   - Tim Fletcher: 80+ files (CPTSD focus)
   - Understood: ADHD emotional dysregulation content
@@ -212,12 +233,14 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 ### Core Infrastructure ✅
 
 #### Data Sources ✅
+
 - Tim Fletcher integration complete (913 transcripts, 91 processed to training data) ✅
 - Multi-source voice persona integration (Understood, Wu Wei Wisdom, Unfilteredd, etc.) ✅
 - Video transcripts (ALL .notes/transcripts/ sources, 403+ files) ✅
 - 52.20GB dataset confirmed in S3 ✅
 
 #### Configuration ✅
+
 - Training curriculum 2025 finalized ✅
 - Enhanced `extract_long_running_therapy.py` with S3 streaming, upload, and dir scanning ✅
 - Updated `MASTER_TRAINING_EPIC.md` to reflect dataset focus ✅
@@ -226,6 +249,7 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 ## 🎯 IMMEDIATE ACTIONS - PHASE 1 COMPLETION (Copy-Paste Ready)
 
 ### ✅ Already Complete - Verify Only
+
 ```bash
 # 1. Verify Tier 1 Priority datasets (already processed)
 # Evidence: priority_1_FINAL_summary.json, priority_2_FINAL_summary.json, priority_3_FINAL_summary.json exist
@@ -245,6 +269,7 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 ```
 
 ### ⏳ Remaining Tasks - Execute on VPS (uv compatible)
+
 ```bash
 cd ~/pixelated
 
@@ -290,6 +315,7 @@ aws s3 ls s3://pixel-data/final_dataset/ --recursive
 **Status Update (2026-01-30)**: Phase 1 is **85% complete**. Most heavy lifting is done!
 
 All coding agents should:
+
 1. Execute REMAINING TASKS above (not the completed ones)
 2. Document execution results in .memory/50-progress.md
 3. Update .memory/48-completion-verification.md with new completion dates
@@ -299,8 +325,11 @@ All coding agents should:
 **Current focus**: Scale edge cases, verify Tier 3/4 downloads, run quality gates
 
 ## Infrastructure Issue
+
 - **Azure Host Platform**: LOST - Need to find alternative hosting solution
+
 - **Current Options to Explore**:
+
   - OVHcloud AI Training (existing S3 integration)
   - RunPod (GPU-optimized, pay-as-you-go)
   - Lambda Labs (high-performance GPUs)
