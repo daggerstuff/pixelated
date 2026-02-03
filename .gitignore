@@ -239,3 +239,6 @@ ssl/**/*.pem
 ssl/**/*.crt
 ssl/**/*.csr
 ssl/backup/
+
+.ralph
+.zed
