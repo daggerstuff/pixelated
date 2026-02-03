@@ -1,0 +1,42 @@
+# NVIDIA NeMo Customizer for Precision Fine-Tuning
+# Part of Priority #5
+
+services:
+  nemo-customizer:
+    image: nvcr.io/nvidia/nemo-microservices/customizer:25.12
+    container_name: nemo-customizer
+    environment:
+      - DATABASE_URL=postgresql://nmp:nmp@nemo-postgres:5432/customizer
+      - PORT=8001
+      - MODELS_CACHE_PATH=/mount/models
+      - NGC_API_KEY=${NVIDIA_API_KEY}
+      - ENTITY_STORE_URL=http://nemo-entity-store:8000
+      - NEMO_DATA_STORE_URL=http://nemo-datastore:3000
+    volumes:
+      - nemo_customizer_model_cache:/mount/models
+      - nemo_customizer_workspace:/mount/workspace
+      - ./ai/training_data_consolidated/final:/app/data/training # Mapping local consolidated data
+    ports:
+      - "8001:8001"
+    depends_on:
+      nemo-postgres:
+        condition: service_healthy
+      nemo-datastore:
+        condition: service_started
+    networks:
+      - nemo-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+
+volumes:
+  nemo_customizer_model_cache:
+  nemo_customizer_workspace:
+
+networks:
+  nemo-network:
+    external: true
