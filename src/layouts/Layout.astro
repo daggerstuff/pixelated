@@ -1,5 +1,6 @@
 ---
 // Theme CSS files are linked directly from public folder for SSR compatibility
+import { Analytics } from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
 
 interface Props {
@@ -26,6 +27,8 @@ const { cspNonce } = Astro.locals;
     <meta name="theme-color" content="#000000" />
     <title>{title} | Pixelated Empathy</title>
     <meta name="description" content={description} />
+
+    <Analytics />
 
     <!-- Social media meta tags -->
     <meta property="og:title" content={title} />

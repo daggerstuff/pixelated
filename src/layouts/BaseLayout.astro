@@ -4,6 +4,7 @@ import "@/styles/main.css";
 import "@/styles/prose.css";
 import "@/styles/markdown.css";
 import "@/styles/page.css";
+import { Analytics } from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
 
 import Head from "@/components/base/Head.astro";
@@ -70,6 +71,8 @@ if (hasCustomCursor) style["--external-link-cursor"] = cursorType;
 <html lang={SITE.lang} class="dark scroll-smooth">
   <head>
     <Head {title} {description} {ogImage} {pubDate} {lastModDate} />
+
+    <Analytics />
 
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0f172a" />
