@@ -233,3 +233,9 @@ config/secrets/*
 !config/secrets/*.example
 docker/.env
 docker/config/secrets/
+
+# SSL and Certificates
+ssl/**/*.pem
+ssl/**/*.crt
+ssl/**/*.csr
+ssl/backup/
