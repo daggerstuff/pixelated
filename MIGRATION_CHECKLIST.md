@@ -40,9 +40,10 @@
   - [x] Build production Docker image (Node 24 base)
   - [x] Launch stack: `docker compose -f docker/docker-compose.production.yml up -d`
   - [ ] Verify SSL via Let's Encrypt
-- [ ] **2.4 Health & Monitoring**
+- [x] **2.4 Health & Monitoring**
   - [x] Verify `/api/health` responsiveness (App is UP and Healthy)
-  - [x] Confirm Prometheus/Grafana metric collection (Loki config fixed and deployed to production)
+  - [x] Confirm Prometheus/Grafana metric collection (Fixed Loki & Redis config)
+  - [x] Remediate hardcoded secrets (Scrubbed history & cleaned code)
 
 
 ---
