@@ -242,3 +242,8 @@ ssl/backup/
 
 .ralph
 .zed
+.autoswitch_venv
+.codexignore
+.kilocodemodes
+.markdownlintignore
+.ralphrc
