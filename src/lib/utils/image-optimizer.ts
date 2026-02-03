@@ -7,6 +7,7 @@ import { readFile, mkdir } from 'fs/promises'
 import { existsSync, statSync } from 'fs'
 import { join } from 'path'
 import { getLogger } from '@/lib/logging'
+import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = getLogger('image-optimizer')
 
@@ -101,6 +102,11 @@ export class ImageOptimizer {
     const startTime = Date.now()
 
     try {
+      // Security: Validate path to prevent traversal
+      if (!validatePath(imagePath, [ALLOWED_DIRECTORIES.PUBLIC, ALLOWED_DIRECTORIES.ASSETS])) {
+        throw new Error(`Access denied: Path is outside allowed directories: ${imagePath}`)
+      }
+
       // Check if file exists
       if (!existsSync(imagePath)) {
         throw new Error(`Image file not found: ${imagePath}`)
