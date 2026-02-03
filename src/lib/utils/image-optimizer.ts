@@ -79,7 +79,7 @@ export class ImageOptimizer {
       IMAGE_CONFIG.OUTPUT_DIRS.webp,
       IMAGE_CONFIG.OUTPUT_DIRS.avif,
     ]
-    this.ensureOutputDirectories()
+    void this.ensureOutputDirectories()
   }
 
   /**
@@ -99,6 +99,13 @@ export class ImageOptimizer {
    * Optimize a single image
    */
   async optimizeImage(imagePath: string): Promise<OptimizationResult> {
+    // Validate path to prevent traversal attacks
+    try {
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+    } catch (error) {
+      throw new Error(`Invalid image path: ${error instanceof Error ? error.message : String(error)}`)
+    }
+
     const startTime = Date.now()
 
     try {
