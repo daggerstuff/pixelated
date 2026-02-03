@@ -10,17 +10,20 @@ import logging
 import os
 import subprocess
 import sys
-import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
+
+import redis
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import SQLAlchemyError
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class EnhancedSystemDeployer:
     """Deploys enhanced bias detection system components"""
@@ -30,32 +33,32 @@ class EnhancedSystemDeployer:
         self.deployment_config = self.load_deployment_config()
         self.deployment_log = []
 
-    def load_deployment_config(self) -> Dict[str, Any]:
+    def load_deployment_config(self) -> dict[str, Any]:
         """Load deployment configuration"""
-        config_path = self.project_root / 'config' / 'deployment.json'
+        config_path = self.project_root / "config" / "deployment.json"
         if config_path.exists():
-            with open(config_path, 'r') as f:
+            with open(config_path) as f:
                 return json.load(f)
         return {
-            'services': {
-                'bias_detection': {'port': 8001, 'workers': 4},
-                'training_service': {'port': 8002, 'workers': 2},
-                'memory_service': {'port': 8003, 'workers': 2}
+            "services": {
+                "bias_detection": {"port": 8001, "workers": 4},
+                "training_service": {"port": 8002, "workers": 2},
+                "memory_service": {"port": 8003, "workers": 2},
             },
-            'environments': {
-                'development': {'debug': True, 'log_level': 'INFO'},
-                'staging': {'debug': False, 'log_level': 'WARNING'},
-                'production': {'debug': False, 'log_level': 'ERROR'}
-            }
+            "environments": {
+                "development": {"debug": True, "log_level": "INFO"},
+                "staging": {"debug": False, "log_level": "WARNING"},
+                "production": {"debug": False, "log_level": "ERROR"},
+            },
         }
 
     def log_deployment_step(self, step: str, status: str, details: str = ""):
         """Log deployment step"""
         log_entry = {
-            'timestamp': datetime.now().isoformat(),
-            'step': step,
-            'status': status,
-            'details': details
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "step": step,
+            "status": status,
+            "details": details,
         }
         self.deployment_log.append(log_entry)
         logger.info(f"[{status.upper()}] {step}: {details}")
@@ -70,13 +73,24 @@ class EnhancedSystemDeployer:
             if python_version < (3, 8):
                 self.log_deployment_step("Python Version", "failed", "Python 3.8+ required")
                 return False
-            self.log_deployment_step("Python Version", "passed", f"Python {python_version.major}.{python_version.minor}")
+            self.log_deployment_step(
+                "Python Version", "passed", f"Python {python_version.major}.{python_version.minor}"
+            )
 
             # Check required packages
             required_packages = [
-                'fastapi', 'uvicorn', 'pydantic', 'sqlalchemy',
-                'redis', 'psycopg2-binary', 'fairlearn', 'transformers',
-                'torch', 'numpy', 'pandas', 'scikit-learn'
+                "fastapi",
+                "uvicorn",
+                "pydantic",
+                "sqlalchemy",
+                "redis",
+                "psycopg2-binary",
+                "fairlearn",
+                "transformers",
+                "torch",
+                "numpy",
+                "pandas",
+                "scikit-learn",
             ]
 
             for package in required_packages:
@@ -84,18 +98,25 @@ class EnhancedSystemDeployer:
                     __import__(package)
                     self.log_deployment_step(f"Package {package}", "passed")
                 except ImportError:
-                    self.log_deployment_step(f"Package {package}", "failed", "Package not installed")
+                    self.log_deployment_step(
+                        f"Package {package}", "failed", "Package not installed"
+                    )
                     return False
 
             # Check environment variables
             required_env_vars = [
-                'DATABASE_URL', 'REDIS_URL', 'JWT_SECRET_KEY',
-                'IEEE_API_KEY', 'SENTRY_DSN'
+                "DATABASE_URL",
+                "REDIS_URL",
+                "JWT_SECRET_KEY",
+                "IEEE_API_KEY",
+                "SENTRY_DSN",
             ]
 
             for env_var in required_env_vars:
                 if not os.getenv(env_var):
-                    self.log_deployment_step(f"Environment {env_var}", "warning", "Variable not set")
+                    self.log_deployment_step(
+                        f"Environment {env_var}", "warning", "Variable not set"
+                    )
                 else:
                     self.log_deployment_step(f"Environment {env_var}", "passed")
 
@@ -111,11 +132,10 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Database Setup", "started")
 
         try:
-            from sqlalchemy import create_engine, text
-            from sqlalchemy.exc import SQLAlchemyError
-
             # Create database engine
-            database_url = os.getenv('DATABASE_URL', 'postgresql://localhost:5432/pixelated_bias_detection')
+            database_url = os.getenv(
+                "DATABASE_URL", "postgresql://localhost:5432/pixelated_bias_detection"
+            )
             engine = create_engine(database_url)
 
             # Create schema
@@ -185,9 +205,7 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Redis Setup", "started")
 
         try:
-            import redis
-
-            redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
             r = redis.from_url(redis_url)
 
             # Test connection
@@ -195,10 +213,10 @@ class EnhancedSystemDeployer:
 
             # Setup cache keys
             cache_keys = [
-                'bias_detection:patterns:*',
-                'training:scenarios:*',
-                'memory:updates:*',
-                'performance:metrics:*'
+                "bias_detection:patterns:*",
+                "training:scenarios:*",
+                "memory:updates:*",
+                "performance:metrics:*",
             ]
 
             # Clear existing cache
@@ -218,20 +236,24 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Bias Detection Service", "started")
 
         try:
-            service_path = self.project_root / 'src' / 'lib' / 'ai' / 'bias-detection' / 'python-service'
+            service_path = (
+                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
+            )
 
             if not service_path.exists():
-                self.log_deployment_step("Bias Detection Service", "failed", "Service directory not found")
+                self.log_deployment_step(
+                    "Bias Detection Service", "failed", "Service directory not found"
+                )
                 return False
 
             # Copy deployment files
             deployment_files = [
-                'bias_detection_service.py',
-                'real_ml_models.py',
-                'tasks.py',
-                'performance_optimization.py',
-                'real_time_integration.py',
-                'ieee_xplore_integration.py'
+                "bias_detection_service.py",
+                "real_ml_models.py",
+                "tasks.py",
+                "performance_optimization.py",
+                "real_time_integration.py",
+                "ieee_xplore_integration.py",
             ]
 
             for file_name in deployment_files:
@@ -243,17 +265,19 @@ class EnhancedSystemDeployer:
 
             # Create service configuration
             config = {
-                'service_name': 'bias_detection',
-                'port': self.deployment_config['services']['bias_detection']['port'],
-                'workers': self.deployment_config['services']['bias_detection']['workers'],
-                'environment': os.getenv('ENVIRONMENT', 'development')
+                "service_name": "bias_detection",
+                "port": self.deployment_config["services"]["bias_detection"]["port"],
+                "workers": self.deployment_config["services"]["bias_detection"]["workers"],
+                "environment": os.getenv("ENVIRONMENT", "development"),
             }
 
-            config_path = service_path / 'service_config.json'
-            with open(config_path, 'w') as f:
+            config_path = service_path / "service_config.json"
+            with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
-            self.log_deployment_step("Bias Detection Service", "completed", "Service deployed successfully")
+            self.log_deployment_step(
+                "Bias Detection Service", "completed", "Service deployed successfully"
+            )
             return True
 
         except Exception as e:
@@ -265,10 +289,12 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Training Service", "started")
 
         try:
-            service_path = self.project_root / 'src' / 'lib' / 'ai' / 'bias-detection' / 'python-service'
+            service_path = (
+                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
+            )
 
             # Deploy training scenarios module
-            training_module = service_path / 'advanced_training_scenarios.py'
+            training_module = service_path / "advanced_training_scenarios.py"
             if training_module.exists():
                 self.log_deployment_step("Training Scenarios Module", "passed")
             else:
@@ -277,17 +303,23 @@ class EnhancedSystemDeployer:
 
             # Create service configuration
             config = {
-                'service_name': 'training_service',
-                'port': self.deployment_config['services']['training_service']['port'],
-                'workers': self.deployment_config['services']['training_service']['workers'],
-                'training_modules': ['cultural_competency', 'trauma_informed_care', 'bias_awareness']
+                "service_name": "training_service",
+                "port": self.deployment_config["services"]["training_service"]["port"],
+                "workers": self.deployment_config["services"]["training_service"]["workers"],
+                "training_modules": [
+                    "cultural_competency",
+                    "trauma_informed_care",
+                    "bias_awareness",
+                ],
             }
 
-            config_path = service_path / 'training_config.json'
-            with open(config_path, 'w') as f:
+            config_path = service_path / "training_config.json"
+            with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
-            self.log_deployment_step("Training Service", "completed", "Service deployed successfully")
+            self.log_deployment_step(
+                "Training Service", "completed", "Service deployed successfully"
+            )
             return True
 
         except Exception as e:
@@ -299,10 +331,12 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Memory Service", "started")
 
         try:
-            service_path = self.project_root / 'src' / 'lib' / 'ai' / 'bias-detection' / 'python-service'
+            service_path = (
+                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
+            )
 
             # Deploy memory update module
-            memory_module = service_path / 'automated_memory_updates.py'
+            memory_module = service_path / "automated_memory_updates.py"
             if memory_module.exists():
                 self.log_deployment_step("Memory Update Module", "passed")
             else:
@@ -311,15 +345,15 @@ class EnhancedSystemDeployer:
 
             # Create service configuration
             config = {
-                'service_name': 'memory_service',
-                'port': self.deployment_config['services']['memory_service']['port'],
-                'workers': self.deployment_config['services']['memory_service']['workers'],
-                'update_interval': 300,  # 5 minutes
-                'max_memory_size': 1000  # MB
+                "service_name": "memory_service",
+                "port": self.deployment_config["services"]["memory_service"]["port"],
+                "workers": self.deployment_config["services"]["memory_service"]["workers"],
+                "update_interval": 300,  # 5 minutes
+                "max_memory_size": 1000,  # MB
             }
 
-            config_path = service_path / 'memory_config.json'
-            with open(config_path, 'w') as f:
+            config_path = service_path / "memory_config.json"
+            with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
             self.log_deployment_step("Memory Service", "completed", "Service deployed successfully")
@@ -336,25 +370,27 @@ class EnhancedSystemDeployer:
         try:
             # Create monitoring configuration
             monitoring_config = {
-                'metrics': {
-                    'bias_detection_requests': 'counter',
-                    'bias_detection_errors': 'counter',
-                    'training_scenarios_generated': 'counter',
-                    'memory_updates': 'counter',
-                    'system_performance': 'gauge'
+                "metrics": {
+                    "bias_detection_requests": "counter",
+                    "bias_detection_errors": "counter",
+                    "training_scenarios_generated": "counter",
+                    "memory_updates": "counter",
+                    "system_performance": "gauge",
                 },
-                'alerts': {
-                    'high_error_rate': {'threshold': 0.05, 'window': '5m'},
-                    'high_latency': {'threshold': 1000, 'window': '1m'},
-                    'low_memory': {'threshold': 100, 'window': '1m'}
-                }
+                "alerts": {
+                    "high_error_rate": {"threshold": 0.05, "window": "5m"},
+                    "high_latency": {"threshold": 1000, "window": "1m"},
+                    "low_memory": {"threshold": 100, "window": "1m"},
+                },
             }
 
-            config_path = self.project_root / 'config' / 'monitoring.json'
-            with open(config_path, 'w') as f:
+            config_path = self.project_root / "config" / "monitoring.json"
+            with open(config_path, "w") as f:
                 json.dump(monitoring_config, f, indent=2)
 
-            self.log_deployment_step("Monitoring Setup", "completed", "Monitoring configured successfully")
+            self.log_deployment_step(
+                "Monitoring Setup", "completed", "Monitoring configured successfully"
+            )
             return True
 
         except Exception as e:
@@ -373,32 +409,32 @@ class EnhancedSystemDeployer:
 echo "Starting Enhanced Bias Detection Services..."
 
 # Set environment variables
-export ENVIRONMENT={os.getenv('ENVIRONMENT', 'development')}
-export DATABASE_URL={os.getenv('DATABASE_URL', 'postgresql://localhost:5432/pixelated_bias_detection')}
-export REDIS_URL={os.getenv('REDIS_URL', 'redis://localhost:6379/0')}
+export ENVIRONMENT={os.getenv("ENVIRONMENT", "development")}
+export DATABASE_URL={os.getenv("DATABASE_URL", "postgresql://localhost:5432/pixelated_bias_detection")}
+export REDIS_URL={os.getenv("REDIS_URL", "redis://localhost:6379/0")}
 
 # Start bias detection service
-echo "Starting Bias Detection Service on port {self.deployment_config['services']['bias_detection']['port']}..."
+echo "Starting Bias Detection Service on port {self.deployment_config["services"]["bias_detection"]["port"]}..."
 cd {self.project_root}/src/lib/ai/bias-detection/python-service
-uvicorn bias_detection_service:app --host 0.0.0.0 --port {self.deployment_config['services']['bias_detection']['port']} --workers {self.deployment_config['services']['bias_detection']['workers']} &
+uvicorn bias_detection_service:app --host 0.0.0.0 --port {self.deployment_config["services"]["bias_detection"]["port"]} --workers {self.deployment_config["services"]["bias_detection"]["workers"]} &
 
 # Start training service
-echo "Starting Training Service on port {self.deployment_config['services']['training_service']['port']}..."
-uvicorn advanced_training_scenarios:app --host 0.0.0.0 --port {self.deployment_config['services']['training_service']['port']} --workers {self.deployment_config['services']['training_service']['workers']} &
+echo "Starting Training Service on port {self.deployment_config["services"]["training_service"]["port"]}..."
+uvicorn advanced_training_scenarios:app --host 0.0.0.0 --port {self.deployment_config["services"]["training_service"]["port"]} --workers {self.deployment_config["services"]["training_service"]["workers"]} &
 
 # Start memory service
-echo "Starting Memory Service on port {self.deployment_config['services']['memory_service']['port']}..."
-uvicorn automated_memory_updates:app --host 0.0.0.0 --port {self.deployment_config['services']['memory_service']['port']} --workers {self.deployment_config['services']['memory_service']['workers']} &
+echo "Starting Memory Service on port {self.deployment_config["services"]["memory_service"]["port"]}..."
+uvicorn automated_memory_updates:app --host 0.0.0.0 --port {self.deployment_config["services"]["memory_service"]["port"]} --workers {self.deployment_config["services"]["memory_service"]["workers"]} &
 
 echo "All services started successfully!"
 echo "Services available at:"
-echo "  - Bias Detection: http://localhost:{self.deployment_config['services']['bias_detection']['port']}"
-echo "  - Training Service: http://localhost:{self.deployment_config['services']['training_service']['port']}"
-echo "  - Memory Service: http://localhost:{self.deployment_config['services']['memory_service']['port']}"
+echo "  - Bias Detection: http://localhost:{self.deployment_config["services"]["bias_detection"]["port"]}"
+echo "  - Training Service: http://localhost:{self.deployment_config["services"]["training_service"]["port"]}"
+echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["memory_service"]["port"]}"
 """
 
-            script_path = self.project_root / 'scripts' / 'start_enhanced_services.sh'
-            with open(script_path, 'w') as f:
+            script_path = self.project_root / "scripts" / "start_enhanced_services.sh"
+            with open(script_path, "w") as f:
                 f.write(startup_script)
 
             # Make script executable
@@ -417,51 +453,53 @@ echo "  - Memory Service: http://localhost:{self.deployment_config['services']['
 
         try:
             # Run validation script
-            validation_script = self.project_root / 'scripts' / 'validate_deployment.py'
+            validation_script = self.project_root / "scripts" / "validate_deployment.py"
 
             if validation_script.exists():
                 result = subprocess.run(
                     [sys.executable, str(validation_script)],
                     capture_output=True,
                     text=True,
-                    timeout=300  # 5 minutes timeout
+                    timeout=300,  # 5 minutes timeout
+                    shell=False,
+                    check=False,
                 )
 
                 if result.returncode == 0:
                     self.log_deployment_step("Integration Tests", "completed", "All tests passed")
                     return True
-                else:
-                    self.log_deployment_step("Integration Tests", "failed", result.stderr)
-                    return False
-            else:
-                self.log_deployment_step("Integration Tests", "warning", "Validation script not found")
-                return True  # Allow deployment to continue
+                self.log_deployment_step("Integration Tests", "failed", result.stderr)
+                return False
+            self.log_deployment_step("Integration Tests", "warning", "Validation script not found")
+            return True  # Allow deployment to continue
 
         except Exception as e:
             self.log_deployment_step("Integration Tests", "failed", str(e))
             return False
 
-    async def generate_deployment_report(self) -> Dict[str, Any]:
+    async def generate_deployment_report(self) -> dict[str, Any]:
         """Generate deployment report"""
         report = {
-            'deployment_timestamp': datetime.now().isoformat(),
-            'environment': os.getenv('ENVIRONMENT', 'development'),
-            'services': self.deployment_config['services'],
-            'deployment_log': self.deployment_log,
-            'status': 'completed'
+            "deployment_timestamp": datetime.now(timezone.utc).isoformat(),
+            "environment": os.getenv("ENVIRONMENT", "development"),
+            "services": self.deployment_config["services"],
+            "deployment_log": self.deployment_log,
+            "status": "completed",
         }
 
         # Calculate success rate
         total_steps = len(self.deployment_log)
-        successful_steps = sum(1 for log in self.deployment_log if log['status'] in ['passed', 'completed'])
-        report['success_rate'] = successful_steps / total_steps if total_steps > 0 else 0
+        successful_steps = sum(
+            1 for log in self.deployment_log if log["status"] in ["passed", "completed"]
+        )
+        report["success_rate"] = successful_steps / total_steps if total_steps > 0 else 0
 
         return report
 
     async def deploy_all(self) -> bool:
         """Deploy all enhanced system components"""
         logger.info("🚀 Starting Enhanced Bias Detection System Deployment")
-        print("=" * 60)
+        logger.info("=" * 60)
 
         deployment_steps = [
             ("Prerequisites", self.check_prerequisites),
@@ -472,7 +510,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config['services']['
             ("Memory Service", self.deploy_memory_service),
             ("Monitoring Setup", self.setup_monitoring),
             ("Service Startup", self.start_services),
-            ("Integration Tests", self.run_integration_tests)
+            ("Integration Tests", self.run_integration_tests),
         ]
 
         failed_steps = []
@@ -485,33 +523,32 @@ echo "  - Memory Service: http://localhost:{self.deployment_config['services']['
                     logger.error(f"❌ Deployment step failed: {step_name}")
             except Exception as e:
                 failed_steps.append(step_name)
-                logger.error(f"❌ Deployment step error: {step_name} - {str(e)}")
+                logger.error(f"❌ Deployment step error: {step_name} - {e!s}")
 
         # Generate final report
         report = await self.generate_deployment_report()
 
-        print("\n" + "=" * 60)
-        print("📊 DEPLOYMENT SUMMARY")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("📊 DEPLOYMENT SUMMARY")
+        logger.info("=" * 60)
 
         if failed_steps:
-            print(f"❌ Deployment completed with failures:")
+            logger.error("❌ Deployment completed with failures:")
             for step in failed_steps:
-                print(f"   - {step}")
-            print(f"\nSuccess Rate: {report['success_rate']:.2%}")
+                logger.error(f"   - {step}")
+            logger.info(f"\nSuccess Rate: {report['success_rate']:.2%}")
             return False
-        else:
-            print("✅ All deployment steps completed successfully!")
-            print(f"Success Rate: {report['success_rate']:.2%}")
+        logger.info("✅ All deployment steps completed successfully!")
+        logger.info(f"Success Rate: {report['success_rate']:.2%}")
 
-            # Save deployment report
-            report_file = self.project_root / 'deployment_report.json'
-            with open(report_file, 'w') as f:
-                json.dump(report, f, indent=2)
+        # Save deployment report
+        report_file = self.project_root / "deployment_report.json"
+        with open(report_file, "w") as f:
+            json.dump(report, f, indent=2)
 
-            print(f"\n📋 Deployment report saved to: {report_file}")
+        logger.info(f"\n📋 Deployment report saved to: {report_file}")
 
-            return True
+        return True
 
 
 async def main():
@@ -521,18 +558,17 @@ async def main():
     success = await deployer.deploy_all()
 
     if success:
-        print("\n🎉 Enhanced Bias Detection System deployment completed successfully!")
-        print("\nNext steps:")
-        print("1. Run the startup script: ./scripts/start_enhanced_services.sh")
-        print("2. Monitor service health and logs")
-        print("3. Run validation tests: python scripts/deploy/validate_deployment.py")
+        logger.info("\n🎉 Enhanced Bias Detection System deployment completed successfully!")
+        logger.info("\nNext steps:")
+        logger.info("1. Run the startup script: ./scripts/start_enhanced_services.sh")
+        logger.info("2. Monitor service health and logs")
+        logger.info("3. Run validation tests: python scripts/deploy/validate_deployment.py")
         return 0
-    else:
-        print("\n❌ Enhanced Bias Detection System deployment failed!")
-        print("\nPlease review the deployment log and address any issues.")
-        return 1
+    logger.error("\n❌ Enhanced Bias Detection System deployment failed!")
+    logger.error("\nPlease review the deployment log and address any issues.")
+    return 1
 
 
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
-    exit(exit_code)
+    sys.exit(exit_code)
