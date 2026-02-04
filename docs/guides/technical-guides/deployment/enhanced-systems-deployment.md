@@ -36,7 +36,7 @@ pip install scholarly==1.6.0
 
 # Performance optimization
 pip install numpy==1.23.0
-pip install pandas==1.4.0
+pip install pandas==3.0.0
 pip install scikit-learn==1.1.0
 pip install joblib==1.1.0
 
