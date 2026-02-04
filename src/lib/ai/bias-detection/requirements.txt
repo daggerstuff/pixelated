@@ -106,7 +106,7 @@ executing==2.2.1
     # via stack-data
 fairlearn==0.13.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-filelock==3.20.1
+filelock==3.20.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets
