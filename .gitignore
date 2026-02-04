@@ -203,3 +203,5 @@ ssl/**/*.crt
 ssl/**/*.csr
 ssl/backup/
 !/.env.example
+
+CRUSH.md

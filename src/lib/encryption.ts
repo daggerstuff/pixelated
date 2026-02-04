@@ -1,12 +1,19 @@
 import { Buffer } from 'node:buffer'
 import { webcrypto } from 'node:crypto'
-import process from 'node:process'
+
 
 interface EncryptedData {
   iv: string
   data: string
   tag: string
   salt: string
+}
+
+/**
+ * Standard ErrorOptions interface for environments where it's missing
+ */
+interface ErrorOptions {
+  cause?: unknown
 }
 
 const ALGORITHM = 'AES-GCM'
@@ -17,12 +24,17 @@ const IV_LENGTH = 12 // 96 bits for GCM
 const MIN_PASSWORD_LENGTH = 32
 const ITERATIONS = 100000
 
+import { config } from '../config/env.config'
+
 async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
-  if (!process.env['ENCRYPTION_KEY']) {
+  const encryptionKey = config.security.encryption.key()
+
+  if (!encryptionKey) {
     throw new Error('ENCRYPTION_KEY environment variable is required')
   }
 
-  if (process.env['ENCRYPTION_KEY'].length < MIN_PASSWORD_LENGTH) {
+  // Zod validation in env.config.ts ensures minimum length, but we double-check here for safety
+  if (encryptionKey.length < MIN_PASSWORD_LENGTH) {
     throw new Error(
       `Encryption key must be at least ${MIN_PASSWORD_LENGTH} characters long`,
     )
@@ -32,7 +44,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder()
   const keyMaterial = await webcrypto.subtle.importKey(
     'raw',
-    encoder.encode(process.env['ENCRYPTION_KEY']),
+    encoder.encode(encryptionKey),
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey'],
@@ -42,7 +54,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   return webcrypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: Buffer.from(salt),
       iterations: ITERATIONS,
       hash: 'SHA-256',
     },
@@ -50,7 +62,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
     { name: ALGORITHM, length: 256 },
     false,
     ['encrypt', 'decrypt'],
-  )
+  ) as Promise<CryptoKey>
 }
 
 function validateInput(data: unknown): void {
@@ -88,19 +100,16 @@ export async function encrypt(data: unknown): Promise<string> {
     const encrypted = await webcrypto.subtle.encrypt(
       {
         name: ALGORITHM,
-        iv,
+        iv: Buffer.from(iv),
         tagLength: TAG_LENGTH * 8, // Convert bytes to bits
       },
       key,
-      encodedData,
+      Buffer.from(encodedData),
     )
 
     // Split the encrypted data and auth tag
     const encryptedBytes = new Uint8Array(encrypted)
-    const encryptedData = encryptedBytes.slice(
-      0,
-      encrypted.byteLength - TAG_LENGTH,
-    )
+    const encryptedData = encryptedBytes.slice(0, encrypted.byteLength - TAG_LENGTH)
     const tag = encryptedBytes.slice(encrypted.byteLength - TAG_LENGTH)
 
     // Convert to base64 for storage/transmission
@@ -113,7 +122,9 @@ export async function encrypt(data: unknown): Promise<string> {
 
     return JSON.stringify(result)
   } catch (error: unknown) {
-    throw new Error(`Encryption failed: ${(error as Error).message}`, {
+    throw new (Error as {
+      new(message: string, options?: ErrorOptions): Error
+    })(`Encryption failed: ${(error as Error).message}`, {
       cause: error,
     })
   }
@@ -154,18 +165,20 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     const decrypted = await webcrypto.subtle.decrypt(
       {
         name: ALGORITHM,
-        iv: new Uint8Array(ivArray),
+        iv: Buffer.from(ivArray),
         tagLength: TAG_LENGTH * 8,
       },
       key,
-      encryptedWithTag,
+      Buffer.from(encryptedWithTag),
     )
 
     // Decode and parse result
     const decoder = new TextDecoder()
     return JSON.parse(decoder.decode(decrypted))
   } catch (error: unknown) {
-    throw new Error(`Decryption failed: ${(error as Error).message}`, {
+    throw new (Error as {
+      new(message: string, options?: ErrorOptions): Error
+    })(`Decryption failed: ${(error as Error).message}`, {
       cause: error,
     })
   }

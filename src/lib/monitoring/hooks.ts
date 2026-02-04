@@ -12,9 +12,7 @@ export function useMonitoring() {
 
   const trackEvent = useCallback(
     (eventName: string, properties?: Record<string, unknown>) => {
-      // @ts-expect-error - Faro is loaded globally
       if (window.faro) {
-        // @ts-expect-error - Faro is loaded globally
         window.faro.api.pushEvent(eventName, properties)
       }
     },
@@ -23,9 +21,7 @@ export function useMonitoring() {
 
   const trackError = useCallback(
     (error: Error, context?: Record<string, unknown>) => {
-      // @ts-expect-error - Faro is loaded globally
       if (window.faro) {
-        // @ts-expect-error - Faro is loaded globally
         window.faro.api.pushError(error, context)
       }
     },
@@ -34,9 +30,7 @@ export function useMonitoring() {
 
   const trackMetric = useCallback(
     (name: string, value: number, unit?: string) => {
-      // @ts-expect-error - Faro is loaded globally
       if (window.faro) {
-        // @ts-expect-error - Faro is loaded globally
         window.faro.api.pushMeasurement(name, {
           value,
           unit,
@@ -138,7 +132,7 @@ export function useRUMData() {
 
   // Fetch data on mount and provide refresh function
   useEffect(() => {
-    fetchRUMData()
+    void fetchRUMData()
   }, [fetchRUMData])
 
   return {
