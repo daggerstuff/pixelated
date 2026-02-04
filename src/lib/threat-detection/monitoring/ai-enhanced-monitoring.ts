@@ -157,8 +157,8 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       enableAIInsights: config.enableAIInsights ?? true,
     } as MonitoringConfig;
 
-    this.redis = redis
-    this.mongoClient = mongoClient
+    this.redis = redis as Redis
+    this.mongoClient = mongoClient as MongoClient
     this.aiService = aiService
     this.orchestrator = orchestrator
     if (!this.redis || !this.mongoClient) {
