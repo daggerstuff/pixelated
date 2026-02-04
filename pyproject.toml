@@ -50,7 +50,7 @@ dependencies = [
   "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
-  "transformers>=4.35.0", # Required for dataset_pipeline training_runner
+  "transformers>=5.0.0", # Required for dataset_pipeline training_runner
   "torch>=2.6.0,<3.0.0", # Fixes CVE-2025-32434 affecting versions ≤2.5.1
   "gguf>=0.10.0",
   "ruff>=0.12.5",
