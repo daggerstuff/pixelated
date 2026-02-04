@@ -97,7 +97,6 @@ dependencies = [
   "onnx>=1.20.0",
   "onnxscript>=0.5.7",
   "mem0-mcp-server>=0.2.1",
-  "zep-cloud>=3.14.0",
   "fastapi>=0.124.4",
   "uvicorn>=0.38.0",
   "minio>=7.2.20",
@@ -108,6 +107,11 @@ dependencies = [
   "clickhouse-driver>=0.2.10",
   "semgrep>=1.79.0",
   "pyright>=1.1.408",
+  "mem0ai>=1.0.2",
+  "pydantic-ai>=1.22.0",
+  "nest-asyncio>=1.6.0",
+  "uv>=0.9.28",
+  "google-genai>=1.61.0",
 ]
 [project.optional-dependencies]
 test = [

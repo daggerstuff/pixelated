@@ -10,7 +10,7 @@ export class PerformanceLogger {
 
   private constructor() {
     this.logDir = process.env['LOG_DIR'] || './logs/performance'
-    this.initializeLogDir()
+    void this.initializeLogDir()
     this.startPeriodicFlush()
   }
 
@@ -21,7 +21,7 @@ export class PerformanceLogger {
     return PerformanceLogger.instance
   }
 
-  private async initializeLogDir() {
+  private async initializeLogDir(): Promise<void> {
     try {
       const fs = await import('node:fs/promises')
       await fs.mkdir(this.logDir, { recursive: true })
@@ -38,7 +38,7 @@ export class PerformanceLogger {
     }, this.FLUSH_INTERVAL)
   }
 
-  public async logMetric(metric: PerformanceMetrics): void {
+  public async logMetric(metric: PerformanceMetrics): Promise<void> {
     this.metricsBuffer.push(metric)
 
     // Log warnings for performance issues
@@ -60,7 +60,7 @@ export class PerformanceLogger {
     }
   }
 
-  private async flushMetricsBuffer() {
+  private async flushMetricsBuffer(): Promise<void> {
     if (this.metricsBuffer.length === 0) {
       return
     }
@@ -75,19 +75,20 @@ export class PerformanceLogger {
         .join('\n')}\n`
       await fs.appendFile(logFile, metricsToWrite)
 
+      const flushedCount = this.metricsBuffer.length
       // Clear the buffer
       this.metricsBuffer = []
 
       // Log summary
       logger.info(
-        `Flushed ${this.metricsBuffer.length} performance metrics to ${logFile}`,
+        `Flushed ${flushedCount} performance metrics to ${logFile}`,
       )
     } catch (error: unknown) {
       logger.error('Failed to flush performance metrics:', error)
     }
   }
 
-  public async getMetrics(timeRange: { start: Date; end: Date }) {
+  public async getMetrics(timeRange: { start: Date; end: Date }): Promise<any[]> {
     if (!timeRange?.['start'] || !timeRange?.['end']) {
       logger.error('Invalid time range provided')
       return []
@@ -112,7 +113,7 @@ export class PerformanceLogger {
           const fileMetrics = content
             .split('\n')
             .filter((line) => line.trim())
-            .map((line) => JSON.parse(line) as unknown)
+            .map((line) => JSON.parse(line) as PerformanceMetrics)
           metrics.push(...fileMetrics)
         }
       }
@@ -124,7 +125,7 @@ export class PerformanceLogger {
     }
   }
 
-  public async cleanup(retentionDays = 30): void {
+  public async cleanup(retentionDays = 30): Promise<void> {
     try {
       const fs = await import('node:fs/promises')
       const files = await fs.readdir(this.logDir)

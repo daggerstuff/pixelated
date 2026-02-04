@@ -97,7 +97,7 @@ pixelated/
 │   ├── layouts/            # Layout components
 │   ├── lib/                # Core libraries & utilities
 │   │   ├── ai/             # AI services & bias detection
-│   │   ├── memory/         # Conversation memory (Zep)
+│   │   ├── memory/         # Conversation memory (Mem0)
 │   │   └── services/       # Backend services
 │   ├── pages/              # Astro pages & routes
 │   ├── simulator/          # Empathy Gym training simulator
@@ -288,9 +288,8 @@ DATABASE_URL=postgresql://...
 REDIS_URL=redis://localhost:6379/0
 
 # AI Services
-ZEP_API_KEY=your-zep-api-key
-ZEP_API_URL=https://api.getzep.com
-ZEP_ENABLED=true
+MEM0_API_KEY=your-mem0-api-key
+MEM0_ENABLED=true
 
 # Security
 JWT_SECRET=your-jwt-secret
