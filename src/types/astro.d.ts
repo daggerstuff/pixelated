@@ -27,50 +27,6 @@ declare global {
     // (Removed duplicate/conflicting SpeechRecognition and SpeechGrammarList declarations; see src/simulator/utils/speechRecognition.ts)
   }
 }
-declare module 'astro' {
-  interface AstroGlobal {
-    locals: Locals
-  }
-  interface Locals extends Record<string, unknown> {
-    headers: Record<string, string>
-    isPrerendered: boolean
-    isSSR: boolean
-    cspNonce?: string
-    session?: any
-    userPreferences: {
-      language: string
-      darkMode: boolean
-      reducedMotion: boolean
-      userAgent: string
-      ip: string
-      isIOS: boolean
-      isAndroid: boolean
-      isMobile: boolean
-    }
-    user?: {
-      id: string
-      name?: string
-      email?: string
-      role?: string
-    }
-  }
-}
-
-declare namespace App {
-  interface Locals extends Record<string, unknown> {
-    isSSR?: boolean
-    isPrerendered?: boolean
-    cspNonce?: string
-    user?: any
-    session?: any
-    userPreferences?: {
-      darkMode?: boolean
-      language?: string
-      userAgent?: string
-      isMobile?: boolean
-    }
-  }
-}
 
 declare module 'astro:content' {
   interface ContentCollectionMap {

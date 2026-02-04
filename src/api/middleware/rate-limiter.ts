@@ -28,7 +28,7 @@ async function incrementRedisCounter(key: string, windowSeconds: number) {
  * Global IP-based rate limiter
  * Default: 100 requests per 60 seconds
  */
-export function rateLimiter(req: Request, res: Response, next: NextFunction) {
+export function rateLimiter(req: Request, res: Response, next: NextFunction): void {
     const ip = req.ip || req.connection.remoteAddress || 'unknown'
     const windowMs = 60000 // 60 seconds
     const maxRequests = 100
@@ -50,7 +50,7 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
         })
 
     if (redisAvailable) {
-        incrementRedisCounter(`rate:ip:${ip}`, windowSeconds)
+        void incrementRedisCounter(`rate:ip:${ip}`, windowSeconds)
             .then((count) => {
                 if (count === null) {
                     // Fallback to in-memory if Redis failed
@@ -61,14 +61,15 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
                 const resetTime = Date.now() + windowMs
                 applyHeaders(count, resetTime)
                 if (count > maxRequests) {
-                    return handleLimitExceeded(resetTime)
+                    handleLimitExceeded(resetTime)
+                    return
                 }
                 return next()
             })
             .catch((error) => {
                 console.error('Rate limiter failure:', error)
                 redisAvailable = false
-                return rateLimiter(req, res, next)
+                rateLimiter(req, res, next)
             })
         return
     }
@@ -89,10 +90,11 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
 
     // Check limit exceeded
     if (record.count > maxRequests) {
-        return handleLimitExceeded(record.resetTime)
+        handleLimitExceeded(record.resetTime)
+        return
     }
 
-    next()
+    return next()
 }
 
 /**
@@ -102,7 +104,7 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction) {
 export function rateLimitByUser(maxRequests: number = 30, windowMs: number = 60000) {
     const userStore: RateLimitStore = {}
 
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
         const userId = (req as any).user?.id || req.ip || 'anonymous'
         const now = Date.now()
         const record = userStore[userId] || { count: 0, resetTime: now + windowMs }
@@ -123,12 +125,13 @@ export function rateLimitByUser(maxRequests: number = 30, windowMs: number = 600
 
         // Check limit exceeded
         if (record.count > maxRequests) {
-            return res.status(429).json({
+            res.status(429).json({
                 error: {
                     code: 'RATE_LIMIT_EXCEEDED',
                     message: `Too many requests, please retry after ${Math.ceil((record.resetTime - now) / 1000)}s`
                 }
             })
+            return
         }
 
         next()

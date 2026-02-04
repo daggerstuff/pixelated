@@ -139,12 +139,12 @@ export class Logger {
     // Sanitize error object properties if it exists
     const processedError = errorObject
       ? {
-          name: errorObject.name, // Typically safe
-          message: this.sanitizeString(errorObject.message),
-          stack: errorObject.stack
-            ? this.sanitizeString(errorObject.stack)
-            : undefined,
-        }
+        name: errorObject.name, // Typically safe
+        message: this.sanitizeString(errorObject.message),
+        stack: errorObject.stack
+          ? this.sanitizeString(errorObject.stack)
+          : undefined,
+      }
       : undefined
 
     const errorMetadata = {
@@ -363,20 +363,19 @@ export class Logger {
   }
 }
 
+// Module-level singleton instance
+let _globalLoggerInstance: Logger | undefined
+
 /**
  * Get the global logger instance
  * Creates one if it doesn't exist
  * Refactored to avoid TDZ/circular import issues.
  */
 export function getLogger(options?: Partial<LoggerOptions>): Logger {
-  // Use a function-scoped static variable to avoid TDZ/circular import issues
-  // @ts-expect-error - Using static property on function for singleton pattern
-  if (!getLogger._instance || options) {
-    // @ts-expect-error - Using static property on function for singleton pattern
-    getLogger._instance = new Logger(options || {})
+  if (!_globalLoggerInstance || options) {
+    _globalLoggerInstance = new Logger(options || {})
   }
-  // @ts-expect-error - Using static property on function for singleton pattern
-  return getLogger._instance
+  return _globalLoggerInstance
 }
 
 /**
@@ -397,9 +396,7 @@ export function clearCollectedLogs() {
  * Configure global logging
  */
 export function configureLogging(options: Partial<LoggerOptions>): void {
-  // Use the function-scoped singleton pattern
-  // @ts-expect-error - Using static property on function for singleton pattern
-  getLogger._instance = new Logger(options)
+  _globalLoggerInstance = new Logger(options)
 }
 
 /**

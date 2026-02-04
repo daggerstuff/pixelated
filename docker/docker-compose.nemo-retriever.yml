@@ -1,0 +1,48 @@
+# NVIDIA NIM for Retrieval (Embedding & Reranking)
+# Part of Priority #3
+
+services:
+  nim-embedding:
+    image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:1.0.0
+    container_name: nim-embedding
+    ports:
+      - "8080:8000"
+    environment:
+      - NGC_API_KEY=${NVIDIA_API_KEY}
+    volumes:
+      - nim_model_cache:/opt/nim/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1
+    networks:
+      - nemo-network
+
+  nim-reranking:
+    image: nvcr.io/nim/nvidia/nv-rerankqa-mistral-4b-v3:1.0.0
+    container_name: nim-reranking
+    ports:
+      - "8081:8000"
+    environment:
+      - NGC_API_KEY=${NVIDIA_API_KEY}
+    volumes:
+      - nim_model_cache:/opt/nim/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1
+    networks:
+      - nemo-network
+
+volumes:
+  nim_model_cache:
+
+networks:
+  nemo-network:
+    external: true

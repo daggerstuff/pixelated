@@ -1,0 +1,23 @@
+# NVIDIA NeMo Evaluator for RAG and Reasoning Validation
+# Part of Priority #6
+
+services:
+  nemo-evaluator:
+    image: nvcr.io/nvidia/nemo-microservices/evaluator:25.12
+    container_name: nemo-evaluator
+    ports:
+      - "7331:7331"
+    environment:
+      MODE: standalone
+      POSTGRES_URI: postgresql://nmp:nmp@nemo-postgres:5432/evaluator
+      DATA_STORE_URL: http://nemo-datastore:3000/v1/hf
+      ENTITY_STORE_URL: http://nemo-entity-store:8000
+    depends_on:
+      - nemo-postgres
+      - nemo-datastore
+    networks:
+      - nemo-network
+
+networks:
+  nemo-network:
+    external: true

@@ -90,7 +90,6 @@ export class MonitoringService {
         'https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js'
       script.async = true
       script.onload = () => {
-        // @ts-expect-error - Faro is loaded globally
         window.faro.init({
           url: this.config.grafana.url,
           apiKey,
@@ -161,9 +160,7 @@ export class MonitoringService {
   }
 
   private reportWebVital(metric: string, entry: PerformanceEntry): void {
-    // @ts-expect-error - Faro is loaded globally
     if (window.faro) {
-      // @ts-expect-error - Faro is loaded globally
       window.faro.api.pushMeasurement(metric, {
         value: entry.startTime,
         unit: 'ms',
@@ -175,13 +172,11 @@ export class MonitoringService {
     const metrics = {
       timestamp: Date.now(),
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
-      navigation: performance.getEntriesByType('navigation')[0],
-      resources: performance.getEntriesByType('resource'),
+      navigation: performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming,
+      resources: performance.getEntriesByType('resource') as PerformanceResourceTiming[],
     }
 
-    // @ts-expect-error - Faro is loaded globally
     if (window.faro) {
-      // @ts-expect-error - Faro is loaded globally
       window.faro.api.pushMeasurement('performance', {
         value: metrics,
       })
@@ -194,8 +189,8 @@ export class MonitoringService {
   private checkPerformanceThresholds(metrics: {
     timestamp: number
     memory: number
-    navigation: PerformanceEntry | undefined
-    resources: PerformanceEntry[]
+    navigation: PerformanceNavigationTiming | undefined
+    resources: PerformanceResourceTiming[]
   }): void {
     const { slowRequestThreshold } = this.config.metrics
 
@@ -204,7 +199,7 @@ export class MonitoringService {
       metrics.navigation &&
       metrics.navigation.duration > slowRequestThreshold
     ) {
-      this.triggerAlert('performance', {
+      void this.triggerAlert('performance', {
         message: `Slow page load detected: ${metrics.navigation.duration}ms`,
         level: 'warning',
       })
@@ -213,7 +208,7 @@ export class MonitoringService {
     // Check resource timing
     metrics.resources.forEach((resource: PerformanceResourceTiming) => {
       if (resource.duration > slowRequestThreshold) {
-        this.triggerAlert('performance', {
+        void this.triggerAlert('performance', {
           message: `Slow resource load detected: ${resource.name} (${resource.duration}ms)`,
           level: 'warning',
         })
@@ -235,7 +230,7 @@ export class MonitoringService {
 
   private setupAlertHandlers() {
     window.addEventListener('error', (event) => {
-      this.triggerAlert('error', {
+      void this.triggerAlert('error', {
         message: event.message,
         error: event.error,
         level: 'error',
@@ -243,7 +238,7 @@ export class MonitoringService {
     })
 
     window.addEventListener('unhandledrejection', (event) => {
-      this.triggerAlert('error', {
+      void this.triggerAlert('error', {
         message: 'Unhandled Promise Rejection',
         error: event.reason,
         level: 'error',
@@ -265,9 +260,7 @@ export class MonitoringService {
 
     try {
       // Send to Grafana
-      // @ts-expect-error - Faro is loaded globally
       if (window.faro) {
-        // @ts-expect-error - Faro is loaded globally
         window.faro.api.pushError(new Error(data.message), {
           type,
           level: data.level,
