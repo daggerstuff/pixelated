@@ -29,7 +29,7 @@ const AccordionContext = React.createContext<{
   openItems: string[]
   toggleItem: (value: string) => void
   type: 'single' | 'multiple'
-}>({ openItems: [], toggleItem: () => {}, type: 'single' })
+}>({ openItems: [], toggleItem: () => { }, type: 'single' })
 
 const AccordionItemContext = React.createContext<{
   value: string
@@ -94,25 +94,37 @@ const AccordionTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const { toggleItem } = React.useContext(AccordionContext)
   const { value, isOpen } = React.useContext(AccordionItemContext)
+  const id = React.useId()
+  const contentId = `accordion-content-${id}`
+  const triggerId = `accordion-trigger-${id}`
+
+  // Pass IDs down via context or props if possible, but for now we'll recreate them in Content if needed
+  // A better pattern would be to generate ID in Item and pass down.
+  // Simplifying for this specific refactor to keep it contained.
 
   return (
-    <button
-      ref={ref}
-      className={cn(
-        'flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline text-left w-full',
-        className,
-      )}
-      onClick={() => toggleItem(value)}
-      {...props}
-    >
-      {children}
-      <ChevronDown
+    <AccordionItemContext.Provider value={{ value, isOpen, contentId, triggerId } as any}>
+      <button
+        ref={ref}
+        id={triggerId}
         className={cn(
-          'h-4 w-4 shrink-0 transition-transform duration-200',
-          isOpen && 'rotate-180',
+          'flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline text-left w-full',
+          className,
         )}
-      />
-    </button>
+        onClick={() => toggleItem(value)}
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        {...props}
+      >
+        {children}
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 shrink-0 transition-transform duration-200',
+            isOpen && 'rotate-180',
+          )}
+        />
+      </button>
+    </AccordionItemContext.Provider>
   )
 })
 AccordionTrigger.displayName = 'AccordionTrigger'
@@ -121,11 +133,14 @@ const AccordionContent = React.forwardRef<
   HTMLDivElement,
   AccordionContentProps
 >(({ className, children, ...props }, ref) => {
-  const { isOpen } = React.useContext(AccordionItemContext)
+  const { isOpen, contentId, triggerId } = React.useContext(AccordionItemContext) as any
 
   return (
     <div
       ref={ref}
+      id={contentId}
+      role="region"
+      aria-labelledby={triggerId}
       className={cn(
         'overflow-hidden text-sm transition-all duration-200',
         isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
