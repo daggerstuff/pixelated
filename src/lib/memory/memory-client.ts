@@ -5,9 +5,17 @@ export type MemoryMetadata = {
   category?: string
   tags?: string[]
   timestamp?: string
-  role?: 'user' | 'assistant' | string
+  role?: 'user' | 'assistant' | (string & {})
   userId?: string
   sessionId?: string
+  // Therapeutic & multi-agent fields
+  agentId?: string
+  agentRole?: string
+  scope?: 'shared' | 'private' | 'user' | 'global'
+  crisisSeverity?: 'none' | 'low' | 'medium' | 'high' | 'critical'
+  isSpeculative?: boolean
+  confidence?: number
+  piiRemoved?: boolean
   [key: string]: unknown
 }
 

@@ -2,6 +2,8 @@
 import BaseHead from '@components/tailus/BaseHead.astro'
 import AppFooter from '@components/tailus/AppFooter.astro'
 import AppHeader from '@components/tailus/AppHeader.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 
 interface Props {
   title?: string
@@ -56,7 +58,8 @@ const {
       <slot />
     </main>
     <AppFooter />
-
+    <SpeedInsights />
+    <Analytics />
     <script is:inline>
       function speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)

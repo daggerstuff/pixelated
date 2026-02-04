@@ -63,6 +63,7 @@
 .brv
 .claude-flow/
 .claude/
+.config/
 .codacy
 .codebuff
 .codebuff/agents
@@ -112,6 +113,10 @@
 .vscode/
 .webassets-cache
 .windsurf/
+.codexignore
+.kilocodemodes
+.markdownlintignore
+.ralphrc
 /*.env.*
 /*.iml
 /*.log
@@ -132,15 +137,18 @@
 /.gemini/
 /.local
 /.mcp.json/
+/.notes/
 /.openagents/
 /.openskills/
 /.output
 /.python
+/.ralph/
 /.spec-workflow/
 /.temp
 /.tmp
 /.vite/
 /.vite/deps/
+/.zed/
 /Thumbs.db*
 /acontext_server/
 /bin/
@@ -262,3 +270,10 @@ aws/
 
 .netlify/v1/functions/ssr
 .zed
+
+# SSL and Certificates
+ssl/**/*.pem
+ssl/**/*.crt
+ssl/**/*.csr
+ssl/backup/
+
