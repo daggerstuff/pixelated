@@ -27,6 +27,7 @@ export default function SearchBox({
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
@@ -62,6 +63,31 @@ export default function SearchBox({
       inputRef.current.focus()
     }
   }, [autoFocus])
+
+  // Detect OS for shortcut symbol
+  useEffect(() => {
+    if (
+      typeof navigator !== 'undefined' &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
+    ) {
+      setShortcutSymbol('⌘')
+    }
+  }, [])
+
+  // Handle global keyboard shortcut
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleGlobalKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [])
 
   // Reset active index when results change
   useEffect(() => {
@@ -188,6 +214,7 @@ export default function SearchBox({
           onFocus={() => query.length >= minQueryLength && setIsOpen(true)}
           placeholder={placeholder}
           aria-label="Search"
+          aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
           className={`w-full py-2 px-4 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 ${className}`}
           aria-autocomplete="list"
           aria-controls="search-results"
@@ -196,6 +223,14 @@ export default function SearchBox({
           }
           autoComplete="off"
         />
+
+        {query.length === 0 && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-gray-200 bg-gray-100 px-1.5 font-mono text-[10px] font-medium text-gray-500 opacity-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+              <span className="text-xs">{shortcutSymbol}</span>K
+            </kbd>
+          </div>
+        )}
 
         {query.length > 0 && (
           <button
@@ -244,11 +279,10 @@ export default function SearchBox({
                     type="button"
                     role="option"
                     aria-selected={index === activeIndex}
-                    className={`w-full text-left px-4 py-3 focus:outline-none ${
-                      index === activeIndex
+                    className={`w-full text-left px-4 py-3 focus:outline-none ${index === activeIndex
                         ? 'bg-gray-100 dark:bg-gray-700'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
+                      }`}
                     onClick={() => handleResultClick(result)}
                     tabIndex={-1}
                   >
