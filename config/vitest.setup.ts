@@ -395,6 +395,7 @@ function createMockRedis() {
     return pipeline
   }
   const _connect = async () => undefined
+  const _isHealthy = async () => true
   const _getPoolStats = async () => ({
     totalConnections: 1,
     activeConnections: 1,
@@ -686,4 +687,4 @@ if (process.env['CI'] && global.gc) {
   })
 }
 
-export { }
+export {}
