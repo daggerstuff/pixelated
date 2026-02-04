@@ -3,8 +3,8 @@ name: GKE Deployment Pipeline
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
+  # pull_request:
+  #   branches: [master]
   workflow_dispatch:
 
 jobs:
