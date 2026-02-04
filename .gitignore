@@ -205,3 +205,4 @@ ssl/backup/
 !/.env.example
 
 CRUSH.md
+coverage/
