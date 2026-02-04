@@ -1,4 +1,4 @@
-5# NGC Therapeutic Enhancement — Actionable Checklist
+# NGC Therapeutic Enhancement — Actionable Checklist
 
 This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md` and organized for progress tracking.
 
@@ -195,7 +195,7 @@ All identified gaps have been systematically addressed:
     - EQ score-based emotional distress detection
     - Safety score monitoring with crisis signal extraction (7 types)
     - Fallback to keywords if API unavailable
-    - See [PIXEL-MODEL-TRAINING-HUB.md](../PIXEL-MODEL-TRAINING-HUB.md) (Phase completion status)
+    - See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md) (Phase completion status)
   - ✅ **Integration Tests** (`crisis-integration.test.ts`): **10/10 passing + 1 skipped**
     - Mock Pixel API with 8 crisis pattern categories implemented
     - Comprehensive pattern detection (immediate harm, self-harm, substance, panic, psychotic, passive ideation)
@@ -208,7 +208,7 @@ All identified gaps have been systematically addressed:
     - Inference: 64.645ms (<200ms target ✅)
     - Service: `ai/api/pixel_inference_service.py`
     - Status: Fresh model loaded (requires trained checkpoint)
-  - 📊 **Results**: See [PIXEL-MODEL-TRAINING-HUB.md](../PIXEL-MODEL-TRAINING-HUB.md) (Phase 3.3 & 4.3 status)
+  - 📊 **Results**: See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md) (Phase 3.3 & 4.3 status)
   - 🎯 **Next Actions**:
     1. ✅ ~~Fix integration test structure~~ → **COMPLETE** (10/10 passing)
     2. ✅ ~~Deploy Pixel API service~~ → **RUNNING on :8001**
@@ -235,7 +235,7 @@ All identified gaps have been systematically addressed:
 
 ### Four Phases
 
-**Phase 1: Dataset Creation (Week 1)**
+### Phase 1: Dataset Creation (Week 1)
 
 - [x] 1.1 Synthetic data generation (3,000 samples) (Enhanced with 'Nightmare Mode' & Safety Bypass)
 - [x] 1.2 Real conversation collection (Tier 7 added - High-quality multi-turn)
@@ -246,14 +246,14 @@ All identified gaps have been systematically addressed:
 - [x] 2.2 Edge case synthesis (Pipeline built, safety rails bypassed for realism)
 - [ ] 2.3 Final dataset compilation (5,000+)
 
-**Phase 3: Model Training (Week 3)**
+### Phase 3: Model Training (Week 3)
 
 - [ ] 3.1 Training pipeline setup
 - [ ] 3.2 Hyperparameter tuning
 - [ ] 3.3 Validation & metrics (>95% sensitivity)
 - [ ] 3.4 Checkpoints & documentation
 
-**Phase 4: Deployment & Validation**
+### Phase 4: Deployment & Validation
 
 - [ ] 4.1 Load trained model into API
 - [ ] 4.2 E2E integration testing
