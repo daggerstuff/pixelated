@@ -7,6 +7,7 @@
 
 import { WebSocketServer, WebSocket } from 'ws'
 import type { IncomingMessage } from 'http'
+import { verifyToken } from '../../auth/jwt-service'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   BiasAlert,
@@ -59,7 +60,7 @@ export class BiasWebSocketServer {
   private bannedIPs: Map<string, Date> = new Map()
   private messageRateLimits: Map<string, Array<Date>> = new Map()
 
-  constructor(private config: WebSocketServerConfig) {}
+  constructor(private config: WebSocketServerConfig) { }
 
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -249,7 +250,10 @@ export class BiasWebSocketServer {
   /**
    * Handle incoming WebSocket message
    */
-  private handleMessage(clientId: string, data: unknown): void {
+  /**
+   * Handle incoming WebSocket message
+   */
+  private async handleMessage(clientId: string, data: unknown): Promise<void> {
     const client = this.clients.get(clientId)
     if (!client) {
       return
@@ -280,7 +284,7 @@ export class BiasWebSocketServer {
           client.lastPing = new Date()
           break
         case 'authenticate':
-          this.handleAuthentication(clientId, message)
+          await this.handleAuthentication(clientId, message)
           break
         case 'get_dashboard_data':
           this.handleDashboardDataRequest(clientId, message)
@@ -437,19 +441,19 @@ export class BiasWebSocketServer {
   /**
    * Handle authentication
    */
-  private handleAuthentication(
+  private async handleAuthentication(
     clientId: string,
     message: { token?: string; userId?: string },
-  ): void {
+  ): Promise<void> {
     const client = this.clients.get(clientId)
     if (!client) {
       return
     }
 
-    // In a real implementation, this would validate the token/credentials
+    // Verify token against Auth0/JWT service
     const { token, userId } = message
 
-    if (token && userId && this.validateAuthToken(token, userId)) {
+    if (token && userId && (await this.validateAuthToken(token, userId))) {
       client.isAuthenticated = true
       client.userId = userId
 
@@ -789,9 +793,21 @@ export class BiasWebSocketServer {
     return count
   }
 
-  private validateAuthToken(token?: string, userId?: string): boolean {
-    // In a real implementation, this would validate the JWT token
-    return !!(token && userId) // Simplified for now
+  private async validateAuthToken(
+    token?: string,
+    userId?: string,
+  ): Promise<boolean> {
+    if (!token || !userId) {
+      return false
+    }
+
+    try {
+      const result = await verifyToken(token, 'access')
+      return result.valid && result.userId === userId
+    } catch (error) {
+      logger.warn('Token validation failed', { userId, error })
+      return false
+    }
   }
 
   private getUserPermissions(userId?: string): string[] {

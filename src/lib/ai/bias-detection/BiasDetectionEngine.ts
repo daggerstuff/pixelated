@@ -551,13 +551,11 @@ export class BiasDetectionEngine {
           : { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
     }
 
-    // Only collect metrics when auditLogging is turned OFF (per tests)
-    if (!this.config.auditLogging) {
-      try {
-        await this.metricsCollector.storeAnalysisResult?.(result)
-      } catch (err) {
-        console.warn('storeAnalysisResult failed:', err)
-      }
+    // Collect metrics regardless of audit logging state
+    try {
+      await this.metricsCollector.storeAnalysisResult?.(result)
+    } catch (err) {
+      console.warn('storeAnalysisResult failed:', err)
     }
 
     // Store result in distributed cache for future retrieval
