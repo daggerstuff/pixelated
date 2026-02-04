@@ -15,6 +15,7 @@ This document describes the configuration fixes made to resolve the "Loki needs 
 ### 2. Promtail Configuration (`docker/promtail/config.yml`)
 
 **Enhancements Made:**
+
 - Added host labels for better log identification
 - Added stream labels for log filtering
 - Added docker service discovery configuration to automatically discover and collect logs from all running containers
@@ -23,6 +24,7 @@ This document describes the configuration fixes made to resolve the "Loki needs 
 ### 3. Grafana Loki Datasource (`docker/grafana/provisioning/datasources/loki.yml`)
 
 **Enhancements Made:**
+
 - Added timeout configuration (60 seconds)
 - Added tenant header support for multi-tenancy
 - Explicitly set `isDefault: false` to avoid conflicts
@@ -30,6 +32,7 @@ This document describes the configuration fixes made to resolve the "Loki needs 
 ## Verification
 
 Run the verification script to confirm all configurations are correct:
+
 ```bash
 ./scripts/devops/verify-monitoring.sh
 ```
@@ -37,6 +40,7 @@ Run the verification script to confirm all configurations are correct:
 ## Starting the Monitoring Stack
 
 To start the monitoring services:
+
 ```bash
 ./scripts/devops/start-monitoring.sh
 ```
@@ -44,7 +48,7 @@ To start the monitoring services:
 ## Key Configuration Changes Summary
 
 | Component | File | Change Made | Purpose |
-|-----------|------|-------------|---------|
+| --------- | ---- | ----------- | ------- |
 | Loki | `docker/loki/config.yml` | `instance_addr: 0.0.0.0` | Enable container networking |
 | Loki | `docker/loki/config.yml` | `alertmanager_url: http://alertmanager:9093` | Correct service reference |
 | Promtail | `docker/promtail/config.yml` | Added docker service discovery | Automatic container log collection |
@@ -54,10 +58,11 @@ To start the monitoring services:
 ## Access Points
 
 Once running, the monitoring services will be available at:
-- **Grafana:** http://localhost:3001
-- **Prometheus:** http://localhost:9090
-- **Loki:** http://localhost:3100
-- **AlertManager:** http://localhost:9093
+
+- **Grafana:** <http://localhost:3001>
+- **Prometheus:** <http://localhost:9090>
+- **Loki:** <http://localhost:3100>
+- **AlertManager:** <http://localhost:9093>
 
 ## Checklist Status
 
