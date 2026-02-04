@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Minimal tag-manager.cjs for rollback workflow (CommonJS)
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const args = process.argv.slice(2);
 
 function usage() {
@@ -19,7 +19,7 @@ if (!['staging', 'production'].includes(env)) {
 
 function getTags(pattern) {
   try {
-    const tags = execSync(`git tag -l "${pattern}" --sort=-committerdate`, { encoding: 'utf8' });
+    const tags = execFileSync('git', ['tag', '-l', pattern, '--sort=-committerdate'], { encoding: 'utf8' });
     return tags.split('\n').filter(Boolean);
   } catch {
     return [];
@@ -50,10 +50,10 @@ if (command === 'create') {
   const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
   const tagName = `${env}-${timestamp}`;
   try {
-    execSync(`git tag -a ${tagName} -m "${message || 'Rollback tag'}"`);
+    execFileSync('git', ['tag', '-a', tagName, '-m', message || 'Rollback tag']);
     if (push) {
       const remote = process.env.GIT_PUSH_REMOTE || 'origin';
-      execSync(`git push ${remote} ${tagName}`);
+      execFileSync('git', ['push', remote, tagName]);
     }
     console.log(`Created tag: ${tagName}`);
     process.exit(0);

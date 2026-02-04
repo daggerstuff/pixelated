@@ -10,20 +10,20 @@ const envSchema = z.object({
     .default('development'),
 
   // Server configuration
-  PORT: z.string().transform(Number).default('3000'),
+  PORT: z.string().transform(Number).default(3000),
   LOG_LEVEL: z
     .enum(['error', 'warn', 'info', 'verbose', 'debug'])
     .default('info'),
   ENABLE_RATE_LIMITING: z
     .string()
     .transform((val: string) => val === 'true')
-    .default('true'),
+    .default(true),
 
   // Analytics worker configuration
-  ANALYTICS_WS_PORT: z.string().transform(Number).default('8083'),
+  ANALYTICS_WS_PORT: z.string().transform(Number).default(8083),
 
   // Notification worker configuration
-  NOTIFICATION_WS_PORT: z.string().transform(Number).default('8082'),
+  NOTIFICATION_WS_PORT: z.string().transform(Number).default(8082),
 
   // Database - MongoDB Atlas
   MONGODB_URI: z.string().optional(),
@@ -88,31 +88,40 @@ const envSchema = z.object({
   SECURITY_ENABLE_BRUTE_FORCE_PROTECTION: z
     .string()
     .transform((val: string) => val === 'true')
-    .default('true'),
-  SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default('5'),
+    .default(true),
+  SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default(5),
   SECURITY_ACCOUNT_LOCKOUT_DURATION: z
     .string()
     .transform(Number)
-    .default('1800'),
-  SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default('100'),
+    .default(1800),
+  SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default(100),
   SECURITY_ENABLE_ALERTS: z
     .string()
     .transform((val: string) => val === 'true')
-    .default('true'),
+    .default(true),
 
   // Rate limiting
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default('100'),
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('900000'),
+  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default(100),
+  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default(900000),
 
   // Logging
   LOG_CONSOLE: z
     .string()
     .transform((val: string) => val === 'true')
-    .default('true'),
+    .default(true),
   LOG_AUDIT: z
     .string()
     .transform((val: string) => val === 'true')
-    .default('true'),
+    .default(true),
+
+  // Security Implementation
+  ENABLE_AUDIT_LOGGING: z
+    .string()
+    .transform((val: string) => val === 'true')
+    .default(true),
+  AUDIT_LOG_RETENTION_DAYS: z.string().transform(Number).default(2555),
+  ENCRYPTION_ALGORITHM: z.enum(['aes-256-gcm']).default('aes-256-gcm'),
+  ENCRYPTION_KEY: z.string().min(32).optional(),
 
   // Client-side variables (exposed to the browser)
   VITE_API_URL: z.string().url().optional(),
@@ -181,7 +190,9 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
     'RESEND_API_KEY',
     'TWILIO_AUTH_TOKEN',
     'SENTRY_DSN',
+    'SENTRY_DSN',
     'SLACK_WEBHOOK_URL',
+    'ENCRYPTION_KEY',
   ]
   return Object.fromEntries(
     Object.entries(env).map(([k, v]) => [
@@ -344,6 +355,14 @@ export const config = {
       env().SECURITY_ACCOUNT_LOCKOUT_DURATION,
     apiAbuseThreshold: (): number => env().SECURITY_API_ABUSE_THRESHOLD,
     enableAlerts: (): boolean => env().SECURITY_ENABLE_ALERTS,
+    encryption: {
+      algorithm: (): string => env().ENCRYPTION_ALGORITHM,
+      key: (): string | undefined => env().ENCRYPTION_KEY,
+    },
+    audit: {
+      enabled: (): boolean => env().ENABLE_AUDIT_LOGGING,
+      retentionDays: (): number => env().AUDIT_LOG_RETENTION_DAYS,
+    },
   },
 
   rateLimiting: {

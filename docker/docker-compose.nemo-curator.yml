@@ -1,0 +1,27 @@
+# NVIDIA NeMo Curator for Data Refinement
+# Part of Priority #1
+
+services:
+  nemo-curator:
+    image: nvcr.io/nvidia/nemo-curator:latest
+    container_name: nemo-curator
+    entrypoint: /bin/bash
+    tty: true
+    volumes:
+      - ./ai/datasets:/workspace/datasets
+      - ./ai/pipelines/orchestrator/processing:/workspace/scripts
+    environment:
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    networks:
+      - nemo-network
+
+networks:
+  nemo-network:
+    external: true

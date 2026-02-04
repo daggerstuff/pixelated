@@ -6,7 +6,7 @@
  */
 
 import { readdir, stat } from 'fs/promises'
-import { join, extname } from 'path'
+import { join, extname, resolve, sep } from 'path'
 import { fileURLToPath } from 'url'
 import { imageOptimizer, generateOptimizationReport } from '../src/lib/utils/image-optimizer.ts'
 
@@ -16,6 +16,8 @@ const __dirname = join(__filename, '..')
 // Configuration
 const CONFIG = {
   PUBLIC_DIR: './public',
+  // Resolve absolute path for security check
+  ABS_PUBLIC_DIR: resolve('./public'),
   IMAGE_EXTENSIONS: ['.jpg', '.jpeg', '.png', '.webp'],
   SKIP_PATTERNS: ['node_modules', '.git', 'dist', 'build'],
   MIN_SIZE: 10 * 1024, // 10KB minimum for optimization
@@ -30,6 +32,13 @@ async function findImageFiles(dir, files = []) {
 
     for (const entry of entries) {
       const fullPath = join(dir, entry.name)
+
+      // Security check: ensure path stays within public directory
+      const resolvedPath = resolve(fullPath)
+      if (!resolvedPath.startsWith(CONFIG.ABS_PUBLIC_DIR + sep) && resolvedPath !== CONFIG.ABS_PUBLIC_DIR) {
+        console.warn(`Warning: Skipping unsafe path ${fullPath}`)
+        continue
+      }
 
       // Skip unwanted directories
       if (entry.isDirectory() && !CONFIG.SKIP_PATTERNS.includes(entry.name)) {

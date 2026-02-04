@@ -1,6 +1,7 @@
 ---
 // Theme CSS files are linked directly from public folder for SSR compatibility
 import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 
 export interface Props {
   title: string
@@ -148,8 +149,9 @@ const { cspNonce } = Astro.locals
       }
     </script>
 
-    <!-- Vercel Speed Insights -->
+    <!-- Vercel Speed Insights and Analytics -->
     <SpeedInsights />
+    <Analytics />
   </body>
 </html>
 
