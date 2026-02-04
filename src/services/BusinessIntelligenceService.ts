@@ -69,7 +69,7 @@ export class BusinessIntelligenceService {
 
   constructor(db: Pool) {
     this.db = db
-    this.alphaVantageApiKey = process.env.ALPHA_VANTAGE_API_KEY || 'demo'
+    this.alphaVantageApiKey = process.env.ALPHA_VANTAGE_API_KEY || ''
   }
 
   async getMarketData(symbol: string): Promise<MarketData> {

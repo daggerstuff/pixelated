@@ -31,6 +31,18 @@ if (isCloudflareDeploy && !cloudflareAdapter) {
   console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
 }
 
+const isNetlifyDeploy = !!process.env.NETLIFY;
+let netlifyAdapter;
+if (isNetlifyDeploy) {
+  try {
+    const netlifyModule = await import('@astrojs/netlify');
+    netlifyAdapter = netlifyModule.default;
+  } catch (e) {
+    console.warn('⚠️  Netlify adapter not available, will use Node adapter:', e.message);
+    netlifyAdapter = undefined;
+  }
+}
+
 const isVercelDeploy = !!process.env.VERCEL;
 const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
 const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
@@ -39,7 +51,7 @@ const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 // Detect if we're running a build command (not dev server)
-const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES || !!process.env.VERCEL;
+const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES || !!process.env.VERCEL || !!process.env.NETLIFY;
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
 const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN; // Only enable if DSN is actually present
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
@@ -112,6 +124,11 @@ const adapter = (() => {
   if (isVercelDeploy) {
     console.log('⚡ Using Vercel adapter for deployment');
     return vercel();
+  }
+
+  if (isNetlifyDeploy && netlifyAdapter) {
+    console.log('🔹 Using Netlify adapter for deployment');
+    return netlifyAdapter();
   }
 
   if (isRailwayDeploy) {

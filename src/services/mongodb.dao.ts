@@ -54,6 +54,13 @@ async function initializeDependencies() {
   }
   return serverDepsPromise
 }
+
+// Export a helper to create ObjectId from string, which handles lazy loading
+export async function createObjectId(id: string): Promise<MongoObjectId> {
+  await initializeDependencies()
+  return new ObjectId!(id)
+}
+
 import type {
   AIMetrics,
   BiasDetection,
@@ -61,7 +68,82 @@ import type {
   CrisisSessionFlag,
   Todo,
   TreatmentPlan,
+  User,
+  Session,
 } from '../types/mongodb.types'
+
+export class UserDAO {
+  private async getCollection(): Promise<MongoCollection<User>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<User>('users')
+  }
+
+  async findAll(): Promise<User[]> {
+    const collection = await this.getCollection()
+    const users = await collection.find({}).toArray()
+    return users.map((user) => ({ ...user, id: user._id?.toString() }))
+  }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(users: User[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (users.length > 0) {
+      // Ensure we have objectIDs
+      const processedUsers = users.map(user => {
+         const u = { ...user } as any
+         if (typeof u._id === 'string') {
+             u._id = new ObjectId!(u._id)
+         }
+         return u
+      })
+      await collection.insertMany(processedUsers)
+    }
+  }
+}
+
+export class SessionDAO {
+  private async getCollection(): Promise<MongoCollection<Session>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<Session>('sessions')
+  }
+
+  async findAll(): Promise<Session[]> {
+    const collection = await this.getCollection()
+    const sessions = await collection.find({}).toArray()
+    // Session interface has _id as ObjectId
+    return sessions
+  }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(sessions: Session[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (sessions.length > 0) {
+       const processed = sessions.map(session => {
+         const s = { ...session } as any
+         if (typeof s._id === 'string') s._id = new ObjectId!(s._id)
+         if (typeof s.userId === 'string') s.userId = new ObjectId!(s.userId)
+         return s
+      })
+      await collection.insertMany(processed)
+    }
+  }
+}
 
 export class TodoDAO {
   private async getCollection(): Promise<MongoCollection<Todo>> {
@@ -129,6 +211,24 @@ export class TodoDAO {
     const result = await collection.deleteOne({ _id: new ObjectId!(id) })
 
     return result.deletedCount > 0
+  }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(todos: Todo[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (todos.length > 0) {
+      const processed = todos.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
   }
 }
 
@@ -211,6 +311,30 @@ export class AIMetricsDAO {
 
     return stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
   }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(metrics: AIMetrics[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (metrics.length > 0) {
+      const processed = metrics.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
+  }
+
+  async findAll(): Promise<AIMetrics[]> {
+      const collection = await this.getCollection()
+      const metrics = await collection.find({}).toArray()
+      return metrics.map((metric) => ({ ...metric, id: metric._id?.toString() }))
+  }
 }
 
 export class BiasDetectionDAO {
@@ -252,6 +376,30 @@ export class BiasDetectionDAO {
       ...detection,
       id: detection._id?.toString(),
     }))
+  }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(detections: BiasDetection[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (detections.length > 0) {
+      const processed = detections.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
+  }
+
+  async findAll(): Promise<BiasDetection[]> {
+      const collection = await this.getCollection()
+      const detections = await collection.find({}).toArray()
+      return detections.map((detection) => ({ ...detection, id: detection._id?.toString() }))
   }
 }
 
@@ -320,6 +468,31 @@ export class TreatmentPlanDAO {
 
     return result ? { ...result, id: result._id?.toString() } : null
   }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(plans: TreatmentPlan[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (plans.length > 0) {
+      const processed = plans.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         if (typeof obj.therapistId === 'string') obj.therapistId = new ObjectId!(obj.therapistId)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
+  }
+
+  async findAll(): Promise<TreatmentPlan[]> {
+      const collection = await this.getCollection()
+      const plans = await collection.find({}).toArray()
+      return plans.map((plan) => ({ ...plan, id: plan._id?.toString() }))
+  }
 }
 
 export class CrisisSessionFlagDAO {
@@ -387,6 +560,31 @@ export class CrisisSessionFlagDAO {
     )
 
     return result ? { ...result, id: result._id?.toString() } : null
+  }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(flags: CrisisSessionFlag[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (flags.length > 0) {
+      const processed = flags.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         if (typeof obj.resolvedBy === 'string') obj.resolvedBy = new ObjectId!(obj.resolvedBy)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
+  }
+
+  async findAll(): Promise<CrisisSessionFlag[]> {
+      const collection = await this.getCollection()
+      const flags = await collection.find({}).toArray()
+      return flags.map((flag) => ({ ...flag, id: flag._id?.toString() }))
   }
 }
 
@@ -460,9 +658,35 @@ export class ConsentManagementDAO {
 
     return { ...result, id: result._id?.toString() }
   }
+
+  async deleteAll(): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.deleteMany({})
+  }
+
+  async insertMany(consents: ConsentManagement[]): Promise<void> {
+    const collection = await this.getCollection()
+    if (consents.length > 0) {
+      const processed = consents.map(item => {
+         const obj = { ...item } as any
+         if (typeof obj._id === 'string') obj._id = new ObjectId!(obj._id)
+         if (typeof obj.userId === 'string') obj.userId = new ObjectId!(obj.userId)
+         return obj
+      })
+      await collection.insertMany(processed)
+    }
+  }
+
+  async findAll(): Promise<ConsentManagement[]> {
+      const collection = await this.getCollection()
+      const consents = await collection.find({}).toArray()
+      return consents.map((consent) => ({ ...consent, id: consent._id?.toString() }))
+  }
 }
 
 // Export instances for use throughout the application
+export const userDAO = new UserDAO()
+export const sessionDAO = new SessionDAO()
 export const todoDAO = new TodoDAO()
 export const aiMetricsDAO = new AIMetricsDAO()
 export const biasDetectionDAO = new BiasDetectionDAO()

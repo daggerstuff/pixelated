@@ -19,9 +19,20 @@ import {
   type StorageProvider,
   type StorageProviderConfig,
   type RecoveryTestConfig,
+  type ApplicationBackupData,
 } from './types'
 import { isBrowser } from '../../browser/is-browser'
 import * as NodeCrypto from 'crypto'
+import {
+  userDAO,
+  sessionDAO,
+  todoDAO,
+  aiMetricsDAO,
+  biasDetectionDAO,
+  treatmentPlanDAO,
+  crisisSessionFlagDAO,
+  consentManagementDAO,
+} from '../../../services/mongodb.dao'
 
 // Import crypto polyfill statically to avoid issues during build
 
@@ -823,15 +834,54 @@ export class BackupSecurityManager {
    * Get data to backup based on backup type
    */
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    // Implementation would collect app data based on backup type
-    // For now return dummy data for demonstration
-    // TODO: No more fucking cop-outs
-    const dummyData = {
-      message: `This is a ${type} backup created at ${new Date().toISOString()}`,
-    }
+    logger.info(`Collecting data for ${type} backup`)
 
-    // Use TextEncoder for cross-environment compatibility
-    return new TextEncoder().encode(JSON.stringify(dummyData))
+    try {
+      // In a real implementation, 'type' (FULL, INCREMENTAL, etc.) would affect logic.
+      // For now, we'll perform a FULL backup for all types as a safe default,
+      // collecting all data from all DAOs.
+
+      // Parallelize fetching data
+      const [
+        users,
+        sessions,
+        todos,
+        aiMetrics,
+        biasDetections,
+        treatmentPlans,
+        crisisSessionFlags,
+        consentManagements,
+      ] = await Promise.all([
+        userDAO.findAll(),
+        sessionDAO.findAll(),
+        todoDAO.findAll(),
+        aiMetricsDAO.findAll(),
+        biasDetectionDAO.findAll(),
+        treatmentPlanDAO.findAll(),
+        crisisSessionFlagDAO.findAll(),
+        consentManagementDAO.findAll(),
+      ])
+
+      const backupData: ApplicationBackupData = {
+        users,
+        sessions,
+        todos,
+        aiMetrics,
+        biasDetections,
+        treatmentPlans,
+        crisisSessionFlags,
+        consentManagements,
+      }
+
+      // Use TextEncoder for cross-environment compatibility
+      return new TextEncoder().encode(JSON.stringify(backupData))
+    } catch (error: unknown) {
+      logger.error('Failed to collect backup data:', { error: String(error) })
+      throw new Error(
+        `Failed to collect backup data: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
+      )
+    }
   }
 
   /**
@@ -1001,13 +1051,96 @@ export class BackupSecurityManager {
    * @param data The restored data object
    */
   private async processRestoredData(data: unknown): Promise<void> {
-    // This is where you would implement the actual data restoration logic
-    // The implementation would be specific to your application's needs
-    // TODO: What did I just fucking say?
     logger.info('Processing restored data')
 
-    // For now, just log that we received the data
-    logger.debug('Restored data', { data })
+    // Validate the data structure
+    const backupData = data as ApplicationBackupData
+    if (!backupData || typeof backupData !== 'object') {
+      throw new Error('Invalid backup data format: data must be an object')
+    }
+
+    // List of keys to check for in the backup data
+    const keys: (keyof ApplicationBackupData)[] = [
+      'users',
+      'sessions',
+      'todos',
+      'aiMetrics',
+      'biasDetections',
+      'treatmentPlans',
+      'crisisSessionFlags',
+      'consentManagements',
+    ]
+
+    // Verify all keys exist and are arrays
+    for (const key of keys) {
+      if (!Array.isArray(backupData[key])) {
+        // Warning instead of error? Some backups might be partial or older?
+        // For now, strict validation:
+        // throw new Error(`Invalid backup data format: ${key} is missing or not an array`);
+        // Relaxed validation: ensure it is at least defined, default to empty array
+        logger.warn(
+          `Backup data for ${key} is missing or invalid. Defaulting to empty array.`,
+        )
+        backupData[key] = [] as any
+      }
+    }
+
+    // Helper function to restore a collection
+    const restoreCollection = async <T>(
+      name: string,
+      dao: { deleteAll: () => Promise<void>; insertMany: (items: T[]) => Promise<void> },
+      items: T[],
+    ) => {
+      logger.info(`Restoring ${name}...`)
+      try {
+        await dao.deleteAll()
+        if (items.length > 0) {
+          await dao.insertMany(items)
+        }
+        logger.info(`Restored ${items.length} items to ${name}`)
+      } catch (error: unknown) {
+        logger.error(`Failed to restore ${name}:`, { error: String(error) })
+        throw new Error(
+          `Failed to restore ${name}: ${error instanceof Error ? String(error) : String(error)}`,
+        )
+      }
+    }
+
+    // Restore all collections sequentially (or parallel if safe)
+    // Sequential is safer to avoid overwhelming the DB
+    try {
+      await restoreCollection('Users', userDAO, backupData.users)
+      await restoreCollection('Sessions', sessionDAO, backupData.sessions)
+      await restoreCollection('Todos', todoDAO, backupData.todos)
+      await restoreCollection('AI Metrics', aiMetricsDAO, backupData.aiMetrics)
+      await restoreCollection(
+        'Bias Detections',
+        biasDetectionDAO,
+        backupData.biasDetections,
+      )
+      await restoreCollection(
+        'Treatment Plans',
+        treatmentPlanDAO,
+        backupData.treatmentPlans,
+      )
+      await restoreCollection(
+        'Crisis Session Flags',
+        crisisSessionFlagDAO,
+        backupData.crisisSessionFlags,
+      )
+      await restoreCollection(
+        'Consent Managements',
+        consentManagementDAO,
+        backupData.consentManagements,
+      )
+
+      logger.info('All data restored successfully')
+    } catch (error: unknown) {
+      logger.error('Critical failure during data restoration:', {
+        error: String(error),
+      })
+      throw error // Re-throw to propagate failure
+    }
   }
 }
 

@@ -10,8 +10,34 @@ import type {
 } from './backup-types'
 import { BackupType } from './backup-types'
 
+// Import MongoDB types for ApplicationBackupData
+import type {
+  User,
+  Session,
+  Todo,
+  AIMetrics,
+  BiasDetection,
+  TreatmentPlan,
+  CrisisSessionFlag,
+  ConsentManagement,
+} from '../../../types/mongodb.types'
+
 // Only export types needed by this file, not re-export from backup-types.ts
 // to avoid duplicate exports
+
+/**
+ * Interface for application backup data
+ */
+export interface ApplicationBackupData {
+  users: User[]
+  sessions: Session[]
+  todos: Todo[]
+  aiMetrics: AIMetrics[]
+  biasDetections: BiasDetection[]
+  treatmentPlans: TreatmentPlan[]
+  crisisSessionFlags: CrisisSessionFlag[]
+  consentManagements: ConsentManagement[]
+}
 
 /**
  * Interface for backup metadata
