@@ -106,7 +106,7 @@ export function Tabs({
         tabValues,
       }}
     >
-      <div className={`tabs ${className}`} role="tablist">
+      <div className={`tabs ${className}`}>
         {children}
       </div>
     </TabsContext.Provider>
@@ -121,8 +121,45 @@ export interface TabsListProps {
 
 // TabsList component - container for tab triggers
 export function TabsList({ children, className = '' }: TabsListProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const list = e.currentTarget
+    const tabs = Array.from(
+      list.querySelectorAll('[role="tab"]:not([disabled])'),
+    ) as HTMLElement[]
+    const index = tabs.indexOf(document.activeElement as HTMLElement)
+
+    if (index < 0) return
+
+    let nextIndex = index
+
+    switch (e.key) {
+      case 'ArrowRight':
+        nextIndex = (index + 1) % tabs.length
+        break
+      case 'ArrowLeft':
+        nextIndex = (index - 1 + tabs.length) % tabs.length
+        break
+      case 'Home':
+        nextIndex = 0
+        break
+      case 'End':
+        nextIndex = tabs.length - 1
+        break
+      default:
+        return
+    }
+
+    e.preventDefault()
+    tabs[nextIndex].focus()
+    tabs[nextIndex].click()
+  }
+
   return (
-    <div className={`tabs-list ${className}`} role="tablist">
+    <div
+      className={`tabs-list ${className}`}
+      role="tablist"
+      onKeyDown={handleKeyDown}
+    >
       {children}
     </div>
   )
