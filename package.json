@@ -161,7 +161,6 @@
     "@aws-sdk/lib-dynamodb": "^3.975.0",
     "@aws-sdk/s3-request-presigner": "^3.975.0",
     "@azure/storage-blob": "^12.30.0",
-    "@better-auth/cli": "^1.4.17",
     "@contextstream/mcp-server": "^0.4.43",
     "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.39.2",
@@ -212,7 +211,6 @@
     "auth0": "^5.2.0",
     "axios": "^1.13.3",
     "bcryptjs": "^3.0.3",
-    "better-auth": "^1.4.17",
     "better-sqlite3": "^12.6.2",
     "buffer": "^6.0.3",
     "chart.js": "^4.5.1",
@@ -425,7 +423,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@10.28.1",
+  "packageManager": "pnpm@10.28.2",
   "pnpm": {
     "overrides": {
       "@opentelemetry/api": "^1.9.0",

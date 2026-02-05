@@ -105,12 +105,17 @@ async function callPixelService(
             headers['Authorization'] = `Bearer ${PIXEL_API_KEY}`
         }
 
-        const response = await fetch(url, {
+        const fetchOptions: RequestInit = {
             method,
             headers,
-            body: body ? JSON.stringify(body) : undefined,
             signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-        })
+        }
+
+        if (method !== 'GET' && body) {
+            fetchOptions.body = JSON.stringify(body)
+        }
+
+        const response = await fetch(url, fetchOptions)
 
         if (!response.ok) {
             const error = await response.text()

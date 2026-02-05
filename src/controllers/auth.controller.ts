@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
-import { validationSchema } from '../validation/register-schema';
+import { validate } from 'class-validator';
+import { RegisterDto } from '../validation/register-schema';
 import { AuthService } from '../services/auth.service';
 
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
       const user = await this.authService.register(dto);
       const token = await this.authService.generateToken(user);
       return res.status(201).json({ token });
-    } catch (err) {
+    } catch {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
