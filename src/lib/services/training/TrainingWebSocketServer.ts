@@ -52,8 +52,13 @@ interface ClientAuthResult {
 type WebSocketMessage =
   | { type: 'authenticate', payload: { token: string } }
   | { type: 'join_session', payload: { sessionId: string, role: 'trainee' | 'observer' | 'supervisor', userId: string } }
-  | { type: 'session_message', payload: { content: string, role: string } }
-  | { type: 'coaching_note', payload: { content: string } }
+  | { type: 'session_message', payload: { content: string, role: string, userId?: string, timestamp?: string } }
+  | { type: 'coaching_note', payload: { content: string, authorId?: string, timestamp?: string } }
+  | { type: 'authenticated', payload: { userId: string, role: string } }
+  | { type: 'session_joined', payload: { sessionId: string, role: string, userId: string } }
+  | { type: 'participant_joined', payload: { userId: string, role: string } }
+  | { type: 'participant_left', payload: { userId: string } }
+  | { type: 'error', payload: { message: string } }
 
 export class TrainingWebSocketServer {
   private wss: WebSocketServer
@@ -94,14 +99,14 @@ export class TrainingWebSocketServer {
       }
     }, this.AUTH_TIMEOUT)
 
-    ws.on('message', (data: string) => {
+    ws.on('message', async (data: string) => {
       try {
         const message = JSON.parse(data) as WebSocketMessage
         if (message.type === 'authenticate') {
           clearTimeout(timeout)
-          this.handleAuthenticate(ws, clientId, message.payload)
+          await this.handleAuthenticate(ws, clientId, message.payload)
         } else {
-          this.handleMessage(ws, clientId, message)
+          await this.handleMessage(ws, clientId, message)
         }
       } catch (err) {
         logger.error('Failed to parse message', { clientId, error: err })
@@ -121,7 +126,7 @@ export class TrainingWebSocketServer {
     }
   }
 
-  private handleAuthenticate(ws: WebSocket, clientId: string, payload: { token: string }) {
+  private async handleAuthenticate(ws: WebSocket, clientId: string, payload: { token: string }) {
     const client = this.clients.get(clientId)
     if (!client) return
 
@@ -135,7 +140,7 @@ export class TrainingWebSocketServer {
       return
     }
 
-    this.attemptAuthentication(clientId, payload.token)
+    await this.attemptAuthentication(clientId, payload.token)
   }
 
   /**
@@ -274,10 +279,10 @@ export class TrainingWebSocketServer {
     }
   }
 
-  private handleMessage(ws: WebSocket, clientId: string, message: WebSocketMessage) {
+  private async handleMessage(ws: WebSocket, clientId: string, message: WebSocketMessage) {
     switch (message.type) {
       case 'join_session':
-        this.handleJoinSession(ws, clientId, message.payload)
+        await this.handleJoinSession(ws, clientId, message.payload)
         break
       case 'session_message':
         this.handleSessionMessage(clientId, message.payload)
@@ -419,7 +424,6 @@ export class TrainingWebSocketServer {
     }
 
     // Broadcast chat message to everyone in the session
-    // Note: client.sessionId and client.role are already validated during join_session
     this.broadcastToSession(client.sessionId, {
       type: 'session_message',
       payload: {
