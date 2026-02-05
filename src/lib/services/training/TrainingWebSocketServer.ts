@@ -5,6 +5,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { validateToken } from '../../auth/jwt-service'
 import type { UserRole } from '../../auth/roles'
 import { AIRepository } from '../../db/ai/repository'
+import type { TherapySession } from '../../ai/models/ai-types'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
@@ -274,7 +275,7 @@ export class TrainingWebSocketServer {
     try {
       // Validate session access permissions
       // We try searching by ID first, then by sessionId field if it's a string identifier
-      let session = null
+      let session: TherapySession | null = null
       const sessionsById = await this.repository.getSessionsByIds([payload.sessionId])
       if (sessionsById && sessionsById.length > 0) {
           session = sessionsById[0]
@@ -283,7 +284,7 @@ export class TrainingWebSocketServer {
           // This is a bit of a workaround since getSessions doesn't support sessionId filtering directly
           // but we can look for it in recent sessions
           const recentSessions = await this.repository.getSessions({ limit: 100 } as any)
-          session = recentSessions.find(s => s.sessionId === payload.sessionId)
+          session = recentSessions.find((s: TherapySession) => s.sessionId === payload.sessionId) || null
       }
 
       if (!session) {
