@@ -22,6 +22,7 @@
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\" \"pnpm dev:training-server\" \"pnpm dev:websocket\" \"pnpm dev:academic-sourcing\" \"pnpm bias:py\"",
     "setup:dev": "./scripts/setup-dev.sh",
     "build": "node scripts/build-with-pipe-handling.mjs",
+    "postbuild": "cp dist/client/_headers dist/ && cp dist/client/_redirects dist/",
     "build:cloudflare": "bash scripts/build-cloudflare.sh",
     "build:railway": "DEPLOY_TARGET=railway astro build",
     "build:heroku": "DEPLOY_TARGET=heroku astro build",
