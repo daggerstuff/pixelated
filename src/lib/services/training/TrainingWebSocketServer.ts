@@ -58,6 +58,11 @@ interface WebSocketMessage {
 export class TrainingWebSocketServer {
   private wss: WebSocketServer
   private clients: Map<string, TrainingSessionClient> = new Map()
+  private messageRateLimits: Map<string, number[]> = new Map()
+  private mutedUsers: Set<string> = new Set()
+  private bannedUsers: Set<string> = new Set()
+  private sessionOwners: Map<string, string> = new Map()
+  private readonly MAX_MESSAGES_PER_MINUTE = 30
   private readonly AUTH_TIMEOUT_MS = 10000 // 10 seconds to authenticate
 
   constructor(port: number) {
@@ -292,6 +297,22 @@ export class TrainingWebSocketServer {
       }))
     }
   }
+  private checkRateLimit(clientId: string): boolean {
+    const now = Date.now()
+    const timestamps = this.messageRateLimits.get(clientId) || []
+
+    // Filter out timestamps older than 60 seconds
+    const recentTimestamps = timestamps.filter(ts => now - ts < 60000)
+
+    if (recentTimestamps.length >= this.MAX_MESSAGES_PER_MINUTE) {
+      return false
+    }
+
+    recentTimestamps.push(now)
+    this.messageRateLimits.set(clientId, recentTimestamps)
+    return true
+  }
+
 
   private handleMessage(ws: WebSocket, clientId: string, message: WebSocketMessage) {
     switch (message.type) {
@@ -304,8 +325,68 @@ export class TrainingWebSocketServer {
       case 'coaching_note':
         this.handleCoachingNote(clientId, message.payload)
         break
+      case 'mute_user':
+        this.handleMuteUser(clientId, message.payload)
+        break
+      case 'ban_user':
+        this.handleBanUser(clientId, message.payload)
+        break
       default:
         logger.warn('Unknown message type', { type: message.type })
+    }
+  }
+
+  private handleMuteUser(clientId: string, payload: { userId: string, mute: boolean }) {
+    const client = this.clients.get(clientId)
+    if (!client || !client.sessionId || !client.isAuthenticated) return
+
+    if (client.role !== 'supervisor') {
+      this.sendError(client.ws, 'Unauthorized: Only supervisors can mute users.')
+      return
+    }
+
+    const targetKey = `${payload.userId}:${client.sessionId}`
+    if (payload.mute) {
+      this.mutedUsers.add(targetKey)
+      logger.info('User muted', { userId: payload.userId, sessionId: client.sessionId, mutedBy: client.userId })
+    } else {
+      this.mutedUsers.delete(targetKey)
+      logger.info('User unmuted', { userId: payload.userId, sessionId: client.sessionId, unmutedBy: client.userId })
+    }
+
+    // Notify session about mute status change
+    this.broadcastToSession(client.sessionId, {
+      type: 'user_mute_status',
+      payload: { userId: payload.userId, isMuted: payload.mute }
+    })
+  }
+
+  private handleBanUser(clientId: string, payload: { userId: string }) {
+    const client = this.clients.get(clientId)
+    if (!client || !client.sessionId || !client.isAuthenticated) return
+
+    if (client.role !== 'supervisor') {
+      this.sendError(client.ws, 'Unauthorized: Only supervisors can ban users.')
+      return
+    }
+
+    const targetKey = `${payload.userId}:${client.sessionId}`
+    this.bannedUsers.add(targetKey)
+    logger.info('User banned from session', { userId: payload.userId, sessionId: client.sessionId, bannedBy: client.userId })
+
+    // Notify session
+    this.broadcastToSession(client.sessionId, {
+      type: 'user_banned',
+      payload: { userId: payload.userId }
+    })
+
+    // Find and disconnect the banned user if they are currently connected to this session
+    for (const [id, c] of this.clients.entries()) {
+      if (c.userId === payload.userId && c.sessionId === client.sessionId) {
+        this.sendError(c.ws, 'You have been banned from this session.')
+        c.ws.close(4003, 'Banned by supervisor')
+        this.clients.delete(id)
+      }
     }
   }
 
@@ -322,26 +403,54 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // TODO: Validate session access permissions
-    // - Verify user has permission to access this sessionId
-    // - Verify role matches user's actual permissions
-    // - Check if session exists and is active
-    // - Enforce role-based access (e.g., only supervisors can join as 'supervisor')
-
-    // In development mode, allow role to be set from payload (for testing different roles)
-    // In production, role should come from authentication token only
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    if (isDevelopment && payload.role) {
-      client.role = payload.role
+    // Check if banned
+    if (this.bannedUsers.has(`${client.userId}:${payload.sessionId}`)) {
+      logger.warn('Banned user attempted to join session', {
+        userId: client.userId,
+        sessionId: payload.sessionId
+      })
+      this.sendError(ws, 'You have been banned from this session')
+      return
     }
 
-    // Use authenticated user info, but allow userId from payload in development
-    if (isDevelopment && payload.userId) {
-      client.userId = payload.userId
+    // In development mode, allow role and userId to be set from payload (for testing different roles)
+    // In production, role should come from authentication token only
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (isDevelopment) {
+      if (payload.role) client.role = payload.role
+      if (payload.userId) client.userId = payload.userId
+    } else {
+      // Production role validation
+      if (payload.role === 'supervisor' && client.role !== 'supervisor') {
+        this.sendError(ws, 'Unauthorized: You do not have permission to join as supervisor')
+        return
+      }
+      if (payload.role === 'observer' && client.role === 'trainee') {
+        this.sendError(ws, 'Unauthorized: Trainees cannot join as observers')
+        return
+      }
+      if (payload.role) {
+        const roleHierarchy: Record<string, number> = { 'trainee': 0, 'observer': 1, 'supervisor': 2 }
+        if (roleHierarchy[payload.role] <= roleHierarchy[client.role]) {
+          client.role = payload.role
+        }
+      }
     }
 
     // Use authenticated user info, not payload (prevent role spoofing)
     client.sessionId = payload.sessionId
+
+    // Assign session owner if not already set
+    if (!this.sessionOwners.has(payload.sessionId)) {
+      if (client.role === 'trainee' || client.role === 'supervisor') {
+        this.sessionOwners.set(payload.sessionId, client.userId)
+        logger.info('Session owner assigned', {
+          sessionId: payload.sessionId,
+          userId: client.userId,
+          role: client.role
+        })
+      }
+    }
 
     logger.info('Client joined session', {
       clientId,
@@ -366,16 +475,46 @@ export class TrainingWebSocketServer {
       }
     }))
   }
-
   private handleSessionMessage(clientId: string, payload: { content: string, role: string }) {
     const client = this.clients.get(clientId)
     if (!client || !client.sessionId || !client.isAuthenticated) {
       return
     }
 
-    // TODO: Validate user has permission to send messages in this session
+    // Rate limiting
+    if (!this.checkRateLimit(clientId)) {
+      this.sendError(client.ws, 'Rate limit exceeded. Please wait a moment.')
+      return
+    }
+
+    // Check if muted or banned
+    if (this.bannedUsers.has(`${client.userId}:${client.sessionId}`)) {
+      this.sendError(client.ws, 'You have been banned from this session')
+      client.ws.close(4003, 'Banned from session')
+      return
+    }
+
+    if (this.mutedUsers.has(`${client.userId}:${client.sessionId}`)) {
+      this.sendError(client.ws, 'You are muted and cannot send messages')
+      return
+    }
+
+    // Verify user has permission to send messages in this session
     // - Verify user is the session owner or has appropriate role
-    // - Rate limiting to prevent abuse
+    const isOwner = this.sessionOwners.get(client.sessionId) === client.userId
+    const isSupervisor = client.role === 'supervisor'
+
+    // Only owner (trainee) or supervisors can send session messages
+    // Observers should only send coaching notes
+    if (!isOwner && !isSupervisor) {
+      logger.warn('Unauthorized session message attempt', {
+        userId: client.userId,
+        sessionId: client.sessionId,
+        role: client.role
+      })
+      this.sendError(client.ws, 'Unauthorized: Only the session owner or a supervisor can send messages.')
+      return
+    }
 
     // Broadcast chat message to everyone in the session
     this.broadcastToSession(client.sessionId, {
@@ -395,16 +534,31 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // TODO: Validate user has permission to send coaching notes
-    // - Only supervisors/observers should be able to send coaching notes
-    // - Verify role matches 'supervisor' or 'observer'
+    // Rate limiting
+    if (!this.checkRateLimit(clientId)) {
+      this.sendError(client.ws, 'Rate limit exceeded. Please wait a moment.')
+      return
+    }
 
+    // Check if muted or banned
+    if (this.bannedUsers.has(`${client.userId}:${client.sessionId}`)) {
+      this.sendError(client.ws, 'You have been banned from this session')
+      return
+    }
+
+    if (this.mutedUsers.has(`${client.userId}:${client.sessionId}`)) {
+      this.sendError(client.ws, 'You are muted and cannot send coaching notes')
+      return
+    }
+
+    // Role-based access control
     if (client.role !== 'supervisor' && client.role !== 'observer') {
       logger.warn('Unauthorized coaching note attempt', {
         clientId,
         userId: client.userId,
         role: client.role
       })
+      this.sendError(client.ws, 'Unauthorized: Only supervisors and observers can send coaching notes.')
       return
     }
 
@@ -422,7 +576,6 @@ export class TrainingWebSocketServer {
       }
     )
   }
-
   private handleDisconnect(clientId: string) {
     const client = this.clients.get(clientId)
     if (client && client.sessionId) {
