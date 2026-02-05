@@ -137,7 +137,7 @@ export async function checkRateLimitHealth(): Promise<{
     }
 
     return { status, details }
-  } catch (_error) {
+  } catch {
     return {
       status: 'unhealthy',
       details: {

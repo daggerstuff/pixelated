@@ -31,10 +31,10 @@ export function generateThreatId(): string {
       const fn = asObj['randomBytes'] as (size: number) => Buffer
       return `threat_${fn(16).toString('hex')}`
     }
-  } catch (_err) {
+  } catch (err) {
     // Log at debug level to avoid swallowing errors silently
     logger.debug('generateThreatId: crypto fallback failed', {
-      error: String(_err),
+      error: String(err),
     })
   }
   return _secureId('threat_')
@@ -52,9 +52,9 @@ function _secureId(prefix = ''): string {
       const fn = asObj['randomBytes'] as (size: number) => Buffer
       return `${prefix}${fn(16).toString('hex')}`
     }
-  } catch (_err) {
+  } catch (err) {
     // Log at debug level to avoid swallowing errors silently
-    logger.debug('_secureId: crypto fallback failed', { error: String(_err) })
+    logger.debug('_secureId: crypto fallback failed', { error: String(err) })
   }
   return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }

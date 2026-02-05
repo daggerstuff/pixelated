@@ -7,7 +7,6 @@ import { aiRepository } from '@/lib/db/ai'
 import { getUserById } from '@/services/auth0.service'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { requireRole } from '@/lib/auth/auth0-middleware'
 
 export const GET = async ({ request, url }) => {
   let userId: string | null = null

@@ -38,27 +38,27 @@ export const queryStaleTimes = {
   // Sessions change infrequently
   sessions: 5 * 60_000, // 5 minutes
   sessionDetail: 2 * 60_000, // 2 minutes
-  
+
   // Discovery results change during active discovery
   discovery: 30_000, // 30 seconds
   discoveryDetail: 60_000, // 1 minute
-  
+
   // Evaluations change when updated manually
   evaluations: 2 * 60_000, // 2 minutes
   evaluationDetail: 60_000, // 1 minute
-  
+
   // Acquisitions change during active acquisition
   acquisitions: 30_000, // 30 seconds
   acquisitionDetail: 60_000, // 1 minute
-  
+
   // Integration plans change infrequently
   integrationPlans: 5 * 60_000, // 5 minutes
   integrationPlanDetail: 2 * 60_000, // 2 minutes
-  
+
   // Progress updates frequently
   progress: 15_000, // 15 seconds
   progressMetrics: 30_000, // 30 seconds
-  
+
   // Reports are static once generated
   reports: 10 * 60_000, // 10 minutes
   reportDetail: 30 * 60_000, // 30 minutes
@@ -96,13 +96,13 @@ export const journalResearchQueryClient =
 type QueryKeyFactory = (...args: unknown[]) => QueryKey
 type MutationKeyFactory = (...args: unknown[]) => MutationKey
 
-const buildKey =
+const _buildKey =
   (...parts: unknown[]): QueryKeyFactory =>
-  (...args) => [...parts, ...args]
+    (...args) => [...parts, ...args]
 
 const buildMutationKey =
   (...parts: unknown[]): MutationKeyFactory =>
-  (...args) => [...parts, ...args]
+    (...args) => [...parts, ...args]
 
 export const journalResearchQueryKeys = {
   root: ['journal-research'] as const,

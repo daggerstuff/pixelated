@@ -56,20 +56,10 @@
 *kubeconfig*.yaml
 *kubeconfig*.yml
 *service-connection*.json
-.Jules
-.aider*
-.amazonq/
-.augment/
-.brv
-.claude-flow/
-.claude/
 .codacy
-.codebuff
-.codebuff/agents
 .copilot-tracking/
 .coverage
 .coverage.*
-.crush/
 .cursor/rclone.conf
 .eggs/
 .endgame
@@ -151,8 +141,6 @@
 /test-results/
 /yarn-debug.log*
 /yarn-error.log*
-AGENTS.md
-CLAUDE.md
 MANIFEST
 build/
 cover/
@@ -204,3 +192,8 @@ yt-downloader
 
 config/secrets/*
 !config/secrets/*.example
+
+.ralph
+.notes
+.crush
+.trunk

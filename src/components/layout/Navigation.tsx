@@ -2,7 +2,6 @@ import type { UserRole } from '../../types/auth'
 import React from 'react'
 
 import { authClient } from '@/lib/auth-client'
-import { useStore } from 'nanostores'
 import { cn } from '@/lib/utils'
 
 export interface NavigationItem {
@@ -44,7 +43,7 @@ export function Navigation({
   className = '',
   isMobile = false,
 }: NavigationProps) {
-  const { data: user, isPending: loading } = authClient.useSession()
+  const { data: user } = authClient.useSession()
   const isAuthenticated = !!user?.user
 
   // Filter navigation items based on authentication state and user roles

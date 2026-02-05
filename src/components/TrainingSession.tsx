@@ -100,7 +100,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
       if (newProgress % 25 === 0) {
         addProgressSnapshot(newProgress)
       }
-    } catch (err) {
+    } catch {
       setClientResponse('Error getting response')
     } finally {
       setIsLoading(false)

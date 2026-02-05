@@ -5,7 +5,7 @@
 
 import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
-import { BETTER_AUTH_CONFIG } from './config'
+import { BCRYPT_CONFIG, PASSWORD_CONFIG } from './config'
 
 /**
  * Generate secure random token
@@ -25,7 +25,7 @@ export function generateSecureId(prefix: string = 'id'): string {
  * Hash password with bcrypt
  */
 export async function hashPassword(password: string): Promise<string> {
-  const rounds = BETTER_AUTH_CONFIG.security.bcryptRounds
+  const rounds = BCRYPT_CONFIG.rounds
   return await bcrypt.hash(password, rounds)
 }
 
@@ -55,8 +55,8 @@ export function isValidPassword(password: string): {
   errors: string[]
 } {
   const errors: string[] = []
-  const minLength = BETTER_AUTH_CONFIG.emailAndPassword.minPasswordLength
-  const maxLength = BETTER_AUTH_CONFIG.emailAndPassword.maxPasswordLength
+  const minLength = PASSWORD_CONFIG.minLength
+  const maxLength = PASSWORD_CONFIG.maxLength
 
   if (password.length < minLength) {
     errors.push(`Password must be at least ${minLength} characters long`)

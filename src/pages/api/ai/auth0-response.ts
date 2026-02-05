@@ -16,8 +16,6 @@ import type {
   AIServiceOptions,
   AIStreamChunk,
   TherapeuticResponse,
-  AICompletion,
-  AIUsage,
 } from '@/lib/ai/models/ai-types'
 import { createTogetherAIService } from '@/lib/ai/services/together'
 import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
@@ -116,7 +114,6 @@ export const GET: APIRoute = async ({ request }) => {
  */
 export const POST: APIRoute = async ({
   request,
-  locals,
 }) => {
   const startTime = Date.now()
   const endpoint = '/api/ai/response'

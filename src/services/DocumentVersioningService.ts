@@ -387,7 +387,7 @@ export class DocumentVersioningService {
     return { files, folders }
   }
 
-  private async generateChecksum(buffer: Buffer): Promise<string> {
+  private async generateChecksum(_buffer: Buffer): Promise<string> {
     // In a real implementation, you'd use crypto.createHash('sha256')
     // For now, return a mock checksum
     return 'mock-checksum-' + Math.random().toString(36).substring(2, 15)

@@ -67,8 +67,7 @@ export interface ValidationMetrics {
 
 export class GlobalThreatIntelligenceNetworkCore
   extends EventEmitter
-  implements GlobalThreatIntelligenceNetwork
-{
+  implements GlobalThreatIntelligenceNetwork {
   private redis: Redis
   private mongoClient: MongoClient
   private db: Db
@@ -150,7 +149,7 @@ export class GlobalThreatIntelligenceNetworkCore
     try {
       this.mongoClient = new MongoClient(
         process.env.MONGODB_URI ||
-          'mongodb://localhost:27017/global_threat_intelligence',
+        'mongodb://localhost:27017/global_threat_intelligence',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('global_threat_intelligence')
@@ -486,7 +485,7 @@ export class GlobalThreatIntelligenceNetworkCore
       if (cryptoModule.randomUUID) {
         return cryptoModule.randomUUID()
       }
-    } catch (e) {
+    } catch {
       // Fallback to timestamp-based ID
     }
     return `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`

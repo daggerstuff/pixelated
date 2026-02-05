@@ -14,7 +14,7 @@ function _secureId(prefix = ''): string {
     if (typeof nodeCrypto.randomBytes === 'function') {
       return `${prefix}${nodeCrypto.randomBytes(16).toString('hex')}`
     }
-  } catch (_e) {
+  } catch {
     // ignore errors when crypto is unavailable
   }
 
@@ -187,8 +187,7 @@ export interface PredictiveThreatIntelligence {
 
 export class AdvancedPredictiveThreatIntelligence
   extends EventEmitter
-  implements PredictiveThreatIntelligence
-{
+  implements PredictiveThreatIntelligence {
   private redis!: Redis
   private mongoClient!: MongoClient
   private timeSeriesForecaster!: TimeSeriesForecaster
@@ -1348,7 +1347,7 @@ export class AdvancedPredictiveThreatIntelligence
   private calculateTimeHorizon(timeframe: TimeWindow): string {
     const days = Math.ceil(
       (timeframe.end.getTime() - timeframe.start.getTime()) /
-        (1000 * 60 * 60 * 24),
+      (1000 * 60 * 60 * 24),
     )
     return `${days} days`
   }
@@ -1436,7 +1435,7 @@ interface ModelRegistry {
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(private _mongoClient: MongoClient) {}
+  constructor(private _mongoClient: MongoClient) { }
 
   async registerModel(_id: string, _model: unknown): Promise<void> {
     // Implementation placeholder
@@ -1893,8 +1892,8 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
       let i = 0;
       i <=
       dataPoints.length -
-        this.config.lookbackWindow -
-        this.config.predictionHorizon;
+      this.config.lookbackWindow -
+      this.config.predictionHorizon;
       i++
     ) {
       const xWindow = dataPoints.slice(i, i + this.config.lookbackWindow)

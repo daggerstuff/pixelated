@@ -70,7 +70,7 @@ export class HealthMonitor {
           ])
           result.responseTime = performance.now() - checkStart
           return result
-        } catch (_error) {
+        } catch (error) {
           return {
             name,
             status: 'unhealthy' as const,
@@ -141,7 +141,7 @@ export class HealthMonitor {
           release: os.release(),
         },
       }
-    } catch (_error) {
+    } catch (error) {
       return {
         name: 'system',
         status: 'unhealthy',
@@ -181,7 +181,7 @@ export class HealthMonitor {
           usagePercent: Math.round(usagePercent * 100) / 100,
         },
       }
-    } catch (_error) {
+    } catch (error) {
       return {
         name: 'memory',
         status: 'unhealthy',
@@ -217,7 +217,7 @@ export class HealthMonitor {
           heapUsagePercent: Math.round(heapUsagePercent * 100) / 100,
         },
       }
-    } catch (_error) {
+    } catch (error) {
       return {
         name: 'disk',
         status: 'unhealthy',

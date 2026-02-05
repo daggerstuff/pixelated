@@ -336,7 +336,7 @@ export class BusinessIntelligenceService {
       // Combine multiple data sources for comprehensive industry analysis
       const marketData = await this.getMarketTrends(industry)
       const competitors = await this.getCompetitorAnalysis(industry)
-      const opportunities = await this.getMarketOpportunities(industry)
+      /* const opportunities = */ await this.getMarketOpportunities(industry)
 
       return {
         overview: `Analysis of ${industry} industry with ${marketData.length} tracked companies`,
@@ -372,12 +372,12 @@ export class BusinessIntelligenceService {
     }
   }
 
-  private getDemoMarketTrends(industry: string): MarketData[] {
+  private getDemoMarketTrends(_industry: string): MarketData[] {
     const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META']
     return symbols.map((symbol) => this.getDemoMarketData(symbol))
   }
 
-  private getDemoCompetitorAnalysis(industry: string): CompetitorAnalysis[] {
+  private getDemoCompetitorAnalysis(_industry: string): CompetitorAnalysis[] {
     return [
       {
         company: 'Market Leader Inc',
@@ -402,7 +402,7 @@ export class BusinessIntelligenceService {
     ]
   }
 
-  private getDemoMarketOpportunities(industry: string): MarketOpportunity[] {
+  private getDemoMarketOpportunities(_industry: string): MarketOpportunity[] {
     return [
       {
         segment: 'Emerging Markets',
@@ -523,7 +523,7 @@ export class BusinessIntelligenceService {
   }
 
   private async fetchCompetitorsFromAPI(
-    industry: string,
+    _industry: string,
   ): Promise<CompetitorAnalysis[]> {
     // This would integrate with real competitor APIs
     // For now, return empty to trigger fallback
@@ -531,7 +531,7 @@ export class BusinessIntelligenceService {
   }
 
   private async analyzeMarketOpportunities(
-    industry: string,
+    _industry: string,
   ): Promise<MarketOpportunity[]> {
     // This would analyze real market data
     // For now, return empty to trigger fallback
