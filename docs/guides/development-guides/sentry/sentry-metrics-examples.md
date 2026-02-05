@@ -5,7 +5,7 @@ Sentry Metrics are already configured and enabled in this project. This document
 ## Configuration Status
 
 ✅ **Metrics are enabled** in both `sentry.client.config.js` and `sentry.server.config.js`  
-✅ **SDK Version**: `@sentry/astro@^10.28.1` (requires >= 10.28.1)  
+✅ **SDK Version**: `@sentry/astro@^10.28.2` (requires >= 10.28.2)  
 ✅ **DSN**: Configured and matches Sentry project  
 ✅ **Utilities**: Available in `src/lib/sentry/utils.ts`
 
@@ -87,7 +87,9 @@ sessionMetrics.completed('therapy', 45) // duration in minutes
 ## Metric Types
 
 ### Counter (`count`)
+
 Use for incrementing values:
+
 - Button clicks
 - API calls
 - Feature usage
@@ -95,7 +97,9 @@ Use for incrementing values:
 - Job completions
 
 ### Gauge (`gauge`)
+
 Use for values that can go up and down:
+
 - Active sessions
 - Queue depth
 - Memory usage
@@ -103,7 +107,9 @@ Use for values that can go up and down:
 - Cache size
 
 ### Distribution (`distribution`)
+
 Use for value distributions (calculates percentiles: p50, p90, p99):
+
 - Response times
 - Request sizes
 - Processing durations
@@ -152,10 +158,12 @@ await flushMetrics()
 ## Configuration
 
 Metrics are configured in:
+
 - **Client**: `sentry.client.config.js`
 - **Server**: `sentry.server.config.js`
 
 Both include:
+
 - `enableMetrics: true` (enabled by default)
 - `beforeSendMetric` callback for filtering/modifying metrics
 - Environment-specific attributes

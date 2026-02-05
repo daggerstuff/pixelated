@@ -7,6 +7,7 @@ This comprehensive testing suite validates the deployment pipeline improvement i
 The testing suite is organized into two main categories:
 
 ### Unit Tests
+
 - **Environment Manager**: Tests Node.js and pnpm installation and verification functions
 - **Backup Manager**: Tests backup preservation, archiving, and rollback command generation
 - **Container Manager**: Tests container building, health checks, and traffic switching
@@ -14,6 +15,7 @@ The testing suite is organized into two main categories:
 - **Secure Environment Manager**: Tests environment file encryption, transfer, and secure deployment
 
 ### Integration Tests
+
 - **End-to-End Deployment**: Tests complete deployment scenarios from start to finish
 - **Failure Scenarios**: Tests various failure conditions and recovery mechanisms
 - **Rollback Procedures**: Tests rollback and recovery mechanisms
@@ -23,6 +25,7 @@ The testing suite is organized into two main categories:
 ## Quick Start
 
 ### Run All Tests
+
 ```bash
 # Run both unit and integration tests
 ./tests/deployment/run_all_tests.sh
@@ -32,6 +35,7 @@ The testing suite is organized into two main categories:
 ```
 
 ### Run Specific Test Categories
+
 ```bash
 # Run only unit tests
 ./tests/deployment/run_all_tests.sh --unit-only
@@ -41,6 +45,7 @@ The testing suite is organized into two main categories:
 ```
 
 ### Run Individual Test Components
+
 ```bash
 # Run unit tests for specific components
 ./tests/deployment/run_unit_tests.sh --component environment
@@ -54,7 +59,7 @@ The testing suite is organized into two main categories:
 
 ## Test Structure
 
-```
+```text
 tests/deployment/
 ├── README.md                           # This file
 ├── run_all_tests.sh                   # Comprehensive test runner
@@ -76,7 +81,9 @@ tests/deployment/
 ## Test Features
 
 ### Mock Services
+
 All tests use comprehensive mock services to simulate:
+
 - SSH connections and remote command execution
 - Docker container operations
 - Registry push/pull operations
@@ -84,7 +91,9 @@ All tests use comprehensive mock services to simulate:
 - Network conditions and failures
 
 ### Performance Validation
+
 Tests validate performance requirements:
+
 - Environment setup: < 5 seconds
 - Code synchronization: < 30 seconds
 - Container build: < 2 minutes
@@ -92,14 +101,18 @@ Tests validate performance requirements:
 - Total deployment: < 5 minutes
 
 ### Security Testing
+
 Tests validate security measures:
+
 - Environment variable encryption/decryption
 - Sensitive data masking in logs
 - Secure file cleanup procedures
 - Access control and permissions
 
 ### Failure Simulation
+
 Tests simulate various failure scenarios:
+
 - Network connectivity issues
 - Build failures
 - Health check failures
@@ -109,6 +122,7 @@ Tests simulate various failure scenarios:
 ## Test Results
 
 Test results are saved to `/tmp/deployment-*-results/` directories with:
+
 - Detailed test logs
 - Performance metrics
 - Summary reports
@@ -117,16 +131,19 @@ Test results are saved to `/tmp/deployment-*-results/` directories with:
 ### Understanding Test Output
 
 #### Success Indicators
+
 - `✅ PASSED`: Test completed successfully
 - `[PASS]`: Individual test assertion passed
 - `SUCCESS`: Operation completed successfully
 
 #### Failure Indicators
+
 - `❌ FAILED`: Test failed
 - `[FAIL]`: Individual test assertion failed
 - `FAIL`: Operation failed
 
 #### Information
+
 - `[INFO]`: General information
 - `[WARNING]`: Non-critical issues
 - `[DEBUG]`: Detailed debugging information
@@ -136,32 +153,38 @@ Test results are saved to `/tmp/deployment-*-results/` directories with:
 The test suite validates all requirements from the deployment pipeline improvement specification:
 
 ### Requirement 1: Node.js Environment Modernization
-- ✓ Node.js 24.11.0 installation and verification
-- ✓ pnpm 10.28.1 installation and verification
+
+- ✓ Node.js 24.13.0 installation and verification
+- ✓ pnpm 10.28.2 installation and verification
 - ✓ Version validation and error handling
 
 ### Requirement 2: Safe Pipeline-Style Deployment
+
 - ✓ Health check validation before traffic switching
 - ✓ Container lifecycle management
 - ✓ Failure handling and rollback procedures
 
 ### Requirement 3: Backup Management and Retention
+
 - ✓ Backup preservation until deployment verification
 - ✓ Timestamped backup archiving
 - ✓ Retention policy (up to 3 backups)
 - ✓ Rollback command generation
 
 ### Requirement 4: Container Registry Integration
+
 - ✓ Container tagging with timestamp and commit hash
 - ✓ GitLab registry push and verification
 - ✓ Registry-based rollback commands
 
 ### Requirement 5: Git Repository Synchronization
+
 - ✓ .git directory inclusion in rsync
 - ✓ Git status and remote configuration verification
 - ✓ Git-based update instructions
 
 ### Requirement 6: Comprehensive Health Check System
+
 - ✓ Application readiness waiting (60-second timeout)
 - ✓ Root endpoint testing (200 status validation)
 - ✓ Critical API endpoint testing
@@ -169,12 +192,14 @@ The test suite validates all requirements from the deployment pipeline improveme
 - ✓ Health check summary reporting
 
 ### Requirement 7: Rollback and Recovery Mechanisms
+
 - ✓ Container-based rollback commands
 - ✓ Filesystem rollback procedures
 - ✓ Registry-based rollback options
 - ✓ Rollback priority and reliability assessment
 
 ### Requirement 8: Secure Environment Variable Management
+
 - ✓ Environment file encryption (OpenSSL/GPG)
 - ✓ Secure transfer and decryption
 - ✓ Automatic cleanup of temporary files
@@ -182,6 +207,7 @@ The test suite validates all requirements from the deployment pipeline improveme
 - ✓ Environment variable rollback support
 
 ### Requirement 9: Enhanced Logging and Monitoring
+
 - ✓ Structured logging with timestamps
 - ✓ Detailed error logging and context
 - ✓ Deployment summary with timing information
@@ -193,6 +219,7 @@ The test suite validates all requirements from the deployment pipeline improveme
 ### Common Issues
 
 #### Test Script Not Found
+
 ```bash
 # Make sure you're running from the correct directory
 cd /path/to/pixelated
@@ -200,6 +227,7 @@ cd /path/to/pixelated
 ```
 
 #### Permission Denied
+
 ```bash
 # Make test scripts executable
 chmod +x tests/deployment/*.sh
@@ -209,10 +237,9 @@ chmod +x tests/deployment/integration/*.sh
 #### Mock Command Failures
 Tests use mock commands that simulate real operations. If you see unexpected failures:
 1. Check that mock commands are being created properly
-2. Verify PATH is set correctly in test environment
-3. Review test logs for specific error messages
 
-### Getting Help
+#### Getting Help
+
 
 1. **Review Test Logs**: Check detailed logs in `/tmp/deployment-*-results/`
 2. **Run Individual Tests**: Isolate issues by running specific test components

@@ -353,7 +353,7 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
           // batch render or single render
           this.#allResults = res.results
           this.#render({ requestId })
-        } catch (_err) {
+        } catch (err) {
           this.#showOnlyError(requestId)
         }
       } else {
@@ -549,7 +549,7 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
           const hasMore = this.#renderedCount < this.#allResults.length
           this.#showPagination(hasMore)
         }
-      } catch (_err) {
+      } catch (err) {
         this.#showOnlyError(requestId)
       } finally {
         this.#results?.removeAttribute('aria-busy')

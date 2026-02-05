@@ -326,7 +326,7 @@ export class ContextualEnhancer {
 
   private calculateEngagementProgress(
     history: SessionContext[],
-    profile: PatientPsiProfile,
+    _profile: PatientPsiProfile,
   ): number {
     return Math.min(1.0, 0.7 + history.length * 0.03)
   }

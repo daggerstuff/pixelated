@@ -74,7 +74,7 @@ export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
   const groups = threatData.reduce(
     (acc, t) => {
       const key = JSON.stringify({ type: t.type, source: t.source })
-      ;(acc[key] = acc[key] || []).push(t)
+        ; (acc[key] = acc[key] || []).push(t)
       return acc
     },
     {} as Record<string, ThreatData[]>,

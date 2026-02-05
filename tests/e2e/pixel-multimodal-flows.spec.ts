@@ -81,7 +81,7 @@ test.describe('Pixel Multimodal Chat - Core Flows', () => {
 
     test.describe('Audio Recording', () => {
 
-        test('record audio with permission', async ({ page }) => {
+        test('record audio with permission', async () => {
             await chatPage.grantMicrophonePermission()
             await chatPage.recordAudio(2000) // 2 seconds
 

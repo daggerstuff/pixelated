@@ -3,7 +3,7 @@
 ## Current Deployment Info (Updated: 2025-11-25)
 
 | Resource | Value |
-|----------|-------|
+| ---------- | ------- |
 | **AKS Cluster** | `pixelated-aks-cluster` |
 | **Resource Group** | `pixelated-azure-resources` |
 | **Region** | East US |
@@ -16,6 +16,7 @@
 ### DNS Configuration
 
 Point these A records to `20.242.241.80`:
+
 - `staging.pixelatedempathy.com`
 - `pixelatedempathy.com`
 
@@ -38,6 +39,7 @@ This document outlines all variables and secrets that must be configured in Azur
    - **Allow access to all pipelines**: ✅ Check this or scope to specific pipelines
 5. Save the variable group
 6. Reference in pipeline YAML:
+
    ```yaml
    variables:
    - group: pixelated-pipeline-variables
@@ -57,9 +59,9 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Build Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
-| `NODE_VERSION` | `24.11.0` | ❌ No | Node.js version to use |
-| `PNPM_VERSION` | `10.28.1` | ❌ No | pnpm version to use |
+| -------------- | ------- | --------- | ------------- |
+| `NODE_VERSION` | `24.13.0` | ❌ No | Node.js version to use |
+| `PNPM_VERSION` | `10.28.2` | ❌ No | pnpm version to use |
 | `PYTHON_VERSION` | `3.11` | ❌ No | Python version (if needed) |
 | `NODE_ENV` | `production` | ❌ No | Node environment |
 | `GITHUB_ACTIONS` | `false` | ❌ No | Set to false for Azure Pipelines |
@@ -67,7 +69,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Git/Repository Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `SYSTEM_ACCESSTOKEN` | `$(System.AccessToken)` | ✅ Yes | Azure DevOps access token (automatically provided) |
 
 **Note**: `SYSTEM_ACCESSTOKEN` is automatically available in Azure Pipelines when `persistCredentials: true` is set in checkout. You don't need to manually configure this, but the pipeline needs permission to access it.
@@ -75,7 +77,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Azure Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `AZURE_SUBSCRIPTION` | `azure-startups-connection` | ❌ No | Azure subscription service connection name |
 | `AZURE_RESOURCE_GROUP` | `pixelated-azure-resources` | ❌ No | Azure resource group name |
 | `AZURE_LOCATION` | `eastus` | ❌ No | Azure region |
@@ -84,7 +86,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Kubernetes Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `AKS_CLUSTER_NAME` | `pixelated-aks-cluster` | ❌ No | Azure Kubernetes Service cluster name |
 | `KUBE_NAMESPACE` | `pixelated-staging` | ❌ No | Kubernetes namespace for staging |
 | `KUBE_NAMESPACE_PROD` | `pixelated-production` | ❌ No | Kubernetes namespace for production |
@@ -92,7 +94,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Application Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `IMAGE_REPOSITORY` | `pixelatedempathy` | ❌ No | Docker image repository name |
 | `STAGING_URL` | `https://staging.pixelatedempathy.com` | ❌ No | Staging environment URL |
 | `PRODUCTION_URL` | `https://pixelatedempathy.com` | ❌ No | Production environment URL |
@@ -101,7 +103,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Sentry Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `SENTRY_DSN` | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No | Sentry DSN for error tracking |
 | `SENTRY_ORG` | `pixelated-empathy-dq` | ❌ No | Sentry organization slug |
 | `SENTRY_PROJECT` | `pixel-astro` | ❌ No | Sentry project slug (environments separated via `-e staging`/`-e production` flags) |
@@ -110,7 +112,7 @@ This document outlines all variables and secrets that must be configured in Azur
 ### Deployment Configuration Variables
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `DEPLOYMENT_TIMEOUT` | `600` | ❌ No | Deployment timeout in seconds |
 | `HEALTH_CHECK_TIMEOUT` | `300` | ❌ No | Health check timeout in seconds |
 
@@ -119,23 +121,26 @@ This document outlines all variables and secrets that must be configured in Azur
 These variables are required for the OVH AI Training stage. Add them if using OVH for model training.
 
 | Variable Name | Value | Secret? | Description |
-|--------------|-------|---------|-------------|
+| -------------- | ------- | --------- | ------------- |
 | `OVH_AI_TOKEN` | `<your-ovh-token>` | ✅ Yes | OVH AI Platform authentication token |
 | `WANDB_API_KEY` | `<your-wandb-key>` | ✅ Yes | Weights & Biases API key for experiment tracking |
 | `TRIGGER_AI_TRAINING` | `false` | ❌ No | Set to `true` to trigger AI training stage |
 
 **To trigger AI training:**
+
 ```bash
 az pipelines run --name "your-pipeline" --parameters TRIGGER_AI_TRAINING=true
 ```
 
 **OVH Setup:**
+
 1. Create an OVH AI Platform user at [OVH Control Panel](https://us.ovhcloud.com/)
 2. Assign roles: `AI Training Operator` and `ObjectStore operator`
 3. Generate an application token
 4. Add the token to Azure DevOps variable group as `OVH_AI_TOKEN`
 
 **Object Storage Setup:**
+
 - Create containers: `pixel-data` and `pixelated-checkpoints`
 - Region: US-EAST-VA
 
@@ -146,11 +151,12 @@ For the Schedule Posts pipeline to work, you need to:
 1. **Grant repository permissions**:
    - Go to **Project Settings** → **Repositories** → Select your repository
    - Go to **Security** tab
-   - Find **Project Collection Build Service** or **[Your Project] Build Service**
+   - Find **Project Collection Build Service** or **\[Your Project\] Build Service**
    - Grant **Contribute** permission ✅
 
 2. **Enable OAuth token access**:
    - In your pipeline YAML, the checkout step should have:
+
      ```yaml
      - checkout: self
        persistCredentials: true
@@ -169,8 +175,9 @@ For the Schedule Posts pipeline to work, you need to:
 Create a variable group named `pixelated-pipeline-variables` with:
 
 **Non-secret variables:**
-- `NODE_VERSION`: `24.11.0`
-- `PNPM_VERSION`: `10.28.1`
+
+- `NODE_VERSION`: `24.13.0`
+- `PNPM_VERSION`: `10.28.2`
 - `PYTHON_VERSION`: `3.11`
 - `NODE_ENV`: `production`
 - `GITHUB_ACTIONS`: `false`
@@ -188,6 +195,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 - `HEALTH_CHECK_TIMEOUT`: `300`
 
 **Secret variables:**
+
 - `SENTRY_AUTH_TOKEN`: Your Sentry authentication token (for release tracking)
 
 **Note:** System.AccessToken is auto-provided for git operations.
@@ -203,15 +211,18 @@ After configuring variables:
 ## Troubleshooting
 
 ### "Permission denied" errors
+
 - Verify repository permissions are granted to Build Service
 - Check that `persistCredentials: true` is set in checkout step
 
 ### Variables not found
+
 - Verify variable group is linked to the pipeline
 - Check variable names match exactly (case-sensitive)
 - Ensure variable scope includes your pipeline
 
 ### Git operations failing
+
 - Verify `SYSTEM_ACCESSTOKEN` is available (automatic with persistCredentials)
 - Check git config is set correctly in the pipeline step
 
@@ -223,4 +234,3 @@ After configuring variables:
 4. ✅ **Use pipeline-specific variables** for environment-specific values
 5. ✅ **Rotate secrets regularly** in production
 6. ✅ **Limit access** to variable groups using Azure DevOps security groups
-

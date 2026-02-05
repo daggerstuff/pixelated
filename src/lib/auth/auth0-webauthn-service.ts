@@ -436,7 +436,7 @@ export class Auth0WebAuthnService {
   /**
    * Validate WebAuthn credential response
    */
-  async validateCredentialResponse(userId: string, response: any): Promise<boolean> {
+  async validateCredentialResponse(userId: string, _response: any): Promise<boolean> {
     try {
       // In a real implementation, we would validate the credential response
       // For now, we'll simulate validation

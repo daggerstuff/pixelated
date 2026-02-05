@@ -12,7 +12,7 @@ router.get('/templates', authenticateToken, async (req, res) => {
   try {
     const templates = WorkflowService.getWorkflowTemplates()
     res.json(templates)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch workflow templates' })
   }
 })
@@ -25,7 +25,7 @@ router.get('/templates/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Template not found' })
     }
     res.json(template)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch workflow template' })
   }
 })
@@ -67,7 +67,7 @@ router.get(
         req.params.documentId,
       )
       res.json(instances)
-    } catch (_error) {
+    } catch {
       res.status(500).json({ error: 'Failed to fetch workflow instances' })
     }
   },
@@ -81,7 +81,7 @@ router.get('/instances/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Workflow instance not found' })
     }
     res.json(instance)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch workflow instance' })
   }
 })
@@ -106,7 +106,7 @@ router.get('/instances', authenticateToken, async (req, res) => {
 
     const instances = WorkflowService.searchWorkflowInstances(filters)
     res.json(instances)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to search workflow instances' })
   }
 })
@@ -177,7 +177,7 @@ router.get('/instances/:id/comments', authenticateToken, async (req, res) => {
   try {
     const comments = WorkflowService.getCommentsForWorkflow(req.params.id)
     res.json(comments)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch comments' })
   }
 })
@@ -187,7 +187,7 @@ router.get('/instances/:id/approvals', authenticateToken, async (req, res) => {
   try {
     const approvals = WorkflowService.getApprovalsForWorkflow(req.params.id)
     res.json(approvals)
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch approvals' })
   }
 })
@@ -201,7 +201,7 @@ router.get(
     try {
       const analytics = WorkflowService.getWorkflowAnalytics()
       res.json(analytics)
-    } catch (_error) {
+    } catch {
       res.status(500).json({ error: 'Failed to fetch analytics' })
     }
   },
@@ -216,7 +216,7 @@ router.get(
     try {
       const overdue = WorkflowService.getOverdueWorkflows()
       res.json(overdue)
-    } catch (_error) {
+    } catch {
       res.status(500).json({ error: 'Failed to fetch overdue workflows' })
     }
   },

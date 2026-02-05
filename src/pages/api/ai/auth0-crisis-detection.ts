@@ -1,6 +1,5 @@
 import type { APIRoute, APIContext } from 'astro'
 import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
-import { getAIServiceByProvider } from '@/lib/ai/providers'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,

@@ -229,7 +229,7 @@ export class Auth0SocialAuthService {
     try {
       await this.getUserInfo(accessToken)
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }

@@ -135,7 +135,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       if (enableBenchmarks) {
         runBenchmark(operation)
       }
-    } catch (_err) {
+    } catch {
       setOperations((prev) =>
         prev.map((op) =>
           op.id === operation.id ? { ...op, status: 'error' as const } : op,

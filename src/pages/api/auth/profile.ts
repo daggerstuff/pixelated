@@ -5,7 +5,6 @@ import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { detectAndRedactPHI } from '../../../lib/security/phiDetection'
 import { csrfProtection, rateLimitMiddleware } from '../../../lib/auth/middleware'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
-import { redactPotentialPhi } from '../../../lib/utils/phi-sanitizer'
 
 /**
  * User profile endpoint using Auth0
