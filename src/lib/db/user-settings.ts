@@ -1,12 +1,9 @@
-// Use server-only helper for MongoDB types
-import type { ObjectId } from '@/lib/server-only/mongodb-types'
 import { mongoClient } from './mongoClient'
 import { createAuditLog } from '../audit'
 
-// MongoDB-based user settings types
-
+// User settings types
 export interface UserSettings {
-  _id?: ObjectId
+  _id?: string
   user_id: string
   theme: string
   notifications_enabled: boolean
@@ -55,12 +52,19 @@ export interface UpdateUserSettings {
 export async function getUserSettings(
   userId: string,
 ): Promise<UserSettings | null> {
-  const db = await mongoClient.connect()
-  const settings = await db
+  await mongoClient.connect()
+  const settings = await mongoClient.db
     .collection<UserSettings>('user_settings')
     .findOne({ user_id: userId })
 
-  return settings
+  if (settings && settings._id) {
+    return {
+      ...settings,
+      _id: settings._id.toString(),
+    }
+  }
+
+  return settings as UserSettings | null
 }
 
 /**
@@ -70,8 +74,8 @@ export async function createUserSettings(
   settings: NewUserSettings,
   request?: Request,
 ): Promise<UserSettings> {
-  const db = await mongoClient.connect()
-  const collection = db.collection<UserSettings>('user_settings')
+  await mongoClient.connect()
+  const collection = mongoClient.db.collection<UserSettings>('user_settings')
 
   const now = new Date()
   const newSettings = {
@@ -84,7 +88,7 @@ export async function createUserSettings(
 
   const createdSettings = {
     ...newSettings,
-    _id: result.insertedId,
+    _id: result.insertedId.toString(),
   } as UserSettings
 
   // Log the event for HIPAA compliance
@@ -109,8 +113,8 @@ export async function updateUserSettings(
   updates: UpdateUserSettings,
   request?: Request,
 ): Promise<UserSettings> {
-  const db = await mongoClient.connect()
-  const collection = db.collection<UserSettings>('user_settings')
+  await mongoClient.connect()
+  const collection = mongoClient.db.collection<UserSettings>('user_settings')
 
   const now = new Date()
 
@@ -128,11 +132,16 @@ export async function updateUserSettings(
 
   // In MongoDB Node.js driver 6.x+, findOneAndUpdate might return the document directly
   // or a ModifyResult object with a value property.
-  const updatedSettings = (result && 'value' in result ? result.value : result) as UserSettings
+  const updatedSettings = (result && 'value' in result ? result.value : result) as any
 
   if (!updatedSettings) {
     throw new Error('Failed to update/create user settings')
   }
+
+  const settingsWithId = {
+    ...updatedSettings,
+    _id: updatedSettings._id?.toString(),
+  } as UserSettings
 
   // Log the event for HIPAA compliance
   await createAuditLog({
@@ -146,7 +155,7 @@ export async function updateUserSettings(
     },
   } as any)
 
-  return updatedSettings
+  return settingsWithId
 }
 
 /**
