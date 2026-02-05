@@ -4,7 +4,7 @@ import type { WebSocket } from 'ws'
 import { WebSocketServer as WSServer } from 'ws'
 import type { IncomingMessage } from 'http'
 import { z } from 'zod'
-// Supabase admin import removed - migrate to MongoDB/auth provider
+import { validateToken } from "@/lib/auth/auth0-jwt-service"
 
 // Define message types using Zod for runtime validation
 const BaseMessageSchema = z.object({
@@ -39,12 +39,12 @@ interface ServerMessage {
  * WebSocketServer provides real-time notification capabilities using WebSockets
  *
  * This server:
- * 1. Verifies client authentication using Supabase tokens
+ * 1. Verifies client authentication using Auth0 tokens
  * 2. Manages client connections and disconnections
  * 3. Handles client messages for notification operations
  * 4. Distributes notifications to connected clients
  *
- * Authentication is performed using Supabase JWT tokens passed in the
+ * Authentication is performed using Auth0 JWT tokens passed in the
  * Authorization header as a Bearer token.
  */
 export class WebSocketServer {
@@ -115,25 +115,24 @@ export class WebSocketServer {
   /**
    * Verify the authentication token
    */
-  private async verifyToken(_token: string): Promise<string> {
+  private async verifyToken(token: string): Promise<string> {
     try {
-      // Use Supabase admin client to verify the token and get user information
-      // TODO: Replace with MongoDB/auth provider implementation for token verification and user lookup
-      // For now, simulate a user ID
-      const userId = 'mock-user-id'
-      logger
-        .createBuildSafeLogger('websocket')
-        .info('Token verified successfully (Supabase removed)', {
-          userId,
-          role: 'user',
-        })
-      return userId
+      const result = await validateToken(token, 'access')
+
+      if (!result.valid || !result.userId) {
+        throw new Error(result.error || 'Token validation failed')
+      }
+
+      logger.createBuildSafeLogger('websocket').info('Token verified successfully', {
+        userId: result.userId,
+        role: result.role,
+      })
+
+      return result.userId
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Token verification failed', {
-          error: error instanceof Error ? String(error) : String(error),
-        })
+      logger.createBuildSafeLogger('websocket').error('Token verification failed', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
       throw new Error('Invalid token', { cause: error })
     }
   }
