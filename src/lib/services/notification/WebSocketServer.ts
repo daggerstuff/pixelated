@@ -4,7 +4,7 @@ import type { WebSocket } from 'ws'
 import { WebSocketServer as WSServer } from 'ws'
 import type { IncomingMessage } from 'http'
 import { z } from 'zod'
-import { validateToken } from "@/lib/auth/auth0-jwt-service"
+import { validateToken } from '../../auth/auth0-jwt-service'
 
 // Define message types using Zod for runtime validation
 const BaseMessageSchema = z.object({
@@ -301,5 +301,20 @@ export class WebSocketServer {
         })
       this.sendError(ws, 'Error processing message')
     }
+  }
+
+  /**
+   * Register an event listener
+   */
+  public on(event: string, listener: (...args: any[]) => void): this {
+    this.wss.on(event, listener)
+    return this
+  }
+
+  /**
+   * Close the server
+   */
+  public close(): void {
+    this.wss.close()
   }
 }
