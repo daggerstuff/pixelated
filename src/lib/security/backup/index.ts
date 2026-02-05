@@ -22,6 +22,7 @@ import {
 } from './types'
 import { isBrowser } from '../../browser/is-browser'
 import * as NodeCrypto from 'crypto'
+import { allDAOs } from '@/services/mongodb.dao'
 
 // Import crypto polyfill statically to avoid issues during build
 
@@ -57,12 +58,12 @@ const getCrypto = async () => {
         const importedKey = await subtle.importKey(
           'raw',
           key,
-          { name: 'AES-GCM' },
+          { name: 'AES-GCM' } as AlgorithmIdentifier,
           false,
-          ['encrypt'],
+          ['encrypt'] as KeyUsage[],
         )
         const encrypted = await subtle.encrypt(
-          { name: 'AES-GCM', iv },
+          { name: 'AES-GCM', iv } as AesGcmParams,
           importedKey,
           data,
         )
@@ -82,9 +83,9 @@ const getCrypto = async () => {
         const importedKey = await subtle.importKey(
           'raw',
           key,
-          { name: 'AES-GCM' },
+          { name: 'AES-GCM' } as AlgorithmIdentifier,
           false,
-          ['decrypt'],
+          ['decrypt'] as KeyUsage[],
         )
         // Combine ciphertext and auth tag for Web Crypto API
         const combined = new Uint8Array(data.length + authTag.length)
@@ -94,7 +95,7 @@ const getCrypto = async () => {
         const combinedBuffer = new ArrayBuffer(combined.byteLength)
         new Uint8Array(combinedBuffer).set(combined)
         const decrypted = await subtle.decrypt(
-          { name: 'AES-GCM', iv },
+          { name: 'AES-GCM', iv } as AesGcmParams,
           importedKey,
           combinedBuffer,
         )
@@ -809,15 +810,28 @@ export class BackupSecurityManager {
    * Get data to backup based on backup type
    */
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    // Implementation would collect app data based on backup type
-    // For now return dummy data for demonstration
-    // [PIX-44] TODO: No more fucking cop-outs
-    const dummyData = {
-      message: `This is a ${type} backup created at ${new Date().toISOString()}`,
-    }
+    logger.info(`Collecting data for backup type: ${type}`)
 
-    // Use TextEncoder for cross-environment compatibility
-    return new TextEncoder().encode(JSON.stringify(dummyData))
+    // For now, we perform a full data collection for all types
+    // In a more advanced implementation, we could filter by date for DIFFERENTIAL/INCREMENTAL
+    const backupData: Record<string, any[]> = {}
+
+    try {
+      const daoKeys = Object.keys(allDAOs)
+      for (const key of daoKeys) {
+        const dao = allDAOs[key]
+        if (dao && typeof dao.findAll === 'function') {
+          logger.debug(`Collecting data from DAO: ${key}`)
+          backupData[key] = await dao.findAll()
+        }
+      }
+
+      logger.info(`Successfully collected data from ${Object.keys(backupData).length} DAOs`)
+      return new TextEncoder().encode(JSON.stringify(backupData))
+    } catch (error: unknown) {
+      logger.error('Failed to collect data for backup:', { error: String(error) })
+      throw new Error(`Data collection failed: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
 
   /**
@@ -1005,13 +1019,39 @@ export class BackupSecurityManager {
    * @param data The restored data object
    */
   private async processRestoredData(data: unknown): Promise<void> {
-    // This is where you would implement the actual data restoration logic
-    // The implementation would be specific to your application's needs
-    // [PIX-43] TODO: What did I just fucking say?
-    logger.info('Processing restored data')
+    logger.info('Processing restored data for recovery')
 
-    // For now, just log that we received the data
-    logger.debug('Restored data', { data })
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid backup data format: expected an object')
+    }
+
+    const backupData = data as Record<string, any[]>
+    const daoKeys = Object.keys(backupData)
+
+    try {
+      for (const key of daoKeys) {
+        const dao = allDAOs[key]
+        if (dao && typeof dao.deleteAll === 'function' && typeof dao.insertMany === 'function') {
+          logger.info(`Restoring collection: ${key} (${backupData[key]?.length || 0} items)`)
+
+          // Clear existing data
+          await dao.deleteAll()
+
+          // Insert backed up data
+          const items = backupData[key]
+          if (items && items.length > 0) {
+            await dao.insertMany(items)
+          }
+        } else {
+          logger.warn(`No matching DAO found for collection: ${key}, skipping restoration`)
+        }
+      }
+
+      logger.info('Data restoration completed successfully')
+    } catch (error: unknown) {
+      logger.error('Failed to restore data:', { error: String(error) })
+      throw new Error(`Data restoration failed: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
 }
 
