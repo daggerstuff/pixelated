@@ -125,7 +125,6 @@
 /.openskills/
 /.output
 /.python
-/.spec-workflow/
 /.temp
 /.tmp
 /.vite/
@@ -155,11 +154,7 @@
 AGENTS.md
 CLAUDE.md
 MANIFEST
-azure-devops-kubeconfig.yaml
 build/
-claude-wrapper.sh
-cluster-backup-*/
-codecov/
 cover/
 db.sqlite3
 db.sqlite3-journal
@@ -168,11 +163,6 @@ dist/
 downloads/
 eggs/
 external/
-filled-azure-connection.json
-filled-k8s-connection.json
-gcp-service-account-key.json
-gitlab-runner-values.yaml
-htmlcov/
 instance/
 k8s/azure/aks-service-connection.json
 k8s/azure/azure-rm-service-connection.json
@@ -183,13 +173,9 @@ logs/*.jsonl
 mcp_agent.config.yaml
 mcp_agent.secrets.yaml
 memAgent/
-ngc-cli/
 node_modules/
-openspec/
 packages
 parts/
-pip-delete-this-directory.txt
-pip-log.txt
 pnpm-workspace.yaml
 processed/
 reports/
