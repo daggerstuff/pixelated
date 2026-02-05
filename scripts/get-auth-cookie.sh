@@ -25,8 +25,9 @@ trap "rm -f $COOKIE_JAR" EXIT
 
 # Attempt to login and capture cookies
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -c "$COOKIE_JAR" \
-  -X POST "${PRODUCTION_URL}/api/auth/login" \
+  -X POST "${PRODUCTION_URL}/api/auth/signin" \
   -H "Content-Type: application/json" \
+  -H "X-Device-ID: lighthouse-cli" \
   -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}" \
   2>/dev/null || echo "000")
 
@@ -36,7 +37,7 @@ if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "302" ]; then
   echo "Please verify:"
   echo "  1. The production URL is correct"
   echo "  2. The email and password are valid"
-  echo "  3. The /api/auth/login endpoint exists"
+  echo "  3. The /api/auth/signin endpoint exists (Auth0 migration confirmed)"
   exit 1
 fi
 
@@ -44,10 +45,10 @@ echo "✅ Login successful (HTTP $HTTP_CODE)"
 echo ""
 
 # Extract the authentication cookies
-ACCESS_TOKEN=$(grep -o 'sb-access-token[[:space:]]*[^[:space:]]*' "$COOKIE_JAR" | awk '{print $NF}' || echo "")
-REFRESH_TOKEN=$(grep -o 'sb-refresh-token[[:space:]]*[^[:space:]]*' "$COOKIE_JAR" | awk '{print $NF}' || echo "")
+AUTH_TOKEN=$(grep -o 'auth-token[[:space:]]*[^[:space:]]*' "$COOKIE_JAR" | awk '{print $NF}' || echo "")
+REFRESH_TOKEN=$(grep -o 'refresh-token[[:space:]]*[^[:space:]]*' "$COOKIE_JAR" | awk '{print $NF}' || echo "")
 
-if [ -z "$ACCESS_TOKEN" ] && [ -z "$REFRESH_TOKEN" ]; then
+if [ -z "$AUTH_TOKEN" ]; then
   echo "⚠️  No authentication cookies found in response"
   echo ""
   echo "Cookie jar contents:"
@@ -61,19 +62,12 @@ if [ -z "$ACCESS_TOKEN" ] && [ -z "$REFRESH_TOKEN" ]; then
 fi
 
 # Format the cookie string
-COOKIE_STRING=""
-if [ -n "$ACCESS_TOKEN" ]; then
-  COOKIE_STRING="sb-access-token=$ACCESS_TOKEN"
-fi
+COOKIE_STRING="auth-token=$AUTH_TOKEN"
 if [ -n "$REFRESH_TOKEN" ]; then
-  if [ -n "$COOKIE_STRING" ]; then
-    COOKIE_STRING="$COOKIE_STRING; sb-refresh-token=$REFRESH_TOKEN"
-  else
-    COOKIE_STRING="sb-refresh-token=$REFRESH_TOKEN"
-  fi
+  COOKIE_STRING="$COOKIE_STRING; refresh-token=$REFRESH_TOKEN"
 fi
 
-echo "✅ Authentication cookies extracted!"
+echo "✅ Auth0 authentication tokens extracted!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📋 LH_AUTH_COOKIE value (copy this):"
