@@ -123,7 +123,9 @@ deploy_services() {
     fi
 
     # Create deployment backup
-    cp -r . "deployment-backup/"
+    mkdir -p "deployment-backup"
+    rsync -a --exclude='deployment-backup' . "deployment-backup/"
+
 
     # Start services with health checks
     $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml up -d
