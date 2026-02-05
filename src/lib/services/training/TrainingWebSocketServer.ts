@@ -524,7 +524,7 @@ export class TrainingWebSocketServer {
    * Check if a session has no more connected clients
    */
   private isSessionEmpty(sessionId: string): boolean {
-    for (const client of this.clients.values()) {
+    for (const client of Array.from(this.clients.values())) {
       if (client.sessionId === sessionId) {
         return false
       }
@@ -566,7 +566,7 @@ export class TrainingWebSocketServer {
   }
 
   private broadcastToSession(sessionId: string, message: WebSocketMessage) {
-    for (const client of this.clients.values()) {
+    for (const client of Array.from(this.clients.values())) {
       if (client.sessionId === sessionId && client.ws.readyState === WebSocket.OPEN) {
         client.ws.send(JSON.stringify(message))
       }
@@ -585,7 +585,7 @@ export class TrainingWebSocketServer {
     allowedRoles: Array<'trainee' | 'observer' | 'supervisor'>,
     message: WebSocketMessage
   ) {
-    for (const client of this.clients.values()) {
+    for (const client of Array.from(this.clients.values())) {
       if (
         client.sessionId === sessionId &&
         client.ws.readyState === WebSocket.OPEN &&
