@@ -73,7 +73,7 @@ jobs:
           for i in {1..3}; do
             echo "📦 Attempt $i of 3: Installing dependencies..."
             ERROR_LOG=$(mktemp)
-            
+
             if pnpm install --no-frozen-lockfile 2>&1 | tee "$ERROR_LOG"; then
               echo "✅ Dependencies installed successfully"
               rm -f "$ERROR_LOG"
@@ -83,7 +83,7 @@ jobs:
               echo "❌ Install failed with exit code: $EXIT_CODE"
               echo "📝 Error output:"
               cat "$ERROR_LOG"
-              
+
               # Check for network errors
               if grep -qE "ENOTFOUND|ETIMEDOUT|ECONNRESET|fetch failed|network" "$ERROR_LOG"; then
                 echo "⚠️ Network error detected"
@@ -93,7 +93,7 @@ jobs:
                   exit 1
                 fi
               fi
-              
+
               # Check for peer dependency issues
               if grep -qE "WARN.*peer dep|unmet peer" "$ERROR_LOG"; then
                 echo "⚠️ Peer dependency warnings detected, trying with --no-strict-peer-dependencies..."
@@ -103,9 +103,9 @@ jobs:
                   break
                 fi
               fi
-              
+
               rm -f "$ERROR_LOG"
-              
+
               if [ $i -lt 3 ]; then
                 DELAY=$((5 * i))
                 echo "⏳ Retrying in $DELAY seconds..."
@@ -325,7 +325,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp || 'N/A' }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                    "text": "🚨 *PRODUCTION MONITORING FAILED*\n\n*Environment:* Production (Critical Alert)\n*URL:* ${{ env.BASE_URL }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis is a PRODUCTION failure requiring immediate attention.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
                   }
                 }
               ]
@@ -773,6 +773,7 @@ jobs:
     name: Performance Check
     runs-on: ubuntu-latest
     needs: [health-check-production]
+    environment: production
     permissions:
       contents: read
     env:
@@ -925,7 +926,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Time:* ${{ github.event.head_commit.timestamp || 'N/A' }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
+                    "text": "⚠️ *Performance Issues Detected in PRODUCTION*\n\n*Environment:* Production\n*URL:* ${{ env.BASE_URL }}\n*Workflow:* ${{ github.workflow }}\n*Run ID:* ${{ github.run_id }}\n\nThis affects production performance and should be reviewed.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View GitHub Action>"
                   }
                 }
               ]

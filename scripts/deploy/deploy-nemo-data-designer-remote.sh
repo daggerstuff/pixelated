@@ -4,7 +4,7 @@
 set -e
 
 REMOTE_USER="${REMOTE_USER:-vivi}"
-REMOTE_HOST="${REMOTE_HOST:-212.2.244.60}"
+REMOTE_HOST="${REMOTE_HOST:-194.113.75.34}"
 REMOTE_PATH="${REMOTE_PATH:-~/nemo-microservices}"
 REMOTE_PORT="${REMOTE_PORT:-8080}"
 
@@ -72,9 +72,9 @@ echo "✅ NVIDIA_API_KEY found"
 # Copy deployment script to remote
 echo ""
 echo "Copying deployment script to remote server..."
-scp scripts/deploy/deploy-nemo-data-designer-remote-server.sh "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/deploy.sh" 2>/dev/null || \
+scp scripts/infrastructure/deploy-nemo-data-designer-remote-server.sh "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/deploy.sh" 2>/dev/null || \
     ssh "${REMOTE_USER}@${REMOTE_HOST}" "mkdir -p ${REMOTE_PATH}" && \
-    scp scripts/deploy/deploy-nemo-data-designer-remote-server.sh "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/deploy.sh"
+    scp scripts/infrastructure/deploy-nemo-data-designer-remote-server.sh "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/deploy.sh"
 
 # Make script executable
 ssh "${REMOTE_USER}@${REMOTE_HOST}" "chmod +x ${REMOTE_PATH}/deploy.sh"

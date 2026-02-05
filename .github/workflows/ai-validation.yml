@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       ENV_NAME:
-        description: "Environment to validate (staging/production)"
+        description: "Target environment for validation"
         required: false
         default: "staging"
         type: choice

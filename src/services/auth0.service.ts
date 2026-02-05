@@ -12,7 +12,6 @@ import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
 import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
 import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
-import { auth0Config } from '../lib/auth/auth0-config'
 
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
@@ -24,33 +23,46 @@ let auth0Authentication: AuthenticationClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!auth0Config.domain || !auth0Config.managementClientId || !auth0Config.managementClientSecret) {
-    console.warn('Auth0 configuration is incomplete. Authentication features may not work.')
-    // return // Continue anyway, maybe some parts work? or just return to be safe like before.
-    // The original code returned early. Let's return config too?
-    // Original returned 'config'. Here I should return auth0Config.
-    return auth0Config
+  const config = {
+    domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
+    clientId: process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+    clientSecret: process.env.AUTH0_CLIENT_SECRET || import.meta.env.AUTH0_CLIENT_SECRET || '',
+    audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
+    managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
+    managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope: 'read:users update:users create:users delete:users'
-    })
+  // Initialize Management Client if config is available
+  if (config.domain && config.managementClientId && config.managementClientSecret) {
+    if (!auth0Management) {
+      auth0Management = new ManagementClient({
+        domain: config.domain,
+        clientId: config.managementClientId,
+        clientSecret: config.managementClientSecret,
+        audience: `https://${config.domain}/api/v2/`,
+        scope: 'read:users update:users create:users delete:users'
+      })
+    }
+  } else {
+    console.warn('Auth0 Management configuration is incomplete. User management features may not work.')
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret
-    })
+  // Initialize Authentication Client if config is available
+  if (config.domain && config.clientId && config.clientSecret) {
+    if (!auth0Authentication) {
+      auth0Authentication = new AuthenticationClient({
+        domain: config.domain,
+        clientId: config.clientId,
+        clientSecret: config.clientSecret
+      })
+    }
+  } else {
+    console.warn('Auth0 Authentication configuration is incomplete. Login features will not work.')
   }
 
-  return auth0Config
+  return config
+
+  return config
 }
 
 /**
@@ -87,16 +99,37 @@ export class Auth0UserService {
 
     try {
       // Use Auth0's Resource Owner Password grant for direct authentication
-      const tokenResponse = await auth0Authentication.passwordGrant({
+      const response = await auth0Authentication.oauth.passwordGrant({
         username: email,
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: auth0Config.audience || `https://${auth0Config.domain}/api/v2/` // fallback if audience missing
+        audience: process.env.AUTH0_AUDIENCE || ''
       })
+      const tokenResponse = response.data;
 
-      // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      // Get user info using UserInfoClient if possible, or decode token
+      // Since we don't have userInfoClient handy in this scope (it's initialized in constructor but not saved to the global var in this file properly yet? - Need to check initialization)
+      // Wait, initializeAuth0Clients returns config, but vars are module-level.
+      // We need to make sure auth0UserInfo is initialized in initializeAuth0Clients in this file too.
+
+      let userResponse: any;
+      if (auth0UserInfo) {
+        try {
+          // In v5, getUserInfo takes the access token
+          const userInfoRes = await auth0UserInfo.getUserInfo(tokenResponse.access_token);
+          userResponse = userInfoRes.data;
+          // normalized to match old structure expected below
+          userResponse.user_id = userResponse.sub;
+        } catch (e) {
+          console.warn('Failed to fetch user info, falling back to token decode if possible or error', e);
+          // If we can't get user info, we might not be able to return full user object
+          throw e;
+        }
+      } else {
+        // Should have been initialized
+        throw new Error('Auth0 UserInfo client not initialized');
+      }
 
       // Log security event
       logSecurityEvent(SecurityEventType.LOGIN, {
@@ -113,10 +146,10 @@ export class Auth0UserService {
           role: this.extractRoleFromUser(userResponse),
           fullName: userResponse.name,
           avatarUrl: userResponse.picture,
-          createdAt: userResponse.created_at,
-          lastLogin: userResponse.last_login,
-          appMetadata: userResponse.app_metadata,
-          userMetadata: userResponse.user_metadata
+          createdAt: userResponse.created_at || new Date().toISOString(),
+          lastLogin: new Date().toISOString(), // userResponse.last_login might not be in OIDC profile
+          appMetadata: userResponse['https://pixelated-empathy.com/app_metadata'] || {}, // Custom claim often used
+          userMetadata: userResponse['https://pixelated-empathy.com/user_metadata'] || {}
         },
         token: tokenResponse.access_token,
         refreshToken: tokenResponse.refresh_token

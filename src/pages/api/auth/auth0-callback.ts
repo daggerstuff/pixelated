@@ -49,33 +49,20 @@ export const GET = async ({
     // Complete authentication flow with Auth0
     const { user: socialUser, tokens } = await auth0SocialAuth.authenticate(authCode, redirectUri)
 
-    // Check if user already exists in our system
-    let existingUser = await auth0UserService.findUserByEmail(socialUser.email)
-
-    if (!existingUser) {
-      // Create new user in Auth0
-      existingUser = await auth0UserService.createUser(
-        socialUser.email,
-        // Generate a random password for social users since they'll use OAuth
-        Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8),
-        'user' // Default role
-      )
-
-      // Update user profile with social information
-      if (existingUser) {
-        await auth0UserService.updateUser(existingUser.id, {
-          name: socialUser.name,
-          picture: socialUser.picture,
-          email_verified: socialUser.emailVerified,
-          user_metadata: {
-            provider: socialUser.provider,
-            given_name: socialUser.givenName,
-            family_name: socialUser.familyName,
-            created_via_social: true
-          }
-        })
-      }
+    // Check if we can/should sync with Auth0 Management API (optional)
+    let existingUser = null;
+    try {
+      existingUser = await auth0UserService.findUserByEmail(socialUser.email)
+    } catch (e) {
+      // Ignore management API errors (e.g. not initialized), proceed with social identity
+      console.log('Skipping Auth0 Management API lookup (likely not configured or error)', e instanceof Error ? e.message : e);
     }
+
+    // In a social login flow, Auth0 has already created/linked the user.
+    // We just need a reference to the user ID and role.
+    // If we couldn't fetch from Management API, we use the identity from the token.
+    const userId = existingUser?.id || socialUser.id;
+    const userRole = existingUser?.role || 'user'; // Default role if we can't fetch real role
 
     // Set cookies for session management
     cookies.set('auth-token', tokens.accessToken, {
@@ -97,54 +84,52 @@ export const GET = async ({
       })
     }
 
-    // Check if user has a profile, create one if needed
-    if (existingUser) {
-      const db = await mongodb.connect()
-      const profilesCollection = db.collection('profiles')
+    // Ensure local profile exists (Sync logic)
+    const db = await mongodb.connect()
+    const profilesCollection = db.collection('profiles')
 
-      const existingProfile = await profilesCollection.findOne({
-        userId: existingUser.id,
+    const existingProfile = await profilesCollection.findOne({
+      userId: userId,
+    })
+
+    if (!existingProfile) {
+      // Create a profile for the user
+      await profilesCollection.insertOne({
+        userId: userId,
+        fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
+        avatarUrl: socialUser.picture || null,
+        role: userRole,
+        provider: socialUser.provider,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
-
-      if (!existingProfile) {
-        // Create a profile for the user
-        await profilesCollection.insertOne({
-          userId: existingUser.id,
-          fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
-          avatarUrl: socialUser.picture || null,
-          role: existingUser.role,
-          provider: socialUser.provider,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })
-      } else {
-        // Update existing profile with social info
-        await profilesCollection.updateOne(
-          { userId: existingUser.id },
-          {
-            $set: {
-              fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
-              avatarUrl: socialUser.picture || existingProfile.avatarUrl,
-              provider: socialUser.provider,
-              updatedAt: new Date(),
-            }
-          }
-        )
-      }
-
-      // Log the sign in for audit/compliance
-      await createAuditLog(
-        AuditEventType.LOGIN,
-        'auth.signin.social',
-        existingUser.id,
-        'auth',
+    } else {
+      // Update existing profile with social info
+      await profilesCollection.updateOne(
+        { userId: userId },
         {
-          email: socialUser.email,
-          provider: socialUser.provider,
-          name: socialUser.name,
-        },
+          $set: {
+            fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
+            avatarUrl: socialUser.picture || existingProfile.avatarUrl,
+            provider: socialUser.provider,
+            updatedAt: new Date(),
+          }
+        }
       )
     }
+
+    // Log the sign in for audit/compliance
+    await createAuditLog(
+      AuditEventType.LOGIN,
+      'auth.signin.social',
+      userId,
+      'auth',
+      {
+        email: socialUser.email,
+        provider: socialUser.provider,
+        name: socialUser.name,
+      },
+    )
 
     // Redirect to dashboard or original destination
     const destination = state ? decodeURIComponent(state) : '/dashboard'
