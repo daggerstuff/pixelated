@@ -54,14 +54,14 @@ export async function getUserSettings(
 ): Promise<UserSettings | null> {
   await mongoClient.connect()
   const settings = await mongoClient.db
-    .collection<UserSettings>('user_settings')
-    .findOne({ user_id: userId })
+    .collection('user_settings')
+    .findOne({ user_id: userId }) as any
 
   if (settings && settings._id) {
     return {
       ...settings,
       _id: settings._id.toString(),
-    }
+    } as UserSettings
   }
 
   return settings as UserSettings | null
@@ -75,7 +75,7 @@ export async function createUserSettings(
   request?: Request,
 ): Promise<UserSettings> {
   await mongoClient.connect()
-  const collection = mongoClient.db.collection<UserSettings>('user_settings')
+  const collection = mongoClient.db.collection('user_settings')
 
   const now = new Date()
   const newSettings = {
@@ -92,7 +92,8 @@ export async function createUserSettings(
   } as UserSettings
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  // Using the object syntax to match messages.ts pattern
+  const auditParams = {
     userId: settings.user_id,
     action: 'user_settings_created',
     resource: 'user_settings',
@@ -100,7 +101,8 @@ export async function createUserSettings(
       ipAddress: request?.headers.get('x-forwarded-for'),
       userAgent: request?.headers.get('user-agent'),
     },
-  } as any)
+  }
+  await (createAuditLog as any)(auditParams)
 
   return createdSettings
 }
@@ -114,7 +116,7 @@ export async function updateUserSettings(
   request?: Request,
 ): Promise<UserSettings> {
   await mongoClient.connect()
-  const collection = mongoClient.db.collection<UserSettings>('user_settings')
+  const collection = mongoClient.db.collection('user_settings')
 
   const now = new Date()
 
@@ -127,12 +129,12 @@ export async function updateUserSettings(
         updatedAt: now,
       },
     },
-    { returnDocument: 'after', upsert: true },
-  )
+    { returnDocument: 'after', upsert: true }
+  ) as any
 
   // In MongoDB Node.js driver 6.x+, findOneAndUpdate might return the document directly
   // or a ModifyResult object with a value property.
-  const updatedSettings = (result && 'value' in result ? result.value : result) as any
+  const updatedSettings = result && 'value' in result ? result.value : result
 
   if (!updatedSettings) {
     throw new Error('Failed to update/create user settings')
@@ -144,7 +146,7 @@ export async function updateUserSettings(
   } as UserSettings
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  const auditParams = {
     userId,
     action: 'user_settings_updated',
     resource: 'user_settings',
@@ -153,7 +155,8 @@ export async function updateUserSettings(
       ipAddress: request?.headers.get('x-forwarded-for'),
       userAgent: request?.headers.get('user-agent'),
     },
-  } as any)
+  }
+  await (createAuditLog as any)(auditParams)
 
   return settingsWithId
 }
