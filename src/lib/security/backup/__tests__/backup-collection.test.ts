@@ -57,9 +57,7 @@ describe('BackupSecurityManager Data Collection', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    manager = new BackupSecurityManager({
-      encryptionKey: Array.from({ length: 32 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('')
-    })
+    manager = new BackupSecurityManager()
   })
 
   describe('getDataForBackup', () => {
