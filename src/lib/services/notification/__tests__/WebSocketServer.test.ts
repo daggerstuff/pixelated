@@ -39,7 +39,7 @@ vi.mock('../../../logging/build-safe-logger', () => ({
 }))
 
 // Mock Auth0 JWT Service
-vi.mock('@/lib/auth/auth0-jwt-service', () => ({
+vi.mock('../../../auth/auth0-jwt-service', () => ({
   validateToken: vi.fn().mockResolvedValue({
     valid: true,
     userId: 'test-user',
@@ -174,7 +174,7 @@ describe('WebSocketServer', () => {
 
     it('should handle authentication failure', async () => {
       // Mock failed authentication
-      const { validateToken } = await import('@/lib/auth/auth0-jwt-service')
+      const { validateToken } = await import('../../../auth/auth0-jwt-service')
       vi.mocked(validateToken).mockResolvedValueOnce({
         valid: false,
         error: 'Invalid token',

@@ -1,10 +1,10 @@
 import type { WebSocket } from 'ws'
-import { config } from '@/config/env.config'
-import { EmailService, type EmailConfig } from '@/lib/email'
-import { redis } from '@/lib/redis'
+import { config } from '../../../config/env.config'
+import { EmailService, type EmailConfig } from '../../email'
+import { redis } from '../../redis'
 import type { IRedisService } from '../redis/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { RoutingContext } from '../../ai/mental-llama/routing/MentalHealthTaskRouter'
 import { z } from 'zod'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'
@@ -722,9 +722,7 @@ export class NotificationService {
       })
       // Rethrow to indicate failure to dispatch, allowing caller to handle
       throw new Error(
-        'Failed to dispatch crisis alert via NotificationService.',
-        { cause: error },
-      )
+        'Failed to dispatch crisis alert via NotificationService.')
     }
   }
 }

@@ -19,7 +19,7 @@ async function startWorker() {
   const notificationService = new NotificationService()
 
   // Create WebSocket server
-  wsServer = new WebSocketServer(config.notification.wsPort(), notificationService)
+  wsServer = new WebSocketServer(config.workers.notification.wsPort(), notificationService)
 
 
   // Handle WebSocket errors

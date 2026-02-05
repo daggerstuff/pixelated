@@ -133,7 +133,7 @@ export class WebSocketServer {
       logger.createBuildSafeLogger('websocket').error('Token verification failed', {
         error: error instanceof Error ? String(error) : String(error),
       })
-      throw new Error('Invalid token', { cause: error })
+      throw new Error('Invalid token')
     }
   }
 
