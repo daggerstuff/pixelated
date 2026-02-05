@@ -1,15 +1,16 @@
-import twilio, { type Twilio } from 'twilio'
+import twilio from 'twilio'
+type Twilio = any
 import { config } from '../../../config/env.config'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('smsUtils')
 
-let twilioClient: ReturnType<typeof twilio> | null = null
+let twilioClient: any | null = null
 
 /**
  * Initialize Twilio client with credentials
  */
-export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
+export function initializeTwilioClient(): any | null {
   const accountSid = config.twilio.accountSid()
   const authToken = config.twilio.authToken()
 

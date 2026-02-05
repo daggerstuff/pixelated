@@ -5,7 +5,7 @@
  * previous MongoDB-based authentication system.
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
 import type { Db } from 'mongodb'
 import { mongodb } from '../config/mongodb.config'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
@@ -18,6 +18,7 @@ import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 // Initialize Auth0 clients
 let auth0Management: ManagementClient | null = null
 let auth0Authentication: AuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 clients
@@ -43,7 +44,7 @@ function initializeAuth0Clients() {
       clientId: config.managementClientId,
       clientSecret: config.managementClientSecret,
       audience: `https://${config.domain}/api/v2/`,
-      scope: 'read:users update:users create:users delete:users'
+      // scope removed for v5 compatibility
     })
   }
 
@@ -51,7 +52,11 @@ function initializeAuth0Clients() {
     auth0Authentication = new AuthenticationClient({
       domain: config.domain,
       clientId: config.clientId,
-      clientSecret: config.clientSecret
+      // clientSecret removed from main options for v5 compatibility
+    })
+    auth0UserInfo = new UserInfoClient({
+      domain: config.domain,
+      // clientSecret removed from main options for v5 compatibility
     })
   }
 
@@ -92,7 +97,7 @@ export class Auth0UserService {
 
     try {
       // Use Auth0's Resource Owner Password grant for direct authentication
-      const tokenResponse = await auth0Authentication.passwordGrant({
+      const { data: tokenResponse } = await auth0Authentication.oauth.passwordGrant({
         username: email,
         password: password,
         realm: 'Username-Password-Authentication',
@@ -101,7 +106,7 @@ export class Auth0UserService {
       })
 
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      const { data: userResponse } = await auth0UserInfo!.getUserInfo(tokenResponse.access_token)
 
       // Log security event
        logSecurityEvent(SecurityEventType.LOGIN, {
@@ -146,7 +151,7 @@ export class Auth0UserService {
 
     try {
       // Create user in Auth0
-      const auth0User = await auth0Management.createUser({
+      const auth0User = await (auth0Management as any).users.create({
         email,
         password,
         connection: 'Username-Password-Authentication',
@@ -189,7 +194,7 @@ export class Auth0UserService {
     }
 
     try {
-      const auth0User = await auth0Management.getUser({ id: userId })
+      const auth0User = await (auth0Management as any).users.get({ id: userId })
 
       return {
         id: auth0User.user_id,
@@ -219,7 +224,7 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers()
+      const users = await (auth0Management as any).users.getAll()
       return users.map(user => ({
         id: user.user_id,
         email: user.email,
@@ -249,7 +254,7 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers({
+      const users = await (auth0Management as any).users.getAll({
         q: `email:"${email}"`,
         search_engine: 'v3'
       })
@@ -332,7 +337,7 @@ export class Auth0UserService {
         updateParams.app_metadata = appMetadataUpdates
       }
 
-      const auth0User = await auth0Management.updateUser(
+      const auth0User = await (auth0Management as any).users.update(
         { id: userId },
         updateParams
       )
@@ -366,7 +371,7 @@ export class Auth0UserService {
     }
 
     try {
-      await auth0Management.updateUser(
+      await (auth0Management as any).users.update(
         { id: userId },
         { password: newPassword }
       )
@@ -387,7 +392,7 @@ export class Auth0UserService {
 
     try {
       // Revoke refresh token
-      await auth0Authentication.revokeRefreshToken({
+      await (auth0Authentication as any).oauth.revokeRefreshToken({
         token: refreshToken
       })
     } catch (error) {
@@ -408,12 +413,12 @@ export class Auth0UserService {
 
     try {
       // Exchange refresh token for new access token
-      const tokenResponse = await auth0Authentication.refreshToken({
+      const { data: tokenResponse } = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken
       })
 
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      const { data: userResponse } = await auth0UserInfo!.getUserInfo(tokenResponse.access_token)
 
       return {
         user: {
@@ -453,7 +458,7 @@ export class Auth0UserService {
 
     try {
       // Decode token to get user info
-      const decodedToken = await auth0Authentication.getProfile(token)
+      const { data: decodedToken } = await auth0UserInfo!.getUserInfo(token)
 
       return {
         userId: decodedToken.user_id,
@@ -478,7 +483,7 @@ export class Auth0UserService {
     }
 
     try {
-      const ticket = await auth0Management.createPasswordChangeTicket({
+      const ticket = await (auth0Management as any).tickets.changePassword({
         user_id: userId,
         result_url: returnUrl,
         ttl_sec: 3600 // 1 hour

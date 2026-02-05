@@ -48,7 +48,7 @@ export async function sendNotification(
   // Import VAPID keys
   const privateKey = await subtle.importKey(
     'pkcs8',
-    base64ToUint8Array(vapidKeys.privateKey),
+    base64ToUint8Array(vapidKeys.privateKey) as any,
     {
       name: 'ECDSA',
       namedCurve: 'P-256',

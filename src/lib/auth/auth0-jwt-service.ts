@@ -3,7 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0'
 import * as jwt from 'jsonwebtoken'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
@@ -19,6 +19,7 @@ const AUTH0_CONFIG = {
 
 // Initialize Auth0 authentication client
 let auth0Authentication: AuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
@@ -32,7 +33,10 @@ function initializeAuth0Client() {
     auth0Authentication = new AuthenticationClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      // clientSecret removed from main options for v5 compatibility
+    })
+    auth0UserInfo = new UserInfoClient({
+      domain: AUTH0_CONFIG.domain
     })
   }
 }
@@ -209,7 +213,7 @@ export async function validateToken(
 
     // Now verify with UserInfo (acts as online signature/revocation check)
     // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
-    const userInfo = await auth0Authentication.getProfile(token)
+    const { data: userInfo } = await (auth0UserInfo as any).getUserInfo(token)
 
     // Extract user information
     const userId = userInfo.sub || payload.sub
@@ -269,12 +273,12 @@ export async function refreshAccessToken(
     }
 
     // Exchange refresh token for new access token
-    const tokenResponse = await auth0Authentication.refreshToken({
+    const { data: tokenResponse } = await (auth0Authentication as any).oauth.refreshTokenGrant({
       refresh_token: refreshToken
     })
 
     // Get user info from new access token
-    const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+    const { data: userResponse } = await auth0UserInfo!.getUserInfo(tokenResponse.access_token)
 
     // Extract user information
     const userId = userResponse.sub || ''

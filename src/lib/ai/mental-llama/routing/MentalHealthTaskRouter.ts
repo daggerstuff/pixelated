@@ -3,7 +3,6 @@ import type {
   RoutingInput,
   RoutingDecision,
   LLMInvoker,
-  RoutingContext,
 } from '../types/mentalLLaMATypes'
 
 export interface RoutingContext {
@@ -227,15 +226,15 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
   // Perform a structured LLM classification call and return a RoutingDecision when possible
   private async performBroadClassificationLLM(
     text: string,
-    context?: RoutingContext,
+    context?: any,
   ): Promise<RoutingDecision | null> {
     const system =
       `You are a classification assistant. Classify the user's text into one of: crisis, depression, anxiety, general, none, unknown. Respond with a JSON object: { "category": "<one of the categories>", "confidence": 0.0, "is_critical": false, "reason": "explain briefly" }`.trim()
     const user = `Text: ${text}\nContext: ${context ? JSON.stringify(context) : '{}'}\nRespond only with the JSON object described.`
 
     const messages = [
-      { role: 'system', content: system },
-      { role: 'user', content: user },
+      { role: 'system' as const, content: system },
+      { role: 'user' as const, content: user },
     ]
 
     const resp = await this.llmInvoker(messages, {

@@ -7,7 +7,7 @@
 // Stub implementation to prevent build failures
 // The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
 
-import { secureRandomUUID } from '@/lib/crypto/secure-random' // new import (uses project alias)
+import { secureRandomUUID } from '../crypto/secure-random' // new import (uses project alias)
 
 export type AuthenticationEvent =
   | 'user_created'
