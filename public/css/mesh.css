@@ -1,0 +1,67 @@
+/* ================================================
+   UNIFIED BLENDED THEME - MESH BACKGROUNDS
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   ================================================ */
+
+:root {
+  /* === MESH BACKGROUNDS - BRUTALIST ELEGANCE === */
+  --mesh-1: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+           radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+           radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+
+  --mesh-2: radial-gradient(circle at 60% 30%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+           radial-gradient(circle at 20% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+}
+
+/* MESH BACKGROUNDS */
+.mesh-bg-1 {
+  position: absolute;
+  inset: 0;
+  background: var(--mesh-1);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.mesh-bg-2 {
+  position: absolute;
+  inset: 0;
+  background: var(--mesh-2);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* BACKGROUND UTILITIES */
+.bg-mesh-1 {
+  background: var(--mesh-1);
+}
+
+.bg-mesh-2 {
+  background: var(--mesh-2);
+}
+
+/* CARD MESH EFFECTS */
+.card--mesh {
+  background: var(--bg-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.card--mesh::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--mesh-1);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card--mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--mesh-2);
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 1;
+}

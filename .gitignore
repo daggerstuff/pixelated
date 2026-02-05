@@ -197,3 +197,11 @@ config/secrets/*
 .notes
 .crush
 .trunk
+deployment-backup
+# Agent and Tool Specific
+.cline/
+.goose/
+.tinyb
+
+# Backups
+deployment-backup/

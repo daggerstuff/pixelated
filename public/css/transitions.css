@@ -1,0 +1,70 @@
+/* ================================================
+   UNIFIED BLENDED THEME - TRANSITION SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   ================================================ */
+
+:root {
+  /* === TRANSITIONS - SMOOTH ELEGANCE === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* GENERAL TRANSITIONS */
+*,
+*::before,
+*::after {
+  transition: all var(--transition-base);
+}
+
+/* BUTTON SYSTEM */
+.btn {
+  transition: all var(--transition-base);
+}
+
+.btn--primary:hover {
+  transition: all var(--transition-base);
+}
+
+.btn--secondary:hover {
+  transition: all var(--transition-base);
+}
+
+.btn--outline:hover {
+  transition: all var(--transition-base);
+}
+
+.btn--ghost:hover {
+  transition: all var(--transition-base);
+}
+
+/* CARD SYSTEM */
+.card {
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  transition: all var(--transition-base);
+}
+
+/* STATUS INDICATORS */
+.status-dot--processing {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

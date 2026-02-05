@@ -4,6 +4,8 @@
  * that communicates with our Auth0-backed backend API.
  */
 
+import React from 'react';
+
 export interface User {
   id: string
   email: string
@@ -24,12 +26,28 @@ class AuthClient {
 
   /**
    * Hook-like method for React components (mimicking better-auth useSession)
+   * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.
    */
   useSession() {
-    // This is a simplified version. In a real app, this would use React context or a state library.
+    const [session, setSession] = React.useState<Session | null>(this._session);
+    const [isLoading, setIsLoading] = React.useState(!this._session);
+
+    React.useEffect(() => {
+      if (!this._session) {
+        void this.getSession().then(({ data }) => {
+          if (data?.session) {
+            setSession(data.session);
+          }
+          setIsLoading(false);
+        });
+      } else {
+        setIsLoading(false);
+      }
+    }, []);
+
     return {
-      data: this._session,
-      isPending: this._isLoading,
+      data: session,
+      isPending: isLoading,
       error: null
     }
   }
@@ -38,11 +56,48 @@ class AuthClient {
    * Get the current session (Promise-based, mimicking better-auth client)
    */
   async getSession() {
+    if (this._session) {
+      return {
+        data: {
+          session: this._session,
+          user: this._session.user
+        },
+        error: null
+      }
+    }
+
+    try {
+      const response = await fetch('/api/auth/auth0-profile');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          this._session = {
+            user: {
+              id: data.user.id,
+              email: data.user.email,
+              role: data.user.role,
+              fullName: data.user.fullName,
+              avatarUrl: data.user.profile?.picture
+            },
+            expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
+            token: 'cookie-based'
+          };
+
+          return {
+            data: {
+              session: this._session,
+              user: this._session.user
+            },
+            error: null
+          }
+        }
+      }
+    } catch {
+      // Ignore error, just no session
+    }
+
     return {
-      data: this._session ? {
-        session: this._session,
-        user: this._session.user
-      } : null,
+      data: null,
       error: null
     }
   }
@@ -110,9 +165,12 @@ class AuthClient {
    */
   async signOut() {
     try {
-      await fetch('/api/auth/signout', { method: 'POST' })
+      // Clear cookie
+      document.cookie = 'auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'refresh-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
       this._session = null
-      window.location.href = '/login'
+      window.location.href = '/'
     } catch (error) {
       console.error('Sign out failed:', error)
     }
@@ -125,9 +183,10 @@ class AuthClient {
     return {
       email: this.signInEmail.bind(this),
       social: async ({ provider, callbackURL }: any) => {
-        // Implementation for social login redirect to Auth0
+        // Implementation for social login using server-side flow
         console.log(`Social login with ${provider} initiated`)
-        window.location.href = `/api/auth/auth0-callback?provider=${provider}&redirect=${callbackURL}`
+        const returnTo = callbackURL || window.location.pathname;
+        window.location.href = `/api/auth/login?connection=${provider === 'google' ? 'google-oauth2' : provider}&returnTo=${encodeURIComponent(returnTo)}`
       }
     }
   }
@@ -140,6 +199,7 @@ class AuthClient {
     // This would Normalmente hit another endpoint, e.g., /api/auth/forgot-password
     return { success: true }
   }
+
 }
 
 // Export a singleton instance
