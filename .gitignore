@@ -111,12 +111,11 @@
 /.gemini/
 /.local
 /.mcp.json/
-/.openagents/
-/.openskills/
 /.output
 /.python
 /.temp
 /.tmp
+/.trunk
 /.vite/
 /.vite/deps/
 /Thumbs.db*
