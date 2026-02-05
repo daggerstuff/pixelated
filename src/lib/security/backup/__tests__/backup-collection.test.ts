@@ -6,10 +6,10 @@ vi.unmock('../index')
 
 import BackupSecurityManager from '../index'
 import { BackupType } from '../backup-types'
-import { allDAOs } from '@/services/mongodb.dao'
+import { allDAOs } from '../../../../services/mongodb.dao'
 
 // Mock allDAOs
-vi.mock('@/services/mongodb.dao', () => {
+vi.mock('../../../../services/mongodb.dao', () => {
   return {
     allDAOs: {
       todos: {

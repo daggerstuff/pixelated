@@ -805,6 +805,8 @@ export class SessionDAO {
 }
 
 // Export instances for use throughout the application
+
+// Export instances for use throughout the application
 export const todoDAO = new TodoDAO()
 export const aiMetricsDAO = new AIMetricsDAO()
 export const biasDetectionDAO = new BiasDetectionDAO()
@@ -815,6 +817,7 @@ export const dataExportDAO = new DataExportDAO()
 export const userDAO = new UserDAO()
 export const sessionDAO = new SessionDAO()
 
+// DAO Registry for system-wide operations
 export const allDAOs: Record<string, any> = {
   todos: todoDAO,
   aiMetrics: aiMetricsDAO,

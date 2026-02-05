@@ -22,7 +22,7 @@ import {
 } from './types'
 import { isBrowser } from '../../browser/is-browser'
 import * as NodeCrypto from 'crypto'
-import { allDAOs } from '@/services/mongodb.dao'
+import { allDAOs } from '../../../services/mongodb.dao'
 
 // Import crypto polyfill statically to avoid issues during build
 
@@ -57,7 +57,7 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          key,
+          key as any,
           { name: 'AES-GCM' } as AlgorithmIdentifier,
           false,
           ['encrypt'] as KeyUsage[],
@@ -65,7 +65,7 @@ const getCrypto = async () => {
         const encrypted = await subtle.encrypt(
           { name: 'AES-GCM', iv } as AesGcmParams,
           importedKey,
-          data,
+          data as any,
         )
         // In Web Crypto API, the auth tag is appended to the ciphertext
         const encryptedArray = new Uint8Array(encrypted)
@@ -82,7 +82,7 @@ const getCrypto = async () => {
         const { subtle } = window.crypto
         const importedKey = await subtle.importKey(
           'raw',
-          key,
+          key as any,
           { name: 'AES-GCM' } as AlgorithmIdentifier,
           false,
           ['decrypt'] as KeyUsage[],
@@ -97,7 +97,7 @@ const getCrypto = async () => {
         const decrypted = await subtle.decrypt(
           { name: 'AES-GCM', iv } as AesGcmParams,
           importedKey,
-          combinedBuffer,
+          combinedBuffer as any,
         )
         return new Uint8Array(decrypted)
       },
@@ -168,7 +168,7 @@ const logger = createBuildSafeLogger('backup-security')
 // Current version of the encryption implementation
 const ENCRYPTION_VERSION = '1.0'
 
-import { BackupType, BackupStatus, StorageLocation } from './backup-types'
+import { BackupType, BackupStatus, StorageLocation, TestEnvironmentType } from './backup-types'
 
 export interface BackupRetentionPolicy {
   retention: number
@@ -269,7 +269,7 @@ export class BackupSecurityManager {
         schedule: '0 0 * * 0', // Weekly
         testCases: [],
         environment: {
-          type: 'sandbox',
+          type: TestEnvironmentType.SANDBOX,
           config: {},
         },
         notifyOnFailure: true,
@@ -504,7 +504,7 @@ export class BackupSecurityManager {
 
       return backupId
     } catch (error: unknown) {
-      logger.error('Backup creation failed:', { error: String(error) })
+      logger.error(`Backup creation failed: ${String(error)}`)
       throw new Error(
         `Failed to create backup: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -557,7 +557,7 @@ export class BackupSecurityManager {
         authTag,
       )
     } catch (error: unknown) {
-      logger.error('Decryption failed:', { error: String(error) })
+      logger.error(`Decryption failed: ${String(error)}`)
       throw new Error('Failed to decrypt backup data', { cause: error })
     }
   }
@@ -573,7 +573,7 @@ export class BackupSecurityManager {
       new Uint8Array(dataBuffer).set(data)
       const hashBuffer = await window.crypto.subtle.digest(
         'SHA-256',
-        dataBuffer,
+        dataBuffer as any,
       )
       return Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, '0'))
@@ -650,7 +650,7 @@ export class BackupSecurityManager {
       )
     } catch (error: unknown) {
       logger.error(
-        `Failed to store backup ${metadata.id} in ${metadata.location}: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to store backup ${metadata.id} in ${metadata.location}: ${String(error)}`,
       )
       throw error
     }
@@ -748,7 +748,7 @@ export class BackupSecurityManager {
       return isValid
     } catch (error: unknown) {
       logger.error(
-        `Failed to verify backup ${backupId}: ${error instanceof Error ? String(error) : String(error)}`,
+        `Failed to verify backup ${backupId}: ${String(error)}`,
       )
 
       // Log verification failure as an audit event
@@ -758,7 +758,7 @@ export class BackupSecurityManager {
         'system',
         backupId,
         {
-          error: error instanceof Error ? String(error) : String(error),
+          error: String(error),
         },
       )
 
@@ -798,7 +798,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? String(error) : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${String(error)}`,
         )
       }
     }
@@ -829,7 +829,7 @@ export class BackupSecurityManager {
       logger.info(`Successfully collected data from ${Object.keys(backupData).length} DAOs`)
       return new TextEncoder().encode(JSON.stringify(backupData))
     } catch (error: unknown) {
-      logger.error('Failed to collect data for backup:', { error: String(error) })
+      logger.error(`Failed to collect data for backup: ${String(error)}`)
       throw new Error(`Data collection failed: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -903,13 +903,11 @@ export class BackupSecurityManager {
         'system',
         backupId,
         {
-          error: error instanceof Error ? String(error) : String(error),
+          error: String(error),
         },
       )
 
-      logger.error(
-        `Restore failed: ${error instanceof Error ? String(error) : String(error)}`,
-      )
+      logger.error(`Restore failed: ${String(error)}`)
       throw error
     }
   }
@@ -1004,9 +1002,7 @@ export class BackupSecurityManager {
       // This is a placeholder - actual implementation would depend on your application's needs
       await this.processRestoredData(restoredData)
     } catch (error: unknown) {
-      logger.error(
-        `Failed to restore data: ${error instanceof Error ? String(error) : String(error)}`,
-      )
+      logger.error(`Failed to restore data: ${String(error)}`)
       throw new Error(
         `Data restoration failed: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -1049,7 +1045,7 @@ export class BackupSecurityManager {
 
       logger.info('Data restoration completed successfully')
     } catch (error: unknown) {
-      logger.error('Failed to restore data:', { error: String(error) })
+      logger.error(`Failed to restore data: ${String(error)}`)
       throw new Error(`Data restoration failed: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -1086,7 +1082,7 @@ async function getStorageProvider(
   try {
     // Import the storage provider dynamically
     const { getStorageProvider: importedGetStorageProvider } = await import(
-      './storage-providers-wrapper.ts'
+      './storage-providers-wrapper'
     )
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
@@ -1096,9 +1092,7 @@ async function getStorageProvider(
 
     return importedGetStorageProvider(provider, providerConfig)
   } catch (error: unknown) {
-    logger.error(
-      `Failed to load storage provider: ${error instanceof Error ? String(error) : String(error)}`,
-    )
+    logger.error(`Failed to load storage provider: ${String(error)}`)
     throw new Error(
       `Storage provider loading failed: ${error instanceof Error ? String(error) : String(error)}`,
       { cause: error },
