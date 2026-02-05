@@ -60,7 +60,6 @@
 .copilot-tracking/
 .coverage
 .coverage.*
-.cursor/rclone.conf
 .eggs/
 .endgame
 .env.sentry-build-plugin
@@ -108,7 +107,6 @@
 /.env.production
 /.env.staging
 /.env.test
-/.gemini/
 /.local
 /.mcp.json/
 /.output
