@@ -1,0 +1,13 @@
+DESCRIPTION >
+    Generated from https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+
+SCHEMA >
+    `locationid` Int32,
+    `borough` String,
+    `zone` String,
+    `service_zone` String
+
+ENGINE "MergeTree"
+# ENGINE_SORTING_KEY "user_id, timestamp"
+# ENGINE_TTL "timestamp + toIntervalDay(60)"
+# Learn more at https://www.tinybird.co/docs/forward/dev-reference/datafiles/datasource-files
