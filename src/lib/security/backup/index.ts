@@ -115,7 +115,7 @@ const getCrypto = async () => {
         key: Uint8Array,
         iv: Uint8Array,
       ): Promise<{ encryptedData: Uint8Array; authTag: Uint8Array }> => {
-        const cipher: import('crypto').CipherGCM = nodeCrypto.createCipheriv(
+        const cipher: any = nodeCrypto.createCipheriv(
           'aes-256-gcm',
           key,
           iv,
@@ -130,9 +130,7 @@ const getCrypto = async () => {
         encryptedData.set(part2, part1.length)
 
         // Get authentication tag
-        const authTag = new Uint8Array(
-          (cipher as import('crypto').CipherGCM).getAuthTag(),
-        )
+        const authTag = new Uint8Array(cipher.getAuthTag())
 
         return { encryptedData, authTag }
       },
@@ -142,8 +140,7 @@ const getCrypto = async () => {
         iv: Uint8Array,
         authTag: Uint8Array,
       ): Promise<Uint8Array> => {
-        const decipher: import('crypto').DecipherGCM =
-          nodeCrypto.createDecipheriv('aes-256-gcm', key, iv)
+        const decipher: any = nodeCrypto.createDecipheriv('aes-256-gcm', key, iv)
         decipher.setAuthTag(authTag)
 
         // Manual concatenation of Uint8Arrays without Buffer
@@ -419,9 +416,7 @@ export class BackupSecurityManager {
       this.isInitialized = true
       logger.info('Backup security manager initialized successfully')
     } catch (error: unknown) {
-      logger.error(
-        `Failed to initialize backup security manager: ${error instanceof Error ? String(error) : String(error)}`,
-      )
+      logger.error(`Failed to initialize backup security manager: ${String(error)}`)
       throw new Error(
         `Backup manager initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -649,9 +644,7 @@ export class BackupSecurityManager {
         },
       )
     } catch (error: unknown) {
-      logger.error(
-        `Failed to store backup ${metadata.id} in ${metadata.location}: ${String(error)}`,
-      )
+      logger.error(`Failed to store backup ${metadata.id} in ${metadata.location}: ${String(error)}`)
       throw error
     }
   }
@@ -747,9 +740,7 @@ export class BackupSecurityManager {
 
       return isValid
     } catch (error: unknown) {
-      logger.error(
-        `Failed to verify backup ${backupId}: ${String(error)}`,
-      )
+      logger.error(`Failed to verify backup ${backupId}: ${String(error)}`)
 
       // Log verification failure as an audit event
       logAuditEvent(
@@ -797,9 +788,7 @@ export class BackupSecurityManager {
           ) as BackupMetadata
         }
       } catch (error: unknown) {
-        logger.error(
-          `Error searching for backup metadata in ${location}: ${String(error)}`,
-        )
+        logger.error(`Error searching for backup metadata in ${location}: ${String(error)}`)
       }
     }
 
