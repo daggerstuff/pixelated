@@ -1,0 +1,9 @@
+[build]
+  command = "pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  NODE_OPTIONS = "--max-old-space-size=8192"
+  # Skip strict checks during deploy if they are flaky
+  CI = "true"
