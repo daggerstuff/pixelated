@@ -8,9 +8,9 @@ import Redis from 'ioredis'
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
-    restUrl: process.env['UPSTASH_REDIS_REST_URL'] || process.env['REDIS_URL'],
+    // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
+    connectionUrl: process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
     restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
-    url: process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
   }
 }
 
@@ -190,11 +190,11 @@ function createMockRedisClient() {
  * Returns a real Redis client if credentials are present, otherwise a mock client.
  */
 function createRedisClient() {
-  const { restUrl, restToken } = getRedisConfig()
+  const { connectionUrl, restToken } = getRedisConfig()
 
-  if (restUrl) {
+  if (connectionUrl && connectionUrl.startsWith('redis')) {
     // Initialize ioredis client with credentials
-    return new Redis(restUrl, {
+    return new Redis(connectionUrl, {
       password: restToken,
       // Add any additional options here if needed
     })

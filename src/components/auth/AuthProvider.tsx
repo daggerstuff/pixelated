@@ -14,7 +14,10 @@ export const PixelatedAuthProvider = ({ children }: { children: React.ReactNode 
     };
 
     // Ensure config is valid even during SSR, though this component should be client-only
-    const redirectUri = typeof window !== 'undefined' ? window.location.origin : '';
+    // Use explicit callback URL to ensure correct redirect after Auth0 authentication
+    const redirectUri = typeof window !== 'undefined'
+        ? `${window.location.origin}/api/auth/auth0-callback`
+        : '';
 
     if (!domain || !clientId) {
         return null;
@@ -25,7 +28,8 @@ export const PixelatedAuthProvider = ({ children }: { children: React.ReactNode 
             domain={domain}
             clientId={clientId}
             authorizationParams={{
-                redirect_uri: redirectUri
+                redirect_uri: redirectUri,
+                audience: import.meta.env.PUBLIC_AUTH0_AUDIENCE || undefined,
             }}
             onRedirectCallback={onRedirectCallback}
         >

@@ -4,7 +4,7 @@
 set -e
 
 REMOTE_USER="${REMOTE_USER:-vivi}"
-REMOTE_HOST="${REMOTE_HOST:-212.2.244.60}"
+REMOTE_HOST="${REMOTE_HOST:-194.113.75.34}"
 NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"
 
 echo "=========================================="
