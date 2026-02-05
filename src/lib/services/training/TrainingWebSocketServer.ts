@@ -69,6 +69,7 @@ export class TrainingWebSocketServer {
 
     logger.info(`Training WebSocket Server started on port ${port}`)
   }
+
   private sessionOwners: Map<string, string> = new Map() // sessionId -> userId
   private mutedUsers: Map<string, Set<string>> = new Map() // sessionId -> Set<userId>
   private bannedUsers: Map<string, Set<string>> = new Map() // sessionId -> Set<userId>
@@ -104,8 +105,8 @@ export class TrainingWebSocketServer {
     const authTimeout = setTimeout(() => {
       const client = this.clients.get(id)
       if (client && !client.isAuthenticated) {
-        logger.warn('Client failed to authenticate within timeout', { clientId: id })
-        this.sendError(ws, 'Authentication timeout - connection closed')
+        logger.warn('Authentication timeout', { clientId: id })
+        this.sendError(ws, 'Authentication timeout')
         ws.close(1008, 'Authentication timeout')
         this.clients.delete(id)
       }
@@ -325,17 +326,17 @@ export class TrainingWebSocketServer {
       this.sendError(ws, 'Authentication required to join session')
       return
     }
+
     // Check if user is banned from the session
     const bannedInSession = this.bannedUsers.get(payload.sessionId)
     if (bannedInSession && bannedInSession.has(client.userId)) {
-      logger.warn("Banned user attempted to join session", {
+      logger.warn('Banned user attempted to join session', {
         userId: client.userId,
         sessionId: payload.sessionId
       })
-      this.sendError(ws, "You are banned from this session")
+      this.sendError(ws, 'You are banned from this session')
       return
     }
-
 
     // TODO: Validate session access permissions
     // - Verify user has permission to access this sessionId
@@ -357,18 +358,18 @@ export class TrainingWebSocketServer {
 
     // Use authenticated user info, not payload (prevent role spoofing)
     client.sessionId = payload.sessionId
+
     // Assign session owner if not already assigned
     if (!this.sessionOwners.has(payload.sessionId)) {
-      if (client.role === "trainee") {
+      if (client.role === 'trainee') {
         this.sessionOwners.set(payload.sessionId, client.userId)
-        logger.info("Session owner assigned", {
+        logger.info('Session owner assigned', {
           sessionId: payload.sessionId,
           userId: client.userId,
           role: client.role
         })
       }
     }
-
 
     logger.info('Client joined session', {
       clientId,
@@ -403,39 +404,39 @@ export class TrainingWebSocketServer {
     // Check if user is banned or muted in this session
     const bannedInSession = this.bannedUsers.get(client.sessionId)
     if (bannedInSession && bannedInSession.has(client.userId)) {
-      this.sendError(client.ws, "You are banned from this session")
+      this.sendError(client.ws, 'You are banned from this session')
       return
     }
 
     const mutedInSession = this.mutedUsers.get(client.sessionId)
     if (mutedInSession && mutedInSession.has(client.userId)) {
-      this.sendError(client.ws, "You are muted in this session")
+      this.sendError(client.ws, 'You are muted in this session')
       return
     }
 
     // Verify user is the session owner or has supervisor role
     const sessionOwner = this.sessionOwners.get(client.sessionId)
     const isOwner = sessionOwner === client.userId
-    const isSupervisor = client.role === "supervisor"
+    const isSupervisor = client.role === 'supervisor'
 
     if (!isOwner && !isSupervisor) {
-      logger.warn("Unauthorized message attempt", {
+      logger.warn('Unauthorized message attempt', {
         clientId,
         userId: client.userId,
         sessionId: client.sessionId,
         role: client.role
       })
-      this.sendError(client.ws, "Only the session owner or a supervisor can send messages")
+      this.sendError(client.ws, 'Only the session owner or a supervisor can send messages')
       return
     }
 
     // Apply rate limiting
     if (!this.checkRateLimit(client.userId)) {
-      logger.warn("Rate limit exceeded", {
+      logger.warn('Rate limit exceeded', {
         userId: client.userId,
         sessionId: client.sessionId
       })
-      this.sendError(client.ws, "Message rate limit exceeded. Please wait a moment.")
+      this.sendError(client.ws, 'Message rate limit exceeded. Please wait a moment.')
       return
     }
 
@@ -456,19 +457,19 @@ export class TrainingWebSocketServer {
     if (!client || !client.sessionId || !client.isAuthenticated) {
       return
     }
+
     // Check if user is banned or muted in this session
     const bannedInSession = this.bannedUsers.get(client.sessionId)
     if (bannedInSession && bannedInSession.has(client.userId)) {
-      this.sendError(client.ws, "You are banned from this session")
+      this.sendError(client.ws, 'You are banned from this session')
       return
     }
 
     const mutedInSession = this.mutedUsers.get(client.sessionId)
     if (mutedInSession && mutedInSession.has(client.userId)) {
-      this.sendError(client.ws, "You are muted in this session")
+      this.sendError(client.ws, 'You are muted in this session')
       return
     }
-
 
     // TODO: Validate user has permission to send coaching notes
     // - Only supervisors/observers should be able to send coaching notes
@@ -544,7 +545,7 @@ export class TrainingWebSocketServer {
     if (sessionId) {
       // Notify others in the session
       this.broadcastToSession(sessionId, {
-        type: "participant_left",
+        type: 'participant_left',
         payload: { userId }
       })
 
@@ -553,7 +554,7 @@ export class TrainingWebSocketServer {
         this.sessionOwners.delete(sessionId)
         this.mutedUsers.delete(sessionId)
         this.bannedUsers.delete(sessionId)
-        logger.info("Cleaned up session state", { sessionId })
+        logger.info('Cleaned up session state', { sessionId })
       }
     }
 
