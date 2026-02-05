@@ -39,12 +39,15 @@ describe('user-settings', () => {
 
   describe('getUserSettings', () => {
     it('should return settings for a user', async () => {
-      const mockSettings = { user_id: 'user123', theme: 'dark' }
+      const mockSettings = { _id: 'mock_id', user_id: 'user123', theme: 'dark' }
       mockDb.findOne.mockResolvedValue(mockSettings)
 
       const result = await getUserSettings('user123')
 
-      expect(result).toMatchObject(mockSettings)
+      expect(result).toMatchObject({
+        ...mockSettings,
+        _id: 'mock_id'
+      })
       expect(mockDb.collection).toHaveBeenCalledWith('user_settings')
       expect(mockDb.findOne).toHaveBeenCalledWith({ user_id: 'user123' })
     })
@@ -80,13 +83,16 @@ describe('user-settings', () => {
   describe('updateUserSettings', () => {
     it('should update and return settings', async () => {
       const mockResult = {
-        value: { user_id: 'user123', theme: 'dark' }
+        value: { _id: 'mock_id', user_id: 'user123', theme: 'dark' }
       }
       mockDb.findOneAndUpdate.mockResolvedValue(mockResult)
 
       const result = await updateUserSettings('user123', { theme: 'dark' })
 
-      expect(result).toMatchObject(mockResult.value)
+      expect(result).toMatchObject({
+        ...mockResult.value,
+        _id: 'mock_id'
+      })
       expect(mockDb.findOneAndUpdate).toHaveBeenCalledWith(
         { user_id: 'user123' },
         expect.objectContaining({
@@ -97,23 +103,29 @@ describe('user-settings', () => {
     })
 
     it('should handle direct document return from findOneAndUpdate', async () => {
-      const mockDoc = { user_id: 'user123', theme: 'dark' }
+      const mockDoc = { _id: 'mock_id', user_id: 'user123', theme: 'dark' }
       mockDb.findOneAndUpdate.mockResolvedValue(mockDoc)
 
       const result = await updateUserSettings('user123', { theme: 'dark' })
 
-      expect(result).toMatchObject(mockDoc)
+      expect(result).toMatchObject({
+        ...mockDoc,
+        _id: 'mock_id'
+      })
     })
   })
 
   describe('getOrCreateUserSettings', () => {
     it('should return existing settings if found', async () => {
-      const mockSettings = { user_id: 'user123', theme: 'dark' }
+      const mockSettings = { _id: 'mock_id', user_id: 'user123', theme: 'dark' }
       mockDb.findOne.mockResolvedValue(mockSettings)
 
       const result = await getOrCreateUserSettings('user123')
 
-      expect(result).toMatchObject(mockSettings)
+      expect(result).toMatchObject({
+        ...mockSettings,
+        _id: 'mock_id'
+      })
       expect(mockDb.insertOne).not.toHaveBeenCalled()
     })
 
