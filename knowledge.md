@@ -3,8 +3,8 @@
 Pixelated Empathy - AI-powered mental health training platform ("The Empathy Gym"). Provides risk-free practice environments for mental health professionals using AI personas.
 
 ## Quickstart
-- Setup: `pnpm install` (requires pnpm 10.28.1+, Node.js >= 24)
-- Dev: `pnpm dev` (runs on http://localhost:3000)
+- Setup: `pnpm install` (requires pnpm 10.28.2+, Node.js >= 24)
+- Dev: `pnpm dev` (runs on <http://localhost:3000>)
 - Build: `pnpm build`
 - Preview: `pnpm preview`
 

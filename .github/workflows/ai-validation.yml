@@ -19,8 +19,6 @@ jobs:
     name: AI Model Validation
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    env:
-      ENV_NAME: ${{ inputs.ENV_NAME }}
 
     steps:
       - name: Checkout code
@@ -29,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24.11.0"
+          node-version: "24.13.0"
 
       - name: Enable Corepack
         run: corepack enable
@@ -37,7 +35,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: "10.28.1"
+          version: "10.28.2"
           run_install: false
 
       - name: Get pnpm store directory
@@ -71,15 +69,19 @@ jobs:
 
       - name: Set environment variables
         run: |
-          # Default environment if not provided
-          if [[ -z "${ENV_NAME}" ]]; then
-            echo 'ENV_NAME=staging' >> $GITHUB_ENV
+          # Determine target environment (default to staging)
+          TARGET_ENV="${{ inputs.ENV_NAME }}"
+          if [[ -z "$TARGET_ENV" ]]; then
+            TARGET_ENV="staging"
           fi
 
-          # Set environment-specific URLs (add more as needed)
-          if [[ "$ENV_NAME" == "production" ]]; then
+          # Persist to GITHUB_ENV for subsequent steps
+          echo "ENV_NAME=$TARGET_ENV" >> $GITHUB_ENV
+
+          # Set environment-specific URLs
+          if [[ "$TARGET_ENV" == "production" ]]; then
             echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
-          elif [[ "$ENV_NAME" == "staging" ]]; then
+          elif [[ "$TARGET_ENV" == "staging" ]]; then
             echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV
           else
             echo 'APP_URL=https://pixelatedempathy.com' >> $GITHUB_ENV

@@ -378,7 +378,7 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
   try {
     // Create permissions first (Note: Auth0 v5 manages permissions as scopes on Resource Servers)
     console.log('Creating permissions in Auth0...')
-    
+
     // Create roles and assign permissions
     console.log('Creating roles in Auth0...')
     for (const [roleName, roleDef] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
@@ -387,7 +387,7 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
         const { data: existingRoles } = await auth0Management.roles.list({ name_filter: roleName })
         const existingRole = existingRoles.find(r => r.name === roleName)
 
-        let roleId: string
+        let _roleId: string
 
         if (!existingRole) {
           // Create new role
@@ -395,10 +395,10 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
             name: roleName,
             description: roleDef.description
           })
-          roleId = createdRole.id!
+          _roleId = createdRole.id!
           console.log(`Created role: ${roleName}`)
         } else {
-          roleId = existingRole.id!
+          _roleId = existingRole.id!
           console.log(`Role already exists: ${roleName}`)
         }
       } catch (error) {

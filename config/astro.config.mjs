@@ -202,10 +202,6 @@ export default defineConfig({
           "mysql2",
           "sqlite3",
           "better-sqlite3",
-          "better-auth",
-          "better-auth/adapters/mongodb",
-          "better-auth/adapters/drizzle",
-          "better-auth/react",
           "axios",
           "bcryptjs",
           "jsonwebtoken",
@@ -256,12 +252,12 @@ export default defineConfig({
     plugins: [
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
-        visualizer({
-          filename: "dist/bundle-analysis.html",
-          open: true,
-          gzipSize: true,
-          brotliSize: true,
-        }),
+      visualizer({
+        filename: "dist/bundle-analysis.html",
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
     ].filter(Boolean),
     resolve: {
       alias: {
@@ -290,10 +286,9 @@ export default defineConfig({
         "mysql2",
         "sqlite3",
         "better-sqlite3",
-        "better-auth",
-        "better-auth/adapters/mongodb",
-        "better-auth/adapters/drizzle",
-        "better-auth/react",
+        "mysql2",
+        "sqlite3",
+        "better-sqlite3",
         "axios",
         "bcryptjs",
         "jsonwebtoken",
@@ -331,10 +326,6 @@ export default defineConfig({
         "playwright",
         "@sentry/profiling-node",
         "pdfkit",
-        "better-auth",
-        "better-auth/adapters/mongodb",
-        "better-auth/adapters/drizzle",
-        "better-auth/react",
         "axios",
         "bcryptjs",
         "jsonwebtoken",
@@ -396,32 +387,32 @@ export default defineConfig({
       }),
       ...(hasSentryDSN
         ? [
-            sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || "pixelated-empathy-dq",
-                project: process.env.SENTRY_PROJECT || "pixel-astro",
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    "./.astro/dist/**/*.js",
-                    "./.astro/dist/**/*.mjs",
-                    "./dist/**/*.js",
-                    "./dist/**/*.mjs",
-                  ],
-                  ignore: ["**/node_modules/**"],
-                  filesToDeleteAfterUpload: ["**/*.map", "**/*.js.map"],
-                },
+          sentry({
+            sourceMapsUploadOptions: {
+              org: process.env.SENTRY_ORG || "pixelated-empathy-dq",
+              project: process.env.SENTRY_PROJECT || "pixel-astro",
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              // Include release for proper stack trace linking and code mapping
+              release:
+                process.env.SENTRY_RELEASE ||
+                process.env.npm_package_version ||
+                undefined,
+              telemetry: false,
+              sourcemaps: {
+                assets: [
+                  "./.astro/dist/**/*.js",
+                  "./.astro/dist/**/*.mjs",
+                  "./dist/**/*.js",
+                  "./dist/**/*.mjs",
+                ],
+                ignore: ["**/node_modules/**"],
+                filesToDeleteAfterUpload: ["**/*.map", "**/*.js.map"],
               },
-            }),
-            // Temporarily disable SpotlightJS due to build issues
-            // ...(shouldUseSpotlight ? [spotlightjs()] : [])
-          ]
+            },
+          }),
+          // Temporarily disable SpotlightJS due to build issues
+          // ...(shouldUseSpotlight ? [spotlightjs()] : [])
+        ]
         : []),
     ];
   })(),

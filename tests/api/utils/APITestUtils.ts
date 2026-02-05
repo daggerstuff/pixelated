@@ -55,9 +55,9 @@ export class APITestUtils {
     })
 
     if (response.ok) {
-      // const _data = await response.json();
-      this.testUsers.set('primary', { ...response, token: response.token })
-      return response.token
+      const data = await response.json()
+      this.testUsers.set('primary', { ...data, token: data.token })
+      return data.token
     }
 
     throw new Error('Failed to get valid token')
@@ -85,7 +85,7 @@ export class APITestUtils {
     })
 
     if (response.ok) {
-      const _data = await response.json()
+      await response.json()
       const loginResponse = await fetch(`${this.baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -186,7 +186,7 @@ export class APITestUtils {
         password: 'testPassword123',
         name: 'Primary Test User',
       })
-    } catch (error: unknown) {
+    } catch {
       // User might already exist, try to login
       try {
         await this.getValidToken()
