@@ -80,13 +80,13 @@ describe('WebSocketServer', () => {
   let mockPort: number
   let mockNotificationService: NotificationService
 
-  let server: WebSocketServer
+  let _server: WebSocketServer
 
   beforeEach(() => {
     vi.clearAllMocks()
     mockPort = 8082
     mockNotificationService = new NotificationService()
-    server = new WebSocketServer(mockPort, mockNotificationService)
+    _server = new WebSocketServer(mockPort, mockNotificationService)
   })
 
   describe('constructor', () => {
