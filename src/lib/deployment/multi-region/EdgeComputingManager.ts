@@ -2278,7 +2278,7 @@ export class EdgeComputingManager extends EventEmitter {
           deploymentResult = await this.deployGCPEdge(location)
           break
         default:
-          throw new Error(`Unsupported edge provider: ${location.provider}`)
+          throw new Error(`Unsupported edge provider: ${location.provider as string}`)
       }
 
       // Create successful status
@@ -3012,7 +3012,7 @@ async function processRequest(req, threatCheck, biasCheck) {
     }
 
     this.healthCheckInterval = setInterval(() => {
-      this.performHealthChecks()
+      void this.performHealthChecks()
     }, this.config.healthCheck.interval)
 
     logger.info('Edge node health monitoring started', {
