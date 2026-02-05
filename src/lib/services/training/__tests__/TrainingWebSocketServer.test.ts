@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { WebSocket, WebSocketServer as WSServer } from 'ws'
+import { WebSocketServer as WSServer } from 'ws'
 import { TrainingWebSocketServer } from '../TrainingWebSocketServer'
 
 // Mock dependencies

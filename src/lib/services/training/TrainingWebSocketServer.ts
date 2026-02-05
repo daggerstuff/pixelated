@@ -381,7 +381,7 @@ export class TrainingWebSocketServer {
     })
 
     // Find and disconnect the banned user if they are currently connected to this session
-    for (const [id, c] of this.clients.entries()) {
+    for (const [id, c] of Array.from(this.clients.entries())) {
       if (c.userId === payload.userId && c.sessionId === client.sessionId) {
         this.sendError(c.ws, 'You have been banned from this session.')
         c.ws.close(4003, 'Banned by supervisor')
@@ -588,7 +588,7 @@ export class TrainingWebSocketServer {
   }
 
   private broadcastToSession(sessionId: string, message: WebSocketMessage) {
-    for (const client of this.clients.values()) {
+    for (const client of Array.from(this.clients.values())) {
       if (client.sessionId === sessionId && client.ws.readyState === WebSocket.OPEN) {
         client.ws.send(JSON.stringify(message))
       }
@@ -607,7 +607,7 @@ export class TrainingWebSocketServer {
     allowedRoles: Array<'trainee' | 'observer' | 'supervisor'>,
     message: WebSocketMessage
   ) {
-    for (const client of this.clients.values()) {
+    for (const client of Array.from(this.clients.values())) {
       if (
         client.sessionId === sessionId &&
         client.ws.readyState === WebSocket.OPEN &&
