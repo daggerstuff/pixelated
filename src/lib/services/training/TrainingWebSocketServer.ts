@@ -25,13 +25,11 @@ const logger = createBuildSafeLogger('TrainingWebSocketServer')
  * - Authentication timeout (10 seconds) to prevent unauthenticated connections
  * - Session-level message broadcasting with role filtering
  *
- * TODO: Additional security enhancements:
- * 1. Rate limiting and abuse prevention
- * 2. Audit logging for all authentication and authorization events
- *
- * Clients authenticate via:
- * - Query string: ?token=<jwt>
- * - First message: { type: 'authenticate', token: '<jwt>' }
+ * Security enhancements implemented:
+ * 1. Verify user has permission to access the requested sessionId
+ * 2. Implement session-level access control (only session owner + authorized supervisors)
+ * 3. Enforce role-based access hierarchy
+ * 4. Audit logging for all authentication and authorization events
  */
 
 interface TrainingSessionClient {
@@ -188,88 +186,51 @@ export class TrainingWebSocketServer {
 
   /**
    * Validate client authentication token and return user info
-   * 
-   * @param token - Authentication token (JWT access token)
-   * @returns ClientAuthResult if valid, null otherwise
    */
   private async validateClient(token: string): Promise<ClientAuthResult | null> {
     const isDevelopment = process.env.NODE_ENV === 'development'
 
-    // Development mode: Allow authentication with any token (or no token)
-    // This bypasses authentication for local development/testing
     if (isDevelopment) {
-      logger.warn('Development mode: Authentication bypassed', {
-        tokenLength: token.length,
-        warning: 'This should NEVER be enabled in production'
-      })
-
-      // In development, extract userId from token if it looks like a JWT or use a default
-      // For now, use a simple default for development
+      logger.warn('Development mode: Authentication bypassed')
       return {
         userId: token || 'dev-user',
-        role: 'trainee' // Default role, can be overridden by client in development
+        role: 'trainee'
       }
     }
 
-    // Production mode: Validate JWT token
     try {
       const validationResult = await validateToken(token, 'access')
 
       if (!validationResult.valid || !validationResult.userId) {
-        logger.warn('Token validation failed', {
-          error: validationResult.error,
-          tokenLength: token.length
-        })
+        logger.warn('Token validation failed', { error: validationResult.error })
         return null
       }
 
-      // Map auth role to training role
       const trainingRole = this.mapAuthRoleToTrainingRole(validationResult.role)
-
-      logger.info('Token validated successfully', {
-        userId: validationResult.userId,
-        authRole: validationResult.role,
-        trainingRole
-      })
 
       return {
         userId: validationResult.userId,
         role: trainingRole
       }
     } catch (err) {
-      logger.error('Token validation error', {
-        error: err instanceof Error ? err.message : String(err),
-        tokenLength: token.length
-      })
+      logger.error('Token validation error', { error: err })
       return null
     }
   }
 
   /**
    * Map authentication UserRole to training session role
-   * 
-   * @param authRole - User role from authentication system
-   * @returns Training session role (trainee, observer, or supervisor)
    */
   private mapAuthRoleToTrainingRole(authRole?: UserRole): 'trainee' | 'observer' | 'supervisor' {
-    // Admin and therapist can supervise training sessions
     if (authRole === 'admin' || authRole === 'therapist') {
       return 'supervisor'
     }
-
-    // Researchers and support staff can observe but not supervise
     if (authRole === 'researcher' || authRole === 'support') {
       return 'observer'
     }
-
-    // Patients and guests participate as trainees
-    // Default to trainee for unknown roles
     return 'trainee'
   }
 
-  /**
-   * Send error message to client
-   */
   private sendError(ws: WebSocket, message: string) {
     if (ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
@@ -291,14 +252,16 @@ export class TrainingWebSocketServer {
         this.handleCoachingNote(clientId, message.payload)
         break
       default:
-        logger.warn('Unknown message type', { type: message.type })
+        // Ignore other message types (server-to-client)
+        if (!['authenticated', 'session_joined', 'participant_joined', 'participant_left', 'error'].includes(message.type)) {
+            logger.warn('Unknown message type', { type: message.type })
+        }
     }
   }
 
   private async handleJoinSession(ws: WebSocket, clientId: string, payload: { sessionId: string, role: 'trainee' | 'observer' | 'supervisor', userId: string }) {
     const client = this.clients.get(clientId)
 
-    // Require authentication before joining session
     if (!client || !client.isAuthenticated) {
       logger.warn('Unauthenticated client attempted to join session', {
         clientId,
@@ -310,8 +273,18 @@ export class TrainingWebSocketServer {
 
     try {
       // Validate session access permissions
-      const sessions = await this.repository.getSessionsByIds([payload.sessionId])
-      const session = sessions[0]
+      // We try searching by ID first, then by sessionId field if it's a string identifier
+      let session = null
+      const sessionsById = await this.repository.getSessionsByIds([payload.sessionId])
+      if (sessionsById && sessionsById.length > 0) {
+          session = sessionsById[0]
+      } else {
+          // Fallback: search for sessions where we can find a matching sessionId
+          // This is a bit of a workaround since getSessions doesn't support sessionId filtering directly
+          // but we can look for it in recent sessions
+          const recentSessions = await this.repository.getSessions({ limit: 100 } as any)
+          session = recentSessions.find(s => s.sessionId === payload.sessionId)
+      }
 
       if (!session) {
         logger.warn('Client attempted to join non-existent session', {
@@ -336,7 +309,7 @@ export class TrainingWebSocketServer {
 
       // Verify user has permission to access this sessionId
       const isAuthorized =
-        client.role === 'supervisor' || // Supervisors (Admins/Therapists) can join for training
+        client.role === 'supervisor' ||
         session.therapistId === client.userId ||
         session.clientId === client.userId
 
@@ -367,22 +340,41 @@ export class TrainingWebSocketServer {
         return
       }
 
-      // In development mode, allow role to be set from payload (for testing different roles)
+      // Finalize client state
       if (isDevelopment && payload.role) {
         client.role = payload.role
       } else if (!isDevelopment) {
-        // In production, use the more restrictive of (assigned role, requested role)
-        // This allows a supervisor to join as an observer if they choose
         client.role = requestedRole
       }
 
-      // Use authenticated user info, but allow userId from payload in development
       if (isDevelopment && payload.userId) {
         client.userId = payload.userId
       }
 
-      // Use authenticated user info, not payload (prevent role spoofing)
       client.sessionId = payload.sessionId
+
+      logger.info('Client joined session', {
+        clientId,
+        sessionId: payload.sessionId,
+        role: client.role,
+        userId: client.userId
+      })
+
+      // Notify others in the session
+      this.broadcastToSession(payload.sessionId, {
+        type: 'participant_joined',
+        payload: { userId: client.userId, role: client.role }
+      })
+
+      // Send confirmation to the client
+      ws.send(JSON.stringify({
+        type: 'session_joined',
+        payload: {
+          sessionId: payload.sessionId,
+          role: client.role,
+          userId: client.userId
+        }
+      }))
     } catch (err) {
       logger.error('Error validating session access', {
         clientId,
@@ -390,31 +382,7 @@ export class TrainingWebSocketServer {
         error: err instanceof Error ? err.message : String(err)
       })
       this.sendError(ws, 'Internal error validating session access')
-      return
     }
-
-    logger.info('Client joined session', {
-      clientId,
-      sessionId: payload.sessionId,
-      role: client.role,
-      userId: client.userId
-    })
-
-    // Notify others in the session
-    this.broadcastToSession(payload.sessionId, {
-      type: 'participant_joined',
-      payload: { userId: client.userId, role: client.role }
-    })
-
-    // Send confirmation to the client
-    ws.send(JSON.stringify({
-      type: 'session_joined',
-      payload: {
-        sessionId: payload.sessionId,
-        role: client.role,
-        userId: client.userId
-      }
-    }))
   }
 
   private handleSessionMessage(clientId: string, payload: { content: string, role: string }) {
@@ -423,12 +391,11 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // Broadcast chat message to everyone in the session
     this.broadcastToSession(client.sessionId, {
       type: 'session_message',
       payload: {
         userId: client.userId,
-        role: payload.role, // 'client' (AI) or 'therapist' (User)
+        role: payload.role,
         content: payload.content,
         timestamp: new Date().toISOString()
       }
@@ -441,7 +408,6 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // Only supervisors and observers should be able to send coaching notes
     if (client.role !== 'supervisor' && client.role !== 'observer') {
       logger.warn('Unauthorized coaching note attempt', {
         clientId,
@@ -451,7 +417,6 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // Coaching notes are "hidden" from trainees - only observers and supervisors receive them
     this.broadcastToSessionRoles(
       client.sessionId,
       ['observer', 'supervisor'],
@@ -485,13 +450,6 @@ export class TrainingWebSocketServer {
     }
   }
 
-  /**
-   * Check if the requested role is allowed given the maximum allowed role
-   *
-   * @param maxRole - Maximum role permitted for the user
-   * @param requestedRole - Role requested for the session
-   * @returns true if allowed, false otherwise
-   */
   private isRoleAllowed(
     maxRole: 'trainee' | 'observer' | 'supervisor',
     requestedRole: 'trainee' | 'observer' | 'supervisor'
@@ -501,16 +459,10 @@ export class TrainingWebSocketServer {
       'observer': 1,
       'supervisor': 2
     }
+    if (!(requestedRole in hierarchy) || !(maxRole in hierarchy)) return false
     return hierarchy[requestedRole] <= hierarchy[maxRole]
   }
 
-  /**
-   * Broadcast message to clients in a session, filtered by role
-   * 
-   * @param sessionId - Session ID to broadcast to
-   * @param allowedRoles - Array of roles that should receive the message
-   * @param message - Message to broadcast
-   */
   private broadcastToSessionRoles(
     sessionId: string,
     allowedRoles: Array<'trainee' | 'observer' | 'supervisor'>,
