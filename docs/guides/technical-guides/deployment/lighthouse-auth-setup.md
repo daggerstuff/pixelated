@@ -51,13 +51,14 @@ Based on your Pixelated Empathy configuration, you're using **Auth0** for authen
 
 Combine the cookies into a single string in this format:
 
-```
-sb-access-token=<ACCESS_TOKEN_VALUE>; sb-refresh-token=<REFRESH_TOKEN_VALUE>
+```auth
+auth-token=<ACCESS_TOKEN_VALUE>; refresh-token=<REFRESH_TOKEN_VALUE>
 ```
 
 **Example:**
-```
-sb-access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; sb-refresh-token=v1.MRjTvIk8RqnN...
+
+```auth
+auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; refresh-token=v1.MRjTvIk8RqnN...
 ```
 
 ### Step 4: Add the Secret to GitHub
@@ -95,6 +96,7 @@ If Auth0 supports it, create a machine-to-machine (M2M) token with extended expi
 ### Option 2: Use GitHub Actions to Refresh Tokens
 
 Create a scheduled workflow that:
+
 1. Authenticates with your API
 2. Retrieves fresh tokens
 3. Updates the GitHub secret programmatically
@@ -126,6 +128,7 @@ jobs:
 After setting the secret, test it:
 
 1. Trigger the monitoring workflow manually:
+
    ```bash
    gh workflow run monitoring.yml
    ```
@@ -147,6 +150,7 @@ With `LH_AUTH_COOKIE` configured, Lighthouse will test:
 - **Protected pages**: `/dashboard?perf=1` (and any other authenticated routes)
 
 Performance metrics collected:
+
 - First Contentful Paint (FCP)
 - Largest Contentful Paint (LCP)
 - Time to Interactive (TTI)
@@ -157,7 +161,8 @@ Performance metrics collected:
 
 ### Issue: "403 Forbidden" on protected pages
 
-**Solution**: 
+**Solution**:
+
 - Verify cookie values are correct
 - Check that the test account is active
 - Ensure cookies haven't expired
@@ -165,12 +170,14 @@ Performance metrics collected:
 ### Issue: "Lighthouse skipped authenticated URLs"
 
 **Solution**:
+
 - Verify `LH_AUTH_COOKIE` secret is set in GitHub
 - Check workflow logs for "No LH_AUTH_COOKIE secret set"
 
 ### Issue: Tokens expire too quickly
 
 **Solution**:
+
 - Increase `sessionDuration` in `src/config/auth.config.ts`
 - Or implement automated token refresh
 
@@ -182,5 +189,5 @@ Performance metrics collected:
 
 ---
 
-**Last Updated**: 2026-02-05  
+**Last Updated**: 2026-02-05
 **Maintained By**: Pixelated Empathy DevOps Team
