@@ -204,6 +204,4 @@ deployment-backup
 .tinyb
 
 # Backups
-deployment-backup/
-
-deployment-backup-20260205-195001
+deployment-backup*/
