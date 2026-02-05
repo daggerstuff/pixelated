@@ -141,9 +141,9 @@ export async function initializeAuthSystem(): Promise<void> {
     startTokenCleanupScheduler()
 
     console.log('✅ Authentication system initialized successfully (Auth0-native)')
-  } catch (_error) {
-    console.error('❌ Failed to initialize authentication system:', _error)
-    throw _error
+  } catch (error) {
+    console.error('❌ Failed to initialize authentication system:', error)
+    throw error
   }
 }
 

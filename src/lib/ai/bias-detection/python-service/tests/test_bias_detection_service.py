@@ -11,13 +11,13 @@ import json
 import os
 import tempfile
 import unittest
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 # Top-level imports for tests (avoid import-inside-function warnings)
 import jwt
 import pandas as pd
 import pytest
-from werkzeug.exceptions import Unauthorized
 
 # Import the service and related classes
 from bias_detection_service import (
@@ -28,6 +28,7 @@ from bias_detection_service import (
     SessionData,
     app,
 )
+from werkzeug.exceptions import Unauthorized
 
 
 class TestBiasDetectionConfig(unittest.TestCase):
@@ -93,9 +94,7 @@ class TestSessionData(unittest.TestCase):
             content={"session_notes": "Test session"},
             ai_responses=[{"content": "How are you feeling?", "response_time": 1.2}],
             expected_outcomes=[{"outcome": "improved_mood"}],
-            transcripts=[
-                {"text": "I feel better today", "timestamp": "2024-01-01T10:00:00Z"}
-            ],
+            transcripts=[{"text": "I feel better today", "timestamp": "2024-01-01T10:00:00Z"}],
             metadata={"version": "1.0"},
         )
 
@@ -265,9 +264,7 @@ class TestBiasDetectionService(unittest.TestCase):
                 },
             },
             training_scenario={"scenario_type": "anxiety_management"},
-            content={
-                "session_notes": "Patient expressing anxiety about work situation"
-            },
+            content={"session_notes": "Patient expressing anxiety about work situation"},
             ai_responses=[
                 {"content": "How are you feeling today?", "response_time": 1.2},
                 {"content": "Can you tell me more about that?", "response_time": 1.5},
@@ -305,9 +302,7 @@ class TestBiasDetectionService(unittest.TestCase):
 
     def test_demographic_representation_analysis(self):
         """Test demographic representation analysis"""
-        result = self.service._analyze_demographic_representation(
-            self.test_session_data
-        )
+        result = self.service._analyze_demographic_representation(self.test_session_data)
 
         assert "bias_score" in result
         assert "representation_score" in result
@@ -375,9 +370,7 @@ class TestBiasDetectionService(unittest.TestCase):
     def test_calculate_confidence(self):
         """Test confidence calculation"""
         self._extracted_from_test_calculate_confidence_4("bias_score", 0.5, 0.8)
-        self._extracted_from_test_calculate_confidence_4(
-            "error", "Failed to analyze", 0.5
-        )
+        self._extracted_from_test_calculate_confidence_4("error", "Failed to analyze", 0.5)
 
     # TODO Rename this here and in `test_calculate_confidence`
     def _extracted_from_test_calculate_confidence_4(self, arg0, arg1, arg2):
@@ -420,12 +413,8 @@ class TestBiasDetectionService(unittest.TestCase):
         import asyncio
 
         # Mock the audit logger to avoid file operations
-        with patch.object(
-            self.service.audit_logger, "log_event", new_callable=AsyncMock
-        ):
-            result = asyncio.run(
-                self.service.analyze_session(self.test_session_data, "test_user")
-            )
+        with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
+            result = asyncio.run(self.service.analyze_session(self.test_session_data, "test_user"))
 
             # Verify result structure
             assert "session_id" in result
@@ -486,9 +475,7 @@ class TestFlaskEndpoints(unittest.TestCase):
         """Test health check endpoint"""
         data = self._extracted_from_test_404_endpoint_3("/health", 200)
         assert data["status"] == "healthy"
-        self._extracted_from_test_dashboard_endpoint_8(
-            "components", data, "timestamp", "version"
-        )
+        self._extracted_from_test_dashboard_endpoint_8("components", data, "timestamp", "version")
 
     def test_analyze_endpoint_valid_data(self):
         """Test analyze endpoint with valid data"""
@@ -501,9 +488,7 @@ class TestFlaskEndpoints(unittest.TestCase):
             "content": {"session_notes": "Test session"},
             "ai_responses": [{"content": "How are you?", "response_time": 1.0}],
             "expected_outcomes": [{"outcome": "positive"}],
-            "transcripts": [
-                {"text": "I feel good", "timestamp": "2024-01-01T10:00:00Z"}
-            ],
+            "transcripts": [{"text": "I feel good", "timestamp": "2024-01-01T10:00:00Z"}],
             "metadata": {"version": "1.0"},
         }
 
@@ -541,9 +526,7 @@ class TestFlaskEndpoints(unittest.TestCase):
     def test_dashboard_endpoint(self):
         """Test dashboard data endpoint"""
         data = self._extracted_from_test_404_endpoint_3("/dashboard", 200)
-        self._extracted_from_test_dashboard_endpoint_8(
-            "summary", data, "trends", "demographics"
-        )
+        self._extracted_from_test_dashboard_endpoint_8("summary", data, "trends", "demographics")
 
     def test_export_endpoint_json(self):
         """Test export endpoint with JSON format"""

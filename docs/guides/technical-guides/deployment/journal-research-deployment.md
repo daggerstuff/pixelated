@@ -1,4 +1,4 @@
-## Journal Research Deployment Guide
+# Journal Research Deployment Guide
 
 ## Overview
 
@@ -19,12 +19,14 @@ This guide covers deployment of the Journal Research system, including both the 
 ### System Requirements
 
 **API Server:**
+
 - Python 3.11+
 - Docker 20.10+ (for containerized deployment)
 - 2GB RAM minimum
 - 10GB disk space
 
 **Frontend:**
+
 - Node.js 24+
 - pnpm 10.28.2+
 - 4GB RAM minimum
@@ -89,12 +91,14 @@ NODE_ENV=production
 ### Quick Start
 
 1. **Build and run API server:**
+
 ```bash
 cd docker/journal-research-api
 docker-compose up -d
 ```
 
-2. **Verify deployment:**
+1. **Verify deployment:**
+
 ```bash
 curl http://localhost:8000/health
 ```
@@ -112,12 +116,14 @@ curl http://localhost:8000/health
 ### Docker Compose Configuration
 
 The `docker-compose.yml` file includes:
+
 - API server service
 - Volume for session storage
 - Network configuration
 - Health checks
 
 **Customize for your environment:**
+
 ```yaml
 services:
   journal-research-api:
@@ -133,24 +139,28 @@ services:
 ### API Server
 
 1. **Install dependencies:**
+
 ```bash
 cd ai/journal_dataset_research/api
 uv sync --frozen
 ```
 
-2. **Set environment variables:**
+1. **Set environment variables:**
+
 ```bash
 export JWT_SECRET=your-secret-key
 export ENVIRONMENT=production
 # ... other variables
 ```
 
-3. **Run server:**
+1. **Run server:**
+
 ```bash
 python -m ai.journal_dataset_research.api.server
 ```
 
 Or using uvicorn directly:
+
 ```bash
 uvicorn ai.journal_dataset_research.api.main:app \
   --host 0.0.0.0 \
@@ -161,21 +171,25 @@ uvicorn ai.journal_dataset_research.api.main:app \
 ### Frontend
 
 1. **Install dependencies:**
+
 ```bash
 pnpm install --frozen-lockfile
 ```
 
-2. **Build:**
+1. **Build:**
+
 ```bash
 pnpm build
 ```
 
-3. **Preview (for testing):**
+1. **Preview (for testing):**
+
 ```bash
 pnpm preview
 ```
 
-4. **Production server:**
+1. **Production server:**
+
 ```bash
 pnpm start
 ```
@@ -206,6 +220,7 @@ WantedBy=multi-user.target
 ```
 
 **Enable and start:**
+
 ```bash
 sudo systemctl enable journal-research-api
 sudo systemctl start journal-research-api
@@ -266,6 +281,7 @@ server {
 ```
 
 **Enable site:**
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/journal-research /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -275,6 +291,7 @@ sudo systemctl reload nginx
 ### Docker Production Deployment
 
 **docker-compose.prod.yml:**
+
 ```yaml
 version: '3.8'
 
@@ -325,6 +342,7 @@ networks:
 ```
 
 **Deploy:**
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
@@ -340,6 +358,7 @@ curl http://localhost:8000/health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -351,6 +370,7 @@ curl http://localhost:8000/health
 ### Monitoring Setup
 
 **Prometheus metrics** (if configured):
+
 ```yaml
 scrape_configs:
   - job_name: 'journal-research-api'
@@ -359,6 +379,7 @@ scrape_configs:
 ```
 
 **Logging:**
+
 - Logs are output to stdout/stderr
 - Configure log aggregation (e.g., ELK, Loki)
 - Log level controlled by `LOG_LEVEL` environment variable
@@ -389,6 +410,7 @@ fi
 #### API Server Won't Start
 
 **Check logs:**
+
 ```bash
 docker logs journal-research-api
 # or
@@ -396,6 +418,7 @@ journalctl -u journal-research-api -f
 ```
 
 **Common causes:**
+
 - Missing `JWT_SECRET` environment variable
 - Port 8000 already in use
 - Invalid CORS configuration
@@ -403,6 +426,7 @@ journalctl -u journal-research-api -f
 #### CORS Errors
 
 **Solution:**
+
 - Ensure `CORS_ORIGINS` includes your frontend URL
 - Check that frontend is making requests to correct API URL
 - Verify authentication headers are included
@@ -410,6 +434,7 @@ journalctl -u journal-research-api -f
 #### WebSocket Connection Fails
 
 **Solution:**
+
 - Check reverse proxy WebSocket configuration
 - Verify WebSocket endpoint is accessible
 - Check firewall rules for WebSocket ports
@@ -417,6 +442,7 @@ journalctl -u journal-research-api -f
 #### Session Storage Issues
 
 **Solution:**
+
 - Verify volume mount permissions
 - Check disk space availability
 - Ensure `SESSION_STORAGE_PATH` is writable
@@ -424,18 +450,21 @@ journalctl -u journal-research-api -f
 ### Debugging
 
 **Enable debug mode:**
+
 ```bash
 export DEBUG=true
 export LOG_LEVEL=DEBUG
 ```
 
 **Check API documentation:**
+
 ```bash
 # Development only
 curl http://localhost:8000/api/docs
 ```
 
 **Test endpoints:**
+
 ```bash
 # Health check
 curl http://localhost:8000/health
@@ -466,6 +495,7 @@ curl -H "Authorization: Bearer <token>" \
 ### Secrets Management
 
 **Use environment variables or secrets manager:**
+
 - AWS Secrets Manager
 - HashiCorp Vault
 - Kubernetes Secrets
@@ -478,11 +508,13 @@ curl -H "Authorization: Bearer <token>" \
 ### Horizontal Scaling
 
 **API Server:**
+
 - Run multiple instances behind load balancer
 - Use shared session storage (database or Redis)
 - Configure sticky sessions for WebSocket connections
 
 **Frontend:**
+
 - Use CDN for static assets
 - Configure caching headers
 - Use edge functions for dynamic content
@@ -490,6 +522,7 @@ curl -H "Authorization: Bearer <token>" \
 ### Vertical Scaling
 
 **API Server:**
+
 - Increase container resources
 - Adjust uvicorn workers: `--workers 4`
 - Monitor memory and CPU usage
@@ -540,6 +573,7 @@ sudo systemctl reload nginx
 ## Support
 
 For deployment issues:
+
 - Check logs: `docker logs journal-research-api`
 - Review health check endpoint
 - Verify environment variables
@@ -547,4 +581,3 @@ For deployment issues:
 - Review API documentation
 
 **Last Updated**: January 2025
-

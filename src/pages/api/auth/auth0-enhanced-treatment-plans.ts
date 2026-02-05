@@ -404,14 +404,14 @@ export const GET: APIRoute = async ({ request }) => {
       filteredPlans = filteredPlans.map((plan) => ({
         ...plan,
         goals: plan.goals.map((goal) => {
-          const { metrics, ...goalWithoutMetrics } = goal as any
+          const { metrics: _metrics, ...goalWithoutMetrics } = goal as any
           return goalWithoutMetrics
         }),
         metadata: plan.metadata
           ? {
-              ...plan.metadata,
-              interventionHistory: [],
-            }
+            ...plan.metadata,
+            interventionHistory: [],
+          }
           : undefined,
       }))
     }

@@ -18,13 +18,13 @@
     "directory": "packages/integrations/react"
   },
   "files": [
-    "client-v17.js",
-    "client.js",
-    "context.js",
     "dist",
+    "client.js",
+    "client-v17.js",
+    "context.js",
     "jsx-runtime.js",
-    "server-v17.js",
     "server.js",
+    "server-v17.js",
     "static-html.js",
     "vnode-children.js"
   ],
@@ -67,7 +67,10 @@
     "react": "^17.0.2 || ^18.0.0",
     "react-dom": "^17.0.2 || ^18.0.0 || ^19.2.0"
   },
+  "overrides": {
+    "esbuild": "^0.25.9"
+  },
   "engines": {
-    "node": ">=24"
+    "node": "24.13.0"
   }
 }

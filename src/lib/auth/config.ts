@@ -13,57 +13,30 @@ export const JWT_CONFIG = {
   algorithm: 'HS256' as const,
 }
 
-// Better-Auth Configuration
-export const BETTER_AUTH_CONFIG = {
-  database: {
-    provider: process.env.DATABASE_PROVIDER || 'sqlite',
-    url: process.env.DATABASE_URL || ':memory:',
-  },
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: process.env.NODE_ENV === 'production',
-    minPasswordLength: 8,
-    maxPasswordLength: 128,
-  },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      enabled: !!process.env.GOOGLE_CLIENT_ID,
-    },
-  },
-  user: {
-    modelName: 'users',
-    fields: {
-      role: {
-        type: 'string',
-        defaultValue: 'guest',
-      },
-      createdAt: {
-        type: 'number',
-        defaultValue: Date.now,
-      },
-      updatedAt: {
-        type: 'number',
-        defaultValue: Date.now,
-      },
-    },
-  },
-  session: {
-    modelName: 'sessions',
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-  },
-  rateLimit: {
-    window: 10,
-    max: 10,
-    skipSuccessfulRequests: false,
-    skipFailedRequests: false,
-  },
-  security: {
-    bcryptRounds: 12,
-    sessionSecret: process.env.SESSION_SECRET || 'fallback-session-secret',
-  },
+// Auth0 Configuration
+export const AUTH0_CONFIG = {
+  domain: process.env.AUTH0_DOMAIN || '',
+  clientId: process.env.AUTH0_CLIENT_ID || '',
+  clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
+  audience: process.env.AUTH0_AUDIENCE || '',
+  callbackUrl:
+    process.env.AUTH0_CALLBACK_URL || 'http://localhost:4321/api/auth/callback',
+  scope: 'openid profile email offline_access',
+}
+
+// Password Policy Configuration
+export const PASSWORD_CONFIG = {
+  minLength: 8,
+  maxLength: 128,
+  requireLowercase: true,
+  requireUppercase: true,
+  requireNumber: true,
+  requireSpecial: true,
+}
+
+// Bcrypt Configuration
+export const BCRYPT_CONFIG = {
+  rounds: 12,
 }
 
 // Rate Limiting Configuration
@@ -201,7 +174,9 @@ export const HIPAA_CONFIG = {
 export function getAuthConfig() {
   return {
     jwt: JWT_CONFIG,
-    betterAuth: BETTER_AUTH_CONFIG,
+    auth0: AUTH0_CONFIG,
+    password: PASSWORD_CONFIG,
+    bcrypt: BCRYPT_CONFIG,
     rateLimit: RATE_LIMIT_CONFIG,
     security: SECURITY_CONFIG,
     rbac: RBAC_CONFIG,
@@ -222,31 +197,11 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
     errors.push('JWT_SECRET is required in production')
   }
 
-  // Validate database configuration
-  if (
-    !BETTER_AUTH_CONFIG.database.url &&
-    process.env.NODE_ENV === 'production'
-  ) {
-    errors.push('DATABASE_URL is required in production')
-  }
-
-  // Validate session secret
-  if (
-    !BETTER_AUTH_CONFIG.security.sessionSecret &&
-    process.env.NODE_ENV === 'production'
-  ) {
-    errors.push('SESSION_SECRET is required in production')
-  }
-
-  // Validate social provider configuration
-  if (
-    BETTER_AUTH_CONFIG.socialProviders.google.enabled &&
-    (!BETTER_AUTH_CONFIG.socialProviders.google.clientId ||
-      !BETTER_AUTH_CONFIG.socialProviders.google.clientSecret)
-  ) {
-    errors.push(
-      'Google OAuth client ID and secret are required when Google auth is enabled',
-    )
+  // Validate Auth0 configuration in production
+  if (process.env.NODE_ENV === 'production') {
+    if (!AUTH0_CONFIG.domain) errors.push('AUTH0_DOMAIN is required')
+    if (!AUTH0_CONFIG.clientId) errors.push('AUTH0_CLIENT_ID is required')
+    if (!AUTH0_CONFIG.clientSecret) errors.push('AUTH0_CLIENT_SECRET is required')
   }
 
   return {

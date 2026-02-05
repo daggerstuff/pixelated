@@ -7,15 +7,15 @@ permissions:
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master, staging]
   pull_request:
-    branches: [master, develop]
+    branches: [master, staging]
   schedule:
     # Run every Monday at 2:00 AM UTC
     - cron: "0 2 * * 1"
 
 env:
-  NODE_VERSION: 24.11.0
+  NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
   PNPM_VERSION: 10.28.2
 
@@ -147,8 +147,6 @@ jobs:
           upload: true
           # Configure output format
           output: sarif-latest
-          # Fail the workflow if critical vulnerabilities are found
-          # fail-on: high
 
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v4
