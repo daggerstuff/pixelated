@@ -2,6 +2,7 @@ import type { ToastOptions } from 'react-hot-toast'
 import type { ReactNode } from 'react'
 import { toast as hotToast, Toaster } from 'react-hot-toast'
 import { cn } from '../../lib/utils'
+import { IconX } from './icons'
 
 // Types for toast options
 export interface ToastProps extends Omit<ToastOptions, 'icon'> {
@@ -83,22 +84,10 @@ export const toast = {
           <div className="flex-1">{message}</div>
           <button
             onClick={() => hotToast.dismiss(t.id)}
-            className="ml-4 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+            className="ml-4 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Dismiss"
           >
-            <svg
-              className="w-4 h-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <IconX size={16} className="text-gray-500" aria-hidden="true" />
           </button>
         </div>
       ),
