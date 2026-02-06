@@ -71,7 +71,7 @@ This document summarizes the complete implementation of the Auth0 authentication
   - Testing procedures
   - Troubleshooting guide
 
-- **Rollback Plan** (`scripts/auth0-rollback.sh`)
+- **Rollback Plan** (`scripts/utils/auth0-rollback.sh`)
   - Automated rollback script
   - Backup and restoration procedures
   - Service reversion processes

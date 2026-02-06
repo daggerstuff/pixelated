@@ -851,9 +851,9 @@ psql pixelated_memory_store < backup_memory_store_YYYYMMDD_HHMMSS.sql
 
 ### Emergency Contacts
 
-- Development Team: dev-team@pixelated-empathy.com
-- Operations Team: ops-team@pixelated-empathy.com
-- Security Team: security-team@pixelated-empathy.com
+- Development Team: dev-team@pixelatedempathy.com
+- Operations Team: ops-team@pixelatedempathy.com
+- Security Team: security-team@pixelatedempathy.com
 
 ### Documentation Links
 

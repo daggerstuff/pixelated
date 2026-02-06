@@ -12,13 +12,13 @@ export function requestLogger(
     req: Request,
     res: Response,
     next: NextFunction
-) {
+): void {
     const startTime = Date.now()
-    const requestId = generateRequestId()
+    const requestId = createRequestId()
 
         // Store metadata on request object
-        (req as any).requestId = requestId
-            (req as any).startTime = startTime
+        ; (req as any).requestId = requestId
+        ; (req as any).startTime = startTime
 
     // Log on response finish
     res.on('finish', () => {
@@ -30,8 +30,8 @@ export function requestLogger(
         )
 
         // Audit log for user actions
-        if (req.user && shouldAuditLog(req)) {
-            logAuditEvent(req, res, requestId, duration)
+        if (req.user && shouldAuditLog(req as any)) {
+            void logAuditEvent(req as any, res, requestId, duration)
         }
     })
 
@@ -189,8 +189,11 @@ function shouldAuditLog(req: Request): boolean {
 // UTILITY FUNCTIONS
 // ============================================================================
 
-function generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+/**
+ * Generate a unique request ID
+ */
+function createRequestId(): string {
+    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 }
 
 export function getRequestId(req: Request): string {

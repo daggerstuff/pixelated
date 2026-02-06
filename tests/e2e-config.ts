@@ -16,7 +16,7 @@ const __dirname = dirname(__filename)
 
 export default defineConfig({
   // Use this configuration in addition to playwright.config.ts
-  // by running: npx playwright test --config=tests/e2e-config.ts
+  // by running: pnpm dlx playwright test --config=tests/e2e-config.ts
 
   testDir: resolve(__dirname, './e2e'),
 
@@ -69,15 +69,15 @@ export default defineConfig({
   // Run your local dev server before starting tests
   webServer: isCi
     ? {
-        command: 'pnpm run build && pnpm run preview -- --port 3000',
-        url: 'http://localhost:3000',
-        reuseExistingServer: false,
-        timeout: 10 * 60 * 1000,
-      }
+      command: 'pnpm run build && pnpm run preview -- --port 3000',
+      url: 'http://localhost:3000',
+      reuseExistingServer: false,
+      timeout: 10 * 60 * 1000,
+    }
     : {
-        command: 'pnpm run dev',
-        port: 3000,
-        reuseExistingServer: true,
-        timeout: 60000,
-      },
+      command: 'pnpm run dev',
+      port: 3000,
+      reuseExistingServer: true,
+      timeout: 60000,
+    },
 })

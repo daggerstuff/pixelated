@@ -1,17 +1,18 @@
 # Dependabot Alerts Script
 
-This script queries the GitHub Dependabot alerts API for the current repository and outputs the list of alerts to `alerts.json`.
+This script queries the GitHub Dependabot alerts API for the current repository,
+and outputs the list of alerts to `alerts.json`.
 
 ## Usage
 
 ```bash
-pnpm ts-node scripts/list-dependabot-alerts.ts
+pnpm ts-node scripts/utils/list-dependabot-alerts.ts
 ```
 
 Or if ts-node is globally available:
 
 ```bash
-./scripts/list-dependabot-alerts.ts
+./scripts/utils/list-dependabot-alerts.ts
 ```
 
 ## Requirements
@@ -22,4 +23,5 @@ Or if ts-node is globally available:
 
 ## Output
 
-The script will create or overwrite `alerts.json` in the repository root with the Dependabot alerts data.
+The script will create or overwrite `alerts.json` in the repository root,
+with the Dependabot alerts data.

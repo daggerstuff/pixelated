@@ -3,15 +3,12 @@ import {
   MarketPenetration,
   MarketOpportunity,
 } from '../types/business-intelligence'
-import { DatabaseService } from './databaseService'
+// import { DatabaseService } from './databaseService'
 
 export class MarketAnalyticsService {
   private logger: Logger
-  private db: DatabaseService
-
   constructor() {
     this.logger = new Logger('MarketAnalyticsService')
-    this.db = new DatabaseService()
   }
 
   /**
@@ -48,7 +45,7 @@ export class MarketAnalyticsService {
         error,
         targetSegments,
       })
-      throw new Error(`Market penetration analysis failed: ${error}`)
+      throw new Error(`Market penetration analysis failed: ${String(error)}`)
     }
   }
 
@@ -100,7 +97,7 @@ export class MarketAnalyticsService {
     resourceRequirements: ResourceRequirements
     riskAssessment: RiskAssessment
   }> {
-    const marketAnalysis = await this.analyzeTargetMarkets(
+    await this.analyzeTargetMarkets(
       currentMarket,
       targetMarkets,
     )
@@ -389,7 +386,7 @@ export class MarketAnalyticsService {
     ]
   }
 
-  private async fetchMarketSaturationData(market: string): Promise<any> {
+  private async fetchMarketSaturationData(_market: string): Promise<any> {
     // Mock data - replace with actual market data
     return {
       currentCustomers: 450,
@@ -399,7 +396,7 @@ export class MarketAnalyticsService {
   }
 
   private async fetchHistoricalData(
-    market: string,
+    _market: string,
     months: number,
   ): Promise<any[]> {
     // Mock historical data - replace with actual data

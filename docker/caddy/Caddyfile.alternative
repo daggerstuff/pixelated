@@ -9,7 +9,7 @@
 
 {
     # Global options
-    email admin@pixelated-empathy.com
+    email admin@pixelatedempathy.com
     
     # Metrics
     servers {
@@ -18,7 +18,7 @@
 }
 
 # Main site with automatic HTTPS
-pixelated-empathy.com www.pixelated-empathy.com {
+pixelatedempathy.com www.pixelatedempathy.com {
     # Automatic HTTPS with Let's Encrypt
     
     # Security headers

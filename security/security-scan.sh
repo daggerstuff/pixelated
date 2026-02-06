@@ -61,7 +61,7 @@ scan_network() {
     nmap -sS -O localhost
     
     # SSL/TLS configuration testing
-    testssl.sh --parallel --severity HIGH pixelated-empathy.com
+    testssl.sh --parallel --severity HIGH pixelatedempathy.com
     
     echo "✅ Network scanning completed"
 }

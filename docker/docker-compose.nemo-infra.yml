@@ -1,0 +1,78 @@
+# NVIDIA NeMo Microservices Platform Infrastructure
+# Provides core services (Datastore, Entity Store, NMP Core) required by Customizer and Evaluator.
+
+services:
+  nemo-datastore:
+    image: nvcr.io/nvidia/nemo-microservices/datastore:25.12
+    container_name: nemo-datastore
+    environment:
+      GITEA_WORK_DIR: /nds-data/app
+      HTTP_PORT: 3000
+      GITEA__DATABASE__DB_TYPE: postgres
+      GITEA__DATABASE__HOST: nemo-postgres:5432
+      GITEA__DATABASE__NAME: datastore
+      GITEA__DATABASE__USER: nmp
+      GITEA__DATABASE__PASSWD: nmp
+      GITEA__LFS__STORAGE_TYPE: minio
+      GITEA__LFS__MINIO_ENDPOINT: nemo-minio:9000
+      GITEA__LFS__MINIO_ACCESS_KEY_ID: minioadmin
+      GITEA__LFS__MINIO_SECRET_ACCESS_KEY: minioadmin
+      GITEA__LFS__MINIO_BUCKET: nds
+    volumes:
+      - nemo_datastore_storage:/nds-data
+    depends_on:
+      - nemo-postgres
+      - nemo-minio
+    networks:
+      - nemo-network
+
+  nemo-minio:
+    image: quay.io/minio/minio:RELEASE.2024-11-07T00-52-20Z
+    container_name: nemo-minio
+    command: minio server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - nemo_minio_storage:/data
+    networks:
+      - nemo-network
+
+  nemo-postgres:
+    image: postgres:16.1
+    container_name: nemo-postgres
+    environment:
+      POSTGRES_USER: nmp
+      POSTGRES_PASSWORD: nmp
+    volumes:
+      - nemo_postgres_storage:/var/lib/postgresql/data
+    networks:
+      - nemo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nmp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nemo-entity-store:
+    image: nvcr.io/nvidia/nemo-microservices/entity-store:25.12
+    container_name: nemo-entity-store
+    environment:
+      POSTGRES_PASSWORD: nmp
+      POSTGRES_USER: nmp
+      POSTGRES_HOST: nemo-postgres
+      POSTGRES_DB: entitystore
+      BASE_URL_DATASTORE: http://nemo-datastore:3000/v1/hf
+    depends_on:
+      - nemo-postgres
+    networks:
+      - nemo-network
+
+volumes:
+  nemo_datastore_storage:
+  nemo_minio_storage:
+  nemo_postgres_storage:
+
+networks:
+  nemo-network:
+    driver: bridge

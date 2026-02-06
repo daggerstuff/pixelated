@@ -73,6 +73,31 @@ interface SyntheticConversation {
   accuracyScore?: number
 }
 
+interface ScenarioSymptom {
+  name: string
+  severity: number
+  duration: string
+  indicators: string[]
+  cognitivePatterns?: string[]
+}
+
+interface IdentifiedSymptom {
+  name: string
+}
+
+interface ScenarioResult {
+  scenario: {
+    clientStatement: string
+    therapistResponse: string
+    symptoms: ScenarioSymptom[]
+  }
+  analysis: {
+    identifiedSymptoms: IdentifiedSymptom[]
+    clinicalSummary: string
+    accuracyScore: number
+  }
+}
+
 /**
  * Component for demonstrating synthetic therapy conversation generation
  */
@@ -128,7 +153,7 @@ export default function SyntheticTherapyDemo() {
         throw new Error(`API request failed: ${response.status}`)
       }
 
-      const scenarioResult = await response.json()
+      const scenarioResult = (await response.json()) as ScenarioResult
 
       // Transform API response to match our conversation format
       const apiConversations: SyntheticConversation[] = [
@@ -136,23 +161,16 @@ export default function SyntheticTherapyDemo() {
           patientText: scenarioResult.scenario.clientStatement,
           therapistText: scenarioResult.scenario.therapistResponse,
           encodedSymptoms: scenarioResult.scenario.symptoms.map(
-            (symptom: unknown) => ({
-              // @ts-expect-error: type from API
+            (symptom: ScenarioSymptom) => ({
               name: symptom.name,
-              // @ts-expect-error: type from API
               severity: symptom.severity / 10, // Convert 1-10 to 0-1
-              // @ts-expect-error: type from API
               duration: symptom.duration,
-              // @ts-expect-error: type from API
               manifestations: symptom.indicators,
-              // @ts-expect-error: type from API
               cognitions: symptom.cognitivePatterns || [],
             }),
           ),
           decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map(
-            (symptom: unknown) =>
-              // @ts-expect-error: type from API
-              symptom.name,
+            (symptom: IdentifiedSymptom) => symptom.name,
           ),
           sessionSummary: scenarioResult.analysis.clinicalSummary,
           accuracyScore: scenarioResult.analysis.accuracyScore || 0.8,
@@ -620,7 +638,7 @@ export default function SyntheticTherapyDemo() {
                         <Badge
                           variant={
                             selectedConversation.accuracyScore &&
-                            selectedConversation.accuracyScore >= 0.7
+                              selectedConversation.accuracyScore >= 0.7
                               ? 'default'
                               : 'destructive'
                           }

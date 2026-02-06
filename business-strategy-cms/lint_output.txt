@@ -1,0 +1,128 @@
+
+> business-strategy-cms@1.0.0 lint /home/vivi/pixelated/business-strategy-cms
+> eslint src/**/*.ts
+
+
+/home/vivi/pixelated/business-strategy-cms/src/middleware/errorHandler.ts
+  44:34  error  The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type  @typescript-eslint/no-unsafe-function-type
+
+/home/vivi/pixelated/business-strategy-cms/src/models/Document.ts
+   34:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   35:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  132:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/models/User.ts
+   5:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/aiStrategyReviewService.ts
+  1:10  warning  'Document' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/vivi/pixelated/business-strategy-cms/src/services/alphaVantageService.ts
+   67:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  305:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  340:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  366:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  450:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  458:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/authService.ts
+  23:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/businessIntelligenceService.ts
+   86:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  276:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  351:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/collaborationService.ts
+  22:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/databaseService.ts
+  210:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/documentService.ts
+  158:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/edgeCaseMappingService.ts
+  75:13  error  'matchedKeywords' is never reassigned. Use 'const' instead  prefer-const
+
+/home/vivi/pixelated/business-strategy-cms/src/services/marketAnalyticsService.ts
+  103:11  warning  'marketAnalysis' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  228:19  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  353:14  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  362:49  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  362:65  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  392:43  warning  'market' is defined but never used. Allowed unused args must match /^_/u                   @typescript-eslint/no-unused-vars
+  392:68  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  404:14  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+  420:33  warning  Unexpected any. Specify a different type                                                   @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/mediaService.ts
+  175:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/realBusinessIntelligenceService.ts
+  259:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  413:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  473:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  492:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/socketService.ts
+   30:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  287:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  317:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  321:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/workflowService.ts
+  123:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/services/yahooFinanceService.ts
+   52:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  266:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  269:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  277:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/tests/bi-persistence.test.ts
+  35:5  error  Test has no assertions  vitest/expect-expect
+
+/home/vivi/pixelated/business-strategy-cms/src/tests/workflow.test.ts
+  5:10  warning  'UserRole' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/vivi/pixelated/business-strategy-cms/src/types/business-intelligence.ts
+  117:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/types/document.ts
+  27:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/types/editor.ts
+   4:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:9   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/types/workflow.ts
+   61:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   72:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vivi/pixelated/business-strategy-cms/src/utils/logger.ts
+  26:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 70 problems (3 errors, 67 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.

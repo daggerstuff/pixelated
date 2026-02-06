@@ -130,7 +130,7 @@ This document summarizes the complete implementation of the Auth0 authentication
   - Implementation order and dependencies
   - Success metrics and risk mitigation
 
-- **Rollback Plan** (`scripts/auth0-rollback.sh`)
+- **Rollback Plan** (`scripts/utils/auth0-rollback.sh`)
   - Automated rollback script
   - Backup and restoration procedures
   - Service reversion processes

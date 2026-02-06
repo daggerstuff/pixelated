@@ -9,13 +9,7 @@ import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
-// Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  clientId: process.env.AUTH0_CLIENT_ID || '',
-  clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
-  audience: process.env.AUTH0_AUDIENCE || '',
-}
+import { auth0Config, isAuth0Configured } from './auth0-config'
 
 // Initialize Auth0 authentication client
 let auth0Authentication: AuthenticationClient | null = null
@@ -24,15 +18,15 @@ let auth0Authentication: AuthenticationClient | null = null
  * Initialize Auth0 authentication client
  */
 function initializeAuth0Client() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
+  if (!isAuth0Configured()) {
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain: auth0Config.domain,
+      clientId: auth0Config.clientId,
+      clientSecret: auth0Config.clientSecret
     })
   }
 }
@@ -170,7 +164,7 @@ export async function validateToken(
     const { payload } = decodedToken
 
     // Validate Issuer
-    const expectedIssuer = `https://${process.env.AUTH0_DOMAIN || AUTH0_CONFIG.domain}/`
+    const expectedIssuer = `https://${auth0Config.domain}/`
     if (!payload.iss) {
       throw new AuthenticationError('Token missing issuer claim')
     }
@@ -179,7 +173,7 @@ export async function validateToken(
     }
 
     // Validate Audience
-    const expectedAudience = process.env.AUTH0_AUDIENCE ?? AUTH0_CONFIG.audience
+    const expectedAudience = auth0Config.audience
     if (!expectedAudience || expectedAudience.trim() === '') {
       console.warn('AUTH0_AUDIENCE not configured - audience validation skipped')
     } else {

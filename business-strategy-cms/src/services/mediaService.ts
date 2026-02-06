@@ -1,3 +1,4 @@
+// @ts-ignore
 import AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -103,7 +104,7 @@ export class MediaService {
       url: string | null
     }[]
   > {
-    const params: AWS.S3.ListObjectsV2Request = {
+    const params: any = {
       Bucket: BUCKET_NAME,
     }
 
@@ -116,7 +117,7 @@ export class MediaService {
     if (!result.Contents) return []
 
     return await Promise.all(
-      result.Contents.map(async (file) => {
+      result.Contents.map(async (file: any) => {
         try {
           const url = await this.getSignedUrl(file.Key || '')
           return {

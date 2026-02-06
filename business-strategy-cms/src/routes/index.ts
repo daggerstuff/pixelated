@@ -4,6 +4,7 @@ import { userRouter } from './users'
 import { onboardingRouter } from './onboarding'
 import { documentRouter } from './documents'
 import { marketRouter } from './market'
+import { strategyRouter } from './strategy'
 
 const router = Router()
 
@@ -18,6 +19,7 @@ router.use('/users', userRouter)
 router.use('/onboarding', onboardingRouter)
 router.use('/documents', documentRouter)
 router.use('/market', marketRouter)
+router.use('/strategy', strategyRouter)
 // router.use('/workflows', workflowRoutes)
 
 export { router as apiRouter }

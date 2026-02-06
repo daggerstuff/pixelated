@@ -52,7 +52,10 @@ program
       const { file, taskId, summary, verbose } = options
 
       // Validate file path to prevent path traversal
-      const validatedFilePath = validatePath(file, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+      const validatedFilePath = validatePath(
+        file,
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      )
 
       if (!existsSync(validatedFilePath)) {
         console.error(`❌ Task list file not found: ${file}`)
@@ -60,7 +63,11 @@ program
       }
 
       if (verbose) {
-        logger.info('Starting check-in process', { file: validatedFilePath, taskId, summary })
+        logger.info('Starting check-in process', {
+          file: validatedFilePath,
+          taskId,
+          summary,
+        })
       }
 
       const taskManager = new TaskListManager()
@@ -183,7 +190,10 @@ program
       const { file } = options
 
       // Validate file path to prevent path traversal
-      const validatedFilePath = validatePath(file, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+      const validatedFilePath = validatePath(
+        file,
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      )
 
       if (!existsSync(validatedFilePath)) {
         console.error(`❌ Task list file not found: ${file}`)
@@ -237,7 +247,10 @@ program
       const { file, title } = options
 
       // Validate file path to prevent path traversal
-      const validatedFilePath = validatePath(file, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+      const validatedFilePath = validatePath(
+        file,
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      )
 
       if (existsSync(validatedFilePath)) {
         console.error(`❌ File already exists: ${file}`)

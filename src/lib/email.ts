@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 
-const logger = createBuildSafeLogger({ prefix: 'EmailService' })
+const logger = createBuildSafeLogger('EmailService')
 
 export interface EmailConfig {
   provider: 'smtp' | 'sendgrid' | 'aws-ses' | 'resend'
@@ -111,7 +111,7 @@ export class EmailService {
         <div style="background-color: #dc3545; color: white; padding: 20px; text-align: center;">
           <h1>🚨 Security Breach Alert</h1>
         </div>
-        
+
         <div style="padding: 20px;">
           <h2>Breach Details</h2>
           <table style="width: 100%; border-collapse: collapse;">
@@ -122,7 +122,7 @@ export class EmailService {
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Severity:</strong></td>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                <span style="color: ${this.getSeverityColor(breachDetails.severity)}; font-weight: bold;">
+              <span style="color: ${this.getSeverityColor(breachDetails.severity)}; font-weight: bold;">
                   ${breachDetails.severity.toUpperCase()}
                 </span>
               </td>
@@ -136,10 +136,10 @@ export class EmailService {
               <td style="padding: 8px; border-bottom: 1px solid #ddd;">${breachDetails.detectedAt.toISOString()}</td>
             </tr>
           </table>
-          
+
           <h3>Description</h3>
           <p>${breachDetails.description}</p>
-          
+
           <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
             <p><strong>Immediate Actions Required:</strong></p>
             <ul>
@@ -150,7 +150,7 @@ export class EmailService {
             </ul>
           </div>
         </div>
-        
+
         <div style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #ddd;">
           <p style="margin: 0; color: #6c757d; font-size: 12px;">
             This is an automated security alert from Pixelated Mental Health Platform
@@ -185,12 +185,12 @@ export class EmailService {
         <div style="background-color: #007bff; color: white; padding: 20px; text-align: center;">
           <h1>Data Deletion Request Confirmed</h1>
         </div>
-        
+
         <div style="padding: 20px;">
           <p>Dear Patient,</p>
-          
+
           <p>We have received and confirmed your request to delete your personal data from our system.</p>
-          
+
           <h3>Deletion Details</h3>
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
@@ -202,18 +202,18 @@ export class EmailService {
               <td style="padding: 8px; border-bottom: 1px solid #ddd;">${deletionDetails.scheduledDate.toLocaleDateString()}</td>
             </tr>
           </table>
-          
+
           <h3>Data Types to be Deleted</h3>
           <ul>
             ${deletionDetails.dataTypes.map((type) => `<li>${type}</li>`).join('')}
           </ul>
-          
+
           <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
             <p><strong>Important:</strong> Once your data is deleted, it cannot be recovered. Please ensure you have downloaded any information you may need before the scheduled deletion date.</p>
           </div>
-          
+
           <p>If you have any questions or need to modify this request, please contact our support team immediately.</p>
-          
+
           <p>Best regards,<br>Pixelated Mental Health Platform Team</p>
         </div>
       </div>

@@ -5,7 +5,7 @@
 ### One-Command Deployment
 
 ```bash
-./scripts/deploy-nemo-data-designer-k8s.sh
+./scripts/deploy/deploy-nemo-data-designer-k8s.sh
 ```
 
 ### What It Does

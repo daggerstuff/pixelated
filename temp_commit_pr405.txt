@@ -1,0 +1,1 @@
+Applying session access validation in TrainingWebSocketServer from PR #405

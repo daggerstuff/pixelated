@@ -47,7 +47,7 @@
     "port": 3000,
     "cors": {
       "enabled": true,
-      "origins": ["https://staging.pixelated-empathy.com"],
+      "origins": ["https://staging.pixelatedempathy.com"],
       "credentials": true
     },
     "rate_limiting": {
@@ -72,7 +72,7 @@
       "google": {
         "client_id": "${GOOGLE_CLIENT_ID_STAGING}",
         "client_secret": "${GOOGLE_CLIENT_SECRET_STAGING}",
-        "callback_url": "https://staging.pixelated-empathy.com/auth/google/callback"
+        "callback_url": "https://staging.pixelatedempathy.com/auth/google/callback"
       }
     }
   },
@@ -109,7 +109,7 @@
     "region": "${AWS_REGION}",
     "access_key": "${AWS_ACCESS_KEY_STAGING}",
     "secret_key": "${AWS_SECRET_KEY_STAGING}",
-    "from": "staging@pixelated-empathy.com"
+    "from": "staging@pixelatedempathy.com"
   },
   "monitoring": {
     "enabled": true,

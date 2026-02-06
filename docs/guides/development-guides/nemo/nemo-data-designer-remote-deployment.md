@@ -23,7 +23,7 @@ This guide covers deploying NeMo Data Designer on a remote server for use with t
 Run the deployment script from your local machine:
 
 ```bash
-./scripts/deploy-nemo-data-designer-remote.sh
+./scripts/deploy/deploy-nemo-data-designer-remote.sh
 ```
 
 The script will:

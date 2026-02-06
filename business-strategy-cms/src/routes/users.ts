@@ -14,7 +14,7 @@ router.get(
   '/',
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res) => {
+  async (_req: AuthenticatedRequest, res) => {
     try {
       const users = await UserService.getAllUsers()
       res.json({

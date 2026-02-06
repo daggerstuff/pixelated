@@ -115,7 +115,7 @@ describe('Auth0 Integration Tests', () => {
     vi.stubEnv('AUTH0_DOMAIN', 'test-domain.auth0.com')
     vi.stubEnv('AUTH0_CLIENT_ID', 'test-client-id')
     vi.stubEnv('AUTH0_CLIENT_SECRET', 'test-client-secret')
-    vi.stubEnv('AUTH0_AUDIENCE', 'https://api.pixelated-empathy.com')
+    vi.stubEnv('AUTH0_AUDIENCE', 'https://api.pixelatedempathy.com')
     vi.stubEnv('AUTH0_MANAGEMENT_CLIENT_ID', 'test-mgmt-id')
     vi.stubEnv('AUTH0_MANAGEMENT_CLIENT_SECRET', 'test-mgmt-secret')
 
@@ -203,7 +203,7 @@ describe('Auth0 Integration Tests', () => {
         password: 'password123',
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: 'https://api.pixelated-empathy.com'
+        audience: 'https://api.pixelatedempathy.com'
       })
 
       // Verify security event was logged
@@ -409,7 +409,7 @@ describe('Auth0 Integration Tests', () => {
       const mockPayload = {
         sub: 'auth0|123456',
         iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelated-empathy.com',
+        aud: 'https://api.pixelatedempathy.com',
         exp: 9999999999,
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] }
       }
@@ -440,7 +440,7 @@ describe('Auth0 Integration Tests', () => {
       const mockPayload = {
         sub: 'auth0|123456',
         iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelated-empathy.com',
+        aud: 'https://api.pixelatedempathy.com',
         exp: 1516239022
       }
 
@@ -669,7 +669,7 @@ describe('Auth0 Integration Tests', () => {
       const mockPayload = {
         sub: 'auth0|123456',
         iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelated-empathy.com',
+        aud: 'https://api.pixelatedempathy.com',
         exp: 9999999999,
         jti: 'token-id-123', // Added jti for tokenId expectation
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] }

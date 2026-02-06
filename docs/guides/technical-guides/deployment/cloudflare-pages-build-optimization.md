@@ -10,7 +10,7 @@ We've implemented a multi-layered approach to prevent Python dependency installa
 
 ### 1. Build Script Modification
 
-The `build:cloudflare` command in `package.json` now uses `scripts/build-cloudflare.sh`, which:
+The `build:cloudflare` command in `package.json` now uses `scripts/ci/build-cloudflare.sh`, which:
 - Sets all necessary environment variables (`DEPLOY_TARGET=cloudflare`, `SKIP_PYTHON_INSTALL=true`, etc.)
 - Temporarily renames `pyproject.toml` to `pyproject.toml.cloudflare-backup` to prevent automatic detection
 - Runs the Astro build
@@ -62,7 +62,6 @@ If builds still attempt to install Python dependencies:
 
 - `package.json` - Build scripts (uses `build:cloudflare` command)
 - `wrangler.toml` - Cloudflare configuration (uses `pnpm build:cloudflare`)
-- `scripts/build-cloudflare.sh` - Main Cloudflare build script that skips Python installation
-- `scripts/skip-python-install.sh` - Helper script (can be used standalone if needed)
+- `scripts/ci/build-cloudflare.sh` - Main Cloudflare build script that skips Python installation
 - `.cloudflareignore` - Files to exclude from builds (may not be fully supported)
 

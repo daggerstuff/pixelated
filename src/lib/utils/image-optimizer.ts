@@ -7,6 +7,7 @@ import { readFile, mkdir } from 'fs/promises'
 import { existsSync, statSync } from 'fs'
 import { join } from 'path'
 import { getLogger } from '@/lib/logging'
+import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = getLogger('image-optimizer')
 
@@ -78,7 +79,7 @@ export class ImageOptimizer {
       IMAGE_CONFIG.OUTPUT_DIRS.webp,
       IMAGE_CONFIG.OUTPUT_DIRS.avif,
     ]
-    this.ensureOutputDirectories()
+    void this.ensureOutputDirectories()
   }
 
   /**
@@ -98,9 +99,21 @@ export class ImageOptimizer {
    * Optimize a single image
    */
   async optimizeImage(imagePath: string): Promise<OptimizationResult> {
+    // Validate path to prevent traversal attacks
+    try {
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+    } catch (error) {
+      throw new Error(`Invalid image path: ${error instanceof Error ? error.message : String(error)}`)
+    }
+
     const startTime = Date.now()
 
     try {
+      // Security: Validate path to prevent traversal
+      if (!validatePath(imagePath, [ALLOWED_DIRECTORIES.PUBLIC, ALLOWED_DIRECTORIES.ASSETS])) {
+        throw new Error(`Access denied: Path is outside allowed directories: ${imagePath}`)
+      }
+
       // Check if file exists
       if (!existsSync(imagePath)) {
         throw new Error(`Image file not found: ${imagePath}`)

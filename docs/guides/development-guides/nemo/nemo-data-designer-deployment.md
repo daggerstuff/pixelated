@@ -24,7 +24,7 @@ According to the [official NVIDIA documentation](https://docs.nvidia.com/nemo/mi
 
 2. Deploy using the provided script:
    ```bash
-   ./scripts/deploy-nemo-data-designer.sh
+   ./scripts/deploy/deploy-nemo-data-designer.sh
    ```
 
 3. Verify the service is running:

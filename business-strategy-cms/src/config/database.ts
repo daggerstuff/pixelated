@@ -3,32 +3,45 @@ import { Pool } from 'pg'
 import { createClient } from 'redis'
 import { logger } from '@/utils/logger'
 
+// Constants for retry logic
+const MAX_RETRIES = 10
+const RETRY_DELAY = 3000
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 // MongoDB connection
 export const connectMongoDB = async (): Promise<void> => {
-  try {
-    const mongoUri =
-      process.env.MONGODB_URI ||
-      'mongodb://localhost:27017/business-strategy-cms'
+  let retries = 0
+  while (retries < MAX_RETRIES) {
+    try {
+      const mongoUri =
+        process.env.MONGODB_URI ||
+        'mongodb://localhost:27017/business-strategy-cms'
 
-    await mongoose.connect(mongoUri)
+      await mongoose.connect(mongoUri)
 
-    logger.info('MongoDB connected successfully')
+      logger.info('MongoDB connected successfully')
 
-    // Handle connection events
-    mongoose.connection.on('error', (err) => {
-      logger.error('MongoDB connection error:', err)
-    })
+      // Handle connection events
+      mongoose.connection.on('error', (err) => {
+        logger.error('MongoDB connection error:', err)
+      })
 
-    mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected')
-    })
+      mongoose.connection.on('disconnected', () => {
+        logger.warn('MongoDB disconnected')
+      })
 
-    mongoose.connection.on('reconnected', () => {
-      logger.info('MongoDB reconnected')
-    })
-  } catch (error) {
-    logger.error('MongoDB connection failed:', error)
-    throw error
+      mongoose.connection.on('reconnected', () => {
+        logger.info('MongoDB reconnected')
+      })
+
+      return
+    } catch (error) {
+      retries++
+      logger.error(`MongoDB connection attempt ${retries} failed:`, error)
+      if (retries >= MAX_RETRIES) throw error
+      await sleep(RETRY_DELAY)
+    }
   }
 }
 
@@ -41,42 +54,58 @@ export const postgresPool = new Pool({
   password: process.env.POSTGRES_PASSWORD || 'password',
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000,
 })
 
 // Test PostgreSQL connection
 export const testPostgresConnection = async (): Promise<void> => {
-  try {
-    const client = await postgresPool.connect()
-    logger.info('PostgreSQL connected successfully')
-    client.release()
-  } catch (error) {
-    logger.error('PostgreSQL connection failed:', error)
-    throw error
+  let retries = 0
+  while (retries < MAX_RETRIES) {
+    try {
+      const client = await postgresPool.connect()
+      logger.info('PostgreSQL connected successfully')
+      client.release()
+      return
+    } catch (error) {
+      retries++
+      logger.error(`PostgreSQL connection attempt ${retries} failed:`, error)
+      if (retries >= MAX_RETRIES) throw error
+      await sleep(RETRY_DELAY)
+    }
   }
 }
 
 // Redis connection
 export const redisClient = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  url:
+    process.env.REDIS_URL ||
+    `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}`,
 })
 
 export const connectRedis = async (): Promise<void> => {
-  try {
-    await redisClient.connect()
-    logger.info('Redis connected successfully')
+  let retries = 0
+  while (retries < MAX_RETRIES) {
+    try {
+      if (!redisClient.isOpen) {
+        await redisClient.connect()
+      }
+      logger.info('Redis connected successfully')
 
-    // Handle connection events
-    redisClient.on('error', (err) => {
-      logger.error('Redis connection error:', err)
-    })
+      // Handle connection events
+      redisClient.on('error', (err) => {
+        logger.error('Redis connection error:', err)
+      })
 
-    redisClient.on('end', () => {
-      logger.warn('Redis disconnected')
-    })
-  } catch (error) {
-    logger.error('Redis connection failed:', error)
-    throw error
+      redisClient.on('end', () => {
+        logger.warn('Redis disconnected')
+      })
+      return
+    } catch (error) {
+      retries++
+      logger.error(`Redis connection attempt ${retries} failed:`, error)
+      if (retries >= MAX_RETRIES) throw error
+      await sleep(RETRY_DELAY)
+    }
   }
 }
 

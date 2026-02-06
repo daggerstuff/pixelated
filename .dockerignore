@@ -188,10 +188,12 @@ clusters/
 scripts/*
 !scripts/setup-dev.sh
 !scripts/build-*.sh
-!scripts/build-with-pipe-handling.mjs
+!scripts/ci/
+!scripts/ci/build-with-pipe-handling.mjs
 !scripts/create-prod-package.js
 !scripts/utils/
 !scripts/utils/start-server.mjs
+!scripts/docker-entrypoint.js
 
 # Tools and utilities
 tools/
@@ -260,3 +262,9 @@ tsconfig*.json
 !mdx-components.js
 !patches/
 !.npmrc
+
+# Exclude deployment backups from Docker context
+deployment-backup*/
+backup/
+*.backup
+*.bak

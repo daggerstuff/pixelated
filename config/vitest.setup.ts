@@ -118,6 +118,7 @@ function createMockRedis() {
   }
 
   const _ping = async () => 'PONG'
+  const _isHealthy = async () => true
   const _disconnect = async () => undefined
   const _hset = async (key, field, value) => {
     if (!hashStore.has(key)) {
@@ -390,8 +391,8 @@ function createMockRedis() {
       },
     }
 
-    // pipeline alias commonly used in some clients
-    ;(pipeline as unknown as { pipeline?: RedisPipeline }).pipeline = pipeline
+      // pipeline alias commonly used in some clients
+      ; (pipeline as unknown as { pipeline?: RedisPipeline }).pipeline = pipeline
     return pipeline
   }
   const _connect = async () => undefined

@@ -1,18 +1,19 @@
 ---
 // Theme CSS files are linked directly from public folder for SSR compatibility
-import SpeedInsights from "@vercel/speed-insights/astro";
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 
-interface Props {
-  title: string;
-  description?: string;
+export interface Props {
+  title: string
+  description?: string
 }
 
 const {
   title,
-  description = "Pixelated Empathy - AI-powered Therapy Training",
-} = Astro.props;
+  description = 'Pixelated Empathy - AI-powered Therapy Training',
+} = Astro.props
 
-const { cspNonce } = Astro.locals;
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
@@ -143,13 +144,14 @@ const { cspNonce } = Astro.locals;
     </footer>
     <script is:inline nonce={cspNonce}>
       function speedInsightsBeforeSend(data) {
-        console.log("Speed Insights before send", data);
-        return data;
+        console.log('Speed Insights before send', data)
+        return data
       }
     </script>
 
-    <!-- Vercel Speed Insights -->
+    <!-- Vercel Speed Insights and Analytics -->
     <SpeedInsights />
+    <Analytics />
   </body>
 </html>
 

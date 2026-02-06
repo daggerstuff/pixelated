@@ -58,11 +58,9 @@ http:
     pixelated-backend:
       loadBalancer:
         servers:
-          - url: "http://app1:3000"
-          - url: "http://app2:3000"
-          - url: "http://app3:3000"
+          - url: "http://pixelated-app:4321"
         healthCheck:
-          path: /health
+          path: /api/health
           interval: 30s
           timeout: 5s
         sticky:
@@ -76,7 +74,7 @@ http:
   routers:
     # Main Application
     app:
-      rule: "Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)"
+      rule: "Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)"
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -90,7 +88,7 @@ http:
 
     # API Routes
     api:
-      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/api/`)"
+      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/api/`)"
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -104,7 +102,7 @@ http:
 
     # Auth Routes (stricter rate limiting)
     auth:
-      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/api/auth/`)"
+      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/api/auth/`)"
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -118,7 +116,7 @@ http:
 
     # WebSocket Routes
     websocket:
-      rule: "(Host(`pixelated-empathy.com`) || Host(`www.pixelated-empathy.com`)) && PathPrefix(`/ws`)"
+      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/ws`)"
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -126,8 +124,3 @@ http:
         - security-headers
       tls:
         certResolver: letsencrypt
-
-# TCP Configuration (if needed for database proxying)
-tcp:
-  routers: {}
-  services: {}

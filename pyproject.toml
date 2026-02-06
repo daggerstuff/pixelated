@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11.13"
 dependencies = [
   "flask",
   "flask-cors>=6.0.2", # Updated to latest secure version
@@ -102,30 +102,40 @@ dependencies = [
   "minio>=7.2.20",
   "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
+  "ray>=2.53.0",
+  "pydantic>=2.12.5",
+  "clickhouse-driver>=0.2.10",
+  "semgrep>=1.79.0",
+  "pyright>=1.1.408",
+  "mem0ai>=1.0.2",
+  "pydantic-ai>=1.22.0",
+  "nest-asyncio>=1.6.0",
+  "google-genai>=1.61.0",
 ]
-
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "coverage"]
+test = [
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-asyncio",
+  "coverage",
+  "types-requests",
+]
 dev = ["black", "isort", "ruff", "mypy", "pyright"]
-
 [project.scripts]
 process-priority-5 = "ai.scripts.process_priority_5:main"
-
 [build-system]
 requires = ["setuptools>=78.1.1", "wheel>=0.38.1"]
 build-backend = "setuptools.build_meta"
-
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["ai*"]
-
 [tool.mypy]
 python_version = "3.11"
 ignore_missing_imports = true
 mypy_path = "stubs"
 files = ["src", "tests", "ai"]
 show_error_codes = true
-
 [tool.pyright]
 include = ["src", "tests", "ai"]
 exclude = [
@@ -147,7 +157,6 @@ reportMissingImports = false
 reportMissingModuleSource = false
 reportPrivateUsage = false
 pythonVersion = "3.11"
-
 [tool.ruff]
 target-version = "py311"
 line-length = 100
@@ -163,7 +172,6 @@ exclude = [
   ".git",
   "dist",
 ]
-
 [tool.ruff.lint]
 select = [
   "E",
@@ -188,50 +196,44 @@ select = [
   "RUF",
 ]
 ignore = ["E501", "UP017", "PLR2004"]
-
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true
 force-single-line = false
-
 [tool.black]
 target-version = ["py311"]
 line-length = 100
 skip-string-normalization = false
-
 [tool.isort]
 profile = "black"
 line_length = 100
 known_first_party = ["ai", "src"]
 combine_as_imports = true
 force_single_line = false
-
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
-
+filterwarnings = [
+  "ignore:.*WordPiece.*:DeprecationWarning",
+  "ignore:.*swig.*:DeprecationWarning",
+  "ignore:.*Swig.*:DeprecationWarning",
+]
 [tool.coverage.run]
 branch = true
 source = ["src", "ai"]
-
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
-
 [tool.uv]
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
 # Note: Increase timeout via environment variable: UV_HTTP_TIMEOUT=300 uv sync
-
 [tool.uv.sources.pytorch-cpu]
 url = "https://download.pytorch.org/whl/cpu"
-
 # Note: nvidia-nim and ngc-python-cli require NVIDIA NGC authentication
 # Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
 # After authenticating with your NGC API key
-
 [dependency-groups]
 dev = ["pip-audit>=2.9.0", "pytest>=8.4.2"]

@@ -52,7 +52,7 @@ docker-compose up -d
 ```
 
 ### Access Dashboard
-Dashboard is available at `https://traefik.pixelated-empathy.com`
+Dashboard is available at `https://traefik.pixelatedempathy.com`
 Default credentials: `admin` / Change in production!
 
 To generate new password:
@@ -65,7 +65,7 @@ htpasswd -nb admin your_password
 - **HTTP**: Port 80 (auto-redirects to HTTPS)
 - **HTTPS**: Port 443 (main traffic)
 - **Metrics**: Port 8082 (Prometheus scraping)
-- **Dashboard**: https://traefik.pixelated-empathy.com
+- **Dashboard**: https://traefik.pixelatedempathy.com
 
 ## Health Checks
 
@@ -103,7 +103,7 @@ docker exec traefik traefik healthcheck
 
 ### Test Rate Limiting
 ```bash
-for i in {1..10}; do curl -I https://pixelated-empathy.com/api/test; done
+for i in {1..10}; do curl -I https://pixelatedempathy.com/api/test; done
 ```
 
 ## Migration from NGINX

@@ -119,16 +119,18 @@ interface AuditServiceConfig {
   debugMode: boolean
 }
 
+import { config as envConfig } from '@/config/env.config'
+
 // Default configuration
 const DEFAULT_CONFIG: AuditServiceConfig = {
-  enabled: true,
+  enabled: envConfig.security.audit.enabled(),
   localStorageEnabled: true,
-  remoteStorageEnabled: getEnvVar('NODE_ENV') === 'production',
-  remoteEndpoint: getEnvVar('AUDIT_LOG_ENDPOINT') ?? undefined,
-  encryptLogs: getEnvVar('NODE_ENV') === 'production',
-  retentionDays: 90, // HIPAA requires 6 years, but for this app we'll use 90 days
+  remoteStorageEnabled: envConfig.isProduction(),
+  remoteEndpoint: undefined, // Removed direct Env var access, relies on passed config or explicit setup if needed
+  encryptLogs: envConfig.isProduction(),
+  retentionDays: envConfig.security.audit.retentionDays(),
   batchSize: 100,
-  debugMode: getEnvVar('NODE_ENV') === 'development',
+  debugMode: envConfig.isDevelopment(),
 }
 // Queue of pending log entries for batch processing
 let logQueue: AuditLogEntry[] = []
@@ -166,7 +168,7 @@ function startBatchTimer() {
   // Process logs every 60 seconds
   batchTimer = setInterval(() => {
     if (logQueue.length > 0) {
-      processBatch()
+      void processBatch()
     }
   }, 60000)
 }

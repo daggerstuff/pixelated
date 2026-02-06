@@ -8,13 +8,8 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
 // Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  clientId: process.env.AUTH0_CLIENT_ID || '',
-  clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
-}
+import { auth0Config } from './auth0-config'
+
 
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
@@ -24,24 +19,25 @@ let auth0Management: ManagementClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
+  if (!auth0Config.domain || !auth0Config.clientId || !auth0Config.clientSecret) {
+
     console.warn('Auth0 configuration incomplete'); return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      domain: auth0Config.domain,
+      clientId: auth0Config.clientId,
+      clientSecret: auth0Config.clientSecret
     })
   }
 
-  if (!auth0Management && AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
+  if (!auth0Management && auth0Config.managementClientId && auth0Config.managementClientSecret) {
     auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+      domain: auth0Config.domain,
+      clientId: auth0Config.managementClientId,
+      clientSecret: auth0Config.managementClientSecret,
+      audience: `https://${auth0Config.domain}/api/v2/`,
       scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
     })
   }
@@ -124,12 +120,12 @@ export class Auth0WebAuthnService {
   private readonly rpId: string
 
   constructor() {
-    if (!AUTH0_CONFIG.domain) {
+    if (!auth0Config.domain) {
       console.warn('Auth0 is not properly configured')
     }
 
     // Use the domain as RP ID for WebAuthn
-    this.rpId = AUTH0_CONFIG.domain
+    this.rpId = auth0Config.domain
   }
 
   /**

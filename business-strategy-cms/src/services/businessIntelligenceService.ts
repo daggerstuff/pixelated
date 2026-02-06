@@ -36,7 +36,7 @@ export class BusinessIntelligenceService {
         error,
         industry,
       })
-      throw new Error(`Competitive analysis failed: ${error}`)
+      throw new Error(`Competitive analysis failed: ${String(error)}`)
     }
   }
 
@@ -73,10 +73,10 @@ export class BusinessIntelligenceService {
     return Math.min(
       100,
       marketScore +
-        growthScore +
-        competitionScore +
-        barrierScore +
-        economicScore,
+      growthScore +
+      competitionScore +
+      barrierScore +
+      economicScore,
     )
   }
 
@@ -174,7 +174,7 @@ export class BusinessIntelligenceService {
       segment: string
       penetration: number
       opportunity: number
-    }
+    }[]
     totalAddressableMarket: number
     serviceableAddressableMarket: number
     serviceableObtainableMarket: number

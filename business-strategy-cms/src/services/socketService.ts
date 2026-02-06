@@ -133,7 +133,7 @@ export class SocketService {
       this.connectedUsers.get(documentId)?.add(socket.user.userId)
 
       // Register user in collaboration service
-      const session = CollaborationService.joinDocument(
+      const session = CollaborationService.joinSession(
         documentId,
         socket.user.userId,
         socket.user.email,
@@ -319,7 +319,7 @@ export class SocketService {
   }
 
   public emitToUser(userId: string, event: string, data: any): void {
-    const {sockets} = this.io.sockets
+    const { sockets } = this.io.sockets
     for (const [_socketId, socket] of sockets) {
       const authSocket = socket as AuthenticatedSocket
       if (authSocket.user?.userId === userId) {
