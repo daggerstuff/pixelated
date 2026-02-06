@@ -50,7 +50,7 @@ RUN ( \
     INSTALL_SUCCESS=0; \
     for i in 1 2 3; do \
     echo "Attempt $i: Installing dependencies with frozen lockfile..." && \
-    if pnpm install --frozen-lockfile; then \
+    if pnpm install --frozen-lockfile --prod=false; then \
     echo "✅ Dependencies installed successfully" && \
     INSTALL_SUCCESS=1 && \
     break; \
@@ -59,7 +59,7 @@ RUN ( \
     echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
     if [ $i -eq 3 ]; then \
     echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
-    if pnpm install --no-frozen-lockfile; then \
+    if pnpm install --no-frozen-lockfile --prod=false; then \
     echo "✅ Dependencies installed with lockfile update" && \
     INSTALL_SUCCESS=1 && \
     break; \
