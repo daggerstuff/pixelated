@@ -12,4 +12,4 @@ export * from './IntegrationDetail'
 export * from './ProgressTracker'
 export * from './ReportGenerator'
 export * from './ReportViewer'
-
+export * from './BiasAuditDashboard'
