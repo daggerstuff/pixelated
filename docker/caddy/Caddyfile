@@ -51,7 +51,7 @@ ollama.pixelatedempathy.tech {
 }
 
 # Staging Application Subdomain
-staging.pixelatedempathy.tech {
+staging.pixelatedempathy.tech, pixelatedempathy.tech {
     # Proxy to the main Astro/React application
     reverse_proxy app:4321 {
         header_up Host {host}
