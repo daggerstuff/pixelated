@@ -16,7 +16,7 @@ fairlearn==0.13.0
 pandas==3.0.0
 numpy==2.3.5
 scipy==1.15.3
-pymongo==4.10.1
+pymongo==4.16.0
 dnspython==2.8.0
 
 # API framework
