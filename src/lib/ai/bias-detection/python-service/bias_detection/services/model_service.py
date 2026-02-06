@@ -555,6 +555,15 @@ class ModelEnsembleService:
         self.pt_service = PyTorchModelService()
         self.services.append(self.pt_service)
 
+        # NVIDIA API service for Kimi-k2.5 (optional)
+        try:
+            from .nvidia_api_service import NvidiaAPIService
+            self.nvidia_service = NvidiaAPIService()
+            # Note: We don't add this to services list automatically as it's a different type of service
+        except Exception as e:
+            logger.warning(f"NVIDIA API service not available: {e}")
+            self.nvidia_service = None
+
     async def load_all_models(self) -> bool:
         """Load all models"""
         results = []

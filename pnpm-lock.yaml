@@ -66,9 +66,6 @@ importers:
       '@auth0/auth0-react':
         specifier: ~2.11.0
         version: 2.11.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@auth0/auth0-spa-js':
-        specifier: ^2.13.1
-        version: 2.13.1
       '@aws-sdk/client-dynamodb':
         specifier: ^3.981.0
         version: 3.981.0
