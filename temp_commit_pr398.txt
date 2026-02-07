@@ -1,1 +1,0 @@
-Applying performance assertions for Allscripts test from PR #398
