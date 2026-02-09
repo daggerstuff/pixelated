@@ -268,3 +268,7 @@ deployment-backup*/
 backup/
 *.backup
 *.bak
+
+.flaskenv*
+!.env.project
+!.env.vault
