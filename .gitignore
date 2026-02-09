@@ -165,3 +165,7 @@ deployment-backup
 deployment-backup*/
 performance-results
 patches
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

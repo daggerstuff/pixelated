@@ -1,6 +1,5 @@
 # exclude formatting
 pnpm-lock.yaml
-*.md
 node_modules/
 **/node_modules/**
 dist/
