@@ -160,6 +160,8 @@ yt-downloader
 .trunk
 deployment-backup
 
+Stashed changes
+
 # Backups
 deployment-backup*/
 performance-results
