@@ -3,7 +3,6 @@
  * Multi-dimensional analysis and interactive data exploration
  */
 
-import type { FC } from 'react'
 import React from 'react'
 
 export interface DataDimension {
@@ -15,13 +14,13 @@ export interface DataDimension {
 
 export interface VisualizationConfig {
   type:
-    | 'scatter'
-    | 'line'
-    | 'bar'
-    | 'heatmap'
-    | 'network'
-    | 'parallel'
-    | 'treemap'
+  | 'scatter'
+  | 'line'
+  | 'bar'
+  | 'heatmap'
+  | 'network'
+  | 'parallel'
+  | 'treemap'
   dimensions: {
     x: DataDimension
     y: DataDimension
@@ -44,15 +43,22 @@ export interface AnalyticsInsight {
   impact: 'low' | 'medium' | 'high'
 }
 
-/**
- * Advanced Analytics Visualization Component
- */
-export const AdvancedVisualization: FC<{
+interface AdvancedVisualizationProps {
   data: any[]
   config: VisualizationConfig
   onInsightGenerated?: (insight: AnalyticsInsight) => void
   className?: string
-}> = ({ data, config, onInsightGenerated, className = '' }) => {
+}
+
+/**
+ * Advanced Analytics Visualization Component
+ */
+export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
+  data,
+  config,
+  onInsightGenerated,
+  className = '',
+}) => {
   const [insights, setInsights] = React.useState<AnalyticsInsight[]>([])
   const [selectedDataPoints, setSelectedDataPoints] = React.useState<any[]>([])
   const [viewMode, setViewMode] = React.useState<
@@ -63,7 +69,9 @@ export const AdvancedVisualization: FC<{
   React.useEffect(() => {
     const generatedInsights = generateInsights(data, config)
     setInsights(generatedInsights)
-    generatedInsights.forEach(onInsightGenerated)
+    if (onInsightGenerated) {
+      generatedInsights.forEach(onInsightGenerated)
+    }
   }, [data, config, onInsightGenerated])
 
   const handleDataPointSelection = (points: any[]) => {
@@ -93,16 +101,14 @@ export const AdvancedVisualization: FC<{
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Interactive:</span>
             <button
-              className={`w-10 h-5 rounded-full transition-colors ${
-                config.interactive
+              className={`w-10 h-5 rounded-full transition-colors ${config.interactive
                   ? 'bg-blue-500'
                   : 'bg-gray-300 dark:bg-gray-600'
-              }`}
+                }`}
             >
               <div
-                className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                  config.interactive ? 'translate-x-5' : 'translate-x-1'
-                }`}
+                className={`w-4 h-4 bg-white rounded-full transition-transform ${config.interactive ? 'translate-x-5' : 'translate-x-1'
+                  }`}
               />
             </button>
           </div>
@@ -188,19 +194,18 @@ export const AdvancedVisualization: FC<{
                 Trend
               </div>
               <div
-                className={`text-lg font-bold ${
-                  calculateTrend(
-                    selectedDataPoints,
-                    config.dimensions.x.field,
-                  ) > 0
+                className={`text-lg font-bold ${calculateTrend(
+                  selectedDataPoints,
+                  config.dimensions.x.field,
+                ) > 0
                     ? 'text-green-600'
                     : 'text-red-600'
-                }`}
+                  }`}
               >
                 {calculateTrend(selectedDataPoints, config.dimensions.x.field) >
-                0
-                  ? '↗'
-                  : '↘'}
+                  0
+                  ? '\u2197' // ↗
+                  : '\u2198'} {/* ↘ */}
               </div>
             </div>
           </div>
@@ -210,39 +215,51 @@ export const AdvancedVisualization: FC<{
   )
 }
 
-/**
- * Visualization Chart Component (Simplified for demo)
- */
-const VisualizationChart: FC<{
+interface VisualizationChartProps {
   data: any[]
   config: VisualizationConfig
   selectedPoints: any[]
   onSelectionChange: (points: any[]) => void
-}> = ({ data, config, selectedPoints, onSelectionChange }) => {
+}
+
+/**
+ * VisualizationChart Component
+ */
+const VisualizationChart: React.FC<VisualizationChartProps> = ({
+  data,
+  config,
+  selectedPoints,
+  onSelectionChange,
+}) => {
   const [hoveredPoint, setHoveredPoint] = React.useState<any>(null)
 
-  // Simplified chart rendering - in real implementation would use D3/Chart.js
+  // Simplified chart rendering
   const chartHeight = 400
   const chartWidth = 600
 
   const xValues = data.map((d) => d[config.dimensions.x.field] || 0)
   const yValues = data.map((d) => d[config.dimensions.y.field] || 0)
 
-  const xMin = Math.min(...xValues)
-  const xMax = Math.max(...xValues)
-  const yMin = Math.min(...yValues)
-  const yMax = Math.max(...yValues)
+  // Avoid NaN/Infinity with empty/single data
+  const xMin = xValues.length ? Math.min(...xValues) : 0
+  const xMax = xValues.length ? Math.max(...xValues) : 100
+  const yMin = yValues.length ? Math.min(...yValues) : 0
+  const yMax = yValues.length ? Math.max(...yValues) : 100
+
+  // Safe checks for zero range
+  const xRange = xMax - xMin || 1
+  const yRange = yMax - yMin || 1
 
   const getPointPosition = (point: any) => {
     const x =
-      (((point[config.dimensions.x.field] || 0) - xMin) / (xMax - xMin)) *
-        (chartWidth - 40) +
+      (((point[config.dimensions.x.field] || 0) - xMin) / xRange) *
+      (chartWidth - 40) +
       20
     const y =
       chartHeight -
       20 -
-      (((point[config.dimensions.y.field] || 0) - yMin) / (yMax - yMin)) *
-        (chartHeight - 40)
+      (((point[config.dimensions.y.field] || 0) - yMin) / yRange) *
+      (chartHeight - 40)
     return { x, y }
   }
 
@@ -325,21 +342,23 @@ const VisualizationChart: FC<{
 /**
  * Insight Card Component
  */
-const InsightCard: FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
+const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
   const [isExpanded, setIsExpanded] = React.useState(false)
 
   const impactColors = {
     low: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-    high: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
+    medium:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+    high:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
   }
 
-  const typeIcons = {
-    trend: '📈',
-    anomaly: '⚠️',
-    correlation: '🔗',
-    pattern: '🔍',
-    prediction: '🔮',
+  const typeIcons: Record<string, string> = {
+    trend: '\uD83D\uDCC8', // 📈
+    anomaly: '\u26A0\uFE0F', // ⚠️
+    correlation: '\uD83D\uDD17', // 🔗
+    pattern: '\uD83D\uDD0D', // 🔍
+    prediction: '\uD83D\uDD2E', // 🔮
   }
 
   return (
@@ -351,7 +370,8 @@ const InsightCard: FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
             <h4 className="font-medium text-sm">{insight.title}</h4>
           </div>
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]}`}
+            className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]
+              }`}
           >
             {insight.impact}
           </span>
@@ -412,7 +432,9 @@ function generateInsights(
       id: `trend_${Date.now()}`,
       type: 'trend',
       title: `${trend > 0 ? 'Increasing' : 'Decreasing'} Trend Detected`,
-      description: `The data shows a ${trend > 0 ? 'positive' : 'negative'} trend in ${config.dimensions.y.label} over ${config.dimensions.x.label}`,
+      description: `The data shows a ${trend > 0 ? 'positive' : 'negative'
+        } trend in ${config.dimensions.y.label} over ${config.dimensions.x.label
+        }`,
       confidence: Math.min(Math.abs(trend) * 2, 0.95),
       data: { trend, field: config.dimensions.y.field },
       recommendations: [
@@ -429,7 +451,7 @@ function generateInsights(
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
   const stdDev = Math.sqrt(
     yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-      yValues.length,
+    yValues.length,
   )
 
   const anomalies = data.filter((d) => {
@@ -437,12 +459,16 @@ function generateInsights(
     return Math.abs(val - mean) > 2 * stdDev
   })
 
+  // Avoid division by zero in correlation if data is constant
+  // (Handling logic simplified here)
+
   if (anomalies.length > 0) {
     insights.push({
       id: `anomaly_${Date.now()}`,
       type: 'anomaly',
       title: 'Data Anomalies Detected',
-      description: `${anomalies.length} unusual data point${anomalies.length > 1 ? 's' : ''} found that deviate significantly from the norm`,
+      description: `${anomalies.length} unusual data point${anomalies.length > 1 ? 's' : ''
+        } found that deviate significantly from the norm`,
       confidence: 0.85,
       data: { anomalies: anomalies.length, threshold: 2 * stdDev },
       recommendations: [
@@ -466,7 +492,9 @@ function generateInsights(
         id: `correlation_${Date.now()}`,
         type: 'correlation',
         title: 'Strong Correlation Found',
-        description: `Significant ${correlation > 0 ? 'positive' : 'negative'} correlation detected between ${config.dimensions.x.label} and ${config.dimensions.color.label}`,
+        description: `Significant ${correlation > 0 ? 'positive' : 'negative'
+          } correlation detected between ${config.dimensions.x.label} and ${config.dimensions.color.label
+          }`,
         confidence: Math.abs(correlation),
         data: {
           correlation,
@@ -497,7 +525,11 @@ function calculateTrend(data: any[], xField: string): number {
   const sumXY = points.reduce((sum, [x, y]) => sum + x * y, 0)
   const sumXX = points.reduce((sum, [x]) => sum + x * x, 0)
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
+  // Avoid division by zero
+  const denominator = n * sumXX - sumX * sumX
+  if (denominator === 0) return 0
+
+  const slope = (n * sumXY - sumX * sumY) / denominator
   return slope
 }
 
@@ -512,6 +544,8 @@ function calculateCorrelation(
   const values1 = data.map((d) => d[field1] || 0)
   const values2 = data.map((d) => d[field2] || 0)
 
+  if (values1.length === 0 || values2.length === 0) return 0
+
   const mean1 = values1.reduce((sum, val) => sum + val, 0) / values1.length
   const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length
 
@@ -525,6 +559,8 @@ function calculateCorrelation(
   const denom2 = Math.sqrt(
     values2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0),
   )
+
+  if (denom1 === 0 || denom2 === 0) return 0
 
   return numerator / (denom1 * denom2)
 }

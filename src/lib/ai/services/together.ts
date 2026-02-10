@@ -168,7 +168,7 @@ class RateLimitManager {
 
     if (
       this.rateLimitInfo.requestTimestamps.length >=
-        this.rateLimitInfo.requestsPerMinute &&
+      this.rateLimitInfo.requestsPerMinute &&
       oldestRequestTime
     ) {
       requestWaitTime = oldestRequestTime + windowMs - now
@@ -181,7 +181,7 @@ class RateLimitManager {
 
     if (
       currentTokenCount + estimatedTokens >=
-        this.rateLimitInfo.tokensPerMinute &&
+      this.rateLimitInfo.tokensPerMinute &&
       oldestTokenTime
     ) {
       tokenWaitTime = oldestTokenTime + windowMs - now
@@ -276,7 +276,7 @@ export function createTogetherAIService(
 
     if (data && typeof data === 'object' && 'error' in data) {
       const errorData = data as { error: { message?: string; code?: string } }
-      errorMessage = `Together AI API error: ${errorData.String(error) || errorData.error}`
+      errorMessage = `Together AI API error: ${errorData.error.message || JSON.stringify(errorData.error)}`
       errorCode = errorData.error.code || errorCode
     }
 
@@ -389,15 +389,15 @@ export function createTogetherAIService(
                 ? 'length'
                 : 'stop') as 'stop' | 'length' | 'content_filter',
           })) || [
-            {
-              message: {
-                role: 'assistant',
-                content: '',
-                name: 'assistant',
+              {
+                message: {
+                  role: 'assistant',
+                  content: '',
+                  name: 'assistant',
+                },
+                finishReason: 'stop' as const,
               },
-              finishReason: 'stop' as const,
-            },
-          ],
+            ],
           usage: {
             promptTokens: data.usage?.prompt_tokens || 0,
             completionTokens: data.usage?.completion_tokens || 0,
@@ -488,7 +488,7 @@ export function createTogetherAIService(
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
 
-        const streamGenerator = async function* (): AsyncGenerator<
+        const streamGenerator = async function*(): AsyncGenerator<
           AIStreamChunk,
           void,
           void

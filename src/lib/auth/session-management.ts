@@ -1,11 +1,11 @@
 /**
  * Session Management Module
- * 
+ *
  * This module provides session management functionality for the authentication system.
  * It handles session creation, validation, and cleanup.
  */
 
-import { redis, setInCache, getFromCache, removeFromCache } from '../redis'
+import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent } from '../security'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
@@ -97,7 +97,7 @@ export async function createSession(options: SessionCreateOptions): Promise<Sess
 
   // Store session data
   await setInCache(`session:${sessionId}`, sessionData, Math.floor(timeout / 1000))
-  
+
   // Store device binding
   const deviceFingerprint = `${deviceInfo.deviceId}:${ipAddress}:${userAgent}`
   await setInCache(`session:device:${sessionId}`, { fingerprint: deviceFingerprint }, Math.floor(timeout / 1000))
@@ -136,7 +136,7 @@ export async function validateSession(
 ): Promise<{ valid: boolean; session?: SessionData; error?: string; securityAlert?: string }> {
   try {
     const session = await getFromCache(`session:${sessionId}`)
-    
+
     if (!session) {
       return { valid: false, error: 'Session not found' }
     }
@@ -151,10 +151,10 @@ export async function validateSession(
     // Check device binding
     const deviceFingerprint = `${deviceInfo.deviceId}:${ipAddress}:${userAgent}`
     const storedFingerprint = await getFromCache(`session:device:${sessionId}`)
-    
+
     if (storedFingerprint && storedFingerprint.fingerprint !== deviceFingerprint) {
-      return { 
-        valid: false, 
+      return {
+        valid: false,
         error: 'Device binding mismatch',
         securityAlert: 'Suspicious device change detected'
       }
@@ -166,7 +166,7 @@ export async function validateSession(
 
     // Update user's session list
     const userSessions = await getFromCache(`user:sessions:${session.userId}`) || []
-    const updatedSessions = userSessions.map(s => 
+    const updatedSessions = userSessions.map(s =>
       s.sessionId === sessionId ? { ...s, lastActivity: session.lastActivity } : s
     )
     await setInCache(`user:sessions:${session.userId}`, updatedSessions, Math.floor((session.expiresAt - Date.now()) / 1000))
@@ -178,7 +178,7 @@ export async function validateSession(
     })
 
     return { valid: true, session }
-  } catch (error) {
+  } catch {
     return { valid: false, error: 'Session validation failed' }
   }
 }
@@ -188,11 +188,11 @@ export async function validateSession(
  */
 export async function invalidateSession(sessionId: string): Promise<void> {
   const session = await getFromCache(`session:${sessionId}`)
-  
+
   if (session) {
     await removeFromCache(`session:${sessionId}`)
     await removeFromCache(`session:device:${sessionId}`)
-    
+
     // Update user's session list
     const userSessions = await getFromCache(`user:sessions:${session.userId}`) || []
     const updatedSessions = userSessions.filter(s => s.sessionId !== sessionId)
@@ -212,9 +212,9 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 export async function getUserSessions(userId: string): Promise<SessionData[]> {
   const sessionList = await getFromCache(`user:sessions:${userId}`) || []
   const now = Date.now()
-  
+
   const activeSessions: SessionData[] = []
-  
+
   for (const sessionInfo of sessionList) {
     if (sessionInfo.expiresAt > now) {
       const session = await getFromCache(`session:${sessionInfo.sessionId}`)
@@ -223,7 +223,7 @@ export async function getUserSessions(userId: string): Promise<SessionData[]> {
       }
     }
   }
-  
+
   return activeSessions
 }
 

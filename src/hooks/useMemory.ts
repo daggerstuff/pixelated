@@ -1,10 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
-  memoryManager,
+  memoryManager as localMemoryManager,
   type MemoryEntry,
   type SearchOptions,
   type MemoryStats,
 } from '../lib/memory/memory-client'
+import { mcpMemoryManager } from '../lib/memory/mcp-memory-client'
+
+const memoryManager = process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'true'
+  ? mcpMemoryManager
+  : localMemoryManager
 
 interface UseMemoryOptions {
   userId?: string
@@ -59,7 +64,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const [error, setError] = useState<string | null>(null)
   const [stats, setStats] = useState<MemoryStats | null>(null)
 
-  const handleError = useCallback((err: Error | unknown) => {
+  const handleError = useCallback((err: unknown) => {
     const errorMessage =
       err instanceof Error
         ? (err as Error)?.message || String(err)
@@ -249,7 +254,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   // Auto-load memories on mount or when dependencies change
   useEffect(() => {
     if (autoLoad && userId) {
-      refreshMemories()
+      void refreshMemories()
     }
   }, [autoLoad, userId, refreshMemories])
 
@@ -368,11 +373,11 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
           const match = prefMemory.content.match(/= (.+)$/)
           return match && match[1]
             ? (JSON.parse(match[1]) as
-                | string
-                | number
-                | boolean
-                | object
-                | null)
+              | string
+              | number
+              | boolean
+              | object
+              | null)
             : null
         } catch {
           return null

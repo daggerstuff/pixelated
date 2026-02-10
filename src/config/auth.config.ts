@@ -69,8 +69,8 @@ export const authConfig: AuthConfig = {
   sessionDuration: 7 * 24 * 60 * 60, // 1 week in seconds
 
   cookies: {
-    accessToken: 'sb-access-token',
-    refreshToken: 'sb-refresh-token',
+    accessToken: 'auth-token',
+    refreshToken: 'refresh-token',
     path: '/',
     domain: undefined,
     secure: true,

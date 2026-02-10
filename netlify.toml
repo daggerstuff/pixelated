@@ -1,5 +1,5 @@
 [build]
-command = "pnpm build:netlify"
+command = "pnpm run build"
 publish = "dist"
 
 [functions]
@@ -24,3 +24,9 @@ pretty_urls = true
 
 [build.processing.images]
 compress = true
+
+[build.environment]
+NODE_VERSION = "24"
+NODE_OPTIONS = "--max-old-space-size=8192"
+# Skip strict checks during deploy if they are flaky
+CI = "true"

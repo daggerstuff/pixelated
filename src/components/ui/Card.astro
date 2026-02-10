@@ -10,7 +10,7 @@ const { class: className, ...props } = Astro.props
 <div
   data-slot="card"
   class={cn(
-    'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+    'card--glass text-card-foreground flex flex-col gap-6 rounded-xl py-6 shadow-sm transition-all duration-300 hover:shadow-glow hover:-translate-y-1',
     className,
   )}
   {...props}

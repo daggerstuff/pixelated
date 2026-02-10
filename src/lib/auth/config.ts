@@ -5,65 +5,38 @@
 
 // JWT Configuration
 export const JWT_CONFIG = {
-  secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
-  audience: process.env.JWT_AUDIENCE || 'pixelated-empathy',
-  issuer: process.env.JWT_ISSUER || 'pixelated-auth-service',
+  secret: process.env.JWT_SECRET || import.meta.env.JWT_SECRET || 'fallback-secret-change-in-production',
+  audience: process.env.JWT_AUDIENCE || import.meta.env.JWT_AUDIENCE || 'pixelated-empathy',
+  issuer: process.env.JWT_ISSUER || import.meta.env.JWT_ISSUER || 'pixelated-auth-service',
   accessTokenExpiry: 24 * 60 * 60, // 24 hours - matching original inline config per PR requirements
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
   algorithm: 'HS256' as const,
 }
 
-// Better-Auth Configuration
-export const BETTER_AUTH_CONFIG = {
-  database: {
-    provider: process.env.DATABASE_PROVIDER || 'sqlite',
-    url: process.env.DATABASE_URL || ':memory:',
-  },
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: process.env.NODE_ENV === 'production',
-    minPasswordLength: 8,
-    maxPasswordLength: 128,
-  },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      enabled: !!process.env.GOOGLE_CLIENT_ID,
-    },
-  },
-  user: {
-    modelName: 'users',
-    fields: {
-      role: {
-        type: 'string',
-        defaultValue: 'guest',
-      },
-      createdAt: {
-        type: 'number',
-        defaultValue: Date.now,
-      },
-      updatedAt: {
-        type: 'number',
-        defaultValue: Date.now,
-      },
-    },
-  },
-  session: {
-    modelName: 'sessions',
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-  },
-  rateLimit: {
-    window: 10,
-    max: 10,
-    skipSuccessfulRequests: false,
-    skipFailedRequests: false,
-  },
-  security: {
-    bcryptRounds: 12,
-    sessionSecret: process.env.SESSION_SECRET || 'fallback-session-secret',
-  },
+// Auth0 Configuration
+export const AUTH0_CONFIG = {
+  domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
+  clientId: process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+  clientSecret: process.env.AUTH0_CLIENT_SECRET || import.meta.env.AUTH0_CLIENT_SECRET || '',
+  audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
+  callbackUrl:
+    process.env.AUTH0_CALLBACK_URL || import.meta.env.AUTH0_CALLBACK_URL || 'http://localhost:4321/api/auth/callback',
+  scope: 'openid profile email offline_access',
+}
+
+// Password Policy Configuration
+export const PASSWORD_CONFIG = {
+  minLength: 8,
+  maxLength: 128,
+  requireLowercase: true,
+  requireUppercase: true,
+  requireNumber: true,
+  requireSpecial: true,
+}
+
+// Bcrypt Configuration
+export const BCRYPT_CONFIG = {
+  rounds: 12,
 }
 
 // Rate Limiting Configuration
@@ -91,14 +64,14 @@ export const RATE_LIMIT_CONFIG = {
 // Security Configuration
 export const SECURITY_CONFIG = {
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:4321'],
+    origin: (process.env.CORS_ORIGIN || import.meta.env.CORS_ORIGIN)?.split(',') || ['http://localhost:4321'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   },
   csrf: {
-    enabled: process.env.NODE_ENV === 'production',
-    secret: process.env.CSRF_SECRET || 'fallback-csrf-secret',
+    enabled: process.env.NODE_ENV === 'production' || import.meta.env.PROD,
+    secret: process.env.CSRF_SECRET || import.meta.env.CSRF_SECRET || 'fallback-csrf-secret',
   },
   headers: {
     contentSecurityPolicy: {
@@ -201,7 +174,9 @@ export const HIPAA_CONFIG = {
 export function getAuthConfig() {
   return {
     jwt: JWT_CONFIG,
-    betterAuth: BETTER_AUTH_CONFIG,
+    auth0: AUTH0_CONFIG,
+    password: PASSWORD_CONFIG,
+    bcrypt: BCRYPT_CONFIG,
     rateLimit: RATE_LIMIT_CONFIG,
     security: SECURITY_CONFIG,
     rbac: RBAC_CONFIG,
@@ -217,36 +192,19 @@ export function getAuthConfig() {
 export function validateAuthConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
+  const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD;
+
   // Validate JWT secret
-  if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  const jwtSecret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET;
+  if (!jwtSecret && isProd) {
     errors.push('JWT_SECRET is required in production')
   }
 
-  // Validate database configuration
-  if (
-    !BETTER_AUTH_CONFIG.database.url &&
-    process.env.NODE_ENV === 'production'
-  ) {
-    errors.push('DATABASE_URL is required in production')
-  }
-
-  // Validate session secret
-  if (
-    !BETTER_AUTH_CONFIG.security.sessionSecret &&
-    process.env.NODE_ENV === 'production'
-  ) {
-    errors.push('SESSION_SECRET is required in production')
-  }
-
-  // Validate social provider configuration
-  if (
-    BETTER_AUTH_CONFIG.socialProviders.google.enabled &&
-    (!BETTER_AUTH_CONFIG.socialProviders.google.clientId ||
-      !BETTER_AUTH_CONFIG.socialProviders.google.clientSecret)
-  ) {
-    errors.push(
-      'Google OAuth client ID and secret are required when Google auth is enabled',
-    )
+  // Validate Auth0 configuration in production
+  if (isProd) {
+    if (!AUTH0_CONFIG.domain) errors.push('AUTH0_DOMAIN is required')
+    if (!AUTH0_CONFIG.clientId) errors.push('AUTH0_CLIENT_ID is required')
+    if (!AUTH0_CONFIG.clientSecret) errors.push('AUTH0_CLIENT_SECRET is required')
   }
 
   return {
@@ -259,15 +217,15 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
  * Environment-specific configuration
  */
 export function getEnvironmentConfig() {
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  const isProduction = process.env.NODE_ENV === 'production'
+  const isDevelopment = process.env.NODE_ENV === 'development' || import.meta.env.DEV
+  const isProduction = process.env.NODE_ENV === 'production' || import.meta.env.PROD
   const isTest = process.env.NODE_ENV === 'test'
 
   return {
     isDevelopment,
     isProduction,
     isTest,
-    debug: isDevelopment || process.env.DEBUG === 'true',
+    debug: isDevelopment || process.env.DEBUG === 'true' || import.meta.env.DEBUG === 'true',
     strictMode: isProduction,
     enableDetailedErrors: isDevelopment,
     enableStackTraces: isDevelopment || isTest,

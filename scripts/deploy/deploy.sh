@@ -19,9 +19,14 @@ NC='\033[0m' # No Color
 
 # Default values
 ENVIRONMENT="${1:-staging}"
-BRANCH="${2:-main}"
+BRANCH="${2:-$(git rev-parse --abbrev-ref HEAD)}"
+
 HEALTH_CHECK_TIMEOUT=300
 ROLLBACK_ON_FAILURE=true
+DOCKER_COMPOSE="docker compose"
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+fi
 
 # Functions
 log() {
@@ -109,7 +114,8 @@ deploy_services() {
     log "Deploying services to ${ENVIRONMENT}..."
 
     # Stop existing services
-    docker-compose down
+    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml down
+
 
     # Backup current deployment (if exists)
     if [[ -d "deployment-backup" ]]; then
@@ -117,10 +123,12 @@ deploy_services() {
     fi
 
     # Create deployment backup
-    cp -r . "deployment-backup/"
+    mkdir -p "deployment-backup"
+    rsync -a --exclude='deployment-backup' . "deployment-backup/"
+
 
     # Start services with health checks
-    docker-compose up -d
+    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml up -d
 
     # Wait for services to be ready
     log "Waiting for services to start..."
@@ -199,13 +207,13 @@ rollback() {
 
     if [[ -d "deployment-backup" ]]; then
         # Stop current services
-        docker-compose down
+        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml down
 
         # Restore from backup
         cp -r deployment-backup/* .
 
         # Restart services
-        docker-compose up -d
+        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml up -d
 
         success "Rollback completed"
     else

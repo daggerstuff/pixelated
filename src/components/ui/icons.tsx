@@ -5,6 +5,7 @@ interface IconProps {
   className?: string
   size?: number
   strokeWidth?: number
+  'aria-hidden'?: boolean | 'true' | 'false'
 }
 
 export const IconRefresh = (props: IconProps) => (
@@ -36,6 +37,7 @@ export const IconX = (props: IconProps) => (
     className={props.className}
     size={props.size}
     strokeWidth={props.strokeWidth}
+    aria-hidden={props['aria-hidden']}
   />
 )
 

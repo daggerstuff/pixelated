@@ -3,6 +3,7 @@
 Streaming exporter writes ChatML JSONL shards directly to S3 (no local files, no full downloads).
 
 ## Environment
+
 Set credentials via env or your AWS profile. Required/optional vars:
 
 - `AWS_S3_ENDPOINT` (default: `https://s3.us-east-va.io.cloud.ovh.us`)
@@ -14,6 +15,7 @@ Set credentials via env or your AWS profile. Required/optional vars:
 - `CHATML_MAX_WORKERS` (optional; parallel family exports, default 1)
 
 ## Smoke Test (limit 200 records per dataset)
+
 ```bash
 export AWS_ACCESS_KEY_ID=...   # or rely on configured profile
 export AWS_SECRET_ACCESS_KEY=...
@@ -26,10 +28,12 @@ uv run ai/dataset_pipeline/chatml_export_generator.py
 ```
 
 ## Outputs
+
 - Shards: `s3://$AWS_S3_BUCKET/$CHATML_OUTPUT_PREFIX/<family>_chatml-shard-00001.jsonl`
 - Summary: `s3://$AWS_S3_BUCKET/$CHATML_OUTPUT_PREFIX/release_0_export_summary.json`
 
 ## Behavior
+
 - Streams JSONL via `iter_lines`, converts each record to ChatML, uploads via multipart (8MB parts, >=5MB safe).
 - Shard rollover every 250,000 records (configurable in code).
 - Minimal logging, no PII content logged.
