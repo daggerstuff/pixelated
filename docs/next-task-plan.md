@@ -17,6 +17,14 @@
 
 ## Task Breakdown
 
+### Phase 3.1: Model Training Environment Setup
+
+- [x] Setup training environment (0.5 day) - **VERIFIED (CPU)**
+  - [x] Create data loader pipeline (1 day) - **DONE** (`train_pixel.py`)
+  - [x] Configure model & training loop (1 day) - **DONE** (`train_pixel.py`)
+  - [x] Dry run (verify no OOM errors) (0.5 day) - **VERIFIED (CPU)**
+- **Success**: Training script ready, dry run successful on CPU
+
 ### Phase 1.3: Annotation & Labeling (Kappa >0.85)
 
 **Objective**: Create high-quality labeled dataset for Pixel model training with
@@ -27,7 +35,8 @@ strong inter-annotator agreement
 - [x] Set up annotation framework and guidelines
 - [/] Recruit and train mental health professional annotators (Multi-agent AI operational)
 - [x] Implement annotation quality control measures
-- [/] Conduct multi-annotator labeling process (Scaling to 5,000 Reddit samples)
+- [/] Conduct multi-annotator labeling process (Scaling to 5,000 Reddit
+  samples - Batch 1 Active)
 - [x] Calculate and validate Kappa coefficient (Pilot κ=0.61 achieving
       substantial agreement)
 - [ ] Resolve annotation conflicts and edge cases (Consensus engine active)
