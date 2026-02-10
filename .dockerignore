@@ -36,7 +36,6 @@ plan/
 # Environment and config files
 .env*
 !.env.example
-!.env
 .nvmrc
 .python-version
 
@@ -78,7 +77,7 @@ pip-delete-this-directory.txt
 .coverage
 htmlcov/
 .tox/
-# uv.lock
+uv.lock
 
 # Build artifacts (keep only what's needed)
 dist/
@@ -131,7 +130,7 @@ Thumbs.db
 *.fig
 
 # AI/ML files
-# ai/
+ai/
 training_dataset.json
 *.csv
 *.parquet
@@ -269,7 +268,3 @@ deployment-backup*/
 backup/
 *.backup
 *.bak
-
-.flaskenv*
-!.env.project
-!.env.vault
