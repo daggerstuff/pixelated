@@ -1,6 +1,7 @@
 # Mental Health Datasets Expansion: Repo Map & Runbook (S3-First)
 
-**Purpose**: Practical map of where the dataset expansion and training-ready work lives, plus an operational “what to run / what to verify” checklist.
+**Purpose**: Map of dataset expansion and training-ready work locations,
+plus an operational checklist for verification and execution.
 
 **Last updated**: 2025-12-29
 
@@ -10,7 +11,8 @@ Canonical flow:
 
 - Source/staging (e.g., Google Drive) → sync to S3 bucket
 - S3 becomes **single source of truth**
-- Pipeline reads from S3 → produces processed artifacts + manifests + compiled exports
+- Pipeline reads from S3 → produces processed artifacts, manifests, and
+  compiled exports.
 - Training reads from S3 release artifacts
 
 ## 2) Key locations in this workspace
@@ -33,27 +35,30 @@ Canonical flow:
 ### Dataset pipeline code (integration target)
 
 - `ai/dataset_pipeline/`
-  - This is where the spec’s modular architecture implies “source → processing → validation → assembly” components should live.
+  - Modular architecture for source processing, validation, and assembly.
 - `ai/dataset_pipeline/storage_config.py`
-  - Storage backend selection and S3-compatible configuration via environment variables.
+  - Storage selection and S3-compatible config via env variables.
 
 ### Training scripts
 
 - `ai/lightning/`
-  - Lightning.ai-related training scripts and assets (verify which scripts are currently authoritative before modifying).
+  - Lightning.ai training scripts (verify versions before use).
 
 ### Workspace note
 
-The `ai/` directory may be a separate git repository nested inside the broader workspace. Treat cross-repo changes carefully.
+The `ai/` directory may be a separate nested repository.
+Treat cross-repo changes carefully.
 
 ## 3) S3 canonical structure (high-level)
 
-The canonical bucket described in `ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md` is centered on:
+The canonical bucket structure described in
+`ai/training_ready/docs/S3_TRAINING_DATA_STRUCTURE.md` focuses on:
 
 - `pixel-data` bucket (OVH S3-compatible)
 - `gdrive/raw/` (mirror/staging backup)
 - `gdrive/processed/` (canonical “training-ready” structure)
-- Additional top-level prefixes for platform-specific datasets such as `lightning/`, `voice/`, and `dual_persona/`.
+- Additional top-level prefixes for platform-specific datasets such as
+  `lightning/`, `voice/`, and `dual_persona/`.
 
 ## 4) Environment variables (no secrets)
 
@@ -138,7 +143,8 @@ A release is considered ready when:
 - Dedup and cross-split leakage gates pass
 - Bias/QA reports are produced and reviewed
 
-For a one-page run sheet version of this, see: `docs/datasets/release-0-checklist.md`.
+For a one-page run sheet version of this, see:
+`docs/datasets/release-0-checklist.md`.
 
 ## 7) Suggested conventions
 
