@@ -18,21 +18,19 @@ from pathlib import Path
 
 import pytest
 
-from ai.pipelines.orchestrator.ears_compliance_gate import EarsComplianceGate, EarsConfig
-from ai.pipelines.orchestrator.quality_gates_runner import (
-    GateResult,
-    QualityGateRunner,
-)
-from ai.safety.content_filter import SafetyFilter, SafetyScore
-from ai.safety.crisis_detection.production_crisis_detector import (
-    CrisisDetector,
-    UrgencyLevel,
-)
+ears_compliance_gate = pytest.importorskip("ai.pipelines.orchestrator.ears_compliance_gate")
+EarsComplianceGate = ears_compliance_gate.EarsComplianceGate
 
-pytest.importorskip("ai.pipelines.orchestrator.ears_compliance_gate")
-pytest.importorskip("ai.safety.crisis_detection.production_crisis_detector")
-pytest.importorskip("ai.safety.content_filter")
-pytest.importorskip("ai.pipelines.orchestrator.quality_gates_runner")
+quality_gates_runner = pytest.importorskip("ai.pipelines.orchestrator.quality_gates_runner")
+GateResult = quality_gates_runner.GateResult
+QualityGateRunner = quality_gates_runner.QualityGateRunner
+
+content_filter = pytest.importorskip("ai.safety.content_filter")
+SafetyFilter = content_filter.SafetyFilter
+SafetyScore = content_filter.SafetyScore
+
+crisis_detection = pytest.importorskip("ai.safety.crisis_detection.production_crisis_detector")
+CrisisDetector = crisis_detection.CrisisDetector
 
 
 class TestEARSComplianceGate:
