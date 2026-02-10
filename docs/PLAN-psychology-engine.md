@@ -2,14 +2,19 @@
 
 **Status**: 🚀 **EXECUTION READY**
 **Date**: 2026-02-10
-**Context**: Unification of Data Pipeline (Phase 1), Annotation (Phase 1.3), and Training Strategy (Phase 2+).
+**Context**: Unification of Data Pipeline (Phase 1), Annotation (Phase 1.3),
+and Training Strategy (Phase 2+).
 
 ---
 
 ## 🎯 Executive Summary
 
-The "Psychology Engine" is the transition from **infrastructure** (pipelines, databases) to **intelligence** (trained models).
-We are currently at the **Data Handoff** point. The infrastructure is online, the raw data is 85% ready, but the **Labeled Intelligence** (annotation) is the critical blocker for the Pixel Model.
+The "Psychology Engine" is the transition from **infrastructure**
+(pipelines, databases) to **intelligence** (trained models).
+
+We are currently at the **Data Handoff** point. The infrastructure is online,
+the raw data is 85% ready, but the **Labeled Intelligence** (annotation)
+is the critical blocker for the Pixel Model.
 
 ### 🛑 Critical Path Blockers
 
@@ -23,12 +28,10 @@ We are currently at the **Data Handoff** point. The infrastructure is online, th
 **Objective**: Finalize the 60,000+ sample raw dataset.
 **Reference**: `.memory/65-EXECUTION-HANDOFF.md`
 
-| Task | Status | Action |
-| :--- | :--- | :--- |
-| **Edge Case Synthetic** | ⚠️ 50/10k | Run `generate_edge_case_synthetic_dataset.py` (Scale to 10k) |
-| **Long-Running Therapy** | ⚠️ Partial | Run `extract_long_running_therapy.py` |
-| **Nightmare Fuel** | ⚠️ Hydrating | Compete Hydration & Ultra-Nightmare generation |
-| **Final Compilation** | ⏳ Pending | Run `compile_final_dataset.py` |
+- **Edge Case**: ⚠️ 50/10k | Run `generate_edge_case_synthetic_dataset.py`
+- **Long-Running**: ⚠️ Partial | Run `extract_long_running_therapy.py`
+- **Nightmare Fuel**: ⚠️ Hydrate | Compete Hydration & generation
+- **Final Compilation**: ⏳ Pending | Run `compile_final_dataset.py`
 
 **👉 EXECUTION COMMAND (Staging VPS):**
 
@@ -36,7 +39,8 @@ We are currently at the **Data Handoff** point. The infrastructure is online, th
 ssh staging "bash ~/pixelated/scripts/run_phase1_full.sh"
 ```
 
-*(Note: `verify_final_dataset.py` fix may be required if operating on S3 directly, but local compilation is prioritized).*
+_(Note: `verify_final_dataset.py` fix may be required if operating on S3
+directly, but local compilation is prioritized)._
 
 ---
 
@@ -49,15 +53,15 @@ ssh staging "bash ~/pixelated/scripts/run_phase1_full.sh"
 
 ### 2.1 Recruitment (Days 1-7)
 
-* **Target**: 5 Clinical Annotators (Masters/PhD level).
-* **Channels**: Professional Networks, Academic Depts.
-* **Action**: Execute `recruitment-plan.md`.
+- **Target**: 5 Clinical Annotators (Masters/PhD level).
+- **Channels**: Professional Networks, Academic Depts.
+- **Action**: Execute `recruitment-plan.md`.
 
 ### 2.2 Annotation Process (Weeks 2-3)
 
-* **Volume**: 5,000 High-Impact Samples.
-* **Labels**: Crisis Intensity, Therapeutic Modality, Empathy Score.
-* **Success Metric**: Inter-annotator Agreement (Kappa) > 0.85.
+- **Volume**: 5,000 High-Impact Samples.
+- **Labels**: Crisis Intensity, Therapeutic Modality, Empathy Score.
+- **Success Metric**: Inter-annotator Agreement (Kappa) > 0.85.
 
 ---
 
@@ -68,14 +72,14 @@ ssh staging "bash ~/pixelated/scripts/run_phase1_full.sh"
 
 ### Phase A: Continued Pretraining (Week 2)
 
-* **Data**: The 60k Raw Samples from Phase 1.
-* **Goal**: Domain Adaptation (Vocabulary & Tone).
-* **Infrastructure**: Lightning.ai / H100 Cluster.
+- **Data**: The 60k Raw Samples from Phase 1.
+- **Goal**: Domain Adaptation (Vocabulary & Tone).
+- **Infrastructure**: Lightning.ai / H100 Cluster.
 
 ### Phase B: SFT Curriculum (Weeks 3-4)
 
-* **Data**: The 5k Annotated Samples from Phase 2 + Professional Datasets.
-* **Stages**:
+- **Data**: The 5k Annotated Samples from Phase 2 + Professional Datasets.
+- **Stages**:
   1. Foundation (Rapport)
   2. Expertise (Reasoning chains)
   3. Edge Stress (Crisis)
@@ -83,8 +87,8 @@ ssh staging "bash ~/pixelated/scripts/run_phase1_full.sh"
 
 ### Phase C: Alignment (Week 5)
 
-* **Method**: ORPO / DPO.
-* **Data**: Preference pairs from Annotation phase.
+- **Method**: ORPO / DPO.
+- **Data**: Preference pairs from Annotation phase.
 
 ---
 
@@ -93,9 +97,9 @@ ssh staging "bash ~/pixelated/scripts/run_phase1_full.sh"
 **Objective**: Activation of the "Therapeutic Session" resource.
 **Reference**: `docs/ngc-therapeutic-enhancement-checklist.md`
 
-* **Inference**: Deploy `PixelInferenceService` on Triton.
-* **Monitoring**: Loki/Prometheus (Configured & Verified).
-* **Feedback**: Real-time "Supervisor" loop enabled.
+- **Inference**: Deploy `PixelInferenceService` on Triton.
+- **Monitoring**: Loki/Prometheus (Configured & Verified).
+- **Feedback**: Real-time "Supervisor" loop enabled.
 
 ---
 
