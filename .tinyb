@@ -1,0 +1,14 @@
+{
+    "host": "https://api.us-east.tinybird.co",
+    "id": "c731b0b7-3404-49b2-8774-c77ef2c8bc91",
+    "name": "pixelated",
+    "scope": "user",
+    "token": "p.eyJ1IjogImM3MzFiMGI3LTM0MDQtNDliMi04Nzc0LWM3N2VmMmM4YmM5MSIsICJpZCI6ICI2MjQ0ZDQ5NC1kZWQzLTQyMWMtYmJkYy02YTQ3ODBlMzZkYmEiLCAiaG9zdCI6ICJ1c19lYXN0In0.upqHtSRdFLnDLo6ox7QgGPPvPJFNWxlKGtwccS1Jaus",
+    "tokens": {
+        "https://api.us-east.tinybird.co": "p.eyJ1IjogImM3MzFiMGI3LTM0MDQtNDliMi04Nzc0LWM3N2VmMmM4YmM5MSIsICJpZCI6ICI2MjQ0ZDQ5NC1kZWQzLTQyMWMtYmJkYy02YTQ3ODBlMzZkYmEiLCAiaG9zdCI6ICJ1c19lYXN0In0.upqHtSRdFLnDLo6ox7QgGPPvPJFNWxlKGtwccS1Jaus"
+    },
+    "user_email": "chad@pixelatedempathy.com",
+    "user_id": "37113782-9b51-4a6a-81b7-91ebcb7be3b7",
+    "user_token": "p.eyJ1IjogIjM3MTEzNzgyLTliNTEtNGE2YS04MWI3LTkxZWJjYjdiZTNiNyIsICJpZCI6ICJlODZhMzBkMi0zODIxLTQ4ZWMtYWQ4Ny01MDUyYTc1MTAxZGUiLCAiaG9zdCI6ICJ1c19lYXN0In0.GRTuSrnJx1FRs-GQjGaI3g-ktXe8mU-oCbPWQXYlwQk",
+    "version": "3.2.0"
+}
