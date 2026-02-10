@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.venv/
+*.log
+*.map
+.git/

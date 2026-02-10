@@ -1,1 +1,0 @@
-Applying accessibility fix from PR #395

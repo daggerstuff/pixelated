@@ -197,7 +197,7 @@ export function PixelEnhancedChat({
                   label="Emotional Awareness"
                   value={
                     eqMetrics.emotionalAwareness[
-                      eqMetrics.emotionalAwareness.length - 1
+                    eqMetrics.emotionalAwareness.length - 1
                     ] || 0
                   }
                 />
@@ -205,7 +205,7 @@ export function PixelEnhancedChat({
                   label="Empathy"
                   value={
                     eqMetrics.empathyRecognition[
-                      eqMetrics.empathyRecognition.length - 1
+                    eqMetrics.empathyRecognition.length - 1
                     ] || 0
                   }
                 />
@@ -213,7 +213,7 @@ export function PixelEnhancedChat({
                   label="Regulation"
                   value={
                     eqMetrics.emotionalRegulation[
-                      eqMetrics.emotionalRegulation.length - 1
+                    eqMetrics.emotionalRegulation.length - 1
                     ] || 0
                   }
                 />
@@ -221,7 +221,7 @@ export function PixelEnhancedChat({
                   label="Social Cognition"
                   value={
                     eqMetrics.socialCognition[
-                      eqMetrics.socialCognition.length - 1
+                    eqMetrics.socialCognition.length - 1
                     ] || 0
                   }
                 />
@@ -229,7 +229,7 @@ export function PixelEnhancedChat({
                   label="Interpersonal Skills"
                   value={
                     eqMetrics.interpersonalSkills[
-                      eqMetrics.interpersonalSkills.length - 1
+                    eqMetrics.interpersonalSkills.length - 1
                     ] || 0
                   }
                 />
@@ -370,11 +370,10 @@ function MessageBubble({
       className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`max-w-sm px-4 py-2 rounded-lg ${
-          message.role === "user"
+        className={`max-w-sm px-4 py-2 rounded-lg ${message.role === "user"
             ? "bg-blue-600 text-white"
             : "bg-gray-100 text-gray-900"
-        }`}
+          }`}
       >
         <p className="text-sm">{message.content}</p>
         {showMetrics && pixelMetrics && (
@@ -396,7 +395,19 @@ function MessageBubble({
                 </p>
               </div>
             )}
-            <p className="opacity-50">
+            {pixelMetrics.memories && pixelMetrics.memories.length > 0 && (
+              <details className="mt-1">
+                <summary className="cursor-pointer opacity-75 hover:opacity-100 font-semibold">
+                  📚 Context Used ({pixelMetrics.memories.length})
+                </summary>
+                <ul className="pl-3 mt-1 list-disc space-y-1 opacity-90 max-h-32 overflow-y-auto bg-black/5 rounded p-2">
+                  {pixelMetrics.memories.map((mem, i) => (
+                    <li key={i} className="text-[10px] leading-3">{mem}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            <p className="opacity-50 pt-1">
               Latency: {pixelMetrics.inference_time_ms.toFixed(0)}ms
             </p>
           </div>
