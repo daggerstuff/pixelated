@@ -1,0 +1,19 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: pixelated-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - web
+
+volumes:
+  mongo_data:
+
+networks:
+  web:
+    name: docker_web
+    external: true

@@ -36,12 +36,6 @@ const act = (callback: () => void | Promise<void>): Promise<void> => {
 // Try to add act to React object for React DOM test utils compatibility
 try {
   if (!React.act || typeof React.act !== 'function') {
-    // @ts-expect-error - Adding act to React for compatibility
-    ;(React as unknown as { act?: typeof act }).act = act
-  }
-} catch {
-  // If we can't set it directly, try with Object.defineProperty
-  try {
     const reactNamespace = React as unknown as object
 
     Object.defineProperty(reactNamespace, 'act', {
@@ -50,10 +44,10 @@ try {
       configurable: true,
       enumerable: false,
     })
-  } catch (defineError) {
-    // If both fail, log the error but continue
-    console.warn('Could not set React.act:', defineError)
   }
+} catch (defineError) {
+  // If we can't set it, log the error but continue
+  console.warn('Could not set React.act:', defineError)
 }
 
 // Export act for use in tests

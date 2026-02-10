@@ -435,7 +435,7 @@ export class ModelServingServer extends EventEmitter {
         const { length } = first as number[]
         const sumVec = Array.from({ length }, () => 0)
         outputs.forEach((out) => {
-          ;(out as number[]).forEach((v, i) => {
+          ; (out as number[]).forEach((v, i) => {
             sumVec[i] += v
           })
         })
@@ -452,9 +452,9 @@ export class ModelServingServer extends EventEmitter {
       const { length } = firstOutput as number[]
       const weightedSum = predictions.reduce((sum, pred, index) => {
         const w = weights[index]
-        ;(pred.output as number[]).forEach((val, i) => {
-          sum[i] = (sum[i] || 0) + val * w
-        })
+          ; (pred.output as number[]).forEach((val, i) => {
+            sum[i] = (sum[i] || 0) + val * w
+          })
         return sum
       }, Array.from({ length }, () => 0))
 
@@ -572,7 +572,7 @@ export class ModelServingServer extends EventEmitter {
 
 // Helper classes for dependencies
 class RedisFeatureStore implements FeatureStore {
-  constructor(private redis: Redis) {}
+  constructor(private redis: Redis) { }
 
   async getFeatures(featureSetId: string): Promise<FeatureSet> {
     const data = await this.redis.get(`features:${featureSetId}`)
@@ -606,7 +606,7 @@ class RedisFeatureStore implements FeatureStore {
 }
 
 class MongoModelRegistry implements ModelRegistry {
-  constructor(private mongoClient: MongoClient) {}
+  constructor(private mongoClient: MongoClient) { }
 
   async registerModel(config: ModelConfig): Promise<void> {
     const db = this.mongoClient.db('threat_detection')
@@ -663,7 +663,7 @@ class ComprehensiveModelMonitoring implements ModelMonitoring {
   constructor(
     private redis: Redis,
     private mongoClient: MongoClient,
-  ) {}
+  ) { }
 
   async trackPrediction(prediction: ModelPrediction): Promise<void> {
     const db = this.mongoClient.db('threat_detection')

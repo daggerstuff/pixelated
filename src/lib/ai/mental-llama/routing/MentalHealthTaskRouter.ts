@@ -51,7 +51,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) {}
+  constructor(private llmInvoker: LLMInvoker) { }
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -283,7 +283,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
           llmCategory: parsed.category,
         },
       }
-    } catch (err) {
+    } catch {
       // Parsing failed - return a conservative fallback decision
       return {
         targetAnalyzer: 'general_mental_health',

@@ -1,0 +1,41 @@
+/* ================================================
+   UNIFIED BLENDED THEME - GRADIENT SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   ================================================ */
+
+:root {
+  /* === GRADIENTS - ENTERPRISE POLISH === */
+  --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+  --gradient-bg-subtle: linear-gradient(135deg, #0a0a0a 0%, #111111 50%, #151515 100%);
+  --gradient-overlay: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+/* BUTTON SYSTEM */
+.btn--primary {
+  background: var(--gradient-primary);
+}
+
+/* DISPLAY HEADINGS */
+.display-heading--gradient {
+  background: var(--gradient-primary);
+}
+
+/* TEXT GRADIENTS */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+}
+
+/* MESH BACKGROUNDS */
+.mesh-bg-1 {
+  background: var(--mesh-1);
+}
+
+.mesh-bg-2 {
+  background: var(--mesh-2);
+}

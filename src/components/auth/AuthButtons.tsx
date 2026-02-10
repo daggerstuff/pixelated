@@ -1,17 +1,15 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { PixelatedAuthProvider } from './AuthProvider';
+import { authClient } from '@/lib/auth-client';
+// Remove AuthProvider wrapper dependency if possible, but keep structure for now if needed
 
 const AuthButtonsInner = () => {
-    const {
-        isAuthenticated,
-        loginWithRedirect,
-        logout,
-        user,
-        isLoading
-    } = useAuth0();
+    const { data: session, isPending } = authClient.useSession();
 
-    if (isLoading) {
+    // Derived state
+    const user = session?.user;
+    const isAuthenticated = !!user;
+
+    if (isPending) {
         return <div className="text-slate-300 text-sm font-medium">Loading...</div>;
     }
 
@@ -19,13 +17,13 @@ const AuthButtonsInner = () => {
         return (
             <div className="flex items-center gap-4">
                 <div className="hidden lg:block text-slate-300 text-sm font-medium">
-                    {user?.picture ? (
-                        <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full inline-block mr-2" />
+                    {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.fullName || user.email} className="w-8 h-8 rounded-full inline-block mr-2" />
                     ) : null}
-                    {user?.name}
+                    {user?.fullName || user?.email}
                 </div>
                 <button
-                    onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                    onClick={() => authClient.signOut()}
                     className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
                 >
                     Log out
@@ -36,26 +34,24 @@ const AuthButtonsInner = () => {
 
     return (
         <div className="flex items-center gap-4">
-            <button
-                onClick={() => loginWithRedirect()}
+            <a
+                href="/api/auth/login"
                 className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
             >
                 Log in
-            </button>
-            <button
-                onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: "signup" } })}
+            </a>
+            <a
+                href="/api/auth/login?connection=google-oauth2"
                 className="bg-white text-slate-950 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-200 transition-colors"
             >
                 Get Started
-            </button>
+            </a>
         </div>
     );
 };
 
 export const AuthButtons = () => {
     return (
-        <PixelatedAuthProvider>
-            <AuthButtonsInner />
-        </PixelatedAuthProvider>
+        <AuthButtonsInner />
     );
 };

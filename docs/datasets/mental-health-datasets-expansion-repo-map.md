@@ -84,6 +84,7 @@ The canonical bucket described in `ai/training_ready/docs/S3_TRAINING_DATA_STRUC
 ### Step A — Access sanity
 
 Verify:
+
 - Python environment is available
 - S3 credentials are configured
 - You can list the bucket/prefix you expect
@@ -91,16 +92,19 @@ Verify:
 ### Step B — Inventory and mapping
 
 Goal:
+
 - Confirm what exists in S3
 - Build a coverage matrix mapping required dataset families to S3 evidence
 
 Expected outputs (examples):
+
 - coverage report JSON
 - dataset routing config
 
 ### Step C — Build the release artifact
 
 Goal:
+
 - Produce a versioned dataset release:
   - manifest (authoritative index)
   - compiled ChatML JSONL export (single or sharded)
@@ -108,6 +112,7 @@ Goal:
 ### Step D — Verification gates
 
 Goal:
+
 - Fail closed if any gate fails:
   - provenance missing
   - PII check failure
@@ -117,6 +122,7 @@ Goal:
 ### Step E — Curriculum
 
 Goal:
+
 - Route dataset families into training phases:
   - continued pretraining
   - SFT curriculum (staged)
@@ -125,6 +131,7 @@ Goal:
 ## 6) What “done” looks like (artifact checklist)
 
 A release is considered ready when:
+
 - Manifest + compiled export exist in S3 under a versioned release prefix
 - Coverage report shows required families present (or explicitly waived)
 - PII/provenance gates pass

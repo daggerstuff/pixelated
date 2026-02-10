@@ -87,7 +87,9 @@ sessionMetrics.completed('therapy', 45) // duration in minutes
 ## Metric Types
 
 ### Counter (`count`)
+
 Use for incrementing values:
+
 - Button clicks
 - API calls
 - Feature usage
@@ -95,7 +97,9 @@ Use for incrementing values:
 - Job completions
 
 ### Gauge (`gauge`)
+
 Use for values that can go up and down:
+
 - Active sessions
 - Queue depth
 - Memory usage
@@ -103,7 +107,9 @@ Use for values that can go up and down:
 - Cache size
 
 ### Distribution (`distribution`)
+
 Use for value distributions (calculates percentiles: p50, p90, p99):
+
 - Response times
 - Request sizes
 - Processing durations
@@ -152,10 +158,12 @@ await flushMetrics()
 ## Configuration
 
 Metrics are configured in:
+
 - **Client**: `sentry.client.config.js`
 - **Server**: `sentry.server.config.js`
 
 Both include:
+
 - `enableMetrics: true` (enabled by default)
 - `beforeSendMetric` callback for filtering/modifying metrics
 - Environment-specific attributes

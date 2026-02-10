@@ -159,7 +159,7 @@ class PrivacyEngine {
   private async applyDifferentialPrivacy(
     update: ModelUpdate,
   ): Promise<ModelUpdate> {
-    const { epsilon, delta, sensitivity, mechanism } = this.dpConfig
+    const { epsilon, delta: _delta, sensitivity, mechanism } = this.dpConfig
 
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)

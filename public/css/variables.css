@@ -1,0 +1,44 @@
+/* ================================================
+   UNIFIED BLENDED THEME - CORE VARIABLES
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   ================================================ */
+
+:root {
+  /* === DEEP DARK FOUNDATION === */
+  --bg-void: #000000;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #181818;
+  --bg-elevated: #1f1f1f;
+  --bg-card: #151515;
+  --bg-glass: rgba(15, 15, 15, 0.85);
+  --bg-overlay: rgba(0, 0, 0, 0.92);
+
+  /* === TEXT HIERARCHY - CLEAN & ELEGANT === */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-tertiary: #b3b3b3;
+  --text-muted: #888888;
+  --text-subtle: #666666;
+  --text-accent: #10b981;
+  --text-link: #34d399;
+  --text-link-hover: #6ee7b7;
+
+  /* === ACCENT SYSTEM - GREEN PRIMARY === */
+  --accent-primary: #10b981;
+  --accent-primary-hover: #34d399;
+  --accent-primary-dark: #059669;
+  --accent-secondary: #3b82f6;
+  --accent-tertiary: #6366f1;
+  --accent-purple: #8b5cf6;
+  --accent-warm: #f59e0b;
+
+  /* === Z-INDEX SYSTEM === */
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-sticky: 50;
+  --z-dropdown: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-tooltip: 400;
+}

@@ -112,6 +112,9 @@ export interface PixelInferenceResponse {
 
     /** Warning if response exceeded latency targets */
     warning?: string
+
+    /** Memories used for context generation */
+    memories?: string[]
 }
 
 /**

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { authClient } from '@/lib/auth-client'
 import { Avatar } from './avatar'
-import { useStore } from 'nanostores'
 
 export interface UserMenuProps {
   className?: string

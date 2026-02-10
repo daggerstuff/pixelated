@@ -129,7 +129,7 @@ if [[ $_CCR_SOURCED -eq 1 ]]; then
 else
   # Executed: advise how to persist exports
   echo "[CCR] Note: to persist ANTHROPIC_* exports in your shell, source this script instead:"
-  echo "  source scripts/dev/ccr.sh"
+  echo "  source scripts/devops/ccr.sh"
   echo "[CCR] Or export manually in your shell:"
   echo "  export ANTHROPIC_BASE_URL=$ANTHROPIC_BASE_URL"
   echo "  export ANTHROPIC_API_KEY=any-string-is-ok"
@@ -139,4 +139,8 @@ echo "[CCR] Ready. Example next steps:"
 echo "  claude code"
 echo "  # or switch model in-session: /model openai,\"\$OPENAI_MODEL\""
 
-
+# Validating if we should execute a command (wrapper mode)
+if [[ $# -gt 0 ]]; then
+  echo "[CCR] Executing command in configured environment: $*"
+  exec "$@"
+fi

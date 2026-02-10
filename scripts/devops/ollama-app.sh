@@ -112,6 +112,7 @@ deploy_app() {
     --volume "$VOLUME_REF" \
     --env "OLLAMA_PRELOAD_MODELS=$PRELOAD_MODELS" \
     --env "OLLAMA_MODELS=/models" \
+    --env "OLLAMA_ORIGINS=*" \
     --default-http-port "$PORT" \
     "$image"
 

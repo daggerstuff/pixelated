@@ -8,7 +8,7 @@ from pathlib import Path
 
 def get_search_file_path():
     """Get the path to the clinical similarity search file."""
-    return Path(__file__).parent.parent / "ai" / "pixel" / "data" / "clinical_similarity_search.py"
+    return Path(__file__).parent.parent / "ai" / "models" / "pixel_core" / "data" / "clinical_similarity_search.py"
 
 
 def get_test_file_path():

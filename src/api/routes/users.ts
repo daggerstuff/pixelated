@@ -143,7 +143,7 @@ router.put('/:userId', asyncHandler(async (req: Request, res: Response) => {
  * Grant permission to user (admin only)
  */
 router.post('/:userId/permissions', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params
+    const { userId: _userId } = req.params
     const { permission } = req.body
 
     if (!permission) {
@@ -164,7 +164,7 @@ router.post('/:userId/permissions', requireRole(['admin']), asyncHandler(async (
  * Revoke permission from user (admin only)
  */
 router.delete('/:userId/permissions/:permissionId', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
-    const { userId, permissionId } = req.params
+    const { userId: _userId, permissionId: _permissionId } = req.params
 
     // TODO: Implement permission revocation
     // TODO: Update PostgreSQL permissions table

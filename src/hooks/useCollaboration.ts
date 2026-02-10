@@ -161,7 +161,7 @@ export function useCollaboration({
     }
   }, [content, version, isConnected])
 
-  const applyRemoteChange = useCallback((change: DocumentChangeEvent) => {
+  const applyRemoteChange = useCallback((_change: DocumentChangeEvent) => {
     // This would be used for more complex change application
     // For now, we'll let the remote change handler do it
   }, [])

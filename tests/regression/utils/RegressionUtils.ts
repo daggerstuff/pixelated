@@ -131,7 +131,7 @@ export class RegressionUtils {
 
     // Start performance monitoring
     await page.evaluate(() => {
-      ;(window as any).performanceMarks = []
+      ; (window as any).performanceMarks = []
       performance.mark('test-start')
     })
 
@@ -151,10 +151,10 @@ export class RegressionUtils {
             duration: measure ? measure.duration : 0,
             memory: memory
               ? {
-                  used: memory.usedJSHeapSize,
-                  total: memory.totalJSHeapSize,
-                  limit: memory.jsHeapSizeLimit,
-                }
+                used: memory.usedJSHeapSize,
+                total: memory.totalJSHeapSize,
+                limit: memory.jsHeapSizeLimit,
+              }
               : null,
           }
         })
@@ -190,7 +190,7 @@ export class RegressionUtils {
         () => (window as any).xssTest === true,
       )
       results.xssProtection = !xssExecuted
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       results.xssProtection = true // Error means XSS was blocked
     }
 
@@ -206,7 +206,7 @@ export class RegressionUtils {
         .last()
         .textContent()
       results.inputSanitization = !messageContent?.includes('<img')
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       results.inputSanitization = true
     }
 
@@ -262,8 +262,8 @@ Generated: ${new Date().toISOString()}
 
 ## Fixed Bugs Validated
 ${this.getFixedBugs()
-  .map((bug) => `- ✅ ${bug}`)
-  .join('\n')}
+        .map((bug) => `- ✅ ${bug}`)
+        .join('\n')}
 
 ## Failed Tests
 ${failedTests.map((test) => `- ❌ ${test.name}: ${test.error}`).join('\n')}

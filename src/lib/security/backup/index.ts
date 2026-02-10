@@ -361,7 +361,7 @@ export class BackupSecurityManager {
       BackupSecurityManager.instance = new BackupSecurityManager(config)
     } else if (config) {
       // Update the existing instance's configuration
-      BackupSecurityManager.instance.updateConfig(config)
+      void BackupSecurityManager.instance.updateConfig(config)
     }
     return BackupSecurityManager.instance
   }
@@ -441,7 +441,7 @@ export class BackupSecurityManager {
 
       // Process through DLP if available
       const dlpResult = dlpService
-        ? await dlpService.scanContent(new TextDecoder().decode(data), {
+        ? dlpService.scanContent(new TextDecoder().decode(data), {
             userId: 'system',
             action: 'backup',
             metadata: { mode: 'backup' },

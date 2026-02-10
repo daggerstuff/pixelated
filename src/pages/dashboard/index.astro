@@ -1,12 +1,11 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
 // import { requireAuth } from '@/lib/auth'
 import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts'
 // Use Astro.props for user, which is injected at runtime by Astro
-// @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
 
 // Lightweight performance mode for Lighthouse (`/dashboard?perf=1`)
@@ -18,487 +17,583 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
   description="Your therapy dashboard - Overview and quick access to all features"
 >
   <div class="container mx-auto py-6">
-    {perfMode ? (
-      <div class="flex flex-col gap-6" role="region" aria-label="Performance Mode">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold tracking-tight mb-1">Dashboard (Perf Mode)</h1>
-          <p class="text-muted-foreground">Static render for performance checks</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><div class="p-4"><p class="text-sm text-muted-foreground">Sessions</p><p class="text-2xl font-bold">42</p></div></Card>
-          <Card><div class="p-4"><p class="text-sm text-muted-foreground">Practice Hours</p><p class="text-2xl font-bold">18.5</p></div></Card>
-          <Card><div class="p-4"><p class="text-sm text-muted-foreground">Avg. Score</p><p class="text-2xl font-bold">4.2</p></div></Card>
-          <Card><div class="p-4"><p class="text-sm text-muted-foreground">Growth</p><p class="text-2xl font-bold">+15%</p></div></Card>
-        </div>
-        <Card>
-          <div class="p-6">
-            <div class="h-40 rounded-md bg-white/5 border border-white/10 flex items-center justify-center">Charts omitted in perf mode</div>
-          </div>
-        </Card>
-      </div>
-    ) : (
-    <div class="flex flex-col gap-6">
-      <div class="flex items-center justify-between">
-        <div class="text-center w-full">
-          <h1 class="text-3xl font-bold tracking-tight mb-1">
-            Welcome Back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}
-          </h1>
-          <p class="text-muted-foreground">
-            Here's an overview of your therapy space
-          </p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="text-right">
-            <p class="text-sm font-medium">Security Level</p>
-            <p class="text-xs text-muted-foreground">Maximum (FHE)</p>
-          </div>
-          <div
-            class="h-10 w-10 rounded-full bg-gradient-to-br from-primary/60 to-primary flex items-center justify-center text-primary-foreground"
-          >
-            <span class="material-symbols-outlined text-lg">security</span>
-          </div>
-        </div>
-      </div>
-
-      {/* $1 */}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <div class="p-4 flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-muted-foreground">
-                Total Sessions
-              </p>
-              <p class="text-2xl font-bold">42</p>
-            </div>
-            <div
-              class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-            >
-              <span class="material-symbols-outlined">psychology</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="p-4 flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-muted-foreground">
-                Practice Hours
-              </p>
-              <p class="text-2xl font-bold">18.5</p>
-            </div>
-            <div
-              class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-            >
-              <span class="material-symbols-outlined">timer</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="p-4 flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-muted-foreground">
-                Avg. Score
-              </p>
-              <p class="text-2xl font-bold">4.2</p>
-            </div>
-            <div
-              class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-            >
-              <span class="material-symbols-outlined">grade</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="p-4 flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-muted-foreground">Growth</p>
-              <p class="text-2xl font-bold">+15%</p>
-            </div>
-            <div
-              class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-            >
-              <span class="material-symbols-outlined">trending_up</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* $1 */}
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <div class="p-6">
-            <div class="flex items-center gap-2 mb-4 justify-center">
-              <span class="text-muted-foreground material-symbols-outlined">
-                psychology
-              </span>
-              <h3 class="text-lg font-medium">Mental Health Chat</h3>
-            </div>
-            <p class="text-sm text-muted-foreground mb-4 text-center">
-              Start a therapeutic conversation with our AI-powered mental health
-              assistant
+    {
+      perfMode ?
+        <div
+          class="flex flex-col gap-6"
+          role="region"
+          aria-label="Performance Mode"
+        >
+          <div class="text-center">
+            <h1 class="text-3xl font-bold tracking-tight mb-1">
+              Dashboard (Perf Mode)
+            </h1>
+            <p class="text-muted-foreground">
+              Static render for performance checks
             </p>
-            <div class="text-center">
-              <a
-                href="/mental-health-chat"
-                class="text-sm text-primary hover:text-primary/90 font-medium"
-              >
-                Open Chat →
-              </a>
-            </div>
           </div>
-        </Card>
-
-        <Card>
-          <div class="p-6">
-            <div class="flex items-center gap-2 mb-4 justify-center">
-              <span class="text-muted-foreground material-symbols-outlined">
-                exercise
-              </span>
-              <h3 class="text-lg font-medium">Practice Simulator</h3>
-            </div>
-            <p class="text-sm text-muted-foreground mb-4 text-center">
-              Practice therapeutic techniques in a safe, private environment
-            </p>
-            <div class="text-center">
-              <a
-                href="/simulator"
-                class="text-sm text-primary hover:text-primary/90 font-medium"
-              >
-                Start Practice →
-              </a>
-            </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <div class="p-4">
+                <>
+                  <p class="text-sm text-muted-foreground">Sessions</p>
+                  <p class="text-2xl font-bold">42</p>
+                </>
+              </div>
+            </Card>
+            <Card>
+              <div class="p-4">
+                <>
+                  <p class="text-sm text-muted-foreground">Practice Hours</p>
+                  <p class="text-2xl font-bold">18.5</p>
+                </>
+              </div>
+            </Card>
+            <Card>
+              <div class="p-4">
+                <>
+                  <p class="text-sm text-muted-foreground">Avg. Score</p>
+                  <p class="text-2xl font-bold">4.2</p>
+                </>
+              </div>
+            </Card>
+            <Card>
+              <div class="p-4">
+                <>
+                  <p class="text-sm text-muted-foreground">Growth</p>
+                  <p class="text-2xl font-bold">+15%</p>
+                </>
+              </div>
+            </Card>
           </div>
-        </Card>
-
-        <Card>
-          <div class="p-6">
-            <div class="flex items-center gap-2 mb-4 justify-center">
-              <span class="text-primary material-symbols-outlined">
-                analytics
-              </span>
-              <h3 class="text-lg font-medium">Progress Analytics</h3>
-            </div>
-            <p class="text-sm text-muted-foreground mb-4 text-center">
-              View insights and progress from your therapeutic journey
-            </p>
-            <div class="text-center">
-              <a
-                href="/components/analytics-dashboard"
-                class="text-sm text-primary hover:text-primary/90 font-medium"
-              >
-                View Analytics →
-              </a>
-            </div>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
-          <div class="p-6">
-            <div class="flex items-center gap-2 mb-4 justify-center">
-              <span class="text-indigo-600 dark:text-indigo-400 material-symbols-outlined">
-                science
-              </span>
-              <h3 class="text-lg font-medium text-indigo-900 dark:text-indigo-100">Journal Research</h3>
-            </div>
-            <p class="text-sm text-muted-foreground mb-4 text-center">
-              Manage journal dataset research, discovery, evaluation, and training pipeline integration
-            </p>
-            <div class="text-center">
-              <a
-                href="/journal-research"
-                class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
-              >
-                Open Journal Research →
-              </a>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* $1 */}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
-          <div class="p-4">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">science</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-sm">Dataset Pipeline</h4>
-                <p class="text-xs text-muted-foreground">Journal research & training</p>
+          <Card>
+            <div class="p-6">
+              <div class="h-40 rounded-md bg-white/5 border border-white/10 flex items-center justify-center">
+                Charts omitted in perf mode
               </div>
             </div>
-            <a 
-              href="/journal-research" 
-              class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
-            >
-              Manage →
-            </a>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
-          <div class="p-4">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">scatter_plot</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-sm">3D Emotions</h4>
-                <p class="text-xs text-muted-foreground">Interactive emotion mapping</p>
-              </div>
-            </div>
-            <a 
-              href="/components/emotion-visualization" 
-              class="text-xs text-purple-600 hover:text-purple-700 font-medium"
-            >
-              Explore →
-            </a>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
-          <div class="p-4">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">assignment</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-sm">Treatment Plans</h4>
-                <p class="text-xs text-muted-foreground">Goal tracking & milestones</p>
-              </div>
-            </div>
-            <a 
-              href="/components/treatment-plans" 
-              class="text-xs text-green-600 hover:text-green-700 font-medium"
-            >
-              Manage →
-            </a>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
-          <div class="p-4">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">security</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-sm">Privacy Demo</h4>
-                <p class="text-xs text-muted-foreground">FHE encryption showcase</p>
-              </div>
-            </div>
-            <a 
-              href="/components/security-demo" 
-              class="text-xs text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Demo →
-            </a>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
-          <div class="p-4">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">view_carousel</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-sm">UI Components</h4>
-                <p class="text-xs text-muted-foreground">Interactive carousels</p>
-              </div>
-            </div>
-            <a 
-              href="/components/ui-showcase" 
-              class="text-xs text-orange-600 hover:text-orange-700 font-medium"
-            >
-              View →
-            </a>
-          </div>
-        </Card>
-      </div>
-
-      {/* $1 */}
-      <Card class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800">
-        <div class="p-6">
+          </Card>
+        </div>
+      : <div class="flex flex-col gap-6">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-xl">auto_awesome</span>
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-blue-900 dark:text-blue-100">Enhanced Dashboard Available</h3>
-                <p class="text-blue-700 dark:text-blue-200 text-sm">
-                  Experience our new enterprise-grade dashboard with 3D visualizations, real-time analytics, and advanced treatment planning.
+            <div class="relative flex items-center justify-center mb-8">
+              <div class="text-center z-10 w-full max-w-2xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-2 text-balance leading-tight">
+                  <span class="text-gradient bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 drop-shadow-sm">
+                    Welcome Back
+                    {user?.name ? `, ${user.name.split(' ')[0]}` : ''}
+                  </span>
+                </h1>
+                <p class="text-muted-foreground text-lg font-medium">
+                  Here's an overview of your therapy space
                 </p>
               </div>
+              <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-4 hidden lg:flex glass-panel px-4 py-2 rounded-full border border-white/10">
+                <div class="text-right">
+                  <p class="text-sm font-semibold text-white">Security Level</p>
+                  <p class="text-xs text-indigo-300">Maximum (FHE)</p>
+                </div>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-glow ring-2 ring-white/20">
+                  <span class="material-symbols-outlined text-lg">
+                    security
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="flex items-center gap-2">
-              <a 
-                href="/dashboard/enhanced" 
-                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-              >
-                <span>Try Enhanced Dashboard</span>
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </a>
+
+            {/* $1 */}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <div class="p-4 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      Total Sessions
+                    </p>
+                    <p class="text-2xl font-bold">42</p>
+                  </div>
+                  <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">psychology</span>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-4 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      Practice Hours
+                    </p>
+                    <p class="text-2xl font-bold">18.5</p>
+                  </div>
+                  <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">timer</span>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-4 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      Avg. Score
+                    </p>
+                    <p class="text-2xl font-bold">4.2</p>
+                  </div>
+                  <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">grade</span>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-4 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      Growth
+                    </p>
+                    <p class="text-2xl font-bold">+15%</p>
+                  </div>
+                  <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">trending_up</span>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* $1 */}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-4 justify-center">
+                    <span class="text-muted-foreground material-symbols-outlined">
+                      psychology
+                    </span>
+                    <h3 class="text-lg font-medium">Mental Health Chat</h3>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-4 text-center">
+                    Start a therapeutic conversation with our AI-powered mental
+                    health assistant
+                  </p>
+                  <div class="text-center">
+                    <a
+                      href="/mental-health-chat"
+                      class="text-sm text-primary hover:text-primary/90 font-medium"
+                    >
+                      Open Chat →
+                    </a>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-4 justify-center">
+                    <span class="text-muted-foreground material-symbols-outlined">
+                      exercise
+                    </span>
+                    <h3 class="text-lg font-medium">Practice Simulator</h3>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-4 text-center">
+                    Practice therapeutic techniques in a safe, private
+                    environment
+                  </p>
+                  <div class="text-center">
+                    <a
+                      href="/simulator"
+                      class="text-sm text-primary hover:text-primary/90 font-medium"
+                    >
+                      Start Practice →
+                    </a>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-4 justify-center">
+                    <span class="text-primary material-symbols-outlined">
+                      analytics
+                    </span>
+                    <h3 class="text-lg font-medium">Progress Analytics</h3>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-4 text-center">
+                    View insights and progress from your therapeutic journey
+                  </p>
+                  <div class="text-center">
+                    <a
+                      href="/components/analytics-dashboard"
+                      class="text-sm text-primary hover:text-primary/90 font-medium"
+                    >
+                      View Analytics →
+                    </a>
+                  </div>
+                </div>
+              </Card>
+
+              <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-4 justify-center">
+                    <span class="text-indigo-600 dark:text-indigo-400 material-symbols-outlined">
+                      science
+                    </span>
+                    <h3 class="text-lg font-medium text-indigo-900 dark:text-indigo-100">
+                      Journal Research
+                    </h3>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-4 text-center">
+                    Manage journal dataset research, discovery, evaluation, and
+                    training pipeline integration
+                  </p>
+                  <div class="text-center">
+                    <a
+                      href="/journal-research"
+                      class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                    >
+                      Open Journal Research →
+                    </a>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* $1 */}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 border-indigo-200 dark:border-indigo-800">
+                <div class="p-4">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-lg">
+                        science
+                      </span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-sm">Dataset Pipeline</h4>
+                      <p class="text-xs text-muted-foreground">
+                        Journal research & training
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/journal-research"
+                    class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                  >
+                    Manage →
+                  </a>
+                </div>
+              </Card>
+
+              <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+                <div class="p-4">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-lg">
+                        scatter_plot
+                      </span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-sm">3D Emotions</h4>
+                      <p class="text-xs text-muted-foreground">
+                        Interactive emotion mapping
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/components/emotion-visualization"
+                    class="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                  >
+                    Explore →
+                  </a>
+                </div>
+              </Card>
+
+              <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+                <div class="p-4">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-lg">
+                        assignment
+                      </span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-sm">Treatment Plans</h4>
+                      <p class="text-xs text-muted-foreground">
+                        Goal tracking & milestones
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/components/treatment-plans"
+                    class="text-xs text-green-600 hover:text-green-700 font-medium"
+                  >
+                    Manage →
+                  </a>
+                </div>
+              </Card>
+
+              <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+                <div class="p-4">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-lg">
+                        security
+                      </span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-sm">Privacy Demo</h4>
+                      <p class="text-xs text-muted-foreground">
+                        FHE encryption showcase
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/components/security-demo"
+                    class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Demo →
+                  </a>
+                </div>
+              </Card>
+
+              <Card class="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
+                <div class="p-4">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-lg">
+                        view_carousel
+                      </span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-sm">UI Components</h4>
+                      <p class="text-xs text-muted-foreground">
+                        Interactive carousels
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/components/ui-showcase"
+                    class="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    View →
+                  </a>
+                </div>
+              </Card>
+            </div>
+
+            {/* $1 */}
+            <Card class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800">
+              <div class="p-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-xl">
+                        auto_awesome
+                      </span>
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-semibold text-blue-900 dark:text-blue-100">
+                        Enhanced Dashboard Available
+                      </h3>
+                      <p class="text-blue-700 dark:text-blue-200 text-sm">
+                        Experience our new enterprise-grade dashboard with 3D
+                        visualizations, real-time analytics, and advanced
+                        treatment planning.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <a
+                      href="/dashboard/enhanced"
+                      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+                    >
+                      <span>Try Enhanced Dashboard</span>
+                      <span class="material-symbols-outlined">
+                        arrow_forward
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* $1 */}
+            <Card>
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-semibold">Analytics Overview</h3>
+                  <a
+                    href="/components/analytics-dashboard"
+                    class="text-sm text-primary hover:text-primary/90 font-medium flex items-center gap-1"
+                  >
+                    <span>View Detailed Analytics</span>
+                    <span class="material-symbols-outlined text-sm">
+                      open_in_new
+                    </span>
+                  </a>
+                </div>
+                <div
+                  class="min-h-[220px] animate-pulse rounded-md bg-white/5 border border-white/10"
+                  aria-hidden="true"
+                />
+                <AnalyticsCharts client:visible />
+              </div>
+            </Card>
+
+            {/* $1 */}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card class="lg:col-span-2">
+                <div class="p-6">
+                  <h3 class="text-lg font-medium mb-4 text-center">
+                    Recent Sessions
+                  </h3>
+                  <div class="divide-y divide-border">
+                    <div class="py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          <span class="material-symbols-outlined text-sm">
+                            videocam
+                          </span>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium">
+                            CBT Practice Session
+                          </p>
+                          <p class="text-xs text-muted-foreground">
+                            30 minutes
+                          </p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm">Today</p>
+                        <p class="text-xs text-muted-foreground">10:30 AM</p>
+                      </div>
+                    </div>
+
+                    <div class="py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          <span class="material-symbols-outlined text-sm">
+                            chat
+                          </span>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium">
+                            Therapy Chat Session
+                          </p>
+                          <p class="text-xs text-muted-foreground">
+                            45 minutes
+                          </p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm">Yesterday</p>
+                        <p class="text-xs text-muted-foreground">2:15 PM</p>
+                      </div>
+                    </div>
+
+                    <div class="py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          <span class="material-symbols-outlined text-sm">
+                            videocam
+                          </span>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium">
+                            Mindfulness Practice
+                          </p>
+                          <p class="text-xs text-muted-foreground">
+                            20 minutes
+                          </p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm">2 days ago</p>
+                        <p class="text-xs text-muted-foreground">9:00 AM</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-4 text-center">
+                    <a
+                      href="/sessions"
+                      class="text-sm text-primary hover:underline"
+                    >
+                      View all sessions
+                    </a>
+                  </div>
+                </div>
+              </Card>
+
+              <Card>
+                <div class="p-6">
+                  <h3 class="text-lg font-medium mb-4 text-center">
+                    Improvement Areas
+                  </h3>
+                  <div class="space-y-4">
+                    <div>
+                      <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">Active Listening</span>
+                        <span class="text-xs text-muted-foreground">85%</span>
+                      </div>
+                      <div class="w-full bg-border/50 rounded-full h-2">
+                        <div
+                          class="bg-primary h-2 rounded-full"
+                          style="width: 85%"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">Empathetic Responses</span>
+                        <span class="text-xs text-muted-foreground">72%</span>
+                      </div>
+                      <div class="w-full bg-border/50 rounded-full h-2">
+                        <div
+                          class="bg-primary h-2 rounded-full"
+                          style="width: 72%"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">CBT Techniques</span>
+                        <span class="text-xs text-muted-foreground">60%</span>
+                      </div>
+                      <div class="w-full bg-border/50 rounded-full h-2">
+                        <div
+                          class="bg-primary h-2 rounded-full"
+                          style="width: 60%"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm">Trauma-Informed Care</span>
+                        <span class="text-xs text-muted-foreground">45%</span>
+                      </div>
+                      <div class="w-full bg-border/50 rounded-full h-2">
+                        <div
+                          class="bg-primary h-2 rounded-full"
+                          style="width: 45%"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-6 text-center">
+                    <a
+                      href="/resources"
+                      class="text-sm text-primary hover:underline"
+                    >
+                      View improvement resources
+                    </a>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         </div>
-      </Card>
-
-      {/* $1 */}
-      <Card>
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-semibold">Analytics Overview</h3>
-            <a 
-              href="/components/analytics-dashboard" 
-              class="text-sm text-primary hover:text-primary/90 font-medium flex items-center gap-1"
-            >
-              <span>View Detailed Analytics</span>
-              <span class="material-symbols-outlined text-sm">open_in_new</span>
-            </a>
-          </div>
-          <div class="min-h-[220px] animate-pulse rounded-md bg-white/5 border border-white/10" aria-hidden="true"></div>
-          <AnalyticsCharts client:visible />
-        </div>
-      </Card>
-
-      {/* $1 */}
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card class="lg:col-span-2">
-          <div class="p-6">
-            <h3 class="text-lg font-medium mb-4 text-center">
-              Recent Sessions
-            </h3>
-            <div class="divide-y divide-border">
-              <div class="py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-                  >
-                    <span class="material-symbols-outlined text-sm"
-                      >videocam</span
-                    >
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium">CBT Practice Session</p>
-                    <p class="text-xs text-muted-foreground">30 minutes</p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm">Today</p>
-                  <p class="text-xs text-muted-foreground">10:30 AM</p>
-                </div>
-              </div>
-
-              <div class="py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-                  >
-                    <span class="material-symbols-outlined text-sm">chat</span>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium">Therapy Chat Session</p>
-                    <p class="text-xs text-muted-foreground">45 minutes</p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm">Yesterday</p>
-                  <p class="text-xs text-muted-foreground">2:15 PM</p>
-                </div>
-              </div>
-
-              <div class="py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-                  >
-                    <span class="material-symbols-outlined text-sm"
-                      >videocam</span
-                    >
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium">Mindfulness Practice</p>
-                    <p class="text-xs text-muted-foreground">20 minutes</p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm">2 days ago</p>
-                  <p class="text-xs text-muted-foreground">9:00 AM</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 text-center">
-              <a href="/sessions" class="text-sm text-primary hover:underline">
-                View all sessions
-              </a>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="p-6">
-            <h3 class="text-lg font-medium mb-4 text-center">
-              Improvement Areas
-            </h3>
-            <div class="space-y-4">
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-sm">Active Listening</span>
-                  <span class="text-xs text-muted-foreground">85%</span>
-                </div>
-                <div class="w-full bg-border/50 rounded-full h-2">
-                  <div class="bg-primary h-2 rounded-full" style="width: 85%">
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-sm">Empathetic Responses</span>
-                  <span class="text-xs text-muted-foreground">72%</span>
-                </div>
-                <div class="w-full bg-border/50 rounded-full h-2">
-                  <div class="bg-primary h-2 rounded-full" style="width: 72%">
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-sm">CBT Techniques</span>
-                  <span class="text-xs text-muted-foreground">60%</span>
-                </div>
-                <div class="w-full bg-border/50 rounded-full h-2">
-                  <div class="bg-primary h-2 rounded-full" style="width: 60%">
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-sm">Trauma-Informed Care</span>
-                  <span class="text-xs text-muted-foreground">45%</span>
-                </div>
-                <div class="w-full bg-border/50 rounded-full h-2">
-                  <div class="bg-primary h-2 rounded-full" style="width: 45%">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-6 text-center">
-              <a href="/resources" class="text-sm text-primary hover:underline">
-                View improvement resources
-              </a>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-    )}
+    }
   </div>
 </DashboardLayout>
