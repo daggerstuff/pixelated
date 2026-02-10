@@ -1,0 +1,14 @@
+git/
+.agent/safety-net/
+node_modules/
+dist/
+build/
+coverage/
+tmp/
+__pycache__/
+.venv/
+venv/
+.pytest_cache/
+.DS_Store
+.env.example
+*.log
