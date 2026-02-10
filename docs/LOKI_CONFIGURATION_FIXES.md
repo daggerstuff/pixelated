@@ -1,6 +1,7 @@
 # Loki Configuration Fixes
 
-This document describes the configuration fixes made to resolve the "Loki needs config tweak" issue mentioned in the migration checklist.
+This document describes the configuration fixes made to resolve the
+"Loki needs config tweak" issue mentioned in the migration checklist.
 
 ## Issues Identified and Fixed
 
@@ -18,7 +19,8 @@ This document describes the configuration fixes made to resolve the "Loki needs 
 
 - Added host labels for better log identification
 - Added stream labels for log filtering
-- Added docker service discovery configuration to automatically discover and collect logs from all running containers
+- Added docker service discovery configuration to automatically discover and
+  collect logs from all running containers
 - Improved JSON parsing pipeline
 
 ### 3. Grafana Loki Datasource (`docker/grafana/provisioning/datasources/loki.yml`)
@@ -47,13 +49,14 @@ To start the monitoring services:
 
 ## Key Configuration Changes Summary
 
-| Component | File | Change Made | Purpose |
-| --------- | ---- | ----------- | ------- |
-| Loki | `docker/loki/config.yml` | `instance_addr: 0.0.0.0` | Enable container networking |
-| Loki | `docker/loki/config.yml` | `alertmanager_url: http://alertmanager:9093` | Correct service reference |
-| Promtail | `docker/promtail/config.yml` | Added docker service discovery | Automatic container log collection |
-| Promtail | `docker/promtail/config.yml` | Added host/stream labels | Better log organization |
-| Grafana | `docker/grafana/provisioning/datasources/loki.yml` | Added timeout/tenant config | Improved reliability |
+- **Loki** (`loki/config.yml`): Set `instance_addr: 0.0.0.0` for networking.
+- **Loki** (`loki/config.yml`): Fixed `alertmanager_url` service reference.
+- **Promtail** (`promtail/config.yml`): Added Docker discovery for
+  auto-collection.
+- **Promtail** (`promtail/config.yml`): Added host/stream labels for
+  organization.
+- **Grafana** (`grafana/.../loki.yml`): Added timeout/tenant config for
+  reliability.
 
 ## Access Points
 

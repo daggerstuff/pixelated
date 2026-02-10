@@ -16,7 +16,8 @@
    - 5 dataset families catalogued (4 active, 1 pending)
    - Total size: 1.9GB across 19,330 S3 objects
 
-2. **✅ Routing Configuration** - `ai/training_ready/config/release_0_routing_config.json`
+2. **✅ Routing Configuration** -
+   `ai/training_ready/config/release_0_routing_config.json`
    - Family-based sampling weights configured
    - Quality tier assignments (premium/high/critical)
    - Training parameters optimized for ~83,500 conversations
@@ -29,7 +30,8 @@
    - Bias Detection (gender, race, age, disability categories)
    - **Demo Results:** 4 gates run, 3 passed, 1 warning, 0 failed
 
-4. **✅ ChatML Export Generator** - `ai/dataset_pipeline/chatml_export_generator.py`
+4. **✅ ChatML Export Generator** -
+   `ai/dataset_pipeline/chatml_export_generator.py`
    - Streaming download for large datasets (1.2GB priority family)
    - Multi-format conversation parsing
    - Progress tracking and error handling
@@ -37,8 +39,10 @@
 
 5. **✅ Documentation**
    - [S3_MANIFEST_CLEANUP.md](./S3_MANIFEST_CLEANUP.md) - Migration procedure
-   - [RELEASE_0_INVENTORY_SUMMARY.md](./RELEASE_0_INVENTORY_SUMMARY.md) - Dataset inventory
-   - Quality gates report: `ai/training_ready/reports/release_0_quality_gates_report.json`
+   - [RELEASE_0_INVENTORY_SUMMARY.md](./RELEASE_0_INVENTORY_SUMMARY.md) -
+     Dataset inventory
+   - Quality gates report:
+     `ai/training_ready/reports/release_0_quality_gates_report.json`
 
 ---
 
@@ -46,20 +50,20 @@
 
 ### Active Families (Training Ready)
 
-| Family | Status | Size | Est. Conversations | Weight | Quality Tier |
-|--------|--------|------|-------------------|--------|--------------|
-| **Priority** | ✅ COMPLETE | 1.2GB | 50,000 | 40% | Premium |
-| **Professional Therapeutic** | ✅ COMPLETE | 70MB | 8,000 | 30% | High |
-| **CoT Reasoning** | ✅ COMPLETE | 628MB | 25,000 | 20% | High |
-| **Edge Cases** | ✅ COMPLETE | 3.5MB | 500 | 10% | Critical |
+| Family          | Status  | Size  | Conv. | Weight | Tier |
+| :-------------- | :------ | :---- | :---- | :----- | :--- |
+| **Priority**    | ✅ DONE | 1.2GB | 50k   | 40%    | Prem |
+| **Prof. Ther.** | ✅ DONE | 70MB  | 8k    | 30%    | High |
+| **CoT**         | ✅ DONE | 628MB | 25k   | 20%    | High |
+| **Edge**        | ✅ DONE | 3.5MB | 500   | 10%    | Crit |
 
 **Total Active:** 1.9GB, ~83,500 conversations
 
 ### Pending Families
 
-| Family | Status | Size | Plan |
-|--------|--------|------|------|
-| **Voice** | ⚠️ LIMITED | 9KB | Phase 2 - Voice data generation required |
+| Family    | Status     | Size | Plan                                     |
+| --------- | ---------- | ---- | ---------------------------------------- |
+| **Voice** | ⚠️ LIMITED | 9KB  | Phase 2 - Voice data generation required |
 
 ---
 
@@ -214,9 +218,11 @@
 
 **S3:**
 
-- ❌ `s3://pixel-data/datasets/consolidated/FINAL_TRAINING_DATA_MANIFEST.json` (deleted)
+- ❌ `s3://pixel-data/datasets/consolidated/FINAL_TRAINING_DATA_MANIFEST.json`
+  (deleted)
 - ❌ `s3://pixel-data/datasets/consolidated/MANIFEST.json` (deleted)
-- ❌ `s3://pixel-data/datasets/consolidated/final/MASTER_STAGE_MANIFEST.json` (deleted)
+- ❌ `s3://pixel-data/datasets/consolidated/final/MASTER_STAGE_MANIFEST.json`
+  (deleted)
 
 **Rollback Safety:**
 
@@ -333,13 +339,15 @@ s3://pixel-data/
 
 ## 📞 Contact & Support
 
-**Dataset Issues:** Check `RELEASE_0_INVENTORY_SUMMARY.md` for family-specific details
-**Quality Gates:** Review `ai/training_ready/reports/release_0_quality_gates_report.json`
-**Training Config:** Reference `ai/training_ready/config/release_0_routing_config.json`
-**S3 Access:** Credentials in environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+**Dataset Issues:** Check `RELEASE_0_INVENTORY_SUMMARY.md` for details
+**Quality Gates:** Review `release_0_quality_gates_report.json`
+**Training Config:** Reference `release_0_routing_config.json`
+**S3 Access:** Credentials in environment variables
+(`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
 
 ---
 
-**Release 0 Status:** ✅ **DEPLOYMENT COMPLETE - READY FOR TRAINING PIPELINE EXECUTION**
+**Release 0 Status:** ✅ **DEPLOYMENT COMPLETE - READY FOR TRAINING**
+**PIPELINE EXECUTION**
 
 Last Updated: 2026-01-07 | Next Review: After ChatML Export Completion

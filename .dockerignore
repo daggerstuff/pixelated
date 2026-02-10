@@ -77,7 +77,9 @@ pip-delete-this-directory.txt
 .coverage
 htmlcov/
 .tox/
-uv.lock
+# uv.lock is required for reproducible builds
+!uv.lock
+!**/uv.lock
 
 # Build artifacts (keep only what's needed)
 dist/
@@ -129,8 +131,22 @@ Thumbs.db
 *.sketch
 *.fig
 
-# AI/ML files
-ai/
+# AI/ML files (submodule)
+# Allow the ai directory for service builds, but ignore large models and datasets within it
+!/ai/
+/ai/models/
+/ai/datasets/
+/ai/data/
+/ai/logs/
+/ai/.venv/
+/ai/__pycache__/
+# Explicitly allow training packages even if they are in 'models' or 'configs' subfolders
+!/ai/training/ready_packages/models/
+!/ai/training/ready_packages/packages/
+!/ai/training/ready_packages/configs/
+!/ai/training/ready_packages/platforms/
+!/ai/uv.lock
+!/ai/pyproject.toml
 training_dataset.json
 *.csv
 *.parquet

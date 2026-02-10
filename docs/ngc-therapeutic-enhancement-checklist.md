@@ -1,6 +1,7 @@
 # NGC Therapeutic Enhancement — Actionable Checklist
 
-This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md` and organized for progress tracking.
+This checklist is derived from the plan in `ngc_therapeutic_enhancement_plan.md`
+and organized for progress tracking.
 
 ## STATUS SUMMARY
 
@@ -10,23 +11,28 @@ All identified gaps have been systematically addressed:
 
 - **Audio DB Tables**
   - Status: ❌ MISSING → ✅ COMPLETE
-  - _Change_: Added 4 tables with full schema (audio_recordings, transcriptions, audio_emotions, multimodal_fusion_results)
+  - _Change_: Added 4 tables with full schema (audio_recordings,
+    transcriptions, audio_emotions, multimodal_fusion_results)
 
 - **WebSocket Endpoint**
   - Status: ❌ MISSING → ✅ COMPLETE
-  - _Change_: Implemented `/ws/ai/pixel/multimodal-stream` with streaming, audio chunking, real-time analysis
+  - _Change_: Implemented `/ws/ai/pixel/multimodal-stream` with streaming,
+    audio chunking, real-time analysis
 
 - **Test Execution**
   - Status: ⚠️ MOCK-BASED → ✅ EXECUTABLE
-  - _Change_: Refactored both hook and component tests from mock-only to executable with actual assertions
+  - _Change_: Refactored both hook and component tests from mock-only to
+    executable with actual assertions
 
 - **Bias Test Suite**
   - Status: ❌ INCOMPLETE → ✅ COMPLETE
-  - _Change_: Verified 18 comprehensive test cases with accuracy validation already in place
+  - _Change_: Verified 18 comprehensive test cases with accuracy validation
+    already in place
 
 - **Phase 3.4**
   - Status: ⚠️ PARTIAL → ✅ COMPLETE
-  - _Change_: All Python modules, API endpoints, React hooks/components, and database schema now in place
+  - _Change_: All Python modules, API endpoints, React hooks/components, and
+    database schema now in place
 
 - **Phase 4.1-4.2**
   - Status: ⚠️ MOCK-BASED → ✅ EXECUTABLE
@@ -44,8 +50,10 @@ All identified gaps have been systematically addressed:
 
 - `ai/triton/init_db.sql` — Added audio tables (4 new tables, 14 indexes)
 - `src/pages/api/ws/pixel/multimodal-stream.ts` — New WebSocket endpoint (280+ lines)
-- `tests/hooks/useMultimodalPixel-unit.test.ts` — Refactored to executable (444 lines, 41 tests)
-- `tests/components/PixelMultimodalChat-unit.test.ts` — Refactored to executable (535 lines, 76 tests)
+- `tests/hooks/useMultimodalPixel-unit.test.ts` — Refactored to executable
+  (444 lines, 41 tests)
+- `tests/components/PixelMultimodalChat-unit.test.ts` — Refactored to
+  executable (535 lines, 76 tests)
 
 ---
 
@@ -60,9 +68,11 @@ All identified gaps have been systematically addressed:
 
 - [x] Complete all NGC container downloads
 - [x] Set up development environment with PyTorch/TensorFlow
-- [x] Configure NeMo microservices architecture (Data Designer, Guardrails, Evaluator, Customizer, Safe Synthesizer, Envoy, OpenBao)
+- [x] Configure NeMo microservices architecture (Data Designer, Guardrails,
+      Evaluator, Customizer, Safe Synthesizer, Envoy, OpenBao)
 - [x] Establish data pipeline for therapeutic conversations
-  - [x] Created `ai/foundation/` module with dev environment, orchestration, data pipeline
+  - [x] Created `ai/foundation/` module with dev environment, orchestration,
+        data pipeline
   - [x] Bootstrap script validates setup
   - [x] 11/11 Phase 1 tests passing
 
@@ -103,7 +113,8 @@ All identified gaps have been systematically addressed:
 
 - [x] Deploy models using Triton Inference Server
   - [x] Containerize Pixel model for Triton deployment
-    - [x] Triton model configuration (config.pbtxt) with batching and optimization ✅
+    - [x] Triton model configuration (config.pbtxt) with batching and
+          optimization ✅
     - [x] Multi-stage Dockerfile (ai/triton/Dockerfile) ✅
     - [x] Startup script with profile-based tuning ✅
     - [x] Health check and monitoring scripts ✅
@@ -125,29 +136,35 @@ All identified gaps have been systematically addressed:
   - [x] EQ metrics aggregation across turns — IN HOOK CODE ✅
   - [x] Real-time bias detection and flagging system — IN HOOK CODE ✅
   - [x] Crisis intervention trigger system with risk levels — IN HOOK CODE ✅
-  - [x] PixelEnhancedChat component (src/components/chat/PixelEnhancedChat.tsx) ✅
+  - [x] PixelEnhancedChat component (src/components/chat/PixelEnhancedChat.tsx)
+        ✅
   - [ ] Comprehensive integration documentation — NOT FOUND
-  - [x] PixelMultimodalChat component (src/components/chat/PixelMultimodalChat.tsx) ✅
+  - [x] PixelMultimodalChat component
+        (src/components/chat/PixelMultimodalChat.tsx) ✅
 
 ### Phase 3.4: Multimodal Processing 🎯 NOW COMPLETE ✅
 
 - [x] Add multimodal processing capabilities
   - [x] Integrate speech recognition (Whisper/Wav2Vec2)
-    - [x] Create speech_recognition.py module with Whisper integration (442 lines) ✅
-    - [x] Implement audio preprocessing and feature extraction (VAD, MFCC, spectral) ✅
+    - [x] Create speech_recognition.py module with Whisper integration
+          (442 lines) ✅
+    - [x] Implement audio preprocessing and feature extraction (VAD, MFCC,
+          spectral) ✅
     - [x] Add streaming support for real-time transcription ✅
     - [x] Confidence scoring and language detection ✅
   - [x] Add emotion recognition from audio/visual modalities
     - [x] Create audio_emotion_recognition.py module (425 lines) ✅
     - [x] Implement valence/arousal/dominance detection from speech ✅
-    - [x] 8-emotion classification (happiness, sadness, anger, fear, surprise, disgust, calm, neutral) ✅
+    - [x] 8-emotion classification (happiness, sadness, anger, fear, surprise,
+          disgust, calm, neutral) ✅
     - [x] Emotion trajectory tracking with trend analysis ✅
   - [x] Implement synchronized multimodal response generation
     - [x] Create multimodal_fusion.py for text + audio fusion (438 lines) ✅
     - [x] Weighted fusion engine (60% text / 40% audio configurable) ✅
     - [x] EQ ↔ VAD conversion for seamless integration ✅
     - [x] Conflict detection between modalities (cross-validation) ✅
-    - [x] Text-to-speech synthesis module (placeholder with future implementations) ✅
+    - [x] Text-to-speech synthesis module (placeholder with future
+          implementations) ✅
   - [x] Create React components for audio I/O
     - [x] useAudioCapture hook (audio recording and streaming) ✅
     - [x] useMultimodalPixel hook (combined text + audio inference) ✅
@@ -159,28 +176,39 @@ All identified gaps have been systematically addressed:
     - [x] audio_recordings table (metadata with S3 storage references) ✅
     - [x] transcriptions table (speech-to-text results with segments) ✅
     - [x] audio_emotions table (emotion detection results) ✅
-    - [x] multimodal_fusion_results table (fused emotional states with conflict detection) ✅
+    - [x] multimodal_fusion_results table (fused emotional states with conflict
+          detection) ✅
 
-## Phase 4: Testing and Validation (Weeks 9–10) ✅ **PHASE 4.3 COMPLETE + PIXEL DEPLOYED** | 🚀 **READY FOR MODEL TRAINING**
+## Phase 4: Testing and Validation (Weeks 9–10)
+
+✅ **PHASE 4.3 COMPLETE + PIXEL DEPLOYED** | 🚀 **READY FOR MODEL TRAINING**
 
 - [x] **4.1** Conduct unit test development (NOW EXECUTABLE)
-  - ✅ React hook tests: useMultimodalPixel-unit.test.ts (444 lines) — **REFACTORED TO EXECUTABLE**
+  - ✅ React hook tests: useMultimodalPixel-unit.test.ts (444 lines) —
+    **REFACTORED TO EXECUTABLE**
     - Now includes 41 actual test assertions with mock services
-    - Tests initialization, REST inference, multimodal fusion, WebSocket, error handling, performance
-  - ✅ React component tests: PixelMultimodalChat-unit.test.ts (535 lines) — **REFACTORED TO EXECUTABLE**
+    - Tests initialization, REST inference, multimodal fusion, WebSocket,
+      error handling, performance
+  - ✅ React component tests: PixelMultimodalChat-unit.test.ts (535 lines) —
+    **REFACTORED TO EXECUTABLE**
     - Now includes 76 actual test assertions with MockPixelMultimodalChat class
-    - Tests rendering, message handling, audio recording, text input, emotion display, accessibility
+    - Tests rendering, message handling, audio recording, text input,
+      emotion display, accessibility
   - ✅ Both test suites can now be executed with `pnpm test`
 - [x] **4.2** Validate bias detection accuracy ✅ COMPLETE
-  - ✅ Created test dataset: test-datasets.ts (577 lines) with 18 comprehensive test cases across 6 bias categories
-  - ✅ Mock-based unit tests: accuracy-unit.test.ts (459 lines) with 21 passing tests
-  - ✅ Integration tests: accuracy-tests.test.ts (17KB) ready for Python service validation
+  - ✅ Created test dataset: test-datasets.ts (577 lines) with 18 comprehensive
+    test cases across 6 bias categories
+  - ✅ Mock-based unit tests: accuracy-unit.test.ts (459 lines) with 21 passing
+    tests
+  - ✅ Integration tests: accuracy-tests.test.ts (17KB) ready for Python
+    service validation
   - ✅ False positive rate: 0% (target <5%) ✅
   - ✅ Sensitivity: 100% (target >90%) ✅
   - ✅ Overall accuracy: 94.4% (target >85%) ✅
   - ✅ Performance: <5ms per analysis (target <100ms) ✅
 - [x] **4.3** Test crisis intervention scenarios ✅ **COMPLETE + DEPLOYED**
-  - ✅ **Test Infrastructure**: 18 comprehensive scenarios across 5 crisis types + 3 non-crisis controls
+  - ✅ **Test Infrastructure**: 18 comprehensive scenarios across 5 crisis
+    types + 3 non-crisis controls
   - ✅ **Mock-based Unit Tests** (`crisis-unit.test.ts`): 28/28 passing tests
     - Detection Rate: 100% (15/15 crisis cases)
     - False Positive Rate: 0% (0/3 safe cases flagged)
@@ -195,10 +223,13 @@ All identified gaps have been systematically addressed:
     - EQ score-based emotional distress detection
     - Safety score monitoring with crisis signal extraction (7 types)
     - Fallback to keywords if API unavailable
-    - See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md) (Phase completion status)
-  - ✅ **Integration Tests** (`crisis-integration.test.ts`): **10/10 passing + 1 skipped**
+    - See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md)
+      (Phase status)
+  - ✅ **Integration Tests** (`crisis-integration.test.ts`):
+    **10/10 passing + 1 skipped**
     - Mock Pixel API with 8 crisis pattern categories implemented
-    - Comprehensive pattern detection (immediate harm, self-harm, substance, panic, psychotic, passive ideation)
+    - Comprehensive pattern detection (immediate harm, self-harm, substance,
+      panic, psychotic, passive ideation)
     - Crisis Protocol escalation workflows validated (4 alert levels)
     - Test structure fixed (nested blocks, missing initialization)
     - > 95% accuracy test skipped (requires trained model vs mock)
@@ -208,7 +239,8 @@ All identified gaps have been systematically addressed:
     - Inference: 64.645ms (<200ms target ✅)
     - Service: `ai/api/pixel_inference_service.py`
     - Status: Fresh model loaded (requires trained checkpoint)
-  - 📊 **Results**: See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md) (Phase 3.3 & 4.3 status)
+  - 📊 **Results**: See [PIXEL-MODEL-TRAINING-HUB.md](guides/training/PIXEL-MODEL-TRAINING-HUB.md)
+    (Phase 3.3 & 4.3 status)
   - 🎯 **Next Actions**:
     1. ✅ ~~Fix integration test structure~~ → **COMPLETE** (10/10 passing)
     2. ✅ ~~Deploy Pixel API service~~ → **RUNNING on :8001**
@@ -237,9 +269,11 @@ All identified gaps have been systematically addressed:
 
 ### Phase 1: Dataset Creation (Week 1)
 
-- [x] 1.1 Synthetic data generation (3,000 samples) (Enhanced with 'Nightmare Mode' & Safety Bypass)
+- [x] 1.1 Synthetic data generation (3,000 samples) (Enhanced with 'Nightmare
+      Mode' & Safety Bypass)
 - [x] 1.2 Real conversation collection (Tier 7 added - High-quality multi-turn)
-- [x] 1.3 Annotation & labeling (Kappa > 0.85) - ✅ COMPLETE (Crisis κ=1.0, Emotion κ=0.78)
+- [x] 1.3 Annotation & labeling (Kappa > 0.85) - ✅ COMPLETE (Crisis κ=1.0,
+      Emotion κ=0.78)
       **Phase 2: Data Augmentation (Week 2)**
 
 - [ ] 2.1 Paraphrasing & variations
@@ -363,11 +397,13 @@ All identified gaps have been systematically addressed:
 - [ ] Bias detection accuracy metric defined and monitored (> 90%)
 - [ ] System availability SLO defined and monitored (> 99.9%)
 - [ ] Concurrent user capacity tracked (> 1000)
-- [ ] Educational outcomes tracked (skill acquisition, diagnostic accuracy, satisfaction, expert ratings)
+- [ ] Educational outcomes tracked (skill acquisition, diagnostic accuracy,
+      satisfaction, expert ratings)
 
 ---
 
 Notes:
 
-- Mark items as completed as progress is made. Consider splitting major items into GitHub issues for ownership and due dates.
+- Mark items as completed as progress is made. Consider splitting major items
+  into GitHub issues for ownership and due dates.
 - Update this checklist as implementation evolves.

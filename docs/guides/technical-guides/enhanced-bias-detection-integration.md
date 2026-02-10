@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide covers the integration and usage of the enhanced bias detection system, including real-time analysis, feedback loops, performance optimization, and automated memory updates.
+This guide covers integration of the enhanced bias detection system, including
+real-time analysis, feedback loops, and automated memory updates.
 
 ## Architecture
 
@@ -18,7 +19,9 @@ The enhanced bias detection system consists of four main components:
 ### Real-time Bias Detection
 
 ```python
-from src.lib.ai.bias_detection.python_service.real_time_integration import RealTimeBiasDetector
+from src.lib.ai.bias_detection.python_service.real_time_integration import (
+    RealTimeBiasDetector
+)
 
 # Initialize real-time detector
 detector = RealTimeBiasDetector(
@@ -40,7 +43,9 @@ result = await detector.analyze_conversation(conversation_data)
 ### Performance Optimization
 
 ```python
-from src.lib.ai.bias_detection.python_service.performance_optimization import PerformanceOptimizer
+from src.lib.ai.bias_detection.python_service.performance_optimization import (
+    PerformanceOptimizer
+)
 
 # Initialize performance optimizer
 optimizer = PerformanceOptimizer(
@@ -87,7 +92,7 @@ async def setup_bias_detection():
     detector = RealTimeBiasDetector()
     feedback_manager = FeedbackLoopManager()
     streaming_analyzer = StreamingBiasAnalyzer()
-    
+
     return detector, feedback_manager, streaming_analyzer
 ```
 
@@ -95,16 +100,18 @@ async def setup_bias_detection():
 
 ```python
 async def process_conversation_stream(messages):
-    detector, feedback_manager, streaming_analyzer = await setup_bias_detection()
-    
+    (detector, feedback_manager, streaming_analyzer) = (
+        await setup_bias_detection()
+    )
+
     results = []
     for message in messages:
         # Streaming analysis
         stream_result = await streaming_analyzer.analyze_message(message)
-        
+
         # Bias detection
         bias_result = await detector.analyze_message(message)
-        
+
         # Combine results
         combined_result = {
             "message_id": message["id"],
@@ -112,9 +119,9 @@ async def process_conversation_stream(messages):
             "bias_detection": bias_result,
             "timestamp": datetime.now().isoformat()
         }
-        
+
         results.append(combined_result)
-    
+
     return results
 ```
 
@@ -123,19 +130,19 @@ async def process_conversation_stream(messages):
 ```python
 async def integrate_feedback(detection_id, user_feedback):
     feedback_manager = FeedbackLoopManager()
-    
+
     feedback_data = {
         "detection_id": detection_id,
         "user_feedback": user_feedback,
         "timestamp": datetime.now().isoformat()
     }
-    
+
     # Process feedback
     await feedback_manager.process_feedback(feedback_data)
-    
+
     # Update model if needed
     updated_model = await feedback_manager.update_model(detector)
-    
+
     return updated_model
 ```
 
@@ -144,12 +151,12 @@ async def integrate_feedback(detection_id, user_feedback):
 ```python
 async def integrate_with_memory(detection_results):
     memory_handler = MemoryUpdateHandler()
-    
+
     for result in detection_results:
         if result["bias_detection"]["bias_detected"]:
             # Update memory with detection
             await memory_handler.process_detection(result["bias_detection"])
-    
+
     # Get updated memory state
     memory_state = await memory_handler.get_memory_state()
     return memory_state
@@ -183,25 +190,25 @@ AUTO_COMMIT_MEMORY=true
 bias_detection:
   real_time:
     threshold: 0.7
-    model_name: "fairlearn_classifier"
+    model_name: 'fairlearn_classifier'
     enable_feedback: true
     window_size: 100
     slide_interval: 10
-  
+
   performance:
     batch_size: 32
     max_workers: 8
     cache_ttl: 3600
     processing_timeout: 30.0
-  
+
   memory:
     update_threshold: 0.1
     max_batch_size: 50
     sync_interval: 300
     auto_commit: true
-  
+
   ieee_integration:
-    api_key: "${IEEE_API_KEY}"
+    api_key: '${IEEE_API_KEY}'
     rate_limit: 10
     max_retries: 3
 ```
@@ -225,7 +232,7 @@ async def analyze_conversation_realtime():
                 "timestamp": datetime.now().isoformat()
             },
             {
-                "role": "candidate", 
+                "role": "candidate",
                 "content": "As a woman in tech, I've led diverse teams...",
                 "timestamp": datetime.now().isoformat()
             }
@@ -235,19 +242,19 @@ async def analyze_conversation_realtime():
             "user_id": "candidate_456"
         }
     }
-    
+
     # Initialize detector
     detector = RealTimeBiasDetector()
-    
+
     # Analyze conversation
     result = await detector.analyze_conversation(conversation)
-    
+
     # Process results
     if result["bias_detected"]:
         print(f"Bias detected: {result['bias_type']}")
         print(f"Confidence: {result['confidence']}")
         print(f"Recommendations: {result['recommendations']}")
-    
+
     return result
 ```
 
@@ -263,32 +270,36 @@ async def process_large_dataset():
             "text": f"Sample text for bias analysis {i}",
             "metadata": {"source": f"source_{i % 10}"}
         })
-    
+
     # Initialize optimizer
     optimizer = PerformanceOptimizer()
-    
+
     # Process dataset
     results = await optimizer.process_large_dataset(dataset)
-    
+
     # Analyze results
     bias_summary = analyze_bias_results(results)
-    
+
     return bias_summary
 
 def analyze_bias_results(results):
     """Analyze bias detection results"""
     total_records = len(results)
     biased_records = sum(1 for r in results if r.get("bias_detected", False))
-    
+
     bias_types = {}
     for result in results:
         if result.get("bias_type"):
-            bias_types[result["bias_type"]] = bias_types.get(result["bias_type"], 0) + 1
-    
+            bias_types[result["bias_type"]] = (
+                bias_types.get(result["bias_type"], 0) + 1
+            )
+
     return {
         "total_records": total_records,
         "biased_records": biased_records,
-        "bias_rate": biased_records / total_records if total_records > 0 else 0,
+        "bias_rate": (
+            biased_records / total_records if total_records > 0 else 0
+        ),
         "bias_types": bias_types
     }
 ```
@@ -297,28 +308,30 @@ def analyze_bias_results(results):
 
 ```python
 async def integrate_ieee_research():
-    from src.lib.ai.journal_research.ieee_xplore_integration import IEEEClient, ResearchPipeline
-    
+    from src.lib.ai.journal_research.ieee_xplore_integration import (
+        IEEEClient, ResearchPipeline
+    )
+
     # Initialize IEEE client
     ieee_client = IEEEClient(api_key="your_api_key")
-    
+
     # Define research topics
     research_topics = [
         "bias detection machine learning",
         "fairness in artificial intelligence",
         "cultural competency AI systems"
     ]
-    
+
     # Process research
     pipeline = ResearchPipeline(ieee_client=ieee_client)
     research_results = await pipeline.process_queries(research_topics)
-    
+
     # Integrate findings with bias detection
     for result in research_results:
         if "bias_patterns" in result:
             # Update bias detection models
             await update_bias_models(result["bias_patterns"])
-    
+
     return research_results
 ```
 
@@ -327,24 +340,28 @@ async def integrate_ieee_research():
 ### Metrics Collection
 
 ```python
-from src.lib.ai.bias_detection.python_service.sentry_metrics import MetricsCollector
+from src.lib.ai.bias_detection.python_service.sentry_metrics import (
+    MetricsCollector
+)
 
 async def monitor_performance():
     metrics_collector = MetricsCollector()
-    
+
     # Start monitoring
     start_time = time.time()
-    
+
     # Your bias detection operations here
     # ...
-    
+
     # Record metrics
     duration = time.time() - start_time
-    metrics_collector.record_operation("bias_detection", duration, memory_usage=100)
-    
+    metrics_collector.record_operation(
+        "bias_detection", duration, memory_usage=100
+    )
+
     # Get performance report
     report = metrics_collector.get_performance_report()
-    
+
     return report
 ```
 
@@ -352,25 +369,27 @@ async def monitor_performance():
 
 ```python
 async def setup_alerts():
-    from src.lib.ai.bias_detection.python_service.sentry_metrics import BiasDetectionMetrics
-    
+    from src.lib.ai.bias_detection.python_service.sentry_metrics import (
+        BiasDetectionMetrics
+    )
+
     metrics = BiasDetectionMetrics()
-    
+
     # Configure alert thresholds
     thresholds = {
         "detection_rate": 0.8,
         "false_positive_rate": 0.2,
         "accuracy": 0.7
     }
-    
+
     # Check for alerts
     alerts = metrics.check_alerts(thresholds)
-    
+
     if alerts:
         for alert in alerts:
             print(f"Alert: {alert['type']} - {alert['severity']}")
             # Send notification, log, etc.
-    
+
     return alerts
 ```
 
@@ -383,18 +402,22 @@ async def setup_alerts():
 pytest src/lib/ai/tests/integration/test_bias_detection_integration.py -v
 
 # Run specific test categories
-pytest src/lib/ai/tests/integration/test_bias_detection_integration.py::TestRealTimeBiasDetectionIntegration -v
-pytest src/lib/ai/tests/integration/test_bias_detection_integration.py::TestPerformanceOptimizationIntegration -v
+pytest src/lib/ai/tests/integration/test_bias_detection_integration.py \
+  -k "TestRealTimeBiasDetectionIntegration" -v
+pytest src/lib/ai/tests/integration/test_bias_detection_integration.py \
+  -k "TestPerformanceOptimizationIntegration" -v
 ```
 
 ### Performance Tests
 
 ```python
 # Run performance tests
-pytest src/lib/ai/tests/integration/test_bias_detection_integration.py::TestPerformanceOptimizationIntegration::test_large_dataset_batch_processing -v
+TEST_PATH="src/lib/ai/tests/integration/test_bias_detection_integration.py"
+P_TEST="TestPerformanceOptimizationIntegration"
+pytest $TEST_PATH::$P_TEST::test_large_dataset_batch_processing -v
 
 # Run stress tests
-pytest src/lib/ai/tests/integration/test_bias_detection_integration.py::TestEndToEndIntegration::test_performance_under_load -v
+pytest $TEST_PATH::TestEndToEndIntegration::test_performance_under_load -v
 ```
 
 ## Troubleshooting
@@ -460,10 +483,13 @@ result = await detector.analyze_conversation(conversation_data)
 
 See the individual module documentation for detailed API references:
 
-- [`RealTimeBiasDetector`](src/lib/ai/bias-detection/python-service/real_time_integration.py)
-- [`PerformanceOptimizer`](src/lib/ai/bias-detection/python-service/performance_optimization.py)
+- [RealTimeBiasDetector][ref1]
+- [PerformanceOptimizer][ref2]
 - [`MemoryUpdateHandler`](src/lib/ai/memory/automated_memory_updates.py)
 - [`IEEEClient`](src/lib/ai/journal-research/ieee_xplore_integration.py)
+
+[ref1]: src/lib/ai/bias-detection/python-service/real_time_integration.py
+[ref2]: src/lib/ai/bias-detection/python-service/performance_optimization.py
 
 ## Support
 

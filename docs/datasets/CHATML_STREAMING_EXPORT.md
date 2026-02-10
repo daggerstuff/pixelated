@@ -1,6 +1,7 @@
 # ChatML Streaming Export (Release 0)
 
-Streaming exporter writes ChatML JSONL shards directly to S3 (no local files, no full downloads).
+Streaming exporter writes ChatML JSONL shards directly to S3
+(no local files, no full downloads).
 
 ## Environment
 
@@ -34,7 +35,8 @@ uv run ai/dataset_pipeline/chatml_export_generator.py
 
 ## Behavior
 
-- Streams JSONL via `iter_lines`, converts each record to ChatML, uploads via multipart (8MB parts, >=5MB safe).
+- Streams JSONL via `iter_lines`, converts each record to ChatML,
+  uploads via multipart (8MB parts, >=5MB safe).
 - Shard rollover every 250,000 records (configurable in code).
 - Minimal logging, no PII content logged.
 - Works with boto3 default credential chain when env vars are not set.
