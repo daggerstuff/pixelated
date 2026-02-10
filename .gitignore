@@ -166,4 +166,6 @@ deployment-backup*/
 !.env.project
 !.env.vault
 performance-results
-uv.lock
+uv.lock.agent
+.agent/*
+.agent/*/*

@@ -1,7 +1,7 @@
 # Release 0 Deployment Complete - Executive Summary
 
-**Generated:** 2026-01-07  
-**Release Version:** v2026-01-07  
+**Generated:** 2026-01-07
+**Release Version:** v2026-01-07
 **Status:** ✅ READY FOR TRAINING
 
 ---
@@ -71,7 +71,7 @@
   - Email, phone, SSN, credit card patterns
   - Name and address detection
   - 85% confidence threshold
-  
+
 - **Bias Detection:** ✅ Enabled
   - Gender, race, age, disability categories
   - 70% detection threshold
@@ -94,24 +94,29 @@
 ### Immediate Actions (Next 24-48 Hours)
 
 1. **Run Production ChatML Export**
+
    ```bash
    cd /home/vivi/pixelated
    uv run ai/dataset_pipeline/chatml_export_generator.py
    ```
+
    - Outputs: `ai/training_ready/data/release_0_chatml/*.jsonl`
    - Expected duration: 30-60 minutes for full export
    - Streaming mode handles 1.2GB priority dataset efficiently
 
 2. **Execute Quality Gates on Full Dataset**
+
    ```bash
    # After ChatML export completes
    uv run ai/dataset_pipeline/quality_gates_runner.py --full-dataset
    ```
+
    - Process all 83,500 conversations
    - Generate comprehensive compliance report
    - Flag any PII, bias, or duplicate issues
 
 3. **Upload Training-Ready Data to S3**
+
    ```bash
    aws s3 sync ai/training_ready/data/release_0_chatml/ \
      s3://pixel-data/releases/v2026-01-07/chatml/ \
@@ -120,19 +125,19 @@
 
 ### Phase 1 Training Launch (Week of Jan 13, 2026)
 
-4. **Configure Training Pipeline**
+1. **Configure Training Pipeline**
    - Load routing config: `release_0_routing_config.json`
    - Set batch size: 32, gradient accumulation: 4
    - Learning rate: 2e-5, warmup: 10%
    - Max sequence length: 2048 tokens
 
-5. **Initialize Model Training**
+2. **Initialize Model Training**
    - Base model: Meta-Llama-3.1-8B-Instruct
    - Training method: LoRA fine-tuning
    - Estimated training time: 24-36 hours (A100 GPU)
    - Checkpoints every 1000 steps
 
-6. **Monitor Training Metrics**
+3. **Monitor Training Metrics**
    - Loss convergence tracking
    - Validation set performance (10% holdout)
    - Test set evaluation (5% holdout)
@@ -140,17 +145,17 @@
 
 ### Phase 2 Enhancements (Q1 2026)
 
-7. **Voice Dataset Expansion**
+1. **Voice Dataset Expansion**
    - Generate synthetic voice training data
    - Integrate transcription pipelines
    - Update routing config with voice family
 
-8. **Advanced Quality Gates**
+2. **Advanced Quality Gates**
    - Integrate Presidio for enhanced PII detection
    - Add cultural sensitivity analysis
    - Implement adversarial robustness testing
 
-9. **Continuous Integration**
+3. **Continuous Integration**
    - Automated daily dataset updates
    - Incremental training on new data
    - A/B testing framework for model versions
@@ -164,15 +169,15 @@
 - **Weighted Random Sampling** (Priority): 40% of batches
   - Ensures core therapeutic quality
   - Highest quality conversations prioritized
-  
+
 - **Balanced Modality** (Professional): 30% of batches
   - Equal representation of 12 therapeutic frameworks
   - DBT, CBT, ACT, Somatic, Trauma-Informed, etc.
-  
+
 - **Sequential** (CoT Reasoning): 20% of batches
   - Maintains reasoning chain integrity
   - Prevents fragmented thought processes
-  
+
 - **Full Coverage** (Edge Cases): 10% of batches
   - Guarantees exposure to challenging scenarios
   - CPTSD, crisis situations, complex presentations
@@ -202,16 +207,19 @@
 ### Deprecated Manifests Removed
 
 **Local:**
+
 - ❌ `ai/training_ready/data/s3_manifest.json` (deleted)
 - ❌ `ai/training_ready/data/final_dataset/manifest.json` (deleted)
 - ❌ `ai/training_ready/docs/manifest.json` (deleted)
 
 **S3:**
+
 - ❌ `s3://pixel-data/datasets/consolidated/FINAL_TRAINING_DATA_MANIFEST.json` (deleted)
 - ❌ `s3://pixel-data/datasets/consolidated/MANIFEST.json` (deleted)
 - ❌ `s3://pixel-data/datasets/consolidated/final/MASTER_STAGE_MANIFEST.json` (deleted)
 
 **Rollback Safety:**
+
 - ETags preserved in `S3_MANIFEST_CLEANUP.md`
 - Can restore from versioned S3 bucket if needed
 
@@ -229,7 +237,7 @@
 
 ### Dataset Paths
 
-```
+```text
 s3://pixel-data/
 ├── releases/
 │   └── v2026-01-07/
@@ -309,12 +317,14 @@ s3://pixel-data/
 ### Training Success Metrics
 
 **Week 1 Targets:**
+
 - Model converges with loss < 1.5 after 10k steps
 - Validation perplexity < 15
 - Zero PII leakage in generated outputs
 - Bias scores within acceptable thresholds (<0.7)
 
 **Week 2 Targets:**
+
 - Human evaluation: 80%+ therapeutic appropriateness
 - Safety testing: 100% pass rate on red-team prompts
 - Performance: <50ms inference latency on A100
@@ -323,13 +333,13 @@ s3://pixel-data/
 
 ## 📞 Contact & Support
 
-**Dataset Issues:** Check `RELEASE_0_INVENTORY_SUMMARY.md` for family-specific details  
-**Quality Gates:** Review `ai/training_ready/reports/release_0_quality_gates_report.json`  
-**Training Config:** Reference `ai/training_ready/config/release_0_routing_config.json`  
+**Dataset Issues:** Check `RELEASE_0_INVENTORY_SUMMARY.md` for family-specific details
+**Quality Gates:** Review `ai/training_ready/reports/release_0_quality_gates_report.json`
+**Training Config:** Reference `ai/training_ready/config/release_0_routing_config.json`
 **S3 Access:** Credentials in environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
 
 ---
 
 **Release 0 Status:** ✅ **DEPLOYMENT COMPLETE - READY FOR TRAINING PIPELINE EXECUTION**
 
-*Last Updated: 2026-01-07 | Next Review: After ChatML Export Completion*
+Last Updated: 2026-01-07 | Next Review: After ChatML Export Completion
