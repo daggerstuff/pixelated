@@ -282,7 +282,7 @@ All identified gaps have been systematically addressed:
 
 ### Phase 3: Model Training (Week 3)
 
-- [ ] 3.1 Training pipeline setup
+- [x] 3.1 Training pipeline setup (Script created, CPU dry-run verified)
 - [ ] 3.2 Hyperparameter tuning
 - [ ] 3.3 Validation & metrics (>95% sensitivity)
 - [ ] 3.4 Checkpoints & documentation
