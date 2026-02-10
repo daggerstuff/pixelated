@@ -84,23 +84,27 @@ SESSION_STORAGE_PATH=/app/sessions
 ### Using Docker Compose
 
 1. **Navigate to the docker directory**:
+
 ```bash
 cd docker/journal-research-mcp-server
 ```
 
-2. **Create `.env` file** with your configuration (see [Environment Configuration](#environment-configuration))
+1. **Create `.env` file** with your configuration (see [Environment Configuration](#environment-configuration))
 
-3. **Start the server**:
+2. **Start the server**:
+
 ```bash
 docker-compose up -d
 ```
 
-4. **Check logs**:
+1. **Check logs**:
+
 ```bash
 docker-compose logs -f journal-research-mcp-server
 ```
 
-5. **Stop the server**:
+1. **Stop the server**:
+
 ```bash
 docker-compose down
 ```
@@ -108,11 +112,13 @@ docker-compose down
 ### Using Docker
 
 1. **Build the image**:
+
 ```bash
 docker build -f docker/journal-research-mcp-server/Dockerfile -t journal-research-mcp-server:latest .
 ```
 
-2. **Run the container**:
+1. **Run the container**:
+
 ```bash
 docker run -d \
   --name journal-research-mcp-server \
@@ -128,18 +134,21 @@ docker run -d \
 ### Installation
 
 1. **Install dependencies**:
+
 ```bash
 uv sync
 ```
 
-2. **Set environment variables** (see [Environment Configuration](#environment-configuration))
+1. **Set environment variables** (see [Environment Configuration](#environment-configuration))
 
-3. **Create directories**:
+2. **Create directories**:
+
 ```bash
 mkdir -p logs sessions
 ```
 
-4. **Run the server**:
+1. **Run the server**:
+
 ```bash
 uv run python -m ai.journal_dataset_research.mcp.server
 ```
@@ -167,6 +176,7 @@ WantedBy=multi-user.target
 ```
 
 Enable and start the service:
+
 ```bash
 sudo systemctl enable journal-research-mcp-server
 sudo systemctl start journal-research-mcp-server
@@ -185,6 +195,7 @@ The MCP server integrates with the journal dataset research backend through the 
 ### Session Storage
 
 Sessions are stored in the directory specified by `SESSION_STORAGE_PATH`. Ensure this directory:
+
 - Has sufficient disk space
 - Has proper permissions (read/write for the server user)
 - Is backed up regularly
@@ -220,12 +231,14 @@ Add to `~/.cursor/mcp.json` or `~/.openhands/mcp.json`:
 ### HTTP Transport (if supported)
 
 For HTTP transport, configure the client to connect to:
-```
+
+```bash
 http://localhost:8001
 ```
 
 With authentication header:
-```
+
+```bash
 Authorization: Bearer your-api-key
 ```
 
@@ -239,18 +252,21 @@ Authorization: Bearer your-api-key
 ### Log Rotation
 
 Logs are automatically rotated:
+
 - Max file size: 10 MB
 - Backup count: 5
 
 ### Health Checks
 
 The server includes health check endpoints (if HTTP transport is enabled):
+
 - Health endpoint: `GET /health`
 - Metrics endpoint: `GET /metrics`
 
 ### Monitoring
 
 Monitor the following:
+
 - Server uptime and availability
 - Request rate and latency
 - Error rates
@@ -289,6 +305,7 @@ Monitor the following:
 ### Debug Mode
 
 Enable debug mode for detailed logging:
+
 ```bash
 MCP_DEBUG=true
 MCP_LOG_LEVEL=DEBUG
@@ -297,6 +314,7 @@ MCP_LOG_LEVEL=DEBUG
 ### Log Analysis
 
 View recent logs:
+
 ```bash
 tail -f /app/logs/mcp.log
 tail -f /app/logs/mcp_audit.log
@@ -324,4 +342,3 @@ For issues, questions, or contributions, please see the project repository.
 ---
 
 For API documentation, see [MCP Server API Documentation](../api/mcp-server/README.md).
-

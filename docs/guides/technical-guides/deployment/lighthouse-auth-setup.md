@@ -51,13 +51,13 @@ Based on your Pixelated Empathy configuration, you're using **Auth0** for authen
 
 Combine the cookies into a single string in this format:
 
-```auth
+```text
 auth-token=<ACCESS_TOKEN_VALUE>; refresh-token=<REFRESH_TOKEN_VALUE>
 ```
 
 **Example:**
 
-```auth
+```text
 auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; refresh-token=v1.MRjTvIk8RqnN...
 ```
 

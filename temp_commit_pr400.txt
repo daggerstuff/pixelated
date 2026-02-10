@@ -1,1 +1,0 @@
-Applying actual token verification in WebSocketServer from PR #400

@@ -63,36 +63,19 @@
 .eggs/
 .endgame
 .env.sentry-build-plugin
-.envrc
-.hypothesis/
-.idea/
 .installed.cfg
-.junie/
 .kaggle-outputs
-.kilocode
-.kiro
-.mcp.json
-.memory
 .mypy_cache
 .nox/
 .nyc_output/
 .osv-scanner.toml
 .plandex-v2
 .pytest_cache
-.qoder/
-.qodo/
-.qwen/
-.roo/
 .ruff_cache/
 .scrapy
-.serena/
 .sonarlint
 .tox/
-.vercel/
-.vscode/
 .webassets-cache
-.windsurf/
-/*.env.*
 /*.iml
 /*.log
 /*.tsbuildinfo
@@ -100,15 +83,8 @@
 /.astro
 /.azure-artifacts/
 /.cache
-/.cursor/
-/.env
-/.env.development
-/.env.local
-/.env.production
-/.env.staging
 /.env.test
 /.local
-/.mcp.json/
 /.output
 /.python
 /.temp
@@ -122,7 +98,6 @@
 /build-errors.md
 /bundle-analysis.html
 /coverage/
-/credential-scan-results.json
 /dist/
 /dist/bundle-analysis.html
 /npm-debug.log*
@@ -155,9 +130,6 @@ k8s/azure/service-connection.json
 kubeconfig
 local_settings.py
 logs/*.jsonl
-mcp_agent.config.yaml
-mcp_agent.secrets.yaml
-memAgent/
 node_modules/
 packages
 parts/
@@ -177,24 +149,11 @@ terraform/.terraform.lock.hcl
 terraform/.terraform/
 terraform/plan.tfplan
 tmp/
-training_ready/
-tsconfig.json.backup
 values.yaml
 verbose/coverage/
 volumes/
 wheels/
-workspace/
-y-router/
-yt-downloader
 
-config/secrets/*
-!config/secrets/*.example
-
-.ralph
-.notes
-.crush
-.trunk
-deployment-backup
 # Agent and Tool Specific
 .cline/
 .goose/
@@ -202,3 +161,9 @@ deployment-backup
 
 # Backups
 deployment-backup*/
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+performance-results
+uv.lock
