@@ -50,6 +50,44 @@ ollama.pixelatedempathy.tech {
     }
 }
 
+# MCP Server Subdomain
+mcp.pixelatedempathy.tech {
+    # Allow unrestricted API access (secured by API key in future if needed, or open for now as public facing)
+    # Since this is a public facing request, we'll keep it open but logged.
+    
+    reverse_proxy mcp-server:5003 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Security Headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # CORS for web clients
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS, PATCH, DELETE"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
+    # Handle OPTIONS requests for CORS
+    @options {
+        method OPTIONS
+    }
+    handle @options {
+        respond 204
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
+
 # Staging Application Subdomain
 staging.pixelatedempathy.tech, pixelatedempathy.tech {
     # Proxy to the main Astro/React application
