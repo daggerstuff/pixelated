@@ -172,6 +172,6 @@ process.on('SIGTERM', async () => {
 })
 
 // Start the server
-startServer()
+void startServer()
 
 export default app

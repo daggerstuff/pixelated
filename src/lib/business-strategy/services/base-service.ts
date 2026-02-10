@@ -40,10 +40,10 @@ export abstract class BaseService {
      * Validate user permissions for an action
      */
     protected async validatePermissions(
-        userId: UserId,
-        resource: string,
-        action: string,
-        conditions?: Record<string, unknown>
+        _userId: UserId,
+        _resource: string,
+        _action: string,
+        _conditions?: Record<string, unknown>
     ): Promise<boolean> {
         // Implementation will be added when UserManagementService is complete
         // For now, return true to allow development to continue

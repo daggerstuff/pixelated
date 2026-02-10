@@ -103,14 +103,14 @@ export interface ThreatIndicator {
   id: string
   feed_id: string
   type:
-    | 'ip'
-    | 'domain'
-    | 'hash'
-    | 'url'
-    | 'email'
-    | 'file'
-    | 'behavior'
-    | 'vulnerability'
+  | 'ip'
+  | 'domain'
+  | 'hash'
+  | 'url'
+  | 'email'
+  | 'file'
+  | 'behavior'
+  | 'vulnerability'
   value: string
   confidence: number // 0-1
   severity: 'low' | 'medium' | 'high' | 'critical'
@@ -528,7 +528,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       }
 
       return { cert, key, ca }
-    } catch (_e) {
+    } catch {
       logger.warn('Invalid certificate credentials provided')
       return {}
     }
@@ -862,7 +862,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           response = await this.downloadCustomData(feed, client)
           break
         default:
-          throw new Error(`Unknown feed type: ${feed.type}`)
+          throw new Error(`Unknown feed type: ${feed.type as string}`)
       }
 
       return response.data
@@ -991,7 +991,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           indicators = await this.processCustomData(rawData, feed)
           break
         default:
-          throw new Error(`Unknown data format: ${feed.configuration.format}`)
+          throw new Error(`Unknown data format: ${feed.configuration.format as string}`)
       }
 
       // Apply transformations
@@ -1081,16 +1081,23 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         description:
           (this.getNestedValue(stixObject, 'description') as string) || '',
         first_seen: new Date(
-          String(this.getNestedValue(stixObject, 'created') ?? Date.now()),
+          String(
+            (this.getNestedValue(stixObject, 'created') as string | number) ??
+            Date.now(),
+          ),
         ),
         last_seen: new Date(
-          String(this.getNestedValue(stixObject, 'modified') ?? Date.now()),
+          String(
+            (this.getNestedValue(stixObject, 'modified') as string | number) ??
+            Date.now(),
+          ),
         ),
         expiration_date: this.getNestedValue(stixObject, 'valid_until')
           ? new Date(String(this.getNestedValue(stixObject, 'valid_until')))
           : undefined,
         source_reliability: this.mapSTIXReliability(
-          String(this.getNestedValue(stixObject, 'created_by_ref') ?? ''),
+          String(this.getNestedValue(stixObject, 'created_by_ref') as string) ||
+          '',
         ),
         tags: (this.getNestedValue(stixObject, 'labels') as string[]) || [],
         attributes: {
@@ -1171,11 +1178,15 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     feed: ThreatFeed,
   ): ThreatIndicator | null {
     try {
-      const typeStr = String(this.getNestedValue(attribute, 'type') || '')
+      const typeStr = String(
+        (this.getNestedValue(attribute, 'type') as string) || '',
+      )
       const indicatorType = this.mapMISPTypeToIndicatorType(typeStr)
       if (!indicatorType) return null
 
-      const value = String(this.getNestedValue(attribute, 'value') ?? '')
+      const value = String(
+        (this.getNestedValue(attribute, 'value') as string | number) ?? '',
+      )
 
       const tagsA = this.getNestedValue(attribute, 'Tag')
       const tagsE = this.getNestedValue(event, 'Tag')
@@ -1200,22 +1211,22 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         severity: this.mapMISPToSeverity(attribute),
         threat_type: this.mapMISPToThreatType(attribute),
         description: String(
-          this.getNestedValue(attribute, 'comment') ??
-            this.getNestedValue(event, 'info') ??
-            '',
+          (this.getNestedValue(attribute, 'comment') as string) ??
+          (this.getNestedValue(event, 'info') as string) ??
+          '',
         ),
         first_seen: new Date(
           String(
-            this.getNestedValue(attribute, 'first_seen') ??
-              this.getNestedValue(event, 'date') ??
-              Date.now(),
+            (this.getNestedValue(attribute, 'first_seen') as string | number) ??
+            (this.getNestedValue(event, 'date') as string | number) ??
+            Date.now(),
           ),
         ),
         last_seen: new Date(
           String(
-            this.getNestedValue(attribute, 'last_seen') ??
-              this.getNestedValue(event, 'date') ??
-              Date.now(),
+            (this.getNestedValue(attribute, 'last_seen') as string | number) ??
+            (this.getNestedValue(event, 'date') as string | number) ??
+            Date.now(),
           ),
         ),
         expiration_date: this.getNestedValue(attribute, 'expiration')
@@ -1298,18 +1309,18 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   ): ThreatIndicator | null {
     try {
       const type = String(
-        this.getNestedValue(data, 'type') ??
-          this.getNestedValue(data, 'indicator') ??
-          'ip',
+        (this.getNestedValue(data, 'type') as string) ??
+        (this.getNestedValue(data, 'indicator') as string) ??
+        'ip',
       )
       const value = String(
-        this.getNestedValue(data, 'value') ??
-          this.getNestedValue(data, 'indicator') ??
-          '',
+        (this.getNestedValue(data, 'value') as string | number) ??
+        (this.getNestedValue(data, 'indicator') as string | number) ??
+        '',
       )
       const confidence = Number(this.getNestedValue(data, 'confidence') ?? 0.5)
       const severity = String(
-        this.getNestedValue(data, 'severity') ?? 'medium',
+        (this.getNestedValue(data, 'severity') as string) ?? 'medium',
       ) as 'low' | 'medium' | 'high' | 'critical'
 
       return {
@@ -1320,20 +1331,28 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         confidence,
         severity,
         threat_type: String(
-          this.getNestedValue(data, 'threat_type') ?? 'unknown',
+          (this.getNestedValue(data, 'threat_type') as string) ?? 'unknown',
         ),
-        description: String(this.getNestedValue(data, 'description') ?? ''),
+        description: String(
+          (this.getNestedValue(data, 'description') as string) ?? '',
+        ),
         first_seen: new Date(
-          String(this.getNestedValue(data, 'first_seen') ?? Date.now()),
+          String(
+            (this.getNestedValue(data, 'first_seen') as string | number) ??
+            Date.now(),
+          ),
         ),
         last_seen: new Date(
-          String(this.getNestedValue(data, 'last_seen') ?? Date.now()),
+          String(
+            (this.getNestedValue(data, 'last_seen') as string | number) ??
+            Date.now(),
+          ),
         ),
         expiration_date: this.getNestedValue(data, 'expiration_date')
           ? new Date(String(this.getNestedValue(data, 'expiration_date')))
           : undefined,
         source_reliability: String(
-          this.getNestedValue(data, 'reliability') ?? 'c',
+          (this.getNestedValue(data, 'reliability') as string) ?? 'c',
         ) as ThreatIndicator['source_reliability'],
         tags: (this.getNestedValue(data, 'tags') as string[]) ?? [],
         attributes:
@@ -1973,7 +1992,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         default:
           return true // Assume valid for unknown types
       }
-    } catch (_error) {
+    } catch {
       return false
     }
   }

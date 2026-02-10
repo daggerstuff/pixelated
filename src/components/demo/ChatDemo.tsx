@@ -3,7 +3,6 @@ import type { AIMessage } from '../../lib/ai'
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { authClient } from '@/lib/auth-client'
-import { useStore } from 'nanostores'
 import {
   ChatContainer,
   useChatCompletion,
@@ -372,15 +371,14 @@ export function ChatDemo({
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Risk Level:</span>
                       <span
-                        className={`text-sm font-medium ${
-                          crisisResult.riskLevel === 'critical'
+                        className={`text-sm font-medium ${crisisResult.riskLevel === 'critical'
                             ? 'text-red-600'
                             : crisisResult.riskLevel === 'high'
                               ? 'text-orange-600'
                               : crisisResult.riskLevel === 'medium'
                                 ? 'text-yellow-600'
                                 : 'text-green-600'
-                        }`}
+                          }`}
                       >
                         {crisisResult.riskLevel}
                       </span>

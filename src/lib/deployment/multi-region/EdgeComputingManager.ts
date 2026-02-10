@@ -2161,7 +2161,7 @@ export class EdgeComputingManager extends EventEmitter {
       this.emit('initialized', { locations: this.config.locations.length })
     } catch (error) {
       logger.error('Failed to initialize Edge Computing Manager', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
+      throw new Error(`Initialization failed: ${(error as Error).message}`, {
         cause: error,
       })
     }
@@ -2243,7 +2243,7 @@ export class EdgeComputingManager extends EventEmitter {
       return statuses
     } catch (error) {
       logger.error('Edge node deployment failed', { error })
-      throw new Error(`Deployment failed: ${error.message}`, { cause: error })
+      throw new Error(`Deployment failed: ${(error as Error).message}`, { cause: error })
     }
   }
 
@@ -2278,7 +2278,7 @@ export class EdgeComputingManager extends EventEmitter {
           deploymentResult = await this.deployGCPEdge(location)
           break
         default:
-          throw new Error(`Unsupported edge provider: ${location.provider}`)
+          throw new Error(`Unsupported edge provider: ${location.provider as string}`)
       }
 
       // Create successful status
@@ -2334,13 +2334,13 @@ export class EdgeComputingManager extends EventEmitter {
           inferenceTime: 0,
           accuracy: 0,
         })),
-        metadata: { error: error.message },
+        metadata: { error: (error as Error).message },
       }
 
       this.edgeNodes.set(location.id, failedStatus)
       this.emit('node-deployment-failed', {
         location: location.id,
-        error: error.message,
+        error: (error as Error).message,
       })
 
       throw error
@@ -2371,7 +2371,7 @@ export class EdgeComputingManager extends EventEmitter {
       logger.error(`Cloudflare Worker deployment failed: ${location.name}`, {
         error,
       })
-      throw new Error(`Cloudflare deployment failed: ${error.message}`, {
+      throw new Error(`Cloudflare deployment failed: ${(error as Error).message}`, {
         cause: error,
       })
     }
@@ -2401,7 +2401,7 @@ export class EdgeComputingManager extends EventEmitter {
       logger.error(`AWS Lambda@Edge deployment failed: ${location.name}`, {
         error,
       })
-      throw new Error(`AWS Lambda deployment failed: ${error.message}`, {
+      throw new Error(`AWS Lambda deployment failed: ${(error as Error).message}`, {
         cause: error,
       })
     }
@@ -2426,7 +2426,7 @@ export class EdgeComputingManager extends EventEmitter {
       return { functionId: `function-${location.id}`, region: location.region }
     } catch (error) {
       logger.error(`Azure Edge deployment failed: ${location.name}`, { error })
-      throw new Error(`Azure Edge deployment failed: ${error.message}`, {
+      throw new Error(`Azure Edge deployment failed: ${(error as Error).message}`, {
         cause: error,
       })
     }
@@ -2451,7 +2451,7 @@ export class EdgeComputingManager extends EventEmitter {
       return { functionName: `edge-${location.id}`, region: location.region }
     } catch (error) {
       logger.error(`GCP Edge deployment failed: ${location.name}`, { error })
-      throw new Error(`GCP Edge deployment failed: ${error.message}`, {
+      throw new Error(`GCP Edge deployment failed: ${(error as Error).message}`, {
         cause: error,
       })
     }
@@ -3012,7 +3012,7 @@ async function processRequest(req, threatCheck, biasCheck) {
     }
 
     this.healthCheckInterval = setInterval(() => {
-      this.performHealthChecks()
+      void this.performHealthChecks()
     }, this.config.healthCheck.interval)
 
     logger.info('Edge node health monitoring started', {
@@ -3101,12 +3101,13 @@ async function processRequest(req, threatCheck, biasCheck) {
         ...currentStatus,
         status: 'failed',
         lastHealthCheck: new Date(),
+
         errorRate: 1,
-        metadata: { ...currentStatus.metadata, error: error.message },
+        metadata: { ...currentStatus.metadata, error: (error as Error).message },
       }
 
       this.edgeNodes.set(locationId, failedStatus)
-      this.emit('node-failed', { locationId, error: error.message })
+      this.emit('node-failed', { locationId, error: (error as Error).message })
     }
   }
 

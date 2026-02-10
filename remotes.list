@@ -1,0 +1,6 @@
+# List remote servers here, one per line.
+# Format: user@hostname:/path/to/pixelated
+# These servers must be accessible via SSH key authentication (passwordless) from this machine.
+# Example:
+# ubuntu@server2.example.com:/home/ubuntu/pixelated
+# root@192.168.1.50:/var/www/pixelated

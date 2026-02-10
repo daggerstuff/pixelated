@@ -3,7 +3,6 @@ import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import { createServer } from 'http'
-import type { } from 'express'
 
 import { config } from '@/config/app'
 import {
@@ -146,7 +145,7 @@ const gracefulShutdown = async (signal: string) => {
 
       // Close Socket.IO connections
       if (socketService && config.enableRealTimeCollaboration) {
-        ;(socketService as any).io.close()
+        ; (socketService as any).io.close()
         logger.info('Socket.IO service closed')
       }
 
@@ -186,7 +185,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Start the server if this file is run directly
 if (require.main === module) {
-  startServer()
+  void startServer()
 }
 
 // Export app and server for testing

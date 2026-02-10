@@ -1,44 +1,124 @@
 # Pixelated Empathy Caddy Configuration
+# Optimized for Ollama Exposure and Staging Subdomains
+
 {
-    # Global options
-    auto_https off
+    email {$SSL_EMAIL:admin@pixelatedempathy.com}
     admin off
 }
 
-# Main application
-:80 {
-    # Health check endpoint
-    handle /health {
-        respond "OK" 200
+# Ollama API Subdomain
+ollama.pixelatedempathy.tech {
+    # Security: Enforce OLLAMA API key
+    @unauthorized {
+        not header Authorization "Bearer {$OLLAMA_API_KEY}"
+        # Allow OPTIONS for CORS preflight
+        not method OPTIONS
+    }
+    
+    # Handle Unauthorized
+    handle @unauthorized {
+        respond "Unauthorized: Missing or invalid OLLAMA API Key" 401
     }
 
-    # API routes
-    handle /api/bias-detection/* {
-        reverse_proxy bias-detection-service:5001
+    # CORS Headers (Ollama handles some, but we ensure they are set for the proxy)
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Max-Age 3600
     }
 
-    # Main application
-    handle {
-        reverse_proxy frontend:4321
+    # Proxy to the remote OVH AI Deploy instance
+    reverse_proxy {$OLLAMA_REMOTE_URL} {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
     }
 
-    # Logging
+    # Security Headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+
     log {
         output stdout
         format console
     }
+}
 
-    # Error handling
-    handle_errors {
-        respond "Service temporarily unavailable" 503
+# MCP Server Subdomain
+mcp.pixelatedempathy.tech {
+    # Allow unrestricted API access (secured by API key in future if needed, or open for now as public facing)
+    # Since this is a public facing request, we'll keep it open but logged.
+    
+    reverse_proxy mcp-server:5003 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Security Headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # CORS for web clients
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS, PATCH, DELETE"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
+    # Handle OPTIONS requests for CORS
+    @options {
+        method OPTIONS
+    }
+    handle @options {
+        respond 204
+    }
+
+    log {
+        output stdout
+        format console
     }
 }
 
-# HTTPS configuration (for production)
-# pixelatedempathy.com {
-#     reverse_proxy frontend:4321
-#     
-#     handle /api/bias-detection/* {
-#         reverse_proxy bias-detection-service:5001
-#     }
-# }
+# Staging Application Subdomain
+staging.pixelatedempathy.tech, pixelatedempathy.tech {
+    # Proxy to the main Astro/React application
+    reverse_proxy app:4321 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    # Security Headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
+
+# Default catch-all for port 80 (Redirect to HTTPS)
+:80 {
+    # Health check for the server itself
+    handle /health {
+        respond "OK" 200
+    }
+
+    # Redirect everything else to HTTPS
+    handle {
+        redir https://{host}{uri}
+    }
+}

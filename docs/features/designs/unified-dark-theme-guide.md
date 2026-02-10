@@ -25,6 +25,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ## 🎨 Color System
 
 ### Foundation Colors
+
 ```css
 :root {
   --color-void: #000000;          /* Pure black */
@@ -36,6 +37,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ```
 
 ### Text Hierarchy
+
 ```css
 --text-primary: #ffffff;       /* Pure white */
 --text-secondary: #f8f8f8;     /* Subtle secondary */
@@ -46,6 +48,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ```
 
 ### Accent Colors
+
 ```css
 --accent-emerald: #10b981;     /* Primary accent */
 --accent-blue: #3b82f6;        /* Secondary accent */
@@ -57,6 +60,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ## 🔧 Typography System
 
 ### Fluid Typography Scale
+
 ```css
 --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
 --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
@@ -71,6 +75,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ```
 
 ### Font Families
+
 ```css
 --font-sans: 'Geist Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont, sans-serif;
 --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
@@ -80,6 +85,7 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ## 📏 8-Point Grid System
 
 Consistent spacing with 8-point increments:
+
 ```css
 --space-1: 0.25rem;   /* 4px */
 --space-2: 0.5rem;    /* 8px */
@@ -91,6 +97,7 @@ Consistent spacing with 8-point increments:
 ## 🧩 Component System
 
 ### Buttons
+
 ```html
 <button class="btn btn-primary">Primary Button</button>
 <button class="btn btn-secondary">Secondary Button</button>
@@ -105,6 +112,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Cards
+
 ```html
 <div class="card">Standard Card</div>
 <div class="card card--elevated">Elevated Card</div>
@@ -116,6 +124,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Inputs
+
 ```html
 <input class="input" type="text" placeholder="Standard input">
 <input class="input input--large" type="text" placeholder="Large input">
@@ -124,6 +133,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Navigation
+
 ```html
 <nav class="nav">
   <a href="#" class="nav__link">Home</a>
@@ -133,6 +143,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Badges
+
 ```html
 <span class="badge badge--success">Success</span>
 <span class="badge badge--info">Info</span>
@@ -144,11 +155,13 @@ Consistent spacing with 8-point increments:
 ## 🎭 Advanced Surface Variants
 
 ### Glass Surfaces
+
 ```html
 <div class="glass-card">Glass Card Content</div>
 ```
 
 ### Gradient Surfaces
+
 ```html
 <div class="gradient-text">Gradient Text</div>
 <div class="gradient-text--primary">Primary Gradient Text</div>
@@ -156,6 +169,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Mesh Backgrounds
+
 ```html
 <div class="mesh-background">Mesh Background</div>
 <div class="mesh-background--2">Alternative Mesh</div>
@@ -163,6 +177,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Aesthetic Surfaces
+
 ```html
 <div class="elegant-surface">Elegant Surface</div>
 <div class="brutalist-surface">Brutalist Surface</div>
@@ -173,6 +188,7 @@ Consistent spacing with 8-point increments:
 ## 🎨 Gradients & Effects
 
 ### Gradient System
+
 ```css
 --gradient-primary: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-light) 50%, var(--accent-blue) 100%);
 --gradient-secondary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 50%, var(--accent-emerald) 100%);
@@ -181,6 +197,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Mesh Gradients
+
 ```css
 --mesh-1: radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
          radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
@@ -190,6 +207,7 @@ Consistent spacing with 8-point increments:
 ## 🎯 Animation System
 
 ### Keyframe Animations
+
 - `fadeIn` - Smooth opacity transition
 - `fadeInUp` - Fade with upward movement
 - `slideInLeft` - Slide from left
@@ -200,6 +218,7 @@ Consistent spacing with 8-point increments:
 - `slideUp` - Slide up animation
 
 ### Utility Classes
+
 ```html
 <div class="animate-fade-in">Fade In</div>
 <div class="animate-fade-in-up">Fade In Up</div>
@@ -212,6 +231,7 @@ Consistent spacing with 8-point increments:
 ## 🌙 Dark Mode Optimization
 
 ### Automatic Dark Mode
+
 ```css
 @media (prefers-color-scheme: dark) {
   :root {
@@ -221,6 +241,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### High Contrast Support
+
 ```css
 @media (prefers-contrast: high) {
   :root {
@@ -231,6 +252,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Reduced Motion Support
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -244,6 +266,7 @@ Consistent spacing with 8-point increments:
 ## 🏗️ Container System
 
 ### Standard Containers
+
 ```html
 <div class="container">Standard Container</div>
 <div class="container container--narrow">Narrow Container</div>
@@ -251,6 +274,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Section Spacing
+
 ```html
 <section class="section">Standard Section</section>
 <section class="section section--compact">Compact Section</section>
@@ -260,6 +284,7 @@ Consistent spacing with 8-point increments:
 ## 📊 Status Indicators
 
 ### Status Dots
+
 ```html
 <span class="status-dot status-dot--online"></span>
 <span class="status-dot status-dot--warning"></span>
@@ -268,6 +293,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Loading States
+
 ```html
 <div class="loading-shimmer">Loading...</div>
 <div class="loading-skeleton"></div>
@@ -276,6 +302,7 @@ Consistent spacing with 8-point increments:
 ## 🎪 Utility Classes
 
 ### Text Utilities
+
 ```html
 <div class="text-center">Centered Text</div>
 <div class="text-left">Left Aligned</div>
@@ -287,6 +314,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Color Utilities
+
 ```html
 <span class="text-emerald">Emerald Text</span>
 <span class="text-blue">Blue Text</span>
@@ -304,6 +332,7 @@ Consistent spacing with 8-point increments:
 ## 🔧 Integration with pnpm
 
 ### Package.json Configuration
+
 ```json
 {
   "name": "your-project",
@@ -315,6 +344,7 @@ Consistent spacing with 8-point increments:
 ```
 
 ### Build Process Integration
+
 ```bash
 # Development
 pnpm dev
@@ -327,6 +357,7 @@ pnpm run build:prod
 ```
 
 ### CSS Import Options
+
 ```css
 /* Option 1: Import in main CSS */
 @import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
@@ -341,6 +372,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ## 🎨 Customization
 
 ### Override Variables
+
 ```css
 :root {
   /* Override accent colors */
@@ -356,6 +388,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ```
 
 ### Component Customization
+
 ```css
 /* Custom button variant */
 .btn-custom {
@@ -376,6 +409,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ## 📱 Responsive Design
 
 ### Mobile Optimizations
+
 ```css
 @media (max-width: 768px) {
   .grid--2,
@@ -397,6 +431,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ## 🎯 Best Practices
 
 ### 1. Semantic HTML
+
 ```html
 <article class="card">
   <header class="card-header">
@@ -413,6 +448,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ```
 
 ### 2. Accessibility First
+
 ```html
 <button class="btn btn-primary" aria-label="Primary action">
   <span aria-hidden="true">→</span>
@@ -421,6 +457,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ```
 
 ### 3. Performance Optimization
+
 ```html
 <!-- Use utility classes for quick styling -->
 <div class="text-center font-mono text-emerald">
@@ -431,6 +468,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ## 🚀 Advanced Features
 
 ### Glass Morphism
+
 ```html
 <div class="glass-card">
   <h3>Glass Card Title</h3>
@@ -439,12 +477,14 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ```
 
 ### Gradient Text Effects
+
 ```html
 <h1 class="gradient-text--primary">Hero Heading</h1>
 <h2 class="gradient-text--secondary">Subheading</h2>
 ```
 
-### Mesh Backgrounds
+### Advanced Mesh Backgrounds
+
 ```html
 <section class="mesh-background">
   <div class="container">
@@ -472,6 +512,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 ## 🤝 Contributing
 
 ### Development Setup with pnpm
+
 ```bash
 # Clone the repository
 git clone https://github.com/pixelated/unified-dark-theme.git
@@ -487,6 +528,7 @@ pnpm build
 ```
 
 ### Code Standards
+
 - Use CSS custom properties for all values
 - Follow BEM methodology for class naming
 - Maintain accessibility standards
@@ -506,4 +548,4 @@ MIT License - Feel free to use in personal and commercial projects.
 
 ---
 
-**Built with ❤️ for the dark mode community**
+## **🎉 Built with ❤️ for the dark mode community**

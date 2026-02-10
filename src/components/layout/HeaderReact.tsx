@@ -25,6 +25,19 @@ export function Header({
     setIsSearchOpen(false)
   }, [])
 
+  // Handle keyboard shortcut for search (Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen((prev) => !prev)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   // Safe check for client-side rendering
   const isBrowser = typeof window !== 'undefined'
 
@@ -82,8 +95,15 @@ export function Header({
               type="button"
               className="inline-flex items-center p-2 text-sm text-muted-foreground rounded-lg lg:hidden hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+              aria-expanded={mobileMenuOpen || false}
             >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
                 <path
                   fillRule="evenodd"
                   d={
@@ -119,12 +139,14 @@ export function Header({
                 className="p-2 text-muted-foreground rounded-lg hover:text-foreground hover:bg-accent"
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 aria-label="Search"
-                aria-expanded={isSearchOpen}
+                aria-expanded={isSearchOpen || false}
+                title="Search (Cmd+K)"
               >
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  aria-hidden="true"
                 >
                   <path
                     fillRule="evenodd"
@@ -136,11 +158,13 @@ export function Header({
               <button
                 type="button"
                 className="p-2 text-muted-foreground rounded-lg hover:text-foreground hover:bg-accent"
+                aria-label="View notifications"
               >
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  aria-hidden="true"
                 >
                   <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                 </svg>
@@ -165,11 +189,13 @@ export function Header({
                   type="button"
                   className="text-muted-foreground bg-transparent hover:bg-accent hover:text-foreground rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
                   onClick={() => setIsSearchOpen(false)}
+                  aria-label="Close search"
                 >
                   <svg
                     className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    aria-hidden="true"
                   >
                     <path
                       fillRule="evenodd"

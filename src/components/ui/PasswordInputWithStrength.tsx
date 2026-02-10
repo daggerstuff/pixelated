@@ -1,5 +1,6 @@
 import React, { useState, forwardRef } from 'react'
 import { usePasswordStrength } from '../../hooks/usePasswordStrength'
+import { Eye, EyeOff } from 'lucide-react'
 
 interface PasswordInputWithStrengthProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -147,21 +148,12 @@ export const PasswordInputWithStrength = forwardRef<
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded-sm"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <span
-                    className="material-symbols-outlined"
-                    aria-hidden="true"
-                  >
-                    visibility_off
-                  </span>
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <span
-                    className="material-symbols-outlined"
-                    aria-hidden="true"
-                  >
-                    visibility
-                  </span>
+                  <Eye className="h-4 w-4" aria-hidden="true" />
                 )}
               </button>
             )}

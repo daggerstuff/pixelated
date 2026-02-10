@@ -327,7 +327,7 @@ export class CrisisSessionFlaggingService {
       let objectId: ObjectId
       try {
         objectId = new ObjectId(request.flagId)
-      } catch (_e) {
+      } catch (e) {
         throw new Error('flagId is not a valid ObjectId.', { cause: _e })
       }
       const updateResult = await db
