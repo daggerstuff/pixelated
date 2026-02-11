@@ -5,7 +5,7 @@ Sentry Metrics are already configured and enabled in this project. This document
 ## Configuration Status
 
 ✅ **Metrics are enabled** in both `sentry.client.config.js` and `sentry.server.config.js`  
-✅ **SDK Version**: `@sentry/astro@^10.28.2` (requires >= 10.28.2)  
+✅ **SDK Version**: `@sentry/astro@^10.29.2` (requires >= 10.29.2)  
 ✅ **DSN**: Configured and matches Sentry project  
 ✅ **Utilities**: Available in `src/lib/sentry/utils.ts`
 
@@ -24,13 +24,13 @@ Sentry.metrics.distribution('api_response_time', 150, {
   unit: 'millisecond',
   attributes: {
     endpoint: '/api/analyze',
-    method: 'POST'
-  }
+    method: 'POST',
+  },
 })
 
 // Gauge - track values that go up and down
 Sentry.metrics.gauge('active_sessions', 42, {
-  attributes: { region: 'us-west' }
+  attributes: { region: 'us-west' },
 })
 ```
 
@@ -46,7 +46,7 @@ import {
   emotionMetrics,
   biasMetrics,
   apiMetrics,
-  sessionMetrics
+  sessionMetrics,
 } from '@/lib/sentry/utils'
 
 // Counter metrics
@@ -56,7 +56,7 @@ countMetric('api_call', 1, { endpoint: '/api/analyze', method: 'POST' })
 // Distribution metrics (for percentiles: p50, p90, p99)
 distributionMetric('api_response_time', 187.5, {
   attributes: { endpoint: '/api/analyze' },
-  unit: 'millisecond'
+  unit: 'millisecond',
 })
 
 // Gauge metrics
@@ -67,14 +67,14 @@ gaugeMetric('queue_depth', 15, { priority: 'high' }, 'count')
 emotionMetrics.analysisPerformed({
   model: 'emotion-llama',
   sessionType: 'therapy',
-  success: true
+  success: true,
 })
 
 emotionMetrics.analysisLatency(234, 'emotion-llama')
 
 biasMetrics.analysisPerformed({
   layer: 'preprocessing',
-  success: true
+  success: true,
 })
 
 apiMetrics.request('/api/analyze', 'POST', 200)
@@ -125,8 +125,8 @@ Sentry.metrics.count('button_click', 1, {
     browser: 'Firefox',
     app_version: '1.0.0',
     page: 'login',
-    button: 'submit'
-  }
+    button: 'submit',
+  },
 })
 ```
 
@@ -136,11 +136,11 @@ For `gauge` and `distribution` metrics, specify units for better display:
 
 ```typescript
 Sentry.metrics.distribution('response_time', 187.5, {
-  unit: 'millisecond'
+  unit: 'millisecond',
 })
 
 Sentry.metrics.gauge('memory_usage', 1024, {
-  unit: 'byte'
+  unit: 'byte',
 })
 ```
 
