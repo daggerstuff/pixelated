@@ -2,16 +2,16 @@
 
 ## Current Deployment Info (Updated: 2025-11-25)
 
-| Resource | Value |
-| ---------- | ------- |
-| **AKS Cluster** | `pixelated-aks-cluster` |
-| **Resource Group** | `pixelated-azure-resources` |
-| **Region** | East US |
-| **ACR** | `pixelatedregistry.azurecr.io` |
-| **External IP** | `20.242.241.80` (NGINX Ingress) |
-| **Staging URL** | `https://staging.pixelatedempathy.com` |
-| **Production URL** | `https://pixelatedempathy.com` |
-| **Current Image** | `pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25` |
+| Resource           | Value                                                             |
+| ------------------ | ----------------------------------------------------------------- |
+| **AKS Cluster**    | `pixelated-aks-cluster`                                           |
+| **Resource Group** | `pixelated-azure-resources`                                       |
+| **Region**         | East US                                                           |
+| **ACR**            | `pixelatedregistry.azurecr.io`                                    |
+| **External IP**    | `20.242.241.80` (NGINX Ingress)                                   |
+| **Staging URL**    | `https://staging.pixelatedempathy.com`                            |
+| **Production URL** | `https://pixelatedempathy.com`                                    |
+| **Current Image**  | `pixelatedregistry.azurecr.io/pixelatedempathy:launch-2025-11-25` |
 
 ### DNS Configuration
 
@@ -42,7 +42,7 @@ This document outlines all variables and secrets that must be configured in Azur
 
    ```yaml
    variables:
-   - group: pixelated-pipeline-variables
+     - group: pixelated-pipeline-variables
    ```
 
 ### Option 2: Pipeline Variables (For pipeline-specific variables)
@@ -58,73 +58,73 @@ This document outlines all variables and secrets that must be configured in Azur
 
 ### Build Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `NODE_VERSION` | `24.13.0` | ❌ No | Node.js version to use |
-| `PNPM_VERSION` | `10.28.2` | ❌ No | pnpm version to use |
-| `PYTHON_VERSION` | `3.11` | ❌ No | Python version (if needed) |
-| `NODE_ENV` | `production` | ❌ No | Node environment |
-| `GITHUB_ACTIONS` | `false` | ❌ No | Set to false for Azure Pipelines |
+| Variable Name    | Value        | Secret? | Description                      |
+| ---------------- | ------------ | ------- | -------------------------------- |
+| `NODE_VERSION`   | `24.13.0`    | ❌ No   | Node.js version to use           |
+| `PNPM_VERSION`   | `10.29.2`    | ❌ No   | pnpm version to use              |
+| `PYTHON_VERSION` | `3.11`       | ❌ No   | Python version (if needed)       |
+| `NODE_ENV`       | `production` | ❌ No   | Node environment                 |
+| `GITHUB_ACTIONS` | `false`      | ❌ No   | Set to false for Azure Pipelines |
 
 ### Git/Repository Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `SYSTEM_ACCESSTOKEN` | `$(System.AccessToken)` | ✅ Yes | Azure DevOps access token (automatically provided) |
+| Variable Name        | Value                   | Secret? | Description                                        |
+| -------------------- | ----------------------- | ------- | -------------------------------------------------- |
+| `SYSTEM_ACCESSTOKEN` | `$(System.AccessToken)` | ✅ Yes  | Azure DevOps access token (automatically provided) |
 
 **Note**: `SYSTEM_ACCESSTOKEN` is automatically available in Azure Pipelines when `persistCredentials: true` is set in checkout. You don't need to manually configure this, but the pipeline needs permission to access it.
 
 ### Azure Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `AZURE_SUBSCRIPTION` | `azure-startups-connection` | ❌ No | Azure subscription service connection name |
-| `AZURE_RESOURCE_GROUP` | `pixelated-azure-resources` | ❌ No | Azure resource group name |
-| `AZURE_LOCATION` | `eastus` | ❌ No | Azure region |
-| `AZURE_CONTAINER_REGISTRY` | `pixelatedregistry` | ❌ No | Azure Container Registry name |
+| Variable Name              | Value                       | Secret? | Description                                |
+| -------------------------- | --------------------------- | ------- | ------------------------------------------ |
+| `AZURE_SUBSCRIPTION`       | `azure-startups-connection` | ❌ No   | Azure subscription service connection name |
+| `AZURE_RESOURCE_GROUP`     | `pixelated-azure-resources` | ❌ No   | Azure resource group name                  |
+| `AZURE_LOCATION`           | `eastus`                    | ❌ No   | Azure region                               |
+| `AZURE_CONTAINER_REGISTRY` | `pixelatedregistry`         | ❌ No   | Azure Container Registry name              |
 
 ### Kubernetes Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `AKS_CLUSTER_NAME` | `pixelated-aks-cluster` | ❌ No | Azure Kubernetes Service cluster name |
-| `KUBE_NAMESPACE` | `pixelated-staging` | ❌ No | Kubernetes namespace for staging |
-| `KUBE_NAMESPACE_PROD` | `pixelated-production` | ❌ No | Kubernetes namespace for production |
+| Variable Name         | Value                   | Secret? | Description                           |
+| --------------------- | ----------------------- | ------- | ------------------------------------- |
+| `AKS_CLUSTER_NAME`    | `pixelated-aks-cluster` | ❌ No   | Azure Kubernetes Service cluster name |
+| `KUBE_NAMESPACE`      | `pixelated-staging`     | ❌ No   | Kubernetes namespace for staging      |
+| `KUBE_NAMESPACE_PROD` | `pixelated-production`  | ❌ No   | Kubernetes namespace for production   |
 
 ### Application Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `IMAGE_REPOSITORY` | `pixelatedempathy` | ❌ No | Docker image repository name |
-| `STAGING_URL` | `https://staging.pixelatedempathy.com` | ❌ No | Staging environment URL |
-| `PRODUCTION_URL` | `https://pixelatedempathy.com` | ❌ No | Production environment URL |
-| `EXTERNAL_IP` | `20.242.241.80` | ❌ No | NGINX Ingress Controller external IP |
+| Variable Name      | Value                                  | Secret? | Description                          |
+| ------------------ | -------------------------------------- | ------- | ------------------------------------ |
+| `IMAGE_REPOSITORY` | `pixelatedempathy`                     | ❌ No   | Docker image repository name         |
+| `STAGING_URL`      | `https://staging.pixelatedempathy.com` | ❌ No   | Staging environment URL              |
+| `PRODUCTION_URL`   | `https://pixelatedempathy.com`         | ❌ No   | Production environment URL           |
+| `EXTERNAL_IP`      | `20.242.241.80`                        | ❌ No   | NGINX Ingress Controller external IP |
 
 ### Sentry Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `SENTRY_DSN` | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No | Sentry DSN for error tracking |
-| `SENTRY_ORG` | `pixelated-empathy-dq` | ❌ No | Sentry organization slug |
-| `SENTRY_PROJECT` | `pixel-astro` | ❌ No | Sentry project slug (environments separated via `-e staging`/`-e production` flags) |
-| `SENTRY_AUTH_TOKEN` | `sntrys_eyJ...` | ✅ Yes | Sentry authentication token for releases |
+| Variable Name       | Value                                                                                             | Secret? | Description                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `SENTRY_DSN`        | `https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032` | ❌ No   | Sentry DSN for error tracking                                                       |
+| `SENTRY_ORG`        | `pixelated-empathy-dq`                                                                            | ❌ No   | Sentry organization slug                                                            |
+| `SENTRY_PROJECT`    | `pixel-astro`                                                                                     | ❌ No   | Sentry project slug (environments separated via `-e staging`/`-e production` flags) |
+| `SENTRY_AUTH_TOKEN` | `sntrys_eyJ...`                                                                                   | ✅ Yes  | Sentry authentication token for releases                                            |
 
 ### Deployment Configuration Variables
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `DEPLOYMENT_TIMEOUT` | `600` | ❌ No | Deployment timeout in seconds |
-| `HEALTH_CHECK_TIMEOUT` | `300` | ❌ No | Health check timeout in seconds |
+| Variable Name          | Value | Secret? | Description                     |
+| ---------------------- | ----- | ------- | ------------------------------- |
+| `DEPLOYMENT_TIMEOUT`   | `600` | ❌ No   | Deployment timeout in seconds   |
+| `HEALTH_CHECK_TIMEOUT` | `300` | ❌ No   | Health check timeout in seconds |
 
 ### OVH AI Training Variables (Optional)
 
 These variables are required for the OVH AI Training stage. Add them if using OVH for model training.
 
-| Variable Name | Value | Secret? | Description |
-| -------------- | ------- | --------- | ------------- |
-| `OVH_AI_TOKEN` | `<your-ovh-token>` | ✅ Yes | OVH AI Platform authentication token |
-| `WANDB_API_KEY` | `<your-wandb-key>` | ✅ Yes | Weights & Biases API key for experiment tracking |
-| `TRIGGER_AI_TRAINING` | `false` | ❌ No | Set to `true` to trigger AI training stage |
+| Variable Name         | Value              | Secret? | Description                                      |
+| --------------------- | ------------------ | ------- | ------------------------------------------------ |
+| `OVH_AI_TOKEN`        | `<your-ovh-token>` | ✅ Yes  | OVH AI Platform authentication token             |
+| `WANDB_API_KEY`       | `<your-wandb-key>` | ✅ Yes  | Weights & Biases API key for experiment tracking |
+| `TRIGGER_AI_TRAINING` | `false`            | ❌ No   | Set to `true` to trigger AI training stage       |
 
 **To trigger AI training:**
 
@@ -161,6 +161,7 @@ For the Schedule Posts pipeline to work, you need to:
      - checkout: self
        persistCredentials: true
      ```
+
    - This enables access to `$(System.AccessToken)` for git operations
 
 3. **Create a scheduled trigger** (if using schedules):
@@ -177,7 +178,7 @@ Create a variable group named `pixelated-pipeline-variables` with:
 **Non-secret variables:**
 
 - `NODE_VERSION`: `24.13.0`
-- `PNPM_VERSION`: `10.28.2`
+- `PNPM_VERSION`: `10.29.2`
 - `PYTHON_VERSION`: `3.11`
 - `NODE_ENV`: `production`
 - `GITHUB_ACTIONS`: `false`
