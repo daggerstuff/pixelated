@@ -20,11 +20,11 @@ dependencies = [
   "spacy>=3.8.11", # Updated to latest secure version
   "nltk",
   "evaluate",
-  "cryptography>=46.0.3", # Updated to latest secure version
+  "cryptography>=46.0.5", # Updated to latest secure version
   "requests>=2.32.4", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv>=1.2.1", # Updated to latest secure version
   "click<9.0",
-  "numba>=0.56.0",
+  "numba>=0.63.1",
   "faiss-cpu>=1.11.0",
   "pytest-asyncio>=1.0.0",
   "flake8>=7.3.0",
@@ -50,7 +50,7 @@ dependencies = [
   "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
-  "transformers>=5.0.0", # Required for dataset_pipeline training_runner
+  "transformers>=4.48.0", # Required for dataset_pipeline training_runner
   "torch>=2.6.0,<3.0.0", # Fixes CVE-2025-32434 affecting versions ≤2.5.1
   "gguf>=0.10.0",
   "ruff>=0.12.5",
@@ -108,7 +108,7 @@ dependencies = [
   "semgrep>=1.79.0",
   "pyright>=1.1.408",
   "mem0ai>=1.0.2",
-  "pydantic-ai>=1.22.0",
+  "pydantic-ai>=1.56.0",
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
 ]

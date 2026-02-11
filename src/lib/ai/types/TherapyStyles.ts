@@ -3,11 +3,11 @@ export interface TherapyStyle {
   name: string
   description: string
   approach:
-    | 'cognitive-behavioral'
-    | 'psychodynamic'
-    | 'humanistic'
-    | 'integrative'
-    | 'solution-focused'
+  | 'cognitive-behavioral'
+  | 'psychodynamic'
+  | 'humanistic'
+  | 'integrative'
+  | 'solution-focused'
   techniques: string[]
   suitableFor: string[]
   contraindications?: string[]
@@ -20,7 +20,7 @@ export interface TherapyStylePreferences {
   clientSpecificAdjustments: Record<string, Partial<TherapyStyle>>
 }
 
-export const THERAPY_STYLES: Record<string, TherapyStyle> = {
+export const THERAPY_STYLES = {
   cbt: {
     id: 'cbt',
     name: 'Cognitive Behavioral Therapy',
@@ -59,7 +59,7 @@ export const THERAPY_STYLES: Record<string, TherapyStyle> = {
       'specific problems',
     ],
   },
-}
+} as const satisfies Record<string, TherapyStyle>
 
 export type TherapyStyleId = keyof typeof THERAPY_STYLES
 
