@@ -28,33 +28,33 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 
 ```css
 :root {
-  --color-void: #000000;          /* Pure black */
-  --color-primary: #0a0a0a;       /* Main background */
-  --color-secondary: #111111;     /* Secondary surfaces */
-  --color-tertiary: #181818;      /* Tertiary elements */
-  --color-elevated: #1f1f1f;      /* Elevated surfaces */
+  --color-void: #000000; /* Pure black */
+  --color-primary: #0a0a0a; /* Main background */
+  --color-secondary: #111111; /* Secondary surfaces */
+  --color-tertiary: #181818; /* Tertiary elements */
+  --color-elevated: #1f1f1f; /* Elevated surfaces */
 }
 ```
 
 ### Text Hierarchy
 
 ```css
---text-primary: #ffffff;       /* Pure white */
---text-secondary: #f8f8f8;     /* Subtle secondary */
---text-tertiary: #e8e8e8;      /* Supporting text */
---text-muted: #b8b8b8;         /* Muted text */
---text-subtle: #8a8a8a;        /* Subtle hints */
---text-disabled: #666666;      /* Disabled state */
+--text-primary: #ffffff; /* Pure white */
+--text-secondary: #f8f8f8; /* Subtle secondary */
+--text-tertiary: #e8e8e8; /* Supporting text */
+--text-muted: #b8b8b8; /* Muted text */
+--text-subtle: #8a8a8a; /* Subtle hints */
+--text-disabled: #666666; /* Disabled state */
 ```
 
 ### Accent Colors
 
 ```css
---accent-emerald: #10b981;     /* Primary accent */
---accent-blue: #3b82f6;        /* Secondary accent */
---accent-purple: #8b5cf6;      /* Tertiary accent */
---accent-orange: #f59e0b;      /* Warning accent */
---accent-red: #ef4444;         /* Error accent */
+--accent-emerald: #10b981; /* Primary accent */
+--accent-blue: #3b82f6; /* Secondary accent */
+--accent-purple: #8b5cf6; /* Tertiary accent */
+--accent-orange: #f59e0b; /* Warning accent */
+--accent-red: #ef4444; /* Error accent */
 ```
 
 ## 🔧 Typography System
@@ -77,7 +77,8 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 ### Font Families
 
 ```css
---font-sans: 'Geist Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+--font-sans:
+  'Geist Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont, sans-serif;
 --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
 --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 ```
@@ -87,11 +88,11 @@ cp src/styles/unified-dark-theme-comprehensive.css your-project/styles/
 Consistent spacing with 8-point increments:
 
 ```css
---space-1: 0.25rem;   /* 4px */
---space-2: 0.5rem;    /* 8px */
---space-4: 1rem;      /* 16px */
---space-8: 2rem;      /* 32px */
---space-16: 4rem;     /* 64px */
+--space-1: 0.25rem; /* 4px */
+--space-2: 0.5rem; /* 8px */
+--space-4: 1rem; /* 16px */
+--space-8: 2rem; /* 32px */
+--space-16: 4rem; /* 64px */
 ```
 
 ## 🧩 Component System
@@ -126,10 +127,10 @@ Consistent spacing with 8-point increments:
 ### Inputs
 
 ```html
-<input class="input" type="text" placeholder="Standard input">
-<input class="input input--large" type="text" placeholder="Large input">
-<input class="input input--small" type="text" placeholder="Small input">
-<input class="input input--minimal" type="text" placeholder="Minimal input">
+<input class="input" type="text" placeholder="Standard input" />
+<input class="input input--large" type="text" placeholder="Large input" />
+<input class="input input--small" type="text" placeholder="Small input" />
+<input class="input input--minimal" type="text" placeholder="Minimal input" />
 ```
 
 ### Navigation
@@ -190,18 +191,51 @@ Consistent spacing with 8-point increments:
 ### Gradient System
 
 ```css
---gradient-primary: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-light) 50%, var(--accent-blue) 100%);
---gradient-secondary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 50%, var(--accent-emerald) 100%);
---gradient-warm: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-yellow) 50%, var(--accent-emerald) 100%);
---gradient-cool: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-emerald) 50%, var(--accent-purple) 100%);
+--gradient-primary: linear-gradient(
+  135deg,
+  var(--accent-emerald) 0%,
+  var(--accent-emerald-light) 50%,
+  var(--accent-blue) 100%
+);
+--gradient-secondary: linear-gradient(
+  135deg,
+  var(--accent-blue) 0%,
+  var(--accent-purple) 50%,
+  var(--accent-emerald) 100%
+);
+--gradient-warm: linear-gradient(
+  135deg,
+  var(--accent-orange) 0%,
+  var(--accent-yellow) 50%,
+  var(--accent-emerald) 100%
+);
+--gradient-cool: linear-gradient(
+  135deg,
+  var(--accent-blue) 0%,
+  var(--accent-emerald) 50%,
+  var(--accent-purple) 100%
+);
 ```
 
 ### Mesh Gradients
 
 ```css
---mesh-1: radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-         radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-         radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+--mesh-1:
+  radial-gradient(
+    circle at 20% 80%,
+    rgba(16, 185, 129, 0.1) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    circle at 80% 20%,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    circle at 40% 40%,
+    rgba(139, 92, 246, 0.05) 0%,
+    transparent 50%
+  );
 ```
 
 ## 🎯 Animation System
@@ -255,7 +289,9 @@ Consistent spacing with 8-point increments:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -336,7 +372,7 @@ Consistent spacing with 8-point increments:
 ```json
 {
   "name": "your-project",
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.29.2",
   "dependencies": {
     "@pixelated/unified-dark-theme": "^4.0.0"
   }
@@ -460,9 +496,7 @@ import '@pixelated/unified-dark-theme/unified-dark-theme-comprehensive.css';
 
 ```html
 <!-- Use utility classes for quick styling -->
-<div class="text-center font-mono text-emerald">
-  Optimized content
-</div>
+<div class="text-center font-mono text-emerald">Optimized content</div>
 ```
 
 ## 🚀 Advanced Features

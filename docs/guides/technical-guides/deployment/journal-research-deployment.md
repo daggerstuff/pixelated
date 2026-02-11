@@ -28,7 +28,7 @@ This guide covers deployment of the Journal Research system, including both the 
 **Frontend:**
 
 - Node.js 24+
-- pnpm 10.28.2+
+- pnpm 10.29.2+
 - 4GB RAM minimum
 - 5GB disk space
 
@@ -128,10 +128,10 @@ The `docker-compose.yml` file includes:
 services:
   journal-research-api:
     environment:
-      - JWT_SECRET=${JWT_SECRET}  # Set in .env file
+      - JWT_SECRET=${JWT_SECRET} # Set in .env file
       - CORS_ORIGINS=${CORS_ORIGINS}
     volumes:
-      - ./sessions:/app/sessions  # Persistent storage
+      - ./sessions:/app/sessions # Persistent storage
 ```
 
 ## Manual Deployment
@@ -322,8 +322,8 @@ services:
     image: nginx:alpine
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./dist:/usr/share/nginx/html
