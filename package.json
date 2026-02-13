@@ -435,7 +435,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@10.29.2",
+  "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "overrides": {
       "@opentelemetry/api": "^1.9.0",
@@ -518,6 +518,8 @@
       "@smithery/cli",
       "agentdb",
       "agentic-flow",
+      "argon2",
+      "bcrypt",
       "better-sqlite3",
       "browser-tabs-lock",
       "bufferutil",

@@ -1,9 +1,0 @@
-modules:
-  - name: emotional_cnn_layer
-    enabled: true
-  - name: emotional_resnet_memory
-    enabled: true
-  - name: emotional_flow_dynamics
-    enabled: true
-  - name: meta_emotional_intelligence
-    enabled: true
