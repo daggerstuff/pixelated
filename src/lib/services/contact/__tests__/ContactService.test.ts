@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, type MockedClass } from 'vitest'
 import { ContactService } from '../ContactService'
-import { EmailService } from '@/lib/services/email/EmailService'
+import { EmailService } from '../../email/EmailService'
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('contact-service')
@@ -8,11 +8,14 @@ const logger = createBuildSafeLogger('contact-service')
 // Mock dependencies
 vi.mock('@/lib/services/email/EmailService')
 vi.mock('@/lib/utils/logger')
+vi.mock('@/lib/utils/server', () => ({
+  securePathJoin: vi.fn((base: string, file: string) => `${base}/${file}`),
+}))
 vi.mock('@/lib/utils', async () => {
   const actual = await vi.importActual('@/lib/utils')
   return {
     ...actual,
-    securePathJoin: vi.fn((base: string, file: string) => `${base}/${file}`),
+    generateId: vi.fn(() => 'test-id'),
   }
 })
 vi.mock('fs/promises', () => ({
@@ -44,7 +47,7 @@ const mockEmailService = {
   getQueueStats: vi.fn().mockResolvedValue({ pending: 0, processing: 0 }),
 }
 
-const MockedEmailService = EmailService as unknown as vi.MockedClass<
+const MockedEmailService = EmailService as unknown as MockedClass<
   typeof EmailService
 >
 
