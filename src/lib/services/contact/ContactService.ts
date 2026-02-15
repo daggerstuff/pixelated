@@ -1,6 +1,6 @@
-import { EmailService } from '@/lib/services/email/EmailService'
+import { EmailService } from '../email/EmailService'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { securePathJoin } from '../../utils/index'
+import { securePathJoin } from '../../utils/server'
 import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { z } from 'zod'
 import { readFile } from 'fs/promises'
@@ -224,7 +224,7 @@ export class ContactService {
       }
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
-        const validationError = error.errors[0]
+        const validationError = error.issues[0]
         logger.warn('Contact form validation failed', {
           error: validationError,
           formData: { ...formData, message: '[REDACTED]' },

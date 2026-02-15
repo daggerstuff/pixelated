@@ -18,12 +18,6 @@ import {
   DashboardData,
 } from './types'
 
-import * as zlib from 'zlib'
-import { promisify } from 'util'
-
-const deflate = promisify(zlib.deflate)
-const inflate = promisify(zlib.inflate)
-
 // Prefix for compressed data to easily identify it
 const COMPRESSION_PREFIX = 'COMPRESSED:'
 
@@ -138,7 +132,7 @@ export class BiasDetectionCache {
     }
 
     this.cacheService = null // Initialize as null
-    this.initializeRedis()
+    void this.initializeRedis()
     this.startCleanupTimer()
     logger.info('BiasDetectionCache initialized', { config: this.config })
   }
@@ -697,7 +691,13 @@ export class BiasDetectionCache {
    */
 
   private async compressData<T>(data: T): Promise<string | T> {
+    if (typeof window !== 'undefined') return data
+
     try {
+      const zlib = await import('zlib')
+      const { promisify } = await import('util')
+      const deflate = promisify(zlib.deflate)
+
       const stringData = JSON.stringify(data)
       const compressed = await deflate(stringData)
       return COMPRESSION_PREFIX + compressed.toString('base64')
@@ -715,7 +715,13 @@ export class BiasDetectionCache {
       return data as T // Not compressed or invalid format
     }
 
+    if (typeof window !== 'undefined') return data as T
+
     try {
+      const zlib = await import('zlib')
+      const { promisify } = await import('util')
+      const inflate = promisify(zlib.inflate)
+
       const base64Data = data.substring(COMPRESSION_PREFIX.length)
       const buffer = Buffer.from(base64Data, 'base64')
       const decompressed = await inflate(buffer)

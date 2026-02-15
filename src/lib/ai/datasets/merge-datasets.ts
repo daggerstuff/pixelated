@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { securePathJoin } from '../../utils/index'
+import { securePathJoin } from '../../utils/server'
 import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 
 const logger = createBuildSafeLogger('default')

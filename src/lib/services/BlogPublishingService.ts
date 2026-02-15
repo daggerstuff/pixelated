@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import * as cron from 'node-cron'
-import fs from 'fs/promises'
-import path from 'path'
+import * as fs from 'fs/promises'
+import * as path from 'path'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { securePathJoin } from '../utils/index'
+import { securePathJoin } from '../utils/server'
 import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publishing')
@@ -135,7 +135,7 @@ export class BlogPublishingService {
 
       if (cron.validate(cronExpression)) {
         const job = cron.schedule(cronExpression, () => {
-          this.publishPost(id)
+          void this.publishPost(id)
         })
 
         this.scheduledJobs.set(id, job)
