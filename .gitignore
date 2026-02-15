@@ -170,3 +170,5 @@ patches
 .flaskenv*
 !.env.project
 !.env.vault
+
+docs2
