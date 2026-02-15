@@ -6,7 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { securePathJoin } from '../../utils/index'
+import { securePathJoin } from '../../utils/server'
 import { ALLOWED_DIRECTORIES, safeJoin, validatePath } from '../../../utils/path-security'
 import * as path from 'path'
 import * as fs from 'fs/promises'
@@ -504,9 +504,9 @@ export class AWSS3StorageProvider implements StorageProvider {
     const endpoint = config['endpoint'] as string | undefined
     const credentials = config['credentials'] as
       | {
-          accessKeyId: string
-          secretAccessKey: string
-        }
+        accessKeyId: string
+        secretAccessKey: string
+      }
       | undefined
 
     this.config = {
