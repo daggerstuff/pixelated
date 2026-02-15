@@ -1,0 +1,4 @@
+services:
+  pixelated-ai:
+    volumes:
+      - ../ai/api:/app/api
