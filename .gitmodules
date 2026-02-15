@@ -1,5 +1,5 @@
 [submodule "ai"]
 	path = ai
 	url = https://github.com/pixelatedempathy/ai.git
-	branch = staging
+	branch = .
 	ignore = all
