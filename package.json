@@ -351,6 +351,7 @@
     "eslint-plugin-vitest": "^0.5.4",
     "eslint-plugin-vitest-globals": "^1.5.0",
     "espree": "^11.1.0",
+    "github-repo-mcp": "^1.0.3",
     "glob": "^13.0.3",
     "glob-parent": "^6.0.2",
     "globals": "^17.3.0",
