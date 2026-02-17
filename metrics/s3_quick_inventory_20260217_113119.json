@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-02-17T11:31:19.855359",
+  "bucket": "pixel-data",
+  "total_estimated_samples": 47461607,
+  "total_size": 40108919707,
+  "total_jsonl_files": 75,
+  "directories": {
+    "datasets/": {
+      "prefix": "datasets/",
+      "total_files": 119,
+      "total_size": 7565554572,
+      "jsonl_count": 40,
+      "jsonl_size": 7478243970,
+      "json_count": 18,
+      "json_size": 85720866,
+      "csv_count": 0,
+      "csv_size": 0,
+      "md_count": 53,
+      "other_count": 8,
+      "estimated_samples": 9970971
+    },
+    "training/": {
+      "prefix": "training/",
+      "total_files": 218,
+      "total_size": 6692357736,
+      "jsonl_count": 9,
+      "jsonl_size": 2218362246,
+      "json_count": 41,
+      "json_size": 1023072159,
+      "csv_count": 121,
+      "csv_size": 3426840778,
+      "md_count": 7,
+      "other_count": 40,
+      "estimated_samples": 11524860
+    },
+    "processed/": {
+      "prefix": "processed/",
+      "total_files": 5,
+      "total_size": 1272802766,
+      "jsonl_count": 5,
+      "jsonl_size": 1272802766,
+      "json_count": 0,
+      "json_size": 0,
+      "csv_count": 0,
+      "csv_size": 0,
+      "md_count": 0,
+      "other_count": 0,
+      "estimated_samples": 1697068
+    },
+    "acquired/": {
+      "prefix": "acquired/",
+      "total_files": 4,
+      "total_size": 10558112,
+      "jsonl_count": 0,
+      "jsonl_size": 0,
+      "json_count": 3,
+      "json_size": 10551749,
+      "csv_count": 0,
+      "csv_size": 0,
+      "md_count": 1,
+      "other_count": 0,
+      "estimated_samples": 0
+    },
+    "ai/": {
+      "prefix": "ai/",
+      "total_files": 37,
+      "total_size": 24075393456,
+      "jsonl_count": 21,
+      "jsonl_size": 16016644394,
+      "json_count": 9,
+      "json_size": 2588913164,
+      "csv_count": 1,
+      "csv_size": 1165277530,
+      "md_count": 0,
+      "other_count": 6,
+      "estimated_samples": 24268708
+    },
+    "knowledge/": {
+      "prefix": "knowledge/",
+      "total_files": 408,
+      "total_size": 492253065,
+      "jsonl_count": 0,
+      "jsonl_size": 0,
+      "json_count": 0,
+      "json_size": 0,
+      "csv_count": 0,
+      "csv_size": 0,
+      "md_count": 0,
+      "other_count": 408,
+      "estimated_samples": 0
+    }
+  }
+}
