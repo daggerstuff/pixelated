@@ -112,6 +112,8 @@ dependencies = [
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
   "ruff-lsp>=0.0.62",
+  "e2b>=2.6.1",
+  "lancedb>=0.29.2",
 ]
 [project.optional-dependencies]
 test = [

@@ -1,0 +1,176 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "coder": {
+      "model": "nvidia/z-ai/glm5",
+      "variant": "high",
+      "reasoningEffort": "high"
+    }
+  },
+  "provider": {
+    "antigravity-manager": {
+      "models": {
+        "claude-sonnet-4-5": {
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          },
+          "name": "Claude Sonnet 4.5"
+        },
+        "claude-sonnet-4-5-thinking": {
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          },
+          "name": "Claude Sonnet 4.5 Thinking",
+          "reasoning": true,
+          "variants": {
+            "high": {
+              "thinking": {
+                "budget_tokens": 24576,
+                "type": "enabled"
+              },
+              "thinkingConfig": {
+                "thinkingBudget": 24576
+              }
+            },
+            "low": {
+              "thinking": {
+                "budget_tokens": 8192,
+                "type": "enabled"
+              },
+              "thinkingConfig": {
+                "thinkingBudget": 8192
+              }
+            },
+            "max": {
+              "thinking": {
+                "budget_tokens": 32768,
+                "type": "enabled"
+              },
+              "thinkingConfig": {
+                "thinkingBudget": 32768
+              }
+            },
+            "medium": {
+              "thinking": {
+                "budget_tokens": 16384,
+                "type": "enabled"
+              },
+              "thinkingConfig": {
+                "thinkingBudget": 16384
+              }
+            }
+          }
+        },
+        "gemini-3-flash": {
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          },
+          "name": "Gemini 3 Flash",
+          "reasoning": true,
+          "variants": {
+            "high": {
+              "thinkingLevel": "high"
+            },
+            "low": {
+              "thinkingLevel": "low"
+            },
+            "medium": {
+              "thinkingLevel": "medium"
+            },
+            "minimal": {
+              "thinkingLevel": "minimal"
+            }
+          }
+        },
+        "gemini-3-pro-high": {
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text", "image"]
+          },
+          "name": "Gemini 3 Pro High",
+          "reasoning": true,
+          "variants": {
+            "high": {
+              "thinkingLevel": "high"
+            },
+            "low": {
+              "thinkingLevel": "low"
+            }
+          }
+        },
+        "gemini-3-pro-low": {
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text", "image"]
+          },
+          "name": "Gemini 3 Pro Low",
+          "reasoning": true,
+          "variants": {
+            "high": {
+              "thinkingLevel": "high"
+            },
+            "low": {
+              "thinkingLevel": "low"
+            }
+          }
+        }
+      }
+    },
+    "nvidia": {
+      "models": {
+        "minimaxai/minimax-m2.1": {
+          "name": "minimax-m2.1"
+        },
+        "moonshotai/kimi-k2.5": {
+          "name": "kimi-k2.5"
+        },
+        "nvidia/nemotron-3-nano-30b-a3b": {
+          "name": "nemotron-3-nano-30b-a3b"
+        },
+        "qwen/qwen3-next-80b-a3b-instruct": {
+          "name": "qwen3-next-80b-a3b-instruct"
+        },
+        "stepfun-ai/step-3.5-flash": {
+          "name": "step-3.5-flash"
+        },
+        "z-ai/glm5": {
+          "name": "glm5"
+        }
+      },
+      "options": {
+        "apiKey": "${NVIDIA_API_KEY}",
+        "baseURL": "https://integrate.api.nvidia.com/v1"
+      }
+    },
+    "ollama": {
+      "models": {
+        "glm-4.7:cloud": {
+          "name": "glm-4.7"
+        }
+      }
+    }
+  }
+}
