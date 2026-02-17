@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-02-17T11:21:22.677270",
+  "file_catalog": {
+    "total_files": 5208,
+    "local_only": 5134,
+    "huggingface": 74,
+    "kaggle": 0,
+    "url": 0,
+    "stage_breakdown": {
+      "stage3_edge": 238,
+      "unassigned": 4841,
+      "stage4_voice": 34,
+      "stage1_foundation": 8,
+      "stage2_reasoning": 13
+    },
+    "format_breakdown": {
+      "md": 86,
+      "py": 878,
+      "db": 1,
+      "unknown": 3,
+      "log": 16,
+      "sh": 9,
+      "wandb": 6,
+      "backup": 1,
+      "zip": 9,
+      "template": 1,
+      "txt": 4086,
+      "csv": 8,
+      "ts": 1,
+      "parquet": 3,
+      "sql": 1,
+      "npz": 24,
+      "ipynb": 1
+    }
+  },
+  "sample_counts": {
+    "therapeutic_conversations": 0,
+    "bias_samples": 0,
+    "grounded_conversations": 0,
+    "crisis_samples": 0,
+    "edge_cases": 0
+  },
+  "database": {
+    "database_available": false,
+    "error": "cannot import name 'DatasetPersistence' from 'ai.infrastructure.database.persistence' (/home/vivi/pixelated/ai/infrastructure/database/persistence.py)"
+  },
+  "crisis_detector": {
+    "threshold": 0.45,
+    "test_sensitivity": "100.0%",
+    "status": "\u2705 VERIFIED"
+  },
+  "prd_targets": {
+    "therapeutic_samples": 10000,
+    "bias_samples": 5000,
+    "grounded_conversations": 5000,
+    "crisis_detection_sensitivity": "\u226595%",
+    "e2e_performance": "\u226430 min (100k records)",
+    "test_coverage": "\u226580%"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "timestamp": "2026-02-17T13:44:40.803972",
+  "total_records": 102589,
+  "datasets": {
+    "Tier1 Priority Curated": {
+      "records": 37381,
+      "categories": {},
+      "sources": {
+        "wendy_priority_1": 32138,
+        "wendy_priority_2": 422,
+        "wendy_priority_3": 4821
+      },
+      "avg_messages": 1.141060966801316
+    },
+    "Mental Health Clean": {
+      "records": 64536,
+      "categories": {},
+      "sources": {},
+      "avg_messages": 2.15312383785794
+    },
+    "Training V3 - Counseling": {
+      "records": 500,
+      "categories": {},
+      "sources": {
+        "Amod/mental_health_counseling_conversations": 500
+      },
+      "avg_messages": 2.0
+    },
+    "Training V3 - Helios": {
+      "records": 172,
+      "categories": {},
+      "sources": {
+        "heliosbrahma/mental_health_chatbot_dataset": 172
+      },
+      "avg_messages": 2.0
+    }
+  },
+  "aggregated": {
+    "categories": {},
+    "sources": {
+      "wendy_priority_1": 32138,
+      "wendy_priority_2": 422,
+      "wendy_priority_3": 4821,
+      "Amod/mental_health_counseling_conversations": 500,
+      "heliosbrahma/mental_health_chatbot_dataset": 172
+    }
+  },
+  "prd_comparison": {
+    "Therapeutic Samples": {
+      "target": 10000,
+      "actual": 0
+    },
+    "Bias Detection Samples": {
+      "target": 5000,
+      "actual": 0
+    },
+    "Grounded Conversations": {
+      "target": 5000,
+      "actual": 0
+    },
+    "Total Dataset Size": {
+      "target": 20000,
+      "actual": 102589
+    }
+  }
+}

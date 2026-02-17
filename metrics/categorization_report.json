@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-02-17T13:45:25.405754",
+  "total_records": 102589,
+  "categories": {
+    "therapeutic_conversation": 34319,
+    "clinical_diagnosis": 120,
+    "mens_mental_health": 296,
+    "problem_solving": 4,
+    "philosophical_reasoning": 2,
+    "mental_health_support": 3403,
+    "counseling": 23,
+    "therapy": 1133,
+    "uncategorized": 63204,
+    "crisis_support": 85
+  },
+  "prd_comparison": {
+    "Therapeutic Samples": {
+      "target": 10000,
+      "actual": 37807
+    },
+    "Total Dataset Size": {
+      "target": 20000,
+      "actual": 102589
+    }
+  }
+}

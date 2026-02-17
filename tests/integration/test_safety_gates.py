@@ -20,6 +20,7 @@ import pytest
 
 ears_compliance_gate = pytest.importorskip("ai.pipelines.orchestrator.ears_compliance_gate")
 EarsComplianceGate = ears_compliance_gate.EarsComplianceGate
+EarsConfig = ears_compliance_gate.EarsConfig
 
 quality_gates_runner = pytest.importorskip("ai.pipelines.orchestrator.quality_gates_runner")
 GateResult = quality_gates_runner.GateResult
@@ -31,6 +32,7 @@ SafetyScore = content_filter.SafetyScore
 
 crisis_detection = pytest.importorskip("ai.safety.crisis_detection.production_crisis_detector")
 CrisisDetector = crisis_detection.CrisisDetector
+UrgencyLevel = crisis_detection.UrgencyLevel
 
 
 class TestEARSComplianceGate:
