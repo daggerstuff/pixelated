@@ -16,8 +16,14 @@
             "output": 64000
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "name": "Claude Sonnet 4.5"
         },
@@ -27,8 +33,14 @@
             "output": 64000
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "name": "Claude Sonnet 4.5 Thinking",
           "reasoning": true,
@@ -77,8 +89,14 @@
             "output": 65536
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "name": "Gemini 3 Flash",
           "reasoning": true,
@@ -103,8 +121,15 @@
             "output": 65535
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text", "image"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text",
+              "image"
+            ]
           },
           "name": "Gemini 3 Pro High",
           "reasoning": true,
@@ -123,8 +148,15 @@
             "output": 65535
           },
           "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text", "image"]
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text",
+              "image"
+            ]
           },
           "name": "Gemini 3 Pro Low",
           "reasoning": true,
@@ -161,15 +193,21 @@
         }
       },
       "options": {
-        "apiKey": "${NVIDIA_API_KEY}",
+        "apiKey": "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",
         "baseURL": "https://integrate.api.nvidia.com/v1"
       }
     },
     "ollama": {
       "models": {
-        "glm-4.7:cloud": {
-          "name": "glm-4.7"
+        "gemma3:latest": {
+          "name": "gemma3"
+        },
+        "llama3.2:latest": {
+          "name": "llama3.2"
         }
+      },
+      "options": {
+        "baseURL": "http://localhost:11434"
       }
     }
   }

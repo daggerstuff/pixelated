@@ -88,13 +88,18 @@ mcp.pixelatedempathy.tech {
     }
 }
 
-# Staging Application Subdomain
-staging.pixelatedempathy.tech, pixelatedempathy.tech {
+# Main Application & Staging Subdomain
+staging.pixelatedempathy.tech, pixelatedempathy.tech, pixelatedempathy.com {
     # Proxy to the main Astro/React application
     reverse_proxy app:4321 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
     }
+
+    # API routes from native caddyfile - bias detection (backend not found in docker-compose.yml)
+    # handle /api/bias-detection/* {
+    #     reverse_proxy bias-detection-service:5001
+    # }
 
     # Security Headers
     header {
@@ -107,6 +112,34 @@ staging.pixelatedempathy.tech, pixelatedempathy.tech {
     log {
         output stdout
         format console
+    }
+}
+
+# NVIDIA NeMo services
+nemo.pixelatedempathy.com {
+    reverse_proxy nemo-envoy-gateway:8080
+
+    log {
+        output stdout
+        format console
+    }
+
+    handle_errors {
+        respond "Service temporarily unavailable" 503
+    }
+}
+
+# NVIDIA NeMo services - Dashboard
+dash.pixelatedempathy.tech {
+    reverse_proxy nemo-envoy-gateway:4040
+
+    log {
+        output stdout
+        format console
+    }
+
+    handle_errors {
+        respond "Service temporarily unavailable" 503
     }
 }
 

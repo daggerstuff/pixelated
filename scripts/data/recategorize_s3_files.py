@@ -20,7 +20,8 @@ from datetime import datetime
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from ai.pipelines.design.taxonomy_classifier import TaxonomyClassifier, TherapeuticCategory
+from ai.pipelines.design.taxonomy_classifier import TherapeuticCategory
+from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
 from ai.data.loaders.s3_dataset_loader import S3DatasetLoader
 
 logger = logging.getLogger(__name__)
@@ -59,9 +60,10 @@ class S3Recategorizer:
         self.confidence_threshold = confidence_threshold
         
         self.s3_loader = S3DatasetLoader()
-        self.classifier = TaxonomyClassifier()
+        self.classifier = HybridTaxonomyClassifier(enable_llm=True, confidence_threshold=0.80)
         
-        logger.info(f"Initialized recategorizer: {input_bucket}/{input_prefix} -> {output_bucket}/{output_prefix}")
+        logger.info(f"Initialized recategorizer with hybrid classifier: {input_bucket}/{input_prefix} -> {output_bucket}/{output_prefix}")
+        logger.info(f"Using NVIDIA NIM GLM4.7 for low-confidence cases (threshold: 0.80)")
     
     def list_other_files(self) -> List[str]:
         """
@@ -148,8 +150,17 @@ class S3Recategorizer:
                     record = json.loads(line)
                     stats["total_records"] += 1
                     
-                    # Classify
-                    classification = self.classifier.classify_record(record)
+                    # Classify using hybrid classifier (keyword + LLM fallback)
+                    # Extract text from record (handle various formats)
+                    text = ""
+                    if "text" in record:
+                        text = record["text"]
+                    elif "messages" in record:
+                        text = " ".join([msg.get("content", "") for msg in record["messages"]])
+                    elif "conversation" in record:
+                        text = " ".join([turn.get("content", "") for turn in record["conversation"]])
+                    
+                    classification = self.classifier.classify(text)
                     total_confidence += classification.confidence
                     
                     # Update record with classification
