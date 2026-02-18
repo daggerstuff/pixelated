@@ -1084,35 +1084,6 @@ wheels = [
 ]
 
 [[package]]
-name = "claude-agent-sdk"
-version = "0.1.18"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "anyio" },
-    { name = "mcp" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/3d/a8c6ad873e8448696d44441c9eb2c24dded620fb32415d68f576a542ccde/claude_agent_sdk-0.1.18.tar.gz", hash = "sha256:4fcb8730cc77dea562fbe9aa48c65eced3ef58a6bb1f34f77e50e8258902477d", size = 56162, upload-time = "2025-12-18T00:42:57.926Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/14/f529f7c4bab7c71dcbcc8c66f12f491e644ee8a027ac5111d13705df207e/claude_agent_sdk-0.1.18-py3-none-macosx_11_0_arm64.whl", hash = "sha256:9e45b4e3c20c072c3e3325fa60bab9a4b5a7cbbce64ca274b8d7d0af42dd9dd8", size = 54560828, upload-time = "2025-12-18T00:42:44.71Z" },
-    { url = "https://files.pythonhosted.org/packages/2c/68/6e83005aa7bb9056bfad0aef0605249f877dc0c78724c9c0fadebff600fb/claude_agent_sdk-0.1.18-py3-none-manylinux_2_17_aarch64.whl", hash = "sha256:3c41bd8f38848609ae0d5da8d7327a4c2d7057a363feafb6fd70df611ea204cc", size = 68743107, upload-time = "2025-12-18T00:42:48.255Z" },
-    { url = "https://files.pythonhosted.org/packages/fb/85/7d6dd85f402135a610894734c442f1166ffed61d03eced39d6bfd14efccd/claude_agent_sdk-0.1.18-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:983f15e51253f40c55136a86d7cc63e023a3576428b05fa1459093d461b2d215", size = 70444964, upload-time = "2025-12-18T00:42:51.752Z" },
-    { url = "https://files.pythonhosted.org/packages/3c/fa/d2b22b7a713c4c049cbd5f9f635836ea5429ff65c1f3bcf4658a8e1c1cf5/claude_agent_sdk-0.1.18-py3-none-win_amd64.whl", hash = "sha256:36f5b84d5c3c8773ee9b56aeb5ab345d1033231db37f80d1f20ac15239bef41c", size = 72637215, upload-time = "2025-12-18T00:42:55.269Z" },
-]
-
-[[package]]
-name = "claude-code-sdk"
-version = "0.0.25"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "anyio" },
-    { name = "mcp" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/0d/0f4a71415826578a5ace16817c52df84d76ffbda5cdad02f520a2b963bde/claude_code_sdk-0.0.25.tar.gz", hash = "sha256:0d9e1eba432d4fe8a2f75f06ec9bb4c310f39b1d55246e7e4b2c69bfdd69eab3", size = 41273, upload-time = "2025-09-29T20:14:51.882Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/41/c934058080f3233bbc95bc9abac5e0191bf336ad5f69a33b5f54a4737e88/claude_code_sdk-0.0.25-py3-none-any.whl", hash = "sha256:3d6a4ef958182f311d6050776d2675d9b39650a2db221c582a0a5156472dcee3", size = 31031, upload-time = "2025-09-29T20:14:50.687Z" },
-]
-
-[[package]]
 name = "click"
 version = "8.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -4726,35 +4697,6 @@ wheels = [
 ]
 
 [[package]]
-name = "omnara"
-version = "1.7.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aiohttp" },
-    { name = "certifi" },
-    { name = "claude-code-sdk" },
-    { name = "fastapi" },
-    { name = "fastmcp" },
-    { name = "pydantic" },
-    { name = "requests" },
-    { name = "urllib3" },
-    { name = "uvicorn" },
-    { name = "websocket-client" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/11/3d/4d46acda35a59e64aa9f0ce174e82ae5caf6e23363f4cdf754da59525f87/omnara-1.7.0.tar.gz", hash = "sha256:989710438f7d6aa68a26a2dbad35e92c177733550e5a2fe95a97d6fc5002152f", size = 124328, upload-time = "2025-11-09T08:11:22.221Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/3d/cb16b0490e03703192b89fd98c4fce0c68ac08e3b0211cdae00315daea17/omnara-1.7.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:b980eb0be2c9ce5b35f37a796caf3d99814b93c40e7bc716013632ab519599ee", size = 8725170, upload-time = "2025-11-09T08:11:03.69Z" },
-    { url = "https://files.pythonhosted.org/packages/49/10/ac64c960945f36dff52c5e9b7c897105a247e8dc9406bc3260b819a8bb69/omnara-1.7.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:aa898e13c9311a5f32facf062c6565f29553ecb36f377d499f73eeec7da2f670", size = 8140964, upload-time = "2025-11-09T08:11:05.992Z" },
-    { url = "https://files.pythonhosted.org/packages/30/28/d96615bb6b18ab3325fe58f48e1d4cf49ecf70706f2bb4119e2227bc1870/omnara-1.7.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:fe2afdfecc3beabe35d126250e0267ef2813688c18df6934e90e38205d48524d", size = 10631793, upload-time = "2025-11-09T08:11:07.542Z" },
-    { url = "https://files.pythonhosted.org/packages/ce/f1/5bcddf50b4216ab5a6dc14a83f5e9279ddf1e914e35c4cb009b7098779ef/omnara-1.7.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:4997a7c9619de9b543dee22a5204e7cdfedc6552060ebdb8ddb6cba201524a60", size = 8725169, upload-time = "2025-11-09T08:11:10.102Z" },
-    { url = "https://files.pythonhosted.org/packages/10/bf/c362b08a71f33c0d0d830ac62df1fb397b8a79641868c61cb0b3b37de1e1/omnara-1.7.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ef7451b14959a3ca5eb9dde4153ab6807718124e59a905afa53bd2ae604c445c", size = 8140963, upload-time = "2025-11-09T08:11:11.888Z" },
-    { url = "https://files.pythonhosted.org/packages/ff/34/c0c1511d83beb430272b15ee57eb5ae5d5ccc5275653a27c1cbbc6b221f8/omnara-1.7.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:45eb26e6226590a4c039a27d47eada714439d5fa03952b3543b76e12a7e869b5", size = 10631792, upload-time = "2025-11-09T08:11:14.265Z" },
-    { url = "https://files.pythonhosted.org/packages/89/dc/c870f7b16e791cb397b9d8bb2e88f2a2d74a787fdf9cc77290e6becfeef5/omnara-1.7.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:41d57a07f6dc29d54668b0bbcb2a38dc322bb5551de77a71666cbb2a25101e39", size = 8725170, upload-time = "2025-11-09T08:11:16.607Z" },
-    { url = "https://files.pythonhosted.org/packages/4b/17/746b13fc1f88b683a1a437e747187ff14980e51b88bf7d705a9e82ce8fa8/omnara-1.7.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:ff3f21dbe7570f0fb958c5c6429b6b7ab888ac26cafd4a9193494560bf3cf723", size = 8140964, upload-time = "2025-11-09T08:11:18.526Z" },
-    { url = "https://files.pythonhosted.org/packages/2b/b5/e4524fcb79675d301f164415aff5f49683f11f4e5e8dbe444e7a2a20d1fd/omnara-1.7.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:6d597f48c5ff94ef7f7d5fee07660c87d9312391f8cf9a62d1b98a6736edbca8", size = 10631792, upload-time = "2025-11-09T08:11:20.462Z" },
-]
-
-[[package]]
 name = "onnx"
 version = "1.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -5487,7 +5429,6 @@ dependencies = [
     { name = "nltk" },
     { name = "numba" },
     { name = "numpy" },
-    { name = "omnara" },
     { name = "onnx" },
     { name = "onnxscript" },
     { name = "openai" },
@@ -5530,7 +5471,6 @@ dependencies = [
     { name = "transformers" },
     { name = "urllib3" },
     { name = "uvicorn" },
-    { name = "vicoa" },
     { name = "wandb" },
     { name = "werkzeug" },
     { name = "yamllint" },
@@ -5620,7 +5560,6 @@ requires-dist = [
     { name = "nltk" },
     { name = "numba", specifier = ">=0.63.1" },
     { name = "numpy" },
-    { name = "omnara", specifier = ">=1.5.7" },
     { name = "onnx", specifier = ">=1.20.0" },
     { name = "onnxscript", specifier = ">=0.5.7" },
     { name = "openai", specifier = ">=1.107.2" },
@@ -5670,7 +5609,6 @@ requires-dist = [
     { name = "types-requests", marker = "extra == 'test'" },
     { name = "urllib3", specifier = ">=2.6.2" },
     { name = "uvicorn", specifier = ">=0.38.0" },
-    { name = "vicoa", specifier = ">=1.2.5" },
     { name = "wandb", specifier = ">=0.21.1" },
     { name = "werkzeug", specifier = ">=3.1.4" },
     { name = "yamllint", specifier = ">=1.37.1" },
@@ -9004,34 +8942,6 @@ wheels = [
 ]
 
 [[package]]
-name = "vicoa"
-version = "1.2.5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aiohttp" },
-    { name = "anthropic" },
-    { name = "certifi" },
-    { name = "claude-agent-sdk" },
-    { name = "fastapi" },
-    { name = "fastmcp" },
-    { name = "pathspec" },
-    { name = "pydantic" },
-    { name = "requests" },
-    { name = "urllib3" },
-    { name = "uvicorn" },
-    { name = "websocket-client" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3e/d5/18c63951a31c2a95399708ec52e0e779d53bfe5387234c9d8bed4f121ae0/vicoa-1.2.5.tar.gz", hash = "sha256:03b4954c23b32f264938b86cd0c0eac304ff0ee07eecb33f62cfa3993bdc3f75", size = 170847, upload-time = "2025-12-18T09:42:50.427Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/6c/158365a3decbdb1d4af15d17251338f00ebd5c3871380f0710b6aff69d3f/vicoa-1.2.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:be726d7fe77633831bd8f9264ae39f1ee75652ae3d7dde04956471f5e3774ab8", size = 8205355, upload-time = "2025-12-18T09:42:39.374Z" },
-    { url = "https://files.pythonhosted.org/packages/21/c3/ed9dea539b871f320f01ade495d9e41692ca4858ec9672c4c3a4477a9b16/vicoa-1.2.5-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:176fbc4be2f0e2aed4167d13622cff028a64faee825956d92b53ce1bbdc11e3d", size = 10696357, upload-time = "2025-12-18T09:42:41.095Z" },
-    { url = "https://files.pythonhosted.org/packages/c2/b8/9168b2652ebf9e2da7bf343641fe0c555650acbfa66593cc34db791a0fc7/vicoa-1.2.5-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e6c2efc68ec1932e142f7dd959d9b643994cc10810b346a32bb16cfb9a195bff", size = 8205357, upload-time = "2025-12-18T09:42:42.839Z" },
-    { url = "https://files.pythonhosted.org/packages/1d/f2/c4479fb363a67cdd61d95e35cb63abc10159383a1fb20946730f5edfb27e/vicoa-1.2.5-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:d0392de57d3a25dc18bcfe157ad81f28f6e2758ee28a814a25c46a3cfb7aaf90", size = 10696355, upload-time = "2025-12-18T09:42:44.194Z" },
-    { url = "https://files.pythonhosted.org/packages/14/33/fd3dccb2bd02be67fcbfff1ce314bc5dafc2d34329d2a4dd348bfbbcf304/vicoa-1.2.5-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f17379925d18e49abdb4eabbdc100f957e943ecf1c34ee0d81f8c7c3ef718445", size = 8205356, upload-time = "2025-12-18T09:42:46.581Z" },
-    { url = "https://files.pythonhosted.org/packages/09/26/225dfd3046c3989141b7f6ef910b3aeed974920a55710c76dcfda1e01e40/vicoa-1.2.5-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:85d3fef62921f1d96ff14c3c475bf2a63fa55ad058d7c60d88f50f2f4328fcb2", size = 10696356, upload-time = "2025-12-18T09:42:48.265Z" },
-]
-
-[[package]]
 name = "virtualenv"
 version = "20.36.1"
 source = { registry = "https://pypi.org/simple" }
@@ -9134,15 +9044,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923", size = 9721, upload-time = "2017-04-05T20:21:34.189Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/24/2a3e3df732393fed8b3ebf2ec078f05546de641fe1b667ee316ec1dcf3b7/webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78", size = 11774, upload-time = "2017-04-05T20:21:32.581Z" },
-]
-
-[[package]]
-name = "websocket-client"
-version = "1.9.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2c/41/aa4bf9664e4cda14c3b39865b12251e8e7d239f4cd0e3cc1b6c2ccde25c1/websocket_client-1.9.0.tar.gz", hash = "sha256:9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98", size = 70576, upload-time = "2025-10-07T21:16:36.495Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/db/b10e48aa8fff7407e67470363eac595018441cf32d5e1001567a7aeba5d2/websocket_client-1.9.0-py3-none-any.whl", hash = "sha256:af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef", size = 82616, upload-time = "2025-10-07T21:16:34.951Z" },
 ]
 
 [[package]]
