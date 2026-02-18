@@ -395,28 +395,39 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // TODO: Validate user has permission to send coaching notes
-    // - Only supervisors/observers should be able to send coaching notes
-    // - Verify role matches 'supervisor' or 'observer'
-
-    if (client.role !== 'supervisor' && client.role !== 'observer') {
-      logger.warn('Unauthorized coaching note attempt', {
+    // Validate user has permission to send coaching notes
+    // Only supervisors and observers should be able to send coaching notes
+    if (client.role !== "supervisor" && client.role !== "observer") {
+      logger.warn("Unauthorized coaching note attempt", {
         clientId,
         userId: client.userId,
-        role: client.role
+        role: client.role,
+        sessionId: client.sessionId
       })
+      this.sendError(client.ws, "Unauthorized: Only supervisors and observers can send coaching notes")
+      return
+    }
+
+    // Validate coaching note content
+    if (!payload.content || typeof payload.content !== "string" || payload.content.trim().length === 0) {
+      logger.warn("Invalid coaching note content", {
+        clientId,
+        userId: client.userId,
+        sessionId: client.sessionId
+      })
+      this.sendError(client.ws, "Invalid coaching note: content is required")
       return
     }
 
     // Coaching notes are "hidden" from trainees - only observers and supervisors receive them
     this.broadcastToSessionRoles(
       client.sessionId,
-      ['observer', 'supervisor'],
+      ["observer", "supervisor"],
       {
-        type: 'coaching_note',
+        type: "coaching_note",
         payload: {
           authorId: client.userId,
-          content: payload.content,
+          content: payload.content.trim(),
           timestamp: new Date().toISOString()
         }
       }
