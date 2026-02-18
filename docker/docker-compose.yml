@@ -47,13 +47,13 @@ services:
     image: ollama/ollama:latest
     container_name: pixelated-ollama
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
@@ -71,16 +71,16 @@ services:
       dockerfile: Dockerfile
     container_name: pixelated-ai
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - PORT=8000
     ports:
       - "8000:8000"
@@ -89,6 +89,7 @@ services:
       - ../ai/data:/app/data
     networks:
       - web
+    command: sh -c "chown ubuntu:ubuntu /app/uv.lock && PYTHONPATH=/ uv run python -m ai.main"
 
 networks:
   web:
