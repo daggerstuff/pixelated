@@ -223,17 +223,10 @@ class PIX8Orchestrator:
         Returns:
             Task result
         """
-        args = []
+        args = ["--output-dir", str(self.output_dir)]
         
         if self.test_mode:
             args.extend(["--limit", "5"])
-        
-        args.extend([
-            "--bucket", "pixel-data",
-            "--input-prefix", "processed_ready/",
-            "--output-prefix", "categorized/",
-            "--output-stats", str(self.output_dir / "recategorization_stats.json")
-        ])
         
         result = self._run_script(
             "recategorize_s3_files.py",
@@ -251,20 +244,11 @@ class PIX8Orchestrator:
         Returns:
             Task result
         """
-        args = []
+        args = ["--output-dir", str(self.output_dir)]
         
+        # In test mode, only generate nightmare scenarios (fastest to test)
         if self.test_mode:
-            args.extend(["--test", "10"])
-        else:
-            args.extend([
-                "--nightmare", "25000",
-                "--standard", "50000"
-            ])
-        
-        args.extend([
-            "--bucket", "pixel-data",
-            "--output-prefix", "edge_cases/"
-        ])
+            args.append("--nightmare-only")
         
         result = self._run_script(
             "generate_edge_cases_pix8.py",
@@ -282,17 +266,20 @@ class PIX8Orchestrator:
         Returns:
             Task result
         """
-        args = []
+        args = ["--output-dir", str(self.output_dir)]
         
         if self.test_mode:
-            args.extend(["--test", "10"])
+            # Small test targets
+            args.extend([
+                "--extraction-target", "5",
+                "--synthesis-target", "5"
+            ])
         else:
-            args.extend(["--count", "200000"])
-        
-        args.extend([
-            "--bucket", "pixel-data",
-            "--output-prefix", "long_sessions/"
-        ])
+            # Production targets (200K total)
+            args.extend([
+                "--extraction-target", "100000",
+                "--synthesis-target", "100000"
+            ])
         
         result = self._run_script(
             "generate_long_sessions_pix8.py",
