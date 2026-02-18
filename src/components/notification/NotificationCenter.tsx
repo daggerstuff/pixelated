@@ -18,15 +18,35 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   const [unreadCount, setUnreadCount] = useState(0)
 
   const { sendMessage } = useWebSocket({
-    url: 'ws://localhost:8080', // Placeholder URL
+    url: 'ws://localhost:8082', // Notification worker port
     sessionId: 'placeholder-session', // Placeholder session ID
     onMessage: (message) => {
-      // TODO: This is where incoming messages (lastMessage equivalent) would be handled
-      console.log('Received message:', message)
-      // For now, parsing and handling logic from the original useEffect [lastMessage] needs to be adapted here
-      // Example of how you might handle based on your previous logic:
-      // const data = JSON.parse(message.content) as unknown // Assuming message.content is the stringified data
-      // switch (data.type) { ... }
+      try {
+        const payload = JSON.parse(message.content)
+        switch (payload.type) {
+          case 'notifications':
+            setNotifications(payload.data)
+            const unreadCount = (payload.data as NotificationItem[]).filter(
+              (n) => n.status !== NotificationStatus.READ,
+            ).length
+            setUnreadCount(unreadCount)
+            break
+          case 'notification':
+            setNotifications((prev) => [payload.data, ...prev])
+            if (payload.data.status !== NotificationStatus.READ) {
+              setUnreadCount((prev) => prev + 1)
+            }
+            break
+          case 'unreadCount':
+            setUnreadCount(payload.count)
+            break
+          case 'error':
+            console.error('Notification error:', payload.message)
+            break
+        }
+      } catch (error) {
+        console.error('Failed to parse notification message:', error)
+      }
     },
   })
 
@@ -79,7 +99,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
     )
     if (
       notifications.find((n: NotificationItem) => n.id === notificationId)
-        ?.status === NotificationStatus.PENDING
+        ?.status !== NotificationStatus.READ
     ) {
       setUnreadCount((prev: number) => Math.max(0, prev - 1))
     }
@@ -92,6 +112,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         size="icon"
         className="relative"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -112,6 +133,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
+              aria-label="Close"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -129,7 +151,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                     key={notification.id}
                     className={cn(
                       'flex items-start gap-4 p-4 transition-colors',
-                      notification.status === NotificationStatus.PENDING &&
+                      notification.status !== NotificationStatus.READ &&
                         'bg-muted/50',
                     )}
                   >
@@ -144,11 +166,12 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                     </div>
 
                     <div className="flex gap-1">
-                      {notification.status === NotificationStatus.PENDING && (
+                      {notification.status !== NotificationStatus.READ && (
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => handleMarkAsRead(notification.id)}
+                          aria-label="Mark as read"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -157,6 +180,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDismiss(notification.id)}
+                        aria-label="Dismiss notification"
                       >
                         <X className="h-4 w-4" />
                       </Button>

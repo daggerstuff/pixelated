@@ -1,0 +1,82 @@
+<<<<<<< SEARCH
+  /**
+   * Send a message to a WebSocket client
+   */
+  private sendMessage(ws: WebSocket, message: ServerMessage): void {
+    try {
+      ws.send(JSON.stringify(message))
+    } catch (error: unknown) {
+      logger
+        .createBuildSafeLogger('websocket')
+        .error('Failed to send message to client', {
+          error: error instanceof Error ? String(error) : String(error),
+        })
+    }
+  }
+=======
+  /**
+   * Send a message to a WebSocket client
+   */
+  private sendMessage(ws: WebSocket, message: ServerMessage): void {
+    try {
+      // Wrap the message in a ChatMessage structure to be compatible with useWebSocket hook
+      const chatMessage = {
+        type: 'message',
+        data: {
+          id: crypto.randomUUID(),
+          role: 'system',
+          content: JSON.stringify(message),
+          timestamp: Date.now(),
+        },
+      }
+      ws.send(JSON.stringify(chatMessage))
+    } catch (error: unknown) {
+      logger
+        .createBuildSafeLogger('websocket')
+        .error('Failed to send message to client', {
+          error: error instanceof Error ? String(error) : String(error),
+        })
+    }
+  }
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+  /**
+   * Handle client message
+   */
+  private handleClientMessage(
+    userId: string,
+    data: string,
+    ws: WebSocket,
+  ): void {
+    try {
+      const message: unknown = JSON.parse(data) as unknown
+      const validatedMessage = ClientMessageSchema.parse(message)
+      this.processMessage(userId, validatedMessage, ws)
+    } catch (error: unknown) {
+=======
+  /**
+   * Handle client message
+   */
+  private handleClientMessage(
+    userId: string,
+    data: string,
+    ws: WebSocket,
+  ): void {
+    try {
+      const raw = JSON.parse(data)
+      let payload = raw
+
+      // Check if it is wrapped in a ChatMessage structure (from useWebSocket hook)
+      if (raw.type === 'message' && raw.data?.content) {
+        try {
+          payload = JSON.parse(raw.data.content)
+        } catch {
+          // If content is not JSON, use it as is or handle appropriately
+          payload = raw.data
+        }
+      }
+
+      const validatedMessage = ClientMessageSchema.parse(payload)
+      this.processMessage(userId, validatedMessage, ws)
+    } catch (error: unknown) {
+>>>>>>> REPLACE

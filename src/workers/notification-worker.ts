@@ -1,3 +1,4 @@
+import { config } from '@/config/env.config'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -18,7 +19,7 @@ async function startWorker() {
   const notificationService = new NotificationService()
 
   // Create WebSocket server
-  wsServer = new WebSocketServer()
+  wsServer = new WebSocketServer(config.workers.notification.wsPort(), notificationService)
 
 
   // Handle WebSocket errors

@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events'
 import type { NotificationService } from './NotificationService'
 import * as logger from '../../logging/build-safe-logger'
 import type { WebSocket } from 'ws'
@@ -30,7 +31,7 @@ const ClientMessageSchema = z.discriminatedUnion('type', [
 type ClientMessage = z.infer<typeof ClientMessageSchema>
 
 // Server message types
-interface ServerMessage {
+export interface ServerMessage {
   type: string
   [key: string]: unknown
 }
@@ -47,16 +48,19 @@ interface ServerMessage {
  * Authentication is performed using Supabase JWT tokens passed in the
  * Authorization header as a Bearer token.
  */
-export class WebSocketServer {
+export class WebSocketServer extends EventEmitter {
   private wss: WSServer
   private notificationService: NotificationService
 
   constructor(port: number, notificationService: NotificationService) {
+    super()
     this.notificationService = notificationService
     this.wss = new WSServer({ port })
 
     this.wss.on('connection', this.handleConnection.bind(this))
     this.wss.on('error', this.handleServerError.bind(this))
+
+    this.wss.on('error', (err) => this.emit('error', err))
 
     logger
       .createBuildSafeLogger('websocket')
@@ -77,7 +81,17 @@ export class WebSocketServer {
    */
   private sendMessage(ws: WebSocket, message: ServerMessage): void {
     try {
-      ws.send(JSON.stringify(message))
+      // Wrap the message in a ChatMessage structure to be compatible with useWebSocket hook
+      const chatMessage = {
+        type: 'message',
+        data: {
+          id: crypto.randomUUID(),
+          role: 'system',
+          content: JSON.stringify(message),
+          timestamp: Date.now(),
+        },
+      }
+      ws.send(JSON.stringify(chatMessage))
     } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')
@@ -230,8 +244,20 @@ export class WebSocketServer {
     ws: WebSocket,
   ): void {
     try {
-      const message: unknown = JSON.parse(data) as unknown
-      const validatedMessage = ClientMessageSchema.parse(message)
+      const raw = JSON.parse(data)
+      let payload = raw
+
+      // Check if it is wrapped in a ChatMessage structure (from useWebSocket hook)
+      if (raw.type === 'message' && raw.data?.content) {
+        try {
+          payload = JSON.parse(raw.data.content)
+        } catch {
+          // If content is not JSON, use it as is or handle appropriately
+          payload = raw.data
+        }
+      }
+
+      const validatedMessage = ClientMessageSchema.parse(payload)
       this.processMessage(userId, validatedMessage, ws)
     } catch (error: unknown) {
       logger
@@ -302,5 +328,12 @@ export class WebSocketServer {
         })
       this.sendError(ws, 'Error processing message')
     }
+  }
+
+  /**
+   * Close the WebSocket server
+   */
+  public close(): void {
+    this.wss.close()
   }
 }

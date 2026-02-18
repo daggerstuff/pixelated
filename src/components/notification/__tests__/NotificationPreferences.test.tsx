@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach } from 'vitest'
+import { afterEach } from 'vitest'
+import { afterEach } from 'vitest'
 import { NotificationChannel } from '@/lib/services/notification/NotificationService'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import { NotificationPreferences } from '../NotificationPreferences'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 
@@ -43,6 +47,10 @@ vi.mock('@/hooks/useNotificationPreferences', () => ({
 }))
 
 describe('notificationPreferences', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
