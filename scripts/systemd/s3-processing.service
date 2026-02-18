@@ -1,0 +1,22 @@
+[Unit]
+Description=S3 Full Pipeline Processing - All 589 Files
+After=network.target
+
+[Service]
+Type=simple
+User=vivi
+Group=vivi
+WorkingDirectory=/home/vivi/pixelated
+Environment="PYTHONPATH=/home/vivi/pixelated"
+Environment="AWS_ACCESS_KEY_ID=b6939e6b65ef4252b20338499421a5f0"
+Environment="AWS_SECRET_ACCESS_KEY=4a7e939381c6467c88f81a5024672a96"
+Environment="OVH_S3_ENDPOINT=https://s3.us-east-va.io.cloud.ovh.us"
+Environment="OVH_S3_BUCKET=pixel-data"
+ExecStart=/home/vivi/.local/bin/uv run python -u /home/vivi/pixelated/scripts/data/process_all_s3_full_pipeline.py
+StandardOutput=append:/tmp/s3_processing_service.log
+StandardError=append:/tmp/s3_processing_service.log
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
