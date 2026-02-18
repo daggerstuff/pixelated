@@ -20,6 +20,10 @@ from typing import Dict, Any, List
 from datetime import datetime
 from collections import Counter
 
+# Load .env before any imports that need it
+from dotenv import load_dotenv
+load_dotenv()
+
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
