@@ -1,361 +1,492 @@
 #!/usr/bin/env python3
 """
-PIX-8 Dataset Enhancement Master Orchestrator
+PIX-8 Dataset Enhancement Orchestrator
 
-Coordinates all PIX-8 dataset enhancement tasks:
-1. Re-categorize 67 'Other' files using Phase 2 hybrid classifier
-2. Generate 75K edge cases (25K Nightmare Fuel)
-3. Generate 200K long-running therapy sessions (20+ turns)
-4. Validate enhanced dataset quality
+Master orchestration script for completing PIX-8 dataset enhancement tasks:
+1. Recategorize 67 'Other' files using Phase 2 hybrid classifier
+2. Generate 75K edge cases (25K nightmare fuel + 50K standard)
+3. Generate 200K long-running sessions (20+ turns each)
 
-Progress tracking and reporting to Jira PIX-8.
+Features:
+- Orchestrates all PIX-8 tasks
+- Real-time progress tracking
+- Error handling and recovery
+- Generates comprehensive final report
+- All operations use uv for Python execution
+
+Usage:
+    uv run scripts/data/pix8_dataset_enhancement.py --all
+    uv run scripts/data/pix8_dataset_enhancement.py --task recategorization
+    uv run scripts/data/pix8_dataset_enhancement.py --task edge_cases
+    uv run scripts/data/pix8_dataset_enhancement.py --task long_sessions
+    uv run scripts/data/pix8_dataset_enhancement.py --test  # Small test run
 """
 
 import json
 import logging
-import sys
 import subprocess
+import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from datetime import datetime
+from dataclasses import dataclass, field
 from enum import Enum
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger(__name__)
 
 
-class PIX8Phase(str, Enum):
-    """PIX-8 enhancement phases."""
-    RECATEGORIZATION = "recategorization"
-    EDGE_CASES = "edge_cases"
-    LONG_SESSIONS = "long_sessions"
-    VALIDATION = "validation"
+class TaskStatus(str, Enum):
+    """Status of a PIX-8 task."""
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+
+
+@dataclass
+class TaskResult:
+    """Result of a PIX-8 task execution."""
+    task_name: str
+    status: TaskStatus
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    duration_seconds: float = 0.0
+    records_generated: int = 0
+    error: Optional[str] = None
+    details: Dict[str, Any] = field(default_factory=dict)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "task_name": self.task_name,
+            "status": self.status.value,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "duration_seconds": round(self.duration_seconds, 2),
+            "records_generated": self.records_generated,
+            "error": self.error,
+            "details": self.details,
+        }
 
 
 class PIX8Orchestrator:
-    """Master orchestrator for PIX-8 dataset enhancement."""
+    """
+    Orchestrate all PIX-8 dataset enhancement tasks.
     
-    def __init__(self, output_dir: Path = None):
+    Manages execution of recategorization, edge case generation, and
+    long session generation with proper error handling and reporting.
+    """
+    
+    def __init__(
+        self,
+        test_mode: bool = False,
+        output_dir: Path = Path("metrics")
+    ):
         """
-        Initialize the PIX-8 orchestrator.
+        Initialize orchestrator.
         
         Args:
-            output_dir: Output directory for all PIX-8 outputs
+            test_mode: If True, run small test batches
+            output_dir: Directory for output reports
         """
-        self.output_dir = output_dir or Path("ai/training_ready/data/pix8_enhanced")
+        self.test_mode = test_mode
+        self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        self.scripts_dir = Path(__file__).parent
+        # Task results
+        self.results: Dict[str, TaskResult] = {}
         
-        self.progress = {
-            "started_at": datetime.utcnow().isoformat(),
-            "phases": {},
-            "overall_status": "in_progress"
-        }
+        # Script paths
+        self.project_root = Path(__file__).resolve().parent.parent.parent
+        self.scripts_dir = self.project_root / "scripts" / "data"
         
-        logger.info("="*80)
-        logger.info("PIX-8 DATASET ENHANCEMENT ORCHESTRATOR")
-        logger.info("="*80)
-        logger.info(f"Output directory: {self.output_dir}")
-        logger.info("="*80)
+        logger.info(f"Initialized PIX-8 Orchestrator (test_mode: {test_mode})")
     
-    def run_phase(self, phase: PIX8Phase, script_name: str, args: List[str] = None) -> Dict[str, Any]:
+    def _run_script(
+        self,
+        script_name: str,
+        args: List[str],
+        task_name: str
+    ) -> TaskResult:
         """
-        Run a PIX-8 enhancement phase.
+        Run a Python script using uv.
         
         Args:
-            phase: Phase identifier
-            script_name: Script filename to run
-            args: Additional command-line arguments
+            script_name: Script filename
+            args: Command-line arguments
+            task_name: Human-readable task name
             
         Returns:
-            Phase execution results
+            Task result
         """
-        logger.info("\n" + "="*80)
-        logger.info(f"PHASE: {phase.value.upper()}")
-        logger.info("="*80)
+        import time
+        
+        result = TaskResult(task_name=task_name, status=TaskStatus.IN_PROGRESS)
+        result.start_time = datetime.utcnow().isoformat()
+        start_time = time.time()
         
         script_path = self.scripts_dir / script_name
         
         if not script_path.exists():
-            logger.error(f"Script not found: {script_path}")
-            return {
-                "phase": phase.value,
-                "status": "failed",
-                "error": f"Script not found: {script_path}"
-            }
+            result.status = TaskStatus.FAILED
+            result.error = f"Script not found: {script_path}"
+            result.end_time = datetime.utcnow().isoformat()
+            result.duration_seconds = time.time() - start_time
+            return result
         
-        cmd = ["python3", str(script_path)]
-        if args:
-            cmd.extend(args)
+        # Build command using uv
+        cmd = ["uv", "run", str(script_path)] + args
         
-        logger.info(f"Running: {' '.join(cmd)}")
-        
-        phase_result = {
-            "phase": phase.value,
-            "script": script_name,
-            "command": ' '.join(cmd),
-            "started_at": datetime.utcnow().isoformat()
-        }
+        logger.info(f"🚀 Starting: {task_name}")
+        logger.info(f"   Command: {' '.join(cmd)}")
         
         try:
-            result = subprocess.run(
+            # Run with real-time output
+            process = subprocess.Popen(
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
-                check=True
+                bufsize=1,
+                universal_newlines=True,
+                cwd=str(self.project_root)
             )
             
-            phase_result["status"] = "success"
-            phase_result["stdout"] = result.stdout
-            phase_result["completed_at"] = datetime.utcnow().isoformat()
+            # Stream output
+            output_lines = []
+            if process.stdout:
+                for line in process.stdout:
+                    line = line.rstrip()
+                    output_lines.append(line)
+                    print(f"  {line}")
             
-            logger.info(f"✅ Phase {phase.value} completed successfully!")
-            logger.info(result.stdout)
+            # Wait for completion
+            return_code = process.wait()
             
-        except subprocess.CalledProcessError as e:
-            phase_result["status"] = "failed"
-            phase_result["error"] = str(e)
-            phase_result["stdout"] = e.stdout
-            phase_result["stderr"] = e.stderr
-            phase_result["failed_at"] = datetime.utcnow().isoformat()
+            result.end_time = datetime.utcnow().isoformat()
+            result.duration_seconds = time.time() - start_time
             
-            logger.error(f"❌ Phase {phase.value} failed!")
-            logger.error(f"Error: {e}")
-            logger.error(f"stdout: {e.stdout}")
-            logger.error(f"stderr: {e.stderr}")
+            if return_code == 0:
+                result.status = TaskStatus.COMPLETED
+                logger.info(f"✅ Completed: {task_name} ({result.duration_seconds:.1f}s)")
+                
+                # Try to extract statistics from output
+                stats = self._parse_output_stats(output_lines)
+                if stats:
+                    result.details = stats
+                    result.records_generated = stats.get("total_generated", 0) or stats.get("total_records", 0)
+            else:
+                result.status = TaskStatus.FAILED
+                result.error = f"Script exited with code {return_code}"
+                logger.error(f"❌ Failed: {task_name} - {result.error}")
         
-        self.progress["phases"][phase.value] = phase_result
-        self._save_progress()
+        except Exception as e:
+            result.status = TaskStatus.FAILED
+            result.error = str(e)
+            result.end_time = datetime.utcnow().isoformat()
+            result.duration_seconds = time.time() - start_time
+            logger.error(f"❌ Failed: {task_name} - {e}", exc_info=True)
         
-        return phase_result
+        return result
     
-    def phase_1_recategorization(self) -> Dict[str, Any]:
+    def _parse_output_stats(self, output_lines: List[str]) -> Dict[str, Any]:
         """
-        Phase 1: Re-categorize 67 'Other' files using Phase 2 hybrid classifier.
+        Parse statistics from script output.
         
-        Uses NVIDIA NIM GLM4.7 for edge cases and ambiguous entries.
+        Args:
+            output_lines: Output lines from script
+            
+        Returns:
+            Parsed statistics
         """
-        logger.info("\n🔄 Starting Phase 1: Recategorization")
-        logger.info("Task: Re-categorize 67 'Other' files with hybrid classifier")
-        logger.info("Expected: Proper taxonomy for 60% of dataset")
+        stats = {}
         
-        return self.run_phase(
-            phase=PIX8Phase.RECATEGORIZATION,
-            script_name="recategorize_s3_files.py",
-            args=["--threshold=0.70"]
-        )
+        # Look for JSON stats in output
+        for line in output_lines:
+            if "total_generated" in line.lower() or "total_records" in line.lower():
+                # Try to extract numbers
+                import re
+                numbers = re.findall(r'(\d+(?:,\d+)*)', line)
+                if numbers:
+                    # Remove commas and convert to int
+                    value = int(numbers[0].replace(',', ''))
+                    if "total" in line.lower():
+                        stats["total_generated"] = value
+        
+        return stats
     
-    def phase_2_edge_cases(self) -> Dict[str, Any]:
+    def run_recategorization(self) -> TaskResult:
         """
-        Phase 2: Generate 75K edge cases (25K Nightmare Fuel).
-        
-        Uses NeMo Data Designer for extreme therapeutic scenarios.
-        """
-        logger.info("\n🔥 Starting Phase 2: Edge Case Generation")
-        logger.info("Task: Generate 75K edge cases")
-        logger.info("  - 25K Nightmare Fuel (extreme scenarios)")
-        logger.info("  - 50K Standard edge cases")
-        
-        return self.run_phase(
-            phase=PIX8Phase.EDGE_CASES,
-            script_name="generate_edge_cases_pix8.py"
-        )
-    
-    def phase_3_long_sessions(self) -> Dict[str, Any]:
-        """
-        Phase 3: Generate 200K long-running therapy sessions (20+ turns).
-        
-        Extracts from existing datasets and generates synthetic sessions.
-        """
-        logger.info("\n💬 Starting Phase 3: Long-Running Session Generation")
-        logger.info("Task: Generate 200K sessions with ≥20 turns")
-        logger.info("  - 100K from extraction")
-        logger.info("  - 100K synthetic (if available)")
-        
-        return self.run_phase(
-            phase=PIX8Phase.LONG_SESSIONS,
-            script_name="generate_long_sessions_pix8.py",
-            args=["--min-turns=20"]
-        )
-    
-    def phase_4_validation(self) -> Dict[str, Any]:
-        """
-        Phase 4: Validate enhanced dataset quality.
-        
-        Checks:
-        - Categorization distribution
-        - Edge case coverage
-        - Session length distribution
-        - Overall dataset quality
-        """
-        logger.info("\n✅ Starting Phase 4: Validation")
-        logger.info("Task: Validate enhanced dataset quality")
-        
-        # For now, collect statistics from previous phases
-        validation_result = {
-            "phase": PIX8Phase.VALIDATION.value,
-            "started_at": datetime.utcnow().isoformat(),
-            "status": "success"
-        }
-        
-        # Aggregate statistics from phases
-        stats = {
-            "recategorization": self._extract_stats(PIX8Phase.RECATEGORIZATION),
-            "edge_cases": self._extract_stats(PIX8Phase.EDGE_CASES),
-            "long_sessions": self._extract_stats(PIX8Phase.LONG_SESSIONS)
-        }
-        
-        validation_result["statistics"] = stats
-        validation_result["completed_at"] = datetime.utcnow().isoformat()
-        
-        self.progress["phases"][PIX8Phase.VALIDATION.value] = validation_result
-        self._save_progress()
-        
-        logger.info("✅ Validation complete!")
-        
-        return validation_result
-    
-    def _extract_stats(self, phase: PIX8Phase) -> Dict[str, Any]:
-        """Extract statistics from a phase's output."""
-        if phase.value not in self.progress["phases"]:
-            return {"status": "not_run"}
-        
-        phase_data = self.progress["phases"][phase.value]
-        
-        # Try to find stats file
-        stats_files = {
-            PIX8Phase.RECATEGORIZATION: "metrics/recategorization_stats.json",
-            PIX8Phase.EDGE_CASES: "ai/training_ready/data/generated/pix8_edge_cases/pix8_edge_cases_stats.json",
-            PIX8Phase.LONG_SESSIONS: "ai/training_ready/data/generated/pix8_long_sessions/pix8_long_sessions_stats.json"
-        }
-        
-        stats_file = Path(stats_files.get(phase, ""))
-        if stats_file.exists():
-            with open(stats_file, 'r') as f:
-                return json.load(f)
-        
-        return {"status": phase_data.get("status", "unknown")}
-    
-    def run_all_phases(self) -> Dict[str, Any]:
-        """
-        Run all PIX-8 enhancement phases in sequence.
+        Run recategorization task.
         
         Returns:
-            Final orchestration results
+            Task result
         """
-        logger.info("\n🚀 Starting PIX-8 Dataset Enhancement")
-        logger.info("All phases will run in sequence:")
-        logger.info("  1. Recategorization (hybrid classifier)")
-        logger.info("  2. Edge Case Generation (75K total)")
-        logger.info("  3. Long Session Generation (200K total)")
-        logger.info("  4. Validation")
+        args = []
         
-        # Phase 1: Recategorization
-        phase1_result = self.phase_1_recategorization()
-        if phase1_result["status"] != "success":
-            logger.warning("⚠️  Phase 1 failed, continuing with remaining phases...")
+        if self.test_mode:
+            args.extend(["--limit", "5"])
         
-        # Phase 2: Edge Cases
-        phase2_result = self.phase_2_edge_cases()
-        if phase2_result["status"] != "success":
-            logger.warning("⚠️  Phase 2 failed, continuing with remaining phases...")
+        args.extend([
+            "--bucket", "pixel-data",
+            "--input-prefix", "processed_ready/",
+            "--output-prefix", "categorized/",
+            "--output-stats", str(self.output_dir / "recategorization_stats.json")
+        ])
         
-        # Phase 3: Long Sessions
-        phase3_result = self.phase_3_long_sessions()
-        if phase3_result["status"] != "success":
-            logger.warning("⚠️  Phase 3 failed, continuing with validation...")
-        
-        # Phase 4: Validation
-        phase4_result = self.phase_4_validation()
-        
-        # Final summary
-        self.progress["completed_at"] = datetime.utcnow().isoformat()
-        
-        successful_phases = sum(
-            1 for p in self.progress["phases"].values()
-            if p.get("status") == "success"
+        result = self._run_script(
+            "recategorize_s3_files.py",
+            args,
+            "Recategorization"
         )
         
-        if successful_phases == 4:
-            self.progress["overall_status"] = "success"
-        elif successful_phases > 0:
-            self.progress["overall_status"] = "partial_success"
+        self.results["recategorization"] = result
+        return result
+    
+    def run_edge_case_generation(self) -> TaskResult:
+        """
+        Run edge case generation task.
+        
+        Returns:
+            Task result
+        """
+        args = []
+        
+        if self.test_mode:
+            args.extend(["--test", "10"])
         else:
-            self.progress["overall_status"] = "failed"
+            args.extend([
+                "--nightmare", "25000",
+                "--standard", "50000"
+            ])
         
-        self._save_progress()
-        self._print_final_summary()
+        args.extend([
+            "--bucket", "pixel-data",
+            "--output-prefix", "edge_cases/"
+        ])
         
-        return self.progress
+        result = self._run_script(
+            "generate_edge_cases_pix8.py",
+            args,
+            "Edge Case Generation"
+        )
+        
+        self.results["edge_cases"] = result
+        return result
     
-    def _save_progress(self):
-        """Save progress to JSON file."""
-        progress_file = self.output_dir / "pix8_progress.json"
-        with open(progress_file, 'w') as f:
-            json.dump(self.progress, f, indent=2)
-        logger.debug(f"Progress saved: {progress_file}")
+    def run_long_session_generation(self) -> TaskResult:
+        """
+        Run long session generation task.
+        
+        Returns:
+            Task result
+        """
+        args = []
+        
+        if self.test_mode:
+            args.extend(["--test", "10"])
+        else:
+            args.extend(["--count", "200000"])
+        
+        args.extend([
+            "--bucket", "pixel-data",
+            "--output-prefix", "long_sessions/"
+        ])
+        
+        result = self._run_script(
+            "generate_long_sessions_pix8.py",
+            args,
+            "Long Session Generation"
+        )
+        
+        self.results["long_sessions"] = result
+        return result
     
-    def _print_final_summary(self):
-        """Print final execution summary."""
+    def run_all(self) -> Dict[str, TaskResult]:
+        """
+        Run all PIX-8 tasks in sequence.
+        
+        Returns:
+            Dictionary of task results
+        """
         logger.info("\n" + "="*80)
-        logger.info("📊 PIX-8 DATASET ENHANCEMENT - FINAL SUMMARY")
+        logger.info("🚀 STARTING PIX-8 DATASET ENHANCEMENT")
         logger.info("="*80)
         
-        for phase_name, phase_data in self.progress["phases"].items():
-            status_icon = "✅" if phase_data.get("status") == "success" else "❌"
-            logger.info(f"{status_icon} {phase_name.upper()}: {phase_data.get('status', 'unknown')}")
+        if self.test_mode:
+            logger.info("⚠️  TEST MODE: Running small batches for validation")
         
-        logger.info("\n" + "="*80)
-        logger.info(f"Overall Status: {self.progress['overall_status'].upper()}")
-        logger.info(f"Duration: {self.progress.get('started_at')} → {self.progress.get('completed_at')}")
-        logger.info(f"Progress file: {self.output_dir / 'pix8_progress.json'}")
-        logger.info("="*80)
+        # Task 1: Recategorization
+        logger.info("\n📋 TASK 1/3: Recategorization")
+        self.run_recategorization()
+        
+        # Task 2: Edge Cases
+        logger.info("\n📋 TASK 2/3: Edge Case Generation")
+        self.run_edge_case_generation()
+        
+        # Task 3: Long Sessions
+        logger.info("\n📋 TASK 3/3: Long Session Generation")
+        self.run_long_session_generation()
+        
+        return self.results
+    
+    def generate_report(self) -> Dict[str, Any]:
+        """
+        Generate comprehensive PIX-8 completion report.
+        
+        Returns:
+            Report dictionary
+        """
+        report = {
+            "pix8_dataset_enhancement": {
+                "timestamp": datetime.utcnow().isoformat(),
+                "test_mode": self.test_mode,
+                "overall_status": self._calculate_overall_status(),
+                "tasks": {
+                    name: result.to_dict()
+                    for name, result in self.results.items()
+                },
+                "summary": {
+                    "total_tasks": len(self.results),
+                    "completed": sum(1 for r in self.results.values() if r.status == TaskStatus.COMPLETED),
+                    "failed": sum(1 for r in self.results.values() if r.status == TaskStatus.FAILED),
+                    "total_records_generated": sum(r.records_generated for r in self.results.values()),
+                    "total_duration_seconds": sum(r.duration_seconds for r in self.results.values()),
+                }
+            }
+        }
+        
+        return report
+    
+    def _calculate_overall_status(self) -> str:
+        """Calculate overall completion status."""
+        if not self.results:
+            return "not_started"
+        
+        statuses = [r.status for r in self.results.values()]
+        
+        if all(s == TaskStatus.COMPLETED for s in statuses):
+            return "completed"
+        elif any(s == TaskStatus.FAILED for s in statuses):
+            return "partial_failure"
+        elif any(s == TaskStatus.IN_PROGRESS for s in statuses):
+            return "in_progress"
+        else:
+            return "unknown"
+    
+    def save_report(self, filename: str = "pix8_completion_report.json"):
+        """
+        Save report to file.
+        
+        Args:
+            filename: Output filename
+        """
+        report = self.generate_report()
+        output_path = self.output_dir / filename
+        
+        with open(output_path, 'w') as f:
+            json.dump(report, f, indent=2)
+        
+        logger.info(f"💾 Saved report: {output_path}")
+        return output_path
+    
+    def print_summary(self):
+        """Print human-readable summary."""
+        report = self.generate_report()
+        summary = report["pix8_dataset_enhancement"]["summary"]
+        
+        print("\n" + "="*80)
+        print("📊 PIX-8 DATASET ENHANCEMENT SUMMARY")
+        print("="*80)
+        print(f"Overall Status:    {report['pix8_dataset_enhancement']['overall_status']}")
+        print(f"Test Mode:         {self.test_mode}")
+        print(f"Total Tasks:       {summary['total_tasks']}")
+        print(f"Completed:         {summary['completed']}")
+        print(f"Failed:            {summary['failed']}")
+        print(f"Records Generated: {summary['total_records_generated']:,}")
+        print(f"Total Duration:    {summary['total_duration_seconds']:.1f}s")
+        print("\nTask Details:")
+        
+        for name, result in self.results.items():
+            status_emoji = {
+                TaskStatus.COMPLETED: "✅",
+                TaskStatus.FAILED: "❌",
+                TaskStatus.IN_PROGRESS: "🔄",
+                TaskStatus.PENDING: "⏳",
+                TaskStatus.SKIPPED: "⏭️"
+            }.get(result.status, "❓")
+            
+            print(f"  {status_emoji} {result.task_name:30s}: {result.status.value:12s} "
+                  f"({result.duration_seconds:.1f}s, {result.records_generated:,} records)")
+            
+            if result.error:
+                print(f"     Error: {result.error}")
+        
+        print("="*80)
 
 
 def main():
-    """Run PIX-8 dataset enhancement orchestrator."""
+    """Run PIX-8 orchestration."""
     import argparse
     
     parser = argparse.ArgumentParser(
-        description="PIX-8 Dataset Enhancement Master Orchestrator"
+        description="Orchestrate PIX-8 dataset enhancement tasks"
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Run all tasks"
+    )
+    parser.add_argument(
+        "--task",
+        choices=["recategorization", "edge_cases", "long_sessions"],
+        help="Run specific task"
+    )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Test mode: run small batches"
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("ai/training_ready/data/pix8_enhanced"),
-        help="Output directory for PIX-8 outputs"
-    )
-    parser.add_argument(
-        "--phase",
-        type=str,
-        choices=["recategorization", "edge_cases", "long_sessions", "validation", "all"],
-        default="all",
-        help="Phase to run (default: all)"
+        default=Path("metrics"),
+        help="Output directory for reports (default: metrics)"
     )
     
     args = parser.parse_args()
     
-    orchestrator = PIX8Orchestrator(output_dir=args.output_dir)
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
-    if args.phase == "all":
-        results = orchestrator.run_all_phases()
-    elif args.phase == "recategorization":
-        results = orchestrator.phase_1_recategorization()
-    elif args.phase == "edge_cases":
-        results = orchestrator.phase_2_edge_cases()
-    elif args.phase == "long_sessions":
-        results = orchestrator.phase_3_long_sessions()
-    elif args.phase == "validation":
-        results = orchestrator.phase_4_validation()
+    # Initialize orchestrator
+    orchestrator = PIX8Orchestrator(
+        test_mode=args.test,
+        output_dir=args.output_dir
+    )
     
-    logger.info("\n✅ PIX-8 dataset enhancement orchestration complete!")
+    # Execute tasks
+    if args.all:
+        orchestrator.run_all()
+    elif args.task:
+        if args.task == "recategorization":
+            orchestrator.run_recategorization()
+        elif args.task == "edge_cases":
+            orchestrator.run_edge_case_generation()
+        elif args.task == "long_sessions":
+            orchestrator.run_long_session_generation()
+    else:
+        parser.print_help()
+        sys.exit(1)
     
-    return 0 if results.get("overall_status") in ["success", "partial_success"] else 1
+    # Generate and save report
+    orchestrator.save_report()
+    orchestrator.print_summary()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
