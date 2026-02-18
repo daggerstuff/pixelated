@@ -1,120 +1,170 @@
 #!/usr/bin/env python3
 """
-Re-categorize S3 'Other' Files Using Taxonomy Classifier
+Re-categorize S3 'Other' Files Using Hybrid Taxonomy Classifier
 
-This script processes the 67 'Other' labeled files (132,801 records) from
-s3://pixel-data/processed_ready/ and re-categorizes them using the taxonomy
-classifier into 6 therapeutic categories.
+Processes files from OVHAI S3 bucket and re-categorizes them using the
+Phase 2 hybrid taxonomy classifier (keyword + LLM fallback).
 
-Output: s3://pixel-data/categorized/
+Usage:
+    uv run scripts/data/recategorize_s3_files.py --limit 5
+    uv run scripts/data/recategorize_s3_files.py --output-dir metrics/
 """
 
 import json
 import logging
+import os
 import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from collections import Counter
 from datetime import datetime
+from dataclasses import dataclass, field
 
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from ai.pipelines.design.taxonomy_classifier import TherapeuticCategory
 from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
-from ai.data.loaders.s3_dataset_loader import S3DatasetLoader
+from ai.infrastructure.s3.s3_dataset_loader import S3DatasetLoader, S3Config
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class RecategorizationStats:
+    """Statistics for recategorization process."""
+    total_files: int = 0
+    total_records: int = 0
+    classified_records: int = 0
+    low_confidence_records: int = 0
+    category_counts: Dict[str, int] = field(default_factory=dict)
+    avg_confidence: float = 0.0
+    start_time: str = ""
+    end_time: str = ""
+    duration_seconds: float = 0.0
+
+
 class S3Recategorizer:
     """
-    Re-categorize S3 files using the taxonomy classifier.
+    Re-categorize S3 files using the hybrid taxonomy classifier.
     
-    Processes files from s3://pixel-data/processed_ready/ that are labeled 'Other'
-    and writes categorized versions to s3://pixel-data/categorized/
+    Uses Phase 2 hybrid classifier: keyword-based (fast) with LLM fallback (accurate).
     """
     
     def __init__(
         self,
-        input_bucket: str = "pixel-data",
-        input_prefix: str = "processed_ready/",
-        output_bucket: str = "pixel-data",
-        output_prefix: str = "categorized/",
+        output_dir: Path = Path("metrics"),
         confidence_threshold: float = 0.70
     ):
         """
         Initialize the recategorizer.
         
         Args:
-            input_bucket: S3 bucket for input files
-            input_prefix: S3 prefix for input files
-            output_bucket: S3 bucket for output files
-            output_prefix: S3 prefix for output files
+            output_dir: Directory for output statistics
             confidence_threshold: Minimum confidence for classification
         """
-        self.input_bucket = input_bucket
-        self.input_prefix = input_prefix
-        self.output_bucket = output_bucket
-        self.output_prefix = output_prefix
+        self.output_dir = output_dir
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.confidence_threshold = confidence_threshold
         
-        self.s3_loader = S3DatasetLoader()
-        self.classifier = HybridTaxonomyClassifier(enable_llm=True, confidence_threshold=0.80)
+        # Initialize S3 loader with OVHAI configuration
+        s3_config = S3Config(
+            endpoint_url=os.getenv("OVH_S3_ENDPOINT"),
+            bucket_name="pixel-data",
+            access_key_id=os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID"),
+            secret_access_key=os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY"),
+            region_name=os.getenv("OVH_S3_REGION", "us-east-va"),
+        )
+        self.s3_loader = S3DatasetLoader(s3_config)
         
-        logger.info(f"Initialized recategorizer with hybrid classifier: {input_bucket}/{input_prefix} -> {output_bucket}/{output_prefix}")
-        logger.info(f"Using NVIDIA NIM GLM4.7 for low-confidence cases (threshold: 0.80)")
+        # Initialize hybrid classifier
+        self.classifier = HybridTaxonomyClassifier(
+            enable_llm=True,
+            keyword_confidence_threshold=0.80,
+            final_confidence_threshold=self.confidence_threshold
+        )
+        
+        logger.info("Initialized S3 Recategorizer")
+        logger.info(f"S3 Endpoint: {s3_config.endpoint_url}")
+        logger.info(f"S3 Bucket: {s3_config.bucket_name}")
+        logger.info(f"Using NVIDIA NIM GLM4.7 for low-confidence cases")
     
-    def list_other_files(self) -> List[str]:
+    def list_files_to_recategorize(
+        self,
+        prefix: str = "processed_ready/",
+        limit: Optional[int] = None
+    ) -> List[str]:
         """
-        List all files labeled as 'Other' in the S3 bucket.
+        List files that need recategorization.
         
+        Args:
+            prefix: S3 prefix to list files from
+            limit: Maximum number of files to return
+            
         Returns:
-            List of S3 keys for 'Other' files
+            List of S3 keys
         """
-        logger.info(f"Listing files in s3://{self.input_bucket}/{self.input_prefix}")
-        
-        # For now, return a sample - in production, use boto3 to list all files
-        # and filter by metadata or filename pattern
-        import boto3
-        
-        s3 = boto3.client('s3')
+        logger.info(f"Listing files in s3://pixel-data/{prefix}")
         
         try:
-            response = s3.list_objects_v2(
-                Bucket=self.input_bucket,
-                Prefix=self.input_prefix
-            )
+            all_keys = self.s3_loader.list_objects(prefix=prefix)
+            jsonl_files = [k for k in all_keys if k.endswith('.jsonl')]
             
-            all_files = [obj['Key'] for obj in response.get('Contents', [])]
+            if limit:
+                jsonl_files = jsonl_files[:limit]
             
-            # Filter for JSONL files
-            jsonl_files = [f for f in all_files if f.endswith('.jsonl')]
-            
-            logger.info(f"Found {len(jsonl_files)} JSONL files")
-            
-            # TODO: Filter by 'Other' category metadata
-            # For now, return all files - categorization will update them
+            logger.info(f"Found {len(jsonl_files)} JSONL files to process")
             return jsonl_files
             
         except Exception as e:
             logger.error(f"Failed to list S3 files: {e}")
             return []
     
-    def process_file_streaming(
+    def extract_text_from_record(self, record: Dict[str, Any]) -> str:
+        """
+        Extract text content from a record in various formats.
+        
+        Args:
+            record: Dataset record
+            
+        Returns:
+            Extracted text content
+        """
+        if "text" in record:
+            return record["text"]
+        elif "messages" in record and isinstance(record["messages"], list):
+            texts = []
+            for msg in record["messages"]:
+                if isinstance(msg, dict) and "content" in msg:
+                    texts.append(msg["content"])
+            return " ".join(texts)
+        elif "conversation" in record and isinstance(record["conversation"], list):
+            texts = []
+            for turn in record["conversation"]:
+                if isinstance(turn, dict) and "content" in turn:
+                    texts.append(turn["content"])
+            return " ".join(texts)
+        else:
+            # Fallback: try to find any text field
+            for key in ["input", "prompt", "query", "question"]:
+                if key in record and isinstance(record[key], str):
+                    return record[key]
+            return ""
+    
+    def process_file(
         self,
         s3_key: str,
-        batch_size: int = 1000
+        output_prefix: str = "categorized/"
     ) -> Dict[str, Any]:
         """
-        Process a single S3 file in streaming mode (S3 -> classify -> S3).
+        Process a single S3 file and recategorize its records.
         
         Args:
             s3_key: S3 key for input file
-            batch_size: Records to process before writing to S3
+            output_prefix: S3 prefix for output files
             
         Returns:
-            Statistics for this file
+            File processing statistics
         """
         logger.info(f"Processing: {s3_key}")
         
@@ -127,79 +177,56 @@ class S3Recategorizer:
             "avg_confidence": 0.0
         }
         
-        import boto3
-        
-        s3 = boto3.client('s3')
-        
-        # Output key
-        filename = Path(s3_key).name
-        output_key = f"{self.output_prefix}{filename}"
-        
-        total_confidence = 0.0
-        records_buffer = []
-        
         try:
-            # Stream input from S3
-            response = s3.get_object(Bucket=self.input_bucket, Key=s3_key)
+            # Load file from S3
+            records = self.s3_loader.load_jsonl(s3_key)
+            stats["total_records"] = len(records)
             
-            for line in response['Body'].iter_lines():
-                if not line:
+            total_confidence = 0.0
+            processed_records = []
+            
+            for record in records:
+                # Extract text
+                text = self.extract_text_from_record(record)
+                
+                if not text:
+                    logger.warning(f"No text found in record: {record.keys()}")
+                    processed_records.append(record)
                     continue
                 
-                try:
-                    record = json.loads(line)
-                    stats["total_records"] += 1
-                    
-                    # Classify using hybrid classifier (keyword + LLM fallback)
-                    # Extract text from record (handle various formats)
-                    text = ""
-                    if "text" in record:
-                        text = record["text"]
-                    elif "messages" in record:
-                        text = " ".join([msg.get("content", "") for msg in record["messages"]])
-                    elif "conversation" in record:
-                        text = " ".join([turn.get("content", "") for turn in record["conversation"]])
-                    
-                    classification = self.classifier.classify(text)
-                    total_confidence += classification.confidence
-                    
-                    # Update record with classification
-                    if "metadata" not in record:
-                        record["metadata"] = {}
-                    
-                    if classification.confidence >= self.confidence_threshold:
-                        record["metadata"]["category"] = classification.category.value
-                        record["metadata"]["category_confidence"] = classification.confidence
-                        record["metadata"]["category_reasoning"] = classification.reasoning
-                        record["metadata"]["recategorized_at"] = datetime.utcnow().isoformat()
-                        stats["classified"] += 1
-                        stats["categories"][classification.category.value] += 1
-                    else:
-                        stats["low_confidence"] += 1
-                        record["metadata"]["category"] = "uncategorized"
-                        record["metadata"]["category_confidence"] = classification.confidence
-                    
-                    # Add to buffer
-                    records_buffer.append(json.dumps(record))
-                    
-                    # Write batch to S3
-                    if len(records_buffer) >= batch_size:
-                        self._write_batch_to_s3(output_key, records_buffer, append=True)
-                        records_buffer = []
-                    
-                except json.JSONDecodeError:
-                    logger.warning(f"Invalid JSON in {s3_key}")
-                    continue
+                # Classify using hybrid classifier
+                classification = self.classifier.classify(text)
+                total_confidence += classification.confidence
+                
+                # Update record metadata
+                if "metadata" not in record:
+                    record["metadata"] = {}
+                
+                if classification.confidence >= self.confidence_threshold:
+                    record["metadata"]["category"] = classification.category.value
+                    record["metadata"]["category_confidence"] = classification.confidence
+                    record["metadata"]["category_reasoning"] = classification.reasoning
+                    record["metadata"]["recategorized_at"] = datetime.utcnow().isoformat()
+                    stats["classified"] += 1
+                    stats["categories"][classification.category.value] += 1
+                else:
+                    record["metadata"]["category"] = "uncategorized"
+                    record["metadata"]["category_confidence"] = classification.confidence
+                    stats["low_confidence"] += 1
+                
+                processed_records.append(record)
             
-            # Write remaining records
-            if records_buffer:
-                self._write_batch_to_s3(output_key, records_buffer, append=True)
-            
+            # Calculate average confidence
             if stats["total_records"] > 0:
                 stats["avg_confidence"] = total_confidence / stats["total_records"]
             
+            # Save to S3
+            filename = Path(s3_key).name
+            output_key = f"{output_prefix}{filename}"
+            self.s3_loader.save_jsonl(output_key, processed_records)
+            
             logger.info(f"✅ {filename}: {stats['classified']}/{stats['total_records']} "
-                       f"(avg confidence: {stats['avg_confidence']:.2f})")
+                       f"(avg confidence: {stats['avg_confidence']:.2%})")
             
         except Exception as e:
             logger.error(f"Failed to process {s3_key}: {e}")
@@ -207,103 +234,93 @@ class S3Recategorizer:
         
         return stats
     
-    def _write_batch_to_s3(
+    def process_all_files(
         self,
-        s3_key: str,
-        records: List[str],
-        append: bool = False
-    ):
+        input_prefix: str = "processed_ready/",
+        output_prefix: str = "categorized/",
+        limit: Optional[int] = None
+    ) -> RecategorizationStats:
         """
-        Write a batch of records to S3.
+        Process all files and generate aggregate statistics.
         
         Args:
-            s3_key: S3 key for output file
-            records: List of JSON strings
-            append: Whether to append to existing file
-        """
-        import boto3
-        
-        s3 = boto3.client('s3')
-        
-        content = "\n".join(records) + "\n"
-        
-        if append:
-            # TODO: Implement proper append logic (read existing, concatenate, write)
-            # For now, this is simplified
-            pass
-        
-        s3.put_object(
-            Bucket=self.output_bucket,
-            Key=s3_key,
-            Body=content.encode('utf-8'),
-            ContentType='application/x-ndjson'
-        )
-    
-    def process_all_files(self, limit: int = None) -> Dict[str, Any]:
-        """
-        Process all 'Other' files and generate aggregate statistics.
-        
-        Args:
-            limit: Maximum number of files to process (for testing)
+            input_prefix: S3 prefix for input files
+            output_prefix: S3 prefix for output files
+            limit: Maximum number of files to process
             
         Returns:
             Aggregate statistics
         """
-        other_files = self.list_other_files()
+        start_time = datetime.utcnow()
         
-        if limit:
-            other_files = other_files[:limit]
+        # List files
+        files_to_process = self.list_files_to_recategorize(
+            prefix=input_prefix,
+            limit=limit
+        )
         
-        logger.info(f"Processing {len(other_files)} files")
+        logger.info(f"Processing {len(files_to_process)} files")
         
-        aggregate_stats = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "total_files": len(other_files),
-            "total_records": 0,
-            "total_classified": 0,
-            "total_low_confidence": 0,
-            "categories": {cat.value: 0 for cat in TherapeuticCategory},
-            "avg_confidence": 0.0,
-            "file_stats": []
-        }
+        # Initialize stats
+        stats = RecategorizationStats(
+            start_time=start_time.isoformat(),
+            total_files=len(files_to_process),
+            category_counts={cat.value: 0 for cat in TherapeuticCategory}
+        )
         
         total_confidence = 0.0
+        file_stats_list = []
         
-        for i, s3_key in enumerate(other_files, 1):
-            logger.info(f"\n[{i}/{len(other_files)}] Processing: {s3_key}")
+        # Process each file
+        for i, s3_key in enumerate(files_to_process, 1):
+            logger.info(f"\n[{i}/{len(files_to_process)}] Processing: {s3_key}")
             
-            file_stats = self.process_file_streaming(s3_key)
+            file_stats = self.process_file(s3_key, output_prefix=output_prefix)
             
             # Aggregate
-            aggregate_stats["total_records"] += file_stats["total_records"]
-            aggregate_stats["total_classified"] += file_stats["classified"]
-            aggregate_stats["total_low_confidence"] += file_stats["low_confidence"]
+            stats.total_records += file_stats["total_records"]
+            stats.classified_records += file_stats["classified"]
+            stats.low_confidence_records += file_stats["low_confidence"]
             
             for cat, count in file_stats["categories"].items():
-                aggregate_stats["categories"][cat] += count
+                stats.category_counts[cat] = stats.category_counts.get(cat, 0) + count
             
             if file_stats["total_records"] > 0:
                 total_confidence += file_stats["avg_confidence"] * file_stats["total_records"]
             
-            aggregate_stats["file_stats"].append(file_stats)
+            file_stats_list.append(file_stats)
         
-        if aggregate_stats["total_records"] > 0:
-            aggregate_stats["avg_confidence"] = total_confidence / aggregate_stats["total_records"]
+        # Finalize stats
+        end_time = datetime.utcnow()
+        stats.end_time = end_time.isoformat()
+        stats.duration_seconds = (end_time - start_time).total_seconds()
         
-        return aggregate_stats
+        if stats.total_records > 0:
+            stats.avg_confidence = total_confidence / stats.total_records
+        
+        # Save detailed stats
+        output_file = self.output_dir / "recategorization_stats.json"
+        with open(output_file, 'w') as f:
+            json.dump({
+                "summary": stats.__dict__,
+                "file_details": file_stats_list
+            }, f, indent=2)
+        
+        logger.info(f"💾 Saved statistics: {output_file}")
+        
+        return stats
 
 
 def main():
     """Run the recategorization process."""
     import argparse
     
-    parser = argparse.ArgumentParser(description="Re-categorize S3 'Other' files")
+    parser = argparse.ArgumentParser(description="Re-categorize S3 'Other' files using hybrid classifier")
     parser.add_argument("--limit", type=int, help="Limit number of files (for testing)")
     parser.add_argument("--threshold", type=float, default=0.70,
                        help="Confidence threshold (default: 0.70)")
-    parser.add_argument("--output-stats", type=Path, 
-                       default=Path("metrics/recategorization_stats.json"),
-                       help="Output statistics file")
+    parser.add_argument("--output-dir", type=Path, default=Path("metrics"),
+                       help="Output directory for statistics")
     
     args = parser.parse_args()
     
@@ -312,29 +329,27 @@ def main():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     
-    recategorizer = S3Recategorizer(confidence_threshold=args.threshold)
+    recategorizer = S3Recategorizer(
+        output_dir=args.output_dir,
+        confidence_threshold=args.threshold
+    )
     stats = recategorizer.process_all_files(limit=args.limit)
     
     # Print summary
     print("\n" + "="*80)
     print("📊 RECATEGORIZATION SUMMARY")
     print("="*80)
-    print(f"Files processed: {stats['total_files']}")
-    print(f"Total records: {stats['total_records']:,}")
-    print(f"Classified: {stats['total_classified']:,}")
-    print(f"Low confidence: {stats['total_low_confidence']:,}")
-    print(f"Avg confidence: {stats['avg_confidence']:.2%}")
+    print(f"Files processed: {stats.total_files}")
+    print(f"Total records: {stats.total_records:,}")
+    print(f"Classified: {stats.classified_records:,}")
+    print(f"Low confidence: {stats.low_confidence_records:,}")
+    print(f"Avg confidence: {stats.avg_confidence:.2%}")
+    print(f"Duration: {stats.duration_seconds:.1f}s")
     print("\nCategories:")
-    for cat, count in sorted(stats['categories'].items(), key=lambda x: -x[1]):
-        pct = (count / stats['total_records'] * 100) if stats['total_records'] > 0 else 0
+    for cat, count in sorted(stats.category_counts.items(), key=lambda x: -x[1]):
+        pct = (count / stats.total_records * 100) if stats.total_records > 0 else 0
         print(f"  • {cat}: {count:,} ({pct:.1f}%)")
-    
-    # Save statistics
-    args.output_stats.parent.mkdir(exist_ok=True)
-    with open(args.output_stats, 'w') as f:
-        json.dump(stats, f, indent=2)
-    
-    print(f"\n💾 Saved statistics: {args.output_stats}")
+    print("="*80)
 
 
 if __name__ == "__main__":
