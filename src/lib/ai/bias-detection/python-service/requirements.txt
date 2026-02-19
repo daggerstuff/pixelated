@@ -79,7 +79,7 @@ confection==0.1.5
     #   weasel
 contourpy==1.3.3
     # via matplotlib
-cryptography==46.0.4
+cryptography==46.0.5
     # via bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
 cuda-bindings==12.9.4
     # via torch
@@ -105,7 +105,7 @@ fairlearn==0.13.0
     # via bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
 fastapi==0.128.1
     # via bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
-filelock==3.20.3
+filelock==3.24.3
     # via
     #   bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
     #   huggingface-hub
@@ -327,7 +327,7 @@ pandas==3.0.0
     #   evaluate
     #   fairlearn
     #   shap
-pillow==12.1.0
+pillow==12.1.1
     # via
     #   imageio
     #   matplotlib

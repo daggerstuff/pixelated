@@ -88,7 +88,7 @@ contourpy==1.3.3
     # via matplotlib
 coverage==7.13.2
     # via pytest-cov
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   mlflow
@@ -128,7 +128,7 @@ fastapi==0.128.0
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   mlflow-skinny
-filelock==3.20.3
+filelock==3.24.3
     # via
     #   datasets
     #   huggingface-hub
@@ -418,7 +418,7 @@ pathspec==1.0.3
     #   mypy
 peft==0.18.1
     # via -r src/lib/ai/training/requirements.txt
-pillow==12.1.0
+pillow==12.1.1
     # via
     #   matplotlib
     #   tensorboard
@@ -439,7 +439,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.4
+protobuf==6.33.5
     # via
     #   databricks-sdk
     #   mlflow-skinny
