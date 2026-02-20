@@ -348,7 +348,7 @@
     "globby": "^16.1.0",
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.1",
-    "hono": "^4.11.5",
+    "hono": "^4.11.10",
     "html-entities": "^2.6.0",
     "js-base64": "^3.7.8",
     "jsdom": "^27.4.0",
@@ -415,7 +415,7 @@
     "wait-on": "^9.0.3"
   },
   "peerDependencies": {
-    "hono": "^4.11.5"
+    "hono": "^4.11.10"
   },
   "resolutions": {
     "path-to-regexp": "8.3.0"
