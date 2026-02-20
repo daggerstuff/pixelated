@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-02-18T22:21:26.983403",
+  "pix8_task": "long_running_session_generation",
+  "min_turns": 20,
+  "target_total": 10,
+  "actual_total": 4658,
+  "extraction": {
+    "timestamp": "2026-02-18T22:21:26.982998",
+    "method": "extraction",
+    "source": "existing_datasets",
+    "min_turns": 20,
+    "extracted_count": 4658,
+    "output_file": "metrics/extracted_long_sessions.jsonl"
+  },
+  "synthesis": {
+    "timestamp": "2026-02-18T22:21:26.983384",
+    "method": "synthetic_generation",
+    "target_count": 5,
+    "generated_count": 0,
+    "status": "not_implemented",
+    "note": "NeMo Data Designer integration required for synthetic session generation"
+  }
+}

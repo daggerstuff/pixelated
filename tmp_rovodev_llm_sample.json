@@ -1,0 +1,68 @@
+[
+  {
+    "record_id": 0,
+    "category": "mental_health_support",
+    "confidence": 0.85,
+    "method": "llm",
+    "reasoning": "LLM: The user presents symptoms of depression (insomnia, feelings of worthlessness) and asks for guidance on how to change these feelings. While the user mentions 'I shouldn't be here,' they explicitly deny having contemplated suicide or self-harm, shifting the focus from active crisis intervention to symptom management and coping strategies.",
+    "keywords": [
+      "barely sleep",
+      "feelings of worthlessness",
+      "request for coping strategies",
+      "explicit denial of suicidal contemplation"
+    ]
+  },
+  {
+    "record_id": 1,
+    "category": "mental_health_support",
+    "confidence": 0.85,
+    "method": "llm",
+    "reasoning": "LLM: The user presents with classic symptoms of depression (sleeplessness, feelings of worthlessness) and seeks advice on how to manage these feelings. While the user mentions feeling they 'shouldn't be here,' they explicitly deny active suicidal ideation or contemplation. The assistant provides psychoeducation about thought management (ACT) and coping strategies, which aligns with mental health support rather than active crisis intervention.",
+    "keywords": [
+      "feelings of worthlessness",
+      "sleep disturbance",
+      "seeking coping strategies",
+      "denial of active suicidal ideation"
+    ]
+  },
+  {
+    "record_id": 2,
+    "category": "mental_health_support",
+    "confidence": 0.85,
+    "method": "llm",
+    "reasoning": "LLM: The user is reporting symptoms of depression (insomnia, feelings of worthlessness) and explicitly asking for guidance on how to change their mindset. Although the user mentions feeling they 'shouldn't be here,' they immediately clarify that they have never contemplated suicide, which shifts the focus away from active crisis intervention to symptom management and coping strategies. The assistant responds with standard mental health advice regarding sleep hygiene and cognitive reframing (gratitude/purpose).",
+    "keywords": [
+      "expressions of worthlessness",
+      "sleep disturbance (insomnia)",
+      "seeking guidance for emotional regulation",
+      "explicit denial of suicidal contemplation",
+      "focus on coping strategies (sleep, gratitude)"
+    ]
+  },
+  {
+    "record_id": 3,
+    "category": "mental_health_support",
+    "confidence": 0.8,
+    "method": "keyword",
+    "reasoning": "Keyword (high confidence): Keyword-based classification: 4 indicators found",
+    "keywords": [
+      "depression",
+      "anxiety",
+      "stress",
+      "coping"
+    ]
+  },
+  {
+    "record_id": 4,
+    "category": "mental_health_support",
+    "confidence": 0.85,
+    "method": "llm",
+    "reasoning": "LLM: The user presents with classic symptoms of depression (sleeplessness, feelings of worthlessness) and explicitly asks for guidance on how to change these feelings. While the user mentions feeling they 'shouldn't be here,' they immediately and explicitly deny contemplating suicide or self-harm, which moves the interaction away from active crisis intervention to mental health guidance and coping strategy development.",
+    "keywords": [
+      "feelings of worthlessness",
+      "sleep disturbance",
+      "request for coping strategies",
+      "explicit denial of suicidal contemplation"
+    ]
+  }
+]

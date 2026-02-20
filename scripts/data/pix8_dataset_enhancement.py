@@ -313,11 +313,9 @@ class PIX8Orchestrator:
                 "summary": {
                     "total_tasks": len(self.results),
                     "completed": sum(
-                        1 for r in self.results.values() if r.status == TaskStatus.COMPLETED
+                        r.status == TaskStatus.COMPLETED for r in self.results.values()
                     ),
-                    "failed": sum(
-                        1 for r in self.results.values() if r.status == TaskStatus.FAILED
-                    ),
+                    "failed": sum(r.status == TaskStatus.FAILED for r in self.results.values()),
                     "total_records_generated": sum(
                         r.records_generated for r in self.results.values()
                     ),
