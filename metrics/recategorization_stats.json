@@ -1,0 +1,38 @@
+{
+  "summary": {
+    "total_files": 1,
+    "total_records": 313639,
+    "classified_records": 0,
+    "low_confidence_records": 0,
+    "category_counts": {
+      "therapeutic_conversation": 0,
+      "crisis_support": 0,
+      "mental_health_support": 0,
+      "trauma_processing": 0,
+      "relationship_therapy": 0,
+      "clinical_assessment": 0
+    },
+    "avg_confidence": 0.0,
+    "start_time": "2026-02-19T15:05:55.613001",
+    "end_time": "2026-02-19T15:06:38.125147",
+    "duration_seconds": 42.512146
+  },
+  "file_details": [
+    {
+      "file": "processed_ready/ULTIMATE_FINAL_DATASET_cleaned_processed.jsonl",
+      "total_records": 313639,
+      "classified": 0,
+      "low_confidence": 0,
+      "categories": {
+        "therapeutic_conversation": 0,
+        "crisis_support": 0,
+        "mental_health_support": 0,
+        "trauma_processing": 0,
+        "relationship_therapy": 0,
+        "clinical_assessment": 0
+      },
+      "avg_confidence": 0.0,
+      "error": "'HybridTaxonomyClassifier' object has no attribute 'classify'"
+    }
+  ]
+}

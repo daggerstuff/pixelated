@@ -93,11 +93,7 @@ class PIX8LongSessionGenerator:
             logger.info("Extraction complete!")
             logger.info(result.stdout)
 
-            # Count extracted sessions
-            extracted_count = 0
-            if output_file.exists():
-                with open(output_file) as f:
-                    extracted_count = sum(1 for _ in f)
+            extracted_count = self._count_lines(output_file)
 
             stats = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -123,6 +119,13 @@ class PIX8LongSessionGenerator:
                 "error": str(e),
                 "extracted_count": 0,
             }
+
+    def _count_lines(self, file_path: Path) -> int:
+        """Count the number of lines in a file."""
+        if not file_path.exists():
+            return 0
+        with open(file_path) as f:
+            return sum(1 for _ in f)
 
     def _generate_patient_profiles(
         self, target_count: int, designer: NeMoDataDesignerService
@@ -312,8 +315,7 @@ class PIX8LongSessionGenerator:
 
         with open(output_file, "a") as f:
             for i, profile in enumerate(selected_profiles):
-                session = self._create_session_from_profile(i, profile, llm_client)
-                if session:
+                if session := self._create_session_from_profile(i, profile, llm_client):
                     f.write(json.dumps(session) + "\n")
                     f.flush()
                     generated_count += 1
