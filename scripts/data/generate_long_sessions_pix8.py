@@ -88,26 +88,7 @@ class PIX8LongSessionGenerator:
         logger.info(f"Running: {' '.join(cmd)}")
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-
-            logger.info("Extraction complete!")
-            logger.info(result.stdout)
-
-            extracted_count = self._count_lines(output_file)
-
-            stats = {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "method": "extraction",
-                "source": "existing_datasets",
-                "min_turns": self.min_turns,
-                "extracted_count": extracted_count,
-                "output_file": str(output_file),
-            }
-
-            logger.info(f"✅ Extracted {extracted_count:,} long-running sessions")
-
-            return stats
-
+            return self._run_extraction_process(cmd, output_file)
         except subprocess.CalledProcessError as e:
             logger.error(f"Extraction failed: {e}")
             logger.error(f"stdout: {e.stdout}")
@@ -119,6 +100,27 @@ class PIX8LongSessionGenerator:
                 "error": str(e),
                 "extracted_count": 0,
             }
+
+    def _run_extraction_process(self, cmd, output_file):
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+
+        logger.info("Extraction complete!")
+        logger.info(result.stdout)
+
+        extracted_count = self._count_lines(output_file)
+
+        stats = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "method": "extraction",
+            "source": "existing_datasets",
+            "min_turns": self.min_turns,
+            "extracted_count": extracted_count,
+            "output_file": str(output_file),
+        }
+
+        logger.info(f"✅ Extracted {extracted_count:,} long-running sessions")
+
+        return stats
 
     def _count_lines(self, file_path: Path) -> int:
         """Count the number of lines in a file."""
