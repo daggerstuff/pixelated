@@ -15,7 +15,7 @@
 set -e
 
 # Configuration
-NEMO_DIR="/home/vivi/nemo-microservices-quickstart_v25.12"
+NEMO_DIR="/home/vivi/pixelated/ai/nemo"
 LOG_DIR="/home/vivi/pixelated/logs/nemo"
 LOG_FILE="$LOG_DIR/recovery.log"
 RETRY_COUNT=3

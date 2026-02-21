@@ -8,8 +8,8 @@ User=vivi
 Group=vivi
 WorkingDirectory=/home/vivi/pixelated
 Environment="PYTHONPATH=/home/vivi/pixelated"
-Environment="AWS_ACCESS_KEY_ID=b6939e6b65ef4252b20338499421a5f0"
-Environment="AWS_SECRET_ACCESS_KEY=4a7e939381c6467c88f81a5024672a96"
+Environment="OVH_S3_ACCESS_KEY=YOUR_ACCESS_KEY"
+Environment="OVH_S3_SECRET_KEY=YOUR_SECRET_KEY"
 Environment="OVH_S3_ENDPOINT=https://s3.us-east-va.io.cloud.ovh.us"
 Environment="OVH_S3_BUCKET=pixel-data"
 ExecStart=/home/vivi/.local/bin/uv run python -u /home/vivi/pixelated/scripts/data/process_all_s3_full_pipeline.py
