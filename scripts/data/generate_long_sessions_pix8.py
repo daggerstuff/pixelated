@@ -20,11 +20,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from ai.common.llm_client import LLMClient
-from ai.pipelines.design.service import NeMoDataDesignerService
+from ai.common.llm_client import LLMClient  # noqa: E402
+from ai.pipelines.design.service import NeMoDataDesignerService  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -177,10 +182,48 @@ class PIX8LongSessionGenerator:
                     logger.info(f"Retrying in {sleep_time:.2f}s...")
                     time.sleep(sleep_time)
                 else:
-                    logger.error("All NeMo generation attempts failed.")
-                    raise
+                    logger.error(
+                        "All NeMo generation attempts failed. Using LLM global fallback for profiles."
+                    )
+                    return self._generate_llm_fallback_profiles(target_count)
 
         return patient_profiles
+
+    def _generate_llm_fallback_profiles(self, count: int) -> list[dict[str, Any]]:
+        """Generate patient profiles via LLM if NeMo is down."""
+        logger.info(f"Generating {count} fallback patient profiles via LLM...")
+        llm = LLMClient(driver="openai")
+
+        prompt = (
+            f"Generate {count} diverse therapeutic patient profiles.\n"
+            "Include fields: age, gender, ethnicity, primary_diagnosis, symptom_severity (1-10), "
+            "treatment_type, symptom_duration_months.\n"
+            "Return a JSON LIST of objects. Return ONLY the JSON."
+        )
+
+        profiles = []
+        try:
+            # Chunking for token limits
+            chunk_size = 10
+            for i in range(0, count, chunk_size):
+                current_chunk = min(chunk_size, count - i)
+                chunk_prompt = prompt.replace(f"Generate {count}", f"Generate {current_chunk}")
+                res_text = llm.generate(
+                    chunk_prompt, system_prompt="You are a clinical data architect."
+                )
+
+                # Extract JSON
+                start = res_text.find("[")
+                end = res_text.rfind("]") + 1
+                if start != -1 and end != -1:
+                    chunk_data = json.loads(res_text[start:end])
+                    profiles.extend(chunk_data)
+                else:
+                    logger.error("Failed to parse JSON from LLM profile fallback.")
+        except Exception as e:
+            logger.error(f"LLM Profile fallback failed: {e}")
+
+        return profiles
 
     def _create_session_from_profile(
         self, idx: int, profile: dict[str, Any], llm_client: LLMClient
