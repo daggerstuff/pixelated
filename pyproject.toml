@@ -112,6 +112,8 @@ dependencies = [
   "ruff-lsp>=0.0.62",
   "e2b>=2.6.1",
   "lancedb>=0.29.2",
+  "openai-whisper>=20250625",
+  "faster-whisper>=1.2.0",
 ]
 [project.optional-dependencies]
 test = [
