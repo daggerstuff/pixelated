@@ -190,3 +190,9 @@ docs/recruitment-plan.md
 docs/STRATEGY-psychology-engine.md
 .planning/codebase
 docs/prd
+
+wandb/
+
+# Compiled training datasets (stored on S3)
+compiled_dataset/
+llama.cpp/
