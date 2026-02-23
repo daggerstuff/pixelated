@@ -115,6 +115,11 @@ dependencies = [
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
   "kernels>=0.12.1",
+  "peft>=0.10.0",
+  "accelerate>=0.28.0",
+  "bitsandbytes>=0.43.0",
+  "lightning>=2.1.0",
+  "wandb>=0.16.0",
 ]
 [project.optional-dependencies]
 test = [

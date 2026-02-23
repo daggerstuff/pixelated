@@ -18,7 +18,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from dotenv import load_dotenv
 
@@ -191,7 +191,7 @@ class PIX8LongSessionGenerator:
 
         return patient_profiles
 
-    PATIENT_PERSONAS = [
+    PATIENT_PERSONAS: ClassVar[list[dict[str, str]]] = [
         {
             "name": "The Anxious Over-Explainer",
             "traits": "High-income, highly educated, uses intellectualization to avoid feelings. Speaks rapidly, uses long complex sentences, constantly justifies actions, fears failure.",
@@ -258,14 +258,14 @@ class PIX8LongSessionGenerator:
         return profiles
 
     # Therapeutic phase definitions for raw, realistic multi-segment generation
-    THERAPEUTIC_PHASES = [
+    THERAPEUTIC_PHASES: ClassVar[list[dict[str, str]]] = [
         {
             "name": "rapport_building",
             "label": "Tense Opening & Defensive Assessment",
             "instruction": (
                 "This is the OPENING phase of a therapy session. "
                 "The therapist should warm up but use minimal encouragers ('Mhm', 'Right', 'Okay'). "
-                "The patient should be guarded, slightly defensive, and perhaps annoyed or distracted. "
+                "The patient should be guarded, slightly defensive, and perhaps annoyed or detached. "
                 "CRITICAL: Do NOT write perfectly formed paragraphs. Use fragmented sentences, "
                 "filler words ('um', 'uh', 'you know'), hesitations, and false starts. "
                 "The language must be raw, slightly awkward, and distinctly human. "
@@ -313,7 +313,7 @@ class PIX8LongSessionGenerator:
     ]
 
     # Goodbye/farewell patterns for repetition detection
-    GOODBYE_PATTERNS = [
+    GOODBYE_PATTERNS: ClassVar[list[str]] = [
         "bye",
         "goodbye",
         "take care",
@@ -360,14 +360,13 @@ class PIX8LongSessionGenerator:
             if i >= 10 and len(content_lower) < 40:
                 recent_contents = [m.get("content", "").lower().strip() for m in filtered[-10:]]
                 duplicate_count = sum(
-                    1
-                    for rc in recent_contents
-                    if rc == content_lower
+                    rc == content_lower
                     or (
                         len(rc) > 5
                         and len(content_lower) > 5
                         and (rc in content_lower or content_lower in rc)
                     )
+                    for rc in recent_contents
                 )
                 if duplicate_count >= 3:
                     logger.info(f"🔪 Truncated at turn {i}: detected repetitive content")
@@ -401,15 +400,18 @@ class PIX8LongSessionGenerator:
     def _generate_segment(
         self,
         llm_client: LLMClient,
-        profile_desc: str,
+        profile: dict[str, Any],
         phase: dict[str, str],
         segment_turns: int,
         prior_context: list[dict[str, Any]],
-        diagnosis: str,
-        treatment: str,
-        severity: str | int,
     ) -> list[dict[str, Any]]:
         """Generate a single segment of the therapy session."""
+        # Extract profile features for the prompt
+        diagnosis = profile.get("primary_diagnosis", "General Issues")
+        severity = profile.get("symptom_severity", "Moderate")
+        treatment = profile.get("treatment_type", "Talk Therapy")
+        profile_desc = self._format_profile_description(profile)
+
         # Build continuity context from prior segment
         context_block = ""
         if prior_context:
@@ -445,6 +447,25 @@ class PIX8LongSessionGenerator:
 
         return self._parse_dialogue_text(dialogue_text)
 
+    def _format_profile_description(self, profile: dict[str, Any]) -> str:
+        """Format the profile description for the prompt."""
+        age = profile.get("age", "Unknown")
+        gender = profile.get("gender", "Unknown")
+        ethnicity = profile.get("ethnicity", "Unknown")
+        diagnosis = profile.get("primary_diagnosis", "General Issues")
+        severity = profile.get("symptom_severity", "Moderate")
+        treatment = profile.get("treatment_type", "Talk Therapy")
+        duration = profile.get("symptom_duration_months", 0)
+        persona = profile.get("patient_persona", "")
+
+        return (
+            f"Patient: {age} year old {ethnicity} {gender}.\n"
+            f"Diagnosis: {diagnosis} (Severity: {severity}/10).\n"
+            f"History: Symptoms for {duration} months.\n"
+            f"Treatment Context: Currently receiving {treatment}.\n"
+            f"Communication Style & Demographics: {persona}"
+        )
+
     def _create_session_from_profile(
         self, idx: int, profile: dict[str, Any], llm_client: LLMClient
     ) -> dict[str, Any] | None:
@@ -456,14 +477,9 @@ class PIX8LongSessionGenerator:
         turn count boundaries.
         """
         try:
-            # Extract profile features
-            age = profile.get("age", "Unknown")
-            gender = profile.get("gender", "Unknown")
-            ethnicity = profile.get("ethnicity", "Unknown")
+            # Extract profile features needed for metadata
             diagnosis = profile.get("primary_diagnosis", "General Issues")
-            severity = profile.get("symptom_severity", "Moderate")
             treatment = profile.get("treatment_type", "Talk Therapy")
-            duration = profile.get("symptom_duration_months", 0)
 
             # Ensure a persona is attached, if not from LLM fallback, randomly assign one
             persona = profile.get("patient_persona")
@@ -474,17 +490,8 @@ class PIX8LongSessionGenerator:
 
             total_turns = random.randint(self.min_turns, self.max_turns)
 
-            profile_desc = (
-                f"Patient: {age} year old {ethnicity} {gender}.\n"
-                f"Diagnosis: {diagnosis} (Severity: {severity}/10).\n"
-                f"History: Symptoms for {duration} months.\n"
-                f"Treatment Context: Currently receiving {treatment}.\n"
-                f"Communication Style & Demographics: {persona}"
-            )
-
-            # Distribute turns across 4 phases
-            base_per_segment = total_turns // 4
-            remainder = total_turns % 4
+            # Distribute turns across 4 phases using divmod for clarity
+            base_per_segment, remainder = divmod(total_turns, 4)
             segment_sizes = [base_per_segment] * 4
             for i in range(remainder):
                 segment_sizes[i] += 1
@@ -498,13 +505,10 @@ class PIX8LongSessionGenerator:
             for phase_idx, phase in enumerate(self.THERAPEUTIC_PHASES):
                 segment_msgs = self._generate_segment(
                     llm_client=llm_client,
-                    profile_desc=profile_desc,
+                    profile=profile,
                     phase=phase,
                     segment_turns=segment_sizes[phase_idx],
                     prior_context=all_messages,
-                    diagnosis=diagnosis,
-                    treatment=treatment,
-                    severity=severity,
                 )
 
                 if not segment_msgs:
