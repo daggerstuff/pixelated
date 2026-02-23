@@ -1,0 +1,343 @@
+---
+title: 'Creating Custom Scenarios'
+description: 'Build, configure, test, and deploy custom training scenarios tailored to your program objectives and trainee needs'
+---
+
+Custom scenarios allow you to create targeted training experiences that address specific competency gaps, align with your curriculum, and reflect the populations your trainees will serve. The scenario builder gives you full control over client demographics, presenting conditions, difficulty levels, cultural contexts, and therapeutic challenges.
+
+## Scenario builder overview
+
+Access the scenario builder from **Dashboard** → **Scenarios** → **Create new**. The builder guides you through a structured workflow to define every aspect of your training scenario.
+
+<Steps>
+  <Step title="Define the scenario concept">
+    Start with the clinical situation you want trainees to practice. Give your scenario a clear title, description, and learning objectives.
+  </Step>
+  <Step title="Configure the AI client">
+    Set the client's demographics, presenting condition, personality traits, communication style, and backstory.
+  </Step>
+  <Step title="Set difficulty and parameters">
+    Configure the difficulty level, session length, available tools, and scoring criteria.
+  </Step>
+  <Step title="Add cultural context">
+    Define cultural factors that influence the client's presentation, communication preferences, and therapeutic expectations.
+  </Step>
+  <Step title="Test the scenario">
+    Run through the scenario yourself to verify the AI client behaves as intended and the difficulty is appropriate.
+  </Step>
+  <Step title="Deploy to library">
+    Publish the scenario to your organization's training library or assign it directly to trainees and groups.
+  </Step>
+</Steps>
+
+## Configuring the AI client
+
+The AI client configuration determines how the simulated client behaves during the training session. Each parameter shapes the conversation dynamics and the challenges the trainee will face.
+
+### Demographics
+
+Set the client's demographic profile to create realistic, diverse training experiences:
+
+| Parameter | Options | Impact |
+|---|---|---|
+| **Age** | 13–85 years | Affects communication style, life context, and presenting concerns |
+| **Gender identity** | Full spectrum including non-binary, transgender, and custom | Influences pronoun usage, identity-related concerns, and cultural context |
+| **Ethnicity/Race** | Multi-select with intersectional support | Shapes cultural background, potential discrimination experiences, and worldview |
+| **Socioeconomic status** | Low, working class, middle class, upper middle, high | Affects access to resources, stressors, and treatment barriers |
+| **Education level** | Elementary through doctoral | Influences vocabulary, health literacy, and communication preferences |
+| **Relationship status** | Single, partnered, married, divorced, widowed, other | Provides relational context for presenting concerns |
+| **Occupation** | Free-text with suggested categories | Adds workplace stressors and schedule constraints |
+
+<Tip>
+  Create scenarios with demographics that represent the populations your trainees are least experienced with. This builds cultural competency where it's needed most.
+</Tip>
+
+### Presenting conditions
+
+Choose from validated clinical presentations or create custom combinations:
+
+<AccordionGroup>
+  <Accordion title="Mood disorders">
+    Major depressive disorder, persistent depressive disorder, bipolar I and II, cyclothymic disorder, and seasonal affective disorder. Configure severity (mild, moderate, severe), episode duration, and treatment history.
+  </Accordion>
+  <Accordion title="Anxiety disorders">
+    Generalized anxiety disorder, panic disorder, social anxiety, specific phobias, agoraphobia, and separation anxiety. Set trigger contexts, avoidance behaviors, and physical symptom profiles.
+  </Accordion>
+  <Accordion title="Trauma and stressor-related">
+    PTSD, complex PTSD, acute stress disorder, and adjustment disorders. Configure trauma type, chronicity, dissociative features, and triggering stimuli within the session.
+  </Accordion>
+  <Accordion title="Substance use">
+    Alcohol, opioid, stimulant, cannabis, and polysubstance use disorders. Set stage of change (precontemplation through maintenance), severity, and ambivalence level.
+  </Accordion>
+  <Accordion title="Personality and relational">
+    Borderline, narcissistic, avoidant, and dependent patterns. Configure interpersonal dynamics, therapeutic alliance challenges, and splitting behaviors.
+  </Accordion>
+  <Accordion title="Crisis presentations">
+    Suicidal ideation, self-harm, acute psychosis, domestic violence, and child abuse disclosure. Set urgency level and required safety interventions.
+  </Accordion>
+  <Accordion title="Custom conditions">
+    Define custom presentations by specifying symptoms, behaviors, cognitions, and interpersonal patterns. Use the symptom builder to create nuanced clinical pictures.
+  </Accordion>
+</AccordionGroup>
+
+### Personality and communication style
+
+Fine-tune how the AI client communicates and interacts:
+
+```json
+{
+  "personality": {
+    "openness": 0.6,
+    "agreeableness": 0.3,
+    "emotional_expressiveness": 0.7,
+    "defensiveness": 0.5,
+    "insight_level": 0.4
+  },
+  "communication_style": {
+    "verbosity": "moderate",
+    "directness": "indirect",
+    "emotional_vocabulary": "limited",
+    "resistance_pattern": "intellectualization",
+    "rapport_building_speed": "slow"
+  }
+}
+```
+
+Key communication parameters:
+
+- **Verbosity** — how much the client shares without prompting (minimal, moderate, verbose)
+- **Directness** — whether the client states concerns directly or communicates indirectly
+- **Emotional vocabulary** — the client's ability to name and describe emotions
+- **Resistance pattern** — how the client avoids difficult topics (denial, intellectualization, deflection, silence, anger)
+- **Rapport building speed** — how quickly the client warms to the therapist (immediate, moderate, slow, very slow)
+
+## Setting difficulty parameters
+
+Difficulty configuration determines how challenging the scenario is for trainees. The platform uses a 1–10 difficulty scale with granular control over specific challenge dimensions.
+
+### Difficulty levels
+
+<Tabs>
+  <Tab title="Beginner (1–3)">
+    Designed for trainees in their first semester of practice. The AI client is cooperative, presents clearly, and responds positively to basic therapeutic techniques.
+
+    - Client is forthcoming with information
+    - Minimal resistance or defensiveness
+    - Clear presenting concern with straightforward dynamics
+    - Generous scoring thresholds
+  </Tab>
+  <Tab title="Intermediate (4–6)">
+    Appropriate for trainees with foundational skills. The AI client introduces realistic challenges that require adaptive responses.
+
+    - Client shows some ambivalence or indirect communication
+    - Moderate resistance to specific topics
+    - Comorbid presentations or complex social context
+    - Standard scoring thresholds
+  </Tab>
+  <Tab title="Advanced (7–9)">
+    Challenges experienced trainees with complex clinical dynamics. Requires sophisticated therapeutic skills and real-time clinical judgment.
+
+    - Client is guarded, inconsistent, or actively resistant
+    - Rapid topic shifts or emotional escalation
+    - Multiple comorbidities with competing treatment priorities
+    - Strict scoring thresholds
+  </Tab>
+  <Tab title="Expert (10)">
+    Simulates the most demanding clinical encounters. Designed for advanced trainees preparing for independent practice.
+
+    - Client presents with therapeutic impasses, alliance ruptures, or crisis escalation
+    - Requires integration of multiple therapeutic modalities
+    - Tests ethical decision-making under pressure
+    - Expert-level scoring criteria
+  </Tab>
+</Tabs>
+
+### Session parameters
+
+| Parameter | Description | Default |
+|---|---|---|
+| **Session length** | Maximum duration in minutes (10, 20, 30, 45, 60) | 30 |
+| **Turn limit** | Maximum number of conversational exchanges | Unlimited |
+| **Available tools** | Whether the trainee can access reference materials during the session | Enabled |
+| **Hint system** | Whether the platform provides guidance prompts when the trainee appears stuck | Disabled |
+| **Crisis injection** | Whether the scenario can dynamically introduce a crisis moment mid-session | Off |
+| **Alliance rupture** | Whether the AI client will introduce a therapeutic alliance challenge | Off |
+
+### Scoring criteria
+
+Customize which competency dimensions are evaluated and their relative weight:
+
+```json
+{
+  "scoring": {
+    "empathic_accuracy": {
+      "weight": 0.30,
+      "minimum_passing": 65
+    },
+    "bias_awareness": {
+      "weight": 0.25,
+      "minimum_passing": 60
+    },
+    "crisis_response": {
+      "weight": 0.25,
+      "minimum_passing": 70
+    },
+    "cultural_sensitivity": {
+      "weight": 0.20,
+      "minimum_passing": 60
+    }
+  }
+}
+```
+
+## Adding cultural context
+
+Cultural context adds depth and realism to scenarios by incorporating cultural factors that influence the client's experience, communication, and expectations of therapy.
+
+### Cultural context parameters
+
+<CardGroup cols={2}>
+  <Card title="Cultural background" icon="earth-americas">
+    Define the client's cultural heritage, immigration history, acculturation level, and community ties. These factors shape how the client views mental health and help-seeking.
+  </Card>
+  <Card title="Language and communication" icon="language">
+    Set the client's primary language, English proficiency, use of idioms of distress, and culturally specific communication norms (eye contact, silence, storytelling).
+  </Card>
+  <Card title="Religious and spiritual context" icon="hands-praying">
+    Configure the client's spiritual beliefs, religious practices, and how faith intersects with their presenting concerns and openness to treatment.
+  </Card>
+  <Card title="Family and community dynamics" icon="people-roof">
+    Define family structure, generational roles, collective vs. individualistic orientation, and community support systems.
+  </Card>
+</CardGroup>
+
+### Cultural challenge modes
+
+Enable specific cultural competency challenges within the scenario:
+
+- **Microaggression sensitivity** — the AI client reacts to culturally insensitive language or assumptions from the trainee
+- **Idioms of distress** — the client expresses psychological distress through culture-specific physical or metaphorical language
+- **Stigma barriers** — the client expresses culturally rooted shame or reluctance about mental health treatment
+- **Traditional healing integration** — the client asks about incorporating traditional or alternative healing practices
+- **Interpreter dynamics** — simulate sessions involving a language interpreter with associated communication challenges
+
+<Warning>
+  Cultural scenarios are developed in consultation with cultural advisors and community representatives. If you create custom cultural contexts, ensure they avoid stereotyping and reflect genuine cultural complexity. Contact your program's diversity officer for review guidance.
+</Warning>
+
+## Testing scenarios
+
+Before deploying a scenario, test it thoroughly to ensure the AI client behaves as intended and the difficulty is calibrated appropriately.
+
+### Test mode
+
+Click **Test scenario** in the builder to enter test mode. In this mode:
+
+- You play the role of the trainee and interact with the AI client
+- A debug panel shows the AI client's internal state, including emotional state, resistance level, and triggered behaviors
+- Competency scoring runs in real time so you can verify scoring accuracy
+- You can reset and restart at any point
+
+### Testing checklist
+
+Use this checklist before deploying:
+
+<Steps>
+  <Step title="Verify client persona">
+    Confirm the AI client's demographics, communication style, and presenting condition match your design. Check that the backstory is consistent and doesn't contain contradictions.
+  </Step>
+  <Step title="Test difficulty calibration">
+    Run through the scenario with both strong and weak therapeutic responses. Verify that the AI client appropriately escalates resistance for poor responses and opens up for good ones.
+  </Step>
+  <Step title="Check cultural authenticity">
+    Ensure cultural elements are portrayed respectfully and accurately. Verify that cultural challenge modes trigger at appropriate moments.
+  </Step>
+  <Step title="Validate scoring">
+    Review the competency scores generated during your test run. Confirm that scoring weights produce appropriate differentiation between strong and weak performances.
+  </Step>
+  <Step title="Test edge cases">
+    Try unusual or off-topic responses to verify the AI client handles unexpected trainee behavior gracefully. Check crisis injection timing if enabled.
+  </Step>
+</Steps>
+
+<Info>
+  Test sessions are not counted in any analytics or reported to trainees. You can test as many times as needed without affecting your data.
+</Info>
+
+## Deploying to the training library
+
+Once testing is complete, deploy your scenario to make it available for training.
+
+### Deployment options
+
+<Tabs>
+  <Tab title="Organization library">
+    Publish the scenario to your organization's shared training library. All supervisors and trainees within your organization can access it. Set visibility to **All trainees**, **Supervisor-assigned only**, or **Specific cohorts**.
+  </Tab>
+  <Tab title="Direct assignment">
+    Assign the scenario directly to individual trainees or groups without adding it to the general library. Useful for targeted remediation or specialized training tracks.
+  </Tab>
+  <Tab title="Draft">
+    Save the scenario as a draft for further refinement. Drafts are visible only to you and other supervisors with edit access.
+  </Tab>
+</Tabs>
+
+### Scenario metadata
+
+When publishing, complete the following metadata fields to help trainees and other supervisors find and understand the scenario:
+
+| Field | Description | Required |
+|---|---|---|
+| **Title** | Clear, descriptive scenario name | Yes |
+| **Description** | 2–3 sentence summary of the clinical situation | Yes |
+| **Learning objectives** | Specific skills or competencies the scenario targets | Yes |
+| **Difficulty level** | 1–10 rating displayed to trainees | Yes |
+| **Tags** | Searchable categories (e.g., "crisis", "cultural", "substance use") | Recommended |
+| **Estimated duration** | Expected session length in minutes | Recommended |
+| **Prerequisites** | Other scenarios that should be completed first | Optional |
+| **Author notes** | Guidance for other supervisors using this scenario | Optional |
+
+### Version control
+
+The scenario builder maintains a version history for every published scenario:
+
+- Each edit creates a new version with a timestamp and change summary
+- Trainees always see the latest published version
+- Historical versions can be restored if needed
+- Session records reference the specific scenario version used, ensuring scoring consistency
+
+## Scenario templates
+
+Jumpstart your scenario creation with built-in templates:
+
+<CardGroup cols={3}>
+  <Card title="Intake assessment" icon="clipboard-list">
+    First-session template with customizable presenting concern and demographic profile.
+  </Card>
+  <Card title="Crisis intervention" icon="triangle-exclamation">
+    Pre-configured crisis scenario with adjustable severity and risk factors.
+  </Card>
+  <Card title="Cultural adaptation" icon="globe">
+    Template focused on cross-cultural therapeutic dynamics with configurable cultural context.
+  </Card>
+  <Card title="Substance use" icon="prescription-bottle">
+    Motivational interviewing scenario with adjustable stage-of-change and ambivalence.
+  </Card>
+  <Card title="Alliance rupture" icon="handshake-slash">
+    Mid-therapy scenario where the client expresses dissatisfaction with the therapeutic relationship.
+  </Card>
+  <Card title="Termination" icon="door-open">
+    End-of-treatment scenario focused on reviewing progress, managing endings, and relapse planning.
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Supervisor dashboard" icon="gauge-high" href="/guides/supervisors/dashboard">
+    Manage your trainees and review sessions from the central dashboard.
+  </Card>
+  <Card title="Track trainee progress" icon="chart-line" href="/guides/supervisors/tracking-progress">
+    Monitor how trainees perform in your custom scenarios over time.
+  </Card>
+</CardGroup>

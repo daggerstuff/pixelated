@@ -196,3 +196,4 @@ wandb/
 # Compiled training datasets (stored on S3)
 compiled_dataset/
 llama.cpp/
+therapeutic_ai_final_stage1/

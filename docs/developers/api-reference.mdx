@@ -1,0 +1,298 @@
+---
+title: 'API Reference'
+description: 'Endpoints, data shapes, and how to talk to our services.'
+---
+
+## Overview
+
+Pixelated Empathy exposes APIs for interacting with The Empathy Gym™,
+the Emotional Intelligence Engine, and supporting services. This
+reference covers the primary endpoints you'll work with.
+
+All API routes follow REST conventions and return JSON.
+
+## Base URLs
+
+| Environment     | URL                         |
+| :-------------- | :-------------------------- |
+| **Development** | `http://localhost:4321/api` |
+| **AI Service**  | `http://localhost:8000`     |
+| **WebSocket**   | `ws://localhost:8080`       |
+
+## Authentication
+
+API requests require a valid JWT token in the `Authorization`
+header:
+
+```text
+Authorization: Bearer <token>
+```
+
+Tokens are issued on login and expire according to your
+environment configuration. See
+[/developers/getting-started](/developers/getting-started) for setup.
+
+## Training Sessions
+
+<AccordionGroup>
+  <Accordion title="Start a Session" icon="play">
+    ```http
+    POST /api/sessions
+    Content-Type: application/json
+
+    {
+      "scenarioId": "crisis-first-session",
+      "difficulty": "intermediate"
+    }
+    ```
+
+    **Response** (201):
+
+    ```json
+    {
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "scenario": {
+        "name": "First Session — Crisis Signals",
+        "clientProfile": {
+          "age": 34,
+          "presentingIssue": "grief and anxiety",
+          "emotionalBaseline": {
+            "sadness": 0.7,
+            "fear": 0.5,
+            "anger": 0.3,
+            "trust": 0.2
+          },
+          "personality": {
+            "openness": 0.4,
+            "conscientiousness": 0.6,
+            "extraversion": 0.3,
+            "agreeableness": 0.5,
+            "neuroticism": 0.8
+          }
+        }
+      },
+      "status": "active"
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion title="Send a Message" icon="paper-plane">
+    ```http
+    POST /api/sessions/:sessionId/messages
+    Content-Type: application/json
+
+    {
+      "content": "It sounds like you've been carrying a lot.",
+      "timestamp": "2026-02-15T10:30:00Z"
+    }
+    ```
+
+    **Response** (200):
+
+    ```json
+    {
+      "clientResponse": {
+        "content": "Yeah... I guess I just don't know who to talk to anymore.",
+        "emotionalState": {
+          "sadness": 0.75,
+          "trust": 0.3,
+          "fear": 0.4
+        },
+        "crisisLevel": "watch"
+      },
+      "evaluation": {
+        "technique": "reflection",
+        "effectiveness": 0.72,
+        "notes": "Good reflective opening. Consider "
+          + "checking in on the isolation signal."
+      }
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion title="End a Session" icon="flag-checkered">
+    ```http
+    POST /api/sessions/:sessionId/end
+    ```
+
+    **Response** (200):
+
+    ```json
+    {
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "duration": "14:32",
+      "feedback": {
+        "overallScore": 0.68,
+        "strengths": [
+          "Consistent use of reflective listening",
+          "Appropriate pacing in early session"
+        ],
+        "growthAreas": [
+          "Directness when checking child safety",
+          "Premature closure in middle phase"
+        ],
+        "emotionalTimeline": [
+          { "messageIndex": 1, "clientSadness": 0.7, "clientTrust": 0.2 },
+          { "messageIndex": 5, "clientSadness": 0.65, "clientTrust": 0.35 },
+          { "messageIndex": 10, "clientSadness": 0.75, "clientTrust": 0.3 }
+        ]
+      },
+      "status": "completed"
+    }
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+## Emotion Analysis
+
+```http
+POST /api/analyze/emotion
+Content-Type: application/json
+
+{
+  "text": "I don't know if I can keep doing this."
+}
+```
+
+**Response** (200):
+
+```json
+{
+  "emotions": {
+    "sadness": 0.65,
+    "fear": 0.4,
+    "anger": 0.15,
+    "anticipation": 0.1
+  },
+  "crisisSignals": {
+    "detected": true,
+    "level": "concern",
+    "indicators": ["hopelessness language"]
+  },
+  "confidence": 0.82
+}
+```
+
+## Data Validation
+
+<Warning>
+  All emotion scores must be between 0.0 and 1.0. The API will
+  reject any value outside this range with a `400 Bad Request`:
+
+```json
+{
+  "error": "ValidationError",
+  "message": "Emotion score must be between 0 and 1, got: 1.5",
+  "field": "emotions.sadness"
+}
+```
+
+</Warning>
+
+## WebSocket Events
+
+For real-time session communication, connect to the WebSocket
+server:
+
+```javascript
+const ws = new WebSocket('ws://localhost:8080')
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+
+  switch (data.type) {
+    case 'client_response':
+      // New message from simulated client
+      break
+    case 'emotion_update':
+      // Real-time emotional state change
+      break
+    case 'crisis_alert':
+      // Crisis signal detected
+      break
+    case 'session_feedback':
+      // End-of-session evaluation
+      break
+  }
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="client_response" icon="comment">
+    New message from the simulated client.
+  </Card>
+  <Card title="emotion_update" icon="chart-line">
+    Real-time emotional state change.
+  </Card>
+  <Card title="crisis_alert" icon="shield-halved">
+    Crisis signal detected — requires attention.
+  </Card>
+  <Card title="session_feedback" icon="clipboard-check">
+    End-of-session evaluation results.
+  </Card>
+</CardGroup>
+
+## Error Handling
+
+All errors follow a consistent format:
+
+```json
+{
+  "error": "ErrorType",
+  "message": "Human-readable description",
+  "statusCode": 400
+}
+```
+
+Common error codes:
+
+| Code  | Meaning                                     |
+| :---- | :------------------------------------------ |
+| `400` | Invalid input (validation failure)          |
+| `401` | Authentication required                     |
+| `403` | Insufficient permissions                    |
+| `404` | Resource not found                          |
+| `422` | Semantically invalid (e.g., invalid config) |
+| `500` | Internal server error                       |
+
+## Rate Limiting
+
+API requests are rate-limited to prevent abuse. Current limits:
+
+| Endpoint         | Limit     |
+| :--------------- | :-------- |
+| Session creation | 10/minute |
+| Message sending  | 60/minute |
+| Emotion analysis | 30/minute |
+
+<Note>
+  Rate limit headers are included in every response:
+
+```text
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1708000000
+```
+
+</Note>
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card title="Architecture" icon="sitemap" href="/developers/architecture">
+    System design context.
+  </Card>
+  <Card
+    title="Getting Started"
+    icon="rocket"
+    href="/developers/getting-started"
+  >
+    Local setup.
+  </Card>
+  <Card title="Platform Overview" icon="circle-info" href="/platform/overview">
+    How it all works.
+  </Card>
+</CardGroup>

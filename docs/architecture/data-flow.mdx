@@ -1,0 +1,519 @@
+---
+title: "Data Flow & Integration Points"
+description: "How data moves through Pixelated Empathy — from user input to emotional analysis, bias detection, memory storage, and real-time feedback. Covers all external integrations and communication protocols."
+---
+
+## Data flow overview
+
+Every interaction on the Pixelated Empathy platform triggers a precisely orchestrated data flow across multiple services. Understanding these flows is essential for debugging, performance optimization, and compliance auditing.
+
+<Note>
+  All data flows are designed with **HIPAA compliance** as a first-class constraint. PII is filtered before storage, sensitive data never leaves the processing boundary unencrypted, and audit logs track every data movement.
+</Note>
+
+## Training session flow
+
+The most critical data flow in the platform is the **training session lifecycle** — the path data takes from the moment a trainee types a message to when they receive AI-generated feedback.
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│  Trainee │    │ Frontend │    │   API    │    │    AI    │    │  Memory  │
+│  Input   │───▶│  (Astro) │───▶│ Gateway  │───▶│ Services │───▶│  Server  │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+                                     │               │               │
+                                     │          ┌────┴────┐          │
+                                     │          │         │          │
+                                ┌────▼───┐ ┌───▼───┐ ┌───▼───┐ ┌───▼────┐
+                                │  Bias  │ │  EI   │ │Crisis │ │  Mem0  │
+                                │  Check │ │Engine │ │Detect │ │+Gemini │
+                                └────┬───┘ └───┬───┘ └───┬───┘ └───┬────┘
+                                     │         │         │         │
+                                     └────┬────┘         │         │
+                                          │              │         │
+                                     ┌────▼────┐    ┌────▼───┐    │
+                                     │Response │    │  Alert │    │
+                                     │  Gen    │───▶│ System │    │
+                                     └────┬────┘    └────────┘    │
+                                          │                       │
+                                     ┌────▼────────────────┐      │
+                                     │  Feedback +         │◀─────┘
+                                     │  Analytics Pipeline │
+                                     └────────┬───────────┘
+                                              │
+                                         ┌────▼────┐
+                                         │ Trainee │
+                                         │ Display │
+                                         └─────────┘
+```
+
+### Step-by-step walkthrough
+
+<Steps>
+  <Step title="User Input" icon="keyboard">
+    The trainee types a message in the Empathy Gym™ interface. The frontend captures the raw text, attaches session metadata (session ID, timestamp, scenario context), and prepares the request payload.
+
+    ```typescript
+    // Frontend captures and sends user input
+    const payload = {
+      message: userInput,
+      session_id: currentSession.id,
+      scenario_id: currentScenario.id,
+      timestamp: Date.now(),
+      conversation_history: recentMessages
+    }
+    ```
+  </Step>
+  <Step title="API Gateway Processing" icon="shield-halved">
+    The Express API gateway receives the request and runs it through the middleware chain:
+
+    1. **Authentication**: JWT token validation via auth middleware
+    2. **Rate Limiting**: Per-user request throttling (prevents abuse)
+    3. **Input Validation**: Schema validation and sanitization
+    4. **Request Logging**: Audit trail entry with request metadata
+    5. **Routing**: Forward to the appropriate AI service endpoint
+  </Step>
+  <Step title="Parallel AI Analysis" icon="arrows-split-up-and-left">
+    The request fans out to multiple AI services simultaneously for maximum throughput:
+
+    - **EI Engine**: Emotional analysis of the trainee's utterance (valence, arousal, dominance, primary emotions)
+    - **Bias Detection**: Check for demographic bias patterns in the conversation context
+    - **Crisis Detection**: Scan for self-harm, violence, despair, substance abuse, or medical emergency signals
+    - **Memory Retrieval**: Search for relevant long-term memories to personalize the response
+  </Step>
+  <Step title="Crisis Detection Gate" icon="triangle-exclamation">
+    Crisis detection results are evaluated **before** response generation. If a crisis signal is detected:
+
+    - **Imminent/High**: Escalation protocol activated, supervisor notified immediately, safety resources injected into response
+    - **Moderate**: Session flagged for review, crisis resources provided to user
+    - **Low/Minimal**: Logged for pattern tracking, normal flow continues
+
+    ```python
+    crisis_severity = crisis_detector.get_crisis_severity(query)
+    if crisis_severity != "none":
+        logger.warning(f"Crisis signal: {crisis_severity} for user {uid}")
+        # Crisis context injected into response generation prompt
+    ```
+  </Step>
+  <Step title="Response Generation" icon="robot">
+    The Pixel Inference Service combines all analysis results to generate a contextual response:
+
+    1. Retrieve relevant memories from Mem0 vector store
+    2. Format memory context for the system prompt
+    3. Inject crisis handling instructions if applicable
+    4. Inject emotional context from EI Engine analysis
+    5. Generate response via Google Gemini (or fallback model)
+    6. Apply bias-aware language guidelines
+
+    ```python
+    # Build context-aware prompt
+    system_prompt = build_system_prompt(
+        memory_context=format_memories(memories),
+        emotional_context=ei_analysis,
+        crisis_severity=crisis_severity,
+        scenario_context=scenario.instructions
+    )
+
+    # Generate response
+    response = gemini_client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=f"{system_prompt}\nUSER: {query}"
+    )
+    ```
+  </Step>
+  <Step title="Memory Storage" icon="floppy-disk">
+    After response generation, the interaction is stored in long-term memory with full filtering:
+
+    1. **PII Filter**: Regex-based detection and redaction of SSNs, phone numbers, addresses, insurance numbers
+    2. **Speculation Filter**: Flag uncertain statements (e.g., "I think I might have...") with reduced confidence
+    3. **Content Truncation**: Enforce maximum memory length (2000 chars) to prevent storage bloat
+    4. **Metadata Tagging**: Attach session ID, crisis flags, category, and timestamp
+
+    If content fails filtering (>50% redacted, below confidence threshold), it is **not stored**.
+  </Step>
+  <Step title="Feedback & Analytics" icon="chart-mixed">
+    The final response is packaged with rich analytics metadata and returned to the frontend:
+
+    ```json
+    {
+      "response": "I hear how overwhelming this feels...",
+      "latency_ms": 342,
+      "memories_used": 3,
+      "user_id": "trainee_001",
+      "crisis_detected": false,
+      "crisis_severity": "none",
+      "emotional_analysis": {
+        "primary_emotion": "sadness",
+        "valence": -0.6,
+        "arousal": 0.3,
+        "empathy_score": 0.82
+      },
+      "bias_analysis": {
+        "bias_level": "none",
+        "demographic_parity": 0.95
+      },
+      "timestamp": "2025-01-24T14:30:00Z"
+    }
+    ```
+  </Step>
+  <Step title="Real-time Display" icon="display">
+    The frontend receives the response and updates the UI in real time:
+
+    - **Chat Panel**: Displays the AI persona's response with typing animation
+    - **Emotion Radar**: Updates the real-time emotion visualization
+    - **Feedback Sidebar**: Shows empathy score, technique suggestions, and breakthrough indicators
+    - **Session Timeline**: Adds the interaction to the session history with emotional trajectory
+  </Step>
+</Steps>
+
+## Real-time communication (WebSocket)
+
+Training sessions require low-latency, bidirectional communication that HTTP request-response cannot provide. WebSocket connections handle all real-time data flows.
+
+<Tabs>
+  <Tab title="Connection Lifecycle">
+    ```
+    ┌──────────┐                    ┌──────────────┐
+    │  Client  │                    │   WebSocket  │
+    │ (Browser)│                    │    Server    │
+    └────┬─────┘                    └──────┬───────┘
+         │                                 │
+         │──── WS Upgrade Request ────────▶│
+         │◀─── 101 Switching Protocols ────│
+         │                                 │
+         │──── auth:token ────────────────▶│  Authentication
+         │◀─── auth:confirmed ─────────────│
+         │                                 │
+         │──── session:join {id} ─────────▶│  Join Session
+         │◀─── session:state {snapshot} ───│
+         │                                 │
+         │──── message:send {text} ───────▶│  Training Loop
+         │◀─── emotion:update {analysis} ──│
+         │◀─── message:response {text} ────│
+         │◀─── feedback:update {scores} ───│
+         │                                 │
+         │──── session:leave ─────────────▶│  Disconnect
+         │◀─── session:summary {report} ───│
+         │                                 │
+    ```
+  </Tab>
+  <Tab title="Event Types">
+    | Event | Direction | Purpose |
+    |---|---|---|
+    | `auth:token` | Client → Server | Authenticate WebSocket connection |
+    | `session:join` | Client → Server | Join a training session room |
+    | `session:state` | Server → Client | Full session state snapshot |
+    | `message:send` | Client → Server | Trainee sends a message |
+    | `message:response` | Server → Client | AI persona response |
+    | `emotion:update` | Server → Client | Real-time emotional analysis |
+    | `feedback:update` | Server → Client | Updated empathy scores and suggestions |
+    | `crisis:alert` | Server → Client | Crisis detection notification |
+    | `persona:state` | Server → Client | AI persona emotional state change |
+    | `session:leave` | Client → Server | End session |
+    | `session:summary` | Server → Client | Final session analytics report |
+  </Tab>
+  <Tab title="Supervisor Live View">
+    Supervisors can observe active training sessions in real time via a separate WebSocket channel:
+
+    | Event | Direction | Purpose |
+    |---|---|---|
+    | `observe:join` | Supervisor → Server | Start observing a session |
+    | `observe:stream` | Server → Supervisor | Live transcript + emotion data |
+    | `observe:intervene` | Supervisor → Server | Send guidance to trainee |
+    | `observe:flag` | Supervisor → Server | Flag a moment for review |
+    | `observe:leave` | Supervisor → Server | Stop observing |
+
+    <Tip>
+      Supervisor observation is **read-only by default** — supervisors see everything the trainee sees plus additional analytics, but the trainee is unaware of the observation unless the supervisor chooses to intervene.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Integration points
+
+Pixelated Empathy integrates with multiple external services and academic databases. Each integration is abstracted behind a service interface with retry logic, circuit breakers, and fallback behavior.
+
+### Academic databases
+
+<CardGroup cols={3}>
+  <Card title="PubMed" icon="flask">
+    **NIH National Library of Medicine**
+
+    Primary source for peer-reviewed mental health research. The Journal Research Pipeline queries PubMed's E-utilities API for therapeutic technique studies, treatment efficacy data, and clinical guidelines.
+  </Card>
+  <Card title="arXiv" icon="file-lines">
+    **Open-Access Research**
+
+    Source for pre-print research in computational psychology, NLP for mental health, and AI-assisted therapy. Useful for staying current with cutting-edge methodologies before peer review.
+  </Card>
+  <Card title="IEEE Xplore" icon="microchip">
+    **Engineering & Computing**
+
+    Source for research on affective computing, emotion recognition systems, bias detection algorithms, and human-computer interaction in therapeutic contexts.
+  </Card>
+</CardGroup>
+
+The Journal Research Pipeline processes academic sources through a standardized ingestion flow:
+
+```
+┌───────────┐    ┌────────────┐    ┌──────────────┐    ┌─────────────┐
+│  Academic │    │  Ingestion │    │  HuggingFace │    │  Knowledge  │
+│  Sources  │───▶│  Adapter   │───▶│  Embeddings  │───▶│  Base       │
+│ (APIs)    │    │ (FastAPI)  │    │  + Chunking  │    │ (Qdrant)    │
+└───────────┘    └────────────┘    └──────────────┘    └─────────────┘
+                                          │
+                                   ┌──────▼──────┐
+                                   │  Citation   │
+                                   │  Manager    │
+                                   └─────────────┘
+```
+
+### Cloud services
+
+<Tabs>
+  <Tab title="Storage (AWS S3 / Cloudflare R2)">
+    Object storage for documents, session exports, training materials, and backup data.
+
+    | Use Case | Bucket / Path | Access Pattern |
+    |---|---|---|
+    | Session recordings | `sessions/{user_id}/{session_id}/` | Write-once, read-many |
+    | Training materials | `materials/{scenario_id}/` | Read-heavy, CDN-cached |
+    | Document exports | `exports/{user_id}/` | Write-once, time-limited access |
+    | Database backups | `backups/{date}/` | Write-once, scheduled lifecycle |
+
+    ```typescript
+    // S3/R2 configuration from production Docker Compose
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-pixelated-business-docs}
+      AWS_CLOUDFRONT_DOMAIN: ${AWS_CLOUDFRONT_DOMAIN}
+    ```
+  </Tab>
+  <Tab title="Authentication (Better Auth)">
+    Authentication is handled through a JWT-based flow with role-based access control (RBAC).
+
+    **Authentication Flow:**
+    1. User submits credentials to `/api/auth` (public route)
+    2. Auth middleware validates against the identity provider
+    3. JWT token issued with user claims (roles, permissions)
+    4. Subsequent requests include JWT in `Authorization` header
+    5. `authMiddleware` validates token on every protected route
+    6. Role/permission checks via `requireRoles()` and `requirePermissions()`
+
+    **Supported Roles:**
+    | Role | Access Level |
+    |---|---|
+    | `trainee` | Training sessions, own analytics, memory dashboard |
+    | `supervisor` | Trainee observation, progress reports, scenario management |
+    | `admin` | Full platform access, user management, system configuration |
+    | `researcher` | Anonymized analytics, research pipeline access |
+  </Tab>
+  <Tab title="Email & Notifications">
+    Transactional email and notification delivery for session summaries, crisis alerts, and administrative communications.
+
+    | Provider | Purpose |
+    |---|---|
+    | SendGrid | Primary email delivery (session reports, onboarding) |
+    | SMTP Fallback | Secondary delivery when SendGrid is unavailable |
+
+    ```yaml
+    # Email configuration
+    EMAIL_PROVIDER: ${EMAIL_PROVIDER:-sendgrid}
+    SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+    SMTP_HOST: ${SMTP_HOST}
+    SMTP_PORT: ${SMTP_PORT:-587}
+    FROM_EMAIL: ${FROM_EMAIL:-noreply@pixelated.com}
+    ```
+  </Tab>
+</Tabs>
+
+### MCP Protocol for AI agent integration
+
+The Model Context Protocol (MCP) enables external AI agents to interact with Pixelated Empathy's memory system through a standardized interface.
+
+<AccordionGroup>
+  <Accordion title="What is MCP?" icon="plug">
+    The **Model Context Protocol** is an open standard for connecting AI models to external data sources and tools. Pixelated Empathy implements an MCP server that exposes memory operations (add, search, update, delete) to any MCP-compatible AI agent.
+
+    This means tools like Claude, custom LangChain agents, or third-party therapy platforms can read and write to the Pixelated Empathy memory system — with full PII filtering and access control.
+  </Accordion>
+  <Accordion title="MCP Server Endpoints" icon="server">
+    The MCP Memory Server (port `5003`) exposes these operations:
+
+    ```python
+    # MCP-compatible memory operations
+    POST   /api/memory/add          # Add memory with PII filtering
+    POST   /api/memory/search       # Semantic similarity search
+    GET    /api/memory/all/{uid}    # List all memories for user
+    PATCH  /api/memory/{id}         # Update memory content
+    DELETE /api/memory/{id}         # Delete specific memory
+    ```
+
+    All operations pass through the `GeminiMem0Manager` which enforces:
+    - PII detection and redaction (HIPAA-compliant regex patterns)
+    - Speculation filtering (confidence thresholds for uncertain statements)
+    - Crisis signal detection and flagging
+    - Content length limits (max 2000 characters per memory)
+  </Accordion>
+  <Accordion title="Client Integration" icon="code">
+    Frontend applications use the `MCPMemoryClient` TypeScript client:
+
+    ```typescript
+    import { mcpMemoryManager } from '@/lib/memory/mcp-memory-client'
+
+    // Add a memory
+    const memoryId = await mcpMemoryManager.addMemory({
+      content: "User prefers cognitive behavioral techniques",
+      metadata: { category: "preference", tags: ["CBT"] }
+    }, userId)
+
+    // Search memories
+    const results = await mcpMemoryManager.searchMemories({
+      query: "coping strategies",
+      userId,
+      limit: 10
+    })
+
+    // Get statistics
+    const stats = await mcpMemoryManager.getMemoryStats(userId)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Analytics pipeline
+
+Every training session produces rich analytics data that flows through a dedicated pipeline for reporting and continuous improvement.
+
+```
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐    ┌──────────────┐
+│  Session    │    │  Aggregation │    │  Analytics  │    │  Dashboard   │
+│  Events    │───▶│  Service     │───▶│  Store      │───▶│  Queries     │
+│  (Stream)  │    │  (Real-time) │    │  (MongoDB)  │    │  (API)       │
+└─────────────┘    └──────────────┘    └─────────────┘    └──────────────┘
+                         │
+                    ┌────▼─────┐
+                    │  Redis   │
+                    │  (Live   │
+                    │  Counters│
+                    └──────────┘
+```
+
+<Tabs>
+  <Tab title="Session Metrics">
+    | Metric | Description | Update Frequency |
+    |---|---|---|
+    | `empathy_score` | Overall empathetic accuracy (0.0–1.0) | Per-utterance |
+    | `technique_usage` | Therapeutic techniques applied and effectiveness | Per-utterance |
+    | `emotional_trajectory` | Emotion map over session duration | Per-utterance |
+    | `bias_score` | Aggregate bias detection across categories | Per-session |
+    | `crisis_events` | Count and severity of detected crisis signals | Per-utterance |
+    | `response_latency` | Time from user input to AI response | Per-utterance |
+    | `breakthrough_moments` | Identified emotional breakthroughs | Per-session |
+    | `session_duration` | Total active session time | Per-session |
+  </Tab>
+  <Tab title="Aggregate Analytics">
+    | Metric | Description | Aggregation |
+    |---|---|---|
+    | `trainee_progress` | Empathy score trend over time | Weekly rolling average |
+    | `scenario_difficulty` | Success rates per scenario type | Per-scenario |
+    | `cohort_comparison` | Trainee performance relative to cohort | Per-cohort |
+    | `bias_trends` | Bias detection trends over training period | Monthly |
+    | `technique_mastery` | Competency levels per therapeutic technique | Cumulative |
+  </Tab>
+  <Tab title="Real-time Counters (Redis)">
+    Redis maintains live counters for operational dashboards:
+
+    ```
+    active_sessions:count          → 47
+    active_sessions:by_scenario    → {"crisis": 12, "trauma": 8, ...}
+    crisis_events:today            → 3
+    avg_response_latency:5min      → 312ms
+    memory_operations:today        → 1,247
+    ```
+
+    These counters power the supervisor dashboard's real-time activity feed and the admin system health panel.
+  </Tab>
+</Tabs>
+
+## Data flow security
+
+<Warning>
+  All data flows between services use **TLS encryption** in production. Internal service-to-service communication within the Docker/Kubernetes network uses mutual TLS where available. No sensitive data is transmitted in plaintext.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Encryption in Transit" icon="lock">
+    - HTTPS (TLS 1.3) for all external traffic
+    - WSS (WebSocket Secure) for real-time connections
+    - Caddy/Nginx handles TLS termination with auto-renewed certificates
+    - Internal traffic encrypted via Docker network isolation
+  </Card>
+  <Card title="Encryption at Rest" icon="hard-drive">
+    - MongoDB encryption at rest (WiredTiger)
+    - Redis AOF persistence with requirepass authentication
+    - S3/R2 server-side encryption (AES-256)
+    - Qdrant vector store with access-controlled endpoints
+  </Card>
+  <Card title="PII Boundary" icon="user-shield">
+    - PII filtering at the memory layer (before storage)
+    - Regex-based detection: SSN, phone, address, insurance numbers
+    - Content rejected if >50% redacted (meaningless after filtering)
+    - Third-party names anonymized ("family member", "partner")
+  </Card>
+  <Card title="Audit Trail" icon="scroll">
+    - Every API request logged with Morgan + custom logger
+    - Memory operations tracked with user ID and timestamp
+    - Crisis events logged with full context for compliance
+    - Session analytics retained per configurable retention policy
+  </Card>
+</CardGroup>
+
+## Error handling and resilience
+
+Each data flow implements circuit breaker patterns and fallback hierarchies to ensure graceful degradation.
+
+<AccordionGroup>
+  <Accordion title="Memory System Fallback Chain" icon="link-slash">
+    ```
+    Primary: Google Gemini API (PII filtering + generation)
+        │
+        ▼ (on failure)
+    Secondary: Mem0 Platform Client (vector search + storage)
+        │
+        ▼ (on failure)
+    Tertiary: NullMemoryManager (no-op, logs warning)
+    ```
+
+    The `NullMemoryManager` ensures the platform continues functioning even if the entire memory subsystem is unavailable — responses are generated without memory context, and a warning is logged for operations review.
+  </Accordion>
+  <Accordion title="Database Connection Recovery" icon="database">
+    The API gateway implements automatic reconnection for all three database systems:
+
+    ```typescript
+    // Graceful shutdown with connection cleanup
+    process.on('SIGTERM', async () => {
+      if (mongoConnection) await mongoConnection.disconnect()
+      if (postgresConnection) await postgresConnection.end()
+      if (redisConnection) await redisConnection.quit()
+      process.exit(0)
+    })
+    ```
+
+    On startup, if any database connection fails, the server exits with a clear error message rather than running in a degraded state that could cause data inconsistency.
+  </Accordion>
+  <Accordion title="Rate Limiting and Back-pressure" icon="gauge-high">
+    Rate limiting is applied at the API gateway level to prevent any single user or service from overwhelming the system:
+
+    - **Per-user**: Configurable requests per window (default: 100 req/min)
+    - **Per-endpoint**: Critical endpoints (e.g., `/api/auth`) have stricter limits
+    - **Global**: Overall system throughput cap to protect downstream services
+    - **WebSocket**: Message frequency limits per session to prevent flooding
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Info>
+  **Next:** Dive into the [Memory System Architecture](/architecture/memory-system) to understand how Mem0 + Gemini powers long-term memory with PII compliance, or explore the [Deployment Architecture](/architecture/deployment) for infrastructure details.
+</Info>

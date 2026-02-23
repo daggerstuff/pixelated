@@ -1,0 +1,188 @@
+---
+title: 'Crisis Detection'
+description: "Because some moments can't wait."
+---
+
+<Warning>
+  **If you or someone you know is in crisis:**
+  - **National Suicide Prevention Lifeline**: 988 (US)
+  - **Crisis Text Line**: Text HOME to 741741
+  - **International Association for Suicide Prevention**:
+    [iasp.info/resources/Crisis_Centres](https://www.iasp.info/resources/Crisis_Centres/)
+
+We include these resources not because it's expected, but
+because it matters.
+
+</Warning>
+
+## Why This Comes First
+
+In every conversation — simulated or real — there's a possibility
+that someone expresses something that signals imminent danger.
+Self-harm ideation. Suicidal thoughts. A plan. A timeline.
+
+We don't treat crisis detection as a feature. We treat it as a
+responsibility.
+
+Our crisis detection system runs as a **parallel process** across
+every conversation in the platform. It's not something that
+activates when things "seem bad." It's always on. Every exchange.
+Every session.
+
+## How It Works
+
+### Signal Detection
+
+The system monitors for three categories of crisis indicators:
+
+<AccordionGroup>
+  <Accordion title="Explicit Signals" icon="bullhorn">
+    Direct statements of intent. "I want to hurt myself." "I've
+    been thinking about ending it." "I have a plan."
+  </Accordion>
+
+<Accordion title="Implicit Signals" icon="eye">
+  Indirect language that often precedes or accompanies crisis states.
+  Hopelessness language ("things will never get better"), farewell patterns ("I
+  just wanted to say goodbye"), sudden calm after prolonged distress (a
+  well-documented risk signal).
+</Accordion>
+
+  <Accordion title="Behavioral Signals" icon="chart-line">
+    Patterns in the conversation flow itself. A sudden withdrawal
+    after emotional disclosure. Rapid escalation from mild
+    distress to intense despair. Giving away meaningful items or
+    resolving unfinished business.
+  </Accordion>
+</AccordionGroup>
+
+### Sensitivity Levels
+
+Not every crisis signal requires the same response. We use a
+tiered assessment:
+
+| Level        | Signal Type              | System Response                    |
+| :----------- | :----------------------- | :--------------------------------- |
+| **Watch**    | Mild distress indicators | Increased monitoring sensitivity   |
+| **Concern**  | Multiple indirect signs  | Flag for review, adjusted behavior |
+| **Alert**    | Direct crisis indicators | Immediate safety response protocol |
+| **Critical** | Imminent danger language | Emergency response, intervention   |
+
+### What We Don't Do
+
+We want to be honest about what crisis detection can and cannot do:
+
+<CardGroup cols={3}>
+  <Card title="We Don't Diagnose" icon="x">
+    Our system identifies _signals_, not conditions. A flag from our system is
+    not a clinical assessment.
+  </Card>
+  <Card title="We Don't Replace Judgment" icon="x">
+    Crisis detection in a training environment supplements the learning — it
+    doesn't replace the therapist's clinical responsibility.
+  </Card>
+  <Card title="We Don't Overcorrect" icon="x">
+    False positives in crisis detection are dangerous in their own way — they
+    can lead to unnecessary panic and can undermine trust. We calibrate for
+    precision, not just recall.
+  </Card>
+</CardGroup>
+
+## In Training vs. In Practice
+
+Here's an important distinction:
+
+<Tabs>
+  <Tab title="In The Empathy Gym™">
+    Crisis detection serves the _training_ purpose. When a simulated client
+    exhibits crisis signals, the system evaluates how the trainee responds. Did
+    they notice the signal? Did they ask directly? Did they create safety? The
+    feedback helps trainees build crisis response reflexes.
+  </Tab>
+  <Tab title="In Real-World Applications">
+    In any future real-world application, crisis detection would serve a
+    _safety_ purpose — flagging real distress for human review and intervention.
+  </Tab>
+</Tabs>
+
+<Note>
+  We build for both scenarios, but we never blur the line between them.
+</Note>
+
+## The Ethics of Detection
+
+Crisis detection raises real ethical questions. We think about them
+constantly:
+
+<AccordionGroup>
+  <Accordion
+    title="Sensitivity vs. Specificity"
+    icon="scale-balanced"
+  >
+    Cast too wide a net and you overwhelm with false alarms.
+    Cast too narrow and you miss real signals. We bias toward
+    sensitivity, but we're transparent about the tradeoffs.
+  </Accordion>
+
+  <Accordion title="Cultural Context" icon="globe">
+    Crisis language varies across cultures. Expressions of
+    distress that are common in one cultural context may be rare
+    or different in another. We work to incorporate cultural
+    variation into our detection models.
+
+    Learn more:
+    [Cultural Empathy](/knowledge/cultural-empathy)
+
+  </Accordion>
+
+  <Accordion title="Privacy" icon="lock">
+    Every conversation is analyzed for safety signals. That means
+    the system is "reading" content that is often deeply personal.
+    We handle this data with the sensitivity it deserves.
+
+    Learn more:
+    [Privacy & Trust](/platform/privacy-and-trust)
+
+  </Accordion>
+</AccordionGroup>
+
+## For Developers
+
+If you're building on our platform or working with our codebase,
+crisis detection is integrated into the core modules at
+`src/lib/ai/crisis-detection/`. Key principles:
+
+- Crisis checks run on **every** message exchange, not on-demand
+- Detection logic is isolated from response generation — a crash
+  in the AI engine doesn't take crisis monitoring offline
+- All crisis-related data is handled under our strictest privacy
+  protocols
+- The system validates that crisis signals produce **actionable
+  outputs**, not just severity scores
+
+<Info>
+  For technical architecture details, see the
+  [Architecture](/developers/architecture) guide.
+</Info>
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="When Someone Is in Crisis"
+    icon="heart-pulse"
+    href="/knowledge/when-someone-is-in-crisis"
+  >
+    Responding to crisis signals as a human.
+  </Card>
+  <Card title="Privacy & Trust" icon="lock" href="/platform/privacy-and-trust">
+    How we protect sensitive data.
+  </Card>
+  <Card
+    title="Ethical AI Framework"
+    icon="scale-balanced"
+    href="/research/ethical-ai-framework"
+  >
+    Our approach to responsible AI.
+  </Card>
+</CardGroup>

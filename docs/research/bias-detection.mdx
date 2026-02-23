@@ -1,0 +1,187 @@
+---
+title: 'Bias Detection'
+description: "Even well-intentioned AI can carry prejudice it doesn't know about."
+---
+
+## The Problem
+
+Every AI system inherits biases from the data it's trained on, the
+frameworks it implements, and the assumptions its creators make. In
+a platform that models human emotion, these biases aren't abstract
+concerns — they directly affect how realistic, fair, and useful our
+simulations are.
+
+If our emotional models assume that "normal" grief looks a certain
+way, we'll train therapists to recognize one kind of grief and miss
+others. If our crisis detection is calibrated to one cultural
+expression of distress, it'll fail for others.
+
+We can't eliminate bias entirely. But we can — and do — work
+systematically to detect it, measure it, and mitigate it.
+
+## Where Bias Lives in Our System
+
+<AccordionGroup>
+  <Accordion title="Training Data" icon="database">
+    Our emotional models are trained on datasets that reflect the biases
+    of their sources. Published psychological research is predominantly
+    Western, educated, industrialized, rich, and democratic (WEIRD). We
+    know this. We account for it.
+
+    **What we do**: We actively seek data from diverse sources. We weight
+    our training data to avoid over-representing any single demographic.
+    We flag findings that haven't been validated cross-culturally.
+
+  </Accordion>
+
+  <Accordion title="Emotional Frameworks" icon="chart-pie">
+    Plutchik's Wheel and the Big Five were both developed primarily
+    within Western academic psychology. While both have reasonable
+    cross-cultural validation, neither is universally applicable without
+    adaptation.
+
+    **What we do**: We treat cultural variation as a feature, not a bug.
+    Our models include cultural context as an explicit variable in
+    emotional assessment. An expression of distress that's indirect in
+    one culture might be direct in another — our models account for
+    this.
+
+    _→ Learn more: [Cultural Empathy](/knowledge/cultural-empathy)_
+
+  </Accordion>
+
+  <Accordion title="Therapeutic Evaluation" icon="comments">
+    "Good therapy" is culturally influenced. Motivational Interviewing
+    emphasizes individual autonomy — a value more prominent in
+    individualistic cultures than collectivist ones. Person-centered
+    therapy assumes that emotional disclosure is therapeutic, which
+    isn't universally true.
+
+    **What we do**: Our evaluation system doesn't assume one therapeutic
+    style is universally correct. We assess technique within context,
+    and we're transparent about the cultural framework we're operating
+    within.
+
+  </Accordion>
+
+  <Accordion title="Language Processing" icon="language">
+    Natural language processing models carry linguistic biases.
+    Sentiment analysis trained primarily on English text will perform
+    differently on other languages, dialects, and communication styles.
+
+    **What we do**: We test our NLP components across diverse language
+    patterns and flag performance discrepancies.
+
+  </Accordion>
+</AccordionGroup>
+
+## Our Bias Detection Process
+
+<Steps>
+  <Step title="Proactive Auditing">
+    Before deploying any new model or feature, we run it through
+    bias checks:
+
+    - **Demographic parity** — Does the model perform equally across
+      demographic groups?
+    - **Cultural sensitivity** — Does it handle diverse emotional
+      expressions appropriately?
+    - **Language bias** — Does it favor certain communication styles
+      over others?
+
+  </Step>
+
+  <Step title="Continuous Monitoring">
+    In production, we watch for:
+
+    - Patterns in crisis detection across demographic groups
+    - Systematic differences in therapeutic evaluation scores
+    - User feedback indicating culturally inappropriate responses
+
+  </Step>
+
+  <Step title="Human Review">
+    AI can detect statistical anomalies, but understanding whether
+    those anomalies represent bias requires human judgment. We
+    maintain review processes that include:
+
+    - Subject-matter experts in cross-cultural psychology
+    - Community feedback channels
+    - Regular team reflection on assumptions and blind spots
+
+  </Step>
+</Steps>
+
+## What We've Learned
+
+Being honest about what we've found:
+
+<Warning>
+  These are known limitations we are actively working to address. Transparency
+  about bias is more valuable than pretending it doesn't exist.
+</Warning>
+
+<CardGroup cols={1}>
+  <Card title="Our emotional taxonomy is Western-centric" icon="globe">
+    Plutchik's Wheel was developed in a Western context. Some emotions that are
+    primary in other cultures (like "amae" in Japanese — a feeling of pleasant
+    dependence) don't map cleanly onto it. We're exploring extensions to address
+    this.
+  </Card>
+  <Card title="Silence is culturally loaded" icon="volume-xmark">
+    We model silence as a therapeutic tool, but the meaning of silence varies
+    enormously across cultures. In some contexts, it's reflective. In others, it
+    signals discomfort, respect, or disagreement.
+  </Card>
+  <Card title="Crisis signals differ" icon="triangle-exclamation">
+    Direct statements of self-harm intent are more common in some cultural
+    contexts than others. Our crisis detection must be sensitive to both direct
+    and indirect expressions of distress.
+  </Card>
+</CardGroup>
+
+## Transparency
+
+We believe transparency about bias is more valuable than pretending
+it doesn't exist. When we identify a bias in our system, we:
+
+<Steps>
+  <Step title="Document It">Publicly in our research notes.</Step>
+  <Step title="Assess Impact">How does this affect users?</Step>
+  <Step title="Prioritize Mitigation">Based on impact severity.</Step>
+  <Step title="Track Progress">Report on improvements.</Step>
+  <Step title="Stay Honest">About what we haven't solved yet.</Step>
+</Steps>
+
+## The Bigger Picture
+
+Bias detection isn't a launch requirement — it's an ongoing practice.
+We'll never be completely bias-free, and claiming otherwise would be
+dishonest.
+
+What we can do is build systems that are aware of their limitations,
+transparent about their assumptions, and actively working to improve.
+
+That's the standard we hold ourselves to.
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="Cultural Empathy"
+    icon="earth-americas"
+    href="/knowledge/cultural-empathy"
+  >
+    How emotion varies across cultures.
+  </Card>
+  <Card
+    title="Ethical AI Framework"
+    icon="scale-balanced"
+    href="/research/ethical-ai-framework"
+  >
+    Our ethical principles.
+  </Card>
+  <Card title="Our Approach" icon="flask" href="/research/our-approach">
+    How we build on established science.
+  </Card>
+</CardGroup>

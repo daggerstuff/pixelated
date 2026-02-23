@@ -1,0 +1,501 @@
+---
+title: "Development Environment Setup"
+description: "Get your local development environment running for Pixelated Empathy — from prerequisites to running all services."
+---
+
+This guide walks you through setting up a complete local development environment for Pixelated Empathy. By the end, you'll have the frontend, backend services, AI engine, and supporting infrastructure running on your machine.
+
+<Note>
+  Pixelated Empathy handles sensitive mental health data. Even in local development, follow security practices — never commit `.env` files, never use real patient data in test fixtures, and always run `pnpm security:check` before pushing code.
+</Note>
+
+## Prerequisites
+
+Ensure the following tools are installed before proceeding:
+
+<CardGroup cols={2}>
+  <Card title="Node.js 24+" icon="node-js">
+    Required for the frontend (Astro/React) and Node.js backend services. Download from [nodejs.org](https://nodejs.org).
+
+    ```bash
+    node --version
+    # v24.x.x or higher
+    ```
+  </Card>
+  <Card title="Python 3.11+" icon="python">
+    Required for AI services, bias detection, and the research pipeline. We use **uv** as the package manager.
+
+    ```bash
+    python3 --version
+    # Python 3.11.x or higher
+    ```
+  </Card>
+  <Card title="Docker 20.10+" icon="docker">
+    Required for running MongoDB, Redis, and other infrastructure services via Docker Compose.
+
+    ```bash
+    docker --version
+    # Docker version 20.10.x or higher
+    ```
+  </Card>
+  <Card title="Git 2.30+" icon="git-alt">
+    Required for version control. The project uses Git submodules for the AI engine.
+
+    ```bash
+    git --version
+    # git version 2.30.x or higher
+    ```
+  </Card>
+</CardGroup>
+
+### Additional Tools
+
+<AccordionGroup>
+  <Accordion title="pnpm (Node.js package manager)" icon="box">
+    We use **pnpm** exclusively for Node.js dependency management. Do not use npm or yarn.
+
+    ```bash
+    corepack enable
+    corepack prepare pnpm@latest --activate
+
+    pnpm --version
+    # 10.x.x or higher
+    ```
+
+    <Warning>
+      **Never use npm or yarn** for installing dependencies. The project uses pnpm's workspace features and lockfile format. Using a different package manager will cause dependency resolution failures.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="uv (Python package manager)" icon="box">
+    We use **uv** for Python dependency management. Do not use pip, conda, or venv directly.
+
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    uv --version
+    # uv 0.x.x or higher
+    ```
+
+    <Warning>
+      **Never use pip, conda, or venv** for Python dependencies. The project uses uv's lockfile (`uv.lock`) for deterministic builds.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Docker Compose" icon="layer-group">
+    Docker Compose is included with Docker Desktop. For Linux installations, ensure the Compose plugin is available:
+
+    ```bash
+    docker compose version
+    # Docker Compose version v2.x.x
+    ```
+  </Accordion>
+
+  <Accordion title="Recommended: VS Code Extensions" icon="puzzle-piece">
+    For the best development experience, install these VS Code extensions:
+
+    - **Astro** — Syntax highlighting and IntelliSense for `.astro` files
+    - **MDX** — Support for MDX files
+    - **ESLint** — Inline linting feedback
+    - **Prettier** — Code formatting for Astro and MDX files
+    - **CSS Modules** — IntelliSense for CSS Module imports
+    - **Python** — Python language support
+    - **Docker** — Dockerfile and Compose file support
+  </Accordion>
+</AccordionGroup>
+
+## Initial Setup
+
+<Steps>
+  <Step title="Clone the Repository">
+    Clone the repository with submodules (the AI engine is a Git submodule):
+
+    ```bash
+    git clone --recurse-submodules https://github.com/pixelatedempathy/pixelated.git
+    cd pixelated
+    ```
+
+    If you've already cloned without submodules:
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+  </Step>
+
+  <Step title="Install Node.js Dependencies">
+    Install all frontend and Node.js service dependencies with pnpm:
+
+    ```bash
+    pnpm install
+    ```
+
+    This installs dependencies for the main application, including Astro, React 19, TypeScript, and all backend services.
+  </Step>
+
+  <Step title="Install Python Dependencies">
+    Install all Python dependencies for AI services, bias detection, and the research pipeline:
+
+    ```bash
+    uv install
+    ```
+
+    This reads `pyproject.toml` and `uv.lock` to create a deterministic Python environment.
+  </Step>
+
+  <Step title="Configure Environment Variables">
+    Copy the example environment file and configure it for local development:
+
+    ```bash
+    cp .env.example .env.local
+    ```
+
+    Edit `.env.local` with your local configuration. See the [Environment Variables](#environment-variables) section below for details.
+  </Step>
+
+  <Step title="Start Infrastructure Services">
+    Launch MongoDB, Redis, and other supporting services via Docker Compose:
+
+    ```bash
+    docker compose -f docker/docker-compose.dev.yml up -d
+    ```
+
+    Verify services are running:
+
+    ```bash
+    docker compose -f docker/docker-compose.dev.yml ps
+    ```
+
+    You should see MongoDB (port 27017) and Redis (port 6379) in a "running" state.
+  </Step>
+
+  <Step title="Initialize the Database">
+    Seed the local database with development data:
+
+    ```bash
+    pnpm mongodb:init
+    pnpm mongodb:seed
+    ```
+
+    This creates the required collections, indexes, and populates sample training scenarios.
+  </Step>
+</Steps>
+
+## Running the Application
+
+### Frontend Only
+
+Start the Astro development server with hot module reloading:
+
+```bash
+pnpm dev
+```
+
+The application will be available at **http://localhost:5173** with automatic hot reloading as you edit files.
+
+### All Services
+
+Start the frontend and all backend services simultaneously:
+
+```bash
+pnpm dev:all-services
+```
+
+This runs the following services concurrently:
+
+| Service | Port | Command |
+|:---|:---|:---|
+| Frontend (Astro) | 5173 | `pnpm dev` |
+| Bias Detection | 8001 | `pnpm dev:bias-detection` |
+| AI Service | 8002 | `pnpm dev:ai-service` |
+| Analytics | — | `pnpm dev:analytics` |
+| Background Worker | — | `pnpm dev:worker` |
+| Training Server | — | `pnpm dev:training-server` |
+| WebSocket Server | — | `pnpm dev:websocket` |
+| Academic Sourcing API | 8000 | `pnpm dev:academic-sourcing` |
+| Bias Detection (Python) | — | `pnpm bias:py` |
+
+### Individual Services
+
+You can also start services individually for focused development:
+
+```bash
+pnpm dev:bias-detection    # Bias detection service on port 8001
+pnpm dev:ai-service        # AI service on port 8002
+pnpm dev:websocket         # WebSocket server
+pnpm dev:academic-sourcing # Academic sourcing API on port 8000
+pnpm dev:training-server   # Training platform backend
+```
+
+## Environment Variables
+
+Environment variables are configured in `.env.local` for local development. Never commit this file.
+
+<Tabs>
+  <Tab title="Core">
+    ```bash
+    # Application
+    NODE_ENV=development
+    PORT=4321
+
+    # Feature Flags
+    FEATURE_AI_INSIGHTS=true
+    FEATURE_CRISIS_DETECTION=true
+    ```
+  </Tab>
+
+  <Tab title="Database">
+    ```bash
+    # MongoDB (local Docker instance)
+    MONGODB_URI=mongodb://localhost:27017/pixelated-empathy
+
+    # PostgreSQL (if using relational features)
+    DATABASE_URL=postgresql://localhost:5432/pixelated
+
+    # Redis (local Docker instance)
+    REDIS_URL=redis://localhost:6379/0
+    ```
+  </Tab>
+
+  <Tab title="Authentication">
+    ```bash
+    # Auth Secret (generate with: openssl rand -hex 32)
+    AUTH_SECRET=your-local-auth-secret
+
+    # Auth0 (optional for local development)
+    AUTH0_DOMAIN=your-domain.auth0.com
+    AUTH0_CLIENT_ID=your-client-id
+    AUTH0_CLIENT_SECRET=your-client-secret
+
+    # JWT
+    JWT_SECRET=your-local-jwt-secret
+    ```
+  </Tab>
+
+  <Tab title="AI Services">
+    ```bash
+    # OpenAI (for AI-powered features)
+    OPENAI_API_KEY=sk-...
+
+    # HuggingFace (for model inference)
+    HUGGINGFACE_TOKEN=hf_...
+
+    # Mem0 (conversation memory)
+    MEM0_API_KEY=your-mem0-api-key
+    MEM0_ENABLED=true
+    ```
+  </Tab>
+
+  <Tab title="Security">
+    ```bash
+    # Encryption (generate with: openssl rand -hex 16)
+    ENCRYPTION_KEY=your-32-character-encryption-key
+    ```
+
+    <Warning>
+      Never use production keys in local development. Generate fresh secrets for your `.env.local` file. The `security:check` script will flag any committed credentials.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Path Aliases
+
+The project uses TypeScript path aliases for clean imports. These are configured in `tsconfig.json`:
+
+| Alias | Resolves To | Usage |
+|:---|:---|:---|
+| `@/*` | `./src/*` | General source imports |
+| `~/*` | `./src/*` | Alternative general imports |
+| `@lib/*` | `./src/lib/*` | Core libraries and utilities |
+| `@components/*` | `./src/components/*` | UI components |
+| `@layouts/*` | `./src/layouts/*` | Layout components |
+| `@utils/*` | `./src/utils/*` | Utility functions |
+| `@types/*` | `./src/types/*` | TypeScript type definitions |
+
+### Usage Examples
+
+```typescript
+// ✅ Correct — use path aliases
+import { EmotionAnalyzer } from '@lib/ai/emotion-analyzer'
+import { useConversation } from '@/hooks/useConversation'
+import type { EmotionScore } from '@types/index'
+import { Button } from '@components/ui/Button'
+
+// ❌ Wrong — never use relative paths for cross-directory imports
+import { EmotionAnalyzer } from '../../../lib/ai/emotion-analyzer'
+```
+
+## Docker Compose Services
+
+The `docker/docker-compose.dev.yml` file defines the local infrastructure stack:
+
+<AccordionGroup>
+  <Accordion title="MongoDB" icon="database">
+    **Port**: 27017
+
+    MongoDB 7.0 for primary data storage — user accounts, session transcripts, scenario definitions, and analytics data.
+
+    ```bash
+    # Connect with MongoDB Compass
+    mongodb://localhost:27017/pixelated-empathy
+
+    # Or use the shell
+    docker exec -it pixelated-mongodb mongosh
+    ```
+  </Accordion>
+
+  <Accordion title="Redis" icon="bolt">
+    **Port**: 6379
+
+    Redis 5.x for caching, session management, real-time pub/sub, and rate limiting.
+
+    ```bash
+    # Connect with Redis CLI
+    docker exec -it pixelated-redis redis-cli
+
+    # Health check
+    pnpm redis:check
+    ```
+  </Accordion>
+
+  <Accordion title="Production-Like Stack" icon="server">
+    For a production-like environment with all services containerized:
+
+    ```bash
+    # Full production stack
+    docker compose -f docker/docker-compose.prod.yml up -d
+
+    # Or use the convenience script
+    pnpm docker:up
+    ```
+
+    This includes the application, all backend services, and infrastructure — useful for integration testing and pre-deployment verification.
+  </Accordion>
+</AccordionGroup>
+
+## Verifying Your Setup
+
+Run these checks to confirm everything is working:
+
+<Steps>
+  <Step title="TypeScript Compilation">
+    ```bash
+    pnpm typecheck
+    ```
+
+    Should complete with zero errors.
+  </Step>
+
+  <Step title="Linting">
+    ```bash
+    pnpm lint
+    ```
+
+    Should report no errors (warnings are acceptable during initial setup).
+  </Step>
+
+  <Step title="Unit Tests">
+    ```bash
+    pnpm test
+    ```
+
+    All tests should pass. If you see failures related to missing environment variables, ensure your `.env.local` is configured correctly.
+  </Step>
+
+  <Step title="Security Check">
+    ```bash
+    pnpm security:check
+    ```
+
+    Should report no committed credentials or secrets.
+  </Step>
+
+  <Step title="Full Quality Gate">
+    ```bash
+    pnpm check:all
+    ```
+
+    Runs linting, type checking, and format verification. This is the same check that runs in CI.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port conflicts" icon="circle-exclamation">
+    If port 5173 is already in use, the Astro dev server will attempt the next available port. You can also specify a custom port:
+
+    ```bash
+    pnpm dev -- --port 3000
+    ```
+
+    For Docker services, check for existing containers:
+
+    ```bash
+    docker ps
+    docker compose -f docker/docker-compose.dev.yml down
+    ```
+  </Accordion>
+
+  <Accordion title="Node.js memory issues" icon="memory">
+    The dev server is configured with increased memory (`--max-old-space-size=8192`). If you still encounter memory issues:
+
+    ```bash
+    export NODE_OPTIONS='--max-old-space-size=16384'
+    pnpm dev
+    ```
+  </Accordion>
+
+  <Accordion title="Python environment issues" icon="python">
+    If uv encounters issues, try resetting the environment:
+
+    ```bash
+    rm -rf .venv
+    uv install
+    ```
+
+    Ensure you're using Python 3.11+ (check `.python-version` in the project root).
+  </Accordion>
+
+  <Accordion title="Docker services won't start" icon="docker">
+    Check Docker daemon status and available disk space:
+
+    ```bash
+    docker info
+    docker system df
+    ```
+
+    Reset development services completely:
+
+    ```bash
+    pnpm docker:down
+    docker volume prune
+    docker compose -f docker/docker-compose.dev.yml up -d
+    ```
+  </Accordion>
+
+  <Accordion title="Git submodule issues" icon="code-branch">
+    If the AI engine submodule is missing or outdated:
+
+    ```bash
+    git submodule update --init --recursive
+    git submodule update --remote
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Code Conventions" icon="code" href="/guides/developers/conventions">
+    Learn the coding standards, file naming conventions, and architectural patterns used across the codebase.
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/guides/developers/contributing">
+    Understand the contribution workflow, quality gates, and PR process.
+  </Card>
+  <Card title="Testing Strategy" icon="flask-vial" href="/guides/developers/testing">
+    Explore the testing pyramid, test commands, and coverage requirements.
+  </Card>
+  <Card title="API Reference" icon="terminal" href="/api-reference/introduction">
+    Browse the API endpoints for sessions, analytics, bias detection, and crisis detection.
+  </Card>
+</CardGroup>

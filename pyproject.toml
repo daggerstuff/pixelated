@@ -114,6 +114,7 @@ dependencies = [
   "lancedb>=0.29.2",
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
+  "kernels>=0.12.1",
 ]
 [project.optional-dependencies]
 test = [

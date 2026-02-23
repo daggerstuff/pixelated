@@ -1,0 +1,345 @@
+---
+title: 'Authentication'
+description: 'JWT bearer tokens, API keys, session management, and role-based access control for the Pixelated Empathy API'
+---
+
+The Pixelated Empathy API uses two authentication methods: **JWT bearer tokens** for user-facing applications and **API keys** for service-to-service communication. Both methods enforce role-based access control (RBAC) to ensure users can only access resources appropriate to their role.
+
+## JWT bearer tokens
+
+JWT (JSON Web Token) bearer tokens are the primary authentication method for applications where users log in interactively. Tokens are issued through an OAuth 2.0 authorization code flow.
+
+### Obtaining a token
+
+<Steps>
+  <Step title="Redirect to authorization">
+    Direct the user to the Pixelated Empathy authorization endpoint:
+
+    ```
+    https://auth.pixelatedempathy.com/authorize?
+      response_type=code&
+      client_id=YOUR_CLIENT_ID&
+      redirect_uri=https://yourapp.com/callback&
+      scope=read write&
+      state=random_state_value
+    ```
+  </Step>
+  <Step title="Exchange authorization code">
+    After the user authenticates, they are redirected to your `redirect_uri` with an authorization code. Exchange it for tokens:
+
+    ```bash
+    curl -X POST https://auth.pixelatedempathy.com/token \
+      -H "Content-Type: application/json" \
+      -d '{
+        "grant_type": "authorization_code",
+        "code": "AUTH_CODE_FROM_REDIRECT",
+        "client_id": "YOUR_CLIENT_ID",
+        "client_secret": "YOUR_CLIENT_SECRET",
+        "redirect_uri": "https://yourapp.com/callback"
+      }'
+    ```
+  </Step>
+  <Step title="Receive token response">
+    The token endpoint returns an access token, refresh token, and metadata:
+
+    ```json
+    {
+      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "refresh_token": "rt_a1b2c3d4e5f6g7h8i9j0...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "read write",
+      "user": {
+        "id": "usr_k1l2m3n4",
+        "email": "therapist@example.com",
+        "role": "therapist",
+        "organization_id": "org_p5q6r7s8"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Include token in requests">
+    Add the access token to the `Authorization` header of every API request:
+
+    ```bash
+    curl https://api.pixelatedempathy.com/v1/sessions \
+      -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+    ```
+  </Step>
+</Steps>
+
+### Token structure
+
+JWT tokens contain the following claims:
+
+| Claim | Description |
+|---|---|
+| `sub` | User ID (`usr_k1l2m3n4`) |
+| `role` | User's RBAC role (`admin`, `supervisor`, `therapist`, `user`) |
+| `org` | Organization ID |
+| `scope` | Granted permission scopes |
+| `iat` | Token issued-at timestamp |
+| `exp` | Token expiration timestamp |
+| `jti` | Unique token identifier for revocation tracking |
+
+<Warning>
+  Never decode or trust JWT claims on the client side for authorization decisions. Always validate tokens server-side using the public key from the JWKS endpoint.
+</Warning>
+
+### Token expiration
+
+| Token type | Lifetime | Renewable |
+|---|---|---|
+| Access token | 1 hour | Via refresh token |
+| Refresh token | 30 days | Via re-authentication |
+| Session token | 8 hours (sliding) | Automatic on activity |
+
+## Token refresh flow
+
+When an access token expires, use the refresh token to obtain a new one without requiring the user to log in again.
+
+```bash
+curl -X POST https://auth.pixelatedempathy.com/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "refresh_token",
+    "refresh_token": "rt_a1b2c3d4e5f6g7h8i9j0",
+    "client_id": "YOUR_CLIENT_ID",
+    "client_secret": "YOUR_CLIENT_SECRET"
+  }'
+```
+
+Response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.NEW_TOKEN...",
+  "refresh_token": "rt_z9y8x7w6v5u4t3s2r1q0...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+<Note>
+  Each refresh token is single-use. The response includes a new refresh token that must be stored for the next refresh cycle. Using an already-consumed refresh token invalidates the entire token family as a security precaution.
+</Note>
+
+## API keys
+
+API keys provide a simpler authentication method for server-side integrations, background jobs, and service-to-service communication where interactive user login is not practical.
+
+### Generating an API key
+
+<Steps>
+  <Step title="Navigate to API settings">
+    Log in to the Pixelated Empathy dashboard and go to **Settings** → **API Keys**.
+  </Step>
+  <Step title="Create a new key">
+    Click **Generate new key**. Provide a descriptive name (e.g., "EHR Integration - Production") and select the appropriate permission scopes.
+  </Step>
+  <Step title="Copy your key">
+    Your API key is displayed once. Copy it immediately and store it securely. The key format is:
+
+    ```
+    pe_live_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+    ```
+  </Step>
+  <Step title="Include key in requests">
+    Add the API key to the `X-API-Key` header:
+
+    ```bash
+    curl https://api.pixelatedempathy.com/v1/analytics/dashboard \
+      -H "X-API-Key: pe_live_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+    ```
+  </Step>
+</Steps>
+
+### API key prefixes
+
+| Prefix | Environment | Description |
+|---|---|---|
+| `pe_live_` | Production | Full access to production data |
+| `pe_test_` | Sandbox | Access to test data only; no PHI |
+| `pe_dev_` | Development | Local development; rate limits relaxed |
+
+<Warning>
+  Never embed API keys in client-side code, mobile apps, or public repositories. API keys should only be used in server-side environments where they can be kept secret.
+</Warning>
+
+### Key management
+
+| Action | How |
+|---|---|
+| **Rotate** | Generate a new key and update your integration. The old key remains active for 24 hours to allow zero-downtime migration. |
+| **Revoke** | Immediately invalidate a key from **Settings** → **API Keys** → **Revoke**. Revocation takes effect within 60 seconds. |
+| **Audit** | View key usage logs including request count, last used timestamp, and IP addresses. |
+
+## Session management
+
+The API tracks active sessions to prevent unauthorized concurrent access and enforce security policies.
+
+### Session behavior
+
+- Each user can have up to **3 concurrent sessions** across different devices
+- Sessions expire after **8 hours of inactivity** (sliding window)
+- Explicit logout invalidates the session immediately
+- Suspicious activity (impossible travel, unusual IP) triggers automatic session invalidation with email notification
+
+### Listing active sessions
+
+```bash
+curl https://api.pixelatedempathy.com/v1/auth/sessions \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "session_id": "ses_abc123",
+      "device": "Chrome on macOS",
+      "ip_address": "192.168.1.100",
+      "last_active": "2025-01-15T10:25:00Z",
+      "created_at": "2025-01-15T08:00:00Z"
+    },
+    {
+      "session_id": "ses_def456",
+      "device": "Pixelated Empathy iOS App",
+      "ip_address": "10.0.0.50",
+      "last_active": "2025-01-15T09:15:00Z",
+      "created_at": "2025-01-14T14:30:00Z"
+    }
+  ]
+}
+```
+
+### Revoking a session
+
+```bash
+curl -X DELETE https://api.pixelatedempathy.com/v1/auth/sessions/ses_def456 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+## Role-based access control
+
+The API enforces RBAC with four predefined roles. Each role inherits the permissions of the roles below it.
+
+### Role hierarchy
+
+<Tabs>
+  <Tab title="Admin">
+    Full platform access including organization settings, user management, billing, and all API endpoints.
+
+    **Unique permissions:**
+    - Manage organization settings and billing
+    - Create and manage user accounts
+    - Access audit logs
+    - Configure SSO and security policies
+    - Export organization-wide data
+  </Tab>
+  <Tab title="Supervisor">
+    Access to trainee management, session review, scenario creation, and analytics for assigned trainees.
+
+    **Unique permissions:**
+    - View and annotate trainee sessions
+    - Create and deploy custom scenarios
+    - Access comparative benchmarking
+    - Generate trainee reports
+    - Manage training groups
+  </Tab>
+  <Tab title="Therapist">
+    Access to their own training sessions, personal analytics, and assigned scenarios.
+
+    **Unique permissions:**
+    - Create and manage own training sessions
+    - View personal competency scores and progress
+    - Access assigned scenarios
+    - Request supervisor review
+  </Tab>
+  <Tab title="User">
+    Basic read access for exploring the platform and viewing public resources.
+
+    **Unique permissions:**
+    - View public scenario library
+    - Access own profile
+    - Read documentation and resources
+  </Tab>
+</Tabs>
+
+### Checking permissions
+
+Use the permissions endpoint to verify what the current token can access:
+
+```bash
+curl https://api.pixelatedempathy.com/v1/auth/permissions \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "role": "supervisor",
+    "permissions": [
+      "sessions:read",
+      "sessions:create",
+      "sessions:review",
+      "trainees:read",
+      "trainees:annotate",
+      "scenarios:read",
+      "scenarios:create",
+      "analytics:read",
+      "analytics:export",
+      "reports:generate"
+    ],
+    "restrictions": {
+      "trainee_scope": "assigned_only",
+      "data_export": "de_identified_only"
+    }
+  }
+}
+```
+
+## JWKS endpoint
+
+Validate JWT tokens using the JSON Web Key Set (JWKS) published at:
+
+```
+https://auth.pixelatedempathy.com/.well-known/jwks.json
+```
+
+<Tip>
+  Cache the JWKS response for up to 24 hours to reduce latency. The keys are rotated quarterly, and new keys are published at least 7 days before the old keys are retired.
+</Tip>
+
+## Security best practices
+
+<AccordionGroup>
+  <Accordion title="Store secrets securely">
+    Use environment variables or a secrets manager (AWS Secrets Manager, HashiCorp Vault) for API keys and client secrets. Never commit secrets to version control.
+  </Accordion>
+  <Accordion title="Implement token refresh proactively">
+    Refresh access tokens 5 minutes before expiration rather than waiting for a `401` response. This prevents failed requests and improves user experience.
+  </Accordion>
+  <Accordion title="Use the principle of least privilege">
+    Request only the scopes your application needs. Create API keys with the minimum permissions required for each integration.
+  </Accordion>
+  <Accordion title="Monitor and rotate regularly">
+    Review API key usage monthly. Rotate keys at least quarterly, or immediately if a key may have been compromised. Enable key expiration dates for temporary integrations.
+  </Accordion>
+  <Accordion title="Validate tokens server-side">
+    Always verify JWT signatures using the JWKS endpoint on your server. Never rely on client-side token validation for authorization decisions.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="API overview" icon="book" href="/api-reference/introduction">
+    Review the full API reference including rate limits, error codes, and pagination.
+  </Card>
+  <Card title="Bias Analysis API" icon="scale-balanced" href="/api-reference/bias-analysis">
+    Start making your first API calls with the bias analysis endpoint.
+  </Card>
+</CardGroup>

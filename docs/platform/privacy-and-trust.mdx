@@ -1,0 +1,238 @@
+---
+title: 'Privacy & Trust'
+description: 'Your data is not our product. Your growth is.'
+---
+
+## Our Promise
+
+We work with some of the most sensitive data in technology:
+therapeutic conversations, emotional states, crisis signals, and the
+intimate details of how people learn to help others heal.
+
+We don't take that lightly. Here's exactly how we handle it.
+
+## The Short Version
+
+<CardGroup cols={3}>
+  <Card title="No Data Selling" icon="ban">
+    Data never sold or shared for ads.
+  </Card>
+  <Card title="Minimal Collection" icon="minimize">
+    Only what the platform needs.
+  </Card>
+  <Card title="Encryption" icon="lock">
+    Encrypted in transit and at rest.
+  </Card>
+  <Card title="PII Redaction" icon="eraser">
+    PII stripped from training data.
+  </Card>
+  <Card title="Crisis Isolation" icon="shield-halved">
+    Crisis data gets highest protection.
+  </Card>
+  <Card title="Your Data" icon="download">
+    Export or delete at any time.
+  </Card>
+</CardGroup>
+
+## What We Collect and Why
+
+<AccordionGroup>
+  <Accordion title="Training Session Data" icon="comments">
+    **What**: Your conversations with simulated clients, your
+    response patterns, session feedback scores.
+
+    **Why**: This is how the platform works. We need to analyze
+    your responses to provide meaningful feedback. We need session
+    history to track your progress over time.
+
+    **How long**: Session data is retained as long as your account
+    is active. You can delete individual sessions or all data
+    at any time.
+
+  </Accordion>
+
+  <Accordion title="Emotional Analytics" icon="chart-bar">
+    **What**: Aggregated, anonymized patterns from training
+    sessions — common mistakes, effective techniques, skill
+    progression curves.
+
+    **Why**: To improve The Empathy Gym™. Understanding where
+    trainees commonly struggle helps us design better scenarios
+    and more targeted feedback.
+
+    **How long**: Analytics data is retained indefinitely but is
+    anonymized — it cannot be traced back to individual users.
+
+  </Accordion>
+
+  <Accordion title="Account Information" icon="user">
+    **What**: Email, name, professional role, and authentication
+    credentials.
+
+    **Why**: Account management and platform access.
+
+    **How long**: As long as your account exists.
+
+  </Accordion>
+</AccordionGroup>
+
+### What We Don't Collect
+
+<Warning>
+  - Real patient data. Ever. The Empathy Gym™ is a training environment. If
+  you're practicing a scenario, the "client" is simulated. - Biometric data. We
+  don't track your facial expressions, voice patterns, or physiological
+  responses. - Browsing history outside our platform. - Your location, device
+  identifiers, or any data beyond what's needed to run the platform.
+</Warning>
+
+## Security Architecture
+
+<Tabs>
+  <Tab title="Encryption">
+    - **In transit**: All data moves over TLS 1.3
+    - **At rest**: AES-256 encryption for stored data
+    - **Secrets management**: API keys, tokens, and credentials
+      are managed through environment-level secrets,
+      never hardcoded
+  </Tab>
+
+<Tab title="Access Control">
+  - Role-based access control (RBAC) for all internal systems - Principle of
+  least privilege — services only access the data they need - Authentication via
+  JWT with appropriate expiration policies
+</Tab>
+
+  <Tab title="Development Practices">
+    Our codebase includes:
+
+    - Automated security scanning in the development pipeline
+    - PII detection tools that flag potentially sensitive data
+      before it reaches production
+    - A "zero-leak policy" — every developer understands that
+      leaked credentials or PII is treated as a
+      critical incident
+
+  </Tab>
+</Tabs>
+
+## HIPAA Alignment
+
+While The Empathy Gym™ works with simulated conversations (not real
+patient data), we build to **HIPAA-level standards** because:
+
+<Steps>
+  <Step title="Professional Context Demands It">
+    Our users are mental health professionals. Their professional context
+    demands it.
+  </Step>
+  <Step title="Upgrading Later Is Risky">
+    Building to a lower standard and then trying to upgrade later is expensive
+    and risky.
+  </Step>
+  <Step title="It's the Right Thing to Do">
+    It's the right thing to do when you work in the mental health space.
+  </Step>
+</Steps>
+
+This means:
+
+- Data access is logged and auditable
+- We maintain a Business Associate Agreement (BAA) framework
+- Incident response procedures are documented and practiced
+- Regular security assessments are part of our operations
+
+## AI Training Data
+
+Here's an important question: **Does your data train our AI?**
+
+The honest answer:
+
+<Tabs>
+  <Tab title="Aggregated Patterns — Yes">
+    **Anonymized, aggregated patterns** from training sessions may inform
+    improvements to our emotional intelligence models. This means we might learn
+    from patterns like "trainees consistently miss crisis signals when the
+    client uses indirect language" — and use that insight to improve our
+    scenario design.
+  </Tab>
+  <Tab title="Individual Content — No">
+    **Individual session content** is not used to train models without explicit
+    consent. Your specific conversations, responses, and feedback remain yours.
+  </Tab>
+</Tabs>
+
+<Tip>
+  We believe transparency about this is more important than privacy theater.
+</Tip>
+
+## Your Rights
+
+You have the right to:
+
+<CardGroup cols={3}>
+  <Card title="Access" icon="eye">
+    See all data we hold about you.
+  </Card>
+  <Card title="Export" icon="download">
+    Download your data in a portable format.
+  </Card>
+  <Card title="Delete" icon="trash">
+    Remove your data from our systems.
+  </Card>
+  <Card title="Correct" icon="pen">
+    Update inaccurate information.
+  </Card>
+  <Card title="Restrict" icon="hand">
+    Limit how we process your data.
+  </Card>
+  <Card title="Object" icon="xmark">
+    Opt out of specific data uses.
+  </Card>
+</CardGroup>
+
+To exercise any of these rights, contact our privacy team. We aim to
+respond to all requests within 30 days.
+
+## For Developers
+
+If you're contributing to the codebase, privacy is part of your job:
+
+- Run `pnpm security:check` before every commit
+- Never hardcode secrets, tokens, or credentials
+- Use anonymized IDs in all documentation and examples
+- If in doubt about whether data constitutes PII, treat it as PII
+- Crisis-related data gets the highest protection level in code
+
+<Info>
+  For technical guidelines, see the [Developer
+  Guidelines](/developers/contributing).
+</Info>
+
+## Questions?
+
+If you have privacy concerns or questions, we want to hear them.
+Seriously. A privacy question asked is always better than a privacy
+concern left unspoken.
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="Ethical AI Framework"
+    icon="scale-balanced"
+    href="/research/ethical-ai-framework"
+  >
+    Our approach to responsible AI.
+  </Card>
+  <Card
+    title="Crisis Detection"
+    icon="shield-halved"
+    href="/platform/crisis-detection"
+  >
+    Safety monitoring in every session.
+  </Card>
+  <Card title="Platform Overview" icon="sitemap" href="/platform/overview">
+    How everything fits together.
+  </Card>
+</CardGroup>

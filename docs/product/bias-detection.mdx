@@ -1,0 +1,430 @@
+---
+title: 'Real-Time Bias Detection'
+description: 'Multi-layered bias detection system with 92%+ accuracy and <100ms latency that identifies cultural, gender, racial, and socioeconomic bias in therapeutic conversations.'
+---
+
+Unconscious bias is one of the most persistent threats to equitable mental
+health care. Pixelated Empathy's Bias Detection System continuously monitors
+therapeutic conversations for bias signals — surfacing patterns that even
+experienced clinicians miss — and provides actionable correction
+recommendations in real time.
+
+<CardGroup cols={3}>
+  <Card title="92%+ Accuracy" icon="bullseye">
+    Validated across 200+ cultural patterns with multi-layered analysis for
+    high-confidence detection.
+  </Card>
+  <Card title="<100ms Latency" icon="bolt">
+    Streaming analysis delivers real-time alerts during live conversations
+    without noticeable delay.
+  </Card>
+  <Card title="200+ Cultural Patterns" icon="earth-americas">
+    Comprehensive coverage of bias patterns across demographics, cultures, and
+    intersectional identities.
+  </Card>
+</CardGroup>
+
+## Bias categories
+
+The system detects four primary categories of bias, each with specialized
+detection models and cultural pattern libraries:
+
+<Tabs>
+  <Tab title="Cultural bias">
+    Detects assumptions, stereotypes, and blind spots rooted in cultural differences:
+
+    - **Ethnocentric framing** — Interpreting client behavior through the therapist's own cultural lens
+    - **Cultural dismissal** — Minimizing culturally significant concerns or practices
+    - **Pathologizing cultural norms** — Treating culturally normative behavior as symptomatic
+    - **Spiritual/religious invalidation** — Dismissing faith-based coping or spiritual distress
+    - **Language bias** — Assumptions based on accent, dialect, or English proficiency
+    - **Collectivist vs. individualist mismatch** — Applying individualist
+    therapeutic frameworks to collectivist clients
+
+    <Info>
+      Cultural bias detection is informed by a library of **200+ validated
+      cultural patterns** spanning 15+ cultural contexts, developed in
+      collaboration with cultural competency researchers and community
+      advisors.
+    </Info>
+
+  </Tab>
+  <Tab title="Gender bias">
+    Detects differential treatment, assumptions, and stereotypes based on gender:
+
+    - **Gendered language patterns** — Using gendered assumptions in questions or reflections
+    - **Emotional expression bias** — Different expectations for emotional expression based on gender
+    - **Role assumption** — Assuming family, career, or relationship roles based on gender
+    - **Diagnostic bias** — Gender-influenced diagnostic assumptions (e.g.,
+    under-diagnosing depression in men)
+    - **Sexuality assumptions** — Heteronormative framing or assumptions about sexual orientation
+    - **Non-binary erasure** — Failure to acknowledge or accommodate non-binary identities
+
+  </Tab>
+  <Tab title="Racial bias">
+    Detects racial stereotyping, microaggressions, and differential treatment:
+
+    - **Stereotyped assumptions** — Attributing behaviors or beliefs based on race
+    - **Microaggressions** — Subtle invalidations, slights, or othering language
+    - **Pain perception bias** — Differential assessment of distress severity based on race
+    - **Cultural competency gaps** — Failing to account for race-related stressors and historical trauma
+    - **Colorblind framing** — Dismissing the impact of race with "I don't see color" approaches
+    - **Tokenizing** — Treating a client as representative of their entire
+    racial group
+
+  </Tab>
+  <Tab title="Socioeconomic bias">
+    Detects assumptions and blind spots related to socioeconomic status:
+
+    - **Resource assumptions** — Suggesting interventions that assume financial resources
+    - **Education-level bias** — Adjusting language or expectations based on assumed education
+    - **Housing/stability assumptions** — Overlooking housing insecurity or instability
+    - **Insurance/access bias** — Treatment recommendations biased by insurance coverage
+    - **Class-based stereotyping** — Attributing behaviors or values based on socioeconomic status
+    - **Lifestyle judgment** — Judging life choices that reflect economic
+    constraints rather than preference
+
+  </Tab>
+</Tabs>
+
+## Architecture
+
+The Bias Detection Engine uses a multi-layered analysis architecture. Each layer
+specializes in a different aspect of bias detection, and results are combined
+through a weighted scoring system to produce a unified bias assessment.
+
+```text
+┌─────────────────────────────────────────────────────┐
+│                  Therapist Input                     │
+└──────────────┬──────────────────────────────────────┘
+               │
+       ┌───────▼───────┐
+       │  Streaming     │
+       │  Preprocessor  │  ◄── Tokenization, linguistic analysis
+       └───────┬───────┘
+               │
+    ┌──────────┼──────────┐──────────┐
+    ▼          ▼          ▼          ▼
+┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+│ Pre-   │ │ Model  │ │ Inter- │ │ Eval-  │
+│process.│ │ Level  │ │ active │ │ uation │
+│ Layer  │ │ Layer  │ │ Layer  │ │ Layer  │
+└───┬────┘ └───┬────┘ └───┬────┘ └───┬────┘
+    │          │          │          │
+    └──────────┴──────────┴──────────┘
+               │
+       ┌───────▼───────┐
+       │  Weighted      │
+       │  Aggregator    │  ◄── Configurable layer weights
+       └───────┬───────┘
+               │
+       ┌───────▼───────┐
+       │  Alert System  │  ◄── Real-time alerts & escalation
+       └───────────────┘
+```
+
+### Analysis layers
+
+<AccordionGroup>
+  <Accordion title="Preprocessing layer" icon="filter">
+    **Weight: 25% (configurable)**
+
+    Performs linguistic analysis on raw text before model inference:
+
+    - **Linguistic bias scoring** — Gender, racial, age, and cultural bias
+    scores from language patterns
+    - **Sentiment analysis** — Overall sentiment, emotional valence, subjectivity, and demographic variations
+    - **Representation analysis** — Demographic distribution, underrepresented groups, diversity index
+    - **Data quality metrics** — Completeness, consistency, accuracy,
+    timeliness, and validity checks
+
+    ```typescript
+    interface PreprocessingResult {
+      biasScore: number
+      linguisticBias: {
+        genderBiasScore: number
+        racialBiasScore: number
+        ageBiasScore: number
+        culturalBiasScore: number
+        biasedTerms: string[]
+        sentimentAnalysis: {
+          overallSentiment: number
+          emotionalValence: number
+          subjectivity: number
+          demographicVariations: Record<string, number>
+        }
+      }
+      representationAnalysis: {
+        demographicDistribution: Record<string, number>
+        underrepresentedGroups: string[]
+        diversityIndex: number
+      }
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="Model-level layer" icon="microchip">
+    **Weight: 25% (configurable)**
+
+    Evaluates bias at the ML model level using fairness metrics:
+
+    - **Demographic parity** — Equal positive outcome rates across demographic groups
+    - **Equalized odds** — Equal true positive and false positive rates across groups
+    - **Equal opportunity** — Equal true positive rates across groups
+    - **Calibration** — Predicted probabilities match actual outcomes across groups
+    - **Individual fairness** — Similar individuals receive similar treatment
+    - **Counterfactual fairness** — Outcomes remain consistent when demographic
+    attributes are changed
+
+    Built on [Fairlearn](https://fairlearn.org/) with custom
+    therapeutic-context algorithms that account for the unique dynamics of
+    mental health conversations.
+
+  </Accordion>
+  <Accordion title="Interactive layer" icon="arrows-spin">
+    **Weight: 25% (configurable)**
+
+    Analyzes conversational dynamics and interaction patterns:
+
+    - **Counterfactual analysis** — Tests how changing demographic attributes
+    would affect the AI's response
+    - **Feature importance** — Identifies which conversational features most contribute to bias
+    - **What-if scenarios** — Generates alternative interaction paths to expose hidden bias patterns
+    - **Problematic scenario detection** — Flags specific interaction patterns
+    that indicate systemic bias
+
+  </Accordion>
+  <Accordion title="Evaluation layer" icon="chart-column">
+    **Weight: 25% (configurable)**
+
+    Post-hoc evaluation using industry-standard metrics:
+
+    - **HuggingFace metrics** — Toxicity, bias, regard, stereotype, and fairness scores
+    - **Custom therapeutic metrics** — Therapeutic bias, cultural sensitivity, professional ethics, and patient safety
+    - **Temporal analysis** — Trend direction, change rate, seasonal patterns,
+    and intervention effectiveness
+
+    ```typescript
+    interface EvaluationMetrics {
+      huggingFaceMetrics: {
+        toxicity: number
+        bias: number
+        regard: Record<string, number>
+        stereotype: number
+        fairness: number
+      }
+      customMetrics: {
+        therapeuticBias: number
+        culturalSensitivity: number
+        professionalEthics: number
+        patientSafety: number
+      }
+    }
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+### Weighted scoring
+
+Each layer produces a `biasScore` between 0.0 and 1.0. The final overall bias
+score is a weighted average:
+
+```text
+overallBiasScore = (preprocessing × 0.25) + (modelLevel × 0.25)
+                 + (interactive × 0.25) + (evaluation × 0.25)
+```
+
+<Tip>
+  Layer weights are fully configurable. Organizations can adjust weights to
+  emphasize the analysis layers most relevant to their training goals — for
+  example, increasing the preprocessing weight to prioritize linguistic bias
+  detection.
+</Tip>
+
+## Real-time alert system
+
+The alert system uses configurable thresholds to classify bias severity and
+trigger appropriate responses:
+
+| Alert Level  | Threshold | Response                                                                          |
+| :----------- | :-------- | :-------------------------------------------------------------------------------- |
+| **Low**      | < 0.30    | Logged for analytics, no interruption                                             |
+| **Medium**   | ≥ 0.30    | Subtle in-session indicator, post-session recommendation                          |
+| **High**     | ≥ 0.60    | Real-time alert with specific bias pattern identified and correction guidance     |
+| **Critical** | ≥ 0.80    | Immediate intervention alert, supervisor notification, session flagged for review |
+
+### Alert rules
+
+The system includes built-in alert rules that automatically trigger based on
+analysis results:
+
+- **High bias score** (>0.7) — Alerts therapist supervisor and ethics committee
+- **Critical bias score** (>0.9) — Immediate intervention with chief
+  supervisor, ethics committee, and system admin notification
+- **Demographic disparity** — Flags significant bias disparities across
+  demographic groups
+- **Low confidence + elevated score** — Alerts when bias detection confidence is
+  low but scores are elevated, indicating uncertain but potentially
+  significant bias
+
+### Escalation protocol
+
+Unacknowledged alerts automatically escalate:
+
+<Steps>
+  <Step title="Initial alert">
+    Alert is generated and displayed in real time. Notification sent via
+    configured channels (email, Slack, webhook).
+  </Step>
+  <Step title="Acknowledgment window">
+    The alert remains active for a configurable period (default: 5 minutes for
+    critical, 15 minutes for high).
+  </Step>
+  <Step title="Auto-escalation">
+    If not acknowledged, the alert escalates to the next tier of recipients with
+    an `[ESCALATED]` flag.
+  </Step>
+  <Step title="Resolution">
+    Acknowledged alerts are tracked for resolution. The system monitors whether
+    corrective action is taken.
+  </Step>
+</Steps>
+
+## Streaming analysis
+
+For live training sessions, the Bias Detection Engine operates in streaming mode:
+
+```typescript
+// Real-time bias analysis during a training session
+const engine = new BiasDetectionEngine({
+  thresholds: { warning: 0.3, high: 0.6, critical: 0.8 },
+  layerWeights: {
+    preprocessing: 0.25,
+    modelLevel: 0.25,
+    interactive: 0.25,
+    evaluation: 0.25,
+  },
+  hipaaCompliant: true,
+  dataMaskingEnabled: true,
+  auditLogging: true,
+})
+
+await engine.initialize()
+
+// Start real-time monitoring with callback
+await engine.startMonitoring((alert) => {
+  console.log(`Bias alert: ${alert.level} for session ${alert.sessionId}`)
+})
+
+// Analyze a session in real time
+const result = await engine.analyzeSession({
+  sessionId: 'training-session-001',
+  messages: conversationHistory,
+  participantDemographics: {
+    age: '30s',
+    gender: 'female',
+    ethnicity: 'Latina',
+  },
+  timestamp: new Date(),
+})
+
+// result.overallBiasScore: 0.0 - 1.0
+// result.alertLevel: "low" | "medium" | "high" | "critical"
+// result.recommendations: string[]
+```
+
+<Warning>
+  All session data processed by the Bias Detection Engine is **HIPAA-compliant**
+  by default. Demographic data is automatically masked, PII fields are stripped,
+  and all analysis events are written to the HIPAA audit log. See [Compliance &
+  Security](/compliance/hipaa) for details.
+</Warning>
+
+## Multi-session pattern analysis
+
+Beyond individual session analysis, the system identifies bias patterns across
+multiple sessions:
+
+<CardGroup cols={2}>
+  <Card title="Trend detection" icon="chart-line">
+    Tracks bias scores over time to identify improving or worsening patterns in
+    a therapist's practice.
+  </Card>
+  <Card title="Demographic breakdown" icon="users">
+    Analyzes whether bias scores vary based on client demographics — revealing
+    blind spots with specific populations.
+  </Card>
+  <Card title="Intervention effectiveness" icon="chart-mixed">
+    Measures whether bias correction recommendations lead to measurable
+    improvement in subsequent sessions.
+  </Card>
+  <Card title="Comparative benchmarking" icon="scale-balanced">
+    Compares individual bias patterns against anonymized cohort data to
+    contextualize performance.
+  </Card>
+</CardGroup>
+
+## Personalized correction recommendations
+
+When bias is detected, the system doesn't just flag the problem — it provides
+specific, actionable guidance:
+
+- **What was detected** — Clear description of the bias pattern and which
+  category it falls into
+- **Why it matters** — Clinical context explaining how this bias affects
+  therapeutic outcomes
+- **What to do instead** — Specific alternative language, framing, or approach
+  recommendations
+- **Learning resources** — Links to relevant cultural competency materials and
+  training scenarios
+- **Practice opportunities** — Recommended [Empathy Gym](/product/empathy-gym)
+  scenarios that target the identified bias pattern
+
+## Dashboard and reporting
+
+The Bias Detection Dashboard provides a comprehensive view of bias analytics for
+both individual therapists and supervisors:
+
+<Tabs>
+  <Tab title="Real-time monitoring">
+    - Live bias score feed across active training sessions - Active alert queue
+    with acknowledgment controls - System health indicators for all analysis
+    layers - Performance metrics (response time, error rate, throughput)
+  </Tab>
+  <Tab title="Historical analytics">
+    - Bias score trends over configurable time ranges - Demographic disparity
+    analysis - Alert distribution by level and category - Intervention
+    effectiveness tracking
+  </Tab>
+  <Tab title="Reporting">
+    - Automated bias analysis reports with executive summaries - Demographic
+    breakdown and intersectional analysis - Temporal trend analysis with
+    seasonal patterns - Compliance-ready exports in JSON format
+  </Tab>
+</Tabs>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api-reference/bias-analysis">
+    Integrate bias detection into your workflow with the Bias Analysis API.
+  </Card>
+  <Card title="Empathy Gym" icon="dumbbell" href="/product/empathy-gym">
+    See how bias detection integrates with real-time training sessions.
+  </Card>
+  <Card
+    title="Ethics & Compliance"
+    icon="scale-balanced"
+    href="/compliance/ethics"
+  >
+    Learn about our ethical framework for bias detection in mental health AI.
+  </Card>
+  <Card
+    title="Understanding Feedback"
+    icon="chart-line"
+    href="/guides/therapists/understanding-feedback"
+  >
+    Learn how to interpret and act on bias detection feedback.
+  </Card>
+</CardGroup>

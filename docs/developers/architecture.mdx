@@ -1,0 +1,252 @@
+---
+title: 'Architecture'
+description: "How the pieces fit together — and why they're separate."
+---
+
+## System Overview
+
+Pixelated Empathy is a multi-service application. Each service handles
+a distinct responsibility and communicates with others through
+well-defined interfaces.
+
+```text
+┌──────────────────────────────────────────────────┐
+│                 User's Browser                   │
+└──────────┬───────────────────────┬───────────────┘
+           │ HTTP                  │ WebSocket
+           ▼                      ▼
+┌──────────────────┐   ┌──────────────────────────┐
+│  Astro Frontend  │   │   WebSocket Server       │
+│  (SSR + React)   │   │   (Real-time events)     │
+└────────┬─────────┘   └─────────┬────────────────┘
+         │ API calls             │ Event streaming
+         ▼                      ▼
+┌─────────────────────────────────────────────────┐
+│            AI Service (FastAPI)                  │
+│  ┌─────────────┐  ┌───────────┐  ┌───────────┐ │
+│  │  Emotion    │  │  Response  │  │  Crisis   │ │
+│  │  Analysis   │  │  Gen      │  │  Monitor  │ │
+│  └─────────────┘  └───────────┘  └───────────┘ │
+└────────────────────┬────────────────────────────┘
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+┌────────────────┐    ┌──────────────────┐
+│  Memory (Mem0) │    │  Worker Service  │
+│  Conversation  │    │  Background jobs │
+│  persistence   │    │  Async tasks     │
+└────────────────┘    └──────────────────┘
+```
+
+## Service Breakdown
+
+<AccordionGroup>
+  <Accordion
+    title="Frontend (Astro + React)"
+    icon="window-maximize"
+  >
+    **Language**: TypeScript
+    **Framework**: Astro 5 with React 19 islands
+    **Styling**: CSS Modules (no Tailwind unless explicitly added)
+    **State**: Zustand (component state) + Nanostores
+    (Astro island state)
+    **Data Fetching**: TanStack Query
+
+The frontend is server-rendered with Astro for fast initial
+loads, with React components hydrated on the client for
+interactive features like The Empathy Gym™ training interface.
+
+**Key directories**:
+
+| Path              | Contents                            |
+| :---------------- | :---------------------------------- |
+| `src/pages/`      | File-based routes                   |
+| `src/components/` | React UI components                 |
+| `src/simulator/`  | Empathy Gym™ components             |
+| `src/lib/`        | Business logic, services, utilities |
+| `src/styles/`     | Design tokens, global styles        |
+
+  </Accordion>
+
+  <Accordion title="AI Service (FastAPI)" icon="brain">
+    **Language**: Python
+    **Framework**: FastAPI
+    **Package Manager**: uv
+
+The emotional intelligence engine — handles emotion analysis,
+client response generation, therapeutic evaluation, and
+crisis detection.
+
+**Key directories**:
+
+| Path                    | Contents                  |
+| :---------------------- | :------------------------ |
+| `ai/core/`              | Core AI modules           |
+| `ai/training/`          | Model training & tuning   |
+| `ai/academic_sourcing/` | Journal research pipeline |
+| `ai/api/`               | API endpoints             |
+
+  </Accordion>
+
+<Accordion title="WebSocket Server" icon="bolt">
+  Handles real-time bidirectional communication between the frontend and AI
+  service. This is what makes conversations feel live rather than
+  request-response.
+</Accordion>
+
+  <Accordion title="Worker Service" icon="gears">
+    Background processing for tasks that don't need
+    immediate results:
+
+- Training data preparation
+- Analytics aggregation
+- Scheduled maintenance tasks
+
+  </Accordion>
+
+  <Accordion title="Memory (Mem0)" icon="database">
+    Conversation context persistence. Maintains state across
+    interactions so training scenarios can build over time.
+  </Accordion>
+
+</AccordionGroup>
+
+## Technology Decisions
+
+<Tabs>
+  <Tab title="Why Astro + React?">
+    Astro gives us static generation for content pages (like the
+    docs you're reading) and selective hydration for interactive
+    components. Most of our pages don't need to be fully
+    interactive — only The Empathy Gym™ simulator requires heavy
+    client-side JavaScript. Astro's island architecture lets us
+    ship less JavaScript for content pages while still having full
+    React capabilities where we need them.
+  </Tab>
+
+<Tab title="Why CSS Modules?">
+  CSS Modules give us scoped styles without utility class bloat. For a platform
+  that needs careful, accessible design — especially in the training interface —
+  explicit stylesheets are easier to maintain and audit than long chains of
+  utility classes. Tailwind can be added if explicitly requested.
+</Tab>
+
+<Tab title="Why FastAPI?">
+  The AI/ML ecosystem is Python-native. Libraries for NLP, emotion modeling, and
+  model fine-tuning have first-class Python support. Running the AI service in
+  Python lets us use these tools directly rather than building bridges to a
+  Node.js runtime.
+</Tab>
+
+  <Tab title="Why Separate Services?">
+    - **Safety isolation**: Crisis detection continues running
+      even if the main AI engine has an issue
+    - **Language-appropriate**: TypeScript for UI, Python for AI
+    - **Independent scaling**: AI compute scales differently
+      from frontend edge delivery
+    - **Developer experience**: Frontend and AI teams work in
+      their natural environments
+  </Tab>
+</Tabs>
+
+## Data Flow: A Training Session
+
+Here's what happens when a user starts a training session:
+
+<Steps>
+  <Step title="User Selects Scenario">
+    Frontend sends scenario config to AI Service.
+  </Step>
+  <Step title="AI Initializes Client">
+    Creates client profile (Plutchik emotions + Big Five personality + scenario
+    context).
+  </Step>
+  <Step title="AI Generates Opening">
+    First client message sent to Frontend via WebSocket.
+  </Step>
+  <Step title="User Responds">Message sent to AI Service for analysis.</Step>
+  <Step title="AI Processes Response">
+    Emotion analysis, state update, therapeutic evaluation, crisis check.
+  </Step>
+  <Step title="Client Responds">
+    New message generated and sent to Frontend. Steps 4–6 repeat until session
+    ends.
+  </Step>
+  <Step title="Session Feedback">
+    Aggregated evaluation delivered to Frontend.
+  </Step>
+  <Step title="Memory Updated">Session context saved for continuity.</Step>
+</Steps>
+
+## Validation Strategy
+
+We use **Zod** for runtime validation across all service boundaries.
+Key validation rules:
+
+```typescript
+// Emotion scores MUST be 0.0–1.0
+const EmotionScore = z.number().min(0).max(1)
+
+// All input is validated before processing
+const MessageInput = z.object({
+  content: z.string().min(1).max(10000),
+  sessionId: z.string().uuid(),
+  timestamp: z.string().datetime(),
+})
+```
+
+<Warning>
+  Every emotion score must be in the 0.0–1.0 range. Values outside this range
+  are rejected as errors, not rounded.
+</Warning>
+
+## Testing Strategy
+
+| Layer           | Tool         | Coverage                    |
+| :-------------- | :----------- | :-------------------------- |
+| **Unit**        | Vitest + RTL | Components, utils, services |
+| **Integration** | Vitest       | Service interactions        |
+| **E2E**         | Playwright   | Full user flows             |
+| **Security**    | Custom suite | PII detection, crisis       |
+| **Python**      | pytest       | AI engine modules           |
+
+Run everything with `pnpm test:all`.
+
+## Deployment
+
+<Tabs>
+  <Tab title="Development">
+    `pnpm dev:all-services` or `pnpm docker:up`
+  </Tab>
+  <Tab title="Production">
+  Docker Compose orchestration with environment-specific
+  configurations. Kubernetes support is on the roadmap.
+
+All deployments go through:
+
+1. `pnpm check:all` — Lint + typecheck + format
+2. `pnpm test:all` — Full test suite
+3. `pnpm security:scan` — Security audit
+4. Build verification
+5. Staged deployment
+
+  </Tab>
+</Tabs>
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="Getting Started"
+    icon="rocket"
+    href="/developers/getting-started"
+  >
+    Set up your environment.
+  </Card>
+  <Card title="API Reference" icon="code" href="/developers/api-reference">
+    Work with our APIs.
+  </Card>
+  <Card title="Platform Overview" icon="sitemap" href="/platform/overview">
+    The non-technical version.
+  </Card>
+</CardGroup>

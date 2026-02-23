@@ -1,0 +1,272 @@
+---
+title: 'Tracking Trainee Progress'
+description: 'Monitor competency scores, benchmark performance, track bias reduction trends, and generate reports for trainee development'
+---
+
+Effective supervision requires clear visibility into how trainees are developing over time. Pixelated Empathy provides comprehensive progress tracking tools that go beyond simple pass/fail metrics — giving you multidimensional insight into competency growth, bias reduction, and skill acquisition patterns.
+
+## Competency scoring system
+
+Every training session generates competency scores across five core dimensions. These scores are calculated by combining AI analysis of trainee responses with validated psychometric models.
+
+<CardGroup cols={2}>
+  <Card title="Empathic accuracy" icon="heart">
+    Measures the trainee's ability to correctly identify and reflect the client's emotional state. Scored 0–100.
+  </Card>
+  <Card title="Bias awareness" icon="scale-balanced">
+    Tracks recognition and mitigation of cognitive, cultural, and diagnostic biases during sessions. Scored 0–100.
+  </Card>
+  <Card title="Crisis response" icon="shield-halved">
+    Evaluates appropriate identification and response to crisis signals, including safety planning and de-escalation. Scored 0–100.
+  </Card>
+  <Card title="Cultural sensitivity" icon="globe">
+    Assesses the trainee's ability to adapt therapeutic approaches across diverse cultural contexts and identities. Scored 0–100.
+  </Card>
+</CardGroup>
+
+A fifth composite score, **Overall clinical competency**, is a weighted average of all four dimensions. Your organization can customize the weighting to align with program priorities.
+
+### Understanding score ranges
+
+| Range | Level | Interpretation |
+|---|---|---|
+| 90–100 | Advanced | Consistently demonstrates expert-level skill |
+| 75–89 | Proficient | Meets professional competency standards |
+| 60–74 | Developing | Shows emerging skill with room for growth |
+| 40–59 | Foundational | Building basic awareness; needs structured practice |
+| 0–39 | Beginning | Early stage; requires intensive support and guidance |
+
+<Tip>
+  Scores reflect performance within AI-simulated scenarios, not clinical readiness. Use scores as one data point alongside your own clinical judgment and direct observation.
+</Tip>
+
+## Progress over time
+
+The **Progress Timeline** view shows how a trainee's competency scores evolve across sessions and weeks.
+
+### Reading the timeline
+
+Navigate to **Trainees** → select a trainee → **Progress** to access the timeline view. The timeline displays:
+
+- **Line chart** showing each competency dimension over time
+- **Session markers** indicating when each training session occurred
+- **Trend arrows** showing the direction and velocity of score changes over the last 30 days
+- **Milestone markers** for significant achievements (first session above 75, longest streak, etc.)
+
+### Time range controls
+
+<Tabs>
+  <Tab title="Weekly view">
+    Displays session-by-session scores for the current week. Best for identifying immediate patterns and responding to recent sessions.
+  </Tab>
+  <Tab title="Monthly view">
+    Aggregates scores by week, showing rolling averages. Best for tracking steady improvement and identifying plateaus.
+  </Tab>
+  <Tab title="Program view">
+    Shows the entire enrollment period from first session to present. Best for evaluating overall program impact and readiness assessments.
+  </Tab>
+  <Tab title="Custom range">
+    Select any date range to focus on specific training periods, such as before and after a particular intervention or curriculum change.
+  </Tab>
+</Tabs>
+
+### Identifying patterns
+
+The platform automatically detects and flags several important patterns:
+
+<AccordionGroup>
+  <Accordion title="Plateau detection">
+    When a trainee's score in any dimension remains within a 5-point range for more than 10 sessions, the system flags a plateau. Plateaus may indicate that the trainee needs more challenging scenarios, different scenario types, or direct supervisor intervention.
+  </Accordion>
+  <Accordion title="Regression alerts">
+    A sustained drop of 10 or more points across three consecutive sessions triggers a regression alert. This could signal fatigue, personal stressors, or a need to revisit foundational concepts.
+  </Accordion>
+  <Accordion title="Breakthrough moments">
+    Sudden score jumps of 15+ points are flagged as breakthroughs. Review the associated sessions to understand what clicked — these insights can inform guidance for other trainees.
+  </Accordion>
+  <Accordion title="Inconsistency patterns">
+    High variance between sessions (scoring 85 in one session and 55 in the next) may indicate that the trainee performs well in familiar scenarios but struggles with novel situations.
+  </Accordion>
+</AccordionGroup>
+
+## Comparative benchmarking
+
+Benchmarking tools allow you to contextualize individual trainee performance against meaningful reference groups.
+
+### Available benchmarks
+
+| Benchmark | Description |
+|---|---|
+| **Cohort average** | Average scores across all trainees in the same training group |
+| **Program average** | Average scores across all trainees in your organization's program |
+| **National percentile** | Anonymized percentile ranking against all Pixelated Empathy users at the same training level |
+| **Competency standard** | Your organization's defined minimum competency thresholds |
+| **Expert baseline** | Average scores from licensed professionals completing the same scenarios |
+
+### Using the benchmark comparison
+
+<Steps>
+  <Step title="Select a trainee">
+    Open the trainee's profile from your dashboard and navigate to the **Benchmarks** tab.
+  </Step>
+  <Step title="Choose benchmarks">
+    Select one or more reference benchmarks from the dropdown. You can overlay up to three benchmarks simultaneously on the chart.
+  </Step>
+  <Step title="Compare dimensions">
+    The radar chart displays the trainee's scores across all competency dimensions with benchmark overlays. Gaps between the trainee's scores and the benchmark indicate areas for focused development.
+  </Step>
+  <Step title="Drill into specifics">
+    Click any dimension on the radar chart to see a detailed breakdown of sub-competencies. For example, clicking **Bias awareness** reveals scores for confirmation bias, cultural bias, diagnostic bias, and anchoring bias.
+  </Step>
+</Steps>
+
+<Info>
+  National percentile benchmarks are calculated from anonymized, aggregated data across all Pixelated Empathy organizations. No personally identifiable information is shared between organizations.
+</Info>
+
+## Bias reduction trends
+
+Bias reduction is a core focus of Pixelated Empathy training. The **Bias Trends** panel provides specialized analytics for tracking how trainees improve their ability to recognize and mitigate various bias types.
+
+### Tracked bias categories
+
+The platform monitors trainee performance across these bias categories:
+
+- **Confirmation bias** — tendency to seek information that confirms existing beliefs about a client
+- **Cultural bias** — assumptions based on a client's cultural background, ethnicity, or identity
+- **Diagnostic bias** — premature diagnostic conclusions based on limited information
+- **Anchoring bias** — over-reliance on first impressions or initial information
+- **Gender bias** — differential treatment or assumptions based on gender identity
+- **Socioeconomic bias** — assumptions or judgments based on perceived economic status
+- **Age bias** — stereotyping or differential treatment based on client age
+
+### Reading bias trend charts
+
+Each bias category displays:
+
+1. **Detection rate** — how often the trainee recognizes bias cues in scenarios (higher is better)
+2. **Mitigation rate** — how often the trainee adjusts their response after recognizing bias (higher is better)
+3. **Incident rate** — frequency of unrecognized bias instances per session (lower is better)
+
+<Note>
+  Bias detection improves nonlinearly. Trainees often see a temporary increase in detected bias as their awareness grows — this is a positive sign that they are noticing patterns they previously missed.
+</Note>
+
+### Bias reduction milestones
+
+The platform tracks key milestones in bias reduction:
+
+- **First recognition** — trainee's first self-correction of a biased response
+- **Consistent detection** — 80%+ bias detection rate sustained over 5 sessions
+- **Automatic mitigation** — trainee demonstrates bias correction without explicit prompting
+- **Cross-context transfer** — bias awareness skills generalize across different scenario types
+
+## Session frequency analytics
+
+Session frequency and consistency are strong predictors of training outcomes. The frequency panel helps you monitor engagement patterns.
+
+### Key frequency metrics
+
+| Metric | Description |
+|---|---|
+| **Sessions per week** | Average number of completed sessions per week |
+| **Streak length** | Consecutive days with at least one session |
+| **Time between sessions** | Average gap between sessions (shorter is generally better for retention) |
+| **Session duration** | Average time spent per session |
+| **Peak training times** | Most common days and times the trainee practices |
+| **Completion rate** | Percentage of started sessions that are fully completed |
+
+### Engagement alerts
+
+Configure automated alerts to notify you when trainees fall below engagement thresholds:
+
+```json
+{
+  "alert_rules": [
+    {
+      "metric": "sessions_per_week",
+      "threshold": 2,
+      "condition": "below",
+      "action": "email_supervisor"
+    },
+    {
+      "metric": "days_since_last_session",
+      "threshold": 7,
+      "condition": "above",
+      "action": "flag_at_risk"
+    },
+    {
+      "metric": "completion_rate",
+      "threshold": 0.5,
+      "condition": "below",
+      "action": "email_supervisor"
+    }
+  ]
+}
+```
+
+## Reports and exports
+
+Generate comprehensive reports for program evaluation, accreditation, trainee review meetings, and research purposes.
+
+### Report types
+
+<AccordionGroup>
+  <Accordion title="Individual trainee report">
+    A complete summary of a single trainee's performance, including all competency scores, bias trends, session history, benchmark comparisons, and supervisor annotations. Available as PDF or interactive HTML.
+  </Accordion>
+  <Accordion title="Cohort summary report">
+    Aggregate performance data for an entire training group. Includes score distributions, completion rates, common growth areas, and comparisons against program standards. Ideal for program review meetings.
+  </Accordion>
+  <Accordion title="Competency assessment report">
+    A focused report mapping trainee performance to specific competency frameworks (APA, CACREP, or custom). Designed for accreditation documentation and competency committee review.
+  </Accordion>
+  <Accordion title="Bias reduction report">
+    Detailed analysis of bias detection and mitigation trends across all tracked categories. Includes before/after comparisons and statistical significance indicators.
+  </Accordion>
+  <Accordion title="Research export">
+    De-identified dataset export in CSV or JSON format for research analysis. Includes session-level and response-level data with all competency metrics. Requires IRB approval documentation.
+  </Accordion>
+</AccordionGroup>
+
+### Generating a report
+
+<Steps>
+  <Step title="Navigate to Reports">
+    From your supervisor dashboard, click **Reports** in the left sidebar.
+  </Step>
+  <Step title="Select report type">
+    Choose the report type from the available templates. Each template shows a preview of included sections.
+  </Step>
+  <Step title="Configure parameters">
+    Set the date range, select trainees or groups, choose comparison benchmarks, and toggle optional sections on or off.
+  </Step>
+  <Step title="Generate and download">
+    Click **Generate report**. Processing typically takes 10–30 seconds depending on the data volume. Download the completed report or share it via a secure link.
+  </Step>
+</Steps>
+
+### Scheduling automated reports
+
+Set up recurring reports that are automatically generated and delivered:
+
+1. Open **Reports** → **Scheduled**
+2. Click **New schedule**
+3. Select the report type, parameters, and frequency (weekly, biweekly, or monthly)
+4. Add recipients — supervisors, program directors, or trainees
+5. Reports are delivered via email with a secure download link
+
+<Warning>
+  Research exports contain detailed session data and require appropriate data use agreements. Ensure your organization's IRB approval covers the intended use before exporting research data.
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Supervisor dashboard" icon="gauge-high" href="/guides/supervisors/dashboard">
+    Return to the full dashboard overview for session review and trainee management.
+  </Card>
+  <Card title="Create custom scenarios" icon="wand-magic-sparkles" href="/guides/supervisors/custom-scenarios">
+    Build targeted scenarios to address specific competency gaps identified in your reports.
+  </Card>
+</CardGroup>

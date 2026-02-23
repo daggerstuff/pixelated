@@ -1,0 +1,205 @@
+---
+title: 'How Pixelated Empathy Works'
+description: 'The architecture behind the empathy. Less jargon, more clarity.'
+---
+
+## The Big Picture
+
+Pixelated Empathy isn't a single tool — it's a connected system of
+services that work together to create realistic, emotionally intelligent
+training experiences for mental health professionals.
+
+Here's the simplified version of how it all fits together:
+
+```text
+┌─────────────────────────────────────────────────────┐
+│                    You (The User)                    │
+│        Therapist · Counselor · Care Team             │
+└─────────────────┬───────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────┐
+│              The Empathy Gym™ (Frontend)             │
+│     Interactive training simulator interface         │
+│           Astro + React · Real-time UI               │
+└─────────────────┬───────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────┐
+│         Emotional Intelligence Engine (AI)           │
+│    Emotion detection · Response generation           │
+│    Conversational dynamics · Crisis monitoring       │
+└──────┬──────────────────────────────────┬───────────┘
+       │                                  │
+       ▼                                  ▼
+┌──────────────┐               ┌──────────────────────┐
+│   Memory     │               │   Crisis Detection   │
+│   System     │               │   Safety monitoring   │
+│ Conversation │               │   in every session    │
+│   context    │               │                      │
+└──────────────┘               └──────────────────────┘
+```
+
+Let's walk through each piece.
+
+## The Frontend: Where You Train
+
+The interface you interact with is built on **Astro** — a modern web
+framework that lets us deliver fast, accessible pages — combined with
+**React** for the interactive training components.
+
+When you sit down in The Empathy Gym™, you're looking at:
+
+- A chat-style interface for therapeutic dialogue practice
+- Real-time emotional analysis displayed alongside the conversation
+- Session feedback and scoring after each practice
+- Progress tracking across your training journey
+
+We use **WebSockets** for real-time communication, so the conversation
+feels natural — no waiting for page refreshes, no laggy responses.
+
+<Tip>
+  Ready to see the simulator in action? Explore [The Empathy
+  Gym™](/platform/empathy-gym) for a full walkthrough of the training
+  experience.
+</Tip>
+
+## The Brain: Emotional Intelligence Engine
+
+Behind every simulated conversation is our **Emotional Intelligence
+Engine** — a Python-based AI system that does several things
+simultaneously:
+
+<CardGroup cols={2}>
+  <Card title="Understands You" icon="ear-listen">
+    It analyzes what you say — not just the words, but the tone, the timing, the
+    emotional register. Are you reflecting before redirecting? Are you creating
+    safety? Are you rushing to fix?
+  </Card>
+  <Card title="Simulates the Client" icon="masks-theater">
+    It generates realistic client responses based on emotional profiles — a
+    combination of Plutchik's core emotions, Big Five personality traits, and
+    scenario-specific context. The responses aren't scripted. They're
+    dynamically generated based on the conversational flow.
+  </Card>
+  <Card title="Evaluates Your Response" icon="chart-line">
+    After each exchange, the engine assesses the quality of your intervention —
+    did you validate before advising? Did you use precise emotional language?
+    Did you maintain appropriate pacing?
+  </Card>
+  <Card title="Watches for Crisis Signals" icon="shield-halved">
+    Across every conversation, the engine monitors for indicators of severe
+    distress or potential harm. This isn't optional functionality — it's woven
+    into the core of the system.
+  </Card>
+</CardGroup>
+
+<Info>
+  Want the full technical story? See the [Emotional Intelligence
+  Engine](/platform/emotional-intelligence-engine) deep dive.
+</Info>
+
+## The Memory: Conversation Context
+
+Good therapy isn't just about individual responses — it's about
+continuity. A therapist who remembers what a client said three sessions
+ago demonstrates a kind of care that single-response AI systems can't
+match.
+
+Our **conversation memory system** (powered by Mem0) maintains context
+across interactions. It remembers what was discussed, what emotional
+patterns emerged, and where the conversation left off. This allows
+training scenarios to build over time, just like real therapeutic
+relationships.
+
+## The Safety Net: Crisis Detection
+
+We have a separate section dedicated to this because it's that
+important.
+
+Crisis detection runs as a parallel process — it's not something that
+happens _after_ the conversation. It happens _during_ every single
+exchange. If our system detects patterns associated with self-harm,
+suicidal ideation, or acute distress, it responds with the seriousness
+those signals deserve.
+
+<Warning>
+  Crisis detection is never optional. It runs on every exchange, in every
+  session, without exception. See [Crisis Detection](/platform/crisis-detection)
+  for the full picture.
+</Warning>
+
+## The Infrastructure: How It All Runs
+
+For the technically curious:
+
+<AccordionGroup>
+  <Accordion title="Technology Stack" icon="layer-group">
+    | Layer      | Technology         | Purpose                 |
+    | :--------- | :----------------- | :---------------------- |
+    | Frontend   | Astro 5 + React 19 | Fast, interactive UI    |
+    | Styling    | CSS Modules        | Scoped styles           |
+    | State      | Zustand+Nanostores | Client-side management  |
+    | Data Fetch | TanStack Query     | Server communication    |
+    | AI Engine  | Python + FastAPI   | Emotion analysis        |
+    | Real-time  | WebSockets         | Live conversation       |
+    | Memory     | Mem0               | Context persistence     |
+    | Validation | Zod                | Runtime data validation |
+    | Deployment | Docker Compose     | Service orchestration   |
+
+Everything is containerized with Docker Compose for development,
+with Kubernetes support on the roadmap for production scaling.
+
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  For hands-on technical details, see the
+  [Architecture](/developers/architecture) guide.
+</Note>
+
+## The Principle Behind the Architecture
+
+We made a deliberate choice to build a multi-service architecture
+rather than a monolith. Here's why:
+
+<CardGroup cols={2}>
+  <Card title="Separation of Concerns" icon="puzzle-piece">
+    The AI engine is complex enough to warrant its own service. The frontend
+    needs to be fast. The WebSocket server needs to be always-on. Separating
+    these lets each piece do its job well.
+  </Card>
+  <Card title="Safety Isolation" icon="shield-halved">
+    Crisis detection runs as an always-on monitor. If the main AI engine
+    encounters an issue, crisis monitoring continues uninterrupted. Safety
+    doesn't depend on everything working perfectly.
+  </Card>
+  <Card title="Scalability" icon="arrow-up-right-dots">
+    As our user base grows, different parts of the system will need to scale at
+    different rates. Separate services let us scale what needs scaling without
+    rebuilding everything.
+  </Card>
+  <Card title="Developer Experience" icon="code">
+    Different parts of the system use different languages (TypeScript for the
+    frontend, Python for the AI). Separating them means developers work in the
+    environment that's best for the task.
+  </Card>
+</CardGroup>
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card title="The Empathy Gym™" icon="dumbbell" href="/platform/empathy-gym">
+    The training simulator in detail.
+  </Card>
+  <Card
+    title="EI Engine"
+    icon="brain"
+    href="/platform/emotional-intelligence-engine"
+  >
+    How we model and generate emotions.
+  </Card>
+  <Card title="Privacy & Trust" icon="lock" href="/platform/privacy-and-trust">
+    How we protect your data.
+  </Card>
+</CardGroup>

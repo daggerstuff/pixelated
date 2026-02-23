@@ -3281,6 +3281,20 @@ wheels = [
 ]
 
 [[package]]
+name = "kernels"
+version = "0.12.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "packaging" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5d/c5/d9bd5f3332b288bf3e771a42b7c3c9d2af8daa58c682a84c4e0c83058d62/kernels-0.12.1.tar.gz", hash = "sha256:41e31ef167add0062cdc302a943ce287194c13b5af12b82a5fa76e7353ca0042", size = 56712, upload-time = "2026-01-26T16:15:48.319Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4b/ab/6d1453b2a1b0a473e107745ef4d4f79241f6ef0ed8a371d62e93b4100bee/kernels-0.12.1-py3-none-any.whl", hash = "sha256:4569fe00bc6a2b0f2cccff81841d7917af143c786ade152c3b2a78f61097c757", size = 55110, upload-time = "2026-01-26T16:15:46.951Z" },
+]
+
+[[package]]
 name = "keyring"
 version = "25.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -5575,6 +5589,7 @@ dependencies = [
     { name = "isort" },
     { name = "kaggle" },
     { name = "keras" },
+    { name = "kernels" },
     { name = "lancedb" },
     { name = "langsmith-fetch" },
     { name = "librosa" },
@@ -5707,6 +5722,7 @@ requires-dist = [
     { name = "isort", marker = "extra == 'dev'" },
     { name = "kaggle", specifier = ">=1.8.2" },
     { name = "keras", specifier = ">=3.12.0" },
+    { name = "kernels", specifier = ">=0.12.1" },
     { name = "lancedb", specifier = ">=0.29.2" },
     { name = "langsmith-fetch", specifier = ">=0.3.1" },
     { name = "librosa", specifier = ">=0.11.0" },
