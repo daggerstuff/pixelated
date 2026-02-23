@@ -1,0 +1,228 @@
+---
+title: 'Ethical AI Framework'
+description: "Getting the ethics right isn't optional — it's the whole point."
+---
+
+## Why This Document Exists
+
+AI in mental health is not the same as AI in e-commerce, content
+recommendation, or image generation. The stakes are fundamentally
+different.
+
+A recommendation algorithm that suggests the wrong product wastes
+someone's time. An emotional intelligence system that misreads a
+crisis signal could contribute to real harm.
+
+This framework isn't corporate ethics theater. It's the set of
+principles that govern every design decision, every model choice,
+and every feature we build.
+
+## Core Principles
+
+<AccordionGroup>
+  <Accordion title="1. Do No Harm" icon="shield-heart">
+    The oldest principle in healthcare, and our first priority.
+
+    **In practice**: Every feature goes through a harm assessment
+    before development begins. We ask: "If this fails, what's the
+    worst that could happen?" and we design for that scenario.
+
+    Crisis detection runs as an always-on parallel process — not
+    because it's easy, but because it can't afford to fail.
+
+  </Accordion>
+
+  <Accordion title="2. Transparency Over Performance" icon="eye">
+    We would rather be honest about a limitation than hide it behind
+    a higher accuracy score.
+
+    **In practice**: When our models aren't confident, they say so.
+    We surface uncertainty to users rather than burying it. A
+    therapist using our platform should always know when the AI is
+    operating outside its comfort zone.
+
+  </Accordion>
+
+  <Accordion title="3. Human Oversight" icon="user-check">
+    AI should augment human judgment, not replace it.
+
+    **In practice**: The Empathy Gym™ provides feedback, not
+    directives. We evaluate therapeutic technique, but we don't tell
+    therapists what to do. The human remains the decision-maker.
+
+  </Accordion>
+
+  <Accordion title="4. Privacy as Architecture" icon="lock">
+    Privacy isn't a feature bolted onto an existing system. It's
+    built into the architecture from the ground up.
+
+    **In practice**: Data minimization, encryption everywhere, PII
+    redaction in all training data, and HIPAA-aligned standards —
+    even when not legally required.
+
+    _→ [Privacy & Trust](/platform/privacy-and-trust)_
+
+  </Accordion>
+
+  <Accordion title="5. Inclusive by Design" icon="people-group">
+    Our platform should work for everyone, not just the demographic
+    groups best represented in our training data.
+
+    **In practice**: Active bias detection, cultural sensitivity
+    testing, diverse data sourcing, and honest acknowledgment of gaps.
+
+    _→ [Bias Detection](/research/bias-detection)_
+
+  </Accordion>
+
+  <Accordion title="6. Scientific Integrity" icon="flask-vial">
+    We only implement what the science supports.
+
+    **In practice**: All emotional models reference peer-reviewed
+    research. We don't invent psychology — we translate it. When we
+    venture into experimental territory, we label it clearly.
+
+    _→ [Our Research Approach](/research/our-approach)_
+
+  </Accordion>
+</AccordionGroup>
+
+## Ethical Decision-Making
+
+When we encounter a design decision with ethical implications — and
+in our domain, many decisions have ethical implications — we use
+this framework:
+
+### The Five Questions
+
+<Steps>
+  <Step title="Who benefits?">
+    Does this feature help users, or does it help us? We build for users.
+  </Step>
+  <Step title="Who could be harmed?">
+    What's the worst-case scenario if this feature fails, is misused, or
+    exhibits bias?
+  </Step>
+  <Step title="Are we transparent?">
+    Would we be comfortable explaining this decision publicly? If not, we
+    rethink it.
+  </Step>
+  <Step title="Does the science support it?">
+    Is this based on validated research, or are we speculating?
+  </Step>
+  <Step title="What do we not know?">
+    Where are the gaps in our understanding, and are we accounting for them?
+  </Step>
+</Steps>
+
+## Specific Policies
+
+<Tabs>
+  <Tab title="Crisis Handling">
+    - Crisis detection is **always on**. No opt-out, no toggle.
+    - Crisis data receives the highest protection level.
+    - False positives are preferable to false negatives.
+    - We include real crisis resources in our documentation and
+      products.
+
+    <Warning>
+      Crisis detection cannot be disabled. This is a core safety
+      requirement, not a configurable feature.
+    </Warning>
+
+  </Tab>
+
+<Tab title="Data Usage">
+  - User conversation data is **never sold**. - Individual sessions are not used
+  for model training without explicit consent. - Aggregated, anonymized patterns
+  may inform model improvements. - Users can delete their data at any time.
+</Tab>
+
+<Tab title="Psychological Safety">
+  - No toxic positivity. Validation doesn't mean cheerfulness. - We acknowledge
+  difficult emotions rather than redirecting to positive ones. - Our simulated
+  clients exhibit realistic behavior — including anger, resistance, and silence.
+  - Feedback is constructive, specific, and respectful.
+</Tab>
+
+  <Tab title="Professional Boundaries">
+    - We are a **training tool**, not a therapeutic service.
+    - We don't diagnose, prescribe, or replace clinical supervision.
+    - We're clear about what our AI can and can't do.
+    - We design for mental health professionals, not for patients
+      directly.
+
+    <Info>
+      The Empathy Gym™ exists to help therapists practice, not to
+      deliver therapy. This distinction guides every design decision.
+    </Info>
+
+  </Tab>
+</Tabs>
+
+## Accountability
+
+Ethics without accountability is just aspiration. Here's how we
+hold ourselves to these principles:
+
+<CardGroup cols={2}>
+  <Card title="Code Review" icon="code-pull-request">
+    Every PR is reviewed against AGENTS.md, which includes security and ethical
+    guidelines.
+  </Card>
+  <Card title="Security Scanning" icon="shield-halved">
+    Automated tools check for PII leaks, credential exposure, and data handling
+    violations.
+  </Card>
+  <Card title="Bias Auditing" icon="magnifying-glass-chart">
+    Regular assessments of model performance across demographic groups.
+  </Card>
+  <Card title="Community Feedback" icon="comments">
+    We listen when users, researchers, or clinicians tell us something isn't
+    right.
+  </Card>
+</CardGroup>
+
+## What We Get Wrong
+
+No ethical framework prevents all mistakes. Here's what we know we
+struggle with:
+
+<Note>
+  Acknowledging limitations isn't weakness. It's the first step toward
+  addressing them.
+</Note>
+
+- **Cultural coverage is incomplete.** Our emotional models work
+  better for some cultural contexts than others. We're working on it.
+- **Nuance is hard to automate.** Some therapeutic situations are
+  too complex for any AI to evaluate perfectly. We bias toward
+  humility in these cases.
+- **We have blind spots.** Our team, like any team, has its own
+  cultural and professional biases. We actively seek external
+  perspectives to counterbalance them.
+
+## Related Reading
+
+<CardGroup cols={2}>
+  <Card
+    title="Bias Detection"
+    icon="magnifying-glass"
+    href="/research/bias-detection"
+  >
+    How we find and address bias.
+  </Card>
+  <Card title="Our Approach" icon="flask" href="/research/our-approach">
+    How we build on established science.
+  </Card>
+  <Card title="Privacy & Trust" icon="lock" href="/platform/privacy-and-trust">
+    Our data handling principles.
+  </Card>
+  <Card
+    title="Crisis Detection"
+    icon="shield-halved"
+    href="/platform/crisis-detection"
+  >
+    How we detect and respond to crisis.
+  </Card>
+</CardGroup>

@@ -1,0 +1,232 @@
+---
+title: 'Contributing to Pixelated Empathy'
+description: 'Building empathy is a team sport.'
+---
+
+## The Ground Rules
+
+Before writing a line of code, understand what we're building and
+why. This isn't a todo app. Every feature, every commit, every design
+decision intersects with **psychological safety**. That context
+matters.
+
+### What We Expect
+
+<CardGroup cols={2}>
+  <Card title="Read AGENTS.md" icon="book">
+    It's our technical constitution. Every PR should be consistent with it.
+  </Card>
+  <Card title="No Stubs" icon="ban">
+    Every implementation must be complete and production-ready. No `TODO`,
+    `pass`, `NotImplementedError`, or placeholder returns.
+  </Card>
+  <Card title="No Suppression Comments" icon="xmark">
+    Don't silence warnings with `eslint-disable`, `@ts-ignore`, or `noqa`. Fix
+    the root cause.
+  </Card>
+  <Card title="Validate Emotional Data" icon="check-double">
+    If you touch anything related to emotion scores, they must be validated to
+    the 0–1 range. Always.
+  </Card>
+</CardGroup>
+
+<Warning>
+  **Handle crisis signals.** If your code could encounter crisis indicators, it
+  must handle them defensively. This is not optional — it's a core requirement.
+</Warning>
+
+### What We Value
+
+- **Clarity over cleverness.** Readable code is
+  maintainable code.
+- **Type safety.** Use TypeScript strictly. Avoid `any`.
+- **Test coverage.** If it can break, it should have a test.
+- **Privacy awareness.** Never log, commit, or expose PII.
+
+## Development Workflow
+
+<Steps>
+  <Step title="Set Up Your Environment">
+    Follow the [Getting Started](/developers/getting-started) guide.
+  </Step>
+
+<Step title="Pick Your Work">
+  Check the issue tracker for open items, or propose a new feature. If you're
+  new, look for issues labeled `good-first-issue`.
+</Step>
+
+  <Step title="Branch">
+    Create a feature branch from `main`:
+
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+
+  </Step>
+
+  <Step title="Code">
+    Follow our conventions:
+
+    <Tabs>
+      <Tab title="TypeScript">
+        - Strict mode, path aliases (`@/`, `@lib/`)
+        - Functional components with hooks
+        - Formatting: 2 spaces, no semicolons, single
+          quotes, trailing commas
+      </Tab>
+      <Tab title="Python">
+        - Type hints everywhere
+        - `uv` for dependencies
+        - `pytest` for tests
+      </Tab>
+      <Tab title="Styling">
+        - CSS Modules, camelCase class names
+        - File naming: PascalCase for components,
+          camelCase for utilities
+      </Tab>
+    </Tabs>
+
+  </Step>
+
+  <Step title="Verify">
+    Before submitting, run the full quality check:
+
+    ```bash
+    # Must all pass
+    pnpm check:all        # Lint + typecheck + format
+    pnpm test:all         # Full test suite
+    pnpm security:scan    # Security audit
+    ```
+
+  </Step>
+
+  <Step title="Commit">
+    Write clear, descriptive commit messages. We follow
+    conventional commits:
+
+    ```text
+    feat(simulator): add emotional timeline visualization
+    fix(crisis): improve indirect signal detection accuracy
+    docs(knowledge): add cultural empathy article
+    ```
+
+  </Step>
+
+  <Step title="Submit a PR">
+    Push your branch and open a pull request. Include:
+
+    - **What** you changed and **why**
+    - Any context a reviewer needs
+    - Screenshots for UI changes
+    - Test results
+
+  </Step>
+</Steps>
+
+## Code Style Quick Reference
+
+<Tabs>
+  <Tab title="TypeScript (Frontend)">
+    ```typescript
+    // Use path aliases
+    import { EmotionAnalyzer }
+      from '@/lib/ai/emotion-analyzer'
+    import type { EmotionScore } from '@/types'
+
+    // Functional components with explicit props
+    interface EmotionCardProps {
+      emotion: EmotionScore
+      onAnalyze?: (id: string) => void
+    }
+
+    export function EmotionCard(
+      { emotion, onAnalyze }: EmotionCardProps
+    ) {
+      // Always validate emotion scores
+      const normalizedIntensity =
+        Math.max(0, Math.min(1, emotion.intensity))
+
+      return (
+        <div className={styles.card}>
+          {/* ... */}
+        </div>
+      )
+    }
+    ```
+
+  </Tab>
+
+  <Tab title="Python (AI Engine)">
+    ```python
+    def analyze_emotion(text: str) -> EmotionResult:
+        """Analyze emotional content of text.
+
+        Args:
+            text: Input text to analyze.
+
+        Returns:
+            EmotionResult with scores
+            normalized to 0.0–1.0.
+
+        Raises:
+            ValueError: If text is empty.
+        """
+        if not text.strip():
+            raise ValueError(
+                "Cannot analyze empty text"
+            )
+
+        # Complete implementation — never
+        # return placeholders
+        ...
+    ```
+
+  </Tab>
+</Tabs>
+
+## Security Checklist
+
+Before every PR:
+
+- [ ] No hardcoded secrets, API keys, or credentials
+- [ ] No PII in code, comments, or test fixtures
+- [ ] Emotion scores validated to 0–1 range
+- [ ] Crisis detection paths tested
+- [ ] `pnpm security:scan` passes
+- [ ] `.env.local` is not committed
+
+## Package Managers
+
+<Warning>
+  This is non-negotiable:
+
+| Domain      | Use    | Never Use              |
+| :---------- | :----- | :--------------------- |
+| **Node.js** | `pnpm` | `npm`, `yarn`          |
+| **Python**  | `uv`   | `pip`, `conda`, `venv` |
+
+</Warning>
+
+## Questions?
+
+If you're unsure about anything — a design decision, coding
+convention, or ethical consideration — ask. We'd rather have a
+conversation before the PR than a long review afterward.
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="Getting Started"
+    icon="rocket"
+    href="/developers/getting-started"
+  >
+    Environment setup.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/developers/architecture">
+    System design.
+  </Card>
+  <Card title="Privacy & Trust" icon="lock" href="/platform/privacy-and-trust">
+    Data handling policies.
+  </Card>
+</CardGroup>

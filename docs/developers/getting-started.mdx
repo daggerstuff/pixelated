@@ -1,0 +1,216 @@
+---
+title: 'Getting Started'
+description: 'From zero to running in under ten minutes.'
+---
+
+## What You'll Need
+
+Before you start, make sure you have:
+
+- **Node.js** 18+ (we recommend 20 LTS)
+- **pnpm** — our package manager for JavaScript/TypeScript
+  (_never_ use npm or yarn)
+- **uv** — our package manager for Python (_never_ use pip
+  or conda)
+- **Docker** — for running the full service stack
+- **Git** — obviously
+
+<Warning>
+  **Package manager rules are non-negotiable.** Always use `pnpm` for Node.js
+  and `uv` for Python. Never use `npm`, `yarn`, `pip`, or `conda`.
+</Warning>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone https://github.com/pixelated-empathy/pixelated.git
+    cd pixelated
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    ```bash
+    # Node dependencies
+    pnpm install
+
+    # Python dependencies
+    uv install
+    ```
+
+  </Step>
+
+  <Step title="Start the Dev Server">
+    ```bash
+    pnpm dev
+    ```
+
+    That gets you the frontend running at
+    `http://localhost:4321`.
+
+  </Step>
+</Steps>
+
+## Running Everything
+
+The full Pixelated Empathy stack includes multiple services.
+To start them all:
+
+```bash
+pnpm dev:all-services
+```
+
+This spins up:
+
+- **Frontend** — Astro dev server (port 4321)
+- **AI Service** — FastAPI emotional intelligence engine
+- **Worker** — Background processing
+- **WebSocket Server** — Real-time conversation updates
+
+Alternatively, use Docker Compose for a production-like
+environment:
+
+```bash
+pnpm docker:up
+```
+
+## Project Structure at a Glance
+
+```text
+pixelated/
+├── src/              → Frontend (Astro + React)
+│   ├── components/   → Reusable UI components
+│   ├── pages/        → Astro file-based routes
+│   ├── lib/          → Core libraries & services
+│   ├── simulator/    → The Empathy Gym™
+│   └── styles/       → Global styles & tokens
+├── ai/               → EI Engine (Python)
+├── docs2/            → This documentation
+├── tests/            → Test suites
+├── docker/           → Docker configurations
+└── scripts/          → Build & utility scripts
+```
+
+<Info>
+  For a deeper architectural look, see the
+  [Architecture](/developers/architecture) guide.
+</Info>
+
+## Essential Commands
+
+<Tabs>
+  <Tab title="Development">
+    | Command                 | What It Does               |
+    | :---------------------- | :------------------------- |
+    | `pnpm dev`              | Start the frontend server  |
+    | `pnpm dev:all-services` | Start all services         |
+    | `pnpm docker:up`        | Deploy with Docker Compose |
+    | `pnpm docker:down`      | Stop Docker services       |
+  </Tab>
+
+<Tab title="Quality Checks">
+  | Command | What It Does | | :------------------ | :------------------------ |
+  | `pnpm lint` | Run the linter | | `pnpm typecheck` | TypeScript type checking
+  | | `pnpm check:all` | Lint + Typecheck + Format | | `pnpm security:scan`|
+  Deep security audit |
+</Tab>
+
+<Tab title="Testing">
+  | Command | What It Does | | :------------------ | :------------------------ |
+  | `pnpm test` | Unit tests | | `pnpm test:all` | Full test suite | | `pnpm
+  e2e` | E2E tests (Playwright) | | `pnpm test:security`| Security-specific
+  tests |
+</Tab>
+
+  <Tab title="Python">
+    | Command           | What It Does        |
+    | :---------------- | :------------------ |
+    | `uv run <script>` | Run a Python script |
+    | `uv run pytest`   | Run Python tests    |
+  </Tab>
+</Tabs>
+
+## Environment Variables
+
+Copy the example env file and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+Key variables you'll need:
+
+```bash
+NODE_ENV=development
+PORT=4321
+MEM0_API_KEY=your-mem0-api-key
+```
+
+<Warning>**Never commit `.env.local`.** It's already in `.gitignore`.</Warning>
+
+## Path Aliases
+
+We use path aliases to keep imports clean. Instead of:
+
+```typescript
+import { EmotionAnalyzer } from '../../../lib/ai/emotion-analyzer'
+```
+
+You write:
+
+```typescript
+import { EmotionAnalyzer } from '@/lib/ai/emotion-analyzer'
+```
+
+Available aliases:
+
+| Alias           | Maps To              |
+| :-------------- | :------------------- |
+| `@/*`           | `./src/*`            |
+| `@lib/*`        | `./src/lib/*`        |
+| `@components/*` | `./src/components/*` |
+| `@utils/*`      | `./src/utils/*`      |
+| `@types/*`      | `./src/types/*`      |
+
+## Your First Contribution
+
+Once you're running locally:
+
+<Steps>
+  <Step title="Read the Contributing Guide">
+    Review the [Contributing Guide](/developers/contributing) for conventions
+    and expectations.
+  </Step>
+  <Step title="Pick Your Work">
+    Choose an issue or feature to work on from the issue tracker.
+  </Step>
+  <Step title="Branch from Main">
+    ```bash git checkout -b feature/your-feature-name ```
+  </Step>
+  <Step title="Make Your Changes">
+    Follow code conventions and run quality checks as you go.
+  </Step>
+  <Step title="Verify Quality">```bash pnpm check:all pnpm test:all ```</Step>
+  <Step title="Submit a PR">
+    Push your branch and open a pull request with context for reviewers.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Architecture" icon="sitemap" href="/developers/architecture">
+    Understanding how the pieces fit.
+  </Card>
+  <Card title="API Reference" icon="code" href="/developers/api-reference">
+    Working with our APIs.
+  </Card>
+  <Card
+    title="Contributing"
+    icon="code-pull-request"
+    href="/developers/contributing"
+  >
+    How to contribute effectively.
+  </Card>
+</CardGroup>

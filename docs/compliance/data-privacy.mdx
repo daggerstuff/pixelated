@@ -1,0 +1,493 @@
+---
+title: "Data Privacy & Consent"
+description: "Privacy-first architecture, PII handling, patient rights, consent framework, data retention policies, and GDPR considerations for Pixelated Empathy."
+---
+
+Privacy is not a feature of Pixelated Empathy — it is a **foundational architectural constraint**. Every system, pipeline, and data flow is designed with the assumption that therapeutic data is among the most sensitive information a person can share. We protect it accordingly.
+
+<Note>
+  **Privacy Officer:** [privacy@pixelatedempathy.com](mailto:privacy@pixelatedempathy.com)
+  **Data Protection Officer (GDPR):** [dpo@pixelatedempathy.com](mailto:dpo@pixelatedempathy.com)
+
+  Pixelated Empathy does **not** sell, rent, or trade personal information or PHI. Ever.
+</Note>
+
+## Privacy-First Architecture
+
+Pixelated Empathy implements a **zero-knowledge-oriented** architecture where the platform minimizes its own access to identifiable information. Privacy controls are enforced at the infrastructure level, not just the application level.
+
+<CardGroup cols={2}>
+  <Card title="End-to-End Encryption" icon="lock">
+    All data encrypted with AES-256-GCM at rest and TLS 1.3 in transit. PHI is encrypted at the application layer *before* reaching the database — even database administrators cannot read raw PHI.
+  </Card>
+  <Card title="PII Filtering at Ingestion" icon="filter">
+    The GeminiMem0Manager filters all PII from data before it enters the AI memory system. Names, emails, phone numbers, SSNs, and other identifiers are scrubbed or replaced with anonymized placeholders.
+  </Card>
+  <Card title="Anonymized Identifiers" icon="fingerprint">
+    Internal systems reference users by anonymized IDs only. No human-readable names, emails, or other PII appear in logs, monitoring dashboards, error reports, or internal documentation.
+  </Card>
+  <Card title="Minimum Necessary Access" icon="user-lock">
+    Every data access is scoped to the minimum information required for the specific operation. Role-based access controls enforce this at the API, database, and service layers.
+  </Card>
+</CardGroup>
+
+### Data Flow Architecture
+
+```
+┌──────────────┐     TLS 1.3     ┌──────────────────┐
+│    Client     │ ──────────────→ │   API Gateway     │
+│  (Browser)    │                 │  Rate Limiting     │
+└──────────────┘                 │  Input Validation  │
+                                 └────────┬───────────┘
+                                          │
+                                 ┌────────▼───────────┐
+                                 │  Application Layer  │
+                                 │  ┌───────────────┐  │
+                                 │  │ PII Scrubber   │  │ ← Strips PII before processing
+                                 │  └───────┬───────┘  │
+                                 │  ┌───────▼───────┐  │
+                                 │  │ Business Logic │  │
+                                 │  └───────┬───────┘  │
+                                 └──────────┼──────────┘
+                                   ┌────────┴────────┐
+                          ┌────────▼──────┐  ┌───────▼────────┐
+                          │  Encrypted DB  │  │ AI Memory      │
+                          │  (AES-256)     │  │ (PII-free via  │
+                          │                │  │ GeminiMem0Mgr) │
+                          └───────────────┘  └────────────────┘
+```
+
+---
+
+## PII Handling
+
+### GeminiMem0Manager PII Filtering
+
+The GeminiMem0Manager serves as the privacy gateway between user interactions and the AI memory system. It ensures that **no personally identifiable information is ever stored in AI memory**.
+
+<Tabs>
+  <Tab title="How It Works">
+    Before any conversation data enters the memory system:
+
+    1. **Detection:** Multi-pattern PII scanner identifies names, emails, phone numbers, SSNs, addresses, dates of birth, medical record numbers, and financial data
+    2. **Classification:** Each detected PII element is classified by type and confidence score
+    3. **Replacement:** PII is replaced with type-specific placeholders (`[NAME]`, `[EMAIL]`, `[PHONE]`, etc.)
+    4. **Verification:** Post-scrub verification confirms no PII patterns remain
+    5. **Audit:** The scrubbing operation is logged (without the original PII values)
+
+    ```python
+    # PII categories detected and scrubbed
+    class PIICategory(str, Enum):
+        NAMES = "names"          # Dr. John Smith → [NAME]
+        EMAILS = "emails"        # john@example.com → [EMAIL]
+        PHONES = "phones"        # (555) 123-4567 → [PHONE]
+        ADDRESSES = "addresses"  # 123 Main St → [ADDRESS]
+        SSN = "ssn"              # 123-45-6789 → [SSN]
+        DATES = "dates"          # 01/15/1990 → [DATE]
+        FINANCIAL = "financial"  # 4111-1111-1111-1111 → [FINANCIAL]
+    ```
+  </Tab>
+  <Tab title="What Gets Stored">
+    The AI memory system retains only **therapeutic context** — never identity:
+
+    | Stored | NOT Stored |
+    |---|---|
+    | Emotional patterns and themes | Names or identifiers |
+    | Therapeutic progress signals | Contact information |
+    | Coping strategies discussed | Physical addresses |
+    | Session context and continuity | Social Security numbers |
+    | Cultural adaptation preferences | Medical record numbers |
+    | Crisis history (anonymized) | Financial information |
+
+    <Warning>
+      If the PII scrubber detects information it cannot confidently classify, it defaults to **scrubbing** rather than retaining. False positives (over-scrubbing) are preferred over false negatives (PII leakage).
+    </Warning>
+  </Tab>
+  <Tab title="Scanning Capabilities">
+    The PII scanner uses multi-layered detection:
+
+    - **Regex patterns:** High-confidence detection of structured PII (SSN, phone, email, credit card)
+    - **Named Entity Recognition:** ML-based detection of names, addresses, and organizations
+    - **Contextual analysis:** Identifies PII that appears in unstructured text (e.g., "my therapist Dr. Smith" or "I live on Main Street")
+    - **Custom patterns:** Healthcare-specific patterns (MRN numbers, patient IDs, provider IDs)
+
+    ```python
+    def scan_for_pii(text: str) -> dict:
+        """Scans text for PII without modifying it."""
+        result = {
+            "found": False,
+            "categories": [],
+            "count": 0,
+        }
+        for category, patterns in PII_PATTERNS.items():
+            for pattern in patterns:
+                matches = pattern.findall(text)
+                if matches:
+                    result["found"] = True
+                    result["categories"].append(category.value)
+                    result["count"] += len(matches)
+        return result
+    ```
+  </Tab>
+</Tabs>
+
+### PII in Logs and Documentation
+
+<Warning>
+  **Absolute rule: No PII in logs, documentation, error reports, or monitoring systems.**
+
+  - Application logs reference anonymized user IDs only (`usr_a1b2c3d4`)
+  - Error reports are scrubbed before transmission to error tracking services
+  - Monitoring dashboards display aggregated, de-identified metrics
+  - Internal documentation uses placeholder data exclusively
+  - Code comments and examples never contain real user data
+</Warning>
+
+---
+
+## Patient Rights
+
+Pixelated Empathy upholds comprehensive patient rights under HIPAA, GDPR, and applicable state privacy laws.
+
+### Rights Summary
+
+<AccordionGroup>
+  <Accordion title="Right to Access" icon="eye">
+    Patients can request a complete copy of all personal information and PHI held by Pixelated Empathy.
+
+    - **Deadline:** 30 days from request (15-day extension with written notice)
+    - **Format:** Electronic copy in the patient's requested format (JSON, PDF, CSV)
+    - **Scope:** All personal data, session history, assessment results, and profile information
+    - **Cost:** No charge for the first copy; reasonable fee for additional copies
+
+    ```
+    Request → Verify Identity → Gather Data → PII Review → Deliver
+               (MFA required)    (30 days)    (completeness    (secure
+                                               check)          channel)
+    ```
+  </Accordion>
+
+  <Accordion title="Right to Amendment" icon="pen-to-square">
+    Patients can request corrections to inaccurate or incomplete personal information.
+
+    - **Deadline:** 60 days from request
+    - **Process:** Written request → Review → Approve/Deny with rationale
+    - **Amendments:** Appended to original records (originals preserved for integrity)
+    - **Appeals:** Formal appeal process for denied requests
+    - **Notification:** If amendment affects shared data, downstream recipients are notified
+  </Accordion>
+
+  <Accordion title="Right to Disclosure Accounting" icon="list-check">
+    Patients can request a complete accounting of who has accessed or received their PHI.
+
+    - **Coverage:** All disclosures for the prior 6 years
+    - **Details:** Date, recipient, description, and purpose of each disclosure
+    - **Exceptions:** Treatment, payment, and healthcare operations
+    - **Deadline:** 60 days from request
+  </Accordion>
+
+  <Accordion title="Right to Request Restrictions" icon="hand">
+    Patients can request restrictions on how their PHI is used or disclosed.
+
+    - All requests formally considered and documented
+    - Accepted restrictions enforced system-wide through access control policies
+    - Written notification of acceptance or denial
+    - Patients informed of any limitations resulting from accepted restrictions
+  </Accordion>
+
+  <Accordion title="Right to Confidential Communications" icon="envelope-open-text">
+    Patients can request that communications be delivered through alternative means or to alternative locations.
+
+    - No requirement to explain the reason for the request
+    - Honored when reasonable and technically feasible
+    - Configured in the patient's privacy preferences dashboard
+  </Accordion>
+
+  <Accordion title="Right to Deletion" icon="trash-can">
+    Patients can request deletion of their account and all associated data.
+
+    - **Processing:** Completed within 30 days of verified request
+    - **Scope:** All personal data, session history, profile information, and preferences
+    - **Exceptions:** Data required for legal compliance, active investigations, or ongoing litigation
+    - **De-identified data:** Anonymized, aggregated data may be retained for research (cannot be linked back)
+    - **Confirmation:** Written confirmation of deletion provided
+  </Accordion>
+
+  <Accordion title="Right to Data Portability" icon="file-export">
+    Patients can receive their data in a structured, machine-readable format for transfer to another service.
+
+    - **Formats:** JSON, CSV, or FHIR-compatible export
+    - **Scope:** All patient-provided data and system-generated data attributable to the patient
+    - **Delivery:** Secure download link or encrypted email
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Consent Framework
+
+Pixelated Empathy implements a **granular, layered consent model** that gives users meaningful control over how their data is processed.
+
+### Consent Principles
+
+<CardGroup cols={2}>
+  <Card title="Informed" icon="circle-info">
+    All consent requests use plain, understandable language. Each request clearly states the purpose, scope, and consequences of granting or withholding consent.
+  </Card>
+  <Card title="Explicit" icon="check-double">
+    Active opt-in required — no pre-checked boxes or implied consent. Users must take affirmative action for each consent category.
+  </Card>
+  <Card title="Granular" icon="sliders">
+    Separate consent for separate purposes. Users can consent to core services while declining research participation or marketing communications.
+  </Card>
+  <Card title="Revocable" icon="rotate-left">
+    Users can withdraw any consent at any time through their privacy dashboard. Withdrawal takes effect immediately for new data processing.
+  </Card>
+</CardGroup>
+
+### Consent Categories
+
+<Tabs>
+  <Tab title="Required Consents">
+    These consents are necessary for service delivery:
+
+    | Consent | Purpose | Legal Basis | Withdrawable |
+    |---|---|---|---|
+    | **Service Consent** | Core therapeutic AI service delivery | Contractual necessity | No (service terminates) |
+    | **Privacy Policy** | Acknowledgment of data practices | Legal requirement | No (account deletion required) |
+    | **HIPAA Authorization** | Use and disclosure of PHI | HIPAA Privacy Rule | Yes (30-day notice, account closure) |
+  </Tab>
+  <Tab title="Recommended Consents">
+    | Consent | Purpose | Legal Basis | Withdrawable |
+    |---|---|---|---|
+    | **Crisis Intervention** | Safety assessment and emergency response | Vital interests | Yes (service limitations apply) |
+
+    <Info>
+      Crisis intervention consent is strongly recommended. Without it, the platform's ability to detect and respond to safety risks is significantly limited. Users are informed of these limitations at consent time.
+    </Info>
+  </Tab>
+  <Tab title="Optional Consents">
+    | Consent | Purpose | Legal Basis | Withdrawable |
+    |---|---|---|---|
+    | **Research & Analytics** | De-identified data for service improvement | Explicit consent | Yes (immediate) |
+    | **Marketing** | Product updates and promotional content | Explicit consent | Yes (immediate) |
+    | **Third-Party Sharing** | Sharing with BAA-bound service providers | Legitimate interest + consent | Yes (may affect features) |
+    | **Data Export** | Integration with external platforms | User request | N/A (user-initiated) |
+  </Tab>
+</Tabs>
+
+### Onboarding Consent Flow
+
+```
+1. Account Creation
+   ↓
+2. Privacy Policy Review & Acceptance .............. Required
+   ↓
+3. HIPAA Authorization ............................. Required
+   ↓
+4. Service Terms Acceptance ........................ Required
+   ↓
+5. Crisis Intervention Consent ..................... Recommended
+   ↓
+6. Optional Consents (Research, Marketing, etc.) ... Optional
+   ↓
+7. Consent Summary & Confirmation .................. Review all choices
+   ↓
+8. Account Activation
+```
+
+### Consent Records
+
+Every consent action is captured with full audit trail:
+
+- **Timestamp:** Exact date and time (UTC)
+- **User ID:** Anonymized identifier
+- **Consent Type:** Specific consent category
+- **Action:** Granted, withdrawn, or renewed
+- **IP Address:** For consent verification
+- **Policy Version:** Version of the policy consented to
+- **Method:** How consent was given (click, digital signature)
+
+<Tip>
+  Users can view and manage all their consents through the **Privacy Dashboard** — including current status, grant dates, linked policy versions, and one-click withdrawal for optional consents.
+</Tip>
+
+---
+
+## Data Retention
+
+### Retention Schedule
+
+| Data Category | Retention Period | Justification |
+|---|---|---|
+| **Active Account Data** | Duration of account | Service delivery |
+| **Session History** | Account lifetime + 7 years | Clinical record keeping |
+| **Clinical Records** | 6 years minimum | HIPAA requirement |
+| **Audit Logs** | 6 years | HIPAA compliance |
+| **Crisis Records** | 7 years | Safety and legal requirements |
+| **Consent Records** | 6 years after last interaction | Compliance verification |
+| **Inactive Accounts** | 7 years after last activity | Legal retention requirements |
+| **De-identified Research Data** | Indefinite | Cannot be linked to individuals |
+
+### Data Lifecycle
+
+<Tabs>
+  <Tab title="Collection">
+    **Collected only what is necessary:**
+
+    - Account information (email, credentials — encrypted)
+    - Session content (encrypted, PII-scrubbed for AI memory)
+    - Usage analytics (aggregated, anonymized)
+    - Technical data (device type, browser — for security)
+
+    **Never collected:**
+    - Social media profiles or contacts
+    - Location data beyond IP-based country
+    - Biometric data
+    - Third-party behavioral data
+  </Tab>
+  <Tab title="Processing">
+    **Processing controls:**
+
+    - PHI processed only for stated purposes (treatment, safety, consented research)
+    - PII scrubbed before entering AI pipelines
+    - Aggregation and anonymization applied before analytics
+    - Minimum necessary principle enforced at every processing step
+    - All processing operations logged in audit trail
+  </Tab>
+  <Tab title="Deletion">
+    **Upon account deletion request:**
+
+    1. Identity verified through MFA
+    2. All personal data queued for deletion within 30 days
+    3. Active sessions terminated
+    4. Data removed from primary systems, caches, and backups
+    5. Legal retention exceptions applied where required
+    6. De-identified data may be retained (unlinkable)
+    7. Written confirmation provided to the user
+
+    <Warning>
+      Backup deletion may take up to 90 days due to backup rotation cycles. Data in backups is encrypted and inaccessible without active decryption keys, which are revoked upon deletion.
+    </Warning>
+  </Tab>
+</Tabs>
+
+---
+
+## GDPR Considerations
+
+For users in the European Union and European Economic Area, Pixelated Empathy provides additional protections under the General Data Protection Regulation.
+
+### Lawful Bases for Processing
+
+| Processing Activity | Lawful Basis | GDPR Article |
+|---|---|---|
+| Core service delivery | Contractual necessity | Art. 6(1)(b) |
+| Safety and crisis response | Vital interests | Art. 6(1)(d) |
+| Legal compliance (HIPAA, etc.) | Legal obligation | Art. 6(1)(c) |
+| Research and analytics | Explicit consent | Art. 6(1)(a) |
+| Marketing communications | Explicit consent | Art. 6(1)(a) |
+| Health data processing | Explicit consent for health data | Art. 9(2)(a) |
+
+### GDPR-Specific Rights
+
+<CardGroup cols={2}>
+  <Card title="Right to Be Forgotten" icon="eraser">
+    EU users can request complete erasure of all personal data. Requests processed within 30 days. Extends to all processors and sub-processors.
+  </Card>
+  <Card title="Right to Restrict Processing" icon="pause">
+    Users can request that processing of their data be paused while disputes are resolved, without requiring full account deletion.
+  </Card>
+  <Card title="Right to Object" icon="hand">
+    Users can object to specific processing activities, including profiling and automated decision-making.
+  </Card>
+  <Card title="Data Portability" icon="right-left">
+    Users can receive all their data in machine-readable format (JSON/CSV) and have it transmitted directly to another controller.
+  </Card>
+</CardGroup>
+
+### International Data Transfers
+
+- Data may be processed in the United States and other jurisdictions
+- **Standard Contractual Clauses (SCCs)** govern all EU-to-US data transfers
+- Transfer Impact Assessments completed for all data flows
+- Supplementary measures implemented where required by Schrems II guidance
+- Data Processing Agreements (DPAs) in place with all sub-processors
+
+### Data Protection Impact Assessment
+
+A Data Protection Impact Assessment (DPIA) has been completed for Pixelated Empathy covering:
+
+- Processing of special category health data
+- Large-scale profiling and automated decision-making
+- AI-based emotional analysis and crisis detection
+- Cross-border data transfers
+
+<Info>
+  The DPIA is reviewed annually and updated whenever there are significant changes to data processing activities. A summary is available upon request from the Data Protection Officer.
+</Info>
+
+---
+
+## Additional Privacy Protections
+
+### California Residents (CCPA/CPRA)
+
+California residents have additional rights under the California Consumer Privacy Act and California Privacy Rights Act:
+
+- **Right to Know:** What personal information is collected, used, and shared
+- **Right to Delete:** Request deletion of personal information
+- **Right to Opt-Out:** Opt out of sale or sharing of personal information (note: we do **not** sell data)
+- **Right to Non-Discrimination:** No degraded service for exercising privacy rights
+- **Right to Correct:** Request correction of inaccurate personal information
+- **Right to Limit Use:** Limit use and disclosure of sensitive personal information
+
+### Children's Privacy
+
+Pixelated Empathy is **not intended for users under 18 years of age**. We do not knowingly collect information from minors. Age verification is performed during registration. If we discover data has been collected from a minor, it is deleted immediately.
+
+---
+
+## Privacy Incident Response
+
+### Response Process
+
+<CardGroup cols={2}>
+  <Card title="Detection & Triage" icon="magnifying-glass">
+    **0–4 hours:** Privacy incident identified, classified by severity, and assigned to the incident response team. Affected data flows isolated.
+  </Card>
+  <Card title="Assessment & Notification" icon="file-medical">
+    **4–72 hours:** Full impact assessment. Affected individuals notified within 72 hours (GDPR) or 60 days (HIPAA). Supervisory authorities notified as required.
+  </Card>
+</CardGroup>
+
+### Breach Notification
+
+| Regulation | Deadline | Recipient |
+|---|---|---|
+| **GDPR** | 72 hours | Supervisory authority + affected individuals (if high risk) |
+| **HIPAA** | 60 days | HHS + affected individuals + media (if 500+) |
+| **CCPA** | Expeditious | California AG + affected individuals |
+| **State Laws** | Varies | State AG + affected individuals (per state requirements) |
+
+---
+
+## Contact & Resources
+
+<CardGroup cols={2}>
+  <Card title="Privacy Inquiries" icon="envelope">
+    **General:** [privacy@pixelatedempathy.com](mailto:privacy@pixelatedempathy.com)
+    **GDPR / DPO:** [dpo@pixelatedempathy.com](mailto:dpo@pixelatedempathy.com)
+    **HIPAA:** [hipaa-compliance@pixelatedempathy.com](mailto:hipaa-compliance@pixelatedempathy.com)
+  </Card>
+  <Card title="Exercise Your Rights" icon="scale-balanced">
+    **Data Access / Deletion / Portability requests:**
+    Submit through your Privacy Dashboard or email [privacy@pixelatedempathy.com](mailto:privacy@pixelatedempathy.com).
+
+    **Complaints:** You have the right to lodge a complaint with your local data protection authority.
+  </Card>
+</CardGroup>
+
+<Info>
+  This privacy documentation is reviewed and updated quarterly. Last updated: **January 2025**. Material changes are communicated to all users via email and in-app notification, with re-consent obtained where required.
+</Info>

@@ -1,0 +1,160 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "linden",
+  "name": "Pixelated Empathy",
+  "colors": {
+    "primary": "#7C3AED",
+    "light": "#A78BFA",
+    "dark": "#5B21B6"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "concepts"
+            ]
+          },
+          {
+            "group": "The Platform",
+            "pages": [
+              "product/empathy-gym",
+              "product/bias-detection",
+              "product/crisis-detection",
+              "product/emotional-intelligence",
+              "product/training-scenarios"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "architecture/overview",
+              "architecture/data-flow",
+              "architecture/memory-system",
+              "architecture/deployment"
+            ]
+          },
+          {
+            "group": "Compliance & Security",
+            "pages": [
+              "compliance/hipaa",
+              "compliance/security",
+              "compliance/ethics",
+              "compliance/data-privacy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "For Therapists",
+            "pages": [
+              "guides/therapists/getting-started",
+              "guides/therapists/empathy-gym-guide",
+              "guides/therapists/understanding-feedback",
+              "guides/therapists/response-style"
+            ]
+          },
+          {
+            "group": "For Developers",
+            "pages": [
+              "guides/developers/setup",
+              "guides/developers/conventions",
+              "guides/developers/contributing",
+              "guides/developers/testing"
+            ]
+          },
+          {
+            "group": "For Supervisors",
+            "pages": [
+              "guides/supervisors/dashboard",
+              "guides/supervisors/tracking-progress",
+              "guides/supervisors/custom-scenarios"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/bias-analysis",
+              "api-reference/session-management",
+              "api-reference/analytics",
+              "api-reference/crisis-detection"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Enterprise",
+        "groups": [
+          {
+            "group": "For Organizations",
+            "pages": [
+              "enterprise/overview",
+              "enterprise/pricing",
+              "enterprise/case-studies",
+              "enterprise/partnerships"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/pixelatedempathy",
+          "icon": "github"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://pixelatedempathy.com/community",
+          "icon": "users"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@pixelatedempathy.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://pixelatedempathy.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/pixelatedempathy",
+      "github": "https://github.com/pixelatedempathy",
+      "linkedin": "https://linkedin.com/company/pixelated-empathy"
+    }
+  }
+}

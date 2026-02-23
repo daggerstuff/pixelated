@@ -1,0 +1,33 @@
+{
+  "default": true,
+  "MD003": { "style": "atx" },
+  "MD007": { "indent": 2 },
+  "MD013": { "line_length": 120 },
+  "MD024": { "siblings_only": true },
+  "MD025": false,
+  "MD026": false,
+  "MD033": {
+    "allowed_elements": [
+      "div",
+      "span",
+      "Card",
+      "CardGroup",
+      "Steps",
+      "Step",
+      "Accordion",
+      "AccordionGroup",
+      "Tip",
+      "Info",
+      "Warning",
+      "Note",
+      "Tabs",
+      "Tab",
+      "Frame"
+    ]
+  },
+  "MD036": false,
+  "MD040": false,
+  "MD041": false,
+  "MD046": { "style": "fenced" },
+  "MD049": { "style": "asterisk" }
+}

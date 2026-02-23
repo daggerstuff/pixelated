@@ -1,0 +1,243 @@
+---
+title: 'Supervisor Dashboard'
+description: 'Manage trainees, review sessions, annotate responses, and administer group training from a centralized dashboard'
+---
+
+Your supervisor dashboard is the command center for overseeing trainee development across Pixelated Empathy. From here, you can monitor active sessions, review completed training, annotate trainee responses, and manage group training programs — all in one place.
+
+## Accessing the dashboard
+
+Navigate to **Dashboard** → **Supervisor** after logging in with your supervisor credentials. Your dashboard view is personalized based on your assigned trainees and organizational role.
+
+<Note>
+  Supervisor access requires an active supervisor license. Contact your organization's administrator if you don't see the supervisor dashboard option.
+</Note>
+
+## Dashboard overview
+
+The supervisor dashboard is organized into four primary sections, each designed to give you immediate insight into trainee activity and performance.
+
+<CardGroup cols={2}>
+  <Card title="Trainee Management" icon="users">
+    View all assigned trainees, their current status, and quick-access links to individual profiles.
+  </Card>
+  <Card title="Session Review" icon="play">
+    Browse completed training sessions with full transcripts, AI feedback, and your annotation tools.
+  </Card>
+  <Card title="Annotations" icon="highlighter">
+    Add clinical commentary, flag moments for discussion, and provide personalized feedback on trainee responses.
+  </Card>
+  <Card title="Group Training" icon="people-group">
+    Create and manage group training cohorts, assign scenarios, and track collective progress.
+  </Card>
+</CardGroup>
+
+## Dashboard metrics
+
+The top of your dashboard displays real-time summary metrics that update as trainees complete sessions.
+
+<Steps>
+  <Step title="Active trainees">
+    The number of trainees currently assigned to you who have logged in within the last 30 days. Click to see a full roster with last-active timestamps.
+  </Step>
+  <Step title="Sessions this week">
+    Total training sessions completed by your trainees in the current week. The trend arrow compares against the previous week.
+  </Step>
+  <Step title="Average competency score">
+    The aggregate competency score across all your trainees, weighted by session recency. Scores range from 0–100.
+  </Step>
+  <Step title="Pending reviews">
+    Sessions that have been flagged for supervisor review — either automatically by the platform or manually by trainees requesting feedback.
+  </Step>
+</Steps>
+
+## Trainee management
+
+The **Trainees** panel lists every trainee under your supervision with sortable columns for name, cohort, last session date, competency score, and session count.
+
+### Trainee profiles
+
+Click any trainee's name to open their full profile, which includes:
+
+- **Contact information** and program enrollment details
+- **Competency breakdown** across all measured dimensions (empathic accuracy, bias awareness, crisis response, cultural sensitivity)
+- **Session history** with links to full transcripts and AI-generated feedback
+- **Progress timeline** showing score trends over weeks and months
+- **Notes** — your private annotations visible only to supervisors
+
+### Filtering and search
+
+Use the filter bar to narrow your trainee list:
+
+| Filter | Options |
+|---|---|
+| **Cohort** | Filter by training group or enrollment period |
+| **Competency range** | Show trainees within a specific score range |
+| **Activity status** | Active, inactive, or at-risk (no sessions in 14+ days) |
+| **Flagged sessions** | Trainees with sessions awaiting your review |
+| **Scenario type** | Trainees who have completed specific scenario categories |
+
+<Tip>
+  Use the **At-risk** filter to quickly identify trainees who may need encouragement or schedule adjustments. Early outreach significantly improves completion rates.
+</Tip>
+
+## Session review
+
+The session review interface lets you examine completed training sessions in detail. Each session record includes the full conversation transcript, AI-generated feedback, competency scores, and bias detection results.
+
+### Reviewing a session
+
+<Steps>
+  <Step title="Select a session">
+    From the **Session Review** tab, browse sessions by date, trainee, or scenario. Sessions flagged for review appear at the top with an orange indicator.
+  </Step>
+  <Step title="Read the transcript">
+    The transcript view shows the full conversation between the trainee and the AI client. Trainee messages appear on the right, AI client messages on the left. AI-detected empathy markers are highlighted in purple.
+  </Step>
+  <Step title="Review AI feedback">
+    Below the transcript, the platform's AI feedback is displayed with scores for each competency dimension. Expand any dimension to see specific response-level analysis.
+  </Step>
+  <Step title="Add your annotations">
+    Use the annotation toolbar to highlight specific exchanges and add your clinical commentary. Your annotations sync in real time and can be shared with the trainee when you're ready.
+  </Step>
+</Steps>
+
+### Session playback
+
+For sessions conducted with voice mode enabled, you can use the **Playback** feature to listen to the original audio alongside the transcript. Playback controls include:
+
+- **Speed adjustment** — 0.5x, 1x, 1.5x, 2x
+- **Skip silence** — automatically skip pauses longer than 3 seconds
+- **Bookmark** — mark specific timestamps for later reference
+
+## Annotation capabilities
+
+Annotations are your primary tool for providing personalized, contextual feedback to trainees. The annotation system supports multiple feedback types.
+
+<AccordionGroup>
+  <Accordion title="Inline comments">
+    Highlight any portion of a session transcript and attach a comment. Inline comments appear as margin notes when the trainee reviews their session.
+
+    Common uses:
+    - Noting effective empathic responses
+    - Suggesting alternative phrasings
+    - Identifying missed opportunities for deeper exploration
+  </Accordion>
+  <Accordion title="Competency flags">
+    Tag specific exchanges with competency markers: **Strength**, **Growth area**, or **Critical**. These flags feed into the trainee's competency timeline and help track improvement in targeted areas.
+  </Accordion>
+  <Accordion title="Audio notes">
+    Record a brief audio note (up to 2 minutes) attached to a specific point in the session. Audio notes are especially useful for nuanced clinical feedback that benefits from tone and emphasis.
+  </Accordion>
+  <Accordion title="Rubric scoring">
+    Apply your organization's custom rubric to individual responses or entire sessions. Rubric scores integrate with the analytics system for longitudinal tracking.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Annotations marked as **Draft** are visible only to you. Click **Share with trainee** to make annotations visible in the trainee's session review. This action cannot be undone.
+</Warning>
+
+## Group training administration
+
+Group training allows you to organize trainees into cohorts and assign coordinated training plans.
+
+### Creating a group
+
+1. Navigate to **Group Training** → **New Group**
+2. Enter a group name and optional description
+3. Add trainees by searching or selecting from your roster
+4. Set the group's training schedule and scenario assignments
+
+### Assigning scenarios
+
+You can assign scenarios to groups in several ways:
+
+<Tabs>
+  <Tab title="Sequential path">
+    Assign an ordered sequence of scenarios that trainees complete in order. Each scenario unlocks after the previous one meets a minimum competency threshold.
+
+    ```json
+    {
+      "assignment_type": "sequential",
+      "scenarios": ["intake-assessment", "crisis-intervention", "cultural-sensitivity"],
+      "minimum_score": 70,
+      "deadline": "2025-03-15"
+    }
+    ```
+  </Tab>
+  <Tab title="Open selection">
+    Provide a pool of approved scenarios and let trainees choose their own path. You set a minimum number of completions required.
+
+    ```json
+    {
+      "assignment_type": "open",
+      "scenario_pool": ["anxiety-cbt", "grief-processing", "substance-use", "family-dynamics"],
+      "minimum_completions": 3,
+      "deadline": "2025-03-15"
+    }
+    ```
+  </Tab>
+  <Tab title="Adaptive">
+    Let the platform automatically select scenarios based on each trainee's competency gaps. The adaptive engine prioritizes areas where the trainee scores below the group average.
+
+    ```json
+    {
+      "assignment_type": "adaptive",
+      "focus_areas": ["bias_awareness", "crisis_response"],
+      "session_count": 5,
+      "difficulty_range": [3, 7]
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Group analytics
+
+The group view includes aggregate metrics so you can compare performance across trainees:
+
+- **Score distribution** — histogram showing competency score spread across the group
+- **Completion rates** — percentage of assigned scenarios completed by each trainee
+- **Leaderboard** — optional ranked view (can be disabled for your organization)
+- **Common growth areas** — AI-identified patterns in areas where the group collectively needs improvement
+
+<Info>
+  Group analytics respect privacy settings. Individual trainee data is only visible to their assigned supervisor and organization administrators.
+</Info>
+
+## Dashboard views
+
+Switch between dashboard layouts to match your workflow:
+
+| View | Description |
+|---|---|
+| **Overview** | High-level metrics and activity feed for all trainees |
+| **Individual** | Deep dive into a single trainee's profile and session history |
+| **Group** | Cohort-level analytics and assignment management |
+| **Calendar** | Timeline view of scheduled sessions, deadlines, and review dates |
+| **Alerts** | Consolidated view of flagged sessions, at-risk trainees, and system notifications |
+
+## Keyboard shortcuts
+
+Speed up your workflow with these keyboard shortcuts:
+
+| Shortcut | Action |
+|---|---|
+| `G` then `T` | Go to trainees list |
+| `G` then `S` | Go to session review |
+| `G` then `G` | Go to group training |
+| `N` | Next session in review queue |
+| `P` | Previous session in review queue |
+| `A` | Open annotation toolbar |
+| `Esc` | Close current panel |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Track trainee progress" icon="chart-line" href="/guides/supervisors/tracking-progress">
+    Learn how to use competency scores, benchmarks, and reports to monitor trainee development.
+  </Card>
+  <Card title="Create custom scenarios" icon="wand-magic-sparkles" href="/guides/supervisors/custom-scenarios">
+    Build tailored training scenarios for your trainees and cohorts.
+  </Card>
+</CardGroup>

@@ -1,0 +1,491 @@
+---
+title: "Memory System Architecture"
+description: "How Pixelated Empathy implements long-term memory using Mem0 + Google Gemini — with PII filtering, crisis detection, speculation filtering, and HIPAA-compliant storage for therapeutic conversations."
+---
+
+## Memory system overview
+
+The memory system is what transforms Pixelated Empathy from a stateless chatbot into a **contextually aware therapeutic training platform**. It enables the AI to remember trainee preferences, track therapeutic progress across sessions, recall previous emotional states, and maintain continuity — all while enforcing strict privacy controls.
+
+<Note>
+  The memory system implements **three layers of content filtering** before any data is stored: PII detection and redaction, speculation filtering with confidence thresholds, and content length enforcement. Data that fails any filter is **silently rejected** — never stored.
+</Note>
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     MEMORY SYSTEM ARCHITECTURE                       │
+│                                                                     │
+│  ┌───────────────┐    ┌──────────────────────────────────────────┐  │
+│  │   Frontend    │    │         MCP Memory Server (:5003)        │  │
+│  │  Dashboard    │    │  ┌────────────────────────────────────┐  │  │
+│  │              │───▶│  │       GeminiMem0Manager            │  │  │
+│  │ MCPMemory    │    │  │                                    │  │  │
+│  │ Client (TS)  │    │  │  ┌──────────┐  ┌───────────────┐  │  │  │
+│  └───────────────┘    │  │  │   PII    │  │  Speculation  │  │  │  │
+│                       │  │  │  Filter  │  │    Filter     │  │  │  │
+│  ┌───────────────┐    │  │  └────┬─────┘  └──────┬────────┘  │  │  │
+│  │   Pixel      │    │  │       │               │           │  │  │
+│  │  Inference   │───▶│  │  ┌────▼───────────────▼────────┐  │  │  │
+│  │  Service     │    │  │  │     Crisis Detector         │  │  │  │
+│  └───────────────┘    │  │  └────────────┬───────────────┘  │  │  │
+│                       │  └───────────────┼──────────────────┘  │  │
+│                       └──────────────────┼──────────────────────┘  │
+│                                          │                         │
+│                    ┌─────────────────────┼─────────────────────┐   │
+│                    │              STORAGE LAYER                │   │
+│                    │   ┌─────────┐  ┌────▼─────┐  ┌─────────┐│   │
+│                    │   │ Gemini  │  │   Mem0   │  │  Null   ││   │
+│                    │   │  API    │  │  Vector  │  │ Memory  ││   │
+│                    │   │(Filter/ │  │  Store   │  │(Fallback││   │
+│                    │   │ Gen)    │  │ (Qdrant) │  │         ││   │
+│                    │   └─────────┘  └──────────┘  └─────────┘│   │
+│                    └──────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## Core components
+
+The memory system consists of four primary components that work together in a layered architecture.
+
+<CardGroup cols={2}>
+  <Card title="MCP Memory Server" icon="server">
+    **Central Memory Authority**
+
+    FastAPI-based server (port 5003) that exposes RESTful endpoints for all memory operations. Acts as the single gateway to the memory system — no service writes to memory directly.
+  </Card>
+  <Card title="GeminiMem0Manager" icon="brain">
+    **Intelligence Layer**
+
+    Python class that orchestrates PII filtering, speculation filtering, crisis detection, and memory storage/retrieval. Uses Google Gemini for response generation and Mem0 for vector storage.
+  </Card>
+  <Card title="MCPMemoryClient" icon="display">
+    **Frontend Interface**
+
+    TypeScript client used by the dashboard and frontend services to interact with the MCP Memory Server over HTTP. Provides CRUD operations, search, and statistics.
+  </Card>
+  <Card title="NullMemoryManager" icon="circle-xmark">
+    **Fallback Safety Net**
+
+    No-op implementation that gracefully handles all memory operations when the primary system is unavailable. Ensures the platform continues functioning without memory context.
+  </Card>
+</CardGroup>
+
+## GeminiMem0Manager deep dive
+
+The `GeminiMem0Manager` is the core orchestrator of the memory system. It integrates Google Gemini (for PII filtering and response generation) with Mem0 (for vector-based long-term memory storage).
+
+### Initialization and configuration
+
+```python
+from ai.memory.mem0_gemini.manager import GeminiMem0Manager, GeminiMem0Config
+from ai.memory.mem0_gemini.memory_ingestion_config import TherapeuticMemoryConfig
+
+# Configure therapeutic memory settings
+therapeutic_config = TherapeuticMemoryConfig(
+    confidence_threshold=0.8,        # Minimum confidence for storage
+    enable_crisis_detection=True,     # Enable crisis signal flagging
+    max_memory_length=2000,          # Characters per memory entry
+    inference_mode="quality",         # Quality over speed
+)
+
+# Initialize the manager
+config = GeminiMem0Config(
+    gemini_api_key=os.environ["GEMINI_API_KEY"],
+    mem0_api_key=os.environ.get("MEM0_API_KEY"),
+    model_name="gemini-2.0-flash",
+    user_id="default_user",
+    therapeutic_config=therapeutic_config,
+)
+
+manager = GeminiMem0Manager(config)
+```
+
+<Tip>
+  The `TherapeuticMemoryConfig` uses **Mem0 cookbook best practices** for controlling memory ingestion — including custom instructions that tell the memory system exactly what to store, what to ignore, and what requires special handling.
+</Tip>
+
+### Memory operation lifecycle
+
+Every memory operation passes through the same filtering pipeline, regardless of whether it's triggered by the inference service or the frontend dashboard.
+
+<Tabs>
+  <Tab title="Add Memory">
+    ```python
+    # Adding a memory (internal flow)
+    async def add_memory(content, user_id, metadata=None, category=None):
+        # Step 1: PII Filter
+        filtered = pii_filter.filter_for_storage(content)
+        if filtered is None:
+            return None  # Too much PII — rejected
+
+        # Step 2: Speculation Filter
+        if SpeculationFilter.is_speculative(filtered):
+            confidence = SpeculationFilter.get_confidence_adjustment(filtered)
+            if confidence < config.confidence_threshold:  # Default: 0.8
+                return None  # Too speculative — rejected
+
+        # Step 3: Length enforcement
+        if len(filtered) > config.max_memory_length:
+            filtered = filtered[:config.max_memory_length] + "..."
+
+        # Step 4: Store in Mem0 with metadata
+        result = memory.add(
+            filtered,
+            user_id=user_id,
+            metadata={
+                "category": category,
+                "timestamp": datetime.now(UTC).isoformat(),
+                **metadata
+            }
+        )
+        return result
+    ```
+  </Tab>
+  <Tab title="Search Memory">
+    ```python
+    # Searching memories (semantic similarity)
+    def search_memories(query, user_id):
+        # Mem0 performs vector similarity search via Qdrant
+        results = memory.search(query, user_id=user_id)
+
+        # Format for context injection
+        formatted = []
+        for m in results:
+            content = m.get("memory") or m.get("content", "")
+            if content:
+                formatted.append(f"- {content}")
+
+        return "\n".join(formatted)
+    ```
+
+    Search results are injected into the system prompt as `USER MEMORIES` context, enabling the AI to reference past interactions naturally.
+  </Tab>
+  <Tab title="Get Response">
+    The full response generation flow combines memory retrieval, crisis detection, and Gemini generation:
+
+    ```python
+    async def get_response(query, user_id, session_id=None):
+        # 1. Crisis detection (always runs first)
+        crisis_severity = crisis_detector.get_crisis_severity(query)
+
+        # 2. Memory retrieval
+        memories = search_memories(query, user_id)
+        memory_context = format_memories(memories)
+
+        # 3. Prompt construction
+        prompt = build_system_prompt(
+            memory_context, crisis_severity
+        )
+
+        # 4. Gemini generation
+        response = gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"{prompt}\nUSER: {query}"
+        )
+
+        # 5. Store interaction (with filtering)
+        store_interaction(query, response.text, user_id,
+                         session_id, crisis_severity)
+
+        return {
+            "response": response.text,
+            "memories_used": len(memories),
+            "crisis_detected": crisis_severity != "none",
+            "crisis_severity": crisis_severity,
+        }
+    ```
+  </Tab>
+</Tabs>
+
+## PII filtering
+
+PII filtering is the first line of defense in the memory pipeline. It uses regex-based pattern matching to detect and redact personally identifiable information before it reaches the vector store.
+
+### Protected patterns
+
+<Warning>
+  The following PII categories are **always detected and redacted** — there is no configuration to disable PII filtering. This is a HIPAA compliance requirement that cannot be overridden.
+</Warning>
+
+| Pattern | Description | Example Match |
+|---|---|---|
+| SSN | Social Security Numbers | `123-45-6789` |
+| Insurance/Credit Card | Long numeric identifiers (9–18 digits) | `4532015112830366` |
+| License/ID | State ID patterns (`XX000000`) | `CA12345678` |
+| Street Address | Address with street type | `123 Main Street` |
+| ZIP Code | 5 or 9 digit postal codes | `90210`, `90210-1234` |
+| Phone Number | US phone formats | `(555) 123-4567`, `+1-555-123-4567` |
+
+### Filtering behavior
+
+```python
+class PIIFilter:
+    def filter_for_storage(self, text: str) -> Optional[str]:
+        # Empty content → reject
+        if not text or not text.strip():
+            return None
+
+        # Redact all PII occurrences
+        redacted = self.redact_pii(text)  # "[REDACTED]" replacement
+
+        # Check redaction ratio
+        redaction_count = redacted.count("[REDACTED]")
+        original_words = len(text.split())
+
+        # If >50% of content was redacted, content is meaningless
+        if redaction_count / max(original_words, 1) > 0.5:
+            return None  # Reject entirely
+
+        return redacted  # Safe for storage
+```
+
+<AccordionGroup>
+  <Accordion title="Example: PII Redaction" icon="eye-slash">
+    **Input:** `"My phone number is 555-123-4567 and I live at 123 Oak Street, ZIP 90210"`
+
+    **After filtering:** `"My phone number is [REDACTED] and I live at [REDACTED], ZIP [REDACTED]"`
+
+    **Decision:** 3 redactions out of ~14 words (21%) → **Stored** (under 50% threshold)
+  </Accordion>
+  <Accordion title="Example: Excessive PII (Rejected)" icon="ban">
+    **Input:** `"Call me at 555-123-4567, my SSN is 123-45-6789, insurance #4532015112830366"`
+
+    **After filtering:** `"Call me at [REDACTED], my SSN is [REDACTED], insurance [REDACTED]"`
+
+    **Decision:** 3 redactions out of ~10 words (30%) with the remaining content being semantically empty → **Rejected**
+  </Accordion>
+</AccordionGroup>
+
+## Speculation filtering
+
+The speculation filter prevents uncertain or unverified information from being stored as fact — critical in a therapeutic context where misinformation can impact treatment.
+
+<Tabs>
+  <Tab title="How It Works">
+    The filter uses two keyword lists to classify content:
+
+    **Speculation Indicators** (reduce confidence):
+    - "I think", "I might", "maybe", "perhaps", "possibly"
+    - "could be", "not sure", "I guess", "I wonder"
+    - "seems like", "feels like", "probably", "I suspect"
+
+    **Confirmation Indicators** (override speculation):
+    - "diagnosed", "confirmed", "doctor said", "therapist noted"
+    - "definitely", "certainly", "always", "documented"
+    - "prescribed", "verified"
+
+    Confirmation indicators **always override** speculation — so "I think my doctor diagnosed me with anxiety" is classified as **confirmed** (not speculative) due to the word "diagnosed".
+  </Tab>
+  <Tab title="Confidence Scoring">
+    Each piece of content receives a confidence score from `0.5` to `1.0`:
+
+    | Content Type | Confidence Score | Action |
+    |---|---|---|
+    | Confirmed statement | `1.0` | Always stored |
+    | Neutral statement | `0.9` | Stored (above default 0.8 threshold) |
+    | Single speculation indicator | `0.7` | **Rejected** (below 0.8 threshold) |
+    | Multiple speculation indicators | `0.5` | **Rejected** |
+
+    The confidence threshold is configurable via `TherapeuticMemoryConfig.confidence_threshold` (default: `0.8`).
+  </Tab>
+  <Tab title="Examples">
+    ✅ **Stored:** `"Dr. Smith diagnosed me with generalized anxiety disorder last month."`
+    - Contains "diagnosed" → Confidence: `1.0` → Stored
+
+    ❌ **Rejected:** `"I think I might have anxiety, but I'm not sure."`
+    - Contains "I think", "might", "not sure" → Confidence: `0.5` → Rejected
+
+    ✅ **Stored:** `"I've been feeling overwhelmed with my new job."`
+    - No speculation or confirmation indicators → Confidence: `0.9` → Stored
+
+    ❌ **Rejected:** `"Maybe I should try medication, I guess it could help."`
+    - Contains "maybe", "I guess", "could" → Confidence: `0.5` → Rejected
+  </Tab>
+</Tabs>
+
+## Crisis detection
+
+The crisis detector is integrated directly into the memory pipeline. When a crisis signal is detected, the memory is stored with special metadata and the severity level is passed to the response generation system.
+
+### Severity levels
+
+| Level | Trigger | Action |
+|---|---|---|
+| **Critical** | Keywords: "goodbye", "final", "last", "never see" + crisis context | Contact emergency services, notify psychiatrist, activate location tracking |
+| **High** | Keywords: "plan to", "going to", "tonight", "today" + crisis context, or pattern match (wrote note, giving away possessions) | Contact primary therapist, notify crisis response team, review safety plan |
+| **Medium** | General crisis keywords detected (suicidal, self-harm, cutting, overdose, etc.) | Flag for supervisor review, schedule 24hr follow-up, provide crisis resources |
+| **None** | No crisis indicators detected | Normal flow |
+
+```python
+# Crisis detector with keyword + regex pattern matching
+class CrisisDetector:
+    CRISIS_KEYWORDS = [
+        "suicide", "suicidal", "kill myself", "end my life",
+        "want to die", "don't want to live", "self-harm",
+        "cutting", "hurting myself", "overdose",
+        "no reason to live", "better off dead", ...
+    ]
+
+    CRISIS_PATTERNS = [
+        r"(?:have|had|made)\s+(?:a\s+)?(?:plan|plans)\s+to\s+(?:kill|hurt|harm)",
+        r"(?:wrote|writing)\s+(?:a\s+)?(?:note|letter|goodbye)",
+        r"(?:gave|giving)\s+away\s+(?:my|all)\s+(?:things|possessions|stuff)",
+    ]
+```
+
+<Warning>
+  Crisis detection runs on **every** user input — both in the memory pipeline and as a standalone service in the API layer. When crisis severity is `high` or `critical`, the system injects explicit crisis handling instructions into the AI response prompt, overriding normal conversational behavior.
+</Warning>
+
+## Memory categories
+
+Memories are categorized using a predefined taxonomy that supports filtered retrieval and dashboard organization.
+
+| Category | Description | Storage Priority |
+|---|---|---|
+| `therapeutic_insight` | Confirmed emotional patterns and therapeutic progress | High |
+| `emotional_state` | Self-reported emotional states (tagged as self-reported) | Medium |
+| `treatment_progress` | Milestones, coping strategies that work | High |
+| `session_summary` | Session-level summaries and key outcomes | High |
+| `crisis_context` | Crisis-related memories (always stored, always flagged) | Critical |
+| `preference` | Communication preferences, learning style | Medium |
+| `general` | General context without specific categorization | Low |
+
+## Custom instructions (Mem0 integration)
+
+The memory system uses **Mem0's custom instruction feature** to guide what gets extracted and stored. These instructions are applied at the project level and influence Mem0's memory extraction behavior.
+
+<AccordionGroup>
+  <Accordion title="What to STORE (High Confidence)" icon="check">
+    - Confirmed emotional patterns and triggers
+    - Therapeutic progress and milestones achieved
+    - Verified coping strategies that work for the patient
+    - Established treatment goals and preferences
+    - Crisis indicators and safety planning details
+    - Learning style and communication preferences
+    - Session insights confirmed by both parties
+  </Accordion>
+  <Accordion title="What to STORE WITH CAUTION (Moderate Confidence)" icon="circle-exclamation">
+    - Self-reported emotional states (tagged as self-reported)
+    - Mentioned life events affecting mental health
+    - Expressed goals and aspirations
+  </Accordion>
+  <Accordion title="What to NEVER STORE" icon="ban">
+    - Social Security Numbers or government IDs
+    - Insurance policy numbers or financial details
+    - Credit card or banking information
+    - Full addresses or location details beyond city/region
+    - Phone numbers or contact details
+    - Names of family members or third parties (anonymize as "family member", "partner")
+    - Speculative diagnoses not confirmed by professionals
+    - Casual mentions without therapeutic relevance
+  </Accordion>
+  <Accordion title="Special Handling Rules" icon="star">
+    - **Crisis signals**: Always flag and store with high priority
+    - **Medication mentions**: Store only if confirmed as currently prescribed
+    - **Childhood trauma**: Store with sensitivity, require explicit disclosure consent
+    - **Duplicate information**: Detect and merge rather than create duplicates
+  </Accordion>
+</AccordionGroup>
+
+## Fallback hierarchy
+
+The memory system implements a three-tier fallback chain to ensure the platform never fails due to memory system unavailability.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Tier 1: Gemini + Mem0 Platform Client (Production)         │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  • Mem0 Platform API (cloud-hosted vector store)    │    │
+│  │  • Google Gemini API (PII filtering + generation)   │    │
+│  │  • Full feature set: search, filter, custom instr.  │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                         │ on failure                         │
+│                         ▼                                    │
+│  Tier 2: Local Mem0 (Self-hosted)                           │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  • Qdrant vector store (localhost:6333)             │    │
+│  │  • Local memory operations (no cloud dependency)    │    │
+│  │  • Reduced feature set (no custom instructions)     │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                         │ on failure                         │
+│                         ▼                                    │
+│  Tier 3: NullMemoryManager (Emergency Fallback)             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  • All operations return empty/success (no-op)      │    │
+│  │  • Platform continues without memory context        │    │
+│  │  • Warning logged for operations team               │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+<Info>
+  The fallback selection happens at **initialization time**, not per-request. If the Mem0 Platform Client fails to initialize, the manager falls back to local Mem0. If that also fails, `NullMemoryManager` is used for the lifetime of the process. A restart attempts re-initialization.
+</Info>
+
+## Frontend memory dashboard
+
+The Memory Dashboard provides users with visibility and control over their stored memories through the `MCPMemoryClient`.
+
+### Client API
+
+```typescript
+// MCPMemoryClient operations (src/lib/memory/mcp-memory-client.ts)
+
+// Core CRUD
+mcpMemoryManager.addMemory(input, userId)      // Add with PII filtering
+mcpMemoryManager.updateMemory(id, content)     // Update existing memory
+mcpMemoryManager.deleteMemory(id)              // Delete specific memory
+mcpMemoryManager.getAllMemories(userId)         // List all (limit: 100)
+
+// Search
+mcpMemoryManager.searchMemories(options)       // Semantic similarity search
+mcpMemoryManager.searchByCategory(category)    // Filter by category
+mcpMemoryManager.searchByTags(tags)            // Filter by tags
+
+// Analytics
+mcpMemoryManager.getMemoryStats(userId)        // Total count, per-category counts
+
+// Convenience methods
+mcpMemoryManager.addUserPreference(userId, key, value)
+mcpMemoryManager.addConversationContext(userId, context, sessionId)
+```
+
+<Tip>
+  The `MCPMemoryClient` communicates with the MCP Server over HTTP. The server URL is configured via `NEXT_PUBLIC_MEMORY_API_URL` (default: `http://localhost:5003`). In production, this is routed through the internal Docker/Kubernetes network.
+</Tip>
+
+### Data format
+
+Memories are stored and returned in this format:
+
+```typescript
+interface MemoryEntry {
+  id: string           // Unique memory identifier
+  content: string      // Filtered memory content (PII redacted)
+  metadata: {
+    category?: string  // Memory category (therapeutic_insight, etc.)
+    tags?: string[]    // Searchable tags
+    sessionId?: string // Originating session
+    role?: string      // "user" or "assistant"
+    crisis_flag?: boolean
+    crisis_severity?: string
+    timestamp?: string // ISO 8601
+  }
+}
+```
+
+## Environment configuration
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `GEMINI_API_KEY` | Yes | — | Google Gemini API for PII filtering and generation |
+| `MEM0_API_KEY` | No | — | Mem0 Platform API (cloud). If absent, uses local Mem0 |
+| `MEMORY_SERVER_PORT` | No | `5003` | MCP Memory Server listen port |
+| `NEXT_PUBLIC_MEMORY_API_URL` | No | `http://localhost:5003` | Frontend client base URL |
+
+---
+
+<Info>
+  **Next:** Learn about the [Deployment Architecture](/architecture/deployment) to understand how the memory system is containerized and scaled in production, or return to the [System Architecture Overview](/architecture/overview) for the full platform context.
+</Info>

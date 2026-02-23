@@ -1,0 +1,533 @@
+---
+title: "Code Conventions"
+description: "Coding standards, file naming, formatting rules, state management patterns, and architectural conventions for the Pixelated Empathy codebase."
+---
+
+Consistent code conventions are critical for a codebase that handles sensitive mental health data. This guide covers every convention enforced across the Pixelated Empathy project — from TypeScript configuration to import ordering to state management patterns.
+
+<Note>
+  These conventions are enforced by automated tooling wherever possible. Running `pnpm check:all` validates most of these rules. When tooling can't catch something, code review fills the gap.
+</Note>
+
+## TypeScript Configuration
+
+The project uses **TypeScript strict mode** with no exceptions:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+}
+```
+
+### Strict Mode Rules
+
+<CardGroup cols={2}>
+  <Card title="✅ Always Do" icon="check">
+    - Explicitly type all function parameters and return types
+    - Use `unknown` instead of `any` for truly unknown types
+    - Handle all possible `null` and `undefined` cases
+    - Use discriminated unions for complex state
+  </Card>
+  <Card title="❌ Never Do" icon="xmark">
+    - Use `any` type (use `unknown` and narrow instead)
+    - Use `// @ts-ignore` or `// @ts-expect-error`
+    - Use non-null assertions (`!`) without justification
+    - Leave unused variables or parameters
+  </Card>
+</CardGroup>
+
+### Type Import Convention
+
+Always use the `type` keyword for type-only imports:
+
+```typescript
+// ✅ Correct — type-only import
+import type { EmotionScore, ConversationContext } from '@/types'
+
+// ❌ Wrong — mixing type and value imports
+import { EmotionScore, analyzeEmotion } from '@/types'
+
+// ✅ Correct — mixed import with explicit type keyword
+import { analyzeEmotion } from '@lib/ai/emotion-analyzer'
+import type { AnalysisResult } from '@lib/ai/emotion-analyzer'
+```
+
+## Component Architecture
+
+### Functional Components with Hooks
+
+All React components must be **functional components** using hooks. No class components.
+
+```tsx
+import { useState, useCallback } from 'react'
+import type { EmotionScore } from '@/types'
+import styles from './EmotionCard.module.css'
+
+interface EmotionCardProps {
+  emotion: EmotionScore
+  onAnalyze?: (id: string) => void
+}
+
+export function EmotionCard({ emotion, onAnalyze }: EmotionCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const handleAnalyze = useCallback(() => {
+    onAnalyze?.(emotion.id)
+  }, [emotion.id, onAnalyze])
+
+  // Validate emotion score is in valid range (0-1)
+  const normalizedIntensity = Math.max(0, Math.min(1, emotion.intensity))
+
+  return (
+    <div className={styles.card}>
+      <h3 className={styles.title}>{emotion.label}</h3>
+      <meter
+        className={styles.meter}
+        value={normalizedIntensity}
+        min={0}
+        max={1}
+      />
+      <button
+        className={styles.analyzeButton}
+        onClick={handleAnalyze}
+        type="button"
+      >
+        Analyze
+      </button>
+    </div>
+  )
+}
+```
+
+### Component Structure Rules
+
+<AccordionGroup>
+  <Accordion title="Props Interface" icon="brackets-curly">
+    Every component with props must define a TypeScript interface:
+
+    - Name: `ComponentNameProps`
+    - Define all props explicitly — no `Record<string, unknown>` or spreading unknown objects
+    - Use optional markers (`?`) for non-required props
+    - Document complex props with JSDoc comments
+
+    ```typescript
+    interface SessionControlsProps {
+      /** Current session identifier */
+      sessionId: string
+      /** Whether the session is currently active */
+      isActive: boolean
+      /** Callback fired when session state changes */
+      onStateChange?: (state: SessionState) => void
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Named Exports" icon="arrow-right-from-bracket">
+    Always use **named exports** for components — never default exports:
+
+    ```typescript
+    // ✅ Correct
+    export function EmotionCard({ emotion }: EmotionCardProps) { ... }
+
+    // ❌ Wrong
+    export default function EmotionCard({ emotion }: EmotionCardProps) { ... }
+    ```
+
+    Named exports improve refactoring safety, enable better tree-shaking, and make imports explicit.
+  </Accordion>
+
+  <Accordion title="Hook Extraction" icon="hook">
+    Extract complex logic into custom hooks when a component exceeds ~50 lines of logic or when logic is reusable:
+
+    ```typescript
+    // hooks/useSessionProgress.ts
+    export function useSessionProgress(sessionId: string) {
+      const [progress, setProgress] = useState(0)
+      const [milestones, setMilestones] = useState<Milestone[]>([])
+
+      // ... complex progress tracking logic
+
+      return { progress, milestones, isComplete: progress >= 1.0 }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## File Naming Conventions
+
+Consistent file naming makes the codebase navigable at a glance:
+
+| File Type | Convention | Example |
+|:---|:---|:---|
+| React components | PascalCase | `EmotionCard.tsx` |
+| Component styles | PascalCase + `.module.css` | `EmotionCard.module.css` |
+| Component tests | PascalCase + `.test.tsx` | `EmotionCard.test.tsx` |
+| Utility functions | camelCase | `formatScore.ts` |
+| Custom hooks | camelCase with `use` prefix | `useConversation.ts` |
+| Type definitions | camelCase | `emotionTypes.ts` |
+| Constants | camelCase | `emotionConstants.ts` |
+| Astro pages | kebab-case | `training-session.astro` |
+| API routes | kebab-case | `bias-analysis.ts` |
+| Config files | kebab-case or dot notation | `vitest.config.ts` |
+
+### Directory Structure
+
+Components live alongside their styles, tests, and related files:
+
+```text
+src/components/training/
+├── SessionCard/
+│   ├── SessionCard.tsx           # Component
+│   ├── SessionCard.module.css    # Styles
+│   ├── SessionCard.test.tsx      # Tests
+│   └── index.ts                  # Re-export
+├── ProgressTracker/
+│   ├── ProgressTracker.tsx
+│   ├── ProgressTracker.module.css
+│   ├── ProgressTracker.test.tsx
+│   └── index.ts
+└── index.ts                      # Barrel export
+```
+
+## Formatting Rules
+
+Formatting is enforced by oxfmt (Oxc formatter) and Prettier (for Astro/MDX files):
+
+<Tabs>
+  <Tab title="Core Rules">
+    | Rule | Setting |
+    |:---|:---|
+    | Indentation | 2 spaces |
+    | Semicolons | None |
+    | Quotes | Single quotes |
+    | Trailing commas | Always (ES5+) |
+    | Line length | 100 characters (soft limit) |
+    | End of line | LF (Unix-style) |
+    | Final newline | Always |
+  </Tab>
+
+  <Tab title="Examples">
+    ```typescript
+    // ✅ Correct formatting
+    const emotions = [
+      'joy',
+      'sadness',
+      'anger',
+      'fear',
+      'surprise',
+    ]
+
+    function analyzeEmotion(text: string): EmotionResult {
+      const score = computeScore(text)
+      return { score, label: classifyEmotion(score) }
+    }
+
+    // ❌ Wrong — semicolons, double quotes, no trailing comma
+    const emotions = [
+      "joy",
+      "sadness",
+      "anger"
+    ];
+    ```
+  </Tab>
+
+  <Tab title="Format Commands">
+    ```bash
+    # Auto-format all files
+    pnpm format
+
+    # Check formatting without modifying files
+    pnpm format:check
+    ```
+  </Tab>
+</Tabs>
+
+## CSS Modules
+
+The project uses **CSS Modules** with vanilla CSS as the primary styling approach. No Tailwind CSS.
+
+### Styling Rules
+
+```css
+/* EmotionCard.module.css */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.meter {
+  width: 100%;
+  height: var(--spacing-sm);
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="✅ Do" icon="check">
+    - One CSS module per component
+    - Use camelCase for class names
+    - Reference design tokens from `src/styles/`
+    - Use CSS custom properties for theming
+    - Scope all styles to the component
+  </Card>
+  <Card title="❌ Don't" icon="xmark">
+    - Use Tailwind CSS utility classes
+    - Write global styles outside `src/styles/`
+    - Use inline styles for anything beyond dynamic values
+    - Use `!important` (fix specificity instead)
+    - Use CSS-in-JS libraries
+  </Card>
+</CardGroup>
+
+### Using CSS Modules in Components
+
+```tsx
+import styles from './EmotionCard.module.css'
+
+export function EmotionCard({ emotion }: EmotionCardProps) {
+  return (
+    <div className={styles.card}>
+      <h3 className={styles.title}>{emotion.label}</h3>
+    </div>
+  )
+}
+```
+
+## Import Organization
+
+Imports must follow a strict four-section ordering, separated by blank lines:
+
+```typescript
+// 1. External dependencies
+import { useState, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
+
+// 2. Internal modules (use path aliases)
+import { EmotionAnalyzer } from '@lib/ai/emotion-analyzer'
+import { useConversation } from '@/hooks/useConversation'
+import { formatScore } from '@utils/formatScore'
+
+// 3. Types (always use `type` imports)
+import type { EmotionScore, ConversationContext } from '@/types'
+import type { SessionConfig } from '@lib/services/training/types'
+
+// 4. Styles
+import styles from './Component.module.css'
+```
+
+### Import Rules
+
+- **External packages** first (React, TanStack Query, Zod, etc.)
+- **Internal modules** second, using path aliases (`@/`, `@lib/`, `@components/`, etc.)
+- **Type imports** third, always with the `type` keyword
+- **Styles** last
+- **Never use relative imports** that traverse more than one parent directory — use path aliases instead
+- **No barrel imports from large modules** — import specific files to enable tree-shaking
+
+## State Management
+
+### Zustand for Application State
+
+Use **Zustand** for global and feature-level state management in React components:
+
+```typescript
+import { create } from 'zustand'
+import type { SessionState } from '@/types'
+
+interface SessionStore {
+  currentSession: SessionState | null
+  isRecording: boolean
+  startSession: (config: SessionConfig) => void
+  endSession: () => void
+}
+
+export const useSessionStore = create<SessionStore>((set) => ({
+  currentSession: null,
+  isRecording: false,
+  startSession: (config) =>
+    set({
+      currentSession: { ...config, startedAt: Date.now() },
+      isRecording: true,
+    }),
+  endSession: () =>
+    set({
+      currentSession: null,
+      isRecording: false,
+    }),
+}))
+```
+
+### Nanostores for Astro Islands
+
+Use **Nanostores** for state that needs to be shared across Astro islands (framework-agnostic):
+
+```typescript
+import { atom, computed } from 'nanostores'
+
+export const $currentTheme = atom<'light' | 'dark'>('light')
+export const $isDarkMode = computed($currentTheme, (theme) => theme === 'dark')
+```
+
+### State Management Rules
+
+<AccordionGroup>
+  <Accordion title="Where State Lives" icon="sitemap">
+    | State Type | Solution | Location |
+    |:---|:---|:---|
+    | Component-local UI state | `useState` / `useReducer` | Inside the component |
+    | Feature-scoped shared state | Zustand store | `src/lib/stores/` |
+    | Cross-framework state (Astro islands) | Nanostores | `src/lib/stores/` |
+    | Server/async state | TanStack Query | Via query hooks |
+    | Form state | React Hook Form | Inside form components |
+    | URL state | Astro routing | Page-level params |
+  </Accordion>
+
+  <Accordion title="Store Design Principles" icon="layer-group">
+    - Keep stores **focused and minimal** — one store per feature area
+    - Use **selectors** for derived state instead of storing computed values
+    - **Never put API calls** inside stores — use TanStack Query for data fetching
+    - Stores should be **serializable** — no functions, class instances, or DOM refs in state
+  </Accordion>
+</AccordionGroup>
+
+## Data Fetching
+
+### TanStack Query
+
+All API calls use **TanStack Query** for caching, deduplication, and optimistic updates:
+
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { Session } from '@/types'
+
+// Query hook
+export function useSession(sessionId: string) {
+  return useQuery({
+    queryKey: ['session', sessionId],
+    queryFn: () => fetchSession(sessionId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+// Mutation hook
+export function useEndSession() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (sessionId: string) => endSession(sessionId),
+    onSuccess: (_, sessionId) => {
+      queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
+    },
+  })
+}
+```
+
+### Data Fetching Rules
+
+- All API calls organized in a services layer (`src/services/` or `src/lib/services/`)
+- Use proper loading and error states — never leave the UI in an ambiguous state
+- Leverage TanStack Query's caching — don't duplicate cache logic in stores
+- Use optimistic updates for user-facing mutations when safe to do so
+
+## Validation
+
+### Zod for Runtime Validation
+
+Use **Zod** for all runtime data validation — API responses, form inputs, environment variables, and configuration:
+
+```typescript
+import { z } from 'zod'
+
+// Emotion score schema — enforces the 0-1 range
+export const EmotionScoreSchema = z.object({
+  label: z.string().min(1),
+  intensity: z.number().min(0).max(1),
+  confidence: z.number().min(0).max(1),
+  timestamp: z.string().datetime(),
+})
+
+// Validate incoming data
+function processEmotionData(raw: unknown): EmotionScore {
+  return EmotionScoreSchema.parse(raw)
+}
+```
+
+<Warning>
+  **Critical**: All emotion and empathy scores must be validated to the 0–1 range. The `EmotionScoreSchema` above is the canonical way to enforce this. Never trust unvalidated score data from any source — API responses, user input, or AI model output.
+</Warning>
+
+### Validation Rules
+
+- **Validate at boundaries** — every API endpoint, every external data source, every user input
+- **Use Zod schemas** as the single source of truth for data shapes
+- **Derive TypeScript types** from Zod schemas with `z.infer<typeof Schema>`
+- **Never trust client-side validation alone** — always validate server-side too
+- **Emotion scores**: Must always be in the 0–1 range (`z.number().min(0).max(1)`)
+
+## Domain-Specific Conventions
+
+### Emotion Score Validation
+
+This is the most critical domain convention. All emotion and empathy scores must be normalized to the 0.0–1.0 range:
+
+```typescript
+// ✅ Always validate emotion scores
+const validateEmotionScore = (score: number): number => {
+  if (score < 0 || score > 1) {
+    throw new Error(`Emotion score must be 0-1, got: ${score}`)
+  }
+  return score
+}
+```
+
+### Crisis Signal Handling
+
+Every component or service that processes user text must check for crisis signals:
+
+```typescript
+// ✅ Always handle crisis signals defensively
+const hasCrisisSignal = (text: string): boolean => {
+  // Delegate to the crisis detection service
+  // See: src/lib/ai/crisis-detection/
+  return CrisisDetector.evaluate(text).hasCrisisIndicators
+}
+```
+
+<Warning>
+  **Never ignore potential crisis signals.** If your code processes text from users or AI clients, it must integrate with the crisis detection service. When in doubt, flag — false positives are infinitely preferable to missed signals.
+</Warning>
+
+### Psychological Safety in UI
+
+- Error messages must be **supportive and non-judgmental**
+- Progress indicators should **encourage, not shame**
+- Feedback language must avoid prescriptive or corrective tones
+- Consider cultural and linguistic variations in all user-facing text
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Contributing Guide" icon="code-pull-request" href="/guides/developers/contributing">
+    Learn the contribution workflow, quality gates, and PR process.
+  </Card>
+  <Card title="Testing Strategy" icon="flask-vial" href="/guides/developers/testing">
+    Understand the testing pyramid, coverage requirements, and test conventions.
+  </Card>
+</CardGroup>

@@ -1,0 +1,406 @@
+---
+title: "HIPAA Compliance"
+description: "Comprehensive HIPAA compliance documentation for Pixelated Empathy's AI-powered mental health training platform."
+---
+
+Pixelated Empathy operates as a **Business Associate** under HIPAA, handling Protected Health Information (PHI) on behalf of covered entities. Our compliance program exceeds standard HIPAA requirements through what we call **HIPAA++** — enterprise-grade protections purpose-built for therapeutic AI.
+
+<Note>
+  **Compliance Status:** Compliant · **Last Audit:** January 2025 · **Next Review:** July 2025
+  
+  Contact our HIPAA Compliance Officer at [hipaa-compliance@pixelatedempathy.com](mailto:hipaa-compliance@pixelatedempathy.com) with any questions.
+</Note>
+
+## Covered Entity Status
+
+| Detail | Value |
+|---|---|
+| **Entity Type** | Business Associate |
+| **Services** | Therapeutic AI platform services |
+| **PHI Handling** | Yes — on behalf of covered entities |
+| **BAAs Required** | Yes — all service providers sign BAAs |
+| **Compliance Officer** | Designated HIPAA Compliance Officer |
+
+---
+
+## Privacy Rule
+
+The HIPAA Privacy Rule establishes national standards for the protection of individually identifiable health information. Pixelated Empathy implements all Privacy Rule requirements across five key areas.
+
+### Patient Rights
+
+<AccordionGroup>
+  <Accordion title="Right to Access PHI" icon="eye">
+    Patients can request access to their Protected Health Information at any time.
+
+    - Requests processed within **30 days** (15-day extension with notice)
+    - Electronic copies provided in the patient's requested format
+    - All access requests logged in the compliance audit trail
+    - No unreasonable barriers to access
+
+    ```typescript
+    // Access request handling
+    interface PHIAccessRequest {
+      patientId: string;
+      requestDate: Date;
+      requestedFormat: 'json' | 'pdf' | 'csv';
+      processedBy: string;
+      completionDeadline: Date; // 30 days from request
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Right to Amendment" icon="pen-to-square">
+    Patients can request amendments to their PHI when they believe information is inaccurate or incomplete.
+
+    - Amendment requests reviewed and processed within **60 days**
+    - Denials documented with a clear written rationale
+    - Formal appeal process available for denied requests
+    - Amendments appended to — never replace — original records
+  </Accordion>
+
+  <Accordion title="Right to Disclosure Accounting" icon="clipboard-list">
+    Patients can request a complete accounting of all disclosures of their PHI.
+
+    - Disclosure tracking maintained for **6 years**
+    - Includes: date, recipient, description, and purpose of each disclosure
+    - **Exceptions:** Treatment, payment, and healthcare operations
+    - Provided within 60 days of request
+  </Accordion>
+
+  <Accordion title="Right to Request Restrictions" icon="shield-halved">
+    Patients can request restrictions on the use or disclosure of their PHI.
+
+    - All restriction requests are formally considered and documented
+    - Accepted restrictions are enforced system-wide
+    - Written notification of acceptance or denial provided
+    - Restrictions tracked and enforced through RBAC policies
+  </Accordion>
+
+  <Accordion title="Right to Confidential Communications" icon="lock">
+    Patients can request alternative communication methods or channels.
+
+    - Requests honored when reasonable and feasible
+    - Alternative delivery methods configured per patient preference
+    - No requirement for the patient to explain the reason
+  </Accordion>
+</AccordionGroup>
+
+### Minimum Necessary Standard
+
+Pixelated Empathy enforces the minimum necessary standard through technical and administrative controls:
+
+<CardGroup cols={2}>
+  <Card title="Role-Based Access Control" icon="users-gear">
+    Six defined roles — **Admin**, **Therapist**, **Patient**, **Researcher**, **Support**, **Guest** — each with precisely scoped permissions. Access is limited to the minimum PHI needed for each role's function.
+  </Card>
+  <Card title="Regular Access Reviews" icon="magnifying-glass-chart">
+    Quarterly reviews of all access patterns. Permission logs analyzed for anomalies. Unused or excessive permissions revoked automatically.
+  </Card>
+  <Card title="Workforce Training" icon="graduation-cap">
+    All personnel complete minimum necessary training within 30 days of hire, with annual refreshers. Role-specific modules cover PHI handling for each function.
+  </Card>
+  <Card title="Documented Policies" icon="file-lines">
+    Minimum necessary policies documented, versioned, and reviewed annually. Access logs reviewed quarterly with violations tracked and remediated.
+  </Card>
+</CardGroup>
+
+### Authorization Requirements
+
+<Tabs>
+  <Tab title="Valid Authorizations">
+    Written authorization is required for all non-standard disclosures. Every valid authorization must include:
+
+    - Specific description of the PHI to be used or disclosed
+    - Person or entity authorized to make the disclosure
+    - Person or entity authorized to receive the information
+    - Clear description of the purpose
+    - Expiration date or event
+    - Patient signature and date
+
+    Authorization withdrawal is supported at any time through the consent management dashboard.
+  </Tab>
+  <Tab title="Exceptions">
+    Authorization is **not required** for:
+
+    - Treatment, payment, and healthcare operations
+    - Disclosures required by law
+    - Public health activities
+    - Reports of abuse, neglect, or domestic violence
+    - Judicial and administrative proceedings
+    - Law enforcement purposes (under specific conditions)
+    - Research with IRB waiver of authorization
+    - Essential government functions
+    - Workers' compensation claims
+  </Tab>
+</Tabs>
+
+### Business Associate Agreements
+
+All vendors and subcontractors that access, process, or store PHI are required to execute a Business Associate Agreement (BAA).
+
+| Vendor | Service | BAA Status | Last Review |
+|---|---|---|---|
+| AWS | Cloud Infrastructure | ✅ Active | Jan 2025 |
+| Azure | Cloud Services | ✅ Active | Jan 2025 |
+| Stripe | Payment Processing | ✅ Active | Jan 2025 |
+| Twilio | Communications | ✅ Active | Dec 2024 |
+| Auth0 | Authentication & RBAC | ✅ Active | Jan 2025 |
+
+<Tip>
+  BAA compliance is monitored continuously. Vendor audits are conducted annually and any vendor that fails to maintain compliance is offboarded within 30 days.
+</Tip>
+
+---
+
+## Security Rule
+
+The HIPAA Security Rule requires appropriate administrative, physical, and technical safeguards to ensure the confidentiality, integrity, and availability of electronic PHI (ePHI).
+
+### Administrative Safeguards
+
+<AccordionGroup>
+  <Accordion title="Security Management Process" icon="shield-check">
+    - Designated HIPAA Security Officer with executive authority
+    - Comprehensive security policies and procedures, reviewed annually
+    - Formal risk analysis conducted annually with remediation tracking
+    - Security incident procedures with defined response playbooks
+  </Accordion>
+
+  <Accordion title="Workforce Security" icon="user-shield">
+    - Background checks required for all personnel with PHI access
+    - Formal access authorization and clearance procedures
+    - Access establishment, modification, and termination workflows
+    - Immediate credential revocation upon termination
+  </Accordion>
+
+  <Accordion title="Training & Awareness" icon="chalkboard-user">
+    - New hire HIPAA training within **30 days** of onboarding
+    - Annual refresher training for all workforce members
+    - Role-specific security training modules
+    - Training completion tracked — **100% completion rate** required
+    - Documented training records retained for 6 years
+  </Accordion>
+
+  <Accordion title="Contingency Planning" icon="cloud-arrow-up">
+    - **Data Backup:** Daily encrypted backups with off-site storage
+    - **Disaster Recovery:** Documented DR plan with 4-hour RTO, 24-hour RPO
+    - **Emergency Mode Operations:** Procedures for continued critical operations
+    - **Testing:** Regular DR testing with documented results
+  </Accordion>
+</AccordionGroup>
+
+### Physical Safeguards
+
+<CardGroup cols={2}>
+  <Card title="Facility Access Controls" icon="building-shield">
+    Cloud infrastructure hosted in SOC 2 Type II certified data centers with biometric access, 24/7 surveillance, and environmental controls.
+  </Card>
+  <Card title="Workstation Security" icon="desktop">
+    Encrypted endpoints, automatic screen lock after inactivity, full disk encryption, and mobile device management (MDM) policies enforced.
+  </Card>
+  <Card title="Device & Media Controls" icon="hard-drive">
+    Certified media destruction procedures. Hardware encryption required. All backup media encrypted with separate key material.
+  </Card>
+  <Card title="Physical Access Logging" icon="id-card-clip">
+    All physical access to infrastructure components logged, monitored, and retained. Visitor access requires escort and sign-in.
+  </Card>
+</CardGroup>
+
+### Technical Safeguards
+
+<Tabs>
+  <Tab title="Access Controls">
+    | Control | Implementation |
+    |---|---|
+    | **Unique User IDs** | Every user assigned a unique, non-reusable identifier |
+    | **Emergency Access** | Break-glass procedures with post-access audit review |
+    | **Automatic Logoff** | Session timeout after 15 minutes of inactivity |
+    | **Encryption** | AES-256 at rest, TLS 1.3 in transit |
+
+    ```typescript
+    // Role-based access control enforcement
+    type UserRole = 'admin' | 'therapist' | 'patient'
+                  | 'researcher' | 'support' | 'guest';
+
+    interface AccessControl {
+      role: UserRole;
+      permissions: string[];
+      phiAccess: boolean;
+      requiresMFA: boolean;
+      sessionTimeout: number; // minutes
+    }
+    ```
+  </Tab>
+  <Tab title="Encryption">
+    All PHI is encrypted using industry-leading standards:
+
+    | Layer | Standard | Details |
+    |---|---|---|
+    | **Data at Rest** | AES-256-GCM | All databases, backups, and file storage |
+    | **Data in Transit** | TLS 1.3 | All network communications, API calls |
+    | **Key Management** | AWS KMS / Azure Key Vault | Hardware Security Modules (HSMs) |
+    | **Key Rotation** | Automated | Keys rotated on a defined schedule |
+    | **Backup Encryption** | AES-256 | Separate encryption keys for backups |
+  </Tab>
+  <Tab title="Audit Controls">
+    Comprehensive audit logging captures every interaction with PHI:
+
+    ```typescript
+    interface AuditLogEntry {
+      userId: string;
+      resourceType: 'patient_record' | 'session' | 'assessment';
+      actionType: 'view' | 'create' | 'update' | 'delete' | 'export';
+      timestamp: Date;
+      ipAddress: string;
+      userAgent: string;
+      reason: string;
+      outcome: 'success' | 'failure';
+      phiAccessed: boolean;
+    }
+    ```
+
+    - **Retention:** All audit logs retained for **6 years** per HIPAA requirements
+    - **Tamper Protection:** Logs are append-only with cryptographic integrity verification
+    - **Monitoring:** SIEM integration for real-time analysis and alerting
+    - **Review:** Quarterly log reviews with anomaly investigation
+  </Tab>
+  <Tab title="Integrity & Transmission">
+    **Data Integrity:**
+    - Cryptographic checksums (SHA-256) for all stored PHI
+    - Version control with full change history
+    - Electronic signature verification
+    - Database-level integrity constraints
+
+    **Transmission Security:**
+    - End-to-end encryption using TLS 1.3 for all communications
+    - VPN required for all administrative access
+    - Network segmentation isolating PHI systems
+    - Certificate pinning for API communications
+  </Tab>
+</Tabs>
+
+---
+
+## Breach Notification Rule
+
+Pixelated Empathy maintains a comprehensive breach response program aligned with the HIPAA Breach Notification Rule (45 CFR §§ 164.400–414).
+
+### Breach Response Timeline
+
+<CardGroup cols={2}>
+  <Card title="Phase 1: Immediate Response" icon="bolt">
+    **0–4 Hours**
+    - Identify and confirm the breach
+    - Activate incident response team
+    - Isolate affected systems
+    - Assess scope and begin documentation
+  </Card>
+  <Card title="Phase 2: Investigation" icon="magnifying-glass">
+    **4–24 Hours**
+    - Detailed forensic analysis
+    - Determine PHI exposure scope
+    - Document all findings
+    - Engage legal counsel
+  </Card>
+  <Card title="Phase 3: Notification" icon="envelope">
+    **1–60 Days**
+    - Individual notification within 60 days of discovery
+    - Media notification if 500+ individuals affected
+    - HHS notification via electronic submission
+    - State attorney general notifications as required
+  </Card>
+  <Card title="Phase 4: Remediation" icon="wrench">
+    **60+ Days**
+    - Post-incident review and root cause analysis
+    - Long-term security improvements implemented
+    - Enhanced monitoring deployed
+    - Policies and procedures updated
+  </Card>
+</CardGroup>
+
+### Breach Assessment
+
+Every potential breach is evaluated using a four-factor risk assessment:
+
+1. **Nature and extent** of PHI involved (types and identifiers)
+2. **Unauthorized person** who accessed or received the PHI
+3. **Whether PHI was actually acquired or viewed** (vs. opportunity only)
+4. **Extent of risk mitigation** applied after discovery
+
+<Warning>
+  Low-probability exceptions (unintentional access, good faith internal disclosure, limited inadvertent disclosure) are documented but do **not** eliminate the breach assessment requirement.
+</Warning>
+
+### Notification Requirements
+
+| Audience | Threshold | Deadline | Method |
+|---|---|---|---|
+| **Affected Individuals** | Any confirmed breach | 60 days | First-class mail or email |
+| **Prominent Media** | 500+ individuals in a state | 60 days | Press release |
+| **HHS Secretary** | Any confirmed breach | 60 days (or annual log for <500) | Electronic submission |
+
+---
+
+## Compliance Verification
+
+### Ongoing Monitoring
+
+<CardGroup cols={3}>
+  <Card title="Quarterly Reviews" icon="calendar-check">
+    Internal compliance assessments every 90 days covering policies, access patterns, and training completion.
+  </Card>
+  <Card title="Annual Audits" icon="clipboard-check">
+    Comprehensive third-party HIPAA audit including SOC 2 Type II assessment and penetration testing.
+  </Card>
+  <Card title="Continuous Monitoring" icon="chart-line">
+    Automated SIEM monitoring, real-time PHI access alerts, and anomaly detection running 24/7.
+  </Card>
+</CardGroup>
+
+### Compliance Metrics
+
+| Metric | Target | Current |
+|---|---|---|
+| Access violation rate | < 0.1% | ✅ Meeting target |
+| Training completion rate | 100% | ✅ 100% |
+| BAA coverage | 100% | ✅ 100% |
+| Encryption coverage | 100% | ✅ 100% |
+| Audit log coverage | 100% | ✅ 100% |
+
+### Documentation Retention
+
+All HIPAA-related documentation is retained per the following schedule:
+
+| Document Type | Retention Period |
+|---|---|
+| Policies & Procedures | Current + 6 years |
+| Training Records | 6 years |
+| Audit Logs | 6 years |
+| Breach Documentation | 6 years |
+| Risk Assessments | Current + 3 years |
+| BAA Agreements | Duration of relationship + 6 years |
+| Consent Records | 6 years after last interaction |
+
+---
+
+## Contact & Reporting
+
+<CardGroup cols={2}>
+  <Card title="HIPAA Compliance Officer" icon="user-tie">
+    **Email:** [hipaa-compliance@pixelatedempathy.com](mailto:hipaa-compliance@pixelatedempathy.com)
+
+    For compliance inquiries, audit requests, and BAA management.
+  </Card>
+  <Card title="Report a Concern" icon="triangle-exclamation">
+    **Violations:** [hipaa-violations@pixelatedempathy.com](mailto:hipaa-violations@pixelatedempathy.com)
+    **Security Incidents:** [security-incidents@pixelatedempathy.com](mailto:security-incidents@pixelatedempathy.com)
+
+    All reports are investigated within 24 hours.
+  </Card>
+</CardGroup>
+
+<Info>
+  **HHS Office for Civil Rights**
+  For external HIPAA complaints: [hhs.gov/hipaa](https://www.hhs.gov/hipaa) · Hotline: 1-800-368-1019
+</Info>

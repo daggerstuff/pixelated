@@ -1,0 +1,331 @@
+---
+title: 'Bias Analysis API'
+description: 'Analyze text for cognitive, cultural, and diagnostic biases with confidence scoring, explanations, and actionable recommendations'
+---
+
+The Bias Analysis API detects and categorizes biases in clinical text — including session notes, treatment plans, intake assessments, and real-time training conversations. Each analysis returns detected bias types, confidence scores, human-readable explanations, and specific recommendations for bias mitigation.
+
+## Analyze text for bias
+
+Analyze a single text input for bias indicators across all supported categories.
+
+### `POST /v1/bias-analysis/analyze`
+
+<Note>
+  **Required scope:** `bias_analysis:read` · **Rate limit:** Standard tier
+</Note>
+
+### Request
+
+```bash
+curl -X POST https://api.pixelatedempathy.com/v1/bias-analysis/analyze \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "The 45-year-old African American male presents as resistant to treatment and non-compliant with medication. He appears unmotivated and unlikely to follow through with recommendations.",
+    "context": "clinical_notes",
+    "demographics": {
+      "client_age": 45,
+      "client_race": "african_american",
+      "client_gender": "male"
+    },
+    "options": {
+      "include_recommendations": true,
+      "sensitivity": "standard",
+      "language": "en"
+    }
+  }'
+```
+
+### Request body parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `text` | string | Yes | The text to analyze. Maximum 10,000 characters. |
+| `context` | string | No | The context in which the text was written. Options: `clinical_notes`, `treatment_plan`, `intake_assessment`, `session_transcript`, `supervision_notes`, `general`. Default: `general`. |
+| `demographics` | object | No | Known demographic information about the client discussed in the text. Improves detection accuracy for demographic-specific biases. |
+| `demographics.client_age` | integer | No | Client's age in years. |
+| `demographics.client_race` | string | No | Client's race or ethnicity. |
+| `demographics.client_gender` | string | No | Client's gender identity. |
+| `demographics.client_ses` | string | No | Socioeconomic status: `low`, `working`, `middle`, `upper_middle`, `high`. |
+| `options` | object | No | Configuration options for the analysis. |
+| `options.include_recommendations` | boolean | No | Include actionable rewriting suggestions. Default: `true`. |
+| `options.sensitivity` | string | No | Detection sensitivity: `low`, `standard`, `high`. Higher sensitivity catches subtler biases but may increase false positives. Default: `standard`. |
+| `options.language` | string | No | Language code (ISO 639-1). Default: `en`. |
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "analysis_id": "ba_9f8e7d6c5b4a",
+    "text": "The 45-year-old African American male presents as resistant to treatment and non-compliant with medication. He appears unmotivated and unlikely to follow through with recommendations.",
+    "overall_bias_score": 0.82,
+    "bias_detected": true,
+    "bias_count": 3,
+    "biases": [
+      {
+        "type": "cultural_bias",
+        "subtype": "racial_stereotyping",
+        "confidence": 0.89,
+        "severity": "high",
+        "text_span": {
+          "start": 0,
+          "end": 178,
+          "highlighted": "resistant to treatment and non-compliant"
+        },
+        "explanation": "The terms 'resistant' and 'non-compliant' when applied to African American clients can reflect racial stereotyping. Research shows these labels are disproportionately applied to Black clients compared to white clients presenting with similar behaviors.",
+        "recommendation": "Consider replacing 'resistant to treatment' with 'has not yet engaged with treatment plan' and 'non-compliant' with 'has not followed medication regimen as prescribed.' Explore systemic barriers to adherence."
+      },
+      {
+        "type": "diagnostic_bias",
+        "subtype": "premature_conclusion",
+        "confidence": 0.76,
+        "severity": "moderate",
+        "text_span": {
+          "start": 100,
+          "end": 178,
+          "highlighted": "appears unmotivated and unlikely to follow through"
+        },
+        "explanation": "Characterizing the client as 'unmotivated' and 'unlikely to follow through' reflects premature diagnostic conclusions without documented evidence. This may lead to a self-fulfilling prophecy in treatment planning.",
+        "recommendation": "Document specific observable behaviors rather than characterological judgments. For example: 'Client has missed 2 of 4 scheduled appointments and reports difficulty remembering medication schedule.'"
+      },
+      {
+        "type": "confirmation_bias",
+        "subtype": "negative_framing",
+        "confidence": 0.71,
+        "severity": "moderate",
+        "text_span": {
+          "start": 0,
+          "end": 178,
+          "highlighted": "resistant...non-compliant...unmotivated...unlikely"
+        },
+        "explanation": "The note exclusively uses deficit-based language without acknowledging any client strengths, protective factors, or contextual barriers. This pattern suggests confirmation bias toward a negative clinical impression.",
+        "recommendation": "Balance deficit observations with strengths-based language. Note what the client IS doing (e.g., 'Client attended today's session') alongside areas of concern."
+      }
+    ],
+    "summary": {
+      "primary_bias": "cultural_bias",
+      "risk_level": "high",
+      "recommendation_count": 3,
+      "alternative_text": "The 45-year-old client has not yet engaged with the current treatment plan and reports difficulty adhering to the medication regimen. He attended today's session. Further exploration of barriers to treatment engagement is recommended, including potential systemic factors."
+    }
+  },
+  "meta": {
+    "request_id": "req_c3d4e5f6",
+    "timestamp": "2025-01-15T10:30:00Z",
+    "model_version": "bias-detect-v3.2",
+    "processing_time_ms": 342
+  }
+}
+```
+
+### Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `analysis_id` | string | Unique identifier for this analysis |
+| `overall_bias_score` | float | Aggregate bias score from 0.0 (no bias detected) to 1.0 (severe bias) |
+| `bias_detected` | boolean | Whether any bias was detected above the confidence threshold |
+| `bias_count` | integer | Number of distinct bias instances identified |
+| `biases` | array | Detailed list of each detected bias |
+| `biases[].type` | string | Bias category: `cultural_bias`, `confirmation_bias`, `diagnostic_bias`, `anchoring_bias`, `gender_bias`, `socioeconomic_bias`, `age_bias` |
+| `biases[].subtype` | string | Specific bias subtype within the category |
+| `biases[].confidence` | float | Model confidence in the detection (0.0–1.0) |
+| `biases[].severity` | string | Impact severity: `low`, `moderate`, `high`, `critical` |
+| `biases[].text_span` | object | Character positions of the relevant text |
+| `biases[].explanation` | string | Human-readable explanation of why this constitutes bias |
+| `biases[].recommendation` | string | Specific suggestion for mitigating the bias |
+| `summary.alternative_text` | string | AI-generated rewrite of the full text with biases mitigated |
+
+## Batch analysis
+
+Analyze multiple texts in a single request. Ideal for processing historical records, bulk clinical notes, or dataset analysis.
+
+### `POST /v1/bias-analysis/batch`
+
+<Note>
+  **Required scope:** `bias_analysis:batch` · **Rate limit:** Batch tier · **Maximum:** 100 items per request
+</Note>
+
+```bash
+curl -X POST https://api.pixelatedempathy.com/v1/bias-analysis/batch \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "id": "note_001",
+        "text": "Patient is a pleasant, cooperative young woman who is doing well in treatment.",
+        "context": "clinical_notes"
+      },
+      {
+        "id": "note_002",
+        "text": "Client is a large, intimidating male who was agitated during session.",
+        "context": "clinical_notes"
+      },
+      {
+        "id": "note_003",
+        "text": "The elderly patient is confused and unable to articulate her concerns clearly.",
+        "context": "intake_assessment"
+      }
+    ],
+    "options": {
+      "include_recommendations": true,
+      "sensitivity": "standard"
+    }
+  }'
+```
+
+### Batch response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "batch_id": "batch_a1b2c3d4",
+    "total_items": 3,
+    "completed": 3,
+    "results": [
+      {
+        "id": "note_001",
+        "analysis_id": "ba_111aaa",
+        "bias_detected": true,
+        "bias_count": 1,
+        "overall_bias_score": 0.45,
+        "biases": [
+          {
+            "type": "gender_bias",
+            "subtype": "gendered_descriptors",
+            "confidence": 0.68,
+            "severity": "low",
+            "explanation": "Describing a female patient as 'pleasant' and 'cooperative' reflects gendered expectations. Research indicates these descriptors are applied significantly more often to female patients."
+          }
+        ]
+      },
+      {
+        "id": "note_002",
+        "analysis_id": "ba_222bbb",
+        "bias_detected": true,
+        "bias_count": 2,
+        "overall_bias_score": 0.78,
+        "biases": [
+          {
+            "type": "cultural_bias",
+            "subtype": "physical_stereotyping",
+            "confidence": 0.84,
+            "severity": "high",
+            "explanation": "Describing a client as 'large, intimidating' introduces subjective characterization that may reflect racial or cultural bias, particularly when applied to male clients of color."
+          },
+          {
+            "type": "diagnostic_bias",
+            "subtype": "behavioral_labeling",
+            "confidence": 0.72,
+            "severity": "moderate",
+            "explanation": "'Agitated' is a clinical judgment that should be supported by specific observable behaviors rather than used as a standalone descriptor."
+          }
+        ]
+      },
+      {
+        "id": "note_003",
+        "analysis_id": "ba_333ccc",
+        "bias_detected": true,
+        "bias_count": 1,
+        "overall_bias_score": 0.55,
+        "biases": [
+          {
+            "type": "age_bias",
+            "subtype": "cognitive_assumption",
+            "confidence": 0.73,
+            "severity": "moderate",
+            "explanation": "Describing an older patient as 'confused and unable to articulate' may reflect age bias. Consider whether communication barriers might be situational rather than cognitive."
+          }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "req_d5e6f7g8",
+    "timestamp": "2025-01-15T10:31:00Z",
+    "processing_time_ms": 1247
+  }
+}
+```
+
+## Streaming analysis
+
+For real-time applications such as live training sessions, use the streaming endpoint to receive bias analysis as text is being generated.
+
+### `POST /v1/bias-analysis/stream`
+
+<Note>
+  **Required scope:** `bias_analysis:stream` · **Rate limit:** Standard tier · **Protocol:** Server-Sent Events (SSE)
+</Note>
+
+```bash
+curl -X POST https://api.pixelatedempathy.com/v1/bias-analysis/stream \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -d '{
+    "text": "The client is a homeless individual who seems unmotivated to change.",
+    "context": "session_transcript",
+    "stream": true
+  }'
+```
+
+### Stream events
+
+The endpoint returns Server-Sent Events with the following event types:
+
+```
+event: analysis_start
+data: {"analysis_id": "ba_stream_001", "timestamp": "2025-01-15T10:32:00Z"}
+
+event: bias_detected
+data: {"type": "socioeconomic_bias", "subtype": "labeling", "confidence": 0.81, "text_span": {"highlighted": "homeless individual"}, "explanation": "Using 'homeless' as an identity label rather than a circumstance reduces the person to their housing status."}
+
+event: bias_detected
+data: {"type": "confirmation_bias", "subtype": "motivation_assumption", "confidence": 0.74, "text_span": {"highlighted": "unmotivated to change"}, "explanation": "Characterizing the client as 'unmotivated' assumes internal deficits without exploring external barriers."}
+
+event: analysis_complete
+data: {"analysis_id": "ba_stream_001", "bias_count": 2, "overall_bias_score": 0.77, "processing_time_ms": 189}
+```
+
+<Tip>
+  Use streaming analysis during live training sessions to provide real-time bias feedback. The median latency for the first `bias_detected` event is under 200ms.
+</Tip>
+
+## Supported bias types
+
+| Bias type | Description | Example trigger |
+|---|---|---|
+| `cultural_bias` | Assumptions based on race, ethnicity, or cultural background | "Resistant to treatment" applied disproportionately |
+| `confirmation_bias` | Seeking information that confirms existing beliefs | Exclusively deficit-focused documentation |
+| `diagnostic_bias` | Premature or unfounded diagnostic conclusions | "Clearly borderline" without documented criteria |
+| `anchoring_bias` | Over-reliance on first impressions | Diagnosis unchanged despite contradicting evidence |
+| `gender_bias` | Differential treatment based on gender | "Hysterical" applied to female clients |
+| `socioeconomic_bias` | Assumptions based on economic status | "Non-compliant" linked to insurance type |
+| `age_bias` | Stereotyping based on age | "Confused elderly patient" without assessment |
+
+## Error responses
+
+| Status | Error code | Description |
+|---|---|---|
+| `400` | `TEXT_TOO_LONG` | Text exceeds the 10,000 character limit |
+| `400` | `INVALID_CONTEXT` | Unrecognized context value |
+| `400` | `BATCH_TOO_LARGE` | Batch request exceeds 100 items |
+| `422` | `EMPTY_TEXT` | The `text` field is present but empty |
+| `429` | `RATE_LIMITED` | Rate limit exceeded for this endpoint |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Session Management API" icon="comments" href="/api-reference/session-management">
+    Create and manage training sessions that use bias analysis.
+  </Card>
+  <Card title="Crisis Detection API" icon="triangle-exclamation" href="/api-reference/crisis-detection">
+    Detect crisis signals alongside bias analysis for comprehensive text evaluation.
+  </Card>
+</CardGroup>

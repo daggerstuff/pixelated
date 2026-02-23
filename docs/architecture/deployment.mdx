@@ -1,0 +1,788 @@
+---
+title: "Deployment Architecture"
+description: "How Pixelated Empathy is deployed — from local development with Docker Compose to production Kubernetes clusters with Helm charts, CI/CD pipelines, monitoring, and multi-region scaling."
+---
+
+## Deployment overview
+
+Pixelated Empathy supports three deployment tiers, each optimized for its use case. The same containerized services run across all tiers — only the orchestration, scaling, and networking layers differ.
+
+<CardGroup cols={3}>
+  <Card title="Development" icon="laptop-code">
+    **Docker Compose**
+
+    Local development with hot reloading, GPU passthrough for AI services, and Caddy for automatic HTTPS. Optimized for developer productivity.
+  </Card>
+  <Card title="Staging" icon="flask-vial">
+    **Docker Compose (Production)**
+
+    Production-like environment with multiple replicas, Nginx reverse proxy, monitoring stack, and resource limits. Used for integration testing and QA.
+  </Card>
+  <Card title="Production" icon="server">
+    **Kubernetes + Helm**
+
+    Auto-scaling, multi-region deployment with Helm charts, Ingress controllers, cert-manager, and full observability. Designed for enterprise workloads.
+  </Card>
+</CardGroup>
+
+## Development environment
+
+The development environment uses Docker Compose to orchestrate five services with a single command.
+
+### Service architecture
+
+```yaml
+# docker/docker-compose.yml — Development Services
+services:
+  app:            # Astro 5 + React frontend (Node.js)
+  caddy:          # Reverse proxy with automatic HTTPS
+  mcp-server:     # Memory server (FastAPI, port 5003)
+  ollama:         # Local LLM inference (GPU-accelerated)
+  ai-service:     # AI pipeline services (GPU-accelerated)
+```
+
+<Tabs>
+  <Tab title="Application Service">
+    The main Astro application runs in a production-like container with SSR enabled:
+
+    ```yaml
+    app:
+      build:
+        context: ..
+        dockerfile: docker/Dockerfile
+      container_name: pixelated-app
+      restart: unless-stopped
+      environment:
+        - NODE_ENV=production
+        - PUBLIC_SITE_URL=https://pixelatedempathy.com
+      networks:
+        - web
+    ```
+
+    For local development **without Docker**, use the Astro dev server directly:
+
+    ```bash
+    pnpm install
+    pnpm dev          # Starts Astro dev server with hot reloading
+    ```
+  </Tab>
+  <Tab title="AI Services (GPU)">
+    Both the AI service and Ollama require GPU access for model inference:
+
+    ```yaml
+    ai-service:
+      build:
+        context: ../ai
+        dockerfile: Dockerfile
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                count: 1
+                capabilities: [gpu]
+      environment:
+        - NVIDIA_VISIBLE_DEVICES=all
+        - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+        - PORT=8000
+      ports:
+        - "8000:8000"
+      volumes:
+        - ../ai/logs:/app/logs
+        - ../ai/data:/app/data
+
+    ollama:
+      image: ollama/ollama:latest
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                count: 1
+                capabilities: [gpu]
+      environment:
+        - OLLAMA_KEEP_ALIVE=24h
+        - OLLAMA_HOST=0.0.0.0
+        - OLLAMA_ORIGINS=*
+      ports:
+        - "11434:11434"
+      volumes:
+        - ollama_data:/root/.ollama
+    ```
+
+    <Tip>
+      Ollama is configured with `OLLAMA_KEEP_ALIVE=24h` to keep models loaded in GPU memory, eliminating cold-start latency during development sessions.
+    </Tip>
+  </Tab>
+  <Tab title="MCP Memory Server">
+    The memory server runs independently with its own environment:
+
+    ```yaml
+    mcp-server:
+      build:
+        context: ..
+        dockerfile: ai/api/mcp_server/Dockerfile
+      container_name: pixelated-mcp
+      restart: unless-stopped
+      ports:
+        - "127.0.0.1:54321:5003"  # Obfuscated external port
+      environment:
+        - GEMINI_API_KEY=${GEMINI_API_KEY}
+        - MEM0_API_KEY=${MEM0_API_KEY}
+        - MEMORY_SERVER_PORT=5003
+    ```
+
+    <Note>
+      The MCP server port is mapped to `127.0.0.1:54321` externally (localhost only) to prevent accidental exposure. Internal services access it via the Docker network on port `5003`.
+    </Note>
+  </Tab>
+  <Tab title="Reverse Proxy">
+    Caddy provides automatic HTTPS with Let's Encrypt certificates:
+
+    ```yaml
+    caddy:
+      image: caddy:2
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+        - caddy_data:/data
+        - caddy_config:/config
+      environment:
+        - OLLAMA_API_KEY=${OLLAMA_API_KEY}
+        - OLLAMA_REMOTE_URL=http://ollama:11434
+    ```
+  </Tab>
+</Tabs>
+
+### Starting the development environment
+
+```bash
+# Full stack with Docker
+cd docker
+docker compose up -d
+
+# Verify services are running
+docker compose ps
+
+# View logs
+docker compose logs -f app
+docker compose logs -f ai-service
+
+# Tear down
+docker compose down
+```
+
+<Warning>
+  GPU-accelerated services (`ai-service` and `ollama`) require the **NVIDIA Container Toolkit** installed on the host. Without it, these services will fail to start. For CPU-only development, comment out the `deploy.resources.reservations` blocks.
+</Warning>
+
+## Production environment (Docker Compose)
+
+The production Docker Compose configuration adds database services, monitoring, multi-replica deployment, and resource constraints.
+
+### Service architecture
+
+```yaml
+# docker/docker-compose.prod.yml — Production Services
+services:
+  postgres:       # PostgreSQL 15 (primary database)
+  redis:          # Redis 7 (cache + sessions)
+  app:            # Application (2 replicas, resource-limited)
+  nginx:          # Nginx reverse proxy with SSL
+  prometheus:     # Metrics collection
+  grafana:        # Monitoring dashboards
+```
+
+<Tabs>
+  <Tab title="Database Layer">
+    Production databases run with health checks, resource limits, and persistent storage:
+
+    ```yaml
+    postgres:
+      image: postgres:15-alpine
+      environment:
+        POSTGRES_DB: ${POSTGRES_DB:-pixelated_business}
+        POSTGRES_USER: ${POSTGRES_USER:-postgres}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+        - ./db/migrations:/docker-entrypoint-initdb.d
+      healthcheck:
+        test: ['CMD-SHELL', 'pg_isready -U postgres']
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      deploy:
+        resources:
+          limits:   { memory: 2G, cpus: '1' }
+          reservations: { memory: 1G, cpus: '0.5' }
+
+    redis:
+      image: redis:7-alpine
+      command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+      volumes:
+        - redis_data:/data
+      healthcheck:
+        test: ['CMD', 'redis-cli', 'ping']
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      deploy:
+        resources:
+          limits:   { memory: 1G, cpus: '0.5' }
+    ```
+  </Tab>
+  <Tab title="Application (Multi-Replica)">
+    The application runs with **2 replicas** behind a load balancer with automatic restart on failure:
+
+    ```yaml
+    app:
+      build:
+        context: .
+        dockerfile: Dockerfile.prod
+      environment:
+        NODE_ENV: production
+        PORT: 3000
+        WS_PORT: 3001
+        DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+        REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      ports:
+        - '3000:3000'
+        - '3001:3001'      # WebSocket port
+      depends_on:
+        postgres: { condition: service_healthy }
+        redis: { condition: service_healthy }
+      healthcheck:
+        test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+        interval: 30s
+        timeout: 10s
+        retries: 3
+      deploy:
+        replicas: 2
+        resources:
+          limits:   { memory: 2G, cpus: '2' }
+          reservations: { memory: 1G, cpus: '1' }
+        restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+    ```
+  </Tab>
+  <Tab title="Monitoring Stack">
+    Prometheus scrapes metrics from all services, and Grafana provides dashboards:
+
+    ```yaml
+    prometheus:
+      image: prom/prometheus:latest
+      ports:
+        - '9090:9090'
+      volumes:
+        - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        - prometheus_data:/prometheus
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--web.enable-lifecycle'
+      deploy:
+        resources:
+          limits: { memory: 1G, cpus: '0.5' }
+
+    grafana:
+      image: grafana/grafana:latest
+      ports:
+        - '3002:3000'
+      environment:
+        GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+        GF_USERS_ALLOW_SIGN_UP: false
+      volumes:
+        - grafana_data:/var/lib/grafana
+        - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+        - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      depends_on:
+        - prometheus
+    ```
+  </Tab>
+</Tabs>
+
+## Kubernetes deployment (Helm)
+
+For enterprise and high-availability deployments, Pixelated Empathy ships with Helm charts that deploy to any Kubernetes cluster.
+
+### Helm chart structure
+
+```
+ai/infrastructure/helm/pixelated-empathy/
+├── Chart.yaml              # Chart metadata and dependencies
+├── Chart.lock              # Locked dependency versions
+├── values.yaml             # Default configuration values
+├── values-dev.yaml         # Development overrides
+├── values-staging.yaml     # Staging overrides
+├── charts/                 # Vendored sub-charts
+└── templates/              # Kubernetes manifest templates
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    ├── hpa.yaml            # Horizontal Pod Autoscaler
+    ├── configmap.yaml
+    ├── secrets.yaml
+    └── ...
+```
+
+### Chart dependencies
+
+The Helm chart bundles all infrastructure dependencies as sub-charts:
+
+| Dependency | Version | Repository | Condition |
+|---|---|---|---|
+| PostgreSQL | 12.1.9 | Bitnami | `postgresql.enabled` |
+| Redis | 17.3.7 | Bitnami | `redis.enabled` |
+| Prometheus | 15.18.0 | prometheus-community | `monitoring.prometheus.enabled` |
+| Grafana | 6.50.7 | grafana | `monitoring.grafana.enabled` |
+
+### Key configuration values
+
+<Tabs>
+  <Tab title="Scaling">
+    ```yaml
+    # Replica and autoscaling configuration
+    replicaCount: 3                  # Minimum replicas
+
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 70
+      targetMemoryUtilizationPercentage: 80
+    ```
+
+    The Horizontal Pod Autoscaler (HPA) scales between 3 and 10 replicas based on CPU and memory utilization, ensuring the platform handles traffic spikes during peak training hours.
+  </Tab>
+  <Tab title="Resources">
+    ```yaml
+    # Per-pod resource allocation
+    resources:
+      limits:
+        cpu: 2000m        # 2 CPU cores maximum
+        memory: 4Gi       # 4 GB RAM maximum
+      requests:
+        cpu: 1000m        # 1 CPU core guaranteed
+        memory: 2Gi       # 2 GB RAM guaranteed
+    ```
+  </Tab>
+  <Tab title="Security">
+    ```yaml
+    # Pod security context
+    podSecurityContext:
+      fsGroup: 2000
+
+    securityContext:
+      capabilities:
+        drop:
+          - ALL            # Drop all Linux capabilities
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+    ```
+
+    <Warning>
+      The production Helm chart enforces **non-root execution**, read-only filesystem, and drops all Linux capabilities. These constraints are non-negotiable for HIPAA compliance.
+    </Warning>
+  </Tab>
+  <Tab title="Ingress & TLS">
+    ```yaml
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      hosts:
+        - host: api.pixelated-empathy.ai
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: pixelated-empathy-tls
+          hosts:
+            - api.pixelated-empathy.ai
+    ```
+
+    TLS certificates are automatically provisioned and renewed by **cert-manager** using Let's Encrypt.
+  </Tab>
+  <Tab title="High Availability">
+    ```yaml
+    # Pod anti-affinity ensures replicas spread across nodes
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - pixelated-empathy
+            topologyKey: kubernetes.io/hostname
+
+    # Health checks with configurable thresholds
+    healthCheck:
+      enabled: true
+      path: "/health"
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    ```
+  </Tab>
+</Tabs>
+
+### Deploying with Helm
+
+```bash
+# Add dependency repositories
+helm dependency update ai/infrastructure/helm/pixelated-empathy/
+
+# Deploy to development
+helm install pixelated-empathy \
+  ai/infrastructure/helm/pixelated-empathy/ \
+  -f ai/infrastructure/helm/pixelated-empathy/values-dev.yaml \
+  -n pixelated-dev --create-namespace
+
+# Deploy to staging
+helm upgrade --install pixelated-empathy \
+  ai/infrastructure/helm/pixelated-empathy/ \
+  -f ai/infrastructure/helm/pixelated-empathy/values-staging.yaml \
+  -n pixelated-staging --create-namespace
+
+# Deploy to production
+helm upgrade --install pixelated-empathy \
+  ai/infrastructure/helm/pixelated-empathy/ \
+  -f ai/infrastructure/helm/pixelated-empathy/values.yaml \
+  -n pixelated-prod --create-namespace \
+  --set app.secrets.databaseUrl=$DATABASE_URL \
+  --set app.secrets.redisUrl=$REDIS_URL \
+  --set app.secrets.jwtSecret=$JWT_SECRET
+```
+
+### Backup configuration
+
+```yaml
+# Automated daily backups to S3
+backup:
+  enabled: true
+  schedule: "0 2 * * *"        # 2:00 AM UTC daily
+  retention: "30d"              # 30-day retention
+  storage:
+    type: "s3"
+    bucket: "pixelated-empathy-backups"
+    region: "us-west-2"
+```
+
+## Cloudflare Workers (Edge)
+
+Static assets and edge logic are deployed to Cloudflare Workers for global low-latency delivery.
+
+<CardGroup cols={2}>
+  <Card title="Edge Caching" icon="bolt">
+    Static assets (JS bundles, CSS, images, fonts) are served from Cloudflare's edge network — 300+ locations worldwide. Cache-Control headers ensure optimal TTLs for versioned assets.
+  </Card>
+  <Card title="Edge Routing" icon="route">
+    Cloudflare Workers handle request routing, geo-based redirects, and security headers at the edge before requests reach the origin servers. This reduces origin load and improves TTFB globally.
+  </Card>
+</CardGroup>
+
+## CI/CD pipeline
+
+The CI/CD pipeline runs on **GitLab CI/CD** with eight stages that enforce code quality, security, and deployment safety.
+
+```
+┌───────────┐   ┌────────┐   ┌────────────┐   ┌───────────┐   ┌──────────┐
+│ Validate  │──▶│  Test  │──▶│ Terraform  │──▶│   Build   │──▶│ Security │
+│           │   │        │   │            │   │           │   │          │
+│ • deps    │   │ • unit │   │ • validate │   │ • docker  │   │ • trivy  │
+│ • lint    │   │ • integ│   │ • plan     │   │ • push    │   │ • scan   │
+│ • types   │   │ • e2b  │   │            │   │ • acr     │   │          │
+└───────────┘   └────────┘   └────────────┘   └───────────┘   └──────────┘
+                                                                    │
+                                                                    ▼
+                                              ┌──────────┐   ┌─────────────┐
+                                              │  Health   │◀──│   Deploy    │
+                                              │  Check    │   │             │
+                                              │           │   │ • staging   │
+                                              │ • pods    │   │ • prod      │
+                                              │ • curl    │   │ • k8s       │
+                                              └──────────┘   └─────────────┘
+```
+
+### Pipeline stages
+
+<AccordionGroup>
+  <Accordion title="Stage 1: Validate" icon="check-double">
+    Three parallel validation jobs run on every merge request and main branch push:
+
+    | Job | Purpose | Failure Behavior |
+    |---|---|---|
+    | `validate:dependencies` | `pnpm install --frozen-lockfile` + `pnpm audit` | **Blocking** — pipeline stops |
+    | `validate:lint` | Biome linting (`pnpm lint:ci`) | Non-blocking (allow failure) |
+    | `validate:typecheck` | Astro check + TypeScript (`tsc --noEmit`) with 8GB heap | Non-blocking (allow failure) |
+  </Accordion>
+  <Accordion title="Stage 2: Test" icon="vial">
+    | Job | Purpose | Artifacts |
+    |---|---|---|
+    | `test:unit` | Vitest unit tests with coverage | JUnit XML, Cobertura coverage |
+    | `test:integration` | Integration tests | JUnit XML |
+    | `test:e2b-sandbox` | Isolated sandbox testing via E2B (lint + types + tests + pytest) | — |
+  </Accordion>
+  <Accordion title="Stage 3: Terraform" icon="cloud">
+    Infrastructure-as-code validation (runs only when `terraform/` files change):
+
+    | Job | Purpose |
+    |---|---|
+    | `terraform:validate` | `terraform fmt -check` + `terraform validate` |
+    | `terraform:plan` | Generate execution plan with environment-specific tfvars |
+  </Accordion>
+  <Accordion title="Stage 4: Build" icon="hammer">
+    Docker images are built and pushed to registries:
+
+    | Job | Target Registry | Trigger |
+    |---|---|---|
+    | `build` | GitLab Container Registry | Every MR + main |
+    | `build:acr` | Azure Container Registry | Main branch only |
+
+    Both jobs use layer caching (`--cache-from`) to minimize build time:
+
+    ```bash
+    docker build --cache-from ${IMAGE_NAME}:latest \
+      -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} \
+      -t ${IMAGE_NAME}:latest .
+    ```
+  </Accordion>
+  <Accordion title="Stage 5: Security" icon="shield">
+    Container images are scanned with **Trivy** for vulnerabilities:
+
+    ```bash
+    # CRITICAL vulnerabilities fail the pipeline
+    trivy image --severity CRITICAL --exit-code 1 ${IMAGE_NAME}:${SHA}
+
+    # HIGH vulnerabilities are reported as warnings
+    trivy image --severity HIGH --exit-code 0 ${IMAGE_NAME}:${SHA}
+    ```
+  </Accordion>
+  <Accordion title="Stage 6–8: Deploy, Health Check, Cleanup" icon="rocket">
+    Deployment to GKE clusters with rolling updates:
+
+    1. **Deploy**: `kubectl set image deployment/pixelated app=${IMAGE}:${SHA}`
+    2. **Health Check**: `kubectl rollout status` + HTTP health endpoint verification with 3 retries
+    3. **Cleanup**: Resource cleanup for failed deployments
+
+    <Note>
+      GKE deployment is currently **paused** pending billing configuration. The pipeline stages are defined but disabled — re-enable by uncommenting the `deploy:staging` and `health-check` jobs in `.gitlab-ci.yml`.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+## Monitoring and observability
+
+The monitoring stack provides full observability across all deployment tiers.
+
+<CardGroup cols={2}>
+  <Card title="Prometheus" icon="chart-simple">
+    **Metrics Collection**
+
+    Scrapes metrics from all services at configurable intervals. Stores time-series data with configurable retention. Powers alerting rules and Grafana dashboards.
+
+    - Service health metrics (up/down, latency, error rates)
+    - Application metrics (session count, response times, memory usage)
+    - Infrastructure metrics (CPU, memory, disk, network)
+  </Card>
+  <Card title="Grafana" icon="chart-pie">
+    **Visualization & Dashboards**
+
+    Pre-configured dashboards for:
+    - System overview (service health, resource utilization)
+    - Training analytics (active sessions, empathy scores, crisis events)
+    - AI performance (inference latency, model accuracy, memory operations)
+    - Infrastructure (Kubernetes pod status, node health, storage)
+  </Card>
+  <Card title="Sentry" icon="bug">
+    **Error Tracking**
+
+    Captures unhandled exceptions and errors with full stack traces, breadcrumbs, and context. Integrated into both frontend (React) and backend (Node.js, Python) services.
+
+    - Automatic release tracking tied to Git commits
+    - Performance monitoring (transaction tracing)
+    - User context for debugging session-specific issues
+  </Card>
+  <Card title="Structured Logging" icon="file-lines">
+    **Log Aggregation**
+
+    All services emit structured JSON logs with correlation IDs:
+    - Morgan (HTTP request logging) in combined format
+    - Custom request logger with audit trail
+    - Python `logging` module with structured formatters
+    - Build-safe logger for SSR-compatible logging
+  </Card>
+</CardGroup>
+
+### Health checks
+
+Every service exposes a `/health` endpoint that returns service status and dependency connectivity:
+
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "timestamp": "2025-01-24T14:30:00Z",
+  "services": {
+    "mongodb": "connected",
+    "postgresql": "connected",
+    "redis": "connected",
+    "mem0": "connected",
+    "gemini": "available"
+  },
+  "uptime_seconds": 86400
+}
+```
+
+## Environment configuration
+
+<Tabs>
+  <Tab title="Development (.env.local)">
+    ```bash
+    # Core
+    NODE_ENV=development
+    PORT=3000
+    PUBLIC_SITE_URL=http://localhost:3000
+
+    # Database
+    DATABASE_URL=postgresql://postgres:devpassword@localhost:5432/pixelated_dev
+    REDIS_URL=redis://localhost:6379
+
+    # AI Services
+    GEMINI_API_KEY=your-gemini-api-key
+    MEM0_API_KEY=your-mem0-api-key
+    OLLAMA_HOST=http://localhost:11434
+
+    # Memory
+    MEMORY_SERVER_PORT=5003
+    NEXT_PUBLIC_MEMORY_API_URL=http://localhost:5003
+    ```
+  </Tab>
+  <Tab title="Staging (.env.staging)">
+    ```bash
+    # Core
+    NODE_ENV=production
+    PORT=3000
+    PUBLIC_SITE_URL=https://staging.pixelatedempathy.com
+
+    # Database (managed instances)
+    DATABASE_URL=postgresql://user:pass@staging-db:5432/pixelated_staging
+    REDIS_URL=redis://:pass@staging-redis:6379
+
+    # AI Services
+    GEMINI_API_KEY=${GEMINI_API_KEY}     # From CI/CD secrets
+    MEM0_API_KEY=${MEM0_API_KEY}         # From CI/CD secrets
+
+    # Email
+    EMAIL_PROVIDER=sendgrid
+    SENDGRID_API_KEY=${SENDGRID_API_KEY}
+    FROM_EMAIL=noreply@staging.pixelatedempathy.com
+    ```
+  </Tab>
+  <Tab title="Production (.env.production)">
+    ```bash
+    # Core
+    NODE_ENV=production
+    PORT=3000
+    WS_PORT=3001
+    PUBLIC_SITE_URL=https://pixelatedempathy.com
+
+    # Database (managed, encrypted)
+    DATABASE_URL=${DATABASE_URL}          # From Kubernetes secrets
+    REDIS_URL=${REDIS_URL}                # From Kubernetes secrets
+
+    # Authentication
+    JWT_SECRET=${JWT_SECRET}              # From Kubernetes secrets
+    JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+
+    # AI Services
+    GEMINI_API_KEY=${GEMINI_API_KEY}
+    MEM0_API_KEY=${MEM0_API_KEY}
+
+    # Storage
+    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    AWS_REGION=us-east-1
+    AWS_S3_BUCKET=pixelated-business-docs
+    AWS_CLOUDFRONT_DOMAIN=${AWS_CLOUDFRONT_DOMAIN}
+
+    # Monitoring
+    SENTRY_DSN=${SENTRY_DSN}
+    GRAFANA_PASSWORD=${GRAFANA_PASSWORD}
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  **Never commit secrets to the repository.** All sensitive values are injected via CI/CD pipeline variables (GitLab CI/CD → Settings → CI/CD → Variables) or Kubernetes Secrets. The `.env.example` file documents required variables without values.
+</Warning>
+
+## Infrastructure as code (Terraform)
+
+Infrastructure provisioning is managed with Terraform, supporting multi-cloud deployment:
+
+```
+terraform/
+├── main.tf                    # Provider configuration, resource definitions
+├── variables.tf               # Input variable declarations
+├── outputs.tf                 # Output values
+├── backend.config             # State backend configuration
+├── backend.config.example     # Template for backend config
+└── environments/
+    ├── dev.tfvars             # Development variable values
+    ├── staging.tfvars         # Staging variable values
+    └── production.tfvars      # Production variable values
+```
+
+<Info>
+  Terraform state is stored remotely using GitLab's managed Terraform state backend (`TF_HTTP_PASSWORD`). The `terraform:plan` CI job generates execution plans on merge requests, enabling infrastructure review before apply.
+</Info>
+
+## Deployment checklist
+
+<AccordionGroup>
+  <Accordion title="Pre-deployment" icon="clipboard-check">
+    - [ ] All CI/CD pipeline stages pass (validate, test, build, security)
+    - [ ] Trivy security scan reports no CRITICAL vulnerabilities
+    - [ ] Database migrations are backward-compatible
+    - [ ] Environment variables are configured in target environment
+    - [ ] Helm values are reviewed for the target environment
+    - [ ] Backup verification completed (last 24h backup is restorable)
+  </Accordion>
+  <Accordion title="Deployment" icon="rocket">
+    - [ ] Deploy to staging first and verify health checks
+    - [ ] Run integration test suite against staging
+    - [ ] Verify memory system connectivity (MCP Server → Mem0 → Gemini)
+    - [ ] Verify WebSocket connectivity for training sessions
+    - [ ] Check Grafana dashboards for anomalies
+    - [ ] Deploy to production with rolling update strategy
+  </Accordion>
+  <Accordion title="Post-deployment" icon="magnifying-glass">
+    - [ ] Verify `/health` endpoint returns healthy status
+    - [ ] Confirm all Kubernetes pods are in Running state
+    - [ ] Check Sentry for new error patterns
+    - [ ] Verify Prometheus metrics are flowing
+    - [ ] Run smoke test (create session, send message, verify response)
+    - [ ] Monitor error rates for 30 minutes post-deploy
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Info>
+  **Back to:** Return to the [System Architecture Overview](/architecture/overview) for the full platform context, or explore [Data Flow & Integration Points](/architecture/data-flow) to understand how data moves through the deployed services.
+</Info>

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Data Source Approval Matrix",
+  "type": "object",
+  "properties": {
+    "source_name": {"type": "string", "minLength": 1},
+    "url": {"type": "string"},
+    "license": {"type": "string", "enum": ["permissive", "contracted", "proprietary", "unclear"]},
+    "allowed_uses": {"type": "array", "items": {"type": "string"}},
+    "prohibited_uses": {"type": "array", "items": {"type": "string"}},
+    "pii_present": {"type": "boolean"},
+    "deidentification_required": {"type": "boolean"},
+    "provenance_required": {"type": "boolean"},
+    "risk_level": {"type": "string", "enum": ["low", "medium", "high"]},
+    "acceptance_criteria": {"type": "string"},
+    "approval_status": {"type": "string", "enum": ["pending", "approved", "rejected"]},
+    "reviewer": {"type": "string"},
+    "review_date": {"type": "string"},
+    "notes": {"type": "string"}
+  },
+  "required": ["source_name", "url", "license", "allowed_uses", "prohibited_uses", "pii_present", "deidentification_required", "provenance_required", "risk_level", "acceptance_criteria", "approval_status" ]
+}

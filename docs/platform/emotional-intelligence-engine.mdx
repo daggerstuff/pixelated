@@ -1,0 +1,272 @@
+---
+title: 'The Emotional Intelligence Engine'
+description: 'Teaching machines to listen like humans do.'
+---
+
+## What Is It?
+
+The Emotional Intelligence Engine is the AI system that powers every
+conversation in The Empathy Gym™. It's the brain behind the simulated
+clients — the thing that makes them feel real.
+
+But "AI that understands emotions" is a phrase that gets thrown around
+a lot. Let's talk about what we actually mean.
+
+## How We Model Emotions
+
+We don't treat emotions as simple labels. "Happy" and "sad" are useful
+in everyday conversation, but they're insufficient for therapeutic
+training. Real emotions are specific, layered, and constantly shifting.
+
+### Plutchik's Wheel of Emotions
+
+Our primary emotional framework is based on Robert Plutchik's
+psychoevolutionary theory. Instead of a flat list of emotions, Plutchik
+organizes them into a wheel with:
+
+- **8 primary emotions**: Joy, Trust, Fear, Surprise, Sadness,
+  Disgust, Anger, Anticipation
+- **Intensity gradients**: Each emotion has three levels.
+  Annoyance → Anger → Rage. Apprehension → Fear → Terror.
+  Serenity → Joy → Ecstasy.
+- **Composite emotions**: When primary emotions combine, they
+  create more complex feelings. Joy + Trust = Love.
+  Surprise + Sadness = Disapproval. Fear + Surprise = Awe.
+
+This gives us a nuanced emotional vocabulary that mirrors the
+complexity therapists encounter in real sessions.
+
+<Info>
+  Learn more about our emotional taxonomy in [Plutchik's Wheel
+  Explained](/knowledge/plutchiks-wheel-explained).
+</Info>
+
+### Big Five Personality Traits (OCEAN)
+
+Emotions don't happen in a vacuum — they're filtered through
+personality. Two people can experience the same situation and feel
+completely different things.
+
+We use the Big Five model to give each simulated client a stable
+personality profile:
+
+| Trait                 | What It Influences                          |
+| :-------------------- | :------------------------------------------ |
+| **Openness**          | Willingness to explore emotions, new views  |
+| **Conscientiousness** | How structured and deliberate responses are |
+| **Extraversion**      | How much they share vs. need drawing out    |
+| **Agreeableness**     | How cooperative or resistant they are       |
+| **Neuroticism**       | Emotional volatility, tendency to distress  |
+
+A client with high Neuroticism and low Agreeableness will behave very
+differently from one with high Openness and high Extraversion — even
+in the same scenario.
+
+## How We Score Emotions
+
+Every emotional attribute is represented as a normalized score between
+**0.0** and **1.0**. This isn't arbitrary — it's a deliberate design
+decision.
+
+- **0.0** = No presence of this emotion/trait
+- **0.5** = Moderate presence
+- **1.0** = Maximum intensity
+
+<Warning>
+  We validate these scores rigorously. If something falls outside the 0–1 range,
+  the system treats it as an error — not a rounding issue. Emotional data
+  integrity matters.
+</Warning>
+
+### Emotional State vs. Emotional Baseline
+
+We distinguish between two kinds of scores:
+
+<Tabs>
+  <Tab title="Baseline Scores">
+    Baseline scores represent the client's default emotional profile. These are
+    relatively stable across a session. A client with a baseline sadness of 0.7
+    carries that weight into every exchange.
+  </Tab>
+  <Tab title="State Scores">
+    State scores represent the client's _current_ emotional state, which shifts
+    moment-to-moment based on the conversation. A well-placed validation might
+    drop their anxiety from 0.8 to 0.5. A clumsy interpretation might spike it
+    to 0.9.
+  </Tab>
+</Tabs>
+
+The interaction between baseline and state is where the realism lives.
+
+## How We Generate Responses
+
+When you say something to a simulated client, here's what happens
+behind the scenes:
+
+<Steps>
+  <Step title="Your Message Is Analyzed">
+    We look at:
+
+    - **Content** — What you said
+    - **Tone** — How you said it (clinical, warm, directive,
+      tentative)
+    - **Timing** — How quickly you responded (rushing?
+      deliberating?)
+    - **Therapeutic technique** — Are you reflecting? Redirecting?
+      Interpreting? Validating? Questioning?
+
+  </Step>
+
+  <Step title="The Client's State Updates">
+    Your message affects the client's emotional state. The engine
+    calculates:
+
+    - Which emotions are activated or deactivated by your response
+    - How the client's trust level changes
+    - Whether defenses go up or down
+    - Whether crisis signals are present
+
+  </Step>
+
+  <Step title="A Response Is Generated">
+    Based on the updated emotional state, personality profile, and
+    conversational context, the engine generates a response that is:
+
+    - **Emotionally consistent** with the client's profile
+    - **Dynamically appropriate** to the conversation flow
+    - **Unpredictable enough** to feel real (not scripted)
+
+  </Step>
+
+  <Step title="Your Response Is Evaluated">
+    Simultaneously, we assess the quality of your intervention:
+
+    - Did you validate before advising?
+    - Was your emotional language precise or vague?
+    - Did you leave space for the client to process?
+    - Did you pick up on subtextual cues?
+
+    This evaluation feeds into the feedback system you see after
+    each session.
+
+  </Step>
+</Steps>
+
+## Conversational Dynamics
+
+Good therapy isn't just about individual responses — it's about the
+flow of the conversation as a whole. We track several meta-level
+patterns:
+
+<AccordionGroup>
+  <Accordion title="Reciprocity" icon="arrows-rotate">
+    Is the conversation balanced? Is the therapist doing all the
+    talking? Is the client? Healthy therapeutic dialogue has a
+    rhythm to it.
+  </Accordion>
+
+<Accordion title="Escalation and De-escalation" icon="chart-line">
+  We track whether emotional intensity is rising, falling, or stable — and
+  whether the therapist's responses are helping or hurting that trajectory.
+</Accordion>
+
+  <Accordion title="The Power of Silence" icon="volume-xmark">
+    We actively model silence as a therapeutic tool. If a client
+    goes quiet after a particularly deep question, that's not
+    empty space — it's processing time. Our engine recognizes when
+    silence is productive and when it indicates withdrawal.
+
+    Learn more:
+    [/knowledge/the-power-of-silence](/knowledge/the-power-of-silence)
+
+  </Accordion>
+
+  <Accordion title="Turn-Taking Patterns" icon="right-left">
+    Who's driving the conversation? In early sessions, the
+    therapist often needs to lead. In later sessions, the client
+    should be taking more initiative. We track this shift and
+    evaluate whether the therapist is creating space for
+    client agency.
+  </Accordion>
+</AccordionGroup>
+
+## What Makes This Different
+
+There are other AI systems that claim to understand emotions. Here's
+what we do differently:
+
+<CardGroup cols={2}>
+  <Card title="Multi-Dimensional Modeling" icon="cubes">
+    We don't just classify emotions into buckets. We track
+    intensity, personality context, conversation history, and
+    dynamic shifts. The result is a more realistic simulation.
+  </Card>
+  <Card title="Therapeutic Evaluation" icon="stethoscope">
+    Most AI systems optimize for user satisfaction. We optimize
+    for therapeutic effectiveness — which sometimes means making
+    the user uncomfortable (because that's what real clients do).
+  </Card>
+  <Card title="Safety-First Architecture" icon="shield-halved">
+    Crisis detection isn't a feature we bolted on. It's integrated
+    into the core of every response cycle. The engine is always
+    watching for signals that need immediate attention.
+  </Card>
+  <Card title="Bias Awareness" icon="scale-balanced">
+    We actively monitor for and mitigate cultural and demographic
+    biases in our emotional models.
+
+    [Bias Detection →](/research/bias-detection)
+
+  </Card>
+</CardGroup>
+
+## The Science Behind It
+
+Our engine is built on established psychological research — not
+vibes. The key frameworks we draw from:
+
+<AccordionGroup>
+  <Accordion title="Plutchik's Psychoevolutionary Theory (1980)">
+    Emotional taxonomy and intensity modeling.
+  </Accordion>
+  <Accordion title="Big Five Personality Model (Costa & McCrae, 1992)">
+    Personality profiling.
+  </Accordion>
+  <Accordion title="Motivational Interviewing (Miller & Rollnick)">
+    Therapeutic technique evaluation.
+  </Accordion>
+  <Accordion title="Carl Rogers' Person-Centered Approach">
+    Validation and unconditional positive regard.
+  </Accordion>
+  <Accordion title="Dialectical Behavior Theory">
+    Distress tolerance and emotional regulation.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>We're not reinventing psychology. We're translating it into software.</Tip>
+
+## Related Reading
+
+<CardGroup cols={3}>
+  <Card
+    title="Plutchik's Wheel"
+    icon="circle-half-stroke"
+    href="/knowledge/plutchiks-wheel-explained"
+  >
+    The emotional framework in detail.
+  </Card>
+  <Card
+    title="Emotional Cartography"
+    icon="map"
+    href="/knowledge/emotional-cartography"
+  >
+    Mapping the landscape of feeling.
+  </Card>
+  <Card
+    title="Our Research Approach"
+    icon="flask"
+    href="/research/our-approach"
+  >
+    The science behind the engine.
+  </Card>
+</CardGroup>

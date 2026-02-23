@@ -1,0 +1,529 @@
+---
+title: 'Analytics API'
+description: 'Access dashboard data, performance metrics, competency scores, bias reduction trends, and export capabilities for research and compliance'
+---
+
+The Analytics API provides programmatic access to all performance and training data generated on Pixelated Empathy. Use these endpoints to build custom dashboards, power reporting workflows, track competency development over time, and export data for research and compliance purposes.
+
+## Dashboard data
+
+Retrieve a summary of key metrics for the authenticated user's dashboard.
+
+### `GET /v1/analytics/dashboard`
+
+<Note>
+  **Required scope:** `analytics:read` · **Rate limit:** Analytics tier
+</Note>
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/dashboard?period=30d" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `period` | string | `30d` | Time period: `7d`, `30d`, `90d`, `6m`, `1y`, `all` |
+| `user_id` | string | — | Target user (supervisors and admins only) |
+| `group_id` | string | — | Target training group |
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "30d",
+    "date_range": {
+      "start": "2024-12-16T00:00:00Z",
+      "end": "2025-01-15T23:59:59Z"
+    },
+    "summary": {
+      "total_sessions": 24,
+      "total_duration_minutes": 612,
+      "average_session_duration_minutes": 25.5,
+      "sessions_this_week": 7,
+      "sessions_last_week": 5,
+      "week_over_week_change": 0.40
+    },
+    "competency_scores": {
+      "overall": 76,
+      "empathic_accuracy": 80,
+      "bias_awareness": 72,
+      "crisis_response": 78,
+      "cultural_sensitivity": 73,
+      "trend": {
+        "overall": "+4",
+        "empathic_accuracy": "+6",
+        "bias_awareness": "+3",
+        "crisis_response": "+5",
+        "cultural_sensitivity": "+2"
+      }
+    },
+    "bias_reduction": {
+      "total_bias_flags": 18,
+      "bias_flags_previous_period": 31,
+      "reduction_percentage": 41.9,
+      "most_improved": "cultural_bias",
+      "needs_attention": "anchoring_bias"
+    },
+    "streaks": {
+      "current_streak_days": 5,
+      "longest_streak_days": 12,
+      "sessions_to_next_milestone": 6
+    }
+  },
+  "meta": {
+    "request_id": "req_h1i2j3k4",
+    "timestamp": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+## Performance metrics over time
+
+Retrieve detailed performance metrics across a specified time range, broken down by interval.
+
+### `GET /v1/analytics/performance`
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/performance?period=90d&interval=week&metric=overall_score" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `period` | string | `30d` | Time period: `7d`, `30d`, `90d`, `6m`, `1y` |
+| `interval` | string | `week` | Data granularity: `session`, `day`, `week`, `month` |
+| `metric` | string | `overall_score` | Metric to retrieve: `overall_score`, `empathic_accuracy`, `bias_awareness`, `crisis_response`, `cultural_sensitivity`, `session_duration`, `turn_count` |
+| `user_id` | string | — | Target user (supervisors and admins only) |
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "metric": "overall_score",
+    "period": "90d",
+    "interval": "week",
+    "data_points": [
+      { "date": "2024-10-21", "value": 62, "session_count": 3 },
+      { "date": "2024-10-28", "value": 65, "session_count": 4 },
+      { "date": "2024-11-04", "value": 64, "session_count": 2 },
+      { "date": "2024-11-11", "value": 69, "session_count": 5 },
+      { "date": "2024-11-18", "value": 71, "session_count": 4 },
+      { "date": "2024-11-25", "value": 68, "session_count": 3 },
+      { "date": "2024-12-02", "value": 73, "session_count": 5 },
+      { "date": "2024-12-09", "value": 74, "session_count": 4 },
+      { "date": "2024-12-16", "value": 72, "session_count": 3 },
+      { "date": "2024-12-23", "value": 75, "session_count": 2 },
+      { "date": "2024-12-30", "value": 76, "session_count": 4 },
+      { "date": "2025-01-06", "value": 78, "session_count": 5 },
+      { "date": "2025-01-13", "value": 76, "session_count": 3 }
+    ],
+    "statistics": {
+      "mean": 71.0,
+      "median": 72,
+      "min": 62,
+      "max": 78,
+      "standard_deviation": 4.8,
+      "trend_direction": "improving",
+      "trend_slope": 1.2
+    }
+  }
+}
+```
+
+## Competency scores
+
+Retrieve granular competency score breakdowns with sub-competency detail.
+
+### `GET /v1/analytics/competencies`
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/competencies?period=30d" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "30d",
+    "competencies": [
+      {
+        "dimension": "empathic_accuracy",
+        "score": 80,
+        "percentile": 72,
+        "sub_competencies": [
+          { "name": "emotion_identification", "score": 84, "trend": "+5" },
+          { "name": "emotion_reflection", "score": 78, "trend": "+3" },
+          { "name": "perspective_taking", "score": 82, "trend": "+7" },
+          { "name": "validation_quality", "score": 76, "trend": "+1" }
+        ]
+      },
+      {
+        "dimension": "bias_awareness",
+        "score": 72,
+        "percentile": 58,
+        "sub_competencies": [
+          { "name": "confirmation_bias", "score": 75, "trend": "+4" },
+          { "name": "cultural_bias", "score": 78, "trend": "+8" },
+          { "name": "diagnostic_bias", "score": 68, "trend": "+2" },
+          { "name": "anchoring_bias", "score": 65, "trend": "-1" }
+        ]
+      },
+      {
+        "dimension": "crisis_response",
+        "score": 78,
+        "percentile": 65,
+        "sub_competencies": [
+          { "name": "risk_identification", "score": 82, "trend": "+6" },
+          { "name": "safety_planning", "score": 75, "trend": "+4" },
+          { "name": "de_escalation", "score": 80, "trend": "+3" },
+          { "name": "appropriate_referral", "score": 74, "trend": "+2" }
+        ]
+      },
+      {
+        "dimension": "cultural_sensitivity",
+        "score": 73,
+        "percentile": 55,
+        "sub_competencies": [
+          { "name": "cultural_awareness", "score": 77, "trend": "+3" },
+          { "name": "communication_adaptation", "score": 70, "trend": "+2" },
+          { "name": "identity_affirmation", "score": 75, "trend": "+5" },
+          { "name": "systemic_awareness", "score": 68, "trend": "+1" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+<Tip>
+  Use the sub-competency breakdown to identify specific skill areas that need targeted practice. Assign scenarios that specifically exercise low-scoring sub-competencies.
+</Tip>
+
+## Bias reduction trends
+
+Track bias detection and mitigation improvements over time, broken down by bias category.
+
+### `GET /v1/analytics/bias-trends`
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/bias-trends?period=90d&interval=week" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "90d",
+    "interval": "week",
+    "bias_categories": [
+      {
+        "type": "cultural_bias",
+        "current_detection_rate": 0.88,
+        "initial_detection_rate": 0.52,
+        "improvement": 0.36,
+        "current_incident_rate": 0.12,
+        "initial_incident_rate": 0.38,
+        "trend_data": [
+          { "date": "2024-10-21", "detection_rate": 0.52, "incident_rate": 0.38 },
+          { "date": "2024-11-18", "detection_rate": 0.68, "incident_rate": 0.28 },
+          { "date": "2024-12-16", "detection_rate": 0.80, "incident_rate": 0.18 },
+          { "date": "2025-01-13", "detection_rate": 0.88, "incident_rate": 0.12 }
+        ]
+      },
+      {
+        "type": "confirmation_bias",
+        "current_detection_rate": 0.75,
+        "initial_detection_rate": 0.45,
+        "improvement": 0.30,
+        "current_incident_rate": 0.20,
+        "initial_incident_rate": 0.42,
+        "trend_data": [
+          { "date": "2024-10-21", "detection_rate": 0.45, "incident_rate": 0.42 },
+          { "date": "2024-11-18", "detection_rate": 0.58, "incident_rate": 0.35 },
+          { "date": "2024-12-16", "detection_rate": 0.68, "incident_rate": 0.25 },
+          { "date": "2025-01-13", "detection_rate": 0.75, "incident_rate": 0.20 }
+        ]
+      },
+      {
+        "type": "diagnostic_bias",
+        "current_detection_rate": 0.70,
+        "initial_detection_rate": 0.40,
+        "improvement": 0.30,
+        "current_incident_rate": 0.22,
+        "initial_incident_rate": 0.45,
+        "trend_data": [
+          { "date": "2024-10-21", "detection_rate": 0.40, "incident_rate": 0.45 },
+          { "date": "2024-11-18", "detection_rate": 0.52, "incident_rate": 0.38 },
+          { "date": "2024-12-16", "detection_rate": 0.62, "incident_rate": 0.28 },
+          { "date": "2025-01-13", "detection_rate": 0.70, "incident_rate": 0.22 }
+        ]
+      }
+    ],
+    "overall_bias_reduction": {
+      "aggregate_improvement": 0.32,
+      "most_improved_category": "cultural_bias",
+      "needs_attention_category": "anchoring_bias"
+    }
+  }
+}
+```
+
+## Session frequency
+
+Analyze training engagement patterns and session frequency over time.
+
+### `GET /v1/analytics/frequency`
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/frequency?period=30d" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "30d",
+    "total_sessions": 24,
+    "sessions_per_week_average": 6.0,
+    "average_gap_hours": 28.5,
+    "completion_rate": 0.92,
+    "average_duration_minutes": 25.5,
+    "weekly_breakdown": [
+      { "week": "2024-12-16", "sessions": 5, "total_minutes": 128 },
+      { "week": "2024-12-23", "sessions": 4, "total_minutes": 102 },
+      { "week": "2024-12-30", "sessions": 6, "total_minutes": 153 },
+      { "week": "2025-01-06", "sessions": 7, "total_minutes": 178 },
+      { "week": "2025-01-13", "sessions": 2, "total_minutes": 51 }
+    ],
+    "peak_times": {
+      "day_of_week": "Tuesday",
+      "hour_of_day": 14,
+      "timezone": "America/New_York"
+    },
+    "streaks": {
+      "current": 5,
+      "longest": 12,
+      "average": 4.3
+    }
+  }
+}
+```
+
+## Comparative benchmarking
+
+Compare a user's performance against reference groups.
+
+### `GET /v1/analytics/benchmarks`
+
+<Note>
+  **Required scope:** `analytics:benchmarks` · **Available to:** Supervisors and admins
+</Note>
+
+```bash
+curl "https://api.pixelatedempathy.com/v1/analytics/benchmarks?user_id=usr_k1l2m3n4&benchmarks=cohort,program,national" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Query parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `user_id` | string | Target user to benchmark |
+| `benchmarks` | string | Comma-separated benchmark types: `cohort`, `program`, `national`, `expert` |
+| `period` | string | Time period for score calculation |
+
+### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "user_id": "usr_k1l2m3n4",
+    "user_scores": {
+      "overall": 76,
+      "empathic_accuracy": 80,
+      "bias_awareness": 72,
+      "crisis_response": 78,
+      "cultural_sensitivity": 73
+    },
+    "benchmarks": {
+      "cohort": {
+        "label": "Fall 2024 Cohort (n=28)",
+        "overall": 71,
+        "empathic_accuracy": 74,
+        "bias_awareness": 68,
+        "crisis_response": 72,
+        "cultural_sensitivity": 70
+      },
+      "program": {
+        "label": "Clinical Psychology Program (n=156)",
+        "overall": 73,
+        "empathic_accuracy": 76,
+        "bias_awareness": 70,
+        "crisis_response": 74,
+        "cultural_sensitivity": 72
+      },
+      "national": {
+        "label": "National Percentile (all users)",
+        "overall_percentile": 68,
+        "empathic_accuracy_percentile": 72,
+        "bias_awareness_percentile": 60,
+        "crisis_response_percentile": 67,
+        "cultural_sensitivity_percentile": 58
+      }
+    }
+  }
+}
+```
+
+## Export endpoints
+
+Export analytics data for research, compliance, and institutional reporting.
+
+### `POST /v1/analytics/export`
+
+<Warning>
+  Export endpoints may generate large files and are rate-limited to the batch tier. De-identified exports exclude all personally identifiable information. Full exports require admin role and appropriate data use agreements.
+</Warning>
+
+```bash
+curl -X POST https://api.pixelatedempathy.com/v1/analytics/export \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "export_type": "research",
+    "format": "csv",
+    "date_range": {
+      "start": "2024-07-01T00:00:00Z",
+      "end": "2025-01-15T23:59:59Z"
+    },
+    "include": [
+      "session_metadata",
+      "competency_scores",
+      "bias_analysis",
+      "session_frequency"
+    ],
+    "de_identify": true,
+    "group_id": "grp_fall2024"
+  }'
+```
+
+### Export types
+
+<Tabs>
+  <Tab title="Research export">
+    De-identified dataset suitable for academic research. Removes all PII and assigns random participant IDs. Includes session-level and response-level metrics.
+
+    ```json
+    {
+      "export_type": "research",
+      "format": "csv",
+      "de_identify": true
+    }
+    ```
+  </Tab>
+  <Tab title="Compliance export">
+    Structured report for accreditation bodies and regulatory compliance. Maps competency scores to standard frameworks (APA, CACREP).
+
+    ```json
+    {
+      "export_type": "compliance",
+      "format": "pdf",
+      "framework": "cacrep",
+      "include_attestations": true
+    }
+    ```
+  </Tab>
+  <Tab title="Institutional report">
+    Aggregate analytics for institutional dashboards and program review. Includes trends, benchmarks, and ROI metrics.
+
+    ```json
+    {
+      "export_type": "institutional",
+      "format": "json",
+      "aggregate_level": "program"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Export response
+
+Exports are processed asynchronously. The initial response includes a job ID for status polling:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "export_id": "exp_x1y2z3a4",
+    "status": "processing",
+    "estimated_completion_seconds": 45,
+    "poll_url": "https://api.pixelatedempathy.com/v1/analytics/export/exp_x1y2z3a4"
+  }
+}
+```
+
+### Check export status
+
+```bash
+curl https://api.pixelatedempathy.com/v1/analytics/export/exp_x1y2z3a4 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "export_id": "exp_x1y2z3a4",
+    "status": "completed",
+    "download_url": "https://exports.pixelatedempathy.com/exp_x1y2z3a4.csv",
+    "file_size_bytes": 2458624,
+    "row_count": 12847,
+    "expires_at": "2025-01-22T10:30:00Z"
+  }
+}
+```
+
+<Info>
+  Export download links are signed and expire after 7 days. Generate a new export if the link has expired. All export files are encrypted at rest and transmitted over TLS.
+</Info>
+
+## Error responses
+
+| Status | Error code | Description |
+|---|---|---|
+| `400` | `INVALID_PERIOD` | Unrecognized time period value |
+| `400` | `INVALID_METRIC` | Unrecognized metric name |
+| `403` | `BENCHMARK_ACCESS_DENIED` | User role cannot access benchmarking data |
+| `403` | `EXPORT_REQUIRES_ADMIN` | Full (non-de-identified) exports require admin role |
+| `404` | `USER_NOT_FOUND` | Specified `user_id` does not exist or is not accessible |
+| `404` | `EXPORT_NOT_FOUND` | Export job ID does not exist |
+| `429` | `RATE_LIMITED` | Rate limit exceeded for analytics tier |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Session Management API" icon="comments" href="/api-reference/session-management">
+    Manage the training sessions that generate analytics data.
+  </Card>
+  <Card title="Crisis Detection API" icon="triangle-exclamation" href="/api-reference/crisis-detection">
+    Monitor for crisis signals and integrate with safety protocols.
+  </Card>
+</CardGroup>
