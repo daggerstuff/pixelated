@@ -55,7 +55,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload test results
         if: always() && steps.health-check.outputs.status == 'passing'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-test-results-production
           path: playwright-report/
@@ -366,7 +366,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -547,7 +547,7 @@ jobs:
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-test-results-staging
           path: playwright-report/
@@ -582,7 +582,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.get-pnpm-store-path.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -762,7 +762,7 @@ jobs:
 
       - name: Upload test results
         if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-test-results-preview
           path: playwright-report/
