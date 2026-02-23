@@ -4,7 +4,7 @@
 # Core ML/AI
 torch==2.6.0+cpu
 torchvision==0.21.0+cpu
-torchaudio==2.6.0+cpu
+torchaudio==2.10.0
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
 transformers==4.57.6
