@@ -15,39 +15,19 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "concepts"
-            ]
+            "pages": ["index", "quickstart", "concepts", "manifesto"]
           },
           {
             "group": "The Platform",
-            "pages": [
-              "product/empathy-gym",
-              "product/bias-detection",
-              "product/crisis-detection",
-              "product/emotional-intelligence",
-              "product/training-scenarios"
-            ]
+            "pages": ["product/empathy-gym", "product/bias-detection", "product/crisis-detection", "product/emotional-intelligence", "product/training-scenarios"]
           },
           {
             "group": "Architecture",
-            "pages": [
-              "architecture/overview",
-              "architecture/data-flow",
-              "architecture/memory-system",
-              "architecture/deployment"
-            ]
+            "pages": ["architecture/overview", "architecture/data-flow", "architecture/memory-system", "architecture/deployment"]
           },
           {
             "group": "Compliance & Security",
-            "pages": [
-              "compliance/hipaa",
-              "compliance/security",
-              "compliance/ethics",
-              "compliance/data-privacy"
-            ]
+            "pages": ["compliance/hipaa", "compliance/security", "compliance/ethics", "compliance/data-privacy"]
           }
         ]
       },
@@ -56,29 +36,27 @@
         "groups": [
           {
             "group": "For Therapists",
-            "pages": [
-              "guides/therapists/getting-started",
-              "guides/therapists/empathy-gym-guide",
-              "guides/therapists/understanding-feedback",
-              "guides/therapists/response-style"
-            ]
+            "pages": ["guides/therapists/getting-started", "guides/therapists/empathy-gym-guide", "guides/therapists/understanding-feedback", "guides/therapists/response-style"]
           },
           {
             "group": "For Developers",
-            "pages": [
-              "guides/developers/setup",
-              "guides/developers/conventions",
-              "guides/developers/contributing",
-              "guides/developers/testing"
-            ]
+            "pages": ["guides/developers/setup", "guides/developers/conventions", "guides/developers/contributing"]
           },
           {
             "group": "For Supervisors",
-            "pages": [
-              "guides/supervisors/dashboard",
-              "guides/supervisors/tracking-progress",
-              "guides/supervisors/custom-scenarios"
-            ]
+            "pages": ["guides/supervisors/dashboard", "guides/supervisors/tracking-progress", "guides/supervisors/custom-scenarios"]
+          },
+          {
+            "group": "Technical Guides",
+            "pages": ["guides/technical-guides/README", "guides/technical-guides/enhanced-bias-detection-integration"]
+          },
+          {
+            "group": "Training",
+            "pages": ["guides/training/PIXEL-MODEL-TRAINING-HUB"]
+          },
+          {
+            "group": "User Guides",
+            "pages": ["guides/user-guides/README", "guides/user-guides/journal-research-guide", "guides/user-guides/therapist-dashboard-guide"]
           }
         ]
       },
@@ -87,19 +65,79 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": [
-              "api-reference/introduction",
-              "api-reference/authentication"
-            ]
+            "pages": ["api-reference/introduction", "api-reference/authentication"]
           },
           {
             "group": "Endpoints",
-            "pages": [
-              "api-reference/bias-analysis",
-              "api-reference/session-management",
-              "api-reference/analytics",
-              "api-reference/crisis-detection"
-            ]
+            "pages": ["api-reference/bias-analysis", "api-reference/session-management", "api-reference/analytics"]
+          },
+          {
+            "group": "Extended API",
+            "pages": ["api/README", "api/journal-research-api", "api/therapist-dashboard-api", "api/registration"]
+          },
+          {
+            "group": "MCP Server",
+            "pages": ["api/mcp-server/README", "api/mcp-server/prompts", "api/mcp-server/resources", "api/mcp-server/tools"]
+          },
+          {
+            "group": "Embedding Agent",
+            "pages": ["api/embedding-agent/README"]
+          },
+          {
+            "group": "Bias Analysis",
+            "pages": ["api/bias-analysis/README"]
+          }
+        ]
+      },
+      {
+        "tab": "Operations",
+        "groups": [
+          {
+            "group": "Infrastructure",
+            "pages": ["operations/README", "operations/infrastructure-README", "operations/serving", "operations/ingestion"]
+          },
+          {
+            "group": "Deployment",
+            "pages": ["deployment/advanced_deployment_strategy", "deployment/nemo_data_designer"]
+          },
+          {
+            "group": "Procedures",
+            "pages": ["operations/incident-response-procedures", "operations/rollback-procedures", "operations/launch-readiness-summary"]
+          },
+          {
+            "group": "Training Infrastructure",
+            "pages": ["operations/foundation-model-training-setup", "operations/ovh-ollama"]
+          }
+        ]
+      },
+      {
+        "tab": "Knowledge",
+        "groups": [
+          {
+            "group": "Emotional Intelligence",
+            "pages": ["knowledge/index", "knowledge/emotional-cartography", "knowledge/plutchiks-wheel-explained", "knowledge/empathy-in-practice"]
+          },
+          {
+            "group": "Therapeutic Practice",
+            "pages": ["knowledge/therapeutic-dialogue", "knowledge/cultural-empathy", "knowledge/the-power-of-silence", "knowledge/when-someone-is-in-crisis"]
+          }
+        ]
+      },
+      {
+        "tab": "Research",
+        "groups": [
+          {
+            "group": "Our Approach",
+            "pages": ["research/our-approach", "research/ethical-ai-framework", "research/bias-detection"]
+          }
+        ]
+      },
+      {
+        "tab": "Platform",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["platform/overview", "platform/empathy-gym", "platform/emotional-intelligence-engine", "platform/crisis-detection", "platform/privacy-and-trust"]
           }
         ]
       },
@@ -108,47 +146,85 @@
         "groups": [
           {
             "group": "For Organizations",
-            "pages": [
-              "enterprise/overview",
-              "enterprise/pricing",
-              "enterprise/case-studies",
-              "enterprise/partnerships"
-            ]
+            "pages": ["enterprise/overview", "enterprise/pricing", "enterprise/case-studies", "enterprise/partnerships"]
+          }
+        ]
+      },
+      {
+        "tab": "Developers",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["developers/getting-started", "developers/architecture", "developers/api-reference", "developers/contributing"]
+          },
+          {
+            "group": "Development",
+            "pages": ["development/README"]
+          },
+          {
+            "group": "Features",
+            "pages": ["features/README", "features/eval-gating"]
+          },
+          {
+            "group": "Design System",
+            "pages": ["features/designs/README", "features/designs/design-system", "features/designs/design-system-improvements"]
+          },
+          {
+            "group": "Analytics",
+            "pages": ["features/analytics/README", "features/analytics/analytics-charts-production"]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Standards",
+            "pages": ["reference/README", "reference/rules-system", "reference/standardization", "reference/task-list"]
+          },
+          {
+            "group": "Architectures",
+            "pages": ["reference/architectures/README", "reference/architectures/plan", "reference/architectures/property", "reference/architectures/tasks"]
+          }
+        ]
+      },
+      {
+        "tab": "Resources",
+        "groups": [
+          {
+            "group": "Datasets",
+            "pages": ["datasets/mental-health-datasets-expansion-repo-map", "datasets/RELEASE_0_DEPLOYMENT_COMPLETE", "datasets/RELEASE_0_INVENTORY_SUMMARY"]
+          },
+          {
+            "group": "Governance",
+            "pages": ["governance/provenance_storage_plan"]
+          },
+          {
+            "group": "Migration",
+            "pages": ["migration/auth0-migration-guide", "migration/auth0-implementation-summary", "migration/auth0-complete-implementation-summary"]
+          },
+          {
+            "group": "Security",
+            "pages": ["security/safety", "security/credential-files-security"]
+          },
+          {
+            "group": "Audits",
+            "pages": ["audits/Phase-2-Audit", "audits/Phase-3-Audit", "audits/Phase-4-Audit"]
           }
         ]
       }
     ],
     "global": {
       "anchors": [
-        {
-          "anchor": "GitHub",
-          "href": "https://github.com/pixelatedempathy",
-          "icon": "github"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://pixelatedempathy.com/community",
-          "icon": "users"
-        }
+        {"anchor": "GitHub", "href": "https://github.com/pixelatedempathy", "icon": "github"},
+        {"anchor": "Community", "href": "https://pixelatedempathy.com/community", "icon": "users"}
       ]
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
+  "logo": {"light": "/logo/light.svg", "dark": "/logo/dark.svg"},
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@pixelatedempathy.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Get Started",
-      "href": "https://pixelatedempathy.com"
-    }
+    "links": [{"label": "Support", "href": "mailto:support@pixelatedempathy.com"}],
+    "primary": {"type": "button", "label": "Get Started", "href": "https://pixelatedempathy.com"}
   },
   "footer": {
     "socials": {

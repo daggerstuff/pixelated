@@ -22,37 +22,96 @@ clients before meeting real patients. No risk. Real growth.
 ## Documentation Structure
 
 ```
-docs2/
-├── 📄 index.mdx          # Landing page — start here
-├── 📄 quickstart.mdx     # Get up and running in 5 minutes
-├── 📄 docs.json          # Mintlify configuration
-├── 📁 product/           # Product documentation
-│   ├── emotional-intelligence.mdx
+docs/
+├── 📄 index.mdx              # Landing page — start here
+├── 📄 quickstart.mdx         # Get up and running in 5 minutes
+├── 📄 concepts.mdx           # Core concepts overview
+├── 📄 manifesto.mdx          # Our mission and philosophy
+├── 📄 docs.json              # Mintlify configuration
+│
+├── 📁 product/               # Product documentation
+│   ├── empathy-gym.mdx
 │   ├── bias-detection.mdx
 │   ├── crisis-detection.mdx
-│   ├── training-scenarios.mdx
-│   └── empathy-gym.mdx
-├── 📁 platform/          # Technical architecture
+│   ├── emotional-intelligence.mdx
+│   └── training-scenarios.mdx
+│
+├── 📁 platform/              # Technical platform docs
 │   ├── overview.mdx
-│   ├── architecture.mdx
-│   ├── api-reference.mdx
-│   └── security.mdx
-├── 📁 guides/            # User guides
-│   ├── therapists/
-│   ├── supervisors/
-│   └── developers/
-├── 📁 knowledge/         # Psychology & EI concepts
-│   ├── plutchik-wheel.mdx
-│   ├── big-five-ocean.mdx
-│   └── therapeutic-modalities.mdx
-├── 📁 research/          # Methods & ethics
+│   ├── empathy-gym.mdx
+│   ├── emotional-intelligence-engine.mdx
+│   ├── crisis-detection.mdx
+│   └── privacy-and-trust.mdx
+│
+├── 📁 architecture/          # System architecture
+│   ├── overview.mdx
+│   ├── data-flow.mdx
+│   ├── memory-system.mdx
+│   └── deployment.mdx
+│
+├── 📁 guides/                # User guides
+│   ├── therapists/           # For mental health professionals
+│   ├── supervisors/          # For program administrators
+│   ├── developers/           # For engineers
+│   ├── technical-guides/     # Technical implementation
+│   ├── training/             # Model training guides
+│   └── user-guides/          # End-user documentation
+│
+├── 📁 api/                   # Extended API documentation
+│   ├── mcp-server/           # MCP server docs
+│   ├── embedding-agent/      # Embedding agent API
+│   └── bias-analysis/        # Bias analysis API
+│
+├── 📁 api-reference/         # Core API reference
+│   ├── introduction.mdx
+│   ├── authentication.mdx
+│   ├── bias-analysis.mdx
+│   ├── session-management.mdx
+│   └── analytics.mdx
+│
+├── 📁 knowledge/             # Psychology & EI concepts
+│   ├── emotional-cartography.mdx
+│   ├── plutchiks-wheel-explained.mdx
+│   ├── therapeutic-dialogue.mdx
+│   └── cultural-empathy.mdx
+│
+├── 📁 research/              # Methods & ethics
 │   ├── our-approach.mdx
-│   ├── ethics-framework.mdx
-│   └── bias-reports.mdx
-└── 📁 compliance/        # HIPAA, security
-    ├── overview.mdx
-    ├── hipaa.mdx
-    └── security.mdx
+│   ├── ethical-ai-framework.mdx
+│   └── bias-detection.mdx
+│
+├── 📁 compliance/            # HIPAA, security, ethics
+│   ├── hipaa.mdx
+│   ├── security.mdx
+│   ├── ethics.mdx
+│   └── data-privacy.mdx
+│
+├── 📁 operations/            # DevOps & infrastructure
+│   ├── infrastructure-README.md
+│   ├── serving.md
+│   ├── ingestion.md
+│   └── incident-response-procedures.md
+│
+├── 📁 deployment/            # Deployment guides
+│   ├── advanced_deployment_strategy.md
+│   └── nemo_data_designer.md
+│
+├── 📁 development/           # Development docs
+│   └── journal-research/     # Journal research pipeline
+│
+├── 📁 features/              # Feature documentation
+│   ├── designs/              # Design system docs
+│   └── analytics/            # Analytics features
+│
+├── 📁 reference/             # Reference documentation
+│   └── architectures/        # Architecture references
+│
+├── 📁 datasets/              # Dataset documentation
+├── 📁 governance/            # Data governance
+├── 📁 migration/             # Migration guides
+├── 📁 security/              # Security documentation
+├── 📁 audits/                # Audit reports
+└── 📁 enterprise/            # Enterprise documentation
 ```
 
 ---
@@ -62,9 +121,9 @@ docs2/
 | For Therapists | For Supervisors | For Developers |
 | -------------- | --------------- | -------------- |
 | [Quickstart](/quickstart) | [Quickstart](/quickstart) | [Quickstart](/quickstart) |
-| [Empathy Gym Guide](/guides/therapists/empathy-gym-guide) | [Supervisor Dashboard](/guides/supervisors/dashboard) | [API Reference](/platform/api-reference) |
-| [Understanding Feedback](/guides/therapists/understanding-feedback) | [Cohort Management](/guides/supervisors/cohorts) | [Developer Setup](/guides/developers/setup) |
-| [Training Scenarios](/product/training-scenarios) | [Competency Tracking](/guides/supervisors/competencies) | [Architecture](/platform/architecture) |
+| [Empathy Gym Guide](/guides/therapists/empathy-gym-guide) | [Supervisor Dashboard](/guides/supervisors/dashboard) | [API Reference](/api-reference/introduction) |
+| [Understanding Feedback](/guides/therapists/understanding-feedback) | [Tracking Progress](/guides/supervisors/tracking-progress) | [Developer Setup](/guides/developers/setup) |
+| [Training Scenarios](/product/training-scenarios) | [Custom Scenarios](/guides/supervisors/custom-scenarios) | [Architecture](/architecture/overview) |
 
 ---
 
@@ -116,7 +175,7 @@ Real-time monitoring for 40+ bias categories:
 npm i -g mintlify
 
 # Run docs locally
-cd docs2
+cd docs
 mintlify dev
 ```
 
@@ -128,7 +187,7 @@ Documentation will be available at `http://localhost:3333`
 mintlify build
 ```
 
-Output in `docs2/build/` — deploy to any static host.
+Output in `docs/build/` — deploy to any static host.
 
 ---
 
