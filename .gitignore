@@ -1,5 +1,6 @@
 !/.env.example
 opencode.json
+/drive/
 *$py.class
 **/.venv/
 **/__pycache__/
@@ -197,3 +198,16 @@ wandb/
 compiled_dataset/
 llama.cpp/
 therapeutic_ai_final_stage1/
+
+# Training launcher scripts (may contain env-specific paths)
+run_all.py
+run_all.sh
+
+scripts/backup-home.sh
+scripts/home-backup.service
+scripts/home-backup.timer
+scripts/install-backup.sh
+antigravity_chat_export_7days_detailed.md
+antigravity_chat_export_7days.md
+epic-conversion.md
+launch_ovh_job.sh

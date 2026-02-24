@@ -277,8 +277,8 @@ class PIX8LongSessionGenerator:
             "label": "Messy Exploration & Resistance",
             "instruction": (
                 "This is the EXPLORATION phase. The therapist should probe deeper into the core issues, "
-                "but the patient should exhibit clinical resistance (deflection, minimizing, brief silences, "
-                "or mild frustration). "
+                "but the patient should exhibit appropriate defense mechanisms (deflection, awkward silence, "
+                "sarcasm, or mild frustration) instead of instant textbook insight. "
                 "CRITICAL: Absolutely NO instant breakthroughs. People take time to process. "
                 "Keep responses relatively short. Patients do not monologue beautifully about their trauma; "
                 "they stumble through it. The therapist should occasionally interrupt gently or redirect. "
@@ -431,6 +431,12 @@ class PIX8LongSessionGenerator:
             f"{profile_desc}\n\n"
             f"CURRENT PHASE: {phase['label']}\n"
             f"{phase['instruction']}\n\n"
+            f"Crucial constraints for clinical realism:\n"
+            f"- The dialogue must sound like a real, imperfect human conversation.\n"
+            f"- Avoid overly clinical, robotic, or 'AI-sounding' language.\n"
+            f"- Include conversational fillers, pauses, interruptions, and fragmented sentences.\n"
+            f"- Patients do not speak in perfect paragraphs; they hesitate, backtrack, and emote irregularly.\n"
+            f"- Therapists should use minimal encouragers ('Mhm', 'Right', 'Go on') and avoid sounding like a textbook.\n\n"
             f"Generate EXACTLY {segment_turns} exchanges (alternating Therapist: and Patient: lines).\n"
             f"The patient shows realistic symptoms of {diagnosis} at severity {severity}/10.\n"
             f"Each response should be substantive (2-4 sentences minimum).\n"
