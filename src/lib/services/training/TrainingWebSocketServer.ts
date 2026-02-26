@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { validateToken } from '../../auth/jwt-service'
 import type { UserRole } from '../../auth/roles'
+import { GestaltClient } from '../ai/GestaltClient'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
@@ -55,9 +56,16 @@ interface WebSocketMessage {
   payload: any
 }
 
+interface SessionState {
+  dialogue: Array<{ speaker: string; text: string }>;
+  plutchikScores: Record<string, number>;
+  oceanScores: Record<string, number>;
+}
+
 export class TrainingWebSocketServer {
   private wss: WebSocketServer
   private clients: Map<string, TrainingSessionClient> = new Map()
+  private sessions: Map<string, SessionState> = new Map()
   private readonly AUTH_TIMEOUT_MS = 10000 // 10 seconds to authenticate
 
   constructor(port: number) {
@@ -93,7 +101,7 @@ export class TrainingWebSocketServer {
 
     // If token provided in query string, attempt immediate authentication
     if (initialToken) {
-      this.attemptAuthentication(id, initialToken)
+      void this.attemptAuthentication(id, initialToken)
     }
 
     // Set up authentication timeout - close connection if not authenticated
@@ -109,7 +117,20 @@ export class TrainingWebSocketServer {
 
     ws.on('message', (data) => {
       try {
-        const message = JSON.parse(data.toString()) as WebSocketMessage
+        let messageStr: string
+        if (data instanceof Buffer) {
+          messageStr = data.toString()
+        } else if (typeof data === 'string') {
+          messageStr = data
+        } else if (data instanceof ArrayBuffer) {
+          messageStr = Buffer.from(data).toString()
+        } else if (ArrayBuffer.isView(data)) {
+          messageStr = Buffer.from(data).toString()
+        } else {
+          // Fallback for any other type - should not happen but safe to handle
+          messageStr = String(data)
+        }
+        const message = JSON.parse(messageStr) as WebSocketMessage
 
         // Handle authentication message
         if (message.type === 'authenticate') {
@@ -154,7 +175,7 @@ export class TrainingWebSocketServer {
       return
     }
 
-    this.attemptAuthentication(clientId, payload.token)
+    void this.attemptAuthentication(clientId, payload.token)
   }
 
   /**
@@ -387,6 +408,57 @@ export class TrainingWebSocketServer {
         timestamp: new Date().toISOString()
       }
     })
+
+    // Trigger Gestalt analysis for Seeker messages
+    if (payload.role === 'client' || payload.role === 'seeker') {
+      void this.runGestaltAnalysis(client.sessionId, payload.content);
+    }
+  }
+
+  /**
+   * Run Gestalt Fusion analysis for a session and broadcast results.
+   */
+  private async runGestaltAnalysis(sessionId: string, targetUtterance: string) {
+    try {
+      let state = this.sessions.get(sessionId);
+      if (!state) {
+        state = {
+          dialogue: [],
+          plutchikScores: {
+            joy: 0.1, trust: 0.1, fear: 0.1, surprise: 0.1,
+            sadness: 0.1, disgust: 0.1, anger: 0.1, anticipation: 0.1
+          },
+          oceanScores: {
+            openness: 0.5, conscientiousness: 0.5,
+            extraversion: 0.5, agreeableness: 0.5, neuroticism: 0.5
+          }
+        };
+        this.sessions.set(sessionId, state);
+      }
+
+      // Add turn to history
+      state.dialogue.push({ speaker: 'Seeker', text: targetUtterance });
+      if (state.dialogue.length > 40) state.dialogue.shift();
+
+      const gestalt = await GestaltClient.analyzeGestalt({
+        dialogue: state.dialogue,
+        target_utterance: targetUtterance,
+        plutchik_scores: state.plutchikScores,
+        ocean_scores: state.oceanScores
+      });
+
+      // Broadcast Gestalt updates as 'gestalt_update' to all roles
+      // Usually supervisors/observers use this for the Resistance Monitor,
+      // but trainees can see it too if configured.
+      this.broadcastToSession(sessionId, {
+        type: 'gestalt_update',
+        payload: gestalt
+      });
+
+      logger.info('Gestalt update broadcasted', { sessionId, defense: gestalt.defense_label_name });
+    } catch (error) {
+      logger.error('Gestalt analysis failed during websocket broadcast', { sessionId, error });
+    }
   }
 
   private handleCoachingNote(clientId: string, payload: { content: string }) {
