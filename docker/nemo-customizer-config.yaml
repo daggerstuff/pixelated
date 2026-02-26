@@ -1,0 +1,37 @@
+run_jobs_local: true
+
+entity_store_url: http://nemo-entity-store:8000
+nemo_data_store_url: http://nemo-datastore:3000
+
+training:
+  workspace_dir: "/mount/workspace"
+
+customizationTargets:
+  overrideExistingTargets: true
+  targets:
+    meta/llama-3.2-3b-instruct@2.0:
+      name: llama-3.2-3b-instruct@2.0
+      namespace: meta
+      enabled: true
+      base_model: meta/llama-3.2-3b-instruct
+      model_path: llama32_3b_instruct
+      model_uri: ngc://nvidia/nemo/llama-3_2-3b-instruct:2.0
+      num_parameters: 3000000000
+      precision: bf16-mixed
+
+customizationConfigTemplates:
+  overrideExistingTemplates: true
+  templates:
+    meta/llama-3.2-3b-instruct@quickstart:
+      name: llama-3.2-3b-instruct@quickstart
+      namespace: meta
+      target: meta/llama-3.2-3b-instruct@2.0
+      training_options:
+        - training_type: sft
+          finetuning_type: lora
+          num_gpus: 0
+          num_nodes: 1
+          tensor_parallel_size: 1
+          micro_batch_size: 1
+      max_seq_length: 4096
+      prompt_template: "{prompt} {completion}"

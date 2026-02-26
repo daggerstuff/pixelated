@@ -10,6 +10,8 @@ import { z } from 'zod'
  */
 export interface ValidationErrorDetails {
   details: Record<string, string>
+  error?: string
+  status?: number
 }
 
 /**
@@ -34,7 +36,7 @@ export async function validateRequestBody<T extends z.ZodType>(
     if (error instanceof z.ZodError) {
       // Convert Zod errors to field error map
       const fieldErrors: Record<string, string> = {}
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const path = err.path.join('.')
         fieldErrors[path] = err.message
       })

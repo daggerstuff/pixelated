@@ -14,6 +14,11 @@ export async function createMarketResearch(data: {
     targetMarkets?: string[]
     researchType?: string
     timeline?: { startDate: Date; endDate: Date }
+    // Additional fields accepted but not stored
+    industry?: string
+    targetMarket?: string
+    methodology?: string
+    budget?: string
 }) {
     const MarketResearchModel = getMongoConnection().model('MarketResearch')
     const pool = getPostgresPool()
@@ -227,6 +232,7 @@ export async function listMarketResearch(
         limit?: number
         researchType?: string
         status?: string
+        industry?: string
     } = {}
 ) {
     const MarketResearchModel = getMongoConnection().model('MarketResearch')

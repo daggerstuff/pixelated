@@ -3,40 +3,64 @@
 
 services:
   nim-embedding:
-    image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:1.0.0
+    image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:latest
     container_name: nim-embedding
     ports:
       - "8080:8000"
     environment:
-      - NGC_API_KEY=${NVIDIA_API_KEY}
+      - NGC_API_KEY=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
+      - NIM_API_KEY=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
+      - NGC_USER_NAME=$$oauthtoken
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - NIM_MANIFEST_ALLOW_UNSAFE=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+      - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
       - nim_model_cache:/opt/nim/.cache
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu]
-              count: 1
+      - ./scripts/skip-lib-check.sh:/opt/nim/start_server.d/32-ld-library-path.sh:ro
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
     networks:
       - nemo-network
 
   nim-reranking:
-    image: nvcr.io/nim/nvidia/nv-rerankqa-mistral-4b-v3:1.0.0
+    image: nvcr.io/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2:latest
     container_name: nim-reranking
     ports:
       - "8081:8000"
     environment:
-      - NGC_API_KEY=${NVIDIA_API_KEY}
+      - NGC_API_KEY=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
+      - NIM_API_KEY=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
+      - NGC_USER_NAME=$$oauthtoken
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - NIM_MANIFEST_ALLOW_UNSAFE=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+      - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
       - nim_model_cache:/opt/nim/.cache
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu]
-              count: 1
+      - ./scripts/skip-lib-check.sh:/opt/nim/start_server.d/32-ld-library-path.sh:ro
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
     networks:
       - nemo-network
 

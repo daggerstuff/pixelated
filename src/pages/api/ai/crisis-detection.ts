@@ -2,7 +2,6 @@ import type { APIRoute, APIContext } from 'astro'
 import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
 import { getSession } from '@/lib/auth/session'
-import type { SessionData } from '@/lib/auth/session'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,
@@ -14,6 +13,21 @@ import type { AuditResource } from '@/lib/audit/types'
 import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
 
 import type { CrisisDetectionResult } from '@/lib/ai/crisis/types'
+
+// Define Session interface locally (not exported from session module)
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
+
 // Initialize scoped logger for this module
 const logger = createBuildSafeLogger('crisis-detection')
 
@@ -26,17 +40,17 @@ const crisisProtocolInstance = CrisisProtocol.getInstance()
 export const POST: APIRoute = async ({ request }: APIContext) => {
   const startTime = Date.now()
   let crisisDetected = false
-  let session: SessionData | null = null
+  let session: Session | null = null
 
   // DEBUG LOG: POST handler invoked
   console.log('[crisis-detection.ts] POST handler invoked')
 
   try {
     // Get session for authentication
-    session = await getSession(request)
+    session = await getSession()
 
     // Check if user is authenticated
-    if (!session) {
+    if (!session || !session.user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',

@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: docker-app:latest
     container_name: pixelated-app
     restart: unless-stopped
     environment:
@@ -29,13 +27,12 @@ services:
       - web
 
   mcp-server:
-    build:
-      context: ..
-      dockerfile: ai/api/mcp_server/Dockerfile
+    image: docker-mcp-server:latest
     container_name: pixelated-mcp
     restart: unless-stopped
+    user: root
     ports:
-      - "127.0.0.1:54321:5003" # Public obfuscated port for local debugging if needed
+      - "127.0.0.1:54321:5003"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - MEM0_API_KEY=${MEM0_API_KEY}
@@ -47,13 +44,6 @@ services:
     image: ollama/ollama:latest
     container_name: pixelated-ollama
     restart: unless-stopped
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
@@ -66,21 +56,11 @@ services:
       - web
 
   ai-service:
-    build:
-      context: ../ai
-      dockerfile: Dockerfile
+    image: docker-ai-service:latest
     container_name: pixelated-ai
     restart: unless-stopped
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    user: root
     environment:
-      # - NVIDIA_VISIBLE_DEVICES=all
-      # - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - PORT=8000
     ports:
       - "8000:8000"
@@ -89,7 +69,7 @@ services:
       - ../ai/data:/app/data
     networks:
       - web
-    command: sh -c "chown ubuntu:ubuntu /app/uv.lock && PYTHONPATH=/ uv run python -m ai.main"
+    command: sh -c "mkdir -p /tmp/ai_pkg && ln -sf /app /tmp/ai_pkg/ai && PYTHONPATH=/tmp/ai_pkg uv run python -m ai.main"
 
 networks:
   web:

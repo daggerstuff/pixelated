@@ -89,7 +89,7 @@ class TabSyncManager {
   }
 
   private generateTabId(): string {
-    return `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `tab_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
   }
 
   private initialize(): void {

@@ -59,6 +59,8 @@ export enum AuditEventType {
   SERVER_AUTH_SUCCESS = 'server_auth_success',
   RATE_LIMIT_TRIGGERED = 'rate_limit_triggered',
   SUSPICIOUS_ACTIVITY = 'suspicious_activity',
+  AI_MODEL_ACCESS = 'ai_model_access',
+  AI_GENERATION = 'ai_generation',
 }
 
 // Audit log status
@@ -67,6 +69,7 @@ export enum AuditEventStatus {
   FAILURE = 'failure',
   ATTEMPT = 'attempt',
   BLOCKED = 'blocked',
+  WARNING = 'warning',
 }
 
 /**

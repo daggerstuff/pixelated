@@ -1,0 +1,21 @@
+services:
+  nim-embedding:
+    deploy:
+      resources:
+        reservations:
+          devices: []
+  nim-reranking:
+    deploy:
+      resources:
+        reservations:
+          devices: []
+  nemo-customizer:
+    deploy:
+      resources:
+        reservations:
+          devices: []
+  nemo-curator:
+    deploy:
+      resources:
+        reservations:
+          devices: []

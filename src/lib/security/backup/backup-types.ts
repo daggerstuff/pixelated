@@ -23,6 +23,9 @@ export enum BackupStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   DELETED = 'deleted',
+  VERIFIED = 'verified',
+  VERIFICATION_FAILED = 'verification_failed',
+  EXPIRED = 'expired',
 }
 
 /**

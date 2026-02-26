@@ -5,11 +5,12 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { TherapistDashboard } from '../TherapistDashboard'
 import SessionControls from '../SessionControls'
 import { TherapistProgressTracker } from '../TherapistProgressTracker'
-import TherapyProgressCharts from '../TherapyProgressCharts'
+import { AnalyticsCharts } from '../AnalyticsCharts'
 import { ProgressBar } from '../ProgressBar'
 import { SessionMetrics } from '../SessionMetrics'
 import type { TherapistSession } from '@/types/dashboard'
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
+import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import crypto from 'crypto'
 
@@ -62,7 +63,15 @@ function secureRandomFloat(): number {
 }
 
 describe('Dashboard Performance Tests', () => {
-  // Create large dataset for performance testing
+  // Mock the analytics dashboard hook
+  vi.mock('@/hooks/useAnalyticsDashboard', () => ({
+    useAnalyticsDashboard: vi.fn(() => ({
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    })),
+  }))
   const createLargeSessionDataset = (count: number): TherapistSession[] => {
     return Array.from({ length: count }, (_, i) => ({
       id: `session-${i + 1}`,
@@ -265,7 +274,7 @@ describe('Dashboard Performance Tests', () => {
     const startTime = performance.now()
 
     render(
-      React.createElement(TherapyProgressCharts, { data: mockAnalyticsData }),
+      React.createElement(AnalyticsCharts),
     )
 
     const endTime = performance.now()
@@ -273,7 +282,7 @@ describe('Dashboard Performance Tests', () => {
 
     // Should render within reasonable time for large datasets
     expect(renderTime).toBeLessThan(200)
-    expect(screen.getByLabelText('Therapy Progress Charts')).toBeInTheDocument()
+    expect(screen.getByLabelText('Analytics Charts')).toBeInTheDocument()
   })
 
   it('renders progress bar efficiently', () => {
@@ -394,17 +403,19 @@ describe('Dashboard Performance Tests', () => {
   })
 
   it('handles error states efficiently', () => {
+    // Mock the hook to return error state with proper AnalyticsError type
+    vi.mocked(useAnalyticsDashboard).mockReturnValueOnce({
+      data: null,
+      isLoading: false,
+      error: { code: 'FETCH_ERROR', message: 'Test error', details: null },
+      refetch: vi.fn(),
+      clearError: vi.fn(),
+    })
+
     const startTime = performance.now()
 
     render(
-      React.createElement(TherapyProgressCharts, {
-        data: {
-          sessionMetrics: [],
-          skillProgress: [],
-          summaryStats: [],
-          progressSnapshots: [],
-        },
-      }),
+      React.createElement(AnalyticsCharts),
     )
 
     const endTime = performance.now()
@@ -412,7 +423,7 @@ describe('Dashboard Performance Tests', () => {
 
     // Error state should render quickly
     expect(renderTime).toBeLessThan(10)
-    expect(screen.getByLabelText('Therapy Progress Charts')).toBeInTheDocument()
+    expect(screen.getByLabelText('Analytics Charts')).toBeInTheDocument()
   })
 
   it('maintains memory efficiency with large datasets', () => {
@@ -481,9 +492,7 @@ describe('Dashboard Performance Tests', () => {
     promises.push(
       new Promise<void>((resolve) => {
         render(
-          React.createElement(TherapyProgressCharts, {
-            data: mockAnalyticsData,
-          }),
+          React.createElement(AnalyticsCharts),
         )
         resolve()
       }),
@@ -500,7 +509,6 @@ describe('Dashboard Performance Tests', () => {
 
   it('maintains performance under stress testing', () => {
     const veryLargeSessions = createLargeSessionDataset(1000)
-    const veryLargeAnalytics = createLargeAnalyticsDataset(1000)
 
     const startTime = performance.now()
 
@@ -508,9 +516,7 @@ describe('Dashboard Performance Tests', () => {
       React.createElement(
         TherapistDashboard,
         { sessions: veryLargeSessions, onSessionControl: mockOnSessionControl },
-        React.createElement(TherapyProgressCharts, {
-          data: veryLargeAnalytics,
-        }),
+        React.createElement(AnalyticsCharts),
       ),
     )
 

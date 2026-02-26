@@ -7,12 +7,26 @@ import {
 import { getSession } from '../../../lib/auth/session.js'
 import { aiRepository } from '@/lib/db/ai'
 
+// Local Session interface - getSession returns null in this codebase
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
+
 export const GET = async ({ request, url }) => {
-  let session: any
+  let session: Session | null = null
 
   try {
     // Verify session
-    session = await getSession(request)
+    session = await getSession()
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

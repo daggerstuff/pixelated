@@ -58,15 +58,13 @@ export function Navigation({
       return false
     }
 
-    // Check if the user has any of the required roles
+    // Check if the user has the required role
     if (item.roles && item.roles.length > 0) {
-      if (!user?.user || !user.user.roles) {
+      if (!user?.user || !user.user.role) {
         return false
       }
 
-      const hasRequiredRole = user.user.roles.some((role) =>
-        item.roles?.includes(role as UserRole),
-      )
+      const hasRequiredRole = item.roles.includes(user.user.role as UserRole)
 
       if (!hasRequiredRole) {
         return false

@@ -8,6 +8,23 @@ import { getSession } from '../../../lib/auth/session'
 import { aiRepository } from '@/lib/db/ai'
 import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
 import { apiMetrics, countMetric } from '@/lib/sentry/utils'
+import { createTogetherAIService } from '@/lib/ai/together-ai/service'
+import type { AIService, AIServiceOptions, AIMessage, AIStreamChunk, TherapeuticResponse } from '@/lib/ai/types'
+import { ResponseGenerationService } from '@/lib/ai/response-generation/service'
+
+// Local Session interface - getSession returns null in this codebase
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
 
 /**
  * GET handler - returns information about the AI response endpoint
@@ -15,7 +32,7 @@ import { apiMetrics, countMetric } from '@/lib/sentry/utils'
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Verify session for security
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -82,11 +99,11 @@ export const POST: APIRoute = async ({
 }) => {
   const startTime = Date.now()
   const endpoint = '/api/ai/response'
-  let session: Awaited<ReturnType<typeof getSession>> | null = null
+  let session: Session | null = null
 
   try {
     // Verify session
-    session = await getSession(request)
+    session = await getSession()
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

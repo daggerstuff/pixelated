@@ -71,7 +71,7 @@ export function SessionForm({
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldError = error.errors[0]?.message
+        const fieldError = error.issues[0]?.message
         if (fieldError) {
           setErrors((prev) => ({ ...prev, [fieldName]: fieldError }))
         }

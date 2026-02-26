@@ -128,6 +128,73 @@ export async function updateStage(
 }
 
 /**
+ * Update sales opportunity
+ */
+export async function updateSalesOpportunity(
+    opportunityId: string,
+    userId: string,
+    data: {
+        title?: string
+        value?: number
+        stage?: string
+        contacts?: any[]
+        expectedCloseDate?: Date
+        probability?: number
+        status?: string
+    }
+) {
+    const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+
+    const opportunity = await SalesOpportunityModel.findById(opportunityId)
+
+    if (!opportunity) {
+        throw new NotFoundError('sales opportunity', opportunityId)
+    }
+
+    // Check edit permission
+    if (!opportunity.permissions.edit.includes(userId) && opportunity.owner !== userId) {
+        throw new ForbiddenError('Cannot edit this opportunity')
+    }
+
+    if (data.title) opportunity.title = data.title
+    if (data.value !== undefined) opportunity.amount = data.value
+    if (data.stage) opportunity.stage = data.stage
+    if (data.contacts) opportunity.contacts = data.contacts
+    if (data.expectedCloseDate) opportunity.closeDate = data.expectedCloseDate
+    if (data.probability !== undefined) opportunity.probability = data.probability
+    if (data.status) opportunity.status = data.status
+
+    opportunity.updatedAt = new Date()
+    await opportunity.save()
+
+    return opportunity
+}
+
+/**
+ * Delete sales opportunity
+ */
+export async function deleteSalesOpportunity(opportunityId: string, userId: string) {
+    const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+    const pool = getPostgresPool()
+
+    const opportunity = await SalesOpportunityModel.findById(opportunityId)
+
+    if (!opportunity) {
+        throw new NotFoundError('sales opportunity', opportunityId)
+    }
+
+    // Check edit permission
+    if (!opportunity.permissions.edit.includes(userId) && opportunity.owner !== userId) {
+        throw new ForbiddenError('Cannot delete this opportunity')
+    }
+
+    await SalesOpportunityModel.findByIdAndDelete(opportunityId)
+    await pool.query('DELETE FROM sales_opportunities WHERE id = $1', [opportunityId])
+
+    return { success: true }
+}
+
+/**
  * Add activity to sales opportunity
  */
 export async function addActivity(

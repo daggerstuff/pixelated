@@ -183,6 +183,7 @@ export function CognitiveModelSelector({
           conversationalStyle: {
             verbosity: 5,
             emotionalExpressiveness: 5,
+            resistance: 3,
             insightLevel: 3,
             preferredCommunicationModes: [],
           },
@@ -253,6 +254,7 @@ export function CognitiveModelSelector({
           conversationalStyle: {
             verbosity: 5,
             emotionalExpressiveness: 5,
+            resistance: 3,
             insightLevel: 3,
             preferredCommunicationModes: [],
           },
@@ -319,6 +321,7 @@ export function CognitiveModelSelector({
           conversationalStyle: {
             verbosity: 5,
             emotionalExpressiveness: 5,
+            resistance: 3,
             insightLevel: 3,
             preferredCommunicationModes: [],
           },

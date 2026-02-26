@@ -21,7 +21,7 @@ export async function validateData<T extends z.ZodTypeAny>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(
-        `Validation failed: ${error.errors.map((e) => e.message).join(', ')}`,
+        `Validation failed: ${error.issues.map((e) => e.message).join(', ')}`,
         { cause: error },
       )
     }

@@ -63,13 +63,13 @@ export const GET = async ({ request, url }) => {
     const offset = parseInt(url?.searchParams.get('offset') || '0')
 
     // Get high-risk detections
-    const detections = await aiRepository.getHighRiskDetections(limit, offset)
+    const detections = await aiRepository.getHighRiskCrisisDetections(limit)
 
     // Create audit log
     await createAuditLog(
-      AuditEventType.SECURITY_EVENT,
+      AuditEventType.SECURITY,
       'high_risk_detections_access',
-      userId,
+      userId || 'anonymous',
       'ai-high-risk-detections',
       { limit, offset, count: detections.length },
       AuditEventStatus.SUCCESS,
@@ -84,7 +84,7 @@ export const GET = async ({ request, url }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      AuditEventType.SYSTEM_ERROR,
+      AuditEventType.SYSTEM,
       'high_risk_detections_error',
       userId || 'anonymous',
       'ai-high-risk-detections',

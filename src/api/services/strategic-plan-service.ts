@@ -282,3 +282,121 @@ export async function shareStrategicPlan(
 
     return plan
 }
+
+/**
+ * Delete strategic plan
+ */
+export async function deleteStrategicPlan(planId: string, userId: string) {
+    const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+    const pool = getPostgresPool()
+
+    const plan = await StrategicPlanModel.findById(planId)
+
+    if (!plan) {
+        throw new NotFoundError('strategic plan', planId)
+    }
+
+    // Check edit permission
+    if (!plan.permissions.edit.includes(userId) && plan.owner !== userId) {
+        throw new ForbiddenError('Cannot delete this plan')
+    }
+
+    await StrategicPlanModel.findByIdAndDelete(planId)
+    await pool.query('DELETE FROM strategic_plans WHERE id = $1', [planId])
+
+    return { success: true }
+}
+
+/**
+ * Align project/OKR to strategic plan
+ */
+export async function alignProjectToPlan(
+    data: {
+        planId: string
+        projectId?: string
+        okrId?: string
+        userId: string
+    }
+) {
+    const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+
+    const plan = await StrategicPlanModel.findById(data.planId)
+
+    if (!plan) {
+        throw new NotFoundError('strategic plan', data.planId)
+    }
+
+    // Check edit permission
+    if (!plan.permissions.edit.includes(data.userId) && plan.owner !== data.userId) {
+        throw new ForbiddenError('Cannot align to this plan')
+    }
+
+    if (data.projectId) {
+        plan.objectives.push({
+            _id: uuid(),
+            title: `Project: ${data.projectId}`,
+            description: 'Aligned project',
+            progress: 0,
+            status: 'not_started',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        })
+    }
+
+    if (data.okrId) {
+        plan.keyResults.push({
+            _id: uuid(),
+            title: `OKR: ${data.okrId}`,
+            targetValue: 100,
+            currentValue: 0,
+            unit: '%',
+            deadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+            status: 'at_risk',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        })
+    }
+
+    plan.updatedAt = new Date()
+    await plan.save()
+
+    return plan
+}
+
+/**
+ * Update strategic plan status
+ */
+export async function updatePlanStatus(
+    data: {
+        planId: string
+        status: string
+        reason?: string
+        userId: string
+    }
+) {
+    const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+    const pool = getPostgresPool()
+
+    const plan = await StrategicPlanModel.findById(data.planId)
+
+    if (!plan) {
+        throw new NotFoundError('strategic plan', data.planId)
+    }
+
+    // Check edit permission
+    if (!plan.permissions.edit.includes(data.userId) && plan.owner !== data.userId) {
+        throw new ForbiddenError('Cannot update status of this plan')
+    }
+
+    plan.status = data.status
+    plan.updatedAt = new Date()
+    await plan.save()
+
+    // Update PostgreSQL
+    await pool.query(
+        `UPDATE strategic_plans SET status = $1, updated_at = NOW() WHERE id = $2`,
+        [data.status, data.planId]
+    )
+
+    return plan
+}

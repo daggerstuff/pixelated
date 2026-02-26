@@ -2,10 +2,24 @@ import { getSession } from '../../../lib/auth/session'
 import mongodb from '../../../config/mongodb.config'
 import type { APIContext } from 'astro';
 
+// Local Session interface - getSession returns null in this codebase
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
+
 export const GET = async ({ request }: APIContext) => {
   try {
     // Require authentication and admin role
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (session?.user?.role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Unauthorized - Admin access required' }),

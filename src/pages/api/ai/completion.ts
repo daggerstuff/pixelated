@@ -1,10 +1,9 @@
 // import type { AIMessage } from '@/lib/ai/models/types'
-import type { SessionData } from '@/lib/auth/session'
+import { getSession } from '@/lib/auth/session'
 import type { APIRoute, APIContext } from 'astro'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 import { handleApiError } from '@/lib/ai/error-handling'
 import { createTogetherAIService } from '@/lib/ai/services/together'
-import { getSession } from '@/lib/auth/session'
 import { validateRequestBody } from '@/lib/validation/index'
 import { CompletionRequestSchema } from '@/lib/validation/schemas'
 import { applyRateLimit } from '@/lib/api/rate-limit'
@@ -14,6 +13,17 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 interface AIMessage {
   role: 'user' | 'assistant' | 'system'
   content: string
+}
+
+// Define Session interface locally (not exported from session module)
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  expires?: string
 }
 
 // Initialize logger
@@ -30,7 +40,7 @@ const logger = createBuildSafeLogger('ai-completion')
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     // Verify session for security
-    const session = await getSession(request)
+    const session = await getSession()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -84,12 +94,12 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
 
 export const POST: APIRoute = async ({ request }: APIContext) => {
   // Define session outside try block to make it accessible in catch block
-  let session: SessionData | null = null
+  let session: Session | null = null
 
   try {
     logger.info('Processing AI completion request')
     // Verify session
-    session = await getSession(request)
+    session = await getSession()
     if (!session?.user) {
       logger.warn('Unauthorized access attempt to AI completion endpoint')
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -133,14 +143,14 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         'ai-completion', // resource
         {
           // details
-          error: validationError.error,
+          error: 'Validation failed',
           details: JSON.stringify(validationError.details),
         },
         AuditEventStatus.FAILURE, // status
       )
 
-      return new Response(JSON.stringify(validationError), {
-        status: validationError.status,
+      return new Response(JSON.stringify({ error: 'Validation failed', details: validationError.details }), {
+        status: 400,
         headers: {
           'Content-Type': 'application/json',
         },

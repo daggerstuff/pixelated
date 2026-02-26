@@ -17,6 +17,20 @@ import {
 } from '@/lib/ai/embedding-agent'
 import type { EmbeddingRequest, EmbeddingResponse } from '@/lib/ai/embedding-agent'
 
+// Local Session interface - getSession returns null in this codebase
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
+
 const logger = createBuildSafeLogger('embeddings-embed')
 
 /**
@@ -25,7 +39,7 @@ const logger = createBuildSafeLogger('embeddings-embed')
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     // Verify session for security
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -90,7 +104,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Verify session
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

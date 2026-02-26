@@ -106,6 +106,7 @@ export type TherapyHistory = {
 export type ConversationalStyle = {
   verbosity: number
   emotionalExpressiveness: number
+  resistance: number
   insightLevel: number
   preferredCommunicationModes: string[]
 }

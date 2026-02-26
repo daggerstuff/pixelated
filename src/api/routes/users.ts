@@ -2,7 +2,7 @@
 import express, { Router, Request, Response } from 'express'
 import { getPostgresPool } from '../../lib/database/connection'
 import { asyncHandler, NotFoundError, ForbiddenError, ValidationError } from '../middleware/error-handler'
-import { authMiddleware, requireRole } from '../middleware/auth'
+import { authMiddleware, requireRoles } from '../middleware/auth'
 
 const router: Router = express.Router()
 
@@ -13,7 +13,7 @@ router.use(authMiddleware)
  * GET /users
  * List all users (admin and managers only)
  */
-router.get('/', requireRole(['admin', 'manager']), asyncHandler(async (req: Request, res: Response) => {
+router.get('/', requireRoles(['admin', 'manager']), asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 50, role, status } = req.query
 
     const pool = getPostgresPool()
@@ -47,7 +47,7 @@ router.get('/', requireRole(['admin', 'manager']), asyncHandler(async (req: Requ
  * Get user details
  */
 router.get('/:userId', asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params
+    const userId = req.params.userId as string
     const { user } = req as any
 
     // Users can view their own profile, admins can view anyone
@@ -77,7 +77,7 @@ router.get('/:userId', asyncHandler(async (req: Request, res: Response) => {
  * Update user details
  */
 router.put('/:userId', asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params
+    const userId = req.params.userId as string
     const { name, email, status, role } = req.body
     const { user } = req as any
 
@@ -117,7 +117,7 @@ router.put('/:userId', asyncHandler(async (req: Request, res: Response) => {
     }
 
     if (updates.length === 0) {
-        throw new ValidationError('No valid fields to update', {})
+        throw new ValidationError('No valid fields to update', { fields: 'No valid fields to update' })
     }
 
     updates.push(`updated_at = NOW()`)
@@ -142,12 +142,12 @@ router.put('/:userId', asyncHandler(async (req: Request, res: Response) => {
  * POST /users/:userId/permissions
  * Grant permission to user (admin only)
  */
-router.post('/:userId/permissions', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
+router.post('/:userId/permissions', requireRoles(['admin']), asyncHandler(async (req: Request, res: Response) => {
     const { userId: _userId } = req.params
     const { permission } = req.body
 
     if (!permission) {
-        throw new ValidationError('Permission required', { permission: true })
+        throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
     // TODO: Implement permission granting
@@ -163,7 +163,7 @@ router.post('/:userId/permissions', requireRole(['admin']), asyncHandler(async (
  * DELETE /users/:userId/permissions/:permissionId
  * Revoke permission from user (admin only)
  */
-router.delete('/:userId/permissions/:permissionId', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
+router.delete('/:userId/permissions/:permissionId', requireRoles(['admin']), asyncHandler(async (req: Request, res: Response) => {
     const { userId: _userId, permissionId: _permissionId } = req.params
 
     // TODO: Implement permission revocation
@@ -179,8 +179,8 @@ router.delete('/:userId/permissions/:permissionId', requireRole(['admin']), asyn
  * DELETE /users/:userId
  * Deactivate user account (admin only)
  */
-router.delete('/:userId', requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params
+router.delete('/:userId', requireRoles(['admin']), asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.params.userId as string
 
     const pool = getPostgresPool()
     const result = await pool.query(

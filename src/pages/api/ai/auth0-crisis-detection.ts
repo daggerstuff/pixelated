@@ -1,5 +1,6 @@
 import type { APIRoute, APIContext } from 'astro'
 import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
+import { getAIServiceByProvider } from '@/lib/ai/providers'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,
@@ -7,9 +8,8 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from '@/lib/audit'
-import type { AuditResource } from '@/lib/audit/types'
 import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
-import type { CrisisDetectionResult } from '@/lib/ai/crisis/types'
+import type { CrisisDetectionResult, CrisisDetectionOptions } from '@/lib/ai/crisis/types'
 import { getUserById } from '@/services/auth0.service'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
@@ -77,56 +77,73 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       )
     }
 
-    // Initialize crisis detection service
-    const crisisDetectionService = new CrisisDetectionService()
+    // Get the appropriate AI service
+    const aiService = getAIServiceByProvider('anthropic')
+    if (!aiService) {
+      return new Response(
+        JSON.stringify({ error: 'AI service not available' }),
+        {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    // Initialize crisis detection service with required config
+    const crisisDetectionService = new CrisisDetectionService({
+      aiService,
+      sensitivityLevel: 'medium',
+    })
 
     // Perform crisis detection
+    const crisisOptions: CrisisDetectionOptions = {
+      sensitivityLevel: 'medium',
+      userId: userId!,
+      source: 'auth0-api',
+      metadata: { sessionId, context },
+    }
     const detectionResult: CrisisDetectionResult =
-      await crisisDetectionService.detectCrisis(text, {
-        sessionId,
-        userId: userId,
-        context,
-      })
+      await crisisDetectionService.detectCrisis(text, crisisOptions)
 
     // Handle crisis protocol if detected
-    if (detectionResult.crisisDetected) {
+    if (detectionResult.isCrisis) {
       crisisDetected = true
       logger.info('Crisis detected, initiating protocol', {
         userId,
         sessionId,
-        crisisType: detectionResult.crisisType,
+        crisisType: detectionResult.category,
         confidence: detectionResult.confidence,
       })
 
       // Execute crisis protocol
-      await crisisProtocolInstance.handleCrisis({
-        userId: userId,
-        sessionId,
-        crisisType: detectionResult.crisisType,
-        confidence: detectionResult.confidence,
+      await crisisProtocolInstance.handleCrisis(
+        userId || 'anonymous',
+        sessionId || 'unknown',
         text,
-        context,
-      })
+        detectionResult.confidence,
+        detectionResult.detectedTerms,
+      )
     }
 
     // Create audit log
     const auditDetails: AuditDetails = {
       crisisDetected,
       confidence: detectionResult.confidence,
-      crisisType: detectionResult.crisisType,
+      crisisType: detectionResult.category,
       processingTime: Date.now() - startTime,
       sessionId,
     }
 
+    const validUserId = userId || 'anonymous'
     await createAuditLog(
-      AuditEventType.CRISIS_DETECTION,
+      AuditEventType.AI_OPERATION,
       'crisis_detection_analysis',
-      userId,
-      'ai-crisis-detection' as AuditResource,
+      validUserId,
+      'ai-crisis-detection',
       auditDetails,
-      detectionResult.crisisDetected
-        ? AuditEventStatus.SUCCESS
-        : AuditEventStatus.INFO,
+      detectionResult.isCrisis
+        ? AuditEventStatus.WARNING
+        : AuditEventStatus.SUCCESS,
     )
 
     return new Response(JSON.stringify(detectionResult), {
@@ -141,14 +158,14 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     })
 
     // Create audit log for the error
+    const errorUserId = userId || 'anonymous'
     await createAuditLog(
-      AuditEventType.SYSTEM_ERROR,
+      AuditEventType.SYSTEM,
       'crisis_detection_error',
-      userId || 'anonymous',
-      'ai-crisis-detection' as AuditResource,
+      errorUserId,
+      'ai-crisis-detection',
       {
-        error: error?.message,
-        stack: error?.stack,
+        error: error instanceof Error ? error.message : String(error),
         processingTime: Date.now() - startTime,
       },
       AuditEventStatus.FAILURE,

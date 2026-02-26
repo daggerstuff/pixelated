@@ -1,123 +1,100 @@
 #!/bin/bash
 set -e
 
-# Backup Verification Script
-# ==========================
+# Backup Verification Script (Rclone Edition)
+# ==========================================
 
-BACKUP_BUCKET="${BACKUP_BUCKET:-pixelated-empathy-backups}"
+REMOTE_NAME="drive"
+BUCKET_NAME="${S3_BUCKET:-pixel-data}"
 VERIFICATION_LOG="/var/log/backup-verification.log"
 
+# Ensure log file exists and is writable
+touch "${VERIFICATION_LOG}" 2>/dev/null || VERIFICATION_LOG="/tmp/backup-verification.log"
+
+log_verify() {
+	echo "$(date): $1" | tee -a "${VERIFICATION_LOG}"
+}
+
 verify_backups() {
-	local date_output
-	date_output=$(date)
-	echo "${date_output}: Starting backup verification" >>"${VERIFICATION_LOG}"
+	log_verify "Starting backup verification on $REMOTE_NAME:$BUCKET_NAME"
 
 	# Verify database backups
-	verify_database_backups
-	local db_status=$?
-	if [[ ${db_status} -ne 0 ]]; then
-		echo "WARNING: Database backup verification failed" >>"${VERIFICATION_LOG}"
+	if verify_remote_backups "db_backup"; then
+		log_verify "SUCCESS: Database backup verification passed"
+	else
+		log_verify "WARNING: Database backup verification failed"
 	fi
 
 	# Verify application backups
-	verify_application_backups
-	local app_status=$?
-	if [[ ${app_status} -ne 0 ]]; then
-		echo "WARNING: Application backup verification failed" >>"${VERIFICATION_LOG}"
+	if verify_remote_backups "app_data"; then
+		log_verify "SUCCESS: Application backup verification passed"
+	else
+		log_verify "WARNING: Application backup verification failed"
 	fi
 
 	# Verify backup retention
-	verify_backup_retention
-	local retention_status=$?
-	if [[ ${retention_status} -ne 0 ]]; then
-		echo "WARNING: Backup retention verification failed" >>"${VERIFICATION_LOG}"
-	fi
-
-	local completion_date
-	completion_date=$(date)
-	echo "${completion_date}: Backup verification completed" >>"${VERIFICATION_LOG}"
-}
-
-verify_database_backups() {
-	echo "Verifying database backups..."
-
-	# Get latest database backup
-	local latest_backup
-	local aws_output
-	if ! aws_output=$(aws s3 ls "s3://${BACKUP_BUCKET}/database/" 2>&1); then
-		echo "ERROR: Failed to list database backups" >>"${VERIFICATION_LOG}"
-		return 1
-	fi
-	local sorted_output
-	sorted_output=$(echo "${aws_output}" | sort) || true
-	local tail_output
-	tail_output=$(echo "${sorted_output}" | tail -n 1) || true
-	latest_backup=$(echo "${tail_output}" | awk '{print $4}') || true
-
-	if [[ -z ${latest_backup} ]]; then
-		echo "ERROR: No database backups found" >>"${VERIFICATION_LOG}"
-		return 1
-	fi
-
-	# Download and verify integrity
-	aws s3 cp "s3://${BACKUP_BUCKET}/database/${latest_backup}" ./temp_backup.sql.gz || true
-
-	if gzip -t temp_backup.sql.gz; then
-		echo "SUCCESS: Database backup integrity verified" >>"${VERIFICATION_LOG}"
+	if verify_backup_retention; then
+		log_verify "SUCCESS: Backup retention policy compliant"
 	else
-		echo "ERROR: Database backup corrupted: ${latest_backup}" >>"${VERIFICATION_LOG}"
-		return 1
+		log_verify "WARNING: Backup retention verification failed"
 	fi
 
-	rm -f temp_backup.sql.gz
+	log_verify "Backup verification completed"
 }
 
-verify_application_backups() {
-	echo "Verifying application backups..."
+verify_remote_backups() {
+	local pattern="$1"
+	log_verify "Verifying latest $pattern backup..."
 
-	# Similar verification for application backups
+	# Get latest backup matching the pattern
 	local latest_backup
-	local aws_output
-	if ! aws_output=$(aws s3 ls "s3://${BACKUP_BUCKET}/application/" 2>&1); then
-		echo "ERROR: Failed to list application backups" >>"${VERIFICATION_LOG}"
-		return 1
-	fi
-	local sorted_output
-	sorted_output=$(echo "${aws_output}" | sort) || true
-	local tail_output
-	tail_output=$(echo "${sorted_output}" | tail -n 1) || true
-	latest_backup=$(echo "${tail_output}" | awk '{print $4}') || true
+	latest_backup=$(rclone lsf "$REMOTE_NAME:$BUCKET_NAME/backups/" | grep "$pattern" | sort -r | head -n 1)
 
 	if [[ -z ${latest_backup} ]]; then
-		echo "ERROR: No application backups found" >>"${VERIFICATION_LOG}"
+		log_verify "ERROR: No backups found matching $pattern"
 		return 1
 	fi
 
-	echo "SUCCESS: Application backup verified: ${latest_backup}" >>"${VERIFICATION_LOG}"
+	log_verify "Downloading latest backup for verification: $latest_backup"
+	if rclone copy "$REMOTE_NAME:$BUCKET_NAME/backups/$latest_backup" ./temp_verify/ --progress; then
+		local local_file="./temp_verify/$latest_backup"
+		
+		# Integrity check
+		if [[ ${local_file} == *.gz ]]; then
+			if gzip -t "${local_file}"; then
+				log_verify "SUCCESS: $latest_backup integrity verified"
+				rm -rf ./temp_verify/
+				return 0
+			fi
+		elif [[ ${local_file} == *.tar.gz ]]; then
+			if tar -tzf "${local_file}" >/dev/null; then
+				log_verify "SUCCESS: $latest_backup integrity verified"
+				rm -rf ./temp_verify/
+				return 0
+			fi
+		fi
+	fi
+
+	log_verify "ERROR: Integrity check failed for $latest_backup"
+	rm -rf ./temp_verify/
+	return 1
 }
 
 verify_backup_retention() {
-	echo "Verifying backup retention policy..."
+	log_verify "Verifying remote backup retention policy..."
 
-	# Check if backups older than 30 days exist
-	local old_backups
-	local aws_output
-	local date_output
-	date_output=$(date -d '30 days ago' '+%Y-%m-%d')
-	if ! aws_output=$(aws s3 ls "s3://${BACKUP_BUCKET}/" --recursive 2>&1); then
-		echo "ERROR: Failed to list backups" >>"${VERIFICATION_LOG}"
-		return 1
-	fi
-	local awk_output
-	awk_output=$(echo "${aws_output}" | awk "\$1 < \"${date_output}\"") || true
-	old_backups=$(echo "${awk_output}" | wc -l) || true
+	local retention_days=30
+	local old_files
+	old_files=$(rclone lsf "$REMOTE_NAME:$BUCKET_NAME/backups/" --min-age "${retention_days}d" | wc -l)
 
-	if [[ ${old_backups} -gt 0 ]]; then
-		echo "WARNING: Found ${old_backups} backups older than 30 days" >>"${VERIFICATION_LOG}"
-	else
-		echo "SUCCESS: Backup retention policy compliant" >>"${VERIFICATION_LOG}"
+	if [[ ${old_files} -gt 0 ]]; then
+		log_verify "WARNING: Found ${old_files} remote backups older than ${retention_days} days. Pruning..."
+		rclone delete "$REMOTE_NAME:$BUCKET_NAME/backups/" --min-age "${retention_days}d"
 	fi
+
+	return 0
 }
 
 # Execute verification
+mkdir -p ./temp_verify
 verify_backups

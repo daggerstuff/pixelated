@@ -48,6 +48,41 @@ export function useCognitiveDistortionDetection({
     setError(null)
   }, [])
 
+  // Helper function to generate a summary
+  const generateSummary = useCallback(
+    (
+      distortions: CognitiveDistortion[],
+      overallNegativeThinking: number,
+    ): string => {
+      if (distortions.length === 0) {
+        return 'No cognitive distortions detected.'
+      }
+
+      // Get the top distortions by confidence
+      const topDistortions = [...distortions]
+        .sort((a, b) => b.confidence - a.confidence)
+        .slice(0, 3)
+
+      const distortionList = topDistortions
+        .map((d) => {
+          const config =
+            cognitiveDistortionConfigs[d.type as CognitiveDistortionType]
+          return config ? config.name : d.type
+        })
+        .join(', ')
+
+      const severityLevel =
+        overallNegativeThinking < 0.3
+          ? 'mild'
+          : overallNegativeThinking < 0.6
+            ? 'moderate'
+            : 'significant'
+
+      return `Detected ${severityLevel} presence of negative thinking patterns, primarily ${distortionList}.`
+    },
+    [],
+  )
+
   // Client-side distortion detection using pattern matching
   // This is less accurate but works without an API call
   const clientSideDetect = useCallback(
@@ -120,41 +155,6 @@ export function useCognitiveDistortionDetection({
       return result
     },
     [minConfidence, onDetection, onComplete, generateSummary],
-  )
-
-  // Helper function to generate a summary
-  const generateSummary = useCallback(
-    (
-      distortions: CognitiveDistortion[],
-      overallNegativeThinking: number,
-    ): string => {
-      if (distortions.length === 0) {
-        return 'No cognitive distortions detected.'
-      }
-
-      // Get the top distortions by confidence
-      const topDistortions = [...distortions]
-        .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, 3)
-
-      const distortionList = topDistortions
-        .map((d) => {
-          const config =
-            cognitiveDistortionConfigs[d.type as CognitiveDistortionType]
-          return config ? config.name : d.type
-        })
-        .join(', ')
-
-      const severityLevel =
-        overallNegativeThinking < 0.3
-          ? 'mild'
-          : overallNegativeThinking < 0.6
-            ? 'moderate'
-            : 'significant'
-
-      return `Detected ${severityLevel} presence of negative thinking patterns, primarily ${distortionList}.`
-    },
-    [],
   )
 
   // Server-side detection using API
