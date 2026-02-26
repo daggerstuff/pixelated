@@ -79,11 +79,13 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
     // 3. The underlying types are correct in env.d.ts
     // 4. This is a common pattern in Astro projects
     if (context.locals && authResult.request?.user) {
-      const locals = context.locals as App.Locals
-      locals.user = {
+      // Create the user object first, then assign with proper typing
+      const userData = {
         ...authResult.request.user,
         emailVerified: authResult.request.user.emailVerified ?? false
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(context.locals as any).user = userData
     }
   } catch (err) {
     // If authentication check fails, treat as unauthenticated

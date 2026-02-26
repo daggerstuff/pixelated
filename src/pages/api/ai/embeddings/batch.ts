@@ -16,6 +16,20 @@ import {
 } from '@/lib/ai/embedding-agent'
 import type { BatchEmbeddingRequest, BatchEmbeddingResponse, BatchEmbeddingItem } from '@/lib/ai/embedding-agent'
 
+// Local Session interface - getSession returns null in this codebase
+interface Session {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
+  session?: {
+    sessionId?: string
+  }
+  expires?: string
+}
+
 const logger = createBuildSafeLogger('embeddings-batch')
 
 /**
@@ -23,7 +37,7 @@ const logger = createBuildSafeLogger('embeddings-batch')
  */
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -80,7 +94,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    const session = await getSession(request)
+    const session: Session | null = await getSession()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

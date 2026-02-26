@@ -22,7 +22,7 @@ export async function POST({ request }: { request: Request }) {
     const result = RegisterSchema.safeParse(body)
     if (!result.success) {
       return new Response(
-        JSON.stringify({ error: result.error.errors[0].message }),
+        JSON.stringify({ error: result.error.issues[0].message }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }

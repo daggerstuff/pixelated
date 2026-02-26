@@ -52,7 +52,7 @@ export function parseSemanticEvidenceResponse(response: string): Array<
 
     if (!validationResult.success) {
       logger.error('Schema validation failed for semantic evidence response', {
-        validationErrors: validationResult.error.errors,
+        validationErrors: validationResult.error.issues,
         receivedData: parsedResponse,
         responsePreview: response.substring(0, 200),
       })

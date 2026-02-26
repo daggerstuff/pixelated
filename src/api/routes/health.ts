@@ -89,7 +89,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
 // READINESS CHECK (for Kubernetes)
 // ============================================================================
 
-router.get('/ready', async (req: Request, res: Response) => {
+router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
     try {
         // Check all critical services
         const mongo = getMongoConnection()
@@ -107,12 +107,12 @@ router.get('/ready', async (req: Request, res: Response) => {
         await client.query('SELECT 1')
         client.release()
 
-        res.json({
+        return res.json({
             ready: true,
             timestamp: new Date().toISOString()
         })
     } catch (error) {
-        res.status(503).json({
+        return res.status(503).json({
             ready: false,
             error: (error as Error).message
         })

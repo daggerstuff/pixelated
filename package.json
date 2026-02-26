@@ -318,6 +318,8 @@
     "axe-core": "^4.11.1",
     "chalk": "^5.6.2",
     "cheerio": "^1.2.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "del-cli": "^7.0.0",

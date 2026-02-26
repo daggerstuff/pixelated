@@ -41,7 +41,7 @@ export interface GestaltUpdatePayload {
 
 /** Raw envelope that wraps every server → client WebSocket frame. */
 interface GestaltWebSocketFrame {
-    type: 'gestalt_update' | 'status' | 'error' | string
+    type: 'gestalt_update' | 'status' | 'error' | (string & {})
     session_id?: string
     data?: GestaltUpdatePayload
     message?: string

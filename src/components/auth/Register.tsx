@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { FormSubmitEvent } from "astro";
-import { RegisterSchema } from "@/lib/validation/registerSchema";
 
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,7 +10,22 @@ export default function RegisterForm() {
     termsAccepted: false,
   });
 
-  const schema = RegisterSchema;
+  // Simple validation without external schema
+  const validateForm = () => {
+    if (!user.email || !user.email.includes("@")) {
+      return "Please enter a valid email address";
+    }
+    if (!user.password || user.password.length < 6) {
+      return "Password must be at least 6 characters";
+    }
+    if (!user.fullName || user.fullName.trim().length === 0) {
+      return "Please enter your full name";
+    }
+    if (!user.termsAccepted) {
+      return "You must accept the Terms of Service";
+    }
+    return null;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -22,14 +35,14 @@ export default function RegisterForm() {
     }));
   };
 
-  const handleSubmit = async (e: FormSubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const result = schema.safeParse(user);
-    if (!result.success) {
-      setError(result.error.errors[0].message);
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       setIsLoading(false);
       return;
     }
@@ -40,7 +53,7 @@ export default function RegisterForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(result.data),
+        body: JSON.stringify(user),
       });
 
       const data = await response.json();

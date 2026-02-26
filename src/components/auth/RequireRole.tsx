@@ -1,4 +1,5 @@
 
+import { useSession } from '@/lib/auth-client'
 import type { AuthRole } from '@/config/auth.config'
 import type { UserRole } from '@/types/auth'
 
@@ -9,7 +10,7 @@ interface RequireRoleProps {
 }
 
 /**
- * RequireRole component - Alias for RoleGuard with clearer naming
+ * RequireRole component - Checks if current user has required role
  * 
  * Usage:
  * ```tsx
@@ -23,10 +24,27 @@ export function RequireRole({
   role,
   fallback = null,
 }: RequireRoleProps) {
-  return (
-    <RoleGuard requiredRole={role} fallback={fallback}>
-      {children}
-    </RoleGuard>
+  const { data: session } = useSession()
+  
+  // If no session, show fallback
+  if (!session?.user) {
+    return <>{fallback}</>
+  }
+  
+  // Convert role to array for easier checking
+  const requiredRoles = Array.isArray(role) ? role : [role]
+  const userRole = session.user.role
+  
+  // Check if user has any of the required roles
+  const hasRequiredRole = requiredRoles.some(
+    (requiredRole) => 
+      userRole === requiredRole || 
+      userRole?.toLowerCase() === requiredRole.toLowerCase()
   )
+  
+  if (!hasRequiredRole) {
+    return <>{fallback}</>
+  }
+  
+  return <>{children}</>
 }
-

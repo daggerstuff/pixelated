@@ -12,13 +12,6 @@ services:
       - ./ai/pipelines/orchestrator/processing:/workspace/scripts
     environment:
       - NVIDIA_API_KEY=${NVIDIA_API_KEY}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu]
-              count: all
     networks:
       - nemo-network
 

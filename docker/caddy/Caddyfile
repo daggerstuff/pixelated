@@ -143,6 +143,19 @@ dash.pixelatedempathy.tech {
     }
 }
 
+# ThotBot Frontend (Link-in-Bio)
+thot.pixelated.love {
+    reverse_proxy 172.17.0.1:5174 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
+
 # Default catch-all for port 80 (Redirect to HTTPS)
 :80 {
     # Health check for the server itself

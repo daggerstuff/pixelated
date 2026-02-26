@@ -118,8 +118,8 @@ export function useAudioCapture(
                 }
             }
 
-            recorder.onerror = (event: MediaRecorderErrorEvent) => {
-                setError(event.error?.message || 'Recording error')
+            recorder.onerror = (_event: Event) => {
+                setError('Recording error')
             }
 
             recorder.onstop = () => {
@@ -160,6 +160,10 @@ export function useAudioCapture(
 
         return new Promise<Blob | null>((resolve) => {
             const recorder = mediaRecorderRef.current
+            if (!recorder) {
+                resolve(null)
+                return
+            }
 
             const handleStop = () => {
                 recorder.removeEventListener('stop', handleStop)

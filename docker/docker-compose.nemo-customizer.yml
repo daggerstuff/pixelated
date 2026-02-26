@@ -12,10 +12,12 @@ services:
       - NGC_API_KEY=${NVIDIA_API_KEY}
       - ENTITY_STORE_URL=http://nemo-entity-store:8000
       - NEMO_DATA_STORE_URL=http://nemo-datastore:3000
+      - CONFIG_PATH=/mount/cfg/config.yaml
     volumes:
       - nemo_customizer_model_cache:/mount/models
       - nemo_customizer_workspace:/mount/workspace
       - ./ai/training_data_consolidated/final:/app/data/training # Mapping local consolidated data
+      - ./nemo-customizer-config.yaml:/mount/cfg/config.yaml
     ports:
       - "8001:8001"
     depends_on:
@@ -25,13 +27,6 @@ services:
         condition: service_started
     networks:
       - nemo-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu]
-              count: all
 
 volumes:
   nemo_customizer_model_cache:

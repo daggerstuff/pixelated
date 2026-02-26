@@ -29,7 +29,7 @@ async function incrementRedisCounter(key: string, windowSeconds: number) {
  * Default: 100 requests per 60 seconds
  */
 export function rateLimiter(req: Request, res: Response, next: NextFunction): void {
-    const ip = req.ip || req.connection.remoteAddress || 'unknown'
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown'
     const windowMs = 60000 // 60 seconds
     const maxRequests = 100
 

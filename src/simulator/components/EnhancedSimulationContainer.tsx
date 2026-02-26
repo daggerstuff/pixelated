@@ -163,7 +163,7 @@ export function EnhancedSimulationContainer({
       ])
 
       // Start real-time analysis
-      startAnalysisRef.current()
+      void startAnalysisRef.current()
     }
 
     return () => {

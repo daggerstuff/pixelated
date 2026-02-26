@@ -23,7 +23,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     const { user } = req as any
 
     if (!name) {
-        throw new ValidationError('Project name is required', { name: true })
+        throw new ValidationError('Project name is required', { name: 'name is required' })
     }
 
     const project = await createProject({
@@ -61,7 +61,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 
 // Get project details
 router.get('/:projectId', asyncHandler(async (req: Request, res: Response) => {
-    const { projectId } = req.params
+    const projectId = req.params.projectId as string
     const { user } = req as any
 
     const project = await getProject(projectId, user.id)
@@ -74,7 +74,7 @@ router.get('/:projectId', asyncHandler(async (req: Request, res: Response) => {
 
 // Update project details
 router.put('/:projectId', asyncHandler(async (req: Request, res: Response) => {
-    const { projectId } = req.params
+    const projectId = req.params.projectId as string
     const { name, description, category, budget, status } = req.body
     const { user } = req as any
 
@@ -94,12 +94,12 @@ router.put('/:projectId', asyncHandler(async (req: Request, res: Response) => {
 
 // Add objective to project
 router.post('/:projectId/objectives', asyncHandler(async (req: Request, res: Response) => {
-    const { projectId } = req.params
+    const projectId = req.params.projectId as string
     const { title, description, successCriteria, deadline } = req.body
     const { user } = req as any
 
     if (!title) {
-        throw new ValidationError('Objective title is required', { title: true })
+        throw new ValidationError('Objective title is required', { title: 'title is required' })
     }
 
     const project = await addObjective(projectId, user.id, {
@@ -117,19 +117,19 @@ router.post('/:projectId/objectives', asyncHandler(async (req: Request, res: Res
 
 // Share project with another user
 router.post('/:projectId/share', asyncHandler(async (req: Request, res: Response) => {
-    const { projectId } = req.params
+    const projectId = req.params.projectId as string
     const { userId, permissionLevel } = req.body
     const { user } = req as any
 
     if (!userId || !permissionLevel) {
         throw new ValidationError('userId and permissionLevel required', {
-            userId: !userId,
-            permissionLevel: !permissionLevel
+            userId: 'userId is required',
+            permissionLevel: 'permissionLevel is required'
         })
     }
 
     if (!['view', 'edit', 'comment'].includes(permissionLevel)) {
-        throw new ValidationError('Invalid permission level', { permissionLevel: true })
+        throw new ValidationError('Invalid permission level', { permissionLevel: 'invalid permission level' })
     }
 
     const project = await shareProject(
@@ -147,7 +147,7 @@ router.post('/:projectId/share', asyncHandler(async (req: Request, res: Response
 
 // Search projects
 router.get('/search/:query', asyncHandler(async (req: Request, res: Response) => {
-    const { query } = req.params
+    const query = req.params.query as string
     const { user } = req as any
 
     const results = await searchProjects(query, user.id)

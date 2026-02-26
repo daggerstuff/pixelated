@@ -124,14 +124,6 @@ export const OfflineDemo: FC = () => {
 
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   <div>Connection Quality: {connectionQuality}</div>
-                  <div>
-                    Effective Type:{' '}
-                    {navigator.connection?.effectiveType || 'Unknown'}
-                  </div>
-                  <div>
-                    Downlink: {navigator.connection?.downlink || 0} Mbps
-                  </div>
-                  <div>RTT: {navigator.connection?.rtt || 0} ms</div>
                 </div>
               </div>
 

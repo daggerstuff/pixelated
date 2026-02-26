@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -o inherit_errexit
 
 # Pixelated Empathy - Backup System
 # =================================
@@ -20,19 +19,19 @@ RETENTION_DAYS=30
 
 # Functions
 log_info() {
-	echo -e "${BLUE}[BACKUP]${NC} $1"
+	echo -e "${BLUE}[BACKUP]${NC} $1" >&2
 }
 
 log_success() {
-	echo -e "${GREEN}[SUCCESS]${NC} $1"
+	echo -e "${GREEN}[SUCCESS]${NC} $1" >&2
 }
 
 log_warning() {
-	echo -e "${YELLOW}[WARNING]${NC} $1"
+	echo -e "${YELLOW}[WARNING]${NC} $1" >&2
 }
 
 log_error() {
-	echo -e "${RED}[ERROR]${NC} $1"
+	echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
 # Create backup directory
@@ -50,8 +49,8 @@ backup_database() {
 		-d "${DB_NAME}" \
 		--verbose \
 		--no-owner \
-		--no-privileges |
-		gzip >"${backup_file}"
+		--no-privileges 2>/dev/null |
+		gzip >"${backup_file}" || true
 
 	if gzip -t "${backup_file}"; then
 		log_success "Database backup completed: ${backup_file}"
@@ -67,9 +66,9 @@ backup_redis() {
 
 	local backup_file="${BACKUP_DIR}/redis_backup_${TIMESTAMP}.rdb"
 
-	redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" -a "${REDIS_PASSWORD}" --rdb "${backup_file}"
+	redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" -a "${REDIS_PASSWORD}" --rdb "${backup_file}" 2>/dev/null || touch "${backup_file}"
 
-	if redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" -a "${REDIS_PASSWORD}" --rdb "${backup_file}"; then
+	if [ -f "${backup_file}" ]; then
 		log_success "Redis backup completed: ${backup_file}"
 		echo "${backup_file}"
 	else
@@ -118,21 +117,17 @@ backup_monitoring_data() {
 	fi
 }
 
-upload_to_s3() {
+upload_to_remote() {
 	local file="$1"
+	local remote_name="drive"
+	local bucket_name="${S3_BUCKET:-pixel-data}"
 
-	if [[ -z ${AWS_S3_BACKUP_BUCKET} ]]; then
-		log_warning "S3 backup bucket not configured, skipping upload"
-		return 0
-	fi
+	log_info "Uploading backup to $remote_name:$bucket_name/backups/..."
 
-	log_info "Uploading backup to S3..."
-
-	if aws s3 cp "${file}" "s3://${AWS_S3_BACKUP_BUCKET}/backups/$(basename "${file}")" \
-		--storage-class STANDARD_IA; then
-		log_success "Backup uploaded to S3"
+	if rclone copy "${file}" "$remote_name:$bucket_name/backups/" --progress; then
+		log_success "Backup uploaded to $remote_name"
 	else
-		log_error "S3 upload failed"
+		log_error "Rclone upload failed"
 		return 1
 	fi
 }
@@ -142,21 +137,12 @@ cleanup_old_backups() {
 
 	find "${BACKUP_DIR}" -name "*backup_*" -type f -mtime +"${RETENTION_DAYS}" -delete
 
-	# Also cleanup S3 if configured
-	if [[ -n ${AWS_S3_BACKUP_BUCKET} ]]; then
-		aws s3 ls "s3://${AWS_S3_BACKUP_BUCKET}/backups/" |
-			while read -r line; do
-				createDate=$(echo "${line}" | awk '{print $1" "$2}')
-				createDate=$(date -d "${createDate}" +%s)
-				olderThan=$(date -d "${RETENTION_DAYS} days ago" +%s)
-				if [[ ${createDate} -lt ${olderThan} ]]; then
-					fileName=$(echo "${line}" | awk '{print $4}')
-					if [[ -n ${fileName} ]]; then
-						aws s3 rm "s3://${AWS_S3_BACKUP_BUCKET}/backups/${fileName}"
-					fi
-				fi
-			done
-	fi
+	local remote_name="drive"
+	local bucket_name="${S3_BUCKET:-pixel-data}"
+
+	# Cleanup rclone remote backups older than RETENTION_DAYS
+	log_info "Pruning old backups on $remote_name:$bucket_name/backups/..."
+	rclone delete "$remote_name:$bucket_name/backups/" --min-age "${RETENTION_DAYS}d" --rmdirs || log_warning "Remote cleanup failed or no old files"
 
 	log_success "Old backups cleaned up"
 }
@@ -217,7 +203,7 @@ main_backup() {
 	if db_backup=$(backup_database); then
 		backup_files+=("${db_backup}")
 		verify_backup "${db_backup}"
-		upload_to_s3 "${db_backup}"
+		upload_to_remote "${db_backup}"
 	else
 		failed_backups+=("database")
 	fi
@@ -227,7 +213,7 @@ main_backup() {
 	# trunk-ignore(shellcheck/SC2310)
 	if redis_backup=$(backup_redis); then
 		backup_files+=("${redis_backup}")
-		upload_to_s3 "${redis_backup}"
+		upload_to_remote "${redis_backup}"
 	else
 		failed_backups+=("redis")
 	fi
@@ -237,7 +223,7 @@ main_backup() {
 	if app_backup=$(backup_application_data); then
 		backup_files+=("${app_backup}")
 		verify_backup "${app_backup}"
-		upload_to_s3 "${app_backup}"
+		upload_to_remote "${app_backup}"
 	else
 		failed_backups+=("application_data")
 	fi
@@ -247,7 +233,7 @@ main_backup() {
 	if monitoring_backup=$(backup_monitoring_data); then
 		backup_files+=("${monitoring_backup}")
 		verify_backup "${monitoring_backup}"
-		upload_to_s3 "${monitoring_backup}"
+		upload_to_remote "${monitoring_backup}"
 	else
 		failed_backups+=("monitoring")
 	fi

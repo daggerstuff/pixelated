@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { getAIUsageStats } from '../../../lib/ai/analytics'
 import { handleApiError } from '../../../lib/ai/error-handling'
-import { createAuditLog } from '../../../lib/audit'
+import { createAuditLog, AuditEventType, AuditEventStatus } from '../../../lib/audit'
 import { getUserById } from '@/services/auth0.service'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
@@ -62,15 +62,16 @@ export const GET: APIRoute = async ({ request, url }) => {
     const model = url.searchParams.get('model') || 'all'
 
     // Get usage stats
-    const stats = await getAIUsageStats(timeframe, model)
+    const stats = await getAIUsageStats({ period: timeframe, userId: userId || undefined })
 
     // Create audit log
     await createAuditLog(
-      'ai_usage_stats_access',
+      AuditEventType.AI_OPERATION,
       'ai.usage.stats.access',
-      userId,
+      userId || 'anonymous',
       'ai-usage-stats',
-      { timeframe, model }
+      { timeframe, model },
+      AuditEventStatus.SUCCESS,
     )
 
     return new Response(JSON.stringify(stats), {
@@ -79,8 +80,8 @@ export const GET: APIRoute = async ({ request, url }) => {
         'Content-Type': 'application/json',
       },
     })
-  } catch (error: any) {
-    await handleApiError(error, 'ai.usage.stats', userId || 'anonymous')
+  } catch (error: unknown) {
+    await handleApiError(error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: {

@@ -23,7 +23,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     const { id } = (req as any).user
 
     if (!title) {
-        throw new ValidationError('Research title is required', { title: true })
+        throw new ValidationError('Research title is required', { title: 'Title is required' })
     }
 
     const research = await createMarketResearch({
@@ -32,8 +32,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
         targetMarkets,
         researchType,
         timeline,
-        createdBy: id,
-        createdAt: new Date()
+        ownerId: id
     })
 
     res.json({
@@ -47,7 +46,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
  * Search market research
  */
 router.get('/search/:query', asyncHandler(async (req: Request, res: Response) => {
-    const { query } = req.params
+    const query = req.params.query as string
     const { id } = (req as any).user
 
     const results = await searchMarketResearch(query, id)
@@ -63,19 +62,19 @@ router.get('/search/:query', asyncHandler(async (req: Request, res: Response) =>
  * Share research with another user
  */
 router.post('/:researchId/share', asyncHandler(async (req: Request, res: Response) => {
-    const { researchId } = req.params
+    const researchId = req.params.researchId as string
     const { userId, permissionLevel } = req.body
     const { id } = (req as any).user
 
     if (!userId || !permissionLevel) {
         throw new ValidationError('userId and permissionLevel required', {
-            userId: !userId,
-            permissionLevel: !permissionLevel
+            userId: !userId ? 'User ID is required' : '',
+            permissionLevel: !permissionLevel ? 'Permission level is required' : ''
         })
     }
 
     if (!['view', 'edit', 'comment'].includes(permissionLevel)) {
-        throw new ValidationError('Invalid permission level', { permissionLevel: true })
+        throw new ValidationError('Invalid permission level', { permissionLevel: 'Invalid permission level' })
     }
 
     const research = await shareMarketResearch(

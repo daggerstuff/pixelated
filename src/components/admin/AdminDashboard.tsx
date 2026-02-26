@@ -39,13 +39,22 @@ export const AdminDashboard: FC = () => {
   // Persistent dashboard preferences
   const [dashboardView, setDashboardView] = usePersistentState<
     'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
-  >('admin_dashboard_view', 'overview')
+  >({
+    key: 'admin_dashboard_view',
+    defaultValue: 'overview'
+  })
   const [timeRange, setTimeRange] = usePersistentState<
     'week' | 'month' | 'quarter' | 'year'
-  >('admin_dashboard_timerange', 'month')
+  >({
+    key: 'admin_dashboard_timerange',
+    defaultValue: 'month'
+  })
   const [selectedTherapists, setSelectedTherapists] = usePersistentState<
     string[]
-  >('admin_selected_therapists', [])
+  >({
+    key: 'admin_selected_therapists',
+    defaultValue: []
+  })
 
   // Mock data - in real app would come from API
   const institutionMetrics: InstitutionMetrics = {
@@ -168,6 +177,7 @@ export const AdminDashboard: FC = () => {
                 }
               }}
               selectedTherapists={selectedTherapists}
+              timeRange={timeRange}
             />
           )}
 
@@ -210,7 +220,8 @@ const OverviewTab: FC<{
   therapists: TherapistPerformance[]
   onTherapistSelect: (therapistId: string) => void
   selectedTherapists: string[]
-}> = ({ metrics, therapists, onTherapistSelect, selectedTherapists }) => {
+  timeRange: 'week' | 'month' | 'quarter' | 'year'
+}> = ({ metrics, therapists, onTherapistSelect, selectedTherapists, timeRange }) => {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -623,7 +634,7 @@ const TherapistsTab: FC<{
  */
 const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
-}> = ({ _metrics }) => {
+}> = ({ metrics }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

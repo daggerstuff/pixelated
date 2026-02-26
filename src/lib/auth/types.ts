@@ -1,7 +1,21 @@
-// Removed Supabase types, using custom AuthUser and SessionData instead
+import type { AuthRole } from '../../config/auth.config'
 
-// type User = SupabaseUser
-// type Session = SupabaseSession
+export interface AuthUser {
+  id: string
+  email: string
+  emailVerified: boolean
+  name?: string
+  fullName?: string
+  role: AuthRole
+  permissions?: string[]
+  metadata?: Record<string, unknown>
+  avatarUrl?: string
+  createdAt?: string
+  updatedAt?: string
+  lastLogin?: string
+  appMetadata?: Record<string, unknown>
+  userMetadata?: Record<string, unknown>
+}
 
 export interface SessionData {
   sessionId: string
@@ -10,6 +24,13 @@ export interface SessionData {
   expiresAt: number
   securityLevel: string
   metadata?: Record<string, unknown>
+  /** Authenticated user attached by getSessionFromRequest */
+  user?: AuthUser
+  /** Raw session token info */
+  session?: {
+    token: string
+    expiresAt: Date
+  }
 }
 
 export interface AuthContext {
@@ -49,25 +70,6 @@ export interface AuthenticationResult {
   message?: string
   token?: TokenData
   session?: SessionData
-}
-
-import type { AuthRole } from '../../config/auth.config'
-
-export interface AuthUser {
-  id: string
-  email: string
-  emailVerified: boolean
-  name?: string
-  fullName?: string
-  role: AuthRole
-  permissions: string[]
-  metadata?: Record<string, unknown>
-  avatarUrl?: string
-  createdAt?: string
-  updatedAt?: string
-  lastLogin?: string
-  appMetadata?: Record<string, unknown>
-  userMetadata?: Record<string, unknown>
 }
 
 export interface AuthError {

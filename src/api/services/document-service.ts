@@ -23,7 +23,7 @@ export async function createDocument(
     userId: string
 ) {
     const documentId = uuidv4()
-    const documentSlug = slug(data.title, { lower: true })
+    const documentSlug = slug(data.title)
 
     const document = new BusinessDocument({
         documentId,

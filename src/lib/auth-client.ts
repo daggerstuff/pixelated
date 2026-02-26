@@ -192,12 +192,30 @@ class AuthClient {
   }
 
   /**
+   * Sign up getter for better-auth compatibility
+   */
+  get signUp() {
+    return {
+      email: this.signUpEmail.bind(this)
+    }
+  }
+
+  /**
    * Mimic better-auth forgetPassword
    */
   async forgetPassword({ email, redirectTo }: any) {
     console.log(`Password reset for ${email} requested, redirect to ${redirectTo}`)
-    // This would Normalmente hit another endpoint, e.g., /api/auth/forgot-password
+    // This would Normally hit another endpoint, e.g., /api/auth/forgot-password
     return { success: true }
+  }
+
+  /**
+   * Reset password getter for better-auth compatibility
+   */
+  get resetPassword() {
+    return {
+      send: this.forgetPassword.bind(this)
+    }
   }
 
 }
@@ -207,3 +225,47 @@ export const authClient = new AuthClient()
 
 // Export some types for convenience
 export const createAuthClient = () => authClient
+
+
+// React hook for using session in components
+export function useSession() {
+  const [session, setSession] = React.useState<Session | null>(null)
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState<Error | null>(null)
+
+  React.useEffect(() => {
+    let mounted = true
+
+    const fetchSession = async () => {
+      try {
+        const result = await authClient.getSession()
+        if (mounted) {
+          if (result.data?.session) {
+            setSession(result.data.session)
+          }
+          setError(result.error as Error | null)
+        }
+      } catch (e) {
+        if (mounted) {
+          setError(e as Error)
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return {
+    data: session,
+    isPending: isLoading,
+    error
+  }
+}

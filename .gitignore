@@ -212,3 +212,6 @@ antigravity_chat_export_7days.md
 epic-conversion.md
 launch_ovh_job.sh
 docs/epics
+# Internal AI Documentation & Steering
+docs/internal/
+.agent/steering/

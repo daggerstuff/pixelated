@@ -434,7 +434,7 @@ export function useWebSocketMessageHistory(maxMessages = 100) {
       executionId?: string
     }) => {
       const newMessage = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         ...message,
       }

@@ -75,4 +75,4 @@ volumes:
 
 networks:
   nemo-network:
-    driver: bridge
+    external: true

@@ -3,13 +3,13 @@ import express, { Router, Request, Response } from 'express'
 import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import { authMiddleware } from '../middleware/auth'
 import {
-    listPlans,
-    createPlan,
-    getPlan,
-    updatePlan,
-    deletePlan,
-    alignProject,
-    updateStatus
+    listStrategicPlans,
+    createStrategicPlan,
+    getStrategicPlan,
+    updateStrategicPlan,
+    deleteStrategicPlan,
+    alignProjectToPlan,
+    updatePlanStatus
 } from '../services/strategic-plan-service'
 
 const router: Router = express.Router()
@@ -21,12 +21,10 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, status, ownerId } = req.query
     const { user } = req as any
 
-    const result = await listPlans({
+    const result = await listStrategicPlans(user.id, {
         page: page ? parseInt(page as string) : 1,
         limit: limit ? parseInt(limit as string) : 50,
-        status: status as string,
-        ownerId: ownerId as string,
-        userId: user.id
+        status: status as string
     })
 
     res.json({
@@ -40,15 +38,13 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     const { user } = req as any
 
     if (!title) {
-        throw new ValidationError('Plan title is required', { title: true })
+        throw new ValidationError('Plan title is required', { title: 'Title is required' })
     }
 
-    const plan = await createPlan({
+    const plan = await createStrategicPlan({
         title,
         description,
-        horizon,
         objectives,
-        metrics,
         ownerId: user.id
     })
 
@@ -59,10 +55,10 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
 }))
 
 router.get('/:planId', asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params
+    const planId = req.params.planId as string
     const { user } = req as any
 
-    const plan = await getPlan(planId, user.id)
+    const plan = await getStrategicPlan(planId, user.id)
 
     res.json({
         success: true,
@@ -71,11 +67,11 @@ router.get('/:planId', asyncHandler(async (req: Request, res: Response) => {
 }))
 
 router.put('/:planId', asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params
+    const planId = req.params.planId as string
     const { title, description, horizon, objectives, metrics, status } = req.body
     const { user } = req as any
 
-    const plan = await updatePlan(planId, user.id, {
+    const plan = await updateStrategicPlan(planId, user.id, {
         title,
         description,
         horizon,
@@ -91,24 +87,24 @@ router.put('/:planId', asyncHandler(async (req: Request, res: Response) => {
 }))
 
 router.delete('/:planId', asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params
+    const planId = req.params.planId as string
     const { user } = req as any
 
-    await deletePlan(planId, user.id)
+    await deleteStrategicPlan(planId, user.id)
 
     res.json({ success: true })
 }))
 
 router.post('/:planId/align', asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params
+    const planId = req.params.planId as string
     const { projectId, okrId } = req.body
     const { user } = req as any
 
     if (!projectId && !okrId) {
-        throw new ValidationError('projectId or okrId required', { projectId: !projectId, okrId: !okrId })
+        throw new ValidationError('projectId or okrId required', { projectId: !projectId ? 'Project ID is required' : '', okrId: !okrId ? 'OKR ID is required' : '' })
     }
 
-    const plan = await alignProject({
+    const plan = await alignProjectToPlan({
         planId,
         projectId,
         okrId,
@@ -122,15 +118,15 @@ router.post('/:planId/align', asyncHandler(async (req: Request, res: Response) =
 }))
 
 router.post('/:planId/status', asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params
+    const planId = req.params.planId as string
     const { status, reason } = req.body
     const { user } = req as any
 
     if (!status) {
-        throw new ValidationError('status is required', { status: true })
+        throw new ValidationError('status is required', { status: 'Status is required' })
     }
 
-    const plan = await updateStatus({ planId, status, reason, userId: user.id })
+    const plan = await updatePlanStatus({ planId, status, reason, userId: user.id })
 
     res.json({
         success: true,
