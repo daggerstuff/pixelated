@@ -7,11 +7,12 @@
  */
 
 import type { APIRoute, APIContext } from 'astro'
-import { getSession } from '@/lib/auth/session'
+import { z } from 'zod'
+import { getSessionFromRequest } from '@/utils/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { applyRateLimit } from '@/lib/api/rate-limit'
 import { validateRequestBody } from '@/lib/validation/index'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+import { createHIPAACompliantAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
 const logger = createBuildSafeLogger('pixel-inference')
 
@@ -62,6 +63,8 @@ interface PixelInferenceRequest {
     use_eq_awareness?: boolean
     include_metrics?: boolean
     max_tokens?: number
+    plutchik_scores?: Record<string, number>
+    ocean_scores?: Record<string, number>
 }
 
 interface ModelStatusResponse {
@@ -151,7 +154,7 @@ async function callPixelService(
  */
 export const GET: APIRoute = async ({ request }: APIContext) => {
     try {
-        const session = await getSession(request)
+        const session = await getSessionFromRequest(request)
         if (!session?.user) {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 401,
@@ -160,21 +163,25 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
         }
 
         // Apply rate limit
-        const rateLimitResult = await applyRateLimit(session.user.id, 'pixel-status', 100)
-        if (!rateLimitResult.allowed) {
+        const rateLimitResult = await applyRateLimit(request, 'pixel-status', {
+            limits: { user: 100 }
+        })
+        if (!rateLimitResult.result.allowed) {
             return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
                 status: 429,
-                headers: { 'Content-Type': 'application/json' },
+                headers: rateLimitResult.headers,
             })
         }
 
         const status = (await callPixelService('/status', 'GET')) as ModelStatusResponse
 
         // Create audit log
-        await createAuditLog({
+        await createHIPAACompliantAuditLog({
             userId: session.user.id,
             eventType: AuditEventType.AI_MODEL_ACCESS,
             status: AuditEventStatus.SUCCESS,
+            action: 'status_check',
+            resource: 'Pixel',
             details: { model: 'Pixel', action: 'status_check' },
         })
 
@@ -206,7 +213,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
  */
 export const POST: APIRoute = async ({ request }: APIContext) => {
     try {
-        const session = await getSession(request)
+        const session = await getSessionFromRequest(request)
         if (!session?.user) {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 401,
@@ -215,36 +222,43 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         }
 
         // Apply rate limit
-        const rateLimitResult = await applyRateLimit(
-            session.user.id,
-            'pixel-inference',
-            session.user.role === 'admin' ? 120 : session.user.role === 'therapist' ? 80 : 40,
-        )
-        if (!rateLimitResult.allowed) {
+        const limitConfig = {
+            limits: {
+                user: session.user.role === 'admin' ? 120 : session.user.role === 'therapist' ? 80 : 40
+            }
+        }
+        const rateLimitResult = await applyRateLimit(request, 'pixel-inference', limitConfig)
+        if (!rateLimitResult.result.allowed) {
             return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
                 status: 429,
-                headers: { 'Content-Type': 'application/json' },
+                headers: rateLimitResult.headers,
             })
         }
 
-        const body = await request.json()
-
         // Validate request
-        const validation = await validateRequestBody(body, {
-            user_query: 'string',
-            conversation_history: 'array|optional',
-            context_type: 'string|optional',
-            user_id: 'string|optional',
-            use_eq_awareness: 'boolean|optional',
-            include_metrics: 'boolean|optional',
+        const inferenceSchema = z.object({
+            user_query: z.string(),
+            conversation_history: z.array(z.any()).optional(),
+            context_type: z.string().optional(),
+            user_id: z.string().optional(),
+            session_id: z.string().optional(),
+            use_eq_awareness: z.boolean().optional(),
+            include_metrics: z.boolean().optional(),
+            max_tokens: z.number().optional(),
+            plutchik_scores: z.record(z.string(), z.number()).optional(),
+            ocean_scores: z.record(z.string(), z.number()).optional(),
         })
 
-        if (!validation.valid) {
-            return new Response(JSON.stringify({ error: 'Invalid request', details: validation.errors }), {
+        const [validatedData, validationError] = await validateRequestBody(request, inferenceSchema)
+
+        if (validationError || !validatedData) {
+            return new Response(JSON.stringify({ error: 'Invalid request', details: validationError?.details }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             })
         }
+
+        const body = validatedData as any
 
         const pixelRequest: PixelInferenceRequest = {
             user_query: body.user_query,
@@ -255,6 +269,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
             use_eq_awareness: body.use_eq_awareness !== false,
             include_metrics: body.include_metrics !== false,
             max_tokens: body.max_tokens || 200,
+            plutchik_scores: body.plutchik_scores,
+            ocean_scores: body.ocean_scores,
         }
 
         // Call Pixel inference service
@@ -274,10 +290,12 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         }
 
         // Create audit log
-        await createAuditLog({
+        await createHIPAACompliantAuditLog({
             userId: session.user.id,
             eventType: AuditEventType.AI_GENERATION,
             status: crisisDetected ? AuditEventStatus.WARNING : AuditEventStatus.SUCCESS,
+            action: 'ai_generation',
+            resource: 'Pixel',
             details: {
                 model: 'Pixel',
                 inference_time_ms: response.inference_time_ms,
