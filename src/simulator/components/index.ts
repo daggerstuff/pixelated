@@ -9,3 +9,8 @@ export { default as ScenarioInfo } from './ScenarioInfo'
 export { default as VideoDisplay } from './VideoDisplay'
 export { default as ControlPanel } from './ControlPanel'
 export { default as ScenarioSelector } from './ScenarioSelector'
+export {
+    ResistanceMonitor,
+    default as ResistanceMonitorDefault,
+} from './ResistanceMonitor'
+export type { ResistanceMonitorProps } from './ResistanceMonitor'

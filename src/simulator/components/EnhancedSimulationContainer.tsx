@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { cn } from '../../lib/utils'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import type {
@@ -18,6 +19,7 @@ import ScenarioInfo from './ScenarioInfo'
 import RealTimeFeedbackPanel from './RealTimeFeedbackPanel'
 import EmpathyMeter from './EmpathyMeter'
 import RealTimePrompts from './RealTimePrompts'
+import ResistanceMonitor from './ResistanceMonitor'
 
 interface EnhancedSimulationContainerProps {
   scenarioId: string
@@ -56,22 +58,25 @@ export function EnhancedSimulationContainer({
   // Use currentPrompt as a key in React elements for optimization
   const conversationKey = currentPrompt.length > 0 ? 'prompted' : 'unprompted'
 
+  // Unique session ID for the Gestalt WebSocket connection
+  const sessionId = useMemo(() => `session-${scenarioId}-${uuidv4().slice(0, 8)}`, [scenarioId])
+
   // Get scenario details and simulator functions
   // Use getScenarioById from imported function instead of from hook
   const scenario = scenarioId
     ? ({
-        id: scenarioId,
-        title: `Scenario ${scenarioId}`,
-        domain: 'DEPRESSION' as TherapeuticDomain,
-        difficulty: 'BEGINNER' as ScenarioDifficulty,
-        initialPrompt: 'Welcome to the simulation. How are you feeling today?',
-        description: 'Practice scenario for depression treatment',
-        techniques: [],
-        contextDescription: 'Initial therapy session',
-        clientBackground: 'Client presenting with depressive symptoms',
-        presentingIssue: 'Persistent low mood and difficulty concentrating',
-        objectives: ['Build rapport', 'Identify symptoms'],
-      } as Scenario)
+      id: scenarioId,
+      title: `Scenario ${scenarioId}`,
+      domain: 'DEPRESSION' as TherapeuticDomain,
+      difficulty: 'BEGINNER' as ScenarioDifficulty,
+      initialPrompt: 'Welcome to the simulation. How are you feeling today?',
+      description: 'Practice scenario for depression treatment',
+      techniques: [],
+      contextDescription: 'Initial therapy session',
+      clientBackground: 'Client presenting with depressive symptoms',
+      presentingIssue: 'Persistent low mood and difficulty concentrating',
+      objectives: ['Build rapport', 'Identify symptoms'],
+    } as Scenario)
     : null
 
   // Real-time analysis
@@ -320,11 +325,7 @@ export function EnhancedSimulationContainer({
       {/* Header with scenario information */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <ScenarioInfo
-          scenario={{
-            title: scenario.title,
-            domain: scenario.domain,
-            difficulty: scenario.difficulty,
-          }}
+          scenario={scenario}
         />
 
         <div className="flex items-center space-x-3">
@@ -516,6 +517,11 @@ export function EnhancedSimulationContainer({
 
         {/* Right panel - Feedback and metrics */}
         <div className="w-2/5 h-full flex flex-col overflow-hidden bg-gray-50">
+          {/* Live Resistance Monitor (Gestalt Engine) */}
+          <div className="p-4">
+            <ResistanceMonitor sessionId={sessionId} />
+          </div>
+
           {/* Real-time metrics */}
           <div className="p-4 border-b border-gray-200">
             <h3 className="text-sm font-medium text-gray-700 mb-3">
