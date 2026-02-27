@@ -33,13 +33,12 @@ export const GET: APIRoute = async ({ url }: APIContext) => {
     if (!queryResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Invalid query parameters',
-          details: queryResult.error.errors,
+          details: queryResult.error.issues,
         }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 

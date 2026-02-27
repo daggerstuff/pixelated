@@ -43,14 +43,13 @@ export const useRiskAssessment = () => {
         } else {
           analysisText = response
         }
-
-        const analysis = JSON.parse(analysisText) as unknown
+        const parsed = JSON.parse(analysisText) as { category?: string; factors?: string[]; requiresExpert?: boolean; confidence?: number }
 
         return {
-          category: analysis.category || 'low',
-          factors: analysis.factors || [],
-          requiresExpert: analysis.requiresExpert || false,
-          confidence: analysis.confidence || 0.5,
+          category: parsed.category || 'low',
+          factors: parsed.factors || [],
+          requiresExpert: parsed.requiresExpert || false,
+          confidence: parsed.confidence || 0.5,
         }
       } catch (error: unknown) {
         console.error('Error assessing risk:', error)

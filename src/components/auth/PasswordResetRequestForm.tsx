@@ -29,7 +29,8 @@ export default function PasswordResetRequestForm() {
       // Dismiss loading toast
       toast.dismiss(loadingToastId)
 
-      if (!response.error) {
+      // Check for success (forgetPassword returns { success: true })
+      if ('success' in response && response.success) {
         // Dispatch custom success event that will be caught by the Astro component
         document.dispatchEvent(
           new CustomEvent('password-reset-request-success'),
@@ -38,7 +39,7 @@ export default function PasswordResetRequestForm() {
         // Clear the form
         setEmail('')
       } else {
-        throw new Error(response.error.message || 'Failed to send password reset email')
+        throw new Error('Failed to send password reset email')
       }
     } catch (error: unknown) {
       let errorMessage = 'An error occurred while requesting password reset'

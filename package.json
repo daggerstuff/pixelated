@@ -343,6 +343,7 @@
     "html-entities": "^2.6.0",
     "js-base64": "^3.7.8",
     "jsdom": "^27.4.0",
+    "launchdarkly-js-client-sdk": "^3.9.0",
     "lint-staged": "^16.2.7",
     "markdownlint": "^0.40.0",
     "markdownlint-cli": "^0.47.0",

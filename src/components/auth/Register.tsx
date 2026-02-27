@@ -190,6 +190,8 @@ export default function RegisterForm() {
                       </p>
                     </>
                   );
+                default:
+                  return null;
               }
             })()}
           </div>
