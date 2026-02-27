@@ -228,3 +228,4 @@ val_loss_full_curve.csv
 wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
+.gemini/
