@@ -215,3 +215,16 @@ docs/epics
 # Internal AI Documentation & Steering
 docs/internal/
 .agent/steering/
+
+# Training artifacts and backups (stored on S3)
+backups/
+checkpoints/
+divergence_proof.txt
+final_val_loss.txt
+full_val_history.txt
+loss_fixed.txt
+test_write.txt
+val_loss_full_curve.csv
+wandb_hist.csv
+wandb_ver.txt
+zthgquiz_history.json
