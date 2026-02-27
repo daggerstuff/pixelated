@@ -1,4 +1,4 @@
-import { EmotionDataPoint } from '../../hooks/useSessionAnalytics'
+import { useState } from 'react'
 import EmotionTrackingChart from './EmotionTrackingChart'
 
 // Define an interface matching EmotionTimelineData from EmotionTrackingChart
@@ -88,8 +88,8 @@ export default function SessionAnalysis({
               }
 
               // Conditionally add label only when it exists
-              return item.dominantEmotion
-                ? { ...baseData, label: `${item.dominantEmotion}` }
+              return item.label
+                ? { ...baseData, label: `${item.label}` }
                 : baseData
             })
           : []

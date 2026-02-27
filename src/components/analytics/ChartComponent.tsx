@@ -162,6 +162,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       setChartData(data)
       setIsLoading(false)
     }
+    return undefined
   }, [data, type])
 
   const mergedOptions = { ...defaultOptions, ...options }

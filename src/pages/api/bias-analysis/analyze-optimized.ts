@@ -153,16 +153,12 @@ export const POST: APIRoute = async ({ request }) => {
           JSON.stringify(
             scrubForClient({
               error: 'Validation failed',
-              details: error.errors.map((e) => ({
+              details: error.issues.map((e) => ({
                 field: e.path.join('.'),
                 message: e.message,
               })),
             }),
           ),
-          {
-            status: 400,
-            headers: CACHE_HEADERS,
-          },
         )
       }
 
@@ -451,16 +447,12 @@ export const PUT: APIRoute = async ({ request }) => {
           JSON.stringify(
             scrubForClient({
               error: 'Validation failed',
-              details: error.errors.map((e) => ({
+              details: error.issues.map((e) => ({
                 field: e.path.join('.'),
                 message: e.message,
               })),
             }),
           ),
-          {
-            status: 400,
-            headers: CACHE_HEADERS,
-          },
         )
       }
 

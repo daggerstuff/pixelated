@@ -45,10 +45,9 @@ export const PUT = async ({
     if (!parsed.success) {
       return new Response(
         JSON.stringify({
-          error: 'Invalid input',
-          details: parsed.error.errors,
+          details: parsed.error.issues,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
     const existingGoal = goals[idx]

@@ -370,7 +370,7 @@ export function MemoryAwareChatSystem({
           <div className="flex items-center gap-2">
             {user && (
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                User: {String(user.name || user.email)}
+                User: {String(user.fullName || user.email)}
               </div>
             )}
             <Brain className="h-5 w-5 text-blue-600" />
