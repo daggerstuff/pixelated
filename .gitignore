@@ -229,3 +229,21 @@ wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
 .gemini/
+
+# Ignore large ML and data files globally
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.jsonl
+*.zip
+*.tar.gz
+*.pkg
+*.deb
+*.exe
+*.ja
+*.pack
+ai/data/unified_training/*.json
+ai/lightning/h100_deployment/*.zip
+ai/lightning/production/deployment_package/data/*.json
