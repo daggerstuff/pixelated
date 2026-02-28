@@ -248,3 +248,5 @@ zthgquiz_history.json
 ai/data/unified_training/*.json
 ai/lightning/h100_deployment/*.zip
 ai/lightning/production/deployment_package/data/*.json
+
+.brvfailed_job_spec.yaml
