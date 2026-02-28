@@ -265,3 +265,5 @@ prpm.lock
 
 # Loose runtime/nohup output
 nohup.out
+node_modules
+.venv
