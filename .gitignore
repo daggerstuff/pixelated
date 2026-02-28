@@ -249,4 +249,19 @@ ai/data/unified_training/*.json
 ai/lightning/h100_deployment/*.zip
 ai/lightning/production/deployment_package/data/*.json
 
-.brvfailed_job_spec.yaml
+.brv
+failed_job_spec.yaml
+
+# One-off debug scripts (use scripts/debug/ instead)
+test_s3_ckpt.py
+train_with_wandb.py
+update_asana_task.py
+
+# One-off local configs
+moe_config_local.json
+
+# Stale/junk lock files
+prpm.lock
+
+# Loose runtime/nohup output
+nohup.out
