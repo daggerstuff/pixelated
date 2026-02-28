@@ -7,7 +7,7 @@
 import type { Paragraph, PhrasingContent, Root } from 'mdast'
 
 import type { VFile } from 'vfile'
-import { visit } from 'unist-util-visit'
+import { visit, type Visitor } from 'unist-util-visit'
 
 const IMAGE_DIR_REGEXP = /^image-(.*)/
 const VALID_TAGS_FOR_IMG = new Set<string>([
@@ -35,7 +35,7 @@ function remarkImageContainer() {
    *   File.
    */
   return (tree: Root, file: VFile) => {
-    visit(tree, (node) => {
+    visit(tree, (node: Visitor) => {
       if (node.type !== 'containerDirective') {
         return
       }

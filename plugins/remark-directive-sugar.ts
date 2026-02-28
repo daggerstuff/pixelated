@@ -7,7 +7,7 @@
 import type { Root } from 'mdast'
 
 import type { VFile } from 'vfile'
-import { visit } from 'unist-util-visit'
+import { visit, type Visitor } from 'unist-util-visit'
 
 type BadgePreset = Record<string, { text: string; color: string }>
 interface Config {
@@ -77,7 +77,7 @@ function remarkDirectiveSugar() {
    *   File.
    */
   return (tree: Root, file: VFile) => {
-    visit(tree, (node) => {
+    visit(tree, (node: Visitor) => {
       if (
         node.type === 'containerDirective' ||
         node.type === 'leafDirective' ||
@@ -171,6 +171,7 @@ function remarkDirectiveSugar() {
 
           let _resolvedText = ''
           let _resolvedStyle = ''
+          // Reserved for potential future use in link processing
           let _resolvedTab = ''
           let _isOrg = false
 
