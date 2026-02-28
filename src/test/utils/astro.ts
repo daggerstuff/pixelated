@@ -5,8 +5,8 @@
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-export async function renderAstro<Props extends Record<string, unknown>>(
-  Component: { render(props: Record<string, unknown>): Promise<string> } | { (props: Props): unknown } | ((props: Props) => unknown),
+export async function renderAstro<Props extends Record<string, unknown> = Record<string, unknown>>(
+  Component: { render(props: Record<string, unknown>): Promise<string> } | { (props: Record<string, unknown>): unknown } | ((props: Record<string, unknown>) => unknown),
   props: Props = {} as Props,
   slotContent?: string,
 ): Promise<{
