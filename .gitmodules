@@ -1,5 +1,11 @@
 [submodule "ai"]
 	path = ai
-	url = https://github.com/pixelatedempathy/ai.git
+	url = git@github.com:pixelatedempathy/ai.git
+	branch = .
+	ignore = all
+
+[submodule "docs"]
+	path = docs
+	url = git@github.com:pixelatedempathy/docs.git
 	branch = .
 	ignore = all
