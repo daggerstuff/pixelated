@@ -221,12 +221,12 @@ export interface ParticipantDemographics {
 export interface TrainingScenario {
   scenarioId: string
   type:
-  | 'depression'
-  | 'anxiety'
-  | 'trauma'
-  | 'substance-abuse'
-  | 'relationship-issues'
-  | 'general-wellness'
+    | 'depression'
+    | 'anxiety'
+    | 'trauma'
+    | 'substance-abuse'
+    | 'relationship-issues'
+    | 'general-wellness'
 }
 
 export interface SessionContent {
@@ -343,17 +343,17 @@ export interface EvaluationLayerResult {
   recommendations: string[]
 }
 
-export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>;
-export type ModelLevelAnalysisResult = Partial<ModelLevelLayerResult>;
-export type InteractiveAnalysisResult = Partial<InteractiveLayerResult>;
-export type EvaluationAnalysisResult = Partial<EvaluationLayerResult>;
+export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>
+export type ModelLevelAnalysisResult = Partial<ModelLevelLayerResult>
+export type InteractiveAnalysisResult = Partial<InteractiveLayerResult>
+export type EvaluationAnalysisResult = Partial<EvaluationLayerResult>
 
 export type LayerResults = {
-  preprocessing: PreprocessingAnalysisResult;
-  modelLevel: ModelLevelAnalysisResult;
-  interactive: InteractiveAnalysisResult;
-  evaluation: EvaluationAnalysisResult;
-};
+  preprocessing: PreprocessingAnalysisResult
+  modelLevel: ModelLevelAnalysisResult
+  interactive: InteractiveAnalysisResult
+  evaluation: EvaluationAnalysisResult
+}
 
 export interface BiasAnalysisResult {
   sessionId: string
@@ -368,7 +368,7 @@ export interface BiasAnalysisResult {
   error?: string
 }
 
-export type AnalysisResult = BiasAnalysisResult;
+export type AnalysisResult = BiasAnalysisResult
 
 export interface BiasAlert {
   alertId: string
@@ -424,7 +424,7 @@ export interface BiasDashboardData {
   recommendations: DashboardRecommendation[]
 }
 
-export type DashboardData = BiasDashboardData;
+export type DashboardData = BiasDashboardData
 
 export interface SessionData {
   sessionId: string

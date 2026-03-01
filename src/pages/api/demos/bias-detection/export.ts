@@ -1,12 +1,12 @@
 // API endpoint for bias detection data export
 
-import { createExportData } from '../../../../lib/utils/demo-helpers'
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
   HistoricalComparison,
   ExportData,
 } from '../../../../lib/types/bias-detection'
+import { createExportData } from '../../../../lib/utils/demo-helpers'
 
 export const POST = async ({ request }) => {
   try {

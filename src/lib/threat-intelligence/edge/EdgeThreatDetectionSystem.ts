@@ -4,10 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
-import { Redis } from 'ioredis'
-import * as tf from '@tensorflow/tfjs'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import * as tf from '@tensorflow/tfjs'
+import { Redis } from 'ioredis'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   EdgeDetectionConfig,
   EdgeDetectionResult,
@@ -61,7 +62,8 @@ export interface ModelPerformance {
 
 export class EdgeThreatDetectionSystemCore
   extends EventEmitter
-  implements EdgeThreatDetectionSystem {
+  implements EdgeThreatDetectionSystem
+{
   private redis: Redis
   private models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
   private nodeStatus: Map<string, EdgeNodeStatus> = new Map()
@@ -598,7 +600,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = (await anomalyModel.predict(input)) as tf.Tensor
+      const prediction = ( anomalyModel.predict(input)) as tf.Tensor
       const anomalyScore = await prediction.data()
 
       input.dispose()
@@ -638,7 +640,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = (await classificationModel.predict(input)) as tf.Tensor
+      const prediction = ( classificationModel.predict(input)) as tf.Tensor
       const probabilities = await prediction.data()
 
       input.dispose()
@@ -702,7 +704,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = (await predictionModel.predict(input)) as tf.Tensor
+      const prediction = ( predictionModel.predict(input)) as tf.Tensor
       const threatProbability = await prediction.data()
 
       input.dispose()
@@ -740,7 +742,7 @@ export class EdgeThreatDetectionSystemCore
       const severityScore =
         anomalyScore * weights.anomaly +
         this.mapThreatTypeToScore(classificationResult.threatType) *
-        weights.classification +
+          weights.classification +
         predictionScore * weights.prediction
 
       // Determine final threat type based on combined score

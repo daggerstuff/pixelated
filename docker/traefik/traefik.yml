@@ -14,7 +14,7 @@ api:
 # Entry Points
 entryPoints:
   web:
-    address: ":80"
+    address: ':80'
     http:
       redirections:
         entryPoint:
@@ -22,7 +22,7 @@ entryPoints:
           scheme: https
 
   websecure:
-    address: ":443"
+    address: ':443'
     http:
       tls:
         certResolver: letsencrypt
@@ -31,7 +31,7 @@ entryPoints:
         - rate-limit@file
 
   metrics:
-    address: ":8082"
+    address: ':8082'
 
 # Certificate Resolvers
 certificatesResolvers:
@@ -44,7 +44,7 @@ certificatesResolvers:
 # Providers
 providers:
   docker:
-    endpoint: "unix:///var/run/docker.sock"
+    endpoint: 'unix:///var/run/docker.sock'
     exposedByDefault: false
     network: pixelated_network
   file:
@@ -62,7 +62,7 @@ accessLog:
   bufferingSize: 100
   filters:
     statusCodes:
-      - "400-599"
+      - '400-599'
 
 # Metrics
 metrics:

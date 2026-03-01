@@ -26,7 +26,7 @@ export const CSS_FEATURES: CSSFeature[] = [
     value: 'grid',
     fallback: {
       properties: {
-        'display': 'flex',
+        display: 'flex',
         'flex-wrap': 'wrap',
       },
     },
@@ -65,7 +65,7 @@ export const CSS_FEATURES: CSSFeature[] = [
     value: '1/1',
     fallback: {
       properties: {
-        'position': 'relative',
+        position: 'relative',
         'padding-top': '100%',
       },
     },

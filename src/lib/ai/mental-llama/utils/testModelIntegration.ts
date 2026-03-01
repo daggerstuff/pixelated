@@ -1,5 +1,6 @@
-import { getEnv } from '../../../../config/env.config.ts'
 import { getHipaaCompliantLogger } from '@/lib/logging/standardized-logger'
+
+import { getEnv } from '../../../../config/env.config.ts'
 // It might be good to use the factory to check, but that could be too heavy for a status check.
 // For now, directly checking env vars needed by MentalLLaMAModelProvider.
 // import { createMentalLLaMAFactoryFromEnv } from '../index';

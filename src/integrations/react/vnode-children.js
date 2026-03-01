@@ -1,5 +1,5 @@
-import { parse, DOCUMENT_NODE, ELEMENT_NODE, TEXT_NODE } from 'ultrahtml'
 import { createElement, Fragment } from 'react'
+import { parse, DOCUMENT_NODE, ELEMENT_NODE, TEXT_NODE } from 'ultrahtml'
 
 let ids = 0
 export default function convert(children) {

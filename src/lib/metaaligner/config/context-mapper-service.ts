@@ -3,6 +3,7 @@
  * Implements deterministic, config-driven mapping with precedence resolution and explainability
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ContextType } from '../core/objectives'
 import {
   MappingConfiguration,
@@ -12,7 +13,6 @@ import {
   validateMappingConfiguration,
   ValidationError,
 } from './mapping-config'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('context-mapper-service')
 
@@ -54,9 +54,7 @@ export class ContextMapperService {
       const errorMessages = validation.errors
         .map((e) => `${e.type}: ${e.message}`)
         .join('\n')
-      throw new Error(
-        `Invalid mapping configuration:\n${errorMessages}`,
-      )
+      throw new Error(`Invalid mapping configuration:\n${errorMessages}`)
     }
 
     logger.info('Context mapper service initialized', {
@@ -88,7 +86,9 @@ export class ContextMapperService {
     const reasoning: string[] = []
     let safetyFloorApplied = false
 
-    reasoning.push(`Mapped to ${context} context (precedence: ${mapping.precedence})`)
+    reasoning.push(
+      `Mapped to ${context} context (precedence: ${mapping.precedence})`,
+    )
     reasoning.push(mapping.description)
 
     // Apply safety floor if required
@@ -201,8 +201,8 @@ export class ContextMapperService {
     }
 
     // Sort by precedence (lower number = higher precedence)
-    mappings.sort((a, b) => a!.precedence - b!.precedence)
-    const winner = mappings[0]!
+    mappings.sort((a, b) => a.precedence - b.precedence)
+    const winner = mappings[0]
 
     // Find applicable precedence rule
     let reason = `Resolved by precedence: ${winner.context} has precedence ${winner.precedence}`
@@ -235,18 +235,17 @@ export class ContextMapperService {
    * Get mapping with explainability for a context
    * Includes reasoning for the mapping decision
    */
-  getMappingWithExplainability(
-    context: ContextType,
-  ): MappingResolutionResult {
+  getMappingWithExplainability(context: ContextType): MappingResolutionResult {
     return this.getWeightsForContext(context)
   }
 
   /**
    * Validate a custom configuration without applying it
    */
-  static validateConfiguration(
-    config: MappingConfiguration,
-  ): { valid: boolean; errors: ValidationError[] } {
+  static validateConfiguration(config: MappingConfiguration): {
+    valid: boolean
+    errors: ValidationError[]
+  } {
     return validateMappingConfiguration(config)
   }
 

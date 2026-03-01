@@ -1,14 +1,20 @@
 # Fully Homomorphic Encryption (FHE) Module
 
-This module provides a production-grade Fully Homomorphic Encryption (FHE) implementation for the therapy chat system using Microsoft SEAL Library via node-seal.
+This module provides a production-grade Fully Homomorphic Encryption (FHE)
+implementation for the therapy chat system using Microsoft SEAL Library via
+node-seal.
 
 ## Overview
 
-Fully Homomorphic Encryption (FHE) allows computation on encrypted data without decrypting it first. This is particularly valuable for therapy chat applications where sensitive client information needs to remain private while still allowing AI models to process the data.
+Fully Homomorphic Encryption (FHE) allows computation on encrypted data without
+decrypting it first. This is particularly valuable for therapy chat applications
+where sensitive client information needs to remain private while still allowing
+AI models to process the data.
 
 ## Features
 
-- **Production-grade encryption** using Microsoft SEAL Library, a leading FHE implementation
+- **Production-grade encryption** using Microsoft SEAL Library, a leading FHE
+  implementation
 - **Multiple encryption schemes** (BFV, BGV, CKKS) for different use cases
 - **WebAssembly integration** for client-side FHE operations
 - **Homomorphic Operations**: Perform operations on encrypted data:
@@ -17,7 +23,8 @@ Fully Homomorphic Encryption (FHE) allows computation on encrypted data without 
   - Content summarization
   - Text tokenization
   - Content filtering
-- **Privacy-Preserving Analytics**: Process and visualize encrypted data without decryption:
+- **Privacy-Preserving Analytics**: Process and visualize encrypted data without
+  decryption:
   - Sentiment trends
   - Topic clustering
   - Emotional pattern detection
@@ -28,8 +35,10 @@ Fully Homomorphic Encryption (FHE) allows computation on encrypted data without 
 
 The implementation uses:
 
-- [Microsoft SEAL](https://github.com/microsoft/SEAL) via [node-seal](https://github.com/morfix-io/node-seal) for Node.js environments
-- [SEAL-Web](https://github.com/morfix-io/seal-wasm) for browser environments (via WebAssembly)
+- [Microsoft SEAL](https://github.com/microsoft/SEAL) via
+  [node-seal](https://github.com/morfix-io/node-seal) for Node.js environments
+- [SEAL-Web](https://github.com/morfix-io/seal-wasm) for browser environments
+  (via WebAssembly)
 - AES-256-GCM for standard encryption modes
 - Node.js crypto module for cryptographic operations
 
@@ -57,7 +66,7 @@ await fheService.initialize({
   mode: EncryptionMode.FHE,
   keySize: 2048,
   securityLevel: 'high',
-  enableDebug: true
+  enableDebug: true,
 })
 ```
 
@@ -83,7 +92,7 @@ import { FHEOperation } from '@/lib/fhe'
 // Analyze sentiment without decryption
 const sentimentResult = await fheService.processEncrypted(
   encrypted,
-  FHEOperation.SENTIMENT
+  FHEOperation.SENTIMENT,
 )
 
 // The result is still encrypted
@@ -126,11 +135,15 @@ The FHE module consists of:
 
 ## Microsoft SEAL Implementation Details
 
-This implementation uses Microsoft SEAL Library, which provides the following homomorphic encryption schemes:
+This implementation uses Microsoft SEAL Library, which provides the following
+homomorphic encryption schemes:
 
-1. **BFV Scheme**: Best for integer arithmetic. Used for counting, sorting, and other integer-based operations.
-2. **BGV Scheme**: Similar to BFV but with different optimizations. Used for integer operations.
-3. **CKKS Scheme**: Designed for approximate arithmetic with real numbers. Used for floating-point operations.
+1. **BFV Scheme**: Best for integer arithmetic. Used for counting, sorting, and
+   other integer-based operations.
+2. **BGV Scheme**: Similar to BFV but with different optimizations. Used for
+   integer operations.
+3. **CKKS Scheme**: Designed for approximate arithmetic with real numbers. Used
+   for floating-point operations.
 
 The implementation includes:
 
@@ -151,7 +164,8 @@ pnpm run test:fhe
 npm run test:fhe
 ```
 
-This will run a series of tests to verify that encryption, decryption, and basic homomorphic operations work as expected.
+This will run a series of tests to verify that encryption, decryption, and basic
+homomorphic operations work as expected.
 
 ## Performance Considerations
 

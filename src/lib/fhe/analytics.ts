@@ -8,13 +8,13 @@
 
 import type { ChatMessage } from '../../types/chat'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { SealSchemeType } from './seal-types'
 import {
   EncryptionMode,
   FHEOperation as FHEOpType,
   type FHEServiceOptions,
   type FHEServiceInterface,
 } from './types'
-import { SealSchemeType } from './seal-types'
 
 // Initialize logger
 const logger = createBuildSafeLogger('analytics')
@@ -249,7 +249,7 @@ export class FHEAnalyticsService {
         type: AnalyticsType.SENTIMENT_TREND,
         timestamp: Date.now(),
         data: analyticsData as Record<string, unknown>,
-        encryptionMode: this.fheService.getMode() as EncryptionMode,
+        encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
 
@@ -354,7 +354,7 @@ export class FHEAnalyticsService {
         type: AnalyticsType.TOPIC_CLUSTERING,
         timestamp: Date.now(),
         data: analyticsData as Record<string, unknown>,
-        encryptionMode: this.fheService.getMode() as EncryptionMode,
+        encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
 
@@ -463,7 +463,7 @@ export class FHEAnalyticsService {
         type: AnalyticsType.RISK_ASSESSMENT,
         timestamp: Date.now(),
         data: analyticsData as Record<string, unknown>,
-        encryptionMode: this.fheService.getMode() as EncryptionMode,
+        encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
 
@@ -593,7 +593,7 @@ export class FHEAnalyticsService {
         type: AnalyticsType.INTERVENTION_EFFECTIVENESS,
         timestamp: Date.now(),
         data: analyticsData as Record<string, unknown>,
-        encryptionMode: this.fheService.getMode() as EncryptionMode,
+        encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
 
@@ -739,7 +739,7 @@ export class FHEAnalyticsService {
         type: AnalyticsType.EMOTIONAL_PATTERNS,
         timestamp: Date.now(),
         data: analyticsData as Record<string, unknown>,
-        encryptionMode: this.fheService.getMode() as EncryptionMode,
+        encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
 

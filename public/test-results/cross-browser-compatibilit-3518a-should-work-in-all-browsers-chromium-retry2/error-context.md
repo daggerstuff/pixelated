@@ -1,7 +1,9 @@
 # Test info
 
-- Name: Cross-browser compatibility >> simulator page should work in all browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
+- Name: Cross-browser compatibility >> simulator page should work in all
+  browsers
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
 
 # Error details
 
@@ -24,111 +26,122 @@ Error: expect(received).toEqual(expected) // deep equality
 
 ```yaml
 - link "Skip to content":
-  - /url: "#main-content"
+    - /url: '#main-content'
 - banner:
-  - link "Pixelated Empathy Logo Pixelated Empathy":
-    - /url: /
-    - img "Pixelated Empathy Logo"
-    - text: Pixelated Empathy
-  - navigation:
-    - link "Home":
-      - /url: /
-    - link "About":
-      - /url: /about
-    - link "Contact":
-      - /url: /contact
-    - link "Login":
-      - /url: /login
-    - link "Sign Up":
-      - /url: /signup
-  - button "Search":
-    - img
-  - button:
-    - img
-  - button "Switch to dark theme":
-    - img
-  - link "Sign in":
-    - /url: /login
+    - link "Pixelated Empathy Logo Pixelated Empathy":
+        - /url: /
+        - img "Pixelated Empathy Logo"
+        - text: Pixelated Empathy
+    - navigation:
+        - link "Home":
+            - /url: /
+        - link "About":
+            - /url: /about
+        - link "Contact":
+            - /url: /contact
+        - link "Login":
+            - /url: /login
+        - link "Sign Up":
+            - /url: /signup
+    - button "Search":
+        - img
+    - button:
+        - img
+    - button "Switch to dark theme":
+        - img
+    - link "Sign in":
+        - /url: /login
 - complementary:
-  - complementary:
-    - button "Toggle Menu":
-      - img
-      - text: Toggle Menu
-    - button "Overview":
-      - text: Overview
-      - img
-    - list:
-      - listitem:
-        - link "Dashboard":
-          - /url: /dashboard
-          - img
-          - text: Dashboard
-      - listitem:
-        - link "Analytics":
-          - /url: /analytics
-          - img
-          - text: Analytics
-    - button "Therapy Tools":
-      - text: Therapy Tools
-      - img
-    - button "Account":
-      - text: Account
-      - img
+    - complementary:
+        - button "Toggle Menu":
+            - img
+            - text: Toggle Menu
+        - button "Overview":
+            - text: Overview
+            - img
+        - list:
+            - listitem:
+                - link "Dashboard":
+                    - /url: /dashboard
+                    - img
+                    - text: Dashboard
+            - listitem:
+                - link "Analytics":
+                    - /url: /analytics
+                    - img
+                    - text: Analytics
+        - button "Therapy Tools":
+            - text: Therapy Tools
+            - img
+        - button "Account":
+            - text: Account
+            - img
 - main:
-  - heading "Therapeutic Practice Simulator" [level=2]
-  - heading "Select a Practice Scenario" [level=3]
-  - paragraph: Choose a scenario to practice therapeutic techniques in a safe, private environment. All interactions are processed in real-time with no recording or storage.
-  - heading "Depression Assessment" [level=4]
-  - paragraph: "Difficulty: Intermediate"
-  - link "Start Scenario →":
-    - /url: "#"
-  - heading "Anxiety Management" [level=4]
-  - paragraph: "Difficulty: Beginner"
-  - link "Start Scenario →":
-    - /url: "#"
-  - heading "Trauma-Informed Care" [level=4]
-  - paragraph: "Difficulty: Advanced"
-  - link "Start Scenario →":
-    - /url: "#"
-  - heading "About This Simulator" [level=3]:
-    - img
-    - text: About This Simulator
-  - paragraph: This simulator allows you to practice therapeutic techniques in a private, safe environment. No audio or video data is recorded or stored at any time. All processing happens in real-time with zero data retention to ensure complete privacy and HIPAA compliance.
-  - text: You can track your progress through anonymized metrics that are only stored in your browser.
-  - link "Logo Pixelated Empathy":
-    - /url: /
-    - img "Logo"
-    - text: Pixelated Empathy
-  - paragraph: Secure AI therapy platform with advanced encryption for maximum privacy and HIPAA compliance.
-  - link "Twitter":
-    - /url: "#"
-  - link "GitHub":
-    - /url: "#"
-  - link "LinkedIn":
-    - /url: "#"
-  - heading "Platform" [level=3]
-  - list:
-    - listitem:
-      - link "Dashboard":
-        - /url: /dashboard
-    - listitem:
-      - link "Chat":
-        - /url: /chat
-    - listitem:
-      - link "Profile":
-        - /url: /profile
-  - heading "Resources" [level=3]
-  - list:
-    - listitem:
-      - link "About":
-        - /url: /about
-    - listitem:
-      - link "Contact":
-        - /url: /contact
-    - listitem:
-      - link "FAQ":
-        - /url: /faq
-  - paragraph: © 2025 Pixelated Empathy. All rights reserved.
+    - heading "Therapeutic Practice Simulator" [level=2]
+    - heading "Select a Practice Scenario" [level=3]
+    - paragraph:
+        Choose a scenario to practice therapeutic techniques in a safe, private
+        environment. All interactions are processed in real-time with no
+        recording or storage.
+    - heading "Depression Assessment" [level=4]
+    - paragraph: 'Difficulty: Intermediate'
+    - link "Start Scenario →":
+        - /url: '#'
+    - heading "Anxiety Management" [level=4]
+    - paragraph: 'Difficulty: Beginner'
+    - link "Start Scenario →":
+        - /url: '#'
+    - heading "Trauma-Informed Care" [level=4]
+    - paragraph: 'Difficulty: Advanced'
+    - link "Start Scenario →":
+        - /url: '#'
+    - heading "About This Simulator" [level=3]:
+        - img
+        - text: About This Simulator
+    - paragraph:
+        This simulator allows you to practice therapeutic techniques in a
+        private, safe environment. No audio or video data is recorded or stored
+        at any time. All processing happens in real-time with zero data
+        retention to ensure complete privacy and HIPAA compliance.
+    - text:
+        You can track your progress through anonymized metrics that are only
+        stored in your browser.
+    - link "Logo Pixelated Empathy":
+        - /url: /
+        - img "Logo"
+        - text: Pixelated Empathy
+    - paragraph:
+        Secure AI therapy platform with advanced encryption for maximum privacy
+        and HIPAA compliance.
+    - link "Twitter":
+        - /url: '#'
+    - link "GitHub":
+        - /url: '#'
+    - link "LinkedIn":
+        - /url: '#'
+    - heading "Platform" [level=3]
+    - list:
+        - listitem:
+            - link "Dashboard":
+                - /url: /dashboard
+        - listitem:
+            - link "Chat":
+                - /url: /chat
+        - listitem:
+            - link "Profile":
+                - /url: /profile
+    - heading "Resources" [level=3]
+    - list:
+        - listitem:
+            - link "About":
+                - /url: /about
+        - listitem:
+            - link "Contact":
+                - /url: /contact
+        - listitem:
+            - link "FAQ":
+                - /url: /faq
+    - paragraph: © 2025 Pixelated Empathy. All rights reserved.
 ```
 
 # Test source

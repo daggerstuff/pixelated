@@ -1,6 +1,7 @@
 ---
 title: 'Email Service'
-description: 'Guide to Pixelated Healths email service implementation and configuration'
+description:
+  'Guide to Pixelated Healths email service implementation and configuration'
 pubDate: 2025-03-24
 share: true
 toc: true
@@ -11,7 +12,10 @@ author: 'Pixelated Team'
 
 # Email Service
 
-The Email Service in Pixelated is designed to handle all transactional email communication with high reliability and security. It uses Postmark as the email delivery provider and implements a robust queuing system with Redis for reliable delivery.
+The Email Service in Pixelated is designed to handle all transactional email
+communication with high reliability and security. It uses Postmark as the email
+delivery provider and implements a robust queuing system with Redis for reliable
+delivery.
 
 ## Features
 
@@ -27,7 +31,6 @@ The Email Service in Pixelated is designed to handle all transactional email com
 ### Basic Usage
 
 ```tsx
-
 const emailService = new EmailService()
 
 // Queue an email

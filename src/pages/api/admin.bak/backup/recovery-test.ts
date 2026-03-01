@@ -1,7 +1,7 @@
+import { AdminPermission } from '@/lib/admin'
+import { adminGuard } from '@/lib/admin/middleware'
 // import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { logAuditEvent, AuditEventType } from '@/lib/audit'
-import { adminGuard } from '@/lib/admin/middleware'
-import { AdminPermission } from '@/lib/admin'
 import { createBuildSafeLogger } from '@/lib/logger'
 
 const logger = createBuildSafeLogger('api:backup:recovery-test')
@@ -147,7 +147,7 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
       error instanceof Error ? String(error) : 'Unknown error'
     logger.error('Recovery test failed', {
       error: errorMessage,
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
     })
 
     return {
@@ -161,15 +161,18 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
   }
 }
 
-import type { APIContext } from "astro";
+import type { APIContext } from 'astro'
 
 export const POST = async (context: APIContext) => {
-  const { request, locals } = context;
+  const { request, locals } = context
   // Apply admin middleware to check for admin status and required permission
-  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
+  const next = () =>
+    new Promise<Response>((resolve) =>
+      resolve(new Response(null, { status: 200 })),
+    )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)(
     context,
-    next
+    next,
   )
   if (middlewareResponse.status !== 200) {
     return middlewareResponse
@@ -224,7 +227,7 @@ export const POST = async (context: APIContext) => {
       errors: result.details?.errors?.join(', ') || 'None',
       durationMs: result.details?.durationMs,
       note: 'Recovery test initiated.',
-    };
+    }
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_initiated',
@@ -250,7 +253,7 @@ export const POST = async (context: APIContext) => {
     const auditDetails = {
       error: errorMessage,
       // Do not include stack trace in audit logs for security
-    };
+    }
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_failed',

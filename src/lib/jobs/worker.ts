@@ -5,11 +5,11 @@
  * offloading long-running tasks like batch bias analysis.
  */
 
-import { jobQueue, JobStatus, type Job } from './queue'
 import { BiasDetectionEngine } from '../ai/bias-detection/BiasDetectionEngine'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { TherapeuticSession, BiasReport } from '../ai/bias-detection/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { gaugeMetric, distributionMetric, countMetric } from '../sentry/utils'
+import { jobQueue, JobStatus, type Job } from './queue'
 
 const logger = createBuildSafeLogger('JobsWorker')
 
@@ -108,7 +108,8 @@ const jobsWorker = {
           })
           .catch((error) => {
             activeJobs--
-            const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+            const errorType =
+              error instanceof Error ? error.constructor.name : 'UnknownError'
             countMetric('jobs.failed', 1, {
               job_type: job.type,
               error_type: errorType,
@@ -146,7 +147,7 @@ const jobsWorker = {
       switch (job.type) {
         case 'bias-analysis-batch':
           // Payload contains sessions, user, and request information
-          ; ({ sessions, user, request } = job.payload as {
+          ;({ sessions, user, request } = job.payload as {
             sessions: TherapeuticSession[]
             user: User
             request: RequestInfo
@@ -167,10 +168,14 @@ const jobsWorker = {
             },
           )
           const batchDurationMs = Date.now() - batchStartTime
-          distributionMetric('jobs.bias_analysis_batch.duration', batchDurationMs, {
-            attributes: { session_count: sessions.length },
-            unit: 'millisecond',
-          })
+          distributionMetric(
+            'jobs.bias_analysis_batch.duration',
+            batchDurationMs,
+            {
+              attributes: { session_count: sessions.length },
+              unit: 'millisecond',
+            },
+          )
           await jobQueue.updateJobStatus(job.id, JobStatus.COMPLETED, {
             result: results,
             completedAt: new Date().toISOString(),
@@ -178,7 +183,7 @@ const jobsWorker = {
           break
         case 'report-generation': {
           // Payload contains sessions, timeRange, and options
-          ; ({ sessions, timeRange, options } = job.payload as {
+          ;({ sessions, timeRange, options } = job.payload as {
             sessions: TherapeuticSession[]
             timeRange: TimeRange
             options: ReportOptions
@@ -199,10 +204,14 @@ const jobsWorker = {
             safeOptions,
           )
           const reportDurationMs = Date.now() - reportStartTime
-          distributionMetric('jobs.report_generation.duration', reportDurationMs, {
-            attributes: { format: safeOptions?.format || 'json' },
-            unit: 'millisecond',
-          })
+          distributionMetric(
+            'jobs.report_generation.duration',
+            reportDurationMs,
+            {
+              attributes: { format: safeOptions?.format || 'json' },
+              unit: 'millisecond',
+            },
+          )
           await jobQueue.updateJobStatus(job.id, JobStatus.COMPLETED, {
             result: report,
             completedAt: new Date().toISOString(),
@@ -222,7 +231,8 @@ const jobsWorker = {
       })
     } catch (error: unknown) {
       const durationMs = Date.now() - jobStartTime
-      const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'UnknownError'
       countMetric('jobs.error', 1, {
         job_type: job.type,
         error_type: errorType,

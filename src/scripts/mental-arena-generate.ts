@@ -10,9 +10,11 @@
  *   ts-node mental-arena-generate-production.ts --num-conversations 10 --output-path ./data/synthetic.jsonl
  */
 
-import path from 'path'
-import { program } from 'commander'
 import { promises as fs } from 'fs'
+import path from 'path'
+
+import { program } from 'commander'
+
 import {
   MentalArenaAdapter,
   MentalArenaPythonBridge,
@@ -59,11 +61,24 @@ program
   )
   .parse(process.argv)
 
-const options = program.opts()
+interface CommandOptions {
+  'num-conversations': string
+  'output-path': string
+  model: string
+  'python-path': string
+  complexity: string
+  'enable-encryption': boolean
+  'validate-output': boolean
+  'max-turns': string
+  disorders: string
+  'enable-validation'?: boolean
+}
+
+const options = program.opts<CommandOptions>()
 
 // Mock provider implementation with production-like features
 class MockMentalArenaProvider {
-  async analyzeEmotions(text: string): void {
+  async analyzeEmotions(text: string): Promise<any> {
     // Simulate emotion analysis with realistic patterns
     const emotions = ['anxiety', 'depression', 'neutral', 'hope', 'frustration']
     const dominant = emotions[Math.floor(Math.random() * emotions.length)]
@@ -85,7 +100,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async generateIntervention(symptoms: string[]): void {
+  async generateIntervention(symptoms: string[]): Promise<any> {
     const techniques = [
       'cognitive-reframing',
       'mindfulness',
@@ -103,7 +118,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async createChatCompletion() {
+  async createChatCompletion(): Promise<any> {
     const responses = [
       "Can you tell me more about how you've been feeling?",
       'That sounds really challenging. How are you coping with this?',
@@ -117,7 +132,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async assessRisk(conversation: string): void {
+  async assessRisk(conversation: string): Promise<any> {
     const riskKeywords = ['harm', 'hurt', 'end', 'die', 'kill']
     const hasRiskIndicators = riskKeywords.some((keyword) =>
       conversation.toLowerCase().includes(keyword),
@@ -139,7 +154,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async handleEmergency() {
+  async handleEmergency(): Promise<any> {
     return {
       response:
         'Emergency protocols activated. Immediate support resources provided.',
@@ -148,7 +163,7 @@ class MockMentalArenaProvider {
     }
   }
 
-  async generateText(prompt: string): void {
+  async generateText(prompt: string): Promise<string> {
     // Generate contextually appropriate therapeutic responses
     if (prompt.includes('patient')) {
       return "I've been feeling really anxious lately, especially about work and social situations."
@@ -160,34 +175,37 @@ class MockMentalArenaProvider {
 
 // Mock FHE service for encryption capabilities
 class MockFHEService {
-  async encrypt(value: unknown): void {
+  async encrypt(value: unknown): Promise<any> {
     return {
       data: `encrypted_${typeof value}_${Date.now()}`,
       originalType: typeof value,
-      encryptionLevel: 'production',
+      timestamp: new Date().toISOString(),
+      algorithm: 'mock-fhe',
     }
   }
 
-  async decrypt(encrypted: unknown): void {
-    const encryptedData = encrypted as { data?: string }
-    return (
-      encryptedData.data?.replace(/^encrypted_\w+_\d+$/, 'decrypted_data') ||
-      'decrypted'
-    )
+  async decrypt(encrypted: unknown): Promise<string> {
+    if (encrypted && typeof encrypted === 'object' && 'data' in encrypted) {
+      const { data } = encrypted as Record<string, unknown>
+      if (typeof data === 'string') {
+        return data.replace(/^encrypted_\w+_\d+$/, 'decrypted_data')
+      }
+    }
+    return 'decrypted'
   }
 
-  async encryptText(text: string): void {
+  async encryptText(text: string): Promise<string> {
     return `enc:${Buffer.from(text).toString('base64')}`
   }
 
-  async decryptText(encrypted: string): void {
+  async decryptText(encrypted: string): Promise<string> {
     if (encrypted.startsWith('enc:')) {
       return Buffer.from(encrypted.slice(4), 'base64').toString()
     }
     return encrypted
   }
 
-  async generateHash(data: unknown): void {
+  async generateHash(data: unknown): Promise<string> {
     return `hash_${JSON.stringify(data).length}_${Date.now()}`
   }
 
@@ -202,7 +220,7 @@ class MockFHEService {
   isInitialized() {
     return true
   }
-  async initialize() {
+  async initialize(_config?: any) {
     console.log('FHE service initialized')
   }
   async generateKeys() {
@@ -222,7 +240,7 @@ async function main() {
   console.log(
     `Generating ${options['num-conversations']} synthetic therapy conversations`,
   )
-  console.log(`Output path: ${options['output-path'] as string}`)
+  console.log(`Output path: ${options['output-path']}`)
   console.log(`Using model: ${options['model']}`)
   console.log(`Complexity: ${options['complexity']}`)
   console.log(
@@ -231,7 +249,7 @@ async function main() {
 
   try {
     // Create output directory if it doesn't exist
-    const outputDir = path.dirname(options['output-path'] as string)
+    const outputDir = path.dirname(options['output-path'])
     await fs.mkdir(outputDir, { recursive: true })
 
     // Parse disorders from command line
@@ -295,7 +313,11 @@ async function main() {
     console.log('\n🔧 Initializing MentalArena components...')
 
     if (fheService) {
-      await fheService.initialize()
+      await fheService.initialize({
+        mode: 'secure',
+        keySize: 4096,
+        securityLevel: 'tc256',
+      })
       console.log('✅ FHE encryption service initialized')
     }
 
@@ -378,17 +400,17 @@ async function main() {
       .map((conversation) => JSON.stringify(conversation))
       .join('\n')
 
-    await fs.writeFile(options['output-path'] as string, jsonlData)
+    await fs.writeFile(options['output-path'], jsonlData)
 
     // Also save detailed results with metadata
-    const metadataPath = (options['output-path'] as string).replace(
+    const metadataPath = options['output-path'].replace(
       /\.jsonl?$/,
       '.meta.json',
     )
     await fs.writeFile(metadataPath, JSON.stringify(outputData, null, 2))
 
     console.log(`\n💾 Data saved successfully:`)
-    console.log(`   📄 Conversations: ${options['output-path'] as string}`)
+    console.log(`   📄 Conversations: ${options['output-path']}`)
     console.log(`   📋 Metadata: ${metadataPath}`)
 
     console.log(`\n⏱️  Performance metrics:`)
@@ -407,7 +429,7 @@ async function main() {
   } catch (error: unknown) {
     console.error('\n❌ Error generating data:', error)
     if (error instanceof Error) {
-      console.error('Stack trace:', (error as Error)?.stack)
+      console.error('Stack trace:', error.stack)
     }
     process.exit(1)
   }

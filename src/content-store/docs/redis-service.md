@@ -13,9 +13,9 @@ author: 'Pixelated Team'
 
 ### Overview
 
-The Redis service provides a robust, type-safe interface for interacting with Redis
-in the Pixelated application. It includes connection pooling, automatic reconnection,
-health monitoring, and comprehensive error handling.
+The Redis service provides a robust, type-safe interface for interacting with
+Redis in the Pixelated application. It includes connection pooling, automatic
+reconnection, health monitoring, and comprehensive error handling.
 
 ### Installation
 
@@ -58,7 +58,6 @@ const defaultConfig = {
 #### Initialization
 
 ```typescript
-
 const redis = new RedisService({
   url: 'redis://localhost:6379',
 })
@@ -200,7 +199,6 @@ REDIS_HEALTH_CHECK_INTERVAL=30000
 ### Cache Invalidation
 
 ```typescript
-
 const redis = new RedisService({ url: process.env.REDIS_URL })
 const cacheInvalidation = new CacheInvalidationService(redis)
 ```
@@ -208,7 +206,6 @@ const cacheInvalidation = new CacheInvalidationService(redis)
 ### Analytics Service
 
 ```typescript
-
 const redis = new RedisService({ url: process.env.REDIS_URL })
 const analytics = new AnalyticsService(redis)
 ```
@@ -216,7 +213,6 @@ const analytics = new AnalyticsService(redis)
 ### Pattern Recognition Service
 
 ```typescript
-
 const redis = new RedisService({ url: process.env.REDIS_URL })
 const patternRecognition = new PatternRecognitionService(redis)
 ```
@@ -244,7 +240,8 @@ The service includes comprehensive test suites:
 
 ## Monitoring and Metrics
 
-The service provides built-in monitoring capabilities through the `getPoolStats()` method:
+The service provides built-in monitoring capabilities through the
+`getPoolStats()` method:
 
 ```typescript
 const stats = await redis.getPoolStats()

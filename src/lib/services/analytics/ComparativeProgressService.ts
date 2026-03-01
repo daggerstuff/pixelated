@@ -121,7 +121,7 @@ export class ComparativeProgressService {
 
       progressSnapshots.push({
         anonymizedUserId,
-        date: pointDate.toISOString().split('T')[0]!,
+        date: pointDate.toISOString().split('T')[0],
         metricName,
         metricValue: Math.round(value * 10) / 10, // Round to 1 decimal place
         sessionId: `session-${i + 1}`,
@@ -239,14 +239,14 @@ export class ComparativeProgressService {
     // Compare to average
     const relativeToAverage = this.compareToAverage(
       lastValue,
-      benchmark!,
+      benchmark,
       lowerIsBetter,
     )
 
     // Estimate percentile rank
     const percentileRank = this.estimatePercentileRank(
       lastValue,
-      benchmark!,
+      benchmark,
       lowerIsBetter,
     )
 

@@ -85,5 +85,3 @@ export const useIntegrationStore = create<IntegrationStoreState>((set) => ({
   resetFilters: () => set({ filters: defaultFilters }),
   clearCompare: () => set({ comparePlanIds: [] }),
 }))
-
-

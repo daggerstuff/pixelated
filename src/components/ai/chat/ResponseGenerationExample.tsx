@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { useResponseGeneration } from './useResponseGeneration'
 
 /**
@@ -79,59 +80,59 @@ export function ResponseGenerationExample() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">
+    <div className='mx-auto max-w-4xl space-y-6 p-6'>
+      <h2 className='text-gray-900 text-2xl font-bold'>
         AI Response Generation Demo
       </h2>
 
       {/* Input Section */}
-      <div className="space-y-4">
+      <div className='space-y-4'>
         <div>
           <label
-            htmlFor="prompt"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='prompt'
+            className='text-gray-700 block text-sm font-medium'
           >
             Enter your prompt:
           </label>
           <textarea
-            id="prompt"
+            id='prompt'
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none'
             rows={3}
-            placeholder="Type your prompt here..."
+            placeholder='Type your prompt here...'
           />
         </div>
 
         <div>
           <label
-            htmlFor="responseType"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='responseType'
+            className='text-gray-700 block text-sm font-medium'
           >
             Response Type:
           </label>
           <select
-            id="responseType"
+            id='responseType'
             value={responseType}
             onChange={(e) =>
               setResponseType(e.target.value as typeof responseType)
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none'
           >
-            <option value="general">General</option>
-            <option value="therapeutic">Therapeutic</option>
-            <option value="creative">Creative</option>
-            <option value="analytical">Analytical</option>
+            <option value='general'>General</option>
+            <option value='therapeutic'>Therapeutic</option>
+            <option value='creative'>Creative</option>
+            <option value='analytical'>Analytical</option>
           </select>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex space-x-4">
+      <div className='flex space-x-4'>
         <button
           onClick={handleGenerateResponse}
           disabled={isLoading || !prompt.trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
         >
           {isLoading ? 'Generating...' : 'Generate Response'}
         </button>
@@ -139,7 +140,7 @@ export function ResponseGenerationExample() {
         <button
           onClick={handleStreamingResponse}
           disabled={isLoading || !prompt.trim()}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className='bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
         >
           {isStreaming ? 'Streaming...' : 'Stream Response'}
         </button>
@@ -147,7 +148,7 @@ export function ResponseGenerationExample() {
         <button
           onClick={regenerateLastResponse}
           disabled={isLoading}
-          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className='bg-purple-600 text-white hover:bg-purple-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
         >
           Regenerate
         </button>
@@ -155,7 +156,7 @@ export function ResponseGenerationExample() {
         {(isLoading || isStreaming) && (
           <button
             onClick={stopGeneration}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className='bg-red-600 text-white hover:bg-red-700 rounded-md px-4 py-2'
           >
             Stop
           </button>
@@ -163,7 +164,7 @@ export function ResponseGenerationExample() {
 
         <button
           onClick={reset}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+          className='bg-gray-600 text-white hover:bg-gray-700 rounded-md px-4 py-2'
         >
           Reset
         </button>
@@ -171,12 +172,12 @@ export function ResponseGenerationExample() {
 
       {/* Progress Bar */}
       {(isLoading || isStreaming) && (
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className='bg-gray-200 h-2 w-full rounded-full'>
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className='bg-blue-600 h-2 rounded-full transition-all duration-300'
             style={{ width: `${progress}%` }}
           />
-          <div className="text-xs text-gray-600 mt-1">
+          <div className='text-gray-600 mt-1 text-xs'>
             {isStreaming ? 'Streaming' : 'Loading'}: {Math.round(progress)}%
           </div>
         </div>
@@ -184,9 +185,9 @@ export function ResponseGenerationExample() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="text-red-800">
+        <div className='bg-red-50 border-red-200 rounded-md border p-4'>
+          <div className='flex'>
+            <div className='text-red-800'>
               <strong>Error:</strong> {error}
             </div>
           </div>
@@ -195,27 +196,27 @@ export function ResponseGenerationExample() {
 
       {/* Response Display */}
       {response && (
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className='bg-gray-50 border-gray-200 rounded-md border p-4'>
+          <h3 className='text-gray-900 mb-2 text-lg font-medium'>
             Generated Response:
           </h3>
-          <div className="text-gray-700 whitespace-pre-wrap">{response}</div>
+          <div className='text-gray-700 whitespace-pre-wrap'>{response}</div>
         </div>
       )}
 
       {/* Therapeutic Insights */}
       {therapeuticInsights && (
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-          <h3 className="text-lg font-medium text-blue-900 mb-2">
+        <div className='bg-blue-50 border-blue-200 rounded-md border p-4'>
+          <h3 className='text-blue-900 mb-2 text-lg font-medium'>
             Therapeutic Insights:
           </h3>
-          <div className="space-y-2 text-sm text-blue-800">
+          <div className='text-blue-800 space-y-2 text-sm'>
             <div>
               <strong>Confidence:</strong>{' '}
               {Math.round(therapeuticInsights.confidence * 100)}%
             </div>
             {therapeuticInsights.intervention && (
-              <div className="text-red-600">
+              <div className='text-red-600'>
                 <strong>⚠️ Intervention Recommended</strong>
               </div>
             )}
@@ -237,11 +238,11 @@ export function ResponseGenerationExample() {
       )}
 
       {/* Usage Instructions */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-        <h3 className="text-lg font-medium text-yellow-900 mb-2">
+      <div className='bg-yellow-50 border-yellow-200 rounded-md border p-4'>
+        <h3 className='text-yellow-900 mb-2 text-lg font-medium'>
           How to Use:
         </h3>
-        <ul className="list-disc list-inside text-sm text-yellow-800 space-y-1">
+        <ul className='text-yellow-800 list-inside list-disc space-y-1 text-sm'>
           <li>
             <strong>General:</strong> For everyday AI assistance and questions
           </li>

@@ -10,7 +10,8 @@ share: true
 
 # Test Execution
 
-This guide covers how to run tests, configure test environments, and manage test execution in Pixelated.
+This guide covers how to run tests, configure test environments, and manage test
+execution in Pixelated.
 
 ## Test Commands
 

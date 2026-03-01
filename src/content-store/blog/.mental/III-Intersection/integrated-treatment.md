@@ -1,13 +1,15 @@
 ---
 title: 'Integrated Treatment for CPTSD and Addiction'
-description: 'Guide to integrated treatment approaches for concurrent CPTSD and addiction'
+description:
+  'Guide to integrated treatment approaches for concurrent CPTSD and addiction'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Integrated Treatment for CPTSD and Addiction
 
-This guide outlines evidence-based approaches for integrated treatment of Complex Post-Traumatic Stress Disorder (CPTSD) and addiction.
+This guide outlines evidence-based approaches for integrated treatment of
+Complex Post-Traumatic Stress Disorder (CPTSD) and addiction.
 
 ## Treatment Framework
 

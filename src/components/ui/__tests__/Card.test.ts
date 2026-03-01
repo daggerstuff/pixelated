@@ -1,12 +1,14 @@
 import { screen } from '@testing-library/dom'
+
 import { renderAstro } from '@/test/utils/astro'
+
 import Card from '../Card.astro'
+import CardAction from '../CardAction.astro'
+import CardContent from '../CardContent.astro'
+import CardDescription from '../CardDescription.astro'
+import CardFooter from '../CardFooter.astro'
 import CardHeader from '../CardHeader.astro'
 import CardTitle from '../CardTitle.astro'
-import CardDescription from '../CardDescription.astro'
-import CardContent from '../CardContent.astro'
-import CardFooter from '../CardFooter.astro'
-import CardAction from '../CardAction.astro'
 
 describe('Card Components', () => {
   describe('Card', () => {

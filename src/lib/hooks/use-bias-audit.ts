@@ -7,10 +7,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, useCallback, useEffect } from 'react'
-import {
-  getBiasAuditService,
-  type BiasAuditServiceConfig,
-} from '@/lib/services/bias-audit-service'
+
 import type {
   DatasetForAudit,
   DatasetAuditResult,
@@ -21,20 +18,28 @@ import type {
   QuarantineStatus,
   AuditProgressUpdate,
 } from '@/lib/api/journal-research/bias-audit-types'
+import {
+  getBiasAuditService,
+  type BiasAuditServiceConfig,
+} from '@/lib/services/bias-audit-service'
 
 // Query keys
 export const biasAuditKeys = {
   all: ['bias-audit'] as const,
   summary: () => [...biasAuditKeys.all, 'summary'] as const,
   datasets: () => [...biasAuditKeys.all, 'datasets'] as const,
-  datasetsList: (filters: { status?: QuarantineStatus; page?: number; pageSize?: number }) =>
-    [...biasAuditKeys.datasets(), filters] as const,
+  datasetsList: (filters: {
+    status?: QuarantineStatus
+    page?: number
+    pageSize?: number
+  }) => [...biasAuditKeys.datasets(), filters] as const,
   dataset: (id: string) => [...biasAuditKeys.datasets(), id] as const,
   auditResults: () => [...biasAuditKeys.all, 'audit-results'] as const,
   auditResult: (id: string) => [...biasAuditKeys.auditResults(), id] as const,
   auditResultsForDataset: (datasetId: string) =>
     [...biasAuditKeys.auditResults(), 'dataset', datasetId] as const,
-  history: (datasetId: string) => [...biasAuditKeys.all, 'history', datasetId] as const,
+  history: (datasetId: string) =>
+    [...biasAuditKeys.all, 'history', datasetId] as const,
 }
 
 /**
@@ -43,7 +48,7 @@ export const biasAuditKeys = {
 export function useAuditSummary() {
   const service = getBiasAuditService()
 
-  return useQuery<AuditSummary, Error>({
+  return useQuery<AuditSummary>({
     queryKey: biasAuditKeys.summary(),
     queryFn: () => service.getAuditSummary(),
     staleTime: 30000, // 30 seconds
@@ -54,11 +59,13 @@ export function useAuditSummary() {
 /**
  * Hook for fetching datasets pending audit
  */
-export function useDatasetsForAudit(options: {
-  status?: QuarantineStatus
-  page?: number
-  pageSize?: number
-} = {}) {
+export function useDatasetsForAudit(
+  options: {
+    status?: QuarantineStatus
+    page?: number
+    pageSize?: number
+  } = {},
+) {
   const service = getBiasAuditService()
   const { status, page = 1, pageSize = 20 } = options
 
@@ -75,7 +82,7 @@ export function useDatasetsForAudit(options: {
 export function useDataset(datasetId: string | null) {
   const service = getBiasAuditService()
 
-  return useQuery<DatasetForAudit | null, Error>({
+  return useQuery<DatasetForAudit | null>({
     queryKey: biasAuditKeys.dataset(datasetId ?? ''),
     queryFn: () => (datasetId ? service.getDataset(datasetId) : null),
     enabled: Boolean(datasetId),
@@ -89,7 +96,7 @@ export function useDataset(datasetId: string | null) {
 export function useAuditResult(auditId: string | null) {
   const service = getBiasAuditService()
 
-  return useQuery<DatasetAuditResult | null, Error>({
+  return useQuery<DatasetAuditResult | null>({
     queryKey: biasAuditKeys.auditResult(auditId ?? ''),
     queryFn: () => (auditId ? service.getAuditResult(auditId) : null),
     enabled: Boolean(auditId),
@@ -103,9 +110,10 @@ export function useAuditResult(auditId: string | null) {
 export function useAuditResultsForDataset(datasetId: string | null) {
   const service = getBiasAuditService()
 
-  return useQuery<DatasetAuditResult[], Error>({
+  return useQuery<DatasetAuditResult[]>({
     queryKey: biasAuditKeys.auditResultsForDataset(datasetId ?? ''),
-    queryFn: () => (datasetId ? service.getAuditResultsForDataset(datasetId) : []),
+    queryFn: () =>
+      datasetId ? service.getAuditResultsForDataset(datasetId) : [],
     enabled: Boolean(datasetId),
     staleTime: 30000,
   })
@@ -117,7 +125,7 @@ export function useAuditResultsForDataset(datasetId: string | null) {
 export function useAuditHistory(datasetId: string | null) {
   const service = getBiasAuditService()
 
-  return useQuery<AuditHistoryEntry[], Error>({
+  return useQuery<AuditHistoryEntry[]>({
     queryKey: biasAuditKeys.history(datasetId ?? ''),
     queryFn: () => (datasetId ? service.getAuditHistory(datasetId) : []),
     enabled: Boolean(datasetId),
@@ -136,8 +144,8 @@ export function useRegisterDataset() {
     mutationFn: (dataset: Omit<DatasetForAudit, 'quarantineStatus'>) =>
       service.registerDataset(dataset),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
     },
   })
 }
@@ -147,9 +155,9 @@ export function useRegisterDataset() {
  */
 export function useInitiateAudit() {
   const queryClient = useQueryClient()
-  const [progressUpdates, setProgressUpdates] = useState<Map<string, AuditProgressUpdate>>(
-    new Map()
-  )
+  const [progressUpdates, setProgressUpdates] = useState<
+    Map<string, AuditProgressUpdate>
+  >(new Map())
 
   const handleProgressUpdate = useCallback((update: AuditProgressUpdate) => {
     setProgressUpdates((prev) => {
@@ -184,22 +192,28 @@ export function useInitiateAudit() {
     },
     onSuccess: (results) => {
       // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.auditResults() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.auditResults() })
 
       // Set individual results in cache
       for (const result of results) {
-        queryClient.setQueryData(biasAuditKeys.auditResult(result.auditId), result)
-        queryClient.setQueryData(biasAuditKeys.dataset(result.datasetId), (old: DatasetForAudit | undefined) => {
-          if (!old) return old
-          return {
-            ...old,
-            lastAuditId: result.auditId,
-            lastAuditScore: result.overallBiasScore,
-            quarantineStatus: result.quarantineStatus,
-          }
-        })
+        queryClient.setQueryData(
+          biasAuditKeys.auditResult(result.auditId),
+          result,
+        )
+        queryClient.setQueryData(
+          biasAuditKeys.dataset(result.datasetId),
+          (old: DatasetForAudit | undefined) => {
+            if (!old) return old
+            return {
+              ...old,
+              lastAuditId: result.auditId,
+              lastAuditScore: result.overallBiasScore,
+              quarantineStatus: result.quarantineStatus,
+            }
+          },
+        )
       }
     },
     onError: () => {
@@ -228,18 +242,19 @@ export function useQuarantineAction() {
   const service = getBiasAuditService()
 
   return useMutation({
-    mutationFn: (payload: QuarantineActionPayload) => service.processQuarantineAction(payload),
+    mutationFn: (payload: QuarantineActionPayload) =>
+      service.processQuarantineAction(payload),
     onSuccess: (updatedDataset) => {
       // Update the dataset in cache
       queryClient.setQueryData(
         biasAuditKeys.dataset(updatedDataset.datasetId),
-        updatedDataset
+        updatedDataset,
       )
 
       // Invalidate lists and summary
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
-      queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
+      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
+      void queryClient.invalidateQueries({
         queryKey: biasAuditKeys.history(updatedDataset.datasetId),
       })
     },
@@ -250,14 +265,22 @@ export function useQuarantineAction() {
  * Combined hook for bias audit dashboard state
  */
 export function useBiasAuditDashboard() {
-  const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(null)
+  const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(
+    null,
+  )
   const [selectedAuditId, setSelectedAuditId] = useState<string | null>(null)
-  const [statusFilter, setStatusFilter] = useState<QuarantineStatus | undefined>(undefined)
+  const [statusFilter, setStatusFilter] = useState<
+    QuarantineStatus | undefined
+  >(undefined)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
 
   const summaryQuery = useAuditSummary()
-  const datasetsQuery = useDatasetsForAudit({ status: statusFilter, page, pageSize })
+  const datasetsQuery = useDatasetsForAudit({
+    status: statusFilter,
+    page,
+    pageSize,
+  })
   const selectedDatasetQuery = useDataset(selectedDatasetId)
   const selectedAuditQuery = useAuditResult(selectedAuditId)
   const historyQuery = useAuditHistory(selectedDatasetId)
@@ -283,14 +306,17 @@ export function useBiasAuditDashboard() {
 
   const initiateAudit = useCallback(
     async (datasetIds: string[], config?: Partial<AuditConfig>) => {
-      const results = await initiateAuditMutation.mutateAsync({ datasetIds, config })
+      const results = await initiateAuditMutation.mutateAsync({
+        datasetIds,
+        config,
+      })
       if (results.length > 0) {
         setSelectedDatasetId(results[0].datasetId)
         setSelectedAuditId(results[0].auditId)
       }
       return results
     },
-    [initiateAuditMutation]
+    [initiateAuditMutation],
   )
 
   const processQuarantineAction = useCallback(
@@ -305,7 +331,7 @@ export function useBiasAuditDashboard() {
         reviewedBy: 'current_user', // Would come from auth context in production
       })
     },
-    [selectedDatasetId, quarantineActionMutation]
+    [selectedDatasetId, quarantineActionMutation],
   )
 
   return {
@@ -351,14 +377,14 @@ export function useBiasAuditDashboard() {
 
     // Refresh
     refresh: () => {
-      summaryQuery.refetch()
-      datasetsQuery.refetch()
+      void summaryQuery.refetch()
+      void datasetsQuery.refetch()
       if (selectedDatasetId) {
-        selectedDatasetQuery.refetch()
-        historyQuery.refetch()
+        void selectedDatasetQuery.refetch()
+        void historyQuery.refetch()
       }
       if (selectedAuditId) {
-        selectedAuditQuery.refetch()
+        void selectedAuditQuery.refetch()
       }
     },
   }

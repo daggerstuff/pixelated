@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
+
 import type {
-  CognitiveDistortion,
   CognitiveDistortionResult,
   CognitiveDistortionType,
+  DetectedDistortion,
 } from '../lib/ai/types/CognitiveDistortions'
 import { cognitiveDistortionConfigs } from '../lib/ai/types/CognitiveDistortions'
 
@@ -51,7 +52,7 @@ export function useCognitiveDistortionDetection({
   // Helper function to generate a summary
   const generateSummary = useCallback(
     (
-      distortions: CognitiveDistortion[],
+      distortions: DetectedDistortion[],
       overallNegativeThinking: number,
     ): string => {
       if (distortions.length === 0) {
@@ -65,9 +66,8 @@ export function useCognitiveDistortionDetection({
 
       const distortionList = topDistortions
         .map((d) => {
-          const config =
-            cognitiveDistortionConfigs[d.type as CognitiveDistortionType]
-          return config ? config.name : d.type
+          const config = cognitiveDistortionConfigs[d.type]
+          return config ? config.label : d.type
         })
         .join(', ')
 
@@ -87,7 +87,7 @@ export function useCognitiveDistortionDetection({
   // This is less accurate but works without an API call
   const clientSideDetect = useCallback(
     (text: string): CognitiveDistortionResult => {
-      const distortions: CognitiveDistortion[] = []
+      const distortions: DetectedDistortion[] = []
       let overallNegativeThinking = 0
 
       // Check each distortion type
@@ -121,6 +121,7 @@ export function useCognitiveDistortionDetection({
               type: config.type,
               evidence: evidence || text,
               confidence,
+              suggestion: config.question,
             })
 
             // Increase negative thinking score
@@ -216,7 +217,7 @@ export function useCognitiveDistortionDetection({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? err.message
             : 'An unknown error occurred'
         setError(errorMessage)
 
@@ -280,7 +281,7 @@ export function useCognitiveDistortionDetection({
           const errorData = await response.json()
           throw new Error(
             errorData.error ||
-              'Failed to detect cognitive distortions in batch',
+            'Failed to detect cognitive distortions in batch',
           )
         }
 
@@ -297,7 +298,7 @@ export function useCognitiveDistortionDetection({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? err.message
             : 'An unknown error occurred'
         setError(errorMessage)
 

@@ -1,6 +1,7 @@
 # Regression Test Coverage
 
-This directory contains regression tests to ensure that previously fixed bugs do not reoccur.
+This directory contains regression tests to ensure that previously fixed bugs do
+not reoccur.
 
 ## Structure
 
@@ -11,30 +12,36 @@ This directory contains regression tests to ensure that previously fixed bugs do
 ## Test Categories
 
 ### Authentication Regressions
+
 - Expired token handling
 - Concurrent login race conditions
 
-### Chat Functionality Regressions  
+### Chat Functionality Regressions
+
 - Message history persistence
 - Special character handling
 - Duplicate message prevention
 
 ### UI/UX Regressions
+
 - Mobile responsive layout
 - Keyboard navigation
 - Accessibility compliance
 
 ### Performance Regressions
+
 - Dashboard loading times
 - Memory usage with large datasets
 - Network timeout handling
 
 ### Data Integrity Regressions
+
 - User preference persistence
 - Network interruption handling
 - Data validation
 
 ### Security Regressions
+
 - XSS attack prevention
 - File upload validation
 - Input sanitization
@@ -55,6 +62,7 @@ pnpm dlx playwright test tests/regression --reporter=html
 ## Bug Tracking
 
 Each test is linked to a specific bug ID that was previously fixed:
+
 - AUTH-001: Expired tokens were accepted
 - CHAT-001: Message history lost on refresh
 - UI-001: Mobile layout breakage
@@ -65,6 +73,7 @@ Each test is linked to a specific bug ID that was previously fixed:
 ## Adding New Regression Tests
 
 When fixing a bug:
+
 1. Add a regression test to prevent reoccurrence
 2. Update the bug tracking list in `regression.config.json`
 3. Document the test in this README
@@ -72,7 +81,9 @@ When fixing a bug:
 
 ## Performance Monitoring
 
-Regression tests include performance monitoring to catch performance regressions:
+Regression tests include performance monitoring to catch performance
+regressions:
+
 - Page load times
 - Memory usage
 - Network request timing
@@ -81,8 +92,9 @@ Regression tests include performance monitoring to catch performance regressions
 ## Security Validation
 
 Security regression tests validate:
+
 - XSS protection
-- CSRF protection  
+- CSRF protection
 - Input sanitization
 - File upload security
 - Authentication security

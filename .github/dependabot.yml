@@ -4,124 +4,124 @@
 version: 2
 updates:
   # GitHub Actions - Check for security updates weekly
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "03:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:00'
     open-pull-requests-limit: 5
     pull-request-branch-name:
-      separator: "/"
+      separator: '/'
     ignore:
-      - dependency-name: "github/copilot-review-action"
+      - dependency-name: 'github/copilot-review-action'
     groups:
       github-actions:
         patterns:
-          - "*"
+          - '*'
     labels:
-      - "dependencies"
-      - "github-actions"
+      - 'dependencies'
+      - 'github-actions'
 
   # NPM/Node.js - Aggressive security update schedule
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "daily"
-      time: "03:00"
+      interval: 'daily'
+      time: '03:00'
     open-pull-requests-limit: 10
     pull-request-branch-name:
-      separator: "/"
-    rebase-strategy: "auto"
+      separator: '/'
+    rebase-strategy: 'auto'
     commit-message:
-      prefix: "chore(deps):"
-      include: "scope"
+      prefix: 'chore(deps):'
+      include: 'scope'
     labels:
-      - "dependencies"
-      - "npm"
+      - 'dependencies'
+      - 'npm'
     groups:
       # Group all production patch updates for easier management
       production-patches:
-        dependency-type: "production"
+        dependency-type: 'production'
         update-types:
-          - "patch"
+          - 'patch'
       # Minor version updates
       production-minor:
-        dependency-type: "production"
+        dependency-type: 'production'
         update-types:
-          - "minor"
+          - 'minor'
       # Security patches for development dependencies
       security-patches-dev:
-        dependency-type: "development"
+        dependency-type: 'development'
         update-types:
-          - "patch"
+          - 'patch'
       development-dependencies:
-        dependency-type: "development"
+        dependency-type: 'development'
         update-types:
-          - "minor"
+          - 'minor'
       # Major versions - group separately for review
       major-updates:
         update-types:
-          - "major"
+          - 'major'
 
   # Python - Daily security updates
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: 'pip'
+    directory: '/'
     schedule:
-      interval: "daily"
-      time: "03:00"
+      interval: 'daily'
+      time: '03:00'
     open-pull-requests-limit: 10
     pull-request-branch-name:
-      separator: "/"
-    rebase-strategy: "auto"
+      separator: '/'
+    rebase-strategy: 'auto'
     commit-message:
-      prefix: "chore(deps):"
-      include: "scope"
+      prefix: 'chore(deps):'
+      include: 'scope'
     labels:
-      - "dependencies"
-      - "python"
+      - 'dependencies'
+      - 'python'
     groups:
       # Define security-critical Python packages
       security-patches:
         patterns:
-          - "cryptography*"
-          - "requests*"
-          - "urllib3*"
-          - "pyyaml*"
-          - "werkzeug*"
-          - "jinja*"
-          - "flask*"
-          - "certifi*"
-          - "setuptools*"
-          - "pyopenssl*"
-          - "idna*"
+          - 'cryptography*'
+          - 'requests*'
+          - 'urllib3*'
+          - 'pyyaml*'
+          - 'werkzeug*'
+          - 'jinja*'
+          - 'flask*'
+          - 'certifi*'
+          - 'setuptools*'
+          - 'pyopenssl*'
+          - 'idna*'
         update-types:
-          - "patch"
+          - 'patch'
       # Regular patches for other dependencies
       python-patches:
         patterns:
-          - "*"
+          - '*'
         exclude-patterns:
-          - "cryptography*"
-          - "requests*"
-          - "urllib3*"
-          - "pyyaml*"
-          - "werkzeug*"
-          - "jinja*"
-          - "flask*"
-          - "certifi*"
-          - "setuptools*"
-          - "pyopenssl*"
-          - "idna*"
+          - 'cryptography*'
+          - 'requests*'
+          - 'urllib3*'
+          - 'pyyaml*'
+          - 'werkzeug*'
+          - 'jinja*'
+          - 'flask*'
+          - 'certifi*'
+          - 'setuptools*'
+          - 'pyopenssl*'
+          - 'idna*'
         update-types:
-          - "patch"
+          - 'patch'
       python-minor:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
+          - 'minor'
       python-major-updates:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "major"
+          - 'major'

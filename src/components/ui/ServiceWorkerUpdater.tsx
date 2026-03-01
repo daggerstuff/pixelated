@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+
 import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
 
 interface ServiceWorkerUpdaterProps {
@@ -38,31 +39,28 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
       toast.custom(
         (t) => (
           <div
-            className={`
-          ${t.visible ? 'animate-enter' : 'animate-leave'}
-          max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5
-        `}
+            className={` ${t.visible ? 'animate-enter' : 'animate-leave'} bg-white dark:bg-gray-800 ring-black pointer-events-auto flex w-full max-w-md rounded-lg shadow-lg ring-1 ring-opacity-5`}
           >
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className='w-0 flex-1 p-4'>
+              <div className='flex items-start'>
+                <div className='ml-3 flex-1'>
+                  <p className='text-gray-900 dark:text-gray-100 text-sm font-medium'>
                     Update Available
                   </p>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <p className='text-gray-500 dark:text-gray-400 mt-1 text-sm'>
                     A new version is available. Refresh to update.
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex border-l border-gray-200 dark:border-gray-700">
+            <div className='border-gray-200 dark:border-gray-700 flex border-l'>
               <button
                 onClick={() => {
                   window.location.reload()
                   toast.dismiss(t.id)
                   onUpdateComplete?.()
                 }}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className='border-transparent text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 focus:ring-indigo-500 flex w-full items-center justify-center rounded-none rounded-r-lg border p-4 text-sm font-medium focus:outline-none focus:ring-2'
               >
                 Refresh
               </button>
@@ -115,7 +113,7 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
       }
     }
 
-    requestNotificationPermission()
+    void requestNotificationPermission()
   }, [])
 
   return null // This is a utility component, it doesn't render anything

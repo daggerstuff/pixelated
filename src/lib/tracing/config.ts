@@ -1,12 +1,18 @@
+/// <reference types="astro/client" />
 /**
  * OpenTelemetry Tracing Configuration
- * 
+ *
  * Configures distributed tracing for the Pixelated Empathy platform
  * to enable end-to-end request tracking across microservices.
  */
 
-import { Resource } from '@opentelemetry/resources'
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
+import { resourceFromAttributes, type Resource } from '@opentelemetry/resources'
+import {
+  SEMRESATTRS_SERVICE_NAME,
+  SEMRESATTRS_SERVICE_VERSION,
+  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+} from '@opentelemetry/semantic-conventions'
 
 export interface TracingConfig {
   enabled: boolean
@@ -46,10 +52,17 @@ export function getTracingConfig(): TracingConfig {
     enabled,
     serviceName: import.meta.env.TRACING_SERVICE_NAME || 'pixelated-empathy',
     serviceVersion: import.meta.env.TRACING_SERVICE_VERSION || '1.0.0',
-    environment: import.meta.env.MODE || (isProduction ? 'production' : 'development'),
+    environment:
+      import.meta.env.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
-      type: (import.meta.env.TRACING_EXPORTER_TYPE as 'otlp' | 'console' | 'jaeger' | 'zipkin') || 'otlp',
-      endpoint: import.meta.env.TRACING_EXPORTER_ENDPOINT || 'http://localhost:4318',
+      type:
+        (import.meta.env.TRACING_EXPORTER_TYPE as
+          | 'otlp'
+          | 'console'
+          | 'jaeger'
+          | 'zipkin') || 'otlp',
+      endpoint:
+        import.meta.env.TRACING_EXPORTER_ENDPOINT || 'http://localhost:4318',
       headers: import.meta.env.TRACING_EXPORTER_HEADERS
         ? JSON.parse(import.meta.env.TRACING_EXPORTER_HEADERS)
         : undefined,
@@ -72,11 +85,11 @@ export function getTracingConfig(): TracingConfig {
  * Create OpenTelemetry Resource with service information
  */
 export function createResource(config: TracingConfig): Resource {
-  return new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
-    [SemanticResourceAttributes.SERVICE_VERSION]: config.serviceVersion,
-    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.environment,
-    [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
+  return resourceFromAttributes({
+    [SEMRESATTRS_SERVICE_NAME]: config.serviceName,
+    [SEMRESATTRS_SERVICE_VERSION]: config.serviceVersion,
+    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: config.environment,
+    [SEMRESATTRS_SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
   })
 }
 

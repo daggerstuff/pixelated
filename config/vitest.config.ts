@@ -1,8 +1,9 @@
+import path from 'node:path'
+
+import react from '@vitejs/plugin-react'
+import tsconfigPaths from 'vite-tsconfig-paths'
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'node:path'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
@@ -64,24 +65,24 @@ export default defineConfig({
       'backups/**/*',
       ...(process.env['CI']
         ? [
-            'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
-            'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
-            'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
-            'tests/integration/bias-detection-api.integration.test.ts',
-          ]
+          'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
+          'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
+          'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
+          'tests/integration/bias-detection-api.integration.test.ts',
+        ]
         : []),
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     ...(process.env['CI']
       ? {
-          poolOptions: {
-            threads: {
-              minThreads: 1,
-              maxThreads: 2,
-            },
+        poolOptions: {
+          threads: {
+            minThreads: 1,
+            maxThreads: 2,
           },
-        }
+        },
+      }
       : {}),
     environmentOptions: {
       jsdom: {

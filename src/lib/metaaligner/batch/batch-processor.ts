@@ -22,8 +22,9 @@ export interface IBatchProcessor {
   process(request: UnifiedProcessingRequest): Promise<UnifiedProcessingResponse>
 }
 
-import { CircuitBreaker } from '../error-handling/circuit-breaker'
 import { getAiServiceLogger } from '@/lib/logging/standardized-logger'
+
+import { CircuitBreaker } from '../error-handling/circuit-breaker'
 
 const logger = getAiServiceLogger('batch-processor')
 
@@ -75,7 +76,7 @@ export class BatchProcessor implements IBatchProcessor {
     this.queue.push(request)
 
     if (this.queue.length >= this.config.batchSize) {
-      this.flush()
+      void this.flush()
     }
 
     if (!this.timeoutId) {

@@ -1,20 +1,22 @@
 ---
-title: "Security Monitoring and Logging"
-description: "Security Monitoring and Logging documentation"
+title: 'Security Monitoring and Logging'
+description: 'Security Monitoring and Logging documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Security Monitoring and Logging
 
-This document provides an overview of the security monitoring and logging systems implemented in the application.
+This document provides an overview of the security monitoring and logging
+systems implemented in the application.
 
 ## Structured Logging
 
-The application uses a structured logging system that provides consistent logging across all components. The logging system includes:
+The application uses a structured logging system that provides consistent
+logging across all components. The logging system includes:
 
 - Request ID tracking for correlating logs across a request lifecycle
 - Structured JSON log format for easier parsing and analysis
@@ -42,8 +44,7 @@ logger.info('User logged in', { userId: '123', ip: '127.0.0.1' })
 // Logging errors
 try {
   // Some operation that might fail
-}
-catch (error) {
+} catch (error) {
   logger.error('Operation failed', error, { operationId: '456' })
 }
 ```
@@ -68,7 +69,8 @@ The application implements log rotation to manage log file size and retention:
 
 ## Security Monitoring
 
-The security monitoring system tracks security-related events and provides tools for detecting and responding to security incidents.
+The security monitoring system tracks security-related events and provides tools
+for detecting and responding to security incidents.
 
 ### Security Events
 
@@ -92,7 +94,8 @@ Security events are categorized by severity:
 
 ### Security Dashboard
 
-The security dashboard provides a visual interface for monitoring security events:
+The security dashboard provides a visual interface for monitoring security
+events:
 
 - Real-time view of security events
 - Filtering by event type, severity, and time range
@@ -110,7 +113,8 @@ The system can automatically respond to certain security events:
 
 ## Integration
 
-The logging and security monitoring systems are integrated with other system components:
+The logging and security monitoring systems are integrated with other system
+components:
 
 - Middleware for request tracking and logging
 - API endpoints for security event querying

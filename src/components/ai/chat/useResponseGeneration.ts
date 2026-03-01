@@ -1,9 +1,10 @@
+import { useCallback, useState, useRef } from 'react'
+
 import type {
   AIMessage,
   TherapeuticResponse,
 } from '../../../lib/ai/models/ai-types'
 import type { AIStreamChunk } from '../../../lib/ai/models/ai-types'
-import { useCallback, useState, useRef } from 'react'
 
 interface UseResponseGenerationOptions {
   apiEndpoint?: string
@@ -238,7 +239,8 @@ export function useResponseGeneration({
     }
     if (responseData.therapeuticInsights && responseType === 'therapeutic') {
       // Validate that therapeuticInsights has the required properties
-      const insights = responseData.therapeuticInsights as Partial<TherapeuticResponse>
+      const insights =
+        responseData.therapeuticInsights as Partial<TherapeuticResponse>
       if (
         insights &&
         typeof insights === 'object' &&
@@ -250,7 +252,9 @@ export function useResponseGeneration({
         const validatedInsights: TherapeuticResponse = {
           content: insights.content,
           confidence: insights.confidence,
-          ...(insights.intervention !== undefined && { intervention: insights.intervention }),
+          ...(insights.intervention !== undefined && {
+            intervention: insights.intervention,
+          }),
           ...(insights.techniques && { techniques: insights.techniques }),
           ...(insights.usage && { usage: insights.usage }),
         }
@@ -268,7 +272,7 @@ export function useResponseGeneration({
   const handleRetryError = (err: unknown, _retries: number): void => {
     const errorMessage =
       err instanceof Error
-        ? (err as Error)?.message || String(err)
+        ? (err)?.message || String(err)
         : 'Failed to generate response'
     setError(errorMessage)
     if (onError && err instanceof Error) {
@@ -277,10 +281,7 @@ export function useResponseGeneration({
   }
 
   const calculateBackoffDelay = (retries: number): number => {
-    return Math.min(
-      1000 * Math.pow(2, retries) + Math.random() * 1000,
-      10000,
-    )
+    return Math.min(1000 * Math.pow(2, retries) + Math.random() * 1000, 10000)
   }
 
   const executeRequestWithRetry = async (
@@ -293,7 +294,9 @@ export function useResponseGeneration({
       try {
         const response = await makeRequest(requestData)
         const data = await response.json()
-        const generatedResponse = (data.response || data.content || '') as string
+        const generatedResponse = (data.response ||
+          data.content ||
+          '') as string
         setResponse(generatedResponse)
         setProgress(100)
         processResponseData(data, generatedResponse)
@@ -410,7 +413,7 @@ export function useResponseGeneration({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Failed to generate therapeutic response'
         setError(errorMessage)
 
@@ -437,7 +440,7 @@ export function useResponseGeneration({
 
   // Generate streaming response
   const generateStreamingResponse = useCallback(
-    async function*(
+    async function* (
       prompt: string,
       context?: AIMessage[],
     ): AsyncGenerator<string, string, unknown> {
@@ -533,7 +536,7 @@ export function useResponseGeneration({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Failed to generate streaming response'
         setError(errorMessage)
 

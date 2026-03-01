@@ -59,13 +59,15 @@ export class BiasAuditService {
   private onProgressUpdate?: (update: AuditProgressUpdate) => void
 
   constructor(config: BiasAuditServiceConfig = {}) {
-    this.biasEngine = config.biasDetectionEngine ?? new BiasDetectionEngine({
-      thresholds: {
-        warning: DEFAULT_AUDIT_CONFIG.thresholds.overall,
-        high: 0.5,
-        critical: 0.7,
-      },
-    })
+    this.biasEngine =
+      config.biasDetectionEngine ??
+      new BiasDetectionEngine({
+        thresholds: {
+          warning: DEFAULT_AUDIT_CONFIG.thresholds.overall,
+          high: 0.5,
+          critical: 0.7,
+        },
+      })
     this.onProgressUpdate = config.onProgressUpdate
   }
 
@@ -88,14 +90,18 @@ export class BiasAuditService {
         acc[d.quarantineStatus] = (acc[d.quarantineStatus] || 0) + 1
         return acc
       },
-      {} as Record<QuarantineStatus, number>
+      {} as Record<QuarantineStatus, number>,
     )
 
-    const totalBiasScore = results.reduce((sum, r) => sum + r.overallBiasScore, 0)
-    const averageBiasScore = results.length > 0 ? totalBiasScore / results.length : 0
+    const totalBiasScore = results.reduce(
+      (sum, r) => sum + r.overallBiasScore,
+      0,
+    )
+    const averageBiasScore =
+      results.length > 0 ? totalBiasScore / results.length : 0
 
     const sortedResults = [...results].sort(
-      (a, b) => b.auditedAt.getTime() - a.auditedAt.getTime()
+      (a, b) => b.auditedAt.getTime() - a.auditedAt.getTime(),
     )
 
     return {
@@ -113,11 +119,13 @@ export class BiasAuditService {
   /**
    * Get all datasets pending audit or review
    */
-  async getDatasetsForAudit(options: {
-    status?: QuarantineStatus
-    page?: number
-    pageSize?: number
-  } = {}): Promise<{
+  async getDatasetsForAudit(
+    options: {
+      status?: QuarantineStatus
+      page?: number
+      pageSize?: number
+    } = {},
+  ): Promise<{
     items: DatasetForAudit[]
     total: number
     page: number
@@ -149,7 +157,9 @@ export class BiasAuditService {
   /**
    * Register a new dataset for audit
    */
-  async registerDataset(dataset: Omit<DatasetForAudit, 'quarantineStatus'>): Promise<DatasetForAudit> {
+  async registerDataset(
+    dataset: Omit<DatasetForAudit, 'quarantineStatus'>,
+  ): Promise<DatasetForAudit> {
     const datasetWithStatus: DatasetForAudit = {
       ...dataset,
       quarantineStatus: 'pending_review',
@@ -163,7 +173,7 @@ export class BiasAuditService {
    */
   async initiateAudit(
     datasetIds: string[],
-    config: Partial<AuditConfig> = {}
+    config: Partial<AuditConfig> = {},
   ): Promise<DatasetAuditResult[]> {
     const auditConfig: AuditConfig = { ...DEFAULT_AUDIT_CONFIG, ...config }
     const results: DatasetAuditResult[] = []
@@ -190,7 +200,14 @@ export class BiasAuditService {
         datasetsStore.set(datasetId, dataset)
 
         // Record history
-        this.recordHistory(datasetId, result.auditId, 'audit_completed', 'under_audit', result.quarantineStatus, 'system')
+        this.recordHistory(
+          datasetId,
+          result.auditId,
+          'audit_completed',
+          'under_audit',
+          result.quarantineStatus,
+          'system',
+        )
       } catch (error) {
         // On error, revert to pending_review
         dataset.quarantineStatus = 'pending_review'
@@ -207,7 +224,7 @@ export class BiasAuditService {
    */
   private async performAudit(
     dataset: DatasetForAudit,
-    config: AuditConfig
+    config: AuditConfig,
   ): Promise<DatasetAuditResult> {
     const auditId = `audit_${Date.now()}_${dataset.datasetId}`
 
@@ -232,7 +249,7 @@ export class BiasAuditService {
     // Generate sample sessions for analysis
     const sampleSessions = this.generateSampleSessions(
       dataset,
-      Math.min(config.sampleSize, dataset.recordCount)
+      Math.min(config.sampleSize, dataset.recordCount),
     )
 
     // Emit progress update: analyzing
@@ -245,20 +262,23 @@ export class BiasAuditService {
     })
 
     // Run batch analysis using BiasDetectionEngine
-    const batchResult = await this.biasEngine.batchAnalyzeSessions(sampleSessions, {
-      concurrency: 4,
-      batchSize: 50,
-      onProgress: ({ completed, total }) => {
-        const progress = 30 + Math.round((completed / total) * 50)
-        this.emitProgress({
-          auditId,
-          datasetId: dataset.datasetId,
-          status: 'analyzing',
-          progress,
-          currentStep: `Analyzed ${completed}/${total} samples`,
-        })
+    const batchResult = await this.biasEngine.batchAnalyzeSessions(
+      sampleSessions,
+      {
+        concurrency: 4,
+        batchSize: 50,
+        onProgress: ({ completed, total }) => {
+          const progress = 30 + Math.round((completed / total) * 50)
+          this.emitProgress({
+            auditId,
+            datasetId: dataset.datasetId,
+            status: 'analyzing',
+            progress,
+            currentStep: `Analyzed ${completed}/${total} samples`,
+          })
+        },
       },
-    })
+    )
 
     // Emit progress update: computing metrics
     this.emitProgress({
@@ -271,11 +291,17 @@ export class BiasAuditService {
 
     // Compute aggregate metrics from results
     const metrics = this.computeMetrics(batchResult.results, config)
-    const demographicBreakdown = this.computeDemographicBreakdown(batchResult.results)
+    const demographicBreakdown = this.computeDemographicBreakdown(
+      batchResult.results,
+    )
     const scoreDistribution = this.computeScoreDistribution(batchResult.results)
     const overallBiasScore = this.computeOverallScore(batchResult.results)
     const passesThreshold = overallBiasScore <= config.thresholds.overall
-    const recommendations = this.generateRecommendations(metrics, demographicBreakdown, overallBiasScore)
+    const recommendations = this.generateRecommendations(
+      metrics,
+      demographicBreakdown,
+      overallBiasScore,
+    )
 
     // Determine quarantine status
     let quarantineStatus: QuarantineStatus
@@ -340,8 +366,16 @@ export class BiasAuditService {
         ],
         demographics: {
           age: Math.floor(Math.random() * 60) + 18,
-          gender: ['male', 'female', 'non-binary', 'prefer_not_to_say'][Math.floor(Math.random() * 4)],
-          ethnicity: ['caucasian', 'african_american', 'hispanic', 'asian', 'other'][Math.floor(Math.random() * 5)],
+          gender: ['male', 'female', 'non-binary', 'prefer_not_to_say'][
+            Math.floor(Math.random() * 4)
+          ],
+          ethnicity: [
+            'caucasian',
+            'african_american',
+            'hispanic',
+            'asian',
+            'other',
+          ][Math.floor(Math.random() * 5)],
           primaryLanguage: 'en',
         },
         metadata: {
@@ -356,7 +390,10 @@ export class BiasAuditService {
   /**
    * Compute bias metrics from analysis results
    */
-  private computeMetrics(results: AnalysisResult[], config: AuditConfig): BiasMetricResult[] {
+  private computeMetrics(
+    results: AnalysisResult[],
+    config: AuditConfig,
+  ): BiasMetricResult[] {
     const metrics: BiasMetricResult[] = []
 
     // Compute average scores for each metric type
@@ -370,10 +407,13 @@ export class BiasAuditService {
       .map((r) => r.layerResults.preprocessing?.linguisticBias?.ageBiasScore)
       .filter((s): s is number => s !== undefined)
     const culturalScores = results
-      .map((r) => r.layerResults.preprocessing?.linguisticBias?.culturalBiasScore)
+      .map(
+        (r) => r.layerResults.preprocessing?.linguisticBias?.culturalBiasScore,
+      )
       .filter((s): s is number => s !== undefined)
 
-    const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+    const avg = (arr: number[]) =>
+      arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
 
     if (config.enabledMetrics.includes('genderBias')) {
       const score = avg(genderScores)
@@ -425,7 +465,9 @@ export class BiasAuditService {
   /**
    * Compute demographic breakdown from results
    */
-  private computeDemographicBreakdown(results: AnalysisResult[]): DemographicBiasBreakdown[] {
+  private computeDemographicBreakdown(
+    results: AnalysisResult[],
+  ): DemographicBiasBreakdown[] {
     const breakdowns: DemographicBiasBreakdown[] = []
 
     // Group results by demographic categories
@@ -435,14 +477,16 @@ export class BiasAuditService {
 
     const computeBreakdown = (
       category: string,
-      groups: Record<string, AnalysisResult[]>
+      groups: Record<string, AnalysisResult[]>,
     ): DemographicBiasBreakdown => {
       const scores: Record<string, number> = {}
       let totalScore = 0
       let count = 0
 
       for (const [group, groupResults] of Object.entries(groups)) {
-        const avgScore = groupResults.reduce((sum, r) => sum + r.overallBiasScore, 0) / groupResults.length
+        const avgScore =
+          groupResults.reduce((sum, r) => sum + r.overallBiasScore, 0) /
+          groupResults.length
         scores[group] = avgScore
         totalScore += avgScore
         count++
@@ -470,7 +514,7 @@ export class BiasAuditService {
    */
   private groupByDemographic(
     results: AnalysisResult[],
-    attribute: 'gender' | 'age' | 'ethnicity'
+    attribute: 'gender' | 'age' | 'ethnicity',
   ): Record<string, AnalysisResult[]> {
     const groups: Record<string, AnalysisResult[]> = {}
 
@@ -505,13 +549,18 @@ export class BiasAuditService {
   /**
    * Compute score distribution for histogram
    */
-  private computeScoreDistribution(results: AnalysisResult[]): BiasScoreDistribution[] {
+  private computeScoreDistribution(
+    results: AnalysisResult[],
+  ): BiasScoreDistribution[] {
     const buckets = 10
     const distribution: BiasScoreDistribution[] = []
     const counts: number[] = new Array(buckets).fill(0)
 
     for (const result of results) {
-      const bucketIndex = Math.min(Math.floor(result.overallBiasScore * buckets), buckets - 1)
+      const bucketIndex = Math.min(
+        Math.floor(result.overallBiasScore * buckets),
+        buckets - 1,
+      )
       counts[bucketIndex]++
     }
 
@@ -533,7 +582,9 @@ export class BiasAuditService {
    */
   private computeOverallScore(results: AnalysisResult[]): number {
     if (results.length === 0) return 0
-    return results.reduce((sum, r) => sum + r.overallBiasScore, 0) / results.length
+    return (
+      results.reduce((sum, r) => sum + r.overallBiasScore, 0) / results.length
+    )
   }
 
   /**
@@ -542,7 +593,7 @@ export class BiasAuditService {
   private generateRecommendations(
     metrics: BiasMetricResult[],
     demographicBreakdown: DemographicBiasBreakdown[],
-    overallScore: number
+    overallScore: number,
   ): string[] {
     const recommendations: string[] = []
 
@@ -550,32 +601,42 @@ export class BiasAuditService {
     const failingMetrics = metrics.filter((m) => !m.passed)
     for (const metric of failingMetrics) {
       recommendations.push(
-        `Address ${metric.metricName.toLowerCase()} issues: Score ${(metric.score * 100).toFixed(1)}% exceeds threshold of ${(metric.threshold * 100).toFixed(1)}%`
+        `Address ${metric.metricName.toLowerCase()} issues: Score ${(metric.score * 100).toFixed(1)}% exceeds threshold of ${(metric.threshold * 100).toFixed(1)}%`,
       )
     }
 
     // Check for demographic concerns
-    const criticalDemographics = demographicBreakdown.filter((d) => d.concernLevel === 'critical' || d.concernLevel === 'high')
+    const criticalDemographics = demographicBreakdown.filter(
+      (d) => d.concernLevel === 'critical' || d.concernLevel === 'high',
+    )
     for (const demo of criticalDemographics) {
       recommendations.push(
-        `Review ${demo.category} representation: ${demo.concernLevel} concern level detected`
+        `Review ${demo.category} representation: ${demo.concernLevel} concern level detected`,
       )
     }
 
     // Overall recommendations
     if (overallScore > 0.5) {
-      recommendations.push('Consider substantial data preprocessing or filtering before training use')
-      recommendations.push('Manual review by domain expert is strongly recommended')
+      recommendations.push(
+        'Consider substantial data preprocessing or filtering before training use',
+      )
+      recommendations.push(
+        'Manual review by domain expert is strongly recommended',
+      )
     } else if (overallScore > 0.3) {
       recommendations.push('Apply bias mitigation techniques during training')
       recommendations.push('Monitor model outputs for bias after training')
     } else if (overallScore > 0.1) {
-      recommendations.push('Dataset shows acceptable bias levels for training use')
+      recommendations.push(
+        'Dataset shows acceptable bias levels for training use',
+      )
       recommendations.push('Continue routine monitoring of bias metrics')
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('Dataset meets all bias thresholds and is suitable for training')
+      recommendations.push(
+        'Dataset meets all bias thresholds and is suitable for training',
+      )
     }
 
     return recommendations
@@ -584,7 +645,9 @@ export class BiasAuditService {
   /**
    * Process quarantine action (approve, quarantine, reject)
    */
-  async processQuarantineAction(payload: QuarantineActionPayload): Promise<DatasetForAudit> {
+  async processQuarantineAction(
+    payload: QuarantineActionPayload,
+  ): Promise<DatasetForAudit> {
     const dataset = datasetsStore.get(payload.datasetId)
     if (!dataset) {
       throw new Error(`Dataset not found: ${payload.datasetId}`)
@@ -621,7 +684,7 @@ export class BiasAuditService {
       previousStatus,
       newStatus,
       payload.reviewedBy,
-      payload.reason
+      payload.reason,
     )
 
     return dataset
@@ -637,9 +700,11 @@ export class BiasAuditService {
   /**
    * Get audit results for a dataset
    */
-  async getAuditResultsForDataset(datasetId: string): Promise<DatasetAuditResult[]> {
+  async getAuditResultsForDataset(
+    datasetId: string,
+  ): Promise<DatasetAuditResult[]> {
     return Array.from(auditResultsStore.values()).filter(
-      (r) => r.datasetId === datasetId
+      (r) => r.datasetId === datasetId,
     )
   }
 
@@ -660,7 +725,7 @@ export class BiasAuditService {
     previousStatus: QuarantineStatus,
     newStatus: QuarantineStatus,
     performedBy: string,
-    reason?: string
+    reason?: string,
   ): void {
     const history = auditHistoryStore.get(datasetId) ?? []
     history.push({
@@ -697,7 +762,9 @@ export class BiasAuditService {
 // Singleton instance
 let biasAuditServiceInstance: BiasAuditService | null = null
 
-export function getBiasAuditService(config?: BiasAuditServiceConfig): BiasAuditService {
+export function getBiasAuditService(
+  config?: BiasAuditServiceConfig,
+): BiasAuditService {
   if (!biasAuditServiceInstance) {
     biasAuditServiceInstance = new BiasAuditService(config)
   }
@@ -706,7 +773,7 @@ export function getBiasAuditService(config?: BiasAuditServiceConfig): BiasAuditS
 
 export function resetBiasAuditService(): void {
   if (biasAuditServiceInstance) {
-    biasAuditServiceInstance.dispose()
+    void biasAuditServiceInstance.dispose()
     biasAuditServiceInstance = null
   }
 }

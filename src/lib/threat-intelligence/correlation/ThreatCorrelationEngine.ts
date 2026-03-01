@@ -4,11 +4,12 @@
  */
 
 import { EventEmitter } from 'events'
+
+import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
-import * as tf from '@tensorflow/tfjs'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   CorrelationConfig,
   CorrelationAlgorithm,

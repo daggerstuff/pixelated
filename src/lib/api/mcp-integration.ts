@@ -4,6 +4,7 @@
  */
 
 import type { APIContext } from 'astro'
+
 import { getLogger } from '@/lib/utils/logger'
 
 const logger = getLogger('mcp-integration')

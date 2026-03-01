@@ -1,13 +1,15 @@
 ---
 title: 'Case Studies: CPTSD and Addiction'
-description: 'Real-world case studies of integrated treatment for CPTSD and addiction'
+description:
+  'Real-world case studies of integrated treatment for CPTSD and addiction'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Case Studies: CPTSD and Addiction
 
-This guide presents anonymized case studies demonstrating various presentations and treatment approaches for concurrent CPTSD and addiction.
+This guide presents anonymized case studies demonstrating various presentations
+and treatment approaches for concurrent CPTSD and addiction.
 
 ## Case Study Framework
 

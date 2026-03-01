@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
-// Replace Next.js font with @fontsource/inter
-import '@fontsource/inter'
-// Remove Next.js Image import
 
 import { Button } from '~/components/ui/button'
+// Remove Next.js Image import
+
+// Replace Next.js font with @fontsource/inter
+import '@fontsource/inter'
 
 // Replace Next.js font initialization with a CSS class
 const interFont = 'font-["Inter"]'
@@ -23,18 +24,18 @@ function FloatingPaths({ position }: { position: number }) {
   }))
 
   return (
-    <div className="absolute inset-0 pointer-events-none mix-blend-soft-light">
+    <div className='pointer-events-none absolute inset-0 mix-blend-soft-light'>
       <svg
-        className="w-full h-full text-white"
-        viewBox="0 0 696 316"
-        fill="none"
+        className='text-white h-full w-full'
+        viewBox='0 0 696 316'
+        fill='none'
       >
         <title>Ambient Paths</title>
         {paths.map((path) => (
           <motion.path
             key={path.id}
             d={path.d}
-            stroke="currentColor"
+            stroke='currentColor'
             strokeWidth={path.width}
             strokeOpacity={path.opacity}
             initial={{ pathLength: 0.3, opacity: 0.4 }}
@@ -58,36 +59,36 @@ function FloatingPaths({ position }: { position: number }) {
 export default function CubePaths() {
   return (
     <div
-      className={`relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-neutral-900 ${interFont}`}
+      className={`bg-neutral-900 relative flex min-h-screen w-full items-center justify-center overflow-hidden ${interFont}`}
     >
       {/* Grain texture overlay */}
       <div
-        className="fixed inset-0 opacity-20"
+        className='fixed inset-0 opacity-20'
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      <div className="absolute inset-0">
+      <div className='absolute inset-0'>
         <FloatingPaths position={1} />
         <FloatingPaths position={-1} />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
+      <div className='container relative z-10 mx-auto px-4 text-center md:px-6'>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 2 }}
-          className="max-w-4xl mx-auto"
+          className='mx-auto max-w-4xl'
         >
-          <div className="mb-12 relative w-64 h-64 mx-auto">
+          <div className='relative mx-auto mb-12 h-64 w-64'>
             {/* Replace Next.js Image with standard img tag */}
             <img
-              src="/images/placeholder-image.png"
-              alt="Minimalist cube"
+              src='/images/placeholder-image.png'
+              alt='Minimalist cube'
               width={400}
               height={400}
-              className="object-contain"
+              className='object-contain'
             />
           </div>
 
@@ -99,37 +100,30 @@ export default function CubePaths() {
               delay: 1.2,
               ease: 'easeOut',
             }}
-            className="mb-10 tracking-wider"
+            className='mb-10 tracking-wider'
           >
-            <div className="inline-flex items-center justify-center">
-              <span className="text-xl md:text-2xl font-light text-neutral-300 tracking-[0.25em] font-['Inter']">
-                <span className="text-white font-normal">03</span>
-                <span className="mx-2 opacity-40">-</span>
-                <span className="text-white font-normal">31</span>
-                <span className="mx-2 opacity-40">-</span>
-                <span className="text-white font-normal">25</span>
+            <div className='inline-flex items-center justify-center'>
+              <span className="text-neutral-300 font-['Inter'] text-xl font-light tracking-[0.25em] md:text-2xl">
+                <span className='text-white font-normal'>03</span>
+                <span className='mx-2 opacity-40'>-</span>
+                <span className='text-white font-normal'>31</span>
+                <span className='mx-2 opacity-40'>-</span>
+                <span className='text-white font-normal'>25</span>
               </span>
             </div>
           </motion.div>
 
-          <div className="inline-block group relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 blur-xl" />
+          <div className='group relative inline-block'>
+            <div className='from-white/10 to-white/5 absolute inset-0 bg-gradient-to-r blur-xl' />
 
             <Button
-              variant="ghost"
-              className="relative px-7 py-5 text-base font-normal backdrop-blur-sm
-            bg-white/5 hover:bg-white/10
-            text-neutral-200 transition-all duration-300
-            group-hover:-translate-y-0.5 border border-white/10
-            hover:border-white/20 tracking-wide font-['Inter']"
+              variant='ghost'
+              className="bg-white/5 hover:bg-white/10 text-neutral-200 border-white/10 hover:border-white/20 relative border px-7 py-5 font-['Inter'] text-base font-normal tracking-wide backdrop-blur-sm transition-all duration-300 group-hover:-translate-y-0.5"
             >
-              <span className="opacity-90 group-hover:opacity-100 transition-opacity">
+              <span className='opacity-90 transition-opacity group-hover:opacity-100'>
                 Enter Dimension
               </span>
-              <span
-                className="ml-2 opacity-70 group-hover:opacity-100 group-hover:translate-x-1.5
-                    transition-all duration-300"
-              >
+              <span className='ml-2 opacity-70 transition-all duration-300 group-hover:translate-x-1.5 group-hover:opacity-100'>
                 →
               </span>
             </Button>

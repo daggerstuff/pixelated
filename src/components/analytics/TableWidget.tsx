@@ -1,6 +1,8 @@
+import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { DashboardWidget } from './DashboardWidget'
-import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   TableBody,
   TableCell,
@@ -8,9 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
+
+import { DashboardWidget } from './DashboardWidget'
+import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
 // TableState type is not currently used in this component
 
 // Define a generic type for table row data
@@ -27,11 +29,10 @@ export interface Column {
   filterable?: boolean
 }
 
-export interface TableWidgetProps
-  extends Omit<
-    WidgetProps,
-    'children' | 'title' | 'description' | 'isLoading'
-  > {
+export interface TableWidgetProps extends Omit<
+  WidgetProps,
+  'children' | 'title' | 'description' | 'isLoading'
+> {
   /** The title of the table widget */
   title: string
 
@@ -108,7 +109,7 @@ export function TableWidget({
       }
     }
 
-    loadData()
+    void loadData()
 
     // Set up refresh interval if provided
     let intervalId: NodeJS.Timeout | null = null
@@ -222,15 +223,15 @@ export function TableWidget({
       isLoading={isLoading}
       {...props}
     >
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {/* Search and export controls */}
-        <div className="flex justify-between">
+        <div className='flex justify-between'>
           {enableSearch && (
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <div className='relative w-64'>
+              <Search className='text-muted-foreground absolute left-2 top-2.5 h-4 w-4' />
               <Input
-                placeholder="Search..."
-                className="pl-8"
+                placeholder='Search...'
+                className='pl-8'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -239,27 +240,27 @@ export function TableWidget({
 
           {enableExport && (
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleExport}
               disabled={data.length === 0}
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Download className='mr-2 h-4 w-4' />
               Export
             </Button>
           )}
         </div>
 
         {/* Table */}
-        <div className="rounded-md border">
-          <table className="w-full">
+        <div className='rounded-md border'>
+          <table className='w-full'>
             <TableHeader>
               <TableRow>
                 {columns.map((column) => (
                   <TableHead key={column.key}>
                     {column.sortable ? (
                       <button
-                        className="flex items-center space-x-1"
+                        className='flex items-center space-x-1'
                         onClick={() => {
                           if (column.sortable) {
                             handleSort(column.key)
@@ -271,9 +272,9 @@ export function TableWidget({
                         <span>{column.label}</span>
                         {sortConfig?.key === column.key &&
                           (sortConfig.direction === 'asc' ? (
-                            <ArrowUp className="h-4 w-4" />
+                            <ArrowUp className='h-4 w-4' />
                           ) : (
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className='h-4 w-4' />
                           ))}
                       </button>
                     ) : (
@@ -288,7 +289,7 @@ export function TableWidget({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="text-center py-8"
+                    className='py-8 text-center'
                   >
                     No data available
                   </TableCell>

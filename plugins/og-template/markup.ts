@@ -1,5 +1,6 @@
-import type { BgType } from '../../src/types'
 import { html } from 'satori-html'
+
+import type { BgType } from '../../src/types'
 import backgroundBase64 from './base64'
 
 export function ogImageMarkup(

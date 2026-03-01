@@ -865,7 +865,8 @@ paths:
                   summary: Too many email change attempts
                   value:
                     code: RATE_LIMIT_EXCEEDED
-                    message: Too many email change attempts. Please try again later.
+                    message:
+                      Too many email change attempts. Please try again later.
                     details:
                       retryAfter: 3600
                       maxAttempts: 3
@@ -1123,7 +1124,8 @@ paths:
       tags:
         - users
       summary: Remove profile picture
-      description: Remove the user's profile picture and revert to default avatar
+      description:
+        Remove the user's profile picture and revert to default avatar
       security:
         - BearerAuth: []
       parameters:

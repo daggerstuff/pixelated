@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: 'CodeQL'
 
 permissions:
   contents: read
@@ -12,7 +12,7 @@ on:
     branches: [master, staging]
   schedule:
     # Run every Monday at 2:00 AM UTC
-    - cron: "0 2 * * 1"
+    - cron: '0 2 * * 1'
 
 env:
   NODE_VERSION: 24.13.0
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "python"]
+        language: ['javascript', 'python']
 
     steps:
       - name: Checkout repository
@@ -142,7 +142,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: "/language:${{ matrix.language }}"
+          category: '/language:${{ matrix.language }}'
           # Upload SARIF file to GitHub Security tab
           upload: true
           # Configure output format

@@ -9,8 +9,9 @@ Read the [`@astrojs/react` docs][docs]
 
 ## Support
 
-- Get help in the [Astro Discord][discord]. Post questions in our `#support` forum,
-  or visit our dedicated `#dev` channel to discuss current development and more!
+- Get help in the [Astro Discord][discord]. Post questions in our `#support`
+  forum, or visit our dedicated `#dev` channel to discuss current development
+  and more!
 
 - Check our [Astro Integration Documentation][astro-integration] for more on
   integrations.
@@ -19,8 +20,8 @@ Read the [`@astrojs/react` docs][docs]
 
 ## Contributing
 
-This package is maintained by Astro's Core team. You're welcome to submit an issue
-or PR!
+This package is maintained by Astro's Core team. You're welcome to submit an
+issue or PR!
 
 These links will help you get started:
 

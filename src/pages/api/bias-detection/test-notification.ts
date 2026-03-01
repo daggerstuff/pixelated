@@ -1,6 +1,6 @@
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('bias-detection-api')
 const biasDetectionEngine = new BiasDetectionEngine()

@@ -5,9 +5,11 @@
  */
 
 import { EventEmitter } from 'events'
-import { MongoClient, Db, Collection } from 'mongodb'
+
 import { Redis } from 'ioredis'
+import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
+
 import { logger } from '../../logger'
 
 // Types
@@ -1245,7 +1247,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       // Find hunts that might be interested in this data
       const relevantHunts = await this.huntsCollection
         .find({
-          'status': 'active',
+          status: 'active',
           'scope.data_sources': dataInfo.data_source,
         })
         .toArray()

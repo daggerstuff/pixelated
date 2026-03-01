@@ -1,25 +1,30 @@
 // Express.js Server Setup
 // Main application entry point with middleware configuration
 
-import express, { Express } from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
 import compression from 'compression'
-import morgan from 'morgan'
+import cors from 'cors'
 import dotenv from 'dotenv'
-import { connectMongoDB, connectPostgreSQL, connectRedis } from '../lib/database/connection'
-import { errorHandler, notFoundHandler } from './middleware/error-handler'
+import express, { Express } from 'express'
+import helmet from 'helmet'
+import morgan from 'morgan'
+
+import {
+  connectMongoDB,
+  connectPostgreSQL,
+  connectRedis,
+} from '../lib/database/connection'
 import { authMiddleware } from './middleware/auth'
+import { errorHandler, notFoundHandler } from './middleware/error-handler'
 import { requestLogger } from './middleware/logger'
 import { rateLimiter } from './middleware/rate-limiter'
-import documentRoutes from './routes/documents'
-import projectRoutes from './routes/projects'
-import strategicPlanRoutes from './routes/strategic-plans'
-import marketResearchRoutes from './routes/market-research'
-import salesOpportunitiesRoutes from './routes/sales-opportunities'
 import authRoutes from './routes/auth'
-import userRoutes from './routes/users'
+import documentRoutes from './routes/documents'
 import healthRoutes from './routes/health'
+import marketResearchRoutes from './routes/market-research'
+import projectRoutes from './routes/projects'
+import salesOpportunitiesRoutes from './routes/sales-opportunities'
+import strategicPlanRoutes from './routes/strategic-plans'
+import userRoutes from './routes/users'
 
 // Load environment variables
 dotenv.config()
@@ -37,12 +42,12 @@ app.use(helmet())
 
 // CORS configuration
 app.use(
-    cors({
-        origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization']
-    })
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
 )
 
 // ============================================================================
@@ -111,22 +116,22 @@ let postgresConnection: any = null
 let redisConnection: any = null
 
 async function initializeDatabases() {
-    try {
-        console.log('🔄 Connecting to MongoDB...')
-        mongoConnection = await connectMongoDB()
-        console.log('✅ MongoDB connected')
+  try {
+    console.log('🔄 Connecting to MongoDB...')
+    mongoConnection = await connectMongoDB()
+    console.log('✅ MongoDB connected')
 
-        console.log('🔄 Connecting to PostgreSQL...')
-        postgresConnection = await connectPostgreSQL()
-        console.log('✅ PostgreSQL connected')
+    console.log('🔄 Connecting to PostgreSQL...')
+    postgresConnection = await connectPostgreSQL()
+    console.log('✅ PostgreSQL connected')
 
-        console.log('🔄 Connecting to Redis...')
-        redisConnection = await connectRedis()
-        console.log('✅ Redis connected')
-    } catch (error) {
-        console.error('❌ Database connection failed:', error)
-        process.exit(1)
-    }
+    console.log('🔄 Connecting to Redis...')
+    redisConnection = await connectRedis()
+    console.log('✅ Redis connected')
+  } catch (error) {
+    console.error('❌ Database connection failed:', error)
+    process.exit(1)
+  }
 }
 
 // ============================================================================
@@ -134,13 +139,13 @@ async function initializeDatabases() {
 // ============================================================================
 
 async function startServer() {
-    try {
-        // Initialize databases
-        await initializeDatabases()
+  try {
+    // Initialize databases
+    await initializeDatabases()
 
-        // Start HTTP server
-        app.listen(PORT, () => {
-            console.log(`
+    // Start HTTP server
+    app.listen(PORT, () => {
+      console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║  🚀 CMS Business Strategy Server Started                 ║
 ╠═══════════════════════════════════════════════════════════╣
@@ -149,26 +154,26 @@ async function startServer() {
 ║  URL: http://localhost:${String(PORT).padEnd(44)}║
 ╚═══════════════════════════════════════════════════════════╝
       `)
-        })
-    } catch (error) {
-        console.error('Failed to start server:', error)
-        process.exit(1)
-    }
+    })
+  } catch (error) {
+    console.error('Failed to start server:', error)
+    process.exit(1)
+  }
 }
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-    console.log('SIGTERM received, shutting down gracefully...')
-    if (mongoConnection) {
-        await mongoConnection.disconnect()
-    }
-    if (postgresConnection) {
-        await postgresConnection.end()
-    }
-    if (redisConnection) {
-        await redisConnection.quit()
-    }
-    process.exit(0)
+  console.log('SIGTERM received, shutting down gracefully...')
+  if (mongoConnection) {
+    await mongoConnection.disconnect()
+  }
+  if (postgresConnection) {
+    await postgresConnection.end()
+  }
+  if (redisConnection) {
+    await redisConnection.quit()
+  }
+  process.exit(0)
 })
 
 // Start the server

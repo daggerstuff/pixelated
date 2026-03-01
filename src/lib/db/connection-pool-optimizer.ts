@@ -3,8 +3,10 @@
  * Advanced connection pooling with monitoring, health checks, and performance optimization
  */
 
-import { Pool, PoolClient, PoolConfig } from 'pg'
 import { EventEmitter } from 'events'
+
+import { Pool, PoolClient, PoolConfig } from 'pg'
+
 import { getLogger } from '@/lib/logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
@@ -245,7 +247,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       const queryPromise = originalQuery(text, params)
 
       // Track query completion
-      queryPromise.finally(() => {
+      void queryPromise.finally(() => {
         const duration = Date.now() - startTime
         this.recordQueryStats(duration, true)
       })
@@ -478,7 +480,7 @@ export class OptimizedConnectionPool extends EventEmitter {
     performance: 'excellent' | 'good' | 'fair' | 'poor'
   } {
     const utilization = this.metrics.activeConnections / this.config.max
-    const {avgQueryTime} = this.metrics
+    const { avgQueryTime } = this.metrics
 
     let performance: 'excellent' | 'good' | 'fair' | 'poor' = 'excellent'
     if (avgQueryTime > 1000 || utilization > 0.9) {

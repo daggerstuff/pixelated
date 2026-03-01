@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+
 import { journalResearchApiClient } from '@/lib/api/journal-research'
 
 const getAuthToken = () => {
@@ -153,8 +154,7 @@ export const useJournalResearchWebSocket = ({
     }
 
     const baseUrl = journalResearchApiClient.getBaseUrl()
-    const path =
-      endpoint ?? `/sessions/${sessionId}/progress/stream`
+    const path = endpoint ?? `/sessions/${sessionId}/progress/stream`
     const authToken = getAuthToken()
     const wsUrl = buildWebSocketUrl(baseUrl, path, authToken)
 
@@ -281,5 +281,3 @@ export const useJournalResearchWebSocket = ({
     reconnect,
   }
 }
-
-

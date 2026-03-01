@@ -4,7 +4,6 @@ import {
   TherapeuticDomain,
   TherapeuticTechnique,
 } from '../types'
-
 // Import new scenarios from separate file
 import { newScenarios } from './new-scenarios'
 

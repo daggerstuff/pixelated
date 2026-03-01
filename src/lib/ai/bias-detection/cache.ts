@@ -340,7 +340,7 @@ export class BiasDetectionCache {
     }
 
     logger.debug('Memory cache hit', { key, accessCount: entry.accessCount })
-    return value as T
+    return value
   }
 
   /**

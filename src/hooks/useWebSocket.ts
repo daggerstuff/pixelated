@@ -1,5 +1,6 @@
-import type { ChatMessage } from '@/types/chat'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import type { ChatMessage } from '@/types/chat'
 
 interface WebSocketHookOptions {
   url: string
@@ -12,23 +13,23 @@ interface WebSocketHookOptions {
 
 type WebSocketMessage =
   | {
-    type: 'message'
-    data: ChatMessage
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: 'message'
+      data: ChatMessage
+      sessionId?: string
+      encrypted?: boolean
+    }
   | {
-    type: 'status'
-    data: { status: string }
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: 'status'
+      data: { status: string }
+      sessionId?: string
+      encrypted?: boolean
+    }
   | {
-    type: 'error'
-    data: { message?: string }
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: 'error'
+      data: { message?: string }
+      sessionId?: string
+      encrypted?: boolean
+    }
 
 export function useWebSocket({
   url,
@@ -78,13 +79,15 @@ export function useWebSocket({
 
       ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(event.data) as unknown as WebSocketMessage
+          const message: WebSocketMessage = JSON.parse(
+            event.data,
+          ) as unknown as WebSocketMessage
           let wsError: Error
 
           switch (message.type) {
             case 'message':
               if (onMessage && message.data) {
-                onMessage(message.data as ChatMessage)
+                onMessage(message.data)
               }
               break
             case 'status':

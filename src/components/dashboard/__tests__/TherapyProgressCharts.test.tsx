@@ -1,7 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
-import TherapyProgressCharts from '../TherapyProgressCharts'
-import type { TherapistAnalyticsChartData } from '@/types/analytics'
 import { describe, expect, it } from 'vitest'
+
+import type { TherapistAnalyticsChartData } from '@/types/analytics'
+
+import TherapyProgressCharts from '../TherapyProgressCharts'
 
 describe('TherapyProgressCharts', () => {
   const mockData: TherapistAnalyticsChartData = {
@@ -106,9 +108,9 @@ describe('TherapyProgressCharts', () => {
   it('renders session progress timeline with correct data', () => {
     render(<TherapyProgressCharts data={mockData} />)
 
-    const timelineChart = screen
-      .getByText('Session Progress Timeline')
-      .parentElement!
+    const timelineChart = screen.getByText(
+      'Session Progress Timeline',
+    ).parentElement!
 
     // Check that session dates are displayed
     expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
@@ -122,9 +124,9 @@ describe('TherapyProgressCharts', () => {
   it('renders skill development radar chart', () => {
     render(<TherapyProgressCharts data={mockData} />)
 
-    const radarChart = screen
-      .getByText('Skill Development Radar')
-      .parentElement!
+    const radarChart = screen.getByText(
+      'Skill Development Radar',
+    ).parentElement!
 
     // Check that skills are displayed
     expect(within(radarChart).getByText('Active Listening')).toBeInTheDocument()
@@ -134,9 +136,8 @@ describe('TherapyProgressCharts', () => {
   it('renders session comparison with trend data', () => {
     render(<TherapyProgressCharts data={mockData} />)
 
-    const comparisonChart = screen
-      .getByText('Session Comparison')
-      .parentElement!
+    const comparisonChart =
+      screen.getByText('Session Comparison').parentElement!
 
     // Check trend indicator
     expect(within(comparisonChart).getByText('↗ Improving')).toBeInTheDocument()
@@ -149,12 +150,14 @@ describe('TherapyProgressCharts', () => {
   it('renders skill improvement timeline', () => {
     render(<TherapyProgressCharts data={mockData} />)
 
-    const timelineChart = screen
-      .getByText('Skill Practice Timeline')
-      .parentElement!
+    const timelineChart = screen.getByText(
+      'Skill Practice Timeline',
+    ).parentElement!
 
     // Check that skills are displayed in timeline
-    expect(within(timelineChart).getByText('Active Listening')).toBeInTheDocument()
+    expect(
+      within(timelineChart).getByText('Active Listening'),
+    ).toBeInTheDocument()
     expect(within(timelineChart).getByText('Empathy')).toBeInTheDocument()
 
     // Check skill scores
@@ -220,7 +223,7 @@ describe('TherapyProgressCharts', () => {
 
   it('renders with custom className', () => {
     render(
-      <TherapyProgressCharts data={mockData} className="custom-chart-class" />,
+      <TherapyProgressCharts data={mockData} className='custom-chart-class' />,
     )
 
     const container = screen.getByLabelText('Therapy Progress Charts')
@@ -250,7 +253,9 @@ describe('TherapyProgressCharts', () => {
     }
     render(<TherapyProgressCharts data={singleSessionData} />)
 
-    const timelineChart = screen.getByText('Session Progress Timeline').parentElement!
+    const timelineChart = screen.getByText(
+      'Session Progress Timeline',
+    ).parentElement!
     expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
   })
 

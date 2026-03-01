@@ -1,5 +1,5 @@
-import type { RedisServiceConfig } from '../types'
 import { RedisService } from '../RedisService'
+import type { RedisServiceConfig } from '../types'
 import { RedisErrorCode } from '../types'
 import { generateTestKey, sleep } from './test-utils'
 
@@ -124,7 +124,7 @@ describeFn('RedisService Integration Tests', () => {
         const updatedSession = await redis.get(
           `integration:session:${sessionId}`,
         )
-        expect((JSON.parse(updatedSession!) as any).roles).toContain('admin')
+        expect((JSON.parse(updatedSession!)).roles).toContain('admin')
 
         // Delete session
         await redis.del(`integration:session:${sessionId}`)
@@ -156,7 +156,7 @@ describeFn('RedisService Integration Tests', () => {
         )
 
         results.forEach((result, i) => {
-          expect(JSON.parse(result!) as unknown).toEqual(sessions[i]!.data)
+          expect(JSON.parse(result!) as unknown).toEqual(sessions[i].data)
         })
       })
     })
@@ -168,7 +168,7 @@ describeFn('RedisService Integration Tests', () => {
 
         // Simulate events
         for (let i = 0; i < 100; i++) {
-          const type = eventTypes[i % eventTypes.length]!
+          const type = eventTypes[i % eventTypes.length]
           const key = `integration:analytics:${type}`
           await redis.incr(key)
           counts[type] = (counts[type] ?? 0) + 1
@@ -177,7 +177,7 @@ describeFn('RedisService Integration Tests', () => {
         // Verify counts
         for (const type of eventTypes) {
           const count = await redis.get(`integration:analytics:${type}`)
-          expect(Number.parseInt(count!, 10)).toBe(counts[type]!)
+          expect(Number.parseInt(count!, 10)).toBe(counts[type])
         }
       })
 
@@ -224,7 +224,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         successEvents.forEach((event) => {
-          const parsed = JSON.parse(event!) as any
+          const parsed = JSON.parse(event!)
           expect(parsed.type).toBe('success')
         })
       })
@@ -272,7 +272,7 @@ describeFn('RedisService Integration Tests', () => {
           ),
         )
         highConfidencePatterns.forEach((pattern) => {
-          const parsed = JSON.parse(pattern!) as any
+          const parsed = JSON.parse(pattern!)
           expect(parsed.confidence).toBeGreaterThanOrEqual(0.8)
         })
       })

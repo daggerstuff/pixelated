@@ -1,4 +1,5 @@
-import type { Session } from '@/lib/api/journal-research/types'
+import { format } from 'date-fns'
+
 import {
   Card,
   CardContent,
@@ -7,8 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/card'
+import type { Session } from '@/lib/api/journal-research/types'
+
 import { ProgressBar } from './ProgressBar'
-import { format } from 'date-fns'
 
 export interface SessionCardProps {
   session: Session
@@ -17,8 +19,7 @@ export interface SessionCardProps {
 }
 
 export function SessionCard({ session, onClick, className }: SessionCardProps) {
-  const progressPercentage =
-    session.progressMetrics?.progress_percentage ?? 0
+  const progressPercentage = session.progressMetrics?.progress_percentage ?? 0
 
   const phaseColors: Record<string, string> = {
     discovery: 'bg-blue-500',
@@ -34,7 +35,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
     <Card
       className={`cursor-pointer transition-shadow hover:shadow-lg ${className ?? ''}`}
       onClick={onClick}
-      role="button"
+      role='button'
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -44,12 +45,12 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
       }}
     >
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold">
+        <div className='flex items-start justify-between'>
+          <div className='flex-1'>
+            <CardTitle className='text-lg font-semibold'>
               {session.sessionId}
             </CardTitle>
-            <CardDescription className="mt-1">
+            <CardDescription className='mt-1'>
               Started {format(session.startDate, 'MMM d, yyyy')}
             </CardDescription>
           </div>
@@ -62,53 +63,53 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <div>
-            <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Progress</span>
-              <span className="font-medium">{progressPercentage}%</span>
+            <div className='mb-2 flex items-center justify-between text-sm'>
+              <span className='text-muted-foreground'>Progress</span>
+              <span className='font-medium'>{progressPercentage}%</span>
             </div>
             <ProgressBar value={progressPercentage} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className='grid grid-cols-2 gap-4 text-sm'>
             <div>
-              <span className="text-muted-foreground">Phase:</span>
-              <span className="ml-2 font-medium capitalize">
+              <span className='text-muted-foreground'>Phase:</span>
+              <span className='ml-2 font-medium capitalize'>
                 {session.currentPhase}
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground">Sources:</span>
-              <span className="ml-2 font-medium">
+              <span className='text-muted-foreground'>Sources:</span>
+              <span className='ml-2 font-medium'>
                 {session.targetSources.length}
               </span>
             </div>
           </div>
 
           {session.progressMetrics && (
-            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+            <div className='text-muted-foreground grid grid-cols-2 gap-2 text-xs'>
               <div>
                 Identified:{' '}
-                <span className="font-medium text-foreground">
+                <span className='font-medium text-foreground'>
                   {session.progressMetrics.sources_identified ?? 0}
                 </span>
               </div>
               <div>
                 Evaluated:{' '}
-                <span className="font-medium text-foreground">
+                <span className='font-medium text-foreground'>
                   {session.progressMetrics.datasets_evaluated ?? 0}
                 </span>
               </div>
               <div>
                 Acquired:{' '}
-                <span className="font-medium text-foreground">
+                <span className='font-medium text-foreground'>
                   {session.progressMetrics.datasets_acquired ?? 0}
                 </span>
               </div>
               <div>
                 Integrated:{' '}
-                <span className="font-medium text-foreground">
+                <span className='font-medium text-foreground'>
                   {session.progressMetrics.integration_plans_created ?? 0}
                 </span>
               </div>
@@ -117,10 +118,9 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="text-xs text-muted-foreground">
+      <CardFooter className='text-muted-foreground text-xs'>
         {session.targetSources.join(', ')}
       </CardFooter>
     </Card>
   )
 }
-

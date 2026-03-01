@@ -2,32 +2,40 @@
 
 ## Overview
 
-This guide explains how to set up free, trusted SSL certificates from Let's Encrypt for `pixelatedempathy.com`.
+This guide explains how to set up free, trusted SSL certificates from Let's
+Encrypt for `pixelatedempathy.com`.
 
 ## Prerequisites
 
-1. **Domain pointing to your server**: Ensure `pixelatedempathy.com` and `www.pixelatedempathy.com` have DNS A records pointing to your server's public IP address
-2. **Port 80 and 443 open**: Let's Encrypt needs access to these ports for domain validation
+1. **Domain pointing to your server**: Ensure `pixelatedempathy.com` and
+   `www.pixelatedempathy.com` have DNS A records pointing to your server's
+   public IP address
+2. **Port 80 and 443 open**: Let's Encrypt needs access to these ports for
+   domain validation
 3. **Root or sudo access**: Required to install and configure certificates
-4. **Web server running**: Apache, Nginx, or another server that can serve ACME challenges
+4. **Web server running**: Apache, Nginx, or another server that can serve ACME
+   challenges
 
 ## Installation
 
 ### Option 1: Using Certbot (Recommended)
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install certbot
 ```
 
 **CentOS/RHEL:**
+
 ```bash
 sudo yum install epel-release
 sudo yum install certbot
 ```
 
 **macOS (Homebrew):**
+
 ```bash
 brew install certbot
 ```
@@ -43,13 +51,15 @@ docker run -it --rm \
 
 ## Method 1: Standalone (Easiest for Testing)
 
-Use this method if you don't have a web server running yet, or want to test quickly.
+Use this method if you don't have a web server running yet, or want to test
+quickly.
 
 ```bash
 sudo certbot certonly --standalone -d pixelatedempathy.com -d www.pixelatedempathy.com
 ```
 
 This will:
+
 1. Temporarily start a web server on port 80
 2. Validate domain ownership
 3. Issue certificate
@@ -67,7 +77,8 @@ sudo apt install python3-certbot-nginx
 sudo certbot --nginx -d pixelatedempathy.com -d www.pixelatedempathy.com
 ```
 
-Certbot will automatically update your Nginx configuration to use the new certificates.
+Certbot will automatically update your Nginx configuration to use the new
+certificates.
 
 ## Method 3: Apache Plugin (Recommended for Apache)
 
@@ -148,7 +159,8 @@ server {
 
 ## Automatic Renewal
 
-Let's Encrypt certificates are valid for 90 days and should be renewed automatically.
+Let's Encrypt certificates are valid for 90 days and should be renewed
+automatically.
 
 ### Test Renewal (Dry Run)
 
@@ -158,20 +170,22 @@ sudo certbot renew --dry-run
 
 ### Setup Automatic Renewal
 
-**Systemd timer (Ubuntu 18.04+):**
-The certbot package automatically sets up a systemd timer. Verify it's running:
+**Systemd timer (Ubuntu 18.04+):** The certbot package automatically sets up a
+systemd timer. Verify it's running:
 
 ```bash
 sudo systemctl status certbot.timer
 ```
 
 **Cron job (if needed):**
+
 ```bash
 # Add this to crontab (runs daily at 3:30 AM)
 30 3 * * * certbot renew --quiet --post-hook "systemctl reload nginx"
 ```
 
 Or for Apache:
+
 ```bash
 30 3 * * * certbot renew --quiet --post-hook "systemctl reload apache2"
 ```
@@ -180,8 +194,8 @@ Or for Apache:
 
 ### "Connection refused" error
 
-**Problem**: Port 80 or 443 blocked
-**Solution**: 
+**Problem**: Port 80 or 443 blocked **Solution**:
+
 ```bash
 # Check firewall rules
 sudo ufw status
@@ -196,8 +210,8 @@ sudo firewall-cmd --reload
 
 ### "Invalid domain" or DNS error
 
-**Problem**: Domain not pointing to correct IP
-**Solution**:
+**Problem**: Domain not pointing to correct IP **Solution**:
+
 ```bash
 # Check DNS propagation
 dig pixelatedempathy.com +short
@@ -208,7 +222,8 @@ Wait up to 24 hours for DNS to propagate.
 
 ### Rate limiting
 
-Let's Encrypt has rate limits (50 certificates per domain per week). If you hit this limit, use their staging environment:
+Let's Encrypt has rate limits (50 certificates per domain per week). If you hit
+this limit, use their staging environment:
 
 ```bash
 sudo certbot --test-mode --standalone -d pixelatedempathy.com
@@ -216,7 +231,8 @@ sudo certbot --test-mode --standalone -d pixelatedempathy.com
 
 ### Web server reload fails
 
-After renewal, certbot needs to reload your web server. If it can't auto-detect your web server, set up a renewal hook:
+After renewal, certbot needs to reload your web server. If it can't auto-detect
+your web server, set up a renewal hook:
 
 ```bash
 # Edit /etc/letsencrypt/cli.ini or /etc/letsencrypt/renewal/pixelatedempathy.com.conf
@@ -231,10 +247,11 @@ renew_hook = systemctl reload nginx
    - Enable HSTS if appropriate
    - Use OCSP stapling if possible
 
-2. **Test your SSL configuration**:
-   Visit https://www.ssllabs.com/ssltest/ and run the test
+2. **Test your SSL configuration**: Visit https://www.ssllabs.com/ssltest/ and
+   run the test
 
 3. **Monitor expiration**:
+
    ```bash
    sudo certbot certificates
    ```
@@ -257,7 +274,8 @@ ssl/regenerate-cert.sh
 # ssl/private/business-strategy-cms.key
 ```
 
-**Note**: You'll still see a security warning in browsers for self-signed certificates. Trust them manually for development.
+**Note**: You'll still see a security warning in browsers for self-signed
+certificates. Trust them manually for development.
 
 ## Summary
 
@@ -265,4 +283,6 @@ ssl/regenerate-cert.sh
 - **Development**: Use the self-signed certificate in `ssl/`
 - **Never use self-signed certificates in production**
 
-The self-signed certificate we generated in [`ssl/regenerate-cert.sh`](ssl/regenerate-cert.sh:1) is suitable for local development only.
+The self-signed certificate we generated in
+[`ssl/regenerate-cert.sh`](ssl/regenerate-cert.sh:1) is suitable for local
+development only.

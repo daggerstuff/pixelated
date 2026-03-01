@@ -5,10 +5,24 @@
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import {
+  trace,
+  context as otelContext,
+  SpanStatusCode,
+  SpanKind,
+} from '@opentelemetry/api'
+import {
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_URL,
+  ATTR_HTTP_SCHEME,
+  ATTR_HTTP_TARGET,
+  ATTR_HTTP_ROUTE,
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_HTTP_RESPONSE_SIZE,
+} from '@opentelemetry/semantic-conventions/incubating'
 import type { MiddlewareHandler } from 'astro'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('tracing-middleware')
 const tracer = trace.getTracer('pixelated-empathy-http')
@@ -27,7 +41,9 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
 
   // Handle static prerendering scenarios where request or headers might not be available
   if (!context?.request) {
-    logger.debug('Skipping tracing for static prerendering - no request object available')
+    logger.debug(
+      'Skipping tracing for static prerendering - no request object available',
+    )
     return next()
   }
 
@@ -36,7 +52,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const url = (() => {
     try {
       const ctxUrl = (context as any).url
-      if (ctxUrl && ctxUrl instanceof URL) return ctxUrl as URL
+      if (ctxUrl && ctxUrl instanceof URL) return ctxUrl
       // Fallback to constructing from request.url when available
       if (typeof req?.url === 'string') return new URL(req.url)
     } catch {
@@ -51,7 +67,11 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   // Determine if it's safe to access request headers
   // In Astro, accessing headers on a prerendered page during build triggers a warning
   const isBuild = import.meta.env.COMMAND === 'build'
-  const canAccessHeaders = !isBuild && !!req && 'headers' in req && typeof req.headers?.get === 'function'
+  const canAccessHeaders =
+    !isBuild &&
+    !!req &&
+    'headers' in req &&
+    typeof req.headers?.get === 'function'
 
   // Extract trace context from headers only if safe
   const traceParent = canAccessHeaders ? req.headers.get('traceparent') : null
@@ -61,13 +81,17 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const span = tracer.startSpan(`${method} ${url.pathname}`, {
     kind: SpanKind.SERVER,
     attributes: {
-      [SemanticAttributes.HTTP_METHOD]: method,
-      [SemanticAttributes.HTTP_URL]: url.toString(),
-      [SemanticAttributes.HTTP_SCHEME]: url.protocol.replace(':', ''),
-      [SemanticAttributes.HTTP_TARGET]: url.pathname + url.search,
-      [SemanticAttributes.HTTP_ROUTE]: url.pathname,
-      'http.user_agent': canAccessHeaders ? (req.headers.get('user-agent') || '') : '',
-      'http.request_id': canAccessHeaders ? (req.headers.get('x-request-id') || '') : '',
+      [ATTR_HTTP_METHOD]: method,
+      [ATTR_HTTP_URL]: url.toString(),
+      [ATTR_HTTP_SCHEME]: url.protocol.replace(':', ''),
+      [ATTR_HTTP_TARGET]: url.pathname + url.search,
+      [ATTR_HTTP_ROUTE]: url.pathname,
+      'http.user_agent': canAccessHeaders
+        ? req.headers.get('user-agent') || ''
+        : '',
+      'http.request_id': canAccessHeaders
+        ? req.headers.get('x-request-id') || ''
+        : '',
     },
   })
 
@@ -95,8 +119,8 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
 
     // Update span with response information
     span.setAttributes({
-      [SemanticAttributes.HTTP_STATUS_CODE]: response.status,
-      [SemanticAttributes.HTTP_RESPONSE_SIZE]: Number(
+      [ATTR_HTTP_STATUS_CODE]: response.status,
+      [ATTR_HTTP_RESPONSE_SIZE]: Number(
         response.headers.get('content-length') || 0,
       ),
       'http.response.duration_ms': duration,
@@ -137,7 +161,9 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
     })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    )
     span.setAttribute('http.response.duration_ms', duration)
 
     logger.error('Request failed in tracing middleware', {

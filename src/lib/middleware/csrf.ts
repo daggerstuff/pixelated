@@ -1,5 +1,6 @@
 import type { AstroCookies } from 'astro'
 import { defineMiddleware } from 'astro:middleware'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { generateSecureToken } from '../security'
 

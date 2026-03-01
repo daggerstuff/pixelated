@@ -3,9 +3,10 @@
  * Provides React components for visualizing objective evaluation results and alignment metrics
  */
 
-import { LineChart, PieChart } from '@/components/ui/charts'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { LineChart, PieChart } from '@/components/ui/charts'
+
 import {
   ObjectiveMetrics,
   AlignmentMetrics,
@@ -97,39 +98,39 @@ export function ObjectiveScoreVisualization({
 
   return (
     <Card className={`p-6 ${className}`}>
-      <h3 className="text-lg font-semibold mb-4">Objective Performance</h3>
-      <div className="space-y-4">
+      <h3 className='mb-4 text-lg font-semibold'>Objective Performance</h3>
+      <div className='space-y-4'>
         {objectives.map((obj, index) => {
           const metrics = objectiveMetrics[obj.id]
           const score = metrics?.score || 0
           const confidence = metrics?.confidence || 0
 
           return (
-            <div key={obj.id} className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium">{obj.name}</span>
-                  <div className="flex items-center gap-2">
+            <div key={obj.id} className='flex items-center justify-between'>
+              <div className='flex-1'>
+                <div className='mb-1 flex items-center justify-between'>
+                  <span className='text-sm font-medium'>{obj.name}</span>
+                  <div className='flex items-center gap-2'>
                     <Badge variant={getBadgeVariant(score)}>
                       {(score * 100).toFixed(1)}%
                     </Badge>
                     {confidence < 0.7 && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant='outline' className='text-xs'>
                         Low Confidence
                       </Badge>
                     )}
                   </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className='bg-gray-200 h-2 w-full rounded-full'>
                   <div
-                    className="h-2 rounded-full transition-all duration-300"
+                    className='h-2 rounded-full transition-all duration-300'
                     style={{
                       width: `${score * 100}%`,
                       backgroundColor: colors[index],
                     }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{obj.description}</p>
+                <p className='text-gray-500 mt-1 text-xs'>{obj.description}</p>
               </div>
             </div>
           )
@@ -155,35 +156,35 @@ export function CriteriaBreakdownVisualization({
 
   return (
     <Card className={`p-6 ${className}`}>
-      <h3 className="text-lg font-semibold mb-4">
+      <h3 className='mb-4 text-lg font-semibold'>
         {objectiveName} - Criteria Breakdown
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="h-64">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+        <div className='h-64'>
           <PieChart data={data} labels={labels} colors={colors} />
         </div>
-        <div className="space-y-3">
+        <div className='space-y-3'>
           {criteriaMetrics.map((criteria, index) => (
             <div
               key={criteria.criterion}
-              className="flex items-center justify-between"
+              className='flex items-center justify-between'
             >
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 <div
-                  className="w-3 h-3 rounded-full"
+                  className='h-3 w-3 rounded-full'
                   style={{ backgroundColor: colors[index % colors.length] }}
                 />
-                <span className="text-sm font-medium">
+                <span className='text-sm font-medium'>
                   {criteria.criterion
                     .replace('_', ' ')
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 <Badge variant={getBadgeVariant(criteria.score)}>
                   {(criteria.score * 100).toFixed(1)}%
                 </Badge>
-                <span className="text-xs text-gray-500">
+                <span className='text-gray-500 text-xs'>
                   Weight: {(criteria.weight * 100).toFixed(0)}%
                 </span>
               </div>
@@ -259,18 +260,18 @@ export function AlignmentTrendVisualization({
 
   return (
     <Card className={`p-6 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">{chartTitle}</h3>
+      <div className='mb-4 flex items-center justify-between'>
+        <h3 className='text-lg font-semibold'>{chartTitle}</h3>
         <Badge
           variant={getTrendBadgeVariant(trend)}
-          className="flex items-center gap-1"
+          className='flex items-center gap-1'
         >
           {trend > 0 ? '↗' : trend < 0 ? '↘' : '→'}
           {trend > 0 ? '+' : ''}
           {trend.toFixed(1)}%
         </Badge>
       </div>
-      <div className="h-64">
+      <div className='h-64'>
         <LineChart
           data={data}
           labels={labels}
@@ -314,51 +315,51 @@ export function AlignmentComparisonVisualization({
 
   return (
     <Card className={`p-6 ${className}`}>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Before vs After Alignment</h3>
+      <div className='mb-6 flex items-center justify-between'>
+        <h3 className='text-lg font-semibold'>Before vs After Alignment</h3>
         <Badge
           variant={getTrendBadgeVariant(overallImprovement)}
-          className="flex items-center gap-1"
+          className='flex items-center gap-1'
         >
           Overall: {overallImprovement > 0 ? '+' : ''}
           {overallImprovement.toFixed(1)}%
         </Badge>
       </div>
 
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {comparisonData.map((data) => (
-          <div key={data.objective} className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium">{data.objective}</span>
+          <div key={data.objective} className='rounded-lg border p-4'>
+            <div className='mb-2 flex items-center justify-between'>
+              <span className='font-medium'>{data.objective}</span>
               <Badge variant={getTrendBadgeVariant(data.improvement)}>
                 {data.improvement > 0 ? '+' : ''}
                 {data.improvement.toFixed(1)}%
               </Badge>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <div className="text-sm text-gray-500 mb-1">Before</div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className='text-gray-500 mb-1 text-sm'>Before</div>
+                <div className='bg-gray-200 h-2 w-full rounded-full'>
                   <div
-                    className="h-2 rounded-full bg-gray-400"
+                    className='bg-gray-400 h-2 rounded-full'
                     style={{ width: `${data.before}%` }}
                   />
                 </div>
-                <div className="text-xs text-right mt-1">
+                <div className='mt-1 text-right text-xs'>
                   {data.before.toFixed(1)}%
                 </div>
               </div>
 
               <div>
-                <div className="text-sm text-gray-500 mb-1">After</div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className='text-gray-500 mb-1 text-sm'>After</div>
+                <div className='bg-gray-200 h-2 w-full rounded-full'>
                   <div
-                    className="h-2 rounded-full bg-blue-500"
+                    className='bg-blue-500 h-2 rounded-full'
                     style={{ width: `${data.after}%` }}
                   />
                 </div>
-                <div className="text-xs text-right mt-1">
+                <div className='mt-1 text-right text-xs'>
                   {data.after.toFixed(1)}%
                 </div>
               </div>
@@ -399,41 +400,41 @@ export function ObjectiveInfluenceVisualization({
 
   return (
     <Card className={`p-6 ${className}`}>
-      <h3 className="text-lg font-semibold mb-4">
+      <h3 className='mb-4 text-lg font-semibold'>
         Objective Influence on Overall Score
       </h3>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-64">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='h-64'>
           <PieChart data={data} labels={labels} colors={colors} />
         </div>
 
-        <div className="space-y-3">
+        <div className='space-y-3'>
           {influenceData.map((item, index) => (
-            <div key={item.name} className="border rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+            <div key={item.name} className='rounded-lg border p-3'>
+              <div className='mb-2 flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
                   <div
-                    className="w-3 h-3 rounded-full"
+                    className='h-3 w-3 rounded-full'
                     style={{ backgroundColor: colors[index % colors.length] }}
                   />
-                  <span className="font-medium text-sm">{item.name}</span>
+                  <span className='text-sm font-medium'>{item.name}</span>
                 </div>
-                <Badge variant="outline">{item.contribution.toFixed(1)}%</Badge>
+                <Badge variant='outline'>{item.contribution.toFixed(1)}%</Badge>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+              <div className='text-gray-600 grid grid-cols-3 gap-2 text-xs'>
                 <div>
                   <div>Weight</div>
-                  <div className="font-medium">{item.weight.toFixed(0)}%</div>
+                  <div className='font-medium'>{item.weight.toFixed(0)}%</div>
                 </div>
                 <div>
                   <div>Score</div>
-                  <div className="font-medium">{item.score.toFixed(1)}%</div>
+                  <div className='font-medium'>{item.score.toFixed(1)}%</div>
                 </div>
                 <div>
                   <div>Context Fit</div>
-                  <div className="font-medium">
+                  <div className='font-medium'>
                     {item.contextualFit.toFixed(0)}%
                   </div>
                 </div>

@@ -1,5 +1,6 @@
-import type { CrisisDetectionResult } from '../../../lib/ai/crisis/types'
 import { useCallback, useState, useRef } from 'react'
+
+import type { CrisisDetectionResult } from '../../../lib/ai/crisis/types'
 
 interface UseCrisisDetectionOptions {
   apiEndpoint?: string
@@ -124,7 +125,7 @@ function generateCrisisAnalytics(
     .filter((r) => r.isCrisis && r.category)
     .reduce(
       (acc, result) => {
-        const type = result.category!
+        const type = result.category
         acc[type] = (acc[type] || 0) + 1
         return acc
       },
@@ -388,7 +389,7 @@ export function useCrisisDetection({
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
               err instanceof Error
-                ? (err as Error)?.message || String(err)
+                ? (err)?.message || String(err)
                 : 'Failed to detect crisis'
             setError(errorMessage)
 
@@ -496,7 +497,7 @@ export function useCrisisDetection({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Failed to detect crisis in batch'
         setError(errorMessage)
 

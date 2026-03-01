@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   mergeAllDatasets,
   mergedDatasetExists,
   getMergedDatasetPath,
 } from '../../../../lib/ai/datasets/merge-datasets'
-
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('dataset-merge')
 
 export const POST: APIRoute = async ({ request }) => {

@@ -1,5 +1,5 @@
-import type { EHRProvider, FHIRClient } from '../types'
 import { createFHIRClient } from '../services/fhir.client'
+import type { EHRProvider, FHIRClient } from '../types'
 
 export abstract class BaseEHRProvider implements EHRProvider {
   abstract id: string

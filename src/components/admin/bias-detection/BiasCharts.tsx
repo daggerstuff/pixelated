@@ -38,35 +38,35 @@ export function BiasCharts({
   return (
     <>
       {/* Bias Distribution Chart */}
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className='h-80'>
+        <ResponsiveContainer width='100%' height='100%'>
           <BarChart data={biasData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="type" />
+            <CartesianGrid strokeDasharray='3 3' />
+            <XAxis dataKey='type' />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#8884d8" />
-            <ReferenceLine y={50} stroke="red" strokeDasharray="5 5" />
+            <Bar dataKey='count' fill='#8884d8' />
+            <ReferenceLine y={50} stroke='red' strokeDasharray='5 5' />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Demographic Distribution */}
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className='h-80'>
+        <ResponsiveContainer width='100%' height='100%'>
           <PieChart>
             <Pie
               data={demographicData}
-              cx="50%"
-              cy="50%"
+              cx='50%'
+              cy='50%'
               labelLine={false}
               label={({ name, percent }: { name: string; percent?: number }) =>
                 `${name} ${((percent || 0) * 100).toFixed(0)}%`
               }
               outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
+              fill='#8884d8'
+              dataKey='value'
             >
               {demographicData.map((_entry, index: number) => (
                 <Cell
@@ -82,37 +82,37 @@ export function BiasCharts({
       </div>
 
       {/* Time Series Chart */}
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className='h-80'>
+        <ResponsiveContainer width='100%' height='100%'>
           <AreaChart data={timeSeriesData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            <CartesianGrid strokeDasharray='3 3' />
+            <XAxis dataKey='date' />
             <YAxis />
             <Tooltip />
             <Legend />
             <Area
-              type="monotone"
-              dataKey="biasScore"
-              stackId="1"
-              stroke="#8884d8"
-              fill="#8884d8"
+              type='monotone'
+              dataKey='biasScore'
+              stackId='1'
+              stroke='#8884d8'
+              fill='#8884d8'
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
       {/* Radar Chart */}
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className='h-80'>
+        <ResponsiveContainer width='100%' height='100%'>
           <RadarChart data={radarData}>
             <PolarGrid />
-            <PolarAngleAxis dataKey="subject" />
+            <PolarAngleAxis dataKey='subject' />
             <PolarRadiusAxis />
             <Radar
-              name="Bias Score"
-              dataKey="A"
-              stroke="#8884d8"
-              fill="#8884d8"
+              name='Bias Score'
+              dataKey='A'
+              stroke='#8884d8'
+              fill='#8884d8'
               fillOpacity={0.6}
             />
             <Legend />

@@ -13,7 +13,10 @@ date: '2025-04-14'
 
 ## Overview
 
-This document outlines how to set up comprehensive database performance monitoring for our MongoDB Atlas database. The monitoring system collects metrics on connection counts, query performance, resource utilization, and other critical performance indicators.
+This document outlines how to set up comprehensive database performance
+monitoring for our MongoDB Atlas database. The monitoring system collects
+metrics on connection counts, query performance, resource utilization, and other
+critical performance indicators.
 
 ## Architecture
 

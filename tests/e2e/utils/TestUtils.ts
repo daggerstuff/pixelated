@@ -84,7 +84,7 @@ export class TestUtils {
 
   static async mockApiResponse(page: Page, url: string, response: unknown) {
     await page.route(url, (route) => {
-      route.fulfill({
+      void route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(response),

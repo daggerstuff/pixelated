@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { AnalyticsService } from '@/lib/analytics'
+
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -7,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
 import { IconRefresh, IconDownload, IconFilter } from '@/components/ui/icons'
 import {
   Select,
@@ -17,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AnalyticsService } from '@/lib/analytics'
 
 // Types
 interface ConversionEvent {
@@ -84,7 +85,7 @@ export function ConversionDashboard() {
 
   // Load conversion data
   useEffect(() => {
-    loadConversionData()
+    void loadConversionData()
   }, [period, filter, loadConversionData])
 
   // Calculate summary metrics
@@ -291,78 +292,78 @@ export function ConversionDashboard() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
           <div>
-            <CardTitle className="text-xl font-bold">
+            <CardTitle className='text-xl font-bold'>
               Conversion Tracking
             </CardTitle>
             <CardDescription>
               Track and analyze conversion events across your application
             </CardDescription>
           </div>
-          <div className="flex space-x-2">
+          <div className='flex space-x-2'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={loadConversionData}
               disabled={isLoading}
             >
-              <IconRefresh className="h-4 w-4 mr-2" />
+              <IconRefresh className='mr-2 h-4 w-4' />
               Refresh
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={exportToCsv}
               disabled={isLoading || conversionEvents.length === 0}
             >
-              <IconDownload className="h-4 w-4 mr-2" />
+              <IconDownload className='mr-2 h-4 w-4' />
               Export
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <IconFilter className="h-4 w-4 text-gray-500" />
+          <div className='mb-6 flex flex-col justify-between gap-4 md:flex-row'>
+            <div className='flex items-center space-x-4'>
+              <div className='flex items-center space-x-2'>
+                <IconFilter className='text-gray-500 h-4 w-4' />
 
-                <span className="text-sm text-gray-500">Filter:</span>
+                <span className='text-gray-500 text-sm'>Filter:</span>
               </div>
               <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className='w-[180px]'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Conversions</SelectItem>
-                  <SelectItem value="signup">Signup</SelectItem>
-                  <SelectItem value="purchase">Purchase</SelectItem>
-                  <SelectItem value="download">Download</SelectItem>
-                  <SelectItem value="contact">Contact</SelectItem>
+                  <SelectItem value='all'>All Conversions</SelectItem>
+                  <SelectItem value='signup'>Signup</SelectItem>
+                  <SelectItem value='purchase'>Purchase</SelectItem>
+                  <SelectItem value='download'>Download</SelectItem>
+                  <SelectItem value='contact'>Contact</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex space-x-2">
+            <div className='flex space-x-2'>
               <Button
                 variant={period === 'daily' ? 'default' : 'outline'}
-                size="sm"
+                size='sm'
                 onClick={() => setPeriod('daily')}
               >
                 Daily
               </Button>
               <Button
                 variant={period === 'weekly' ? 'default' : 'outline'}
-                size="sm"
+                size='sm'
                 onClick={() => setPeriod('weekly')}
               >
                 Weekly
               </Button>
               <Button
                 variant={period === 'monthly' ? 'default' : 'outline'}
-                size="sm"
+                size='sm'
                 onClick={() => setPeriod('monthly')}
               >
                 Monthly
@@ -371,67 +372,67 @@ export function ConversionDashboard() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <div className='flex h-64 items-center justify-center'>
+              <div className='border-primary h-12 w-12 animate-spin rounded-full border-b-2 border-t-2'></div>
             </div>
           ) : (
             <Tabs
-              defaultValue="overview"
+              defaultValue='overview'
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="mb-6">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="sources">Traffic Sources</TabsTrigger>
-                <TabsTrigger value="pages">Pages</TabsTrigger>
-                <TabsTrigger value="events">Event Log</TabsTrigger>
+              <TabsList className='mb-6'>
+                <TabsTrigger value='overview'>Overview</TabsTrigger>
+                <TabsTrigger value='sources'>Traffic Sources</TabsTrigger>
+                <TabsTrigger value='pages'>Pages</TabsTrigger>
+                <TabsTrigger value='events'>Event Log</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <TabsContent value='overview' className='space-y-4'>
+                <div className='mb-8 grid grid-cols-1 gap-4 md:grid-cols-3'>
                   {summaryData.length > 0 ? (
                     summaryData.map((summary) => (
                       <Card key={summary.id}>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg capitalize">
+                        <CardHeader className='pb-2'>
+                          <CardTitle className='text-lg capitalize'>
                             {summary.id}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">
+                          <div className='space-y-2'>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-500 text-sm'>
                                 Count:
                               </span>
-                              <span className="font-semibold">
+                              <span className='font-semibold'>
                                 {summary.count}
                               </span>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">
+                            <div className='flex justify-between'>
+                              <span className='text-gray-500 text-sm'>
                                 Value:
                               </span>
-                              <span className="font-semibold">
+                              <span className='font-semibold'>
                                 ${summary.totalValue.toFixed(2)}
                               </span>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">
+                            <div className='flex justify-between'>
+                              <span className='text-gray-500 text-sm'>
                                 Conversion Rate:
                               </span>
-                              <span className="font-semibold">
+                              <span className='font-semibold'>
                                 {summary.conversionRate.toFixed(2)}%
                               </span>
                             </div>
-                            <div className="mt-2">
-                              <div className="text-sm text-gray-500 mb-1">
+                            <div className='mt-2'>
+                              <div className='text-gray-500 mb-1 text-sm'>
                                 Last 7 days:
                               </div>
-                              <div className="flex items-end space-x-1 h-8">
+                              <div className='flex h-8 items-end space-x-1'>
                                 {summary.trend.map((value, i) => (
                                   <div
                                     key={`trend-${summary.id}-${i}-${value}`}
-                                    className="bg-primary rounded-sm w-full"
+                                    className='bg-primary w-full rounded-sm'
                                     style={{
                                       height: `${Math.max(20, (value / Math.max(...summary.trend)) * 100)}%`,
                                       minHeight: '4px',
@@ -445,9 +446,9 @@ export function ConversionDashboard() {
                       </Card>
                     ))
                   ) : (
-                    <Card className="col-span-3">
-                      <CardContent className="py-6">
-                        <p className="text-center text-gray-500">
+                    <Card className='col-span-3'>
+                      <CardContent className='py-6'>
+                        <p className='text-gray-500 text-center'>
                           No conversion data available for the selected filters.
                         </p>
                       </CardContent>
@@ -459,8 +460,8 @@ export function ConversionDashboard() {
                   <CardHeader>
                     <CardTitle>Conversions Over Time</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[300px] flex items-center justify-center">
-                    <div className="text-center text-gray-500">
+                  <CardContent className='flex h-[300px] items-center justify-center'>
+                    <div className='text-gray-500 text-center'>
                       [Chart Component Would Render Here with{' '}
                       {timeChartData.labels.join(', ')}]
                     </div>
@@ -471,8 +472,8 @@ export function ConversionDashboard() {
                   <CardHeader>
                     <CardTitle>Conversion Types Distribution</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[300px] flex items-center justify-center">
-                    <div className="text-center text-gray-500">
+                  <CardContent className='flex h-[300px] items-center justify-center'>
+                    <div className='text-gray-500 text-center'>
                       [Pie Chart Would Render Here with{' '}
                       {typeChartData.labels.join(', ')}]
                     </div>
@@ -480,7 +481,7 @@ export function ConversionDashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="sources" className="space-y-4">
+              <TabsContent value='sources' className='space-y-4'>
                 <Card>
                   <CardHeader>
                     <CardTitle>Traffic Sources</CardTitle>
@@ -490,20 +491,20 @@ export function ConversionDashboard() {
                   </CardHeader>
                   <CardContent>
                     {sourceData.length > 0 ? (
-                      <div className="relative overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <div className='relative overflow-x-auto'>
+                        <table className='text-gray-500 dark:text-gray-400 w-full text-left text-sm'>
+                          <thead className='text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase'>
                             <tr>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Source
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Conversions
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Value
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Percentage
                               </th>
                             </tr>
@@ -512,23 +513,23 @@ export function ConversionDashboard() {
                             {sourceData.map((source) => (
                               <tr
                                 key={source.source}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                className='bg-white dark:bg-gray-800 dark:border-gray-700 border-b'
                               >
-                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                <td className='text-gray-900 dark:text-white whitespace-nowrap px-6 py-4 font-medium'>
                                   {source.source}
                                 </td>
-                                <td className="px-6 py-4">{source.count}</td>
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>{source.count}</td>
+                                <td className='px-6 py-4'>
                                   ${source.value.toFixed(2)}
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center">
-                                    <span className="mr-2">
+                                <td className='px-6 py-4'>
+                                  <div className='flex items-center'>
+                                    <span className='mr-2'>
                                       {source.percentage.toFixed(1)}%
                                     </span>
-                                    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                    <div className='bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full'>
                                       <div
-                                        className="bg-primary h-2.5 rounded-full"
+                                        className='bg-primary h-2.5 rounded-full'
                                         style={{
                                           width: `${source.percentage}%`,
                                         }}
@@ -542,7 +543,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">
+                      <p className='text-gray-500 py-4 text-center'>
                         No source data available for the selected filters.
                       </p>
                     )}
@@ -550,7 +551,7 @@ export function ConversionDashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="pages" className="space-y-4">
+              <TabsContent value='pages' className='space-y-4'>
                 <Card>
                   <CardHeader>
                     <CardTitle>Page Performance</CardTitle>
@@ -560,20 +561,20 @@ export function ConversionDashboard() {
                   </CardHeader>
                   <CardContent>
                     {pageData.length > 0 ? (
-                      <div className="relative overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <div className='relative overflow-x-auto'>
+                        <table className='text-gray-500 dark:text-gray-400 w-full text-left text-sm'>
+                          <thead className='text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase'>
                             <tr>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Page
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Conversions
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Value
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Conversion Rate
                               </th>
                             </tr>
@@ -582,23 +583,23 @@ export function ConversionDashboard() {
                             {pageData.map((page) => (
                               <tr
                                 key={page.path}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                className='bg-white dark:bg-gray-800 dark:border-gray-700 border-b'
                               >
-                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                <td className='text-gray-900 dark:text-white whitespace-nowrap px-6 py-4 font-medium'>
                                   {page.path}
                                 </td>
-                                <td className="px-6 py-4">{page.count}</td>
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>{page.count}</td>
+                                <td className='px-6 py-4'>
                                   ${page.value.toFixed(2)}
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center">
-                                    <span className="mr-2">
+                                <td className='px-6 py-4'>
+                                  <div className='flex items-center'>
+                                    <span className='mr-2'>
                                       {page.conversionRate.toFixed(1)}%
                                     </span>
-                                    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                    <div className='bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full'>
                                       <div
-                                        className="bg-primary h-2.5 rounded-full"
+                                        className='bg-primary h-2.5 rounded-full'
                                         style={{
                                           width: `${Math.min(page.conversionRate * 2, 100)}%`,
                                         }}
@@ -612,7 +613,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">
+                      <p className='text-gray-500 py-4 text-center'>
                         No page data available for the selected filters.
                       </p>
                     )}
@@ -620,7 +621,7 @@ export function ConversionDashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="events" className="space-y-4">
+              <TabsContent value='events' className='space-y-4'>
                 <Card>
                   <CardHeader>
                     <CardTitle>Event Log</CardTitle>
@@ -630,23 +631,23 @@ export function ConversionDashboard() {
                   </CardHeader>
                   <CardContent>
                     {conversionEvents.length > 0 ? (
-                      <div className="relative overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <div className='relative overflow-x-auto'>
+                        <table className='text-gray-500 dark:text-gray-400 w-full text-left text-sm'>
+                          <thead className='text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase'>
                             <tr>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Timestamp
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Type
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Value
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Source
                               </th>
-                              <th scope="col" className="px-6 py-3">
+                              <th scope='col' className='px-6 py-3'>
                                 Page
                               </th>
                             </tr>
@@ -655,23 +656,23 @@ export function ConversionDashboard() {
                             {conversionEvents.map((event) => (
                               <tr
                                 key={`event-${event.conversionId}-${event.timestamp}`}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                className='bg-white dark:bg-gray-800 dark:border-gray-700 border-b'
                               >
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>
                                   {new Date(event.timestamp).toLocaleString()}
                                 </td>
-                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                <td className='text-gray-900 dark:text-white px-6 py-4 font-medium'>
                                   {event.conversionId}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>
                                   {event.value
                                     ? `$${event.value.toFixed(2)}`
                                     : '-'}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>
                                   {event.source || 'direct'}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className='px-6 py-4'>
                                   {event.path || '(not set)'}
                                 </td>
                               </tr>
@@ -680,7 +681,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">
+                      <p className='text-gray-500 py-4 text-center'>
                         No events available for the selected filters.
                       </p>
                     )}

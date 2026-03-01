@@ -1,5 +1,5 @@
-import { Pool } from 'pg'
 import dotenv from 'dotenv'
+import { Pool } from 'pg'
 
 // Load environment variables
 dotenv.config()
@@ -35,7 +35,10 @@ async function testConnection() {
       WHERE table_schema = 'public'
       ORDER BY table_name
     `)
-    console.log('Existing tables:', tables.rows.map(row => row.table_name))
+    console.log(
+      'Existing tables:',
+      tables.rows.map((row) => row.table_name),
+    )
 
     // Count users
     const userCount = await client.query('SELECT COUNT(*) as count FROM users')
@@ -50,4 +53,4 @@ async function testConnection() {
   }
 }
 
-testConnection()
+void testConnection()

@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import type { FC } from 'react'
+
 import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
 import type {
   SessionData,
@@ -12,12 +13,12 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className="animate-pulse">
-    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-    <div className="space-y-2">
-      <div className="h-3 bg-gray-200 rounded"></div>
-      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-      <div className="h-3 bg-gray-200 rounded w-4/6"></div>
+  <div className='animate-pulse'>
+    <div className='bg-gray-200 mb-4 h-4 w-3/4 rounded'></div>
+    <div className='space-y-2'>
+      <div className='bg-gray-200 h-3 rounded'></div>
+      <div className='bg-gray-200 h-3 w-5/6 rounded'></div>
+      <div className='bg-gray-200 h-3 w-4/6 rounded'></div>
     </div>
   </div>
 )
@@ -29,17 +30,17 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-    <div className="flex items-center justify-between">
+  <div className='bg-red-50 border-red-200 rounded-lg border p-4'>
+    <div className='flex items-center justify-between'>
       <div>
-        <h4 className="text-red-800 font-medium">
+        <h4 className='text-red-800 font-medium'>
           Unable to load analytics data
         </h4>
-        <p className="text-red-600 text-sm mt-1">{String(error)}</p>
+        <p className='text-red-600 mt-1 text-sm'>{String(error)}</p>
       </div>
       <button
         onClick={onRetry}
-        className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+        className='bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors'
       >
         Retry
       </button>
@@ -62,12 +63,12 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
   ]
 
   return (
-    <div className="flex space-x-2">
+    <div className='flex space-x-2'>
       {options.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
+          className={`rounded px-3 py-1 text-sm transition-colors ${
             value === option.value
               ? 'bg-blue-600 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -96,25 +97,25 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Session Activity</h3>
-      <div className="flex items-end space-x-2 h-48">
+    <div className='bg-white rounded-lg p-6 shadow'>
+      <h3 className='mb-4 text-lg font-semibold'>Session Activity</h3>
+      <div className='flex h-48 items-end space-x-2'>
         {data.map((day) => (
-          <div key={day.date} className="flex-1 flex flex-col items-center">
+          <div key={day.date} className='flex flex-1 flex-col items-center'>
             <div
-              className="bg-blue-500 w-full rounded-t transition-all duration-300 hover:bg-blue-600"
+              className='bg-blue-500 hover:bg-blue-600 w-full rounded-t transition-all duration-300'
               style={{
                 height: `${(day.sessions / maxSessions) * 100}%`,
                 minHeight: '4px',
               }}
               title={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
             />
-            <span className="text-xs mt-2 text-gray-600">
+            <span className='text-gray-600 mt-2 text-xs'>
               {new Date(day.date).toLocaleDateString('en-US', {
                 weekday: 'short',
               })}
             </span>
-            <span className="text-xs text-gray-500">{day.sessions}</span>
+            <span className='text-gray-500 text-xs'>{day.sessions}</span>
           </div>
         ))}
       </div>
@@ -156,23 +157,23 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Skill Progress</h3>
-      <div className="space-y-4">
+    <div className='bg-white rounded-lg p-6 shadow'>
+      <h3 className='mb-4 text-lg font-semibold'>Skill Progress</h3>
+      <div className='space-y-4'>
         {data.map((skill) => (
           <div key={skill.skill}>
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">{skill.skill}</span>
+            <div className='mb-2 flex items-center justify-between'>
+              <div className='flex items-center space-x-2'>
+                <span className='text-sm font-medium'>{skill.skill}</span>
                 <span className={`text-sm ${getTrendColor(skill.trend)}`}>
                   {getTrendIcon(skill.trend)}
                 </span>
               </div>
-              <span className="text-sm text-gray-600">{skill.score}%</span>
+              <span className='text-gray-600 text-sm'>{skill.score}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className='bg-gray-200 h-2 w-full rounded-full'>
               <div
-                className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                className='bg-green-500 h-2 rounded-full transition-all duration-500'
                 style={{ width: `${skill.score}%` }}
               />
             </div>
@@ -192,9 +193,9 @@ interface SummaryStatsProps {
 const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white p-4 rounded-lg shadow">
+          <div key={i} className='bg-white rounded-lg p-4 shadow'>
             <LoadingSkeleton />
           </div>
         ))}
@@ -220,20 +221,20 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
       {data.map((stat) => (
         <div
           key={stat.label}
-          className="bg-white p-4 rounded-lg shadow text-center"
+          className='bg-white rounded-lg p-4 text-center shadow'
         >
           <div className={`text-2xl font-bold ${getColorClasses(stat.color)}`}>
             {typeof stat.value === 'number'
               ? stat.value.toLocaleString()
               : stat.value}
           </div>
-          <div className="text-sm text-gray-600">{stat.label}</div>
+          <div className='text-gray-600 text-sm'>{stat.label}</div>
           {stat.trend && (
-            <div className="text-xs text-gray-500 mt-1">
+            <div className='text-gray-500 mt-1 text-xs'>
               <span
                 className={
                   stat.trend.direction === 'up'
@@ -250,7 +251,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
                     : '→'}{' '}
                 {stat.trend.value}%
               </span>
-              <span className="ml-1">{stat.trend.period}</span>
+              <span className='ml-1'>{stat.trend.period}</span>
             </div>
           )}
         </div>
@@ -275,7 +276,7 @@ export const AnalyticsCharts: FC = () => {
 
   // Handle retry
   const handleRetry = useCallback(() => {
-    refetch()
+    void refetch()
   }, [refetch])
 
   // Handle time range change
@@ -286,9 +287,9 @@ export const AnalyticsCharts: FC = () => {
   // Render error state
   if (error && !isLoading) {
     return (
-      <div className="analytics-charts space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Analytics Overview</h2>
+      <div className='analytics-charts space-y-6'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-2xl font-bold'>Analytics Overview</h2>
           <TimeRangeSelector
             value={filters.timeRange}
             onChange={handleTimeRangeChange}
@@ -300,10 +301,10 @@ export const AnalyticsCharts: FC = () => {
   }
 
   return (
-    <div className="analytics-charts space-y-6">
+    <div className='analytics-charts space-y-6'>
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Analytics Overview</h2>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-2xl font-bold'>Analytics Overview</h2>
         <TimeRangeSelector
           value={filters.timeRange}
           onChange={handleTimeRangeChange}
@@ -321,7 +322,7 @@ export const AnalyticsCharts: FC = () => {
 
       {/* Data freshness indicator */}
       {data && !isLoading && (
-        <div className="text-xs text-gray-500 text-center">
+        <div className='text-gray-500 text-center text-xs'>
           Data updated {new Date().toLocaleTimeString()}
         </div>
       )}

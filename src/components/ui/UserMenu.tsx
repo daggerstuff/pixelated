@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
+
 import { authClient } from '@/lib/auth-client'
+
 import { Avatar } from './avatar'
 
 export interface UserMenuProps {
@@ -25,7 +27,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
   if (isPending) {
     return (
       <div className={className}>
-        <div className="text-gray-700 dark:text-gray-300 font-medium rounded-lg text-sm px-4 py-2 text-center inline-flex items-center">
+        <div className='text-gray-700 dark:text-gray-300 inline-flex items-center rounded-lg px-4 py-2 text-center text-sm font-medium'>
           Loading...
         </div>
       </div>
@@ -36,8 +38,8 @@ export function UserMenu({ className = '' }: UserMenuProps) {
     return (
       <div className={className}>
         <a
-          href="/login"
-          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 text-center inline-flex items-center"
+          href='/login'
+          className='text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-300 inline-flex items-center rounded-lg px-4 py-2 text-center text-sm font-medium focus:ring-4'
         >
           Sign in
         </a>
@@ -48,44 +50,44 @@ export function UserMenu({ className = '' }: UserMenuProps) {
   return (
     <div className={`relative ${className}`} ref={menuRef}>
       <button
-        type="button"
-        className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+        type='button'
+        className='bg-gray-800 focus:ring-gray-300 dark:focus:ring-gray-600 flex rounded-full text-sm focus:ring-4 md:me-0'
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="sr-only">Open user menu</span>
+        <span className='sr-only'>Open user menu</span>
         <Avatar
           src={user.user_metadata?.avatar_url}
           initials={((user.email as string)?.[0] || 'U').toUpperCase()}
-          size="sm"
-          className="w-8 h-8"
+          size='sm'
+          className='h-8 w-8'
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 z-50 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-          <div className="px-4 py-3">
-            <span className="block text-sm text-gray-900 dark:text-white">
+        <div className='bg-white divide-gray-100 dark:bg-gray-700 dark:divide-gray-600 absolute right-0 z-50 mt-2 w-56 list-none divide-y rounded-lg text-base shadow'>
+          <div className='px-4 py-3'>
+            <span className='text-gray-900 dark:text-white block text-sm'>
               {user.user_metadata?.full_name || user.email}
             </span>
-            <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+            <span className='text-gray-500 dark:text-gray-400 block truncate text-sm'>
               {user.email?.toString() || ''}
             </span>
           </div>
-          <ul className="py-2" role="none">
+          <ul className='py-2' role='none'>
             <li>
               <a
-                href="/dashboard"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                role="menuitem"
+                href='/dashboard'
+                className='text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block px-4 py-2 text-sm'
+                role='menuitem'
               >
                 Dashboard
               </a>
             </li>
             <li>
               <a
-                href="/settings"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                role="menuitem"
+                href='/settings'
+                className='text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block px-4 py-2 text-sm'
+                role='menuitem'
               >
                 Settings
               </a>
@@ -96,8 +98,8 @@ export function UserMenu({ className = '' }: UserMenuProps) {
                   await authClient.signOut()
                   window.location.href = '/'
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                role="menuitem"
+                className='text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block w-full px-4 py-2 text-left text-sm'
+                role='menuitem'
               >
                 Sign out
               </button>

@@ -1,14 +1,15 @@
 import { renderHook, act } from '@testing-library/react'
-import {
-  SimulatorProvider,
-  useSimulator,
-  initialState,
-} from '../SimulatorContext'
+
 import type {
   EmotionState,
   SpeechPattern,
   DetectedTechnique,
 } from '../../types'
+import {
+  SimulatorProvider,
+  useSimulator,
+  initialState,
+} from '../SimulatorContext'
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SimulatorProvider>{children}</SimulatorProvider>

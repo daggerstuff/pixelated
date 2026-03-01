@@ -4,12 +4,12 @@
  * It allows the MetaAligner pipeline to process responses from various LLMs in a standardized way.
  */
 
+import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes'
 import type {
   LLMOutput,
   UnifiedContext,
   UnifiedProcessingRequest,
 } from './unified-api'
-import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes'
 
 /**
  * Represents the supported LLM providers.

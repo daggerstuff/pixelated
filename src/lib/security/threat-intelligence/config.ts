@@ -3,13 +3,13 @@
  * Centralized configuration for all threat intelligence components
  */
 
-import { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
-import { GlobalThreatIntelligenceNetworkConfig } from './GlobalThreatIntelligenceNetwork'
-import { EdgeThreatDetectionSystemConfig } from './EdgeThreatDetectionSystem'
-import { ThreatCorrelationEngineConfig } from './ThreatCorrelationEngine'
 import { AutomatedThreatResponseOrchestratorConfig } from './AutomatedThreatResponseOrchestrator'
-import { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
+import { EdgeThreatDetectionSystemConfig } from './EdgeThreatDetectionSystem'
 import { ExternalThreatFeedIntegrationConfig } from './ExternalThreatFeedIntegration'
+import { GlobalThreatIntelligenceNetworkConfig } from './GlobalThreatIntelligenceNetwork'
+import { ThreatCorrelationEngineConfig } from './ThreatCorrelationEngine'
+import { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
+import { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
 import { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
 // NODE_ENV checks are available inline where needed; avoid unused bindings to satisfy linter.
@@ -604,7 +604,7 @@ export function getThreatIntelConfig(component: string): unknown {
   }
 
   return (
-    (configMap as Record<string, unknown>)[component] ||
+    (configMap)[component] ||
     threatIntelligenceConfig
   )
 }

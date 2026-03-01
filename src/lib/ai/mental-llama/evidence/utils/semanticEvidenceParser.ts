@@ -4,7 +4,9 @@
  */
 
 import { z } from 'zod'
+
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+
 // Import shared types to avoid circular dependencies
 import type { EvidenceItem } from '../types'
 
@@ -89,7 +91,7 @@ export function parseSemanticEvidenceResponse(response: string): Array<
       // Extract and validate text/content field
       const rawText =
         typeof evidenceObj['text'] === 'string'
-          ? (evidenceObj['text'] as string)
+          ? (evidenceObj['text'])
           : (evidenceObj['content'] as string | undefined)
       if (typeof rawText !== 'string') {
         logger.warn('Skipping evidence item with non-string text', { item })
@@ -194,7 +196,7 @@ export function parseSemanticEvidenceResponse(response: string): Array<
         error instanceof Error
           ? {
               message: String(error),
-              stack: (error as Error)?.stack,
+              stack: (error)?.stack,
             }
           : error,
       responseLength: response.length,
@@ -225,7 +227,7 @@ export function validateEvidenceItem(item: unknown): {
   // Validate text field
   const rawText =
     typeof evidenceObj['text'] === 'string'
-      ? (evidenceObj['text'] as string)
+      ? (evidenceObj['text'])
       : (evidenceObj['content'] as string | undefined)
   if (typeof rawText !== 'string') {
     errors.push('Text field is not a string')
@@ -277,11 +279,11 @@ export function validateEvidenceItem(item: unknown): {
   // Extract other fields with safe defaults
   const category =
     typeof evidenceObj['category'] === 'string'
-      ? (evidenceObj['category'] as string)
+      ? (evidenceObj['category'])
       : 'semantic_analysis'
   const rationale =
     typeof evidenceObj['rationale'] === 'string'
-      ? (evidenceObj['rationale'] as string)
+      ? (evidenceObj['rationale'])
       : 'Generated via semantic analysis'
 
   const evidenceItem: EvidenceItem = {

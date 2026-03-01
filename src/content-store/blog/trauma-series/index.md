@@ -1,6 +1,8 @@
 ---
 title: 'Understanding Trauma Series'
-description: 'A deep dive into the complex dynamics of trauma and its effects on relationships'
+description:
+  'A deep dive into the complex dynamics of trauma and its effects on
+  relationships'
 author: 'Pixelated Empathy Team'
 pubDate: 2024-02-10
 tags: ['trauma', 'series', 'mental health', 'relationships']
@@ -13,56 +15,44 @@ image:
   }
 ---
 
-
 # Understanding Trauma Series
 
-This series explores the intricate ways trauma shapes our relationships, behaviors, and sense of self. Through clinical insights and compassionate understanding, we examine various aspects of trauma and its lasting impact on mental health.
+This series explores the intricate ways trauma shapes our relationships,
+behaviors, and sense of self. Through clinical insights and compassionate
+understanding, we examine various aspects of trauma and its lasting impact on
+mental health.
 
 ## Featured Articles
 
 ### [The Heart of Codependency](/blog/trauma-series/heart-of-codependency)
 
-<ArticleCard
-  title="The Heart of Codependency"
-  description="Explore the deep connection between trauma and codependent relationships, understanding how early experiences shape our attachment patterns."
-  author="Dr. Sarah Chen"
-  date="2024-02-15"
-  readingTime="12 min"
-  tags={['trauma', 'relationships', 'codependency', 'attachment']}
-/>
+<ArticleCard title="The Heart of Codependency" description="Explore the deep
+connection between trauma and codependent relationships, understanding how early
+experiences shape our attachment patterns." author="Dr. Sarah Chen"
+date="2024-02-15" readingTime="12 min" tags={['trauma', 'relationships',
+'codependency', 'attachment']} />
 
 ### [Understanding the Scapegoat Dynamic](/blog/trauma-series/scapegoat-dynamics)
 
-<ArticleCard
-  title="Understanding the Scapegoat Dynamic"
-  description="Uncover the complex role of the scapegoat in family systems and how this dynamic perpetuates trauma cycles."
-  author="Dr. Michael Rivera"
-  date="2024-02-16"
-  readingTime="15 min"
-  tags={['family systems', 'trauma', 'healing', 'relationships']}
-/>
+<ArticleCard title="Understanding the Scapegoat Dynamic" description="Uncover
+the complex role of the scapegoat in family systems and how this dynamic
+perpetuates trauma cycles." author="Dr. Michael Rivera" date="2024-02-16"
+readingTime="15 min" tags={['family systems', 'trauma', 'healing',
+'relationships']} />
 
 ### [Understanding Narcissistic Patterns](/blog/trauma-series/understanding-narcissism)
 
-<ArticleCard
-  title="Understanding Narcissistic Patterns"
-  description="Examine the roots of narcissistic behavior patterns and their connection to early trauma and attachment wounds."
-  author="Dr. Emily Watson"
-  date="2024-02-17"
-  readingTime="14 min"
-  tags={['narcissism', 'trauma', 'patterns', 'healing']}
-/>
+<ArticleCard title="Understanding Narcissistic Patterns" description="Examine
+the roots of narcissistic behavior patterns and their connection to early trauma
+and attachment wounds." author="Dr. Emily Watson" date="2024-02-17"
+readingTime="14 min" tags={['narcissism', 'trauma', 'patterns', 'healing']} />
 
 ### [The Dark Side of Love](/blog/trauma-series/dark-side-of-love)
 
-<ArticleCard
-  title="The Dark Side of Love"
-  description="Explore how trauma influences our understanding and experience of love, and the path to healthier relationships."
-  author="Dr. James Martinez"
-  date="2024-02-18"
-  readingTime="13 min"
-  tags={['relationships', 'trauma', 'love', 'healing']}
-/>
+<ArticleCard title="The Dark Side of Love" description="Explore how trauma
+influences our understanding and experience of love, and the path to healthier
+relationships." author="Dr. James Martinez" date="2024-02-18" readingTime="13
+min" tags={['relationships', 'trauma', 'love', 'healing']} />
 
 ## Series Overview
 
@@ -82,7 +72,8 @@ This series delves into:
 
 ## Reading Order
 
-While each article stands alone, we recommend reading in the following order for the most comprehensive understanding:
+While each article stands alone, we recommend reading in the following order for
+the most comprehensive understanding:
 
 1. The Heart of Codependency
 2. Understanding the Scapegoat Dynamic
@@ -97,12 +88,13 @@ While each article stands alone, we recommend reading in the following order for
 
 ## Stay Updated
 
-Subscribe to our newsletter to receive notifications about new articles in this series:
+Subscribe to our newsletter to receive notifications about new articles in this
+series:
 
-{/* Subscribe component will be added in a future update */}
+{/_ Subscribe component will be added in a future update _/}
 
 ## Share This Series
 
 Help others discover these insights:
 
-{/* Social sharing component will be added in a future update */}
+{/_ Social sharing component will be added in a future update _/}

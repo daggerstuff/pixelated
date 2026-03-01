@@ -1,19 +1,21 @@
-import { Logger } from '../../utils/logger'
-import { ConfigurationManager } from './ConfigurationManager'
-import { HealthMonitor } from './HealthMonitor'
-import { CrossRegionDataSyncManager } from './CrossRegionDataSyncManager'
 import { EventEmitter } from 'events'
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
+
+import {
+  CloudWatchClient,
+  PutMetricDataCommand,
+} from '@aws-sdk/client-cloudwatch'
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 import {
   Route53Client,
   ChangeResourceRecordSetsCommand,
 } from '@aws-sdk/client-route-53'
-import {
-  CloudWatchClient,
-  PutMetricDataCommand,
-} from '@aws-sdk/client-cloudwatch'
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
+
+import { Logger } from '../../utils/logger'
+import { ConfigurationManager } from './ConfigurationManager'
+import { CrossRegionDataSyncManager } from './CrossRegionDataSyncManager'
+import { HealthMonitor } from './HealthMonitor'
 
 /**
  * Automated Failover Orchestrator

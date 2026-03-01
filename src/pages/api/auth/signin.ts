@@ -1,17 +1,26 @@
 export const prerender = false
-import { auth0UserService } from '../../../services/auth0.service'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
-import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
-import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
+import {
+  rateLimitMiddleware,
+  csrfProtection,
+} from '../../../lib/auth/middleware'
 import { sanitizeInput } from '../../../lib/auth/utils'
+import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
+import { auth0UserService } from '../../../services/auth0.service'
 
 /**
  * Unified Sign in endpoint using Auth0
  * POST /api/auth/signin
  */
-export const POST = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
-  let clientInfo;
+export const POST = async ({
+  request,
+  clientAddress,
+}: {
+  request: Request
+  clientAddress: string
+}) => {
+  let clientInfo
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
@@ -57,7 +66,10 @@ export const POST = async ({ request, clientAddress }: { request: Request; clien
     const { password } = body
 
     // Sign in with Auth0
-    const { user, token, refreshToken } = await auth0UserService.signIn(email, password)
+    const { user, token, refreshToken } = await auth0UserService.signIn(
+      email,
+      password,
+    )
 
     // Set cookies for session management
     const headers = new Headers()
@@ -65,11 +77,17 @@ export const POST = async ({ request, clientAddress }: { request: Request; clien
 
     // Set access token cookie
     const isProd = process.env.NODE_ENV === 'production'
-    headers.append('Set-Cookie', `auth-token=${token}; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=3600`)
+    headers.append(
+      'Set-Cookie',
+      `auth-token=${token}; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=3600`,
+    )
 
     // Set refresh token cookie if available
     if (refreshToken) {
-      headers.append('Set-Cookie', `refresh-token=${refreshToken}; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=2592000`)
+      headers.append(
+        'Set-Cookie',
+        `refresh-token=${refreshToken}; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=2592000`,
+      )
     }
 
     // Log successful login
@@ -81,16 +99,10 @@ export const POST = async ({ request, clientAddress }: { request: Request; clien
     })
 
     // Log for audit/compliance
-    await createAuditLog(
-      AuditEventType.LOGIN,
-      'auth.signin',
-      user.id,
-      'auth',
-      {
-        email: user.email,
-        role: user.role,
-      },
-    )
+    await createAuditLog(AuditEventType.LOGIN, 'auth.signin', user.id, 'auth', {
+      email: user.email,
+      role: user.role,
+    })
 
     // Update Phase 6 MCP server
     await updatePhase6AuthenticationProgress(user.id, 'user_logged_in')
@@ -140,7 +152,8 @@ export const OPTIONS = async ({ request }: { request: Request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

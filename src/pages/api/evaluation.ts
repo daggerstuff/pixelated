@@ -1,7 +1,9 @@
-import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
 import { z } from 'zod'
+
 import { getCurrentUser } from '@/lib/auth'
+
 import { createEnhancedRateLimiter } from '../../lib/middleware/enhanced-rate-limit'
 
 // Database connection pool
@@ -29,7 +31,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } },
-      );
+      )
     }
     const user = await getCurrentUser(cookies)
     if (!user) {
@@ -138,7 +140,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(JSON.stringify({ error: 'Authentication required' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
   }
   const user = await getCurrentUser(cookies)
   if (!user) {

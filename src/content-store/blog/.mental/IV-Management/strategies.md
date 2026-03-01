@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Management Strategies
 
-This guide outlines specific strategies for managing CPTSD and addiction recovery, with practical implementations and examples.
+This guide outlines specific strategies for managing CPTSD and addiction
+recovery, with practical implementations and examples.
 
 ## Daily Management Strategies
 

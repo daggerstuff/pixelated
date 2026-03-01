@@ -1,16 +1,18 @@
 ---
-title: "Plugin Lifecycle Management"
-description: "Plugin Lifecycle Management documentation"
+title: 'Plugin Lifecycle Management'
+description: 'Plugin Lifecycle Management documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Plugin Lifecycle Management
 
-This document describes the lifecycle of plugins in the Pixelated EHR Integration Platform, including installation, initialization, execution, and cleanup.
+This document describes the lifecycle of plugins in the Pixelated EHR
+Integration Platform, including installation, initialization, execution, and
+cleanup.
 
 ## Lifecycle Stages
 
@@ -48,8 +50,8 @@ const installation = await pluginService.installPlugin({
     description: 'Advanced scheduling capabilities',
     permissions: ['read:appointments', 'write:appointments'],
     author: 'Pixelated',
-    homepage: 'https://example.com/plugins/scheduler'
-  }
+    homepage: 'https://example.com/plugins/scheduler',
+  },
 })
 ```
 
@@ -83,9 +85,9 @@ await pluginService.enablePlugin('appointment-scheduler', {
     timezone: 'America/New_York',
     workingHours: {
       start: '09:00',
-      end: '17:00'
-    }
-  }
+      end: '17:00',
+    },
+  },
 })
 ```
 
@@ -118,7 +120,7 @@ pluginService.on('plugin:resource:usage', ({ pluginId, metrics }) => {
     memory: metrics.memory,
     cpu: metrics.cpu,
     storage: metrics.storage,
-    network: metrics.network
+    network: metrics.network,
   })
 })
 ```
@@ -149,7 +151,7 @@ When a plugin is disabled:
 // Deactivation process
 await pluginService.disablePlugin('appointment-scheduler', {
   saveState: true,
-  timeout: 5000 // ms
+  timeout: 5000, // ms
 })
 ```
 
@@ -179,7 +181,7 @@ During plugin removal:
 // Uninstallation process
 await pluginService.uninstallPlugin('appointment-scheduler', {
   preserveData: false,
-  force: false
+  force: false,
 })
 ```
 
@@ -244,8 +246,8 @@ await plugin.setState({
   lastSync: new Date(),
   preferences: {
     notifications: true,
-    theme: 'dark'
-  }
+    theme: 'dark',
+  },
 })
 
 // Load state
@@ -259,8 +261,7 @@ The Plugin System handles various lifecycle errors:
 ```typescript
 try {
   await pluginService.enablePlugin('appointment-scheduler')
-}
-catch (error) {
+} catch (error) {
   switch (error.code) {
     case 'INITIALIZATION_FAILED':
       console.error('Plugin failed to initialize:', error.message)

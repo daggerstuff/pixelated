@@ -1,9 +1,9 @@
 ---
-title: "Credential Security Guide"
-description: "Credential Security Guide documentation"
+title: 'Credential Security Guide'
+description: 'Credential Security Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "security"]
+author: 'Pixelated Team'
+tags: ['documentation', 'security']
 draft: false
 toc: true
 ---
@@ -12,7 +12,8 @@ toc: true
 
 ## Issue: Hardcoded Credentials Detected
 
-The security scanning workflow has detected **140 potential credential references** across 52 files in the codebase. These include:
+The security scanning workflow has detected **140 potential credential
+references** across 52 files in the codebase. These include:
 
 - Patient IDs hardcoded as string literals
 - OAuth Client IDs embedded directly in code
@@ -20,15 +21,21 @@ The security scanning workflow has detected **140 potential credential reference
 - API Keys referenced directly
 
 Hardcoded credentials pose several security risks:
-1. **Version Control Exposure**: Credentials stored in code may be exposed in version control history
-2. **Developer Access**: All developers with code access can see sensitive credentials
-3. **Environment Management**: Difficult to manage different credentials across environments
+
+1. **Version Control Exposure**: Credentials stored in code may be exposed in
+   version control history
+2. **Developer Access**: All developers with code access can see sensitive
+   credentials
+3. **Environment Management**: Difficult to manage different credentials across
+   environments
 4. **Compliance Violations**: May violate HIPAA and other healthcare regulations
-5. **Security Best Practices**: Contradicts security principles of secret management
+5. **Security Best Practices**: Contradicts security principles of secret
+   management
 
 ## Solution: Environment Variables
 
 We've created a script to:
+
 1. Replace hardcoded credentials with environment variables
 2. Generate a proper `.env.example` file for documentation
 3. Safely handle test and type definition files
@@ -44,6 +51,7 @@ node scripts/fix-credentials.js
 ```
 
 This will:
+
 - Replace hardcoded credentials with environment variables
 - Generate a `.env.example` file
 - Apply appropriate fixes for different file types
@@ -73,60 +81,67 @@ node scripts/fix-credentials.js path/to/file.ts
 The script fixes several patterns:
 
 1. **Patient IDs**:
+
    ```typescript
    // Before
-   patientId: process.env.PATIENT_ID || "example-patient-id"
+   patientId: process.env.PATIENT_ID || 'example-patient-id'
 
    // After
-   patientId: process.env.PATIENT_ID || "example-patient-id"
+   patientId: process.env.PATIENT_ID || 'example-patient-id'
    ```
 
 2. **OAuth Client IDs**:
+
    ```typescript
    // Before
-   clientId: exampleId || "example-client-id"
+   clientId: exampleId || 'example-client-id'
 
    // After
-   clientId: exampleId || "example-client-id"
+   clientId: exampleId || 'example-client-id'
    ```
 
 3. **OAuth Client Secrets**:
+
    ```typescript
    // Before
-   clientSecret: process.env.CLIENT_SECRET || "example-client-secret"
+   clientSecret: process.env.CLIENT_SECRET || 'example-client-secret'
 
    // After
-   clientSecret: process.env.CLIENT_SECRET || "example-client-secret"
+   clientSecret: process.env.CLIENT_SECRET || 'example-client-secret'
    ```
 
 4. **Direct Assignments**:
+
    ```typescript
    // Before
-   const clientId = process.env.CLIENT_ID || "example-client-id"
+   const clientId = process.env.CLIENT_ID || 'example-client-id'
 
    // After
-   const clientId = process.env.CLIENT_ID || "example-client-id"
+   const clientId = process.env.CLIENT_ID || 'example-client-id'
    ```
 
 5. **API Keys**:
+
    ```typescript
    // Before
-   apiKey: process.env.API_KEY || "example-api-key"
+   apiKey: process.env.API_KEY || 'example-api-key'
 
    // After
-   apiKey: process.env.API_KEY || "example-api-key"
+   apiKey: process.env.API_KEY || 'example-api-key'
    ```
 
 ## HIPAA Compliance Note
 
-For healthcare applications subject to HIPAA regulations, proper credential management is critical:
+For healthcare applications subject to HIPAA regulations, proper credential
+management is critical:
 
 - Protected Health Information (PHI) must be secured at all times
 - Access to patient data must be properly authenticated and authorized
 - All access to PHI must be audited
 - Credentials that grant access to PHI must be securely managed
 
-This script helps achieve compliance by removing hardcoded credentials from the codebase.
+This script helps achieve compliance by removing hardcoded credentials from the
+codebase.
 
 ## Next Steps After Running the Fix
 
@@ -137,17 +152,20 @@ This script helps achieve compliance by removing hardcoded credentials from the 
 
 ## For Test Files
 
-The script handles test files differently - instead of using environment variables, it uses consistent test values:
+The script handles test files differently - instead of using environment
+variables, it uses consistent test values:
 
 ```typescript
 // In test files
-clientId: exampleId || "example-client-id"
-clientSecret: process.env.CLIENT_SECRET || "example-client-secret"
-patientId: process.env.PATIENT_ID || "example-patient-id"
+clientId: exampleId || 'example-client-id'
+clientSecret: process.env.CLIENT_SECRET || 'example-client-secret'
+patientId: process.env.PATIENT_ID || 'example-patient-id'
 ```
 
-This preserves deterministic behavior in tests while still removing potentially sensitive actual credentials.
+This preserves deterministic behavior in tests while still removing potentially
+sensitive actual credentials.
 
 ## Questions?
 
-If you encounter any issues with the credential fixing process, please contact the security team.
+If you encounter any issues with the credential fixing process, please contact
+the security team.

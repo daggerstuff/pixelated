@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Family Resources
 
-This guide provides resources and support materials for families and support networks of individuals recovering from CPTSD and addiction.
+This guide provides resources and support materials for families and support
+networks of individuals recovering from CPTSD and addiction.
 
 ## Understanding Recovery
 

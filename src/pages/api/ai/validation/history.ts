@@ -1,13 +1,15 @@
 import type { APIRoute } from 'astro'
-import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getSession } from '../../../../lib/auth/session'
-import { verifySecureToken } from '../../../../lib/security'
+
+import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
 import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
 } from '../../../../lib/audit'
+import { getSession } from '../../../../lib/auth/session'
+import { verifySecureToken } from '../../../../lib/security'
 
 export const GET: APIRoute = async ({ request }) => {
   const logger = createBuildSafeLogger('validation-history')

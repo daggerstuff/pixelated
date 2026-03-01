@@ -343,14 +343,14 @@ export function MobileFormValidation({
 
       {/* Hidden element for screen reader announcements */}
       <div
-        id="validation-error-summary"
-        className="sr-only"
-        aria-live="assertive"
+        id='validation-error-summary'
+        className='sr-only'
+        aria-live='assertive'
       ></div>
 
       {/* Error summary for accessibility and mobile UX */}
       {showErrorSummary && submitted && Object.keys(errors).length > 0 && (
-        <div className="validation-error-summary" role="alert">
+        <div className='validation-error-summary' role='alert'>
           <h3>Please correct the following errors:</h3>
           <ul>
             {Object.entries(errors).map(([field, error]) => (

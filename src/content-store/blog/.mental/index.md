@@ -1,19 +1,23 @@
 ---
 title: 'Mental Health Resources'
-description: 'Comprehensive guide to mental health resources and treatment approaches'
+description:
+  'Comprehensive guide to mental health resources and treatment approaches'
 author: 'Clinical Resources Team'
 pubDate: 2024-02-28
 ---
 
 # Mental Health Resources
 
-Welcome to Pixelated Empathy's comprehensive mental health resources section. This collection is designed to provide therapists with in-depth knowledge and practical tools for treating complex mental health conditions.
+Welcome to Pixelated Empathy's comprehensive mental health resources section.
+This collection is designed to provide therapists with in-depth knowledge and
+practical tools for treating complex mental health conditions.
 
 ## Key Areas
 
 ### CPTSD
 
-Comprehensive resources for understanding and treating Complex Post-Traumatic Stress Disorder, including:
+Comprehensive resources for understanding and treating Complex Post-Traumatic
+Stress Disorder, including:
 
 - Diagnostic criteria and assessment tools
 - Treatment approaches and protocols
@@ -58,7 +62,8 @@ Additional support materials:
 
 ## Getting Started
 
-Choose a section from the navigation menu to explore specific topics, or use the search function to find particular resources. Each section includes:
+Choose a section from the navigation menu to explore specific topics, or use the
+search function to find particular resources. Each section includes:
 
 - Theoretical background
 - Practical applications

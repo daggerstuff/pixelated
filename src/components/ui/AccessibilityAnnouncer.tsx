@@ -44,10 +44,10 @@ export function AccessibilityAnnouncer({
 
   return (
     <div
-      role="status"
+      role='status'
       aria-live={assertive ? 'assertive' : 'polite'}
-      aria-atomic="true"
-      className="sr-only"
+      aria-atomic='true'
+      className='sr-only'
     >
       {currentMessage}
     </div>

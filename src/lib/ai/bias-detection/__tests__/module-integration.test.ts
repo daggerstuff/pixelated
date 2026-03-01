@@ -1,13 +1,14 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { PythonBiasDetectionBridge } from '../python-bridge'
-import { BiasMetricsCollector } from '../metrics-collector'
+
 import { BiasAlertSystem } from '../alerts-system'
+import { BiasMetricsCollector } from '../metrics-collector'
+import { PythonBiasDetectionBridge } from '../python-bridge'
 import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
 // Mock the entire Python bridge to avoid network calls
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function() {
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
     return {
       initialize: vi.fn().mockResolvedValue(undefined),
       analyzeSession: vi.fn().mockResolvedValue({
@@ -49,7 +50,7 @@ vi.mock('../python-bridge', () => ({
       }),
       storeMetrics: vi.fn().mockResolvedValue(undefined),
       getAlertStatistics: vi.fn().mockResolvedValue({ total: 10, resolved: 8 }),
-    };
+    }
   }),
 }))
 
@@ -97,8 +98,8 @@ describe('Module Integration Tests', () => {
 
     // Create module instances
     pythonBridge = new PythonBiasDetectionBridge(
-      mockConfig.pythonServiceUrl!,
-      mockConfig.pythonServiceTimeout!,
+      mockConfig.pythonServiceUrl,
+      mockConfig.pythonServiceTimeout,
     )
 
     metricsCollector = new BiasMetricsCollector(mockConfig, pythonBridge)
@@ -658,8 +659,8 @@ describe('Module Integration Tests', () => {
 
       // Create new instances with updated config
       const newPythonBridge = new PythonBiasDetectionBridge(
-        newConfig.pythonServiceUrl!,
-        newConfig.pythonServiceTimeout!,
+        newConfig.pythonServiceUrl,
+        newConfig.pythonServiceTimeout,
       )
 
       const newMetricsCollector = new BiasMetricsCollector(

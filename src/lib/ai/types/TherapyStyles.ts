@@ -3,11 +3,11 @@ export interface TherapyStyle {
   name: string
   description: string
   approach:
-  | 'cognitive-behavioral'
-  | 'psychodynamic'
-  | 'humanistic'
-  | 'integrative'
-  | 'solution-focused'
+    | 'cognitive-behavioral'
+    | 'psychodynamic'
+    | 'humanistic'
+    | 'integrative'
+    | 'solution-focused'
   techniques: string[]
   suitableFor: string[]
   contraindications?: string[]

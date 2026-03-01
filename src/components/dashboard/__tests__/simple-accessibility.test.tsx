@@ -1,13 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom'
-import { TherapistDashboard } from '../TherapistDashboard'
+import { describe, expect, it, vi } from 'vitest'
+
+import { ProgressBar } from '../ProgressBar'
 import SessionControls from '../SessionControls'
+import { SessionMetrics } from '../SessionMetrics'
+import { TherapistDashboard } from '../TherapistDashboard'
 import { TherapistProgressTracker } from '../TherapistProgressTracker'
 import TherapyProgressCharts from '../TherapyProgressCharts'
-import { ProgressBar } from '../ProgressBar'
-import { SessionMetrics } from '../SessionMetrics'
-import { describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom'
 
 describe('Simple Accessibility Tests', () => {
   const mockSessions: any[] = [
@@ -27,7 +29,7 @@ describe('Simple Accessibility Tests', () => {
         activeTime: 3000,
         skillScores: {
           'Active Listening': 85,
-          'Empathy': 78,
+          Empathy: 78,
         },
         responseTime: 2.5,
         conversationFlow: 88,
@@ -119,7 +121,7 @@ describe('Simple Accessibility Tests', () => {
   })
 
   it('renders progress bar with ARIA attributes', () => {
-    render(<ProgressBar value={75} label="Test Progress" />)
+    render(<ProgressBar value={75} label='Test Progress' />)
 
     const progressBar = screen.getByLabelText('Test Progress')
     expect(progressBar).toHaveAttribute('role', 'progressbar')
@@ -601,7 +603,7 @@ describe('Simple Accessibility Tests', () => {
   })
 
   it('provides ARIA roles for rich widgets', () => {
-    render(<ProgressBar value={75} label="Test Progress" />)
+    render(<ProgressBar value={75} label='Test Progress' />)
 
     expect(screen.getByLabelText('Test Progress')).toBeInTheDocument()
   })

@@ -6,17 +6,17 @@
  */
 
 import { getBiasDetectionLogger } from '../../logging/standardized-logger'
+import type {
+  MetricData,
+  DashboardOptions,
+  DashboardMetrics,
+} from './bias-detection-interfaces'
 import { PythonBiasDetectionBridge } from './python-bridge'
 import type {
   BiasDetectionConfig,
   BiasAnalysisResult,
   ParticipantDemographics,
 } from './types'
-import type {
-  MetricData,
-  DashboardOptions,
-  DashboardMetrics,
-} from './bias-detection-interfaces'
 
 const logger = getBiasDetectionLogger('metrics-collector')
 
@@ -230,7 +230,7 @@ export class BiasMetricsCollector {
         average_bias_score:
           localMetrics.length > 0
             ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-            localMetrics.length
+              localMetrics.length
             : 0,
         alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
       },
@@ -241,7 +241,7 @@ export class BiasMetricsCollector {
         average_bias_score:
           localMetrics.length > 0
             ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-            localMetrics.length
+              localMetrics.length
             : 0,
         alert_distribution: this.calculateLocalAlertDistribution(localMetrics),
       },
@@ -367,7 +367,7 @@ export class BiasMetricsCollector {
           average_bias_score:
             localMetrics.length > 0
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-              localMetrics.length
+                localMetrics.length
               : 0,
           alert_distribution:
             this.calculateLocalAlertDistribution(localMetrics),
@@ -382,7 +382,7 @@ export class BiasMetricsCollector {
           average_bias_score:
             localMetrics.length > 0
               ? localMetrics.reduce((sum, m) => sum + m.overall_bias_score, 0) /
-              localMetrics.length
+                localMetrics.length
               : 0,
           alert_distribution:
             this.calculateLocalAlertDistribution(localMetrics),

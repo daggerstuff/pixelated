@@ -3,16 +3,16 @@
  * Production-grade mental health analysis and therapeutic chat system
  */
 
-import { MentalHealthService } from './mental-health/service'
 import { createMentalLLaMAFromEnvSafe } from './ai/mental-llama/client-adapter'
-import { RecommendationService } from './ai/services/RecommendationService'
-import { createBuildSafeLogger } from './logging/build-safe-logger'
-import type { MentalHealthAnalysis as MHAnalysis } from './mental-health/types'
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidedAnalysisResult,
   RoutingContext,
 } from './ai/mental-llama/types/mentalLLaMATypes'
+import { RecommendationService } from './ai/services/RecommendationService'
+import { createBuildSafeLogger } from './logging/build-safe-logger'
+import { MentalHealthService } from './mental-health/service'
+import type { MentalHealthAnalysis as MHAnalysis } from './mental-health/types'
 
 const logger = createBuildSafeLogger('MentalHealthChat')
 
@@ -86,7 +86,7 @@ function convertAnalysisToLegacyFormat(
   // Handle different analysis result types
   if ('indicators' in analysis) {
     // Handle our mental-health service analysis
-    const mhAnalysis = analysis as MHAnalysis
+    const mhAnalysis = analysis
     const scores: Record<string, number> = {}
     const evidence: Record<string, string[]> = {}
 
@@ -128,7 +128,7 @@ function convertAnalysisToLegacyFormat(
     }
   } else {
     // Handle MentalLLaMA analysis result
-    const llmAnalysis = analysis as MentalHealthAnalysisResult
+    const llmAnalysis = analysis
     const isExpertGuided = 'expertGuidance' in llmAnalysis
 
     return {

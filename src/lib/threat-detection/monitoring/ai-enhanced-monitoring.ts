@@ -4,9 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
+
+import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
-import * as tf from '@tensorflow/tfjs'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 // Removed unused type imports to satisfy lint rules
 
@@ -101,7 +103,9 @@ export interface Alert {
 export interface IAIService {
   generateInsights(metrics: unknown[]): Promise<{ insights: AIInsight[] }>
   analyzePattern(alerts: unknown[]): Promise<{ patterns: unknown[] }>
-  predictAnomaly(data: unknown[]): Promise<{ isAnomaly: boolean; confidence: number }>
+  predictAnomaly(
+    data: unknown[],
+  ): Promise<{ isAnomaly: boolean; confidence: number }>
 }
 
 export class AIEnhancedMonitoringService extends EventEmitter {
@@ -114,15 +118,15 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   private alertBuffer: Alert[] = []
   private monitoringIntervals: NodeJS.Timeout[] = []
   private isMonitoring: boolean = false
-  public aiService: IAIService | undefined;
-  public orchestrator: unknown;
+  public aiService: IAIService | undefined
+  public orchestrator: unknown
 
   constructor(
     config: Partial<MonitoringConfig> = {},
     redis?: Redis,
     mongoClient?: MongoClient,
     orchestrator?: unknown,
-    aiService?: IAIService
+    aiService?: IAIService,
   ) {
     super()
     this.config = {
@@ -143,7 +147,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       aiModelConfig: config.aiModelConfig || {
         modelPath: '',
         confidenceThreshold: 0.8,
-        predictionWindow: 10
+        predictionWindow: 10,
       },
       escalationRules: config.escalationRules || {
         critical: { minutes: 5, levels: ['admin', 'security'] },
@@ -155,7 +159,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       metricsRetention: config.metricsRetention || 86400000,
       enableRealTimeAlerting: config.enableRealTimeAlerting ?? true,
       enableAIInsights: config.enableAIInsights ?? true,
-    } as MonitoringConfig;
+    } as MonitoringConfig
 
     this.redis = redis as Redis
     this.mongoClient = mongoClient as MongoClient
@@ -375,7 +379,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         .collection('threat_responses')
         .countDocuments({
           'actions.actionType': 'block',
-          'createdAt': { $gte: new Date(Date.now() - 3600000) },
+          createdAt: { $gte: new Date(Date.now() - 3600000) },
         })
 
       return {
@@ -505,7 +509,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       // Predict anomaly score
       const inputTensor = tf.tensor2d([features])
       try {
-        const result = this.anomalyDetectionModel.predict(inputTensor) as tf.Tensor
+        const result = this.anomalyDetectionModel.predict(
+          inputTensor,
+        ) as tf.Tensor
         const score = await result.data()
         return score[0]
       } finally {
@@ -832,8 +838,8 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       })
       // Add error to alert object so caller knows?
       // Alert is reference.
-      alert.errors = alert.errors || [];
-      alert.errors.push((error as Error).message || 'Processing failed');
+      alert.errors = alert.errors || []
+      alert.errors.push((error as Error).message || 'Processing failed')
     }
   }
 
@@ -848,11 +854,14 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           `alert:${alert.id}`,
           JSON.stringify(alert),
           'EX',
-          86400
+          86400,
         )
         await this.redis.lpush('alerts:active', JSON.stringify(alert))
         if (alert.severity) {
-          await this.redis.lpush(`alerts:${alert.severity}`, JSON.stringify(alert))
+          await this.redis.lpush(
+            `alerts:${alert.severity}`,
+            JSON.stringify(alert),
+          )
         }
       }
 
@@ -990,9 +999,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const db = this.mongoClient.db('threat_detection')
       alert.updatedAt = new Date()
 
-      await db
-        .collection('alerts')
-        .updateOne({ id: alert.id }, { $set: alert })
+      await db.collection('alerts').updateOne({ id: alert.id }, { $set: alert })
     } catch (error) {
       logger.error('Failed to update alert:', { error, alertId: alert.id })
       throw error
@@ -1304,10 +1311,13 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   }
   // Public wrapper for createAlert
   public async createAlert(alertData: Partial<Alert>): Promise<Alert> {
-    const errors: string[] = [];
-    if (!alertData.title) errors.push('Invalid alert data');
-    if (alertData.severity && !['low', 'medium', 'high', 'critical'].includes(alertData.severity)) {
-      errors.push('Invalid alert data');
+    const errors: string[] = []
+    if (!alertData.title) errors.push('Invalid alert data')
+    if (
+      alertData.severity &&
+      !['low', 'medium', 'high', 'critical'].includes(alertData.severity)
+    ) {
+      errors.push('Invalid alert data')
     }
 
     if (errors.length > 0) {
@@ -1324,8 +1334,8 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         acknowledged: false,
         createdAt: new Date(),
         updatedAt: new Date(),
-        errors
-      } as Alert;
+        errors,
+      } as Alert
     }
 
     try {
@@ -1336,7 +1346,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         alertData.description,
         alertData.metrics || {},
         [],
-        alertData.metadata
+        alertData.metadata,
       )
       await this.processAlert(alert)
       return alert
@@ -1379,122 +1389,148 @@ export class AIEnhancedMonitoringService extends EventEmitter {
             cpu: 0,
             memory: 0,
             responseTime: 0,
-            errorRate: 0
-          }
+            errorRate: 0,
+          },
         },
         notifiedChannels: [],
         acknowledged: false,
         createdAt: new Date(),
         updatedAt: new Date(),
-        errors: [(error as Error).message]
-      } as Alert;
+        errors: [(error as Error).message],
+      } as Alert
     }
   }
 
-  public async updateAlert(alertId: string, updateData: Partial<Alert>): Promise<Alert> {
+  public async updateAlert(
+    alertId: string,
+    updateData: Partial<Alert>,
+  ): Promise<Alert> {
     // Stub implementation
-    const alert = await this.getAlert(alertId);
+    const alert = await this.getAlert(alertId)
     if (alert) {
-      Object.assign(alert, updateData);
-      alert.updatedAt = new Date();
-      await this.storeAlert(alert); // Re-save
-      return alert;
+      Object.assign(alert, updateData)
+      alert.updatedAt = new Date()
+      await this.storeAlert(alert) // Re-save
+      return alert
     }
-    throw new Error('Alert not found');
+    throw new Error('Alert not found')
   }
 
   public async escalateAlert(alertId: string): Promise<Alert> {
-    const alert = await this.getAlert(alertId);
+    const alert = await this.getAlert(alertId)
     if (alert) {
-      alert.severity = 'critical';
-      alert.status = 'escalated';
-      alert.escalationCount = (alert.escalationCount || 0) + 1;
-      alert.escalatedAt = new Date();
-      await this.updateAlert(alertId, alert);
-      return alert;
+      alert.severity = 'critical'
+      alert.status = 'escalated'
+      alert.escalationCount = (alert.escalationCount || 0) + 1
+      alert.escalatedAt = new Date()
+      await this.updateAlert(alertId, alert)
+      return alert
     }
-    throw new Error('Alert not found');
+    throw new Error('Alert not found')
   }
 
-  public async resolveAlert(alertId: string, resolutionData: Partial<Alert>): Promise<Alert> {
-    const alert = await this.getAlert(alertId);
+  public async resolveAlert(
+    alertId: string,
+    resolutionData: Partial<Alert>,
+  ): Promise<Alert> {
+    const alert = await this.getAlert(alertId)
     if (alert) {
-      alert.status = 'resolved';
-      Object.assign(alert, resolutionData);
-      alert.resolvedAt = new Date(); // Ensure resolvedAt is set if not in data
-      await this.updateAlert(alertId, alert);
-      return alert;
+      alert.status = 'resolved'
+      Object.assign(alert, resolutionData)
+      alert.resolvedAt = new Date() // Ensure resolvedAt is set if not in data
+      await this.updateAlert(alertId, alert)
+      return alert
     }
-    throw new Error('Alert not found');
+    throw new Error('Alert not found')
   }
 
   public async getAlert(alertId: string): Promise<Alert | null> {
     try {
       if (this.redis) {
-        const cached = await this.redis.get(`alert:${alertId}`);
-        if (cached) return JSON.parse(cached);
+        const cached = await this.redis.get(`alert:${alertId}`)
+        if (cached) return JSON.parse(cached)
       }
-      const db = this.mongoClient.db('threat_detection');
-      const result = await db.collection<Alert>('alerts').findOne({ id: alertId });
-      return result || null;
-    } catch { return null; }
+      const db = this.mongoClient.db('threat_detection')
+      const result = await db
+        .collection<Alert>('alerts')
+        .findOne({ id: alertId })
+      return result || null
+    } catch {
+      return null
+    }
   }
 
   public async getActiveAlerts(): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = await this.redis.lrange('alerts:active', 0, -1);
-        if (cached && cached.length > 0) return cached.map(s => JSON.parse(s));
+        const cached = await this.redis.lrange('alerts:active', 0, -1)
+        if (cached && cached.length > 0) return cached.map((s) => JSON.parse(s))
       }
-      const db = this.mongoClient.db('threat_detection');
-      return await db.collection<Alert>('alerts').find({ acknowledged: false }).toArray();
-    } catch { return []; }
+      const db = this.mongoClient.db('threat_detection')
+      return await db
+        .collection<Alert>('alerts')
+        .find({ acknowledged: false })
+        .toArray()
+    } catch {
+      return []
+    }
   }
 
   public async getAlertsBySeverity(severity: string): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = await this.redis.lrange(`alerts:${severity}`, 0, -1);
-        if (cached && cached.length > 0) return cached.map(s => JSON.parse(s));
+        const cached = await this.redis.lrange(`alerts:${severity}`, 0, -1)
+        if (cached && cached.length > 0) return cached.map((s) => JSON.parse(s))
       }
-      const db = this.mongoClient.db('threat_detection');
-      return await db.collection<Alert>('alerts').find({ severity }).toArray();
-    } catch { return []; }
+      const db = this.mongoClient.db('threat_detection')
+      return await db.collection<Alert>('alerts').find({ severity }).toArray()
+    } catch {
+      return []
+    }
   }
 
   public get alerts() {
-    return this.alertBuffer;
+    return this.alertBuffer
   }
 
   public get metrics() {
-    return this.metricsBuffer;
+    return this.metricsBuffer
   }
 
-  public async trackMetric(metricData: Record<string, unknown> & { name: string }): Promise<void> {
+  public async trackMetric(
+    metricData: Record<string, unknown> & { name: string },
+  ): Promise<void> {
     try {
       await this.redis.set(
         `metric:${metricData.name}:${Date.now()}`,
         JSON.stringify(metricData),
         'EX',
-        86400
-      );
+        86400,
+      )
     } catch (error) {
-      logger.error('Failed to track metric:', { error });
+      logger.error('Failed to track metric:', { error })
     }
   }
 
-  public async getMetrics(name: string, _timeRange: string): Promise<Record<string, unknown>[]> {
+  public async getMetrics(
+    name: string,
+    _timeRange: string,
+  ): Promise<Record<string, unknown>[]> {
     try {
       if (this.redis) {
         // Simplified: ignore timeRange for stub/test satisfaction, just return list
-        const cached = await this.redis.lrange(`metrics:${name}`, 0, -1);
-        if (cached) return cached.map(s => JSON.parse(s));
+        const cached = await this.redis.lrange(`metrics:${name}`, 0, -1)
+        if (cached) return cached.map((s) => JSON.parse(s))
       }
-      return [];
-    } catch { return []; }
+      return []
+    } catch {
+      return []
+    }
   }
 
-  public async generateAIInsights(metrics: unknown[]): Promise<{ insights: AIInsight[], recommendations: string[] }> {
+  public async generateAIInsights(
+    metrics: unknown[],
+  ): Promise<{ insights: AIInsight[]; recommendations: string[] }> {
     if (this.aiService) {
       return this.aiService.generateInsights(metrics)
     }
@@ -1505,64 +1541,74 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           type: 'anomaly',
           description: 'Detected unusual activity based on metrics',
           severity: 'high',
-          confidence: 0.85
-        }
+          confidence: 0.85,
+        },
       ],
-      recommendations: ['Check system resources', 'Review access logs']
-    };
+      recommendations: ['Check system resources', 'Review access logs'],
+    }
   }
 
-  public async analyzeAlertPatterns(alerts: unknown[]): Promise<{ patterns: unknown[] }> {
+  public async analyzeAlertPatterns(
+    alerts: unknown[],
+  ): Promise<{ patterns: unknown[] }> {
     if (this.aiService) {
-      return this.aiService.analyzePattern(alerts);
+      return this.aiService.analyzePattern(alerts)
     }
     // Stub
-    return { patterns: [] };
+    return { patterns: [] }
   }
 
-  public async predictFutureAnomalies(data: unknown[]): Promise<{ isAnomaly: boolean; confidence: number }> {
+  public async predictFutureAnomalies(
+    data: unknown[],
+  ): Promise<{ isAnomaly: boolean; confidence: number }> {
     if (this.aiService) {
-      return this.aiService.predictAnomaly(data);
+      return this.aiService.predictAnomaly(data)
     }
     // Stub
-    return { isAnomaly: false, confidence: 0 };
+    return { isAnomaly: false, confidence: 0 }
   }
 
-  public async performRealTimeMonitoring(data: { metrics?: unknown[] }): Promise<Record<string, unknown>> {
+  public async performRealTimeMonitoring(data: {
+    metrics?: unknown[]
+  }): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {
       healthStatus: 'healthy',
       alerts: [],
       insights: [],
-      actions: []
-    };
+      actions: [],
+    }
 
     if (this.aiService) {
       try {
         // Add timeout for AI service
-        const aiPromise = this.aiService.generateInsights(data.metrics || []);
+        const aiPromise = this.aiService.generateInsights(data.metrics || [])
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('AI analysis timeout')), 1000)
-        );
+          setTimeout(() => reject(new Error('AI analysis timeout')), 1000),
+        )
 
-        const aiResult = await Promise.race([aiPromise, timeoutPromise]) as { insights: AIInsight[] };
+        const aiResult = (await Promise.race([aiPromise, timeoutPromise])) as {
+          insights: AIInsight[]
+        }
 
         if (aiResult) {
-          result.insights = aiResult.insights || [];
+          result.insights = aiResult.insights || []
           // Merge other results
         }
       } catch (error: unknown) {
-        result.errors = [(error as Error).message];
-        result.healthStatus = 'degraded'; // or unknown
+        result.errors = [(error as Error).message]
+        result.healthStatus = 'degraded' // or unknown
         if (error.message === 'AI analysis timeout') {
-          result.healthStatus = 'unknown'; // Match test expectation if any
+          result.healthStatus = 'unknown' // Match test expectation if any
         }
       }
     }
 
-    return result;
+    return result
   }
 
-  public async generateAlertReport(alerts: Alert[]): Promise<Record<string, unknown>> {
+  public async generateAlertReport(
+    alerts: Alert[],
+  ): Promise<Record<string, unknown>> {
     // Delegate to generic report generation or stub
     // Since alert-utils has generateAlertReport but requires options, we default them
     // We can't import generateAlertReport easily here without circular dependency if not careful,
@@ -1574,18 +1620,25 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       alerts: alerts,
       metrics: {
         total: alerts.length,
-        active: alerts.filter(a => a.status === 'active' || a.status === 'escalated' || a.status === 'investigating').length,
-        resolved: alerts.filter(a => a.status === 'resolved').length,
+        active: alerts.filter(
+          (a) =>
+            a.status === 'active' ||
+            a.status === 'escalated' ||
+            a.status === 'investigating',
+        ).length,
+        resolved: alerts.filter((a) => a.status === 'resolved').length,
         bySeverity: {},
         bySource: {},
-        avgResolutionTime: 0
+        avgResolutionTime: 0,
       },
       recommendations: [],
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     }
   }
 
-  public async trackBatchMetrics(metricsData: (Record<string, unknown> & { name: string })[]): Promise<void> {
+  public async trackBatchMetrics(
+    metricsData: (Record<string, unknown> & { name: string })[],
+  ): Promise<void> {
     // Process in batches
     for (const metric of metricsData) {
       await this.trackMetric(metric)

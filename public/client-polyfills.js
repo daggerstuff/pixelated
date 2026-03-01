@@ -1,9 +1,10 @@
 // Import necessary polyfills
 import { Buffer } from 'buffer'
-import streamBrowserify from 'stream-browserify'
-import path from 'path-browserify'
-import util from 'util'
 import events from 'events'
+import util from 'util'
+
+import path from 'path-browserify'
+import streamBrowserify from 'stream-browserify'
 
 // Define process if it doesn't exist
 if (typeof window.process === 'undefined') {

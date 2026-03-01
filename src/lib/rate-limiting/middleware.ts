@@ -4,9 +4,10 @@
  */
 
 import type { APIRoute, APIContext } from 'astro'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { createRateLimiter } from './rate-limiter'
 import { getMergedConfig, defaultRuleSets, defaultBypassRules } from './config'
+import { createRateLimiter } from './rate-limiter'
 import type {
   RateLimitMiddlewareConfig,
   RateLimitContext,
@@ -418,7 +419,7 @@ export function createBetterAuthRateLimitMiddleware(
     description: 'Better-Auth specific rate limiting',
     rules: Object.values(authConfig.authRules || {}).filter(
       Boolean,
-    ) as RateLimitRule[],
+    ),
   }
 
   const authBypassRules: RateLimitBypassRule[] = []

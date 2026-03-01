@@ -1,3 +1,5 @@
+import { DocumentModel } from '@/models/Document'
+import { UserModel } from '@/models/User'
 import {
   Document,
   DocumentCreate,
@@ -6,8 +8,6 @@ import {
   DocumentSearchResult,
   DocumentStatus,
 } from '@/types/document'
-import { DocumentModel } from '@/models/Document'
-import { UserModel } from '@/models/User'
 
 export class DocumentService {
   static async createDocument(

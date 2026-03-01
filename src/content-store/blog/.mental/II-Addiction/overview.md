@@ -7,7 +7,9 @@ pubDate: 2024-02-28
 
 # Understanding Addiction
 
-Addiction is a complex condition characterized by compulsive engagement with a substance or behavior despite negative consequences. It's recognized as a chronic brain disorder that requires comprehensive treatment.
+Addiction is a complex condition characterized by compulsive engagement with a
+substance or behavior despite negative consequences. It's recognized as a
+chronic brain disorder that requires comprehensive treatment.
 
 ## Types of Addiction
 

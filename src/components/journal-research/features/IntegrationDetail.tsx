@@ -1,8 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { useIntegrationPlanQuery } from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { Code, Download } from 'lucide-react'
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import { useIntegrationPlanQuery } from '@/lib/hooks/journal-research'
+import { cn } from '@/lib/utils'
 
 export interface IntegrationDetailProps {
   sessionId: string
@@ -20,7 +26,7 @@ export function IntegrationDetail({
   if (isLoading) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">Loading integration plan...</p>
+        <p className='text-muted-foreground'>Loading integration plan...</p>
       </div>
     )
   }
@@ -28,7 +34,7 @@ export function IntegrationDetail({
   if (!plan) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">Integration plan not found</p>
+        <p className='text-muted-foreground'>Integration plan not found</p>
       </div>
     )
   }
@@ -36,21 +42,21 @@ export function IntegrationDetail({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className="text-3xl font-bold">Integration Plan</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className='text-3xl font-bold'>Integration Plan</h1>
+          <p className='text-muted-foreground mt-1'>
             Created {format(plan.createdDate, 'MMM d, yyyy')} •{' '}
-            <span className="capitalize">{plan.complexity}</span> complexity
+            <span className='capitalize'>{plan.complexity}</span> complexity
           </p>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
-            <Code className="h-4 w-4" />
+        <div className='flex gap-2'>
+          <button className='border-input hover:bg-accent flex items-center gap-2 rounded-md border bg-background px-4 py-2 text-sm font-medium'>
+            <Code className='h-4 w-4' />
             Generate Script
           </button>
-          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            <Download className="h-4 w-4" />
+          <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium'>
+            <Download className='h-4 w-4' />
             Export Plan
           </button>
         </div>
@@ -62,44 +68,44 @@ export function IntegrationDetail({
           <CardTitle>Plan Overview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className='grid gap-4 md:grid-cols-2'>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Plan ID
               </p>
-              <p className="mt-1">{plan.planId}</p>
+              <p className='mt-1'>{plan.planId}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Source ID
               </p>
-              <p className="mt-1">{plan.sourceId}</p>
+              <p className='mt-1'>{plan.sourceId}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Complexity
               </p>
-              <p className="mt-1 capitalize">{plan.complexity}</p>
+              <p className='mt-1 capitalize'>{plan.complexity}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Target Format
               </p>
-              <p className="mt-1">{plan.targetFormat}</p>
+              <p className='mt-1'>{plan.targetFormat}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Estimated Effort
               </p>
-              <p className="mt-1 text-lg font-semibold">
+              <p className='mt-1 text-lg font-semibold'>
                 {plan.estimatedEffortHours} hours
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground text-sm font-medium'>
                 Created Date
               </p>
-              <p className="mt-1">{format(plan.createdDate, 'PPpp')}</p>
+              <p className='mt-1'>{format(plan.createdDate, 'PPpp')}</p>
             </div>
           </div>
         </CardContent>
@@ -112,16 +118,16 @@ export function IntegrationDetail({
             <CardTitle>Required Transformations</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
+            <ul className='space-y-2'>
               {plan.requiredTransformations.map((transformation, index) => (
                 <li
                   key={index}
-                  className="flex items-start gap-3 border-b pb-3 last:border-0"
+                  className='flex items-start gap-3 border-b pb-3 last:border-0'
                 >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                  <span className='bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium'>
                     {index + 1}
                   </span>
-                  <span className="flex-1 text-sm">{transformation}</span>
+                  <span className='flex-1 text-sm'>{transformation}</span>
                 </li>
               ))}
             </ul>
@@ -136,23 +142,23 @@ export function IntegrationDetail({
             <CardTitle>Schema Mapping</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+            <div className='overflow-x-auto'>
+              <table className='w-full border-collapse'>
                 <thead>
-                  <tr className="border-b">
-                    <th className="px-4 py-2 text-left text-sm font-medium">
+                  <tr className='border-b'>
+                    <th className='px-4 py-2 text-left text-sm font-medium'>
                       Source Field
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium">
+                    <th className='px-4 py-2 text-left text-sm font-medium'>
                       Target Field
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {Object.entries(plan.schemaMapping).map(([key, value]) => (
-                    <tr key={key} className="border-b last:border-0">
-                      <td className="px-4 py-2 font-mono text-sm">{key}</td>
-                      <td className="px-4 py-2 font-mono text-sm">{value}</td>
+                    <tr key={key} className='border-b last:border-0'>
+                      <td className='px-4 py-2 font-mono text-sm'>{key}</td>
+                      <td className='px-4 py-2 font-mono text-sm'>{value}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -168,8 +174,8 @@ export function IntegrationDetail({
           <CardTitle>Preprocessing Script</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md bg-muted p-4">
-            <pre className="text-sm">
+          <div className='bg-muted rounded-md p-4'>
+            <pre className='text-sm'>
               {`# Integration script for ${plan.planId}
 # Target format: ${plan.targetFormat}
 # Estimated effort: ${plan.estimatedEffortHours} hours
@@ -188,15 +194,17 @@ ${plan.requiredTransformations.map((t) => `    # - ${t}`).join('\n')}
     return transformed_data
 
 # Schema mapping:
-${Object.entries(plan.schemaMapping).map(([k, v]) => `# ${k} -> ${v}`).join('\n')}
+${Object.entries(plan.schemaMapping)
+  .map(([k, v]) => `# ${k} -> ${v}`)
+  .join('\n')}
 `}
             </pre>
           </div>
-          <div className="mt-4 flex gap-2">
-            <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+          <div className='mt-4 flex gap-2'>
+            <button className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'>
               Generate Full Script
             </button>
-            <button className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+            <button className='border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium'>
               Download Script
             </button>
           </div>
@@ -205,4 +213,3 @@ ${Object.entries(plan.schemaMapping).map(([k, v]) => `# ${k} -> ${v}`).join('\n'
     </div>
   )
 }
-

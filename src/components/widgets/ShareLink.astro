@@ -1,104 +1,100 @@
 ---
-import Link from "@/components/base/Link.astro";
-import type { ShareConfig } from "@/types";
+import Link from '@/components/base/Link.astro'
+import type { ShareConfig } from '@/types'
 
 interface ShareLink {
-  baseUrl: string;
-  formatUrl: (postUrl: URL, config?: [boolean, string?]) => string;
-  label: string;
-  title: string;
+  baseUrl: string
+  formatUrl: (postUrl: URL, config?: [boolean, string?]) => string
+  label: string
+  title: string
 }
 
 interface Props {
-  config: ShareConfig;
-  url?: URL | string;
+  config: ShareConfig
+  url?: URL | string
 }
 
-const { config, url } = Astro.props;
-const postUrl = url
-  ? typeof url === "string"
-    ? new URL(url)
-    : url
-  : Astro.url;
+const { config, url } = Astro.props
+const postUrl = url ? (typeof url === 'string' ? new URL(url) : url) : Astro.url
 
 const SHARE_LINKS: Record<string, ShareLink> = {
   twitter: {
-    baseUrl: "https://twitter.com/intent/tweet?text=",
+    baseUrl: 'https://twitter.com/intent/tweet?text=',
     formatUrl: (url, cfg) =>
-      `${"https://twitter.com/intent/tweet?text="}${encodeURIComponent(
-        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ""}${url}\n\nI think...`,
+      `${'https://twitter.com/intent/tweet?text='}${encodeURIComponent(
+        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
       )}`,
-    label: "twitter",
-    title: "Tweet this post",
+    label: 'twitter',
+    title: 'Tweet this post',
   },
   bluesky: {
-    baseUrl: "https://bsky.app/intent/compose?text=",
+    baseUrl: 'https://bsky.app/intent/compose?text=',
     formatUrl: (url, cfg) =>
       `https://bsky.app/intent/compose?text=${encodeURIComponent(
-        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ""}${url}. I think...`,
+        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}. I think...`,
       )}`,
-    label: "bluesky",
-    title: "Share this post on Bluesky",
+    label: 'bluesky',
+    title: 'Share this post on Bluesky',
   },
   mastodon: {
-    baseUrl: "https://elk.zone/intent/post?text=",
+    baseUrl: 'https://elk.zone/intent/post?text=',
     formatUrl: (url, cfg) =>
       `https://elk.zone/intent/post?text=${encodeURIComponent(
-        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ""}${url}\n\nI think...`,
+        `Reading ${cfg?.[1] ? `${cfg[1]}'s ` : ''}${url}\n\nI think...`,
       )}`,
-    label: "mastodon",
-    title: "Share this post on Mastodon",
+    label: 'mastodon',
+    title: 'Share this post on Mastodon',
   },
   facebook: {
-    baseUrl: "https://www.facebook.com/sharer.php?u=",
+    baseUrl: 'https://www.facebook.com/sharer.php?u=',
     formatUrl: (url) => `https://www.facebook.com/sharer.php?u=${url}`,
-    label: "facebook",
-    title: "Share this post on Facebook",
+    label: 'facebook',
+    title: 'Share this post on Facebook',
   },
   pinterest: {
-    baseUrl: "https://pinterest.com/pin/create/button/?url=",
+    baseUrl: 'https://pinterest.com/pin/create/button/?url=',
     formatUrl: (url) => `https://pinterest.com/pin/create/button/?url=${url}`,
-    label: "pinterest",
-    title: "Share this post on Pinterest",
+    label: 'pinterest',
+    title: 'Share this post on Pinterest',
   },
   reddit: {
-    baseUrl: "https://www.reddit.com/submit?url=",
+    baseUrl: 'https://www.reddit.com/submit?url=',
     formatUrl: (url) => `https://www.reddit.com/submit?url=${url}`,
-    label: "reddit",
-    title: "Share this post on Reddit",
+    label: 'reddit',
+    title: 'Share this post on Reddit',
   },
   telegram: {
-    baseUrl: "https://t.me/share/url?url=",
+    baseUrl: 'https://t.me/share/url?url=',
     formatUrl: (url) => `https://t.me/share/url?url=${url}`,
-    label: "telegram",
-    title: "Share this post via Telegram",
+    label: 'telegram',
+    title: 'Share this post via Telegram',
   },
   whatsapp: {
-    baseUrl: "https://wa.me/?text=",
+    baseUrl: 'https://wa.me/?text=',
     formatUrl: (url) => `https://wa.me/?text=${url}`,
-    label: "whatsapp",
-    title: "Share this post via WhatsApp",
+    label: 'whatsapp',
+    title: 'Share this post via WhatsApp',
   },
   email: {
-    baseUrl: "mailto:?subject=See%20this%20post&body=",
+    baseUrl: 'mailto:?subject=See%20this%20post&body=',
     formatUrl: (url) => `mailto:?subject=See%20this%20post&body=${url}`,
-    label: "email",
-    title: "Share this post via email",
+    label: 'email',
+    title: 'Share this post via email',
   },
-} as const satisfies Record<string, ShareLink>;
+} as const satisfies Record<string, ShareLink>
 
 const links = Object.entries(config)
   .filter(([key, value]) => value && key in SHARE_LINKS)
   .map(([key, cfg]) => {
-    const linkConfig = SHARE_LINKS[key as keyof typeof SHARE_LINKS];
-    if (!linkConfig) return null;
+    const linkConfig = SHARE_LINKS[key as keyof typeof SHARE_LINKS]
+    if (!linkConfig) return null
     return {
       url: linkConfig.formatUrl(postUrl, cfg as [boolean, string?]),
       label: linkConfig.label,
       title: linkConfig.title,
-    };
+    }
   })
-  .filter((link): link is NonNullable<typeof link> => link !== null);
+  .filter((link): link is NonNullable<typeof link> => link !== null)
 ---
 
 <span class="font-mono op-50">&gt; </span>

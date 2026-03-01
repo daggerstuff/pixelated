@@ -10,7 +10,7 @@
 export function generateId(): string {
   return `id_${Math.random()
     .toString(36)
-    .substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+    .substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`
 }
 
 /**
@@ -19,19 +19,19 @@ export function generateId(): string {
  * @returns Memoized function with same signature
  */
 export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
-  const cache = new Map<string, ReturnType<T>>();
+  const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
-    const key = JSON.stringify(args);
+    const key = JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>;
+      return cache.get(key) as ReturnType<T>
     }
 
-    const result = fn(...args) as ReturnType<T>;
-    cache.set(key, result);
-    return result;
-  }) as T;
+    const result = fn(...args) as ReturnType<T>
+    cache.set(key, result)
+    return result
+  }) as T
 }
 
 /**
@@ -46,19 +46,19 @@ export function validateFilename(
   allowedPattern: RegExp = /^[a-zA-Z0-9._-]+$/,
 ): string {
   if (!allowedPattern.test(filename)) {
-    throw new Error("Filename contains invalid characters");
+    throw new Error('Filename contains invalid characters')
   }
 
   // Additional checks for common attack vectors
   if (
-    filename.includes("..") ||
-    filename.includes("/") ||
-    filename.includes("\\")
+    filename.includes('..') ||
+    filename.includes('/') ||
+    filename.includes('\\')
   ) {
-    throw new Error("Filename contains path traversal sequences");
+    throw new Error('Filename contains path traversal sequences')
   }
 
-  return filename;
+  return filename
 }
 
 /**
@@ -68,13 +68,13 @@ export function validateFilename(
 export function tryRequireNode(id: string): unknown {
   try {
     const maybeRequire = (globalThis as unknown as Record<string, unknown>)[
-      "require"
-    ] as ((m: string) => unknown) | undefined;
-    if (typeof maybeRequire === "function") {
-      return maybeRequire(id);
+      'require'
+    ] as ((m: string) => unknown) | undefined
+    if (typeof maybeRequire === 'function') {
+      return maybeRequire(id)
     }
   } catch {
     // Ignore errors
   }
-  return null;
+  return null
 }

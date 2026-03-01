@@ -4,12 +4,13 @@
  */
 
 import type { APIRoute } from 'astro'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   rateLimitAnalytics,
   getRateLimitStatus,
   checkRateLimitHealth,
 } from '@/lib/rate-limiting'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('rate-limit-status')
 
@@ -197,7 +198,7 @@ export const POST: APIRoute = async ({ request }) => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
+                Authorization: `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
               },
               body: JSON.stringify({
                 to: adminEmail,

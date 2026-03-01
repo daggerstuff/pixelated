@@ -11,7 +11,7 @@ ogImage: false
 draft: false
 ---
 
-Welcome to the platform documentation. This section contains guides, tutorials, 
+Welcome to the platform documentation. This section contains guides, tutorials,
 and reference materials to help you get the most out of the platform.
 
 ## Tutorial

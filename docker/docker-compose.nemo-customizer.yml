@@ -19,7 +19,7 @@ services:
       - ./ai/training_data_consolidated/final:/app/data/training # Mapping local consolidated data
       - ./nemo-customizer-config.yaml:/mount/cfg/config.yaml
     ports:
-      - "8001:8001"
+      - '8001:8001'
     depends_on:
       nemo-postgres:
         condition: service_healthy

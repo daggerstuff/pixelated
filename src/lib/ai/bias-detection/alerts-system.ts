@@ -6,9 +6,6 @@
  */
 
 import { getBiasDetectionLogger } from '../../logging/standardized-logger'
-import { PythonBiasDetectionBridge } from './python-bridge'
-import { performanceMonitor } from './performance-monitor'
-import type { BiasAnalysisResult } from './types'
 import type {
   AlertLevel as _AlertLevel,
   AlertData as _AlertData,
@@ -21,6 +18,9 @@ import type {
   SystemNotificationData as _SystemNotificationData,
   TimeRange as _TimeRange,
 } from './bias-detection-interfaces'
+import { performanceMonitor } from './performance-monitor'
+import { PythonBiasDetectionBridge } from './python-bridge'
+import type { BiasAnalysisResult } from './types'
 
 const logger = getBiasDetectionLogger('alerts-system')
 
@@ -99,7 +99,7 @@ function alertDataToInstance(a: AlertLike): AlertInstance {
     timestamp: a.timestamp ? new Date(a.timestamp) : new Date(),
     level:
       'level' in a && typeof a.level === 'string'
-        ? (a.level as AlertLevel)
+        ? (a.level)
         : 'alertLevel' in a &&
             typeof (a as { alertLevel?: string }).alertLevel === 'string'
           ? (a as { alertLevel: AlertLevel }).alertLevel

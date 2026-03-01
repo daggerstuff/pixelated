@@ -1,10 +1,12 @@
 import { createHash } from 'crypto'
-import { getLogger } from '@/lib/utils/logger'
+
 import {
   ResearchQuery,
   QueryResult,
   QueryApproval,
 } from '@/lib/research/types/research-types'
+import { getLogger } from '@/lib/utils/logger'
+
 import { AnonymizationService } from './AnonymizationService'
 import { ConsentManagementService } from './ConsentManagementService'
 import { HIPAADataService } from './HIPAADataService'
@@ -486,15 +488,15 @@ export class ResearchQueryEngine {
     queryType: string,
   ): Promise<boolean> {
     const permissions = {
-      'researcher': ['sql', 'pattern-discovery', 'aggregate-analysis'],
+      researcher: ['sql', 'pattern-discovery', 'aggregate-analysis'],
       'data-scientist': [
         'sql',
         'pattern-discovery',
         'longitudinal-analysis',
         'cohort-comparison',
       ],
-      'therapist': ['own-client-analysis'],
-      'admin': ['all'],
+      therapist: ['own-client-analysis'],
+      admin: ['all'],
     }
 
     const userPermissions = permissions[userRole] || []

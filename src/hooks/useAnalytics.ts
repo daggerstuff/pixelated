@@ -1,6 +1,6 @@
+import { EventPriority } from '@/lib/services/analytics/analytics-types'
 import type { EventType } from '@/lib/services/analytics/AnalyticsService'
 import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
-import { EventPriority } from '@/lib/services/analytics/analytics-types'
 
 const analyticsService = new AnalyticsService()
 

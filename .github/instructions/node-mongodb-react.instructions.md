@@ -8,6 +8,7 @@ description: 'Node.js, MongoDB, and React backend API development guidelines'
 ## Technology Stack
 
 ### Core Backend Technologies
+
 - **Runtime**: Node.js with Express.js for API routes
 - **Database**: MongoDB with Mongoose ODM, PostgreSQL for relational data
 - **Authentication**: JWT with proper rotation and validation
@@ -15,7 +16,9 @@ description: 'Node.js, MongoDB, and React backend API development guidelines'
 - **Caching**: Redis for session management and performance optimization
 
 ### API Architecture Patterns
-- **RESTful Design**: Follow REST conventions with proper HTTP methods and status codes
+
+- **RESTful Design**: Follow REST conventions with proper HTTP methods and
+  status codes
 - **Microservices**: Separate AI services from main application logic
 - **Error Handling**: Consistent error response format across all endpoints
 - **Input Validation**: Comprehensive validation using Joi or Zod schemas
@@ -24,6 +27,7 @@ description: 'Node.js, MongoDB, and React backend API development guidelines'
 ## Data Models & Business Logic
 
 ### Core Entity Relationships
+
 ```javascript
 // Request → Entry workflow
 Request {
@@ -44,6 +48,7 @@ Entry {
 ```
 
 ### Business Rules Implementation
+
 - **Request Limits**: Maximum 3 requests per user per pool
 - **State Transitions**: Request (pending → approved) → Entry creation
 - **Payment Validation**: Entry creation only after payment completion
@@ -52,6 +57,7 @@ Entry {
 ## API Development Standards
 
 ### Endpoint Structure
+
 ```javascript
 // Standard API response format
 {
@@ -70,6 +76,7 @@ Entry {
 ```
 
 ### Security Implementation
+
 - **Authentication Middleware**: Verify JWT tokens on protected routes
 - **Authorization**: Role-based access control (user, admin, moderator)
 - **Input Sanitization**: Prevent NoSQL injection and XSS attacks
@@ -77,6 +84,7 @@ Entry {
 - **Audit Logging**: Log all critical operations for compliance
 
 ### Database Operations
+
 - **Connection Management**: Use connection pooling for MongoDB/PostgreSQL
 - **Transaction Handling**: Implement transactions for multi-step operations
 - **Query Optimization**: Use proper indexing and query optimization
@@ -85,22 +93,24 @@ Entry {
 ## Error Handling & Monitoring
 
 ### Error Response Standards
+
 ```javascript
 // Consistent error handling middleware
 app.use((error, req, res, next) => {
-  const statusCode = error.statusCode || 500;
+  const statusCode = error.statusCode || 500
   res.status(statusCode).json({
     success: false,
     error: {
       code: error.code || 'INTERNAL_ERROR',
       message: error.message,
-      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-    }
-  });
-});
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+    },
+  })
+})
 ```
 
 ### Performance Monitoring
+
 - **Response Time Tracking**: Monitor API response times
 - **Database Query Performance**: Log slow queries for optimization
 - **Memory Usage**: Monitor memory consumption in long-running processes
@@ -109,12 +119,16 @@ app.use((error, req, res, next) => {
 ## Integration Guidelines
 
 ### Frontend Integration
+
 - **API Client**: Centralized API client with error handling and retries
-- **State Management**: Proper state synchronization between frontend and backend
+- **State Management**: Proper state synchronization between frontend and
+  backend
 - **Real-time Updates**: WebSocket implementation for live data updates
-- **Caching Strategy**: Implement appropriate caching for frequently accessed data
+- **Caching Strategy**: Implement appropriate caching for frequently accessed
+  data
 
 ### AI Service Integration
+
 - **Async Processing**: Use message queues for AI processing tasks
 - **Timeout Handling**: Implement proper timeouts for AI service calls
 - **Fallback Mechanisms**: Graceful degradation when AI services are unavailable

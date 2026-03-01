@@ -1,16 +1,20 @@
-name: "Prepare uv venv"
-description: 'Ensure uv is available and create a uv virtual environment in the given service directory. Outputs `use-system` which will be "--system" when venv creation failed, or empty when venv succeeded.'
+name: 'Prepare uv venv'
+description:
+  'Ensure uv is available and create a uv virtual environment in the given
+  service directory. Outputs `use-system` which will be "--system" when venv
+  creation failed, or empty when venv succeeded.'
 inputs:
   service-dir:
-    description: "Path to the Python service directory (relative to repo root)"
+    description: 'Path to the Python service directory (relative to repo root)'
     required: true
-    default: "."
+    default: '.'
 outputs:
   use-system:
-    description: "If non-empty, contains the --system flag to use for uv pip installs"
+    description:
+      'If non-empty, contains the --system flag to use for uv pip installs'
     value: ${{ steps.create_venv.outputs.use-system }}
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Ensure `uv` shim is available
       shell: bash

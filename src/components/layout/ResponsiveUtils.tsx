@@ -13,19 +13,19 @@ interface ResponsiveUtilsProps {
 
 // Responsive visibility utilities
 export const ShowOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className="block sm:hidden">{children}</div>
+  <div className='block sm:hidden'>{children}</div>
 )
 
 export const HideOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className="hidden sm:block">{children}</div>
+  <div className='hidden sm:block'>{children}</div>
 )
 
 export const ShowOnTablet: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className="hidden md:block lg:hidden">{children}</div>
+  <div className='hidden md:block lg:hidden'>{children}</div>
 )
 
 export const ShowOnDesktop: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className="hidden lg:block">{children}</div>
+  <div className='hidden lg:block'>{children}</div>
 )
 
 // Responsive spacing utilities
@@ -65,7 +65,7 @@ export const TouchTarget: FC<{ children: ReactNode; className?: string }> = ({
   className = '',
 }) => (
   <div
-    className={`min-h-[44px] min-w-[44px] flex items-center justify-center ${className}`}
+    className={`flex min-h-[44px] min-w-[44px] items-center justify-center ${className}`}
   >
     {children}
   </div>
@@ -119,11 +119,11 @@ export const useResponsive = () => {
 
 // Breakpoint constants for consistent usage
 export const BREAKPOINTS = {
-  'xs': 0,
-  'sm': 640,
-  'md': 768,
-  'lg': 1024,
-  'xl': 1280,
+  xs: 0,
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
   '2xl': 1536,
 } as const
 

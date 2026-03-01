@@ -1,7 +1,8 @@
-import { Pool } from 'pg'
-import dotenv from 'dotenv'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
+
+import dotenv from 'dotenv'
+import { Pool } from 'pg'
 
 // Load environment variables
 dotenv.config()
@@ -41,7 +42,10 @@ async function runAuthMigration() {
       WHERE table_schema = 'public'
       ORDER BY table_name
     `)
-    console.log('Current tables:', tables.rows.map(row => row.table_name))
+    console.log(
+      'Current tables:',
+      tables.rows.map((row) => row.table_name),
+    )
 
     // Show users table structure
     const usersColumns = await client.query(`
@@ -51,7 +55,7 @@ async function runAuthMigration() {
       ORDER BY ordinal_position
     `)
     console.log('Users table columns:')
-    usersColumns.rows.forEach(row => {
+    usersColumns.rows.forEach((row) => {
       console.log(`  - ${row.column_name} (${row.data_type})`)
     })
 
@@ -64,4 +68,4 @@ async function runAuthMigration() {
   }
 }
 
-runAuthMigration()
+void runAuthMigration()

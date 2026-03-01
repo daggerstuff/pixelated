@@ -1,7 +1,9 @@
 import { renderHook, act } from '@testing-library/react'
-import { useTherapistAnalytics } from '../useTherapistAnalytics'
-import type { TherapistSession } from '@/types/dashboard'
 import { describe, expect, it, vi } from 'vitest'
+
+import type { TherapistSession } from '@/types/dashboard'
+
+import { useTherapistAnalytics } from '../useTherapistAnalytics'
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -26,7 +28,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 3000,
         skillScores: {
           'Active Listening': 85,
-          'Empathy': 78,
+          Empathy: 78,
         },
         responseTime: 2.5,
         conversationFlow: 88,
@@ -49,7 +51,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 1500,
         skillScores: {
           'Active Listening': 90,
-          'Empathy': 82,
+          Empathy: 82,
         },
         responseTime: 2.1,
         conversationFlow: 92,
@@ -177,7 +179,9 @@ describe('useTherapistAnalytics', () => {
 
   it('handles empty sessions array', async () => {
     const emptySessions: TherapistSession[] = []
-    const { result } = renderHook(() => useTherapistAnalytics(mockFilters, emptySessions))
+    const { result } = renderHook(() =>
+      useTherapistAnalytics(mockFilters, emptySessions),
+    )
 
     // Wait for data to load
     await act(async () => {
@@ -253,7 +257,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 1800,
         skillScores: {
           'Active Listening': 95,
-          'Empathy': 88,
+          Empathy: 88,
         },
         responseTime: 1.8,
         conversationFlow: 95,
@@ -299,7 +303,7 @@ describe('useTherapistAnalytics', () => {
   it('handles single session for comparative data', async () => {
     const singleSession = [mockSessions[0]].filter(
       Boolean,
-    ) as TherapistSession[]
+    )
     const { result } = renderHook(() =>
       useTherapistAnalytics(mockFilters, singleSession),
     )

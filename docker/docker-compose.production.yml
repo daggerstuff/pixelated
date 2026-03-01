@@ -7,7 +7,7 @@ services:
     container_name: pixelated-app
     restart: unless-stopped
     ports:
-      - "4321:4321"
+      - '4321:4321'
     environment:
       - NODE_ENV=production
       - PORT=4321
@@ -41,7 +41,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:4321/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -49,16 +49,16 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
+          cpus: '1.0'
           memory: 1G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`${DOMAIN:-pixelatedempathy.com}`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.app.rule=Host(`${DOMAIN:-pixelatedempathy.com}`)'
+      - 'traefik.http.routers.app.entrypoints=websecure'
+      - 'traefik.http.routers.app.tls.certresolver=letsencrypt'
 
   # PostgreSQL Database
   postgres:
@@ -77,8 +77,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          "pg_isready -U ${DB_USER:-pixelated_user} -d ${DB_NAME:-pixelated}",
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USER:-pixelated_user} -d ${DB_NAME:-pixelated}',
         ]
       interval: 10s
       timeout: 5s
@@ -86,7 +86,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
 
   # Redis Cache
@@ -94,7 +94,9 @@ services:
     image: redis:7
     container_name: pixelated-redis
     restart: unless-stopped
-    command: sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)" --appendonly yes'
+    command:
+      sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)"
+      --appendonly yes'
     secrets:
       - redis_password
     volumes:
@@ -102,8 +104,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          'redis-cli -a "$$(cat /run/secrets/redis_password)" ping | grep -q PONG',
+          'CMD-SHELL',
+          'redis-cli -a "$$(cat /run/secrets/redis_password)" ping | grep -q
+          PONG',
         ]
       interval: 10s
       timeout: 5s
@@ -111,7 +114,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
+          cpus: '0.25'
           memory: 256M
 
   # Reverse Proxy & Load Balancer
@@ -120,9 +123,9 @@ services:
     container_name: pixelated-traefik
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080" # Dashboard
+      - '80:80'
+      - '443:443'
+      - '8080:8080' # Dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik:/etc/traefik
@@ -138,7 +141,7 @@ services:
       # - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_HTTPCHALLENGE_ENTRYPOINT=web
       - CF_DNS_API_TOKEN=${CLOUDFLARE_API_TOKEN}
     labels:
-      - "traefik.enable=true"
+      - 'traefik.enable=true'
       # - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
       # - "traefik.http.routers.traefik.service=api@internal"
       # - "traefik.http.routers.traefik.entrypoints=websecure"
@@ -146,7 +149,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
+          cpus: '0.25'
           memory: 128M
 
   # Monitoring & Observability
@@ -158,17 +161,17 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--web.console.templates=/etc/prometheus/consoles"
-      - "--web.enable-lifecycle"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
     ports:
-      - "9090:9090"
+      - '9090:9090'
     deploy:
       resources:
         limits:
-          cpus: "0.25"
+          cpus: '0.25'
           memory: 256M
 
   grafana:
@@ -184,13 +187,13 @@ services:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - prometheus
     deploy:
       resources:
         limits:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 256M
 
   # Log Aggregation
@@ -203,11 +206,11 @@ services:
       - ./loki/config.yml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     ports:
-      - "3100:3100"
+      - '3100:3100'
     deploy:
       resources:
         limits:
-          cpus: "0.25"
+          cpus: '0.25'
           memory: 256M
 
   promtail:
@@ -224,7 +227,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.1"
+          cpus: '0.1'
           memory: 128M
 
   # Therapeutic AI API
@@ -235,16 +238,16 @@ services:
     container_name: pixelated-ai-api
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - '5000:5000'
     environment:
       - MONGODB_URI=${MONGODB_URI}
     deploy:
       resources:
         limits:
-          cpus: "1.0"
+          cpus: '1.0'
           memory: 1G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
 
 volumes:

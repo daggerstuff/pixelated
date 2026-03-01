@@ -68,12 +68,12 @@
       "astro/client",
       "node",
       "react",
-      "react-dom",
-      "vitest",
-      "vitest/globals"
+      "react-dom"
     ],
     "typeRoots": [
+      "../node_modules/@types",
       "./node_modules/@types",
+      "../src/types",
       "./src/types"
     ],
     "plugins": [

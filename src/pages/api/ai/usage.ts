@@ -1,12 +1,14 @@
 import type { APIRoute } from 'astro'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+
 import { getAIUsageStats } from '@/lib/ai/analytics'
 import { handleApiError } from '@/lib/ai/error-handling'
+import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { getSession } from '../../../lib/auth/session'
+import { RateLimiter } from '../../../lib/middleware/rate-limit'
 import { validateQueryParams } from '../../../lib/validation/index'
 import { UsageStatsRequestSchema } from '../../../lib/validation/schemas'
-import { RateLimiter } from '../../../lib/middleware/rate-limit'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -181,7 +183,7 @@ export const GET: APIRoute = async ({ request }) => {
       'ai_usage',
       {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
         status: 'error',
       },
       AuditEventStatus.FAILURE,

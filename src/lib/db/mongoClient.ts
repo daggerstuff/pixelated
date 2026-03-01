@@ -1,23 +1,24 @@
-import { mongodb } from '../../config/mongodb.config';
-import type { Db } from 'mongodb';
+import type { Db } from 'mongodb'
+
+import { mongodb } from '../../config/mongodb.config'
 
 /**
  * MongoDB Client bridge for legacy code.
  * Provides access to the database instance.
  */
 class MongoClientBridge {
-    public connect() {
-        return mongodb.connect();
-    }
+  public connect() {
+    return mongodb.connect()
+  }
 
-    public disconnect() {
-        return mongodb.disconnect();
-    }
+  public disconnect() {
+    return mongodb.disconnect()
+  }
 
-    public get db(): Db {
-        return mongodb.getDb();
-    }
+  public get db(): Db {
+    return mongodb.getDb()
+  }
 }
 
-export const mongoClient = new MongoClientBridge();
-export default mongoClient;
+export const mongoClient = new MongoClientBridge()
+export default mongoClient

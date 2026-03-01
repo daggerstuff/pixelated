@@ -69,7 +69,7 @@ export default function externalNodePlugin() {
     },
   }
 }
-void (function () {
+ (function () {
   try {
     var e =
         'undefined' != typeof window

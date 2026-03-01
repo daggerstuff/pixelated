@@ -22,13 +22,12 @@ interface StoredKeyData {
   encryptedKey?: string
 }
 
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   KMSClient,
   GenerateDataKeyCommand,
   DecryptCommand,
 } from '@aws-sdk/client-kms'
-
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   DynamoDBDocumentClient,
   PutCommand,

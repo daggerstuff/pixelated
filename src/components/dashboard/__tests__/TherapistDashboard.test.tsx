@@ -1,30 +1,31 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { TherapistDashboard } from '../TherapistDashboard'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { TherapistSession } from '@/types/dashboard'
-import { describe, expect, it, vi } from 'vitest'
+
+import { TherapistDashboard } from '../TherapistDashboard'
 
 // Mock child components
 vi.mock('../AnalyticsCharts', () => ({
   AnalyticsCharts: () => (
-    <div data-testid="analytics-charts">Analytics Charts</div>
+    <div data-testid='analytics-charts'>Analytics Charts</div>
   ),
 }))
 
 vi.mock('../SessionControls', () => ({
   __esModule: true,
-  default: () => <div data-testid="session-controls">Session Controls</div>,
+  default: () => <div data-testid='session-controls'>Session Controls</div>,
 }))
 
 vi.mock('../TherapistProgressTracker', () => ({
   TherapistProgressTracker: () => (
-    <div data-testid="progress-tracker">Progress Tracker</div>
+    <div data-testid='progress-tracker'>Progress Tracker</div>
   ),
 }))
 
 vi.mock('../TherapyProgressCharts', () => ({
   __esModule: true,
-  default: () => <div data-testid="therapy-charts">Therapy Charts</div>,
+  default: () => <div data-testid='therapy-charts'>Therapy Charts</div>,
 }))
 
 // Mock the useTherapistAnalytics hook
@@ -128,7 +129,7 @@ describe('TherapistDashboard', () => {
 
   it('renders children components when provided', () => {
     const ChildComponent = () => (
-      <div data-testid="child-component">Child Component</div>
+      <div data-testid='child-component'>Child Component</div>
     )
     render(
       <TherapistDashboard

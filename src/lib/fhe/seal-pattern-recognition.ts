@@ -5,10 +5,9 @@
  * for homomorphic encryption.
  */
 
+import type { EmotionAnalysis, TherapySession } from '../ai/interfaces/therapy'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { SealService } from './seal-service'
-import { FHEOperation } from './types'
-import type { FHEService, FHEConfig, FHEKeys, EncryptedData } from './types'
+import { createEnhancedFHEService } from './enhanced-service'
 import type {
   EncryptedPattern,
   EncryptedAnalysis,
@@ -17,8 +16,9 @@ import type {
   CrossSessionPattern,
   RiskCorrelation,
 } from './pattern-recognition'
-import type { EmotionAnalysis, TherapySession } from '../ai/interfaces/therapy'
-import { createEnhancedFHEService } from './enhanced-service'
+import { SealService } from './seal-service'
+import { FHEOperation } from './types'
+import type { FHEService, FHEConfig, FHEKeys, EncryptedData } from './types'
 
 // Initialize logger
 const logger = createBuildSafeLogger('seal-pattern-recognition')
@@ -62,7 +62,7 @@ export class SealPatternRecognitionService implements FHEService {
    * Generate new encryption keys
    */
   async generateKeys(config?: FHEConfig): Promise<FHEKeys> {
-    return this.enhancedService.generateKeys(config) as Promise<FHEKeys>
+    return this.enhancedService.generateKeys(config)
   }
 
   /**
@@ -78,7 +78,7 @@ export class SealPatternRecognitionService implements FHEService {
   async encrypt<T>(
     value: T,
     options?: unknown,
-  ): Promise<EncryptedData<unknown>> {
+  ): Promise<EncryptedData> {
     return this.enhancedService.encrypt(value, options)
   }
 
@@ -86,7 +86,7 @@ export class SealPatternRecognitionService implements FHEService {
    * Decrypt data using SEAL
    */
   async decrypt<T>(
-    encryptedData: EncryptedData<unknown>,
+    encryptedData: EncryptedData,
     options?: unknown,
   ): Promise<T> {
     return this.enhancedService.decrypt(encryptedData, options)
@@ -174,7 +174,7 @@ export class SealPatternRecognitionService implements FHEService {
       // Accept an array of EncryptedPattern and process each
       const allPatterns: TrendPattern[] = []
       for (const encryptedData of encryptedPatterns) {
-        const data = JSON.parse(encryptedData.encryptedData) as any
+        const data = JSON.parse(encryptedData.encryptedData)
 
         // In a real implementation, we would decrypt the data using SEAL
         // For now, we'll generate synthetic data based on the encrypted info
@@ -287,7 +287,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     try {
       // Parse the encrypted data
-      const data = JSON.parse(encryptedData.encryptedData) as any
+      const data = JSON.parse(encryptedData.encryptedData)
 
       // Session IDs from the encrypted data
       const sessionIds = data.sessionIds as string[]
@@ -557,15 +557,15 @@ export class SealPatternRecognitionService implements FHEService {
       // For valence/arousal/dominance, we'll need to extract from the emotions array
       if ((analysis.emotions || []).length > 0) {
         // Find valence-related emotion
-        const valenceEmotion = analysis.emotions!.find(
+        const valenceEmotion = analysis.emotions.find(
           (e) => String(e.type) === 'valence' || String(e.type) === 'happiness',
         )
         // Find arousal-related emotion
-        const arousalEmotion = analysis.emotions!.find(
+        const arousalEmotion = analysis.emotions.find(
           (e) => String(e.type) === 'arousal' || String(e.type) === 'anxiety',
         )
         // Find dominance-related emotion
-        const dominanceEmotion = analysis.emotions!.find(
+        const dominanceEmotion = analysis.emotions.find(
           (e) => String(e.type) === 'dominance' || String(e.type) === 'control',
         )
 
@@ -586,13 +586,13 @@ export class SealPatternRecognitionService implements FHEService {
       // Extract risk factors from the riskFactors array
       if ((analysis.riskFactors || []).length > 0) {
         // Find specific risk factors
-        const suicidalRisk = analysis.riskFactors!.find((r) =>
+        const suicidalRisk = analysis.riskFactors.find((r) =>
           r.type.includes('suicid'),
         )
-        const substanceRisk = analysis.riskFactors!.find((r) =>
+        const substanceRisk = analysis.riskFactors.find((r) =>
           r.type.includes('substance'),
         )
-        const isolationRisk = analysis.riskFactors!.find((r) =>
+        const isolationRisk = analysis.riskFactors.find((r) =>
           r.type.includes('isolation'),
         )
 
@@ -657,7 +657,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     for (let i = 0; i < patternCount; i++) {
       const type =
-        patternTypes[Math.floor(Math.random() * patternTypes.length)]!
+        patternTypes[Math.floor(Math.random() * patternTypes.length)]
       const confidence = threshold + Math.random() * (1 - threshold)
 
       results.push({
@@ -737,7 +737,7 @@ export class SealPatternRecognitionService implements FHEService {
 
     for (let i = 0; i < count; i++) {
       const index = Math.floor(Math.random() * copy.length)
-      result.push(copy[index] as T)
+      result.push(copy[index])
       copy.splice(index, 1)
     }
 

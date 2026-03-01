@@ -1,10 +1,3 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Loader2,
   Brain,
@@ -17,6 +10,14 @@ import {
   Download,
   History,
 } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 
 interface Entity {
   text: string
@@ -169,7 +170,7 @@ export default function KnowledgeParsingDemo() {
       console.error('Analysis failed:', err)
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'Analysis failed. Please try again.',
       )
 
@@ -212,7 +213,7 @@ export default function KnowledgeParsingDemo() {
         clearTimeout(realTimeTimeout.current)
       }
       realTimeTimeout.current = setTimeout(() => {
-        analyze()
+        void analyze()
       }, 1500)
     }
     return () => {
@@ -269,37 +270,37 @@ export default function KnowledgeParsingDemo() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className='mx-auto w-full max-w-6xl space-y-6'>
       {/* Header Section with Enterprise Features */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Brain className="w-6 h-6 text-blue-600" />
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-blue-100 rounded-lg p-2'>
+                <Brain className='text-blue-600 h-6 w-6' />
               </div>
               <div>
-                <CardTitle className="text-2xl">
+                <CardTitle className='text-2xl'>
                   Enterprise Knowledge Parsing
                 </CardTitle>
-                <p className="text-gray-600 mt-1">
+                <p className='text-gray-600 mt-1'>
                   Advanced clinical text analysis with real-time monitoring
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className='flex items-center gap-2'>
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => setIsRealTimeMode(!isRealTimeMode)}
                 className={isRealTimeMode ? 'bg-green-50 border-green-200' : ''}
               >
-                <Activity className="w-4 h-4 mr-2" />
+                <Activity className='mr-2 h-4 w-4' />
                 {isRealTimeMode ? 'Real-time ON' : 'Real-time OFF'}
               </Button>
               {results && (
-                <Button variant="outline" size="sm" onClick={exportResults}>
-                  <Download className="w-4 h-4 mr-2" />
+                <Button variant='outline' size='sm' onClick={exportResults}>
+                  <Download className='mr-2 h-4 w-4' />
                   Export
                 </Button>
               )}
@@ -307,71 +308,71 @@ export default function KnowledgeParsingDemo() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            <div className="lg:col-span-3">
+          <div className='grid grid-cols-1 gap-4 lg:grid-cols-4'>
+            <div className='lg:col-span-3'>
               <Textarea
-                placeholder="Enter clinical text, patient notes, or psychological content to analyze..."
+                placeholder='Enter clinical text, patient notes, or psychological content to analyze...'
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="min-h-[120px] text-sm"
+                className='min-h-[120px] text-sm'
               />
-              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+              <div className='text-gray-500 mt-2 flex items-center justify-between text-xs'>
                 <span>
                   {inputText.length} characters,{' '}
                   {inputText.split(/\s+/).filter((w) => w).length} words
                 </span>
                 {isRealTimeMode && inputText.length > 10 && (
-                  <span className="text-green-600">
+                  <span className='text-green-600'>
                     Real-time analysis active
                   </span>
                 )}
               </div>
             </div>
-            <div className="space-y-3">
+            <div className='space-y-3'>
               <Button
                 onClick={analyze}
                 disabled={isAnalyzing || !inputText.trim()}
-                className="w-full"
+                className='w-full'
               >
                 {isAnalyzing ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                     Analyzing...
                   </>
                 ) : (
                   <>
-                    <Brain className="w-4 h-4 mr-2" />
+                    <Brain className='mr-2 h-4 w-4' />
                     Analyze Text
                   </>
                 )}
               </Button>
 
               {processingTime && (
-                <div className="text-center">
-                  <Badge variant="outline" className="text-xs">
-                    <Clock className="w-3 h-3 mr-1" />
+                <div className='text-center'>
+                  <Badge variant='outline' className='text-xs'>
+                    <Clock className='mr-1 h-3 w-3' />
                     {processingTime}ms
                   </Badge>
                 </div>
               )}
 
               {confidence > 0 && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
+                <div className='space-y-2'>
+                  <div className='flex justify-between text-xs'>
                     <span>Confidence</span>
                     <span>{confidence.toFixed(1)}%</span>
                   </div>
-                  <Progress value={confidence} className="h-2" />
+                  <Progress value={confidence} className='h-2' />
                 </div>
               )}
             </div>
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center gap-2 text-red-700">
-                <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm">{error}</span>
+            <div className='bg-red-50 border-red-200 mt-4 rounded-lg border p-3'>
+              <div className='text-red-700 flex items-center gap-2'>
+                <AlertTriangle className='h-4 w-4' />
+                <span className='text-sm'>{error}</span>
               </div>
             </div>
           )}
@@ -380,56 +381,56 @@ export default function KnowledgeParsingDemo() {
 
       {/* Results Section */}
       {results && (
-        <Tabs defaultValue="entities" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="entities">
-              <Tag className="w-4 h-4 mr-2" />
+        <Tabs defaultValue='entities' className='w-full'>
+          <TabsList className='grid w-full grid-cols-5'>
+            <TabsTrigger value='entities'>
+              <Tag className='mr-2 h-4 w-4' />
               Entities
             </TabsTrigger>
-            <TabsTrigger value="concepts">
-              <Brain className="w-4 h-4 mr-2" />
+            <TabsTrigger value='concepts'>
+              <Brain className='mr-2 h-4 w-4' />
               Concepts
             </TabsTrigger>
-            <TabsTrigger value="risks">
-              <AlertTriangle className="w-4 h-4 mr-2" />
+            <TabsTrigger value='risks'>
+              <AlertTriangle className='mr-2 h-4 w-4' />
               Risk Factors
             </TabsTrigger>
-            <TabsTrigger value="insights">
-              <TrendingUp className="w-4 h-4 mr-2" />
+            <TabsTrigger value='insights'>
+              <TrendingUp className='mr-2 h-4 w-4' />
               Insights
             </TabsTrigger>
-            <TabsTrigger value="metadata">
-              <BarChart3 className="w-4 h-4 mr-2" />
+            <TabsTrigger value='metadata'>
+              <BarChart3 className='mr-2 h-4 w-4' />
               Analytics
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="entities" className="space-y-4">
+          <TabsContent value='entities' className='space-y-4'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Tag className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Tag className='h-5 w-5' />
                   Clinical Entities ({results.entities.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   {results.entities.map((entity) => (
                     <div
                       key={entity.text + entity.type}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className='flex items-center justify-between rounded-lg border p-3'
                     >
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline">{entity.type}</Badge>
-                        <span className="font-medium">{entity.text}</span>
+                      <div className='flex items-center gap-3'>
+                        <Badge variant='outline'>{entity.type}</Badge>
+                        <span className='font-medium'>{entity.text}</span>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium">
+                      <div className='text-right'>
+                        <div className='text-sm font-medium'>
                           {(entity.confidence * 100).toFixed(1)}%
                         </div>
                         <Progress
                           value={entity.confidence * 100}
-                          className="w-20 h-2 mt-1"
+                          className='mt-1 h-2 w-20'
                         />
                       </div>
                     </div>
@@ -439,29 +440,29 @@ export default function KnowledgeParsingDemo() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="concepts" className="space-y-4">
+          <TabsContent value='concepts' className='space-y-4'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Brain className='h-5 w-5' />
                   Key Concepts ({results.concepts.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   {results.concepts.map((concept) => (
                     <div
                       key={concept.concept}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className='flex items-center justify-between rounded-lg border p-3'
                     >
-                      <span className="font-medium">{concept.concept}</span>
-                      <div className="text-right">
-                        <div className="text-sm font-medium">
+                      <span className='font-medium'>{concept.concept}</span>
+                      <div className='text-right'>
+                        <div className='text-sm font-medium'>
                           {(concept.relevance * 100).toFixed(1)}%
                         </div>
                         <Progress
                           value={concept.relevance * 100}
-                          className="w-20 h-2 mt-1"
+                          className='mt-1 h-2 w-20'
                         />
                       </div>
                     </div>
@@ -471,24 +472,24 @@ export default function KnowledgeParsingDemo() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="risks" className="space-y-4">
+          <TabsContent value='risks' className='space-y-4'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <AlertTriangle className='h-5 w-5' />
                   Risk Assessment ({results.riskFactors.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   {results.riskFactors.map((risk) => (
                     <div
                       key={risk.factor}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className='flex items-center justify-between rounded-lg border p-3'
                     >
-                      <span className="font-medium">{risk.factor}</span>
+                      <span className='font-medium'>{risk.factor}</span>
                       <Badge
-                        variant="outline"
+                        variant='outline'
                         className={
                           risk.severity === 'High'
                             ? 'border-red-200 text-red-700 bg-red-50'
@@ -506,37 +507,37 @@ export default function KnowledgeParsingDemo() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-4">
+          <TabsContent value='insights' className='space-y-4'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <TrendingUp className='h-5 w-5' />
                   Clinical Insights
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {results.insights && results.insights.length > 0 ? (
-                  <div className="grid gap-3">
+                  <div className='grid gap-3'>
                     {results.insights.map((insight) => (
                       <div
                         key={insight.category + insight.insight}
-                        className="p-4 border rounded-lg bg-blue-50"
+                        className='bg-blue-50 rounded-lg border p-4'
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <Badge variant="outline">{insight.category}</Badge>
-                          <span className="text-sm text-gray-600">
+                        <div className='mb-2 flex items-start justify-between'>
+                          <Badge variant='outline'>{insight.category}</Badge>
+                          <span className='text-gray-600 text-sm'>
                             {(insight.confidence * 100).toFixed(1)}% confidence
                           </span>
                         </div>
-                        <p className="text-sm text-gray-700">
+                        <p className='text-gray-700 text-sm'>
                           {insight.insight}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Brain className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <div className='text-gray-500 py-8 text-center'>
+                    <Brain className='mx-auto mb-3 h-12 w-12 opacity-50' />
                     <p>
                       Clinical insights will appear here based on advanced
                       analysis
@@ -547,53 +548,53 @@ export default function KnowledgeParsingDemo() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="metadata" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TabsContent value='metadata' className='space-y-4'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
+                  <CardTitle className='flex items-center gap-2'>
+                    <BarChart3 className='h-5 w-5' />
                     Text Analytics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {results.metadata && (
-                    <div className="space-y-4">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                    <div className='space-y-4'>
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Processing Time
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.metadata.processingTime}ms
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Word Count
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.metadata.wordCount}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Sentences</span>
-                        <span className="font-medium">
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600 text-sm'>Sentences</span>
+                        <span className='font-medium'>
                           {results.metadata.sentenceCount}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Complexity Score
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.metadata.complexity.toFixed(1)}/100
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Readability Score
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.metadata.readabilityScore.toFixed(1)}/100
                         </span>
                       </div>
@@ -604,50 +605,50 @@ export default function KnowledgeParsingDemo() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
+                  <CardTitle className='flex items-center gap-2'>
+                    <Activity className='h-5 w-5' />
                     Performance Metrics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className='space-y-4'>
                     <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">
+                      <div className='mb-2 flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Analysis Confidence
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {confidence.toFixed(1)}%
                         </span>
                       </div>
-                      <Progress value={confidence} className="h-2" />
+                      <Progress value={confidence} className='h-2' />
                     </div>
                     <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">
+                      <div className='mb-2 flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Entity Detection
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.entities.length} found
                         </span>
                       </div>
                       <Progress
                         value={Math.min(100, results.entities.length * 10)}
-                        className="h-2"
+                        className='h-2'
                       />
                     </div>
                     <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">
+                      <div className='mb-2 flex justify-between'>
+                        <span className='text-gray-600 text-sm'>
                           Risk Assessment
                         </span>
-                        <span className="font-medium">
+                        <span className='font-medium'>
                           {results.riskFactors.length} factors
                         </span>
                       </div>
                       <Progress
                         value={Math.min(100, results.riskFactors.length * 15)}
-                        className="h-2"
+                        className='h-2'
                       />
                     </div>
                   </div>
@@ -662,35 +663,35 @@ export default function KnowledgeParsingDemo() {
       {analysisHistory.length > 0 && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <History className="w-5 h-5" />
+            <div className='flex items-center justify-between'>
+              <CardTitle className='flex items-center gap-2'>
+                <History className='h-5 w-5' />
                 Analysis History ({analysisHistory.length})
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={clearHistory}>
+              <Button variant='outline' size='sm' onClick={clearHistory}>
                 Clear History
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className='max-h-60 space-y-2 overflow-y-auto'>
               {analysisHistory.map((item) => (
                 <button
                   key={item.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-left"
+                  className='hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-lg border p-3 text-left'
                   onClick={() => loadFromHistory(item)}
                 >
                   <div>
-                    <p className="text-sm font-medium truncate max-w-md">
+                    <p className='max-w-md truncate text-sm font-medium'>
                       {item.text}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className='text-gray-500 text-xs'>
                       {new Date(item.timestamp).toLocaleString()} •{' '}
                       {item.processingTime}ms
                     </p>
                   </div>
-                  <div className="text-right">
-                    <Badge variant="outline" className="text-xs">
+                  <div className='text-right'>
+                    <Badge variant='outline' className='text-xs'>
                       {item.result.entities.length} entities
                     </Badge>
                   </div>

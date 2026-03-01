@@ -1,6 +1,8 @@
 import type { AstroCookies } from 'astro'
+
+import { auth0UserService } from '@/services/auth0.service'
+
 import type { AuthRole } from '../config/auth.config'
-import type { AuditMetadata } from './audit/types'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
 import {
   createHIPAACompliantAuditLog,
@@ -8,8 +10,8 @@ import {
   AuditEventStatus,
   type AuditDetails,
 } from './audit'
+import type { AuditMetadata } from './audit/types'
 import { validateToken } from './auth/auth0-jwt-service'
-import { auth0UserService } from '@/services/auth0.service'
 
 export interface AuthUser {
   id: string
@@ -39,7 +41,7 @@ export async function getCurrentUser(
       return null
     }
 
-    const {userId} = decoded
+    const { userId } = decoded
 
     // Fetch user from Auth0
     const user = await auth0UserService.getUserById(userId)

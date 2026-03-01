@@ -7,9 +7,14 @@ featured: true
 tags: ['welcome', 'intro']
 ---
 
-Glad you made it here! This is a customizable, feature-rich :link[Astro]{id=withastro/astro} theme for blog and portfolio creation, inspired by the minimalist style of :link[antfu.me]{link=https://antfu.me/ imageUrl=https://antfu.me/favicon.svg}. The design has been refined and its functionality expanded for greater flexibility.
+Glad you made it here! This is a customizable, feature-rich
+:link[Astro]{id=withastro/astro} theme for blog and portfolio creation, inspired
+by the minimalist style of :link[antfu.me]{link=https://antfu.me/
+imageUrl=https://antfu.me/favicon.svg}. The design has been refined and its
+functionality expanded for greater flexibility.
 
-This live demo will guide you through setup and customization, offering helpful insights along the way. Enjoy exploring all the features this theme provides! ✨
+This live demo will guide you through setup and customization, offering helpful
+insights along the way. Enjoy exploring all the features this theme provides! ✨
 
 **Optimized Infrastructure**
 
@@ -20,7 +25,8 @@ This live demo will guide you through setup and customization, offering helpful 
 - Optimized Local Image Handling
 - VS Code Snippets for Quick Coding
 - Well-organized [Project Structure](./blog/project-structure/)
-- Outstanding [Lighthouse Performance](./blog/faqs-and-known-issues/#lighthouse-scores)
+- Outstanding
+  [Lighthouse Performance](./blog/faqs-and-known-issues/#lighthouse-scores)
 
 **Content Management**
 
@@ -29,7 +35,8 @@ This live demo will guide you through setup and customization, offering helpful 
 - KaTeX Math Integration
 - [Dynamic OG Image Generation](./blog/about-open-graph-images/)
 - [Callouts (Alerts / Admonitions)](./blog/markdown-mdx-extended-features/#callouts-alerts--admonitions)
-- [Directive Sugar](./blog/markdown-mdx-extended-features/#image-caption--link) for Both Markdown/MDX
+- [Directive Sugar](./blog/markdown-mdx-extended-features/#image-caption--link)
+  for Both Markdown/MDX
 - [Code Syntax Highlighting & Annotations](./blog/markdown-mdx-extended-features/#fully-featured-code-blocks)
 - Customizable Animated Backgrounds (Take a look around!)
 - [Showcase Your GitHub Releases and PRs](./blog/customizing-github-activity-pages)
@@ -47,7 +54,8 @@ This live demo will guide you through setup and customization, offering helpful 
 - Social Media Sharing
 - Keyboard-Friendly
 
-> Preparing to upgrade to Astro 5 with [more features](https://github.com/users/lin-stephanie/projects/4)! 🚀
+> Preparing to upgrade to Astro 5 with
+> [more features](https://github.com/users/lin-stephanie/projects/4)! 🚀
 
 ---
 
@@ -78,7 +86,8 @@ This live demo will guide you through setup and customization, offering helpful 
 
 ---
 
-If you find this theme helpful, consider supporting the project maintainer or the style designer. Your support means more than you know. Thank you! ❤️
+If you find this theme helpful, consider supporting the project maintainer or
+the style designer. Your support means more than you know. Thank you! ❤️
 
 <div class="flex flex-wrap gap-4">
   <a class="btn-rose" href="https://github.com/sponsors/lin-stephanie">

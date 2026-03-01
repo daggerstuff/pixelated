@@ -4,6 +4,7 @@
  */
 
 import type { AstroCookies } from 'astro'
+
 import { authConfig } from '../../config/auth.config'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
@@ -17,7 +18,7 @@ export type { SessionData } from './session'
  * Get the current user from the request or cookies
  */
 export async function getCurrentUser(
-  context: Request | AstroCookies
+  context: Request | AstroCookies,
 ): Promise<{ id: string; role: string } | null> {
   let token: string | null = null
 
@@ -27,7 +28,8 @@ export async function getCurrentUser(
   } else {
     // It's AstroCookies
     // Check for Auth0 token first, then fallback to configured name
-    token = (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
+    token =
+      (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
       (context as AstroCookies).get('auth_token')?.value ||
       null
   }
@@ -65,7 +67,9 @@ export async function hasRole(
 /**
  * Check if the current user is authenticated
  */
-export async function isAuthenticated(context: AstroCookies | Request): Promise<boolean> {
+export async function isAuthenticated(
+  context: AstroCookies | Request,
+): Promise<boolean> {
   const user = await getCurrentUser(context)
   return !!user
 }
@@ -82,14 +86,14 @@ export async function requirePageAuth(
   if (!user) {
     return new Response(null, {
       status: 302,
-      headers: { Location: '/login' }
+      headers: { Location: '/login' },
     })
   }
 
   if (role && user.role !== role) {
     return new Response(null, {
       status: 302,
-      headers: { Location: '/access-denied' }
+      headers: { Location: '/access-denied' },
     })
   }
 
@@ -140,7 +144,9 @@ export async function initializeAuthSystem(): Promise<void> {
     const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
     startTokenCleanupScheduler()
 
-    console.log('✅ Authentication system initialized successfully (Auth0-native)')
+    console.log(
+      '✅ Authentication system initialized successfully (Auth0-native)',
+    )
   } catch (error) {
     console.error('❌ Failed to initialize authentication system:', error)
     throw error

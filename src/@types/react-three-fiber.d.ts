@@ -3,12 +3,12 @@
  * This extends the JSX namespace to include Three.js object properties
  */
 
-import type * as THREE from 'three'
 import type {
   Object3DNode,
   MaterialNode,
   BufferGeometryNode,
 } from '@react-three/fiber'
+import type * as THREE from 'three'
 
 declare global {
   namespace JSX {

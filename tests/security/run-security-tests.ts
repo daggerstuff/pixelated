@@ -14,8 +14,9 @@
 import { spawn } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
-import { fileURLToPath } from 'url'
 import { performance } from 'perf_hooks'
+import { fileURLToPath } from 'url'
+
 import { getEnvironment, getBaseUrl, getSecurityReportPath } from './utils/env'
 
 // Get current directory equivalent to __dirname in CommonJS
@@ -114,7 +115,7 @@ async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
 
     const childProcess = spawn('ts-node', [scriptPath], {
       env: {
-        ...(process.env as NodeJS.ProcessEnv),
+        ...(process.env),
         BASE_URL: config.baseUrl,
         AUTH_TOKEN: config.authToken,
         ADMIN_TOKEN: config.adminToken,

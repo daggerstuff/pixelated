@@ -13,14 +13,15 @@ author: 'Pixelated Team'
 
 ## Overview
 
-This guide provides step-by-step instructions for migrating existing services to use the
-new Redis service implementation. The migration process is designed to be incremental
-and safe, allowing for gradual adoption of the new service while
+This guide provides step-by-step instructions for migrating existing services to
+use the new Redis service implementation. The migration process is designed to
+be incremental and safe, allowing for gradual adoption of the new service while
 maintaining system stability.
 
 ## Migration Steps
 
 1. Update Dependencies
+
    ```bash
    pnpm add ioredis
    ```
@@ -42,7 +43,6 @@ maintaining system stability.
 3. Initialize the Redis Service
 
    ```typescript
-
    const redis = new RedisService({
      url: process.env.REDIS_URL,
      keyPrefix: process.env.REDIS_KEY_PREFIX,
@@ -51,7 +51,6 @@ maintaining system stability.
    await redis.connect()
    ```
 
-
 ## Service-Specific Migration Guides
 
 ### Cache Invalidation Service
@@ -59,6 +58,7 @@ maintaining system stability.
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -115,12 +115,12 @@ maintaining system stability.
    const cacheInvalidation = new CacheInvalidationService(redis)
    ```
 
-
 ### Analytics Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -178,12 +178,12 @@ maintaining system stability.
    const analytics = new AnalyticsService(redis)
    ```
 
-
 ### Pattern Recognition Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -247,12 +247,12 @@ maintaining system stability.
    const patternRecognition = new PatternRecognitionService(redis)
    ```
 
-
 ### Notification Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -316,12 +316,12 @@ maintaining system stability.
    const notification = new NotificationService(redis)
    ```
 
-
 ## Advanced Migration Patterns
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -384,7 +384,6 @@ maintaining system stability.
    })
    const wsServer = new WebSocketServer(redis)
    ```
-
 
 ## Testing the Migration
 

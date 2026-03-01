@@ -1,16 +1,18 @@
-import express from 'express'
-import { createServer } from 'https'
 import { readFileSync } from 'fs'
-import helmet from 'helmet'
+import { createServer } from 'https'
+
 import compression from 'compression'
-import rateLimit from 'express-rate-limit'
 import cors from 'cors'
+import express from 'express'
+import rateLimit from 'express-rate-limit'
+import helmet from 'helmet'
 import Redis from 'ioredis'
 import { Pool } from 'pg'
-import { SocketService } from './services/socketService.js'
-import { createFileRoutes } from './routes/fileRoutes.js'
-import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
+
 import { productionConfig } from './config/production.js'
+import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
+import { createFileRoutes } from './routes/fileRoutes.js'
+import { SocketService } from './services/socketService.js'
 
 const app = express()
 

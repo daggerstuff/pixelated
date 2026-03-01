@@ -3,12 +3,23 @@
  * Coordinates threat intelligence across multiple regions with real-time capabilities
  */
 
+import crypto from 'crypto'
 import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
-import crypto from 'crypto'
-
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
+import { AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
+import { AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
+import { ThreatCorrelationEngine } from '../correlation/ThreatCorrelationEngine'
+import { ThreatIntelligenceDatabase } from '../database/ThreatIntelligenceDatabase'
+import { EdgeThreatDetectionSystem } from '../edge/EdgeThreatDetectionSystem'
+import { ThreatHuntingSystem } from '../hunting/ThreatHuntingSystem'
+import { ExternalThreatFeedIntegration } from '../integration/ExternalThreatFeedIntegration'
+import { AutomatedThreatResponseOrchestrator } from '../orchestration/AutomatedThreatResponseOrchestrator'
+import { ThreatValidationSystem } from '../validation/ThreatValidationSystem'
 import {
   GlobalThreatIntelligenceNetworkConfig,
   GlobalThreatIntelligence,
@@ -19,19 +30,6 @@ import {
   ValidationStatus,
   HealthStatus,
 } from './types'
-
-import { EdgeThreatDetectionSystem } from '../edge/EdgeThreatDetectionSystem'
-import { ThreatCorrelationEngine } from '../correlation/ThreatCorrelationEngine'
-import { ThreatIntelligenceDatabase } from '../database/ThreatIntelligenceDatabase'
-import { AutomatedThreatResponseOrchestrator } from '../orchestration/AutomatedThreatResponseOrchestrator'
-import { ThreatHuntingSystem } from '../hunting/ThreatHuntingSystem'
-import { ExternalThreatFeedIntegration } from '../integration/ExternalThreatFeedIntegration'
-import { ThreatValidationSystem } from '../validation/ThreatValidationSystem'
-
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
-import { ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
-import { AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
 
 const logger = createBuildSafeLogger('global-threat-intelligence-network')
 
@@ -67,7 +65,8 @@ export interface ValidationMetrics {
 
 export class GlobalThreatIntelligenceNetworkCore
   extends EventEmitter
-  implements GlobalThreatIntelligenceNetwork {
+  implements GlobalThreatIntelligenceNetwork
+{
   private redis: Redis
   private mongoClient: MongoClient
   private db: Db
@@ -149,7 +148,7 @@ export class GlobalThreatIntelligenceNetworkCore
     try {
       this.mongoClient = new MongoClient(
         process.env.MONGODB_URI ||
-        'mongodb://localhost:27017/global_threat_intelligence',
+          'mongodb://localhost:27017/global_threat_intelligence',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('global_threat_intelligence')
@@ -614,7 +613,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
       const validThreats = threats.filter(
         (t) => t !== null,
-      ) as GlobalThreatIntelligence[]
+      )
 
       if (validThreats.length === 0) {
         return []

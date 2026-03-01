@@ -3,7 +3,12 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('default')
 
 import fs from 'node:fs'
-import { safeJoin, ALLOWED_DIRECTORIES, validateAndCreateDir } from '../../../utils/path-security'
+
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  validateAndCreateDir,
+} from '../../../utils/path-security'
 
 export interface DatasetPaths {
   openai: string | null
@@ -37,7 +42,11 @@ export async function prepareForOpenAI(): Promise<string | null> {
     logger.info('Preparing dataset for OpenAI format')
 
     // TODO: Implement actual OpenAI dataset preparation
-    const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'prepared')
+    const dataDir = safeJoin(
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      'data',
+      'prepared',
+    )
     const outputPath = safeJoin(dataDir, 'openai_dataset.jsonl')
 
     // Ensure directory exists
@@ -68,7 +77,11 @@ export async function prepareForHuggingFace(): Promise<string | null> {
     logger.info('Preparing dataset for HuggingFace format')
 
     // TODO: Implement actual HuggingFace dataset preparation
-    const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'prepared')
+    const dataDir = safeJoin(
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      'data',
+      'prepared',
+    )
     const outputPath = safeJoin(dataDir, 'huggingface_dataset.json')
 
     // Ensure directory exists

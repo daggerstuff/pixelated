@@ -10,8 +10,9 @@ import { EKSClient } from '@aws-sdk/client-eks'
 import { RDSClient } from '@aws-sdk/client-rds'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Compute, DNS, Storage } from '@google-cloud/compute'
-import { RegionConfig } from './MultiRegionDeploymentManager'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { RegionConfig } from './MultiRegionDeploymentManager'
 
 const logger = createBuildSafeLogger('CloudProviderManager')
 

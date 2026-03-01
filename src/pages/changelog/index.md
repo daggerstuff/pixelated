@@ -8,9 +8,7 @@ ogImage: false
 prerender: true
 ---
 
-<BaseLayout
-  title={frontmatter.title}
-  description={frontmatter.description}
-  bgType={frontmatter.bgType}
-  ogImage={frontmatter.ogImage}
+<BaseLayout title={frontmatter.title} description={frontmatter.description}
+bgType={frontmatter.bgType} ogImage={frontmatter.ogImage}
+
 >

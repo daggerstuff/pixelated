@@ -1,7 +1,7 @@
-import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
 import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
+import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Define the ExtendedEmotionAnalysis interface that includes sessionId
 interface ExtendedEmotionAnalysis extends EmotionAnalysis {

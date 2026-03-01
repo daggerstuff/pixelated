@@ -8,8 +8,8 @@ groups:
   - healthcare
 
 dependencies:
-  codeql/javascript-all: "*"
-  codeql/javascript-queries: "*"
+  codeql/javascript-all: '*'
+  codeql/javascript-queries: '*'
 
 # Extend the JavaScript query pack
 extractor: javascript

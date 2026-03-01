@@ -1,13 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Textarea } from '@/components/ui/textarea'
 import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
+
+import BrainVisualization from './BrainVisualization'
 import MindMirrorDashboard, {
   type MindMirrorAnalysis,
 } from './MindMirrorDashboard'
-import BrainVisualization from './BrainVisualization'
 
 interface Message {
   id: string
@@ -269,40 +271,40 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSend()
+      void handleSend()
     }
   }
 
   return (
-    <div className={`flex gap-6 w-full max-w-7xl mx-auto ${className}`}>
+    <div className={`mx-auto flex w-full max-w-7xl gap-6 ${className}`}>
       {/* Main Chat Interface */}
       <div className={`flex-1 ${showAnalysisPanel ? 'max-w-[60%]' : 'w-full'}`}>
-        <Card className="h-[700px] flex flex-col shadow-lg border-0">
+        <Card className='flex h-[700px] flex-col border-0 shadow-lg'>
           {/* Header */}
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-white" />
+          <CardHeader className='from-purple-50 to-blue-50 border-b bg-gradient-to-r'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center space-x-3'>
+                <div className='from-purple-500 to-blue-600 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r'>
+                  <Brain className='text-white h-5 w-5' />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">
+                  <CardTitle className='text-lg'>
                     Enhanced Mental Health Chat
                   </CardTitle>
-                  <p className="text-sm text-gray-600">
+                  <p className='text-gray-600 text-sm'>
                     Real-time psychological analysis
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className='flex items-center space-x-2'>
                 {isAnalyzing && (
-                  <Badge variant="secondary" className="animate-pulse">
-                    <Activity className="w-3 h-3 mr-1" />
+                  <Badge variant='secondary' className='animate-pulse'>
+                    <Activity className='mr-1 h-3 w-3' />
                     Analyzing...
                   </Badge>
                 )}
-                <Badge variant="outline">
-                  <Sparkles className="w-3 h-3 mr-1" />
+                <Badge variant='outline'>
+                  <Sparkles className='mr-1 h-3 w-3' />
                   AI Enhanced
                 </Badge>
               </div>
@@ -310,7 +312,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
           </CardHeader>
 
           {/* Messages */}
-          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+          <CardContent className='flex-1 space-y-4 overflow-y-auto p-4'>
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -319,21 +321,21 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                 <div
                   className={`max-w-[80%] rounded-lg p-3 ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                      ? 'from-blue-500 to-purple-600 text-white bg-gradient-to-r'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  <div className="flex items-start space-x-2">
+                  <div className='flex items-start space-x-2'>
                     {message.role === 'assistant' && (
-                      <Bot className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <Bot className='mt-0.5 h-4 w-4 flex-shrink-0' />
                     )}
                     {message.role === 'user' && (
-                      <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <User className='mt-0.5 h-4 w-4 flex-shrink-0' />
                     )}
-                    <div className="flex-1">
-                      <p className="text-sm">{message.content}</p>
+                    <div className='flex-1'>
+                      <p className='text-sm'>{message.content}</p>
                       <p
-                        className={`text-xs mt-1 ${
+                        className={`mt-1 text-xs ${
                           message.role === 'user'
                             ? 'text-blue-100'
                             : 'text-gray-500'
@@ -350,22 +352,22 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
           </CardContent>
 
           {/* Input */}
-          <div className="p-4 border-t bg-gray-50">
-            <div className="flex space-x-2">
+          <div className='bg-gray-50 border-t p-4'>
+            <div className='flex space-x-2'>
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Share your thoughts and feelings..."
-                className="flex-1 min-h-[60px] resize-none"
+                placeholder='Share your thoughts and feelings...'
+                className='min-h-[60px] flex-1 resize-none'
                 disabled={isAnalyzing}
               />
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || isAnalyzing}
-                className="self-end bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
+                className='from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 self-end bg-gradient-to-r'
               >
-                <Send className="w-4 h-4" />
+                <Send className='h-4 w-4' />
               </Button>
             </div>
           </div>
@@ -374,7 +376,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
 
       {/* Analysis Panel */}
       {showAnalysisPanel && (
-        <div className="w-[40%] space-y-6">
+        <div className='w-[40%] space-y-6'>
           {/* Brain Visualization */}
           {showBrainViz && (
             <BrainVisualization

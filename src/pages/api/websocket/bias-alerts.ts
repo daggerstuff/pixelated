@@ -6,8 +6,9 @@
  * bias detection alerts and dashboard updates.
  */
 
-import { BiasWebSocketServer } from '../../../lib/services/websocket/BiasWebSocketServer'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { BiasWebSocketServer } from '../../../lib/services/websocket/BiasWebSocketServer'
 
 const logger = createBuildSafeLogger('BiasAlertsWebSocketAPI')
 

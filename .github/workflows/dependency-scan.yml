@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [master]
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: '0 0 * * 0'
 
 jobs:
   node_scan:
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: '24'
 
       - name: Validate package.json
         run: |
@@ -50,12 +50,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install uv (force latest secure version)
         uses: astral-sh/setup-uv@v7
         with:
-          version: ">=0.9.6"
+          version: '>=0.9.6'
 
       - name: Ensure pip is at secure version
         run: |

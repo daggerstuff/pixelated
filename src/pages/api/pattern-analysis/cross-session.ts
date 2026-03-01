@@ -1,8 +1,8 @@
+import type { TherapySession } from '@/lib/ai/AIService'
 // import type { APIRoute } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
-import type { TherapySession } from '@/lib/ai/AIService'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Get logger instance
 const logger = createBuildSafeLogger('api-pattern-cross-session')

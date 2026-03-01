@@ -5,8 +5,9 @@
  * It uses dynamic imports to prevent bundling Node.js modules with client code
  */
 
-import type { StorageProviderConfig } from '../backup-types'
 import type { Dirent } from 'fs'
+
+import type { StorageProviderConfig } from '../backup-types'
 
 interface FileSystem {
   mkdir: (

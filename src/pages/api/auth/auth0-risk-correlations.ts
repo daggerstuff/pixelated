@@ -4,13 +4,14 @@
  */
 
 import type { APIRoute } from 'astro'
+
+import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
+import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
-import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createAuditLog } from '@/lib/audit'
-import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
+import { getUserById } from '@/services/auth0.service'
 
 // Define the ExtendedEmotionAnalysis interface that includes sessionId
 interface ExtendedEmotionAnalysis extends EmotionAnalysis {
@@ -40,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -53,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -83,7 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           error: 'Failed to parse request body',
           details: error instanceof Error ? error.message : String(error),
-        }
+        },
       )
 
       return new Response(
@@ -165,8 +166,8 @@ export const POST: APIRoute = async ({ request }) => {
         {
           action: 'analyze_risk_correlations',
           clientId,
-          reason: 'no_access_to_client'
-        }
+          reason: 'no_access_to_client',
+        },
       )
 
       return new Response(
@@ -187,8 +188,8 @@ export const POST: APIRoute = async ({ request }) => {
       {
         action: 'analyze_risk_correlations',
         clientId,
-        analysesCount: validAnalyses.length
-      }
+        analysesCount: validAnalyses.length,
+      },
     )
 
     logger.info('Processing risk correlation request', {
@@ -234,7 +235,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     // Return an error response

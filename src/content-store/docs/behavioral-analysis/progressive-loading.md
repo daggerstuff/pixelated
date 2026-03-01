@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-The Progressive Loading system enables efficient loading and rendering of large AI datasets and analysis results. This document outlines the implementation details, best practices, and integration points for the progressive loading system used in the therapy and behavioral analysis platform.
+The Progressive Loading system enables efficient loading and rendering of large
+AI datasets and analysis results. This document outlines the implementation
+details, best practices, and integration points for the progressive loading
+system used in the therapy and behavioral analysis platform.
 
 ## Core Components
 

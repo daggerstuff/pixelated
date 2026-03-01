@@ -8,11 +8,16 @@
 
 import type { APIRoute, APIContext } from 'astro'
 import { z } from 'zod'
-import { getSessionFromRequest } from '@/utils/auth'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { applyRateLimit } from '@/lib/api/rate-limit'
+import {
+  createHIPAACompliantAuditLog,
+  AuditEventType,
+  AuditEventStatus,
+} from '@/lib/audit'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { validateRequestBody } from '@/lib/validation/index'
-import { createHIPAACompliantAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+import { getSessionFromRequest } from '@/utils/auth'
 
 const logger = createBuildSafeLogger('pixel-inference')
 
@@ -21,59 +26,59 @@ const logger = createBuildSafeLogger('pixel-inference')
 // ============================================================================
 
 interface ConversationMessage {
-    role: 'user' | 'assistant' | 'system'
-    content: string
-    timestamp?: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  timestamp?: string
 }
 
 interface EQScores {
-    emotional_awareness: number
-    empathy_recognition: number
-    emotional_regulation: number
-    social_cognition: number
-    interpersonal_skills: number
-    overall_eq: number
+  emotional_awareness: number
+  empathy_recognition: number
+  emotional_regulation: number
+  social_cognition: number
+  interpersonal_skills: number
+  overall_eq: number
 }
 
 interface ConversationMetadata {
-    detected_techniques: string[]
-    technique_consistency: number
-    bias_score: number
-    safety_score: number
-    crisis_signals?: string[]
-    therapeutic_effectiveness_score: number
+  detected_techniques: string[]
+  technique_consistency: number
+  bias_score: number
+  safety_score: number
+  crisis_signals?: string[]
+  therapeutic_effectiveness_score: number
 }
 
 interface PixelInferenceResponse {
-    response: string
-    inference_time_ms: number
-    eq_scores?: EQScores
-    conversation_metadata?: ConversationMetadata
-    persona_mode: 'therapy' | 'assistant'
-    confidence: number
-    warning?: string
+  response: string
+  inference_time_ms: number
+  eq_scores?: EQScores
+  conversation_metadata?: ConversationMetadata
+  persona_mode: 'therapy' | 'assistant'
+  confidence: number
+  warning?: string
 }
 
 interface PixelInferenceRequest {
-    user_query: string
-    conversation_history?: ConversationMessage[]
-    context_type?: string
-    user_id?: string
-    session_id?: string
-    use_eq_awareness?: boolean
-    include_metrics?: boolean
-    max_tokens?: number
-    plutchik_scores?: Record<string, number>
-    ocean_scores?: Record<string, number>
+  user_query: string
+  conversation_history?: ConversationMessage[]
+  context_type?: string
+  user_id?: string
+  session_id?: string
+  use_eq_awareness?: boolean
+  include_metrics?: boolean
+  max_tokens?: number
+  plutchik_scores?: Record<string, number>
+  ocean_scores?: Record<string, number>
 }
 
 interface ModelStatusResponse {
-    model_loaded: boolean
-    model_name: string
-    inference_engine: string
-    available_features: string[]
-    performance_metrics: Record<string, unknown>
-    last_inference_time_ms?: number
+  model_loaded: boolean
+  model_name: string
+  inference_engine: string
+  available_features: string[]
+  performance_metrics: Record<string, unknown>
+  last_inference_time_ms?: number
 }
 
 // ============================================================================
@@ -93,55 +98,60 @@ const MAX_RETRIES = 3
  * Call Pixel inference service with error handling and retries
  */
 async function callPixelService(
-    endpoint: string,
-    method: 'GET' | 'POST' = 'POST',
-    body?: unknown,
-    retries = 0,
+  endpoint: string,
+  method: 'GET' | 'POST' = 'POST',
+  body?: unknown,
+  retries = 0,
 ): Promise<unknown> {
-    try {
-        const url = `${PIXEL_API_URL}${endpoint}`
-        const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-        }
-
-        if (PIXEL_API_KEY) {
-            headers['Authorization'] = `Bearer ${PIXEL_API_KEY}`
-        }
-
-        const fetchOptions: RequestInit = {
-            method,
-            headers,
-            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-        }
-
-        if (method !== 'GET' && body) {
-            fetchOptions.body = JSON.stringify(body)
-        }
-
-        const response = await fetch(url, fetchOptions)
-
-        if (!response.ok) {
-            const error = await response.text()
-            throw new Error(`Pixel API error: ${response.status} ${error}`)
-        }
-
-        return await response.json()
-    } catch (error) {
-        if (retries < MAX_RETRIES) {
-            logger.warn(`Pixel API call failed, retrying (${retries + 1}/${MAX_RETRIES})`, {
-                error: error instanceof Error ? error.message : String(error),
-            })
-            // Exponential backoff
-            await new Promise((resolve) => setTimeout(resolve, Math.pow(2, retries) * 1000))
-            return callPixelService(endpoint, method, body, retries + 1)
-        }
-
-        logger.error('Pixel API call failed after retries', {
-            endpoint,
-            error: error instanceof Error ? error.message : String(error),
-        })
-        throw error
+  try {
+    const url = `${PIXEL_API_URL}${endpoint}`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
     }
+
+    if (PIXEL_API_KEY) {
+      headers['Authorization'] = `Bearer ${PIXEL_API_KEY}`
+    }
+
+    const fetchOptions: RequestInit = {
+      method,
+      headers,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    }
+
+    if (method !== 'GET' && body) {
+      fetchOptions.body = JSON.stringify(body)
+    }
+
+    const response = await fetch(url, fetchOptions)
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Pixel API error: ${response.status} ${error}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    if (retries < MAX_RETRIES) {
+      logger.warn(
+        `Pixel API call failed, retrying (${retries + 1}/${MAX_RETRIES})`,
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      )
+      // Exponential backoff
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.pow(2, retries) * 1000),
+      )
+      return callPixelService(endpoint, method, body, retries + 1)
+    }
+
+    logger.error('Pixel API call failed after retries', {
+      endpoint,
+      error: error instanceof Error ? error.message : String(error),
+    })
+    throw error
+  }
 }
 
 // ============================================================================
@@ -153,58 +163,61 @@ async function callPixelService(
  * Get Pixel model status and performance metrics
  */
 export const GET: APIRoute = async ({ request }: APIContext) => {
-    try {
-        const session = await getSessionFromRequest(request)
-        if (!session?.user) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' },
-            })
-        }
-
-        // Apply rate limit
-        const rateLimitResult = await applyRateLimit(request, 'pixel-status', {
-            limits: { user: 100 }
-        })
-        if (!rateLimitResult.result.allowed) {
-            return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
-                status: 429,
-                headers: rateLimitResult.headers,
-            })
-        }
-
-        const status = (await callPixelService('/status', 'GET')) as ModelStatusResponse
-
-        // Create audit log
-        await createHIPAACompliantAuditLog({
-            userId: session.user.id,
-            eventType: AuditEventType.AI_MODEL_ACCESS,
-            status: AuditEventStatus.SUCCESS,
-            action: 'status_check',
-            resource: 'Pixel',
-            details: { model: 'Pixel', action: 'status_check' },
-        })
-
-        return new Response(JSON.stringify(status), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        })
-    } catch (error: unknown) {
-        logger.error('Failed to get Pixel status', {
-            error: error instanceof Error ? error.message : String(error),
-        })
-
-        return new Response(
-            JSON.stringify({
-                error: 'Failed to get Pixel model status',
-                message: error instanceof Error ? error.message : 'Unknown error',
-            }),
-            {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' },
-            },
-        )
+  try {
+    const session = await getSessionFromRequest(request)
+    if (!session?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
+
+    // Apply rate limit
+    const rateLimitResult = await applyRateLimit(request, 'pixel-status', {
+      limits: { user: 100 },
+    })
+    if (!rateLimitResult.result.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: rateLimitResult.headers,
+      })
+    }
+
+    const status = (await callPixelService(
+      '/status',
+      'GET',
+    )) as ModelStatusResponse
+
+    // Create audit log
+    await createHIPAACompliantAuditLog({
+      userId: session.user.id,
+      eventType: AuditEventType.AI_MODEL_ACCESS,
+      status: AuditEventStatus.SUCCESS,
+      action: 'status_check',
+      resource: 'Pixel',
+      details: { model: 'Pixel', action: 'status_check' },
+    })
+
+    return new Response(JSON.stringify(status), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (error: unknown) {
+    logger.error('Failed to get Pixel status', {
+      error: error instanceof Error ? error.message : String(error),
+    })
+
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get Pixel model status',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
 }
 
 /**
@@ -212,117 +225,141 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
  * Generate response using Pixel model
  */
 export const POST: APIRoute = async ({ request }: APIContext) => {
-    try {
-        const session = await getSessionFromRequest(request)
-        if (!session?.user) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' },
-            })
-        }
-
-        // Apply rate limit
-        const limitConfig = {
-            limits: {
-                user: session.user.role === 'admin' ? 120 : session.user.role === 'therapist' ? 80 : 40
-            }
-        }
-        const rateLimitResult = await applyRateLimit(request, 'pixel-inference', limitConfig)
-        if (!rateLimitResult.result.allowed) {
-            return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
-                status: 429,
-                headers: rateLimitResult.headers,
-            })
-        }
-
-        // Validate request
-        const inferenceSchema = z.object({
-            user_query: z.string(),
-            conversation_history: z.array(z.any()).optional(),
-            context_type: z.string().optional(),
-            user_id: z.string().optional(),
-            session_id: z.string().optional(),
-            use_eq_awareness: z.boolean().optional(),
-            include_metrics: z.boolean().optional(),
-            max_tokens: z.number().optional(),
-            plutchik_scores: z.record(z.string(), z.number()).optional(),
-            ocean_scores: z.record(z.string(), z.number()).optional(),
-        })
-
-        const [validatedData, validationError] = await validateRequestBody(request, inferenceSchema)
-
-        if (validationError || !validatedData) {
-            return new Response(JSON.stringify({ error: 'Invalid request', details: validationError?.details }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            })
-        }
-
-        const body = validatedData as any
-
-        const pixelRequest: PixelInferenceRequest = {
-            user_query: body.user_query,
-            conversation_history: body.conversation_history || [],
-            context_type: body.context_type,
-            user_id: body.user_id || session.user.id,
-            session_id: body.session_id,
-            use_eq_awareness: body.use_eq_awareness !== false,
-            include_metrics: body.include_metrics !== false,
-            max_tokens: body.max_tokens || 200,
-            plutchik_scores: body.plutchik_scores,
-            ocean_scores: body.ocean_scores,
-        }
-
-        // Call Pixel inference service
-        const response = (await callPixelService('/infer', 'POST', pixelRequest)) as PixelInferenceResponse
-
-        // Check for crisis signals
-        let crisisDetected = false
-        if (
-            response.conversation_metadata?.crisis_signals &&
-            response.conversation_metadata.crisis_signals.length > 0
-        ) {
-            crisisDetected = true
-            logger.warn('Crisis signal detected in Pixel inference', {
-                userId: session.user.id,
-                signals: response.conversation_metadata.crisis_signals,
-            })
-        }
-
-        // Create audit log
-        await createHIPAACompliantAuditLog({
-            userId: session.user.id,
-            eventType: AuditEventType.AI_GENERATION,
-            status: crisisDetected ? AuditEventStatus.WARNING : AuditEventStatus.SUCCESS,
-            action: 'ai_generation',
-            resource: 'Pixel',
-            details: {
-                model: 'Pixel',
-                inference_time_ms: response.inference_time_ms,
-                eq_overall: response.eq_scores?.overall_eq,
-                persona_mode: response.persona_mode,
-                crisis_detected: crisisDetected,
-            },
-        })
-
-        return new Response(JSON.stringify(response), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        })
-    } catch (error: unknown) {
-        logger.error('Pixel inference failed', {
-            error: error instanceof Error ? error.message : String(error),
-        })
-
-        return new Response(
-            JSON.stringify({
-                error: 'Pixel inference failed',
-                message: error instanceof Error ? error.message : 'Unknown error',
-            }),
-            {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' },
-            },
-        )
+  try {
+    const session = await getSessionFromRequest(request)
+    if (!session?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
+
+    // Apply rate limit
+    const limitConfig = {
+      limits: {
+        user:
+          session.user.role === 'admin'
+            ? 120
+            : session.user.role === 'therapist'
+              ? 80
+              : 40,
+      },
+    }
+    const rateLimitResult = await applyRateLimit(
+      request,
+      'pixel-inference',
+      limitConfig,
+    )
+    if (!rateLimitResult.result.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: rateLimitResult.headers,
+      })
+    }
+
+    // Validate request
+    const inferenceSchema = z.object({
+      user_query: z.string(),
+      conversation_history: z.array(z.any()).optional(),
+      context_type: z.string().optional(),
+      user_id: z.string().optional(),
+      session_id: z.string().optional(),
+      use_eq_awareness: z.boolean().optional(),
+      include_metrics: z.boolean().optional(),
+      max_tokens: z.number().optional(),
+      plutchik_scores: z.record(z.string(), z.number()).optional(),
+      ocean_scores: z.record(z.string(), z.number()).optional(),
+    })
+
+    const [validatedData, validationError] = await validateRequestBody(
+      request,
+      inferenceSchema,
+    )
+
+    if (validationError || !validatedData) {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid request',
+          details: validationError?.details,
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    const body = validatedData as any
+
+    const pixelRequest: PixelInferenceRequest = {
+      user_query: body.user_query,
+      conversation_history: body.conversation_history || [],
+      context_type: body.context_type,
+      user_id: body.user_id || session.user.id,
+      session_id: body.session_id,
+      use_eq_awareness: body.use_eq_awareness !== false,
+      include_metrics: body.include_metrics !== false,
+      max_tokens: body.max_tokens || 200,
+      plutchik_scores: body.plutchik_scores,
+      ocean_scores: body.ocean_scores,
+    }
+
+    // Call Pixel inference service
+    const response = (await callPixelService(
+      '/infer',
+      'POST',
+      pixelRequest,
+    )) as PixelInferenceResponse
+
+    // Check for crisis signals
+    let crisisDetected = false
+    if (
+      response.conversation_metadata?.crisis_signals &&
+      response.conversation_metadata.crisis_signals.length > 0
+    ) {
+      crisisDetected = true
+      logger.warn('Crisis signal detected in Pixel inference', {
+        userId: session.user.id,
+        signals: response.conversation_metadata.crisis_signals,
+      })
+    }
+
+    // Create audit log
+    await createHIPAACompliantAuditLog({
+      userId: session.user.id,
+      eventType: AuditEventType.AI_GENERATION,
+      status: crisisDetected
+        ? AuditEventStatus.WARNING
+        : AuditEventStatus.SUCCESS,
+      action: 'ai_generation',
+      resource: 'Pixel',
+      details: {
+        model: 'Pixel',
+        inference_time_ms: response.inference_time_ms,
+        eq_overall: response.eq_scores?.overall_eq,
+        persona_mode: response.persona_mode,
+        crisis_detected: crisisDetected,
+      },
+    })
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (error: unknown) {
+    logger.error('Pixel inference failed', {
+      error: error instanceof Error ? error.message : String(error),
+    })
+
+    return new Response(
+      JSON.stringify({
+        error: 'Pixel inference failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
 }

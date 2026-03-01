@@ -3,20 +3,19 @@ type RemarkPlugin = unknown
 type RehypePlugin = unknown
 type RemarkPlugins = Array<RemarkPlugin | [RemarkPlugin, unknown]>
 type RehypePlugins = Array<RehypePlugin | [RehypePlugin, unknown]>
-import type { CreateProperties } from 'rehype-external-links'
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeCallouts from 'rehype-callouts'
+import type { CreateProperties } from 'rehype-external-links'
 import rehypeExternalLinks from 'rehype-external-links'
 import rehypeKatex from 'rehype-katex'
 import remarkDirective from 'remark-directive'
-
 import remarkImgattr from 'remark-imgattr'
 import remarkMath from 'remark-math'
 import { visit, type Visitor } from 'unist-util-visit'
+
 import { UI } from '../src/config'
 import remarkDirectiveSugar from './remark-directive-sugar'
-
 import remarkImageContainer from './remark-image-container'
 import remarkReadingTime from './remark-reading-time'
 
@@ -94,7 +93,7 @@ export const rehypePlugins: RehypePlugins = [
 
         return {
           'u-i-lucide-external-link': true,
-          'className': ['new-tab-icon'],
+          className: ['new-tab-icon'],
           'aria-hidden': 'true',
         }
       },
@@ -115,9 +114,9 @@ export const rehypePlugins: RehypePlugins = [
           ) {
             props['className'] = Array.isArray(el.properties?.['className'])
               ? [
-                ...(el.properties!['className'] as string[]),
-                'external-link-cursor',
-              ]
+                  ...(el.properties['className'] as string[]),
+                  'external-link-cursor',
+                ]
               : ['external-link-cursor']
           }
         }
@@ -137,7 +136,7 @@ export const rehypePlugins: RehypePlugins = [
           content += textNode.value
         })
         return {
-          'class': 'header-anchor',
+          class: 'header-anchor',
           'tab-index': 0,
           'aria-hidden': 'false',
           'aria-label': content ? `Link to ${content}` : undefined,

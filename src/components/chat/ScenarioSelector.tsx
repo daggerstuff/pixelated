@@ -1,4 +1,5 @@
 import type { Scenario } from '@/types/scenarios'
+
 import { IconChevronDown, IconUserCircle } from './icons'
 
 interface ScenarioSelectorProps {
@@ -17,13 +18,13 @@ export function ScenarioSelector({
   onSelect,
 }: ScenarioSelectorProps) {
   return (
-    <div className="relative mb-4">
+    <div className='relative mb-4'>
       <button
         onClick={() => setShowScenarios(!showScenarios)}
-        className="flex justify-between items-center w-full p-2 border border-purple-700 rounded-md bg-black bg-opacity-50 text-left"
+        className='border-purple-700 bg-black flex w-full items-center justify-between rounded-md border bg-opacity-50 p-2 text-left'
       >
-        <span className="flex items-center">
-          <IconUserCircle className="h-5 w-5 mr-2 text-purple-500" />
+        <span className='flex items-center'>
+          <IconUserCircle className='text-purple-500 mr-2 h-5 w-5' />
 
           <span>
             Scenario: <strong>{selectedScenario.name}</strong>
@@ -35,15 +36,15 @@ export function ScenarioSelector({
       </button>
 
       {showScenarios && (
-        <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg bg-black bg-opacity-80 border border-purple-800">
+        <div className='bg-black border-purple-800 absolute z-10 mt-1 w-full rounded-md border bg-opacity-80 shadow-lg'>
           {scenarios.map((scenario) => (
             <button
               key={scenario.name}
-              className="block w-full px-4 py-2 text-left hover:bg-purple-900 first:rounded-t-md last:rounded-b-md"
+              className='hover:bg-purple-900 block w-full px-4 py-2 text-left first:rounded-t-md last:rounded-b-md'
               onClick={() => onSelect(scenario)}
             >
-              <div className="font-medium">{scenario.name}</div>
-              <div className="text-sm text-gray-300">
+              <div className='font-medium'>{scenario.name}</div>
+              <div className='text-gray-300 text-sm'>
                 {scenario.description}
               </div>
             </button>

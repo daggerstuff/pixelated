@@ -5,6 +5,9 @@
  * with support for FHE encryption and multidimensional emotion mapping.
  */
 
+import { v4 as uuidv4 } from 'uuid'
+
+import type { FHESystem } from '../../fhe/index'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   EmotionAnalysis,
@@ -12,8 +15,6 @@ import type {
   EmotionDimensions,
   EmotionMetadata,
 } from '../emotions/types'
-import type { FHESystem } from '../../fhe/index'
-import { v4 as uuidv4 } from 'uuid'
 
 const logger = createBuildSafeLogger('EmotionLlamaProvider')
 
@@ -80,7 +81,7 @@ export class EmotionLlamaProvider {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'X-Model-Version': this.modelVersion,
         },
         body: JSON.stringify(payload),
@@ -103,13 +104,17 @@ export class EmotionLlamaProvider {
         return this.fallbackAnalysis(text, startTime)
       }
 
-      const result = (await response.json()) as any
+      const result = (await response.json())
 
       // Decrypt and process the response
       const decryptedResult = await this.processEncryptedResponse(result)
 
       // Convert to standardized format
-      const analysis = this.convertToEmotionAnalysis(decryptedResult, text, startTime)
+      const analysis = this.convertToEmotionAnalysis(
+        decryptedResult,
+        text,
+        startTime,
+      )
       const totalDurationMs = Date.now() - startTime
 
       // Track successful analysis metrics
@@ -159,7 +164,9 @@ export class EmotionLlamaProvider {
       }
     } catch (error: unknown) {
       logger.error('Error processing encrypted response', { error })
-      throw new Error('Failed to decrypt emotion analysis response', { cause: error })
+      throw new Error('Failed to decrypt emotion analysis response', {
+        cause: error,
+      })
     }
   }
 

@@ -1,11 +1,13 @@
 import type { WebSocket } from 'ws'
-import { config } from '@/config/env.config'
-import { EmailService, type EmailConfig } from '@/lib/email'
-import { redis } from '@/lib/redis'
-import type { IRedisService } from '../redis/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
 import { z } from 'zod'
+
+import { config } from '@/config/env.config'
+import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
+import { EmailService, type EmailConfig } from '@/lib/email'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { redis } from '@/lib/redis'
+
+import type { IRedisService } from '../redis/types'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'
 import { sendSMS, isValidPhoneNumber } from './smsUtils'
@@ -348,12 +350,16 @@ export class NotificationService {
    * Start processing notifications at a specific interval
    */
   async startProcessing(interval: number): Promise<void> {
-    logger.info(`Starting notification processing loop (interval: ${interval}ms)`)
+    logger.info(
+      `Starting notification processing loop (interval: ${interval}ms)`,
+    )
     while (true) {
       try {
         await this.processQueue()
       } catch (error) {
-        logger.error('Error in notification processing loop', { error: error instanceof Error ? String(error) : String(error) })
+        logger.error('Error in notification processing loop', {
+          error: error instanceof Error ? String(error) : String(error),
+        })
       }
       await new Promise((resolve) => setTimeout(resolve, interval))
     }
@@ -464,7 +470,7 @@ export class NotificationService {
     }
 
     const parsed = NotificationItemSchema.parse(
-      JSON.parse(notification as string) as NotificationItem,
+      JSON.parse(notification) as NotificationItem,
     )
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
@@ -494,7 +500,7 @@ export class NotificationService {
     return Object.values(notifications)
       .map((n) =>
         NotificationItemSchema.parse(
-          JSON.parse(n as string) as NotificationItem,
+          JSON.parse(n) as NotificationItem,
         ),
       )
       .sort((a, b) => b.createdAt - a.createdAt)
@@ -515,7 +521,7 @@ export class NotificationService {
     return Object.values(notifications)
       .map((n) =>
         NotificationItemSchema.parse(
-          JSON.parse(n as string) as NotificationItem,
+          JSON.parse(n) as NotificationItem,
         ),
       )
       .filter((n) => n.status !== NotificationStatus.READ).length
@@ -574,7 +580,7 @@ export class NotificationService {
     if (!subscription) {
       return null
     }
-    return JSON.parse(subscription as string) as PushSubscription | null
+    return JSON.parse(subscription) as PushSubscription | null
   }
 
   /**
@@ -615,7 +621,7 @@ export class NotificationService {
     } catch (error: unknown) {
       if (
         error instanceof Error &&
-        (error as Error)?.name === 'ExpiredSubscriptionError'
+        (error)?.name === 'ExpiredSubscriptionError'
       ) {
         await this.removePushSubscription(notification.userId)
         logger.info('Removed expired push subscription', {

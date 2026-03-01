@@ -9,6 +9,7 @@
  * - Performance monitoring
  */
 
+import { Provider as JotaiProvider } from 'jotai'
 import type { ReactNode } from 'react'
 import React, {
   createContext,
@@ -17,9 +18,9 @@ import React, {
   useState,
   useCallback,
 } from 'react'
-import { Provider as JotaiProvider } from 'jotai'
-import { persistenceManager } from '@/lib/state/jotai-persistence'
+
 import { logger } from '@/lib/logger'
+import { persistenceManager } from '@/lib/state/jotai-persistence'
 
 // ============================================================================
 // Types
@@ -91,7 +92,7 @@ export function StatePersistenceProvider({
         // Set up automatic backups if enabled
         if (enableBackups && typeof window !== 'undefined') {
           backupTimer = setInterval(() => {
-            createBackup()
+            void createBackup()
           }, backupInterval)
 
           if (debug) {
@@ -114,7 +115,7 @@ export function StatePersistenceProvider({
       }
     }
 
-    initializePersistence()
+    void initializePersistence()
 
     // Cleanup function
     return () => {
@@ -141,7 +142,7 @@ export function StatePersistenceProvider({
     const monitorStorage = () => {
       try {
         if ('storage' in navigator && 'estimate' in navigator.storage) {
-          navigator.storage.estimate().then((estimate) => {
+          void navigator.storage.estimate().then((estimate) => {
             const usageRatio =
               estimate.usage && estimate.quota
                 ? estimate.usage / estimate.quota
@@ -404,11 +405,11 @@ export function StatePersistenceDebugger() {
         <button onClick={refreshStats}>Refresh</button>
         <button onClick={handleExport}>Export</button>
         <input
-          type="file"
-          accept=".json"
+          type='file'
+          accept='.json'
           onChange={handleImport}
           style={{ display: 'none' }}
-          id="import-input"
+          id='import-input'
         />
         <button
           onClick={() =>

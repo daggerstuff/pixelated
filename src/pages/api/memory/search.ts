@@ -1,4 +1,5 @@
 import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
+
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { MemoryService } from '../../../lib/memory'
 
@@ -61,26 +62,29 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
       offset,
     })
 
-    return new Response(JSON.stringify({
-      success: true,
-      memories: result,
-      query,
-      pagination: {
-        limit,
-        offset,
-        total: result.length
+    return new Response(
+      JSON.stringify({
+        success: true,
+        memories: result,
+        query,
+        pagination: {
+          limit,
+          offset,
+          total: result.length,
+        },
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      }
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    )
   } catch (error: unknown) {
     logger.error('Error searching memories:', error)
 

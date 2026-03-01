@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react'
-import { Canvas, useFrame, extend } from '@react-three/fiber'
 import { OrbitControls, Text, Line } from '@react-three/drei'
+import { Canvas, useFrame, extend } from '@react-three/fiber'
+import React, { useRef, useMemo, useState, useEffect } from 'react'
 import * as THREE from 'three'
 
 // Extend Three.js objects for react-three-fiber
@@ -80,9 +80,9 @@ const EmotionSphere: React.FC<{ point: EmotionPoint; index: number }> = ({
         <Text
           position={[0, 0.3, 0]}
           fontSize={0.2}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
+          color='white'
+          anchorX='center'
+          anchorY='middle'
         >
           {point.emotion}
         </Text>
@@ -110,7 +110,7 @@ const EmotionTrail: React.FC<{ points: EmotionPoint[] }> = ({ points }) => {
   return (
     <Line
       points={trailPoints}
-      color="#64748B"
+      color='#64748B'
       lineWidth={2}
       transparent
       opacity={0.6}
@@ -127,13 +127,13 @@ const CoordinateAxes: React.FC = () => {
           [-4, 0, 0],
           [4, 0, 0],
         ]}
-        color="#EF4444"
+        color='#EF4444'
         lineWidth={2}
       />
-      <Text position={[4.2, 0, 0]} fontSize={0.3} color="#EF4444">
+      <Text position={[4.2, 0, 0]} fontSize={0.3} color='#EF4444'>
         Valence+
       </Text>
-      <Text position={[-4.2, 0, 0]} fontSize={0.3} color="#EF4444">
+      <Text position={[-4.2, 0, 0]} fontSize={0.3} color='#EF4444'>
         Valence-
       </Text>
 
@@ -143,13 +143,13 @@ const CoordinateAxes: React.FC = () => {
           [0, -4, 0],
           [0, 4, 0],
         ]}
-        color="#10B981"
+        color='#10B981'
         lineWidth={2}
       />
-      <Text position={[0, 4.2, 0]} fontSize={0.3} color="#10B981">
+      <Text position={[0, 4.2, 0]} fontSize={0.3} color='#10B981'>
         Arousal+
       </Text>
-      <Text position={[0, -4.2, 0]} fontSize={0.3} color="#10B981">
+      <Text position={[0, -4.2, 0]} fontSize={0.3} color='#10B981'>
         Arousal-
       </Text>
 
@@ -159,13 +159,13 @@ const CoordinateAxes: React.FC = () => {
           [0, 0, -4],
           [0, 0, 4],
         ]}
-        color="#3B82F6"
+        color='#3B82F6'
         lineWidth={2}
       />
-      <Text position={[0, 0, 4.2]} fontSize={0.3} color="#3B82F6">
+      <Text position={[0, 0, 4.2]} fontSize={0.3} color='#3B82F6'>
         Dominance+
       </Text>
-      <Text position={[0, 0, -4.2]} fontSize={0.3} color="#3B82F6">
+      <Text position={[0, 0, -4.2]} fontSize={0.3} color='#3B82F6'>
         Dominance-
       </Text>
     </group>
@@ -280,7 +280,7 @@ const MultidimensionalEmotionChart: React.FC<
 
   return (
     <div
-      className={`w-full h-96 bg-gray-900 rounded-lg overflow-hidden ${className}`}
+      className={`bg-gray-900 h-96 w-full overflow-hidden rounded-lg ${className}`}
     >
       <Canvas
         camera={{ position: [8, 6, 8], fov: 50 }}
@@ -292,22 +292,22 @@ const MultidimensionalEmotionChart: React.FC<
       </Canvas>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white p-3 rounded text-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+      <div className='bg-black text-white absolute bottom-4 left-4 rounded bg-opacity-60 p-3 text-sm'>
+        <div className='space-y-1'>
+          <div className='flex items-center gap-2'>
+            <div className='bg-green-500 h-3 w-3 rounded-full'></div>
             <span>Positive High Arousal</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <div className='flex items-center gap-2'>
+            <div className='bg-blue-500 h-3 w-3 rounded-full'></div>
             <span>Positive Low Arousal</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className='flex items-center gap-2'>
+            <div className='bg-red-500 h-3 w-3 rounded-full'></div>
             <span>Negative High Arousal</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+          <div className='flex items-center gap-2'>
+            <div className='bg-purple-500 h-3 w-3 rounded-full'></div>
             <span>Negative Low Arousal</span>
           </div>
         </div>

@@ -1,13 +1,15 @@
 ---
 title: 'Addiction Intervention'
-description: 'Guide to effective addiction intervention strategies and approaches'
+description:
+  'Guide to effective addiction intervention strategies and approaches'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Addiction Intervention
 
-This guide covers evidence-based approaches to addiction intervention, including strategies for both early and crisis intervention.
+This guide covers evidence-based approaches to addiction intervention, including
+strategies for both early and crisis intervention.
 
 ## Intervention Types
 

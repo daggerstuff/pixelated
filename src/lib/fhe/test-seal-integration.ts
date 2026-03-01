@@ -7,8 +7,8 @@
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealContext } from './seal-context'
-import { SealService } from './seal-service'
 import { SealOperations } from './seal-operations'
+import { SealService } from './seal-service'
 import { SealSchemeType } from './seal-types'
 import { EncryptionMode } from './types'
 

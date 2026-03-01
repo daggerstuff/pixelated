@@ -10,18 +10,23 @@ toc: true
 
 # CI/CD Pipeline
 
-This document outlines our Continuous Integration and Continuous Deployment (CI/CD) pipeline, implemented using GitHub Actions.
+This document outlines our Continuous Integration and Continuous Deployment
+(CI/CD) pipeline, implemented using GitHub Actions.
 
 ## Overview
 
-Our CI/CD pipeline automates the building, testing, deployment, and verification of our application. It is configured to deploy to different environments depending on the trigger:
+Our CI/CD pipeline automates the building, testing, deployment, and verification
+of our application. It is configured to deploy to different environments
+depending on the trigger:
 
 - **Push to `main` branch**: Automatic deployment to staging
-- **Workflow dispatch with environment selection**: Manual deployment to staging or production
+- **Workflow dispatch with environment selection**: Manual deployment to staging
+  or production
 
 ## Pipeline Configuration
 
-The pipeline is defined in `.github/workflows/deploy.yml` and consists of the following jobs:
+The pipeline is defined in `.github/workflows/deploy.yml` and consists of the
+following jobs:
 
 1. **Build**: Compiles and packages the application
 2. **Deploy**: Pushes the application to the target environment
@@ -139,7 +144,8 @@ deploy:
 
 ### Rollback Job
 
-The rollback job is triggered automatically if the deploy job fails. It performs the following tasks:
+The rollback job is triggered automatically if the deploy job fails. It performs
+the following tasks:
 
 1. Checks out the code repository
 2. Sets up pnpm and Node.js
@@ -198,7 +204,8 @@ rollback:
 
 ## Manual Deployments
 
-To manually trigger a deployment to a specific environment, use the GitHub Actions workflow dispatch:
+To manually trigger a deployment to a specific environment, use the GitHub
+Actions workflow dispatch:
 
 1. Go to the GitHub repository
 2. Click on the "Actions" tab
@@ -209,14 +216,16 @@ To manually trigger a deployment to a specific environment, use the GitHub Actio
 
 ## Environment Secrets
 
-The CI/CD pipeline requires the following secrets to be configured in the GitHub repository:
+The CI/CD pipeline requires the following secrets to be configured in the GitHub
+repository:
 
 - `SUPABASE_URL`: The URL of the Supabase project
 - `SUPABASE_ANON_KEY`: The anonymous key for the Supabase project
 - `SUPABASE_SERVICE_ROLE_KEY`: The service role key for the Supabase project
 - `SLACK_WEBHOOK`: The webhook URL for Slack notifications
 
-These secrets should be configured for each environment (staging and production) to ensure proper isolation.
+These secrets should be configured for each environment (staging and production)
+to ensure proper isolation.
 
 ## Deployment Scripts
 
@@ -239,13 +248,15 @@ The CI/CD pipeline sends notifications to Slack for important events:
 - Successful rollbacks
 - Failed rollbacks
 
-These notifications help the team stay informed about the status of the deployment process.
+These notifications help the team stay informed about the status of the
+deployment process.
 
 ## Future Improvements
 
 We plan to make the following improvements to our CI/CD pipeline:
 
-1. Add more comprehensive testing stages (unit tests, integration tests, end-to-end tests)
+1. Add more comprehensive testing stages (unit tests, integration tests,
+   end-to-end tests)
 2. Implement blue-green deployments for zero-downtime updates
 3. Add canary releases for gradual rollouts
 4. Implement feature flags for controlled feature releases

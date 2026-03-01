@@ -3,13 +3,14 @@
  * Handles session analytics with Auth0 integration
  */
 
-import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
+
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createAuditLog } from '@/lib/audit'
+import { getUserById } from '@/services/auth0.service'
 
 // Database connection pool
 const pool = new Pool({
@@ -41,7 +42,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -76,8 +77,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: 'Missing required fields: sessionId, analyticsData',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -163,7 +163,7 @@ export const POST: APIRoute = async ({ request }) => {
           sessionId,
           sessionMetricsCount: analyticsData.sessionMetrics?.length || 0,
           skillProgressCount: analyticsData.skillProgress?.length || 0,
-        }
+        },
       )
 
       logger.info('Saved session analytics', {
@@ -192,7 +192,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
@@ -223,7 +223,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -342,7 +342,7 @@ export const GET: APIRoute = async ({ request }) => {
           timeRange,
           sessionMetricsCount: sessionMetrics.length,
           skillProgressCount: skillProgress.length,
-        }
+        },
       )
 
       logger.info('Fetched session analytics', {
@@ -378,7 +378,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(JSON.stringify({ error: 'Internal server error' }), {

@@ -1,3 +1,4 @@
+import { Logger } from '../../utils/logger'
 import {
   SessionContext,
   TherapeuticProgress,
@@ -6,7 +7,6 @@ import {
 import { EmotionState, CrisisLevel } from '../types/emotional'
 import { PatientPsiProfile } from '../types/patient-psi'
 import { RealTimeAnalyzer } from './real-time-analyzer'
-import { Logger } from '../../utils/logger'
 
 export class ContextualEnhancer {
   private sessionHistory: Map<string, SessionContext[]> = new Map()
@@ -352,7 +352,7 @@ export class ContextualEnhancer {
   private assessTherapeuticAlliance(history: SessionContext[]): number {
     return history.length > 0
       ? history.reduce((sum, h) => sum + (h.therapeuticAlliance || 0.5), 0) /
-      history.length
+          history.length
       : 0.5
   }
 

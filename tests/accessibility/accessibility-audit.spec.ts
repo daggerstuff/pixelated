@@ -1,6 +1,6 @@
+import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import AxeBuilder from '@axe-core/playwright'
 
 test.describe('Accessibility Audit and Compliance', () => {
   let page: Page
@@ -89,7 +89,7 @@ test.describe('Accessibility Audit and Compliance', () => {
         ariaLabel: string | null
         text: string | null
       }[] = []
-      let currentElement = await page.locator(':focus').first()
+      let currentElement =  page.locator(':focus').first()
 
       // Navigate through all tabbable elements
       for (let i = 0; i < 50; i++) {
@@ -110,7 +110,7 @@ test.describe('Accessibility Audit and Compliance', () => {
         }
 
         await page.keyboard.press('Tab')
-        const nextElement = await page.locator(':focus').first()
+        const nextElement =  page.locator(':focus').first()
 
         // Check if we've cycled back to the beginning
         const isSameElement = await currentElement.evaluate(
@@ -359,7 +359,7 @@ test.describe('Accessibility Audit and Compliance', () => {
 
           if (!hasGoodContrast) {
             const text = await element.textContent()
-            ;(contrastIssues as any[]).push({
+            ;(contrastIssues).push({
               text: text?.slice(0, 50),
               styles,
             })

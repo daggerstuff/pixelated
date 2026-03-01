@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+
 import { SecurityError } from './errors/security.error'
 
 export interface AuditLogConfig {

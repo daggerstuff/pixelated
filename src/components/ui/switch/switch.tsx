@@ -1,8 +1,7 @@
 import * as React from 'react'
 
 // This is a dependency-free placeholder to allow the server to run.
-export interface SwitchProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SwitchProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label?: string
   showLabel?: boolean
   labelPosition?: 'left' | 'right'
@@ -10,7 +9,7 @@ export interface SwitchProps
 
 const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
   ({ label, ...props }, ref) => (
-    <button ref={ref} {...props} type="button">
+    <button ref={ref} {...props} type='button'>
       {label}
     </button>
   ),

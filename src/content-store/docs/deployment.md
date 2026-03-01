@@ -1,9 +1,9 @@
 ---
-title: "Deployment Guide"
-description: "Deployment Guide documentation"
+title: 'Deployment Guide'
+description: 'Deployment Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -23,7 +23,8 @@ Before deploying, ensure:
 
 ## Environment Variables
 
-The following environment variables should be set in your deployment environment:
+The following environment variables should be set in your deployment
+environment:
 
 ```bash
 # Database
@@ -46,7 +47,8 @@ OPENAI_API_KEY=your-openai-key
 
 ### 1. Static Hosting (Recommended)
 
-Astro supports static generation, which is the recommended approach for deploying this application.
+Astro supports static generation, which is the recommended approach for
+deploying this application.
 
 #### Build for Static Hosting
 
@@ -54,7 +56,8 @@ Astro supports static generation, which is the recommended approach for deployin
 pnpm build
 ```
 
-This will generate a static site in the `dist/` directory, which can be deployed to any static hosting service.
+This will generate a static site in the `dist/` directory, which can be deployed
+to any static hosting service.
 
 #### Deploy to Vercel
 
@@ -78,22 +81,23 @@ This runs a script that pushes the `dist/` directory to the `gh-pages` branch.
 
 ### 2. Server-Side Rendering (SSR)
 
-For dynamic content that needs to be generated at request time, use SSR deployment.
+For dynamic content that needs to be generated at request time, use SSR
+deployment.
 
 #### Build for SSR
 
 Update `astro.config.mjs` to use the appropriate adapter:
 
 ```js
-import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import { defineConfig } from 'astro/config'
+import node from '@astrojs/node'
 
 export default defineConfig({
   output: 'server',
   adapter: node({
     mode: 'standalone',
   }),
-});
+})
 ```
 
 Then build the application:
@@ -188,7 +192,7 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - POSTGRES_URL=your-database-url
       - SUPABASE_URL=your-supabase-url
@@ -225,7 +229,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -276,7 +280,8 @@ After deploying, perform these checks:
 
 If issues are encountered after deployment:
 
-1. For Vercel/Netlify: Use their dashboard to roll back to the previous deployment
+1. For Vercel/Netlify: Use their dashboard to roll back to the previous
+   deployment
 2. For Docker: Restart the container with the previous image version
 3. For database changes: Have a rollback plan for schema migrations
 
@@ -286,7 +291,8 @@ Set up monitoring for your deployed application:
 
 1. Add [Sentry](https://sentry.io/) for error tracking
 2. Set up [LogRocket](https://logrocket.com/) for session replay
-3. Configure [Vercel Analytics](https://vercel.com/analytics) or [Google Analytics](https://analytics.google.com/)
+3. Configure [Vercel Analytics](https://vercel.com/analytics) or
+   [Google Analytics](https://analytics.google.com/)
 
 ## Troubleshooting
 
@@ -303,4 +309,5 @@ If you encounter issues not covered here:
 
 1. Check the [Astro documentation](https://docs.astro.build/en/guides/deploy/)
 2. Post in the [Astro Discord](https://astro.build/chat)
-3. Search for similar issues in the [Astro GitHub repository](https://github.com/withastro/astro/issues)
+3. Search for similar issues in the
+   [Astro GitHub repository](https://github.com/withastro/astro/issues)

@@ -1,26 +1,34 @@
-import { defineCollection, z } from 'astro:content'
-import { glob } from 'astro/loaders'
-import path from 'node:path';
-import process from 'node:process';
+import path from 'node:path'
+import process from 'node:process'
 
 import { i18nSchema, pagesSchema } from 'astro-vitesse/schema'
-import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema, streamsSchema } from './lib/schema'
+import { glob } from 'astro/loaders'
+import { defineCollection, z } from 'astro:content'
+
+import {
+  postSchema,
+  projectsSchema,
+  techniqueSchema,
+  prsSchema,
+  releasesSchema,
+  streamsSchema,
+} from './lib/schema'
 
 /**
  * KNOWN ISSUE: Astro 5.15+ "Invalid key in record" Bug
- * 
+ *
  * You will see "Invalid key in record" warnings for all collections during sync.
  * This is a CONFIRMED BUG in Astro 5.15+ Content Layer validation.
- * 
+ *
  * - Collections sync successfully (Exit code 0)
  * - Content loads correctly
  * - Builds succeed
- * 
+ *
  * PLEASE IGNORE THESE WARNINGS.
  */
 
 // Move content to src/content-store/ to avoid legacy auto-generation warnings
-const baseDir = path.resolve(process.cwd(), 'src/content-store');
+const baseDir = path.resolve(process.cwd(), 'src/content-store')
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: `${baseDir}/blog` }),

@@ -10,7 +10,9 @@ share: true
 
 ## Overview
 
-The session management system handles real-time communication between clients and the AI therapy platform. It manages WebSocket connections, message routing, and session state.
+The session management system handles real-time communication between clients
+and the AI therapy platform. It manages WebSocket connections, message routing,
+and session state.
 
 ## Features
 

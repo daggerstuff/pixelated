@@ -3,9 +3,9 @@
  * Tests sub-250ms performance and generates visualization data
  */
 
+import { ObjectiveId } from '../config/mapping-config'
 import { DynamicWeightingEngine } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
-import { ObjectiveId } from '../config/mapping-config'
 
 export interface BenchmarkResult {
   testName: string
@@ -157,7 +157,8 @@ async function benchmarkRapidOscillations(): Promise<BenchmarkResult> {
   const times: number[] = []
 
   for (let i = 0; i < iterations; i++) {
-    const contextType = i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT
+    const contextType =
+      i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT
     const context: AlignmentContext = {
       userQuery: `Oscillation test ${i}`,
       detectedContext: contextType,
@@ -324,7 +325,8 @@ async function generateVisualizationData(): Promise<VisualizationData> {
   }
 
   // Performance distribution
-  const performanceDistribution = calculatePerformanceDistribution(performanceTimes)
+  const performanceDistribution =
+    calculatePerformanceDistribution(performanceTimes)
 
   return {
     timeSeries,
@@ -462,7 +464,9 @@ if (require.main === module) {
     .then((suite) => {
       const jsonData = exportVisualizationDataForGraphing(suite)
       console.log('\n📁 Visualization data available (JSON):')
-      console.log('   Save to file for graphing with tools like Python/matplotlib or Chart.js')
+      console.log(
+        '   Save to file for graphing with tools like Python/matplotlib or Chart.js',
+      )
       // Optionally write to file
       // fs.writeFileSync('benchmark-results.json', jsonData)
     })

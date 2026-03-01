@@ -10,7 +10,9 @@ toc: true
 
 # Deployment Rollback Guide
 
-This guide explains the rollback procedures for our Astro application. Proper rollback procedures are essential for minimizing downtime and ensuring service reliability when deployments encounter issues.
+This guide explains the rollback procedures for our Astro application. Proper
+rollback procedures are essential for minimizing downtime and ensuring service
+reliability when deployments encounter issues.
 
 ## When to Initiate a Rollback
 
@@ -80,7 +82,8 @@ After completing a rollback:
 2. **Root Cause Analysis**: Determine why the deployment failed
 3. **Fix Development**: Create a plan to fix the issues in the failed deployment
 4. **Team Communication**: Update the team on status and next steps
-5. **User Communication**: If the issue affected users, communicate as appropriate
+5. **User Communication**: If the issue affected users, communicate as
+   appropriate
 
 ## Advanced Rollback Options
 
@@ -143,4 +146,5 @@ The rollback system should be tested regularly:
 4. Verify notification systems work correctly
 5. Time how long rollbacks take to complete
 
-By maintaining and practicing these rollback procedures, we ensure minimal disruption to service when deployment issues occur.
+By maintaining and practicing these rollback procedures, we ensure minimal
+disruption to service when deployment issues occur.

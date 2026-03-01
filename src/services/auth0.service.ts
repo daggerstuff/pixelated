@@ -7,12 +7,20 @@
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
 import type { Db } from 'mongodb'
+
 import { mongodb } from '../config/mongodb.config'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
+import type {
+  MFAFactor,
+  MFAEnrollment,
+  MFAVerification,
+} from '../lib/auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
-import type { MFAFactor, MFAEnrollment, MFAVerification } from '../lib/auth/auth0-mfa-service'
-import type { WebAuthnCredential, WebAuthnRegistrationOptions, WebAuthnAuthenticationOptions } from '../lib/auth/auth0-webauthn-service'
-
+import type {
+  WebAuthnCredential,
+  WebAuthnRegistrationOptions,
+  WebAuthnAuthenticationOptions,
+} from '../lib/auth/auth0-webauthn-service'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
 // Initialize Auth0 clients
@@ -25,26 +33,43 @@ let auth0Authentication: AuthenticationClient | null = null
 function initializeAuth0Clients() {
   const config = {
     domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
-    clientId: process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
-    clientSecret: process.env.AUTH0_CLIENT_SECRET || import.meta.env.AUTH0_CLIENT_SECRET || '',
-    audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
-    managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-    managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+    clientId:
+      process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+    clientSecret:
+      process.env.AUTH0_CLIENT_SECRET ||
+      import.meta.env.AUTH0_CLIENT_SECRET ||
+      '',
+    audience:
+      process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
+    managementClientId:
+      process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
+      import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID ||
+      '',
+    managementClientSecret:
+      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
+      import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
+      '',
   }
 
   // Initialize Management Client if config is available
-  if (config.domain && config.managementClientId && config.managementClientSecret) {
+  if (
+    config.domain &&
+    config.managementClientId &&
+    config.managementClientSecret
+  ) {
     if (!auth0Management) {
       auth0Management = new ManagementClient({
         domain: config.domain,
         clientId: config.managementClientId,
         clientSecret: config.managementClientSecret,
         audience: `https://${config.domain}/api/v2/`,
-        scope: 'read:users update:users create:users delete:users'
+        scope: 'read:users update:users create:users delete:users',
       })
     }
   } else {
-    console.warn('Auth0 Management configuration is incomplete. User management features may not work.')
+    console.warn(
+      'Auth0 Management configuration is incomplete. User management features may not work.',
+    )
   }
 
   // Initialize Authentication Client if config is available
@@ -53,11 +78,13 @@ function initializeAuth0Clients() {
       auth0Authentication = new AuthenticationClient({
         domain: config.domain,
         clientId: config.clientId,
-        clientSecret: config.clientSecret
+        clientSecret: config.clientSecret,
       })
     }
   } else {
-    console.warn('Auth0 Authentication configuration is incomplete. Login features will not work.')
+    console.warn(
+      'Auth0 Authentication configuration is incomplete. Login features will not work.',
+    )
   }
 
   return config
@@ -104,38 +131,43 @@ export class Auth0UserService {
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: process.env.AUTH0_AUDIENCE || ''
+        audience: process.env.AUTH0_AUDIENCE || '',
       })
-      const tokenResponse = response.data;
+      const tokenResponse = response.data
 
       // Get user info using UserInfoClient if possible, or decode token
       // Since we don't have userInfoClient handy in this scope (it's initialized in constructor but not saved to the global var in this file properly yet? - Need to check initialization)
       // Wait, initializeAuth0Clients returns config, but vars are module-level.
       // We need to make sure auth0UserInfo is initialized in initializeAuth0Clients in this file too.
 
-      let userResponse: any;
+      let userResponse: any
       if (auth0UserInfo) {
         try {
           // In v5, getUserInfo takes the access token
-          const userInfoRes = await auth0UserInfo.getUserInfo(tokenResponse.access_token);
-          userResponse = userInfoRes.data;
+          const userInfoRes = await auth0UserInfo.getUserInfo(
+            tokenResponse.access_token,
+          )
+          userResponse = userInfoRes.data
           // normalized to match old structure expected below
-          userResponse.user_id = userResponse.sub;
+          userResponse.user_id = userResponse.sub
         } catch (e) {
-          console.warn('Failed to fetch user info, falling back to token decode if possible or error', e);
+          console.warn(
+            'Failed to fetch user info, falling back to token decode if possible or error',
+            e,
+          )
           // If we can't get user info, we might not be able to return full user object
-          throw e;
+          throw e
         }
       } else {
         // Should have been initialized
-        throw new Error('Auth0 UserInfo client not initialized');
+        throw new Error('Auth0 UserInfo client not initialized')
       }
 
       // Log security event
       logSecurityEvent(SecurityEventType.LOGIN, {
         userId: userResponse.user_id,
         email: userResponse.email,
-        method: 'password'
+        method: 'password',
       })
 
       return {
@@ -148,11 +180,13 @@ export class Auth0UserService {
           avatarUrl: userResponse.picture,
           createdAt: userResponse.created_at || new Date().toISOString(),
           lastLogin: new Date().toISOString(), // userResponse.last_login might not be in OIDC profile
-          appMetadata: userResponse['https://pixelated-empathy.com/app_metadata'] || {}, // Custom claim often used
-          userMetadata: userResponse['https://pixelated-empathy.com/user_metadata'] || {}
+          appMetadata:
+            userResponse['https://pixelated-empathy.com/app_metadata'] || {}, // Custom claim often used
+          userMetadata:
+            userResponse['https://pixelated-empathy.com/user_metadata'] || {},
         },
         token: tokenResponse.access_token,
-        refreshToken: tokenResponse.refresh_token
+        refreshToken: tokenResponse.refresh_token,
       }
     } catch (error) {
       console.error('Auth0 sign in error:', error)
@@ -181,12 +215,12 @@ export class Auth0UserService {
         email_verified: false,
         app_metadata: {
           roles: [this.mapRoleToAuth0Role(role)],
-          imported_from: 'manual_creation'
+          imported_from: 'manual_creation',
         },
         user_metadata: {
           role,
-          created_at: new Date().toISOString()
-        }
+          created_at: new Date().toISOString(),
+        },
       })
 
       return {
@@ -198,7 +232,7 @@ export class Auth0UserService {
         avatarUrl: auth0User.picture,
         createdAt: auth0User.created_at,
         appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata
+        userMetadata: auth0User.user_metadata,
       }
     } catch (error) {
       console.error('Auth0 create user error:', error)
@@ -229,7 +263,7 @@ export class Auth0UserService {
         createdAt: auth0User.created_at,
         lastLogin: auth0User.last_login,
         appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata
+        userMetadata: auth0User.user_metadata,
       }
     } catch (error) {
       console.error('Auth0 get user error:', error)
@@ -248,7 +282,7 @@ export class Auth0UserService {
 
     try {
       const users = await auth0Management.getUsers()
-      return users.map(user => ({
+      return users.map((user) => ({
         id: user.user_id,
         email: user.email,
         emailVerified: user.email_verified,
@@ -258,7 +292,7 @@ export class Auth0UserService {
         createdAt: user.created_at,
         lastLogin: user.last_login,
         appMetadata: user.app_metadata,
-        userMetadata: user.user_metadata
+        userMetadata: user.user_metadata,
       }))
     } catch (error) {
       console.error('Auth0 get all users error:', error)
@@ -279,7 +313,7 @@ export class Auth0UserService {
     try {
       const users = await auth0Management.getUsers({
         q: `email:"${email}"`,
-        search_engine: 'v3'
+        search_engine: 'v3',
       })
 
       if (users.length === 0) {
@@ -298,7 +332,7 @@ export class Auth0UserService {
         createdAt: auth0User.created_at,
         lastLogin: auth0User.last_login,
         appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata
+        userMetadata: auth0User.user_metadata,
       }
     } catch (error) {
       console.error('Auth0 find user error:', error)
@@ -362,7 +396,7 @@ export class Auth0UserService {
 
       const auth0User = await auth0Management.updateUser(
         { id: userId },
-        updateParams
+        updateParams,
       )
 
       return {
@@ -375,7 +409,7 @@ export class Auth0UserService {
         createdAt: auth0User.created_at,
         lastLogin: auth0User.last_login,
         appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata
+        userMetadata: auth0User.user_metadata,
       }
     } catch (error) {
       console.error('Auth0 update user error:', error)
@@ -396,7 +430,7 @@ export class Auth0UserService {
     try {
       await auth0Management.updateUser(
         { id: userId },
-        { password: newPassword }
+        { password: newPassword },
       )
     } catch (error) {
       console.error('Auth0 change password error:', error)
@@ -416,7 +450,7 @@ export class Auth0UserService {
     try {
       // Revoke refresh token
       await auth0Authentication.revokeRefreshToken({
-        token: refreshToken
+        token: refreshToken,
       })
     } catch (error) {
       console.error('Auth0 sign out error:', error)
@@ -437,11 +471,13 @@ export class Auth0UserService {
     try {
       // Exchange refresh token for new access token
       const tokenResponse = await auth0Authentication.refreshToken({
-        refresh_token: refreshToken
+        refresh_token: refreshToken,
       })
 
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+      const userResponse = await auth0Authentication.getProfile(
+        tokenResponse.access_token,
+      )
 
       return {
         user: {
@@ -454,14 +490,14 @@ export class Auth0UserService {
           createdAt: userResponse.created_at,
           lastLogin: userResponse.last_login,
           appMetadata: userResponse.app_metadata,
-          userMetadata: userResponse.user_metadata
+          userMetadata: userResponse.user_metadata,
         },
         session: {
           accessToken: tokenResponse.access_token,
           refreshToken: tokenResponse.refresh_token,
-          expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000)
+          expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000),
         },
-        accessToken: tokenResponse.access_token
+        accessToken: tokenResponse.access_token,
       }
     } catch (error) {
       console.error('Auth0 refresh session error:', error)
@@ -486,7 +522,7 @@ export class Auth0UserService {
       return {
         userId: decodedToken.user_id,
         email: decodedToken.email,
-        role: this.extractRoleFromUser(decodedToken)
+        role: this.extractRoleFromUser(decodedToken),
       }
     } catch (error) {
       console.error('Auth0 verify token error:', error)
@@ -509,7 +545,7 @@ export class Auth0UserService {
       const ticket = await auth0Management.createPasswordChangeTicket({
         user_id: userId,
         result_url: returnUrl,
-        ttl_sec: 3600 // 1 hour
+        ttl_sec: 3600, // 1 hour
       })
 
       return ticket.ticket
@@ -534,7 +570,10 @@ export class Auth0UserService {
    * @param factor MFA enrollment details
    * @returns MFA challenge information
    */
-  async startMFAEnrollment(userId: string, factor: MFAEnrollment): Promise<any> {
+  async startMFAEnrollment(
+    userId: string,
+    factor: MFAEnrollment,
+  ): Promise<any> {
     return await auth0MFAService.startEnrollment(userId, factor)
   }
 
@@ -544,7 +583,10 @@ export class Auth0UserService {
    * @param verification MFA verification details
    * @returns Enrolled MFA factor
    */
-  async completeMFAEnrollment(userId: string, verification: MFAVerification): Promise<MFAFactor> {
+  async completeMFAEnrollment(
+    userId: string,
+    verification: MFAVerification,
+  ): Promise<MFAFactor> {
     return await auth0MFAService.completeEnrollment(userId, verification)
   }
 
@@ -582,7 +624,10 @@ export class Auth0UserService {
    * @param verification MFA verification details
    * @returns Whether verification was successful
    */
-  async verifyMFAChallenge(userId: string, verification: MFAVerification): Promise<boolean> {
+  async verifyMFAChallenge(
+    userId: string,
+    verification: MFAVerification,
+  ): Promise<boolean> {
     return await auth0MFAService.verifyChallenge(userId, verification)
   }
 
@@ -609,7 +654,10 @@ export class Auth0UserService {
    * @param userId Auth0 user ID
    * @param factorId MFA factor ID
    */
-  async setUserPreferredMFAFactor(userId: string, factorId: string): Promise<void> {
+  async setUserPreferredMFAFactor(
+    userId: string,
+    factorId: string,
+  ): Promise<void> {
     await auth0MFAService.setUserPreferredFactor(userId, factorId)
   }
 
@@ -618,8 +666,12 @@ export class Auth0UserService {
    * @param registrationOptions WebAuthn registration options
    * @returns WebAuthn credential creation options
    */
-  async getWebAuthnRegistrationOptions(registrationOptions: WebAuthnRegistrationOptions): Promise<any> {
-    return await auth0WebAuthnService.getRegistrationOptions(registrationOptions)
+  async getWebAuthnRegistrationOptions(
+    registrationOptions: WebAuthnRegistrationOptions,
+  ): Promise<any> {
+    return await auth0WebAuthnService.getRegistrationOptions(
+      registrationOptions,
+    )
   }
 
   /**
@@ -628,7 +680,10 @@ export class Auth0UserService {
    * @param credential WebAuthn credential data
    * @returns Registered WebAuthn credential
    */
-  async verifyWebAuthnRegistration(userId: string, credential: any): Promise<WebAuthnCredential> {
+  async verifyWebAuthnRegistration(
+    userId: string,
+    credential: any,
+  ): Promise<WebAuthnCredential> {
     return await auth0WebAuthnService.verifyRegistration(userId, credential)
   }
 
@@ -637,8 +692,12 @@ export class Auth0UserService {
    * @param authenticationOptions WebAuthn authentication options
    * @returns WebAuthn credential request options
    */
-  async getWebAuthnAuthenticationOptions(authenticationOptions: WebAuthnAuthenticationOptions): Promise<any> {
-    return await auth0WebAuthnService.getAuthenticationOptions(authenticationOptions)
+  async getWebAuthnAuthenticationOptions(
+    authenticationOptions: WebAuthnAuthenticationOptions,
+  ): Promise<any> {
+    return await auth0WebAuthnService.getAuthenticationOptions(
+      authenticationOptions,
+    )
   }
 
   /**
@@ -647,7 +706,10 @@ export class Auth0UserService {
    * @param credential WebAuthn credential response
    * @returns Whether authentication was successful
    */
-  async verifyWebAuthnAuthentication(userId: string, credential: any): Promise<boolean> {
+  async verifyWebAuthnAuthentication(
+    userId: string,
+    credential: any,
+  ): Promise<boolean> {
     return await auth0WebAuthnService.verifyAuthentication(userId, credential)
   }
 
@@ -656,7 +718,9 @@ export class Auth0UserService {
    * @param userId Auth0 user ID
    * @returns Array of WebAuthn credentials
    */
-  async getUserWebAuthnCredentials(userId: string): Promise<WebAuthnCredential[]> {
+  async getUserWebAuthnCredentials(
+    userId: string,
+  ): Promise<WebAuthnCredential[]> {
     return await auth0WebAuthnService.getUserWebAuthnCredentials(userId)
   }
 
@@ -665,7 +729,10 @@ export class Auth0UserService {
    * @param userId Auth0 user ID
    * @param credentialId WebAuthn credential ID
    */
-  async deleteWebAuthnCredential(userId: string, credentialId: string): Promise<void> {
+  async deleteWebAuthnCredential(
+    userId: string,
+    credentialId: string,
+  ): Promise<void> {
     await auth0WebAuthnService.deleteCredential(userId, credentialId)
   }
 
@@ -675,7 +742,11 @@ export class Auth0UserService {
    * @param credentialId WebAuthn credential ID
    * @param newName New name for the credential
    */
-  async renameWebAuthnCredential(userId: string, credentialId: string, newName: string): Promise<void> {
+  async renameWebAuthnCredential(
+    userId: string,
+    credentialId: string,
+    newName: string,
+  ): Promise<void> {
     await auth0WebAuthnService.renameCredential(userId, credentialId, newName)
   }
 
@@ -693,7 +764,9 @@ export class Auth0UserService {
    * @param userId Auth0 user ID
    * @returns User's preferred WebAuthn credential or null
    */
-  async getUserPreferredWebAuthnCredential(userId: string): Promise<WebAuthnCredential | null> {
+  async getUserPreferredWebAuthnCredential(
+    userId: string,
+  ): Promise<WebAuthnCredential | null> {
     return await auth0WebAuthnService.getUserPreferredCredential(userId)
   }
 
@@ -765,8 +838,16 @@ export async function getUserById(userId: string) {
   return await auth0UserService.getUserById(userId)
 }
 
-export async function createUser(opts: { email: string; password: string; role?: string }) {
-  return await auth0UserService.createUser(opts.email, opts.password, opts.role ?? 'user')
+export async function createUser(opts: {
+  email: string
+  password: string
+  role?: string
+}) {
+  return await auth0UserService.createUser(
+    opts.email,
+    opts.password,
+    opts.role ?? 'user',
+  )
 }
 
 export async function revokeToken(refreshToken: string) {
@@ -789,7 +870,10 @@ export async function signIn(email: string, password: string) {
   return await auth0UserService.signIn(email, password)
 }
 
-export async function updateUser(userId: string, updates: Record<string, unknown>) {
+export async function updateUser(
+  userId: string,
+  updates: Record<string, unknown>,
+) {
   return await auth0UserService.updateUser(userId, updates)
 }
 
@@ -830,24 +914,39 @@ export async function getUserPreferredMFAFactor(userId: string) {
   return await auth0UserService.getUserPreferredMFAFactor(userId)
 }
 
-export async function setUserPreferredMFAFactor(userId: string, factorId: string) {
+export async function setUserPreferredMFAFactor(
+  userId: string,
+  factorId: string,
+) {
   return await auth0UserService.setUserPreferredMFAFactor(userId, factorId)
 }
 
 // WebAuthn functions
 export async function getWebAuthnRegistrationOptions(registrationOptions: any) {
-  return await auth0UserService.getWebAuthnRegistrationOptions(registrationOptions)
+  return await auth0UserService.getWebAuthnRegistrationOptions(
+    registrationOptions,
+  )
 }
 
-export async function verifyWebAuthnRegistration(userId: string, credential: any) {
+export async function verifyWebAuthnRegistration(
+  userId: string,
+  credential: any,
+) {
   return await auth0UserService.verifyWebAuthnRegistration(userId, credential)
 }
 
-export async function getWebAuthnAuthenticationOptions(authenticationOptions: any) {
-  return await auth0UserService.getWebAuthnAuthenticationOptions(authenticationOptions)
+export async function getWebAuthnAuthenticationOptions(
+  authenticationOptions: any,
+) {
+  return await auth0UserService.getWebAuthnAuthenticationOptions(
+    authenticationOptions,
+  )
 }
 
-export async function verifyWebAuthnAuthentication(userId: string, credential: any) {
+export async function verifyWebAuthnAuthentication(
+  userId: string,
+  credential: any,
+) {
   return await auth0UserService.verifyWebAuthnAuthentication(userId, credential)
 }
 
@@ -855,12 +954,23 @@ export async function getUserWebAuthnCredentials(userId: string) {
   return await auth0UserService.getUserWebAuthnCredentials(userId)
 }
 
-export async function deleteWebAuthnCredential(userId: string, credentialId: string) {
+export async function deleteWebAuthnCredential(
+  userId: string,
+  credentialId: string,
+) {
   return await auth0UserService.deleteWebAuthnCredential(userId, credentialId)
 }
 
-export async function renameWebAuthnCredential(userId: string, credentialId: string, newName: string) {
-  return await auth0UserService.renameWebAuthnCredential(userId, credentialId, newName)
+export async function renameWebAuthnCredential(
+  userId: string,
+  credentialId: string,
+  newName: string,
+) {
+  return await auth0UserService.renameWebAuthnCredential(
+    userId,
+    credentialId,
+    newName,
+  )
 }
 
 export async function userHasWebAuthnCredentials(userId: string) {

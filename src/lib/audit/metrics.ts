@@ -52,7 +52,7 @@ export async function generateAuditMetrics(
   logs: AuditLog[],
 ): Promise<AuditMetrics> {
   const { detectUnusualPatterns } = await import('./analysis')
-  const unusualPatterns = await detectUnusualPatterns(logs)
+  const unusualPatterns =  detectUnusualPatterns(logs)
 
   return {
     accessByTime: getAccessByTime(logs),

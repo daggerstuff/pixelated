@@ -1,6 +1,7 @@
 ---
 title: 'Testing Overview'
-description: 'Comprehensive guide to Pixelated testing infrastructure and practices'
+description:
+  'Comprehensive guide to Pixelated testing infrastructure and practices'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,7 +11,9 @@ share: true
 
 # Testing Overview
 
-Pixelated implements a comprehensive testing strategy to ensure reliability, security, and performance across all components. Our testing infrastructure is designed to support rapid development while maintaining high quality standards.
+Pixelated implements a comprehensive testing strategy to ensure reliability,
+security, and performance across all components. Our testing infrastructure is
+designed to support rapid development while maintaining high quality standards.
 
 ## Testing Pyramid
 

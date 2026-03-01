@@ -13,7 +13,10 @@ author: 'Pixelated Team'
 
 ## Overview
 
-The breach notification system is a critical component of our security infrastructure that helps us comply with HIPAA requirements while ensuring timely and appropriate communication of security incidents to all affected parties.
+The breach notification system is a critical component of our security
+infrastructure that helps us comply with HIPAA requirements while ensuring
+timely and appropriate communication of security incidents to all affected
+parties.
 
 ## Key Features
 
@@ -29,7 +32,8 @@ The breach notification system is a critical component of our security infrastru
 
 ### Security Administrators
 
-Security administrators have full access to the breach notification system and can:
+Security administrators have full access to the breach notification system and
+can:
 
 - Report new security breaches
 - Monitor breach notifications
@@ -252,25 +256,25 @@ Access detailed metrics:
 
 ### General Questions
 
-Q: How quickly are notifications sent?
-A: Critical notifications are sent immediately. Other notifications follow user preferences and system settings.
+Q: How quickly are notifications sent? A: Critical notifications are sent
+immediately. Other notifications follow user preferences and system settings.
 
-Q: Can I customize notification templates?
-A: Security administrators can customize templates while maintaining required compliance elements.
+Q: Can I customize notification templates? A: Security administrators can
+customize templates while maintaining required compliance elements.
 
-Q: How long are breach records kept?
-A: Records are retained for 6 years to comply with HIPAA requirements.
+Q: How long are breach records kept? A: Records are retained for 6 years to
+comply with HIPAA requirements.
 
 ### Technical Questions
 
-Q: What browsers are supported?
-A: The system supports the latest versions of Chrome, Firefox, Safari, and Edge.
+Q: What browsers are supported? A: The system supports the latest versions of
+Chrome, Firefox, Safari, and Edge.
 
-Q: Is the system available on mobile devices?
-A: Yes, through our mobile app and mobile-responsive web interface.
+Q: Is the system available on mobile devices? A: Yes, through our mobile app and
+mobile-responsive web interface.
 
-Q: How is sensitive data protected?
-A: We use FHE (Fully Homomorphic Encryption) to protect all sensitive data.
+Q: How is sensitive data protected? A: We use FHE (Fully Homomorphic Encryption)
+to protect all sensitive data.
 
 ## Updates and Changes
 

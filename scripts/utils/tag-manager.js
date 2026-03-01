@@ -21,9 +21,13 @@ if (!['staging', 'production'].includes(env)) {
 
 function getTags(pattern) {
   try {
-    const tags = execFileSync('git', ['tag', '-l', pattern, '--sort=-committerdate'], {
-      encoding: 'utf8',
-    })
+    const tags = execFileSync(
+      'git',
+      ['tag', '-l', pattern, '--sort=-committerdate'],
+      {
+        encoding: 'utf8',
+      },
+    )
     return tags.split('\n').filter(Boolean)
   } catch {
     return []

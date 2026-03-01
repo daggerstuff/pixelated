@@ -1,8 +1,10 @@
 import { renderHook } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { usePatternDetection } from '../usePatternDetection'
-import { useAIService } from '../useAIService'
+
 import type { Message } from '@/types/chat'
+
+import { useAIService } from '../useAIService'
+import { usePatternDetection } from '../usePatternDetection'
 
 // Mock the useAIService hook
 vi.mock('../useAIService', () => ({
@@ -10,8 +12,6 @@ vi.mock('../useAIService', () => ({
   useAIService: vi.fn(),
   default: vi.fn(),
 }))
-
-
 
 describe('usePatternDetection', () => {
   const mockMessages: Message[] = [
@@ -53,7 +53,7 @@ describe('usePatternDetection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: vi.fn()
+      getAIResponse: vi.fn(),
     })
   })
 
@@ -103,7 +103,9 @@ describe('usePatternDetection', () => {
   })
 
   it('should handle malformed JSON responses', async () => {
-    const mockGetAIResponse = vi.fn().mockResolvedValue({ content: 'invalid json' })
+    const mockGetAIResponse = vi
+      .fn()
+      .mockResolvedValue({ content: 'invalid json' })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })
@@ -134,7 +136,9 @@ describe('usePatternDetection', () => {
   })
 
   it('should handle non-array responses', async () => {
-    const mockGetAIResponse = vi.fn().mockResolvedValue({ content: JSON.stringify({}) })
+    const mockGetAIResponse = vi
+      .fn()
+      .mockResolvedValue({ content: JSON.stringify({}) })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })

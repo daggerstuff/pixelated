@@ -4,10 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   HuntingConfig,
   HuntQuery,
@@ -305,7 +306,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Find pattern by ID
-      const pattern = this.huntPatterns.get(query.patternId!)
+      const pattern = this.huntPatterns.get(query.patternId)
       if (!pattern) {
         throw new Error(`Hunt pattern not found: ${query.patternId}`)
       }

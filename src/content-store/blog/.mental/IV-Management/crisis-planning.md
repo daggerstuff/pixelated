@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Crisis Planning
 
-This guide provides a comprehensive approach to crisis planning and management for individuals dealing with CPTSD and addiction recovery.
+This guide provides a comprehensive approach to crisis planning and management
+for individuals dealing with CPTSD and addiction recovery.
 
 ## Crisis Plan Development
 

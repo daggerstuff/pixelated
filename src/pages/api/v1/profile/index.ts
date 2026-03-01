@@ -1,8 +1,8 @@
 // API route implementation for user profile endpoints
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { AuthUser } from '@/lib/auth/types'
-import { auth0UserService } from '@/services/auth0.service'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { auth0UserService } from '@/services/auth0.service'
 
 export const prerender = false
 

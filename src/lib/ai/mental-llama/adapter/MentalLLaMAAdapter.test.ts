@@ -1,4 +1,6 @@
-import { MentalLLaMAAdapter } from './MentalLLaMAAdapter.ts'
+import { EvidenceService } from '../evidence/EvidenceService.js'
+import { ExpertGuidanceOrchestrator } from '../ExpertGuidanceOrchestrator.js'
+import type { AnalyzeMentalHealthParams } from '../types/index.ts'
 import type {
   IModelProvider,
   IMentalHealthTaskRouter,
@@ -9,9 +11,7 @@ import type {
   RoutingDecision,
   LLMResponse,
 } from '../types/mentalLLaMATypes.ts'
-import type { AnalyzeMentalHealthParams } from '../types/index.ts'
-import { EvidenceService } from '../evidence/EvidenceService.js'
-import { ExpertGuidanceOrchestrator } from '../ExpertGuidanceOrchestrator.js'
+import { MentalLLaMAAdapter } from './MentalLLaMAAdapter.ts'
 // Mock dependencies
 vi.mock('../evidence/EvidenceService')
 vi.mock('../ExpertGuidanceOrchestrator')

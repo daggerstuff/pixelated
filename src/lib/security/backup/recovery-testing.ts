@@ -11,9 +11,8 @@
  * safely restored and validated without impacting production systems.
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { AuditEventType, logAuditEvent } from '../../audit'
-import type { RecoveryTestConfig, RecoveryTestResult } from './types'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   RecoveryTestStatus,
   VerificationMethod,
@@ -21,6 +20,7 @@ import {
   TestCase,
   VerificationStep,
 } from './backup-types'
+import type { RecoveryTestConfig, RecoveryTestResult } from './types'
 
 // Environment detection
 const isBrowser =

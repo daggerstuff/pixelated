@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import { render, hydrate, unmountComponentAtNode } from 'react-dom'
+
 import StaticHtml from './static-html.js'
 
 export default (element) =>

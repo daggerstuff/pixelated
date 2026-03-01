@@ -2,11 +2,16 @@
 
 ## Overview
 
-This document outlines the configuration plan for integrating the Playwright MCP (Model Context Protocol) server with our existing testing infrastructure. The MCP server will enable AI-powered testing of our application, with a focus on critical user flows and integration with our AI features.
+This document outlines the configuration plan for integrating the Playwright MCP
+(Model Context Protocol) server with our existing testing infrastructure. The
+MCP server will enable AI-powered testing of our application, with a focus on
+critical user flows and integration with our AI features.
 
 ## Background
 
-The Playwright MCP server allows Large Language Models (LLMs) to interact with web browsers programmatically, enabling capabilities such as:
+The Playwright MCP server allows Large Language Models (LLMs) to interact with
+web browsers programmatically, enabling capabilities such as:
+
 - Automated navigation through our application
 - Form filling and interaction with UI elements
 - Screenshot capture for visual verification
@@ -76,23 +81,23 @@ For each critical user flow, we will implement a test following this structure:
 // Example test for authentication flow
 test('Authentication keeps user logged in', async ({ page }) => {
   // Setup
-  await page.goto('/auth/login');
+  await page.goto('/auth/login')
 
   // Test actions
-  await page.fill('input[name="email"]', 'test@example.com');
-  await page.fill('input[name="password"]', 'password123');
-  await page.click('button[type="submit"]');
+  await page.fill('input[name="email"]', 'test@example.com')
+  await page.fill('input[name="password"]', 'password123')
+  await page.click('button[type="submit"]')
 
   // Wait for navigation
-  await page.waitForURL('/dashboard');
+  await page.waitForURL('/dashboard')
 
   // Verify persistence
-  await page.reload();
+  await page.reload()
 
   // Assertions
-  await expect(page).toHaveURL('/dashboard');
-  await expect(page.locator('h1')).toContainText('Dashboard');
-});
+  await expect(page).toHaveURL('/dashboard')
+  await expect(page.locator('h1')).toContainText('Dashboard')
+})
 ```
 
 ### GitHub Actions Configuration
@@ -102,9 +107,9 @@ name: Playwright MCP Tests
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [main, dev]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:

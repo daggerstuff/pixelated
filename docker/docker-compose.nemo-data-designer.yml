@@ -7,13 +7,14 @@ services:
     container_name: nemo-data-designer
     restart: unless-stopped
     ports:
-      - "8080:8000" # API port
+      - '8080:8000' # API port
     environment:
-      NVIDIA_API_KEY: ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
+      NVIDIA_API_KEY:
+        ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
       NIM_API_KEY: ${NVIDIA_API_KEY}
       NGC_CLI_API_KEY: ${NVIDIA_API_KEY}
       DATA_DESIGNER_LOG_LEVEL: INFO
-      NEMO_MICROSERVICES_DATA_DESIGNER_JOB_IMAGE: "nvcr.io/nvidia/nemo-microservices/data-designer:25.12"
+      NEMO_MICROSERVICES_DATA_DESIGNER_JOB_IMAGE: 'nvcr.io/nvidia/nemo-microservices/data-designer:25.12'
       NEMO_MICROSERVICES_DATA_DESIGNER_MODEL_PROVIDER_REGISTRY: '{"providers":[{"name":"nim","endpoint":"https://integrate.api.nvidia.com/v1","provider_type":"openai","api_key":"NVIDIA_API_KEY"}],"default":"nim"}'
       DATA_DESIGNER_HOST: 0.0.0.0
       DATA_DESIGNER_PORT: 8000
@@ -29,7 +30,7 @@ services:
     networks:
       - nemo-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
       interval: 30s
       timeout: 10s
       retries: 3

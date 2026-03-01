@@ -1,3 +1,6 @@
+import { v4 as uuidv4 } from 'uuid'
+
+import { UserRole } from '../types/user'
 import {
   WorkflowInstance,
   WorkflowTemplate,
@@ -9,10 +12,8 @@ import {
   WorkflowSearchFilters,
   WorkflowAnalytics,
 } from '../types/workflow'
-import { UserRole } from '../types/user'
 import { DocumentService } from './documentService'
 import { EmailService } from './emailService'
-import { v4 as uuidv4 } from 'uuid'
 
 export class WorkflowService {
   private static workflowInstances: Map<string, WorkflowInstance> = new Map()
@@ -440,12 +441,12 @@ export class WorkflowService {
     const averageReviewTime =
       completedInstances.length > 0
         ? completedInstances.reduce(
-          (sum, i) =>
-            sum + (i.completedAt!.getTime() - i.createdAt.getTime()),
-          0,
-        ) /
-        completedInstances.length /
-        (1000 * 60 * 60) // Convert to hours
+            (sum, i) =>
+              sum + (i.completedAt!.getTime() - i.createdAt.getTime()),
+            0,
+          ) /
+          completedInstances.length /
+          (1000 * 60 * 60) // Convert to hours
         : 0
 
     // Calculate approval/rejection rates

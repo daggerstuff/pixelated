@@ -1,14 +1,14 @@
-import type { AIService } from '../models/ai-types'
-import type {
-  CrisisDetectionResult,
-  CrisisDetectionOptions,
-  RiskAssessment,
-} from '../crisis/types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   SUICIDE_EUPHEMISMS as CONFIG_SUICIDE_EUPHEMISMS,
   SAFE_IDIOMATIC_EXCLUSIONS as CONFIG_SAFE_EXCLUSIONS,
 } from '../crisis/config/keywords'
+import type {
+  CrisisDetectionResult,
+  CrisisDetectionOptions,
+  RiskAssessment,
+} from '../crisis/types'
+import type { AIService } from '../models/ai-types'
 
 const appLogger = createBuildSafeLogger('app')
 
@@ -162,7 +162,7 @@ export class CrisisDetectionService {
     } catch (error: unknown) {
       appLogger.error('Error in crisis detection:', {
         message: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : '',
+        stack: error instanceof Error ? (error)?.stack : '',
         error,
       })
 
@@ -192,7 +192,7 @@ export class CrisisDetectionService {
     } catch (error: unknown) {
       appLogger.error('Error in batch crisis detection:', {
         message: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : '',
+        stack: error instanceof Error ? (error)?.stack : '',
         error,
       })
       throw new Error('Batch crisis detection failed', { cause: error })
@@ -234,9 +234,10 @@ export class CrisisDetectionService {
 
         if (matches) {
           // Apply idiom/cultural exclusions to prevent false positives
-          const excluded = CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some(
-            (re) => re.test(text),
-          )
+          const excluded =
+            CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some((re) =>
+              re.test(text),
+            )
 
           if (!excluded) {
             indicators.push(keyword)

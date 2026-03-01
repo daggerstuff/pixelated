@@ -1,9 +1,11 @@
-import type { NotificationService } from './NotificationService'
-import * as logger from '../../logging/build-safe-logger'
+import type { IncomingMessage } from 'http'
+
 import type { WebSocket } from 'ws'
 import { WebSocketServer as WSServer } from 'ws'
-import type { IncomingMessage } from 'http'
 import { z } from 'zod'
+
+import * as logger from '../../logging/build-safe-logger'
+import type { NotificationService } from './NotificationService'
 // Supabase admin import removed - migrate to MongoDB/auth provider
 
 // Define message types using Zod for runtime validation
@@ -179,7 +181,7 @@ export class WebSocketServer {
     ws.on('close', () => this.handleClientDisconnection(userId))
     ws.on('error', (error: Error) => this.handleClientError(userId, error))
 
-    this.sendUnreadCount(userId, ws)
+    void this.sendUnreadCount(userId, ws)
   }
 
   /**
@@ -232,7 +234,7 @@ export class WebSocketServer {
     try {
       const message: unknown = JSON.parse(data) as unknown
       const validatedMessage = ClientMessageSchema.parse(message)
-      this.processMessage(userId, validatedMessage, ws)
+      void this.processMessage(userId, validatedMessage, ws)
     } catch (error: unknown) {
       logger
         .createBuildSafeLogger('websocket')

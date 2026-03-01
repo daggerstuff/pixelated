@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { authClient } from '@/lib/auth-client'
+
 import type { AuthRole } from '@/config/auth.config'
+import { authClient } from '@/lib/auth-client'
 import type { UserRole } from '@/types/auth'
 
 export interface ProtectedRouteProps {
@@ -22,7 +23,9 @@ export function ProtectedRoute({
   const { data: session, isPending: loading } = authClient.useSession()
 
   // Simple role check function
-  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
+  const hasRole = (
+    role: AuthRole | AuthRole[] | UserRole | UserRole[],
+  ): boolean => {
     if (!session?.user) {
       return false
     }
@@ -47,10 +50,10 @@ export function ProtectedRoute({
   if (loading) {
     return (
       fallback ?? (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Verifying session...</p>
+        <div className='flex min-h-[60vh] items-center justify-center'>
+          <div className='text-center'>
+            <div className='border-green-500 mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-t-2'></div>
+            <p className='text-gray-400 mt-4'>Verifying session...</p>
           </div>
         </div>
       )
@@ -61,17 +64,17 @@ export function ProtectedRoute({
   if (!session) {
     return (
       fallback ?? (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <h2 className="text-2xl font-bold text-white mb-2">
+        <div className='flex min-h-[60vh] items-center justify-center'>
+          <div className='bg-white/5 border-white/10 max-w-md rounded-2xl border p-8 text-center backdrop-blur-md'>
+            <h2 className='text-white mb-2 text-2xl font-bold'>
               Authentication Required
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className='text-gray-400 mb-6'>
               Please log in to your account to access this page.
             </p>
             <a
               href={redirectTo}
-              className="inline-block w-full py-3 bg-green-500 text-black font-semibold rounded-xl hover:bg-green-400 transition-colors"
+              className='bg-green-500 text-black hover:bg-green-400 inline-block w-full rounded-xl py-3 font-semibold transition-colors'
             >
               Go to Login
             </a>
@@ -85,17 +88,17 @@ export function ProtectedRoute({
   if (requiredRole && !hasRole(requiredRole)) {
     return (
       fallback ?? (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <h2 className="text-2xl font-bold text-red-400 mb-2">
+        <div className='flex min-h-[60vh] items-center justify-center'>
+          <div className='bg-white/5 border-white/10 max-w-md rounded-2xl border p-8 text-center backdrop-blur-md'>
+            <h2 className='text-red-400 mb-2 text-2xl font-bold'>
               Access Denied
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className='text-gray-400 mb-6'>
               You don't have the required permissions to access this page.
             </p>
             <a
-              href="/"
-              className="inline-block w-full py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-colors"
+              href='/'
+              className='bg-white/10 text-white hover:bg-white/20 inline-block w-full rounded-xl py-3 font-semibold transition-colors'
             >
               Back to Safety
             </a>

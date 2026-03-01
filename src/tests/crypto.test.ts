@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import type { CryptoSystem } from '../lib/crypto'
 
 // Define SessionData locally rather than importing it
@@ -353,10 +354,10 @@ describe('encryption', () => {
     // Mock test key - DO NOT USE IN PRODUCTION
     const key = getTestKey('encryption')
 
-    const encrypted = Encryption.encrypt(data, key as string)
+    const encrypted = Encryption.encrypt(data, key)
     expect(encrypted).toContain('v1:') // Should have version prefix
 
-    const decrypted = Encryption.decrypt(encrypted, key as string)
+    const decrypted = Encryption.decrypt(encrypted, key)
     expect(decrypted).toBe(data)
   })
 
@@ -366,7 +367,7 @@ describe('encryption', () => {
     const key = getTestKey('version-test')
     const version = 3
 
-    const encrypted = Encryption.encrypt(data, key as string, version)
+    const encrypted = Encryption.encrypt(data, key, version)
     expect(encrypted).toContain(`v${version}:`)
   })
 
@@ -376,10 +377,10 @@ describe('encryption', () => {
     const key = getTestKey('correct')
     const wrongKey = getTestKey('wrong')
 
-    const encrypted = Encryption.encrypt(data, key as string)
+    const encrypted = Encryption.encrypt(data, key)
 
     expect(() => {
-      Encryption.decrypt(encrypted, wrongKey as string)
+      Encryption.decrypt(encrypted, wrongKey)
     }).toThrow('Failed to decrypt data')
   })
 })
@@ -411,10 +412,10 @@ describe('keyRotationManager', () => {
     const newKey = getTestKey('rotated')
 
     // Add initial key
-    keyManager.addKey(keyId, key as string)
+    keyManager.addKey(keyId, key)
 
     // Rotate the key
-    const rotatedMetadata = keyManager.rotateKey(keyId, newKey as string)
+    const rotatedMetadata = keyManager.rotateKey(keyId, newKey)
 
     expect(rotatedMetadata.id).toBe(keyId)
     expect(rotatedMetadata.version).toBe(2)
@@ -427,7 +428,7 @@ describe('keyRotationManager', () => {
     const key = getTestKey('rotation-check')
 
     // Add a key with custom expiration (expired)
-    const metadata = keyManager.addKey(keyId, key as string)
+    const metadata = keyManager.addKey(keyId, key)
 
     // Mock the expiration date to be in the pas
     const originalDate = Date.now
@@ -826,7 +827,7 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
 
     // Decrypt the data
     const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted) as any
+    const parsedData = JSON.parse(decrypted)
 
     expect(parsedData.message).toBe(data.message)
     expect(parsedData.patientId).toBe(data.patientId)

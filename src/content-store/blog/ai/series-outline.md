@@ -1,6 +1,8 @@
 ---
 title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
-description: 'Exploring the intersection of artificial intelligence and emotional wellbeing, from digital therapeutics to AI-enhanced mental health support'
+description:
+  'Exploring the intersection of artificial intelligence and emotional
+  wellbeing, from digital therapeutics to AI-enhanced mental health support'
 author: 'AI & Psychology Team'
 pubDate: 2024-04-26
 draft: false
@@ -13,7 +15,9 @@ timeframe: 'May-June 2024'
 
 ```yaml
 title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
-description: 'Investigating how AI is transforming our understanding and support of emotional wellbeing'
+description:
+  'Investigating how AI is transforming our understanding and support of
+  emotional wellbeing'
 timeframe: 'June-July 2024'
 articles: 5
 frequency: 'Weekly'
@@ -169,4 +173,6 @@ _June 3, 2024_
 
 ---
 
-_This series explores the exciting intersection of AI and emotional intelligence, examining how technology can enhance mental wellness while maintaining human connection and ethical considerations._
+_This series explores the exciting intersection of AI and emotional
+intelligence, examining how technology can enhance mental wellness while
+maintaining human connection and ethical considerations._

@@ -1,31 +1,7 @@
+import { PlusCircle, Trash2 } from 'lucide-react'
 import React, { useState, useEffect, useCallback, useId } from 'react'
-import type {
-  TreatmentPlan,
-  NewTreatmentPlanData,
-  UpdateTreatmentPlanData,
-  TreatmentGoal,
-  NewTreatmentGoalData,
-  TreatmentObjective,
-  NewTreatmentObjectiveData,
-} from '@/types/treatment'
-import { Button } from '@/components/ui/button'
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { DialogModal } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { toast } from 'sonner'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,8 +13,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { toast } from 'sonner'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { DialogModal } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import type {
+  TreatmentPlan,
+  NewTreatmentPlanData,
+  UpdateTreatmentPlanData,
+  TreatmentGoal,
+  NewTreatmentGoalData,
+  TreatmentObjective,
+  NewTreatmentObjectiveData,
+} from '@/types/treatment'
 
 const formatDate = (dateString?: string | Date) => {
   if (!dateString) {
@@ -58,20 +59,24 @@ const formatDate = (dateString?: string | Date) => {
 }
 
 interface ClientSideNewObjective
-  extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
+  extends
+    Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
     Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
   tempId: string
 }
 
 interface ClientSideNewGoal
-  extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
+  extends
+    Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
     Omit<NewTreatmentGoalData, 'description' | 'status'> {
   tempId: string
   objectives: ClientSideNewObjective[]
 }
 
-interface FormNewPlanData
-  extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
+interface FormNewPlanData extends Omit<
+  NewTreatmentPlanData,
+  'goals' | 'startDate'
+> {
   userId: string
   startDate?: string
   goals: ClientSideNewGoal[]
@@ -89,8 +94,10 @@ type EditableGoal =
     })
   | ClientSideNewGoal
 
-interface FormUpdatePlanData
-  extends Omit<UpdateTreatmentPlanData, 'goals' | 'startDate'> {
+interface FormUpdatePlanData extends Omit<
+  UpdateTreatmentPlanData,
+  'goals' | 'startDate'
+> {
   id: string
   startDate?: string
   goals?: EditableGoal[]
@@ -135,7 +142,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An unknown error occurred'
       setError(errorMessage)
       toast.error(`Failed to load plans: ${errorMessage}`)
@@ -145,7 +152,7 @@ const TreatmentPlanManager: FC = () => {
   }, [])
 
   useEffect(() => {
-    fetchPlans()
+    void fetchPlans()
   }, [fetchPlans])
 
   const handleInputChange = (
@@ -211,7 +218,7 @@ const TreatmentPlanManager: FC = () => {
     if (isEdit && editingPlanData) {
       const updatedGoals = [...(editingPlanData.goals || [])]
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as EditableGoal)[field as keyof EditableGoal] =
+        ;(updatedGoals[index])[field as keyof EditableGoal] =
           value as never // Type-safe cast for EditableGoal union
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
@@ -220,8 +227,8 @@ const TreatmentPlanManager: FC = () => {
     } else {
       const updatedGoals = [...newPlanData.goals]
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as ClientSideNewGoal)[
-          field as keyof ClientSideNewGoal
+        ;(updatedGoals[index])[
+          field
         ] = value as never // ClientSideNewGoal is more straightforward
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
@@ -302,7 +309,7 @@ const TreatmentPlanManager: FC = () => {
         updatedGoals[goalIndex] &&
         updatedGoals[goalIndex].objectives[objIndex]
       ) {
-        ;(updatedGoals[goalIndex].objectives[objIndex] as EditableObjective)[
+        ;(updatedGoals[goalIndex].objectives[objIndex])[
           field as keyof EditableObjective
         ] = value as never
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
@@ -320,8 +327,8 @@ const TreatmentPlanManager: FC = () => {
         ;(
           updatedNewGoals[goalIndex].objectives[
             objIndex
-          ] as ClientSideNewObjective
-        )[field as keyof ClientSideNewObjective] = value as never
+          ]
+        )[field] = value as never
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedNewGoals,
@@ -407,7 +414,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to create plan: ${errorMessage}`)
     } finally {
@@ -434,7 +441,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to delete plan: ${errorMessage}`)
     } finally {
@@ -478,7 +485,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to update plan: ${errorMessage}`)
     } finally {
@@ -514,7 +521,7 @@ const TreatmentPlanManager: FC = () => {
   }
 
   if (error) {
-    return <p className="text-red-500">Error: {error}</p>
+    return <p className='text-red-500'>Error: {error}</p>
   }
 
   const renderObjectivesSection = (
@@ -522,23 +529,23 @@ const TreatmentPlanManager: FC = () => {
     objectives: EditableObjective[],
     isEdit = false,
   ) => (
-    <div className="mt-3 ml-4 pl-4 border-l border-slate-300 dark:border-slate-700">
-      <div className="flex justify-between items-center mb-2">
-        <h4 className="text-md font-medium text-slate-700 dark:text-slate-300">
+    <div className='border-slate-300 dark:border-slate-700 ml-4 mt-3 border-l pl-4'>
+      <div className='mb-2 flex items-center justify-between'>
+        <h4 className='text-md text-slate-700 dark:text-slate-300 font-medium'>
           Objectives
         </h4>
         <Button
-          type="button"
-          variant="outline"
-          size="sm"
+          type='button'
+          variant='outline'
+          size='sm'
           onClick={() => addObjective(goalIndex, isEdit)}
-          className="py-1 px-2 h-auto text-xs"
+          className='h-auto px-2 py-1 text-xs'
         >
-          <PlusCircle className="h-3 w-3 mr-1" /> Add Objective
+          <PlusCircle className='mr-1 h-3 w-3' /> Add Objective
         </Button>
       </div>
       {objectives.length === 0 && (
-        <p className="text-xs text-muted-foreground">
+        <p className='text-muted-foreground text-xs'>
           No objectives added for this goal.
         </p>
       )}
@@ -547,9 +554,9 @@ const TreatmentPlanManager: FC = () => {
           key={
             obj.tempId || (obj as TreatmentObjective).id || `obj-${objIndex}`
           }
-          className="p-2 mb-2 border rounded-md bg-slate-100 dark:bg-slate-700/50"
+          className='bg-slate-100 dark:bg-slate-700/50 mb-2 rounded-md border p-2'
         >
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-2 items-center">
+          <div className='grid grid-cols-1 items-center gap-2 md:grid-cols-6'>
             <Textarea
               placeholder={`Objective ${objIndex + 1} description`}
               value={obj.description}
@@ -562,7 +569,7 @@ const TreatmentPlanManager: FC = () => {
                   isEdit,
                 )
               }
-              className="md:col-span-4 min-h-[40px] text-sm"
+              className='min-h-[40px] text-sm md:col-span-4'
               required
             />
             <Select
@@ -577,25 +584,25 @@ const TreatmentPlanManager: FC = () => {
                 )
               }
             >
-              <SelectTrigger className="md:col-span-1 h-9 text-sm">
+              <SelectTrigger className='h-9 text-sm md:col-span-1'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Not Started">Not Started</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
-                <SelectItem value="On Hold">On Hold</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
+                <SelectItem value='Not Started'>Not Started</SelectItem>
+                <SelectItem value='In Progress'>In Progress</SelectItem>
+                <SelectItem value='Completed'>Completed</SelectItem>
+                <SelectItem value='On Hold'>On Hold</SelectItem>
+                <SelectItem value='Cancelled'>Cancelled</SelectItem>
               </SelectContent>
             </Select>
             <Button
-              type="button"
-              variant="ghost"
-              size="icon"
+              type='button'
+              variant='ghost'
+              size='icon'
               onClick={() => removeObjective(goalIndex, objIndex, isEdit)}
-              className="text-red-500 hover:text-red-700 md:col-span-1 place-self-center md:place-self-auto h-9 w-9"
+              className='text-red-500 hover:text-red-700 h-9 w-9 place-self-center md:col-span-1 md:place-self-auto'
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className='h-4 w-4' />
             </Button>
           </div>
         </div>
@@ -607,35 +614,35 @@ const TreatmentPlanManager: FC = () => {
     goals: (ClientSideNewGoal | EditableGoal)[],
     isEdit = false,
   ) => (
-    <div className="mt-4 pt-4 border-t">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-medium">Goals</h3>
+    <div className='mt-4 border-t pt-4'>
+      <div className='mb-2 flex items-center justify-between'>
+        <h3 className='text-lg font-medium'>Goals</h3>
         <Button
-          type="button"
-          variant="outline"
-          size="sm"
+          type='button'
+          variant='outline'
+          size='sm'
           onClick={() => addGoal(isEdit)}
         >
-          <PlusCircle className="h-4 w-4 mr-2" /> Add Goal
+          <PlusCircle className='mr-2 h-4 w-4' /> Add Goal
         </Button>
       </div>
       {goals.length === 0 && (
-        <p className="text-sm text-muted-foreground">No goals added yet.</p>
+        <p className='text-muted-foreground text-sm'>No goals added yet.</p>
       )}
       {goals.map((goal, index) => (
         <div
           key={goal.tempId || (goal as TreatmentGoal).id || `goal-${index}`}
-          className="p-3 mb-3 border rounded-md bg-background dark:bg-slate-800 shadow-sm"
+          className='dark:bg-slate-800 mb-3 rounded-md border bg-background p-3 shadow-sm'
         >
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-2 items-center">
+          <div className='grid grid-cols-1 items-center gap-2 md:grid-cols-6'>
             <Textarea
-              placeholder="Goal description"
+              placeholder='Goal description'
               name={`goal-description-${index}`}
               value={goal.description}
               onChange={(e) =>
                 handleGoalChange(index, 'description', e.target.value, isEdit)
               }
-              className="md:col-span-4 min-h-[60px]"
+              className='min-h-[60px] md:col-span-4'
               required
             />
             <Select
@@ -644,25 +651,25 @@ const TreatmentPlanManager: FC = () => {
                 handleGoalChange(index, 'status', value, isEdit)
               }
             >
-              <SelectTrigger className="md:col-span-1">
+              <SelectTrigger className='md:col-span-1'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Not Started">Not Started</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
-                <SelectItem value="On Hold">On Hold</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
+                <SelectItem value='Not Started'>Not Started</SelectItem>
+                <SelectItem value='In Progress'>In Progress</SelectItem>
+                <SelectItem value='Completed'>Completed</SelectItem>
+                <SelectItem value='On Hold'>On Hold</SelectItem>
+                <SelectItem value='Cancelled'>Cancelled</SelectItem>
               </SelectContent>
             </Select>
             <Button
-              type="button"
-              variant="ghost"
-              size="icon"
+              type='button'
+              variant='ghost'
+              size='icon'
               onClick={() => removeGoal(index, isEdit)}
-              className="text-red-500 hover:text-red-700 md:col-span-1 place-self-center md:place-self-auto"
+              className='text-red-500 hover:text-red-700 place-self-center md:col-span-1 md:place-self-auto'
             >
-              <Trash2 className="h-5 w-5" />
+              <Trash2 className='h-5 w-5' />
             </Button>
           </div>
           {renderObjectivesSection(index, goal.objectives || [], isEdit)}
@@ -672,9 +679,9 @@ const TreatmentPlanManager: FC = () => {
   )
 
   return (
-    <div className="p-4 md:p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Treatment Plan Management</h1>
+    <div className='p-4 md:p-6'>
+      <div className='mb-6 flex items-center justify-between'>
+        <h1 className='text-2xl font-semibold'>Treatment Plan Management</h1>
         <Button onClick={openCreateModal}>Create New Plan</Button>
       </div>
 
@@ -683,8 +690,8 @@ const TreatmentPlanManager: FC = () => {
       )}
 
       {plans.length > 0 && (
-        <div className="rounded-md border">
-          <table className="w-full">
+        <div className='rounded-md border'>
+          <table className='w-full'>
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
@@ -704,13 +711,13 @@ const TreatmentPlanManager: FC = () => {
                   <TableCell>{formatDate(plan.startDate)}</TableCell>
                   <TableCell>{formatDate(plan.updatedAt)}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" className="mr-2">
+                    <Button variant='outline' size='sm' className='mr-2'>
                       View
                     </Button>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      className="mr-2"
+                      variant='outline'
+                      size='sm'
+                      className='mr-2'
                       onClick={() => openEditModal(plan)}
                     >
                       Edit
@@ -718,11 +725,11 @@ const TreatmentPlanManager: FC = () => {
 
                     <AlertDialogTrigger>
                       <Button
-                        variant="destructive"
-                        size="sm"
+                        variant='destructive'
+                        size='sm'
                         onClick={() => setPlanToDelete(plan)}
                       >
-                        <Trash2 className="h-4 w-4 mr-1 md:mr-2" /> Delete
+                        <Trash2 className='mr-1 h-4 w-4 md:mr-2' /> Delete
                       </Button>
                     </AlertDialogTrigger>
                   </TableCell>
@@ -735,21 +742,21 @@ const TreatmentPlanManager: FC = () => {
       <DialogModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Treatment Plan"
+        title='Create New Treatment Plan'
         showCloseButton={true}
-        className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
+        className='max-h-[90vh] overflow-y-auto sm:max-w-[700px]'
         footer={
           <>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={() => setIsCreateModalOpen(false)}
             >
               Cancel
             </Button>
             <Button
               form={`create-plan-form-${formId}`}
-              type="submit"
+              type='submit'
               disabled={isLoading}
             >
               {isLoading ? 'Saving...' : 'Save Plan'}
@@ -758,47 +765,47 @@ const TreatmentPlanManager: FC = () => {
         }
       >
         <form id={`create-plan-form-${formId}`} onSubmit={handleCreatePlan}>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className='text-muted-foreground mb-4 text-sm'>
             Fill in the details below to create a new treatment plan.
           </p>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
+          <div className='grid gap-4 py-4'>
+            <div className='grid grid-cols-4 items-center gap-4'>
               <label
                 htmlFor={`title-${formId}`}
-                className="text-right col-span-1"
+                className='col-span-1 text-right'
               >
                 Title
               </label>
               <Input
                 id={`title-${formId}`}
-                name="title"
+                name='title'
                 value={newPlanData.title}
                 onChange={(e) => handleInputChange(e)}
-                className="col-span-3"
+                className='col-span-3'
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className='grid grid-cols-4 items-center gap-4'>
               <label
                 htmlFor={`clientId-${formId}`}
-                className="text-right col-span-1"
+                className='col-span-1 text-right'
               >
                 Client ID
               </label>
               <Input
                 id={`clientId-${formId}`}
-                name="clientId"
+                name='clientId'
                 value={newPlanData.clientId || ''}
                 onChange={(e) => handleInputChange(e)}
-                className="col-span-3"
-                placeholder="e.g., user_xyz123 or numerical ID"
+                className='col-span-3'
+                placeholder='e.g., user_xyz123 or numerical ID'
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className='grid grid-cols-4 items-center gap-4'>
               <label
                 htmlFor={`status-${formId}`}
-                className="text-right col-span-1"
+                className='col-span-1 text-right'
               >
                 Status
               </label>
@@ -806,32 +813,32 @@ const TreatmentPlanManager: FC = () => {
                 value={newPlanData.status}
                 onValueChange={(value) => handleSelectChange('status', value)}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className='col-span-3'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="On Hold">On Hold</SelectItem>
-                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                  <SelectItem value='Draft'>Draft</SelectItem>
+                  <SelectItem value='Active'>Active</SelectItem>
+                  <SelectItem value='Completed'>Completed</SelectItem>
+                  <SelectItem value='On Hold'>On Hold</SelectItem>
+                  <SelectItem value='Cancelled'>Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className='grid grid-cols-4 items-center gap-4'>
               <label
                 htmlFor={`startDate-${formId}`}
-                className="text-right col-span-1"
+                className='col-span-1 text-right'
               >
                 Start Date
               </label>
               <Input
                 id={`startDate-${formId}`}
-                name="startDate"
-                type="date"
+                name='startDate'
+                type='date'
                 value={newPlanData.startDate}
                 onChange={(e) => handleInputChange(e)}
-                className="col-span-3"
+                className='col-span-3'
                 required
               />
             </div>
@@ -863,7 +870,7 @@ const TreatmentPlanManager: FC = () => {
             <AlertDialogAction
               onClick={handleDeletePlan}
               disabled={isLoading}
-              className="bg-destructive hover:bg-destructive/90"
+              className='bg-destructive hover:bg-destructive/90'
             >
               {isLoading ? 'Deleting...' : 'Yes, delete plan'}
             </AlertDialogAction>
@@ -878,14 +885,14 @@ const TreatmentPlanManager: FC = () => {
           setIsEditModalOpen(false)
           setEditingPlanData(null)
         }}
-        title="Edit Treatment Plan"
+        title='Edit Treatment Plan'
         showCloseButton={true}
-        className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
+        className='max-h-[90vh] overflow-y-auto sm:max-w-[700px]'
         footer={
           <>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={() => {
                 setIsEditModalOpen(false)
                 setEditingPlanData(null)
@@ -895,7 +902,7 @@ const TreatmentPlanManager: FC = () => {
             </Button>
             <Button
               form={`edit-plan-form-${formId}`}
-              type="submit"
+              type='submit'
               disabled={isLoading}
             >
               {isLoading ? 'Saving...' : 'Save Changes'}
@@ -905,47 +912,47 @@ const TreatmentPlanManager: FC = () => {
       >
         {editingPlanData && (
           <form id={`edit-plan-form-${formId}`} onSubmit={handleUpdatePlan}>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className='text-muted-foreground mb-4 text-sm'>
               Update the details for &quot;{editingPlanData.title}&quot;.
             </p>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+            <div className='grid gap-4 py-4'>
+              <div className='grid grid-cols-4 items-center gap-4'>
                 <label
                   htmlFor={`edit-title-${formId}`}
-                  className="text-right col-span-1"
+                  className='col-span-1 text-right'
                 >
                   Title
                 </label>
                 <Input
                   id={`edit-title-${formId}`}
-                  name="title"
+                  name='title'
                   value={editingPlanData.title || ''}
                   onChange={(e) => handleInputChange(e, true)}
-                  className="col-span-3"
+                  className='col-span-3'
                   required
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className='grid grid-cols-4 items-center gap-4'>
                 <label
                   htmlFor={`edit-clientId-${formId}`}
-                  className="text-right col-span-1"
+                  className='col-span-1 text-right'
                 >
                   Client ID
                 </label>
                 <Input
                   id={`edit-clientId-${formId}`}
-                  name="clientId"
+                  name='clientId'
                   value={editingPlanData.clientId || ''}
                   onChange={(e) => handleInputChange(e, true)}
-                  className="col-span-3"
-                  placeholder="e.g., user_xyz123 or numerical ID"
+                  className='col-span-3'
+                  placeholder='e.g., user_xyz123 or numerical ID'
                   required
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className='grid grid-cols-4 items-center gap-4'>
                 <label
                   htmlFor={`edit-status-${formId}`}
-                  className="text-right col-span-1"
+                  className='col-span-1 text-right'
                 >
                   Status
                 </label>
@@ -955,36 +962,36 @@ const TreatmentPlanManager: FC = () => {
                     handleSelectChange('status', value, true)
                   }
                 >
-                  <SelectTrigger className="col-span-3">
+                  <SelectTrigger className='col-span-3'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Draft">Draft</SelectItem>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Completed">Completed</SelectItem>
-                    <SelectItem value="On Hold">On Hold</SelectItem>
-                    <SelectItem value="Cancelled">Cancelled</SelectItem>
+                    <SelectItem value='Draft'>Draft</SelectItem>
+                    <SelectItem value='Active'>Active</SelectItem>
+                    <SelectItem value='Completed'>Completed</SelectItem>
+                    <SelectItem value='On Hold'>On Hold</SelectItem>
+                    <SelectItem value='Cancelled'>Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className='grid grid-cols-4 items-center gap-4'>
                 <label
                   htmlFor={`edit-startDate-${formId}`}
-                  className="text-right col-span-1"
+                  className='col-span-1 text-right'
                 >
                   Start Date
                 </label>
                 <Input
                   id={`edit-startDate-${formId}`}
-                  name="startDate"
-                  type="date"
+                  name='startDate'
+                  type='date'
                   value={
                     editingPlanData.startDate
                       ? editingPlanData.startDate.toString().split('T')[0]
                       : ''
                   }
                   onChange={(e) => handleInputChange(e, true)}
-                  className="col-span-3"
+                  className='col-span-3'
                   required
                 />
               </div>

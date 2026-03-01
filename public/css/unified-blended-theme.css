@@ -4,15 +4,15 @@
    ================================================ */
 
 /* Import modular theme components */
-@import "./variables.css";
-@import "./typography.css";
-@import "./spacing.css";
-@import "./borders.css";
-@import "./shadows.css";
-@import "./gradients.css";
-@import "./mesh.css";
-@import "./transitions.css";
-@import "./utilities.css";
+@import './variables.css';
+@import './typography.css';
+@import './spacing.css';
+@import './borders.css';
+@import './shadows.css';
+@import './gradients.css';
+@import './mesh.css';
+@import './transitions.css';
+@import './utilities.css';
 
 /* Keep base styles and media queries as they are for compatibility */
 /* === BASE STYLES === */
@@ -96,7 +96,12 @@ body {
 }
 
 /* === TYPOGRAPHY SYSTEM === */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: var(--tracking-tight);
@@ -105,12 +110,24 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-h1 { font-size: var(--text-5xl); }
-h2 { font-size: var(--text-4xl); }
-h3 { font-size: var(--text-3xl); }
-h4 { font-size: var(--text-2xl); }
-h5 { font-size: var(--text-xl); }
-h6 { font-size: var(--text-lg); }
+h1 {
+  font-size: var(--text-5xl);
+}
+h2 {
+  font-size: var(--text-4xl);
+}
+h3 {
+  font-size: var(--text-3xl);
+}
+h4 {
+  font-size: var(--text-2xl);
+}
+h5 {
+  font-size: var(--text-xl);
+}
+h6 {
+  font-size: var(--text-lg);
+}
 
 p {
   font-size: var(--text-base);
@@ -320,8 +337,13 @@ a:hover {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* === UTILITY CLASSES === */
@@ -361,7 +383,12 @@ a:hover {
 
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
   margin: var(--space-12) 0;
 }
 
@@ -398,4 +425,3 @@ a:hover {
     --text-muted: #cccccc;
   }
 }
-

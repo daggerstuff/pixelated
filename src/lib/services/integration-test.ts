@@ -3,12 +3,12 @@
  * Tests cross-service communication and type safety
  */
 
-import { MemoryService } from '../memory'
-import { fheService } from '../fhe'
-import { EncryptionMode } from '../fhe/types'
 import { BiasDetectionEngine } from '../ai/bias-detection/index'
 import { MultidimensionalEmotionMapper } from '../ai/emotions/MultidimensionalEmotionMapper'
+import { fheService } from '../fhe'
+import { EncryptionMode } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { MemoryService } from '../memory'
 
 const logger = createBuildSafeLogger('service-integration-test')
 
@@ -86,7 +86,7 @@ export class ServiceIntegrationTester {
 
     const totalTime = Date.now() - startTime
     const success =
-      Object.values(results).every((result) => result === true) &&
+      Object.values(results).every((result) =>  result) &&
       errors.length === 0
 
     logger.info('Service integration test completed', {
@@ -146,7 +146,8 @@ export class ServiceIntegrationTester {
         memories.length > 0 &&
         updated !== null &&
         searchResults.length > 0 &&
-        deleted === true
+        
+        deleted
       )
     } catch (error: unknown) {
       logger.error('Memory service test failed:', {

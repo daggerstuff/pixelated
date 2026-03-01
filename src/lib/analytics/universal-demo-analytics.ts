@@ -186,7 +186,7 @@ export class UniversalDemoAnalytics {
               !this.scrollDepths.has(threshold)
             ) {
               this.scrollDepths.add(threshold)
-              this.trackEvent(ANALYTICS_EVENTS.SCROLL_DEPTH, {
+              void this.trackEvent(ANALYTICS_EVENTS.SCROLL_DEPTH, {
                 depth_percent: threshold,
                 scroll_position: window.scrollY,
                 page_height: document.documentElement.scrollHeight,
@@ -212,7 +212,7 @@ export class UniversalDemoAnalytics {
               entry.target.id || entry.target.className || 'unknown-section'
             if (!this.sectionViews.has(sectionId)) {
               this.sectionViews.add(sectionId)
-              this.trackEvent(ANALYTICS_EVENTS.SECTION_VIEW, {
+              void this.trackEvent(ANALYTICS_EVENTS.SECTION_VIEW, {
                 section: sectionId,
                 time_to_section: Date.now() - this.startTime,
                 section_position: entry.boundingClientRect.top,
@@ -242,7 +242,7 @@ export class UniversalDemoAnalytics {
           const text = target.textContent?.trim() || 'unknown'
           const href = target.getAttribute('href')
 
-          this.trackEvent(ANALYTICS_EVENTS.CTA_CLICK, {
+          void this.trackEvent(ANALYTICS_EVENTS.CTA_CLICK, {
             cta_location: location,
             cta_text: text,
             cta_href: href,
@@ -260,7 +260,7 @@ export class UniversalDemoAnalytics {
     )
     demoContainers.forEach((container) => {
       container.addEventListener('click', (e) => {
-        this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {
+        void this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {
           interaction_type: 'demo_click',
           demo_section: container.className,
           time_to_interaction: Date.now() - this.startTime,
@@ -273,7 +273,7 @@ export class UniversalDemoAnalytics {
     document.addEventListener('focusin', (e) => {
       const target = e.target as HTMLElement
       if (target.matches('input, textarea, select')) {
-        this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {
+        void this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {
           interaction_type: 'input_focus',
           element_type: target.tagName.toLowerCase(),
           input_name: target.getAttribute('name') || 'unknown',
@@ -285,7 +285,7 @@ export class UniversalDemoAnalytics {
   private setupTimeTracking() {
     TIME_THRESHOLDS.forEach((threshold) => {
       setTimeout(() => {
-        this.trackEvent(ANALYTICS_EVENTS.TIME_ON_PAGE, {
+        void this.trackEvent(ANALYTICS_EVENTS.TIME_ON_PAGE, {
           time_threshold: threshold,
           total_time: threshold,
           page_name: this.pageName,
@@ -296,20 +296,20 @@ export class UniversalDemoAnalytics {
     // Track page exit
     window.addEventListener('beforeunload', () => {
       const totalTime = Math.round((Date.now() - this.startTime) / 1000)
-      this.trackEvent(ANALYTICS_EVENTS.PAGE_EXIT, {
+      void this.trackEvent(ANALYTICS_EVENTS.PAGE_EXIT, {
         total_time: totalTime,
         max_scroll_depth: Math.max(...Array.from(this.scrollDepths), 0),
         sections_viewed: this.sectionViews.size,
       })
 
       // Flush remaining events
-      this.flushEvents()
+      void this.flushEvents()
     })
   }
 
   private setupErrorTracking() {
     window.addEventListener('error', (e) => {
-      this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
+      void this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
         error_message: e.message,
         error_filename: e.filename,
         error_line: e.lineno,
@@ -319,7 +319,7 @@ export class UniversalDemoAnalytics {
     })
 
     window.addEventListener('unhandledrejection', (e) => {
-      this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
+      void this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
         error_type: 'unhandled_promise_rejection',
         error_reason: e.reason?.toString(),
       })
@@ -334,7 +334,7 @@ export class UniversalDemoAnalytics {
           'navigation',
         )[0] as PerformanceNavigationTiming
         if (perfData) {
-          this.trackEvent(ANALYTICS_EVENTS.PERFORMANCE_METRIC, {
+          void this.trackEvent(ANALYTICS_EVENTS.PERFORMANCE_METRIC, {
             metric_type: 'page_load',
             dom_content_loaded:
               perfData.domContentLoadedEventEnd -
@@ -351,7 +351,7 @@ export class UniversalDemoAnalytics {
   private setupEventFlushing() {
     // Flush events every 30 seconds
     setInterval(() => {
-      this.flushEvents()
+      void this.flushEvents()
     }, 30000)
   }
 
@@ -377,7 +377,7 @@ export class UniversalDemoAnalytics {
 
     // Auto-flush if queue is full
     if (this.eventQueue.length >= ANALYTICS_CONFIG.BATCH_SIZE) {
-      this.flushEvents()
+      void this.flushEvents()
     }
   }
 
@@ -442,7 +442,7 @@ export class UniversalDemoAnalytics {
 
   // Public methods for manual tracking
   public trackConversion(conversionType: string, value?: number): void {
-    this.trackEvent(ANALYTICS_EVENTS.AB_TEST_CONVERSION, {
+    void this.trackEvent(ANALYTICS_EVENTS.AB_TEST_CONVERSION, {
       conversion_type: conversionType,
       conversion_value: value,
       time_to_conversion: Date.now() - this.startTime,
@@ -453,7 +453,7 @@ export class UniversalDemoAnalytics {
     eventName: string,
     properties: Record<string, unknown> = {},
   ): void {
-    this.trackEvent(eventName, properties)
+    void this.trackEvent(eventName, properties)
   }
 
   // Getters for debugging
@@ -490,7 +490,7 @@ export function initializeDemoAnalytics(
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => analytics.initialize())
   } else {
-    analytics.initialize()
+    void analytics.initialize()
   }
 
   // Make available globally for debugging

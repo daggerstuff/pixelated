@@ -1,13 +1,15 @@
 ---
 title: 'Resources Overview'
-description: 'Comprehensive overview of resources for CPTSD and addiction recovery'
+description:
+  'Comprehensive overview of resources for CPTSD and addiction recovery'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Resources Overview
 
-This guide provides a comprehensive overview of resources available for individuals and professionals dealing with CPTSD and addiction recovery.
+This guide provides a comprehensive overview of resources available for
+individuals and professionals dealing with CPTSD and addiction recovery.
 
 ## Resource Categories
 

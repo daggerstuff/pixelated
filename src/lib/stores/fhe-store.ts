@@ -1,3 +1,9 @@
+import { create } from 'zustand'
+
+import { getFHEService, FHEImplementation } from '../fhe/fhe-factory'
+import { KeyRotationService } from '../fhe/key-rotation'
+import { SealSchemeType } from '../fhe/seal-types'
+import type { SealContextOptions } from '../fhe/seal-types'
 import type {
   EncryptionMode,
   EncryptionOptions,
@@ -8,13 +14,8 @@ import type {
   EncryptedData,
 } from '../fhe/types'
 import { FHEOperation } from '../fhe/types'
-import { create } from 'zustand'
-import { getFHEService, FHEImplementation } from '../fhe/fhe-factory'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { KeyRotationService } from '../fhe/key-rotation'
-import { SealSchemeType } from '../fhe/seal-types'
-import type { SealContextOptions } from '../fhe/seal-types'
 import { EncryptionMode as EncryptionModeEnum } from '../fhe/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 // Initialize logger
 const logger = createBuildSafeLogger('fhe-store')
@@ -132,7 +133,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         })
 
         // Get or generate key ID
-        const keyId = await keyRotationService.getActiveKeyId()
+        const keyId =  keyRotationService.getActiveKeyId()
 
         set({
           isInitialized: true,
@@ -314,7 +315,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
               if ('add' in fheService && fheService.add && params?.['value']) {
                 processedData = await fheService.add(
                   encryptedData,
-                  params['value'] as EncryptedData<unknown>,
+                  params['value'] as EncryptedData,
                 )
               }
               break
@@ -326,7 +327,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
               ) {
                 processedData = await fheService.multiply(
                   encryptedData,
-                  params['value'] as EncryptedData<unknown>,
+                  params['value'] as EncryptedData,
                 )
               }
               break
@@ -440,7 +441,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         await fheService.rotateKeys()
 
         // Get the new key ID
-        const newKeyId = await keyRotationService.getActiveKeyId()
+        const newKeyId =  keyRotationService.getActiveKeyId()
 
         // Update key ID
         set({ keyId: newKeyId })

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import { useChatCompletion } from './useChatCompletion'
 
 /**
@@ -62,24 +63,24 @@ export default function ChatCompletionExample() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSendMessage()
+      void handleSendMessage()
     }
   }
 
   const messageStats = getMessageStats()
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4">
+    <div className='mx-auto max-w-4xl p-6'>
+      <div className='mb-6'>
+        <h2 className='mb-4 text-2xl font-bold'>
           Enhanced Chat Completion Demo
         </h2>
 
         {/* Controls */}
-        <div className="flex flex-wrap gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-          <label className="flex items-center gap-2">
+        <div className='bg-gray-50 mb-4 flex flex-wrap gap-4 rounded-lg p-4'>
+          <label className='flex items-center gap-2'>
             <input
-              type="checkbox"
+              type='checkbox'
               checked={streamingMode}
               onChange={(e) => setStreamingMode(e.target.checked)}
             />
@@ -88,7 +89,7 @@ export default function ChatCompletionExample() {
 
           <button
             onClick={resetChat}
-            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            className='bg-red-500 text-white hover:bg-red-600 rounded px-3 py-1'
           >
             Reset Chat
           </button>
@@ -96,7 +97,7 @@ export default function ChatCompletionExample() {
           <button
             onClick={retryLastMessage}
             disabled={!error}
-            className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
+            className='bg-yellow-500 text-white hover:bg-yellow-600 rounded px-3 py-1 disabled:opacity-50'
           >
             Retry Last
           </button>
@@ -104,7 +105,7 @@ export default function ChatCompletionExample() {
           <button
             onClick={stopGeneration}
             disabled={!isLoading}
-            className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+            className='bg-gray-500 text-white hover:bg-gray-600 rounded px-3 py-1 disabled:opacity-50'
           >
             Stop
           </button>
@@ -112,36 +113,36 @@ export default function ChatCompletionExample() {
           <button
             onClick={() => {
               const exported = exportConversation()
-              navigator.clipboard.writeText(exported)
+              void navigator.clipboard.writeText(exported)
               alert('Conversation copied to clipboard!')
             }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className='bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1'
           >
             Export
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-blue-50 rounded-lg">
+        <div className='bg-blue-50 mb-4 grid grid-cols-2 gap-4 rounded-lg p-4 md:grid-cols-4'>
           <div>
-            <div className="text-sm text-gray-600">Messages</div>
-            <div className="font-semibold">
+            <div className='text-gray-600 text-sm'>Messages</div>
+            <div className='font-semibold'>
               {conversationStats.messageCount}
             </div>
           </div>
           <div>
-            <div className="text-sm text-gray-600">Avg Response Time</div>
-            <div className="font-semibold">
+            <div className='text-gray-600 text-sm'>Avg Response Time</div>
+            <div className='font-semibold'>
               {Math.round(conversationStats.avgResponseTime)}ms
             </div>
           </div>
           <div>
-            <div className="text-sm text-gray-600">Total Tokens</div>
-            <div className="font-semibold">{tokenUsage.totalTokens}</div>
+            <div className='text-gray-600 text-sm'>Total Tokens</div>
+            <div className='font-semibold'>{tokenUsage.totalTokens}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600">Est. Cost</div>
-            <div className="font-semibold">
+            <div className='text-gray-600 text-sm'>Est. Cost</div>
+            <div className='font-semibold'>
               ${tokenUsage.estimatedCost.toFixed(4)}
             </div>
           </div>
@@ -149,19 +150,19 @@ export default function ChatCompletionExample() {
 
         {/* Progress */}
         {isLoading && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="text-sm text-gray-600">
+          <div className='mb-4'>
+            <div className='mb-2 flex items-center gap-2'>
+              <div className='text-gray-600 text-sm'>
                 {isStreaming ? 'Streaming...' : 'Loading...'}
                 {isTyping && ' (AI is typing)'}
               </div>
-              <div className="text-sm text-blue-600">
+              <div className='text-blue-600 text-sm'>
                 {progress.toFixed(1)}%
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className='bg-gray-200 h-2 w-full rounded-full'>
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className='bg-blue-600 h-2 rounded-full transition-all duration-300'
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -170,38 +171,38 @@ export default function ChatCompletionExample() {
 
         {/* Error */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="text-red-700 font-medium">Error:</div>
-            <div className="text-red-600">{error}</div>
+          <div className='bg-red-50 border-red-200 mb-4 rounded-lg border p-4'>
+            <div className='text-red-700 font-medium'>Error:</div>
+            <div className='text-red-600'>{error}</div>
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <div className="mb-6 space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+      <div className='mb-6 max-h-96 space-y-4 overflow-y-auto rounded-lg border p-4'>
         {messages.length === 0 ? (
-          <div className="text-gray-500 text-center py-8">
+          <div className='text-gray-500 py-8 text-center'>
             No messages yet. Start a conversation!
           </div>
         ) : (
           messages.map((message, index) => (
             <div
               key={`${message.role}-${index}-${message.content.slice(0, 20)}`}
-              className={`p-3 rounded-lg ${
+              className={`rounded-lg p-3 ${
                 message.role === 'user'
                   ? 'bg-blue-100 ml-8'
                   : 'bg-gray-100 mr-8'
               }`}
             >
-              <div className="flex justify-between items-start">
+              <div className='flex items-start justify-between'>
                 <div>
-                  <div className="font-medium text-sm mb-1">
+                  <div className='mb-1 text-sm font-medium'>
                     {message.role === 'user' ? 'You' : 'AI'}
                   </div>
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  <div className='whitespace-pre-wrap'>{message.content}</div>
                 </div>
 
-                <div className="flex gap-1 ml-2">
+                <div className='ml-2 flex gap-1'>
                   <button
                     onClick={() => {
                       const newContent = prompt(
@@ -212,20 +213,20 @@ export default function ChatCompletionExample() {
                         editMessage(index, newContent)
                       }
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className='text-blue-600 hover:text-blue-800 text-xs'
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteMessage(index)}
-                    className="text-xs text-red-600 hover:text-red-800"
+                    className='text-red-600 hover:text-red-800 text-xs'
                   >
                     Delete
                   </button>
                   {message.role === 'user' && (
                     <button
                       onClick={() => resendMessage(index)}
-                      className="text-xs text-green-600 hover:text-green-800"
+                      className='text-green-600 hover:text-green-800 text-xs'
                     >
                       Resend
                     </button>
@@ -238,21 +239,21 @@ export default function ChatCompletionExample() {
       </div>
 
       {/* Input */}
-      <div className="space-y-4">
-        <div className="flex gap-2">
+      <div className='space-y-4'>
+        <div className='flex gap-2'>
           <textarea
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Type your message here... (Enter to send, Shift+Enter for new line)"
-            className="flex-1 p-3 border rounded-lg resize-none"
+            placeholder='Type your message here... (Enter to send, Shift+Enter for new line)'
+            className='flex-1 resize-none rounded-lg border p-3'
             rows={3}
             disabled={isLoading}
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputMessage.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className='bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50'
           >
             {isLoading ? 'Sending...' : 'Send'}
           </button>
@@ -260,8 +261,8 @@ export default function ChatCompletionExample() {
 
         {/* Message Stats */}
         {messages.length > 0 && (
-          <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg">
-            <div className="font-medium mb-1">Message Statistics:</div>
+          <div className='text-gray-600 bg-gray-50 rounded-lg p-3 text-sm'>
+            <div className='mb-1 font-medium'>Message Statistics:</div>
             <div>Longest: {messageStats.longestMessage} chars</div>
             <div>Shortest: {messageStats.shortestMessage} chars</div>
             <div>Average: {Math.round(messageStats.averageLength)} chars</div>

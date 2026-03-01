@@ -58,8 +58,12 @@
 
   /* Keyframes */
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes fadeInUp {
@@ -110,7 +114,9 @@
   .scroll-animate {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
   }
 
   .scroll-animate.animate {
@@ -231,14 +237,23 @@
 
   /* Loading skeleton animations */
   .skeleton-loading {
-    background: linear-gradient(90deg, var(--color-neutral-800) 25%, var(--color-neutral-700) 50%, var(--color-neutral-800) 75%);
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-800) 25%,
+      var(--color-neutral-700) 50%,
+      var(--color-neutral-800) 75%
+    );
     background-size: 200% 100%;
     animation: skeleton 1.5s infinite;
   }
 
   @keyframes skeleton {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   /* Smooth transitions for interactive elements */
@@ -248,18 +263,26 @@
 
   /* Hover effects for cards and buttons */
   .interactive-element {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   .interactive-element:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
   /* Dark mode specific adjustments */
   @media (prefers-color-scheme: dark) {
     .dark\:bg-contrast {
-      background: linear-gradient(135deg, var(--color-neutral-950) 0%, var(--color-neutral-900) 100%);
+      background: linear-gradient(
+        135deg,
+        var(--color-neutral-950) 0%,
+        var(--color-neutral-900) 100%
+      );
     }
 
     .dark\:border-contrast {
@@ -274,84 +297,89 @@
   const initScrollAnimations = () => {
     const observerOptions = {
       threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+      rootMargin: '0px 0px -50px 0px',
+    }
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate');
-          observer.unobserve(entry.target);
+          entry.target.classList.add('animate')
+          observer.unobserve(entry.target)
         }
-      });
-    }, observerOptions);
+      })
+    }, observerOptions)
 
     // Observe all elements with scroll-animate class
-    document.querySelectorAll('.scroll-animate').forEach(el => {
-      observer.observe(el);
-    });
-  };
+    document.querySelectorAll('.scroll-animate').forEach((el) => {
+      observer.observe(el)
+    })
+  }
 
   // Initialize staggered animations
   const initStaggeredAnimations = () => {
-    const staggeredContainers = document.querySelectorAll('.staggered-animation');
+    const staggeredContainers = document.querySelectorAll(
+      '.staggered-animation',
+    )
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1 },
+    )
 
-    staggeredContainers.forEach(container => {
-      observer.observe(container);
-    });
-  };
+    staggeredContainers.forEach((container) => {
+      observer.observe(container)
+    })
+  }
 
   // Initialize parallax effects
   const initParallax = () => {
-    const parallaxElements = document.querySelectorAll('.parallax-element');
+    const parallaxElements = document.querySelectorAll('.parallax-element')
 
     window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
+      const scrolled = window.pageYOffset
 
-      parallaxElements.forEach(element => {
-        const speed = parseFloat(element.dataset.parallaxSpeed) || 0.5;
-        const yPos = -(scrolled * speed);
-        element.style.transform = `translate3d(0, ${yPos}px, 0)`;
-      });
-    });
-  };
+      parallaxElements.forEach((element) => {
+        const speed = parseFloat(element.dataset.parallaxSpeed) || 0.5
+        const yPos = -(scrolled * speed)
+        element.style.transform = `translate3d(0, ${yPos}px, 0)`
+      })
+    })
+  }
 
   // Initialize all animations when DOM is loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      initScrollAnimations();
-      initStaggeredAnimations();
-      initParallax();
-    });
+      initScrollAnimations()
+      initStaggeredAnimations()
+      initParallax()
+    })
   } else {
-    initScrollAnimations();
-    initStaggeredAnimations();
-    initParallax();
+    initScrollAnimations()
+    initStaggeredAnimations()
+    initParallax()
   }
 
   // Add smooth scrolling for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href')
       if (href !== '#' && href.length > 1) {
-        e.preventDefault();
-        const target = document.querySelector(href);
+        e.preventDefault()
+        const target = document.querySelector(href)
         if (target) {
           target.scrollIntoView({
             behavior: 'smooth',
-            block: 'start'
-          });
+            block: 'start',
+          })
         }
       }
-    });
-  });
+    })
+  })
 </script>

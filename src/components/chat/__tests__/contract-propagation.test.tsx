@@ -2,8 +2,10 @@
 
 import { render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
-import { ChatContainer } from '../ChatContainer'
+
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+
+import { ChatContainer } from '../ChatContainer'
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 

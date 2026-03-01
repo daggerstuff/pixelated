@@ -1,6 +1,6 @@
 /**
  * Business Strategy System Types
- * 
+ *
  * Core type definitions for the business strategy expansion and CMS system
  */
 

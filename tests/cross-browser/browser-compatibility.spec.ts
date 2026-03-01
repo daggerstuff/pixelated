@@ -57,7 +57,7 @@ browsers.forEach((browserName) => {
         const limit = Math.min(buttonCount, 5)
         for (let i = 0; i < limit; i++) {
           const button = buttons.nth(i)
-          if (await button.isVisible() && await button.isEnabled()) {
+          if ((await button.isVisible()) && (await button.isEnabled())) {
             await button.hover()
             // Button should be hoverable without errors
           }
@@ -216,7 +216,7 @@ browsers.forEach((browserName) => {
         const jsFeatures = await page.evaluate(() => {
           return {
             arrow_functions: true,
-            async_await: !!(async () => { }),
+            async_await: !!(async () => {}),
             promises: 'Promise' in globalThis,
             fetch: 'fetch' in globalThis,
             const_let: (() => {
@@ -278,7 +278,10 @@ browsers.forEach((browserName) => {
 
         // Should have some form of focus indicator
         const noneOrZero = (v: string) => v === 'none' || v === '0px'
-        const hasFocusIndicator = !(noneOrZero(focusStyles.outline) && noneOrZero(focusStyles.outlineWidth))
+        const hasFocusIndicator = !(
+          noneOrZero(focusStyles.outline) &&
+          noneOrZero(focusStyles.outlineWidth)
+        )
 
         expect(hasFocusIndicator).toBe(true)
       })

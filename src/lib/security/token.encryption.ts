@@ -5,6 +5,7 @@ import {
   scrypt,
 } from 'node:crypto'
 import { promisify } from 'node:util'
+
 import { SecurityError } from './errors/security.error'
 
 const scryptAsync = promisify(scrypt)

@@ -6,13 +6,14 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('ConfigurationManager')
 
-import { DeploymentConfig, RegionConfig } from './MultiRegionDeploymentManager'
 import { EdgeDeploymentConfig } from './EdgeComputingManager'
 import { RoutingConfig } from './GlobalTrafficRoutingManager'
+import { DeploymentConfig, RegionConfig } from './MultiRegionDeploymentManager'
 
 export interface MultiRegionConfig {
   deployment: DeploymentConfig
@@ -619,7 +620,7 @@ export class ConfigurationManager extends EventEmitter {
     // In a real implementation, this would use file system watchers
     // For now, we'll simulate periodic checks
     const fileWatcher = setInterval(() => {
-      this.checkForConfigurationUpdates()
+      void this.checkForConfigurationUpdates()
     }, 30000) // Check every 30 seconds
 
     this.configWatchers.set('file', fileWatcher)
@@ -630,7 +631,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   private setupEnvironmentWatchers(): void {
     const envWatcher = setInterval(() => {
-      this.checkForEnvironmentChanges()
+      void this.checkForEnvironmentChanges()
     }, 60000) // Check every minute
 
     this.configWatchers.set('environment', envWatcher)
@@ -641,7 +642,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   private setupFeatureFlagWatchers(): void {
     const flagWatcher = setInterval(() => {
-      this.checkForFeatureFlagChanges()
+      void this.checkForFeatureFlagChanges()
     }, 15000) // Check every 15 seconds
 
     this.configWatchers.set('featureFlags', flagWatcher)
@@ -751,7 +752,7 @@ export class ConfigurationManager extends EventEmitter {
   getEnvironmentConfig(environment: string): EnvironmentConfig {
     return {
       ...this.config.environments[
-      environment as keyof typeof this.config.environments
+        environment as keyof typeof this.config.environments
       ],
     }
   }

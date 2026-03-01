@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { NotificationCenter } from '../NotificationCenter'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import { useWebSocket } from '@/hooks/useWebSocket'
+
+import { NotificationCenter } from '../NotificationCenter'
 
 // Mock useWebSocket hook
 vi.mock('@/hooks/useWebSocket', () => ({

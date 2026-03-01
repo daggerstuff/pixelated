@@ -1,6 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { POST, GET } from '../progress'
 import { Pool } from 'pg'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
+import { POST, GET } from '../progress'
 
 // Mock pg.Pool
 vi.mock('pg', () => {

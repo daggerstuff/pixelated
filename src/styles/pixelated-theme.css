@@ -379,7 +379,9 @@
   border: 1px solid var(--theme-border-primary);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease;
   box-shadow: var(--shadow-1);
 }
 

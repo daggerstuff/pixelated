@@ -10,17 +10,23 @@ toc: true
 
 # Deployment Verification
 
-This document outlines the verification process for deployments to ensure all components are functioning correctly after a deployment or rollback.
+This document outlines the verification process for deployments to ensure all
+components are functioning correctly after a deployment or rollback.
 
 ## Verification Process
 
-After each deployment or rollback, a verification process runs to check critical system components and functionality. This process is automated but can also be run manually if needed.
+After each deployment or rollback, a verification process runs to check critical
+system components and functionality. This process is automated but can also be
+run manually if needed.
 
 ### Automated Verification
 
-Automated verification is triggered by the CI/CD pipeline after each deployment and rollback. The verification script performs checks on various system components and reports success or failure.
+Automated verification is triggered by the CI/CD pipeline after each deployment
+and rollback. The verification script performs checks on various system
+components and reports success or failure.
 
-The script is located at `src/scripts/verify-deployment.ts` and can be run with the following command:
+The script is located at `src/scripts/verify-deployment.ts` and can be run with
+the following command:
 
 ```bash
 pnpm verify-deployment
@@ -63,7 +69,8 @@ Verifies critical API endpoints are functioning correctly:
 
 ### 4. Authentication
 
-Verifies that authentication is working correctly by making a request to the Supabase auth API.
+Verifies that authentication is working correctly by making a request to the
+Supabase auth API.
 
 ### 5. Static Assets
 
@@ -79,7 +86,8 @@ Verifies that the application can connect to the database and execute queries.
 
 ### 7. Browser Tests
 
-In CI environments, runs browser tests using Playwright to verify key user flows.
+In CI environments, runs browser tests using Playwright to verify key user
+flows.
 
 ## Verification Results
 
@@ -87,7 +95,8 @@ The verification process produces results in the following formats:
 
 ### Console Output
 
-The verification results are displayed in the console with color-coded status messages:
+The verification results are displayed in the console with color-coded status
+messages:
 
 - ✅ PASSED: Checks that succeeded
 - ❌ FAILED: Checks that failed
@@ -95,11 +104,14 @@ The verification results are displayed in the console with color-coded status me
 
 ### CI Results
 
-In CI environments, the verification results are saved to a JSON file (`verification-results.json`) for further processing and reporting.
+In CI environments, the verification results are saved to a JSON file
+(`verification-results.json`) for further processing and reporting.
 
 ## Interpreting Results
 
-A successful verification will show all checks as PASSED or SKIPPED. If any check fails, the verification is considered failed and will trigger an automatic rollback in CI environments.
+A successful verification will show all checks as PASSED or SKIPPED. If any
+check fails, the verification is considered failed and will trigger an automatic
+rollback in CI environments.
 
 ## Troubleshooting Failed Verifications
 
@@ -152,4 +164,6 @@ pnpm tsx src/scripts/verify-deployment.ts --base-url=http://localhost:3000
 
 ## Custom Verification Checks
 
-To add custom verification checks, modify the `src/scripts/verify-deployment.ts` file and add new check functions. Each check should return an object with `passed` and optional `message` properties.
+To add custom verification checks, modify the `src/scripts/verify-deployment.ts`
+file and add new check functions. Each check should return an object with
+`passed` and optional `message` properties.

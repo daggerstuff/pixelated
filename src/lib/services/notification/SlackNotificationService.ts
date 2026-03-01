@@ -1,9 +1,10 @@
+import { config } from '@/config/env.config' // For accessing Slack webhook URL
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   CrisisAlertContext,
   ICrisisNotificationHandler,
 } from './NotificationService'
-import { config } from '@/config/env.config' // For accessing Slack webhook URL
 
 const logger = createBuildSafeLogger('SlackNotificationService')
 
@@ -179,7 +180,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
     } catch (error: unknown) {
       logger.error('Exception while sending Slack crisis alert:', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
         webhookUrl:
           this.webhookUrl.substring(
             0,

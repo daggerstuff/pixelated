@@ -10,11 +10,14 @@ toc: true
 
 # AI Deployment Guide
 
-This guide provides comprehensive instructions for deploying the AI components in production environments.
+This guide provides comprehensive instructions for deploying the AI components
+in production environments.
 
 ## Overview
 
-Deploying the AI components requires careful consideration of security, performance, and compliance requirements. This guide covers the necessary steps to deploy the AI components in a secure, scalable, and HIPAA-compliant manner.
+Deploying the AI components requires careful consideration of security,
+performance, and compliance requirements. This guide covers the necessary steps
+to deploy the AI components in a secure, scalable, and HIPAA-compliant manner.
 
 ## Prerequisites
 
@@ -68,9 +71,11 @@ ENABLE_ERROR_TRACKING=true
 
 For secure management of API keys and other secrets:
 
-1. Use a secret management service like AWS Secrets Manager, HashiCorp Vault, or AWS Systems Manager Parameter Store
+1. Use a secret management service like AWS Secrets Manager, HashiCorp Vault, or
+   AWS Systems Manager Parameter Store
 2. Rotate API keys regularly (at least every 90 days)
-3. Use different API keys for different environments (development, staging, production)
+3. Use different API keys for different environments (development, staging,
+   production)
 4. Implement least privilege access to API keys
 
 Example using AWS Secrets Manager:
@@ -229,7 +234,6 @@ For horizontal scaling:
 2. Implement distributed caching with Redis:
 
 ```typescript
-
 const redisClient = createClient({
   url: process.env.REDIS_URL,
 })
@@ -272,7 +276,6 @@ Implement a multi-level caching strategy:
 1. In-memory LRU cache for frequently used prompts:
 
 ```typescript
-
 const memoryCache = new LRUCache<string, AICompletion>({
   max: 1000,
   ttl: 1000 * 60 * 60, // 1 hour
@@ -310,7 +313,6 @@ Set up performance monitoring:
 1. Implement custom metrics for AI operations:
 
 ```typescript
-
 // In your performance optimization wrapper
 async function trackPerformance(
   operation: string,
@@ -348,7 +350,6 @@ Set up usage tracking:
 1. Implement database logging for AI usage:
 
 ```typescript
-
 // In your performance optimization wrapper
 async function trackUsage(
   userId: string,
@@ -385,7 +386,6 @@ Set up HIPAA-compliant audit logging:
 1. Implement comprehensive audit logging:
 
 ```typescript
-
 // In your AI service wrapper
 async function logAuditEvent(
   userId: string,
@@ -459,7 +459,6 @@ Implement content filtering for AI inputs and outputs:
 1. Set up input validation and sanitization:
 
 ```typescript
-
 const messageSchema = z.object({
   role: z.enum(['system', 'user', 'assistant']),
   content: z.string().min(1).max(32768),
@@ -488,7 +487,6 @@ Implement access control for AI features:
 1. Set up role-based access control:
 
 ```typescript
-
 // In your API route
 if (!AccessControl.can(user, 'use', 'ai:sentiment-analysis')) {
   return new Response(
@@ -520,7 +518,6 @@ Implement HIPAA-compliant data protection:
 1. Encrypt sensitive data in transit and at rest:
 
 ```typescript
-
 // Encrypt sensitive data before storing
 const encryptedData = await encrypt(sensitiveData, encryptionKey)
 await db.insert('ai_data', { encrypted_data: encryptedData })
@@ -570,7 +567,6 @@ Implement a failover strategy:
 1. Set up provider failover for AI services:
 
 ```typescript
-
 async function createCompletionWithFailover(
   messages: AIMessage[],
   options?: AIServiceOptions,
@@ -670,7 +666,8 @@ If you encounter API key issues:
 1. Verify the API key is correctly set in environment variables
 2. Check that the API key has the necessary permissions
 3. Ensure the API key is valid and not expired
-4. Verify the API key is for the correct environment (production vs. development)
+4. Verify the API key is for the correct environment (production vs.
+   development)
 
 #### Rate Limiting 2
 

@@ -1,6 +1,7 @@
 export const prerender = false
 
 import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
+
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
@@ -44,7 +45,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
         id: user.id,
         email: user.email,
         role: user.role,
-      }
+      },
     }
 
     return new Response(JSON.stringify(mockData), {

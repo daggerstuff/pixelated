@@ -1,6 +1,8 @@
 ---
 title: '🧬 Research Article Template'
-description: 'Template for creating cutting-edge neuroplasticity and trauma research articles with evidence-based insights and clinical applications'
+description:
+  'Template for creating cutting-edge neuroplasticity and trauma research
+  articles with evidence-based insights and clinical applications'
 author: 'Research & Clinical Team'
 pubDate: 2025-05-06
 tags: ['template', 'guidelines', 'writing', 'blog']
@@ -10,7 +12,6 @@ image:
     alt: 'Writer at desk with notebook and computer',
   }
 ---
-
 
 # 📑 Research Article Template
 
@@ -258,4 +259,5 @@ verification_points:
 
 ---
 
-_This template ensures consistency across our research publications while maintaining scientific rigor and clinical relevance._
+_This template ensures consistency across our research publications while
+maintaining scientific rigor and clinical relevance._

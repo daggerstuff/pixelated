@@ -5,12 +5,34 @@
 
 :root {
   /* === MESH BACKGROUNDS - BRUTALIST ELEGANCE === */
-  --mesh-1: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-           radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
-           radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+  --mesh-1:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(16, 185, 129, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(59, 130, 246, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 20%,
+      rgba(139, 92, 246, 0.04) 0%,
+      transparent 50%
+    );
 
-  --mesh-2: radial-gradient(circle at 60% 30%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
-           radial-gradient(circle at 20% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+  --mesh-2:
+    radial-gradient(
+      circle at 60% 30%,
+      rgba(16, 185, 129, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 20% 70%,
+      rgba(6, 182, 212, 0.05) 0%,
+      transparent 50%
+    );
 }
 
 /* MESH BACKGROUNDS */

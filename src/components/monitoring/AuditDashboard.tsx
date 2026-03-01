@@ -58,12 +58,12 @@ export function AuditDashboard() {
   if (error) return <div>Error: {error}</div>
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Audit Log Dashboard</h1>
+    <div className='space-y-6 p-6'>
+      <h1 className='text-2xl font-bold'>Audit Log Dashboard</h1>
 
       {/* PHI Access Over Time */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">PHI Access Patterns</h2>
+      <div className='bg-white rounded-lg p-6 shadow'>
+        <h2 className='mb-4 text-xl font-semibold'>PHI Access Patterns</h2>
         {/* <LineChart
           data={metrics.accessByTime.data}
           labels={metrics.accessByTime.labels}
@@ -73,9 +73,9 @@ export function AuditDashboard() {
       </div>
 
       {/* Access by Type Distribution */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Access Type Distribution</h2>
-        <div className="h-[300px]">
+      <div className='bg-white rounded-lg p-6 shadow'>
+        <h2 className='mb-4 text-xl font-semibold'>Access Type Distribution</h2>
+        <div className='h-[300px]'>
           {/* <PieChart
             data={metrics.accessByType.data}
             labels={metrics.accessByType.labels}
@@ -84,31 +84,31 @@ export function AuditDashboard() {
       </div>
 
       {/* Unusual Access Patterns */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className='bg-white rounded-lg p-6 shadow'>
+        <h2 className='mb-4 text-xl font-semibold'>
           Unusual Access Patterns
           {metrics.unusualAccess.count > 0 && (
-            <span className="ml-2 px-2 py-1 text-sm bg-red-100 text-red-800 rounded-full">
+            <span className='bg-red-100 text-red-800 ml-2 rounded-full px-2 py-1 text-sm'>
               {metrics.unusualAccess.count} detected
             </span>
           )}
         </h2>
         {metrics.unusualAccess.details.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className='space-y-2'>
             {metrics.unusualAccess.details.map((detail, index) => (
               <li
                 key={`unusual-access-${index}`}
-                className="flex items-center text-red-600"
+                className='text-red-600 flex items-center'
               >
                 <svg
-                  className="w-5 h-5 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+                  className='mr-2 h-5 w-5'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
                 >
                   <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
+                    fillRule='evenodd'
+                    d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z'
+                    clipRule='evenodd'
                   />
                 </svg>
                 {detail}
@@ -116,7 +116,7 @@ export function AuditDashboard() {
             ))}
           </ul>
         ) : (
-          <p className="text-green-600">No unusual access patterns detected</p>
+          <p className='text-green-600'>No unusual access patterns detected</p>
         )}
       </div>
     </div>

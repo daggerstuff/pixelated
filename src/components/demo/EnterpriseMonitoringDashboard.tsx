@@ -1,8 +1,3 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Activity,
   TrendingUp,
@@ -16,6 +11,12 @@ import {
   BarChart3,
   PieChart,
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface PerformanceMetric {
   id: string
@@ -271,117 +272,117 @@ export default function EnterpriseMonitoringDashboard() {
     switch (status) {
       case 'good':
       case 'online':
-        return <CheckCircle className="w-4 h-4" />
+        return <CheckCircle className='h-4 w-4' />
       case 'warning':
       case 'degraded':
-        return <AlertTriangle className="w-4 h-4" />
+        return <AlertTriangle className='h-4 w-4' />
       case 'critical':
       case 'offline':
-        return <AlertTriangle className="w-4 h-4" />
+        return <AlertTriangle className='h-4 w-4' />
       default:
-        return <Activity className="w-4 h-4" />
+        return <Activity className='h-4 w-4' />
     }
   }
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="w-4 h-4 text-green-600" />
+        return <TrendingUp className='text-green-600 h-4 w-4' />
       case 'down':
-        return <TrendingUp className="w-4 h-4 text-red-600 rotate-180" />
+        return <TrendingUp className='text-red-600 h-4 w-4 rotate-180' />
       default:
-        return <Activity className="w-4 h-4 text-gray-600" />
+        return <Activity className='text-gray-600 h-4 w-4' />
     }
   }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading monitoring dashboard...</p>
+      <div className='flex min-h-[400px] items-center justify-center'>
+        <div className='text-center'>
+          <div className='border-blue-600 border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4'></div>
+          <p className='text-gray-600'>Loading monitoring dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className='mx-auto w-full max-w-7xl space-y-6 p-6'>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className='text-gray-900 text-3xl font-bold'>
             Enterprise Monitoring Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className='text-gray-600 mt-1'>
             Real-time system performance and analytics • Last updated:{' '}
             {lastUpdate.toLocaleTimeString()}
           </p>
         </div>
         <Badge
-          variant="outline"
-          className="bg-green-50 text-green-700 border-green-200"
+          variant='outline'
+          className='bg-green-50 text-green-700 border-green-200'
         >
-          <Activity className="w-4 h-4 mr-2" />
+          <Activity className='mr-2 h-4 w-4' />
           All Systems Operational
         </Badge>
       </div>
 
-      <Tabs defaultValue="metrics" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="metrics" className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
+      <Tabs defaultValue='metrics' className='w-full'>
+        <TabsList className='grid w-full grid-cols-3'>
+          <TabsTrigger value='metrics' className='flex items-center gap-2'>
+            <BarChart3 className='h-4 w-4' />
             Performance Metrics
           </TabsTrigger>
-          <TabsTrigger value="health" className="flex items-center gap-2">
-            <Shield className="w-4 h-4" />
+          <TabsTrigger value='health' className='flex items-center gap-2'>
+            <Shield className='h-4 w-4' />
             System Health
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <PieChart className="w-4 h-4" />
+          <TabsTrigger value='analytics' className='flex items-center gap-2'>
+            <PieChart className='h-4 w-4' />
             Usage Analytics
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="metrics" className="space-y-6">
+        <TabsContent value='metrics' className='space-y-6'>
           {/* Key Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {performanceMetrics.map((metric) => (
               <Card key={metric.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-medium text-gray-600">
+                <CardHeader className='pb-2'>
+                  <div className='flex items-center justify-between'>
+                    <CardTitle className='text-gray-600 text-sm font-medium'>
                       {metric.name}
                     </CardTitle>
                     {getTrendIcon(metric.trend)}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-2xl font-bold text-gray-900">
+                  <div className='mb-2 flex items-baseline gap-2'>
+                    <span className='text-gray-900 text-2xl font-bold'>
                       {metric.value.toLocaleString()}
                     </span>
-                    <span className="text-sm text-gray-500">{metric.unit}</span>
+                    <span className='text-gray-500 text-sm'>{metric.unit}</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-gray-500">
+                  <div className='space-y-2'>
+                    <div className='text-gray-500 flex justify-between text-xs'>
                       <span>
                         Threshold: {metric.threshold}
                         {metric.unit}
                       </span>
                       <Badge
-                        variant="outline"
+                        variant='outline'
                         className={`text-xs ${getStatusColor(metric.status)}`}
                       >
                         {getStatusIcon(metric.status)}
-                        <span className="ml-1 capitalize">{metric.status}</span>
+                        <span className='ml-1 capitalize'>{metric.status}</span>
                       </Badge>
                     </div>
 
                     <Progress
                       value={(metric.value / metric.threshold) * 100}
-                      className="h-2"
+                      className='h-2'
                     />
                   </div>
                 </CardContent>
@@ -390,40 +391,40 @@ export default function EnterpriseMonitoringDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="health" className="space-y-6">
+        <TabsContent value='health' className='space-y-6'>
           {/* API Health Status */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
+              <CardTitle className='flex items-center gap-2'>
+                <Zap className='h-5 w-5' />
                 API Endpoints Status
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {systemHealth?.apis.map((api) => (
                   <div
                     key={api.endpoint}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className='flex items-center justify-between rounded-lg border p-3'
                   >
-                    <div className="flex items-center gap-3">
+                    <div className='flex items-center gap-3'>
                       <Badge
-                        variant="outline"
+                        variant='outline'
                         className={`${getStatusColor(api.status)}`}
                       >
                         {getStatusIcon(api.status)}
-                        <span className="ml-1 capitalize">{api.status}</span>
+                        <span className='ml-1 capitalize'>{api.status}</span>
                       </Badge>
                       <div>
-                        <h4 className="font-medium">{api.name}</h4>
-                        <p className="text-sm text-gray-500">{api.endpoint}</p>
+                        <h4 className='font-medium'>{api.name}</h4>
+                        <p className='text-gray-500 text-sm'>{api.endpoint}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">
+                    <div className='text-right'>
+                      <div className='text-sm font-medium'>
                         {api.responseTime}ms
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className='text-gray-500 text-xs'>
                         {api.successRate}% uptime
                       </div>
                     </div>
@@ -434,37 +435,37 @@ export default function EnterpriseMonitoringDashboard() {
           </Card>
 
           {/* Infrastructure Health */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Brain className='h-5 w-5' />
                   Database Performance
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Status</span>
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
-                      variant="outline"
+                      variant='outline'
                       className={`${getStatusColor(systemHealth?.database.status || '')}`}
                     >
                       {getStatusIcon(systemHealth?.database.status || '')}
-                      <span className="ml-1 capitalize">
+                      <span className='ml-1 capitalize'>
                         {systemHealth?.database.status}
                       </span>
                     </Badge>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Response Time</span>
-                    <span className="font-medium">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Response Time</span>
+                    <span className='font-medium'>
                       {systemHealth?.database.responseTime}ms
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Connections</span>
-                    <span className="font-medium">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Connections</span>
+                    <span className='font-medium'>
                       {systemHealth?.database.connections}/
                       {systemHealth?.database.maxConnections}
                     </span>
@@ -475,7 +476,7 @@ export default function EnterpriseMonitoringDashboard() {
                         (systemHealth?.database.maxConnections || 1)) *
                       100
                     }
-                    className="h-2"
+                    className='h-2'
                   />
                 </div>
               </CardContent>
@@ -483,34 +484,34 @@ export default function EnterpriseMonitoringDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Zap className='h-5 w-5' />
                   Cache Performance
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Status</span>
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
-                      variant="outline"
+                      variant='outline'
                       className={`${getStatusColor(systemHealth?.cache.status || '')}`}
                     >
                       {getStatusIcon(systemHealth?.cache.status || '')}
-                      <span className="ml-1 capitalize">
+                      <span className='ml-1 capitalize'>
                         {systemHealth?.cache.status}
                       </span>
                     </Badge>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Hit Rate</span>
-                    <span className="font-medium">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Hit Rate</span>
+                    <span className='font-medium'>
                       {systemHealth?.cache.hitRate}%
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Memory Usage</span>
-                    <span className="font-medium">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Memory Usage</span>
+                    <span className='font-medium'>
                       {systemHealth?.cache.memory}GB /{' '}
                       {systemHealth?.cache.maxMemory}GB
                     </span>
@@ -521,7 +522,7 @@ export default function EnterpriseMonitoringDashboard() {
                         (systemHealth?.cache.maxMemory || 1)) *
                       100
                     }
-                    className="h-2"
+                    className='h-2'
                   />
                 </div>
               </CardContent>
@@ -529,18 +530,18 @@ export default function EnterpriseMonitoringDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value='analytics' className='space-y-6'>
           {/* Usage Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Activity className="w-5 h-5 text-blue-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-blue-100 rounded-lg p-2'>
+                    <Activity className='text-blue-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Active Sessions</p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-gray-600 text-sm'>Active Sessions</p>
+                    <p className='text-2xl font-bold'>
                       {usageAnalytics?.activeSessions.toLocaleString()}
                     </p>
                   </div>
@@ -549,16 +550,16 @@ export default function EnterpriseMonitoringDashboard() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Heart className="w-5 h-5 text-green-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-green-100 rounded-lg p-2'>
+                    <Heart className='text-green-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className='text-gray-600 text-sm'>
                       Crisis Interventions
                     </p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-2xl font-bold'>
                       {usageAnalytics?.crisisInterventions.toLocaleString()}
                     </p>
                   </div>
@@ -567,16 +568,16 @@ export default function EnterpriseMonitoringDashboard() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Clock className="w-5 h-5 text-purple-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-purple-100 rounded-lg p-2'>
+                    <Clock className='text-purple-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className='text-gray-600 text-sm'>
                       Avg Session Duration
                     </p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-2xl font-bold'>
                       {usageAnalytics?.averageSessionDuration}min
                     </p>
                   </div>
@@ -585,14 +586,14 @@ export default function EnterpriseMonitoringDashboard() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-yellow-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-yellow-100 rounded-lg p-2'>
+                    <TrendingUp className='text-yellow-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">User Satisfaction</p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-gray-600 text-sm'>User Satisfaction</p>
+                    <p className='text-2xl font-bold'>
                       {usageAnalytics?.userSatisfaction}/5
                     </p>
                   </div>
@@ -602,42 +603,42 @@ export default function EnterpriseMonitoringDashboard() {
           </div>
 
           {/* Detailed Analytics */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
                 <CardTitle>User Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Daily Active Users
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.dailyActiveUsers.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Weekly Active Users
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.weeklyActiveUsers.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Monthly Active Users
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.monthlyActiveUsers.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Peak Usage Time
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.peakUsageTime}
                     </span>
                   </div>
@@ -650,26 +651,26 @@ export default function EnterpriseMonitoringDashboard() {
                 <CardTitle>Intervention Effectiveness</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Total Interventions
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.crisisInterventions.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Successful Interventions
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {usageAnalytics?.successfulInterventions.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Success Rate</span>
-                    <span className="font-medium">
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Success Rate</span>
+                    <span className='font-medium'>
                       {(
                         ((usageAnalytics?.successfulInterventions || 0) /
                           (usageAnalytics?.crisisInterventions || 1)) *
@@ -684,7 +685,7 @@ export default function EnterpriseMonitoringDashboard() {
                         (usageAnalytics?.crisisInterventions || 1)) *
                       100
                     }
-                    className="h-3"
+                    className='h-3'
                   />
                 </div>
               </CardContent>

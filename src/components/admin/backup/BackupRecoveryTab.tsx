@@ -1,4 +1,6 @@
 import { useState, type FC } from 'react'
+
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -7,7 +9,6 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -15,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
-import type { BackupType, BackupStatus } from '../../../lib/security/backup'
 import { toast } from '@/components/ui/toast'
+
+import type { BackupType, BackupStatus } from '../../../lib/security/backup'
+import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {
@@ -75,20 +77,20 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
   switch (status) {
     case RecoveryTestStatus.PASSED:
       return (
-        <Badge variant="outline" className="bg-green-100 text-green-800">
+        <Badge variant='outline' className='bg-green-100 text-green-800'>
           Passed
         </Badge>
       )
     case RecoveryTestStatus.FAILED:
-      return <Badge variant="destructive">Failed</Badge>
+      return <Badge variant='destructive'>Failed</Badge>
     case RecoveryTestStatus.IN_PROGRESS:
       return (
-        <Badge variant="outline" className="bg-blue-100 text-blue-800">
+        <Badge variant='outline' className='bg-blue-100 text-blue-800'>
           In Progress
         </Badge>
       )
     default:
-      return <Badge variant="secondary">{status}</Badge>
+      return <Badge variant='secondary'>{status}</Badge>
   }
 }
 
@@ -172,7 +174,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   )
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       <Card>
         <CardHeader>
           <CardTitle>Manual Recovery Test</CardTitle>
@@ -180,19 +182,19 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             Select a backup and an environment to run a manual recovery test.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent className='space-y-4'>
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <div>
               <label
-                htmlFor="backup-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                htmlFor='backup-select'
+                className='text-gray-700 dark:text-gray-300 block text-sm font-medium'
               >
                 Select Backup
               </label>
               <Select
                 value={selectedBackupId}
                 onValueChange={setSelectedBackupId}
-                placeholder="Choose a backup..."
+                placeholder='Choose a backup...'
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -209,8 +211,8 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             </div>
             <div>
               <label
-                htmlFor="test-environment"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                htmlFor='test-environment'
+                className='text-gray-700 dark:text-gray-300 block text-sm font-medium'
               >
                 Test Environment
               </label>
@@ -253,24 +255,24 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             <CardTitle>Latest Test Result</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4">
+            <div className='space-y-2'>
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <span className="text-sm font-medium">Status:</span>
-                  <span className="ml-2">
+                  <span className='text-sm font-medium'>Status:</span>
+                  <span className='ml-2'>
                     {renderStatusBadge(latestTestResult.status)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-sm font-medium">Duration:</span>
-                  <span className="ml-2">
+                  <span className='text-sm font-medium'>Duration:</span>
+                  <span className='ml-2'>
                     {formatDuration(latestTestResult.timeTaken)}
                   </span>
                 </div>
               </div>
               <div>
-                <span className="text-sm font-medium">Environment:</span>
-                <span className="ml-2">{latestTestResult.environment}</span>
+                <span className='text-sm font-medium'>Environment:</span>
+                <span className='ml-2'>{latestTestResult.environment}</span>
               </div>
             </div>{' '}
           </CardContent>
@@ -285,124 +287,119 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <div className="grid grid-cols-12 p-3 bg-slate-50 dark:bg-slate-800 text-sm font-medium">
-              <div className="col-span-4">Backup</div>
-              <div className="col-span-3">Test Date</div>
-              <div className="col-span-2">Status</div>
-              <div className="col-span-2">Time Taken</div>
-              <div className="col-span-1">Details</div>
+          <div className='rounded-md border'>
+            <div className='bg-slate-50 dark:bg-slate-800 grid grid-cols-12 p-3 text-sm font-medium'>
+              <div className='col-span-4'>Backup</div>
+              <div className='col-span-3'>Test Date</div>
+              <div className='col-span-2'>Status</div>
+              <div className='col-span-2'>Time Taken</div>
+              <div className='col-span-1'>Details</div>
             </div>
 
             {recoveryHistory.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
+              <div className='text-gray-500 p-4 text-center'>
                 No recovery tests have been run yet
               </div>
             ) : (
-              <div className="divide-y">
+              <div className='divide-y'>
                 {recoveryHistory.map((test) => {
                   const backup = backups.find((b) => b.id === test.backupId)
 
                   return (
                     <div key={test.id}>
                       <div
-                        className={`grid grid-cols-12 p-3 text-sm items-center`}
+                        className={`grid grid-cols-12 items-center p-3 text-sm`}
                       >
-                        <div className="col-span-4 truncate">
+                        <div className='col-span-4 truncate'>
                           {backup ? (
                             <>
-                              <span className="font-medium">{backup.type}</span>{' '}
+                              <span className='font-medium'>{backup.type}</span>{' '}
                               -{' '}
                               {new Date(backup.timestamp).toLocaleDateString()}
                             </>
                           ) : (
-                            <span className="text-gray-500">
+                            <span className='text-gray-500'>
                               Unknown backup
                             </span>
                           )}
                         </div>
 
-                      <div className="col-span-3">
-                        {formatDate(test.testDate)}
+                        <div className='col-span-3'>
+                          {formatDate(test.testDate)}
+                        </div>
+
+                        <div className='col-span-2'>
+                          {renderStatusBadge(test.status)}
+                        </div>
+
+                        <div className='col-span-2'>
+                          {formatDuration(test.timeTaken)}
+                        </div>
+
+                        <div className='col-span-1 text-right'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleSelectTest(test.id)}
+                          >
+                            {selectedTest === test.id ? 'Hide' : 'View'}
+                          </Button>
+                        </div>
                       </div>
 
-                      <div className="col-span-2">
-                        {renderStatusBadge(test.status)}
-                      </div>
+                      {selectedTest === test.id && (
+                        <div className='bg-slate-50 dark:bg-slate-800 col-span-12 mt-1 rounded-md p-3'>
+                          <h4 className='mb-2 font-medium'>Test Results</h4>
 
-                      <div className="col-span-2">
-                        {formatDuration(test.timeTaken)}
-                      </div>
-
-                      <div className="col-span-1 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSelectTest(test.id)}
-                        >
-                          {selectedTest === test.id ? 'Hide' : 'View'}
-                        </Button>
-                      </div>
-                    </div>
-
-                    {selectedTest === test.id && (
-                      <div className="col-span-12 p-3 bg-slate-50 dark:bg-slate-800 mt-1 rounded-md">
-                        <h4 className="font-medium mb-2">Test Results</h4>
-
-                        <div className="space-y-3">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                Environment
-                              </h5>
-                              <p className="text-sm">{test.environment}</p>
-                            </div>
-                            <div>
-                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                Test ID
-                              </h5>
-                              <p className="text-sm font-mono text-xs">
-                                {test.id}
-                              </p>
-                            </div>
-                          </div>
-
-                          {test.verificationResults &&
-                            test.verificationResults.length > 0 && (
-                              <div className="mt-3">
-                                <h5 className="text-sm font-medium mb-2">
-                                  Verification Results
+                          <div className='space-y-3'>
+                            <div className='grid grid-cols-2 gap-4'>
+                              <div>
+                                <h5 className='text-gray-500 dark:text-gray-400 text-xs'>
+                                  Environment
                                 </h5>
-                                <div className="rounded-md border divide-y">
-                                  {test.verificationResults.map((vr, idx) => (
-                                    <div
-                                      key={`vr-${vr.testCase}-${vr.id || idx}`}
-                                      className="p-2 flex justify-between items-center"
-                                    >
-                                      <div>
-                                        <span className="font-medium">
-                                          {vr.testCase}
-                                        </span>
-                                        <Badge
-                                          variant="outline"
-                                          className={`
-                                            ${vr.status === 'critical' ? 'bg-red-100 text-red-800' : ''}
-                                            ${vr.status === 'high' ? 'bg-orange-100 text-orange-800' : ''}
-                                            ${vr.status === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''}
-                                            ${vr.status === 'low' ? 'bg-blue-100 text-blue-800' : ''}
-                                          `}
-                                        >
-                                          {vr.status}
-                                        </Badge>
-                                      </div>
-                                      <p className="text-sm mt-1">
-                                        {vr.description}
-                                      </p>
-                                    </div>
-                                  ))}
-                                </div>
+                                <p className='text-sm'>{test.environment}</p>
                               </div>
-                            )}
+                              <div>
+                                <h5 className='text-gray-500 dark:text-gray-400 text-xs'>
+                                  Test ID
+                                </h5>
+                                <p className='font-mono text-sm text-xs'>
+                                  {test.id}
+                                </p>
+                              </div>
+                            </div>
+
+                            {test.verificationResults &&
+                              test.verificationResults.length > 0 && (
+                                <div className='mt-3'>
+                                  <h5 className='mb-2 text-sm font-medium'>
+                                    Verification Results
+                                  </h5>
+                                  <div className='divide-y rounded-md border'>
+                                    {test.verificationResults.map((vr, idx) => (
+                                      <div
+                                        key={`vr-${vr.testCase}-${vr.id || idx}`}
+                                        className='flex items-center justify-between p-2'
+                                      >
+                                        <div>
+                                          <span className='font-medium'>
+                                            {vr.testCase}
+                                          </span>
+                                          <Badge
+                                            variant='outline'
+                                            className={` ${vr.status === 'critical' ? 'bg-red-100 text-red-800' : ''} ${vr.status === 'high' ? 'bg-orange-100 text-orange-800' : ''} ${vr.status === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''} ${vr.status === 'low' ? 'bg-blue-100 text-blue-800' : ''} `}
+                                          >
+                                            {vr.status}
+                                          </Badge>
+                                        </div>
+                                        <p className='mt-1 text-sm'>
+                                          {vr.description}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                           </div>
                         </div>
                       )}

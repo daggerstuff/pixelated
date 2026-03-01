@@ -1,6 +1,7 @@
 ---
 title: 'Compliance & Standards'
-description: 'Learn about Pixelated Healths compliance framework and security standards'
+description:
+  'Learn about Pixelated Healths compliance framework and security standards'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,17 +11,17 @@ share: true
 
 ## Compliance & Standards
 
-Pixelated maintains strict compliance with healthcare industry standards, with a primary
-focus on HIPAA compliance and data protection regulations.
+Pixelated maintains strict compliance with healthcare industry standards, with a
+primary focus on HIPAA compliance and data protection regulations.
 
 ## Compliance Framework
 
     Healthcare data protection
-  <Card
-    title="Security Standards"
-    icon="shield-check"
-    href="#security-standards"
-  >
+
+<Card title="Security Standards" icon="shield-check" href="#security-standards"
+
+>
+
     Industry certifications
     Privacy regulations
     Security controls
@@ -28,7 +29,6 @@ focus on HIPAA compliance and data protection regulations.
 ## HIPAA Compliance
 
 ### Core Requirements
-
 
 - Privacy Rule compliance
 - Security Rule implementation
@@ -38,14 +38,18 @@ focus on HIPAA compliance and data protection regulations.
 
 ### Automated Compliance Tools
 
-Pixelated implements comprehensive automated tools for HIPAA compliance verification:
+Pixelated implements comprehensive automated tools for HIPAA compliance
+verification:
 
-- **HIPAA Security Check Script**: Automated codebase scanning for security vulnerabilities
+- **HIPAA Security Check Script**: Automated codebase scanning for security
+  vulnerabilities
   - Located at `scripts/hipaa-security-check.js`
-  - Checks for deprecated crypto methods, proper encryption, authentication tags, route authentication, and PHI audit logging
+  - Checks for deprecated crypto methods, proper encryption, authentication
+    tags, route authentication, and PHI audit logging
   - Integrated into CI/CD pipeline for continuous compliance verification
 
-- **Security Scanning Workflow**: GitHub Actions workflow for comprehensive security scanning
+- **Security Scanning Workflow**: GitHub Actions workflow for comprehensive
+  security scanning
   - Located at `.github/workflows/security-scanning.yml`
   - Runs on all pull requests and schedules
   - Generates detailed compliance reports
@@ -62,7 +66,7 @@ Pixelated implements comprehensive automated tools for HIPAA compliance verifica
 
 ### Implementation 1
 
-```typescript Audit Logging
+`````typescript Audit Logging
 
 const logger = new HIPAALogger({
 retentionPeriod: '6y',
@@ -94,16 +98,14 @@ const canAccess = await accessControl.checkAccess({
   resourceId: 'record_456',
   action: 'view'
 });
-````
-
+`````
 
 ### FHE Integration for HIPAA Compliance
 
-  Fully Homomorphic Encryption enhances HIPAA compliance by enabling secure
-  computation on encrypted data
+Fully Homomorphic Encryption enhances HIPAA compliance by enabling secure
+computation on encrypted data
 
 ```typescript
-
 // Initialize FHE service
 const fheService = new FHEService({
   scheme: 'BFV',
@@ -123,15 +125,16 @@ async function processEncryptedPatientData(encryptedData) {
 
 ### Compliance Verification Process
 
-  ### Automated Scanning Run automated compliance checks (daily in CI/CD) ###
-  Manual Review Quarterly review of all PHI handling systems ### Documentation
-  Update compliance documentation ### Training Staff training and certification
-  ### Third-Party Audit Annual external compliance audit
+### Automated Scanning Run automated compliance checks (daily in CI/CD)
+
+Manual Review Quarterly review of all PHI handling systems ### Documentation
+Update compliance documentation ### Training Staff training and certification
+
+### Third-Party Audit Annual external compliance audit
 
 ## Security Standards
 
 ### Certifications
-
 
 | Standard      | Status    | Last Audit | Next Audit |
 | ------------- | --------- | ---------- | ---------- |
@@ -152,7 +155,6 @@ async function processEncryptedPatientData(encryptedData) {
 ## Data Protection
 
 ### Privacy Regulations
-
 
 - HIPAA (United States)
 - GDPR (European Union)
@@ -198,7 +200,7 @@ graph TD
 
 ### Implementation 3
 
-```typescript Risk Assessment
+`````typescript Risk Assessment
 const riskManager = new RiskManager({
   assessmentFrequency: 'quarterly',
   automatedScanning: true,
@@ -225,13 +227,11 @@ const status = await controlMonitor.checkControls({
   controlSet: 'encryption',
   metrics: ['effectiveness', 'coverage']
 });
-````
-
+`````
 
 ## Audit Management
 
 ### Audit Process
-
 
 1. Event Collection
 2. Secure Storage
@@ -274,10 +274,10 @@ const report = await auditManager.generateReport({
 
 ### Response Protocol
 
+### Detection Identify and classify the incident ### Containment Limit the
 
-  ### Detection Identify and classify the incident ### Containment Limit the
-  impact and spread ### Eradication Remove the threat ### Recovery Restore
-  normal operations ### Lessons Learned Document and improve
+impact and spread ### Eradication Remove the threat ### Recovery Restore normal
+operations ### Lessons Learned Document and improve
 
 ### Implementation 5
 
@@ -308,10 +308,10 @@ await incidentManager.handleIncident({
 
 Need help with compliance? Contact our compliance team:
 
-  <Card
-    title="Compliance Support"
-    icon="balance-scale"
-    href="mailto:compliance@gradiant.dev"
-  >
+<Card title="Compliance Support" icon="balance-scale"
+href="mailto:compliance@gradiant.dev"
+
+>
+
     Contact compliance team
     View compliance guides

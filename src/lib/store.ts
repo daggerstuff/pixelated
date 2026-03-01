@@ -1,9 +1,10 @@
-import type { AIService } from './ai/models/ai-types'
-import type { FHEService } from './fhe'
 import { create } from 'zustand'
-import { createMentalHealthChat } from './chat'
 import { devtools } from 'zustand/middleware'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
+
+import type { AIService } from './ai/models/ai-types'
+import { createMentalHealthChat } from './chat'
+import type { FHEService } from './fhe'
 import { logger } from './logger'
 
 // ============================================================================

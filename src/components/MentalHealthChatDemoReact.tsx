@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
 
 import { MentalHealthHistoryChart } from '@/components/MentalHealthHistoryChart'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { MentalHealthAnalysis } from '@/lib/chat'
 import { createMentalHealthChat } from '@/lib/chat'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('MentalHealthChatDemo')
 
@@ -31,8 +31,10 @@ interface ChatMessage {
 }
 
 // Enhanced mental health analysis for UI display
-interface EnhancedMentalHealthAnalysis
-  extends Omit<MentalHealthAnalysis, 'scores' | 'summary' | 'riskLevel'> {
+interface EnhancedMentalHealthAnalysis extends Omit<
+  MentalHealthAnalysis,
+  'scores' | 'summary' | 'riskLevel'
+> {
   riskLevel?: 'low' | 'medium' | 'high'
   summary?: string
   scores?: {
@@ -52,9 +54,9 @@ interface EnhancedMentalHealthAnalysis
 }
 
 interface MentalHealthChatDemoReactProps {
-  'initialTab'?: string
-  'showSettingsPanel'?: boolean
-  'showAnalysisPanel'?: boolean
+  initialTab?: string
+  showSettingsPanel?: boolean
+  showAnalysisPanel?: boolean
   'client:load'?: boolean
   'client:visible'?: boolean
   'client:idle'?: boolean
@@ -232,13 +234,13 @@ export default function MentalHealthChatDemoReact({
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full">
+    <div className='flex w-full flex-col gap-4 md:flex-row'>
       <div
         className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
       >
-        <Card className="h-[600px] flex flex-col">
-          <CardContent className="flex-1 flex flex-col p-4">
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+        <Card className='flex h-[600px] flex-col'>
+          <CardContent className='flex flex-1 flex-col p-4'>
+            <div className='mb-4 flex-1 space-y-4 overflow-y-auto'>
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -247,7 +249,7 @@ export default function MentalHealthChatDemoReact({
                   }`}
                 >
                   <div
-                    className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted'
@@ -258,22 +260,22 @@ export default function MentalHealthChatDemoReact({
                 </div>
               ))}
               {processing && (
-                <div className="flex justify-start">
-                  <div className="rounded-lg px-4 py-2 max-w-[80%] bg-muted">
+                <div className='flex justify-start'>
+                  <div className='bg-muted max-w-[80%] rounded-lg px-4 py-2'>
                     <p>...</p>
                   </div>
                 </div>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className='flex gap-2'>
               <Input
-                placeholder="Type your message..."
+                placeholder='Type your message...'
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
-                    handleSendMessage()
+                    void handleSendMessage()
                   }
                 }}
                 disabled={processing}
@@ -289,40 +291,40 @@ export default function MentalHealthChatDemoReact({
 
       {/* Analysis Panel */}
       {settings.showAnalysisPanel && (
-        <div className="flex-1">
+        <div className='flex-1'>
           <Tabs
             defaultValue={activeTab}
             onValueChange={setActiveTab}
-            className="h-[600px]"
+            className='h-[600px]'
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="analysis">Analysis</TabsTrigger>
+            <TabsList className='grid w-full grid-cols-2'>
+              <TabsTrigger value='analysis'>Analysis</TabsTrigger>
               {showSettingsPanel && (
-                <TabsTrigger value="settings">Settings</TabsTrigger>
+                <TabsTrigger value='settings'>Settings</TabsTrigger>
               )}
             </TabsList>
             <TabsContent
-              value="analysis"
-              className="h-[calc(100%-45px)] overflow-hidden"
+              value='analysis'
+              className='h-[calc(100%-45px)] overflow-hidden'
             >
-              <Card className="h-full">
-                <CardContent className="p-4 h-full overflow-auto">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">
+              <Card className='h-full'>
+                <CardContent className='h-full overflow-auto p-4'>
+                  <div className='space-y-4'>
+                    <h3 className='text-lg font-medium'>
                       Mental Health Insights
                     </h3>
-                    <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm">
+                    <div className='bg-muted rounded-lg p-4'>
+                      <p className='text-sm'>
                         Mental health analysis will appear here
                       </p>
                     </div>
                     {getAnalysisHistory().length === 0 && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className='text-muted-foreground text-sm'>
                         No analysis data available yet
                       </p>
                     )}
-                    <div className="h-[200px] mt-6">
-                      <h3 className="text-lg font-medium mb-2">
+                    <div className='mt-6 h-[200px]'>
+                      <h3 className='mb-2 text-lg font-medium'>
                         Pattern Analysis
                       </h3>
                       <MentalHealthHistoryChart
@@ -359,68 +361,68 @@ export default function MentalHealthChatDemoReact({
             </TabsContent>
             {showSettingsPanel && (
               <TabsContent
-                value="settings"
-                className="h-[calc(100%-45px)] overflow-hidden"
+                value='settings'
+                className='h-[calc(100%-45px)] overflow-hidden'
               >
-                <Card className="h-full">
-                  <CardContent className="p-4 h-full overflow-auto">
-                    <div className="space-y-6">
-                      <h3 className="text-lg font-medium">Chat Settings</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                <Card className='h-full'>
+                  <CardContent className='h-full overflow-auto p-4'>
+                    <div className='space-y-6'>
+                      <h3 className='text-lg font-medium'>Chat Settings</h3>
+                      <div className='space-y-4'>
+                        <div className='flex items-center justify-between'>
                           <div>
                             <Label
-                              htmlFor="enable-analysis"
-                              className="text-base font-medium"
+                              htmlFor='enable-analysis'
+                              className='text-base font-medium'
                             >
                               Enable Analysis
                             </Label>
-                            <p className="text-sm text-muted-foreground">
+                            <p className='text-muted-foreground text-sm'>
                               Analyze messages for mental health indicators
                             </p>
                           </div>
                           <Switch
-                            id="enable-analysis"
+                            id='enable-analysis'
                             checked={settings.enableAnalysis}
                             onCheckedChange={() =>
                               handleToggleSetting('enableAnalysis')
                             }
                           />
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className='flex items-center justify-between'>
                           <div>
                             <Label
-                              htmlFor="expert-guidance"
-                              className="text-base font-medium"
+                              htmlFor='expert-guidance'
+                              className='text-base font-medium'
                             >
                               Expert Guidance
                             </Label>
-                            <p className="text-sm text-muted-foreground">
+                            <p className='text-muted-foreground text-sm'>
                               Use clinician-validated interpretation
                             </p>
                           </div>
                           <Switch
-                            id="expert-guidance"
+                            id='expert-guidance'
                             checked={settings.useExpertGuidance}
                             onCheckedChange={() =>
                               handleToggleSetting('useExpertGuidance')
                             }
                           />
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className='flex items-center justify-between'>
                           <div>
                             <Label
-                              htmlFor="show-analysis"
-                              className="text-base font-medium"
+                              htmlFor='show-analysis'
+                              className='text-base font-medium'
                             >
                               Show Analysis Panel
                             </Label>
-                            <p className="text-sm text-muted-foreground">
+                            <p className='text-muted-foreground text-sm'>
                               Display the analysis sidebar
                             </p>
                           </div>
                           <Switch
-                            id="show-analysis"
+                            id='show-analysis'
                             checked={settings.showAnalysisPanel}
                             onCheckedChange={() =>
                               handleToggleSetting('showAnalysisPanel')

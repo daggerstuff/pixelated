@@ -7,14 +7,19 @@
  */
 
 import type { APIContext, APIRoute } from 'astro'
-import { getSession } from '@/lib/auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   createEmbeddingAgentClient,
   EmbeddingAgentError,
   SimilaritySearchRequestSchema,
 } from '@/lib/ai/embedding-agent'
-import type { SimilaritySearchRequest, SimilaritySearchResponse, SimilarityMatch } from '@/lib/ai/embedding-agent'
+import type {
+  SimilaritySearchRequest,
+  SimilaritySearchResponse,
+  SimilarityMatch,
+} from '@/lib/ai/embedding-agent'
+import { getSession } from '@/lib/auth/session'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('embeddings-search')
 
@@ -34,14 +39,21 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         name: 'Similarity Search API',
-        description: 'Endpoint for searching similar items in clinical knowledge',
+        description:
+          'Endpoint for searching similar items in clinical knowledge',
         methods: ['POST'],
         version: '1.0.0',
         status: 'active',
         authentication: 'required',
         parameters: {
           required: ['query'],
-          optional: ['queryEmbedding', 'topK', 'knowledgeTypes', 'minSimilarity', 'includeMetadata'],
+          optional: [
+            'queryEmbedding',
+            'topK',
+            'knowledgeTypes',
+            'minSimilarity',
+            'includeMetadata',
+          ],
         },
         knowledgeTypes: [
           'dsm5',
@@ -128,7 +140,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     const searchRequest: SimilaritySearchRequest = validation.data
 
-    const agentUrl = import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+    const agentUrl =
+      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {
@@ -199,7 +212,9 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 /**
  * Generate mock search results for testing.
  */
-function generateMockSearchResults(request: SimilaritySearchRequest): SimilaritySearchResponse {
+function generateMockSearchResults(
+  request: SimilaritySearchRequest,
+): SimilaritySearchResponse {
   const topK = request.topK ?? 10
   const mockMatches: SimilarityMatch[] = []
 
@@ -207,31 +222,36 @@ function generateMockSearchResults(request: SimilaritySearchRequest): Similarity
   const mockKnowledge = [
     {
       id: 'mock_dsm5_depression',
-      content: 'Major Depressive Disorder: Characterized by persistent sadness, loss of interest, and impaired functioning.',
+      content:
+        'Major Depressive Disorder: Characterized by persistent sadness, loss of interest, and impaired functioning.',
       type: 'dsm5' as const,
       source: 'DSM-5 Criteria',
     },
     {
       id: 'mock_cbt_technique',
-      content: 'Cognitive Behavioral Therapy: Focuses on identifying and changing negative thought patterns.',
+      content:
+        'Cognitive Behavioral Therapy: Focuses on identifying and changing negative thought patterns.',
       type: 'therapeutic_technique' as const,
       source: 'CBT Manual',
     },
     {
       id: 'mock_pdm2_attachment',
-      content: 'Attachment Theory: Describes the dynamics of interpersonal relationships.',
+      content:
+        'Attachment Theory: Describes the dynamics of interpersonal relationships.',
       type: 'pdm2' as const,
       source: 'PDM-2 Reference',
     },
     {
       id: 'mock_clinical_anxiety',
-      content: 'Generalized Anxiety Disorder: Excessive worry about various aspects of life.',
+      content:
+        'Generalized Anxiety Disorder: Excessive worry about various aspects of life.',
       type: 'clinical' as const,
       source: 'Clinical Guidelines',
     },
     {
       id: 'mock_conversation_empathy',
-      content: 'Empathic response example: "I hear that you\'re feeling overwhelmed right now."',
+      content:
+        'Empathic response example: "I hear that you\'re feeling overwhelmed right now."',
       type: 'therapeutic_conversation' as const,
       source: 'Therapeutic Dialogue Examples',
     },
@@ -253,7 +273,8 @@ function generateMockSearchResults(request: SimilaritySearchRequest): Similarity
           similarityScore: similarity,
           knowledgeType: item.type,
           source: item.source,
-          metadata: request.includeMetadata !== false ? { mock: true } : undefined,
+          metadata:
+            request.includeMetadata !== false ? { mock: true } : undefined,
         })
       }
     }
@@ -267,4 +288,3 @@ function generateMockSearchResults(request: SimilaritySearchRequest): Similarity
     modelUsed: 'mock-embedding-v1',
   }
 }
-

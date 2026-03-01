@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { MongoMemoryServer } from 'mongodb-memory-server'
-import { Redis } from 'ioredis-mock'
-import { createCompleteThreatDetectionSystem } from '../integrations'
 import { EventEmitter } from 'events'
+
+import { Redis } from 'ioredis-mock'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+import { createCompleteThreatDetectionSystem } from '../integrations'
 
 describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer

@@ -1,4 +1,6 @@
-import { PatientProfileService } from './PatientProfileService' // Updated import
+import { vi } from 'vitest'
+
+import { KVStore } from '../../db/KVStore'
 import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
   CognitiveModel,
@@ -8,8 +10,7 @@ import type {
   TherapeuticProgress,
   ConversationalStyle,
 } from '../types/CognitiveModel'
-import { KVStore } from '../../db/KVStore'
-import { vi } from 'vitest'
+import { PatientProfileService } from './PatientProfileService' // Updated import
 
 // Mock KVStore
 vi.mock('../../db/KVStore')

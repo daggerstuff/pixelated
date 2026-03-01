@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-import path from 'path'
 import { spawn } from 'child_process'
-import readline from 'readline'
 import fs from 'fs'
+import path from 'path'
+import readline from 'readline'
 import { fileURLToPath } from 'url'
+
 import { safeJoin, ALLOWED_DIRECTORIES } from '../utils/path-security.js'
 
 // Get current file and directory path for ES modules

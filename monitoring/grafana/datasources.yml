@@ -8,9 +8,9 @@ datasources:
     isDefault: true
     editable: true
     jsonData:
-      timeInterval: "5s"
-      queryTimeout: "60s"
-      httpMethod: "POST"
+      timeInterval: '5s'
+      queryTimeout: '60s'
+      httpMethod: 'POST'
 
   - name: Loki
     type: loki
@@ -34,6 +34,6 @@ datasources:
     secureJsonData:
       password: ${DB_PASSWORD}
     jsonData:
-      sslmode: "require"
+      sslmode: 'require'
       postgresVersion: 1300
       timescaledb: false

@@ -1,16 +1,18 @@
 ---
-title: "Test Patterns Documentation"
-description: "Test Patterns Documentation documentation"
+title: 'Test Patterns Documentation'
+description: 'Test Patterns Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Test Patterns Documentation
 
-This document provides comprehensive documentation for test patterns used in the Pixelated platform, including mocking strategies, test fixtures, test organization patterns, integration tests, and performance testing approaches.
+This document provides comprehensive documentation for test patterns used in the
+Pixelated platform, including mocking strategies, test fixtures, test
+organization patterns, integration tests, and performance testing approaches.
 
 ## Table of Contents
 
@@ -25,7 +27,9 @@ This document provides comprehensive documentation for test patterns used in the
 
 ## Overview
 
-The Pixelated platform uses Vitest as its primary testing framework, replacing the previous  implementation. This document outlines the patterns and strategies used for testing different components of the platform.
+The Pixelated platform uses Vitest as its primary testing framework, replacing
+the previous implementation. This document outlines the patterns and strategies
+used for testing different components of the platform.
 
 ## Test Organization
 
@@ -83,7 +87,8 @@ describe('Button', () => {
 
 ### Test Categories
 
-1. **Unit Tests**: Test individual functions, components, or classes in isolation
+1. **Unit Tests**: Test individual functions, components, or classes in
+   isolation
 2. **Integration Tests**: Test interactions between multiple units
 3. **End-to-End Tests**: Test complete user flows
 4. **Performance Tests**: Test performance characteristics of the application
@@ -243,9 +248,8 @@ Store complex test data in separate files:
 ```typescript
 // fixtures/users.json
 // users.test.ts
-import users from './fixtures/users.json';
-
-[
+import users from './fixtures/users.json'
+;[
   {
     id: 1,
     name: 'John Doe',
@@ -466,7 +470,10 @@ import { memoryUsage } from './testUtils'
 
 describe('dataProcessor', () => {
   it('processes data efficiently', async () => {
-    const data = Array.from({ length: 10000 }, (_, i) => ({ id: i, value: `Value ${i}` }))
+    const data = Array.from({ length: 10000 }, (_, i) => ({
+      id: i,
+      value: `Value ${i}`,
+    }))
 
     const { heapUsed } = await memoryUsage(() => {
       processLargeData(data)
@@ -536,22 +543,21 @@ describe('CircuitBreaker', () => {
 
     try {
       await circuitBreaker.execute(mockFn)
-    }
-    catch (e) {}
+    } catch (e) {}
     try {
       await circuitBreaker.execute(mockFn)
-    }
-    catch (e) {}
+    } catch (e) {}
     try {
       await circuitBreaker.execute(mockFn)
-    }
-    catch (e) {}
+    } catch (e) {}
 
     expect(circuitBreaker.isOpen()).toBe(true)
 
     mockFn.mockResolvedValueOnce('Success')
 
-    await expect(circuitBreaker.execute(mockFn)).rejects.toThrow('Circuit is open')
+    await expect(circuitBreaker.execute(mockFn)).rejects.toThrow(
+      'Circuit is open',
+    )
     expect(mockFn).toHaveBeenCalledTimes(3)
   })
 })

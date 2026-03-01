@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { FC } from 'react'
+
 import type {
   CrisisSessionFlag,
   UserSessionStatus,
@@ -49,7 +50,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'Failed to load crisis flags',
       )
     } finally {
@@ -58,7 +59,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
   }, [userId, showPendingOnly])
 
   useEffect(() => {
-    loadFlags()
+    void loadFlags()
   }, [loadFlags])
 
   const updateFlagStatus = async (
@@ -99,7 +100,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'Failed to update flag',
       )
     } finally {
@@ -143,37 +144,37 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2">Loading crisis flags...</span>
+      <div className='flex items-center justify-center p-8'>
+        <div className='border-blue-600 h-8 w-8 animate-spin rounded-full border-b-2'></div>
+        <span className='ml-2'>Loading crisis flags...</span>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
+      <div className='bg-red-50 border-red-200 rounded-md border p-4'>
+        <div className='flex'>
+          <div className='flex-shrink-0'>
             <svg
-              className="h-5 w-5 text-red-400"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              className='text-red-400 h-5 w-5'
+              viewBox='0 0 20 20'
+              fill='currentColor'
             >
               <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
+                fillRule='evenodd'
+                d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                clipRule='evenodd'
               />
             </svg>
           </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error</h3>
-            <div className="mt-2 text-sm text-red-700">{error}</div>
-            <div className="mt-4">
+          <div className='ml-3'>
+            <h3 className='text-red-800 text-sm font-medium'>Error</h3>
+            <div className='text-red-700 mt-2 text-sm'>{error}</div>
+            <div className='mt-4'>
               <button
                 onClick={loadFlags}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                className='bg-red-100 text-red-800 hover:bg-red-200 rounded-md px-3 py-2 text-sm font-medium'
               >
                 Try Again
               </button>
@@ -185,83 +186,83 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* User Status Summary */}
       {userStatus && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className='bg-white rounded-lg p-6 shadow'>
+          <h3 className='text-gray-900 mb-4 text-lg font-medium'>
             User Status Summary
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">
+          <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
+            <div className='text-center'>
+              <div className='text-gray-900 text-2xl font-bold'>
                 {userStatus.totalCrisisFlags}
               </div>
-              <div className="text-sm text-gray-500">Total Flags</div>
+              <div className='text-gray-500 text-sm'>Total Flags</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">
+            <div className='text-center'>
+              <div className='text-red-600 text-2xl font-bold'>
                 {userStatus.activeCrisisFlags}
               </div>
-              <div className="text-sm text-gray-500">Active Flags</div>
+              <div className='text-gray-500 text-sm'>Active Flags</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <div className='text-center'>
+              <div className='text-green-600 text-2xl font-bold'>
                 {userStatus.resolvedCrisisFlags}
               </div>
-              <div className="text-sm text-gray-500">Resolved</div>
+              <div className='text-gray-500 text-sm'>Resolved</div>
             </div>
-            <div className="text-center">
+            <div className='text-center'>
               <div
                 className={`text-2xl font-bold ${getSeverityColor(userStatus.currentRiskLevel).split(' ')[0]}`}
               >
                 {userStatus.currentRiskLevel.toUpperCase()}
               </div>
-              <div className="text-sm text-gray-500">Risk Level</div>
+              <div className='text-gray-500 text-sm'>Risk Level</div>
             </div>
           </div>
         </div>
       )}
 
       {/* Crisis Flags List */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className='bg-white rounded-lg shadow'>
+        <div className='border-gray-200 border-b px-6 py-4'>
+          <h3 className='text-gray-900 text-lg font-medium'>
             Crisis Session Flags {showPendingOnly && '(Pending Review)'}
           </h3>
         </div>
 
         {flags.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className='text-gray-500 p-6 text-center'>
             No crisis flags found.
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className='divide-gray-200 divide-y'>
             {flags.map((flag) => (
-              <div key={flag.id} className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
+              <div key={flag.id} className='p-6'>
+                <div className='flex items-start justify-between'>
+                  <div className='flex-1'>
+                    <div className='mb-2 flex items-center space-x-2'>
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityColor(flag.severity)}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getSeverityColor(flag.severity)}`}
                       >
                         {flag.severity.toUpperCase()}
                       </span>
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(flag.status)}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(flag.status)}`}
                       >
                         {flag.status.replace('_', ' ').toUpperCase()}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className='text-gray-500 text-xs'>
                         Confidence: {(flag.confidence * 100).toFixed(1)}%
                       </span>
                     </div>
 
-                    <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    <h4 className='text-gray-900 mb-1 text-sm font-medium'>
                       {flag.reason}
                     </h4>
 
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className='text-gray-600 space-y-1 text-sm'>
                       <div>Session: {flag.sessionId}</div>
                       <div>
                         Flagged: {new Date(flag.flaggedAt).toLocaleString()}
@@ -270,20 +271,20 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                         <div>Risks: {flag.detectedRisks.join(', ')}</div>
                       )}
                       {flag.textSample && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                        <div className='bg-gray-50 mt-2 rounded p-2 text-xs'>
                           <strong>Text Sample:</strong> {flag.textSample}
                         </div>
                       )}
                     </div>
 
                     {flag.reviewerNotes && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
+                      <div className='bg-blue-50 mt-2 rounded p-2 text-sm'>
                         <strong>Reviewer Notes:</strong> {flag.reviewerNotes}
                       </div>
                     )}
 
                     {flag.resolutionNotes && (
-                      <div className="mt-2 p-2 bg-green-50 rounded text-sm">
+                      <div className='bg-green-50 mt-2 rounded p-2 text-sm'>
                         <strong>Resolution Notes:</strong>{' '}
                         {flag.resolutionNotes}
                       </div>
@@ -293,11 +294,11 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                   {allowManagement &&
                     flag.status !== 'resolved' &&
                     flag.status !== 'dismissed' && (
-                      <div className="ml-4 flex-shrink-0">
+                      <div className='ml-4 flex-shrink-0'>
                         <button
                           onClick={() => setSelectedFlag(flag)}
                           disabled={updating === flag.id}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+                          className='bg-blue-600 text-white hover:bg-blue-700 rounded px-3 py-1 text-sm disabled:opacity-50'
                         >
                           {updating === flag.id ? 'Updating...' : 'Manage'}
                         </button>
@@ -312,22 +313,22 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
       {/* Flag Management Modal */}
       {selectedFlag && allowManagement && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className='bg-gray-600 fixed inset-0 z-50 h-full w-full overflow-y-auto bg-opacity-50'>
+          <div className='bg-white relative top-20 mx-auto w-96 rounded-md border p-5 shadow-lg'>
+            <div className='mt-3'>
+              <h3 className='text-gray-900 mb-4 text-lg font-medium'>
                 Manage Crisis Flag
               </h3>
 
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 <div>
-                  <div className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className='text-gray-700 mb-2 block text-sm font-medium'>
                     Update Status
                   </div>
                   <div
-                    className="space-y-2"
-                    role="group"
-                    aria-label="Update Status"
+                    className='space-y-2'
+                    role='group'
+                    aria-label='Update Status'
                   >
                     {[
                       'under_review',
@@ -342,7 +343,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                           updateFlagStatus(selectedFlag.id, status)
                         }
                         disabled={updating === selectedFlag.id}
-                        className="w-full text-left px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                        className='border-gray-300 hover:bg-gray-50 w-full rounded-md border px-3 py-2 text-left disabled:opacity-50'
                       >
                         {status.replace('_', ' ').toUpperCase()}
                       </button>
@@ -351,10 +352,10 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end space-x-3">
+              <div className='mt-6 flex justify-end space-x-3'>
                 <button
                   onClick={() => setSelectedFlag(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className='text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-4 py-2 text-sm font-medium'
                 >
                   Cancel
                 </button>

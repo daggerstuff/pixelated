@@ -10,9 +10,11 @@
  *   ts-node mental-llama-analyze.ts --text "Sample text to analyze" --output-path ./results.json
  */
 
-import { program } from 'commander'
 import { promises as fs } from 'fs'
 import path from 'path'
+
+import { program } from 'commander'
+
 import { createMentalLLaMAFromEnv } from '../lib/ai/mental-llama'
 
 // Define types for CLI options
@@ -294,4 +296,4 @@ async function main() {
   }
 }
 
-main()
+void main()

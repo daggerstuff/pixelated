@@ -303,7 +303,9 @@ export class SupportContextIdentifier {
         return patternResult
       }
 
-      const isNonSupport = nonSupportPatterns.some((p) => p.test(userQuery.toLowerCase()))
+      const isNonSupport = nonSupportPatterns.some((p) =>
+        p.test(userQuery.toLowerCase()),
+      )
 
       // Check if we should use AI analysis based on pattern confidence
       const shouldUseAI =
@@ -430,10 +432,10 @@ export class SupportContextIdentifier {
     responseStyle: {
       tone: 'warm' | 'professional' | 'gentle' | 'direct'
       approach:
-      | 'validating'
-      | 'solution-focused'
-      | 'exploratory'
-      | 'stabilizing'
+        | 'validating'
+        | 'solution-focused'
+        | 'exploratory'
+        | 'stabilizing'
       language: 'simple' | 'detailed' | 'metaphorical' | 'clinical'
     }
   } {
@@ -450,7 +452,8 @@ export class SupportContextIdentifier {
         'Emergency support and crisis hotline information',
       ]
       for (const r of crisisAdds) {
-        if (!resources.some((x) => x.toLowerCase() === r.toLowerCase())) resources.push(r)
+        if (!resources.some((x) => x.toLowerCase() === r.toLowerCase()))
+          resources.push(r)
       }
       // Defensive: ensure at least one resource string contains crisis/hotline/emergency keywords
       if (!resources.some((r) => /crisis|hotline|emergency/i.test(r))) {
@@ -462,14 +465,18 @@ export class SupportContextIdentifier {
       result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
-    const urgCheck = String(result.urgency || '').toLowerCase().trim()
+    const urgCheck = String(result.urgency || '')
+      .toLowerCase()
+      .trim()
     if (
       (urgCheck === 'high' ||
         String(result.recommendedApproach || '')
           .toLowerCase()
           .includes('crisis') ||
         (Array.isArray(result.supportNeeds) &&
-          result.supportNeeds.some((n) => String(n).toLowerCase().includes('safety')))) &&
+          result.supportNeeds.some((n) =>
+            String(n).toLowerCase().includes('safety'),
+          ))) &&
       !resources.some((x) => /crisis|hotline|emergency/i.test(x))
     ) {
       resources.push('Emergency support and crisis hotline information')
@@ -496,7 +503,7 @@ export class SupportContextIdentifier {
 
     // Ultra-defensive: if high urgency and still no crisis/hotline/emergency entry, prepend a guaranteed hotline
     const immediateNeedsText = Array.isArray(result.metadata?.immediateNeeds)
-      ? (result.metadata!.immediateNeeds as string[]).join(' ').toLowerCase()
+      ? (result.metadata.immediateNeeds).join(' ').toLowerCase()
       : ''
     if (
       (urgCheck === 'high' ||
@@ -504,7 +511,9 @@ export class SupportContextIdentifier {
         immediateNeedsText.includes('safety')) &&
       !stringifiedResources.some((x) => /crisis|hotline|emergency/i.test(x))
     ) {
-      stringifiedResources.unshift('Crisis hotline: 988 Suicide & Crisis Lifeline')
+      stringifiedResources.unshift(
+        'Crisis hotline: 988 Suicide & Crisis Lifeline',
+      )
     }
 
     return {
@@ -900,7 +909,10 @@ Consider this context in your assessment.`
     } else if (response && typeof response === 'object') {
       if (typeof response.content === 'string') {
         content = response.content
-      } else if (Array.isArray(response.choices) && response.choices[0]?.message?.content) {
+      } else if (
+        Array.isArray(response.choices) &&
+        response.choices[0]?.message?.content
+      ) {
         content = String(response.choices[0].message.content)
       }
     }
@@ -978,8 +990,8 @@ Consider this context in your assessment.`
         urgency: this.validateUrgency(parsed.urgency || ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
-            .map((n: unknown) => this.validateSupportNeed(n as string))
-            .filter((need): need is SupportNeed => need !== null)
+              .map((n: unknown) => this.validateSupportNeed(n as string))
+              .filter((need): need is SupportNeed => need !== null)
           : [],
         recommendedApproach: this.validateRecommendedApproach(
           parsed.recommendedApproach || '',

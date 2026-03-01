@@ -1,8 +1,8 @@
 /**
  * Objective Switching Mechanism for Real-Time Adaptation
- * 
+ *
  * Provides concurrency-safe, high-performance objective switching based on context transitions.
- * 
+ *
  * Features:
  * - Real-time switching (<150ms guaranteed)
  * - Concurrency-safe with mutex locking
@@ -12,20 +12,17 @@
  * - No lost updates guarantee
  */
 
-import {
-  ContextEvent,
-  ContextTransition,
-} from './context-transition-detector'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   getPrioritizedObjectivesForContext,
   ObjectivePriority,
 } from './context-objective-mapping'
+import { ContextEvent, ContextTransition } from './context-transition-detector'
 import {
   defaultWeightingStrategy,
   WeightingParams,
   ObjectiveWeightingStrategy,
 } from './objective-weighting-strategy'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('objective-switcher')
 
@@ -92,7 +89,7 @@ export interface SwitcherTelemetry {
 
 /**
  * Objective Switcher - Concurrency-safe real-time objective switching
- * 
+ *
  * Manages objective transitions based on context changes with performance guarantees.
  */
 export class ObjectiveSwitcher {

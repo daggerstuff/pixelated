@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+
 import { useAIService } from './useAIService.js'
 
 export type EmotionAnalysis = {
@@ -45,7 +46,12 @@ export const useEmotionDetection = () => {
 
   const parseEmotionAnalysis = (analysisText: string): EmotionAnalysis => {
     try {
-      const parsed = JSON.parse(analysisText) as { primaryEmotion?: string; secondaryEmotions?: string[]; intensity?: number; confidence?: number }
+      const parsed = JSON.parse(analysisText) as {
+        primaryEmotion?: string
+        secondaryEmotions?: string[]
+        intensity?: number
+        confidence?: number
+      }
       return {
         primaryEmotion: parsed.primaryEmotion || 'neutral',
         secondaryEmotions: parsed.secondaryEmotions || [],
@@ -83,9 +89,9 @@ export const useEmotionDetection = () => {
           typeof response === 'object' &&
           'getReader' in response
         ) {
-          analysisText = await parseStreamResponse(response as AIResponseStream)
+          analysisText = await parseStreamResponse(response)
         } else {
-          analysisText = extractResponseText(response as AIResponseContent)
+          analysisText = extractResponseText(response)
         }
 
         return parseEmotionAnalysis(analysisText)

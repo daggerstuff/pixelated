@@ -10,13 +10,13 @@ spec:
     kind: Deployment
     name: cert-manager-cainjector
   updatePolicy:
-    updateMode: "Off"  # Only recommendations, no auto-updates
+    updateMode: 'Off' # Only recommendations, no auto-updates
   resourcePolicy:
     containerPolicies:
-    - containerName: cert-manager-cainjector
-      minAllowed:
-        cpu: 50m
-        memory: 64Mi
-      maxAllowed:
-        cpu: 500m
-        memory: 512Mi
+      - containerName: cert-manager-cainjector
+        minAllowed:
+          cpu: 50m
+          memory: 64Mi
+        maxAllowed:
+          cpu: 500m
+          memory: 512Mi

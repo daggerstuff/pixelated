@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
-import { fheService } from '@/lib/fhe'
 import { createContext, useContext, useEffect, useState } from 'react'
+
+import { fheService } from '@/lib/fhe'
 
 export type SecurityLevel = 'standard' | 'hipaa' | 'maximum'
 
@@ -71,7 +72,11 @@ export function SecurityProvider({
         // Initialize FHE if not using standard security
         if (level !== 'standard') {
           if (fheService.initialize) {
-            await fheService.initialize()
+            await fheService.initialize({
+              mode: level === 'maximum' ? 'secure' : 'standard',
+              keySize: level === 'maximum' ? 4096 : 2048,
+              securityLevel: level === 'maximum' ? 'tc256' : 'tc128',
+            })
           }
 
           // Generate initial key if none provided
@@ -100,7 +105,7 @@ export function SecurityProvider({
       }
     }
 
-    initializeSecurity()
+    void initializeSecurity()
   }, [level, initialKey])
 
   // Check key rotation needs
@@ -129,7 +134,11 @@ export function SecurityProvider({
   const setSecurityLevel = async (newLevel: SecurityLevel) => {
     try {
       if (newLevel !== 'standard' && fheService.initialize) {
-        await fheService.initialize()
+        await fheService.initialize({
+          mode: newLevel === 'maximum' ? 'secure' : 'standard',
+          keySize: newLevel === 'maximum' ? 4096 : 2048,
+          securityLevel: newLevel === 'maximum' ? 'tc256' : 'tc128',
+        })
       }
 
       if (newLevel !== 'standard' && !securityState.currentKey) {
@@ -230,8 +239,8 @@ export function SecurityProvider({
       console.error('Decryption failed:', error)
       // Attempt to parse as JSON
       try {
-        const parsed = JSON.parse(data) as unknown
-        if (parsed.data) {
+        const parsed = JSON.parse(data)
+        if (parsed && typeof parsed === 'object' && parsed.data) {
           return JSON.parse(parsed.data) as unknown
         }
         return parsed

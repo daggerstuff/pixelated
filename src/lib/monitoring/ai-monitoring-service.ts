@@ -1,6 +1,7 @@
+import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { OpenAI } from 'openai'
-import { EventEmitter } from 'events'
 
 export interface Alert {
   id: string

@@ -9,8 +9,12 @@
  * - Performance analytics and monitoring
  */
 
+import { promisify } from 'util'
+import * as zlib from 'zlib'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getCacheService } from '../../services/cacheService'
+import type { CacheOptions } from './cache'
 import { getRedisPoolManager } from './redis-pool-manager'
 import type {
   BiasAnalysisResult,
@@ -18,9 +22,6 @@ import type {
   BiasReport,
   BiasDashboardData,
 } from './types'
-import type { CacheOptions } from './cache'
-import * as zlib from 'zlib'
-import { promisify } from 'util'
 
 const logger = createBuildSafeLogger('IntelligentCache')
 
@@ -242,7 +243,7 @@ export class IntelligentCache {
           : null
       const result = await this.getFromTiers<T>(
         key,
-        cacheStrategy as CacheStrategy | null,
+        cacheStrategy,
       )
 
       if (result) {
@@ -971,7 +972,7 @@ export function getIntelligentCache(): IntelligentCache {
     intelligentCache = new IntelligentCache(DEFAULT_CONFIG)
   }
   // The '!' assures TypeScript intelligentCache is not null here.
-  return intelligentCache!
+  return intelligentCache
 }
 
 // Convenience functions for specific data types

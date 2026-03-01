@@ -1,7 +1,12 @@
 import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
+
 import { Table } from '@/components/ui/table'
-import type { TableColumn, TableDataSource, TableState } from '@/components/ui/table-types'
+import type {
+  TableColumn,
+  TableDataSource,
+  TableState,
+} from '@/components/ui/table-types'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,
@@ -47,7 +52,9 @@ export function EvaluationList({
 
     // Apply tier filter
     if (tierFilter !== 'all') {
-      filtered = filtered.filter((evaluation) => evaluation.priorityTier === tierFilter)
+      filtered = filtered.filter(
+        (evaluation) => evaluation.priorityTier === tierFilter,
+      )
     }
 
     // Apply score filter
@@ -55,7 +62,8 @@ export function EvaluationList({
       filtered = filtered.filter((evaluation) => evaluation.overallScore >= 8)
     } else if (scoreFilter === 'medium') {
       filtered = filtered.filter(
-        (evaluation) => evaluation.overallScore >= 6 && evaluation.overallScore < 8,
+        (evaluation) =>
+          evaluation.overallScore >= 6 && evaluation.overallScore < 8,
       )
     } else if (scoreFilter === 'low') {
       filtered = filtered.filter((evaluation) => evaluation.overallScore < 6)
@@ -107,7 +115,8 @@ export function EvaluationList({
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
       high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      medium:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     }
     return (
@@ -122,9 +131,9 @@ export function EvaluationList({
       header: 'Evaluation ID',
       accessor: (row) => (
         <button
-          type="button"
+          type='button'
           onClick={() => onEvaluationClick?.(row)}
-          className="text-left font-medium text-primary hover:underline font-mono text-sm"
+          className='text-primary text-left font-mono text-sm font-medium hover:underline'
         >
           {row.evaluationId.slice(0, 8)}...
         </button>
@@ -135,7 +144,7 @@ export function EvaluationList({
       id: 'sourceId',
       header: 'Source ID',
       accessor: (row) => (
-        <span className="font-mono text-sm">{row.sourceId.slice(0, 8)}...</span>
+        <span className='font-mono text-sm'>{row.sourceId.slice(0, 8)}...</span>
       ),
       hideMobile: true,
     },
@@ -166,7 +175,7 @@ export function EvaluationList({
       id: 'metrics',
       header: 'Metrics',
       accessor: (row) => (
-        <div className="flex gap-1 text-xs">
+        <div className='flex gap-1 text-xs'>
           <span>T:{row.therapeuticRelevance.toFixed(1)}</span>
           <span>D:{row.dataStructureQuality.toFixed(1)}</span>
           <span>I:{row.trainingIntegration.toFixed(1)}</span>
@@ -199,21 +208,21 @@ export function EvaluationList({
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-2">
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-1 gap-2'>
           <input
-            type="text"
-            placeholder="Search evaluations..."
+            type='text'
+            placeholder='Search evaluations...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
           />
           <select
             value={tierFilter}
             onChange={(e) => setTierFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+            className='border-input rounded-md border bg-background px-3 py-2 text-sm capitalize'
           >
-            <option value="all">All Tiers</option>
+            <option value='all'>All Tiers</option>
             {tiers.map((tier) => (
               <option key={tier} value={tier}>
                 {tier}
@@ -223,15 +232,15 @@ export function EvaluationList({
           <select
             value={scoreFilter}
             onChange={(e) => setScoreFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className='border-input rounded-md border bg-background px-3 py-2 text-sm'
           >
-            <option value="all">All Scores</option>
-            <option value="high">High (≥8)</option>
-            <option value="medium">Medium (6-8)</option>
-            <option value="low">Low (&lt;6)</option>
+            <option value='all'>All Scores</option>
+            <option value='high'>High (≥8)</option>
+            <option value='medium'>Medium (6-8)</option>
+            <option value='low'>Low (&lt;6)</option>
           </select>
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className='text-muted-foreground text-sm'>
           Showing {filteredAndSortedEvaluations.length} of {evaluations.total}{' '}
           evaluations
         </div>
@@ -249,4 +258,3 @@ export function EvaluationList({
     </div>
   )
 }
-

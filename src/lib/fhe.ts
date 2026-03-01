@@ -4,23 +4,24 @@
  */
 
 import SEAL from 'node-seal'
-import { createBuildSafeLogger } from './logging/build-safe-logger'
+
 import type { FHEOperation, FHEOperationResult } from './fhe/types'
+import { createBuildSafeLogger } from './logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
 
 // Define types based on the SEAL library structure
 type SealInstance = Awaited<ReturnType<typeof SEAL>>
-type EncryptionParameters = ReturnType<SealInstance['EncryptionParameters']>
-type SEALContext = ReturnType<SealInstance['Context']>
-type KeyGenerator = ReturnType<SealInstance['KeyGenerator']>
+type EncryptionParameters = InstanceType<SealInstance['EncryptionParameters']>
+type SEALContext = InstanceType<SealInstance['SEALContext']>
+type KeyGenerator = InstanceType<SealInstance['KeyGenerator']>
 type PublicKey = ReturnType<KeyGenerator['createPublicKey']>
 type SecretKey = ReturnType<KeyGenerator['secretKey']>
-type BatchEncoder = ReturnType<SealInstance['BatchEncoder']>
-type Encryptor = ReturnType<SealInstance['Encryptor']>
-type Decryptor = ReturnType<SealInstance['Decryptor']>
-type PlainText = ReturnType<SealInstance['PlainText']>
-type CipherText = ReturnType<SealInstance['CipherText']>
+type BatchEncoder = InstanceType<SealInstance['BatchEncoder']>
+type Encryptor = InstanceType<SealInstance['Encryptor']>
+type Decryptor = InstanceType<SealInstance['Decryptor']>
+type PlainText = InstanceType<SealInstance['Plaintext']>
+type CipherText = InstanceType<SealInstance['Ciphertext']>
 
 export type EncryptionMode =
   | 'secure'
@@ -68,65 +69,50 @@ export class RealFHEService implements FHEService {
       this.config = config
       this.encryptionMode = config.mode
 
-      this.seal = await SEAL()
+      const seal = await SEAL()
+      this.seal = seal
 
-      const schemeType = (this.seal as SealInstance).SchemeType.bfv
-      const securityLevel = (this.seal as SealInstance).SecurityLevel.tc128
+      const schemeType = seal.SchemeType.bfv
+      const securityLevel = seal.SecLevelType.tc128
 
       const polyModulusDegree = this.encryptionMode === 'secure' ? 8192 : 4096
       const bitSizes =
         this.encryptionMode === 'secure' ? [60, 40, 40, 60] : [60, 40, 40]
 
-      const encParams = (this.seal as SealInstance).EncryptionParameters(
-        schemeType,
-      ) as EncryptionParameters
+      const encParams = new seal.EncryptionParameters(schemeType)
       encParams.setPolyModulusDegree(polyModulusDegree)
 
       // Set coefficient modulus
-      const coeffModulus = (this.seal as SealInstance).CoeffModulus.Create(
+      const coeffModulus = seal.CoeffModulus.Create(
         polyModulusDegree,
         Int32Array.from(bitSizes),
       )
       encParams.setCoeffModulus(coeffModulus)
 
       // Set plain modulus for BFV scheme
-      const plainModulus = (this.seal as SealInstance).PlainModulus.Batching(
-        polyModulusDegree,
-        20,
-      )
+      const plainModulus = seal.PlainModulus.Batching(polyModulusDegree, 20)
       encParams.setPlainModulus(plainModulus)
 
       // Create context
-      this.context = (this.seal as SealInstance).Context(
-        encParams,
-        true,
-        securityLevel,
-      ) as SEALContext
+      const context = new seal.SEALContext(encParams, true, securityLevel)
+      this.context = context
 
-      if (!(this.context as SEALContext).parametersSet()) {
+      if (!context.parametersSet()) {
         throw new Error('Parameters are not set correctly')
       }
 
       // Create keys
-      const keyGenerator = (this.seal as SealInstance).KeyGenerator(
-        this.context as SEALContext,
-      ) as KeyGenerator
-      this.publicKey = keyGenerator.createPublicKey() as PublicKey
-      this.secretKey = keyGenerator.secretKey() as SecretKey
+      const keyGenerator = new seal.KeyGenerator(context)
+      const publicKey = keyGenerator.createPublicKey()
+      const secretKey = keyGenerator.secretKey()
+
+      this.publicKey = publicKey
+      this.secretKey = secretKey
 
       // Create encryption tools
-      this.encoder = (this.seal as SealInstance).BatchEncoder(
-        this.context as SEALContext,
-      ) as BatchEncoder
-      this.encryptor = (this.seal as SealInstance).Encryptor(
-        this.context as SEALContext,
-        this.publicKey as PublicKey,
-      ) as Encryptor
-      this.decryptor = (this.seal as SealInstance).Decryptor(
-        this.context as SEALContext,
-        this.secretKey as SecretKey,
-      ) as Decryptor
-      // Removed unused evaluator assignment
+      this.encoder = new seal.BatchEncoder(context)
+      this.encryptor = new seal.Encryptor(context, publicKey)
+      this.decryptor = new seal.Decryptor(context, secretKey)
 
       this.isInitialized = true
       logger.info('FHE service initialized successfully')
@@ -194,23 +180,24 @@ export class RealFHEService implements FHEService {
   async encrypt(data: string): Promise<string> {
     try {
       await this.ensureInitialized()
+      if (!this.seal || !this.encryptor || !this.encoder) {
+        throw new Error('FHE service components not initialized')
+      }
+      const { seal, encryptor, encoder } = this
 
       // Convert data to numeric representation
       const dataArray = this.textToUint32Array(data)
 
       // Encode the data
-      const plaintext = (this.seal as SealInstance).PlainText() as PlainText
-      ;(this.encoder as BatchEncoder).encode(
-        Int32Array.from(dataArray),
-        plaintext,
-      )
+      const plaintext = new seal.Plaintext()
+      encoder.encode(Int32Array.from(dataArray), plaintext)
 
       // Encrypt the plaintext
-      const ciphertext = (this.seal as SealInstance).CipherText() as CipherText
-      ;(this.encryptor as Encryptor).encrypt(plaintext, ciphertext)
+      const ciphertext = new seal.Ciphertext()
+      encryptor.encrypt(plaintext, ciphertext)
 
       // Serialize the ciphertext to base64
-      const serialized = ciphertext.save()
+      const serialized = ciphertext.saveToBase64(seal.ComprModeType.none)
 
       // Clean up resources
       plaintext.delete()
@@ -218,7 +205,7 @@ export class RealFHEService implements FHEService {
       return serialized
     } catch (error: unknown) {
       logger.error('Encryption failed', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? String(error.message) : String(error),
       })
       throw error
     }
@@ -227,22 +214,30 @@ export class RealFHEService implements FHEService {
   async decrypt(data: string): Promise<string> {
     try {
       await this.ensureInitialized()
+      if (
+        !this.seal ||
+        !this.decryptor ||
+        !this.encoder ||
+        !this.context
+      ) {
+        throw new Error('FHE service components not initialized')
+      }
+      const { seal, decryptor, encoder, context } = this
 
       // Deserialize the ciphertext
-      const ciphertext = (this.seal as SealInstance).CipherText() as CipherText
-      ciphertext.load(this.context as SEALContext, data)
+      const ciphertext = new seal.Ciphertext()
+      ciphertext.loadFromBase64(context, data)
 
       // Decrypt the ciphertext
-      const plaintext = (this.seal as SealInstance).PlainText() as PlainText
-      ;(this.decryptor as Decryptor).decrypt(ciphertext, plaintext)
+      const plaintext = new seal.Plaintext()
+      decryptor.decrypt(ciphertext, plaintext)
 
       // Decode the plaintext
-      const decodedArray = (this.encoder as BatchEncoder).decode(plaintext)
+      const decodedArray = encoder.decodeBigInt64(plaintext)
 
-      const finalDecodedArray: Uint32Array =
-        decodedArray instanceof Uint32Array
-          ? decodedArray
-          : new Uint32Array(decodedArray)
+      const finalDecodedArray = new Uint32Array(
+        Array.from(decodedArray).map((v) => Number(v)),
+      )
 
       // Convert numeric values back to string
       const result = this.uint32ArrayToText(finalDecodedArray)
@@ -254,7 +249,7 @@ export class RealFHEService implements FHEService {
       return result
     } catch (error: unknown) {
       logger.error('Decryption failed', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? String(error.message) : String(error),
       })
       throw error
     }
@@ -274,11 +269,9 @@ export class RealFHEService implements FHEService {
       const encoder = new TextEncoder()
       const dataBuffer = encoder.encode(data)
 
-      // Perform SHA-256 hashing
-      const hashBuffer = await this.seal.crypto.subtle.digest(
-        'SHA-256',
-        dataBuffer,
-      )
+      // Perform SHA-256 hashing using the standard Web Crypto API
+      // Since we are in Node/Browser, crypto.subtle should be used directly
+      const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
 
       // Convert the hash to hex string
       const hashArray = Array.from(new Uint8Array(hashBuffer))
@@ -338,20 +331,16 @@ export class RealFHEService implements FHEService {
         throw new Error('FHE service is not initialized')
       }
 
+      const { seal, context } = this
+
       // Generate new key pair
-      const keyGen = (this.seal as SealInstance).KeyGenerator(this.context)
+      const keyGen = new seal.KeyGenerator(context)
       this.secretKey = keyGen.secretKey()
       this.publicKey = keyGen.createPublicKey()
 
       // Recreate encryptor and decryptor with new keys
-      this.encryptor = (this.seal as SealInstance).Encryptor(
-        this.context,
-        this.publicKey,
-      )
-      this.decryptor = (this.seal as SealInstance).Decryptor(
-        this.context,
-        this.secretKey,
-      )
+      this.encryptor = new seal.Encryptor(context, this.publicKey)
+      this.decryptor = new seal.Decryptor(context, this.secretKey)
 
       logger.info('Key rotation completed successfully')
     } catch (error: unknown) {

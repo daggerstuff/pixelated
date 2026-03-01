@@ -294,7 +294,7 @@ export class IndexedDBStorageProvider implements StorageProvider {
       const request = store.getAllKeys()
 
       request.onsuccess = () => {
-        const keys = Array.from(request.result as IDBValidKey[])
+        const keys = Array.from(request.result)
           .map((key) => key.toString())
           // Apply pattern matching if provided
           .filter((key) => !pattern || matchesPattern(key, pattern))

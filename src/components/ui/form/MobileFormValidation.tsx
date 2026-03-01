@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+
 import { isFormField } from './form-validation-types'
 import type {
   FormValues,
@@ -124,7 +125,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         if (onValidationChange) {
           onValidationChange(
             formState.isValid,
-            formState.errors as FormErrors<T>,
+            formState.errors,
           )
         }
       }
@@ -332,8 +333,8 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       const validationProps: FormFieldValidationProps = {
         name,
         'aria-required': true,
-        'onChange': handleChange as React.ChangeEventHandler,
-        'onBlur': handleBlur as React.FocusEventHandler,
+        onChange: handleChange as React.ChangeEventHandler,
+        onBlur: handleBlur as React.FocusEventHandler,
       }
 
       Object.entries(validationProps).forEach(([key, value]) => {
@@ -390,14 +391,14 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
 
       {/* Hidden element for screen reader announcements */}
       <div
-        id="validation-error-summary"
-        className="sr-only"
-        aria-live="assertive"
+        id='validation-error-summary'
+        className='sr-only'
+        aria-live='assertive'
       />
 
       {/* Error summary for accessibility and mobile UX */}
       {showErrorSummary && formState.submitCount > 0 && !formState.isValid && (
-        <div className="validation-error-summary" role="alert">
+        <div className='validation-error-summary' role='alert'>
           <h3>Please correct the following errors:</h3>
           <ul>
             {Object.entries(formState.errors).map(([field, error]) => (
@@ -459,23 +460,23 @@ export const ValidationRules = {
   required: createRequiredRule,
   email: (
     message = 'Please enter a valid email address',
-  ): ValidationRule<string> => ({
+  ): ValidationRule => ({
     test: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     message,
   }),
-  minLength: (length: number, message?: string): ValidationRule<string> => ({
+  minLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length >= length,
     message: message || `Must be at least ${length} characters`,
   }),
-  maxLength: (length: number, message?: string): ValidationRule<string> => ({
+  maxLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length <= length,
     message: message || `Must be no more than ${length} characters`,
   }),
-  pattern: (regex: RegExp, message: string): ValidationRule<string> => ({
+  pattern: (regex: RegExp, message: string): ValidationRule => ({
     test: (value) => regex.test(value),
     message,
   }),
-  match: (fieldName: string, message: string): ValidationRule<string> => ({
+  match: (fieldName: string, message: string): ValidationRule => ({
     test: (value) => {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,

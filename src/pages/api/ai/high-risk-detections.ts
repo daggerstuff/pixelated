@@ -1,3 +1,5 @@
+import { aiRepository } from '@/lib/db/ai'
+
 // import type { APIRoute, APIContext } from 'astro'
 import {
   createAuditLog,
@@ -5,7 +7,6 @@ import {
   AuditEventStatus,
 } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
-import { aiRepository } from '@/lib/db/ai'
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {

@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-This guide demonstrates how to integrate the Advanced Detection Systems, Mistral-7B RAG, and Behavioral Analysis Models into a cohesive therapy analysis system. The integration provides real-time analysis, crisis detection, and therapeutic support.
+This guide demonstrates how to integrate the Advanced Detection Systems,
+Mistral-7B RAG, and Behavioral Analysis Models into a cohesive therapy analysis
+system. The integration provides real-time analysis, crisis detection, and
+therapeutic support.
 
 ## System Architecture
 

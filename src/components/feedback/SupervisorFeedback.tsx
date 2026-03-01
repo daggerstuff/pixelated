@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,8 +9,8 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card'
-import { analyzeTherapeuticTechniques } from '@/simulator/utils/speechRecognition'
 import { TherapeuticTechnique } from '@/simulator/types'
+import { analyzeTherapeuticTechniques } from '@/simulator/utils/speechRecognition'
 
 interface DetectedTechnique {
   technique: string
@@ -283,9 +284,9 @@ export function SupervisorFeedback({
   }
 
   return (
-    <Card className="supervisor-feedback shadow-md border-green-700/20 overflow-hidden">
-      <CardHeader className="bg-green-900/10">
-        <CardTitle className="flex justify-between items-center text-green-800">
+    <Card className='supervisor-feedback border-green-700/20 overflow-hidden shadow-md'>
+      <CardHeader className='bg-green-900/10'>
+        <CardTitle className='text-green-800 flex items-center justify-between'>
           <span>Clinical Supervisor Feedback</span>
           {feedbackSummary && (
             <Badge
@@ -303,36 +304,36 @@ export function SupervisorFeedback({
         </CardTitle>
       </CardHeader>
 
-      <div className="bg-green-800/10 px-4 py-1 flex space-x-1">
+      <div className='bg-green-800/10 flex space-x-1 px-4 py-1'>
         <Button
           variant={activeTab === 'techniques' ? 'default' : 'ghost'}
-          size="sm"
+          size='sm'
           onClick={() => setActiveTab('techniques')}
         >
           Techniques
         </Button>
         <Button
           variant={activeTab === 'opportunities' ? 'default' : 'ghost'}
-          size="sm"
+          size='sm'
           onClick={() => setActiveTab('opportunities')}
         >
           Opportunities
         </Button>
         <Button
           variant={activeTab === 'summary' ? 'default' : 'ghost'}
-          size="sm"
+          size='sm'
           onClick={() => setActiveTab('summary')}
         >
           Summary
         </Button>
       </div>
 
-      <CardContent className="p-4 h-[320px] overflow-y-auto">
+      <CardContent className='h-[320px] overflow-y-auto p-4'>
         {isGenerating ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-pulse text-center">
-              <p className="text-green-800">Analyzing therapy session...</p>
-              <p className="text-sm text-green-600">
+          <div className='flex h-full items-center justify-center'>
+            <div className='animate-pulse text-center'>
+              <p className='text-green-800'>Analyzing therapy session...</p>
+              <p className='text-green-600 text-sm'>
                 Using therapeutic technique recognition
               </p>
             </div>
@@ -340,24 +341,24 @@ export function SupervisorFeedback({
         ) : (
           <>
             {activeTab === 'techniques' && (
-              <div className="techniques-analysis">
-                <h3 className="text-lg font-semibold mb-3">
+              <div className='techniques-analysis'>
+                <h3 className='mb-3 text-lg font-semibold'>
                   Detected Therapeutic Techniques
                 </h3>
                 {detectedTechniques.length === 0 ? (
-                  <p className="text-gray-500 italic">
+                  <p className='text-gray-500 italic'>
                     No therapeutic techniques detected in the session.
                   </p>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2 mb-4">
+                  <div className='space-y-4'>
+                    <div className='mb-4 flex flex-wrap gap-2'>
                       {detectedTechniques.map((technique) => (
                         <Badge
                           key={technique.technique}
                           variant={
                             technique.confidence > 0.8 ? 'default' : 'outline'
                           }
-                          className="cursor-pointer"
+                          className='cursor-pointer'
                           onClick={() =>
                             setSelectedTechnique(
                               technique.technique === selectedTechnique
@@ -373,17 +374,17 @@ export function SupervisorFeedback({
                     </div>
 
                     {selectedTechnique && (
-                      <div className="bg-green-50 p-3 rounded-md">
-                        <h4 className="font-medium">
+                      <div className='bg-green-50 rounded-md p-3'>
+                        <h4 className='font-medium'>
                           {selectedTechnique} Examples:
                         </h4>
-                        <ul className="mt-2 space-y-2">
+                        <ul className='mt-2 space-y-2'>
                           {detectedTechniques
                             .find((t) => t.technique === selectedTechnique)
                             ?.examples.map((example) => (
                               <li
                                 key={`${selectedTechnique}-${example.slice(0, 20)}`}
-                                className="text-sm text-gray-700 pl-2 border-l-2 border-green-300"
+                                className='text-gray-700 border-green-300 border-l-2 pl-2 text-sm'
                               >
                                 &ldquo;{example}&rdquo;
                               </li>
@@ -397,41 +398,41 @@ export function SupervisorFeedback({
             )}
 
             {activeTab === 'opportunities' && (
-              <div className="missed-opportunities">
-                <h3 className="text-lg font-semibold mb-3">
+              <div className='missed-opportunities'>
+                <h3 className='mb-3 text-lg font-semibold'>
                   Therapeutic Opportunities
                 </h3>
                 {missedOpportunities.length === 0 ? (
-                  <p className="text-gray-500 italic">
+                  <p className='text-gray-500 italic'>
                     No significant missed opportunities detected.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className='space-y-4'>
                     {missedOpportunities.map((opportunity) => (
                       <div
                         key={`${opportunity.suggestedTechnique}-${opportunity.context.slice(0, 20)}`}
-                        className="bg-blue-50 p-3 rounded-md"
+                        className='bg-blue-50 rounded-md p-3'
                       >
-                        <div className="font-medium flex justify-between">
+                        <div className='flex justify-between font-medium'>
                           <span>
                             Opportunity for {opportunity.suggestedTechnique}
                           </span>
-                          <Badge variant="outline" className="font-normal">
+                          <Badge variant='outline' className='font-normal'>
                             {opportunity.suggestedTechnique}
                           </Badge>
                         </div>
-                        <div className="mt-2 text-sm">
-                          <p className="text-gray-700 italic mb-2">
+                        <div className='mt-2 text-sm'>
+                          <p className='text-gray-700 mb-2 italic'>
                             Client: &ldquo;{opportunity.context}&rdquo;
                           </p>
-                          <p className="text-gray-600 mb-2">
+                          <p className='text-gray-600 mb-2'>
                             {opportunity.rationale}
                           </p>
-                          <div className="bg-white p-2 rounded border border-blue-100">
-                            <p className="text-sm font-medium text-blue-800">
+                          <div className='bg-white border-blue-100 rounded border p-2'>
+                            <p className='text-blue-800 text-sm font-medium'>
                               Example response:
                             </p>
-                            <p className="text-gray-700">
+                            <p className='text-gray-700'>
                               &ldquo;{opportunity.exampleResponse}&rdquo;
                             </p>
                           </div>
@@ -444,21 +445,21 @@ export function SupervisorFeedback({
             )}
 
             {activeTab === 'summary' && feedbackSummary && (
-              <div className="feedback-summary">
-                <h3 className="text-lg font-semibold mb-3">
+              <div className='feedback-summary'>
+                <h3 className='mb-3 text-lg font-semibold'>
                   Session Assessment
                 </h3>
 
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   <div>
-                    <h4 className="font-medium text-green-700">Strengths</h4>
-                    <ul className="mt-1 space-y-1">
+                    <h4 className='text-green-700 font-medium'>Strengths</h4>
+                    <ul className='mt-1 space-y-1'>
                       {feedbackSummary.positivePoints.map((point) => (
                         <li
                           key={point}
-                          className="text-sm flex items-start gap-2"
+                          className='flex items-start gap-2 text-sm'
                         >
-                          <span className="text-green-500">✓</span>
+                          <span className='text-green-500'>✓</span>
                           <span>{point}</span>
                         </li>
                       ))}
@@ -466,25 +467,25 @@ export function SupervisorFeedback({
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-amber-700">
+                    <h4 className='text-amber-700 font-medium'>
                       Development Areas
                     </h4>
-                    <ul className="mt-1 space-y-1">
+                    <ul className='mt-1 space-y-1'>
                       {feedbackSummary.developmentalPoints.map((point) => (
                         <li
                           key={point}
-                          className="text-sm flex items-start gap-2"
+                          className='flex items-start gap-2 text-sm'
                         >
-                          <span className="text-amber-500">→</span>
+                          <span className='text-amber-500'>→</span>
                           <span>{point}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <h4 className="font-medium">Supervisor Recommendations</h4>
-                    <p className="text-sm text-gray-700 mt-1">
+                  <div className='bg-gray-50 rounded-md p-3'>
+                    <h4 className='font-medium'>Supervisor Recommendations</h4>
+                    <p className='text-gray-700 mt-1 text-sm'>
                       {feedbackSummary.overallRating > 7
                         ? 'Excellent therapeutic presence. Continue to build on your strengths while incorporating a wider range of techniques.'
                         : feedbackSummary.overallRating > 4
@@ -499,16 +500,16 @@ export function SupervisorFeedback({
         )}
       </CardContent>
 
-      <CardFooter className="bg-green-50 border-t border-green-100 flex justify-between items-center">
+      <CardFooter className='bg-green-50 border-green-100 flex items-center justify-between border-t'>
         <Button
-          variant="outline"
-          size="sm"
+          variant='outline'
+          size='sm'
           onClick={regenerateFeedback}
           disabled={isGenerating}
         >
           Regenerate Feedback
         </Button>
-        <p className="text-xs text-gray-500">
+        <p className='text-gray-500 text-xs'>
           Feedback generated based on {therapistResponses.length} therapist
           responses
         </p>

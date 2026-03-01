@@ -1,5 +1,7 @@
 import { z } from 'zod'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { getSession } from '../../../lib/auth/session'
 import { createDataExportRequest } from '../../../lib/services/patient-rights/dataPortabilityService'
 
@@ -28,7 +30,7 @@ export const POST = async ({ request }) => {
     } catch (error: unknown) {
       logger.warn('Invalid JSON in request body', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
       })
       return new Response(
         JSON.stringify({
@@ -122,7 +124,7 @@ export const POST = async ({ request }) => {
   } catch (error: unknown) {
     logger.error('Error processing export request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
     })
 
     return new Response(

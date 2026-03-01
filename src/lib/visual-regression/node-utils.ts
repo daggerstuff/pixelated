@@ -5,7 +5,13 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { safeJoin, ALLOWED_DIRECTORIES, validatePath, sanitizeFilename } from '../../utils/path-security'
+
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  validatePath,
+  sanitizeFilename,
+} from '../../utils/path-security'
 
 export interface Screenshot {
   name: string
@@ -34,7 +40,10 @@ export const getVisualRegressionData =
   async (): Promise<VisualRegressionData> => {
     try {
       // Path to visual test results directory
-      const testResultsDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'test-results')
+      const testResultsDir = safeJoin(
+        ALLOWED_DIRECTORIES.PROJECT_ROOT,
+        'test-results',
+      )
 
       if (!fs.existsSync(testResultsDir)) {
         return {
@@ -71,8 +80,14 @@ export const getVisualRegressionData =
                 'root'
 
               const sanitizedBaseName = sanitizeFilename(baseName)
-              const expectedPath = safeJoin(dir, `${sanitizedBaseName}-expected.png`)
-              const actualPath = safeJoin(dir, `${sanitizedBaseName}-actual.png`)
+              const expectedPath = safeJoin(
+                dir,
+                `${sanitizedBaseName}-expected.png`,
+              )
+              const actualPath = safeJoin(
+                dir,
+                `${sanitizedBaseName}-actual.png`,
+              )
               const diffPath = safeJoin(dir, `${sanitizedBaseName}-diff.png`)
 
               const hasExpected = fs.existsSync(expectedPath)

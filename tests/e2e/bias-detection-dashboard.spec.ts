@@ -13,6 +13,7 @@
  */
 
 import { test, expect } from '@playwright/test'
+
 import { login } from './test-utils'
 
 test.describe('Bias Detection Dashboard', () => {

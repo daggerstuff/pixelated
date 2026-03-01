@@ -1,16 +1,17 @@
 ---
-title: "Performance Testing Guide"
-description: "Performance Testing Guide documentation"
+title: 'Performance Testing Guide'
+description: 'Performance Testing Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "testing"]
+author: 'Pixelated Team'
+tags: ['documentation', 'testing']
 draft: false
 toc: true
 ---
 
 # Performance Testing Guide
 
-This guide outlines our approach to performance testing for the Astro project, covering key metrics, testing tools, and optimization strategies.
+This guide outlines our approach to performance testing for the Astro project,
+covering key metrics, testing tools, and optimization strategies.
 
 ## Key Performance Metrics
 
@@ -18,9 +19,11 @@ We focus on measuring the following Core Web Vitals and performance metrics:
 
 ### Loading Performance
 
-- **Time to First Byte (TTFB)**: Time from request to first byte of response received
+- **Time to First Byte (TTFB)**: Time from request to first byte of response
+  received
 - **First Contentful Paint (FCP)**: Time until first content is rendered
-- **Largest Contentful Paint (LCP)**: Time until largest content element is rendered
+- **Largest Contentful Paint (LCP)**: Time until largest content element is
+  rendered
 - **Speed Index**: How quickly content is visually displayed
 
 ### Interactivity
@@ -31,7 +34,8 @@ We focus on measuring the following Core Web Vitals and performance metrics:
 
 ### Visual Stability
 
-- **Cumulative Layout Shift (CLS)**: Measures visual stability and unexpected layout shifts
+- **Cumulative Layout Shift (CLS)**: Measures visual stability and unexpected
+  layout shifts
 
 ### Resource Metrics
 
@@ -81,29 +85,32 @@ Performance tests run automatically on:
 
 #### Cloudflare Access (staging/production)
 
-If the target environment is protected by Cloudflare Zero Trust Access, the pipeline/test runner must authenticate via a **Service Auth token**.
+If the target environment is protected by Cloudflare Zero Trust Access, the
+pipeline/test runner must authenticate via a **Service Auth token**.
 
 - **Azure DevOps variables** (variable group `pixelated-pipeline-variables`):
   - `CF_ACCESS_CLIENT_ID`
   - `CF_ACCESS_CLIENT_SECRET`
 - **Cloudflare configuration**:
-  - Ensure the Access Application protecting the target routes (e.g. `/demo`) has a Policy that **allows Service Auth** and includes the service token used by CI.
+  - Ensure the Access Application protecting the target routes (e.g. `/demo`)
+    has a Policy that **allows Service Auth** and includes the service token
+    used by CI.
 
 ## Performance Budgets
 
 We've established the following performance budgets:
 
-| Metric | Target (Good) | Maximum (Acceptable) |
-|--------|---------------|----------------------|
-| TTFB   | < 300ms       | < 600ms              |
-| FCP    | < 1.8s        | < 3s                 |
-| LCP    | < 2.5s        | < 4s                 |
-| CLS    | < 0.1         | < 0.25               |
-| TBT    | < 200ms       | < 600ms              |
-| FID    | < 100ms       | < 300ms              |
-| JS Size| < 500KB       | < 1MB                |
-| CSS Size| < 100KB      | < 200KB              |
-| Requests| < 50         | < 80                 |
+| Metric   | Target (Good) | Maximum (Acceptable) |
+| -------- | ------------- | -------------------- |
+| TTFB     | < 300ms       | < 600ms              |
+| FCP      | < 1.8s        | < 3s                 |
+| LCP      | < 2.5s        | < 4s                 |
+| CLS      | < 0.1         | < 0.25               |
+| TBT      | < 200ms       | < 600ms              |
+| FID      | < 100ms       | < 300ms              |
+| JS Size  | < 500KB       | < 1MB                |
+| CSS Size | < 100KB       | < 200KB              |
+| Requests | < 50          | < 80                 |
 
 ## Common Performance Optimizations
 
@@ -164,7 +171,8 @@ When a performance test fails or metrics degrade:
 
 When adding new pages or features:
 
-1. Add the page to `PAGES_TO_TEST` in `tests/performance/page-performance.spec.ts`
+1. Add the page to `PAGES_TO_TEST` in
+   `tests/performance/page-performance.spec.ts`
 2. Set appropriate thresholds if different from defaults
 3. Run the tests locally to establish a baseline
 4. Document any special considerations for the new page
@@ -179,4 +187,5 @@ Our performance optimization is an ongoing process:
 4. **Validate**: Confirm improvements with tests
 5. **Monitor**: Watch for regressions
 
-By following this approach, we maintain high performance standards while continuing to evolve the application.
+By following this approach, we maintain high performance standards while
+continuing to evolve the application.

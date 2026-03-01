@@ -3,13 +3,17 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import {
+  journalResearchQueryKeys,
+  journalResearchMutationKeys,
+} from '@/lib/api/journal-research/react-query'
 import {
   integrateDataset,
   integrateAllDatasets,
   getTrainingStatus,
   getPipelineStatus,
-  } from '@/lib/api/journal-research/training'
-import { journalResearchQueryKeys, journalResearchMutationKeys } from '@/lib/api/journal-research/react-query'
+} from '@/lib/api/journal-research/training'
 
 /**
  * Hook for integrating a single dataset into the training pipeline
@@ -30,14 +34,14 @@ export function useIntegrateDataset(sessionId: string) {
     },
     onSuccess: () => {
       // Invalidate training status queries
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.status(sessionId),
       })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.pipelineStatus(),
       })
       // Also invalidate acquisition queries to refresh integration status
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(sessionId),
       })
     },
@@ -57,14 +61,14 @@ export function useIntegrateAllDatasets(sessionId: string) {
     },
     onSuccess: () => {
       // Invalidate training status queries
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.status(sessionId),
       })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.pipelineStatus(),
       })
       // Also invalidate acquisition queries
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(sessionId),
       })
     },
@@ -96,4 +100,3 @@ export function usePipelineStatus(enabled: boolean = true) {
     refetchInterval: 30000, // Refetch every 30 seconds
   })
 }
-

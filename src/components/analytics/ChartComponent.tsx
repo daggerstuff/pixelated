@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,6 +11,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
+import React, { useState, useEffect } from 'react'
 import { Line, Bar, Pie, Scatter } from 'react-chartjs-2'
 
 // Register Chart.js components
@@ -169,9 +169,9 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center h-64 ${className}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600">Loading chart...</span>
+      <div className={`flex h-64 items-center justify-center ${className}`}>
+        <div className='border-blue-500 h-8 w-8 animate-spin rounded-full border-b-2'></div>
+        <span className='text-gray-600 ml-2'>Loading chart...</span>
       </div>
     )
   }
@@ -190,7 +190,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     }
   }
 
-  return <div className={`w-full h-64 ${className}`}>{renderChart()}</div>
+  return <div className={`h-64 w-full ${className}`}>{renderChart()}</div>
 }
 
 export default ChartComponent

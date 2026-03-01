@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import type { TemporalEmotionAnalysis } from '../lib/ai/temporal/EmotionTemporalAnalyzer'
 
 type AnalysisType =
@@ -94,7 +95,7 @@ export function useTemporalEmotionAnalysis(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    fetchAnalysis()
+    void fetchAnalysis()
   }, [fetchAnalysis])
 
   return {
@@ -170,7 +171,7 @@ export function useEmotionProgression(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    fetchProgression()
+    void fetchProgression()
   }, [fetchProgression])
 
   return {
@@ -247,7 +248,7 @@ export function useEmotionPatterns(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    fetchPatterns()
+    void fetchPatterns()
   }, [fetchPatterns])
 
   return {

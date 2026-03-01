@@ -1,17 +1,19 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, it, expect, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
+import { afterEach, describe, it, expect, vi } from 'vitest'
+
 import { Header } from '../HeaderReact'
+
 import '@testing-library/jest-dom/vitest'
 
 // Mock dependencies
 vi.mock('../../ui/UserMenu', () => ({
-  UserMenu: () => <div data-testid="user-menu">UserMenu</div>,
+  UserMenu: () => <div data-testid='user-menu'>UserMenu</div>,
 }))
 
 vi.mock('../Navigation', () => ({
-  Navigation: () => <div data-testid="navigation">Navigation</div>,
+  Navigation: () => <div data-testid='navigation'>Navigation</div>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -22,7 +24,7 @@ vi.mock('@/lib/auth-client', () => ({
 
 // Mock SearchBox since it renders in the portal/modal
 vi.mock('../../ui/SearchBox', () => ({
-  default: () => <div data-testid="search-box">SearchBox</div>,
+  default: () => <div data-testid='search-box'>SearchBox</div>,
 }))
 
 afterEach(() => {

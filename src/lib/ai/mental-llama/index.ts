@@ -1,12 +1,12 @@
 import { getHipaaCompliantLogger } from '@/lib/logging/standardized-logger.ts'
-import { getEnv } from '../../../config/env.config.ts'
 
-import { MentalLLaMAModelProvider } from './models/MentalLLaMAModelProvider.ts'
-import { MentalHealthTaskRouter } from './routing/MentalHealthTaskRouter.ts'
+import { getEnv } from '../../../config/env.config.ts'
+import type { ICrisisNotificationHandler } from '../../services/notification/NotificationService.ts'
+import { SlackNotificationService } from '../../services/notification/SlackNotificationService.ts'
 import { MentalLLaMAAdapter } from './adapter/MentalLLaMAAdapter.ts'
 import { createMentalLLaMAPythonBridge } from './bridge/server.ts'
-import { SlackNotificationService } from '../../services/notification/SlackNotificationService.ts'
-import type { ICrisisNotificationHandler } from '../../services/notification/NotificationService.ts'
+import { MentalLLaMAModelProvider } from './models/MentalLLaMAModelProvider.ts'
+import { MentalHealthTaskRouter } from './routing/MentalHealthTaskRouter.ts'
 import type {
   LLMInvoker,
   LLMInvocationOptions,
@@ -119,7 +119,7 @@ export async function createMentalLLaMAFactory(
 
   if (config.enablePythonBridge || env.MENTALLAMA_ENABLE_PYTHON_BRIDGE) {
     try {
-      pythonBridge = await createMentalLLaMAPythonBridge(
+      pythonBridge =  createMentalLLaMAPythonBridge(
         config.pythonBridgeScriptPath,
       )
       // Initialize the bridge. In a real scenario, you might want to ensure this completes

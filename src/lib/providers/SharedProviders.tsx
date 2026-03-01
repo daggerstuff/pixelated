@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import React from 'react'
-import { AnalyticsProvider } from './AnalyticsProvider'
 
+import { AnalyticsProvider } from './AnalyticsProvider'
 import { ErrorBoundary } from './ErrorBoundary'
 import { NotificationProvider } from './NotificationProvider'
 import { SecurityProvider } from './SecurityProvider'
@@ -52,9 +52,7 @@ export function SharedProviders({
           {enableNotifications && (
             <NotificationProvider>{children}</NotificationProvider>
           )}
-          {enableAnalytics && (
-            <AnalyticsProvider>{children}</AnalyticsProvider>
-          )}
+          {enableAnalytics && <AnalyticsProvider>{children}</AnalyticsProvider>}
           {!enableAnalytics && !enableNotifications && children}
         </SecurityProvider>
       </ThemeProvider>

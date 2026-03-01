@@ -1,6 +1,9 @@
 # Real-Time Healthcare Simulation Module
 
-This module implements a real-time healthcare simulation environment inspired by the Liftoff project approach. It provides practitioners with a safe, private environment to practice therapeutic interactions without any data recording or persistent storage.
+This module implements a real-time healthcare simulation environment inspired by
+the Liftoff project approach. It provides practitioners with a safe, private
+environment to practice therapeutic interactions without any data recording or
+persistent storage.
 
 ## Key Features
 
@@ -8,7 +11,8 @@ This module implements a real-time healthcare simulation environment inspired by
 - **Zero data retention** for complete privacy and HIPAA compliance
 - **Immediate feedback** on therapeutic approaches and techniques
 - **Privacy-preserving metrics** for tracking personal improvement
-- **Simulated patient scenarios** based on various therapeutic needs and contexts
+- **Simulated patient scenarios** based on various therapeutic needs and
+  contexts
 
 ## Technical Implementation
 

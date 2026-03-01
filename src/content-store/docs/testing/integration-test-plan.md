@@ -10,13 +10,15 @@ toc: true
 
 # Integration Test Plan
 
-This document outlines the comprehensive testing strategy for the Pixelated EHR Integration Platform.
+This document outlines the comprehensive testing strategy for the Pixelated EHR
+Integration Platform.
 
 ## Test Strategy
 
 ### 1. Test Environment
 
-The integration tests will be run in a dedicated test environment that mirrors production:
+The integration tests will be run in a dedicated test environment that mirrors
+production:
 
 ```typescript
 interface TestEnvironment {
@@ -377,18 +379,14 @@ jobs:
         env:
           POSTGRES_PASSWORD: test
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
 
       redis:
         image: redis:6
         options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
+          5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v2

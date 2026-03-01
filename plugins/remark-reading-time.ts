@@ -1,6 +1,6 @@
+import type { Root } from 'mdast'
 import { toString } from 'mdast-util-to-string'
 import getReadingTime from 'reading-time'
-import type { Root } from 'mdast'
 import type { VFile } from 'vfile'
 
 /**

@@ -12,7 +12,11 @@ toc: true
 
 ## Overview
 
-The Audit Logging System provides comprehensive tracking, storage, and analysis of all data access and modifications throughout the behavioral analysis platform. This system ensures HIPAA compliance, facilitates security investigations, and provides an immutable record of system activities for regulatory purposes.
+The Audit Logging System provides comprehensive tracking, storage, and analysis
+of all data access and modifications throughout the behavioral analysis
+platform. This system ensures HIPAA compliance, facilitates security
+investigations, and provides an immutable record of system activities for
+regulatory purposes.
 
 ## Core Architecture
 

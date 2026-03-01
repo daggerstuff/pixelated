@@ -1,16 +1,17 @@
 ---
-title: "Litlyx Analytics Integration"
-description: "Litlyx Analytics Integration documentation"
+title: 'Litlyx Analytics Integration'
+description: 'Litlyx Analytics Integration documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Litlyx Analytics Integration
 
-This project uses [Litlyx](https://docs.litlyx.com/) for analytics, a privacy-focused, open-source analytics solution.
+This project uses [Litlyx](https://docs.litlyx.com/) for analytics, a
+privacy-focused, open-source analytics solution.
 
 ## Setup
 
@@ -33,7 +34,8 @@ The integration is already set up in the following files:
 - `src/App.tsx` - Includes the LitlyxAnalytics component
 - `src/hooks/useAnalytics.tsx` - Hook for tracking events
 
-To use this approach, ensure the `LitlyxAnalytics` component is included in your App:
+To use this approach, ensure the `LitlyxAnalytics` component is included in your
+App:
 
 ```jsx
 <LitlyxAnalytics projectId={LITLYX_PROJECT_ID} />
@@ -41,13 +43,14 @@ To use this approach, ensure the `LitlyxAnalytics` component is included in your
 
 #### Option 2: Script Tag
 
-As an alternative, you can use the script tag approach by including the `LitlyxScript` component in your App:
+As an alternative, you can use the script tag approach by including the
+`LitlyxScript` component in your App:
 
 ```jsx
 import { LitlyxScript } from '@/components/LitlyxScript'
 
 // In your component
-<LitlyxScript projectId={LITLYX_PROJECT_ID} />
+;<LitlyxScript projectId={LITLYX_PROJECT_ID} />
 ```
 
 For self-hosted Litlyx instances, you can provide additional parameters:
@@ -55,8 +58,8 @@ For self-hosted Litlyx instances, you can provide additional parameters:
 ```jsx
 <LitlyxScript
   projectId={LITLYX_PROJECT_ID}
-  host="your-host-name"
-  port="your-port"
+  host='your-host-name'
+  port='your-port'
   secure={true}
 />
 ```
@@ -65,7 +68,8 @@ For self-hosted Litlyx instances, you can provide additional parameters:
 
 ### Tracking Page Views
 
-Page views are automatically tracked when using the `Layout` component with React Router.
+Page views are automatically tracked when using the `Layout` component with
+React Router.
 
 ### Tracking Custom Events
 
@@ -81,7 +85,7 @@ function MyComponent() {
     // Track a button click
     trackButtonClick('submit-button', {
       location: 'homepage',
-      action: 'submit-form'
+      action: 'submit-form',
     })
 
     // Do something...
@@ -91,7 +95,7 @@ function MyComponent() {
     // Track a form submission
     trackFormSubmit('contact-form', {
       formType: 'contact',
-      fields: Object.keys(data).length
+      fields: Object.keys(data).length,
     })
 
     // Process form...
@@ -102,32 +106,29 @@ function MyComponent() {
     trackEvent('feature_used', {
       featureName: 'image-upload',
       fileSize: 1024,
-      fileType: 'image/png'
+      fileType: 'image/png',
     })
 
     // Do something...
   }
 
-  return (
-    <div>
-      {/* Your component JSX */}
-    </div>
-  )
+  return <div>{/* Your component JSX */}</div>
 }
 ```
 
 ### Direct API Usage (Script Tag Approach)
 
-If you're using the script tag approach, you can also use the Litlyx API directly in your code:
+If you're using the script tag approach, you can also use the Litlyx API
+directly in your code:
 
 ```javascript
 // Track a custom event
 window.Lit.event('click_on_buy_item', {
   metadata: {
     'product-name': 'Product Name',
-    'price': 19.99,
-    'currency': 'USD'
-  }
+    price: 19.99,
+    currency: 'USD',
+  },
 })
 ```
 
@@ -151,19 +152,23 @@ The following event types are predefined for consistency:
 - `feature_used` - Feature usage
 - `error_occurred` - Errors
 
-You can also use custom event types by passing a string to the `trackEvent` function.
+You can also use custom event types by passing a string to the `trackEvent`
+function.
 
 ## Dashboard Access
 
-Access your Litlyx dashboard at [https://app.litlyx.com/](https://app.litlyx.com/) to view analytics data.
+Access your Litlyx dashboard at
+[https://app.litlyx.com/](https://app.litlyx.com/) to view analytics data.
 
 ## Self-Hosting (Optional)
 
-If you prefer to self-host Litlyx, follow the instructions in the [Litlyx documentation](https://docs.litlyx.com/self-hosting).
+If you prefer to self-host Litlyx, follow the instructions in the
+[Litlyx documentation](https://docs.litlyx.com/self-hosting).
 
 To connect to your self-hosted instance:
 
 1. With the npm package approach:
+
    ```typescript
    // Add this code to configure the Litlyx instance
    import { Lit } from 'litlyx-js'
@@ -177,13 +182,14 @@ To connect to your self-hosted instance:
 2. With the script tag approach, use the additional props:
    ```jsx
    <LitlyxScript
-     projectId="your-project-id"
-     host="your-host-name"
-     port="your-port"
+     projectId='your-project-id'
+     host='your-host-name'
+     port='your-port'
      secure={true}
    />
    ```
 
 ## Advanced Configuration
 
-For advanced configuration options, see the [Litlyx documentation](https://docs.litlyx.com/).
+For advanced configuration options, see the
+[Litlyx documentation](https://docs.litlyx.com/).

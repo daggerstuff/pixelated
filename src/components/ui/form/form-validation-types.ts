@@ -97,12 +97,12 @@ export interface ValidationRuleCreators {
  * Form field validation props
  */
 export interface FormFieldValidationProps {
-  'name': string
+  name: string
   'aria-invalid'?: boolean
   'aria-describedby'?: string
   'aria-required'?: boolean
-  'onBlur'?: (event: React.FocusEvent) => void
-  'onChange'?: (event: React.ChangeEvent) => void
+  onBlur?: (event: React.FocusEvent) => void
+  onChange?: (event: React.ChangeEvent) => void
 }
 
 /**

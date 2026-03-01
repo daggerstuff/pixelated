@@ -1,7 +1,9 @@
 # Test info
 
-- Name: Cross-browser compatibility >> documentation page should work in all browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
+- Name: Cross-browser compatibility >> documentation page should work in all
+  browsers
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
 
 # Error details
 
@@ -22,158 +24,167 @@ Call log:
 
 ```yaml
 - banner:
-  - link "Pixelated Empathy Logo Pixelated Empathy":
-    - /url: /
-    - img "Pixelated Empathy Logo"
-    - text: Pixelated Empathy
-  - navigation:
-    - link "Home":
-      - /url: /
-    - link "About":
-      - /url: /about
-    - link "Contact":
-      - /url: /contact
-    - link "Login":
-      - /url: /login
-    - link "Sign Up":
-      - /url: /signup
-  - button "Search":
-    - img
-  - button:
-    - img
-  - button "Switch to dark theme":
-    - img
-  - link "Sign in":
-    - /url: /login
+    - link "Pixelated Empathy Logo Pixelated Empathy":
+        - /url: /
+        - img "Pixelated Empathy Logo"
+        - text: Pixelated Empathy
+    - navigation:
+        - link "Home":
+            - /url: /
+        - link "About":
+            - /url: /about
+        - link "Contact":
+            - /url: /contact
+        - link "Login":
+            - /url: /login
+        - link "Sign Up":
+            - /url: /signup
+    - button "Search":
+        - img
+    - button:
+        - img
+    - button "Switch to dark theme":
+        - img
+    - link "Sign in":
+        - /url: /login
 - complementary:
-  - heading "Documentation" [level=3]
-  - button "Toggle theme":
-    - img
-  - navigation:
-    - link "Home":
-      - /url: /docs
-    - link "API Reference":
-      - /url: /docs/api
-    - link "Components":
-      - /url: /docs/components
-    - link "Security":
-      - /url: /docs/security
-    - link "Guides":
-      - /url: /docs/guides
-  - heading "ON THIS PAGE" [level=4]
-  - link "Latest Updates":
-    - /url: "#latest-updates"
-  - link "Popular Topics":
-    - /url: "#popular-topics"
-  - link "Get Support":
-    - /url: "#get-support"
+    - heading "Documentation" [level=3]
+    - button "Toggle theme":
+        - img
+    - navigation:
+        - link "Home":
+            - /url: /docs
+        - link "API Reference":
+            - /url: /docs/api
+        - link "Components":
+            - /url: /docs/components
+        - link "Security":
+            - /url: /docs/security
+        - link "Guides":
+            - /url: /docs/guides
+    - heading "ON THIS PAGE" [level=4]
+    - link "Latest Updates":
+        - /url: '#latest-updates'
+    - link "Popular Topics":
+        - /url: '#popular-topics'
+    - link "Get Support":
+        - /url: '#get-support'
 - main:
-  - article:
-    - heading "Documentation" [level=1]
-    - paragraph: Welcome to the Pixelated Empathy Documentation
-    - heading "Pixelated Empathy Documentation" [level=1]
-    - paragraph: Welcome to the Pixelated Empathy documentation. Here you'll find comprehensive guides and documentation to help you start working with Pixelated Empathy as quickly as possible.
-    - link "Tutorial Get up and running with Pixelated Empathy quickly":
-      - /url: /docs/getting-started
-      - img
-      - text: Tutorial
-      - paragraph: Get up and running with Pixelated Empathy quickly
-    - link "API Reference Complete API documentation for developers":
-      - /url: /docs/api
-      - img
-      - text: API Reference
-      - paragraph: Complete API documentation for developers
-    - link "Components Explore our UI component library":
-      - /url: /docs/components
-      - img
-      - text: Components
-      - paragraph: Explore our UI component library
-    - link "Security Learn about our security features and best practices":
-      - /url: /docs/security
-      - img
-      - text: Security
-      - paragraph: Learn about our security features and best practices
-    - heading "Latest Updates" [level=2]
-    - img
-    - text: Version 2.0 Released
-    - paragraph:
-      - text: We've released version 2.0 of Pixelated Empathy with many new features and improvements. Check out the
-      - link "changelog":
-        - /url: /docs/changelog
-      - text: for details.
-    - text: New Feature Performance Security
-    - heading "Popular Topics" [level=2]
-    - list:
-      - listitem:
-        - link "Authentication and Authorization":
-          - /url: /docs/authentication
-      - listitem:
-        - link "AI Integration":
-          - /url: /docs/ai-integration
-      - listitem:
-        - link "Deployment Guide":
-          - /url: /docs/deployment
-      - listitem:
-        - link "Troubleshooting":
-          - /url: /docs/troubleshooting
-      - listitem:
-        - link "Frequently Asked Questions":
-          - /url: /docs/faq
-    - heading "Get Support" [level=2]
-    - paragraph: Need help? Our support team is available to assist you with any questions or issues.
-    - link "Email Support Contact our support team directly":
-      - /url: mailto:support@pixelated.dev
-      - img
-      - text: Email Support
-      - paragraph: Contact our support team directly
-    - link "Discord Community Join our community on Discord":
-      - /url: https://discord.gg/pixelated
-      - img
-      - text: Discord Community
-      - paragraph: Join our community on Discord
-    - link "Previous Page":
-      - /url: "#"
-      - img
-      - text: Previous Page
-    - link "Next Page":
-      - /url: "#"
-      - text: Next Page
-      - img
+    - article:
+        - heading "Documentation" [level=1]
+        - paragraph: Welcome to the Pixelated Empathy Documentation
+        - heading "Pixelated Empathy Documentation" [level=1]
+        - paragraph:
+            Welcome to the Pixelated Empathy documentation. Here you'll find
+            comprehensive guides and documentation to help you start working
+            with Pixelated Empathy as quickly as possible.
+        - link "Tutorial Get up and running with Pixelated Empathy quickly":
+            - /url: /docs/getting-started
+            - img
+            - text: Tutorial
+            - paragraph: Get up and running with Pixelated Empathy quickly
+        - link "API Reference Complete API documentation for developers":
+            - /url: /docs/api
+            - img
+            - text: API Reference
+            - paragraph: Complete API documentation for developers
+        - link "Components Explore our UI component library":
+            - /url: /docs/components
+            - img
+            - text: Components
+            - paragraph: Explore our UI component library
+        - link "Security Learn about our security features and best practices":
+            - /url: /docs/security
+            - img
+            - text: Security
+            - paragraph: Learn about our security features and best practices
+        - heading "Latest Updates" [level=2]
+        - img
+        - text: Version 2.0 Released
+        - paragraph:
+            - text:
+                We've released version 2.0 of Pixelated Empathy with many new
+                features and improvements. Check out the
+            - link "changelog":
+                - /url: /docs/changelog
+            - text: for details.
+        - text: New Feature Performance Security
+        - heading "Popular Topics" [level=2]
+        - list:
+            - listitem:
+                - link "Authentication and Authorization":
+                    - /url: /docs/authentication
+            - listitem:
+                - link "AI Integration":
+                    - /url: /docs/ai-integration
+            - listitem:
+                - link "Deployment Guide":
+                    - /url: /docs/deployment
+            - listitem:
+                - link "Troubleshooting":
+                    - /url: /docs/troubleshooting
+            - listitem:
+                - link "Frequently Asked Questions":
+                    - /url: /docs/faq
+        - heading "Get Support" [level=2]
+        - paragraph:
+            Need help? Our support team is available to assist you with any
+            questions or issues.
+        - link "Email Support Contact our support team directly":
+            - /url: mailto:support@pixelated.dev
+            - img
+            - text: Email Support
+            - paragraph: Contact our support team directly
+        - link "Discord Community Join our community on Discord":
+            - /url: https://discord.gg/pixelated
+            - img
+            - text: Discord Community
+            - paragraph: Join our community on Discord
+        - link "Previous Page":
+            - /url: '#'
+            - img
+            - text: Previous Page
+        - link "Next Page":
+            - /url: '#'
+            - text: Next Page
+            - img
 - contentinfo:
-  - link "Logo Pixelated Empathy":
-    - /url: /
-    - img "Logo"
-    - text: Pixelated Empathy
-  - paragraph: Secure AI therapy platform with advanced encryption for maximum privacy and HIPAA compliance.
-  - link "Twitter":
-    - /url: "#"
-  - link "GitHub":
-    - /url: "#"
-  - link "LinkedIn":
-    - /url: "#"
-  - heading "Platform" [level=3]
-  - list:
-    - listitem:
-      - link "Dashboard":
-        - /url: /dashboard
-    - listitem:
-      - link "Chat":
-        - /url: /chat
-    - listitem:
-      - link "Profile":
-        - /url: /profile
-  - heading "Resources" [level=3]
-  - list:
-    - listitem:
-      - link "About":
-        - /url: /about
-    - listitem:
-      - link "Contact":
-        - /url: /contact
-    - listitem:
-      - link "FAQ":
-        - /url: /faq
-  - paragraph: © 2025 Pixelated Empathy. All rights reserved.
+    - link "Logo Pixelated Empathy":
+        - /url: /
+        - img "Logo"
+        - text: Pixelated Empathy
+    - paragraph:
+        Secure AI therapy platform with advanced encryption for maximum privacy
+        and HIPAA compliance.
+    - link "Twitter":
+        - /url: '#'
+    - link "GitHub":
+        - /url: '#'
+    - link "LinkedIn":
+        - /url: '#'
+    - heading "Platform" [level=3]
+    - list:
+        - listitem:
+            - link "Dashboard":
+                - /url: /dashboard
+        - listitem:
+            - link "Chat":
+                - /url: /chat
+        - listitem:
+            - link "Profile":
+                - /url: /profile
+    - heading "Resources" [level=3]
+    - list:
+        - listitem:
+            - link "About":
+                - /url: /about
+        - listitem:
+            - link "Contact":
+                - /url: /contact
+        - listitem:
+            - link "FAQ":
+                - /url: /faq
+    - paragraph: © 2025 Pixelated Empathy. All rights reserved.
 ```
 
 # Test source

@@ -1,6 +1,8 @@
 ---
 title: 'Centralized Logging System'
-description: 'Comprehensive documentation for our ELK-based centralized logging infrastructure'
+description:
+  'Comprehensive documentation for our ELK-based centralized logging
+  infrastructure'
 pubDate: '2025-01-01'
 author: 'DevOps Team'
 draft: false
@@ -11,33 +13,42 @@ date: '2025-04-12'
 
 # Centralized Logging System
 
-This document provides a comprehensive guide to our centralized logging system built on the ELK stack (Elasticsearch, Logstash, Kibana).
+This document provides a comprehensive guide to our centralized logging system
+built on the ELK stack (Elasticsearch, Logstash, Kibana).
 
 ## Overview
 
 Our centralized logging system provides:
 
-- **Log Collection**: Automatic collection of logs from all application components
+- **Log Collection**: Automatic collection of logs from all application
+  components
 - **Structured Storage**: Indexed storage of logs in Elasticsearch
 - **Advanced Visualization**: Real-time dashboards in Kibana
-- **Automated Retention**: Configurable retention policies for different log types
+- **Automated Retention**: Configurable retention policies for different log
+  types
 - **Log Archiving**: Long-term storage of important logs
 
 ## Architecture
 
 The centralized logging system consists of the following components:
 
-1. **Logger**: Application-level logger that generates structured logs (`src/lib/logging`)
-2. **ELK Service**: Integration with Elasticsearch for storing logs (`src/lib/services/logging/elk.ts`)
-3. **Log Retention**: Management of log retention policies (`src/lib/services/logging/log-retention.ts`)
-4. **Log Visualization**: Creation and configuration of Kibana dashboards (`src/lib/services/logging/log-visualization.ts`)
-5. **Kibana Dashboard Generator**: Utilities for creating dashboards (`src/lib/services/logging/kibana-dashboard.ts`)
+1. **Logger**: Application-level logger that generates structured logs
+   (`src/lib/logging`)
+2. **ELK Service**: Integration with Elasticsearch for storing logs
+   (`src/lib/services/logging/elk.ts`)
+3. **Log Retention**: Management of log retention policies
+   (`src/lib/services/logging/log-retention.ts`)
+4. **Log Visualization**: Creation and configuration of Kibana dashboards
+   (`src/lib/services/logging/log-visualization.ts`)
+5. **Kibana Dashboard Generator**: Utilities for creating dashboards
+   (`src/lib/services/logging/kibana-dashboard.ts`)
 
 ## Configuration
 
 ### Environment Variables
 
-Configure the centralized logging system with the following environment variables:
+Configure the centralized logging system with the following environment
+variables:
 
 ```
 # ELK Configuration
@@ -76,10 +87,10 @@ ELK_REFRESH_INTERVAL=30s
 
 ### Initialization
 
-The centralized logging system is automatically initialized in `src/middleware.ts`. You can also manually initialize it:
+The centralized logging system is automatically initialized in
+`src/middleware.ts`. You can also manually initialize it:
 
 ```typescript
-
 // Initialize all logging services
 loggingServices.initialize({
   elk: {
@@ -119,7 +130,6 @@ const cleanupTask = loggingServices.scheduleRetention()
 Use the standard logger throughout your application:
 
 ```typescript
-
 // Use the default logger
 logger.info('Application started')
 
@@ -148,7 +158,6 @@ try {
 Create custom dashboards for specific application components:
 
 ```typescript
-
 // Create a custom dashboard for API monitoring
 async function createApiDashboard() {
   // Define the endpoints to monitor
@@ -185,7 +194,6 @@ function getEmbedUrl(dashboardId) {
 Configure and manage log retention policies:
 
 ```typescript
-
 // Set up ILM policies in Elasticsearch
 async function setupRetentionPolicies() {
   await logRetention.setupILMPolicies()
@@ -333,4 +341,6 @@ Secure your ELK stack:
 
 ## Conclusion
 
-The centralized logging system provides comprehensive visibility into application behavior and performance. Use it to monitor application health, troubleshoot issues, and gain insights into user activity.
+The centralized logging system provides comprehensive visibility into
+application behavior and performance. Use it to monitor application health,
+troubleshoot issues, and gain insights into user activity.

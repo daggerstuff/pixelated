@@ -5,11 +5,11 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import hipaaKeyRotationService from './key-rotation'
-import { hipaaMonitoring } from './hipaa-monitoring'
 import { validateHIPAAEnvironment, HIPAA_SECURITY_CONFIG } from './hipaa-config'
-import type { AuditEvent, SecurityMetrics } from './key-rotation'
+import { hipaaMonitoring } from './hipaa-monitoring'
 import type { SecurityAlert, ComplianceReport } from './hipaa-monitoring'
+import hipaaKeyRotationService from './key-rotation'
+import type { AuditEvent, SecurityMetrics } from './key-rotation'
 
 const logger = createBuildSafeLogger('hipaa-integration')
 
@@ -167,7 +167,7 @@ export class HIPAAComplianceService {
     // Handle critical security events
     hipaaKeyRotationService.on('security-alert', (event: AuditEvent) => {
       if (event.riskLevel === 'critical') {
-        this.handleCriticalSecurityEvent(event)
+        void this.handleCriticalSecurityEvent(event)
       }
     })
 
@@ -189,12 +189,12 @@ export class HIPAAComplianceService {
     // Process termination handlers
     process.on('SIGTERM', () => {
       logger.info('Received SIGTERM, initiating graceful shutdown')
-      this.gracefulShutdown()
+      void this.gracefulShutdown()
     })
 
     process.on('SIGINT', () => {
       logger.info('Received SIGINT, initiating graceful shutdown')
-      this.gracefulShutdown()
+      void this.gracefulShutdown()
     })
   }
 
@@ -222,9 +222,9 @@ export class HIPAAComplianceService {
 
     // Execute automated responses based on severity
     if (alert.severity === 'critical') {
-      this.executeCriticalResponse(alert)
+      void this.executeCriticalResponse(alert)
     } else if (alert.severity === 'high') {
-      this.executeHighSeverityResponse(alert)
+      void this.executeHighSeverityResponse(alert)
     }
   }
 

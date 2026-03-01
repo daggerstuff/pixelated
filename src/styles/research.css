@@ -12,13 +12,13 @@
 }
 
 .research-hero::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(180, 54, 121, 0.1) 0%, /* Using RGB approx for oklch(70.5% 0.213 47.604) */
-    transparent 50%
+    rgba(180, 54, 121, 0.1) 0%,
+    /* Using RGB approx for oklch(70.5% 0.213 47.604) */ transparent 50%
   );
   pointer-events: none;
 }

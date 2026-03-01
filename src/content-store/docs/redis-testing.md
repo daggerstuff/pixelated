@@ -15,8 +15,8 @@ author: 'Pixelated Team'
 
 This guide provides comprehensive information about testing the Redis service
 implementation. The test suite includes unit tests, integration tests, and
-performance tests, ensuring the service meets all functional and
-non-functional requirements.
+performance tests, ensuring the service meets all functional and non-functional
+requirements.
 
 ### Test Infrastructure
 
@@ -28,9 +28,9 @@ non-functional requirements.
 
 {' '}
 
-  Tests interaction between Redis service and other system components. - Cache
-  service integration - Session management - Analytics integration - Pattern
-  recognition
+Tests interaction between Redis service and other system components. - Cache
+service integration - Session management - Analytics integration - Pattern
+recognition
 
     Tests system behavior under various load conditions.
     - Connection pool management
@@ -44,6 +44,7 @@ non-functional requirements.
    ```bash
    # Install dependencies
    pnpm install --no-frozen-lockfile
+   ```
 
 # Start Redis server
 
@@ -51,8 +52,7 @@ docker run -d -p 6379:6379 redis:latest
 
 # Set environment variables
 
-REDIS_URL=redis://localhost:6379
-REDIS_KEY_PREFIX="test:"
+REDIS_URL=redis://localhost:6379 REDIS_KEY_PREFIX="test:"
 
 ````
 
@@ -78,7 +78,6 @@ pnpm test:redis:watch
    # Open coverage report
    open coverage/lcov-report/index.html
    ```
-
 
 ## Test Configuration
 

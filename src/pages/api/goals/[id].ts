@@ -47,7 +47,7 @@ export const PUT = async ({
         JSON.stringify({
           details: parsed.error.issues,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     const existingGoal = goals[idx]
@@ -74,7 +74,7 @@ export const PUT = async ({
         error: 'Server error',
         details:
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : String(err),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

@@ -1,8 +1,10 @@
 import type React from 'react'
 import { useEffect } from 'react'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { useSimulatorContext } from '../context/SimulatorContext'
 import { useEmotionDetection } from '../hooks/useEmotionDetection'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('EmotionDetector')
 
@@ -33,7 +35,7 @@ export const EmotionDetector: React.FC<EmotionDetectorProps> = ({
       }
     }
 
-    analyzeEmotions()
+    void analyzeEmotions()
   }, [text, isRunning, isProcessing, detectEmotions, onAnalysisComplete])
 
   // This is a utility component that doesn't render anything

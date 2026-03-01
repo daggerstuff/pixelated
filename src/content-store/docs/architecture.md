@@ -1,48 +1,51 @@
 ---
-title: "Pixelated Empathy Architecture"
-description: "Technical architecture overview of the Pixelated Empathy mental health platform"
+title: 'Pixelated Empathy Architecture'
+description:
+  'Technical architecture overview of the Pixelated Empathy mental health
+  platform'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["architecture", "technical", "documentation"]
+author: 'Pixelated Team'
+tags: ['architecture', 'technical', 'documentation']
 draft: false
 toc: true
 ---
-
 
 # Pixelated Empathy Architecture
 
 ## System Overview
 
-Pixelated Empathy is built on a modern, secure, and scalable architecture that combines the best practices from various platforms while maintaining strong privacy and security measures through Zero-Knowledge Encryption and HIPAA compliance.
+Pixelated Empathy is built on a modern, secure, and scalable architecture that
+combines the best practices from various platforms while maintaining strong
+privacy and security measures through Zero-Knowledge Encryption and HIPAA
+compliance.
 
 ## Core Components
 
 ### Frontend Architecture
 
-  The UI layer is built using React and Next.js, incorporating design elements from Liftoff's interview platform:
+The UI layer is built using React and Next.js, incorporating design elements
+from Liftoff's interview platform:
 
-  - **Component Structure**
-    - Atomic Design Principles
-    - Shared Component Library
-    - Theme Provider (Dark/Light modes)
-    - Responsive Layout System
+- **Component Structure**
+  - Atomic Design Principles
+  - Shared Component Library
+  - Theme Provider (Dark/Light modes)
+  - Responsive Layout System
 
-  - **State Management**
-    - React Context for global state
-    - React Query for server state
-    - Local storage for persistence
-    - Secure credential handling
+- **State Management**
+  - React Context for global state
+  - React Query for server state
+  - Local storage for persistence
+  - Secure credential handling
 
-  Data flow follows unidirectional principles:
+Data flow follows unidirectional principles:
 
-  1. User actions trigger state changes
-  2. State updates propagate to components
-  3. Side effects handled by middleware
-  4. Server state synchronized via WebSocket
+1. User actions trigger state changes
+2. State updates propagate to components
+3. Side effects handled by middleware
+4. Server state synchronized via WebSocket
 
 ### Backend Architecture
-
-
 
 - RESTful endpoints
 - GraphQL interface
@@ -50,28 +53,23 @@ Pixelated Empathy is built on a modern, secure, and scalable architecture that c
 - Rate limiting
 - Request validation
 
-
-
 - MongoDB Atlas integration
 - Azure AD authentication
 - JWT token management
 - Role-based access control
 - Session handling
 
-
-
 - End-to-end encryption
 - Client-side key generation
 - Secure message passing
 - Zero-knowledge proofs
 
-
-
 ## Database Design
 
 ### MongoDB Atlas Schema
 
-The application uses MongoDB Atlas as the primary database with the following collections:
+The application uses MongoDB Atlas as the primary database with the following
+collections:
 
 ```sql
 -- Core Tables
@@ -99,14 +97,15 @@ encrypted_content TEXT NOT NULL,
 metadata JSONB,
 created_at TIMESTAMPTZ DEFAULT NOW()
 );
-````
+```
 
 ## Security Architecture
 
-  ### 1. Authentication Flow
-  - User registration/login via Azure AD and JWT authentication
-  - JWT token generation and validation
-  - Secure session management
+### 1. Authentication Flow
+
+- User registration/login via Azure AD and JWT authentication
+- JWT token generation and validation
+- Secure session management
 
 ### 2. Zero-Knowledge Implementation
 
@@ -115,41 +114,34 @@ created_at TIMESTAMPTZ DEFAULT NOW()
 - Zero-knowledge proof verification
 
 ### 3. Data Protection
-  - Encrypted data storage in Supabase
-  - Secure key management
-  - Regular security audits
+
+- Encrypted data storage in Supabase
+- Secure key management
+- Regular security audits
 
 ## Integration Points
 
 ### Liftoff Features
 
-
-- Chat interface adaptation 
-- Dashboard layouts 
+- Chat interface adaptation
+- Dashboard layouts
 - Form components
 - Navigation elements
 
-
-
-- Real-time updates 
-- Cache management 
-- Optimistic updates 
+- Real-time updates
+- Cache management
+- Optimistic updates
 - Error handling
-
 
 ### PocketBase Inspired Features
 
-
-- Adapted for Supabase 
-- Enhanced with ZK principles 
+- Adapted for Supabase
+- Enhanced with ZK principles
 - Role-based access control
 
-
-
-- RESTful endpoints 
-- Real-time subscriptions 
+- RESTful endpoints
+- Real-time subscriptions
 - Request validation
-
 
 ## Performance Considerations
 
@@ -164,7 +156,6 @@ flowchart LR
 ```
 
 - **Client-side caching**
-
   - React Query cache
   - Service Worker cache
   - Local storage cache
@@ -176,21 +167,15 @@ flowchart LR
 
 ### Optimization Techniques
 
-
-
 - Code splitting
-- Lazy loading  
+- Lazy loading
 - Image optimization
 - Bundle size reduction
-
-
 
 - Query optimization
 - Connection pooling
 - Background job processing
 - Resource scaling
-
-
 
 ## Deployment Architecture
 
@@ -246,7 +231,7 @@ pnpm db:migrate
 
 # Testing
 pnpm test
-````
+```
 
 ### CI/CD Pipeline
 
@@ -258,6 +243,6 @@ graph LR
     D --> E[Production Deploy]
 ```
 
-  This architecture documentation is maintained alongside the codebase and
-  updated as the system evolves. For implementation details of specific
-  components, refer to the respective documentation sections.
+This architecture documentation is maintained alongside the codebase and updated
+as the system evolves. For implementation details of specific components, refer
+to the respective documentation sections.

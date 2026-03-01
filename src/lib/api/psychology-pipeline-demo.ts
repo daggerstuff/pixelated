@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import type { } from '../types/psychology-pipeline'
+
+import type {} from '../types/psychology-pipeline'
 
 const Dsm5Schema = z.object({
   'Major Depressive Disorder': z.array(z.string()),
@@ -224,12 +225,13 @@ function generateClinicalFormulation(
   }
 
   // Generate clinical summary
-  const summary = `${patientInfo.age}-year-old ${patientInfo.gender} ${patientInfo.occupation.toLowerCase()} presenting with ${presentingProblem.toLowerCase()}. ${complexity === 'low'
-    ? 'Symptoms appear situational with good functioning. Favorable prognosis.'
-    : complexity === 'medium'
-      ? 'Moderate impact on functioning with multiple contributing factors.'
-      : 'Complex presentation with significant functional impairment requiring intensive treatment.'
-    }`
+  const summary = `${patientInfo.age}-year-old ${patientInfo.gender} ${patientInfo.occupation.toLowerCase()} presenting with ${presentingProblem.toLowerCase()}. ${
+    complexity === 'low'
+      ? 'Symptoms appear situational with good functioning. Favorable prognosis.'
+      : complexity === 'medium'
+        ? 'Moderate impact on functioning with multiple contributing factors.'
+        : 'Complex presentation with significant functional impairment requiring intensive treatment.'
+  }`
 
   return {
     provisionalDiagnosis: diagnoses,

@@ -1,6 +1,6 @@
 import { EHRError } from '../types'
-import { BaseEHRProvider } from './base.provider'
 import type { FHIRResource } from '../types'
+import { BaseEHRProvider } from './base.provider'
 
 interface CapabilityStatement extends FHIRResource {
   rest?: Array<{

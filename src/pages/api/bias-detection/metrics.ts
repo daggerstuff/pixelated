@@ -38,7 +38,7 @@ export const GET: APIRoute = async ({ url }: APIContext) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 

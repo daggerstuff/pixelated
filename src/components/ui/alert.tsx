@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { cn } from '@/lib/utils'
 
 export interface AlertProps {
@@ -37,7 +38,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
-        role="alert"
+        role='alert'
         className={cn(
           'relative w-full rounded-lg border px-4 py-3 text-sm',
           variantStyles[variant],
@@ -45,16 +46,16 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         )}
         {...props}
       >
-        <div className="flex items-start gap-2">
-          {icon && <div className="flex-shrink-0 mt-0.5">{icon}</div>}
-          <div className="flex-1 min-w-0">
+        <div className='flex items-start gap-2'>
+          {icon && <div className='mt-0.5 flex-shrink-0'>{icon}</div>}
+          <div className='min-w-0 flex-1'>
             {title && (
-              <h5 className="mb-1 font-medium leading-none tracking-tight">
+              <h5 className='mb-1 font-medium leading-none tracking-tight'>
                 {title}
               </h5>
             )}
             {description && (
-              <div className="text-sm opacity-90">{description}</div>
+              <div className='text-sm opacity-90'>{description}</div>
             )}
             {children && !description && <div>{children}</div>}
           </div>
@@ -71,11 +72,7 @@ export const AlertDescription = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <div
-      ref={ref}
-      className={cn('text-sm opacity-90', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('text-sm opacity-90', className)} {...props} />
   )
 })
 

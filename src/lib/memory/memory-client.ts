@@ -47,7 +47,10 @@ export interface AddMemoryInput {
 type Store = Map<string, MemoryEntry[]> // key: userId
 
 const store: Store = new Map()
-const history: Map<string, Array<{ id: string; timestamp: string; operation: string; memoryId: string }>> = new Map()
+const history: Map<
+  string,
+  Array<{ id: string; timestamp: string; operation: string; memoryId: string }>
+> = new Map()
 
 function nowISO() {
   return new Date().toISOString()
@@ -64,7 +67,12 @@ function ensureUser(userId: string): void {
 
 function addHistory(userId: string, operation: string, memoryId: string): void {
   ensureUser(userId)
-  history.get(userId)!.push({ id: `${Date.now()}-${Math.random()}`, timestamp: nowISO(), operation, memoryId })
+  history.get(userId)!.push({
+    id: `${Date.now()}-${Math.random()}`,
+    timestamp: nowISO(),
+    operation,
+    memoryId,
+  })
 }
 
 export const memoryManager = {
@@ -86,7 +94,11 @@ export const memoryManager = {
     return id
   },
 
-  async updateMemory(memoryId: string, content: string, userId = 'default'): Promise<void> {
+  async updateMemory(
+    memoryId: string,
+    content: string,
+    userId = 'default',
+  ): Promise<void> {
     ensureUser(userId)
     const list = store.get(userId)!
     const idx = list.findIndex((m) => m.id === memoryId)
@@ -117,7 +129,13 @@ export const memoryManager = {
   },
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
-    const { userId = 'default', query, category, tags = [], limit = 10 } = options
+    const {
+      userId = 'default',
+      query,
+      category,
+      tags = [],
+      limit = 10,
+    } = options
     ensureUser(userId)
     const q = query.toLowerCase()
     let results = store
@@ -125,22 +143,34 @@ export const memoryManager = {
       .filter((m) => m.content.toLowerCase().includes(q))
 
     if (category) {
-      results = results.filter((m) => (m.metadata?.category || 'general') === category)
+      results = results.filter(
+        (m) => (m.metadata?.category || 'general') === category,
+      )
     }
 
     if (tags.length) {
-      results = results.filter((m) => tags.every((t) => m.metadata?.tags?.includes(t)))
+      results = results.filter((m) =>
+        tags.every((t) => m.metadata?.tags?.includes(t)),
+      )
     }
 
     return results.slice(0, limit)
   },
 
-  async searchByCategory(category: string, userId = 'default'): Promise<MemoryEntry[]> {
+  async searchByCategory(
+    category: string,
+    userId = 'default',
+  ): Promise<MemoryEntry[]> {
     ensureUser(userId)
-    return store.get(userId)!.filter((m) => (m.metadata?.category || 'general') === category)
+    return store
+      .get(userId)!
+      .filter((m) => (m.metadata?.category || 'general') === category)
   },
 
-  async searchByTags(tags: string[], userId = 'default'): Promise<MemoryEntry[]> {
+  async searchByTags(
+    tags: string[],
+    userId = 'default',
+  ): Promise<MemoryEntry[]> {
     ensureUser(userId)
     return store
       .get(userId)!
@@ -162,7 +192,11 @@ export const memoryManager = {
     }
   },
 
-  async addUserPreference(userId = 'default', key: string, value: unknown): Promise<void> {
+  async addUserPreference(
+    userId = 'default',
+    key: string,
+    value: unknown,
+  ): Promise<void> {
     await this.addMemory(
       {
         content: `User preference: ${key} = ${JSON.stringify(value)}`,
@@ -172,17 +206,29 @@ export const memoryManager = {
     )
   },
 
-  async addConversationContext(userId = 'default', context: string, sessionId?: string): Promise<void> {
+  async addConversationContext(
+    userId = 'default',
+    context: string,
+    sessionId?: string,
+  ): Promise<void> {
     await this.addMemory(
       {
         content: context,
-        metadata: { category: 'conversation', tags: ['conversation'], sessionId },
+        metadata: {
+          category: 'conversation',
+          tags: ['conversation'],
+          sessionId,
+        },
       },
       userId,
     )
   },
 
-  async addProjectInfo(userId = 'default', projectInfo: string, projectId?: string): Promise<void> {
+  async addProjectInfo(
+    userId = 'default',
+    projectInfo: string,
+    projectId?: string,
+  ): Promise<void> {
     await this.addMemory(
       {
         content: projectInfo,

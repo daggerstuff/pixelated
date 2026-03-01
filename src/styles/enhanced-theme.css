@@ -48,55 +48,81 @@ body,
   --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.35);
 
   /* Gradients - Enterprise Polish (More variations for subtle overlays) */
-  --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  --gradient-primary: linear-gradient(
+    135deg,
+    #10b981 0%,
+    #059669 50%,
+    #047857 100%
+  );
   --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   --gradient-text: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
   --gradient-bg: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #111111 100%);
-  --gradient-bg-subtle: linear-gradient(180deg, #000000 0%, #080808 50%, #0f0f0f 100%);
-  --gradient-card: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%);
-  --gradient-overlay: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, transparent 50%, rgba(59, 130, 246, 0.06) 100%);
-  --gradient-section: linear-gradient(180deg, transparent 0%, rgba(16, 185, 129, 0.02) 50%, transparent 100%);
+  --gradient-bg-subtle: linear-gradient(
+    180deg,
+    #000000 0%,
+    #080808 50%,
+    #0f0f0f 100%
+  );
+  --gradient-card: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.05) 0%,
+    rgba(59, 130, 246, 0.03) 100%
+  );
+  --gradient-overlay: linear-gradient(
+    180deg,
+    rgba(16, 185, 129, 0.08) 0%,
+    transparent 50%,
+    rgba(59, 130, 246, 0.06) 100%
+  );
+  --gradient-section: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(16, 185, 129, 0.02) 50%,
+    transparent 100%
+  );
   --gradient-button: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   --gradient-button-hover: linear-gradient(135deg, #34d399 0%, #10b981 100%);
 
   /* Typography Scale - Refined & Modern */
-  --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:
+    'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  --text-xs: 0.75rem;      /* 12px */
-  --text-sm: 0.875rem;     /* 14px */
-  --text-base: 1rem;       /* 16px */
-  --text-lg: 1.125rem;     /* 18px */
-  --text-xl: 1.25rem;      /* 20px */
-  --text-2xl: 1.5rem;      /* 24px */
-  --text-3xl: 1.875rem;    /* 30px */
-  --text-4xl: 2.25rem;     /* 36px */
-  --text-5xl: 3rem;        /* 48px */
-  --text-6xl: 3.75rem;     /* 60px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem; /* 36px */
+  --text-5xl: 3rem; /* 48px */
+  --text-6xl: 3.75rem; /* 60px */
 
   /* Spacing Scale - Consistent Rhythm (Increased 25% for more breathing room) */
-  --space-1: 0.3125rem;    /* 5px */
-  --space-2: 0.625rem;     /* 10px */
-  --space-3: 0.9375rem;    /* 15px */
-  --space-4: 1.25rem;      /* 20px */
-  --space-5: 1.5625rem;    /* 25px */
-  --space-6: 1.875rem;     /* 30px */
-  --space-8: 2.5rem;       /* 40px */
-  --space-10: 3.125rem;    /* 50px */
-  --space-12: 3.75rem;     /* 60px */
-  --space-16: 5rem;        /* 80px */
-  --space-20: 6.25rem;     /* 100px */
-  --space-24: 7.5rem;      /* 120px */
-  --space-32: 10rem;       /* 160px */
+  --space-1: 0.3125rem; /* 5px */
+  --space-2: 0.625rem; /* 10px */
+  --space-3: 0.9375rem; /* 15px */
+  --space-4: 1.25rem; /* 20px */
+  --space-5: 1.5625rem; /* 25px */
+  --space-6: 1.875rem; /* 30px */
+  --space-8: 2.5rem; /* 40px */
+  --space-10: 3.125rem; /* 50px */
+  --space-12: 3.75rem; /* 60px */
+  --space-16: 5rem; /* 80px */
+  --space-20: 6.25rem; /* 100px */
+  --space-24: 7.5rem; /* 120px */
+  --space-32: 10rem; /* 160px */
 
   /* Border Radius - Refined Minimalism (More rounded, less brutalist) */
   --radius-none: 0;
-  --radius-sm: 0.25rem;    /* 4px */
-  --radius-md: 0.5rem;     /* 8px */
-  --radius-lg: 0.75rem;    /* 12px */
-  --radius-xl: 1rem;       /* 16px */
-  --radius-2xl: 1.25rem;   /* 20px */
-  --radius-3xl: 1.5rem;    /* 24px */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-xl: 1rem; /* 16px */
+  --radius-2xl: 1.25rem; /* 20px */
+  --radius-3xl: 1.5rem; /* 24px */
   --radius-full: 9999px;
 
   /* Transitions - Smooth & Elegant */
@@ -116,7 +142,12 @@ body,
 
 /* === Typography Enhancements === */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-sans);
   font-weight: 800;
   letter-spacing: -0.015em;
@@ -126,12 +157,24 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
-h2 { font-size: clamp(2rem, 4vw, 3rem); }
-h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
-h4 { font-size: var(--text-xl); }
-h5 { font-size: var(--text-lg); }
-h6 { font-size: var(--text-base); }
+h1 {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+}
+h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+h4 {
+  font-size: var(--text-xl);
+}
+h5 {
+  font-size: var(--text-lg);
+}
+h6 {
+  font-size: var(--text-base);
+}
 
 p {
   font-size: var(--text-base);
@@ -437,8 +480,12 @@ section,
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scale-in {
@@ -538,9 +585,21 @@ section,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(99, 102, 241, 0.02) 0%, transparent 50%);
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(16, 185, 129, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(59, 130, 246, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 20%,
+      rgba(99, 102, 241, 0.02) 0%,
+      transparent 50%
+    );
   pointer-events: none;
 }
 
@@ -553,8 +612,16 @@ section,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 30% 40%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+    radial-gradient(
+      circle at 30% 40%,
+      rgba(16, 185, 129, 0.04) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 70% 60%,
+      rgba(59, 130, 246, 0.04) 0%,
+      transparent 50%
+    );
   pointer-events: none;
   z-index: 0;
 }
@@ -565,18 +632,30 @@ section,
 }
 
 /* === Spacing Utilities === */
-.space-y-2 > * + * { margin-top: var(--space-2); }
-.space-y-3 > * + * { margin-top: var(--space-3); }
-.space-y-4 > * + * { margin-top: var(--space-4); }
-.space-y-6 > * + * { margin-top: var(--space-6); }
-.space-y-8 > * + * { margin-top: var(--space-8); }
+.space-y-2 > * + * {
+  margin-top: var(--space-2);
+}
+.space-y-3 > * + * {
+  margin-top: var(--space-3);
+}
+.space-y-4 > * + * {
+  margin-top: var(--space-4);
+}
+.space-y-6 > * + * {
+  margin-top: var(--space-6);
+}
+.space-y-8 > * + * {
+  margin-top: var(--space-8);
+}
 
 /* === Scroll Animations === */
 @media (prefers-reduced-motion: no-preference) {
   .scroll-fade-in {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
   }
 
   .scroll-fade-in.visible {
@@ -608,11 +687,16 @@ section,
     padding: var(--space-16) 0;
   }
 
-  h1 { font-size: var(--text-4xl); }
-  h2 { font-size: var(--text-3xl); }
-  h3 { font-size: var(--text-2xl); }
+  h1 {
+    font-size: var(--text-4xl);
+  }
+  h2 {
+    font-size: var(--text-3xl);
+  }
+  h3 {
+    font-size: var(--text-2xl);
+  }
 }
-
 
 /* === Focus States === */
 :focus-visible {
@@ -652,7 +736,12 @@ section,
 /* === Corporate Section Dividers === */
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
   margin: var(--space-16) 0;
 }
 
@@ -724,7 +813,12 @@ section,
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
 }
 
 /* === Enhanced Glass Effects === */
@@ -877,4 +971,3 @@ section,
     display: none;
   }
 }
-

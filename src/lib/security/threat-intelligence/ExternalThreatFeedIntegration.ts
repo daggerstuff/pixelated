@@ -5,12 +5,14 @@
  */
 
 import { EventEmitter } from 'events'
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
-import { MongoClient, Db, Collection } from 'mongodb'
-import { Redis } from 'ioredis'
-import { v4 as uuidv4 } from 'uuid'
-import { logger } from '../../logger'
 import https from 'https'
+
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import { Redis } from 'ioredis'
+import { MongoClient, Db, Collection } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+
+import { logger } from '../../logger'
 
 /**
  * Normalize unknown errors into Error instances with safe message
@@ -103,14 +105,14 @@ export interface ThreatIndicator {
   id: string
   feed_id: string
   type:
-  | 'ip'
-  | 'domain'
-  | 'hash'
-  | 'url'
-  | 'email'
-  | 'file'
-  | 'behavior'
-  | 'vulnerability'
+    | 'ip'
+    | 'domain'
+    | 'hash'
+    | 'url'
+    | 'email'
+    | 'file'
+    | 'behavior'
+    | 'vulnerability'
   value: string
   confidence: number // 0-1
   severity: 'low' | 'medium' | 'high' | 'critical'
@@ -991,7 +993,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           indicators = await this.processCustomData(rawData, feed)
           break
         default:
-          throw new Error(`Unknown data format: ${feed.configuration.format as string}`)
+          throw new Error(
+            `Unknown data format: ${feed.configuration.format as string}`,
+          )
       }
 
       // Apply transformations
@@ -1083,13 +1087,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         first_seen: new Date(
           String(
             (this.getNestedValue(stixObject, 'created') as string | number) ??
-            Date.now(),
+              Date.now(),
           ),
         ),
         last_seen: new Date(
           String(
             (this.getNestedValue(stixObject, 'modified') as string | number) ??
-            Date.now(),
+              Date.now(),
           ),
         ),
         expiration_date: this.getNestedValue(stixObject, 'valid_until')
@@ -1097,7 +1101,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           : undefined,
         source_reliability: this.mapSTIXReliability(
           String(this.getNestedValue(stixObject, 'created_by_ref') as string) ||
-          '',
+            '',
         ),
         tags: (this.getNestedValue(stixObject, 'labels') as string[]) || [],
         attributes: {
@@ -1212,21 +1216,21 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         threat_type: this.mapMISPToThreatType(attribute),
         description: String(
           (this.getNestedValue(attribute, 'comment') as string) ??
-          (this.getNestedValue(event, 'info') as string) ??
-          '',
+            (this.getNestedValue(event, 'info') as string) ??
+            '',
         ),
         first_seen: new Date(
           String(
             (this.getNestedValue(attribute, 'first_seen') as string | number) ??
-            (this.getNestedValue(event, 'date') as string | number) ??
-            Date.now(),
+              (this.getNestedValue(event, 'date') as string | number) ??
+              Date.now(),
           ),
         ),
         last_seen: new Date(
           String(
             (this.getNestedValue(attribute, 'last_seen') as string | number) ??
-            (this.getNestedValue(event, 'date') as string | number) ??
-            Date.now(),
+              (this.getNestedValue(event, 'date') as string | number) ??
+              Date.now(),
           ),
         ),
         expiration_date: this.getNestedValue(attribute, 'expiration')
@@ -1258,15 +1262,15 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     const typeMap: Record<string, string> = {
       'ip-dst': 'ip',
       'ip-src': 'ip',
-      'domain': 'domain',
-      'hostname': 'domain',
-      'url': 'url',
-      'md5': 'hash',
-      'sha1': 'hash',
-      'sha256': 'hash',
+      domain: 'domain',
+      hostname: 'domain',
+      url: 'url',
+      md5: 'hash',
+      sha1: 'hash',
+      sha256: 'hash',
       'email-src': 'email',
       'email-dst': 'email',
-      'filename': 'file',
+      filename: 'file',
     }
 
     return typeMap[mispType] || 'behavior'
@@ -1310,13 +1314,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     try {
       const type = String(
         (this.getNestedValue(data, 'type') as string) ??
-        (this.getNestedValue(data, 'indicator') as string) ??
-        'ip',
+          (this.getNestedValue(data, 'indicator') as string) ??
+          'ip',
       )
       const value = String(
         (this.getNestedValue(data, 'value') as string | number) ??
-        (this.getNestedValue(data, 'indicator') as string | number) ??
-        '',
+          (this.getNestedValue(data, 'indicator') as string | number) ??
+          '',
       )
       const confidence = Number(this.getNestedValue(data, 'confidence') ?? 0.5)
       const severity = String(
@@ -1339,13 +1343,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         first_seen: new Date(
           String(
             (this.getNestedValue(data, 'first_seen') as string | number) ??
-            Date.now(),
+              Date.now(),
           ),
         ),
         last_seen: new Date(
           String(
             (this.getNestedValue(data, 'last_seen') as string | number) ??
-            Date.now(),
+              Date.now(),
           ),
         ),
         expiration_date: this.getNestedValue(data, 'expiration_date')

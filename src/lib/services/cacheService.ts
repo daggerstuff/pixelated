@@ -1,5 +1,6 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { Buffer } from 'buffer'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { RedisClient } from './types/redis'
 
 const logger = createBuildSafeLogger('cache-service')
@@ -93,7 +94,7 @@ export class EnhancedCacheService implements CacheClient {
     // For memory cache, we need to implement keys functionality
     if (this.baseService instanceof MemoryCacheService) {
       const memoryService = this.baseService as any
-      const allKeys = Array.from(memoryService.cache.keys()) as string[]
+      const allKeys = Array.from(memoryService.cache.keys())
       // Convert wildcard pattern (with '*') into a safe RegExp.
       // Escape regex special chars except '*' then replace '*' with '.*'
       const escapeExceptStar = (s: string) =>

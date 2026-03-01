@@ -3,6 +3,8 @@
  */
 
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
+
+import type { AIService } from '../../ai/models/types'
 import {
   createSupportContextIdentifier,
   EmotionalState,
@@ -14,7 +16,6 @@ import {
   SupportNeed,
   SupportType,
 } from './support-context-identifier'
-import type { AIService } from '../../ai/models/types'
 
 // Extend AIService type for tests to include generateText for mocking
 type TestAIService = AIService & {
@@ -183,7 +184,7 @@ describe('SupportContextIdentifier', () => {
         },
       }
 
-      ;(mockAIService.generateText as Mock).mockResolvedValue(
+      ;(mockAIService.generateText).mockResolvedValue(
         JSON.stringify(mockAIResponse),
       )
     })
@@ -304,7 +305,9 @@ describe('SupportContextIdentifier', () => {
         identifier.generateSupportRecommendations(mockResult)
 
       expect(recommendations.resources).toEqual(
-        expect.arrayContaining([expect.stringMatching(/crisis|hotline|emergency/i)]),
+        expect.arrayContaining([
+          expect.stringMatching(/crisis|hotline|emergency/i),
+        ]),
       )
     })
 

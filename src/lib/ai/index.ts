@@ -127,10 +127,15 @@ export function getAIService(): AIService {
   return aiServiceInstance
 }
 
+import { initArizeTracing } from './tracing/arize-setup'
+
 /**
  * Initialize AI services
  */
 export async function initializeAI(): Promise<void> {
+  // Initialize Tracing
+  initArizeTracing()
+
   const service = getAIService()
   await service.initialize()
 }

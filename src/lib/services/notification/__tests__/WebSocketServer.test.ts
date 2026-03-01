@@ -1,7 +1,9 @@
-import { WebSocket, WebSocketServer as WSServer } from 'ws'
-import { NotificationService } from '../NotificationService'
 import type { IncomingMessage } from 'http'
+
+import { WebSocket, WebSocketServer as WSServer } from 'ws'
 import type { Server } from 'ws'
+
+import { NotificationService } from '../NotificationService'
 
 // Define the mock type correctly based on vi.fn() return type
 type MockFn = ReturnType<typeof vi.fn>
@@ -74,7 +76,7 @@ type MockCall = [
 ]
 
 // Helper type for mocked WebSocket server
-type MockedWSServer = Server<typeof WebSocket, typeof IncomingMessage> & {
+type MockedWSServer = Server & {
   on: MockFn
   mock: {
     calls: MockCall[]

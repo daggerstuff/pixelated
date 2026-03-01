@@ -1,7 +1,7 @@
 import { sendEmail } from '@/lib/email'
+import { fheService } from '@/lib/fhe'
 import { logger } from '@/lib/logger'
 import { redis } from '@/lib/redis'
-import { fheService } from '@/lib/fhe'
 
 export interface TrainingMaterials {
   procedures: {
@@ -336,7 +336,7 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
       .filter((item): item is BreachDetails => Boolean(item))
       .sort(
         (a, b) =>
-          (b as BreachDetails).timestamp - (a as BreachDetails).timestamp,
+          (b).timestamp - (a).timestamp,
       )
   } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)

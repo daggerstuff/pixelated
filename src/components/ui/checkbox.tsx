@@ -29,10 +29,10 @@ export const Checkbox: FC<CheckboxProps> = ({
 
   return (
     <label
-      className={`flex items-center cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      className={`flex cursor-pointer items-center ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${className}`}
     >
       <input
-        type="checkbox"
+        type='checkbox'
         checked={checked}
         defaultChecked={defaultChecked}
         disabled={disabled}
@@ -40,7 +40,7 @@ export const Checkbox: FC<CheckboxProps> = ({
         name={name}
         value={value}
         onChange={handleChange}
-        className="mr-2 h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+        className='text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 mr-2 h-4 w-4 rounded focus:ring-2'
       />
       {children}
     </label>

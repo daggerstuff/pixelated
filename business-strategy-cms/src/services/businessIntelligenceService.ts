@@ -1,9 +1,9 @@
-import { Logger } from '../utils/logger'
 import {
   MarketData,
   CompetitorAnalysis,
   BusinessInsight,
 } from '../types/business-intelligence'
+import { Logger } from '../utils/logger'
 import { DatabaseService } from './databaseService'
 
 export class BusinessIntelligenceService {
@@ -73,10 +73,10 @@ export class BusinessIntelligenceService {
     return Math.min(
       100,
       marketScore +
-      growthScore +
-      competitionScore +
-      barrierScore +
-      economicScore,
+        growthScore +
+        competitionScore +
+        barrierScore +
+        economicScore,
     )
   }
 
@@ -424,7 +424,7 @@ export class BusinessIntelligenceService {
     // Mock implementation - replace with actual market research APIs
     const mockData: Record<string, { current: number; total: number }> = {
       'healthcare-institutions': { current: 150, total: 2000 },
-      'universities': { current: 75, total: 500 },
+      universities: { current: 75, total: 500 },
       'private-practices': { current: 300, total: 8000 },
       'corporate-wellness': { current: 50, total: 1000 },
     }

@@ -5,14 +5,16 @@
  * Implements zero-trust architecture with comprehensive audit trails.
  */
 
-import type { KeyManagementOptions, TFHEKeyPair } from './types'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { SealService } from './seal-service'
-import { EncryptionMode } from './types'
-import type { KMS, CloudWatch } from 'aws-sdk'
-import AWS from 'aws-sdk'
 import crypto from 'crypto'
 import { EventEmitter } from 'node:events'
+
+import type { KMS, CloudWatch } from 'aws-sdk'
+import AWS from 'aws-sdk'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { SealService } from './seal-service'
+import type { KeyManagementOptions, TFHEKeyPair } from './types'
+import { EncryptionMode } from './types'
 
 // HIPAA++ Compliance Types
 interface AuditEvent {
@@ -195,7 +197,7 @@ export class KeyRotationService extends EventEmitter {
 
     // Emit metrics every 5 minutes
     setInterval(() => {
-      this.emitSecurityMetrics()
+      void this.emitSecurityMetrics()
     }, 300000)
 
     // Clean up old audit logs
@@ -338,7 +340,7 @@ export class KeyRotationService extends EventEmitter {
           riskLevel: 'high',
         })
         // Trigger CloudWatch alarm
-        this.triggerSecurityAlarm('KeyAgeViolation', keyId)
+        void this.triggerSecurityAlarm('KeyAgeViolation', keyId)
       }
     }
 
@@ -354,7 +356,7 @@ export class KeyRotationService extends EventEmitter {
         riskLevel: 'critical',
       })
       // Trigger CloudWatch alarm
-      this.triggerSecurityAlarm(
+      void this.triggerSecurityAlarm(
         'SuspiciousActivity',
         `failures: ${recentFailures}`,
       )
@@ -585,7 +587,7 @@ export class KeyRotationService extends EventEmitter {
         clearInterval(timer)
         this.keyRotationTimers.delete(keyId)
       }
-    }, checkInterval) as NodeJS.Timeout
+    }, checkInterval)
 
     this.keyRotationTimers.set(keyId, timer)
   }
@@ -954,7 +956,7 @@ export class KeyRotationService extends EventEmitter {
         .sort((a, b) => b.created - a.created)
 
       if (validKeys.length > 0) {
-        const newestKey = validKeys[0]!
+        const newestKey = validKeys[0]
         this.activeKeyId = newestKey.id
 
         // If SEAL service is available, load the keys
@@ -1060,7 +1062,7 @@ export class KeyRotationService extends EventEmitter {
           .sort((a, b) => b.created - a.created)
 
         if (validKeys.length > 0) {
-          const newestKey = validKeys[0]!
+          const newestKey = validKeys[0]
           this.activeKeyId = newestKey.id
 
           // If SEAL service is available, load the keys
@@ -1097,7 +1099,7 @@ export class KeyRotationService extends EventEmitter {
           .sort((a, b) => b.created - a.created)
 
         if (validKeys.length > 0) {
-          const newestKey = validKeys[0]!
+          const newestKey = validKeys[0]
           this.activeKeyId = newestKey.id
 
           // If SEAL service is available, load the keys

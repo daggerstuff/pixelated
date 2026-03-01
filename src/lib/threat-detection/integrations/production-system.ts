@@ -4,8 +4,8 @@
  */
 
 import { mongoClient } from '../../db/mongoClient'
-import { redis } from '../../redis'
 import { createBuildSafeLogger } from '../../logger'
+import { redis } from '../../redis'
 
 const logger = createBuildSafeLogger('threat-detection-system')
 

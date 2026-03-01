@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { ComparativeProgressService } from '../../../lib/services/analytics/ComparativeProgressService'
 import type { ComparativeProgressParams } from '../../../types/analytics'
@@ -111,7 +112,7 @@ export const get = async ({ request, cookies }) => {
     // Log the error
     logger.error('Error processing comparative progress request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
     })
 
     // Return error response

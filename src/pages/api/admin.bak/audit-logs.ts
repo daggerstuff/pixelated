@@ -1,5 +1,6 @@
-import { type AuditLogEntry, getAuditLogs } from '../../../lib/audit'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { type AuditLogEntry, getAuditLogs } from '../../../lib/audit'
 
 const logger = createBuildSafeLogger('admin-audit-logs')
 

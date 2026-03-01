@@ -4,12 +4,11 @@
  */
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
-import { logSecurityEvent, SecurityEventType } from '../security/index'
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
-
 
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
@@ -19,26 +18,35 @@ let auth0Management: ManagementClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!auth0Config.domain || !auth0Config.clientId || !auth0Config.clientSecret) {
-
-    console.warn('Auth0 configuration incomplete'); return
+  if (
+    !auth0Config.domain ||
+    !auth0Config.clientId ||
+    !auth0Config.clientSecret
+  ) {
+    console.warn('Auth0 configuration incomplete')
+    return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret
+      clientSecret: auth0Config.clientSecret,
     })
   }
 
-  if (!auth0Management && auth0Config.managementClientId && auth0Config.managementClientSecret) {
+  if (
+    !auth0Management &&
+    auth0Config.managementClientId &&
+    auth0Config.managementClientSecret
+  ) {
     auth0Management = new ManagementClient({
       domain: auth0Config.domain,
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
+      scope:
+        'read:users update:users create:users read:guardian_factors update:guardian_factors',
     })
   }
 }
@@ -131,7 +139,9 @@ export class Auth0WebAuthnService {
   /**
    * Get WebAuthn registration options for a new credential
    */
-  async getRegistrationOptions(registrationOptions: WebAuthnRegistrationOptions): Promise<WebAuthnCredentialCreationOptions> {
+  async getRegistrationOptions(
+    registrationOptions: WebAuthnRegistrationOptions,
+  ): Promise<WebAuthnCredentialCreationOptions> {
     try {
       // In a real implementation, we would generate these options using a WebAuthn library
       // For now, we'll return a simulated structure that matches the WebAuthn spec
@@ -140,47 +150,56 @@ export class Auth0WebAuthnService {
         challenge: this.generateChallenge(),
         rp: {
           name: this.rpName,
-          id: this.rpId
+          id: this.rpId,
         },
         user: {
           id: registrationOptions.userId,
           name: registrationOptions.userName,
-          displayName: registrationOptions.userDisplayName
+          displayName: registrationOptions.userDisplayName,
         },
         pubKeyCredParams: [
           { type: 'public-key', alg: -7 }, // ES256
-          { type: 'public-key', alg: -257 } // RS256
+          { type: 'public-key', alg: -257 }, // RS256
         ],
         timeout: 60000, // 60 seconds
         attestation: 'none',
         authenticatorSelection: {
-          authenticatorAttachment: registrationOptions.authenticatorAttachment || 'cross-platform',
+          authenticatorAttachment:
+            registrationOptions.authenticatorAttachment || 'cross-platform',
           residentKey: registrationOptions.residentKey || 'preferred',
-          userVerification: registrationOptions.userVerification || 'preferred'
-        }
+          userVerification: registrationOptions.userVerification || 'preferred',
+        },
       }
 
       // Log registration options generation
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, {
         userId: registrationOptions.userId,
         optionsGenerated: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with registration progress
-      await updatePhase6AuthenticationProgress(registrationOptions.userId, 'webauthn_registration_options_generated')
+      await updatePhase6AuthenticationProgress(
+        registrationOptions.userId,
+        'webauthn_registration_options_generated',
+      )
 
       return options
     } catch (error) {
       console.error('Failed to generate WebAuthn registration options:', error)
-      throw new Error(`Failed to generate WebAuthn registration options: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to generate WebAuthn registration options: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Verify and register a new WebAuthn credential
    */
-  async verifyRegistration(userId: string, credential: any): Promise<WebAuthnCredential> {
+  async verifyRegistration(
+    userId: string,
+    credential: any,
+  ): Promise<WebAuthnCredential> {
     try {
       // In a real implementation, we would verify the credential using a WebAuthn library
       // For now, we'll simulate the verification and registration
@@ -193,101 +212,133 @@ export class Auth0WebAuthnService {
         publicKey: credential.publicKey || 'public-key-placeholder',
         counter: credential.counter || 0,
         deviceType: credential.deviceType || 'unknown',
-        backedUp: credential.backedUp || false
+        backedUp: credential.backedUp || false,
       }
 
       // Log successful registration
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED, {
-        userId: userId,
-        credentialId: newCredential.id,
-        type: newCredential.type,
-        timestamp: new Date().toISOString()
-      })
+       logSecurityEvent(
+        SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED,
+        {
+          userId: userId,
+          credentialId: newCredential.id,
+          type: newCredential.type,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with registration completion
-      await updatePhase6AuthenticationProgress(userId, `webauthn_registration_completed_${newCredential.id}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `webauthn_registration_completed_${newCredential.id}`,
+      )
 
       return newCredential
     } catch (error) {
       console.error('Failed to verify WebAuthn registration:', error)
 
       // Log failed registration
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, {
         userId: userId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
-      throw new Error(`Failed to verify WebAuthn registration: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to verify WebAuthn registration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Get WebAuthn authentication options for an existing user
    */
-  async getAuthenticationOptions(authenticationOptions: WebAuthnAuthenticationOptions): Promise<WebAuthnCredentialRequestOptions> {
+  async getAuthenticationOptions(
+    authenticationOptions: WebAuthnAuthenticationOptions,
+  ): Promise<WebAuthnCredentialRequestOptions> {
     try {
       // Get user's existing WebAuthn credentials
-      const credentials = await this.getUserWebAuthnCredentials(authenticationOptions.userId)
+      const credentials = await this.getUserWebAuthnCredentials(
+        authenticationOptions.userId,
+      )
 
       const options: WebAuthnCredentialRequestOptions = {
         challenge: this.generateChallenge(),
         timeout: 60000, // 60 seconds
         rpId: this.rpId,
         userVerification: authenticationOptions.userVerification || 'preferred',
-        allowCredentials: credentials.map(cred => ({
+        allowCredentials: credentials.map((cred) => ({
           type: 'public-key',
           id: cred.id,
           // In a real implementation, we would include transports information
-        }))
+        })),
       }
 
       // Log authentication options generation
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED, {
-        userId: authenticationOptions.userId,
-        credentialsCount: credentials.length,
-        optionsGenerated: true,
-        timestamp: new Date().toISOString()
-      })
+       logSecurityEvent(
+        SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED,
+        {
+          userId: authenticationOptions.userId,
+          credentialsCount: credentials.length,
+          optionsGenerated: true,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with authentication progress
-      await updatePhase6AuthenticationProgress(authenticationOptions.userId, 'webauthn_authentication_options_generated')
+      await updatePhase6AuthenticationProgress(
+        authenticationOptions.userId,
+        'webauthn_authentication_options_generated',
+      )
 
       return options
     } catch (error) {
-      console.error('Failed to generate WebAuthn authentication options:', error)
-      throw new Error(`Failed to generate WebAuthn authentication options: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        'Failed to generate WebAuthn authentication options:',
+        error,
+      )
+      throw new Error(
+        `Failed to generate WebAuthn authentication options: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Verify WebAuthn authentication response
    */
-  async verifyAuthentication(userId: string, credential: any): Promise<boolean> {
+  async verifyAuthentication(
+    userId: string,
+    credential: any,
+  ): Promise<boolean> {
     try {
       // In a real implementation, we would verify the authentication response using a WebAuthn library
       // For now, we'll simulate the verification
 
       // Log successful authentication
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED, {
-        userId: userId,
-        credentialId: credential.id,
-        timestamp: new Date().toISOString()
-      })
+       logSecurityEvent(
+        SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED,
+        {
+          userId: userId,
+          credentialId: credential.id,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with authentication completion
-      await updatePhase6AuthenticationProgress(userId, `webauthn_authentication_completed_${credential.id}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `webauthn_authentication_completed_${credential.id}`,
+      )
 
       return true
     } catch (error) {
       console.error('Failed to verify WebAuthn authentication:', error)
 
       // Log failed authentication
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, {
         userId: userId,
         credentialId: credential.id,
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       return false
@@ -297,7 +348,9 @@ export class Auth0WebAuthnService {
   /**
    * Get user's WebAuthn credentials
    */
-  async getUserWebAuthnCredentials(userId: string): Promise<WebAuthnCredential[]> {
+  async getUserWebAuthnCredentials(
+    userId: string,
+  ): Promise<WebAuthnCredential[]> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -318,7 +371,7 @@ export class Auth0WebAuthnService {
           publicKey: 'public-key-placeholder-1',
           counter: 5,
           deviceType: 'security-key',
-          backedUp: false
+          backedUp: false,
         })
 
         if (Math.random() < 0.5) {
@@ -331,7 +384,7 @@ export class Auth0WebAuthnService {
             publicKey: 'public-key-placeholder-2',
             counter: 3,
             deviceType: 'platform',
-            backedUp: true
+            backedUp: true,
           })
         }
       }
@@ -356,41 +409,61 @@ export class Auth0WebAuthnService {
       // For now, we'll just log the deletion
 
       // Log credential deletion
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, {
         userId: userId,
         credentialId: credentialId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with credential deletion
-      await updatePhase6AuthenticationProgress(userId, `webauthn_credential_deleted_${credentialId}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `webauthn_credential_deleted_${credentialId}`,
+      )
     } catch (error) {
-      console.error(`Failed to delete WebAuthn credential ${credentialId} for user ${userId}:`, error)
-      throw new Error(`Failed to delete WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        `Failed to delete WebAuthn credential ${credentialId} for user ${userId}:`,
+        error,
+      )
+      throw new Error(
+        `Failed to delete WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Rename a WebAuthn credential
    */
-  async renameCredential(userId: string, credentialId: string, newName: string): Promise<void> {
+  async renameCredential(
+    userId: string,
+    credentialId: string,
+    newName: string,
+  ): Promise<void> {
     try {
       // In a real implementation, we would update the credential name in Auth0
       // For now, we'll just log the rename operation
 
       // Log credential rename
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, {
         userId: userId,
         credentialId: credentialId,
         newName: newName,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with credential rename
-      await updatePhase6AuthenticationProgress(userId, `webauthn_credential_renamed_${credentialId}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `webauthn_credential_renamed_${credentialId}`,
+      )
     } catch (error) {
-      console.error(`Failed to rename WebAuthn credential ${credentialId} for user ${userId}:`, error)
-      throw new Error(`Failed to rename WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        `Failed to rename WebAuthn credential ${credentialId} for user ${userId}:`,
+        error,
+      )
+      throw new Error(
+        `Failed to rename WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -405,7 +478,9 @@ export class Auth0WebAuthnService {
   /**
    * Get user's preferred WebAuthn credential
    */
-  async getUserPreferredCredential(userId: string): Promise<WebAuthnCredential | null> {
+  async getUserPreferredCredential(
+    userId: string,
+  ): Promise<WebAuthnCredential | null> {
     const credentials = await this.getUserWebAuthnCredentials(userId)
     return credentials.length > 0 ? credentials[0] : null
   }
@@ -432,16 +507,19 @@ export class Auth0WebAuthnService {
   /**
    * Validate WebAuthn credential response
    */
-  async validateCredentialResponse(userId: string, _response: any): Promise<boolean> {
+  async validateCredentialResponse(
+    userId: string,
+    _response: any,
+  ): Promise<boolean> {
     try {
       // In a real implementation, we would validate the credential response
       // For now, we'll simulate validation
 
       // Log validation
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, {
         userId: userId,
         responseValid: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       return true
@@ -449,11 +527,14 @@ export class Auth0WebAuthnService {
       console.error('Failed to validate WebAuthn credential response:', error)
 
       // Log validation failure
-      await logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED, {
-        userId: userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      })
+       logSecurityEvent(
+        SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED,
+        {
+          userId: userId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       return false
     }

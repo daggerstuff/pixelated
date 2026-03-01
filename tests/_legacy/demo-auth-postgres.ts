@@ -2,7 +2,7 @@ import {
   registerWithBetterAuth,
   authenticateWithBetterAuth,
   logoutFromBetterAuth,
-  getBetterAuthInstance
+  getBetterAuthInstance,
 } from './src/lib/auth/better-auth-postgres'
 
 async function demonstrateAuthIntegration() {
@@ -20,12 +20,12 @@ async function demonstrateAuthIntegration() {
         email: 'demo.user@example.com',
         password: 'SecurePassword123!',
         name: 'Demo User',
-        role: 'therapist'
+        role: 'therapist',
       },
       {
         ip: '127.0.0.1',
-        userAgent: 'Demo Client'
-      }
+        userAgent: 'Demo Client',
+      },
     )
 
     if (!registerResult.success) {
@@ -34,19 +34,22 @@ async function demonstrateAuthIntegration() {
 
     console.log('✅ User registered successfully!')
     console.log('User ID:', registerResult.user?.id)
-    console.log('Access Token:', registerResult.tokens?.accessToken.substring(0, 20) + '...')
+    console.log(
+      'Access Token:',
+      registerResult.tokens?.accessToken.substring(0, 20) + '...',
+    )
 
     // Authenticate the user
     console.log('\n🔐 Authenticating user...')
     const authResult = await authenticateWithBetterAuth(
       {
         email: 'demo.user@example.com',
-        password: 'SecurePassword123!'
+        password: 'SecurePassword123!',
       },
       {
         ip: '127.0.0.1',
-        userAgent: 'Demo Client'
-      }
+        userAgent: 'Demo Client',
+      },
     )
 
     if (!authResult.success) {
@@ -56,18 +59,18 @@ async function demonstrateAuthIntegration() {
     console.log('✅ User authenticated successfully!')
     console.log('User ID:', authResult.user?.id)
     console.log('Role:', authResult.user?.role)
-    console.log('Access Token:', authResult.tokens?.accessToken.substring(0, 20) + '...')
+    console.log(
+      'Access Token:',
+      authResult.tokens?.accessToken.substring(0, 20) + '...',
+    )
 
     // Logout the user
     console.log('\n👋 Logging out user...')
     if (authResult.user?.id) {
-      await logoutFromBetterAuth(
-        authResult.user.id,
-        {
-          ip: '127.0.0.1',
-          userAgent: 'Demo Client'
-        }
-      )
+      await logoutFromBetterAuth(authResult.user.id, {
+        ip: '127.0.0.1',
+        userAgent: 'Demo Client',
+      })
       console.log('✅ User logged out successfully!')
     }
 
@@ -83,11 +86,10 @@ async function demonstrateAuthIntegration() {
     console.log('3. Set up email verification in production')
     console.log('4. Configure JWT secrets for production')
     console.log('5. Implement role-based access control')
-
   } catch (error) {
     console.error('❌ Demo failed:', error)
   }
 }
 
 // Run the demo
-demonstrateAuthIntegration()
+void demonstrateAuthIntegration()

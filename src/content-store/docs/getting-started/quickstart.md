@@ -152,13 +152,11 @@ Access session management features:
 ### Common Issues
 
 1. **Database Connection Issues**
-
    - Verify MongoDB Atlas credentials
    - Check network connectivity
    - Ensure proper environment variables
 
 2. **API Authentication Errors**
-
    - Verify JWT secret
    - Check token expiration
    - Ensure proper CORS configuration
@@ -168,4 +166,5 @@ Access session management features:
    - Verify WebSocket server status
    - Ensure proper SSL configuration
 
-For more help, check our [deployment guide](/deployment/requirements) or [contact support](mailto:support@gemcity.xyz).
+For more help, check our [deployment guide](/deployment/requirements) or
+[contact support](mailto:support@gemcity.xyz).

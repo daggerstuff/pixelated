@@ -1,9 +1,9 @@
 ---
-title: "Security Guide"
-description: "Security Guide documentation"
+title: 'Security Guide'
+description: 'Security Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "security"]
+author: 'Pixelated Team'
+tags: ['documentation', 'security']
 draft: false
 toc: true
 ---
@@ -21,24 +21,22 @@ toc: true
 
 ## Overview
 
-Our security architecture follows AWS Well-Architected Framework's security pillar and implements defense in depth with multiple security layers:
+Our security architecture follows AWS Well-Architected Framework's security
+pillar and implements defense in depth with multiple security layers:
 
 1. Network Security
-
    - VPC with public and private subnets
    - Security groups with least privilege access
    - WAF for web application protection
    - Shield Advanced for DDoS protection
 
 2. Data Security
-
    - KMS encryption for data at rest
    - TLS encryption for data in transit
    - S3 bucket security with versioning and replication
    - Secrets management with automatic rotation
 
 3. Identity and Access
-
    - IAM policies following least privilege
    - Resource-based policies with conditions
    - Code signing for Lambda functions
@@ -66,7 +64,6 @@ graph TD
 ```
 
 1. VPC Configuration
-
    - Public subnets for ALB only
    - Private subnets for workloads
    - NAT Gateway for outbound traffic
@@ -81,14 +78,12 @@ graph TD
 ### Data Protection
 
 1. Encryption at Rest
-
    - KMS keys with automatic rotation
    - S3 bucket encryption with KMS
    - RDS encryption with KMS
    - OpenSearch encryption with KMS
 
 2. Encryption in Transit
-
    - TLS 1.3 for ALB listeners
    - VPC endpoints for AWS services
    - TLS for database connections
@@ -105,7 +100,6 @@ graph TD
 ### Infrastructure Security
 
 1. S3 Bucket Security
-
    - Access logging enabled
    - Public access blocked
    - Versioning enabled
@@ -114,7 +108,6 @@ graph TD
    - Lifecycle management
 
 2. KMS and Secrets
-
    - Automatic key rotation
    - Secrets rotation
    - Key policies with conditions
@@ -122,7 +115,6 @@ graph TD
    - Audit logging
 
 3. IAM Policies
-
    - Resource-level permissions
    - Condition constraints
    - Least privilege access
@@ -130,7 +122,6 @@ graph TD
    - Service control policies
 
 4. Security Groups
-
    - Specific CIDR blocks
    - Service-linked rules
    - Proper descriptions
@@ -147,14 +138,12 @@ graph TD
 ### Application Security
 
 1. Input Validation
-
    - API Gateway validation
    - WAF rules
    - Schema validation
    - Sanitization
 
 2. Authentication
-
    - Multi-factor authentication
    - Token-based auth
    - Session management
@@ -259,7 +248,6 @@ resource "aws_security_group_rule" "ecs_ingress" {
 ### Monitoring
 
 1. CloudWatch Metrics
-
    - Error rates
    - Request latency
    - Authentication failures
@@ -267,7 +255,6 @@ resource "aws_security_group_rule" "ecs_ingress" {
    - WAF blocks
 
 2. CloudWatch Logs
-
    - Application logs
    - Access logs
    - Audit logs
@@ -283,7 +270,6 @@ resource "aws_security_group_rule" "ecs_ingress" {
 ### Alerting
 
 1. High Priority
-
    - Security group changes
    - IAM policy changes
    - Root account usage
@@ -291,7 +277,6 @@ resource "aws_security_group_rule" "ecs_ingress" {
    - GuardDuty high severity
 
 2. Medium Priority
-
    - Failed login attempts
    - WAF blocks
    - S3 public access
@@ -309,35 +294,30 @@ resource "aws_security_group_rule" "ecs_ingress" {
 ### Response Procedures
 
 1. Detection
-
    - Monitor alerts
    - Review logs
    - Analyze metrics
    - Check GuardDuty
 
 2. Analysis
-
    - Identify scope
    - Determine impact
    - Review audit logs
    - Check configurations
 
 3. Containment
-
    - Isolate resources
    - Block access
    - Rotate credentials
    - Update policies
 
 4. Eradication
-
    - Remove threats
    - Update configurations
    - Apply patches
    - Verify removal
 
 5. Recovery
-
    - Restore services
    - Verify functionality
    - Monitor closely
@@ -352,14 +332,12 @@ resource "aws_security_group_rule" "ecs_ingress" {
 ### Contact Information
 
 1. Security Team
-
    - Slack: #security-team
    - Email: [security@example.com](mailto:security@example.com)
    - Phone: 1-800-xxx-xxxx
    - On-call: PagerDuty
 
 2. AWS Support
-
    - Enterprise Support
    - Security Response
    - TAM Contact

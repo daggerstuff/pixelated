@@ -348,8 +348,14 @@ body.enhanced-dark-theme {
   }
 
   .skip-link {
-    padding-left: max(var(--space-2), env(safe-area-inset-left, var(--space-2)));
-    padding-right: max(var(--space-2), env(safe-area-inset-right, var(--space-2)));
+    padding-left: max(
+      var(--space-2),
+      env(safe-area-inset-left, var(--space-2))
+    );
+    padding-right: max(
+      var(--space-2),
+      env(safe-area-inset-right, var(--space-2))
+    );
   }
 }
 

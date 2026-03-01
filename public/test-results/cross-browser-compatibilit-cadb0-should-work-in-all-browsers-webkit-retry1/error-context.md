@@ -1,7 +1,8 @@
 # Test info
 
 - Name: Cross-browser compatibility >> blog page should work in all browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
 
 # Error details
 
@@ -23,193 +24,197 @@ Call log:
 ```yaml
 - alert
 - link "Skip to content":
-  - /url: "#main"
+    - /url: '#main'
 - banner:
-  - link "Vivi Ornitier @ pixelatedempathy.com":
-    - /url: /
-    - img
-  - navigation:
-    - list:
-      - listitem:
-        - link "Features":
-          - /url: /features
-      - listitem:
-        - link "Blog":
-          - /url: /blog
-      - listitem:
-        - link "Dashboard":
-          - /url: /dashboard
-      - listitem:
-        - link "AntfuStyle on Github":
-          - /url: https://github.com/vivirox
-      - listitem:
-        - link "Vivi on Twitter":
-          - /url: https://x.com/pixelated
-    - button "Toggle theme"
+    - link "Vivi Ornitier @ pixelatedempathy.com":
+        - /url: /
+        - img
+    - navigation:
+        - list:
+            - listitem:
+                - link "Features":
+                    - /url: /features
+            - listitem:
+                - link "Blog":
+                    - /url: /blog
+            - listitem:
+                - link "Dashboard":
+                    - /url: /dashboard
+            - listitem:
+                - link "AntfuStyle on Github":
+                    - /url: https://github.com/vivirox
+            - listitem:
+                - link "Vivi on Twitter":
+                    - /url: https://x.com/pixelated
+        - button "Toggle theme"
 - main:
-  - heading "Blog" [level=1]
-  - heading "2025" [level=2]
-  - list:
-    - listitem:
-      - link "The Dance of Minds - When AI and Human Psychology Collide":
-        - /url: /blog/convergence-of-minds
-      - text: Mar 15
-    - listitem:
-      - link "AI in the Therapy Room - Promise, Pitfalls, and My Patients' Reality":
-        - /url: /blog/ai-mental-health-assistance
-      - text: Mar 9
-    - listitem:
-      - link "When Machines Think But Can't Feel - The EQ Crisis":
-        - /url: /blog/emotional-intelligence-in-ai-world
-      - text: Mar 2
-  - heading "2024" [level=2]
-  - list:
-    - listitem:
-      - 'link "Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities"':
-        - /url: /blog/neuroplasticity/integrative-approaches
-      - text: May 29
-    - listitem:
-      - link "AI in Mental Health Crisis Prevention":
-        - /url: /blog/ai/crisis-prevention
-      - text: May 27
-    - listitem:
-      - 'link "Nature''s Therapy: Outdoor Wellness Practices"':
-        - /url: /blog/wellness/nature-therapy
-      - text: May 25
-    - listitem:
-      - link "Psychedelic Medicine & Neuroplasticity in Trauma Treatment":
-        - /url: /blog/neuroplasticity/psychedelic-medicine
-      - text: May 22
-    - listitem:
-      - 'link "Emotional AI: Understanding Human Feelings"':
-        - /url: /blog/ai/emotional-ai
-      - text: May 20
-    - listitem:
-      - link "Creative Expression for Mental Wellness":
-        - /url: /blog/wellness/creative-expression
-      - text: May 18
-    - listitem:
-      - link "Advanced Somatic Technologies in Trauma Treatment":
-        - /url: /blog/neuroplasticity/somatic-technologies
-      - text: May 15
-    - listitem:
-      - 'link "Digital Therapeutics: AI-Enhanced Mental Health Tools"':
-        - /url: /blog/ai/digital-therapeutics
-      - text: May 13
-    - listitem:
-      - 'link "Friendship as Medicine: Nurturing Social Wellness"':
-        - /url: /blog/wellness/friendship-medicine
-      - text: May 11
-    - listitem:
-      - 'link "Quantum Biology & Trauma: A New Frontier"':
-        - /url: /blog/neuroplasticity/quantum-biology
-      - text: May 8
-    - listitem:
-      - 'link "AI Companions: The Future of Emotional Support"':
-        - /url: /blog/ai/ai-companions
-      - text: May 6
-    - listitem:
-      - 'link "The Art of Micro-Joys: Finding Happiness in Small Moments"':
-        - /url: /blog/wellness/micro-joys
-      - text: May 4
-    - listitem:
-      - link "The Neuroscience Revolution in Trauma Treatment":
-        - /url: /blog/neuroplasticity/neuroscience-revolution
-      - text: May 1
-    - listitem:
-      - 'link "AI & Emotional Intelligence: The Future of Mental Wellness"':
-        - /url: /blog/ai/series-outline
-      - text: Apr 26
-    - listitem:
-      - 'link "Everyday Joy: Simple Practices for Mental Wellness"':
-        - /url: /blog/wellness/series-outline
-      - text: Apr 19
-    - listitem:
-      - link "🧬 Research Article Template":
-        - /url: /blog/planning/article-template
-      - text: Apr 12
-    - listitem:
-      - link "Editorial Roadmap 2024":
-        - /url: /blog/planning/content-calendar
-      - text: Apr 12
-    - listitem:
-      - 'link "Neuroplasticity & Trauma: A Revolutionary Approach"':
-        - /url: /blog/planning/series-outline
-      - text: Apr 12
-    - listitem:
-      - 'link "Breaking the Silence: Our Journey Begins"':
-        - /url: /blog/welcome
-      - text: Apr 11 · 4 min
-    - listitem:
-      - link "Breaking Free from Trauma Bonds":
-        - /url: /blog/trauma-series/trauma-bonds
-      - text: Mar 19 · 11 min
-    - listitem:
-      - link "Emotional Unavail":
-        - /url: /blog/healing-series/emotional-unavailability
-      - text: Mar 15
-    - listitem:
-      - link "Healing Journey Series":
-        - /url: /blog/healing-series
-      - text: Mar 15
-    - listitem:
-      - 'link "Silencing the Inner Critic: Finding Your Authentic Voice"':
-        - /url: /blog/trauma-series/inner-critic
-      - text: Mar 12 · 10 min
-    - listitem:
-      - 'link "Healing Your Inner Child: A Path to Wholeness"':
-        - /url: /blog/trauma-series/healing-inner-child
-      - text: Mar 5 · 12 min
-    - listitem:
-      - link "The Physical Impact of Trauma":
-        - /url: /blog/trauma-body-series/physical-impact
-      - text: Mar 4 · 15 min
-    - listitem:
-      - link "Trauma and the Body Series":
-        - /url: /blog/trauma-body-series
-      - text: Mar 1
-    - listitem:
-      - link "The Dance of Wounded Souls":
-        - /url: /blog/healing-series/dance-of-wounded-souls
-      - text: Feb 21
-    - listitem:
-      - link "The Dark Side of Love":
-        - /url: /blog/trauma-series/dark-side-of-love
-      - text: Feb 20 · 8 min
-    - listitem:
-      - link "Understanding the Scapegoat Dynamic":
-        - /url: /blog/trauma-series/scapegoat-dynamics
-      - text: Feb 20 · 10 min
-    - listitem:
-      - link "Understanding Narcissism and Complex Trauma":
-        - /url: /blog/trauma-series/understanding-narcissism
-      - text: Feb 18 · 10 min
-    - listitem:
-      - link "The Heart of Codependency":
-        - /url: /blog/trauma-series/heart-of-codependency
-      - text: Feb 15 · 12 min
-    - listitem:
-      - link "Understanding Trauma Series":
-        - /url: /blog/trauma-series
-      - text: Feb 10
-    - listitem:
-      - link "Codependency & Complex Trauma":
-        - /url: /blog/healing-series/codependency-and-trauma
-      - text: Jan 25 · 15 min
-  - link "all posts":
-    - /url: /blog
-  - link "tags":
-    - /url: /blog/tags
-  - link "RSS":
-    - /url: /rss.xml
+    - heading "Blog" [level=1]
+    - heading "2025" [level=2]
+    - list:
+        - listitem:
+            - link "The Dance of Minds - When AI and Human Psychology Collide":
+                - /url: /blog/convergence-of-minds
+            - text: Mar 15
+        - listitem:
+            - ? link "AI in the Therapy Room - Promise, Pitfalls, and My
+                Patients' Reality"
+              : - /url: /blog/ai-mental-health-assistance
+            - text: Mar 9
+        - listitem:
+            - link "When Machines Think But Can't Feel - The EQ Crisis":
+                - /url: /blog/emotional-intelligence-in-ai-world
+            - text: Mar 2
+    - heading "2024" [level=2]
+    - list:
+        - listitem:
+            - ? 'link "Integrative Approaches to Trauma Treatment: Synthesizing
+                Modern Modalities"'
+              : - /url: /blog/neuroplasticity/integrative-approaches
+            - text: May 29
+        - listitem:
+            - link "AI in Mental Health Crisis Prevention":
+                - /url: /blog/ai/crisis-prevention
+            - text: May 27
+        - listitem:
+            - 'link "Nature''s Therapy: Outdoor Wellness Practices"':
+                - /url: /blog/wellness/nature-therapy
+            - text: May 25
+        - listitem:
+            - link "Psychedelic Medicine & Neuroplasticity in Trauma Treatment":
+                - /url: /blog/neuroplasticity/psychedelic-medicine
+            - text: May 22
+        - listitem:
+            - 'link "Emotional AI: Understanding Human Feelings"':
+                - /url: /blog/ai/emotional-ai
+            - text: May 20
+        - listitem:
+            - link "Creative Expression for Mental Wellness":
+                - /url: /blog/wellness/creative-expression
+            - text: May 18
+        - listitem:
+            - link "Advanced Somatic Technologies in Trauma Treatment":
+                - /url: /blog/neuroplasticity/somatic-technologies
+            - text: May 15
+        - listitem:
+            - 'link "Digital Therapeutics: AI-Enhanced Mental Health Tools"':
+                - /url: /blog/ai/digital-therapeutics
+            - text: May 13
+        - listitem:
+            - 'link "Friendship as Medicine: Nurturing Social Wellness"':
+                - /url: /blog/wellness/friendship-medicine
+            - text: May 11
+        - listitem:
+            - 'link "Quantum Biology & Trauma: A New Frontier"':
+                - /url: /blog/neuroplasticity/quantum-biology
+            - text: May 8
+        - listitem:
+            - 'link "AI Companions: The Future of Emotional Support"':
+                - /url: /blog/ai/ai-companions
+            - text: May 6
+        - listitem:
+            - ? 'link "The Art of Micro-Joys: Finding Happiness in Small
+                Moments"'
+              : - /url: /blog/wellness/micro-joys
+            - text: May 4
+        - listitem:
+            - link "The Neuroscience Revolution in Trauma Treatment":
+                - /url: /blog/neuroplasticity/neuroscience-revolution
+            - text: May 1
+        - listitem:
+            - ? 'link "AI & Emotional Intelligence: The Future of Mental
+                Wellness"'
+              : - /url: /blog/ai/series-outline
+            - text: Apr 26
+        - listitem:
+            - 'link "Everyday Joy: Simple Practices for Mental Wellness"':
+                - /url: /blog/wellness/series-outline
+            - text: Apr 19
+        - listitem:
+            - link "🧬 Research Article Template":
+                - /url: /blog/planning/article-template
+            - text: Apr 12
+        - listitem:
+            - link "Editorial Roadmap 2024":
+                - /url: /blog/planning/content-calendar
+            - text: Apr 12
+        - listitem:
+            - 'link "Neuroplasticity & Trauma: A Revolutionary Approach"':
+                - /url: /blog/planning/series-outline
+            - text: Apr 12
+        - listitem:
+            - 'link "Breaking the Silence: Our Journey Begins"':
+                - /url: /blog/welcome
+            - text: Apr 11 · 4 min
+        - listitem:
+            - link "Breaking Free from Trauma Bonds":
+                - /url: /blog/trauma-series/trauma-bonds
+            - text: Mar 19 · 11 min
+        - listitem:
+            - link "Emotional Unavail":
+                - /url: /blog/healing-series/emotional-unavailability
+            - text: Mar 15
+        - listitem:
+            - link "Healing Journey Series":
+                - /url: /blog/healing-series
+            - text: Mar 15
+        - listitem:
+            - 'link "Silencing the Inner Critic: Finding Your Authentic Voice"':
+                - /url: /blog/trauma-series/inner-critic
+            - text: Mar 12 · 10 min
+        - listitem:
+            - 'link "Healing Your Inner Child: A Path to Wholeness"':
+                - /url: /blog/trauma-series/healing-inner-child
+            - text: Mar 5 · 12 min
+        - listitem:
+            - link "The Physical Impact of Trauma":
+                - /url: /blog/trauma-body-series/physical-impact
+            - text: Mar 4 · 15 min
+        - listitem:
+            - link "Trauma and the Body Series":
+                - /url: /blog/trauma-body-series
+            - text: Mar 1
+        - listitem:
+            - link "The Dance of Wounded Souls":
+                - /url: /blog/healing-series/dance-of-wounded-souls
+            - text: Feb 21
+        - listitem:
+            - link "The Dark Side of Love":
+                - /url: /blog/trauma-series/dark-side-of-love
+            - text: Feb 20 · 8 min
+        - listitem:
+            - link "Understanding the Scapegoat Dynamic":
+                - /url: /blog/trauma-series/scapegoat-dynamics
+            - text: Feb 20 · 10 min
+        - listitem:
+            - link "Understanding Narcissism and Complex Trauma":
+                - /url: /blog/trauma-series/understanding-narcissism
+            - text: Feb 18 · 10 min
+        - listitem:
+            - link "The Heart of Codependency":
+                - /url: /blog/trauma-series/heart-of-codependency
+            - text: Feb 15 · 12 min
+        - listitem:
+            - link "Understanding Trauma Series":
+                - /url: /blog/trauma-series
+            - text: Feb 10
+        - listitem:
+            - link "Codependency & Complex Trauma":
+                - /url: /blog/healing-series/codependency-and-trauma
+            - text: Jan 25 · 15 min
+    - link "all posts":
+        - /url: /blog
+    - link "tags":
+        - /url: /blog/tags
+    - link "RSS":
+        - /url: /rss.xml
 - contentinfo:
-  - paragraph: © 2025 Pixelated Empathy. All rights reserved.
-  - link "Privacy Policy":
-    - /url: /privacy
-  - link "Terms of Service":
-    - /url: /terms
-  - link "Contact":
-    - /url: /contact
+    - paragraph: © 2025 Pixelated Empathy. All rights reserved.
+    - link "Privacy Policy":
+        - /url: /privacy
+    - link "Terms of Service":
+        - /url: /terms
+    - link "Contact":
+        - /url: /contact
 - button "Scroll to top"
 ```
 

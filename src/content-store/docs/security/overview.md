@@ -1,6 +1,8 @@
 ---
 title: 'Security Overview'
-description: 'Learn about Pixelated Healths comprehensive security features and compliance measures'
+description:
+  'Learn about Pixelated Healths comprehensive security features and compliance
+  measures'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,7 +12,10 @@ share: true
 
 ## Security Overview
 
-Pixelated implements multiple layers of security to protect sensitive healthcare data and ensure HIPAA compliance. Our security architecture combines zero-knowledge encryption, quantum-resistant algorithms, and comprehensive audit logging.
+Pixelated implements multiple layers of security to protect sensitive healthcare
+data and ensure HIPAA compliance. Our security architecture combines
+zero-knowledge encryption, quantum-resistant algorithms, and comprehensive audit
+logging.
 
 ## Security Architecture
 

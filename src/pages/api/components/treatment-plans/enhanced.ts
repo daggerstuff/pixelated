@@ -2,9 +2,10 @@ import type { APIRoute } from 'astro'
 export const prerender = false
 
 import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
+
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('enhanced-treatment-plans-api')
 

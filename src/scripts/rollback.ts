@@ -52,7 +52,7 @@ async function sendNotification(message: string, environment: string): void {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env['EMAIL_API_KEY']}`,
+          Authorization: `Bearer ${process.env['EMAIL_API_KEY']}`,
         },
         body: JSON.stringify({
           from: 'alerts@pixelatedempathy.com',
@@ -237,7 +237,7 @@ async function performRollback(options: RollbackOptions): void {
       console.warn(verify.stderr.toString())
 
       if (options.notify) {
-        await sendNotification(
+         sendNotification(
           'Rollback completed but verification checks failed. Manual intervention may be required.',
           options.environment,
         )
@@ -246,7 +246,7 @@ async function performRollback(options: RollbackOptions): void {
       console.log('✓ Rollback verification successful')
 
       if (options.notify) {
-        await sendNotification(
+         sendNotification(
           `Deployment rollback completed successfully to version ${version}.`,
           options.environment,
         )
@@ -258,7 +258,7 @@ async function performRollback(options: RollbackOptions): void {
     console.error('\n❌ Rollback failed:', error)
 
     if (options.notify) {
-      await sendNotification(
+       sendNotification(
         `CRITICAL: Automatic rollback failed. Manual intervention required. Error: ${error}`,
         options.environment,
       )
@@ -281,13 +281,13 @@ async function main() {
     })
 
     const options: RollbackOptions = {
-      environment: values.environment as string,
-      notify: values.notify as boolean,
-      version: values.version as string | undefined,
+      environment: values.environment,
+      notify: values.notify,
+      version: values.version,
       fallbackBranch: values.fallbackBranch as string | undefined,
     }
 
-    const success = await performRollback(options)
+    const success =  performRollback(options)
     process.exit(success ? 0 : 1)
   } catch (error: unknown) {
     console.error('Unhandled error:', error)

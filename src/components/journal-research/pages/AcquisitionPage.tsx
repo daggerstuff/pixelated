@@ -1,4 +1,5 @@
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
+
 import { AcquisitionPanel } from '../features/AcquisitionPanel'
 
 export interface AcquisitionPageProps {
@@ -12,4 +13,3 @@ export function AcquisitionPage({ sessionId }: AcquisitionPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

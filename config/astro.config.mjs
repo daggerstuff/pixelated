@@ -1,42 +1,53 @@
-import path from 'node:path';
-import process from 'node:process';
+import path from 'node:path'
+import process from 'node:process'
 
-import react from '@astrojs/react';
-import UnoCSS from '@unocss/astro';
-import { defineConfig, passthroughImageService } from 'astro/config';
+import node from '@astrojs/node'
+import react from '@astrojs/react'
+import sentry from '@sentry/astro'
+import UnoCSS from '@unocss/astro'
+import icon from 'astro-icon'
+import { defineConfig, passthroughImageService } from 'astro/config'
+import { visualizer } from 'rollup-plugin-visualizer'
 
-import icon from 'astro-icon';
-import sentry from '@sentry/astro';
-
-import node from '@astrojs/node';
-import { visualizer } from 'rollup-plugin-visualizer';
-
-const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1';
-let cloudflareAdapter;
+const isCloudflareDeploy =
+  process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1'
+let cloudflareAdapter
 if (isCloudflareDeploy) {
   try {
-    const cloudflareModule = await import('@astrojs/cloudflare');
-    cloudflareAdapter = cloudflareModule.default;
+    const cloudflareModule = await import('@astrojs/cloudflare')
+    cloudflareAdapter = cloudflareModule.default
   } catch (e) {
-    console.warn('⚠️  Cloudflare adapter not available, will use Node adapter:', e.message);
-    cloudflareAdapter = undefined;
+    console.warn(
+      '⚠️  Cloudflare adapter not available, will use Node adapter:',
+      e.message,
+    )
+    cloudflareAdapter = undefined
   }
 }
 
 if (isCloudflareDeploy && !cloudflareAdapter) {
-  console.log('🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter');
+  console.log(
+    '🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter',
+  )
 }
 
-const isRailwayDeploy = process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT;
-const isHerokuDeploy = process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO;
-const isFlyioDeploy = process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME;
+const isRailwayDeploy =
+  process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
+const isHerokuDeploy =
+  process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO
+const isFlyioDeploy =
+  process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME
 
-const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isProduction = process.env.NODE_ENV === 'production'
+const isDevelopment = process.env.NODE_ENV === 'development'
 // Detect if we're running a build command (not dev server)
-const isBuildCommand = process.argv.includes('build') || process.env.CI === 'true' || !!process.env.CF_PAGES || !!process.env.VERCEL;
-const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1';
-const hasSentryDSN = !!process.env.SENTRY_DSN;
+const isBuildCommand =
+  process.argv.includes('build') ||
+  process.env.CI === 'true' ||
+  !!process.env.CF_PAGES ||
+  !!process.env.VERCEL
+const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
+const hasSentryDSN = !!process.env.SENTRY_DSN
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 const preferredPort = (() => {
   const candidates = [
@@ -44,85 +55,85 @@ const preferredPort = (() => {
     process.env.HTTP_PORT,
     process.env.WEBSITES_PORT,
     process.env.ASTRO_PORT,
-  ];
+  ]
   for (const value of candidates) {
-    if (!value) continue;
-    const parsed = Number.parseInt(value, 10);
+    if (!value) continue
+    const parsed = Number.parseInt(value, 10)
     if (Number.isInteger(parsed) && parsed > 0 && parsed < 65536) {
-      return parsed;
+      return parsed
     }
   }
-  return 4321;
-})();
+  return 4321
+})()
 
 function getChunkName(id) {
   if (id.includes('react') || id.includes('react-dom')) {
-    return 'react-vendor';
+    return 'react-vendor'
   }
   if (id.includes('framer-motion') || id.includes('lucide-react')) {
-    return 'ui-vendor';
+    return 'ui-vendor'
   }
   if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
-    return 'utils-vendor';
+    return 'utils-vendor'
   }
   if (id.includes('recharts') || id.includes('chart.js')) {
-    return 'charts-vendor';
+    return 'charts-vendor'
   }
   if (id.includes('three') || id.includes('@react-three')) {
-    return 'three-vendor';
+    return 'three-vendor'
   }
   if (id.includes('node_modules')) {
-    return 'vendor';
+    return 'vendor'
   }
-  return null;
+  return null
 }
 
 const adapter = (() => {
   if (isCloudflareDeploy && cloudflareAdapter) {
-    console.log('🔵 Using Cloudflare adapter for Pages deployment');
+    console.log('🔵 Using Cloudflare adapter for Pages deployment')
     // Only enable platformProxy for local dev (not during builds)
     // During Cloudflare Pages builds, platformProxy requires Wrangler auth which isn't available
     const adapterConfig = {
       mode: 'directory',
       functionPerRoute: false,
-    };
+    }
     // Only include platformProxy when running dev server locally (not during builds)
     if (isDevelopment && !isBuildCommand) {
       adapterConfig.platformProxy = {
         enabled: true,
-      };
+      }
     }
-    return cloudflareAdapter(adapterConfig);
+    return cloudflareAdapter(adapterConfig)
   }
 
   if (isRailwayDeploy) {
-    console.log('🚂 Using Node adapter for Railway deployment');
+    console.log('🚂 Using Node adapter for Railway deployment')
     return node({
       mode: 'standalone',
-    });
+    })
   }
 
   if (isHerokuDeploy) {
-    console.log('🟣 Using Node adapter for Heroku deployment');
+    console.log('🟣 Using Node adapter for Heroku deployment')
     return node({
       mode: 'standalone',
-    });
+    })
   }
 
   // Fly.io deployment
   if (isFlyioDeploy) {
-    console.log('✈️ Using Node adapter for Fly.io deployment');
+    console.log('✈️ Using Node adapter for Fly.io deployment')
     return node({
       mode: 'standalone',
-    });
+    })
   }
 
   // Default: Node adapter for Kubernetes/standard deployments
-  console.log('🟢 Using Node adapter for standard deployment');
+  console.log('🟢 Using Node adapter for standard deployment')
   return node({
     mode: 'standalone',
-  });
-})();
+  })
+})()
 
 // https://astro.build/config
 export default defineConfig({
@@ -137,8 +148,8 @@ export default defineConfig({
     copy: [
       {
         from: 'templates/email',
-        to: 'templates/email'
-      }
+        to: 'templates/email',
+      },
     ],
     rollupOptions: {
       output: {
@@ -147,23 +158,22 @@ export default defineConfig({
         // Optimized chunk naming for better caching
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
-      }
-    }
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
   },
   vite: {
     server: {
       watch: {
         ignored: [
           // Aggressive node_modules exclusion at Vite level
-          (p) => (
+          (p) =>
             p.includes('/node_modules/') ||
             p.includes('\\node_modules\\') ||
             p.includes('/.venv/') ||
             p.includes('\\.venv\\') ||
             p.includes('/ai/') ||
-            p.includes('\\ai\\')
-          ),
+            p.includes('\\ai\\'),
           '**/node_modules/**',
           '/node_modules/**',
           'node_modules/**',
@@ -173,22 +183,24 @@ export default defineConfig({
     },
     build: {
       // Enable hidden source maps in production for Sentry upload (not served to users)
-      sourcemap: (!isProduction || hasSentryDSN) ? 'hidden' : false,
+      sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
       // Temporarily disabled minification to debug build hang
       minify: false,
       // minify: isProduction ? 'terser' : false,
-      terserOptions: isProduction ? {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug']
-        },
-        mangle: {
-          safari10: true
-        }
-      } : {},
+      terserOptions: isProduction
+        ? {
+            compress: {
+              drop_console: true,
+              drop_debugger: true,
+              pure_funcs: ['console.log', 'console.info', 'console.debug'],
+            },
+            mangle: {
+              safari10: true,
+            },
+          }
+        : {},
       rollupOptions: {
         // Limit parallel file operations to prevent resource exhaustion
         maxParallelFileOps: 2,
@@ -223,30 +235,35 @@ export default defineConfig({
         ],
         onwarn(warning, warn) {
           if (
-            warning.code === "SOURCEMAP_ERROR" ||
-            (warning.message && warning.message.includes("didn't generate a sourcemap"))
+            warning.code === 'SOURCEMAP_ERROR' ||
+            (warning.message &&
+              warning.message.includes("didn't generate a sourcemap"))
           ) {
             return
           }
-          if (warning.message && (
-            warning.message.includes('externalized for browser compatibility') ||
-            warning.message.includes('icon "-"') ||
-            warning.message.includes('failed to load icon \'-\'')
-          )) {
+          if (
+            warning.message &&
+            (warning.message.includes(
+              'externalized for browser compatibility',
+            ) ||
+              warning.message.includes('icon "-"') ||
+              warning.message.includes("failed to load icon '-'"))
+          ) {
             return
           }
           warn(warning)
-        }
-      }
+        },
+      },
     },
     plugins: [
       // Bundle analyzer for production builds
-      shouldAnalyzeBundle && visualizer({
-        filename: 'dist/bundle-analysis.html',
-        open: true,
-        gzipSize: true,
-        brotliSize: true
-      })
+      shouldAnalyzeBundle &&
+        visualizer({
+          filename: 'dist/bundle-analysis.html',
+          open: true,
+          gzipSize: true,
+          brotliSize: true,
+        }),
     ].filter(Boolean),
     resolve: {
       alias: {
@@ -344,7 +361,7 @@ export default defineConfig({
       react({
         include: ['**/react/*', '**/components/**/*'],
         experimentalReactChildren: true,
-      })
+      }),
     ]
     if (MIN_DEV) return base
     return [
@@ -353,33 +370,49 @@ export default defineConfig({
       icon({
         include: {
           lucide: [
-            'calendar', 'user', 'settings', 'heart', 'brain', 'shield-check', 'info', 'arrow-left', 'shield', 'user-plus'
-          ]
+            'calendar',
+            'user',
+            'settings',
+            'heart',
+            'brain',
+            'shield-check',
+            'info',
+            'arrow-left',
+            'shield',
+            'user-plus',
+          ],
         },
         svgdir: './src/icons',
       }),
-      ...(hasSentryDSN ? [
-        sentry({
-          sourceMapsUploadOptions: {
-            org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-            project: process.env.SENTRY_PROJECT || 'pixel-astro',
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            // Include release for proper stack trace linking and code mapping
-            release:
-              process.env.SENTRY_RELEASE ||
-              process.env.npm_package_version ||
-              undefined,
-            telemetry: false,
-            sourcemaps: {
-              assets: ['./.astro/dist/**/*.js', './.astro/dist/**/*.mjs', './dist/**/*.js', './dist/**/*.mjs'],
-              ignore: ['**/node_modules/**'],
-              filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-            },
-          },
-        }),
-        // Temporarily disable SpotlightJS due to build issues
-        // ...(shouldUseSpotlight ? [spotlightjs()] : [])
-      ] : []),
+      ...(hasSentryDSN
+        ? [
+            sentry({
+              sourceMapsUploadOptions: {
+                org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+                project: process.env.SENTRY_PROJECT || 'pixel-astro',
+                authToken: process.env.SENTRY_AUTH_TOKEN,
+                // Include release for proper stack trace linking and code mapping
+                release:
+                  process.env.SENTRY_RELEASE ||
+                  process.env.npm_package_version ||
+                  undefined,
+                telemetry: false,
+                sourcemaps: {
+                  assets: [
+                    './.astro/dist/**/*.js',
+                    './.astro/dist/**/*.mjs',
+                    './dist/**/*.js',
+                    './dist/**/*.mjs',
+                  ],
+                  ignore: ['**/node_modules/**'],
+                  filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
+                },
+              },
+            }),
+            // Temporarily disable SpotlightJS due to build issues
+            // ...(shouldUseSpotlight ? [spotlightjs()] : [])
+          ]
+        : []),
     ]
   })(),
   markdown: {
@@ -399,14 +432,13 @@ export default defineConfig({
       followSymlinks: false,
       ignored: [
         // Hard guard first: function ignore for node_modules and .venv anywhere
-        (p) => (
+        (p) =>
           p.includes('/node_modules/') ||
           p.includes('\\node_modules\\') ||
           p.includes('/.venv/') ||
           p.includes('\\.venv\\') ||
           p.includes('/ai/') ||
-          p.includes('\\ai\\')
-        ),
+          p.includes('\\ai\\'),
         // Python virtual environments and cache
         '**/.venv/**',
         '.venv/**',
@@ -517,4 +549,4 @@ export default defineConfig({
   devToolbar: {
     enabled: isDevelopment,
   },
-});
+})

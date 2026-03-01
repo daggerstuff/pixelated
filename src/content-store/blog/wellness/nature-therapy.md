@@ -21,7 +21,12 @@ category: Research
 
 ## Introduction
 
-In our increasingly digital and indoor lives, reconnecting with nature offers profound benefits for mental wellness. Research consistently shows that time spent in natural environments reduces stress, improves mood, enhances cognitive function, and promotes overall wellbeing. This article explores accessible ways to harness nature's therapeutic power, regardless of where you live or how busy your schedule might be.
+In our increasingly digital and indoor lives, reconnecting with nature offers
+profound benefits for mental wellness. Research consistently shows that time
+spent in natural environments reduces stress, improves mood, enhances cognitive
+function, and promotes overall wellbeing. This article explores accessible ways
+to harness nature's therapeutic power, regardless of where you live or how busy
+your schedule might be.
 
 ## Forest Bathing Basics
 
@@ -411,7 +416,14 @@ Easy entry points:
 
 ## Conclusion
 
-Nature offers a powerful, accessible path to improved mental wellness that requires no special equipment or expertise—just your presence and attention. By developing simple practices that connect you with the natural world, you can tap into a profound source of healing, joy, and balance that humans have relied upon throughout our existence. Remember that nature connection doesn't require grand wilderness adventures; even small moments with plants, animals, weather, and natural elements can transform your wellbeing when approached with mindfulness and regularity.
+Nature offers a powerful, accessible path to improved mental wellness that
+requires no special equipment or expertise—just your presence and attention. By
+developing simple practices that connect you with the natural world, you can tap
+into a profound source of healing, joy, and balance that humans have relied upon
+throughout our existence. Remember that nature connection doesn't require grand
+wilderness adventures; even small moments with plants, animals, weather, and
+natural elements can transform your wellbeing when approached with mindfulness
+and regularity.
 
 ## Weekly Nature Challenge
 
@@ -425,4 +437,5 @@ Begin your nature connection practice:
 
 ---
 
-_Next in our series, we'll explore how to create joy and mental wellness in the workplace environment._
+_Next in our series, we'll explore how to create joy and mental wellness in the
+workplace environment._

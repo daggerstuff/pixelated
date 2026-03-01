@@ -182,9 +182,9 @@ db.competitor_analysis.insertMany([
     avg_pricing: 499.99,
     feature_frequency: {
       'real-time_collaboration': 0.85,
-      'business_intelligence': 0.75,
-      'workflow_automation': 0.65,
-      'document_management': 0.9,
+      business_intelligence: 0.75,
+      workflow_automation: 0.65,
+      document_management: 0.9,
     },
     competitive_gaps: [
       'advanced_analytics',

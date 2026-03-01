@@ -1,5 +1,5 @@
-import { authClient } from '@/lib/auth-client'
 import type { AuthRole } from '@/config/auth.config'
+import { authClient } from '@/lib/auth-client'
 import type { UserRole } from '@/types/auth'
 
 export interface RoleGuardProps {
@@ -22,7 +22,9 @@ export function RoleGuard({
   const { data: session, isPending: loading } = authClient.useSession()
 
   // Simple role check function
-  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
+  const hasRole = (
+    role: AuthRole | AuthRole[] | UserRole | UserRole[],
+  ): boolean => {
     if (!session?.user) {
       return false
     }
@@ -44,7 +46,7 @@ export function RoleGuard({
   // Not authenticated
   if (!session) {
     return showError ? (
-      <div className="text-red-500 text-sm p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+      <div className='text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm'>
         Authentication required
       </div>
     ) : (
@@ -55,7 +57,7 @@ export function RoleGuard({
   // Check role
   if (!hasRole(requiredRole)) {
     return showError ? (
-      <div className="text-red-500 text-sm p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+      <div className='text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm'>
         Insufficient permissions
       </div>
     ) : (

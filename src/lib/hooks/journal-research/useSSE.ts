@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+
 import { journalResearchApiClient } from '@/lib/api/journal-research'
-import type {
-  WebSocketMessage,
-} from './useWebSocket'
+
+import type { WebSocketMessage } from './useWebSocket'
 
 export type SSEConnectionState =
   | 'disconnected'
@@ -116,8 +116,7 @@ export const useJournalResearchSSE = ({
     }
 
     const baseUrl = journalResearchApiClient.getBaseUrl()
-    const path =
-      endpoint ?? `/sessions/${sessionId}/progress/events`
+    const path = endpoint ?? `/sessions/${sessionId}/progress/events`
     const authToken = getAuthToken()
     const sseUrl = buildSSEUrl(baseUrl, path, authToken)
 
@@ -231,4 +230,3 @@ export const useJournalResearchSSE = ({
     reconnect,
   }
 }
-

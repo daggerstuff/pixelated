@@ -13,19 +13,23 @@ Use consistent design tokens throughout the application:
 // src/lib/design-tokens.ts
 export const tokens = {
   colors: {
-    primary: "hsl(var(--primary))",
-    secondary: "hsl(var(--secondary))",
-    background: "hsl(var(--background))",
-    foreground: "hsl(var(--foreground))",
-    muted: "hsl(var(--muted))",
-    accent: "hsl(var(--accent))",
-    destructive: "hsl(var(--destructive))"
+    primary: 'hsl(var(--primary))',
+    secondary: 'hsl(var(--secondary))',
+    background: 'hsl(var(--background))',
+    foreground: 'hsl(var(--foreground))',
+    muted: 'hsl(var(--muted))',
+    accent: 'hsl(var(--accent))',
+    destructive: 'hsl(var(--destructive))',
   },
   spacing: {
-    xs: "0.25rem", sm: "0.5rem", md: "1rem", 
-    lg: "1.5rem", xl: "2rem", "2xl": "3rem"
-  }
-};
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+  },
+}
 ```
 
 ## Component Architecture
@@ -35,36 +39,36 @@ Follow atomic design principles with clear prop interfaces:
 ```tsx
 // ✅ Proper component structure
 interface ButtonProps {
-  variant?: "primary" | "secondary" | "destructive";
-  size?: "sm" | "md" | "lg";
-  children: React.ReactNode;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'destructive'
+  size?: 'sm' | 'md' | 'lg'
+  children: React.ReactNode
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
 }
 
-export function Button({ 
-  variant = "primary", 
-  size = "md", 
-  children, 
-  leftIcon, 
-  rightIcon, 
-  ...props 
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  children,
+  leftIcon,
+  rightIcon,
+  ...props
 }: ButtonProps) {
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         variants[variant],
-        sizes[size]
+        sizes[size],
       )}
       {...props}
     >
-      {leftIcon && <span className="mr-2">{leftIcon}</span>}
+      {leftIcon && <span className='mr-2'>{leftIcon}</span>}
       {children}
-      {rightIcon && <span className="ml-2">{rightIcon}</span>}
+      {rightIcon && <span className='ml-2'>{rightIcon}</span>}
     </button>
-  );
+  )
 }
 ```
 
@@ -72,12 +76,12 @@ export function Button({
 
 All UI components must meet WCAG AA standards for healthcare applications:
 
-```tsx
+````tsx
 // ✅ Accessible form components
 export function FormField({ label, error, required, ...props }) {
   const id = useId();
   const errorId = error ? `${id}-error` : undefined;
-  
+
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="text-sm font-medium">
@@ -106,21 +110,21 @@ export function FormField({ label, error, required, ...props }) {
 // ✅ Modal with focus management
 export function Modal({ isOpen, onClose, children }) {
   const modalRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const focusableElements = modalRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const firstElement = focusableElements?.[0] as HTMLElement;
     const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement;
-    
+
     firstElement?.focus();
-    
+
     const handleTabKey = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
-      
+
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
           lastElement?.focus();
@@ -133,13 +137,13 @@ export function Modal({ isOpen, onClose, children }) {
         }
       }
     };
-    
+
     document.addEventListener('keydown', handleTabKey);
     return () => document.removeEventListener('keydown', handleTabKey);
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
       <div
@@ -178,7 +182,7 @@ Use mobile-first approach with Tailwind CSS breakpoints:
     {/* Chat area */}
   </main>
 </div>
-```
+````
 
 ## Performance Optimization
 
@@ -186,32 +190,45 @@ Optimize components for the real-time chat interface:
 
 ```tsx
 // ✅ Lazy load heavy AI components
-const AIChat = React.lazy(() => import('~/components/ai/AIChat'));
-const BiasDetection = React.lazy(() => import('~/components/ai/BiasDetection'));
+const AIChat = React.lazy(() => import('~/components/ai/AIChat'))
+const BiasDetection = React.lazy(() => import('~/components/ai/BiasDetection'))
 
 // ✅ Optimized chat message rendering
 const ChatMessage = memo(({ message, isTyping }) => {
   return (
-    <div className={cn("flex gap-3 p-4", message.role === 'user' ? 'justify-end' : 'justify-start')}>
+    <div
+      className={cn(
+        'flex gap-3 p-4',
+        message.role === 'user' ? 'justify-end' : 'justify-start',
+      )}
+    >
       {message.role === 'assistant' && <Avatar />}
-      <div className={cn("max-w-[80%] rounded-lg p-3", 
-        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-      )}>
+      <div
+        className={cn(
+          'max-w-[80%] rounded-lg p-3',
+          message.role === 'user'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted',
+        )}
+      >
         {isTyping ? <TypingIndicator /> : message.content}
       </div>
     </div>
-  );
-});
+  )
+})
 
 // ✅ Virtualized chat history for performance
-import { FixedSizeList as List } from 'react-window';
+import { FixedSizeList as List } from 'react-window'
 
 function ChatHistory({ messages }) {
-  const renderMessage = useCallback(({ index, style }) => (
-    <div style={style}>
-      <ChatMessage message={messages[index]} />
-    </div>
-  ), [messages]);
+  const renderMessage = useCallback(
+    ({ index, style }) => (
+      <div style={style}>
+        <ChatMessage message={messages[index]} />
+      </div>
+    ),
+    [messages],
+  )
 
   return (
     <List
@@ -222,7 +239,7 @@ function ChatHistory({ messages }) {
     >
       {renderMessage}
     </List>
-  );
+  )
 }
 ```
 
@@ -234,33 +251,34 @@ Provide clear feedback for AI interactions and secure operations:
 // ✅ AI processing states
 function AIResponseButton({ isProcessing, onSubmit }) {
   return (
-    <Button 
-      onClick={onSubmit}
-      disabled={isProcessing}
-      className="w-full"
-    >
+    <Button onClick={onSubmit} disabled={isProcessing} className='w-full'>
       {isProcessing ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
           AI Processing...
         </>
       ) : (
         <>
-          <Send className="mr-2 h-4 w-4" />
+          <Send className='mr-2 h-4 w-4' />
           Send Message
         </>
       )}
     </Button>
-  );
+  )
 }
 
 // ✅ Security status indicators
 function SecurityStatus({ encryptionStatus, biasScore }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Shield className={cn("h-4 w-4", 
-        encryptionStatus === 'encrypted' ? 'text-green-500' : 'text-yellow-500'
-      )} />
+    <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+      <Shield
+        className={cn(
+          'h-4 w-4',
+          encryptionStatus === 'encrypted'
+            ? 'text-green-500'
+            : 'text-yellow-500',
+        )}
+      />
       <span>FHE Encrypted</span>
       {biasScore !== null && (
         <Badge variant={biasScore < 0.3 ? 'default' : 'destructive'}>
@@ -268,34 +286,34 @@ function SecurityStatus({ encryptionStatus, biasScore }) {
         </Badge>
       )}
     </div>
-  );
+  )
 }
 
 // ✅ Error boundaries for AI components
 class AIErrorBoundary extends Component {
   constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
+        <Alert variant='destructive'>
+          <AlertTriangle className='h-4 w-4' />
           <AlertTitle>AI Service Error</AlertTitle>
           <AlertDescription>
             The AI service is temporarily unavailable. Please try again.
           </AlertDescription>
         </Alert>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 ```
@@ -306,58 +324,63 @@ Use shadcn/ui components with consistent theming:
 
 ```tsx
 // ✅ Use cn() utility for class merging
-import { cn } from "~/lib/utils";
+import { cn } from '~/lib/utils'
 
 // ✅ Component variant patterns
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "underline-offset-4 hover:underline text-primary"
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline:
+          'border border-input hover:bg-accent hover:text-accent-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'underline-offset-4 hover:underline text-primary',
       },
       size: {
-        default: "h-10 py-2 px-4",
-        sm: "h-9 px-3 rounded-md",
-        lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10"
-      }
+        default: 'h-10 py-2 px-4',
+        sm: 'h-9 px-3 rounded-md',
+        lg: 'h-11 px-8 rounded-md',
+        icon: 'h-10 w-10',
+      },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default"
-    }
-  }
-);
+      variant: 'default',
+      size: 'default',
+    },
+  },
+)
 
 // ✅ Dark mode support
-function ThemeProvider({ children, defaultTheme = "system" }) {
-  const [theme, setTheme] = useState(defaultTheme);
+function ThemeProvider({ children, defaultTheme = 'system' }) {
+  const [theme, setTheme] = useState(defaultTheme)
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
+    const root = window.document.documentElement
+    root.classList.remove('light', 'dark')
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark" : "light";
-      root.classList.add(systemTheme);
-      return;
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light'
+      root.classList.add(systemTheme)
+      return
     }
 
-    root.classList.add(theme);
-  }, [theme]);
+    root.classList.add(theme)
+  }, [theme])
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
-  );
+  )
 }
 ```
 
@@ -367,39 +390,39 @@ Test UI components for accessibility and functionality:
 
 ```tsx
 // ✅ Accessibility testing
-import { render, screen } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { render, screen } from '@testing-library/react'
+import { axe, toHaveNoViolations } from 'jest-axe'
 
-expect.extend(toHaveNoViolations);
+expect.extend(toHaveNoViolations)
 
 test('ChatMessage is accessible', async () => {
   const { container } = render(
-    <ChatMessage 
-      message={{ role: 'assistant', content: 'Hello' }} 
-      isTyping={false} 
-    />
-  );
-  
-  const results = await axe(container);
-  expect(results).toHaveNoViolations();
-  
+    <ChatMessage
+      message={{ role: 'assistant', content: 'Hello' }}
+      isTyping={false}
+    />,
+  )
+
+  const results = await axe(container)
+  expect(results).toHaveNoViolations()
+
   // Test keyboard navigation
-  const message = screen.getByRole('article');
-  expect(message).toBeInTheDocument();
-});
+  const message = screen.getByRole('article')
+  expect(message).toBeInTheDocument()
+})
 
 // ✅ Responsive testing with Playwright
 test('dashboard layout adapts to screen size', async ({ page }) => {
-  await page.goto('/dashboard');
-  
+  await page.goto('/dashboard')
+
   // Mobile view
-  await page.setViewportSize({ width: 375, height: 667 });
-  await expect(page.locator('[data-testid="sidebar"]')).toHaveClass(/hidden/);
-  
+  await page.setViewportSize({ width: 375, height: 667 })
+  await expect(page.locator('[data-testid="sidebar"]')).toHaveClass(/hidden/)
+
   // Desktop view
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await expect(page.locator('[data-testid="sidebar"]')).toBeVisible();
-});
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await expect(page.locator('[data-testid="sidebar"]')).toBeVisible()
+})
 ```
 
 ## Healthcare UI Considerations

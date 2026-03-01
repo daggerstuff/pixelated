@@ -14,13 +14,13 @@ export interface DataDimension {
 
 export interface VisualizationConfig {
   type:
-  | 'scatter'
-  | 'line'
-  | 'bar'
-  | 'heatmap'
-  | 'network'
-  | 'parallel'
-  | 'treemap'
+    | 'scatter'
+    | 'line'
+    | 'bar'
+    | 'heatmap'
+    | 'network'
+    | 'parallel'
+    | 'treemap'
   dimensions: {
     x: DataDimension
     y: DataDimension
@@ -86,44 +86,46 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
   return (
     <div className={`advanced-visualization ${className}`}>
       {/* Visualization Controls */}
-      <div className="flex items-center justify-between mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg border">
-        <div className="flex items-center gap-4">
+      <div className='bg-white dark:bg-gray-800 mb-6 flex items-center justify-between rounded-lg border p-4'>
+        <div className='flex items-center gap-4'>
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+            className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2'
           >
-            <option value="overview">Overview</option>
-            <option value="detailed">Detailed</option>
-            <option value="comparative">Comparative</option>
+            <option value='overview'>Overview</option>
+            <option value='detailed'>Detailed</option>
+            <option value='comparative'>Comparative</option>
           </select>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Interactive:</span>
+          <div className='flex items-center gap-2'>
+            <span className='text-sm font-medium'>Interactive:</span>
             <button
-              className={`w-10 h-5 rounded-full transition-colors ${config.interactive
+              className={`h-5 w-10 rounded-full transition-colors ${
+                config.interactive
                   ? 'bg-blue-500'
                   : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+              }`}
             >
               <div
-                className={`w-4 h-4 bg-white rounded-full transition-transform ${config.interactive ? 'translate-x-5' : 'translate-x-1'
-                  }`}
+                className={`bg-white h-4 w-4 rounded-full transition-transform ${
+                  config.interactive ? 'translate-x-5' : 'translate-x-1'
+                }`}
               />
             </button>
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className='text-gray-600 dark:text-gray-400 text-sm'>
           {data.length} data points • {insights.length} insights
         </div>
       </div>
 
       {/* Main Visualization Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         {/* Chart Area */}
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+        <div className='lg:col-span-2'>
+          <div className='bg-white dark:bg-gray-800 rounded-lg border p-6'>
             <VisualizationChart
               data={data}
               config={config}
@@ -134,10 +136,10 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
         </div>
 
         {/* Insights Panel */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold mb-4">AI Insights</h3>
+        <div className='space-y-4'>
+          <h3 className='mb-4 text-lg font-semibold'>AI Insights</h3>
 
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className='max-h-96 space-y-3 overflow-y-auto'>
             {insights.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}
@@ -147,22 +149,22 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
 
       {/* Detailed Analysis Panel */}
       {selectedDataPoints.length > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h4 className="font-medium mb-3">Selected Data Analysis</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-6 rounded-lg border p-4'>
+          <h4 className='mb-3 font-medium'>Selected Data Analysis</h4>
+          <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">
+              <div className='text-gray-600 dark:text-gray-400 font-medium'>
                 Points
               </div>
-              <div className="text-lg font-bold">
+              <div className='text-lg font-bold'>
                 {selectedDataPoints.length}
               </div>
             </div>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">
+              <div className='text-gray-600 dark:text-gray-400 font-medium'>
                 Avg Value
               </div>
-              <div className="text-lg font-bold">
+              <div className='text-lg font-bold'>
                 {(
                   selectedDataPoints.reduce(
                     (sum, p) => sum + (p[config.dimensions.y.field] || 0),
@@ -172,10 +174,10 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               </div>
             </div>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">
+              <div className='text-gray-600 dark:text-gray-400 font-medium'>
                 Range
               </div>
-              <div className="text-lg font-bold">
+              <div className='text-lg font-bold'>
                 {Math.min(
                   ...selectedDataPoints.map(
                     (p) => p[config.dimensions.y.field] || 0,
@@ -190,22 +192,24 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               </div>
             </div>
             <div>
-              <div className="font-medium text-gray-600 dark:text-gray-400">
+              <div className='text-gray-600 dark:text-gray-400 font-medium'>
                 Trend
               </div>
               <div
-                className={`text-lg font-bold ${calculateTrend(
-                  selectedDataPoints,
-                  config.dimensions.x.field,
-                ) > 0
+                className={`text-lg font-bold ${
+                  calculateTrend(
+                    selectedDataPoints,
+                    config.dimensions.x.field,
+                  ) > 0
                     ? 'text-green-600'
                     : 'text-red-600'
-                  }`}
+                }`}
               >
                 {calculateTrend(selectedDataPoints, config.dimensions.x.field) >
-                  0
+                0
                   ? '\u2197' // ↗
-                  : '\u2198'} {/* ↘ */}
+                  : '\u2198'}{' '}
+                {/* ↘ */}
               </div>
             </div>
           </div>
@@ -253,43 +257,43 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
   const getPointPosition = (point: any) => {
     const x =
       (((point[config.dimensions.x.field] || 0) - xMin) / xRange) *
-      (chartWidth - 40) +
+        (chartWidth - 40) +
       20
     const y =
       chartHeight -
       20 -
       (((point[config.dimensions.y.field] || 0) - yMin) / yRange) *
-      (chartHeight - 40)
+        (chartHeight - 40)
     return { x, y }
   }
 
   return (
-    <div className="relative">
+    <div className='relative'>
       <svg
         width={chartWidth}
         height={chartHeight}
-        className="border border-gray-200 dark:border-gray-700"
+        className='border-gray-200 dark:border-gray-700 border'
       >
         {/* Grid lines */}
         {[0.25, 0.5, 0.75].map((ratio) => (
           <g key={ratio}>
             <line
-              x1="20"
+              x1='20'
               y1={20 + ratio * (chartHeight - 40)}
               x2={chartWidth - 20}
               y2={20 + ratio * (chartHeight - 40)}
-              stroke="currentColor"
-              strokeWidth="0.5"
-              className="text-gray-300 dark:text-gray-600"
+              stroke='currentColor'
+              strokeWidth='0.5'
+              className='text-gray-300 dark:text-gray-600'
             />
             <line
               x1={20 + ratio * (chartWidth - 40)}
-              y1="20"
+              y1='20'
               x2={20 + ratio * (chartWidth - 40)}
               y2={chartHeight - 20}
-              stroke="currentColor"
-              strokeWidth="0.5"
-              className="text-gray-300 dark:text-gray-600"
+              stroke='currentColor'
+              strokeWidth='0.5'
+              className='text-gray-300 dark:text-gray-600'
             />
           </g>
         ))}
@@ -307,8 +311,8 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
               r={isSelected ? 6 : 4}
               fill={isSelected ? '#3b82f6' : '#10b981'}
               stroke={hoveredPoint === point ? '#ef4444' : 'white'}
-              strokeWidth="2"
-              className="cursor-pointer transition-all hover:r-8"
+              strokeWidth='2'
+              className='hover:r-8 cursor-pointer transition-all'
               onMouseEnter={() => setHoveredPoint(point)}
               onMouseLeave={() => setHoveredPoint(null)}
               onClick={(e) => {
@@ -324,7 +328,7 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
       {/* Tooltip */}
       {hoveredPoint && (
         <div
-          className="absolute bg-gray-900 text-white text-xs rounded-lg px-2 py-1 pointer-events-none z-10"
+          className='bg-gray-900 text-white pointer-events-none absolute z-10 rounded-lg px-2 py-1 text-xs'
           style={{
             left: getPointPosition(hoveredPoint).x + 10,
             top: getPointPosition(hoveredPoint).y - 10,
@@ -347,10 +351,8 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
 
   const impactColors = {
     low: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    medium:
-      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-    high:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
+    medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+    high: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
   }
 
   const typeIcons: Record<string, string> = {
@@ -362,45 +364,46 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div className="p-3">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">{typeIcons[insight.type]}</span>
-            <h4 className="font-medium text-sm">{insight.title}</h4>
+    <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
+      <div className='p-3'>
+        <div className='mb-2 flex items-start justify-between'>
+          <div className='flex items-center gap-2'>
+            <span className='text-lg'>{typeIcons[insight.type]}</span>
+            <h4 className='text-sm font-medium'>{insight.title}</h4>
           </div>
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]
-              }`}
+            className={`rounded-full px-2 py-1 text-xs font-medium ${
+              impactColors[insight.impact]
+            }`}
           >
             {insight.impact}
           </span>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+        <p className='text-gray-600 dark:text-gray-400 mb-3 text-sm'>
           {insight.description}
         </p>
 
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">
+        <div className='flex items-center justify-between text-xs'>
+          <span className='text-gray-500'>
             Confidence: {(insight.confidence * 100).toFixed(0)}%
           </span>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 dark:text-blue-400 hover:underline"
+            className='text-blue-600 dark:text-blue-400 hover:underline'
           >
             {isExpanded ? 'Less' : 'More'}
           </button>
         </div>
 
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <div className="space-y-2">
+          <div className='border-gray-200 dark:border-gray-700 mt-3 border-t pt-3'>
+            <div className='space-y-2'>
               <div>
-                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <h5 className='text-gray-700 dark:text-gray-300 mb-1 text-xs font-medium'>
                   Recommendations:
                 </h5>
-                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <ul className='text-gray-600 dark:text-gray-400 space-y-1 text-xs'>
                   {insight.recommendations.map((rec, index) => (
                     <li key={index}>• {rec}</li>
                   ))}
@@ -432,9 +435,11 @@ function generateInsights(
       id: `trend_${Date.now()}`,
       type: 'trend',
       title: `${trend > 0 ? 'Increasing' : 'Decreasing'} Trend Detected`,
-      description: `The data shows a ${trend > 0 ? 'positive' : 'negative'
-        } trend in ${config.dimensions.y.label} over ${config.dimensions.x.label
-        }`,
+      description: `The data shows a ${
+        trend > 0 ? 'positive' : 'negative'
+      } trend in ${config.dimensions.y.label} over ${
+        config.dimensions.x.label
+      }`,
       confidence: Math.min(Math.abs(trend) * 2, 0.95),
       data: { trend, field: config.dimensions.y.field },
       recommendations: [
@@ -451,7 +456,7 @@ function generateInsights(
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
   const stdDev = Math.sqrt(
     yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    yValues.length,
+      yValues.length,
   )
 
   const anomalies = data.filter((d) => {
@@ -467,8 +472,9 @@ function generateInsights(
       id: `anomaly_${Date.now()}`,
       type: 'anomaly',
       title: 'Data Anomalies Detected',
-      description: `${anomalies.length} unusual data point${anomalies.length > 1 ? 's' : ''
-        } found that deviate significantly from the norm`,
+      description: `${anomalies.length} unusual data point${
+        anomalies.length > 1 ? 's' : ''
+      } found that deviate significantly from the norm`,
       confidence: 0.85,
       data: { anomalies: anomalies.length, threshold: 2 * stdDev },
       recommendations: [
@@ -492,9 +498,11 @@ function generateInsights(
         id: `correlation_${Date.now()}`,
         type: 'correlation',
         title: 'Strong Correlation Found',
-        description: `Significant ${correlation > 0 ? 'positive' : 'negative'
-          } correlation detected between ${config.dimensions.x.label} and ${config.dimensions.color.label
-          }`,
+        description: `Significant ${
+          correlation > 0 ? 'positive' : 'negative'
+        } correlation detected between ${config.dimensions.x.label} and ${
+          config.dimensions.color.label
+        }`,
         confidence: Math.abs(correlation),
         data: {
           correlation,

@@ -1,7 +1,9 @@
 # Test info
 
-- Name: Cross-browser compatibility >> animations and transitions work correctly across browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:166:3
+- Name: Cross-browser compatibility >> animations and transitions work correctly
+  across browsers
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:166:3
 
 # Error details
 

@@ -1,19 +1,27 @@
 # End-to-End Tests for Critical User Journeys
 
-This directory contains end-to-end tests that verify critical user journeys in the application using Playwright.
+This directory contains end-to-end tests that verify critical user journeys in
+the application using Playwright.
 
 ## Overview
 
-End-to-end tests are designed to validate the complete flow of critical user journeys through the application, simulating real user behavior across multiple pages and interactions. These tests ensure that core functionality works correctly from the user's perspective.
+End-to-end tests are designed to validate the complete flow of critical user
+journeys through the application, simulating real user behavior across multiple
+pages and interactions. These tests ensure that core functionality works
+correctly from the user's perspective.
 
 ## Test Structure
 
 The tests are organized into the following files:
 
-- **test-utils.ts**: Common utility functions for login, registration, and testing toast notifications
-- **auth-journey.spec.ts**: Tests for the complete authentication flow (registration, login, password reset)
-- **dashboard-journey.spec.ts**: Tests for dashboard functionality and navigation
-- **user-experience.spec.ts**: Tests for UX features like page transitions and form interactions
+- **test-utils.ts**: Common utility functions for login, registration, and
+  testing toast notifications
+- **auth-journey.spec.ts**: Tests for the complete authentication flow
+  (registration, login, password reset)
+- **dashboard-journey.spec.ts**: Tests for dashboard functionality and
+  navigation
+- **user-experience.spec.ts**: Tests for UX features like page transitions and
+  form interactions
 
 ## Running the Tests
 
@@ -35,7 +43,9 @@ pnpm test:e2e:report
 
 ## Configuration
 
-The tests use a dedicated configuration file at `tests/e2e-config.ts`, which extends the base Playwright configuration with settings specific to end-to-end testing:
+The tests use a dedicated configuration file at `tests/e2e-config.ts`, which
+extends the base Playwright configuration with settings specific to end-to-end
+testing:
 
 - Increased timeouts for complex flows
 - Video recording for better debugging
@@ -47,6 +57,7 @@ The tests use a dedicated configuration file at `tests/e2e-config.ts`, which ext
 These tests cover the following critical user journeys:
 
 ### Authentication Journey
+
 - Registration of new users
 - Login with correct and incorrect credentials
 - Password reset flow
@@ -54,6 +65,7 @@ These tests cover the following critical user journeys:
 - CSRF protection
 
 ### Dashboard Journey
+
 - Dashboard access and component loading
 - Sidebar navigation between sections
 - Data visualization interaction
@@ -61,6 +73,7 @@ These tests cover the following critical user journeys:
 - Mobile responsiveness
 
 ### User Experience
+
 - Page transitions between routes
 - Toast notifications for user feedback
 - Loading states during async operations
@@ -78,7 +91,9 @@ When adding new tests:
 
 ## Test Data
 
-The tests use mock data defined in utility functions. For authentication tests, predefined test accounts are used rather than creating new accounts for each test run, to avoid database pollution.
+The tests use mock data defined in utility functions. For authentication tests,
+predefined test accounts are used rather than creating new accounts for each
+test run, to avoid database pollution.
 
 ## Handling Flakiness
 
@@ -91,15 +106,19 @@ If tests become flaky, consider:
 
 ## Visual Testing
 
-Some tests include visual comparison using Playwright's screenshot comparison capabilities. The baseline screenshots are stored in the repository and compared during test execution.
+Some tests include visual comparison using Playwright's screenshot comparison
+capabilities. The baseline screenshots are stored in the repository and compared
+during test execution.
 
 # MCP Integration with Playwright
 
-This directory contains end-to-end tests that utilize the Model Context Protocol (MCP) server integration with Playwright.
+This directory contains end-to-end tests that utilize the Model Context Protocol
+(MCP) server integration with Playwright.
 
 ## Setup and Configuration
 
-The MCP integration is configured in `tests/mcp-e2e-config.ts`. This configuration:
+The MCP integration is configured in `tests/mcp-e2e-config.ts`. This
+configuration:
 
 - Connects to an MCP server running at `http://localhost:8033`
 - Configures test reporters and output formats
@@ -120,7 +139,8 @@ pnpm test:e2e:mcp
 
 The MCP integration enables several advanced testing capabilities:
 
-1. **Browser Tools Integration**: Access browser console logs, network requests, screenshots, and more through the MCP server
+1. **Browser Tools Integration**: Access browser console logs, network requests,
+   screenshots, and more through the MCP server
 2. **Accessibility Testing**: Run automated accessibility audits on your pages
 3. **Performance Testing**: Generate performance reports for your application
 4. **SEO Auditing**: Check SEO best practices compliance
@@ -128,7 +148,8 @@ The MCP integration enables several advanced testing capabilities:
 
 ## Example Tests
 
-See `mcp-example.spec.ts` for a basic example of how to integrate with the MCP server in your tests.
+See `mcp-example.spec.ts` for a basic example of how to integrate with the MCP
+server in your tests.
 
 ## Adding Your Own MCP Tests
 

@@ -10,11 +10,11 @@
 
 ### **Critical Discovery**: MASSIVE Data Gap Between Local & S3
 
-| Location | Training Samples | Status |
-|----------|-----------------|--------|
-| **Local (ai/training/ready_packages)** | 0 | ❌ Not processed |
-| **S3 (pixel-data bucket)** | ~47.5 Million | ✅ Available |
-| **Gap** | **47.5 Million samples missing from local pipeline!** | 🚨 **CRITICAL** |
+| Location                               | Training Samples                                      | Status           |
+| -------------------------------------- | ----------------------------------------------------- | ---------------- |
+| **Local (ai/training/ready_packages)** | 0                                                     | ❌ Not processed |
+| **S3 (pixel-data bucket)**             | ~47.5 Million                                         | ✅ Available     |
+| **Gap**                                | **47.5 Million samples missing from local pipeline!** | 🚨 **CRITICAL**  |
 
 ---
 
@@ -30,11 +30,13 @@
 - ❌ **Orchestrator NOT executed yet**
 
 **Reports Found**:
+
 - `sourcing_report.json`: 5,208 datasets (all cached)
 - `processing_report.json`: 0 processed
 - `preparation_report.json`: 0 prepared
 
-**Root Cause**: The orchestrator pipeline has cataloged source files but hasn't converted them to training format.
+**Root Cause**: The orchestrator pipeline has cataloged source files but hasn't
+converted them to training format.
 
 ---
 
@@ -44,35 +46,39 @@
 
 #### By Directory:
 
-| Directory | Files | Size | JSONL Files | Estimated Samples |
-|-----------|-------|------|-------------|-------------------|
-| **datasets/** | 119 | 7.0 GB | 40 | **9,970,971** |
-| **training/** | 218 | 6.2 GB | 9 | **11,524,860** |
-| **processed/** | 5 | 1.2 GB | 5 | **1,697,068** |
-| **ai/** | 37 | 22.4 GB | 21 | **24,268,708** |
-| **acquired/** | 4 | 10.1 MB | 0 | 0 |
-| **knowledge/** | 408 | 469.4 MB | 0 | 0 |
-| **TOTAL** | **791** | **37.4 GB** | **75** | **~47,461,607** |
+| Directory      | Files   | Size        | JSONL Files | Estimated Samples |
+| -------------- | ------- | ----------- | ----------- | ----------------- |
+| **datasets/**  | 119     | 7.0 GB      | 40          | **9,970,971**     |
+| **training/**  | 218     | 6.2 GB      | 9           | **11,524,860**    |
+| **processed/** | 5       | 1.2 GB      | 5           | **1,697,068**     |
+| **ai/**        | 37      | 22.4 GB     | 21          | **24,268,708**    |
+| **acquired/**  | 4       | 10.1 MB     | 0           | 0                 |
+| **knowledge/** | 408     | 469.4 MB    | 0           | 0                 |
+| **TOTAL**      | **791** | **37.4 GB** | **75**      | **~47,461,607**   |
 
 #### Key Datasets Found:
 
 **In `datasets/`**:
+
 - ✅ `nemo_synthetic/dialogues.jsonl` (403.5 KB)
 - ✅ `youtube_transcripts/tim_fletcher/transcripts.jsonl` (1.4 MB)
 - ✅ `training_v2/` & `training_v3/` - Multiple staged datasets
 - ✅ `consolidated/transcripts/` - Complex trauma transcripts (53 MD files)
 
 **In `training/`**:
+
 - ✅ Reddit mental health data (6.2 GB total)
 - ✅ `merged_mental_health_dataset.jsonl` (85.6 MB)
 - ✅ Multiple CSV files with TF-IDF features
 
 **In `processed/`**:
+
 - ✅ `pixelated_tier1_priority_curated_dark_humor.jsonl` (1.2 GB!) 🎯
 - ✅ Tiers 2-6 professional therapeutic datasets
 - ✅ Total 1.2 GB of curated processed data
 
 **In `ai/`**:
+
 - ✅ 22.4 GB of AI training data
 - ✅ 21 JSONL files (largest directory!)
 - ✅ Estimated ~24M samples
@@ -83,14 +89,14 @@
 
 ### Success Metrics from PRD:
 
-| Metric | Target | Local Status | S3 Status | Overall |
-|--------|--------|--------------|-----------|---------|
-| **Therapeutic Samples** | ≥10,000 | ❌ 0 | ✅ ~10M+ | ✅ **EXCEEDED** |
-| **Bias Samples** | ≥5,000 | ❌ 0 | ✅ ~5M+ | ✅ **EXCEEDED** |
-| **Grounded Conversations** | ≥5,000 | ❌ 0 | ✅ ~1M+ | ✅ **EXCEEDED** |
-| **Crisis Detection Sensitivity** | ≥95% | ✅ 100% | ✅ 100% | ✅ **ACHIEVED** |
-| **E2E Batch Performance** | ≤30 min (100k) | ❓ Not tested | ❓ Not tested | ❌ **PENDING** |
-| **Test Coverage** | ≥80% | ✅ 62-80% | N/A | ✅ **ACHIEVED** |
+| Metric                           | Target         | Local Status  | S3 Status     | Overall         |
+| -------------------------------- | -------------- | ------------- | ------------- | --------------- |
+| **Therapeutic Samples**          | ≥10,000        | ❌ 0          | ✅ ~10M+      | ✅ **EXCEEDED** |
+| **Bias Samples**                 | ≥5,000         | ❌ 0          | ✅ ~5M+       | ✅ **EXCEEDED** |
+| **Grounded Conversations**       | ≥5,000         | ❌ 0          | ✅ ~1M+       | ✅ **EXCEEDED** |
+| **Crisis Detection Sensitivity** | ≥95%           | ✅ 100%       | ✅ 100%       | ✅ **ACHIEVED** |
+| **E2E Batch Performance**        | ≤30 min (100k) | ❓ Not tested | ❓ Not tested | ❌ **PENDING**  |
+| **Test Coverage**                | ≥80%           | ✅ 62-80%     | N/A           | ✅ **ACHIEVED** |
 
 ---
 
@@ -128,6 +134,7 @@
 ## ✅ WHAT'S WORKING WELL
 
 ### Infrastructure:
+
 - ✅ Main orchestrator implemented (627 lines)
 - ✅ Unified preprocessing pipeline (1,407 lines)
 - ✅ EARS compliance gate (840 lines, 62% coverage)
@@ -136,6 +143,7 @@
 - ✅ S3 connectivity working
 
 ### Data Quality:
+
 - ✅ Massive dataset in S3 (37.4 GB)
 - ✅ Multiple therapeutic data sources
 - ✅ Curated processed data (1.2 GB tier1)
@@ -186,33 +194,37 @@
 
 ### Before vs After Audit:
 
-| Metric | Claimed (Docs) | Actual (Verified) | Status |
-|--------|----------------|-------------------|--------|
-| Training Samples | "TBD" | **47.5M in S3, 0 local** | 🟡 Needs sync |
-| Crisis Sensitivity | ">95%" | **100% (verified)** | ✅ Fixed |
-| Test Coverage | "≥80%" | **62-80% (measured)** | ✅ Achieved |
-| Data Sources | "5,208 cataloged" | **791 S3 files, 75 JSONL** | ✅ Verified |
+| Metric             | Claimed (Docs)    | Actual (Verified)          | Status        |
+| ------------------ | ----------------- | -------------------------- | ------------- |
+| Training Samples   | "TBD"             | **47.5M in S3, 0 local**   | 🟡 Needs sync |
+| Crisis Sensitivity | ">95%"            | **100% (verified)**        | ✅ Fixed      |
+| Test Coverage      | "≥80%"            | **62-80% (measured)**      | ✅ Achieved   |
+| Data Sources       | "5,208 cataloged" | **791 S3 files, 75 JSONL** | ✅ Verified   |
 
 ---
 
 ## 🎯 NEXT STEPS
 
 ### Option A: **S3 Data Sync** (Recommended First)
+
 - Download priority datasets
 - Run orchestrator on S3 data
 - Generate local training packages
 
-### Option B: **YouTube/Books Scripts** 
+### Option B: **YouTube/Books Scripts**
+
 - Implement missing extraction scripts
 - Process additional sources
 - Expand dataset coverage
 
 ### Option C: **E2E Testing**
+
 - Validate pipeline end-to-end
 - Measure performance
 - Identify bottlenecks
 
-**Recommendation**: **A → C → B** (Sync data first, test pipeline, then expand sources)
+**Recommendation**: **A → C → B** (Sync data first, test pipeline, then expand
+sources)
 
 ---
 
@@ -226,6 +238,7 @@
 - **PIX-6**: DONE - Crisis Detector Fixed (100% Sensitivity) ✅ **COMPLETE**
 
 **NEW TICKETS NEEDED**:
+
 - P0: Implement S3 Data Sync Strategy
 - P0: Execute Orchestrator on S3 Data
 

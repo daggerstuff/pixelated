@@ -1,5 +1,5 @@
-import { EvidenceExtractor } from '../EvidenceExtractor'
 import type { IModelProvider } from '../../types/mentalLLaMATypes'
+import { EvidenceExtractor } from '../EvidenceExtractor'
 
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({
@@ -64,7 +64,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       )
 
       expect(semanticEvidence).toHaveLength(2)
-      expect(semanticEvidence[0]!).toMatchObject({
+      expect(semanticEvidence[0]).toMatchObject({
         text: 'I feel hopeless',
         type: 'direct_quote',
         confidence: 0.8,
@@ -72,8 +72,8 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         category: 'depression_symptom',
         clinicalRelevance: 'significant',
       })
-      expect(semanticEvidence[0]!.metadata).toBeDefined()
-      expect(semanticEvidence[0]!.metadata!.semanticRationale).toBe(
+      expect(semanticEvidence[0].metadata).toBeDefined()
+      expect(semanticEvidence[0].metadata!.semanticRationale).toBe(
         'Indicates depressive mood',
       )
     })
@@ -163,9 +163,9 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence[0]!.text).toBe('Valid evidence item')
-      expect(semanticEvidence[0]!.confidence).toBe(0.9)
-      expect(semanticEvidence[0]!.clinicalRelevance).toBe('critical')
+      expect(semanticEvidence[0].text).toBe('Valid evidence item')
+      expect(semanticEvidence[0].confidence).toBe(0.9)
+      expect(semanticEvidence[0].clinicalRelevance).toBe('critical')
     })
 
     it('should apply default values for optional fields', async () => {
@@ -272,7 +272,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence[0]!.clinicalRelevance).toBe('supportive') // Should default to 'supportive'
+      expect(semanticEvidence[0].clinicalRelevance).toBe('supportive') // Should default to 'supportive'
     })
 
     it('should trim whitespace from text fields', async () => {
@@ -299,7 +299,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence[0]!.text).toBe('Evidence with whitespace')
+      expect(semanticEvidence[0].text).toBe('Evidence with whitespace')
     })
 
     it('should handle empty evidence array', async () => {
@@ -353,8 +353,8 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence[0]!.text).toBe('Valid item')
-      expect(semanticEvidence[0]!.confidence).toBe(0.8)
+      expect(semanticEvidence[0].text).toBe('Valid item')
+      expect(semanticEvidence[0].confidence).toBe(0.8)
     })
   })
 

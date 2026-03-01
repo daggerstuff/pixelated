@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
 import { mcpSnapshot } from '@playwright/mcp'
+import { test, expect } from '@playwright/test'
 
 /**
  * Authentication Flow Test for MCP Server

@@ -42,8 +42,10 @@ export interface DialogProps<TData = unknown> {
 }
 
 // Confirm Dialog Props
-export interface ConfirmDialogProps<TData = unknown>
-  extends Omit<DialogProps<TData>, 'footer' | 'children'> {
+export interface ConfirmDialogProps<TData = unknown> extends Omit<
+  DialogProps<TData>,
+  'footer' | 'children'
+> {
   /** Message to show in the dialog */
   message: ReactNode
   /** Confirm button text */

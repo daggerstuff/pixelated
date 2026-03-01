@@ -1,6 +1,8 @@
 ---
 title: 'Neuroplasticity & Trauma: A Revolutionary Approach'
-description: 'Exploring cutting-edge neuroscience and innovative approaches in trauma healing through the lens of neuroplasticity and somatic intelligence'
+description:
+  'Exploring cutting-edge neuroscience and innovative approaches in trauma
+  healing through the lens of neuroplasticity and somatic intelligence'
 author: 'Research & Clinical Team'
 pubDate: 2025-04-12
 draft: false
@@ -12,12 +14,15 @@ draft: false
 
 ```yaml
 title: 'Neuroplasticity & Trauma: A Revolutionary Approach'
-description: 'Pioneering the intersection of neuroscience, somatic healing, and trauma recovery through evidence-based innovations'
+description:
+  'Pioneering the intersection of neuroscience, somatic healing, and trauma
+  recovery through evidence-based innovations'
 timeframe: 'May-June 2025'
 articles: 6
 frequency: 'Weekly'
 audience: 'Mental health professionals, neuroscientists, trauma specialists'
-impact_goal: 'Transform trauma treatment through neuroplasticity-informed approaches'
+impact_goal:
+  'Transform trauma treatment through neuroplasticity-informed approaches'
 ```
 
 ## 🎯 Strategic Vision
@@ -226,4 +231,5 @@ dissemination:
 
 ---
 
-_This living document will be updated as new research emerges and clinical insights develop._
+_This living document will be updated as new research emerges and clinical
+insights develop._

@@ -1,7 +1,7 @@
 import { emotionValidationPipeline } from '@/lib/ai/emotions/EmotionValidationPipeline'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getCurrentUser } from '@/lib/auth'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+import { getCurrentUser } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 export const POST = async ({
   cookies,
@@ -24,7 +24,7 @@ export const POST = async ({
             'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
     const user = await getCurrentUser(cookies)
     if (!user) {
@@ -78,7 +78,7 @@ export const POST = async ({
 
     // Start continuous validation
     logger.info('Starting continuous validation')
-    emotionValidationPipeline.startContinuousValidation()
+    void emotionValidationPipeline.startContinuousValidation()
 
     // Create audit log for successful start
     await createAuditLog(

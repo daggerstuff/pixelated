@@ -1,7 +1,8 @@
-import { config } from '@/lib/config/env'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { z } from 'zod'
+
+import { config } from '@/lib/config/env'
 import { normalizeError, NetworkError, ValidationError } from '@/lib/error'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { validateApiResponse } from '@/lib/validation/api'
 
 const logger = createBuildSafeLogger('journal-research-api-client')
@@ -363,5 +364,3 @@ export const journalResearchApiClient = new JournalResearchApiClient({
   getAuthToken: getAuthTokenFromBetterAuth,
   onUnauthorized: handleUnauthorized,
 })
-
-

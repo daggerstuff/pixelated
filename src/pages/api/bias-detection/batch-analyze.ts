@@ -47,7 +47,7 @@ export async function POST({ request }: { request: Request }) {
     })
   }
 
-  const { sessions: batchSessions, options } = body as BatchBody
+  const { sessions: batchSessions, options } = body
   const MAX_BATCH = 100
   if (
     !Array.isArray(batchSessions) ||
@@ -82,7 +82,7 @@ export async function POST({ request }: { request: Request }) {
 
   try {
     const { results, errors } = await engine.batchAnalyzeSessions(
-      batchSessions as SessionData[],
+      batchSessions,
       options,
     )
     return new Response(JSON.stringify({ results, errors }), {

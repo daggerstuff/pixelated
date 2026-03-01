@@ -1,6 +1,8 @@
 # Production Cryptography Library
 
-This is a production-ready cryptography library that uses AWS KMS for key management and DynamoDB for key storage. The library provides secure encryption, hashing, and key management capabilities.
+This is a production-ready cryptography library that uses AWS KMS for key
+management and DynamoDB for key storage. The library provides secure encryption,
+hashing, and key management capabilities.
 
 ## Features
 
@@ -17,7 +19,8 @@ This is a production-ready cryptography library that uses AWS KMS for key manage
 
 1. AWS Resources Required:
    - KMS Key: Create a symmetric KMS key in your AWS account
-   - DynamoDB Table: Create a table named 'encryption-keys' with the following schema:
+   - DynamoDB Table: Create a table named 'encryption-keys' with the following
+     schema:
      - Primary Key: keyId (String)
      - GSI: pk (String) for querying by namespace and purpose
      - TTL field: ttl (Number)
@@ -41,7 +44,7 @@ const keyStorage = new KeyStorage({
   namespace: 'myapp',
   region: process.env.AWS_REGION!,
   kmsKeyId: process.env.AWS_KMS_KEY_ID!,
-  useKms: true
+  useKms: true,
 })
 
 // Generate a new key
@@ -62,7 +65,7 @@ import { Encryption } from './encryption'
 const encryption = new Encryption({
   namespace: 'myapp',
   region: process.env.AWS_REGION!,
-  kmsKeyId: process.env.AWS_KMS_KEY_ID!
+  kmsKeyId: process.env.AWS_KMS_KEY_ID!,
 })
 
 // Encrypt data
@@ -85,7 +88,7 @@ import {
   generateHmac,
   verifyHmac,
   generateCsrfToken,
-  verifyCsrfToken
+  verifyCsrfToken,
 } from './hash'
 
 // Hash a password
@@ -127,6 +130,7 @@ const isValidToken = verifyCsrfToken(userToken, csrfToken)
 ## Error Handling
 
 All functions use proper error handling and will throw descriptive errors when:
+
 - AWS services are unavailable
 - Keys are not found or invalid
 - Decryption fails
@@ -153,6 +157,7 @@ All functions use proper error handling and will throw descriptive errors when:
 ## Development
 
 When developing locally:
+
 1. Use a development KMS key
 2. Set up local DynamoDB for testing
 3. Use proper IAM roles and permissions
@@ -161,11 +166,13 @@ When developing locally:
 ## Testing
 
 Run the test suite:
+
 ```bash
 pnpm test src/lib/crypto
 ```
 
 Tests cover:
+
 - Key generation and rotation
 - Encryption and decryption
 - Password hashing and verification

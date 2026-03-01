@@ -1,6 +1,7 @@
+import { useCallback, useState, useRef, useEffect } from 'react'
+
 import type { AIMessage, AIStreamChunk } from '@/lib/ai/AIService'
 import { logger } from '@/lib/logger'
-import { useCallback, useState, useRef, useEffect } from 'react'
 
 interface UseChatCompletionOptions {
   apiEndpoint?: string
@@ -494,7 +495,7 @@ export function useChatCompletion({
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
               err instanceof Error
-                ? (err as Error)?.message || String(err)
+                ? (err)?.message || String(err)
                 : 'An unknown error occurred'
             setError(errorMessage)
 
@@ -687,7 +688,7 @@ export function useChatCompletion({
       if (index >= 0 && index < newMessages.length) {
         newMessages.splice(index, 1)
       }
-      return newMessages as typeof prev
+      return newMessages
     })
   }, [])
 

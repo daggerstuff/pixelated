@@ -1,7 +1,8 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { getAuditLogger } from '../../ai/bias-detection/audit'
 import mongoClient from '../../db/mongoClient'
 import type { DataDeletionRequest as DeletionRequest } from './dataDeleteService'
-import { getAuditLogger } from '../../ai/bias-detection/audit'
 
 const logger = createBuildSafeLogger()
 const auditLogger = getAuditLogger()
@@ -173,7 +174,7 @@ export async function updateDataDeletionRequest(
     const updatedRequest = result as DataDeletionRequest
 
     // Log the action for audit purposes
-    auditLogger.logAction(
+    void auditLogger.logAction(
       { userId: params.processedBy, role: 'system' as const },
       'update_deletion_request',
       'patient_data',
@@ -240,7 +241,7 @@ async function executeDataDeletion(
     }
 
     // Log the deletion action for audit purposes
-    auditLogger.logAction(
+    void auditLogger.logAction(
       { userId: processedBy, role: 'system' as const },
       'execute_data_deletion',
       'patient_data',
@@ -263,7 +264,7 @@ async function executeDataDeletion(
     // Instead, we log the error and continue
 
     // Log the failure for audit purposes
-    auditLogger.logAction(
+    void auditLogger.logAction(
       { userId: processedBy, role: 'system' as const },
       'data_deletion_error',
       'patient_data',

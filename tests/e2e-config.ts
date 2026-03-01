@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test'
 const isCi = !!process.env['CI']
-import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
+import { fileURLToPath } from 'url'
 
 // Get current directory
 const __filename = fileURLToPath(import.meta.url)
@@ -69,15 +69,15 @@ export default defineConfig({
   // Run your local dev server before starting tests
   webServer: isCi
     ? {
-      command: 'pnpm run build && pnpm run preview -- --port 3000',
-      url: 'http://localhost:3000',
-      reuseExistingServer: false,
-      timeout: 10 * 60 * 1000,
-    }
+        command: 'pnpm run build && pnpm run preview -- --port 3000',
+        url: 'http://localhost:3000',
+        reuseExistingServer: false,
+        timeout: 10 * 60 * 1000,
+      }
     : {
-      command: 'pnpm run dev',
-      port: 3000,
-      reuseExistingServer: true,
-      timeout: 60000,
-    },
+        command: 'pnpm run dev',
+        port: 3000,
+        reuseExistingServer: true,
+        timeout: 60000,
+      },
 })

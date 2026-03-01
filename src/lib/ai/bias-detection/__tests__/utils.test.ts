@@ -3,6 +3,12 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+
+import type {
+  ParticipantDemographics,
+  TherapeuticSession,
+  BiasAnalysisResult,
+} from '../types'
 import {
   validateParticipantDemographics,
   validateTherapeuticSession,
@@ -31,11 +37,6 @@ import {
   calculatePercentageChange,
   generateAnalysisSummary,
 } from '../utils'
-import type {
-  ParticipantDemographics,
-  TherapeuticSession,
-  BiasAnalysisResult,
-} from '../types'
 
 // Mock logger
 vi.mock('../../utils/logger', () => ({

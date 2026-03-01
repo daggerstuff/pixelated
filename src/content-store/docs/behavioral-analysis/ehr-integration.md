@@ -12,7 +12,11 @@ toc: true
 
 ## Overview
 
-Electronic Health Record (EHR) integration enables secure sharing of behavioral analysis data, emotional patterns, and therapeutic insights with healthcare systems while maintaining compliance with regulatory standards. This document outlines the architecture, implementation approaches, and security considerations for integrating behavioral analysis with various EHR systems.
+Electronic Health Record (EHR) integration enables secure sharing of behavioral
+analysis data, emotional patterns, and therapeutic insights with healthcare
+systems while maintaining compliance with regulatory standards. This document
+outlines the architecture, implementation approaches, and security
+considerations for integrating behavioral analysis with various EHR systems.
 
 ## Core Architecture
 

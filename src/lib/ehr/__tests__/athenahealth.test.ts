@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { AthenahealthProvider } from '../providers/athenahealth.provider'
 
 describe('athenahealth Provider', () => {

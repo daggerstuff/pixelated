@@ -1,5 +1,6 @@
-import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
+
 import { getSession } from '../../../lib/auth/session'
 
 // Database connection pool

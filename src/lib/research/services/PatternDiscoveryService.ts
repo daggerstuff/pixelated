@@ -6,6 +6,7 @@ import {
   AnomalyPattern,
   ClusterPattern,
 } from '@/lib/research/types/research-types'
+
 import { ResearchQueryEngine } from './ResearchQueryEngine'
 
 const logger = createBuildSafeLogger('PatternDiscoveryService')
@@ -94,7 +95,7 @@ export class PatternDiscoveryService {
           id: `pattern_${index + 1}`,
           description: this.describePattern(p),
           confidence: 'confidence' in p ? (p.confidence as number) : 1,
-          statisticalSignificance: 'pValue' in p ? (p.pValue as number) : 0.05,
+          statisticalSignificance: 'pValue' in p ? (p.pValue) : 0.05,
           supportingData: p,
         })),
         metadata: {
@@ -470,7 +471,7 @@ export class PatternDiscoveryService {
       timeRange: {
         start: new Date(
           typeof firstTimestamp === 'string' ||
-          typeof firstTimestamp === 'number'
+            typeof firstTimestamp === 'number'
             ? firstTimestamp
             : Date.now(),
         ),
@@ -721,7 +722,7 @@ export class PatternDiscoveryService {
     issues: string[]
   }> {
     const issues: string[] = []
-    const supportingData = pattern.supportingData as Record<string, unknown>
+    const supportingData = pattern.supportingData
 
     if (
       supportingData?.sampleSize &&

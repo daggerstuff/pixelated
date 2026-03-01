@@ -2,10 +2,11 @@
  * Error message component for consistent error display
  */
 
-import { Alert } from '@/components/ui/alert'
-import { cn } from '@/lib/utils'
-import { normalizeError, formatErrorForUser, getFieldErrors } from '@/lib/error'
 import type { ReactNode } from 'react'
+
+import { Alert } from '@/components/ui/alert'
+import { normalizeError, formatErrorForUser, getFieldErrors } from '@/lib/error'
+import { cn } from '@/lib/utils'
 
 export interface ErrorMessageProps {
   error?: unknown
@@ -38,7 +39,8 @@ export function ErrorMessage({
   }
 
   const normalizedError = error ? normalizeError(error) : null
-  const displayMessage = message || (normalizedError ? formatErrorForUser(normalizedError) : null)
+  const displayMessage =
+    message || (normalizedError ? formatErrorForUser(normalizedError) : null)
   const fieldErrs = fieldErrors || (error ? getFieldErrors(error) : undefined)
 
   if (fallback && !displayMessage && !fieldErrs) {
@@ -49,8 +51,9 @@ export function ErrorMessage({
     return (
       <div className={cn('space-y-2', className)}>
         {Object.entries(fieldErrs).map(([field, errorMessage]) => (
-          <Alert key={field} variant="error" className="text-sm">
-            <strong className="font-medium capitalize">{field}:</strong> {errorMessage}
+          <Alert key={field} variant='error' className='text-sm'>
+            <strong className='font-medium capitalize'>{field}:</strong>{' '}
+            {errorMessage}
           </Alert>
         ))}
       </div>
@@ -62,12 +65,12 @@ export function ErrorMessage({
   }
 
   return (
-    <Alert variant="error" className={className}>
+    <Alert variant='error' className={className}>
       {displayMessage}
       {showDetails && normalizedError && (
-        <details className="mt-2 text-xs">
-          <summary className="cursor-pointer">Technical details</summary>
-          <pre className="mt-2 p-2 bg-muted rounded overflow-auto">
+        <details className='mt-2 text-xs'>
+          <summary className='cursor-pointer'>Technical details</summary>
+          <pre className='bg-muted mt-2 overflow-auto rounded p-2'>
             {normalizedError.message}
             {normalizedError.code && `\nCode: ${normalizedError.code}`}
           </pre>
@@ -88,9 +91,8 @@ export function FieldError({ error, className }: FieldErrorProps) {
   }
 
   return (
-    <p className={cn('text-sm text-red-500 mt-1', className)} role="alert">
+    <p className={cn('text-sm text-red-500 mt-1', className)} role='alert'>
       {error}
     </p>
   )
 }
-

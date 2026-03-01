@@ -10,7 +10,10 @@ share: true
 
 ## Overview
 
-Pixelated leverages multiple AI models and providers to deliver intelligent features for therapy sessions. The system dynamically selects the most appropriate model based on the task requirements, cost considerations, and performance needs.
+Pixelated leverages multiple AI models and providers to deliver intelligent
+features for therapy sessions. The system dynamically selects the most
+appropriate model based on the task requirements, cost considerations, and
+performance needs.
 
 ## AI Providers
 

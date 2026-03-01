@@ -78,7 +78,7 @@ export const POST = async ({ request }) => {
     const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN)
     const hasCustom = Boolean(
       import.meta.env.CUSTOM_ANALYTICS_ENDPOINT &&
-        import.meta.env.CUSTOM_ANALYTICS_TOKEN,
+      import.meta.env.CUSTOM_ANALYTICS_TOKEN,
     )
     console.log('Attempting analytics integrations:', {
       hasGA,
@@ -293,7 +293,7 @@ async function sendToCustomAnalytics(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
+        Authorization: `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
       },
       body: JSON.stringify(event),
     })

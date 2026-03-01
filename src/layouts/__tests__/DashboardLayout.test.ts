@@ -1,6 +1,8 @@
+import { renderAstro } from '@/test/utils/astro'
+
 // Vitest is imported via globals from tsconfig
 import DashboardLayout from '../DashboardLayout.astro'
-import { renderAstro } from '@/test/utils/astro'
+
 import '@testing-library/dom'
 
 // Mock components that might cause issues in tests

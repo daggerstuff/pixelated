@@ -1,16 +1,17 @@
 ---
-title: "Plugin Development Best Practices"
-description: "Plugin Development Best Practices documentation"
+title: 'Plugin Development Best Practices'
+description: 'Plugin Development Best Practices documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Plugin Development Best Practices
 
-This document provides comprehensive guidelines and best practices for developing plugins for the Pixelated EHR Integration Platform.
+This document provides comprehensive guidelines and best practices for
+developing plugins for the Pixelated EHR Integration Platform.
 
 ## Architecture
 
@@ -51,7 +52,7 @@ export class AppointmentSchedulerPlugin {
   }
 
   private async loadState() {
-    this.state = await this.api.storage.get('plugin-state') || {}
+    this.state = (await this.api.storage.get('plugin-state')) || {}
   }
 
   private setupBackgroundTasks() {
@@ -110,7 +111,7 @@ Efficiently manage resources:
 // Implement caching
 const cache = new LRUCache({
   max: 1000,
-  maxAge: 1000 * 60 * 5 // 5 minutes
+  maxAge: 1000 * 60 * 5, // 5 minutes
 })
 
 // Use batch operations
@@ -139,7 +140,7 @@ class AppointmentError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: object
+    public details?: object,
   ) {
     super(message)
     this.name = 'AppointmentError'
@@ -149,19 +150,16 @@ class AppointmentError extends Error {
 async function handleAppointmentOperation(operation: () => Promise<any>) {
   try {
     return await operation()
-  }
-  catch (error) {
+  } catch (error) {
     if (error.code === 'RATE_LIMIT_EXCEEDED') {
       // Implement retry with exponential backoff
       return await retryWithBackoff(operation)
     }
 
     if (error.code === 'RESOURCE_NOT_FOUND') {
-      throw new AppointmentError(
-        'Appointment not found',
-        'NOT_FOUND',
-        { originalError: error }
-      )
+      throw new AppointmentError('Appointment not found', 'NOT_FOUND', {
+        originalError: error,
+      })
     }
 
     // Log error and rethrow
@@ -185,19 +183,16 @@ const appointmentSchema = z.object({
   startTime: z.date(),
   endTime: z.date(),
   type: z.enum(['initial', 'follow-up', 'emergency']),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 
 function validateAppointment(data: unknown): Appointment {
   try {
     return appointmentSchema.parse(data)
-  }
-  catch (error) {
-    throw new AppointmentError(
-      'Invalid appointment data',
-      'VALIDATION_ERROR',
-      { details: error.errors }
-    )
+  } catch (error) {
+    throw new AppointmentError('Invalid appointment data', 'VALIDATION_ERROR', {
+      details: error.errors,
+    })
   }
 }
 ```
@@ -252,16 +247,16 @@ describe('AppointmentService', () => {
 
     it('should throw on invalid appointment', async () => {
       const appointment = createInvalidAppointment()
-      await expect(
-        service.scheduleAppointment(appointment)
-      ).rejects.toThrow('VALIDATION_ERROR')
+      await expect(service.scheduleAppointment(appointment)).rejects.toThrow(
+        'VALIDATION_ERROR',
+      )
     })
 
     it('should handle conflicts', async () => {
       const appointment = createConflictingAppointment()
-      await expect(
-        service.scheduleAppointment(appointment)
-      ).rejects.toThrow('CONFLICT_ERROR')
+      await expect(service.scheduleAppointment(appointment)).rejects.toThrow(
+        'CONFLICT_ERROR',
+      )
     })
   })
 })
@@ -288,8 +283,8 @@ describe('Plugin Integration', () => {
   it('should handle appointment lifecycle', async () => {
     // Create appointment
     const appointment = await plugin.scheduleAppointment({
-      patientId: process.env.PATIENT_ID || "example-patient-id",
-      startTime: new Date()
+      patientId: process.env.PATIENT_ID || 'example-patient-id',
+      startTime: new Date(),
     })
 
     // Verify creation
@@ -298,7 +293,7 @@ describe('Plugin Integration', () => {
     // Update appointment
     const updated = await plugin.rescheduleAppointment(
       appointment.id,
-      new Date()
+      new Date(),
     )
     expect(updated.startTime).not.toEqual(appointment.startTime)
 
@@ -353,10 +348,11 @@ export class AppointmentService {
 
 Provide clear documentation:
 
-```markdown
+````markdown
 # Appointment Scheduler Plugin
 
-Provides advanced appointment scheduling capabilities for the Pixelated EHR Platform.
+Provides advanced appointment scheduling capabilities for the Pixelated EHR
+Platform.
 
 ## Features
 
@@ -370,6 +366,7 @@ Provides advanced appointment scheduling capabilities for the Pixelated EHR Plat
 ```bash
 npm install gradiant-appointment-scheduler
 ```
+````
 
 ## Configuration
 
@@ -390,12 +387,12 @@ const plugin = new AppointmentSchedulerPlugin(api, config)
 
 // Schedule appointment
 const appointment = await plugin.scheduleAppointment({
-  patientId: process.env.PATIENT_ID || "example-patient-id",
-  startTime: new Date('2024-04-01T09:00:00Z')
+  patientId: process.env.PATIENT_ID || 'example-patient-id',
+  startTime: new Date('2024-04-01T09:00:00Z'),
 })
 ```
 
-```bash
+````bash
 
 ## Deployment
 
@@ -412,7 +409,7 @@ Follow semantic versioning:
     "gradiant-plugin-sdk": "^2.0.0"
   }
 }
-```
+````
 
 ### 2. Release Process
 

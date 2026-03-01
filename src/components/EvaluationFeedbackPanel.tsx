@@ -13,8 +13,8 @@ export function EvaluationFeedbackPanel({
 
   return (
     <section
-      aria-label="Evaluation Feedback Panel"
-      className="evaluation-feedback-panel"
+      aria-label='Evaluation Feedback Panel'
+      className='evaluation-feedback-panel'
     >
       <h3>Session Feedback</h3>
       <form
@@ -23,15 +23,15 @@ export function EvaluationFeedbackPanel({
           onSubmit(value)
         }}
       >
-        <label htmlFor="feedback-input">Feedback</label>
+        <label htmlFor='feedback-input'>Feedback</label>
         <textarea
-          id="feedback-input"
+          id='feedback-input'
           value={value}
           onChange={(e) => setValue(e.target.value)}
           rows={4}
-          aria-required="true"
+          aria-required='true'
         />
-        <button type="submit">Submit Feedback</button>
+        <button type='submit'>Submit Feedback</button>
       </form>
     </section>
   )

@@ -1,5 +1,5 @@
-import type { BaaTemplate, BaaDocument, BusinessAssociate } from './types'
 import { generateId } from '../../utils/ids'
+import type { BaaTemplate, BaaDocument, BusinessAssociate } from './types'
 
 /**
  * Service for generating BAA documents from templates

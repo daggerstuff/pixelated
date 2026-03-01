@@ -11,8 +11,11 @@
  * - Audit logging of all backup/restore operations
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import * as NodeCrypto from 'crypto'
+
 import { logAuditEvent, AuditEventType } from '../../audit'
+import { isBrowser } from '../../browser/is-browser'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { dlpService } from '../dlp'
 import {
   type BackupMetadata as BaseBackupMetadata,
@@ -20,8 +23,6 @@ import {
   type StorageProviderConfig,
   type RecoveryTestConfig,
 } from './types'
-import { isBrowser } from '../../browser/is-browser'
-import * as NodeCrypto from 'crypto'
 
 // Import crypto polyfill statically to avoid issues during build
 
@@ -130,7 +131,7 @@ const getCrypto = async () => {
 
         // Get authentication tag
         const authTag = new Uint8Array(
-          (cipher as import('crypto').CipherGCM).getAuthTag(),
+          (cipher).getAuthTag(),
         )
 
         return { encryptedData, authTag }
@@ -1045,9 +1046,8 @@ async function getStorageProvider(
 ): Promise<StorageProvider> {
   try {
     // Import the storage provider dynamically
-    const { getStorageProvider: importedGetStorageProvider } = await import(
-      './storage-providers-wrapper.ts'
-    )
+    const { getStorageProvider: importedGetStorageProvider } =
+      await import('./storage-providers-wrapper.ts')
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
       type: provider,

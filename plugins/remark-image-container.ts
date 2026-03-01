@@ -5,9 +5,8 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Paragraph, PhrasingContent, Root } from 'mdast'
-
-import type { VFile } from 'vfile'
 import { visit, type Visitor } from 'unist-util-visit'
+import type { VFile } from 'vfile'
 
 const IMAGE_DIR_REGEXP = /^image-(.*)/
 const VALID_TAGS_FOR_IMG = new Set<string>([

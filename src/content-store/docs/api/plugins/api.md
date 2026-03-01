@@ -1,17 +1,17 @@
 ---
-title: "Plugin API Reference"
-description: "Plugin API Reference documentation"
+title: 'Plugin API Reference'
+description: 'Plugin API Reference documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "api"]
+author: 'Pixelated Team'
+tags: ['documentation', 'api']
 draft: false
 toc: true
 ---
 
 # Plugin API Reference
 
-This document provides detailed information about the APIs available to plugin developers in the Pixelated
-EHR Integration Platform.
+This document provides detailed information about the APIs available to plugin
+developers in the Pixelated EHR Integration Platform.
 
 ## Core APIs
 
@@ -22,6 +22,7 @@ EHR Integration Platform.
 Search for patients based on specified criteria.
 
 **Parameters:**
+
 ```typescript
 interface SearchCriteria {
   name?: string
@@ -40,6 +41,7 @@ interface SearchCriteria {
 **Returns:** Promise resolving to an array of Patient objects.
 
 **Example:**
+
 ```typescript
 const patients = await api.patients.search({
   name: 'John',
@@ -47,8 +49,8 @@ const patients = await api.patients.search({
   limit: 10,
   sort: {
     field: 'lastName',
-    order: 'asc'
-  }
+    order: 'asc',
+  },
 })
 ```
 
@@ -57,11 +59,13 @@ const patients = await api.patients.search({
 Retrieve a specific patient by ID.
 
 **Parameters:**
+
 - `id`: The unique identifier of the patient
 
 **Returns:** Promise resolving to a Patient object.
 
 **Example:**
+
 ```typescript
 const patient = await api.patients.get('123456')
 ```
@@ -71,16 +75,18 @@ const patient = await api.patients.get('123456')
 Update a patient's information.
 
 **Parameters:**
+
 - `id`: The unique identifier of the patient
 - `data`: Partial Patient object containing fields to update
 
 **Returns:** Promise resolving to the updated Patient object.
 
 **Example:**
+
 ```typescript
 const updatedPatient = await api.patients.update('123456', {
   phoneNumber: '+1-555-0123',
-  email: 'john.doe@example.com'
+  email: 'john.doe@example.com',
 })
 ```
 
@@ -91,6 +97,7 @@ const updatedPatient = await api.patients.update('123456', {
 Schedule a new appointment.
 
 **Parameters:**
+
 ```typescript
 interface Appointment {
   patientId: string
@@ -110,15 +117,16 @@ interface Appointment {
 **Returns:** Promise resolving to the created Appointment object.
 
 **Example:**
+
 ```typescript
 const appointment = await api.appointments.schedule({
-  patientId: process.env.PATIENT_ID || "example-patient-id",
+  patientId: process.env.PATIENT_ID || 'example-patient-id',
   providerId: 'dr-smith',
   startTime: new Date('2024-04-01T09:00:00Z'),
   endTime: new Date('2024-04-01T10:00:00Z'),
   type: 'initial-consultation',
   status: 'scheduled',
-  notes: 'First visit'
+  notes: 'First visit',
 })
 ```
 
@@ -127,12 +135,14 @@ const appointment = await api.appointments.schedule({
 Cancel an existing appointment.
 
 **Parameters:**
+
 - `id`: The unique identifier of the appointment
 - `reason`: The reason for cancellation
 
 **Returns:** Promise resolving when the appointment is cancelled.
 
 **Example:**
+
 ```typescript
 await api.appointments.cancel('apt-123', 'Patient request')
 ```
@@ -142,16 +152,18 @@ await api.appointments.cancel('apt-123', 'Patient request')
 Reschedule an existing appointment.
 
 **Parameters:**
+
 - `id`: The unique identifier of the appointment
 - `newTime`: The new start time for the appointment
 
 **Returns:** Promise resolving to the updated Appointment object.
 
 **Example:**
+
 ```typescript
 const rescheduled = await api.appointments.reschedule(
   'apt-123',
-  new Date('2024-04-02T14:00:00Z')
+  new Date('2024-04-02T14:00:00Z'),
 )
 ```
 
@@ -171,10 +183,11 @@ interface Logger {
 ```
 
 **Example:**
+
 ```typescript
 api.logger.info('Processing patient data', {
-  patientId: process.env.PATIENT_ID || "example-patient-id",
-  action: 'update'
+  patientId: process.env.PATIENT_ID || 'example-patient-id',
+  action: 'update',
 })
 
 api.logger.error('Failed to schedule appointment', new Error('Conflict'))
@@ -194,6 +207,7 @@ interface Events {
 ```
 
 **Example:**
+
 ```typescript
 // Subscribe to events
 api.events.on('appointment:created', (appointment) => {
@@ -203,7 +217,7 @@ api.events.on('appointment:created', (appointment) => {
 // Emit events
 api.events.emit('custom:event', {
   type: 'reminder',
-  patientId: process.env.PATIENT_ID || "example-patient-id"
+  patientId: process.env.PATIENT_ID || 'example-patient-id',
 })
 ```
 
@@ -216,11 +230,13 @@ Plugins have access to a persistent key-value storage system.
 Retrieve a value from storage.
 
 **Parameters:**
+
 - `key`: The storage key
 
 **Returns:** Promise resolving to the stored value.
 
 **Example:**
+
 ```typescript
 const settings = await api.storage.get('plugin-settings')
 ```
@@ -230,16 +246,18 @@ const settings = await api.storage.get('plugin-settings')
 Store a value in storage.
 
 **Parameters:**
+
 - `key`: The storage key
 - `value`: The value to store
 
 **Returns:** Promise resolving when the value is stored.
 
 **Example:**
+
 ```typescript
 await api.storage.set('plugin-settings', {
   notificationsEnabled: true,
-  theme: 'dark'
+  theme: 'dark',
 })
 ```
 
@@ -254,6 +272,7 @@ Retrieve the plugin's configuration.
 **Returns:** Promise resolving to the plugin's configuration object.
 
 **Example:**
+
 ```typescript
 const config = await api.config.get()
 console.log(config.apiKey)
@@ -264,15 +283,17 @@ console.log(config.apiKey)
 Update the plugin's configuration.
 
 **Parameters:**
+
 - `updates`: Partial configuration object with updates
 
 **Returns:** Promise resolving to the updated configuration.
 
 **Example:**
+
 ```typescript
 const updatedConfig = await api.config.update({
-  apiKey: process.env.API_KEY || "example-api-key",
-  webhookUrl: 'https://example.com/webhook'
+  apiKey: process.env.API_KEY || 'example-api-key',
+  webhookUrl: 'https://example.com/webhook',
 })
 ```
 
@@ -285,7 +306,7 @@ class PluginError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: object
+    public details?: object,
   ) {
     super(message)
   }
@@ -302,13 +323,13 @@ type ErrorCode =
 ```
 
 **Example:**
+
 ```typescript
 try {
   await api.patients.update('123456', {
-    status: 'invalid-status'
+    status: 'invalid-status',
   })
-}
-catch (error) {
+} catch (error) {
   if (error.code === 'INVALID_ARGUMENT') {
     api.logger.error('Invalid patient status', error)
   }

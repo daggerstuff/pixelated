@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
-import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-detection/integrations/production-system'
+
 import { authenticateRequest } from '../../../../lib/auth/index'
+import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-detection/integrations/production-system'
 
 export const GET: APIRoute = async ({ request }) => {
   try {

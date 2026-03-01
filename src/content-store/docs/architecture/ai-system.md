@@ -10,11 +10,15 @@ toc: true
 
 # AI System Architecture
 
-This document provides a comprehensive overview of the AI system architecture, including its components, interactions, and design decisions.
+This document provides a comprehensive overview of the AI system architecture,
+including its components, interactions, and design decisions.
 
 ## Overview
 
-The AI system is designed to provide a secure, HIPAA-compliant, and extensible framework for integrating AI capabilities into the application. It supports multiple AI providers, specialized services for common AI tasks, and comprehensive error handling and performance optimization.
+The AI system is designed to provide a secure, HIPAA-compliant, and extensible
+framework for integrating AI capabilities into the application. It supports
+multiple AI providers, specialized services for common AI tasks, and
+comprehensive error handling and performance optimization.
 
 ## Architecture Diagram
 
@@ -50,7 +54,8 @@ graph TD
 
 ### AI API Layer
 
-The AI API layer provides RESTful endpoints for accessing AI capabilities. It handles request validation, authentication, and response formatting.
+The AI API layer provides RESTful endpoints for accessing AI capabilities. It
+handles request validation, authentication, and response formatting.
 
 Key components:
 
@@ -62,18 +67,22 @@ Key components:
 
 ### AI Services Layer
 
-The AI Services layer provides specialized services for common AI tasks. It abstracts away the details of prompt engineering and response parsing.
+The AI Services layer provides specialized services for common AI tasks. It
+abstracts away the details of prompt engineering and response parsing.
 
 Key components:
 
 - `SentimentAnalysisService`: Analyzes the sentiment of text
 - `CrisisDetectionService`: Detects potential crisis situations in text
 - `ResponseGenerationService`: Generates therapeutic responses
-- `InterventionAnalysisService`: Analyzes the effectiveness of therapeutic interventions
+- `InterventionAnalysisService`: Analyzes the effectiveness of therapeutic
+  interventions
 
 ### AI Provider Layer
 
-The AI Provider layer provides a unified interface for interacting with different AI providers. It handles provider-specific details like API formats, authentication, and error handling.
+The AI Provider layer provides a unified interface for interacting with
+different AI providers. It handles provider-specific details like API formats,
+authentication, and error handling.
 
 Key components:
 
@@ -83,7 +92,9 @@ Key components:
 
 ### Error Handling
 
-The Error Handling system provides standardized error handling across the AI system. It transforms provider-specific errors into standardized errors and provides retry mechanisms for transient errors.
+The Error Handling system provides standardized error handling across the AI
+system. It transforms provider-specific errors into standardized errors and
+provides retry mechanisms for transient errors.
 
 Key components:
 
@@ -94,7 +105,8 @@ Key components:
 
 ### Performance Optimization
 
-The Performance Optimization system improves the performance and reliability of AI services. It includes caching, token optimization, and performance metrics.
+The Performance Optimization system improves the performance and reliability of
+AI services. It includes caching, token optimization, and performance metrics.
 
 Key components:
 
@@ -105,7 +117,8 @@ Key components:
 
 ### Audit Logging
 
-The Audit Logging system provides comprehensive logging for AI operations. It logs all AI requests, responses, errors, and performance metrics.
+The Audit Logging system provides comprehensive logging for AI operations. It
+logs all AI requests, responses, errors, and performance metrics.
 
 Key components:
 
@@ -130,9 +143,11 @@ Key components:
 ### Error Handling Flow
 
 1. AI provider encounters an error (e.g., rate limit exceeded)
-2. Provider layer catches the error and transforms it into a standardized AIError
+2. Provider layer catches the error and transforms it into a standardized
+   AIError
 3. If the error is transient, the retry mechanism attempts to retry the request
-4. If the retry fails or the error is not transient, the error is propagated to the API layer
+4. If the retry fails or the error is not transient, the error is propagated to
+   the API layer
 5. API layer formats the error response and sends it to the client
 6. Error is logged in the audit log
 
@@ -151,7 +166,8 @@ Key components:
 
 ### Provider Abstraction
 
-The system uses a provider abstraction layer to support multiple AI providers. This allows for:
+The system uses a provider abstraction layer to support multiple AI providers.
+This allows for:
 
 - Easy switching between providers
 - Fallback to alternative providers if one is unavailable

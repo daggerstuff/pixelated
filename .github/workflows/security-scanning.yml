@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [master, development]
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   security-scan:
@@ -32,10 +32,10 @@ jobs:
         uses: aquasecurity/trivy-action@0.33.1
         continue-on-error: true
         with:
-          scan-type: "fs"
-          scanners: "vuln,secret,misconfig"
-          format: "sarif"
-          output: "trivy-results.sarif"
+          scan-type: 'fs'
+          scanners: 'vuln,secret,misconfig'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
       - name: Run Checkov scan
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
@@ -44,8 +44,8 @@ jobs:
           framework: all
           output_format: sarif
           output_file_path: checkov-results.sarif
-          skip_check: ""
-          skip_path: "clusters/**"
+          skip_check: ''
+          skip_path: 'clusters/**'
           log_level: WARNING
           container_user: 0
 
@@ -86,7 +86,7 @@ jobs:
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         continue-on-error: true
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: 'trivy-results.sarif'
 
       - name: Upload Trivy SARIF as artifact
         uses: actions/upload-artifact@v5
@@ -101,7 +101,7 @@ jobs:
         if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
         continue-on-error: true
         with:
-          sarif_file: "checkov-results.sarif"
+          sarif_file: 'checkov-results.sarif'
 
       - name: Create diagnostic artifact when Checkov SARIF missing
         if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
@@ -135,7 +135,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: '24'
 
       - name: Install pnpm
         run: npm install -g pnpm

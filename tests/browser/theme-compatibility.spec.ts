@@ -1,11 +1,4 @@
-import {
-  test,
-  expect,
-  Page,
-  Browser,
-  BrowserContext,
-  } from '@playwright/test'
-
+import { test, expect, Page, Browser, BrowserContext } from '@playwright/test'
 
 // Test configuration for different browsers and devices
 const testConfig = {
@@ -131,7 +124,9 @@ test.describe('Theme Compatibility Tests', () => {
       })
     })
 
-    test('should handle system theme preference', async ({ browserName: _browserName }) => {
+    test('should handle system theme preference', async ({
+      browserName: _browserName,
+    }) => {
       // Mock system dark preference
       await page.addInitScript(() => {
         Object.defineProperty(window, 'matchMedia', {
@@ -212,7 +207,7 @@ test.describe('Theme Compatibility Tests', () => {
     })
 
     test('should update meta theme-color', async () => {
-      const metaThemeColor = await page.locator('meta[name="theme-color"]')
+      const metaThemeColor =  page.locator('meta[name="theme-color"]')
 
       // Test light theme
       await page.evaluate(() => {
@@ -363,16 +358,18 @@ test.describe('Theme Compatibility Tests', () => {
 
   test.describe('Performance', () => {
     test('should load theme styles efficiently', async () => {
-      const performanceEntries = await page.evaluate(() => {
-                                               return performance
-                                                 .getEntriesByType('resource')
-                                                 .filter((entry: any) => entry.name.includes('.css'))
-                                                 .map((entry: any) => ({
-                                                   name: entry.name,
-                                                   duration: entry.duration,
-                                                   size: entry.transferSize,
-                                                 }))
-                                             }).slice()
+      const performanceEntries = await page
+        .evaluate(() => {
+          return performance
+            .getEntriesByType('resource')
+            .filter((entry: any) => entry.name.includes('.css'))
+            .map((entry: any) => ({
+              name: entry.name,
+              duration: entry.duration,
+              size: entry.transferSize,
+            }))
+        })
+        .slice()
 
       // CSS files should load quickly
       for (const entry of performanceEntries) {

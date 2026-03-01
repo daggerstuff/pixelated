@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 
-/* jshint esversion: 6, node: true */
-// IMPORTANT: Import Sentry instrumentation first
-import '../instrument.mjs'
-
+import { spawnSync } from 'child_process'
 /**
  * 🌟 Pixelated Blog Web Interface 🌟
  * A simple web-based UI for blog management
  */
-
-import { spawnSync } from 'child_process'
 import http from 'http'
-
-
 import { URL } from 'url'
 import { fileURLToPath } from 'url'
+
+/* jshint esversion: 6, node: true */
+// IMPORTANT: Import Sentry instrumentation first
+import '../instrument.mjs'
 
 // Get current directory
 const __filename = fileURLToPath(import.meta.url)
@@ -212,12 +209,13 @@ function generateHTML(content = '', message = '') {
     <h1>📝 Blog Management Interface</h1>
   </header>
 
-  ${message
+  ${
+    message
       ? `<div class="message ${message.type || ''}">
     ${message.text}
   </div>`
       : ''
-    }
+  }
 
   <div class="card">
     <h2>Actions</h2>

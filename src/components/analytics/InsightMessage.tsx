@@ -48,13 +48,13 @@ export const InsightMessage: FC<InsightMessageProps> = ({ summary, trend }) => {
         padding: '10px',
         backgroundColor: getColorWithOpacity(color, 0.1), // Proper 10% opacity with rgba
       }}
-      role="alert"
-      aria-live="polite"
+      role='alert'
+      aria-live='polite'
     >
       <div
         style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}
       >
-        <span aria-hidden="true" style={{ marginRight: '8px' }}>
+        <span aria-hidden='true' style={{ marginRight: '8px' }}>
           {icon}
         </span>
         <span style={{ fontWeight: 'bold', color }}>{label}</span>

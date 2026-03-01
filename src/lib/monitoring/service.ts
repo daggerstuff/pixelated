@@ -1,5 +1,5 @@
-import type { MonitoringConfig } from './config'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import type { MonitoringConfig } from './config'
 import { getMonitoringConfig } from './config'
 
 const logger = createBuildSafeLogger('default')
@@ -172,8 +172,12 @@ export class MonitoringService {
     const metrics = {
       timestamp: Date.now(),
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
-      navigation: performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming,
-      resources: performance.getEntriesByType('resource') as PerformanceResourceTiming[],
+      navigation: performance.getEntriesByType(
+        'navigation',
+      )[0] as PerformanceNavigationTiming,
+      resources: performance.getEntriesByType(
+        'resource',
+      ) as PerformanceResourceTiming[],
     }
 
     if (window.faro) {

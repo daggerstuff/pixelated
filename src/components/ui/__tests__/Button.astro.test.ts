@@ -161,7 +161,7 @@ describe('Button.astro', () => {
     const { container } = await renderAstroComponent(
       Button,
       {
-        'id': 'custom-button',
+        id: 'custom-button',
         'aria-label': 'Custom Action',
         'data-testid': 'action-button',
       },

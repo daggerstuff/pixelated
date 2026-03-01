@@ -20,7 +20,11 @@ category: Research
 
 ## Introduction
 
-In our increasingly digital world, meaningful human connection remains one of the most powerful medicines for our mental and emotional wellbeing. Research consistently shows that strong social bonds are as crucial to our health as proper nutrition and exercise. Let's explore how friendships can be intentionally cultivated as a vital part of our wellness practice.
+In our increasingly digital world, meaningful human connection remains one of
+the most powerful medicines for our mental and emotional wellbeing. Research
+consistently shows that strong social bonds are as crucial to our health as
+proper nutrition and exercise. Let's explore how friendships can be
+intentionally cultivated as a vital part of our wellness practice.
 
 ## The Science of Social Connection
 
@@ -350,7 +354,12 @@ Starting today:
 
 ## Conclusion
 
-Friendships are not luxury items in life but essential medicine for our wellbeing. By intentionally cultivating meaningful connections, we create a powerful resource for emotional health, resilience, and joy. Remember that like any valuable practice, building and maintaining strong relationships takes time and energy—but the return on investment is immeasurable in terms of wellness and happiness.
+Friendships are not luxury items in life but essential medicine for our
+wellbeing. By intentionally cultivating meaningful connections, we create a
+powerful resource for emotional health, resilience, and joy. Remember that like
+any valuable practice, building and maintaining strong relationships takes time
+and energy—but the return on investment is immeasurable in terms of wellness and
+happiness.
 
 ## Weekly Connection Challenge
 
@@ -364,4 +373,5 @@ Boost your social wellness:
 
 ---
 
-_Next in our series, we'll explore how creative expression can be a powerful tool for mental wellness and joy._
+_Next in our series, we'll explore how creative expression can be a powerful
+tool for mental wellness and joy._

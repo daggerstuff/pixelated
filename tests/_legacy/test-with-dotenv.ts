@@ -1,36 +1,35 @@
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'
 
 // Load environment variables first
-dotenv.config();
+dotenv.config()
 
-import { auth } from "./src/lib/auth/working-pg-auth-final";
+import { auth } from './src/lib/auth/working-pg-auth-final'
 
 async function testWithDotenv() {
   try {
-    console.log("🚀 Testing With Dotenv");
+    console.log('🚀 Testing With Dotenv')
 
     // Test user creation
-    console.log("\n📝 Creating test user...");
+    console.log('\n📝 Creating test user...')
     const user = await auth.api.signUpEmail({
       body: {
-        email: "dotenvtest@example.com",
-        password: "SecurePassword123!",
-        name: "Dotenv Test User",
+        email: 'dotenvtest@example.com',
+        password: 'SecurePassword123!',
+        name: 'Dotenv Test User',
       },
-    });
+    })
 
     if (!user) {
-      throw new Error("Failed to create user");
+      throw new Error('Failed to create user')
     }
 
-    console.log("✅ User created successfully!");
-    console.log("User ID:", user.user.id);
+    console.log('✅ User created successfully!')
+    console.log('User ID:', user.user.id)
 
-    console.log("\n🎉 Dotenv test completed!");
-
+    console.log('\n🎉 Dotenv test completed!')
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error('❌ Test failed:', error)
   }
 }
 
-testWithDotenv();
+void testWithDotenv()

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import { AnalyticsCharts } from '../AnalyticsCharts'
 
 vi.mock('@/hooks/useAnalyticsDashboard', () => ({
@@ -6,12 +7,12 @@ vi.mock('@/hooks/useAnalyticsDashboard', () => ({
     data: {
       summaryStats: [],
       sessionMetrics: [],
-      skillProgress: []
+      skillProgress: [],
     },
     isLoading: false,
     error: null,
-    refetch: vi.fn()
-  }))
+    refetch: vi.fn(),
+  })),
 }))
 
 describe('AnalyticsCharts', () => {
@@ -22,7 +23,7 @@ describe('AnalyticsCharts', () => {
       json: async () => ({
         sessionMetrics: {},
         skillProgress: {},
-        summaryStats: {}
+        summaryStats: {},
       }),
     })
   })

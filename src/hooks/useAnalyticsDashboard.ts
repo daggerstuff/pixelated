@@ -6,12 +6,14 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
 import type {
   AnalyticsChartData,
   AnalyticsError,
   AnalyticsFilters,
 } from '@/types/analytics'
+
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('use-analytics-dashboard')
 
@@ -204,7 +206,7 @@ export function useAnalyticsDashboard(
       refreshIntervalRef.current = setInterval(() => {
         if (!document.hidden) {
           // Only refresh when tab is visible
-          loadData(false) // Don't show loading for background refresh
+          void loadData(false) // Don't show loading for background refresh
         }
       }, config.refreshInterval)
     }
@@ -237,7 +239,7 @@ export function useAnalyticsDashboard(
    * Load data when filters change
    */
   useEffect(() => {
-    loadData(true)
+    void loadData(true)
   }, [loadData])
 
   /**

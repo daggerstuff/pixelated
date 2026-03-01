@@ -1,9 +1,8 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { TherapySession } from '../models/ai-types'
-import type { EmotionAnalysis } from '../emotions/types'
-import { createPatternRecognitionFHEService } from '../../fhe/pattern-recognition-factory'
 import type { PatternRecognitionOps } from '../../fhe/pattern-recognition'
-
+import { createPatternRecognitionFHEService } from '../../fhe/pattern-recognition-factory'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { EmotionAnalysis } from '../emotions/types'
+import type { TherapySession } from '../models/ai-types'
 import {
   type PatternRecognitionService,
   type PatternRecognitionResult,

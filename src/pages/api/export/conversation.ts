@@ -1,9 +1,10 @@
-import type { ChatMessage } from '../../../types/chat'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { getSession } from '../../../lib/auth/session'
 import { ExportFormat, ExportService } from '../../../lib/export'
 import { fheService } from '../../../lib/fhe'
 import { EncryptionMode } from '../../../lib/fhe/types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { ChatMessage } from '../../../types/chat'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')

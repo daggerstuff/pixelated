@@ -5,10 +5,12 @@
  */
 
 import { EventEmitter } from 'node:events'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import type { AuditEvent } from './key-rotation'
-import { HIPAA_SECURITY_CONFIG } from './hipaa-config'
+
 import * as AWS from 'aws-sdk'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { HIPAA_SECURITY_CONFIG } from './hipaa-config'
+import type { AuditEvent } from './key-rotation'
 
 const logger = createBuildSafeLogger('hipaa-monitoring')
 
@@ -212,7 +214,7 @@ export class HIPAAMonitoringService extends EventEmitter {
 
     // Metrics emission
     const metricsInterval = setInterval(() => {
-      this.emitSecurityMetrics()
+      void this.emitSecurityMetrics()
     }, HIPAA_SECURITY_CONFIG.METRICS_EMISSION_INTERVAL_MS)
 
     this.monitoringIntervals.push(
@@ -536,7 +538,7 @@ export class HIPAAMonitoringService extends EventEmitter {
     this.emit('security-alert', alert)
 
     // Send to AWS SNS for immediate notification
-    this.sendAlertNotification(alert)
+    void this.sendAlertNotification(alert)
 
     logger.warn('Security threat detected', {
       patternId: pattern.id,
@@ -567,7 +569,7 @@ export class HIPAAMonitoringService extends EventEmitter {
 
     this.alerts.push(alert)
     this.emit('security-alert', alert)
-    this.sendAlertNotification(alert)
+    void this.sendAlertNotification(alert)
   }
 
   /**

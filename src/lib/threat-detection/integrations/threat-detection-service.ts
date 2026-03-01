@@ -6,20 +6,23 @@
  * threat detection across the entire application.
  */
 
-import { AdvancedResponseOrchestrator } from '../response-orchestration'
-import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
-import { RateLimitingBridge, createRateLimitingBridge } from './rate-limiting-bridge'
-import {
-  ThreatDetectionMiddleware,
-  createThreatDetectionMiddleware,
-} from './api-middleware'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
+import type { RateLimitResult } from '../../rate-limiting/types'
+import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import type {
   ThreatData,
   ThreatResponse,
   ThreatAnalysis,
 } from '../response-orchestration'
-import type { RateLimitResult } from '../../rate-limiting/types'
+import {
+  ThreatDetectionMiddleware,
+  createThreatDetectionMiddleware,
+} from './api-middleware'
+import {
+  RateLimitingBridge,
+  createRateLimitingBridge,
+} from './rate-limiting-bridge'
 import type { RateLimitIntegrationConfig } from './rate-limiting-bridge'
 
 const logger = createBuildSafeLogger('threat-detection-service')
@@ -621,8 +624,8 @@ export function createThreatDetectionService(
 
   const config = { ...defaultConfig, ...customConfig }
   return new ThreatDetectionService(
-    orchestrator as AdvancedResponseOrchestrator,
-    rateLimiter as DistributedRateLimiter,
+    orchestrator,
+    rateLimiter,
     config,
   )
 }

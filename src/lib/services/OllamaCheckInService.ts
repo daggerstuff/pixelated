@@ -1,5 +1,6 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getEnv } from '@/lib/utils/env'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('ollama-checkin')
 

@@ -1,7 +1,9 @@
 import { EventEmitter } from 'events'
-import { Redis } from 'ioredis'
+
 import axios, { AxiosInstance } from 'axios'
+import { Redis } from 'ioredis'
 import { MongoClient, type Db } from 'mongodb'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { ThreatResponse } from '../response-orchestration'
 
@@ -105,15 +107,15 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     try {
       this.mongoClient = new MongoClient(
         this.config.mongoUrl ||
-        process.env.MONGODB_URI ||
-        'mongodb://localhost:27017/threat_detection',
+          process.env.MONGODB_URI ||
+          'mongodb://localhost:27017/threat_detection',
       )
       await this.mongoClient.connect()
 
       this.redis = new Redis(
         this.config.redisUrl ||
-        process.env.REDIS_URL ||
-        'redis://localhost:6379',
+          process.env.REDIS_URL ||
+          'redis://localhost:6379',
       )
 
       // Initialize HTTP clients for each feed
@@ -213,7 +215,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           resolve(config)
         })
 
-        processQueue()
+        void processQueue()
       })
     })
   }
@@ -453,7 +455,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       // Extract basic fields
       const iocValue = String(data.value || data.ioc || data.indicator || '')
       const iocType = String(data.type || data.ioc_type || 'unknown')
-      const threatType = String(data.threat_type || data.malware_family || 'unknown')
+      const threatType = String(
+        data.threat_type || data.malware_family || 'unknown',
+      )
       const severity = this.mapSeverity(
         String(data.severity || data.confidence || 'medium'),
       )
@@ -468,13 +472,17 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       return {
         intelligenceId: `intel_${feed.name}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
         feedName: feed.name,
-        iocType: iocType as string,
-        iocValue: iocValue as string,
-        threatType: threatType as string,
+        iocType: iocType,
+        iocValue: iocValue,
+        threatType: threatType,
         severity,
         confidence,
-        firstSeen: new Date((data.first_seen || data.created || Date.now()) as any),
-        lastSeen: new Date((data.last_seen || data.updated || Date.now()) as any),
+        firstSeen: new Date(
+          (data.first_seen || data.created || Date.now()) as any,
+        ),
+        lastSeen: new Date(
+          (data.last_seen || data.updated || Date.now()) as any,
+        ),
         expirationDate: data.expiration_date
           ? new Date(data.expiration_date as string)
           : undefined,
@@ -490,16 +498,17 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           : undefined,
         attribution: data.attribution
           ? {
-            actor:
-              ((data.attribution as Record<string, unknown>)
-                .actor as string) || 'unknown',
-            campaign:
-              ((data.attribution as Record<string, unknown>)
-                .campaign as string) || 'unknown',
-            family:
-              String(((data.attribution as Record<string, unknown>)
-                .family as string) || 'unknown'),
-          }
+              actor:
+                ((data.attribution as Record<string, unknown>)
+                  .actor as string) || 'unknown',
+              campaign:
+                ((data.attribution as Record<string, unknown>)
+                  .campaign as string) || 'unknown',
+              family: String(
+                ((data.attribution as Record<string, unknown>)
+                  .family as string) || 'unknown',
+              ),
+            }
           : undefined,
       }
     } catch (error) {
@@ -861,7 +870,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         .limit(100)
         .toArray()
 
-      const sources = Array.from(new Set(intelligence.map((i) => (i as any).feedName as string)))
+      const sources = Array.from(
+        new Set(intelligence.map((i) => (i as any).feedName as string)),
+      )
 
       return {
         intelligence: intelligence as unknown as ThreatIntelligence[],
@@ -992,9 +1003,11 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           externalIntelligence: {
             findings: intelligenceFindings,
             enrichmentTimestamp: new Date(),
-            sources: Array.from(new Set(
-              intelligenceFindings.flatMap((f) => f.sources as string[]),
-            )),
+            sources: Array.from(
+              new Set(
+                intelligenceFindings.flatMap((f) => f.sources as string[]),
+              ),
+            ),
           },
         }
       }
@@ -1183,10 +1196,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       },
     ]
 
-    const results = await db
+    const results = (await db
       .collection('threat_intelligence')
       .aggregate(pipeline)
-      .toArray() as unknown as Array<{ type: string; count: number }>
+      .toArray()) as unknown as Array<{ type: string; count: number }>
 
     return results
   }
@@ -1213,10 +1226,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       },
     ]
 
-    const results = await db
+    const results = (await db
       .collection('threat_intelligence')
       .aggregate(pipeline)
-      .toArray() as unknown as Array<{ severity: string; count: number }>
+      .toArray()) as unknown as Array<{ severity: string; count: number }>
 
     const distribution: Record<string, number> = {}
     for (const result of results) {

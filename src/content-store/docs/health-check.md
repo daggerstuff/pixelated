@@ -1,29 +1,34 @@
 ---
-title: "Website Health Check Documentation"
-description: "Website Health Check Documentation documentation"
+title: 'Website Health Check Documentation'
+description: 'Website Health Check Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Website Health Check Documentation
 
-This document explains the automated health check system that monitors the Pixelated Empathy application.
+This document explains the automated health check system that monitors the
+Pixelated Empathy application.
 
 ## Overview
 
-The health check system regularly checks the main website and API endpoints to ensure they are functioning correctly. If any issues are detected, the system will create a GitHub issue to alert the team.
+The health check system regularly checks the main website and API endpoints to
+ensure they are functioning correctly. If any issues are detected, the system
+will create a GitHub issue to alert the team.
 
 ## How It Works
 
-1. A GitHub Actions workflow runs every 15 minutes (configurable in `.github/workflows/health-check.yml`)
+1. A GitHub Actions workflow runs every 15 minutes (configurable in
+   `.github/workflows/health-check.yml`)
 2. The workflow executes the `health-check.sh` script
 3. The script checks:
    - The main website endpoint (`https://app.pixelatedempathy.com`)
    - The API health endpoint (`https://app.pixelatedempathy.com/api/health`)
-4. If either check fails, a GitHub issue is created and assigned to the repository owner
+4. If either check fails, a GitHub issue is created and assigned to the
+   repository owner
 
 ## Troubleshooting Common Issues
 
@@ -43,7 +48,8 @@ This error indicates a DNS resolution problem. Possible causes:
 
 ### Exit Code 7: Failed to connect
 
-This error indicates that the host was found but a connection could not be established. Possible causes:
+This error indicates that the host was found but a connection could not be
+established. Possible causes:
 
 - The server is down
 - A firewall is blocking the connection
@@ -72,14 +78,16 @@ This error indicates that the request timed out. Possible causes:
 ### HTTP Status Errors
 
 - **404 Not Found**: The endpoint URL is incorrect or the resource doesn't exist
-- **500 Internal Server Error**: The server encountered an error processing the request
+- **500 Internal Server Error**: The server encountered an error processing the
+  request
 - **502/503/504**: Issues with the server or gateway
 
 ## Customizing the Health Check
 
 ### Changing Endpoints
 
-Edit the following environment variables in `.github/workflows/health-check.yml`:
+Edit the following environment variables in
+`.github/workflows/health-check.yml`:
 
 ```yaml
 env:
@@ -94,7 +102,7 @@ Edit the cron schedule in `.github/workflows/health-check.yml`:
 ```yaml
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Current: Every 15 minutes
+    - cron: '*/15 * * * *' # Current: Every 15 minutes
 ```
 
 Common cron schedules:
@@ -105,11 +113,13 @@ Common cron schedules:
 
 ### Adding New Checks
 
-To add a new endpoint to check, modify the `health-check.sh` script to include additional calls to the `check_endpoint` function.
+To add a new endpoint to check, modify the `health-check.sh` script to include
+additional calls to the `check_endpoint` function.
 
 ## Notification Settings
 
-Currently, the health check creates a GitHub issue when a failure is detected. To add additional notification methods:
+Currently, the health check creates a GitHub issue when a failure is detected.
+To add additional notification methods:
 
 1. Edit `.github/workflows/health-check.yml`
 2. Add steps for additional notifications under the "Notify on failure" step
@@ -121,11 +131,13 @@ Currently, the health check creates a GitHub issue when a failure is detected. T
 
 ## Monitoring Dashboard
 
-Consider setting up a monitoring dashboard that visualizes health check results over time, using tools like:
+Consider setting up a monitoring dashboard that visualizes health check results
+over time, using tools like:
 
 - Grafana
 - Datadog
 - New Relic
 - Prometheus
 
-This can help identify patterns and potential issues before they become critical.
+This can help identify patterns and potential issues before they become
+critical.
